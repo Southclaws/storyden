@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Key, SWRConfiguration } from "swr";
@@ -22,14 +24,14 @@ import type {
  */
 export const datagraphSearch = (params?: DatagraphSearchParams) => {
   return fetcher<DatagraphSearchOKResponse>({
-    url: `/v1/datagraph`,
+    url: `/datagraph`,
     method: "GET",
     params,
   });
 };
 
 export const getDatagraphSearchKey = (params?: DatagraphSearchParams) =>
-  [`/v1/datagraph`, ...(params ? [params] : [])] as const;
+  [`/datagraph`, ...(params ? [params] : [])] as const;
 
 export type DatagraphSearchQueryResult = NonNullable<
   Awaited<ReturnType<typeof datagraphSearch>>

@@ -16,9 +16,9 @@
 // and types necessary to implement the binding.
 //
 // Next, you create a file in this package named after the collection. So if you
-// added `/v1/things` you'd create `things.go` and inside that file, a struct
-// named `Things` and a constructor named `NewThings`. This pattern may not
-// always apply for certain cases but it's generally best to try to follow.
+// added `/things/{id}` you'd create `things.go` and inside that file, a struct
+// named `Things` and a constructor named `NewThings`. This pattern may not need
+// to apply for certain cases but it's generally best to try to follow for most.
 //
 // You then add your struct to the `Bindings` composed struct and provide the
 // implementation of your struct to the DI system using `bindingsProviders`.
@@ -124,8 +124,8 @@ func bindingsProviders() fx.Option {
 // changed signature due to changes to the parameters or request or response.
 //
 // This API follows RESTful design so a collection in the API specification
-// (such as `/v1/accounts`) will map to a file, struct and constructor here
-// (such as `accounts.go`, `Accounts` and `NewAccounts`) and everything is glued
+// (such as `/accounts`) will map to a file, struct and constructor here (such
+// as `accounts.go`, `Accounts` and `NewAccounts`) and everything is glued
 // together in this file.
 func bindings(s Bindings) openapi.StrictServerInterface {
 	return &s

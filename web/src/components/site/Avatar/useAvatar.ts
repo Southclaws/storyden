@@ -1,3 +1,3 @@
 export function useAvatar(handle: string) {
-  return { src: `/api/v1/accounts/${handle}/avatar` };
+  return { src: `/api/accounts/${handle}/avatar` };
 }

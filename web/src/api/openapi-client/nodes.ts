@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Arguments, Key, SWRConfiguration } from "swr";
@@ -36,7 +38,7 @@ import type {
  */
 export const nodeCreate = (nodeCreateBody: NodeCreateBody) => {
   return fetcher<NodeCreateOKResponse>({
-    url: `/v1/nodes`,
+    url: `/nodes`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: nodeCreateBody,
@@ -51,7 +53,7 @@ export const getNodeCreateMutationFetcher = () => {
     return nodeCreate(arg);
   };
 };
-export const getNodeCreateMutationKey = () => `/v1/nodes` as const;
+export const getNodeCreateMutationKey = () => `/nodes` as const;
 
 export type NodeCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof nodeCreate>>
@@ -88,15 +90,11 @@ export const useNodeCreate = <
 
  */
 export const nodeList = (params?: NodeListParams) => {
-  return fetcher<NodeListOKResponse>({
-    url: `/v1/nodes`,
-    method: "GET",
-    params,
-  });
+  return fetcher<NodeListOKResponse>({ url: `/nodes`, method: "GET", params });
 };
 
 export const getNodeListKey = (params?: NodeListParams) =>
-  [`/v1/nodes`, ...(params ? [params] : [])] as const;
+  [`/nodes`, ...(params ? [params] : [])] as const;
 
 export type NodeListQueryResult = NonNullable<
   Awaited<ReturnType<typeof nodeList>>
@@ -137,13 +135,13 @@ export const useNodeList = <
  */
 export const nodeGet = (nodeSlug: string) => {
   return fetcher<NodeGetOKResponse>({
-    url: `/v1/nodes/${nodeSlug}`,
+    url: `/nodes/${nodeSlug}`,
     method: "GET",
   });
 };
 
 export const getNodeGetKey = (nodeSlug: string) =>
-  [`/v1/nodes/${nodeSlug}`] as const;
+  [`/nodes/${nodeSlug}`] as const;
 
 export type NodeGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof nodeGet>>
@@ -193,7 +191,7 @@ export const nodeUpdate = (
   nodeUpdateBody: NodeUpdateBody,
 ) => {
   return fetcher<NodeUpdateOKResponse>({
-    url: `/v1/nodes/${nodeSlug}`,
+    url: `/nodes/${nodeSlug}`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: nodeUpdateBody,
@@ -209,7 +207,7 @@ export const getNodeUpdateMutationFetcher = (nodeSlug: string) => {
   };
 };
 export const getNodeUpdateMutationKey = (nodeSlug: string) =>
-  `/v1/nodes/${nodeSlug}` as const;
+  `/nodes/${nodeSlug}` as const;
 
 export type NodeUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof nodeUpdate>>
@@ -253,7 +251,7 @@ export const useNodeUpdate = <
  */
 export const nodeDelete = (nodeSlug: string, params?: NodeDeleteParams) => {
   return fetcher<NodeDeleteOKResponse>({
-    url: `/v1/nodes/${nodeSlug}`,
+    url: `/nodes/${nodeSlug}`,
     method: "DELETE",
     params,
   });
@@ -268,7 +266,7 @@ export const getNodeDeleteMutationFetcher = (
   };
 };
 export const getNodeDeleteMutationKey = (nodeSlug: string) =>
-  `/v1/nodes/${nodeSlug}` as const;
+  `/nodes/${nodeSlug}` as const;
 
 export type NodeDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof nodeDelete>>
@@ -319,7 +317,7 @@ export const nodeUpdateVisibility = (
   visibilityUpdateBody: VisibilityUpdateBody,
 ) => {
   return fetcher<NodeUpdateOKResponse>({
-    url: `/v1/nodes/${nodeSlug}/visibility`,
+    url: `/nodes/${nodeSlug}/visibility`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: visibilityUpdateBody,
@@ -335,7 +333,7 @@ export const getNodeUpdateVisibilityMutationFetcher = (nodeSlug: string) => {
   };
 };
 export const getNodeUpdateVisibilityMutationKey = (nodeSlug: string) =>
-  `/v1/nodes/${nodeSlug}/visibility` as const;
+  `/nodes/${nodeSlug}/visibility` as const;
 
 export type NodeUpdateVisibilityMutationResult = NonNullable<
   Awaited<ReturnType<typeof nodeUpdateVisibility>>
@@ -384,7 +382,7 @@ export const nodeAddAsset = (
   params?: NodeAddAssetParams,
 ) => {
   return fetcher<NodeUpdateOKResponse>({
-    url: `/v1/nodes/${nodeSlug}/assets/${assetId}`,
+    url: `/nodes/${nodeSlug}/assets/${assetId}`,
     method: "PUT",
     params,
   });
@@ -400,7 +398,7 @@ export const getNodeAddAssetMutationFetcher = (
   };
 };
 export const getNodeAddAssetMutationKey = (nodeSlug: string, assetId: string) =>
-  `/v1/nodes/${nodeSlug}/assets/${assetId}` as const;
+  `/nodes/${nodeSlug}/assets/${assetId}` as const;
 
 export type NodeAddAssetMutationResult = NonNullable<
   Awaited<ReturnType<typeof nodeAddAsset>>
@@ -447,7 +445,7 @@ export const useNodeAddAsset = <
  */
 export const nodeRemoveAsset = (nodeSlug: string, assetId: string) => {
   return fetcher<NodeUpdateOKResponse>({
-    url: `/v1/nodes/${nodeSlug}/assets/${assetId}`,
+    url: `/nodes/${nodeSlug}/assets/${assetId}`,
     method: "DELETE",
   });
 };
@@ -463,7 +461,7 @@ export const getNodeRemoveAssetMutationFetcher = (
 export const getNodeRemoveAssetMutationKey = (
   nodeSlug: string,
   assetId: string,
-) => `/v1/nodes/${nodeSlug}/assets/${assetId}` as const;
+) => `/nodes/${nodeSlug}/assets/${assetId}` as const;
 
 export type NodeRemoveAssetMutationResult = NonNullable<
   Awaited<ReturnType<typeof nodeRemoveAsset>>
@@ -509,7 +507,7 @@ export const useNodeRemoveAsset = <
  */
 export const nodeAddNode = (nodeSlug: string, nodeSlugChild: string) => {
   return fetcher<NodeAddChildOKResponse>({
-    url: `/v1/nodes/${nodeSlug}/nodes/${nodeSlugChild}`,
+    url: `/nodes/${nodeSlug}/nodes/${nodeSlugChild}`,
     method: "PUT",
   });
 };
@@ -528,7 +526,7 @@ export const getNodeAddNodeMutationFetcher = (
 export const getNodeAddNodeMutationKey = (
   nodeSlug: string,
   nodeSlugChild: string,
-) => `/v1/nodes/${nodeSlug}/nodes/${nodeSlugChild}` as const;
+) => `/nodes/${nodeSlug}/nodes/${nodeSlugChild}` as const;
 
 export type NodeAddNodeMutationResult = NonNullable<
   Awaited<ReturnType<typeof nodeAddNode>>
@@ -575,7 +573,7 @@ export const useNodeAddNode = <
  */
 export const nodeRemoveNode = (nodeSlug: string, nodeSlugChild: string) => {
   return fetcher<NodeRemoveChildOKResponse>({
-    url: `/v1/nodes/${nodeSlug}/nodes/${nodeSlugChild}`,
+    url: `/nodes/${nodeSlug}/nodes/${nodeSlugChild}`,
     method: "DELETE",
   });
 };
@@ -594,7 +592,7 @@ export const getNodeRemoveNodeMutationFetcher = (
 export const getNodeRemoveNodeMutationKey = (
   nodeSlug: string,
   nodeSlugChild: string,
-) => `/v1/nodes/${nodeSlug}/nodes/${nodeSlugChild}` as const;
+) => `/nodes/${nodeSlug}/nodes/${nodeSlugChild}` as const;
 
 export type NodeRemoveNodeMutationResult = NonNullable<
   Awaited<ReturnType<typeof nodeRemoveNode>>

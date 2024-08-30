@@ -4,6 +4,9 @@ import { PropsWithChildren } from "react";
 import { getColourAsHex } from "src/utils/colour";
 import { getInfo } from "src/utils/info";
 
+import { WEB_ADDRESS } from "@/config";
+import { getIconURL } from "@/utils/icon";
+
 import "./global.css";
 
 import { Providers } from "./providers";
@@ -42,10 +45,9 @@ export async function generateViewport(): Promise<Viewport> {
 export async function generateMetadata(): Promise<Metadata> {
   const info = await getInfo();
 
-  const iconURL = `/api/v1/info/icon/512x512`;
+  const iconURL = getIconURL("512x512");
 
-  const canonical =
-    process.env["NEXT_PUBLIC_WEB_ADDRESS"] ?? "http://localhost:3000";
+  const canonical = WEB_ADDRESS;
 
   // TODO: Add another settings field for this.
   const title = `${info.title} | ${info.description}`;

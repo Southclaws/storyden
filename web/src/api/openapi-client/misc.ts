@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Key, SWRConfiguration } from "swr";
@@ -112,10 +114,10 @@ export const useGetSpec = <TError = InternalServerErrorResponse>(options?: {
 
  */
 export const getInfo = () => {
-  return fetcher<GetInfoOKResponse>({ url: `/v1/info`, method: "GET" });
+  return fetcher<GetInfoOKResponse>({ url: `/info`, method: "GET" });
 };
 
-export const getGetInfoKey = () => [`/v1/info`] as const;
+export const getGetInfoKey = () => [`/info`] as const;
 
 export type GetInfoQueryResult = NonNullable<
   Awaited<ReturnType<typeof getInfo>>
@@ -153,14 +155,14 @@ export const iconGet = (
   iconSize: "512x512" | "32x32" | "180x180" | "120x120" | "167x167" | "152x152",
 ) => {
   return fetcher<AssetGetOKResponse>({
-    url: `/v1/info/icon/${iconSize}`,
+    url: `/info/icon/${iconSize}`,
     method: "GET",
   });
 };
 
 export const getIconGetKey = (
   iconSize: "512x512" | "32x32" | "180x180" | "120x120" | "167x167" | "152x152",
-) => [`/v1/info/icon/${iconSize}`] as const;
+) => [`/info/icon/${iconSize}`] as const;
 
 export type IconGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof iconGet>>
@@ -199,7 +201,7 @@ export const useIconGet = <TError = InternalServerErrorResponse>(
  */
 export const iconUpload = (assetUploadBody: AssetUploadBody) => {
   return fetcher<void>({
-    url: `/v1/info/icon`,
+    url: `/info/icon`,
     method: "POST",
     headers: { "Content-Type": "application/octet-stream" },
     data: assetUploadBody,
@@ -211,7 +213,7 @@ export const getIconUploadMutationFetcher = () => {
     return iconUpload(arg);
   };
 };
-export const getIconUploadMutationKey = () => `/v1/info/icon` as const;
+export const getIconUploadMutationKey = () => `/info/icon` as const;
 
 export type IconUploadMutationResult = NonNullable<
   Awaited<ReturnType<typeof iconUpload>>

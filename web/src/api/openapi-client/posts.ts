@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Arguments, Key, SWRConfiguration } from "swr";
@@ -28,7 +30,7 @@ import type {
  */
 export const postUpdate = (postId: string, postUpdateBody: PostUpdateBody) => {
   return fetcher<PostUpdateOKResponse>({
-    url: `/v1/posts/${postId}`,
+    url: `/posts/${postId}`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: postUpdateBody,
@@ -44,7 +46,7 @@ export const getPostUpdateMutationFetcher = (postId: string) => {
   };
 };
 export const getPostUpdateMutationKey = (postId: string) =>
-  `/v1/posts/${postId}` as const;
+  `/posts/${postId}` as const;
 
 export type PostUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof postUpdate>>
@@ -87,7 +89,7 @@ export const usePostUpdate = <
  * Archive a post using soft-delete.
  */
 export const postDelete = (postId: string) => {
-  return fetcher<void>({ url: `/v1/posts/${postId}`, method: "DELETE" });
+  return fetcher<void>({ url: `/posts/${postId}`, method: "DELETE" });
 };
 
 export const getPostDeleteMutationFetcher = (postId: string) => {
@@ -96,7 +98,7 @@ export const getPostDeleteMutationFetcher = (postId: string) => {
   };
 };
 export const getPostDeleteMutationKey = (postId: string) =>
-  `/v1/posts/${postId}` as const;
+  `/posts/${postId}` as const;
 
 export type PostDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof postDelete>>
@@ -140,14 +142,14 @@ export const usePostDelete = <
  */
 export const postSearch = (params?: PostSearchParams) => {
   return fetcher<PostSearchOKResponse>({
-    url: `/v1/posts/search`,
+    url: `/posts/search`,
     method: "GET",
     params,
   });
 };
 
 export const getPostSearchKey = (params?: PostSearchParams) =>
-  [`/v1/posts/search`, ...(params ? [params] : [])] as const;
+  [`/posts/search`, ...(params ? [params] : [])] as const;
 
 export type PostSearchQueryResult = NonNullable<
   Awaited<ReturnType<typeof postSearch>>
@@ -197,7 +199,7 @@ export const postReactAdd = (
   postReactAddBody: PostReactAddBody,
 ) => {
   return fetcher<PostReactAddOKResponse>({
-    url: `/v1/posts/${postId}/reacts`,
+    url: `/posts/${postId}/reacts`,
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     data: postReactAddBody,
@@ -213,7 +215,7 @@ export const getPostReactAddMutationFetcher = (postId: string) => {
   };
 };
 export const getPostReactAddMutationKey = (postId: string) =>
-  `/v1/posts/${postId}/reacts` as const;
+  `/posts/${postId}/reacts` as const;
 
 export type PostReactAddMutationResult = NonNullable<
   Awaited<ReturnType<typeof postReactAdd>>

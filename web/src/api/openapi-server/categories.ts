@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import type {
   CategoryCreateBody,
@@ -24,7 +26,7 @@ export type categoryCreateResponse = {
 };
 
 export const getCategoryCreateUrl = () => {
-  return `/v1/categories`;
+  return `/categories`;
 };
 
 export const categoryCreate = async (
@@ -47,7 +49,7 @@ export type categoryListResponse = {
 };
 
 export const getCategoryListUrl = () => {
-  return `/v1/categories`;
+  return `/categories`;
 };
 
 export const categoryList = async (
@@ -68,7 +70,7 @@ export type categoryUpdateOrderResponse = {
 };
 
 export const getCategoryUpdateOrderUrl = () => {
-  return `/v1/categories`;
+  return `/categories`;
 };
 
 export const categoryUpdateOrder = async (
@@ -94,7 +96,7 @@ export type categoryUpdateResponse = {
 };
 
 export const getCategoryUpdateUrl = (categoryId: string) => {
-  return `/v1/categories/${categoryId}`;
+  return `/categories/${categoryId}`;
 };
 
 export const categoryUpdate = async (

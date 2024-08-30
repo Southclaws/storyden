@@ -9,6 +9,8 @@ import { getGetInfoKey, iconUpload } from "src/api/openapi-client/misc";
 import { Info } from "src/api/openapi-schema";
 import { getColourVariants } from "src/utils/colour";
 
+import { getIconURL } from "@/utils/icon";
+
 export type Props = Info;
 
 export const FormSchema = z.object({
@@ -32,7 +34,7 @@ export function useBrandSettings(props: Props) {
 
   useEffect(() => {
     (async () => {
-      const icon = await fetch(`/api/v1/info/icon/512x512`);
+      const icon = await fetch(getIconURL("512x512"));
 
       const blob = await icon.blob();
 

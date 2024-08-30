@@ -7,7 +7,7 @@ import { threadList } from "@/api/openapi-server/threads";
 export default async function Page() {
   try {
     // NOTE: This is very unoptimised but GSD. Long term we want an actual API
-    // for feeds at /v1/feed which delivers a list of DatagraphNodeReference
+    // for feeds at /feed which delivers a list of DatagraphNodeReference
     // objects of all kinds based on a set of heuristics such as what's hot,
     // what's relevant to the account (if any) and what's been featured.
 

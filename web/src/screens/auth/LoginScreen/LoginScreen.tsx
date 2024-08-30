@@ -1,12 +1,13 @@
 import Image from "next/image";
 
-import { AuthSelection } from "../components/AuthSelection/AuthSelection";
-import { getProviders } from "../providers";
-
 import { LinkButton } from "@/components/ui/link-button";
 import { css } from "@/styled-system/css";
 import { VStack, styled } from "@/styled-system/jsx";
+import { getIconURL } from "@/utils/icon";
 import { getInfo } from "@/utils/info";
+
+import { AuthSelection } from "../components/AuthSelection/AuthSelection";
+import { getProviders } from "../providers";
 
 import { LoginForm } from "./LoginForm";
 
@@ -25,7 +26,7 @@ export async function LoginScreen() {
       <VStack>
         <Image
           className={css({ width: "28" })}
-          src="/api/v1/info/icon/512x512"
+          src={getIconURL("512x512")}
           width="512"
           height="512"
           alt={`The ${info.title} logo`}

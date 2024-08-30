@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import type {
   AccountAuthProviderListOKResponse,
@@ -28,7 +30,7 @@ export type adminAccountBanCreateResponse = {
 };
 
 export const getAdminAccountBanCreateUrl = (accountHandle: string) => {
-  return `/v1/admin/bans/${accountHandle}`;
+  return `/admin/bans/${accountHandle}`;
 };
 
 export const adminAccountBanCreate = async (
@@ -53,7 +55,7 @@ export type adminAccountBanRemoveResponse = {
 };
 
 export const getAdminAccountBanRemoveUrl = (accountHandle: string) => {
-  return `/v1/admin/bans/${accountHandle}`;
+  return `/admin/bans/${accountHandle}`;
 };
 
 export const adminAccountBanRemove = async (
@@ -78,7 +80,7 @@ export type accountGetResponse = {
 };
 
 export const getAccountGetUrl = () => {
-  return `/v1/accounts`;
+  return `/accounts`;
 };
 
 export const accountGet = async (
@@ -99,7 +101,7 @@ export type accountUpdateResponse = {
 };
 
 export const getAccountUpdateUrl = () => {
-  return `/v1/accounts`;
+  return `/accounts`;
 };
 
 export const accountUpdate = async (
@@ -124,7 +126,7 @@ export type accountAuthProviderListResponse = {
 };
 
 export const getAccountAuthProviderListUrl = () => {
-  return `/v1/accounts/self/auth-methods`;
+  return `/accounts/self/auth-methods`;
 };
 
 export const accountAuthProviderList = async (
@@ -150,7 +152,7 @@ export type accountAuthMethodDeleteResponse = {
 };
 
 export const getAccountAuthMethodDeleteUrl = (authMethodId: string) => {
-  return `/v1/accounts/self/auth-methods/${authMethodId}`;
+  return `/accounts/self/auth-methods/${authMethodId}`;
 };
 
 export const accountAuthMethodDelete = async (
@@ -175,7 +177,7 @@ export type accountSetAvatarResponse = {
 };
 
 export const getAccountSetAvatarUrl = () => {
-  return `/v1/accounts/self/avatar`;
+  return `/accounts/self/avatar`;
 };
 
 export const accountSetAvatar = async (
@@ -198,7 +200,7 @@ export type accountGetAvatarResponse = {
 };
 
 export const getAccountGetAvatarUrl = (accountHandle: string) => {
-  return `/v1/accounts/${accountHandle}/avatar`;
+  return `/accounts/${accountHandle}/avatar`;
 };
 
 export const accountGetAvatar = async (

@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import type {
   AuthEmailBody,
@@ -36,7 +38,7 @@ export type authProviderListResponse = {
 };
 
 export const getAuthProviderListUrl = () => {
-  return `/v1/auth`;
+  return `/auth`;
 };
 
 export const authProviderList = async (
@@ -57,7 +59,7 @@ export type authPasswordSignupResponse = {
 };
 
 export const getAuthPasswordSignupUrl = () => {
-  return `/v1/auth/password/signup`;
+  return `/auth/password/signup`;
 };
 
 export const authPasswordSignup = async (
@@ -83,7 +85,7 @@ export type authPasswordSigninResponse = {
 };
 
 export const getAuthPasswordSigninUrl = () => {
-  return `/v1/auth/password/signin`;
+  return `/auth/password/signin`;
 };
 
 export const authPasswordSignin = async (
@@ -111,7 +113,7 @@ export type authPasswordCreateResponse = {
 };
 
 export const getAuthPasswordCreateUrl = () => {
-  return `/v1/auth/password`;
+  return `/auth/password`;
 };
 
 export const authPasswordCreate = async (
@@ -139,7 +141,7 @@ export type authPasswordUpdateResponse = {
 };
 
 export const getAuthPasswordUpdateUrl = () => {
-  return `/v1/auth/password`;
+  return `/auth/password`;
 };
 
 export const authPasswordUpdate = async (
@@ -165,7 +167,7 @@ export type authEmailPasswordSignupResponse = {
 };
 
 export const getAuthEmailPasswordSignupUrl = () => {
-  return `/v1/auth/email-password/signup`;
+  return `/auth/email-password/signup`;
 };
 
 export const authEmailPasswordSignup = async (
@@ -191,7 +193,7 @@ export type authEmailPasswordSigninResponse = {
 };
 
 export const getAuthEmailPasswordSigninUrl = () => {
-  return `/v1/auth/email-password/signin`;
+  return `/auth/email-password/signin`;
 };
 
 export const authEmailPasswordSignin = async (
@@ -236,7 +238,7 @@ export type authEmailSignupResponse = {
 };
 
 export const getAuthEmailSignupUrl = () => {
-  return `/v1/auth/email/signup`;
+  return `/auth/email/signup`;
 };
 
 export const authEmailSignup = async (
@@ -263,7 +265,7 @@ export type authEmailSigninResponse = {
 };
 
 export const getAuthEmailSigninUrl = () => {
-  return `/v1/auth/email/signin`;
+  return `/auth/email/signin`;
 };
 
 export const authEmailSignin = async (
@@ -288,7 +290,7 @@ export type authEmailVerifyResponse = {
 };
 
 export const getAuthEmailVerifyUrl = () => {
-  return `/v1/auth/email/verify`;
+  return `/auth/email/verify`;
 };
 
 export const authEmailVerify = async (
@@ -311,7 +313,7 @@ export type oAuthProviderCallbackResponse = {
 };
 
 export const getOAuthProviderCallbackUrl = (oauthProvider: string) => {
-  return `/v1/auth/oauth/${oauthProvider}/callback`;
+  return `/auth/oauth/${oauthProvider}/callback`;
 };
 
 export const oAuthProviderCallback = async (
@@ -339,7 +341,7 @@ export type webAuthnRequestCredentialResponse = {
 };
 
 export const getWebAuthnRequestCredentialUrl = (accountHandle: string) => {
-  return `/v1/auth/webauthn/make/${accountHandle}`;
+  return `/auth/webauthn/make/${accountHandle}`;
 };
 
 export const webAuthnRequestCredential = async (
@@ -364,7 +366,7 @@ export type webAuthnMakeCredentialResponse = {
 };
 
 export const getWebAuthnMakeCredentialUrl = () => {
-  return `/v1/auth/webauthn/make`;
+  return `/auth/webauthn/make`;
 };
 
 export const webAuthnMakeCredential = async (
@@ -390,7 +392,7 @@ export type webAuthnGetAssertionResponse = {
 };
 
 export const getWebAuthnGetAssertionUrl = (accountHandle: string) => {
-  return `/v1/auth/webauthn/assert/${accountHandle}`;
+  return `/auth/webauthn/assert/${accountHandle}`;
 };
 
 export const webAuthnGetAssertion = async (
@@ -415,7 +417,7 @@ export type webAuthnMakeAssertionResponse = {
 };
 
 export const getWebAuthnMakeAssertionUrl = () => {
-  return `/v1/auth/webauthn/assert`;
+  return `/auth/webauthn/assert`;
 };
 
 export const webAuthnMakeAssertion = async (
@@ -444,7 +446,7 @@ export type phoneRequestCodeResponse = {
 };
 
 export const getPhoneRequestCodeUrl = () => {
-  return `/v1/auth/phone`;
+  return `/auth/phone`;
 };
 
 export const phoneRequestCode = async (
@@ -469,7 +471,7 @@ export type phoneSubmitCodeResponse = {
 };
 
 export const getPhoneSubmitCodeUrl = (accountHandle: string) => {
-  return `/v1/auth/phone/${accountHandle}`;
+  return `/auth/phone/${accountHandle}`;
 };
 
 export const phoneSubmitCode = async (
@@ -496,7 +498,7 @@ export type authProviderLogoutResponse = {
 };
 
 export const getAuthProviderLogoutUrl = () => {
-  return `/v1/auth/logout`;
+  return `/auth/logout`;
 };
 
 export const authProviderLogout = async (

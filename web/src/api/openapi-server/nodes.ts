@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import type {
   NodeAddAssetParams,
@@ -32,7 +34,7 @@ export type nodeCreateResponse = {
 };
 
 export const getNodeCreateUrl = () => {
-  return `/v1/nodes`;
+  return `/nodes`;
 };
 
 export const nodeCreate = async (
@@ -66,7 +68,7 @@ export const getNodeListUrl = (params?: NodeListParams) => {
     }
   });
 
-  return `/v1/nodes?${normalizedParams.toString()}`;
+  return `/nodes?${normalizedParams.toString()}`;
 };
 
 export const nodeList = async (
@@ -88,7 +90,7 @@ export type nodeGetResponse = {
 };
 
 export const getNodeGetUrl = (nodeSlug: string) => {
-  return `/v1/nodes/${nodeSlug}`;
+  return `/nodes/${nodeSlug}`;
 };
 
 export const nodeGet = async (
@@ -110,7 +112,7 @@ export type nodeUpdateResponse = {
 };
 
 export const getNodeUpdateUrl = (nodeSlug: string) => {
-  return `/v1/nodes/${nodeSlug}`;
+  return `/nodes/${nodeSlug}`;
 };
 
 export const nodeUpdate = async (
@@ -147,7 +149,7 @@ export const getNodeDeleteUrl = (
     }
   });
 
-  return `/v1/nodes/${nodeSlug}?${normalizedParams.toString()}`;
+  return `/nodes/${nodeSlug}?${normalizedParams.toString()}`;
 };
 
 export const nodeDelete = async (
@@ -176,7 +178,7 @@ export type nodeUpdateVisibilityResponse = {
 };
 
 export const getNodeUpdateVisibilityUrl = (nodeSlug: string) => {
-  return `/v1/nodes/${nodeSlug}/visibility`;
+  return `/nodes/${nodeSlug}/visibility`;
 };
 
 export const nodeUpdateVisibility = async (
@@ -217,7 +219,7 @@ export const getNodeAddAssetUrl = (
     }
   });
 
-  return `/v1/nodes/${nodeSlug}/assets/${assetId}?${normalizedParams.toString()}`;
+  return `/nodes/${nodeSlug}/assets/${assetId}?${normalizedParams.toString()}`;
 };
 
 export const nodeAddAsset = async (
@@ -244,7 +246,7 @@ export type nodeRemoveAssetResponse = {
 };
 
 export const getNodeRemoveAssetUrl = (nodeSlug: string, assetId: string) => {
-  return `/v1/nodes/${nodeSlug}/assets/${assetId}`;
+  return `/nodes/${nodeSlug}/assets/${assetId}`;
 };
 
 export const nodeRemoveAsset = async (
@@ -270,7 +272,7 @@ export type nodeAddNodeResponse = {
 };
 
 export const getNodeAddNodeUrl = (nodeSlug: string, nodeSlugChild: string) => {
-  return `/v1/nodes/${nodeSlug}/nodes/${nodeSlugChild}`;
+  return `/nodes/${nodeSlug}/nodes/${nodeSlugChild}`;
 };
 
 export const nodeAddNode = async (
@@ -300,7 +302,7 @@ export const getNodeRemoveNodeUrl = (
   nodeSlug: string,
   nodeSlugChild: string,
 ) => {
-  return `/v1/nodes/${nodeSlug}/nodes/${nodeSlugChild}`;
+  return `/nodes/${nodeSlug}/nodes/${nodeSlugChild}`;
 };
 
 export const nodeRemoveNode = async (

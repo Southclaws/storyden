@@ -2502,9 +2502,6 @@ func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// GetSpec request
-	GetSpec(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// AccountGet request
 	AccountGet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -2732,6 +2729,9 @@ type ClientInterface interface {
 
 	NodeUpdateVisibility(ctx context.Context, nodeSlug NodeSlugParam, body NodeUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// GetSpec request
+	GetSpec(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// PostSearch request
 	PostSearch(ctx context.Context, params *PostSearchParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -2780,18 +2780,6 @@ type ClientInterface interface {
 
 	// GetVersion request
 	GetVersion(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
-}
-
-func (c *Client) GetSpec(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetSpecRequest(c.Server)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
 }
 
 func (c *Client) AccountGet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -3802,6 +3790,18 @@ func (c *Client) NodeUpdateVisibility(ctx context.Context, nodeSlug NodeSlugPara
 	return c.Client.Do(req)
 }
 
+func (c *Client) GetSpec(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetSpecRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) PostSearch(ctx context.Context, params *PostSearchParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostSearchRequest(c.Server, params)
 	if err != nil {
@@ -4018,33 +4018,6 @@ func (c *Client) GetVersion(ctx context.Context, reqEditors ...RequestEditorFn) 
 	return c.Client.Do(req)
 }
 
-// NewGetSpecRequest generates requests for GetSpec
-func NewGetSpecRequest(server string) (*http.Request, error) {
-	var err error
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/openapi.json")
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
 // NewAccountGetRequest generates requests for AccountGet
 func NewAccountGetRequest(server string) (*http.Request, error) {
 	var err error
@@ -4054,7 +4027,7 @@ func NewAccountGetRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/accounts")
+	operationPath := fmt.Sprintf("/accounts")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4092,7 +4065,7 @@ func NewAccountUpdateRequestWithBody(server string, contentType string, body io.
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/accounts")
+	operationPath := fmt.Sprintf("/accounts")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4121,7 +4094,7 @@ func NewAccountAuthProviderListRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/accounts/self/auth-methods")
+	operationPath := fmt.Sprintf("/accounts/self/auth-methods")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4155,7 +4128,7 @@ func NewAccountAuthMethodDeleteRequest(server string, authMethodId string) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/accounts/self/auth-methods/%s", pathParam0)
+	operationPath := fmt.Sprintf("/accounts/self/auth-methods/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4182,7 +4155,7 @@ func NewAccountSetAvatarRequestWithBody(server string, params *AccountSetAvatarP
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/accounts/self/avatar")
+	operationPath := fmt.Sprintf("/accounts/self/avatar")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4231,7 +4204,7 @@ func NewAccountGetAvatarRequest(server string, accountHandle AccountHandleParam)
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/accounts/%s/avatar", pathParam0)
+	operationPath := fmt.Sprintf("/accounts/%s/avatar", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4269,7 +4242,7 @@ func NewAdminSettingsUpdateRequestWithBody(server string, contentType string, bo
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/admin")
+	operationPath := fmt.Sprintf("/admin")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4305,7 +4278,7 @@ func NewAdminAccountBanRemoveRequest(server string, accountHandle AccountHandleP
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/admin/bans/%s", pathParam0)
+	operationPath := fmt.Sprintf("/admin/bans/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4339,7 +4312,7 @@ func NewAdminAccountBanCreateRequest(server string, accountHandle AccountHandleP
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/admin/bans/%s", pathParam0)
+	operationPath := fmt.Sprintf("/admin/bans/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4366,7 +4339,7 @@ func NewAssetUploadRequestWithBody(server string, params *AssetUploadParams, con
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/assets")
+	operationPath := fmt.Sprintf("/assets")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4469,7 +4442,7 @@ func NewAssetGetRequest(server string, assetFilename AssetPathParam) (*http.Requ
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/assets/%s", pathParam0)
+	operationPath := fmt.Sprintf("/assets/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4496,7 +4469,7 @@ func NewAuthProviderListRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth")
+	operationPath := fmt.Sprintf("/auth")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4534,7 +4507,7 @@ func NewAuthEmailPasswordSigninRequestWithBody(server string, contentType string
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/email-password/signin")
+	operationPath := fmt.Sprintf("/auth/email-password/signin")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4574,7 +4547,7 @@ func NewAuthEmailPasswordSignupRequestWithBody(server string, contentType string
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/email-password/signup")
+	operationPath := fmt.Sprintf("/auth/email-password/signup")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4614,7 +4587,7 @@ func NewAuthEmailSigninRequestWithBody(server string, contentType string, body i
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/email/signin")
+	operationPath := fmt.Sprintf("/auth/email/signin")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4654,7 +4627,7 @@ func NewAuthEmailSignupRequestWithBody(server string, contentType string, body i
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/email/signup")
+	operationPath := fmt.Sprintf("/auth/email/signup")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4694,7 +4667,7 @@ func NewAuthEmailVerifyRequestWithBody(server string, contentType string, body i
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/email/verify")
+	operationPath := fmt.Sprintf("/auth/email/verify")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4723,7 +4696,7 @@ func NewAuthProviderLogoutRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/logout")
+	operationPath := fmt.Sprintf("/auth/logout")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4768,7 +4741,7 @@ func NewOAuthProviderCallbackRequestWithBody(server string, oauthProvider OAuthP
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/oauth/%s/callback", pathParam0)
+	operationPath := fmt.Sprintf("/auth/oauth/%s/callback", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4808,7 +4781,7 @@ func NewAuthPasswordUpdateRequestWithBody(server string, contentType string, bod
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/password")
+	operationPath := fmt.Sprintf("/auth/password")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4848,7 +4821,7 @@ func NewAuthPasswordCreateRequestWithBody(server string, contentType string, bod
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/password")
+	operationPath := fmt.Sprintf("/auth/password")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4888,7 +4861,7 @@ func NewAuthPasswordSigninRequestWithBody(server string, contentType string, bod
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/password/signin")
+	operationPath := fmt.Sprintf("/auth/password/signin")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4928,7 +4901,7 @@ func NewAuthPasswordSignupRequestWithBody(server string, contentType string, bod
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/password/signup")
+	operationPath := fmt.Sprintf("/auth/password/signup")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -4968,7 +4941,7 @@ func NewPhoneRequestCodeRequestWithBody(server string, contentType string, body 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/phone")
+	operationPath := fmt.Sprintf("/auth/phone")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5015,7 +4988,7 @@ func NewPhoneSubmitCodeRequestWithBody(server string, accountHandle AccountHandl
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/phone/%s", pathParam0)
+	operationPath := fmt.Sprintf("/auth/phone/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5055,7 +5028,7 @@ func NewWebAuthnMakeAssertionRequestWithBody(server string, contentType string, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/webauthn/assert")
+	operationPath := fmt.Sprintf("/auth/webauthn/assert")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5091,7 +5064,7 @@ func NewWebAuthnGetAssertionRequest(server string, accountHandle AccountHandlePa
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/webauthn/assert/%s", pathParam0)
+	operationPath := fmt.Sprintf("/auth/webauthn/assert/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5129,7 +5102,7 @@ func NewWebAuthnMakeCredentialRequestWithBody(server string, contentType string,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/webauthn/make")
+	operationPath := fmt.Sprintf("/auth/webauthn/make")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5165,7 +5138,7 @@ func NewWebAuthnRequestCredentialRequest(server string, accountHandle AccountHan
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/auth/webauthn/make/%s", pathParam0)
+	operationPath := fmt.Sprintf("/auth/webauthn/make/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5192,7 +5165,7 @@ func NewCategoryListRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/categories")
+	operationPath := fmt.Sprintf("/categories")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5230,7 +5203,7 @@ func NewCategoryUpdateOrderRequestWithBody(server string, contentType string, bo
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/categories")
+	operationPath := fmt.Sprintf("/categories")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5270,7 +5243,7 @@ func NewCategoryCreateRequestWithBody(server string, contentType string, body io
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/categories")
+	operationPath := fmt.Sprintf("/categories")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5317,7 +5290,7 @@ func NewCategoryUpdateRequestWithBody(server string, categoryId CategoryIDParam,
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/categories/%s", pathParam0)
+	operationPath := fmt.Sprintf("/categories/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5346,7 +5319,7 @@ func NewCollectionListRequest(server string, params *CollectionListParams) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/collections")
+	operationPath := fmt.Sprintf("/collections")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5406,7 +5379,7 @@ func NewCollectionCreateRequestWithBody(server string, contentType string, body 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/collections")
+	operationPath := fmt.Sprintf("/collections")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5442,7 +5415,7 @@ func NewCollectionDeleteRequest(server string, collectionId CollectionIDParam) (
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/collections/%s", pathParam0)
+	operationPath := fmt.Sprintf("/collections/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5476,7 +5449,7 @@ func NewCollectionGetRequest(server string, collectionId CollectionIDParam) (*ht
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/collections/%s", pathParam0)
+	operationPath := fmt.Sprintf("/collections/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5521,7 +5494,7 @@ func NewCollectionUpdateRequestWithBody(server string, collectionId CollectionID
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/collections/%s", pathParam0)
+	operationPath := fmt.Sprintf("/collections/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5564,7 +5537,7 @@ func NewCollectionRemoveNodeRequest(server string, collectionId CollectionIDPara
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/collections/%s/nodes/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/collections/%s/nodes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5605,7 +5578,7 @@ func NewCollectionAddNodeRequest(server string, collectionId CollectionIDParam, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/collections/%s/nodes/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/collections/%s/nodes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5646,7 +5619,7 @@ func NewCollectionRemovePostRequest(server string, collectionId CollectionIDPara
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/collections/%s/posts/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/collections/%s/posts/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5687,7 +5660,7 @@ func NewCollectionAddPostRequest(server string, collectionId CollectionIDParam, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/collections/%s/posts/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/collections/%s/posts/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5714,7 +5687,7 @@ func NewDatagraphSearchRequest(server string, params *DatagraphSearchParams) (*h
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/datagraph")
+	operationPath := fmt.Sprintf("/datagraph")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5779,7 +5752,7 @@ func NewGetInfoRequest(server string) (*http.Request, error) {
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/info")
+	operationPath := fmt.Sprintf("/info")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5806,7 +5779,7 @@ func NewIconUploadRequestWithBody(server string, params *IconUploadParams, conte
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/info/icon")
+	operationPath := fmt.Sprintf("/info/icon")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5855,7 +5828,7 @@ func NewIconGetRequest(server string, iconSize IconGetParamsIconSize) (*http.Req
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/info/icon/%s", pathParam0)
+	operationPath := fmt.Sprintf("/info/icon/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5882,7 +5855,7 @@ func NewLinkListRequest(server string, params *LinkListParams) (*http.Request, e
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/links")
+	operationPath := fmt.Sprintf("/links")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5958,7 +5931,7 @@ func NewLinkCreateRequestWithBody(server string, contentType string, body io.Rea
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/links")
+	operationPath := fmt.Sprintf("/links")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -5994,7 +5967,7 @@ func NewLinkGetRequest(server string, linkSlug LinkSlugParam) (*http.Request, er
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/links/%s", pathParam0)
+	operationPath := fmt.Sprintf("/links/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6021,7 +5994,7 @@ func NewNodeListRequest(server string, params *NodeListParams) (*http.Request, e
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/nodes")
+	operationPath := fmt.Sprintf("/nodes")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6161,7 +6134,7 @@ func NewNodeCreateRequestWithBody(server string, contentType string, body io.Rea
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/nodes")
+	operationPath := fmt.Sprintf("/nodes")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6197,7 +6170,7 @@ func NewNodeDeleteRequest(server string, nodeSlug NodeSlugParam, params *NodeDel
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/nodes/%s", pathParam0)
+	operationPath := fmt.Sprintf("/nodes/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6253,7 +6226,7 @@ func NewNodeGetRequest(server string, nodeSlug NodeSlugParam) (*http.Request, er
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/nodes/%s", pathParam0)
+	operationPath := fmt.Sprintf("/nodes/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6298,7 +6271,7 @@ func NewNodeUpdateRequestWithBody(server string, nodeSlug NodeSlugParam, content
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/nodes/%s", pathParam0)
+	operationPath := fmt.Sprintf("/nodes/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6341,7 +6314,7 @@ func NewNodeRemoveAssetRequest(server string, nodeSlug NodeSlugParam, assetId As
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/nodes/%s/assets/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/nodes/%s/assets/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6382,7 +6355,7 @@ func NewNodeAddAssetRequest(server string, nodeSlug NodeSlugParam, assetId Asset
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/nodes/%s/assets/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/nodes/%s/assets/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6461,7 +6434,7 @@ func NewNodeRemoveNodeRequest(server string, nodeSlug NodeSlugParam, nodeSlugChi
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/nodes/%s/nodes/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/nodes/%s/nodes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6502,7 +6475,7 @@ func NewNodeAddNodeRequest(server string, nodeSlug NodeSlugParam, nodeSlugChild 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/nodes/%s/nodes/%s", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/nodes/%s/nodes/%s", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6547,7 +6520,7 @@ func NewNodeUpdateVisibilityRequestWithBody(server string, nodeSlug NodeSlugPara
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/nodes/%s/visibility", pathParam0)
+	operationPath := fmt.Sprintf("/nodes/%s/visibility", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6567,6 +6540,33 @@ func NewNodeUpdateVisibilityRequestWithBody(server string, nodeSlug NodeSlugPara
 	return req, nil
 }
 
+// NewGetSpecRequest generates requests for GetSpec
+func NewGetSpecRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/openapi.json")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewPostSearchRequest generates requests for PostSearch
 func NewPostSearchRequest(server string, params *PostSearchParams) (*http.Request, error) {
 	var err error
@@ -6576,7 +6576,7 @@ func NewPostSearchRequest(server string, params *PostSearchParams) (*http.Reques
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/posts/search")
+	operationPath := fmt.Sprintf("/posts/search")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6664,7 +6664,7 @@ func NewPostDeleteRequest(server string, postId PostIDParam) (*http.Request, err
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/posts/%s", pathParam0)
+	operationPath := fmt.Sprintf("/posts/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6709,7 +6709,7 @@ func NewPostUpdateRequestWithBody(server string, postId PostIDParam, contentType
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/posts/%s", pathParam0)
+	operationPath := fmt.Sprintf("/posts/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6756,7 +6756,7 @@ func NewPostReactAddRequestWithBody(server string, postId PostIDParam, contentTy
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/posts/%s/reacts", pathParam0)
+	operationPath := fmt.Sprintf("/posts/%s/reacts", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6785,7 +6785,7 @@ func NewProfileListRequest(server string, params *ProfileListParams) (*http.Requ
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/profiles")
+	operationPath := fmt.Sprintf("/profiles")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6857,7 +6857,7 @@ func NewProfileGetRequest(server string, accountHandle AccountHandleParam) (*htt
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/profiles/%s", pathParam0)
+	operationPath := fmt.Sprintf("/profiles/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -6884,7 +6884,7 @@ func NewThreadListRequest(server string, params *ThreadListParams) (*http.Reques
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/threads")
+	operationPath := fmt.Sprintf("/threads")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -7008,7 +7008,7 @@ func NewThreadCreateRequestWithBody(server string, contentType string, body io.R
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/threads")
+	operationPath := fmt.Sprintf("/threads")
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -7044,7 +7044,7 @@ func NewThreadDeleteRequest(server string, threadMark ThreadMarkParam) (*http.Re
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/threads/%s", pathParam0)
+	operationPath := fmt.Sprintf("/threads/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -7078,7 +7078,7 @@ func NewThreadGetRequest(server string, threadMark ThreadMarkParam) (*http.Reque
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/threads/%s", pathParam0)
+	operationPath := fmt.Sprintf("/threads/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -7123,7 +7123,7 @@ func NewThreadUpdateRequestWithBody(server string, threadMark ThreadMarkParam, c
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/threads/%s", pathParam0)
+	operationPath := fmt.Sprintf("/threads/%s", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -7170,7 +7170,7 @@ func NewReplyCreateRequestWithBody(server string, threadMark ThreadMarkParam, co
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v1/threads/%s/replies", pathParam0)
+	operationPath := fmt.Sprintf("/threads/%s/replies", pathParam0)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -7260,9 +7260,6 @@ func WithBaseURL(baseURL string) ClientOption {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// GetSpecWithResponse request
-	GetSpecWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSpecResponse, error)
-
 	// AccountGetWithResponse request
 	AccountGetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*AccountGetResponse, error)
 
@@ -7490,6 +7487,9 @@ type ClientWithResponsesInterface interface {
 
 	NodeUpdateVisibilityWithResponse(ctx context.Context, nodeSlug NodeSlugParam, body NodeUpdateVisibilityJSONRequestBody, reqEditors ...RequestEditorFn) (*NodeUpdateVisibilityResponse, error)
 
+	// GetSpecWithResponse request
+	GetSpecWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSpecResponse, error)
+
 	// PostSearchWithResponse request
 	PostSearchWithResponse(ctx context.Context, params *PostSearchParams, reqEditors ...RequestEditorFn) (*PostSearchResponse, error)
 
@@ -7538,28 +7538,6 @@ type ClientWithResponsesInterface interface {
 
 	// GetVersionWithResponse request
 	GetVersionWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetVersionResponse, error)
-}
-
-type GetSpecResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSONDefault  *InternalServerError
-}
-
-// Status returns HTTPResponse.Status
-func (r GetSpecResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetSpecResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
 }
 
 type AccountGetResponse struct {
@@ -8912,6 +8890,28 @@ func (r NodeUpdateVisibilityResponse) StatusCode() int {
 	return 0
 }
 
+type GetSpecResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r GetSpecResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetSpecResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type PostSearchResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -9206,15 +9206,6 @@ func (r GetVersionResponse) StatusCode() int {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
-}
-
-// GetSpecWithResponse request returning *GetSpecResponse
-func (c *ClientWithResponses) GetSpecWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSpecResponse, error) {
-	rsp, err := c.GetSpec(ctx, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return ParseGetSpecResponse(rsp)
 }
 
 // AccountGetWithResponse request returning *AccountGetResponse
@@ -9948,6 +9939,15 @@ func (c *ClientWithResponses) NodeUpdateVisibilityWithResponse(ctx context.Conte
 	return ParseNodeUpdateVisibilityResponse(rsp)
 }
 
+// GetSpecWithResponse request returning *GetSpecResponse
+func (c *ClientWithResponses) GetSpecWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetSpecResponse, error) {
+	rsp, err := c.GetSpec(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetSpecResponse(rsp)
+}
+
 // PostSearchWithResponse request returning *PostSearchResponse
 func (c *ClientWithResponses) PostSearchWithResponse(ctx context.Context, params *PostSearchParams, reqEditors ...RequestEditorFn) (*PostSearchResponse, error) {
 	rsp, err := c.PostSearch(ctx, params, reqEditors...)
@@ -10103,32 +10103,6 @@ func (c *ClientWithResponses) GetVersionWithResponse(ctx context.Context, reqEdi
 		return nil, err
 	}
 	return ParseGetVersionResponse(rsp)
-}
-
-// ParseGetSpecResponse parses an HTTP response from a GetSpecWithResponse call
-func ParseGetSpecResponse(rsp *http.Response) (*GetSpecResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetSpecResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
-		var dest InternalServerError
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, err
-		}
-		response.JSONDefault = &dest
-
-	}
-
-	return response, nil
 }
 
 // ParseAccountGetResponse parses an HTTP response from a AccountGetWithResponse call
@@ -12029,6 +12003,32 @@ func ParseNodeUpdateVisibilityResponse(rsp *http.Response) (*NodeUpdateVisibilit
 	return response, nil
 }
 
+// ParseGetSpecResponse parses an HTTP response from a GetSpecWithResponse call
+func ParseGetSpecResponse(rsp *http.Response) (*GetSpecResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetSpecResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParsePostSearchResponse parses an HTTP response from a PostSearchWithResponse call
 func ParsePostSearchResponse(rsp *http.Response) (*PostSearchResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -12439,221 +12439,221 @@ func ParseGetVersionResponse(rsp *http.Response) (*GetVersionResponse, error) {
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+
+	// (GET /accounts)
+	AccountGet(ctx echo.Context) error
+
+	// (PATCH /accounts)
+	AccountUpdate(ctx echo.Context) error
+
+	// (GET /accounts/self/auth-methods)
+	AccountAuthProviderList(ctx echo.Context) error
+
+	// (DELETE /accounts/self/auth-methods/{auth_method_id})
+	AccountAuthMethodDelete(ctx echo.Context, authMethodId string) error
+
+	// (POST /accounts/self/avatar)
+	AccountSetAvatar(ctx echo.Context, params AccountSetAvatarParams) error
+
+	// (GET /accounts/{account_handle}/avatar)
+	AccountGetAvatar(ctx echo.Context, accountHandle AccountHandleParam) error
+
+	// (PATCH /admin)
+	AdminSettingsUpdate(ctx echo.Context) error
+
+	// (DELETE /admin/bans/{account_handle})
+	AdminAccountBanRemove(ctx echo.Context, accountHandle AccountHandleParam) error
+
+	// (POST /admin/bans/{account_handle})
+	AdminAccountBanCreate(ctx echo.Context, accountHandle AccountHandleParam) error
+
+	// (POST /assets)
+	AssetUpload(ctx echo.Context, params AssetUploadParams) error
+
+	// (GET /assets/{asset_filename})
+	AssetGet(ctx echo.Context, assetFilename AssetPathParam) error
+
+	// (GET /auth)
+	AuthProviderList(ctx echo.Context) error
+
+	// (POST /auth/email-password/signin)
+	AuthEmailPasswordSignin(ctx echo.Context) error
+
+	// (POST /auth/email-password/signup)
+	AuthEmailPasswordSignup(ctx echo.Context) error
+
+	// (POST /auth/email/signin)
+	AuthEmailSignin(ctx echo.Context) error
+
+	// (POST /auth/email/signup)
+	AuthEmailSignup(ctx echo.Context) error
+
+	// (POST /auth/email/verify)
+	AuthEmailVerify(ctx echo.Context) error
+
+	// (GET /auth/logout)
+	AuthProviderLogout(ctx echo.Context) error
+
+	// (POST /auth/oauth/{oauth_provider}/callback)
+	OAuthProviderCallback(ctx echo.Context, oauthProvider OAuthProvider) error
+
+	// (PATCH /auth/password)
+	AuthPasswordUpdate(ctx echo.Context) error
+
+	// (POST /auth/password)
+	AuthPasswordCreate(ctx echo.Context) error
+
+	// (POST /auth/password/signin)
+	AuthPasswordSignin(ctx echo.Context) error
+
+	// (POST /auth/password/signup)
+	AuthPasswordSignup(ctx echo.Context) error
+
+	// (POST /auth/phone)
+	PhoneRequestCode(ctx echo.Context) error
+
+	// (PUT /auth/phone/{account_handle})
+	PhoneSubmitCode(ctx echo.Context, accountHandle AccountHandleParam) error
+
+	// (POST /auth/webauthn/assert)
+	WebAuthnMakeAssertion(ctx echo.Context) error
+
+	// (GET /auth/webauthn/assert/{account_handle})
+	WebAuthnGetAssertion(ctx echo.Context, accountHandle AccountHandleParam) error
+
+	// (POST /auth/webauthn/make)
+	WebAuthnMakeCredential(ctx echo.Context) error
+
+	// (GET /auth/webauthn/make/{account_handle})
+	WebAuthnRequestCredential(ctx echo.Context, accountHandle AccountHandleParam) error
+
+	// (GET /categories)
+	CategoryList(ctx echo.Context) error
+
+	// (PATCH /categories)
+	CategoryUpdateOrder(ctx echo.Context) error
+
+	// (POST /categories)
+	CategoryCreate(ctx echo.Context) error
+
+	// (PATCH /categories/{category_id})
+	CategoryUpdate(ctx echo.Context, categoryId CategoryIDParam) error
+
+	// (GET /collections)
+	CollectionList(ctx echo.Context, params CollectionListParams) error
+
+	// (POST /collections)
+	CollectionCreate(ctx echo.Context) error
+
+	// (DELETE /collections/{collection_id})
+	CollectionDelete(ctx echo.Context, collectionId CollectionIDParam) error
+
+	// (GET /collections/{collection_id})
+	CollectionGet(ctx echo.Context, collectionId CollectionIDParam) error
+
+	// (PATCH /collections/{collection_id})
+	CollectionUpdate(ctx echo.Context, collectionId CollectionIDParam) error
+
+	// (DELETE /collections/{collection_id}/nodes/{node_id})
+	CollectionRemoveNode(ctx echo.Context, collectionId CollectionIDParam, nodeId NodeIDParam) error
+
+	// (PUT /collections/{collection_id}/nodes/{node_id})
+	CollectionAddNode(ctx echo.Context, collectionId CollectionIDParam, nodeId NodeIDParam) error
+
+	// (DELETE /collections/{collection_id}/posts/{post_id})
+	CollectionRemovePost(ctx echo.Context, collectionId CollectionIDParam, postId PostIDParam) error
+
+	// (PUT /collections/{collection_id}/posts/{post_id})
+	CollectionAddPost(ctx echo.Context, collectionId CollectionIDParam, postId PostIDParam) error
+
+	// (GET /datagraph)
+	DatagraphSearch(ctx echo.Context, params DatagraphSearchParams) error
+
+	// (GET /info)
+	GetInfo(ctx echo.Context) error
+
+	// (POST /info/icon)
+	IconUpload(ctx echo.Context, params IconUploadParams) error
+
+	// (GET /info/icon/{icon_size})
+	IconGet(ctx echo.Context, iconSize IconGetParamsIconSize) error
+
+	// (GET /links)
+	LinkList(ctx echo.Context, params LinkListParams) error
+
+	// (POST /links)
+	LinkCreate(ctx echo.Context) error
+
+	// (GET /links/{link_slug})
+	LinkGet(ctx echo.Context, linkSlug LinkSlugParam) error
+
+	// (GET /nodes)
+	NodeList(ctx echo.Context, params NodeListParams) error
+
+	// (POST /nodes)
+	NodeCreate(ctx echo.Context) error
+
+	// (DELETE /nodes/{node_slug})
+	NodeDelete(ctx echo.Context, nodeSlug NodeSlugParam, params NodeDeleteParams) error
+
+	// (GET /nodes/{node_slug})
+	NodeGet(ctx echo.Context, nodeSlug NodeSlugParam) error
+
+	// (PATCH /nodes/{node_slug})
+	NodeUpdate(ctx echo.Context, nodeSlug NodeSlugParam) error
+
+	// (DELETE /nodes/{node_slug}/assets/{asset_id})
+	NodeRemoveAsset(ctx echo.Context, nodeSlug NodeSlugParam, assetId AssetIDParam) error
+
+	// (PUT /nodes/{node_slug}/assets/{asset_id})
+	NodeAddAsset(ctx echo.Context, nodeSlug NodeSlugParam, assetId AssetIDParam, params NodeAddAssetParams) error
+
+	// (DELETE /nodes/{node_slug}/nodes/{node_slug_child})
+	NodeRemoveNode(ctx echo.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam) error
+
+	// (PUT /nodes/{node_slug}/nodes/{node_slug_child})
+	NodeAddNode(ctx echo.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam) error
+
+	// (PATCH /nodes/{node_slug}/visibility)
+	NodeUpdateVisibility(ctx echo.Context, nodeSlug NodeSlugParam) error
 	// Get the OpenAPI 3.0 specification as JSON.
 	// (GET /openapi.json)
 	GetSpec(ctx echo.Context) error
 
-	// (GET /v1/accounts)
-	AccountGet(ctx echo.Context) error
-
-	// (PATCH /v1/accounts)
-	AccountUpdate(ctx echo.Context) error
-
-	// (GET /v1/accounts/self/auth-methods)
-	AccountAuthProviderList(ctx echo.Context) error
-
-	// (DELETE /v1/accounts/self/auth-methods/{auth_method_id})
-	AccountAuthMethodDelete(ctx echo.Context, authMethodId string) error
-
-	// (POST /v1/accounts/self/avatar)
-	AccountSetAvatar(ctx echo.Context, params AccountSetAvatarParams) error
-
-	// (GET /v1/accounts/{account_handle}/avatar)
-	AccountGetAvatar(ctx echo.Context, accountHandle AccountHandleParam) error
-
-	// (PATCH /v1/admin)
-	AdminSettingsUpdate(ctx echo.Context) error
-
-	// (DELETE /v1/admin/bans/{account_handle})
-	AdminAccountBanRemove(ctx echo.Context, accountHandle AccountHandleParam) error
-
-	// (POST /v1/admin/bans/{account_handle})
-	AdminAccountBanCreate(ctx echo.Context, accountHandle AccountHandleParam) error
-
-	// (POST /v1/assets)
-	AssetUpload(ctx echo.Context, params AssetUploadParams) error
-
-	// (GET /v1/assets/{asset_filename})
-	AssetGet(ctx echo.Context, assetFilename AssetPathParam) error
-
-	// (GET /v1/auth)
-	AuthProviderList(ctx echo.Context) error
-
-	// (POST /v1/auth/email-password/signin)
-	AuthEmailPasswordSignin(ctx echo.Context) error
-
-	// (POST /v1/auth/email-password/signup)
-	AuthEmailPasswordSignup(ctx echo.Context) error
-
-	// (POST /v1/auth/email/signin)
-	AuthEmailSignin(ctx echo.Context) error
-
-	// (POST /v1/auth/email/signup)
-	AuthEmailSignup(ctx echo.Context) error
-
-	// (POST /v1/auth/email/verify)
-	AuthEmailVerify(ctx echo.Context) error
-
-	// (GET /v1/auth/logout)
-	AuthProviderLogout(ctx echo.Context) error
-
-	// (POST /v1/auth/oauth/{oauth_provider}/callback)
-	OAuthProviderCallback(ctx echo.Context, oauthProvider OAuthProvider) error
-
-	// (PATCH /v1/auth/password)
-	AuthPasswordUpdate(ctx echo.Context) error
-
-	// (POST /v1/auth/password)
-	AuthPasswordCreate(ctx echo.Context) error
-
-	// (POST /v1/auth/password/signin)
-	AuthPasswordSignin(ctx echo.Context) error
-
-	// (POST /v1/auth/password/signup)
-	AuthPasswordSignup(ctx echo.Context) error
-
-	// (POST /v1/auth/phone)
-	PhoneRequestCode(ctx echo.Context) error
-
-	// (PUT /v1/auth/phone/{account_handle})
-	PhoneSubmitCode(ctx echo.Context, accountHandle AccountHandleParam) error
-
-	// (POST /v1/auth/webauthn/assert)
-	WebAuthnMakeAssertion(ctx echo.Context) error
-
-	// (GET /v1/auth/webauthn/assert/{account_handle})
-	WebAuthnGetAssertion(ctx echo.Context, accountHandle AccountHandleParam) error
-
-	// (POST /v1/auth/webauthn/make)
-	WebAuthnMakeCredential(ctx echo.Context) error
-
-	// (GET /v1/auth/webauthn/make/{account_handle})
-	WebAuthnRequestCredential(ctx echo.Context, accountHandle AccountHandleParam) error
-
-	// (GET /v1/categories)
-	CategoryList(ctx echo.Context) error
-
-	// (PATCH /v1/categories)
-	CategoryUpdateOrder(ctx echo.Context) error
-
-	// (POST /v1/categories)
-	CategoryCreate(ctx echo.Context) error
-
-	// (PATCH /v1/categories/{category_id})
-	CategoryUpdate(ctx echo.Context, categoryId CategoryIDParam) error
-
-	// (GET /v1/collections)
-	CollectionList(ctx echo.Context, params CollectionListParams) error
-
-	// (POST /v1/collections)
-	CollectionCreate(ctx echo.Context) error
-
-	// (DELETE /v1/collections/{collection_id})
-	CollectionDelete(ctx echo.Context, collectionId CollectionIDParam) error
-
-	// (GET /v1/collections/{collection_id})
-	CollectionGet(ctx echo.Context, collectionId CollectionIDParam) error
-
-	// (PATCH /v1/collections/{collection_id})
-	CollectionUpdate(ctx echo.Context, collectionId CollectionIDParam) error
-
-	// (DELETE /v1/collections/{collection_id}/nodes/{node_id})
-	CollectionRemoveNode(ctx echo.Context, collectionId CollectionIDParam, nodeId NodeIDParam) error
-
-	// (PUT /v1/collections/{collection_id}/nodes/{node_id})
-	CollectionAddNode(ctx echo.Context, collectionId CollectionIDParam, nodeId NodeIDParam) error
-
-	// (DELETE /v1/collections/{collection_id}/posts/{post_id})
-	CollectionRemovePost(ctx echo.Context, collectionId CollectionIDParam, postId PostIDParam) error
-
-	// (PUT /v1/collections/{collection_id}/posts/{post_id})
-	CollectionAddPost(ctx echo.Context, collectionId CollectionIDParam, postId PostIDParam) error
-
-	// (GET /v1/datagraph)
-	DatagraphSearch(ctx echo.Context, params DatagraphSearchParams) error
-
-	// (GET /v1/info)
-	GetInfo(ctx echo.Context) error
-
-	// (POST /v1/info/icon)
-	IconUpload(ctx echo.Context, params IconUploadParams) error
-
-	// (GET /v1/info/icon/{icon_size})
-	IconGet(ctx echo.Context, iconSize IconGetParamsIconSize) error
-
-	// (GET /v1/links)
-	LinkList(ctx echo.Context, params LinkListParams) error
-
-	// (POST /v1/links)
-	LinkCreate(ctx echo.Context) error
-
-	// (GET /v1/links/{link_slug})
-	LinkGet(ctx echo.Context, linkSlug LinkSlugParam) error
-
-	// (GET /v1/nodes)
-	NodeList(ctx echo.Context, params NodeListParams) error
-
-	// (POST /v1/nodes)
-	NodeCreate(ctx echo.Context) error
-
-	// (DELETE /v1/nodes/{node_slug})
-	NodeDelete(ctx echo.Context, nodeSlug NodeSlugParam, params NodeDeleteParams) error
-
-	// (GET /v1/nodes/{node_slug})
-	NodeGet(ctx echo.Context, nodeSlug NodeSlugParam) error
-
-	// (PATCH /v1/nodes/{node_slug})
-	NodeUpdate(ctx echo.Context, nodeSlug NodeSlugParam) error
-
-	// (DELETE /v1/nodes/{node_slug}/assets/{asset_id})
-	NodeRemoveAsset(ctx echo.Context, nodeSlug NodeSlugParam, assetId AssetIDParam) error
-
-	// (PUT /v1/nodes/{node_slug}/assets/{asset_id})
-	NodeAddAsset(ctx echo.Context, nodeSlug NodeSlugParam, assetId AssetIDParam, params NodeAddAssetParams) error
-
-	// (DELETE /v1/nodes/{node_slug}/nodes/{node_slug_child})
-	NodeRemoveNode(ctx echo.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam) error
-
-	// (PUT /v1/nodes/{node_slug}/nodes/{node_slug_child})
-	NodeAddNode(ctx echo.Context, nodeSlug NodeSlugParam, nodeSlugChild NodeSlugChildParam) error
-
-	// (PATCH /v1/nodes/{node_slug}/visibility)
-	NodeUpdateVisibility(ctx echo.Context, nodeSlug NodeSlugParam) error
-
-	// (GET /v1/posts/search)
+	// (GET /posts/search)
 	PostSearch(ctx echo.Context, params PostSearchParams) error
 
-	// (DELETE /v1/posts/{post_id})
+	// (DELETE /posts/{post_id})
 	PostDelete(ctx echo.Context, postId PostIDParam) error
 
-	// (PATCH /v1/posts/{post_id})
+	// (PATCH /posts/{post_id})
 	PostUpdate(ctx echo.Context, postId PostIDParam) error
 
-	// (PUT /v1/posts/{post_id}/reacts)
+	// (PUT /posts/{post_id}/reacts)
 	PostReactAdd(ctx echo.Context, postId PostIDParam) error
 
-	// (GET /v1/profiles)
+	// (GET /profiles)
 	ProfileList(ctx echo.Context, params ProfileListParams) error
 
-	// (GET /v1/profiles/{account_handle})
+	// (GET /profiles/{account_handle})
 	ProfileGet(ctx echo.Context, accountHandle AccountHandleParam) error
 
-	// (GET /v1/threads)
+	// (GET /threads)
 	ThreadList(ctx echo.Context, params ThreadListParams) error
 
-	// (POST /v1/threads)
+	// (POST /threads)
 	ThreadCreate(ctx echo.Context) error
 
-	// (DELETE /v1/threads/{thread_mark})
+	// (DELETE /threads/{thread_mark})
 	ThreadDelete(ctx echo.Context, threadMark ThreadMarkParam) error
 	// Get information about a thread and the posts within the thread.
-	// (GET /v1/threads/{thread_mark})
+	// (GET /threads/{thread_mark})
 	ThreadGet(ctx echo.Context, threadMark ThreadMarkParam) error
 
-	// (PATCH /v1/threads/{thread_mark})
+	// (PATCH /threads/{thread_mark})
 	ThreadUpdate(ctx echo.Context, threadMark ThreadMarkParam) error
 
-	// (POST /v1/threads/{thread_mark}/replies)
+	// (POST /threads/{thread_mark}/replies)
 	ReplyCreate(ctx echo.Context, threadMark ThreadMarkParam) error
 	// Get the software version string.
 	// (GET /version)
@@ -12663,15 +12663,6 @@ type ServerInterface interface {
 // ServerInterfaceWrapper converts echo contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler ServerInterface
-}
-
-// GetSpec converts echo context to params.
-func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
-	var err error
-
-	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.GetSpec(ctx)
-	return err
 }
 
 // AccountGet converts echo context to params.
@@ -13718,6 +13709,15 @@ func (w *ServerInterfaceWrapper) NodeUpdateVisibility(ctx echo.Context) error {
 	return err
 }
 
+// GetSpec converts echo context to params.
+func (w *ServerInterfaceWrapper) GetSpec(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.GetSpec(ctx)
+	return err
+}
+
 // PostSearch converts echo context to params.
 func (w *ServerInterfaceWrapper) PostSearch(ctx echo.Context) error {
 	var err error
@@ -14009,78 +14009,78 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 		Handler: si,
 	}
 
+	router.GET(baseURL+"/accounts", wrapper.AccountGet)
+	router.PATCH(baseURL+"/accounts", wrapper.AccountUpdate)
+	router.GET(baseURL+"/accounts/self/auth-methods", wrapper.AccountAuthProviderList)
+	router.DELETE(baseURL+"/accounts/self/auth-methods/:auth_method_id", wrapper.AccountAuthMethodDelete)
+	router.POST(baseURL+"/accounts/self/avatar", wrapper.AccountSetAvatar)
+	router.GET(baseURL+"/accounts/:account_handle/avatar", wrapper.AccountGetAvatar)
+	router.PATCH(baseURL+"/admin", wrapper.AdminSettingsUpdate)
+	router.DELETE(baseURL+"/admin/bans/:account_handle", wrapper.AdminAccountBanRemove)
+	router.POST(baseURL+"/admin/bans/:account_handle", wrapper.AdminAccountBanCreate)
+	router.POST(baseURL+"/assets", wrapper.AssetUpload)
+	router.GET(baseURL+"/assets/:asset_filename", wrapper.AssetGet)
+	router.GET(baseURL+"/auth", wrapper.AuthProviderList)
+	router.POST(baseURL+"/auth/email-password/signin", wrapper.AuthEmailPasswordSignin)
+	router.POST(baseURL+"/auth/email-password/signup", wrapper.AuthEmailPasswordSignup)
+	router.POST(baseURL+"/auth/email/signin", wrapper.AuthEmailSignin)
+	router.POST(baseURL+"/auth/email/signup", wrapper.AuthEmailSignup)
+	router.POST(baseURL+"/auth/email/verify", wrapper.AuthEmailVerify)
+	router.GET(baseURL+"/auth/logout", wrapper.AuthProviderLogout)
+	router.POST(baseURL+"/auth/oauth/:oauth_provider/callback", wrapper.OAuthProviderCallback)
+	router.PATCH(baseURL+"/auth/password", wrapper.AuthPasswordUpdate)
+	router.POST(baseURL+"/auth/password", wrapper.AuthPasswordCreate)
+	router.POST(baseURL+"/auth/password/signin", wrapper.AuthPasswordSignin)
+	router.POST(baseURL+"/auth/password/signup", wrapper.AuthPasswordSignup)
+	router.POST(baseURL+"/auth/phone", wrapper.PhoneRequestCode)
+	router.PUT(baseURL+"/auth/phone/:account_handle", wrapper.PhoneSubmitCode)
+	router.POST(baseURL+"/auth/webauthn/assert", wrapper.WebAuthnMakeAssertion)
+	router.GET(baseURL+"/auth/webauthn/assert/:account_handle", wrapper.WebAuthnGetAssertion)
+	router.POST(baseURL+"/auth/webauthn/make", wrapper.WebAuthnMakeCredential)
+	router.GET(baseURL+"/auth/webauthn/make/:account_handle", wrapper.WebAuthnRequestCredential)
+	router.GET(baseURL+"/categories", wrapper.CategoryList)
+	router.PATCH(baseURL+"/categories", wrapper.CategoryUpdateOrder)
+	router.POST(baseURL+"/categories", wrapper.CategoryCreate)
+	router.PATCH(baseURL+"/categories/:category_id", wrapper.CategoryUpdate)
+	router.GET(baseURL+"/collections", wrapper.CollectionList)
+	router.POST(baseURL+"/collections", wrapper.CollectionCreate)
+	router.DELETE(baseURL+"/collections/:collection_id", wrapper.CollectionDelete)
+	router.GET(baseURL+"/collections/:collection_id", wrapper.CollectionGet)
+	router.PATCH(baseURL+"/collections/:collection_id", wrapper.CollectionUpdate)
+	router.DELETE(baseURL+"/collections/:collection_id/nodes/:node_id", wrapper.CollectionRemoveNode)
+	router.PUT(baseURL+"/collections/:collection_id/nodes/:node_id", wrapper.CollectionAddNode)
+	router.DELETE(baseURL+"/collections/:collection_id/posts/:post_id", wrapper.CollectionRemovePost)
+	router.PUT(baseURL+"/collections/:collection_id/posts/:post_id", wrapper.CollectionAddPost)
+	router.GET(baseURL+"/datagraph", wrapper.DatagraphSearch)
+	router.GET(baseURL+"/info", wrapper.GetInfo)
+	router.POST(baseURL+"/info/icon", wrapper.IconUpload)
+	router.GET(baseURL+"/info/icon/:icon_size", wrapper.IconGet)
+	router.GET(baseURL+"/links", wrapper.LinkList)
+	router.POST(baseURL+"/links", wrapper.LinkCreate)
+	router.GET(baseURL+"/links/:link_slug", wrapper.LinkGet)
+	router.GET(baseURL+"/nodes", wrapper.NodeList)
+	router.POST(baseURL+"/nodes", wrapper.NodeCreate)
+	router.DELETE(baseURL+"/nodes/:node_slug", wrapper.NodeDelete)
+	router.GET(baseURL+"/nodes/:node_slug", wrapper.NodeGet)
+	router.PATCH(baseURL+"/nodes/:node_slug", wrapper.NodeUpdate)
+	router.DELETE(baseURL+"/nodes/:node_slug/assets/:asset_id", wrapper.NodeRemoveAsset)
+	router.PUT(baseURL+"/nodes/:node_slug/assets/:asset_id", wrapper.NodeAddAsset)
+	router.DELETE(baseURL+"/nodes/:node_slug/nodes/:node_slug_child", wrapper.NodeRemoveNode)
+	router.PUT(baseURL+"/nodes/:node_slug/nodes/:node_slug_child", wrapper.NodeAddNode)
+	router.PATCH(baseURL+"/nodes/:node_slug/visibility", wrapper.NodeUpdateVisibility)
 	router.GET(baseURL+"/openapi.json", wrapper.GetSpec)
-	router.GET(baseURL+"/v1/accounts", wrapper.AccountGet)
-	router.PATCH(baseURL+"/v1/accounts", wrapper.AccountUpdate)
-	router.GET(baseURL+"/v1/accounts/self/auth-methods", wrapper.AccountAuthProviderList)
-	router.DELETE(baseURL+"/v1/accounts/self/auth-methods/:auth_method_id", wrapper.AccountAuthMethodDelete)
-	router.POST(baseURL+"/v1/accounts/self/avatar", wrapper.AccountSetAvatar)
-	router.GET(baseURL+"/v1/accounts/:account_handle/avatar", wrapper.AccountGetAvatar)
-	router.PATCH(baseURL+"/v1/admin", wrapper.AdminSettingsUpdate)
-	router.DELETE(baseURL+"/v1/admin/bans/:account_handle", wrapper.AdminAccountBanRemove)
-	router.POST(baseURL+"/v1/admin/bans/:account_handle", wrapper.AdminAccountBanCreate)
-	router.POST(baseURL+"/v1/assets", wrapper.AssetUpload)
-	router.GET(baseURL+"/v1/assets/:asset_filename", wrapper.AssetGet)
-	router.GET(baseURL+"/v1/auth", wrapper.AuthProviderList)
-	router.POST(baseURL+"/v1/auth/email-password/signin", wrapper.AuthEmailPasswordSignin)
-	router.POST(baseURL+"/v1/auth/email-password/signup", wrapper.AuthEmailPasswordSignup)
-	router.POST(baseURL+"/v1/auth/email/signin", wrapper.AuthEmailSignin)
-	router.POST(baseURL+"/v1/auth/email/signup", wrapper.AuthEmailSignup)
-	router.POST(baseURL+"/v1/auth/email/verify", wrapper.AuthEmailVerify)
-	router.GET(baseURL+"/v1/auth/logout", wrapper.AuthProviderLogout)
-	router.POST(baseURL+"/v1/auth/oauth/:oauth_provider/callback", wrapper.OAuthProviderCallback)
-	router.PATCH(baseURL+"/v1/auth/password", wrapper.AuthPasswordUpdate)
-	router.POST(baseURL+"/v1/auth/password", wrapper.AuthPasswordCreate)
-	router.POST(baseURL+"/v1/auth/password/signin", wrapper.AuthPasswordSignin)
-	router.POST(baseURL+"/v1/auth/password/signup", wrapper.AuthPasswordSignup)
-	router.POST(baseURL+"/v1/auth/phone", wrapper.PhoneRequestCode)
-	router.PUT(baseURL+"/v1/auth/phone/:account_handle", wrapper.PhoneSubmitCode)
-	router.POST(baseURL+"/v1/auth/webauthn/assert", wrapper.WebAuthnMakeAssertion)
-	router.GET(baseURL+"/v1/auth/webauthn/assert/:account_handle", wrapper.WebAuthnGetAssertion)
-	router.POST(baseURL+"/v1/auth/webauthn/make", wrapper.WebAuthnMakeCredential)
-	router.GET(baseURL+"/v1/auth/webauthn/make/:account_handle", wrapper.WebAuthnRequestCredential)
-	router.GET(baseURL+"/v1/categories", wrapper.CategoryList)
-	router.PATCH(baseURL+"/v1/categories", wrapper.CategoryUpdateOrder)
-	router.POST(baseURL+"/v1/categories", wrapper.CategoryCreate)
-	router.PATCH(baseURL+"/v1/categories/:category_id", wrapper.CategoryUpdate)
-	router.GET(baseURL+"/v1/collections", wrapper.CollectionList)
-	router.POST(baseURL+"/v1/collections", wrapper.CollectionCreate)
-	router.DELETE(baseURL+"/v1/collections/:collection_id", wrapper.CollectionDelete)
-	router.GET(baseURL+"/v1/collections/:collection_id", wrapper.CollectionGet)
-	router.PATCH(baseURL+"/v1/collections/:collection_id", wrapper.CollectionUpdate)
-	router.DELETE(baseURL+"/v1/collections/:collection_id/nodes/:node_id", wrapper.CollectionRemoveNode)
-	router.PUT(baseURL+"/v1/collections/:collection_id/nodes/:node_id", wrapper.CollectionAddNode)
-	router.DELETE(baseURL+"/v1/collections/:collection_id/posts/:post_id", wrapper.CollectionRemovePost)
-	router.PUT(baseURL+"/v1/collections/:collection_id/posts/:post_id", wrapper.CollectionAddPost)
-	router.GET(baseURL+"/v1/datagraph", wrapper.DatagraphSearch)
-	router.GET(baseURL+"/v1/info", wrapper.GetInfo)
-	router.POST(baseURL+"/v1/info/icon", wrapper.IconUpload)
-	router.GET(baseURL+"/v1/info/icon/:icon_size", wrapper.IconGet)
-	router.GET(baseURL+"/v1/links", wrapper.LinkList)
-	router.POST(baseURL+"/v1/links", wrapper.LinkCreate)
-	router.GET(baseURL+"/v1/links/:link_slug", wrapper.LinkGet)
-	router.GET(baseURL+"/v1/nodes", wrapper.NodeList)
-	router.POST(baseURL+"/v1/nodes", wrapper.NodeCreate)
-	router.DELETE(baseURL+"/v1/nodes/:node_slug", wrapper.NodeDelete)
-	router.GET(baseURL+"/v1/nodes/:node_slug", wrapper.NodeGet)
-	router.PATCH(baseURL+"/v1/nodes/:node_slug", wrapper.NodeUpdate)
-	router.DELETE(baseURL+"/v1/nodes/:node_slug/assets/:asset_id", wrapper.NodeRemoveAsset)
-	router.PUT(baseURL+"/v1/nodes/:node_slug/assets/:asset_id", wrapper.NodeAddAsset)
-	router.DELETE(baseURL+"/v1/nodes/:node_slug/nodes/:node_slug_child", wrapper.NodeRemoveNode)
-	router.PUT(baseURL+"/v1/nodes/:node_slug/nodes/:node_slug_child", wrapper.NodeAddNode)
-	router.PATCH(baseURL+"/v1/nodes/:node_slug/visibility", wrapper.NodeUpdateVisibility)
-	router.GET(baseURL+"/v1/posts/search", wrapper.PostSearch)
-	router.DELETE(baseURL+"/v1/posts/:post_id", wrapper.PostDelete)
-	router.PATCH(baseURL+"/v1/posts/:post_id", wrapper.PostUpdate)
-	router.PUT(baseURL+"/v1/posts/:post_id/reacts", wrapper.PostReactAdd)
-	router.GET(baseURL+"/v1/profiles", wrapper.ProfileList)
-	router.GET(baseURL+"/v1/profiles/:account_handle", wrapper.ProfileGet)
-	router.GET(baseURL+"/v1/threads", wrapper.ThreadList)
-	router.POST(baseURL+"/v1/threads", wrapper.ThreadCreate)
-	router.DELETE(baseURL+"/v1/threads/:thread_mark", wrapper.ThreadDelete)
-	router.GET(baseURL+"/v1/threads/:thread_mark", wrapper.ThreadGet)
-	router.PATCH(baseURL+"/v1/threads/:thread_mark", wrapper.ThreadUpdate)
-	router.POST(baseURL+"/v1/threads/:thread_mark/replies", wrapper.ReplyCreate)
+	router.GET(baseURL+"/posts/search", wrapper.PostSearch)
+	router.DELETE(baseURL+"/posts/:post_id", wrapper.PostDelete)
+	router.PATCH(baseURL+"/posts/:post_id", wrapper.PostUpdate)
+	router.PUT(baseURL+"/posts/:post_id/reacts", wrapper.PostReactAdd)
+	router.GET(baseURL+"/profiles", wrapper.ProfileList)
+	router.GET(baseURL+"/profiles/:account_handle", wrapper.ProfileGet)
+	router.GET(baseURL+"/threads", wrapper.ThreadList)
+	router.POST(baseURL+"/threads", wrapper.ThreadCreate)
+	router.DELETE(baseURL+"/threads/:thread_mark", wrapper.ThreadDelete)
+	router.GET(baseURL+"/threads/:thread_mark", wrapper.ThreadGet)
+	router.PATCH(baseURL+"/threads/:thread_mark", wrapper.ThreadUpdate)
+	router.POST(baseURL+"/threads/:thread_mark/replies", wrapper.ReplyCreate)
 	router.GET(baseURL+"/version", wrapper.GetVersion)
 
 }
@@ -14222,35 +14222,6 @@ type WebAuthnRequestCredentialOKJSONResponse struct {
 	Body WebAuthnPublicKeyCreationOptions
 
 	Headers WebAuthnRequestCredentialOKResponseHeaders
-}
-
-type GetSpecRequestObject struct {
-}
-
-type GetSpecResponseObject interface {
-	VisitGetSpecResponse(w http.ResponseWriter) error
-}
-
-type GetSpec200TextResponse string
-
-func (response GetSpec200TextResponse) VisitGetSpecResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "text/plain")
-	w.WriteHeader(200)
-
-	_, err := w.Write([]byte(response))
-	return err
-}
-
-type GetSpecdefaultJSONResponse struct {
-	Body       APIError
-	StatusCode int
-}
-
-func (response GetSpecdefaultJSONResponse) VisitGetSpecResponse(w http.ResponseWriter) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(response.StatusCode)
-
-	return json.NewEncoder(w).Encode(response.Body)
 }
 
 type AccountGetRequestObject struct {
@@ -16674,6 +16645,35 @@ func (response NodeUpdateVisibilitydefaultJSONResponse) VisitNodeUpdateVisibilit
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type GetSpecRequestObject struct {
+}
+
+type GetSpecResponseObject interface {
+	VisitGetSpecResponse(w http.ResponseWriter) error
+}
+
+type GetSpec200TextResponse string
+
+func (response GetSpec200TextResponse) VisitGetSpecResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "text/plain")
+	w.WriteHeader(200)
+
+	_, err := w.Write([]byte(response))
+	return err
+}
+
+type GetSpecdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response GetSpecdefaultJSONResponse) VisitGetSpecResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type PostSearchRequestObject struct {
 	Params PostSearchParams
 }
@@ -17223,221 +17223,221 @@ func (response GetVersiondefaultJSONResponse) VisitGetVersionResponse(w http.Res
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+
+	// (GET /accounts)
+	AccountGet(ctx context.Context, request AccountGetRequestObject) (AccountGetResponseObject, error)
+
+	// (PATCH /accounts)
+	AccountUpdate(ctx context.Context, request AccountUpdateRequestObject) (AccountUpdateResponseObject, error)
+
+	// (GET /accounts/self/auth-methods)
+	AccountAuthProviderList(ctx context.Context, request AccountAuthProviderListRequestObject) (AccountAuthProviderListResponseObject, error)
+
+	// (DELETE /accounts/self/auth-methods/{auth_method_id})
+	AccountAuthMethodDelete(ctx context.Context, request AccountAuthMethodDeleteRequestObject) (AccountAuthMethodDeleteResponseObject, error)
+
+	// (POST /accounts/self/avatar)
+	AccountSetAvatar(ctx context.Context, request AccountSetAvatarRequestObject) (AccountSetAvatarResponseObject, error)
+
+	// (GET /accounts/{account_handle}/avatar)
+	AccountGetAvatar(ctx context.Context, request AccountGetAvatarRequestObject) (AccountGetAvatarResponseObject, error)
+
+	// (PATCH /admin)
+	AdminSettingsUpdate(ctx context.Context, request AdminSettingsUpdateRequestObject) (AdminSettingsUpdateResponseObject, error)
+
+	// (DELETE /admin/bans/{account_handle})
+	AdminAccountBanRemove(ctx context.Context, request AdminAccountBanRemoveRequestObject) (AdminAccountBanRemoveResponseObject, error)
+
+	// (POST /admin/bans/{account_handle})
+	AdminAccountBanCreate(ctx context.Context, request AdminAccountBanCreateRequestObject) (AdminAccountBanCreateResponseObject, error)
+
+	// (POST /assets)
+	AssetUpload(ctx context.Context, request AssetUploadRequestObject) (AssetUploadResponseObject, error)
+
+	// (GET /assets/{asset_filename})
+	AssetGet(ctx context.Context, request AssetGetRequestObject) (AssetGetResponseObject, error)
+
+	// (GET /auth)
+	AuthProviderList(ctx context.Context, request AuthProviderListRequestObject) (AuthProviderListResponseObject, error)
+
+	// (POST /auth/email-password/signin)
+	AuthEmailPasswordSignin(ctx context.Context, request AuthEmailPasswordSigninRequestObject) (AuthEmailPasswordSigninResponseObject, error)
+
+	// (POST /auth/email-password/signup)
+	AuthEmailPasswordSignup(ctx context.Context, request AuthEmailPasswordSignupRequestObject) (AuthEmailPasswordSignupResponseObject, error)
+
+	// (POST /auth/email/signin)
+	AuthEmailSignin(ctx context.Context, request AuthEmailSigninRequestObject) (AuthEmailSigninResponseObject, error)
+
+	// (POST /auth/email/signup)
+	AuthEmailSignup(ctx context.Context, request AuthEmailSignupRequestObject) (AuthEmailSignupResponseObject, error)
+
+	// (POST /auth/email/verify)
+	AuthEmailVerify(ctx context.Context, request AuthEmailVerifyRequestObject) (AuthEmailVerifyResponseObject, error)
+
+	// (GET /auth/logout)
+	AuthProviderLogout(ctx context.Context, request AuthProviderLogoutRequestObject) (AuthProviderLogoutResponseObject, error)
+
+	// (POST /auth/oauth/{oauth_provider}/callback)
+	OAuthProviderCallback(ctx context.Context, request OAuthProviderCallbackRequestObject) (OAuthProviderCallbackResponseObject, error)
+
+	// (PATCH /auth/password)
+	AuthPasswordUpdate(ctx context.Context, request AuthPasswordUpdateRequestObject) (AuthPasswordUpdateResponseObject, error)
+
+	// (POST /auth/password)
+	AuthPasswordCreate(ctx context.Context, request AuthPasswordCreateRequestObject) (AuthPasswordCreateResponseObject, error)
+
+	// (POST /auth/password/signin)
+	AuthPasswordSignin(ctx context.Context, request AuthPasswordSigninRequestObject) (AuthPasswordSigninResponseObject, error)
+
+	// (POST /auth/password/signup)
+	AuthPasswordSignup(ctx context.Context, request AuthPasswordSignupRequestObject) (AuthPasswordSignupResponseObject, error)
+
+	// (POST /auth/phone)
+	PhoneRequestCode(ctx context.Context, request PhoneRequestCodeRequestObject) (PhoneRequestCodeResponseObject, error)
+
+	// (PUT /auth/phone/{account_handle})
+	PhoneSubmitCode(ctx context.Context, request PhoneSubmitCodeRequestObject) (PhoneSubmitCodeResponseObject, error)
+
+	// (POST /auth/webauthn/assert)
+	WebAuthnMakeAssertion(ctx context.Context, request WebAuthnMakeAssertionRequestObject) (WebAuthnMakeAssertionResponseObject, error)
+
+	// (GET /auth/webauthn/assert/{account_handle})
+	WebAuthnGetAssertion(ctx context.Context, request WebAuthnGetAssertionRequestObject) (WebAuthnGetAssertionResponseObject, error)
+
+	// (POST /auth/webauthn/make)
+	WebAuthnMakeCredential(ctx context.Context, request WebAuthnMakeCredentialRequestObject) (WebAuthnMakeCredentialResponseObject, error)
+
+	// (GET /auth/webauthn/make/{account_handle})
+	WebAuthnRequestCredential(ctx context.Context, request WebAuthnRequestCredentialRequestObject) (WebAuthnRequestCredentialResponseObject, error)
+
+	// (GET /categories)
+	CategoryList(ctx context.Context, request CategoryListRequestObject) (CategoryListResponseObject, error)
+
+	// (PATCH /categories)
+	CategoryUpdateOrder(ctx context.Context, request CategoryUpdateOrderRequestObject) (CategoryUpdateOrderResponseObject, error)
+
+	// (POST /categories)
+	CategoryCreate(ctx context.Context, request CategoryCreateRequestObject) (CategoryCreateResponseObject, error)
+
+	// (PATCH /categories/{category_id})
+	CategoryUpdate(ctx context.Context, request CategoryUpdateRequestObject) (CategoryUpdateResponseObject, error)
+
+	// (GET /collections)
+	CollectionList(ctx context.Context, request CollectionListRequestObject) (CollectionListResponseObject, error)
+
+	// (POST /collections)
+	CollectionCreate(ctx context.Context, request CollectionCreateRequestObject) (CollectionCreateResponseObject, error)
+
+	// (DELETE /collections/{collection_id})
+	CollectionDelete(ctx context.Context, request CollectionDeleteRequestObject) (CollectionDeleteResponseObject, error)
+
+	// (GET /collections/{collection_id})
+	CollectionGet(ctx context.Context, request CollectionGetRequestObject) (CollectionGetResponseObject, error)
+
+	// (PATCH /collections/{collection_id})
+	CollectionUpdate(ctx context.Context, request CollectionUpdateRequestObject) (CollectionUpdateResponseObject, error)
+
+	// (DELETE /collections/{collection_id}/nodes/{node_id})
+	CollectionRemoveNode(ctx context.Context, request CollectionRemoveNodeRequestObject) (CollectionRemoveNodeResponseObject, error)
+
+	// (PUT /collections/{collection_id}/nodes/{node_id})
+	CollectionAddNode(ctx context.Context, request CollectionAddNodeRequestObject) (CollectionAddNodeResponseObject, error)
+
+	// (DELETE /collections/{collection_id}/posts/{post_id})
+	CollectionRemovePost(ctx context.Context, request CollectionRemovePostRequestObject) (CollectionRemovePostResponseObject, error)
+
+	// (PUT /collections/{collection_id}/posts/{post_id})
+	CollectionAddPost(ctx context.Context, request CollectionAddPostRequestObject) (CollectionAddPostResponseObject, error)
+
+	// (GET /datagraph)
+	DatagraphSearch(ctx context.Context, request DatagraphSearchRequestObject) (DatagraphSearchResponseObject, error)
+
+	// (GET /info)
+	GetInfo(ctx context.Context, request GetInfoRequestObject) (GetInfoResponseObject, error)
+
+	// (POST /info/icon)
+	IconUpload(ctx context.Context, request IconUploadRequestObject) (IconUploadResponseObject, error)
+
+	// (GET /info/icon/{icon_size})
+	IconGet(ctx context.Context, request IconGetRequestObject) (IconGetResponseObject, error)
+
+	// (GET /links)
+	LinkList(ctx context.Context, request LinkListRequestObject) (LinkListResponseObject, error)
+
+	// (POST /links)
+	LinkCreate(ctx context.Context, request LinkCreateRequestObject) (LinkCreateResponseObject, error)
+
+	// (GET /links/{link_slug})
+	LinkGet(ctx context.Context, request LinkGetRequestObject) (LinkGetResponseObject, error)
+
+	// (GET /nodes)
+	NodeList(ctx context.Context, request NodeListRequestObject) (NodeListResponseObject, error)
+
+	// (POST /nodes)
+	NodeCreate(ctx context.Context, request NodeCreateRequestObject) (NodeCreateResponseObject, error)
+
+	// (DELETE /nodes/{node_slug})
+	NodeDelete(ctx context.Context, request NodeDeleteRequestObject) (NodeDeleteResponseObject, error)
+
+	// (GET /nodes/{node_slug})
+	NodeGet(ctx context.Context, request NodeGetRequestObject) (NodeGetResponseObject, error)
+
+	// (PATCH /nodes/{node_slug})
+	NodeUpdate(ctx context.Context, request NodeUpdateRequestObject) (NodeUpdateResponseObject, error)
+
+	// (DELETE /nodes/{node_slug}/assets/{asset_id})
+	NodeRemoveAsset(ctx context.Context, request NodeRemoveAssetRequestObject) (NodeRemoveAssetResponseObject, error)
+
+	// (PUT /nodes/{node_slug}/assets/{asset_id})
+	NodeAddAsset(ctx context.Context, request NodeAddAssetRequestObject) (NodeAddAssetResponseObject, error)
+
+	// (DELETE /nodes/{node_slug}/nodes/{node_slug_child})
+	NodeRemoveNode(ctx context.Context, request NodeRemoveNodeRequestObject) (NodeRemoveNodeResponseObject, error)
+
+	// (PUT /nodes/{node_slug}/nodes/{node_slug_child})
+	NodeAddNode(ctx context.Context, request NodeAddNodeRequestObject) (NodeAddNodeResponseObject, error)
+
+	// (PATCH /nodes/{node_slug}/visibility)
+	NodeUpdateVisibility(ctx context.Context, request NodeUpdateVisibilityRequestObject) (NodeUpdateVisibilityResponseObject, error)
 	// Get the OpenAPI 3.0 specification as JSON.
 	// (GET /openapi.json)
 	GetSpec(ctx context.Context, request GetSpecRequestObject) (GetSpecResponseObject, error)
 
-	// (GET /v1/accounts)
-	AccountGet(ctx context.Context, request AccountGetRequestObject) (AccountGetResponseObject, error)
-
-	// (PATCH /v1/accounts)
-	AccountUpdate(ctx context.Context, request AccountUpdateRequestObject) (AccountUpdateResponseObject, error)
-
-	// (GET /v1/accounts/self/auth-methods)
-	AccountAuthProviderList(ctx context.Context, request AccountAuthProviderListRequestObject) (AccountAuthProviderListResponseObject, error)
-
-	// (DELETE /v1/accounts/self/auth-methods/{auth_method_id})
-	AccountAuthMethodDelete(ctx context.Context, request AccountAuthMethodDeleteRequestObject) (AccountAuthMethodDeleteResponseObject, error)
-
-	// (POST /v1/accounts/self/avatar)
-	AccountSetAvatar(ctx context.Context, request AccountSetAvatarRequestObject) (AccountSetAvatarResponseObject, error)
-
-	// (GET /v1/accounts/{account_handle}/avatar)
-	AccountGetAvatar(ctx context.Context, request AccountGetAvatarRequestObject) (AccountGetAvatarResponseObject, error)
-
-	// (PATCH /v1/admin)
-	AdminSettingsUpdate(ctx context.Context, request AdminSettingsUpdateRequestObject) (AdminSettingsUpdateResponseObject, error)
-
-	// (DELETE /v1/admin/bans/{account_handle})
-	AdminAccountBanRemove(ctx context.Context, request AdminAccountBanRemoveRequestObject) (AdminAccountBanRemoveResponseObject, error)
-
-	// (POST /v1/admin/bans/{account_handle})
-	AdminAccountBanCreate(ctx context.Context, request AdminAccountBanCreateRequestObject) (AdminAccountBanCreateResponseObject, error)
-
-	// (POST /v1/assets)
-	AssetUpload(ctx context.Context, request AssetUploadRequestObject) (AssetUploadResponseObject, error)
-
-	// (GET /v1/assets/{asset_filename})
-	AssetGet(ctx context.Context, request AssetGetRequestObject) (AssetGetResponseObject, error)
-
-	// (GET /v1/auth)
-	AuthProviderList(ctx context.Context, request AuthProviderListRequestObject) (AuthProviderListResponseObject, error)
-
-	// (POST /v1/auth/email-password/signin)
-	AuthEmailPasswordSignin(ctx context.Context, request AuthEmailPasswordSigninRequestObject) (AuthEmailPasswordSigninResponseObject, error)
-
-	// (POST /v1/auth/email-password/signup)
-	AuthEmailPasswordSignup(ctx context.Context, request AuthEmailPasswordSignupRequestObject) (AuthEmailPasswordSignupResponseObject, error)
-
-	// (POST /v1/auth/email/signin)
-	AuthEmailSignin(ctx context.Context, request AuthEmailSigninRequestObject) (AuthEmailSigninResponseObject, error)
-
-	// (POST /v1/auth/email/signup)
-	AuthEmailSignup(ctx context.Context, request AuthEmailSignupRequestObject) (AuthEmailSignupResponseObject, error)
-
-	// (POST /v1/auth/email/verify)
-	AuthEmailVerify(ctx context.Context, request AuthEmailVerifyRequestObject) (AuthEmailVerifyResponseObject, error)
-
-	// (GET /v1/auth/logout)
-	AuthProviderLogout(ctx context.Context, request AuthProviderLogoutRequestObject) (AuthProviderLogoutResponseObject, error)
-
-	// (POST /v1/auth/oauth/{oauth_provider}/callback)
-	OAuthProviderCallback(ctx context.Context, request OAuthProviderCallbackRequestObject) (OAuthProviderCallbackResponseObject, error)
-
-	// (PATCH /v1/auth/password)
-	AuthPasswordUpdate(ctx context.Context, request AuthPasswordUpdateRequestObject) (AuthPasswordUpdateResponseObject, error)
-
-	// (POST /v1/auth/password)
-	AuthPasswordCreate(ctx context.Context, request AuthPasswordCreateRequestObject) (AuthPasswordCreateResponseObject, error)
-
-	// (POST /v1/auth/password/signin)
-	AuthPasswordSignin(ctx context.Context, request AuthPasswordSigninRequestObject) (AuthPasswordSigninResponseObject, error)
-
-	// (POST /v1/auth/password/signup)
-	AuthPasswordSignup(ctx context.Context, request AuthPasswordSignupRequestObject) (AuthPasswordSignupResponseObject, error)
-
-	// (POST /v1/auth/phone)
-	PhoneRequestCode(ctx context.Context, request PhoneRequestCodeRequestObject) (PhoneRequestCodeResponseObject, error)
-
-	// (PUT /v1/auth/phone/{account_handle})
-	PhoneSubmitCode(ctx context.Context, request PhoneSubmitCodeRequestObject) (PhoneSubmitCodeResponseObject, error)
-
-	// (POST /v1/auth/webauthn/assert)
-	WebAuthnMakeAssertion(ctx context.Context, request WebAuthnMakeAssertionRequestObject) (WebAuthnMakeAssertionResponseObject, error)
-
-	// (GET /v1/auth/webauthn/assert/{account_handle})
-	WebAuthnGetAssertion(ctx context.Context, request WebAuthnGetAssertionRequestObject) (WebAuthnGetAssertionResponseObject, error)
-
-	// (POST /v1/auth/webauthn/make)
-	WebAuthnMakeCredential(ctx context.Context, request WebAuthnMakeCredentialRequestObject) (WebAuthnMakeCredentialResponseObject, error)
-
-	// (GET /v1/auth/webauthn/make/{account_handle})
-	WebAuthnRequestCredential(ctx context.Context, request WebAuthnRequestCredentialRequestObject) (WebAuthnRequestCredentialResponseObject, error)
-
-	// (GET /v1/categories)
-	CategoryList(ctx context.Context, request CategoryListRequestObject) (CategoryListResponseObject, error)
-
-	// (PATCH /v1/categories)
-	CategoryUpdateOrder(ctx context.Context, request CategoryUpdateOrderRequestObject) (CategoryUpdateOrderResponseObject, error)
-
-	// (POST /v1/categories)
-	CategoryCreate(ctx context.Context, request CategoryCreateRequestObject) (CategoryCreateResponseObject, error)
-
-	// (PATCH /v1/categories/{category_id})
-	CategoryUpdate(ctx context.Context, request CategoryUpdateRequestObject) (CategoryUpdateResponseObject, error)
-
-	// (GET /v1/collections)
-	CollectionList(ctx context.Context, request CollectionListRequestObject) (CollectionListResponseObject, error)
-
-	// (POST /v1/collections)
-	CollectionCreate(ctx context.Context, request CollectionCreateRequestObject) (CollectionCreateResponseObject, error)
-
-	// (DELETE /v1/collections/{collection_id})
-	CollectionDelete(ctx context.Context, request CollectionDeleteRequestObject) (CollectionDeleteResponseObject, error)
-
-	// (GET /v1/collections/{collection_id})
-	CollectionGet(ctx context.Context, request CollectionGetRequestObject) (CollectionGetResponseObject, error)
-
-	// (PATCH /v1/collections/{collection_id})
-	CollectionUpdate(ctx context.Context, request CollectionUpdateRequestObject) (CollectionUpdateResponseObject, error)
-
-	// (DELETE /v1/collections/{collection_id}/nodes/{node_id})
-	CollectionRemoveNode(ctx context.Context, request CollectionRemoveNodeRequestObject) (CollectionRemoveNodeResponseObject, error)
-
-	// (PUT /v1/collections/{collection_id}/nodes/{node_id})
-	CollectionAddNode(ctx context.Context, request CollectionAddNodeRequestObject) (CollectionAddNodeResponseObject, error)
-
-	// (DELETE /v1/collections/{collection_id}/posts/{post_id})
-	CollectionRemovePost(ctx context.Context, request CollectionRemovePostRequestObject) (CollectionRemovePostResponseObject, error)
-
-	// (PUT /v1/collections/{collection_id}/posts/{post_id})
-	CollectionAddPost(ctx context.Context, request CollectionAddPostRequestObject) (CollectionAddPostResponseObject, error)
-
-	// (GET /v1/datagraph)
-	DatagraphSearch(ctx context.Context, request DatagraphSearchRequestObject) (DatagraphSearchResponseObject, error)
-
-	// (GET /v1/info)
-	GetInfo(ctx context.Context, request GetInfoRequestObject) (GetInfoResponseObject, error)
-
-	// (POST /v1/info/icon)
-	IconUpload(ctx context.Context, request IconUploadRequestObject) (IconUploadResponseObject, error)
-
-	// (GET /v1/info/icon/{icon_size})
-	IconGet(ctx context.Context, request IconGetRequestObject) (IconGetResponseObject, error)
-
-	// (GET /v1/links)
-	LinkList(ctx context.Context, request LinkListRequestObject) (LinkListResponseObject, error)
-
-	// (POST /v1/links)
-	LinkCreate(ctx context.Context, request LinkCreateRequestObject) (LinkCreateResponseObject, error)
-
-	// (GET /v1/links/{link_slug})
-	LinkGet(ctx context.Context, request LinkGetRequestObject) (LinkGetResponseObject, error)
-
-	// (GET /v1/nodes)
-	NodeList(ctx context.Context, request NodeListRequestObject) (NodeListResponseObject, error)
-
-	// (POST /v1/nodes)
-	NodeCreate(ctx context.Context, request NodeCreateRequestObject) (NodeCreateResponseObject, error)
-
-	// (DELETE /v1/nodes/{node_slug})
-	NodeDelete(ctx context.Context, request NodeDeleteRequestObject) (NodeDeleteResponseObject, error)
-
-	// (GET /v1/nodes/{node_slug})
-	NodeGet(ctx context.Context, request NodeGetRequestObject) (NodeGetResponseObject, error)
-
-	// (PATCH /v1/nodes/{node_slug})
-	NodeUpdate(ctx context.Context, request NodeUpdateRequestObject) (NodeUpdateResponseObject, error)
-
-	// (DELETE /v1/nodes/{node_slug}/assets/{asset_id})
-	NodeRemoveAsset(ctx context.Context, request NodeRemoveAssetRequestObject) (NodeRemoveAssetResponseObject, error)
-
-	// (PUT /v1/nodes/{node_slug}/assets/{asset_id})
-	NodeAddAsset(ctx context.Context, request NodeAddAssetRequestObject) (NodeAddAssetResponseObject, error)
-
-	// (DELETE /v1/nodes/{node_slug}/nodes/{node_slug_child})
-	NodeRemoveNode(ctx context.Context, request NodeRemoveNodeRequestObject) (NodeRemoveNodeResponseObject, error)
-
-	// (PUT /v1/nodes/{node_slug}/nodes/{node_slug_child})
-	NodeAddNode(ctx context.Context, request NodeAddNodeRequestObject) (NodeAddNodeResponseObject, error)
-
-	// (PATCH /v1/nodes/{node_slug}/visibility)
-	NodeUpdateVisibility(ctx context.Context, request NodeUpdateVisibilityRequestObject) (NodeUpdateVisibilityResponseObject, error)
-
-	// (GET /v1/posts/search)
+	// (GET /posts/search)
 	PostSearch(ctx context.Context, request PostSearchRequestObject) (PostSearchResponseObject, error)
 
-	// (DELETE /v1/posts/{post_id})
+	// (DELETE /posts/{post_id})
 	PostDelete(ctx context.Context, request PostDeleteRequestObject) (PostDeleteResponseObject, error)
 
-	// (PATCH /v1/posts/{post_id})
+	// (PATCH /posts/{post_id})
 	PostUpdate(ctx context.Context, request PostUpdateRequestObject) (PostUpdateResponseObject, error)
 
-	// (PUT /v1/posts/{post_id}/reacts)
+	// (PUT /posts/{post_id}/reacts)
 	PostReactAdd(ctx context.Context, request PostReactAddRequestObject) (PostReactAddResponseObject, error)
 
-	// (GET /v1/profiles)
+	// (GET /profiles)
 	ProfileList(ctx context.Context, request ProfileListRequestObject) (ProfileListResponseObject, error)
 
-	// (GET /v1/profiles/{account_handle})
+	// (GET /profiles/{account_handle})
 	ProfileGet(ctx context.Context, request ProfileGetRequestObject) (ProfileGetResponseObject, error)
 
-	// (GET /v1/threads)
+	// (GET /threads)
 	ThreadList(ctx context.Context, request ThreadListRequestObject) (ThreadListResponseObject, error)
 
-	// (POST /v1/threads)
+	// (POST /threads)
 	ThreadCreate(ctx context.Context, request ThreadCreateRequestObject) (ThreadCreateResponseObject, error)
 
-	// (DELETE /v1/threads/{thread_mark})
+	// (DELETE /threads/{thread_mark})
 	ThreadDelete(ctx context.Context, request ThreadDeleteRequestObject) (ThreadDeleteResponseObject, error)
 	// Get information about a thread and the posts within the thread.
-	// (GET /v1/threads/{thread_mark})
+	// (GET /threads/{thread_mark})
 	ThreadGet(ctx context.Context, request ThreadGetRequestObject) (ThreadGetResponseObject, error)
 
-	// (PATCH /v1/threads/{thread_mark})
+	// (PATCH /threads/{thread_mark})
 	ThreadUpdate(ctx context.Context, request ThreadUpdateRequestObject) (ThreadUpdateResponseObject, error)
 
-	// (POST /v1/threads/{thread_mark}/replies)
+	// (POST /threads/{thread_mark}/replies)
 	ReplyCreate(ctx context.Context, request ReplyCreateRequestObject) (ReplyCreateResponseObject, error)
 	// Get the software version string.
 	// (GET /version)
@@ -17454,29 +17454,6 @@ func NewStrictHandler(ssi StrictServerInterface, middlewares []StrictMiddlewareF
 type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
-}
-
-// GetSpec operation middleware
-func (sh *strictHandler) GetSpec(ctx echo.Context) error {
-	var request GetSpecRequestObject
-
-	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetSpec(ctx.Request().Context(), request.(GetSpecRequestObject))
-	}
-	for _, middleware := range sh.middlewares {
-		handler = middleware(handler, "GetSpec")
-	}
-
-	response, err := handler(ctx, request)
-
-	if err != nil {
-		return err
-	} else if validResponse, ok := response.(GetSpecResponseObject); ok {
-		return validResponse.VisitGetSpecResponse(ctx.Response())
-	} else if response != nil {
-		return fmt.Errorf("unexpected response type: %T", response)
-	}
-	return nil
 }
 
 // AccountGet operation middleware
@@ -19070,6 +19047,29 @@ func (sh *strictHandler) NodeUpdateVisibility(ctx echo.Context, nodeSlug NodeSlu
 	return nil
 }
 
+// GetSpec operation middleware
+func (sh *strictHandler) GetSpec(ctx echo.Context) error {
+	var request GetSpecRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.GetSpec(ctx.Request().Context(), request.(GetSpecRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetSpec")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(GetSpecResponseObject); ok {
+		return validResponse.VisitGetSpecResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // PostSearch operation middleware
 func (sh *strictHandler) PostSearch(ctx echo.Context, params PostSearchParams) error {
 	var request PostSearchRequestObject
@@ -19424,238 +19424,241 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"HwAA//8qRj4gBV4BAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

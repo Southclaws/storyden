@@ -2,19 +2,23 @@
 
 const isStandalone = process.env.NEXT_BUILD_STANDALONE === "true";
 
+const API_ADDRESS =
+  process.env["NEXT_PUBLIC_API_ADDRESS"] ?? "http://localhost:8000";
+
+const apiURL = new URL(API_ADDRESS);
+
 const nextConfig = {
   output: isStandalone ? "standalone" : undefined,
   reactStrictMode: true,
   swcMinify: true,
-  async rewrites() {
-    return [
+  images: {
+    remotePatterns: [
       {
-        source: "/api/:path*",
-        destination: `${
-          process.env.NEXT_PUBLIC_API_ADDRESS ?? "http://localhost:8000"
-        }/api/:path*`,
+        protocol: apiURL.protocol.replace(":", ""),
+        hostname: apiURL.hostname,
+        port: apiURL.port,
       },
-    ];
+    ],
   },
 };
 

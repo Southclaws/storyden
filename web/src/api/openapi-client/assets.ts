@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Key, SWRConfiguration } from "swr";
@@ -29,7 +31,7 @@ export const assetUpload = (
   params?: AssetUploadParams,
 ) => {
   return fetcher<AssetUploadOKResponse>({
-    url: `/v1/assets`,
+    url: `/assets`,
     method: "POST",
     headers: { "Content-Type": "application/octet-stream" },
     data: assetUploadBody,
@@ -45,7 +47,7 @@ export const getAssetUploadMutationFetcher = (params?: AssetUploadParams) => {
     return assetUpload(arg, params);
   };
 };
-export const getAssetUploadMutationKey = () => `/v1/assets` as const;
+export const getAssetUploadMutationKey = () => `/assets` as const;
 
 export type AssetUploadMutationResult = NonNullable<
   Awaited<ReturnType<typeof assetUpload>>
@@ -85,13 +87,13 @@ export const useAssetUpload = <
  */
 export const assetGet = (assetFilename: string) => {
   return fetcher<AssetGetOKResponse>({
-    url: `/v1/assets/${assetFilename}`,
+    url: `/assets/${assetFilename}`,
     method: "GET",
   });
 };
 
 export const getAssetGetKey = (assetFilename: string) =>
-  [`/v1/assets/${assetFilename}`] as const;
+  [`/assets/${assetFilename}`] as const;
 
 export type AssetGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof assetGet>>
