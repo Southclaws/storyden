@@ -20,7 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/app/services/asset_manager"
+	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -28,17 +28,17 @@ import (
 var errEmptyLink = fault.New("empty link")
 
 type Fetcher struct {
-	l     *zap.Logger
-	as    asset_manager.Service
-	lq    *link_querier.LinkQuerier
-	lr    *link_writer.LinkWriter
-	sc    scrape.Scraper
-	queue pubsub.Topic[mq.ScrapeLink]
+	l        *zap.Logger
+	uploader *asset_upload.Uploader
+	lq       *link_querier.LinkQuerier
+	lr       *link_writer.LinkWriter
+	sc       scrape.Scraper
+	queue    pubsub.Topic[mq.ScrapeLink]
 }
 
 func New(
 	l *zap.Logger,
-	as asset_manager.Service,
+	uploader *asset_upload.Uploader,
 	nr library.Repository,
 	lq *link_querier.LinkQuerier,
 	lr *link_writer.LinkWriter,
@@ -46,12 +46,12 @@ func New(
 	queue pubsub.Topic[mq.ScrapeLink],
 ) *Fetcher {
 	return &Fetcher{
-		l:     l.With(zap.String("service", "hydrator")),
-		as:    as,
-		lq:    lq,
-		lr:    lr,
-		sc:    sc,
-		queue: queue,
+		l:        l.With(zap.String("service", "hydrator")),
+		uploader: uploader,
+		lq:       lq,
+		lr:       lr,
+		sc:       sc,
+		queue:    queue,
 	}
 }
 
@@ -159,7 +159,7 @@ func (s *Fetcher) CopyAsset(ctx context.Context, url string) (*asset.Asset, erro
 	// TODO: Better naming???
 	name := slug.Make(url)
 
-	a, err := s.as.Upload(ctx, resp.Body, resp.ContentLength, asset.NewFilename(name), url)
+	a, err := s.uploader.Upload(ctx, resp.Body, resp.ContentLength, asset.NewFilename(name), asset_upload.Options{})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

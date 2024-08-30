@@ -8,6 +8,7 @@ import {
 import { Card } from "@/components/ui/rich-card";
 import { HStack } from "@/styled-system/jsx";
 import { RichCardVariantProps } from "@/styled-system/recipes";
+import { getAssetURL } from "@/utils/asset";
 
 import { DirectoryBadge } from "../DirectoryBadge";
 
@@ -30,7 +31,7 @@ export function NodeCard({ node, directoryPath, context, ...rest }: Props) {
       title={node.name}
       text={node.description}
       url={url}
-      image={asset?.url}
+      image={getAssetURL(asset?.path)}
       {...rest}
     >
       {context === "generic" ? (

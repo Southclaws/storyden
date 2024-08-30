@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -19,7 +20,10 @@ func (Asset) Mixin() []ent.Mixin {
 func (Asset) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("filename"),
-		field.String("url"),
+
+		field.Int("size").
+			Annotations(entsql.Default("0")),
+
 		field.JSON("metadata", map[string]any{}).Optional(),
 
 		// Edges

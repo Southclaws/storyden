@@ -4,6 +4,7 @@ import { LinkButton } from "@/components/ui/link-button";
 import { Card } from "@/components/ui/rich-card";
 import { HStack } from "@/styled-system/jsx";
 import { RichCardVariantProps } from "@/styled-system/recipes";
+import { getAssetURL } from "@/utils/asset";
 
 export type Props = {
   link: LinkReference;
@@ -19,7 +20,7 @@ export function LinkCard({ link, ...rest }: Props) {
       title={link.title ?? link.url}
       url={link.url}
       text={link.description}
-      image={asset?.url}
+      image={getAssetURL(asset?.path)}
       shape="row"
       {...rest}
     >

@@ -14,6 +14,8 @@ export interface Asset {
   height: number;
   id: Identifier;
   mime_type: string;
-  url: string;
+  /** The API path of the asset, conforms to the schema's GET `/assets`.
+   */
+  path: string;
   width: number;
 }

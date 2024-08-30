@@ -71,9 +71,9 @@ func Filename(v string) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldFilename, v))
 }
 
-// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
-func URL(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldEQ(FieldURL, v))
+// Size applies equality check predicate on the "size" field. It's identical to SizeEQ.
+func Size(v int) predicate.Asset {
+	return predicate.Asset(sql.FieldEQ(FieldSize, v))
 }
 
 // AccountID applies equality check predicate on the "account_id" field. It's identical to AccountIDEQ.
@@ -226,69 +226,44 @@ func FilenameContainsFold(v string) predicate.Asset {
 	return predicate.Asset(sql.FieldContainsFold(FieldFilename, v))
 }
 
-// URLEQ applies the EQ predicate on the "url" field.
-func URLEQ(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldEQ(FieldURL, v))
+// SizeEQ applies the EQ predicate on the "size" field.
+func SizeEQ(v int) predicate.Asset {
+	return predicate.Asset(sql.FieldEQ(FieldSize, v))
 }
 
-// URLNEQ applies the NEQ predicate on the "url" field.
-func URLNEQ(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldNEQ(FieldURL, v))
+// SizeNEQ applies the NEQ predicate on the "size" field.
+func SizeNEQ(v int) predicate.Asset {
+	return predicate.Asset(sql.FieldNEQ(FieldSize, v))
 }
 
-// URLIn applies the In predicate on the "url" field.
-func URLIn(vs ...string) predicate.Asset {
-	return predicate.Asset(sql.FieldIn(FieldURL, vs...))
+// SizeIn applies the In predicate on the "size" field.
+func SizeIn(vs ...int) predicate.Asset {
+	return predicate.Asset(sql.FieldIn(FieldSize, vs...))
 }
 
-// URLNotIn applies the NotIn predicate on the "url" field.
-func URLNotIn(vs ...string) predicate.Asset {
-	return predicate.Asset(sql.FieldNotIn(FieldURL, vs...))
+// SizeNotIn applies the NotIn predicate on the "size" field.
+func SizeNotIn(vs ...int) predicate.Asset {
+	return predicate.Asset(sql.FieldNotIn(FieldSize, vs...))
 }
 
-// URLGT applies the GT predicate on the "url" field.
-func URLGT(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldGT(FieldURL, v))
+// SizeGT applies the GT predicate on the "size" field.
+func SizeGT(v int) predicate.Asset {
+	return predicate.Asset(sql.FieldGT(FieldSize, v))
 }
 
-// URLGTE applies the GTE predicate on the "url" field.
-func URLGTE(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldGTE(FieldURL, v))
+// SizeGTE applies the GTE predicate on the "size" field.
+func SizeGTE(v int) predicate.Asset {
+	return predicate.Asset(sql.FieldGTE(FieldSize, v))
 }
 
-// URLLT applies the LT predicate on the "url" field.
-func URLLT(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldLT(FieldURL, v))
+// SizeLT applies the LT predicate on the "size" field.
+func SizeLT(v int) predicate.Asset {
+	return predicate.Asset(sql.FieldLT(FieldSize, v))
 }
 
-// URLLTE applies the LTE predicate on the "url" field.
-func URLLTE(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldLTE(FieldURL, v))
-}
-
-// URLContains applies the Contains predicate on the "url" field.
-func URLContains(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldContains(FieldURL, v))
-}
-
-// URLHasPrefix applies the HasPrefix predicate on the "url" field.
-func URLHasPrefix(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldHasPrefix(FieldURL, v))
-}
-
-// URLHasSuffix applies the HasSuffix predicate on the "url" field.
-func URLHasSuffix(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldHasSuffix(FieldURL, v))
-}
-
-// URLEqualFold applies the EqualFold predicate on the "url" field.
-func URLEqualFold(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldEqualFold(FieldURL, v))
-}
-
-// URLContainsFold applies the ContainsFold predicate on the "url" field.
-func URLContainsFold(v string) predicate.Asset {
-	return predicate.Asset(sql.FieldContainsFold(FieldURL, v))
+// SizeLTE applies the LTE predicate on the "size" field.
+func SizeLTE(v int) predicate.Asset {
+	return predicate.Asset(sql.FieldLTE(FieldSize, v))
 }
 
 // MetadataIsNil applies the IsNil predicate on the "metadata" field.

@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardRows } from "@/components/ui/rich-card";
 import { css } from "@/styled-system/css";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
+import { getAssetURL } from "@/utils/asset";
 
 import { NodeCard } from "../NodeCard";
 
@@ -89,7 +90,7 @@ export function DatagraphBulkImport(props: Props) {
                   title={link.title || link.url}
                   text={link.description || "(no description found)"}
                   url={link.url}
-                  image={link.primary_image?.url}
+                  image={getAssetURL(link.primary_image?.path)}
                   controls={<StateBadge state={task.state} />}
                 >
                   <HStack>

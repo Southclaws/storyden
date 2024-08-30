@@ -11,7 +11,6 @@ import (
 	_ "image/png"
 	"io"
 	"net/url"
-	"path"
 	"strings"
 
 	"github.com/Southclaws/fault"
@@ -26,7 +25,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
-	"github.com/Southclaws/storyden/app/services/asset_manager"
+	"github.com/Southclaws/storyden/app/services/asset/asset_download"
+	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
@@ -76,7 +76,8 @@ type service struct {
 	rbac rbac.AccessManager
 
 	accountQuery account_querier.Querier
-	am           asset_manager.Service
+	uploader     *asset_upload.Uploader
+	downloader   *asset_download.Downloader
 	thread_repo  thread.Repository
 
 	os object.Storer
@@ -89,7 +90,8 @@ func New(
 	rbac rbac.AccessManager,
 
 	accountQuery account_querier.Querier,
-	am asset_manager.Service,
+	uploader *asset_upload.Uploader,
+	downloader *asset_download.Downloader,
 	thread_repo thread.Repository,
 
 	os object.Storer,
@@ -99,7 +101,8 @@ func New(
 		l:            l.With(zap.String("service", "icon")),
 		rbac:         rbac,
 		accountQuery: accountQuery,
-		am:           am,
+		uploader:     uploader,
+		downloader:   downloader,
 		thread_repo:  thread_repo,
 		os:           os,
 		address:      cfg.PublicWebAddress,
@@ -171,10 +174,7 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 
-		apiPath := path.Join(iconRoute)
-		url := fmt.Sprintf("%s/%s", s.address.String(), apiPath)
-
-		_, err = s.am.Upload(ctx, resizeBuffer, int64(resizeBuffer.Len()), assetFilename, url)
+		_, err = s.uploader.Upload(ctx, resizeBuffer, int64(resizeBuffer.Len()), assetFilename, asset_upload.Options{})
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
@@ -186,7 +186,7 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 func (s *service) Get(ctx context.Context, size string) (*asset.Asset, io.Reader, error) {
 	filename := asset.NewFilepathFilename(fmt.Sprintf(iconFileTemplate, size))
 
-	a, r, err := s.am.Get(ctx, filename)
+	a, r, err := s.downloader.Get(ctx, filename)
 	if err != nil {
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}

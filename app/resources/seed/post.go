@@ -238,79 +238,10 @@ Storyden is still in development so please give the repository a watch if you're
 		},
 	}
 
-	Post_04_Photos = thread.Thread{
-		Post: post.Post{
-			ID:      post.ID(id("00000000000000000040")),
-			Author:  profile.Public{ID: Account_005_Þórr.ID},
-			Content: utils.Must(content.NewRichText("some pics from my trip!")),
-			Assets: []*asset.Asset{
-				{
-					ID:   utils.Must(xid.FromString("00000000000000000040")),
-					Name: asset.NewFilename("00000000000000000040-asset-01"),
-					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1158.jpg",
-					Size: 2537802, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
-				},
-				{
-					ID:   utils.Must(xid.FromString("00000000000000000040")),
-					Name: asset.NewFilename("00000000000000000040-asset-01"),
-					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1174.jpg",
-					Size: 1433625, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
-				},
-				{
-					ID:   utils.Must(xid.FromString("00000000000000000040")),
-					Name: asset.NewFilename("00000000000000000040-asset-01"),
-					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1236.jpg",
-					Size: 1828065, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
-				},
-				{
-					ID:   utils.Must(xid.FromString("00000000000000000040")),
-					Name: asset.NewFilename("00000000000000000040-asset-01"),
-					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1239.jpg",
-					Size: 1769497, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 3024, "height": 4032},
-				},
-				{
-					ID:   utils.Must(xid.FromString("00000000000000000040")),
-					Name: asset.NewFilename("00000000000000000040-asset-01"),
-					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1243.jpg",
-					Size: 1930321, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 4032, "height": 3024},
-				},
-				{
-					ID:   utils.Must(xid.FromString("00000000000000000040")),
-					Name: asset.NewFilename("00000000000000000040-asset-01"),
-					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/IMG_1264.jpg",
-					Size: 1724055, Metadata: map[string]any{"mime_type": "image/jpeg", "width": 4032, "height": 3024},
-				},
-				{
-					ID:   utils.Must(xid.FromString("00000000000000000040")),
-					Name: asset.NewFilename("00000000000000000040-asset-01"),
-					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/4b3f6b4eeadb4dcc9358541c1d377588.mov",
-					Size: 2552083, Metadata: map[string]any{"mime_type": "video/quicktime", "width": 1080, "height": 1920},
-				},
-				{
-					ID:   utils.Must(xid.FromString("00000000000000000040")),
-					Name: asset.NewFilename("00000000000000000040-asset-01"),
-					URL:  "https://pub-7b5607a210bc4f0b81cb6ba41e8754f9.r2.dev/test/1631887536125.mov",
-					Size: 3155277, Metadata: map[string]any{"mime_type": "video/quicktime", "width": 1080, "height": 1920},
-				},
-			},
-		},
-		Title:    "Trip to Iceland",
-		Category: Category_02_Photos,
-
-		Replies: []*reply.Reply{
-			{
-				Post: post.Post{
-					Content: utils.Must(content.NewRichText("")),
-				},
-			},
-		},
-	}
-
 	Threads = []thread.Thread{
 		Post_01_Welcome,
 		Post_02_HowToContribute,
 		Post_03_LoremIpsum,
-		Post_04_Photos,
 	}
 )
 
@@ -322,7 +253,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 		for i, a := range t.Assets {
 			id := fmt.Sprintf("%s-asset-%d", t.ID, i)
 
-			a, err := ar.Add(ctx, t.Author.ID, asset.NewFilename(id), a.URL)
+			a, err := ar.Add(ctx, t.Author.ID, asset.NewFilename(id), a.Size)
 			if err != nil {
 				panic(err)
 			}

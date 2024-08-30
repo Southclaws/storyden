@@ -3239,13 +3239,15 @@ components:
 
     Asset:
       type: object
-      required: [id, filename, url, mime_type, width, height]
+      required: [id, filename, path, mime_type, width, height]
       properties:
         id:
           $ref: "#/components/schemas/AssetID"
         filename:
           type: string
-        url:
+        path:
+          description: |
+            The API path of the asset, conforms to the schema's GET `/assets`.
           type: string
         mime_type:
           type: string

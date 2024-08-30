@@ -4,6 +4,7 @@ import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
 import { Box, HStack, Stack, VStack, styled } from "@/styled-system/jsx";
+import { getAssetURL } from "@/utils/asset";
 
 type Props = Node;
 
@@ -39,7 +40,11 @@ export function DatagraphHeader(props: Props) {
 
       {asset && (
         <HStack w="full" h="full" maxH="64" justify="center" minW="0">
-          <styled.img maxHeight="64" borderRadius="lg" src={asset.url} />
+          <styled.img
+            maxHeight="64"
+            borderRadius="lg"
+            src={getAssetURL(asset.path)}
+          />
         </HStack>
       )}
     </Stack>

@@ -6,7 +6,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
 	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/asset"
-	"github.com/Southclaws/storyden/app/services/asset_manager"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
@@ -43,7 +42,6 @@ func Build() fx.Option {
 		search.Build(),
 		avatar.Build(),
 		asset.Build(),
-		asset_manager.Build(),
 		thread_mark.Build(),
 		collection.Build(),
 		link.Build(),

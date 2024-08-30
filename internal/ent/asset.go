@@ -26,8 +26,8 @@ type Asset struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Filename holds the value of the "filename" field.
 	Filename string `json:"filename,omitempty"`
-	// URL holds the value of the "url" field.
-	URL string `json:"url,omitempty"`
+	// Size holds the value of the "size" field.
+	Size int `json:"size,omitempty"`
 	// Metadata holds the value of the "metadata" field.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// AccountID holds the value of the "account_id" field.
@@ -98,7 +98,9 @@ func (*Asset) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case asset.FieldMetadata:
 			values[i] = new([]byte)
-		case asset.FieldFilename, asset.FieldURL:
+		case asset.FieldSize:
+			values[i] = new(sql.NullInt64)
+		case asset.FieldFilename:
 			values[i] = new(sql.NullString)
 		case asset.FieldCreatedAt, asset.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -143,11 +145,11 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.Filename = value.String
 			}
-		case asset.FieldURL:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url", values[i])
+		case asset.FieldSize:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field size", values[i])
 			} else if value.Valid {
-				a.URL = value.String
+				a.Size = int(value.Int64)
 			}
 		case asset.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -228,8 +230,8 @@ func (a *Asset) String() string {
 	builder.WriteString("filename=")
 	builder.WriteString(a.Filename)
 	builder.WriteString(", ")
-	builder.WriteString("url=")
-	builder.WriteString(a.URL)
+	builder.WriteString("size=")
+	builder.WriteString(fmt.Sprintf("%v", a.Size))
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", a.Metadata))

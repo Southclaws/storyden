@@ -54,17 +54,24 @@ func (au *AssetUpdate) SetNillableFilename(s *string) *AssetUpdate {
 	return au
 }
 
-// SetURL sets the "url" field.
-func (au *AssetUpdate) SetURL(s string) *AssetUpdate {
-	au.mutation.SetURL(s)
+// SetSize sets the "size" field.
+func (au *AssetUpdate) SetSize(i int) *AssetUpdate {
+	au.mutation.ResetSize()
+	au.mutation.SetSize(i)
 	return au
 }
 
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (au *AssetUpdate) SetNillableURL(s *string) *AssetUpdate {
-	if s != nil {
-		au.SetURL(*s)
+// SetNillableSize sets the "size" field if the given value is not nil.
+func (au *AssetUpdate) SetNillableSize(i *int) *AssetUpdate {
+	if i != nil {
+		au.SetSize(*i)
 	}
+	return au
+}
+
+// AddSize adds i to the "size" field.
+func (au *AssetUpdate) AddSize(i int) *AssetUpdate {
+	au.mutation.AddSize(i)
 	return au
 }
 
@@ -292,8 +299,11 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.Filename(); ok {
 		_spec.SetField(asset.FieldFilename, field.TypeString, value)
 	}
-	if value, ok := au.mutation.URL(); ok {
-		_spec.SetField(asset.FieldURL, field.TypeString, value)
+	if value, ok := au.mutation.Size(); ok {
+		_spec.SetField(asset.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := au.mutation.AddedSize(); ok {
+		_spec.AddField(asset.FieldSize, field.TypeInt, value)
 	}
 	if value, ok := au.mutation.Metadata(); ok {
 		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)
@@ -507,17 +517,24 @@ func (auo *AssetUpdateOne) SetNillableFilename(s *string) *AssetUpdateOne {
 	return auo
 }
 
-// SetURL sets the "url" field.
-func (auo *AssetUpdateOne) SetURL(s string) *AssetUpdateOne {
-	auo.mutation.SetURL(s)
+// SetSize sets the "size" field.
+func (auo *AssetUpdateOne) SetSize(i int) *AssetUpdateOne {
+	auo.mutation.ResetSize()
+	auo.mutation.SetSize(i)
 	return auo
 }
 
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (auo *AssetUpdateOne) SetNillableURL(s *string) *AssetUpdateOne {
-	if s != nil {
-		auo.SetURL(*s)
+// SetNillableSize sets the "size" field if the given value is not nil.
+func (auo *AssetUpdateOne) SetNillableSize(i *int) *AssetUpdateOne {
+	if i != nil {
+		auo.SetSize(*i)
 	}
+	return auo
+}
+
+// AddSize adds i to the "size" field.
+func (auo *AssetUpdateOne) AddSize(i int) *AssetUpdateOne {
+	auo.mutation.AddSize(i)
 	return auo
 }
 
@@ -775,8 +792,11 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 	if value, ok := auo.mutation.Filename(); ok {
 		_spec.SetField(asset.FieldFilename, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.URL(); ok {
-		_spec.SetField(asset.FieldURL, field.TypeString, value)
+	if value, ok := auo.mutation.Size(); ok {
+		_spec.SetField(asset.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := auo.mutation.AddedSize(); ok {
+		_spec.AddField(asset.FieldSize, field.TypeInt, value)
 	}
 	if value, ok := auo.mutation.Metadata(); ok {
 		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)

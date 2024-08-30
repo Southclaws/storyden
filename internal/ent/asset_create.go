@@ -62,9 +62,9 @@ func (ac *AssetCreate) SetFilename(s string) *AssetCreate {
 	return ac
 }
 
-// SetURL sets the "url" field.
-func (ac *AssetCreate) SetURL(s string) *AssetCreate {
-	ac.mutation.SetURL(s)
+// SetSize sets the "size" field.
+func (ac *AssetCreate) SetSize(i int) *AssetCreate {
+	ac.mutation.SetSize(i)
 	return ac
 }
 
@@ -210,8 +210,8 @@ func (ac *AssetCreate) check() error {
 	if _, ok := ac.mutation.Filename(); !ok {
 		return &ValidationError{Name: "filename", err: errors.New(`ent: missing required field "Asset.filename"`)}
 	}
-	if _, ok := ac.mutation.URL(); !ok {
-		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "Asset.url"`)}
+	if _, ok := ac.mutation.Size(); !ok {
+		return &ValidationError{Name: "size", err: errors.New(`ent: missing required field "Asset.size"`)}
 	}
 	if _, ok := ac.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "Asset.account_id"`)}
@@ -272,9 +272,9 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 		_spec.SetField(asset.FieldFilename, field.TypeString, value)
 		_node.Filename = value
 	}
-	if value, ok := ac.mutation.URL(); ok {
-		_spec.SetField(asset.FieldURL, field.TypeString, value)
-		_node.URL = value
+	if value, ok := ac.mutation.Size(); ok {
+		_spec.SetField(asset.FieldSize, field.TypeInt, value)
+		_node.Size = value
 	}
 	if value, ok := ac.mutation.Metadata(); ok {
 		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)
@@ -421,15 +421,21 @@ func (u *AssetUpsert) UpdateFilename() *AssetUpsert {
 	return u
 }
 
-// SetURL sets the "url" field.
-func (u *AssetUpsert) SetURL(v string) *AssetUpsert {
-	u.Set(asset.FieldURL, v)
+// SetSize sets the "size" field.
+func (u *AssetUpsert) SetSize(v int) *AssetUpsert {
+	u.Set(asset.FieldSize, v)
 	return u
 }
 
-// UpdateURL sets the "url" field to the value that was provided on create.
-func (u *AssetUpsert) UpdateURL() *AssetUpsert {
-	u.SetExcluded(asset.FieldURL)
+// UpdateSize sets the "size" field to the value that was provided on create.
+func (u *AssetUpsert) UpdateSize() *AssetUpsert {
+	u.SetExcluded(asset.FieldSize)
+	return u
+}
+
+// AddSize adds v to the "size" field.
+func (u *AssetUpsert) AddSize(v int) *AssetUpsert {
+	u.Add(asset.FieldSize, v)
 	return u
 }
 
@@ -542,17 +548,24 @@ func (u *AssetUpsertOne) UpdateFilename() *AssetUpsertOne {
 	})
 }
 
-// SetURL sets the "url" field.
-func (u *AssetUpsertOne) SetURL(v string) *AssetUpsertOne {
+// SetSize sets the "size" field.
+func (u *AssetUpsertOne) SetSize(v int) *AssetUpsertOne {
 	return u.Update(func(s *AssetUpsert) {
-		s.SetURL(v)
+		s.SetSize(v)
 	})
 }
 
-// UpdateURL sets the "url" field to the value that was provided on create.
-func (u *AssetUpsertOne) UpdateURL() *AssetUpsertOne {
+// AddSize adds v to the "size" field.
+func (u *AssetUpsertOne) AddSize(v int) *AssetUpsertOne {
 	return u.Update(func(s *AssetUpsert) {
-		s.UpdateURL()
+		s.AddSize(v)
+	})
+}
+
+// UpdateSize sets the "size" field to the value that was provided on create.
+func (u *AssetUpsertOne) UpdateSize() *AssetUpsertOne {
+	return u.Update(func(s *AssetUpsert) {
+		s.UpdateSize()
 	})
 }
 
@@ -837,17 +850,24 @@ func (u *AssetUpsertBulk) UpdateFilename() *AssetUpsertBulk {
 	})
 }
 
-// SetURL sets the "url" field.
-func (u *AssetUpsertBulk) SetURL(v string) *AssetUpsertBulk {
+// SetSize sets the "size" field.
+func (u *AssetUpsertBulk) SetSize(v int) *AssetUpsertBulk {
 	return u.Update(func(s *AssetUpsert) {
-		s.SetURL(v)
+		s.SetSize(v)
 	})
 }
 
-// UpdateURL sets the "url" field to the value that was provided on create.
-func (u *AssetUpsertBulk) UpdateURL() *AssetUpsertBulk {
+// AddSize adds v to the "size" field.
+func (u *AssetUpsertBulk) AddSize(v int) *AssetUpsertBulk {
 	return u.Update(func(s *AssetUpsert) {
-		s.UpdateURL()
+		s.AddSize(v)
+	})
+}
+
+// UpdateSize sets the "size" field to the value that was provided on create.
+func (u *AssetUpsertBulk) UpdateSize() *AssetUpsertBulk {
+	return u.Update(func(s *AssetUpsert) {
+		s.UpdateSize()
 	})
 }
 

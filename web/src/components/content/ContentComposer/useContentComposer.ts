@@ -10,6 +10,7 @@ import { ChangeEvent, useEffect } from "react";
 import { Asset } from "src/api/openapi-schema";
 
 import { css } from "@/styled-system/css";
+import { getAssetURL } from "@/utils/asset";
 
 import { useImageUpload } from "../useImageUpload";
 
@@ -111,7 +112,7 @@ export function useContentComposer(props: ContentComposerProps) {
     for (const f of files) {
       const asset = await upload(f);
 
-      const node = imageNode.create({ src: asset.url });
+      const node = imageNode.create({ src: getAssetURL(asset.path) });
       const transaction = view.state.tr.insert(selection.$head.pos, node);
       view.dispatch(transaction);
 
