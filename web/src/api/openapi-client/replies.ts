@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSWRMutation from "swr/mutation";
 import type { SWRMutationConfiguration } from "swr/mutation";
@@ -25,7 +27,7 @@ export const replyCreate = (
   replyCreateBody: ReplyCreateBody,
 ) => {
   return fetcher<ReplyCreateOKResponse>({
-    url: `/v1/threads/${threadMark}/replies`,
+    url: `/threads/${threadMark}/replies`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: replyCreateBody,
@@ -41,7 +43,7 @@ export const getReplyCreateMutationFetcher = (threadMark: string) => {
   };
 };
 export const getReplyCreateMutationKey = (threadMark: string) =>
-  `/v1/threads/${threadMark}/replies` as const;
+  `/threads/${threadMark}/replies` as const;
 
 export type ReplyCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof replyCreate>>

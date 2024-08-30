@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Arguments, Key, SWRConfiguration } from "swr";
@@ -36,7 +38,7 @@ export const collectionCreate = (
   collectionCreateBody: CollectionCreateBody,
 ) => {
   return fetcher<CollectionCreateOKResponse>({
-    url: `/v1/collections`,
+    url: `/collections`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: collectionCreateBody,
@@ -51,7 +53,7 @@ export const getCollectionCreateMutationFetcher = () => {
     return collectionCreate(arg);
   };
 };
-export const getCollectionCreateMutationKey = () => `/v1/collections` as const;
+export const getCollectionCreateMutationKey = () => `/collections` as const;
 
 export type CollectionCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionCreate>>
@@ -88,14 +90,14 @@ export const useCollectionCreate = <
  */
 export const collectionList = (params?: CollectionListParams) => {
   return fetcher<CollectionListOKResponse>({
-    url: `/v1/collections`,
+    url: `/collections`,
     method: "GET",
     params,
   });
 };
 
 export const getCollectionListKey = (params?: CollectionListParams) =>
-  [`/v1/collections`, ...(params ? [params] : [])] as const;
+  [`/collections`, ...(params ? [params] : [])] as const;
 
 export type CollectionListQueryResult = NonNullable<
   Awaited<ReturnType<typeof collectionList>>
@@ -142,13 +144,13 @@ target collection is public, private, owned or not owned by the account.
  */
 export const collectionGet = (collectionId: string) => {
   return fetcher<CollectionGetOKResponse>({
-    url: `/v1/collections/${collectionId}`,
+    url: `/collections/${collectionId}`,
     method: "GET",
   });
 };
 
 export const getCollectionGetKey = (collectionId: string) =>
-  [`/v1/collections/${collectionId}`] as const;
+  [`/collections/${collectionId}`] as const;
 
 export type CollectionGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof collectionGet>>
@@ -199,7 +201,7 @@ export const collectionUpdate = (
   collectionUpdateBody: CollectionUpdateBody,
 ) => {
   return fetcher<CollectionUpdateOKResponse>({
-    url: `/v1/collections/${collectionId}`,
+    url: `/collections/${collectionId}`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: collectionUpdateBody,
@@ -215,7 +217,7 @@ export const getCollectionUpdateMutationFetcher = (collectionId: string) => {
   };
 };
 export const getCollectionUpdateMutationKey = (collectionId: string) =>
-  `/v1/collections/${collectionId}` as const;
+  `/collections/${collectionId}` as const;
 
 export type CollectionUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionUpdate>>
@@ -260,7 +262,7 @@ export const useCollectionUpdate = <
  */
 export const collectionDelete = (collectionId: string) => {
   return fetcher<void>({
-    url: `/v1/collections/${collectionId}`,
+    url: `/collections/${collectionId}`,
     method: "DELETE",
   });
 };
@@ -271,7 +273,7 @@ export const getCollectionDeleteMutationFetcher = (collectionId: string) => {
   };
 };
 export const getCollectionDeleteMutationKey = (collectionId: string) =>
-  `/v1/collections/${collectionId}` as const;
+  `/collections/${collectionId}` as const;
 
 export type CollectionDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionDelete>>
@@ -318,7 +320,7 @@ making the request. The post can be any published post of any kind.
  */
 export const collectionAddPost = (collectionId: string, postId: string) => {
   return fetcher<CollectionAddPostOKResponse>({
-    url: `/v1/collections/${collectionId}/posts/${postId}`,
+    url: `/collections/${collectionId}/posts/${postId}`,
     method: "PUT",
   });
 };
@@ -337,7 +339,7 @@ export const getCollectionAddPostMutationFetcher = (
 export const getCollectionAddPostMutationKey = (
   collectionId: string,
   postId: string,
-) => `/v1/collections/${collectionId}/posts/${postId}` as const;
+) => `/collections/${collectionId}/posts/${postId}` as const;
 
 export type CollectionAddPostMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionAddPost>>
@@ -385,7 +387,7 @@ account making the request.
  */
 export const collectionRemovePost = (collectionId: string, postId: string) => {
   return fetcher<CollectionRemovePostOKResponse>({
-    url: `/v1/collections/${collectionId}/posts/${postId}`,
+    url: `/collections/${collectionId}/posts/${postId}`,
     method: "DELETE",
   });
 };
@@ -404,7 +406,7 @@ export const getCollectionRemovePostMutationFetcher = (
 export const getCollectionRemovePostMutationKey = (
   collectionId: string,
   postId: string,
-) => `/v1/collections/${collectionId}/posts/${postId}` as const;
+) => `/collections/${collectionId}/posts/${postId}` as const;
 
 export type CollectionRemovePostMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionRemovePost>>
@@ -454,7 +456,7 @@ not published but owned by the collection owner.
  */
 export const collectionAddNode = (collectionId: string, nodeId: string) => {
   return fetcher<CollectionAddNodeOKResponse>({
-    url: `/v1/collections/${collectionId}/nodes/${nodeId}`,
+    url: `/collections/${collectionId}/nodes/${nodeId}`,
     method: "PUT",
   });
 };
@@ -473,7 +475,7 @@ export const getCollectionAddNodeMutationFetcher = (
 export const getCollectionAddNodeMutationKey = (
   collectionId: string,
   nodeId: string,
-) => `/v1/collections/${collectionId}/nodes/${nodeId}` as const;
+) => `/collections/${collectionId}/nodes/${nodeId}` as const;
 
 export type CollectionAddNodeMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionAddNode>>
@@ -521,7 +523,7 @@ account making the request.
  */
 export const collectionRemoveNode = (collectionId: string, nodeId: string) => {
   return fetcher<CollectionRemoveNodeOKResponse>({
-    url: `/v1/collections/${collectionId}/nodes/${nodeId}`,
+    url: `/collections/${collectionId}/nodes/${nodeId}`,
     method: "DELETE",
   });
 };
@@ -540,7 +542,7 @@ export const getCollectionRemoveNodeMutationFetcher = (
 export const getCollectionRemoveNodeMutationKey = (
   collectionId: string,
   nodeId: string,
-) => `/v1/collections/${collectionId}/nodes/${nodeId}` as const;
+) => `/collections/${collectionId}/nodes/${nodeId}` as const;
 
 export type CollectionRemoveNodeMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionRemoveNode>>

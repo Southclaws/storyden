@@ -33,7 +33,7 @@ import (
 )
 
 const (
-	iconRoute        = "api/v1/info/icon"
+	iconRoute        = "api/info/icon"
 	iconFileTemplate = "icon-%s.png"
 )
 

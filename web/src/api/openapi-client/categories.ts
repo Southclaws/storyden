@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Key, SWRConfiguration } from "swr";
@@ -28,7 +30,7 @@ import type {
  */
 export const categoryCreate = (categoryCreateBody: CategoryCreateBody) => {
   return fetcher<CategoryCreateOKResponse>({
-    url: `/v1/categories`,
+    url: `/categories`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: categoryCreateBody,
@@ -43,7 +45,7 @@ export const getCategoryCreateMutationFetcher = () => {
     return categoryCreate(arg);
   };
 };
-export const getCategoryCreateMutationKey = () => `/v1/categories` as const;
+export const getCategoryCreateMutationKey = () => `/categories` as const;
 
 export type CategoryCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof categoryCreate>>
@@ -83,13 +85,10 @@ export const useCategoryCreate = <
  * Get a list of all categories on the site.
  */
 export const categoryList = () => {
-  return fetcher<CategoryListOKResponse>({
-    url: `/v1/categories`,
-    method: "GET",
-  });
+  return fetcher<CategoryListOKResponse>({ url: `/categories`, method: "GET" });
 };
 
-export const getCategoryListKey = () => [`/v1/categories`] as const;
+export const getCategoryListKey = () => [`/categories`] as const;
 
 export type CategoryListQueryResult = NonNullable<
   Awaited<ReturnType<typeof categoryList>>
@@ -129,7 +128,7 @@ export const categoryUpdateOrder = (
   categoryUpdateOrderBody: CategoryUpdateOrderBody,
 ) => {
   return fetcher<CategoryListOKResponse>({
-    url: `/v1/categories`,
+    url: `/categories`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: categoryUpdateOrderBody,
@@ -144,8 +143,7 @@ export const getCategoryUpdateOrderMutationFetcher = () => {
     return categoryUpdateOrder(arg);
   };
 };
-export const getCategoryUpdateOrderMutationKey = () =>
-  `/v1/categories` as const;
+export const getCategoryUpdateOrderMutationKey = () => `/categories` as const;
 
 export type CategoryUpdateOrderMutationResult = NonNullable<
   Awaited<ReturnType<typeof categoryUpdateOrder>>
@@ -183,7 +181,7 @@ export const categoryUpdate = (
   categoryUpdateBody: CategoryUpdateBody,
 ) => {
   return fetcher<CategoryUpdateOKResponse>({
-    url: `/v1/categories/${categoryId}`,
+    url: `/categories/${categoryId}`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: categoryUpdateBody,
@@ -199,7 +197,7 @@ export const getCategoryUpdateMutationFetcher = (categoryId: string) => {
   };
 };
 export const getCategoryUpdateMutationKey = (categoryId: string) =>
-  `/v1/categories/${categoryId}` as const;
+  `/categories/${categoryId}` as const;
 
 export type CategoryUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof categoryUpdate>>

@@ -18,23 +18,30 @@ openapi: 3.1.0
 info:
   contact:
     name: Barnaby Keene
-  description: Storyden social API for building community driven platforms.
+  description: >
+    Storyden social API for building community driven platforms.
+
+    The Storyden API does not adhere to semantic versioning but instead applies
+    a rolling strategy with deprecations and minimal breaking changes. This has
+    been done mainly for a simpler development process and it may be changed to
+    a more fixed versioning strategy in the future. Ultimately, the primary way
+    Storyden tracks versions is dates, there are no set release tags currently.
   title: storyden
-  version: "1"
+  version: "rolling"
 
 servers:
   - url: "/api"
-    description: |
-      The HTTP interface that this document describes is mounted on the `/api` 
-      path and any requests outside of this base path will be proxied to the
-      frontend if Storyden is running in standalone mode.
+    description: >
+      The HTTP interface that this document describes is mounted on the `/api/`
+      path and any requests outside of the base path will not be covered by the
+      API specification and will be used for experimental features and plugins.
 
 security:
   - browser: []
 
 tags:
   - name: misc
-    description: Non-business logic stuff.
+    description: General metadata for the instance and uncategorised routes.
   - name: admin
     description: Administration and configuration settings.
   - name: auth
@@ -122,7 +129,7 @@ paths:
               schema:
                 type: string
 
-  /v1/info:
+  /info:
     get:
       operationId: GetInfo
       description: |
@@ -133,7 +140,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/GetInfoOK" }
 
-  /v1/info/icon/{icon_size}:
+  /info/icon/{icon_size}:
     get:
       operationId: IconGet
       description: Get the logo icon image.
@@ -143,7 +150,7 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/AssetGetOK" }
-  /v1/info/icon:
+  /info/icon:
     post:
       operationId: IconUpload
       description: Upload and process the installation's logo image.
@@ -167,7 +174,7 @@ paths:
   # "Y888888  "Y88888 888  888  888 888 888  888
   #
 
-  /v1/admin:
+  /admin:
     patch:
       operationId: AdminSettingsUpdate
       description: Update non-env configuration settings for installation.
@@ -179,7 +186,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AdminSettingsUpdateOK" }
 
-  /v1/admin/bans/{account_handle}:
+  /admin/bans/{account_handle}:
     post:
       operationId: AdminAccountBanCreate
       description: |
@@ -216,7 +223,7 @@ paths:
   # "Y888888  "Y88888  "Y888 888  888
   #
 
-  /v1/auth:
+  /auth:
     get:
       operationId: AuthProviderList
       description: |
@@ -230,7 +237,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AuthProviderListOK" }
 
-  /v1/auth/password/signup:
+  /auth/password/signup:
     post:
       operationId: AuthPasswordSignup
       description: Register a new account with a username and password.
@@ -242,7 +249,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/password/signin:
+  /auth/password/signin:
     post:
       operationId: AuthPasswordSignin
       description: Sign in to an existing account with a username and password.
@@ -255,7 +262,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/password:
+  /auth/password:
     post:
       operationId: AuthPasswordCreate
       description: |
@@ -283,7 +290,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/email-password/signup:
+  /auth/email-password/signup:
     post:
       operationId: AuthEmailPasswordSignup
       description: Register a new account with a email and password.
@@ -295,7 +302,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/email-password/signin:
+  /auth/email-password/signin:
     post:
       operationId: AuthEmailPasswordSignin
       description: Sign in to an existing account with a email and password.
@@ -308,7 +315,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/email/signup:
+  /auth/email/signup:
     post:
       operationId: AuthEmailSignup
       description: |
@@ -341,7 +348,7 @@ paths:
           description: Verification email sent but no session will be provided.
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/email/signin:
+  /auth/email/signin:
     post:
       operationId: AuthEmailSignin
       description: |
@@ -358,7 +365,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/email/verify:
+  /auth/email/verify:
     post:
       operationId: AuthEmailVerify
       description: |
@@ -373,7 +380,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/oauth/{oauth_provider}/callback:
+  /auth/oauth/{oauth_provider}/callback:
     post:
       operationId: OAuthProviderCallback
       description: OAuth2 callback.
@@ -387,7 +394,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/webauthn/make/{account_handle}:
+  /auth/webauthn/make/{account_handle}:
     get:
       operationId: WebAuthnRequestCredential
       description: |
@@ -400,7 +407,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/WebAuthnRequestCredentialOK" }
 
-  /v1/auth/webauthn/make:
+  /auth/webauthn/make:
     post:
       operationId: WebAuthnMakeCredential
       description: Complete WebAuthn registration by creating a new credential.
@@ -412,7 +419,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/webauthn/assert/{account_handle}:
+  /auth/webauthn/assert/{account_handle}:
     get:
       operationId: WebAuthnGetAssertion
       description: Start the WebAuthn assertion for an existing account.
@@ -426,7 +433,7 @@ paths:
         "200":
           $ref: "#/components/responses/WebAuthnGetAssertionOK"
 
-  /v1/auth/webauthn/assert:
+  /auth/webauthn/assert:
     post:
       operationId: WebAuthnMakeAssertion
       description: Complete the credential assertion and sign in to an account.
@@ -439,7 +446,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/phone:
+  /auth/phone:
     post:
       operationId: PhoneRequestCode
       description: |
@@ -454,7 +461,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/phone/{account_handle}:
+  /auth/phone/{account_handle}:
     put:
       operationId: PhoneSubmitCode
       description: |
@@ -469,7 +476,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
-  /v1/auth/logout:
+  /auth/logout:
     get:
       operationId: AuthProviderLogout
       description: Remove cookies from requesting client.
@@ -492,7 +499,7 @@ paths:
   #  "Y888888  "Y8888P "Y8888P "Y88P"   "Y88888 888  888  "Y888  88888P'
   #
 
-  /v1/accounts:
+  /accounts:
     get:
       operationId: AccountGet
       description: Get the information for the currently authenticated account.
@@ -514,7 +521,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountUpdateOK" }
 
-  /v1/accounts/self/auth-methods:
+  /accounts/self/auth-methods:
     get:
       operationId: AccountAuthProviderList
       description: |
@@ -526,7 +533,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AccountAuthProviderListOK" }
 
-  /v1/accounts/self/auth-methods/{auth_method_id}:
+  /accounts/self/auth-methods/{auth_method_id}:
     delete:
       operationId: AccountAuthMethodDelete
       description: |
@@ -544,7 +551,7 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AccountAuthProviderListOK" }
 
-  /v1/accounts/self/avatar:
+  /accounts/self/avatar:
     post:
       operationId: AccountSetAvatar
       description: Upload an avatar for the authenticated account.
@@ -557,7 +564,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: "OK" }
 
-  /v1/accounts/{account_handle}/avatar:
+  /accounts/{account_handle}/avatar:
     get:
       operationId: AccountGetAvatar
       description: Get an avatar for the specified account.
@@ -584,7 +591,7 @@ paths:
   # 888
   #
 
-  /v1/profiles:
+  /profiles:
     get:
       operationId: ProfileList
       description: Query and search profiles.
@@ -599,7 +606,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ProfileListOK" }
 
-  /v1/profiles/{account_handle}:
+  /profiles/{account_handle}:
     get:
       operationId: ProfileGet
       description: Get a public profile by ID.
@@ -626,7 +633,7 @@ paths:
   #                                   "Y88P"
   #
 
-  /v1/categories:
+  /categories:
     post:
       operationId: CategoryCreate
       description: Create a category for organising posts.
@@ -655,7 +662,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/CategoryListOK" }
 
-  /v1/categories/{category_id}:
+  /categories/{category_id}:
     patch:
       operationId: CategoryUpdate
       description: Create a category for organising posts.
@@ -679,7 +686,7 @@ paths:
   #  "Y888 888  888 888     "Y8888  "Y888888  "Y88888  88888P'
   #
 
-  /v1/threads:
+  /threads:
     post:
       operationId: ThreadCreate
       description: Create a new thread within the specified category.
@@ -720,7 +727,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ThreadListOK" }
 
-  /v1/threads/{thread_mark}:
+  /threads/{thread_mark}:
     get:
       operationId: ThreadGet
       summary: Get information about a thread and the posts within the thread.
@@ -771,7 +778,7 @@ paths:
   #                 888
   #
 
-  /v1/threads/{thread_mark}/replies:
+  /threads/{thread_mark}/replies:
     post:
       operationId: ReplyCreate
       description: Create a new post within a thread.
@@ -798,7 +805,7 @@ paths:
   # 888
   #
 
-  /v1/posts/{post_id}:
+  /posts/{post_id}:
     patch:
       operationId: PostUpdate
       description: Publish changes to a single post.
@@ -821,7 +828,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: OK }
 
-  /v1/posts/search:
+  /posts/search:
     get:
       operationId: PostSearch
       description: Search through posts using various queries and filters.
@@ -849,7 +856,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/PostSearchOK" }
 
-  /v1/posts/{post_id}/reacts:
+  /posts/{post_id}/reacts:
     put:
       operationId: PostReactAdd
       description: Add a reaction to a post.
@@ -873,7 +880,7 @@ paths:
   # "Y888888  88888P'  88888P'  "Y8888   "Y888  88888P'
   #
 
-  /v1/assets:
+  /assets:
     post:
       operationId: AssetUpload
       description: Upload and process a media file.
@@ -888,7 +895,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AssetUploadOK" }
-  /v1/assets/{asset_filename}:
+  /assets/{asset_filename}:
     get:
       operationId: AssetGet
       description: Download an asset by its ID.
@@ -912,7 +919,7 @@ paths:
   #  "Y8888P "Y88P"  888 888  "Y8888   "Y8888P  "Y888 888  "Y88P"  888  888  88888P'
   #
 
-  /v1/collections:
+  /collections:
     post:
       operationId: CollectionCreate
       description: |
@@ -934,7 +941,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/CollectionListOK" }
 
-  /v1/collections/{collection_id}:
+  /collections/{collection_id}:
     get:
       operationId: CollectionGet
       description: |
@@ -971,7 +978,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: OK }
 
-  /v1/collections/{collection_id}/posts/{post_id}:
+  /collections/{collection_id}/posts/{post_id}:
     put:
       operationId: CollectionAddPost
       description: |
@@ -1000,7 +1007,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CollectionRemovePostOK" }
-  /v1/collections/{collection_id}/nodes/{node_id}:
+  /collections/{collection_id}/nodes/{node_id}:
     put:
       operationId: CollectionAddNode
       description: |
@@ -1042,7 +1049,7 @@ paths:
   # 888  888  "Y88P"   "Y88888  "Y8888   88888P'
   #
 
-  /v1/nodes:
+  /nodes:
     post:
       operationId: NodeCreate
       description: |
@@ -1079,7 +1086,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/NodeListOK" }
 
-  /v1/nodes/{node_slug}:
+  /nodes/{node_slug}:
     get:
       operationId: NodeGet
       description: Get a node by its URL slug.
@@ -1115,7 +1122,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NodeDeleteOK" }
 
-  /v1/nodes/{node_slug}/visibility:
+  /nodes/{node_slug}/visibility:
     patch:
       operationId: NodeUpdateVisibility
       description: |
@@ -1131,7 +1138,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NodeUpdateOK" }
 
-  /v1/nodes/{node_slug}/assets/{asset_id}:
+  /nodes/{node_slug}/assets/{asset_id}:
     put:
       operationId: NodeAddAsset
       description: Add an asset to a node.
@@ -1159,7 +1166,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NodeUpdateOK" }
 
-  /v1/nodes/{node_slug}/nodes/{node_slug_child}:
+  /nodes/{node_slug}/nodes/{node_slug_child}:
     put:
       operationId: NodeAddNode
       description: Set a node's parent to the specified node
@@ -1197,7 +1204,7 @@ paths:
   # 888 888 888  888 888  888  88888P'
   #
 
-  /v1/links:
+  /links:
     post:
       operationId: LinkCreate
       description: |
@@ -1230,7 +1237,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/LinkListOK" }
 
-  /v1/links/{link_slug}:
+  /links/{link_slug}:
     get:
       operationId: LinkGet
       description: |
@@ -1258,7 +1265,7 @@ paths:
   #                                    "Y88P"                  888
   #
 
-  /v1/datagraph:
+  /datagraph:
     get:
       operationId: DatagraphSearch
       description: Query and search content.

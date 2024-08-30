@@ -234,7 +234,7 @@ Mutations to data such as create, update and delete (POST, PUT, PATCH and DELETE
  */
 export const accountUpdate = (accountUpdateBody: AccountUpdateBody) => {
   return fetcher<AccountUpdateOKResponse>({
-    url: `/v1/accounts`,
+    url: `/accounts`,
     method: "patch",
     headers: { "Content-Type": "application/json" },
     data: accountUpdateBody,
@@ -257,7 +257,7 @@ How this works in the code is all pages start life as `async` function component
 ```tsx
 export async function FeedScreen(props: Props) {
   const data = await server<ThreadListOKResponse>({
-    url: `/v1/threads`,
+    url: `/threads`,
     params: {
       categories: [props.category],
     } as ThreadListParams,

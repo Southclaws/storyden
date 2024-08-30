@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-import { WEB_ADDRESS } from "src/config";
+import { getIconURL } from "@/utils/icon";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +15,7 @@ export default function Icon() {
     (
       // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
       <img
-        src={`${WEB_ADDRESS}/api/v1/info/icon/512x512`}
+        src={getIconURL("512x512")}
         width={512}
         height={512}
         sizes="512x512"

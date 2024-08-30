@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Key, SWRConfiguration } from "swr";
@@ -40,13 +42,10 @@ endpoint tells a client which auth capabilities are enabled.
 
  */
 export const authProviderList = () => {
-  return fetcher<AuthProviderListOKResponse>({
-    url: `/v1/auth`,
-    method: "GET",
-  });
+  return fetcher<AuthProviderListOKResponse>({ url: `/auth`, method: "GET" });
 };
 
-export const getAuthProviderListKey = () => [`/v1/auth`] as const;
+export const getAuthProviderListKey = () => [`/auth`] as const;
 
 export type AuthProviderListQueryResult = NonNullable<
   Awaited<ReturnType<typeof authProviderList>>
@@ -86,7 +85,7 @@ export const useAuthProviderList = <
  */
 export const authPasswordSignup = (authPasswordBody: AuthPasswordBody) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/password/signup`,
+    url: `/auth/password/signup`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: authPasswordBody,
@@ -102,7 +101,7 @@ export const getAuthPasswordSignupMutationFetcher = () => {
   };
 };
 export const getAuthPasswordSignupMutationKey = () =>
-  `/v1/auth/password/signup` as const;
+  `/auth/password/signup` as const;
 
 export type AuthPasswordSignupMutationResult = NonNullable<
   Awaited<ReturnType<typeof authPasswordSignup>>
@@ -139,7 +138,7 @@ export const useAuthPasswordSignup = <
  */
 export const authPasswordSignin = (authPasswordBody: AuthPasswordBody) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/password/signin`,
+    url: `/auth/password/signin`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: authPasswordBody,
@@ -155,7 +154,7 @@ export const getAuthPasswordSigninMutationFetcher = () => {
   };
 };
 export const getAuthPasswordSigninMutationKey = () =>
-  `/v1/auth/password/signin` as const;
+  `/auth/password/signin` as const;
 
 export type AuthPasswordSigninMutationResult = NonNullable<
   Awaited<ReturnType<typeof authPasswordSignin>>
@@ -200,7 +199,7 @@ export const authPasswordCreate = (
   authPasswordCreateBody: AuthPasswordCreateBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/password`,
+    url: `/auth/password`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: authPasswordCreateBody,
@@ -215,8 +214,7 @@ export const getAuthPasswordCreateMutationFetcher = () => {
     return authPasswordCreate(arg);
   };
 };
-export const getAuthPasswordCreateMutationKey = () =>
-  `/v1/auth/password` as const;
+export const getAuthPasswordCreateMutationKey = () => `/auth/password` as const;
 
 export type AuthPasswordCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof authPasswordCreate>>
@@ -261,7 +259,7 @@ export const authPasswordUpdate = (
   authPasswordUpdateBody: AuthPasswordUpdateBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/password`,
+    url: `/auth/password`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: authPasswordUpdateBody,
@@ -276,8 +274,7 @@ export const getAuthPasswordUpdateMutationFetcher = () => {
     return authPasswordUpdate(arg);
   };
 };
-export const getAuthPasswordUpdateMutationKey = () =>
-  `/v1/auth/password` as const;
+export const getAuthPasswordUpdateMutationKey = () => `/auth/password` as const;
 
 export type AuthPasswordUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof authPasswordUpdate>>
@@ -320,7 +317,7 @@ export const authEmailPasswordSignup = (
   authEmailPasswordBody: AuthEmailPasswordBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/email-password/signup`,
+    url: `/auth/email-password/signup`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: authEmailPasswordBody,
@@ -336,7 +333,7 @@ export const getAuthEmailPasswordSignupMutationFetcher = () => {
   };
 };
 export const getAuthEmailPasswordSignupMutationKey = () =>
-  `/v1/auth/email-password/signup` as const;
+  `/auth/email-password/signup` as const;
 
 export type AuthEmailPasswordSignupMutationResult = NonNullable<
   Awaited<ReturnType<typeof authEmailPasswordSignup>>
@@ -375,7 +372,7 @@ export const authEmailPasswordSignin = (
   authEmailPasswordBody: AuthEmailPasswordBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/email-password/signin`,
+    url: `/auth/email-password/signin`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: authEmailPasswordBody,
@@ -391,7 +388,7 @@ export const getAuthEmailPasswordSigninMutationFetcher = () => {
   };
 };
 export const getAuthEmailPasswordSigninMutationKey = () =>
-  `/v1/auth/email-password/signin` as const;
+  `/auth/email-password/signin` as const;
 
 export type AuthEmailPasswordSigninMutationResult = NonNullable<
   Awaited<ReturnType<typeof authEmailPasswordSignin>>
@@ -451,7 +448,7 @@ be sent to any public address, it MUST be heavily rate limited.
  */
 export const authEmailSignup = (authEmailBody: AuthEmailBody) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/email/signup`,
+    url: `/auth/email/signup`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: authEmailBody,
@@ -467,7 +464,7 @@ export const getAuthEmailSignupMutationFetcher = () => {
   };
 };
 export const getAuthEmailSignupMutationKey = () =>
-  `/v1/auth/email/signup` as const;
+  `/auth/email/signup` as const;
 
 export type AuthEmailSignupMutationResult = NonNullable<
   Awaited<ReturnType<typeof authEmailSignup>>
@@ -509,7 +506,7 @@ but if magic links are preferred, the endpoint will start the code flow.
  */
 export const authEmailSignin = (authEmailBody: AuthEmailBody) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/email/signin`,
+    url: `/auth/email/signin`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: authEmailBody,
@@ -525,7 +522,7 @@ export const getAuthEmailSigninMutationFetcher = () => {
   };
 };
 export const getAuthEmailSigninMutationKey = () =>
-  `/v1/auth/email/signin` as const;
+  `/auth/email/signin` as const;
 
 export type AuthEmailSigninMutationResult = NonNullable<
   Awaited<ReturnType<typeof authEmailSignin>>
@@ -568,7 +565,7 @@ account's email addresses either set via sign up or added later.
  */
 export const authEmailVerify = (authEmailVerifyBody: AuthEmailVerifyBody) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/email/verify`,
+    url: `/auth/email/verify`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: authEmailVerifyBody,
@@ -584,7 +581,7 @@ export const getAuthEmailVerifyMutationFetcher = () => {
   };
 };
 export const getAuthEmailVerifyMutationKey = () =>
-  `/v1/auth/email/verify` as const;
+  `/auth/email/verify` as const;
 
 export type AuthEmailVerifyMutationResult = NonNullable<
   Awaited<ReturnType<typeof authEmailVerify>>
@@ -628,7 +625,7 @@ export const oAuthProviderCallback = (
   oAuthProviderCallbackBody: OAuthProviderCallbackBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/oauth/${oauthProvider}/callback`,
+    url: `/auth/oauth/${oauthProvider}/callback`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: oAuthProviderCallbackBody,
@@ -646,7 +643,7 @@ export const getOAuthProviderCallbackMutationFetcher = (
   };
 };
 export const getOAuthProviderCallbackMutationKey = (oauthProvider: string) =>
-  `/v1/auth/oauth/${oauthProvider}/callback` as const;
+  `/auth/oauth/${oauthProvider}/callback` as const;
 
 export type OAuthProviderCallbackMutationResult = NonNullable<
   Awaited<ReturnType<typeof oAuthProviderCallback>>
@@ -692,13 +689,13 @@ export const useOAuthProviderCallback = <
  */
 export const webAuthnRequestCredential = (accountHandle: string) => {
   return fetcher<WebAuthnRequestCredentialOKResponse>({
-    url: `/v1/auth/webauthn/make/${accountHandle}`,
+    url: `/auth/webauthn/make/${accountHandle}`,
     method: "GET",
   });
 };
 
 export const getWebAuthnRequestCredentialKey = (accountHandle: string) =>
-  [`/v1/auth/webauthn/make/${accountHandle}`] as const;
+  [`/auth/webauthn/make/${accountHandle}`] as const;
 
 export type WebAuthnRequestCredentialQueryResult = NonNullable<
   Awaited<ReturnType<typeof webAuthnRequestCredential>>
@@ -744,7 +741,7 @@ export const webAuthnMakeCredential = (
   webAuthnMakeCredentialBody: WebAuthnMakeCredentialBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/webauthn/make`,
+    url: `/auth/webauthn/make`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: webAuthnMakeCredentialBody,
@@ -760,7 +757,7 @@ export const getWebAuthnMakeCredentialMutationFetcher = () => {
   };
 };
 export const getWebAuthnMakeCredentialMutationKey = () =>
-  `/v1/auth/webauthn/make` as const;
+  `/auth/webauthn/make` as const;
 
 export type WebAuthnMakeCredentialMutationResult = NonNullable<
   Awaited<ReturnType<typeof webAuthnMakeCredential>>
@@ -797,13 +794,13 @@ export const useWebAuthnMakeCredential = <
  */
 export const webAuthnGetAssertion = (accountHandle: string) => {
   return fetcher<WebAuthnGetAssertionOKResponse>({
-    url: `/v1/auth/webauthn/assert/${accountHandle}`,
+    url: `/auth/webauthn/assert/${accountHandle}`,
     method: "GET",
   });
 };
 
 export const getWebAuthnGetAssertionKey = (accountHandle: string) =>
-  [`/v1/auth/webauthn/assert/${accountHandle}`] as const;
+  [`/auth/webauthn/assert/${accountHandle}`] as const;
 
 export type WebAuthnGetAssertionQueryResult = NonNullable<
   Awaited<ReturnType<typeof webAuthnGetAssertion>>
@@ -853,7 +850,7 @@ export const webAuthnMakeAssertion = (
   webAuthnMakeAssertionBody: WebAuthnMakeAssertionBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/webauthn/assert`,
+    url: `/auth/webauthn/assert`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: webAuthnMakeAssertionBody,
@@ -869,7 +866,7 @@ export const getWebAuthnMakeAssertionMutationFetcher = () => {
   };
 };
 export const getWebAuthnMakeAssertionMutationKey = () =>
-  `/v1/auth/webauthn/assert` as const;
+  `/auth/webauthn/assert` as const;
 
 export type WebAuthnMakeAssertionMutationResult = NonNullable<
   Awaited<ReturnType<typeof webAuthnMakeAssertion>>
@@ -915,7 +912,7 @@ export const phoneRequestCode = (
   phoneRequestCodeBody: PhoneRequestCodeBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/phone`,
+    url: `/auth/phone`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: phoneRequestCodeBody,
@@ -930,7 +927,7 @@ export const getPhoneRequestCodeMutationFetcher = () => {
     return phoneRequestCode(arg);
   };
 };
-export const getPhoneRequestCodeMutationKey = () => `/v1/auth/phone` as const;
+export const getPhoneRequestCodeMutationKey = () => `/auth/phone` as const;
 
 export type PhoneRequestCodeMutationResult = NonNullable<
   Awaited<ReturnType<typeof phoneRequestCode>>
@@ -972,7 +969,7 @@ export const phoneSubmitCode = (
   phoneSubmitCodeBody: PhoneSubmitCodeBody,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
-    url: `/v1/auth/phone/${accountHandle}`,
+    url: `/auth/phone/${accountHandle}`,
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     data: phoneSubmitCodeBody,
@@ -988,7 +985,7 @@ export const getPhoneSubmitCodeMutationFetcher = (accountHandle: string) => {
   };
 };
 export const getPhoneSubmitCodeMutationKey = (accountHandle: string) =>
-  `/v1/auth/phone/${accountHandle}` as const;
+  `/auth/phone/${accountHandle}` as const;
 
 export type PhoneSubmitCodeMutationResult = NonNullable<
   Awaited<ReturnType<typeof phoneSubmitCode>>
@@ -1028,10 +1025,10 @@ export const usePhoneSubmitCode = <
  * Remove cookies from requesting client.
  */
 export const authProviderLogout = () => {
-  return fetcher<void>({ url: `/v1/auth/logout`, method: "GET" });
+  return fetcher<void>({ url: `/auth/logout`, method: "GET" });
 };
 
-export const getAuthProviderLogoutKey = () => [`/v1/auth/logout`] as const;
+export const getAuthProviderLogoutKey = () => [`/auth/logout`] as const;
 
 export type AuthProviderLogoutQueryResult = NonNullable<
   Awaited<ReturnType<typeof authProviderLogout>>

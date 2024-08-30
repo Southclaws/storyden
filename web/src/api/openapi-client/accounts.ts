@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Arguments, Key, SWRConfiguration } from "swr";
@@ -33,7 +35,7 @@ anything else about the account such as the avatar, name, etc.
  */
 export const adminAccountBanCreate = (accountHandle: string) => {
   return fetcher<AccountGetOKResponse>({
-    url: `/v1/admin/bans/${accountHandle}`,
+    url: `/admin/bans/${accountHandle}`,
     method: "POST",
   });
 };
@@ -46,7 +48,7 @@ export const getAdminAccountBanCreateMutationFetcher = (
   };
 };
 export const getAdminAccountBanCreateMutationKey = (accountHandle: string) =>
-  `/v1/admin/bans/${accountHandle}` as const;
+  `/admin/bans/${accountHandle}` as const;
 
 export type AdminAccountBanCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof adminAccountBanCreate>>
@@ -91,7 +93,7 @@ export const useAdminAccountBanCreate = <
  */
 export const adminAccountBanRemove = (accountHandle: string) => {
   return fetcher<AccountGetOKResponse>({
-    url: `/v1/admin/bans/${accountHandle}`,
+    url: `/admin/bans/${accountHandle}`,
     method: "DELETE",
   });
 };
@@ -104,7 +106,7 @@ export const getAdminAccountBanRemoveMutationFetcher = (
   };
 };
 export const getAdminAccountBanRemoveMutationKey = (accountHandle: string) =>
-  `/v1/admin/bans/${accountHandle}` as const;
+  `/admin/bans/${accountHandle}` as const;
 
 export type AdminAccountBanRemoveMutationResult = NonNullable<
   Awaited<ReturnType<typeof adminAccountBanRemove>>
@@ -148,10 +150,10 @@ export const useAdminAccountBanRemove = <
  * Get the information for the currently authenticated account.
  */
 export const accountGet = () => {
-  return fetcher<AccountGetOKResponse>({ url: `/v1/accounts`, method: "GET" });
+  return fetcher<AccountGetOKResponse>({ url: `/accounts`, method: "GET" });
 };
 
-export const getAccountGetKey = () => [`/v1/accounts`] as const;
+export const getAccountGetKey = () => [`/accounts`] as const;
 
 export type AccountGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof accountGet>>
@@ -195,7 +197,7 @@ export const useAccountGet = <
  */
 export const accountUpdate = (accountUpdateBody: AccountUpdateBody) => {
   return fetcher<AccountUpdateOKResponse>({
-    url: `/v1/accounts`,
+    url: `/accounts`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: accountUpdateBody,
@@ -210,7 +212,7 @@ export const getAccountUpdateMutationFetcher = () => {
     return accountUpdate(arg);
   };
 };
-export const getAccountUpdateMutationKey = () => `/v1/accounts` as const;
+export const getAccountUpdateMutationKey = () => `/accounts` as const;
 
 export type AccountUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof accountUpdate>>
@@ -253,13 +255,13 @@ ones are active for the currently authenticated account.
  */
 export const accountAuthProviderList = () => {
   return fetcher<AccountAuthProviderListOKResponse>({
-    url: `/v1/accounts/self/auth-methods`,
+    url: `/accounts/self/auth-methods`,
     method: "GET",
   });
 };
 
 export const getAccountAuthProviderListKey = () =>
-  [`/v1/accounts/self/auth-methods`] as const;
+  [`/accounts/self/auth-methods`] as const;
 
 export type AccountAuthProviderListQueryResult = NonNullable<
   Awaited<ReturnType<typeof accountAuthProviderList>>
@@ -302,7 +304,7 @@ ones are active for the currently authenticated account.
  */
 export const accountAuthMethodDelete = (authMethodId: string) => {
   return fetcher<AccountAuthProviderListOKResponse>({
-    url: `/v1/accounts/self/auth-methods/${authMethodId}`,
+    url: `/accounts/self/auth-methods/${authMethodId}`,
     method: "DELETE",
   });
 };
@@ -318,7 +320,7 @@ export const getAccountAuthMethodDeleteMutationFetcher = (
   };
 };
 export const getAccountAuthMethodDeleteMutationKey = (authMethodId: string) =>
-  `/v1/accounts/self/auth-methods/${authMethodId}` as const;
+  `/accounts/self/auth-methods/${authMethodId}` as const;
 
 export type AccountAuthMethodDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof accountAuthMethodDelete>>
@@ -361,7 +363,7 @@ export const accountSetAvatar = (
   accountSetAvatarBody: AccountSetAvatarBody,
 ) => {
   return fetcher<void>({
-    url: `/v1/accounts/self/avatar`,
+    url: `/accounts/self/avatar`,
     method: "POST",
     headers: { "Content-Type": "application/octet-stream" },
     data: accountSetAvatarBody,
@@ -374,7 +376,7 @@ export const getAccountSetAvatarMutationFetcher = () => {
   };
 };
 export const getAccountSetAvatarMutationKey = () =>
-  `/v1/accounts/self/avatar` as const;
+  `/accounts/self/avatar` as const;
 
 export type AccountSetAvatarMutationResult = NonNullable<
   Awaited<ReturnType<typeof accountSetAvatar>>
@@ -415,13 +417,13 @@ export const useAccountSetAvatar = <
  */
 export const accountGetAvatar = (accountHandle: string) => {
   return fetcher<AccountGetAvatarResponse>({
-    url: `/v1/accounts/${accountHandle}/avatar`,
+    url: `/accounts/${accountHandle}/avatar`,
     method: "GET",
   });
 };
 
 export const getAccountGetAvatarKey = (accountHandle: string) =>
-  [`/v1/accounts/${accountHandle}/avatar`] as const;
+  [`/accounts/${accountHandle}/avatar`] as const;
 
 export type AccountGetAvatarQueryResult = NonNullable<
   Awaited<ReturnType<typeof accountGetAvatar>>

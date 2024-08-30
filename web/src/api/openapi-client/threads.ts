@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Arguments, Key, SWRConfiguration } from "swr";
@@ -29,7 +31,7 @@ import type {
  */
 export const threadCreate = (threadCreateBody: ThreadCreateBody) => {
   return fetcher<ThreadCreateOKResponse>({
-    url: `/v1/threads`,
+    url: `/threads`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: threadCreateBody,
@@ -44,7 +46,7 @@ export const getThreadCreateMutationFetcher = () => {
     return threadCreate(arg);
   };
 };
-export const getThreadCreateMutationKey = () => `/v1/threads` as const;
+export const getThreadCreateMutationKey = () => `/threads` as const;
 
 export type ThreadCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof threadCreate>>
@@ -85,14 +87,14 @@ export const useThreadCreate = <
  */
 export const threadList = (params?: ThreadListParams) => {
   return fetcher<ThreadListOKResponse>({
-    url: `/v1/threads`,
+    url: `/threads`,
     method: "GET",
     params,
   });
 };
 
 export const getThreadListKey = (params?: ThreadListParams) =>
-  [`/v1/threads`, ...(params ? [params] : [])] as const;
+  [`/threads`, ...(params ? [params] : [])] as const;
 
 export type ThreadListQueryResult = NonNullable<
   Awaited<ReturnType<typeof threadList>>
@@ -142,13 +144,13 @@ created as well as a list of the posts within the thread.
  */
 export const threadGet = (threadMark: string) => {
   return fetcher<ThreadGetResponse>({
-    url: `/v1/threads/${threadMark}`,
+    url: `/threads/${threadMark}`,
     method: "GET",
   });
 };
 
 export const getThreadGetKey = (threadMark: string) =>
-  [`/v1/threads/${threadMark}`] as const;
+  [`/threads/${threadMark}`] as const;
 
 export type ThreadGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof threadGet>>
@@ -202,7 +204,7 @@ export const threadUpdate = (
   threadUpdateBody: ThreadUpdateBody,
 ) => {
   return fetcher<ThreadUpdateOKResponse>({
-    url: `/v1/threads/${threadMark}`,
+    url: `/threads/${threadMark}`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: threadUpdateBody,
@@ -218,7 +220,7 @@ export const getThreadUpdateMutationFetcher = (threadMark: string) => {
   };
 };
 export const getThreadUpdateMutationKey = (threadMark: string) =>
-  `/v1/threads/${threadMark}` as const;
+  `/threads/${threadMark}` as const;
 
 export type ThreadUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof threadUpdate>>
@@ -261,7 +263,7 @@ export const useThreadUpdate = <
  * Archive a thread using soft-delete.
  */
 export const threadDelete = (threadMark: string) => {
-  return fetcher<void>({ url: `/v1/threads/${threadMark}`, method: "DELETE" });
+  return fetcher<void>({ url: `/threads/${threadMark}`, method: "DELETE" });
 };
 
 export const getThreadDeleteMutationFetcher = (threadMark: string) => {
@@ -270,7 +272,7 @@ export const getThreadDeleteMutationFetcher = (threadMark: string) => {
   };
 };
 export const getThreadDeleteMutationKey = (threadMark: string) =>
-  `/v1/threads/${threadMark}` as const;
+  `/threads/${threadMark}` as const;
 
 export type ThreadDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof threadDelete>>

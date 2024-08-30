@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Key, SWRConfiguration } from "swr";
@@ -23,14 +25,14 @@ import type {
  */
 export const profileList = (params?: ProfileListParams) => {
   return fetcher<ProfileListOKResponse>({
-    url: `/v1/profiles`,
+    url: `/profiles`,
     method: "GET",
     params,
   });
 };
 
 export const getProfileListKey = (params?: ProfileListParams) =>
-  [`/v1/profiles`, ...(params ? [params] : [])] as const;
+  [`/profiles`, ...(params ? [params] : [])] as const;
 
 export type ProfileListQueryResult = NonNullable<
   Awaited<ReturnType<typeof profileList>>
@@ -78,13 +80,13 @@ export const useProfileList = <
  */
 export const profileGet = (accountHandle: string) => {
   return fetcher<ProfileGetOKResponse>({
-    url: `/v1/profiles/${accountHandle}`,
+    url: `/profiles/${accountHandle}`,
     method: "GET",
   });
 };
 
 export const getProfileGetKey = (accountHandle: string) =>
-  [`/v1/profiles/${accountHandle}`] as const;
+  [`/profiles/${accountHandle}`] as const;
 
 export type ProfileGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof profileGet>>

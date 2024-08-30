@@ -54,7 +54,7 @@ func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadReq
 	// TODO: This must be specified on the READ path not the write path.
 	// It's not the responsibility of the write-path transport layer to figure
 	// out the public URL of the asset. This may change if a direct CDN is used.
-	url := fmt.Sprintf("%s/api/v1/assets/%s", i.address.String(), filename.String())
+	url := fmt.Sprintf("%s/api/assets/%s", i.address.String(), filename.String())
 
 	contentFillCmd, err := getContentFillRuleCommand(request.Params.ContentFillRule, request.Params.NodeContentFillTarget)
 	if err != nil {

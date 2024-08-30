@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
 import type { Key, SWRConfiguration } from "swr";
@@ -37,7 +39,7 @@ When a link is submitted, it is first "cleaned" to remove any fragments.
  */
 export const linkCreate = (linkCreateBody: LinkCreateBody) => {
   return fetcher<LinkCreateOKResponse>({
-    url: `/v1/links`,
+    url: `/links`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: linkCreateBody,
@@ -52,7 +54,7 @@ export const getLinkCreateMutationFetcher = () => {
     return linkCreate(arg);
   };
 };
-export const getLinkCreateMutationKey = () => `/v1/links` as const;
+export const getLinkCreateMutationKey = () => `/links` as const;
 
 export type LinkCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof linkCreate>>
@@ -88,15 +90,11 @@ export const useLinkCreate = <
  * List all links using the filtering options.
  */
 export const linkList = (params?: LinkListParams) => {
-  return fetcher<LinkListOKResponse>({
-    url: `/v1/links`,
-    method: "GET",
-    params,
-  });
+  return fetcher<LinkListOKResponse>({ url: `/links`, method: "GET", params });
 };
 
 export const getLinkListKey = (params?: LinkListParams) =>
-  [`/v1/links`, ...(params ? [params] : [])] as const;
+  [`/links`, ...(params ? [params] : [])] as const;
 
 export type LinkListQueryResult = NonNullable<
   Awaited<ReturnType<typeof linkList>>
@@ -139,13 +137,13 @@ which resources it's linked to and how many times it's been opened.
  */
 export const linkGet = (linkSlug: string) => {
   return fetcher<LinkGetOKResponse>({
-    url: `/v1/links/${linkSlug}`,
+    url: `/links/${linkSlug}`,
     method: "GET",
   });
 };
 
 export const getLinkGetKey = (linkSlug: string) =>
-  [`/v1/links/${linkSlug}`] as const;
+  [`/links/${linkSlug}`] as const;
 
 export type LinkGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof linkGet>>

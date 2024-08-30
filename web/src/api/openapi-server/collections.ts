@@ -3,7 +3,9 @@
  * Do not edit manually.
  * storyden
  * Storyden social API for building community driven platforms.
- * OpenAPI spec version: 1
+The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
+
+ * OpenAPI spec version: rolling
  */
 import type {
   CollectionAddNodeOKResponse,
@@ -30,7 +32,7 @@ export type collectionCreateResponse = {
 };
 
 export const getCollectionCreateUrl = () => {
-  return `/v1/collections`;
+  return `/collections`;
 };
 
 export const collectionCreate = async (
@@ -63,7 +65,7 @@ export const getCollectionListUrl = (params?: CollectionListParams) => {
     }
   });
 
-  return `/v1/collections?${normalizedParams.toString()}`;
+  return `/collections?${normalizedParams.toString()}`;
 };
 
 export const collectionList = async (
@@ -91,7 +93,7 @@ export type collectionGetResponse = {
 };
 
 export const getCollectionGetUrl = (collectionId: string) => {
-  return `/v1/collections/${collectionId}`;
+  return `/collections/${collectionId}`;
 };
 
 export const collectionGet = async (
@@ -116,7 +118,7 @@ export type collectionUpdateResponse = {
 };
 
 export const getCollectionUpdateUrl = (collectionId: string) => {
-  return `/v1/collections/${collectionId}`;
+  return `/collections/${collectionId}`;
 };
 
 export const collectionUpdate = async (
@@ -143,7 +145,7 @@ export type collectionDeleteResponse = {
 };
 
 export const getCollectionDeleteUrl = (collectionId: string) => {
-  return `/v1/collections/${collectionId}`;
+  return `/collections/${collectionId}`;
 };
 
 export const collectionDelete = async (
@@ -173,7 +175,7 @@ export const getCollectionAddPostUrl = (
   collectionId: string,
   postId: string,
 ) => {
-  return `/v1/collections/${collectionId}/posts/${postId}`;
+  return `/collections/${collectionId}/posts/${postId}`;
 };
 
 export const collectionAddPost = async (
@@ -204,7 +206,7 @@ export const getCollectionRemovePostUrl = (
   collectionId: string,
   postId: string,
 ) => {
-  return `/v1/collections/${collectionId}/posts/${postId}`;
+  return `/collections/${collectionId}/posts/${postId}`;
 };
 
 export const collectionRemovePost = async (
@@ -236,7 +238,7 @@ export const getCollectionAddNodeUrl = (
   collectionId: string,
   nodeId: string,
 ) => {
-  return `/v1/collections/${collectionId}/nodes/${nodeId}`;
+  return `/collections/${collectionId}/nodes/${nodeId}`;
 };
 
 export const collectionAddNode = async (
@@ -267,7 +269,7 @@ export const getCollectionRemoveNodeUrl = (
   collectionId: string,
   nodeId: string,
 ) => {
-  return `/v1/collections/${collectionId}/nodes/${nodeId}`;
+  return `/collections/${collectionId}/nodes/${nodeId}`;
 };
 
 export const collectionRemoveNode = async (

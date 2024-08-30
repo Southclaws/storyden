@@ -85,7 +85,7 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 	}
 
 	// TODO: Make this a bit more well designed and less coupled to the hostname
-	avatarURL := fmt.Sprintf("%s/api/v1/accounts/%s/avatar", p.apiAddress.String(), acc.Handle)
+	avatarURL := fmt.Sprintf("%s/api/accounts/%s/avatar", p.apiAddress.String(), acc.Handle)
 
 	return openapi.ProfileGet200JSONResponse{
 		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
