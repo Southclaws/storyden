@@ -37,7 +37,7 @@ type PolymorphicComponent = <C extends React.ElementType = "p">(
   props: TextProps<C>,
 ) => React.ReactNode | null;
 
-export const Text: PolymorphicComponent = React.forwardRef(
+export const Text: PolymorphicComponent = React.forwardRef<any, TextProps<any>>(
   <C extends React.ElementType = "p">(
     props: TextProps<C>,
     ref?: PolymorphicRef<C>,
