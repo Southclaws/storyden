@@ -72,6 +72,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Category:    serialiseCategoryReference(&t.Category),
 		Pinned:      t.Pinned,
 		PostCount:   &postCount,
+		Likes:       serialiseLikeStatus(&t.Likes),
 		Reacts:      reacts(t.Reacts),
 		Tags:        t.Tags,
 		Assets:      dt.Map(t.Assets, serialiseAssetPtr),

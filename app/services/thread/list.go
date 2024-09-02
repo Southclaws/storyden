@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 type Params struct {
@@ -29,6 +30,8 @@ func (s *service) List(ctx context.Context,
 	size int,
 	opts Params,
 ) (*thread.Result, error) {
+	accountID := session.GetOptAccountID(ctx)
+
 	q := []thread.Query{
 		// User's drafts are always private so we always filter published only.
 		thread.HasStatus(visibility.VisibilityPublished),
@@ -42,7 +45,7 @@ func (s *service) List(ctx context.Context,
 	opts.Tags.Call(func(a []xid.ID) { q = append(q, thread.HasTags(a)) })
 	opts.Categories.Call(func(a []string) { q = append(q, thread.HasCategories(a)) })
 
-	thr, err := s.thread_repo.List(ctx, page, size, q...)
+	thr, err := s.thread_repo.List(ctx, page, size, accountID, q...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to list threads"))
 	}

@@ -166,10 +166,23 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 	return FromModel(nil)(p)
 }
 
+const likesCountManyQuery = `select
+  p.id        post_id, -- the post (thread or reply) ID
+  count(*)    likes,   -- number of likes
+  count(a.id) liked    -- has the account making the query liked this post?
+from
+  like_posts lp
+  inner join posts p on p.id = lp.post_id
+  left join accounts a on lp.account_id = a.id
+  and a.id = $1
+group by p.id
+`
+
 func (d *database) List(
 	ctx context.Context,
 	page int,
 	size int,
+	accountID opt.Optional[account.AccountID],
 	opts ...Query,
 ) (*Result, error) {
 	if size < 1 {
@@ -223,7 +236,13 @@ func (d *database) List(
 		result = result[:len(result)-1]
 	}
 
-	threads, err := dt.MapErr(result, FromModel(nil))
+	var likes post.PostLikesResults
+	err = d.raw.SelectContext(ctx, &likes, likesCountManyQuery, accountID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	threads, err := dt.MapErr(result, FromModel(likes.Map()))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -88,6 +88,25 @@ func TestLikeThreads(t *testing.T) {
 			r.Equal(profilelikeget.JSON200.Results, len(profilelikeget.JSON200.Likes))
 			a.Equal(thread1create.JSON200.Id, profilelikeget.JSON200.Likes[0].Item.Id)
 			a.Equal(thread1create.JSON200.Slug, profilelikeget.JSON200.Likes[0].Item.Slug)
+
+			// Assert thread list includes all like statuses
+			threadlist1, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{Categories: &[]string{cat1create.JSON200.Slug}}, user1Session)
+			tests.Ok(t, err, threadlist1)
+			r.Len(threadlist1.JSON200.Threads, 1)
+			a.Equal(2, threadlist1.JSON200.Threads[0].Likes.Likes)
+			a.True(threadlist1.JSON200.Threads[0].Likes.Liked)
+
+			threadlist2, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{Categories: &[]string{cat1create.JSON200.Slug}}, user2Session)
+			tests.Ok(t, err, threadlist2)
+			r.Len(threadlist2.JSON200.Threads, 1)
+			a.Equal(2, threadlist2.JSON200.Threads[0].Likes.Likes)
+			a.True(threadlist2.JSON200.Threads[0].Likes.Liked)
+
+			threadlist3, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{Categories: &[]string{cat1create.JSON200.Slug}}, adminSession)
+			tests.Ok(t, err, threadlist3)
+			r.Len(threadlist3.JSON200.Threads, 1)
+			a.Equal(2, threadlist3.JSON200.Threads[0].Likes.Likes)
+			a.False(threadlist3.JSON200.Threads[0].Likes.Liked, "admin has not liked the thread")
 		}))
 	}))
 }
