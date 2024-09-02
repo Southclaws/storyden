@@ -51,7 +51,7 @@ type Repository interface {
 
 	// GetPostCounts(ctx context.Context) (map[string]int, error)
 
-	Get(ctx context.Context, threadID post.ID) (*Thread, error)
+	Get(ctx context.Context, threadID post.ID, accountID opt.Optional[account.AccountID]) (*Thread, error)
 
 	Delete(ctx context.Context, id post.ID) error
 }

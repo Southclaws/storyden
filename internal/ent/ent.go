@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
@@ -96,6 +97,7 @@ func checkColumn(table, column string) error {
 			collectionnode.Table: collectionnode.ValidColumn,
 			collectionpost.Table: collectionpost.ValidColumn,
 			email.Table:          email.ValidColumn,
+			likepost.Table:       likepost.ValidColumn,
 			link.Table:           link.ValidColumn,
 			node.Table:           node.ValidColumn,
 			notification.Table:   notification.ValidColumn,

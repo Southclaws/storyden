@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -379,6 +380,21 @@ func (pu *PostUpdate) AddReacts(r ...*React) *PostUpdate {
 	return pu.AddReactIDs(ids...)
 }
 
+// AddLikeIDs adds the "likes" edge to the LikePost entity by IDs.
+func (pu *PostUpdate) AddLikeIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.AddLikeIDs(ids...)
+	return pu
+}
+
+// AddLikes adds the "likes" edges to the LikePost entity.
+func (pu *PostUpdate) AddLikes(l ...*LikePost) *PostUpdate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return pu.AddLikeIDs(ids...)
+}
+
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
 func (pu *PostUpdate) AddAssetIDs(ids ...xid.ID) *PostUpdate {
 	pu.mutation.AddAssetIDs(ids...)
@@ -540,6 +556,27 @@ func (pu *PostUpdate) RemoveReacts(r ...*React) *PostUpdate {
 		ids[i] = r[i].ID
 	}
 	return pu.RemoveReactIDs(ids...)
+}
+
+// ClearLikes clears all "likes" edges to the LikePost entity.
+func (pu *PostUpdate) ClearLikes() *PostUpdate {
+	pu.mutation.ClearLikes()
+	return pu
+}
+
+// RemoveLikeIDs removes the "likes" edge to LikePost entities by IDs.
+func (pu *PostUpdate) RemoveLikeIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.RemoveLikeIDs(ids...)
+	return pu
+}
+
+// RemoveLikes removes "likes" edges to LikePost entities.
+func (pu *PostUpdate) RemoveLikes(l ...*LikePost) *PostUpdate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return pu.RemoveLikeIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -1009,6 +1046,51 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.LikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.LikesTable,
+			Columns: []string{post.LikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedLikesIDs(); len(nodes) > 0 && !pu.mutation.LikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.LikesTable,
+			Columns: []string{post.LikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.LikesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.LikesTable,
+			Columns: []string{post.LikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1544,6 +1626,21 @@ func (puo *PostUpdateOne) AddReacts(r ...*React) *PostUpdateOne {
 	return puo.AddReactIDs(ids...)
 }
 
+// AddLikeIDs adds the "likes" edge to the LikePost entity by IDs.
+func (puo *PostUpdateOne) AddLikeIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.AddLikeIDs(ids...)
+	return puo
+}
+
+// AddLikes adds the "likes" edges to the LikePost entity.
+func (puo *PostUpdateOne) AddLikes(l ...*LikePost) *PostUpdateOne {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return puo.AddLikeIDs(ids...)
+}
+
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
 func (puo *PostUpdateOne) AddAssetIDs(ids ...xid.ID) *PostUpdateOne {
 	puo.mutation.AddAssetIDs(ids...)
@@ -1705,6 +1802,27 @@ func (puo *PostUpdateOne) RemoveReacts(r ...*React) *PostUpdateOne {
 		ids[i] = r[i].ID
 	}
 	return puo.RemoveReactIDs(ids...)
+}
+
+// ClearLikes clears all "likes" edges to the LikePost entity.
+func (puo *PostUpdateOne) ClearLikes() *PostUpdateOne {
+	puo.mutation.ClearLikes()
+	return puo
+}
+
+// RemoveLikeIDs removes the "likes" edge to LikePost entities by IDs.
+func (puo *PostUpdateOne) RemoveLikeIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.RemoveLikeIDs(ids...)
+	return puo
+}
+
+// RemoveLikes removes "likes" edges to LikePost entities.
+func (puo *PostUpdateOne) RemoveLikes(l ...*LikePost) *PostUpdateOne {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return puo.RemoveLikeIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -2204,6 +2322,51 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.LikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.LikesTable,
+			Columns: []string{post.LikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedLikesIDs(); len(nodes) > 0 && !puo.mutation.LikesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.LikesTable,
+			Columns: []string{post.LikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.LikesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.LikesTable,
+			Columns: []string{post.LikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

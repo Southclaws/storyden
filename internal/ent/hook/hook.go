@@ -105,6 +105,18 @@ func (f EmailFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EmailMutation", m)
 }
 
+// The LikePostFunc type is an adapter to allow the use of ordinary
+// function as LikePost mutator.
+type LikePostFunc func(context.Context, *ent.LikePostMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f LikePostFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.LikePostMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LikePostMutation", m)
+}
+
 // The LinkFunc type is an adapter to allow the use of ordinary
 // function as Link mutator.
 type LinkFunc func(context.Context, *ent.LinkMutation) (ent.Value, error)

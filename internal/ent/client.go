@@ -24,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
@@ -57,6 +58,8 @@ type Client struct {
 	CollectionPost *CollectionPostClient
 	// Email is the client for interacting with the Email builders.
 	Email *EmailClient
+	// LikePost is the client for interacting with the LikePost builders.
+	LikePost *LikePostClient
 	// Link is the client for interacting with the Link builders.
 	Link *LinkClient
 	// Node is the client for interacting with the Node builders.
@@ -92,6 +95,7 @@ func (c *Client) init() {
 	c.CollectionNode = NewCollectionNodeClient(c.config)
 	c.CollectionPost = NewCollectionPostClient(c.config)
 	c.Email = NewEmailClient(c.config)
+	c.LikePost = NewLikePostClient(c.config)
 	c.Link = NewLinkClient(c.config)
 	c.Node = NewNodeClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
@@ -200,6 +204,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		CollectionNode: NewCollectionNodeClient(cfg),
 		CollectionPost: NewCollectionPostClient(cfg),
 		Email:          NewEmailClient(cfg),
+		LikePost:       NewLikePostClient(cfg),
 		Link:           NewLinkClient(cfg),
 		Node:           NewNodeClient(cfg),
 		Notification:   NewNotificationClient(cfg),
@@ -235,6 +240,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		CollectionNode: NewCollectionNodeClient(cfg),
 		CollectionPost: NewCollectionPostClient(cfg),
 		Email:          NewEmailClient(cfg),
+		LikePost:       NewLikePostClient(cfg),
 		Link:           NewLinkClient(cfg),
 		Node:           NewNodeClient(cfg),
 		Notification:   NewNotificationClient(cfg),
@@ -273,8 +279,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Account, c.Asset, c.Authentication, c.Category, c.Collection,
-		c.CollectionNode, c.CollectionPost, c.Email, c.Link, c.Node, c.Notification,
-		c.Post, c.React, c.Role, c.Setting, c.Tag,
+		c.CollectionNode, c.CollectionPost, c.Email, c.LikePost, c.Link, c.Node,
+		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -285,8 +291,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Account, c.Asset, c.Authentication, c.Category, c.Collection,
-		c.CollectionNode, c.CollectionPost, c.Email, c.Link, c.Node, c.Notification,
-		c.Post, c.React, c.Role, c.Setting, c.Tag,
+		c.CollectionNode, c.CollectionPost, c.Email, c.LikePost, c.Link, c.Node,
+		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -311,6 +317,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.CollectionPost.mutate(ctx, m)
 	case *EmailMutation:
 		return c.Email.mutate(ctx, m)
+	case *LikePostMutation:
+		return c.LikePost.mutate(ctx, m)
 	case *LinkMutation:
 		return c.Link.mutate(ctx, m)
 	case *NodeMutation:
@@ -481,6 +489,22 @@ func (c *AccountClient) QueryReacts(a *Account) *ReactQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(react.Table, react.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.ReactsTable, account.ReactsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryLikes queries the likes edge of a Account.
+func (c *AccountClient) QueryLikes(a *Account) *LikePostQuery {
+	query := (&LikePostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(likepost.Table, likepost.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.LikesTable, account.LikesColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -1730,6 +1754,171 @@ func (c *EmailClient) mutate(ctx context.Context, m *EmailMutation) (Value, erro
 	}
 }
 
+// LikePostClient is a client for the LikePost schema.
+type LikePostClient struct {
+	config
+}
+
+// NewLikePostClient returns a client for the LikePost from the given config.
+func NewLikePostClient(c config) *LikePostClient {
+	return &LikePostClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `likepost.Hooks(f(g(h())))`.
+func (c *LikePostClient) Use(hooks ...Hook) {
+	c.hooks.LikePost = append(c.hooks.LikePost, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `likepost.Intercept(f(g(h())))`.
+func (c *LikePostClient) Intercept(interceptors ...Interceptor) {
+	c.inters.LikePost = append(c.inters.LikePost, interceptors...)
+}
+
+// Create returns a builder for creating a LikePost entity.
+func (c *LikePostClient) Create() *LikePostCreate {
+	mutation := newLikePostMutation(c.config, OpCreate)
+	return &LikePostCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of LikePost entities.
+func (c *LikePostClient) CreateBulk(builders ...*LikePostCreate) *LikePostCreateBulk {
+	return &LikePostCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *LikePostClient) MapCreateBulk(slice any, setFunc func(*LikePostCreate, int)) *LikePostCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &LikePostCreateBulk{err: fmt.Errorf("calling to LikePostClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*LikePostCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &LikePostCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for LikePost.
+func (c *LikePostClient) Update() *LikePostUpdate {
+	mutation := newLikePostMutation(c.config, OpUpdate)
+	return &LikePostUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *LikePostClient) UpdateOne(lp *LikePost) *LikePostUpdateOne {
+	mutation := newLikePostMutation(c.config, OpUpdateOne, withLikePost(lp))
+	return &LikePostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *LikePostClient) UpdateOneID(id xid.ID) *LikePostUpdateOne {
+	mutation := newLikePostMutation(c.config, OpUpdateOne, withLikePostID(id))
+	return &LikePostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for LikePost.
+func (c *LikePostClient) Delete() *LikePostDelete {
+	mutation := newLikePostMutation(c.config, OpDelete)
+	return &LikePostDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *LikePostClient) DeleteOne(lp *LikePost) *LikePostDeleteOne {
+	return c.DeleteOneID(lp.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *LikePostClient) DeleteOneID(id xid.ID) *LikePostDeleteOne {
+	builder := c.Delete().Where(likepost.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &LikePostDeleteOne{builder}
+}
+
+// Query returns a query builder for LikePost.
+func (c *LikePostClient) Query() *LikePostQuery {
+	return &LikePostQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeLikePost},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a LikePost entity by its id.
+func (c *LikePostClient) Get(ctx context.Context, id xid.ID) (*LikePost, error) {
+	return c.Query().Where(likepost.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *LikePostClient) GetX(ctx context.Context, id xid.ID) *LikePost {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a LikePost.
+func (c *LikePostClient) QueryAccount(lp *LikePost) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := lp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(likepost.Table, likepost.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, likepost.AccountTable, likepost.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(lp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPost queries the Post edge of a LikePost.
+func (c *LikePostClient) QueryPost(lp *LikePost) *PostQuery {
+	query := (&PostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := lp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(likepost.Table, likepost.FieldID, id),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, likepost.PostTable, likepost.PostColumn),
+		)
+		fromV = sqlgraph.Neighbors(lp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *LikePostClient) Hooks() []Hook {
+	return c.hooks.LikePost
+}
+
+// Interceptors returns the client interceptors.
+func (c *LikePostClient) Interceptors() []Interceptor {
+	return c.inters.LikePost
+}
+
+func (c *LikePostClient) mutate(ctx context.Context, m *LikePostMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&LikePostCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&LikePostUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&LikePostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&LikePostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown LikePost mutation op: %q", m.Op())
+	}
+}
+
 // LinkClient is a client for the Link schema.
 type LinkClient struct {
 	config
@@ -2621,6 +2810,22 @@ func (c *PostClient) QueryReacts(po *Post) *ReactQuery {
 	return query
 }
 
+// QueryLikes queries the likes edge of a Post.
+func (c *PostClient) QueryLikes(po *Post) *LikePostQuery {
+	query := (&LikePostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := po.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, id),
+			sqlgraph.To(likepost.Table, likepost.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.LikesTable, post.LikesColumn),
+		)
+		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryAssets queries the assets edge of a Post.
 func (c *PostClient) QueryAssets(po *Post) *AssetQuery {
 	query := (&AssetClient{config: c.config}).Query()
@@ -3342,13 +3547,13 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 type (
 	hooks struct {
 		Account, Asset, Authentication, Category, Collection, CollectionNode,
-		CollectionPost, Email, Link, Node, Notification, Post, React, Role, Setting,
-		Tag []ent.Hook
+		CollectionPost, Email, LikePost, Link, Node, Notification, Post, React, Role,
+		Setting, Tag []ent.Hook
 	}
 	inters struct {
 		Account, Asset, Authentication, Category, Collection, CollectionNode,
-		CollectionPost, Email, Link, Node, Notification, Post, React, Role, Setting,
-		Tag []ent.Interceptor
+		CollectionPost, Email, LikePost, Link, Node, Notification, Post, React, Role,
+		Setting, Tag []ent.Interceptor
 	}
 )
 

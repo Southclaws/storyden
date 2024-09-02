@@ -232,6 +232,40 @@ var (
 			},
 		},
 	}
+	// LikePostsColumns holds the columns for the "like_posts" table.
+	LikePostsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "post_id", Type: field.TypeString, Size: 20},
+	}
+	// LikePostsTable holds the schema information for the "like_posts" table.
+	LikePostsTable = &schema.Table{
+		Name:       "like_posts",
+		Columns:    LikePostsColumns,
+		PrimaryKey: []*schema.Column{LikePostsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "like_posts_accounts_likes",
+				Columns:    []*schema.Column{LikePostsColumns[2]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "like_posts_posts_likes",
+				Columns:    []*schema.Column{LikePostsColumns[3]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "unique_like_post",
+				Unique:  true,
+				Columns: []*schema.Column{LikePostsColumns[2], LikePostsColumns[3]},
+			},
+		},
+	}
 	// LinksColumns holds the columns for the "links" table.
 	LinksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -686,6 +720,7 @@ var (
 		CollectionNodesTable,
 		CollectionPostsTable,
 		EmailsTable,
+		LikePostsTable,
 		LinksTable,
 		NodesTable,
 		NotificationsTable,
@@ -716,6 +751,8 @@ func init() {
 	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
 	EmailsTable.ForeignKeys[0].RefTable = AccountsTable
 	EmailsTable.ForeignKeys[1].RefTable = AuthenticationsTable
+	LikePostsTable.ForeignKeys[0].RefTable = AccountsTable
+	LikePostsTable.ForeignKeys[1].RefTable = PostsTable
 	LinksTable.ForeignKeys[0].RefTable = AssetsTable
 	LinksTable.ForeignKeys[1].RefTable = AssetsTable
 	NodesTable.ForeignKeys[0].RefTable = AccountsTable

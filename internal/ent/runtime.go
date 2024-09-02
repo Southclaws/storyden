@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
@@ -404,6 +405,37 @@ func init() {
 	// email.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	email.IDValidator = func() func(string) error {
 		validators := emailDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	likepostMixin := schema.LikePost{}.Mixin()
+	likepostMixinFields0 := likepostMixin[0].Fields()
+	_ = likepostMixinFields0
+	likepostMixinFields1 := likepostMixin[1].Fields()
+	_ = likepostMixinFields1
+	likepostFields := schema.LikePost{}.Fields()
+	_ = likepostFields
+	// likepostDescCreatedAt is the schema descriptor for created_at field.
+	likepostDescCreatedAt := likepostMixinFields1[0].Descriptor()
+	// likepost.DefaultCreatedAt holds the default value on creation for the created_at field.
+	likepost.DefaultCreatedAt = likepostDescCreatedAt.Default.(func() time.Time)
+	// likepostDescID is the schema descriptor for id field.
+	likepostDescID := likepostMixinFields0[0].Descriptor()
+	// likepost.DefaultID holds the default value on creation for the id field.
+	likepost.DefaultID = likepostDescID.Default.(func() xid.ID)
+	// likepost.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	likepost.IDValidator = func() func(string) error {
+		validators := likepostDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

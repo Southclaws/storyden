@@ -38,3 +38,11 @@ type ScrapeLink struct {
 	URL  url.URL
 	Item opt.Optional[datagraph.Item]
 }
+
+type LikePost struct {
+	PostID post.ID
+}
+
+type UnlikePost struct {
+	PostID post.ID
+}

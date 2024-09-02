@@ -78,6 +78,9 @@ func (Post) Edges() []ent.Edge {
 		edge.To("reacts", React.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
+		edge.To("likes", LikePost.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
 		edge.To("assets", Asset.Type),
 
 		edge.From("collections", Collection.Type).

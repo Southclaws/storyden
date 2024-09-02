@@ -56,60 +56,63 @@ func replyTo(m *ent.Post) opt.Optional[post.ID] {
 	return opt.NewEmpty[post.ID]()
 }
 
-func FromModel(m *ent.Post) (*Reply, error) {
-	authorEdge, err := m.Edges.AuthorOrErr()
-	if err != nil {
-		return nil, fault.Wrap(err)
+func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Reply, error) {
+	return func(m *ent.Post) (*Reply, error) {
+		authorEdge, err := m.Edges.AuthorOrErr()
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
+
+		pro, err := profile.ProfileFromModel(authorEdge)
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
+
+		content, err := content.NewRichText(m.Body)
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
+
+		replyTo := replyTo(m)
+
+		var rootPostID post.ID
+		var rootThreadMark string
+		var rootThreadTitle string
+		if m.RootPostID == xid.NilID() {
+			// A root post was passed, which is still valid in some cases.
+			rootThreadMark = m.Slug
+			rootThreadTitle = m.Title
+		} else {
+			rootPostID = post.ID(m.RootPostID)
+			rootThreadMark = opt.NewPtr(m.Edges.Root).OrZero().Slug
+			rootThreadTitle = opt.NewPtr(m.Edges.Root).OrZero().Title
+		}
+
+		link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
+			return *link_ref.Map(&in)
+		})
+
+		return &Reply{
+			Post: post.Post{
+				ID: post.ID(m.ID),
+
+				Content: content,
+				Author:  *pro,
+				Likes:   ls.Status(m.ID),
+				Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
+				Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
+				WebLink: link,
+				Meta:    m.Metadata,
+
+				CreatedAt: m.CreatedAt,
+				UpdatedAt: m.UpdatedAt,
+				DeletedAt: opt.NewPtr(m.DeletedAt),
+			},
+			ReplyTo: replyTo,
+
+			RootPostID:      rootPostID,
+			RootThreadMark:  rootThreadMark,
+			RootThreadTitle: rootThreadTitle,
+		}, nil
 	}
-
-	pro, err := profile.ProfileFromModel(authorEdge)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	content, err := content.NewRichText(m.Body)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	replyTo := replyTo(m)
-
-	var rootPostID post.ID
-	var rootThreadMark string
-	var rootThreadTitle string
-	if m.RootPostID == xid.NilID() {
-		// A root post was passed, which is still valid in some cases.
-		rootThreadMark = m.Slug
-		rootThreadTitle = m.Title
-	} else {
-		rootPostID = post.ID(m.RootPostID)
-		rootThreadMark = opt.NewPtr(m.Edges.Root).OrZero().Slug
-		rootThreadTitle = opt.NewPtr(m.Edges.Root).OrZero().Title
-	}
-
-	link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
-		return *link_ref.Map(&in)
-	})
-
-	return &Reply{
-		Post: post.Post{
-			ID: post.ID(m.ID),
-
-			Content: content,
-			Author:  *pro,
-			Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
-			Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
-			WebLink: link,
-			Meta:    m.Metadata,
-
-			CreatedAt: m.CreatedAt,
-			UpdatedAt: m.UpdatedAt,
-			DeletedAt: opt.NewPtr(m.DeletedAt),
-		},
-		ReplyTo: replyTo,
-
-		RootPostID:      rootPostID,
-		RootThreadMark:  rootThreadMark,
-		RootThreadTitle: rootThreadTitle,
-	}, nil
 }

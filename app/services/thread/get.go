@@ -10,13 +10,16 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 func (s *service) Get(
 	ctx context.Context,
 	threadID post.ID,
 ) (*thread.Thread, error) {
-	thr, err := s.thread_repo.Get(ctx, threadID)
+	session := session.GetOptAccountID(ctx)
+
+	thr, err := s.thread_repo.Get(ctx, threadID, session)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get thread"))
 	}

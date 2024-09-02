@@ -77,6 +77,12 @@ erDiagram
         string verification_code
         bool verified
     }
+    LikePost {
+        xidDOTID id
+        timeDOTTime created_at
+        xidDOTID account_id
+        xidDOTID post_id
+    }
     Link {
         xidDOTID id
         timeDOTTime created_at
@@ -155,6 +161,7 @@ erDiagram
     	Account |o--o{ Email : "emails/account"
     	Account |o--o{ Post : "posts/author"
     	Account |o--o{ React : "reacts/account"
+    	Account |o--o{ LikePost : "likes/account"
     	Account |o--o{ Authentication : "authentication/account"
     	Account }o--o{ Tag : "tags/accounts"
     	Account |o--o{ Collection : "collections/owner"
@@ -180,6 +187,7 @@ erDiagram
     	Post |o--o{ Post : "posts/root"
     	Post |o--o{ Post : "replies/replyTo"
     	Post |o--o{ React : "reacts/Post"
+    	Post |o--o{ LikePost : "likes/Post"
     	Post }o--o{ Asset : "assets/posts"
     	Role }o--o{ Account : "accounts/roles"
     	Tag }o--o{ Post : "posts/tags"

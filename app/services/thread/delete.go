@@ -24,7 +24,8 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	thr, err := s.thread_repo.Get(ctx, id)
+	// TODO: Minimal reader interface for thread.
+	thr, err := s.thread_repo.Get(ctx, id, nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

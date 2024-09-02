@@ -27,7 +27,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	thr, err := s.thread_repo.Get(ctx, threadID)
+	thr, err := s.thread_repo.Get(ctx, threadID, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

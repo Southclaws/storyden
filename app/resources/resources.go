@@ -10,6 +10,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_search"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
+	"github.com/Southclaws/storyden/app/resources/like/like_querier"
+	"github.com/Southclaws/storyden/app/resources/like/like_writer"
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/mailtemplate"
@@ -37,6 +39,8 @@ func Build() fx.Option {
 			tag.New,
 			thread.New,
 			react.New,
+			like_querier.New,
+			like_writer.New,
 			notification.New,
 			post_search.New,
 			collection.New,

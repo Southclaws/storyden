@@ -1085,6 +1085,29 @@ func HasReactsWith(preds ...predicate.React) predicate.Post {
 	})
 }
 
+// HasLikes applies the HasEdge predicate on the "likes" edge.
+func HasLikes() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, LikesTable, LikesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasLikesWith applies the HasEdge predicate on the "likes" edge with a given conditions (other predicates).
+func HasLikesWith(preds ...predicate.LikePost) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := newLikesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasAssets applies the HasEdge predicate on the "assets" edge.
 func HasAssets() predicate.Post {
 	return predicate.Post(func(s *sql.Selector) {
