@@ -46,6 +46,7 @@ type Repository interface {
 	List(ctx context.Context,
 		page int,
 		size int,
+		accountID opt.Optional[account.AccountID],
 		opts ...Query,
 	) (*Result, error)
 
