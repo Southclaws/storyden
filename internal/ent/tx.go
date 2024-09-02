@@ -30,6 +30,8 @@ type Tx struct {
 	CollectionPost *CollectionPostClient
 	// Email is the client for interacting with the Email builders.
 	Email *EmailClient
+	// LikePost is the client for interacting with the LikePost builders.
+	LikePost *LikePostClient
 	// Link is the client for interacting with the Link builders.
 	Link *LinkClient
 	// Node is the client for interacting with the Node builders.
@@ -185,6 +187,7 @@ func (tx *Tx) init() {
 	tx.CollectionNode = NewCollectionNodeClient(tx.config)
 	tx.CollectionPost = NewCollectionPostClient(tx.config)
 	tx.Email = NewEmailClient(tx.config)
+	tx.LikePost = NewLikePostClient(tx.config)
 	tx.Link = NewLinkClient(tx.config)
 	tx.Node = NewNodeClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)

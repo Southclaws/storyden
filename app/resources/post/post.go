@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/like"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -30,6 +31,7 @@ type Post struct {
 	Slug    string
 	Content content.Rich
 	Author  profile.Public
+	Likes   like.Status
 	Reacts  []*react.React
 	Assets  []*asset.Asset
 	WebLink opt.Optional[link_ref.LinkRef]

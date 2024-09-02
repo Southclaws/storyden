@@ -39,6 +39,8 @@ const (
 	EdgePosts = "posts"
 	// EdgeReacts holds the string denoting the reacts edge name in mutations.
 	EdgeReacts = "reacts"
+	// EdgeLikes holds the string denoting the likes edge name in mutations.
+	EdgeLikes = "likes"
 	// EdgeRoles holds the string denoting the roles edge name in mutations.
 	EdgeRoles = "roles"
 	// EdgeAuthentication holds the string denoting the authentication edge name in mutations.
@@ -74,6 +76,13 @@ const (
 	ReactsInverseTable = "reacts"
 	// ReactsColumn is the table column denoting the reacts relation/edge.
 	ReactsColumn = "account_id"
+	// LikesTable is the table that holds the likes relation/edge.
+	LikesTable = "like_posts"
+	// LikesInverseTable is the table name for the LikePost entity.
+	// It exists in this package in order to avoid circular dependency with the "likepost" package.
+	LikesInverseTable = "like_posts"
+	// LikesColumn is the table column denoting the likes relation/edge.
+	LikesColumn = "account_id"
 	// RolesTable is the table that holds the roles relation/edge. The primary key declared below.
 	RolesTable = "role_accounts"
 	// RolesInverseTable is the table name for the Role entity.
@@ -251,6 +260,20 @@ func ByReacts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByLikesCount orders the results by likes count.
+func ByLikesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newLikesStep(), opts...)
+	}
+}
+
+// ByLikes orders the results by likes terms.
+func ByLikes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newLikesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByRolesCount orders the results by roles count.
 func ByRolesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -353,6 +376,13 @@ func newReactsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ReactsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ReactsTable, ReactsColumn),
+	)
+}
+func newLikesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(LikesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, LikesTable, LikesColumn),
 	)
 }
 func newRolesStep() *sqlgraph.Step {

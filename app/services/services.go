@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/library/node_read"
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
+	"github.com/Southclaws/storyden/app/services/like/post_liker"
 	"github.com/Southclaws/storyden/app/services/link"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/react"
@@ -38,6 +39,7 @@ func Build() fx.Option {
 		category.Build(),
 		thread.Build(),
 		reply.Build(),
+		post_liker.Build(),
 		react.Build(),
 		search.Build(),
 		avatar.Build(),

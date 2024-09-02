@@ -30,6 +30,9 @@ type CollectionPost func(*sql.Selector)
 // Email is the predicate function for email builders.
 type Email func(*sql.Selector)
 
+// LikePost is the predicate function for likepost builders.
+type LikePost func(*sql.Selector)
+
 // Link is the predicate function for link builders.
 type Link func(*sql.Selector)
 

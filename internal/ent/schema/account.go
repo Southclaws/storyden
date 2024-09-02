@@ -41,6 +41,9 @@ func (Account) Edges() []ent.Edge {
 		edge.To("reacts", React.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
+		edge.To("likes", LikePost.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
 		edge.From("roles", Role.Type).
 			Ref("accounts"),
 

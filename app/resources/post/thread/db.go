@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
+	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -29,11 +30,12 @@ import (
 )
 
 type database struct {
-	db *ent.Client
+	db  *ent.Client
+	raw *sqlx.DB
 }
 
-func New(db *ent.Client) Repository {
-	return &database{db}
+func New(db *ent.Client, raw *sqlx.DB) Repository {
+	return &database{db, raw}
 }
 
 func (d *database) Create(
@@ -111,7 +113,7 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(p)
+	return FromModel(nil)(p)
 }
 
 // func (d *database) createTags(ctx context.Context, tags []string) ([]db.TagWhereParam, error) {
@@ -161,7 +163,7 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(p)
+	return FromModel(nil)(p)
 }
 
 func (d *database) List(
@@ -221,7 +223,7 @@ func (d *database) List(
 		result = result[:len(result)-1]
 	}
 
-	threads, err := dt.MapErr(result, FromModel)
+	threads, err := dt.MapErr(result, FromModel(nil))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -236,7 +238,25 @@ func (d *database) List(
 	}, nil
 }
 
-func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {
+const likesCountQuery = `select
+  p.id        post_id, -- the post (thread or reply) ID
+  count(*)    likes,   -- number of likes
+  count(a.id) liked    -- has the account making the query liked this post?
+from
+  like_posts lp
+  inner join posts p on p.id = lp.post_id
+  left join accounts a on lp.account_id = a.id and a.id = $2
+where
+  p.id = $1 or p.root_post_id = $1
+`
+
+func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Optional[account.AccountID]) (*Thread, error) {
+	var likes post.PostLikesResults
+	err := d.raw.SelectContext(ctx, &likes, likesCountQuery, threadID.String(), accountID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	post, err := d.db.Post.
 		Query().
 		Where(
@@ -282,7 +302,12 @@ func (d *database) Get(ctx context.Context, threadID post.ID) (*Thread, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(post)
+	p, err := FromModel(likes.Map())(post)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return p, nil
 }
 
 func (d *database) Delete(ctx context.Context, id post.ID) error {

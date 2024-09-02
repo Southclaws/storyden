@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -35,6 +36,7 @@ type AccountQuery struct {
 	withEmails         *EmailQuery
 	withPosts          *PostQuery
 	withReacts         *ReactQuery
+	withLikes          *LikePostQuery
 	withRoles          *RoleQuery
 	withAuthentication *AuthenticationQuery
 	withTags           *TagQuery
@@ -137,6 +139,28 @@ func (aq *AccountQuery) QueryReacts() *ReactQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(react.Table, react.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.ReactsTable, account.ReactsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryLikes chains the current query on the "likes" edge.
+func (aq *AccountQuery) QueryLikes() *LikePostQuery {
+	query := (&LikePostClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(likepost.Table, likepost.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.LikesTable, account.LikesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -471,6 +495,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		withEmails:         aq.withEmails.Clone(),
 		withPosts:          aq.withPosts.Clone(),
 		withReacts:         aq.withReacts.Clone(),
+		withLikes:          aq.withLikes.Clone(),
 		withRoles:          aq.withRoles.Clone(),
 		withAuthentication: aq.withAuthentication.Clone(),
 		withTags:           aq.withTags.Clone(),
@@ -513,6 +538,17 @@ func (aq *AccountQuery) WithReacts(opts ...func(*ReactQuery)) *AccountQuery {
 		opt(query)
 	}
 	aq.withReacts = query
+	return aq
+}
+
+// WithLikes tells the query-builder to eager-load the nodes that are connected to
+// the "likes" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithLikes(opts ...func(*LikePostQuery)) *AccountQuery {
+	query := (&LikePostClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withLikes = query
 	return aq
 }
 
@@ -660,10 +696,11 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [9]bool{
+		loadedTypes = [10]bool{
 			aq.withEmails != nil,
 			aq.withPosts != nil,
 			aq.withReacts != nil,
+			aq.withLikes != nil,
 			aq.withRoles != nil,
 			aq.withAuthentication != nil,
 			aq.withTags != nil,
@@ -711,6 +748,13 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := aq.loadReacts(ctx, query, nodes,
 			func(n *Account) { n.Edges.Reacts = []*React{} },
 			func(n *Account, e *React) { n.Edges.Reacts = append(n.Edges.Reacts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withLikes; query != nil {
+		if err := aq.loadLikes(ctx, query, nodes,
+			func(n *Account) { n.Edges.Likes = []*LikePost{} },
+			func(n *Account, e *LikePost) { n.Edges.Likes = append(n.Edges.Likes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -838,6 +882,36 @@ func (aq *AccountQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes
 	}
 	query.Where(predicate.React(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(account.ReactsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadLikes(ctx context.Context, query *LikePostQuery, nodes []*Account, init func(*Account), assign func(*Account, *LikePost)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(likepost.FieldAccountID)
+	}
+	query.Where(predicate.LikePost(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.LikesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

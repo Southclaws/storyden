@@ -60,8 +60,10 @@ tags:
     description: Posts within a specific thread.
   - name: assets
     description: File uploads and downloads.
+  - name: likes
+    description: Likes/votes for posts and library nodes.
   - name: collections
-    description: User curated collections of posts.
+    description: User curated collections of posts and library nodes.
   - name: nodes
     description: Structured knowledgebase content tree.
   - name: links
@@ -907,6 +909,73 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AssetGetOK" }
+
+  #
+  # 888 d8b 888
+  # 888 Y8P 888
+  # 888     888
+  # 888 888 888  888  .d88b.  .d8888b
+  # 888 888 888 .88P d8P  Y8b 88K
+  # 888 888 888888K  88888888 "Y8888b.
+  # 888 888 888 "88b Y8b.          X88
+  # 888 888 888  888  "Y8888   88888P'
+  #
+
+  /likes/posts/{post_id}:
+    get:
+      operationId: LikePostGet
+      description: Retreives all likes for the given post. Not paginated (yet.)
+      tags: [likes]
+      parameters:
+        - $ref: "#/components/parameters/PostIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/LikePostGetOK" }
+    put:
+      operationId: LikePostAdd
+      description: |
+        Add a like/vote to a post. A "like" is pretty much what you'd expect for
+        any modern social platform, it will inform the feed algorithm and the
+        account's recommendations as well as listing the post on their profile.
+        Idempotent operation where repeated use will do nothing.
+      tags: [likes]
+      parameters:
+        - $ref: "#/components/parameters/PostIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
+    delete:
+      operationId: LikePostRemove
+      description: |
+        Removes a like/vote from the authenticated account for the post. It will
+        perform the inverse of any changes to the account's algorithm. Also is
+        idempotent, so repeated use will do nothing after being actioned once.
+      tags: [likes]
+      parameters:
+        - $ref: "#/components/parameters/PostIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
+
+  /likes/profiles/{account_handle}:
+    get:
+      operationId: LikeProfileGet
+      description: Retreives all the likes that the given profile has given.
+      tags: [likes]
+      parameters:
+        - $ref: "#/components/parameters/AccountHandleParam"
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/LikeProfileGetOK" }
 
   #
   #                  888 888                   888    d8b
@@ -1889,6 +1958,23 @@ components:
           schema:
             type: string
             format: binary
+
+    LikePostGetOK:
+      description: All likes for a post.
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [likes]
+            properties:
+              likes: { $ref: "#/components/schemas/ItemLikeList" }
+
+    LikeProfileGetOK:
+      description: Likes that an account has given.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProfileLikeListResult"
 
     CollectionCreateOK:
       description: Collection created.
@@ -3006,7 +3092,7 @@ components:
         body_links: { $ref: "#/components/schemas/LinkReferenceList" }
 
     PostReferenceProps:
-      required: [title, slug, author, assets, reacts, collections]
+      required: [title, slug, author, assets, reacts, collections, likes]
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         description: { $ref: "#/components/schemas/PostDescription" }
@@ -3015,6 +3101,7 @@ components:
         assets: { $ref: "#/components/schemas/AssetList" }
         reacts: { $ref: "#/components/schemas/ReactList" }
         collections: { $ref: "#/components/schemas/CollectionList" }
+        likes: { $ref: "#/components/schemas/LikeData" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
     PostReferenceList:
@@ -3266,6 +3353,78 @@ components:
     AssetSourceList:
       type: array
       items: { $ref: "#/components/schemas/AssetSourceURL" }
+
+    #
+    # 888      d8b 888
+    # 888      Y8P 888
+    # 888          888
+    # 888      888 888  888  .d88b.
+    # 888      888 888 .88P d8P  Y8b
+    # 888      888 888888K  88888888
+    # 888      888 888 "88b Y8b.
+    # 88888888 888 888  888  "Y8888
+    #
+
+    ItemLike:
+      description: A like on an item, contains the owner only.
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/LikeProps"
+        - required: [owner]
+          properties:
+            owner: { $ref: "#/components/schemas/ProfileReference" }
+
+    ItemLikeList:
+      type: array
+      items: { $ref: "#/components/schemas/ItemLike" }
+
+    ProfileLike:
+      description: A like on an item, contains the item only.
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/LikeProps"
+        - required: [item]
+          properties:
+            item: { $ref: "#/components/schemas/DatagraphItem" }
+
+    ProfileLikeList:
+      type: array
+      items: { $ref: "#/components/schemas/ProfileLike" }
+
+    LikeProps:
+      type: object
+      required: [id, created_at]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        created_at:
+          type: string
+          format: date-time
+
+    ProfileLikeListResult:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [likes]
+          properties:
+            likes: { $ref: "#/components/schemas/ProfileLikeList" }
+
+    LikeData:
+      type: object
+      required: [likes, liked]
+      properties:
+        likes: { $ref: "#/components/schemas/LikeCount" }
+        liked: { $ref: "#/components/schemas/LikeStatus" }
+
+    LikeCount:
+      description: |
+        A simple count of likes for contexts where pulling the full list would
+        be overkill. For use on minimal item reference schemas.
+      type: integer
+
+    LikeStatus:
+      description: |
+        A boolean indicating if the account in context has liked this item.
+      type: boolean
 
     #
     #  .d8888b.           888 888                   888    d8b

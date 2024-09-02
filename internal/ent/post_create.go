@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -335,6 +336,21 @@ func (pc *PostCreate) AddReacts(r ...*React) *PostCreate {
 		ids[i] = r[i].ID
 	}
 	return pc.AddReactIDs(ids...)
+}
+
+// AddLikeIDs adds the "likes" edge to the LikePost entity by IDs.
+func (pc *PostCreate) AddLikeIDs(ids ...xid.ID) *PostCreate {
+	pc.mutation.AddLikeIDs(ids...)
+	return pc
+}
+
+// AddLikes adds the "likes" edges to the LikePost entity.
+func (pc *PostCreate) AddLikes(l ...*LikePost) *PostCreate {
+	ids := make([]xid.ID, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return pc.AddLikeIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -685,6 +701,22 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.LikesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.LikesTable,
+			Columns: []string{post.LikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
