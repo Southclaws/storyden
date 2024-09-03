@@ -74,7 +74,8 @@ func (q *watermillQueue[T]) Subscribe(ctx context.Context) (<-chan *pubsub.Messa
 					q.log.Error("failed to decode message payload",
 						zap.Error(err))
 
-					msg.Nack()
+					// Payload is malformed so do not ack and cause retry loop.
+					msg.Ack()
 
 					continue
 				}
