@@ -36,7 +36,7 @@ type AnalyseAsset struct {
 
 type ScrapeLink struct {
 	URL  url.URL
-	Item opt.Optional[datagraph.Item]
+	Item *datagraph.Ref
 }
 
 type LikePost struct {

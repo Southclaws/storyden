@@ -9,7 +9,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
 	"go.uber.org/zap"
 
@@ -101,7 +100,7 @@ func (s *Fetcher) HydrateContentURLs(ctx context.Context, item datagraph.Item) {
 func (s *Fetcher) QueueForItem(ctx context.Context, u url.URL, item datagraph.Item) error {
 	if err := s.queue.Publish(ctx, mq.ScrapeLink{
 		URL:  u,
-		Item: opt.New(item),
+		Item: datagraph.NewRef(item),
 	}); err != nil {
 		s.l.Error("failed to publish scrape link message",
 			zap.Error(err),

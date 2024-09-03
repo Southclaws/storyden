@@ -11,54 +11,45 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
-	"github.com/Southclaws/storyden/app/resources/post/reply"
-	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/post_writer"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 )
 
 type scrapeConsumer struct {
 	fetcher *fetcher.Fetcher
-	threads thread.Repository
-	replies reply.Repository
+	posts   *post_writer.PostWriter
 	nodes   library.Repository
 }
 
 func newScrapeConsumer(
 	fetcher *fetcher.Fetcher,
-	threads thread.Repository,
-	replies reply.Repository,
+	posts *post_writer.PostWriter,
 	nodes library.Repository,
 ) *scrapeConsumer {
 	return &scrapeConsumer{
 		fetcher: fetcher,
-		threads: threads,
-		replies: replies,
+		posts:   posts,
 		nodes:   nodes,
 	}
 }
 
-func (s *scrapeConsumer) scrapeLink(ctx context.Context, u url.URL, item opt.Optional[datagraph.Item]) error {
+func (s *scrapeConsumer) scrapeLink(ctx context.Context, u url.URL, item opt.Optional[datagraph.Ref]) error {
 	ln, err := s.fetcher.ScrapeAndStore(ctx, u)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if i, ok := item.Get(); ok {
-		switch t := i.(type) {
-		case *thread.Thread:
-			_, err := s.threads.Update(ctx, t.ID, thread.WithContentLinks(xid.ID(ln.ID)))
+		switch i.Kind {
+		case datagraph.KindPost:
+			_, err := s.posts.Update(ctx, post.ID(i.ID), post_writer.WithContentLinks(xid.ID(ln.ID)))
 			if err != nil {
 				return fault.Wrap(err, fctx.With(ctx))
 			}
 
-		case *reply.Reply:
-			_, err := s.replies.Update(ctx, t.ID, reply.WithContentLinks(xid.ID(ln.ID)))
-			if err != nil {
-				return fault.Wrap(err, fctx.With(ctx))
-			}
-
-		case *library.Node:
-			_, err := s.nodes.Update(ctx, t.ID, library.WithContentLinks(xid.ID(ln.ID)))
+		case datagraph.KindNode:
+			_, err := s.nodes.Update(ctx, library.NodeID(i.ID), library.WithContentLinks(xid.ID(ln.ID)))
 			if err != nil {
 				return fault.Wrap(err, fctx.With(ctx))
 			}

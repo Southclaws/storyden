@@ -56,3 +56,10 @@ type Ref struct {
 }
 
 type RefList []*Ref
+
+func NewRef(i Item) *Ref {
+	return &Ref{
+		ID:   i.GetID(),
+		Kind: i.GetKind(),
+	}
+}
