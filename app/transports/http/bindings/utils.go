@@ -67,6 +67,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Author:      serialiseProfileReference(t.Author),
 		Slug:        t.Slug,
 		Description: &t.Short,
+		Body:        t.Content.HTML(),
 		Meta:        (*openapi.Metadata)(&t.Meta),
 
 		Category:    serialiseCategoryReference(&t.Category),
