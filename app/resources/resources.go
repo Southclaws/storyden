@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/notification"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
+	"github.com/Southclaws/storyden/app/resources/post/post_writer"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
@@ -43,6 +44,7 @@ func Build() fx.Option {
 			like_writer.New,
 			notification.New,
 			post_search.New,
+			post_writer.New,
 			collection.New,
 			library.New,
 			node_traversal.New,
