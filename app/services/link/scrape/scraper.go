@@ -39,7 +39,7 @@ func (s *webScraper) Scrape(ctx context.Context, addr url.URL) (*WebContent, err
 	}
 
 	req.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7")
-	req.Header.Add("Accept-Encoding", "gzip, deflate")
+	req.Header.Add("Accept-Encoding", "*")
 	req.Header.Add("Accept-Language", "en-GB,en-US;q=0.9,en;q=0.8")
 	req.Header.Add("Cache-Control", "no-cache")
 	req.Header.Add("Dnt", "1")
@@ -63,5 +63,10 @@ func (s *webScraper) Scrape(ctx context.Context, addr url.URL) (*WebContent, err
 		return nil, fault.Wrap(errFailedToScrape, fctx.With(ctx))
 	}
 
-	return s.postprocess(ctx, addr, resp.Body)
+	wc, err := s.postprocess(ctx, addr, resp.Body)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return wc, nil
 }
