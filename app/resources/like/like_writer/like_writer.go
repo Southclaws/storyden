@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/likepost"
 )
 
 type LikeWriter struct {
@@ -35,7 +36,13 @@ func (l *LikeWriter) AddPostLike(ctx context.Context, accountID account.AccountI
 }
 
 func (l *LikeWriter) RemovePostLike(ctx context.Context, accountID account.AccountID, postID post.ID) error {
-	_, err := l.db.LikePost.Delete().Exec(ctx)
+	_, err := l.db.LikePost.
+		Delete().
+		Where(
+			likepost.AccountIDEQ(xid.ID(accountID)),
+			likepost.PostIDEQ(xid.ID(postID)),
+		).
+		Exec(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
