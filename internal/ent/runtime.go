@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/accountfollow"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
@@ -68,6 +69,37 @@ func init() {
 	// account.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	account.IDValidator = func() func(string) error {
 		validators := accountDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	accountfollowMixin := schema.AccountFollow{}.Mixin()
+	accountfollowMixinFields0 := accountfollowMixin[0].Fields()
+	_ = accountfollowMixinFields0
+	accountfollowMixinFields1 := accountfollowMixin[1].Fields()
+	_ = accountfollowMixinFields1
+	accountfollowFields := schema.AccountFollow{}.Fields()
+	_ = accountfollowFields
+	// accountfollowDescCreatedAt is the schema descriptor for created_at field.
+	accountfollowDescCreatedAt := accountfollowMixinFields1[0].Descriptor()
+	// accountfollow.DefaultCreatedAt holds the default value on creation for the created_at field.
+	accountfollow.DefaultCreatedAt = accountfollowDescCreatedAt.Default.(func() time.Time)
+	// accountfollowDescID is the schema descriptor for id field.
+	accountfollowDescID := accountfollowMixinFields0[0].Descriptor()
+	// accountfollow.DefaultID holds the default value on creation for the id field.
+	accountfollow.DefaultID = accountfollowDescID.Default.(func() xid.ID)
+	// accountfollow.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	accountfollow.IDValidator = func() func(string) error {
+		validators := accountfollowDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

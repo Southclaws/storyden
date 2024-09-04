@@ -35,6 +35,10 @@ const (
 	FieldMetadata = "metadata"
 	// EdgeEmails holds the string denoting the emails edge name in mutations.
 	EdgeEmails = "emails"
+	// EdgeFollowing holds the string denoting the following edge name in mutations.
+	EdgeFollowing = "following"
+	// EdgeFollowedBy holds the string denoting the followed_by edge name in mutations.
+	EdgeFollowedBy = "followed_by"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
 	// EdgeReacts holds the string denoting the reacts edge name in mutations.
@@ -62,6 +66,20 @@ const (
 	EmailsInverseTable = "emails"
 	// EmailsColumn is the table column denoting the emails relation/edge.
 	EmailsColumn = "account_id"
+	// FollowingTable is the table that holds the following relation/edge.
+	FollowingTable = "account_follows"
+	// FollowingInverseTable is the table name for the AccountFollow entity.
+	// It exists in this package in order to avoid circular dependency with the "accountfollow" package.
+	FollowingInverseTable = "account_follows"
+	// FollowingColumn is the table column denoting the following relation/edge.
+	FollowingColumn = "follower_account_id"
+	// FollowedByTable is the table that holds the followed_by relation/edge.
+	FollowedByTable = "account_follows"
+	// FollowedByInverseTable is the table name for the AccountFollow entity.
+	// It exists in this package in order to avoid circular dependency with the "accountfollow" package.
+	FollowedByInverseTable = "account_follows"
+	// FollowedByColumn is the table column denoting the followed_by relation/edge.
+	FollowedByColumn = "following_account_id"
 	// PostsTable is the table that holds the posts relation/edge.
 	PostsTable = "posts"
 	// PostsInverseTable is the table name for the Post entity.
@@ -232,6 +250,34 @@ func ByEmails(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByFollowingCount orders the results by following count.
+func ByFollowingCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFollowingStep(), opts...)
+	}
+}
+
+// ByFollowing orders the results by following terms.
+func ByFollowing(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFollowingStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByFollowedByCount orders the results by followed_by count.
+func ByFollowedByCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFollowedByStep(), opts...)
+	}
+}
+
+// ByFollowedBy orders the results by followed_by terms.
+func ByFollowedBy(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFollowedByStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByPostsCount orders the results by posts count.
 func ByPostsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -362,6 +408,20 @@ func newEmailsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EmailsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, EmailsTable, EmailsColumn),
+	)
+}
+func newFollowingStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FollowingInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, FollowingTable, FollowingColumn),
+	)
+}
+func newFollowedByStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FollowedByInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, FollowedByTable, FollowedByColumn),
 	)
 }
 func newPostsStep() *sqlgraph.Step {

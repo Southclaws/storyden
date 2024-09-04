@@ -18,6 +18,12 @@ erDiagram
         LBRACKRBRACKschemaDOTExternalLink links
         mapLBRACKstringRBRACKinterface {} metadata
     }
+    AccountFollow {
+        xidDOTID id
+        timeDOTTime created_at
+        xidDOTID follower_account_id
+        xidDOTID following_account_id
+    }
     Asset {
         xidDOTID id
         timeDOTTime created_at
@@ -159,6 +165,8 @@ erDiagram
         string name
     }
     	Account |o--o{ Email : "emails/account"
+    	Account |o--o{ AccountFollow : "following/follower"
+    	Account |o--o{ AccountFollow : "followed_by/following"
     	Account |o--o{ Post : "posts/author"
     	Account |o--o{ React : "reacts/account"
     	Account |o--o{ LikePost : "likes/account"

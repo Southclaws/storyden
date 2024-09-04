@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/accountfollow"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
@@ -43,6 +44,7 @@ const (
 
 	// Node types.
 	TypeAccount        = "Account"
+	TypeAccountFollow  = "AccountFollow"
 	TypeAsset          = "Asset"
 	TypeAuthentication = "Authentication"
 	TypeCategory       = "Category"
@@ -81,6 +83,12 @@ type AccountMutation struct {
 	emails                map[xid.ID]struct{}
 	removedemails         map[xid.ID]struct{}
 	clearedemails         bool
+	following             map[xid.ID]struct{}
+	removedfollowing      map[xid.ID]struct{}
+	clearedfollowing      bool
+	followed_by           map[xid.ID]struct{}
+	removedfollowed_by    map[xid.ID]struct{}
+	clearedfollowed_by    bool
 	posts                 map[xid.ID]struct{}
 	removedposts          map[xid.ID]struct{}
 	clearedposts          bool
@@ -661,6 +669,114 @@ func (m *AccountMutation) ResetEmails() {
 	m.emails = nil
 	m.clearedemails = false
 	m.removedemails = nil
+}
+
+// AddFollowingIDs adds the "following" edge to the AccountFollow entity by ids.
+func (m *AccountMutation) AddFollowingIDs(ids ...xid.ID) {
+	if m.following == nil {
+		m.following = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.following[ids[i]] = struct{}{}
+	}
+}
+
+// ClearFollowing clears the "following" edge to the AccountFollow entity.
+func (m *AccountMutation) ClearFollowing() {
+	m.clearedfollowing = true
+}
+
+// FollowingCleared reports if the "following" edge to the AccountFollow entity was cleared.
+func (m *AccountMutation) FollowingCleared() bool {
+	return m.clearedfollowing
+}
+
+// RemoveFollowingIDs removes the "following" edge to the AccountFollow entity by IDs.
+func (m *AccountMutation) RemoveFollowingIDs(ids ...xid.ID) {
+	if m.removedfollowing == nil {
+		m.removedfollowing = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.following, ids[i])
+		m.removedfollowing[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedFollowing returns the removed IDs of the "following" edge to the AccountFollow entity.
+func (m *AccountMutation) RemovedFollowingIDs() (ids []xid.ID) {
+	for id := range m.removedfollowing {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// FollowingIDs returns the "following" edge IDs in the mutation.
+func (m *AccountMutation) FollowingIDs() (ids []xid.ID) {
+	for id := range m.following {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetFollowing resets all changes to the "following" edge.
+func (m *AccountMutation) ResetFollowing() {
+	m.following = nil
+	m.clearedfollowing = false
+	m.removedfollowing = nil
+}
+
+// AddFollowedByIDs adds the "followed_by" edge to the AccountFollow entity by ids.
+func (m *AccountMutation) AddFollowedByIDs(ids ...xid.ID) {
+	if m.followed_by == nil {
+		m.followed_by = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.followed_by[ids[i]] = struct{}{}
+	}
+}
+
+// ClearFollowedBy clears the "followed_by" edge to the AccountFollow entity.
+func (m *AccountMutation) ClearFollowedBy() {
+	m.clearedfollowed_by = true
+}
+
+// FollowedByCleared reports if the "followed_by" edge to the AccountFollow entity was cleared.
+func (m *AccountMutation) FollowedByCleared() bool {
+	return m.clearedfollowed_by
+}
+
+// RemoveFollowedByIDs removes the "followed_by" edge to the AccountFollow entity by IDs.
+func (m *AccountMutation) RemoveFollowedByIDs(ids ...xid.ID) {
+	if m.removedfollowed_by == nil {
+		m.removedfollowed_by = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.followed_by, ids[i])
+		m.removedfollowed_by[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedFollowedBy returns the removed IDs of the "followed_by" edge to the AccountFollow entity.
+func (m *AccountMutation) RemovedFollowedByIDs() (ids []xid.ID) {
+	for id := range m.removedfollowed_by {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// FollowedByIDs returns the "followed_by" edge IDs in the mutation.
+func (m *AccountMutation) FollowedByIDs() (ids []xid.ID) {
+	for id := range m.followed_by {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetFollowedBy resets all changes to the "followed_by" edge.
+func (m *AccountMutation) ResetFollowedBy() {
+	m.followed_by = nil
+	m.clearedfollowed_by = false
+	m.removedfollowed_by = nil
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
@@ -1445,9 +1561,15 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 10)
+	edges := make([]string, 0, 12)
 	if m.emails != nil {
 		edges = append(edges, account.EdgeEmails)
+	}
+	if m.following != nil {
+		edges = append(edges, account.EdgeFollowing)
+	}
+	if m.followed_by != nil {
+		edges = append(edges, account.EdgeFollowedBy)
 	}
 	if m.posts != nil {
 		edges = append(edges, account.EdgePosts)
@@ -1486,6 +1608,18 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 	case account.EdgeEmails:
 		ids := make([]ent.Value, 0, len(m.emails))
 		for id := range m.emails {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeFollowing:
+		ids := make([]ent.Value, 0, len(m.following))
+		for id := range m.following {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeFollowedBy:
+		ids := make([]ent.Value, 0, len(m.followed_by))
+		for id := range m.followed_by {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1549,9 +1683,15 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 10)
+	edges := make([]string, 0, 12)
 	if m.removedemails != nil {
 		edges = append(edges, account.EdgeEmails)
+	}
+	if m.removedfollowing != nil {
+		edges = append(edges, account.EdgeFollowing)
+	}
+	if m.removedfollowed_by != nil {
+		edges = append(edges, account.EdgeFollowedBy)
 	}
 	if m.removedposts != nil {
 		edges = append(edges, account.EdgePosts)
@@ -1590,6 +1730,18 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 	case account.EdgeEmails:
 		ids := make([]ent.Value, 0, len(m.removedemails))
 		for id := range m.removedemails {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeFollowing:
+		ids := make([]ent.Value, 0, len(m.removedfollowing))
+		for id := range m.removedfollowing {
+			ids = append(ids, id)
+		}
+		return ids
+	case account.EdgeFollowedBy:
+		ids := make([]ent.Value, 0, len(m.removedfollowed_by))
+		for id := range m.removedfollowed_by {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1653,9 +1805,15 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 10)
+	edges := make([]string, 0, 12)
 	if m.clearedemails {
 		edges = append(edges, account.EdgeEmails)
+	}
+	if m.clearedfollowing {
+		edges = append(edges, account.EdgeFollowing)
+	}
+	if m.clearedfollowed_by {
+		edges = append(edges, account.EdgeFollowedBy)
 	}
 	if m.clearedposts {
 		edges = append(edges, account.EdgePosts)
@@ -1693,6 +1851,10 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 	switch name {
 	case account.EdgeEmails:
 		return m.clearedemails
+	case account.EdgeFollowing:
+		return m.clearedfollowing
+	case account.EdgeFollowedBy:
+		return m.clearedfollowed_by
 	case account.EdgePosts:
 		return m.clearedposts
 	case account.EdgeReacts:
@@ -1730,6 +1892,12 @@ func (m *AccountMutation) ResetEdge(name string) error {
 	case account.EdgeEmails:
 		m.ResetEmails()
 		return nil
+	case account.EdgeFollowing:
+		m.ResetFollowing()
+		return nil
+	case account.EdgeFollowedBy:
+		m.ResetFollowedBy()
+		return nil
 	case account.EdgePosts:
 		m.ResetPosts()
 		return nil
@@ -1759,6 +1927,572 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Account edge %s", name)
+}
+
+// AccountFollowMutation represents an operation that mutates the AccountFollow nodes in the graph.
+type AccountFollowMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *xid.ID
+	created_at       *time.Time
+	clearedFields    map[string]struct{}
+	follower         *xid.ID
+	clearedfollower  bool
+	following        *xid.ID
+	clearedfollowing bool
+	done             bool
+	oldValue         func(context.Context) (*AccountFollow, error)
+	predicates       []predicate.AccountFollow
+}
+
+var _ ent.Mutation = (*AccountFollowMutation)(nil)
+
+// accountfollowOption allows management of the mutation configuration using functional options.
+type accountfollowOption func(*AccountFollowMutation)
+
+// newAccountFollowMutation creates new mutation for the AccountFollow entity.
+func newAccountFollowMutation(c config, op Op, opts ...accountfollowOption) *AccountFollowMutation {
+	m := &AccountFollowMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAccountFollow,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAccountFollowID sets the ID field of the mutation.
+func withAccountFollowID(id xid.ID) accountfollowOption {
+	return func(m *AccountFollowMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *AccountFollow
+		)
+		m.oldValue = func(ctx context.Context) (*AccountFollow, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().AccountFollow.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAccountFollow sets the old AccountFollow of the mutation.
+func withAccountFollow(node *AccountFollow) accountfollowOption {
+	return func(m *AccountFollowMutation) {
+		m.oldValue = func(context.Context) (*AccountFollow, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AccountFollowMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AccountFollowMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of AccountFollow entities.
+func (m *AccountFollowMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *AccountFollowMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *AccountFollowMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().AccountFollow.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *AccountFollowMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *AccountFollowMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the AccountFollow entity.
+// If the AccountFollow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountFollowMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *AccountFollowMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetFollowerAccountID sets the "follower_account_id" field.
+func (m *AccountFollowMutation) SetFollowerAccountID(x xid.ID) {
+	m.follower = &x
+}
+
+// FollowerAccountID returns the value of the "follower_account_id" field in the mutation.
+func (m *AccountFollowMutation) FollowerAccountID() (r xid.ID, exists bool) {
+	v := m.follower
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFollowerAccountID returns the old "follower_account_id" field's value of the AccountFollow entity.
+// If the AccountFollow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountFollowMutation) OldFollowerAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFollowerAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFollowerAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFollowerAccountID: %w", err)
+	}
+	return oldValue.FollowerAccountID, nil
+}
+
+// ResetFollowerAccountID resets all changes to the "follower_account_id" field.
+func (m *AccountFollowMutation) ResetFollowerAccountID() {
+	m.follower = nil
+}
+
+// SetFollowingAccountID sets the "following_account_id" field.
+func (m *AccountFollowMutation) SetFollowingAccountID(x xid.ID) {
+	m.following = &x
+}
+
+// FollowingAccountID returns the value of the "following_account_id" field in the mutation.
+func (m *AccountFollowMutation) FollowingAccountID() (r xid.ID, exists bool) {
+	v := m.following
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFollowingAccountID returns the old "following_account_id" field's value of the AccountFollow entity.
+// If the AccountFollow object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountFollowMutation) OldFollowingAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFollowingAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFollowingAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFollowingAccountID: %w", err)
+	}
+	return oldValue.FollowingAccountID, nil
+}
+
+// ResetFollowingAccountID resets all changes to the "following_account_id" field.
+func (m *AccountFollowMutation) ResetFollowingAccountID() {
+	m.following = nil
+}
+
+// SetFollowerID sets the "follower" edge to the Account entity by id.
+func (m *AccountFollowMutation) SetFollowerID(id xid.ID) {
+	m.follower = &id
+}
+
+// ClearFollower clears the "follower" edge to the Account entity.
+func (m *AccountFollowMutation) ClearFollower() {
+	m.clearedfollower = true
+	m.clearedFields[accountfollow.FieldFollowerAccountID] = struct{}{}
+}
+
+// FollowerCleared reports if the "follower" edge to the Account entity was cleared.
+func (m *AccountFollowMutation) FollowerCleared() bool {
+	return m.clearedfollower
+}
+
+// FollowerID returns the "follower" edge ID in the mutation.
+func (m *AccountFollowMutation) FollowerID() (id xid.ID, exists bool) {
+	if m.follower != nil {
+		return *m.follower, true
+	}
+	return
+}
+
+// FollowerIDs returns the "follower" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// FollowerID instead. It exists only for internal usage by the builders.
+func (m *AccountFollowMutation) FollowerIDs() (ids []xid.ID) {
+	if id := m.follower; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetFollower resets all changes to the "follower" edge.
+func (m *AccountFollowMutation) ResetFollower() {
+	m.follower = nil
+	m.clearedfollower = false
+}
+
+// SetFollowingID sets the "following" edge to the Account entity by id.
+func (m *AccountFollowMutation) SetFollowingID(id xid.ID) {
+	m.following = &id
+}
+
+// ClearFollowing clears the "following" edge to the Account entity.
+func (m *AccountFollowMutation) ClearFollowing() {
+	m.clearedfollowing = true
+	m.clearedFields[accountfollow.FieldFollowingAccountID] = struct{}{}
+}
+
+// FollowingCleared reports if the "following" edge to the Account entity was cleared.
+func (m *AccountFollowMutation) FollowingCleared() bool {
+	return m.clearedfollowing
+}
+
+// FollowingID returns the "following" edge ID in the mutation.
+func (m *AccountFollowMutation) FollowingID() (id xid.ID, exists bool) {
+	if m.following != nil {
+		return *m.following, true
+	}
+	return
+}
+
+// FollowingIDs returns the "following" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// FollowingID instead. It exists only for internal usage by the builders.
+func (m *AccountFollowMutation) FollowingIDs() (ids []xid.ID) {
+	if id := m.following; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetFollowing resets all changes to the "following" edge.
+func (m *AccountFollowMutation) ResetFollowing() {
+	m.following = nil
+	m.clearedfollowing = false
+}
+
+// Where appends a list predicates to the AccountFollowMutation builder.
+func (m *AccountFollowMutation) Where(ps ...predicate.AccountFollow) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the AccountFollowMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *AccountFollowMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.AccountFollow, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *AccountFollowMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *AccountFollowMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (AccountFollow).
+func (m *AccountFollowMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AccountFollowMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.created_at != nil {
+		fields = append(fields, accountfollow.FieldCreatedAt)
+	}
+	if m.follower != nil {
+		fields = append(fields, accountfollow.FieldFollowerAccountID)
+	}
+	if m.following != nil {
+		fields = append(fields, accountfollow.FieldFollowingAccountID)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AccountFollowMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case accountfollow.FieldCreatedAt:
+		return m.CreatedAt()
+	case accountfollow.FieldFollowerAccountID:
+		return m.FollowerAccountID()
+	case accountfollow.FieldFollowingAccountID:
+		return m.FollowingAccountID()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AccountFollowMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case accountfollow.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case accountfollow.FieldFollowerAccountID:
+		return m.OldFollowerAccountID(ctx)
+	case accountfollow.FieldFollowingAccountID:
+		return m.OldFollowingAccountID(ctx)
+	}
+	return nil, fmt.Errorf("unknown AccountFollow field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AccountFollowMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case accountfollow.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case accountfollow.FieldFollowerAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFollowerAccountID(v)
+		return nil
+	case accountfollow.FieldFollowingAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFollowingAccountID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AccountFollow field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AccountFollowMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AccountFollowMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AccountFollowMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown AccountFollow numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AccountFollowMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AccountFollowMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AccountFollowMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown AccountFollow nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AccountFollowMutation) ResetField(name string) error {
+	switch name {
+	case accountfollow.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case accountfollow.FieldFollowerAccountID:
+		m.ResetFollowerAccountID()
+		return nil
+	case accountfollow.FieldFollowingAccountID:
+		m.ResetFollowingAccountID()
+		return nil
+	}
+	return fmt.Errorf("unknown AccountFollow field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AccountFollowMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.follower != nil {
+		edges = append(edges, accountfollow.EdgeFollower)
+	}
+	if m.following != nil {
+		edges = append(edges, accountfollow.EdgeFollowing)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AccountFollowMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case accountfollow.EdgeFollower:
+		if id := m.follower; id != nil {
+			return []ent.Value{*id}
+		}
+	case accountfollow.EdgeFollowing:
+		if id := m.following; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AccountFollowMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AccountFollowMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AccountFollowMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedfollower {
+		edges = append(edges, accountfollow.EdgeFollower)
+	}
+	if m.clearedfollowing {
+		edges = append(edges, accountfollow.EdgeFollowing)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AccountFollowMutation) EdgeCleared(name string) bool {
+	switch name {
+	case accountfollow.EdgeFollower:
+		return m.clearedfollower
+	case accountfollow.EdgeFollowing:
+		return m.clearedfollowing
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AccountFollowMutation) ClearEdge(name string) error {
+	switch name {
+	case accountfollow.EdgeFollower:
+		m.ClearFollower()
+		return nil
+	case accountfollow.EdgeFollowing:
+		m.ClearFollowing()
+		return nil
+	}
+	return fmt.Errorf("unknown AccountFollow unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AccountFollowMutation) ResetEdge(name string) error {
+	switch name {
+	case accountfollow.EdgeFollower:
+		m.ResetFollower()
+		return nil
+	case accountfollow.EdgeFollowing:
+		m.ResetFollowing()
+		return nil
+	}
+	return fmt.Errorf("unknown AccountFollow edge %s", name)
 }
 
 // AssetMutation represents an operation that mutates the Asset nodes in the graph.
