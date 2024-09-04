@@ -267,6 +267,7 @@ from
   left join accounts a on lp.account_id = a.id and a.id = $2
 where
   p.id = $1 or p.root_post_id = $1
+group by p.id
 `
 
 func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Optional[account.AccountID]) (*Thread, error) {
