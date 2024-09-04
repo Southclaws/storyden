@@ -17,6 +17,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/accountfollow"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
@@ -44,6 +45,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Account is the client for interacting with the Account builders.
 	Account *AccountClient
+	// AccountFollow is the client for interacting with the AccountFollow builders.
+	AccountFollow *AccountFollowClient
 	// Asset is the client for interacting with the Asset builders.
 	Asset *AssetClient
 	// Authentication is the client for interacting with the Authentication builders.
@@ -88,6 +91,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Account = NewAccountClient(c.config)
+	c.AccountFollow = NewAccountFollowClient(c.config)
 	c.Asset = NewAssetClient(c.config)
 	c.Authentication = NewAuthenticationClient(c.config)
 	c.Category = NewCategoryClient(c.config)
@@ -197,6 +201,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:            ctx,
 		config:         cfg,
 		Account:        NewAccountClient(cfg),
+		AccountFollow:  NewAccountFollowClient(cfg),
 		Asset:          NewAssetClient(cfg),
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
@@ -233,6 +238,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:            ctx,
 		config:         cfg,
 		Account:        NewAccountClient(cfg),
+		AccountFollow:  NewAccountFollowClient(cfg),
 		Asset:          NewAssetClient(cfg),
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
@@ -278,7 +284,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Account, c.Asset, c.Authentication, c.Category, c.Collection,
+		c.Account, c.AccountFollow, c.Asset, c.Authentication, c.Category, c.Collection,
 		c.CollectionNode, c.CollectionPost, c.Email, c.LikePost, c.Link, c.Node,
 		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
@@ -290,7 +296,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Account, c.Asset, c.Authentication, c.Category, c.Collection,
+		c.Account, c.AccountFollow, c.Asset, c.Authentication, c.Category, c.Collection,
 		c.CollectionNode, c.CollectionPost, c.Email, c.LikePost, c.Link, c.Node,
 		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
@@ -303,6 +309,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AccountMutation:
 		return c.Account.mutate(ctx, m)
+	case *AccountFollowMutation:
+		return c.AccountFollow.mutate(ctx, m)
 	case *AssetMutation:
 		return c.Asset.mutate(ctx, m)
 	case *AuthenticationMutation:
@@ -457,6 +465,38 @@ func (c *AccountClient) QueryEmails(a *Account) *EmailQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(email.Table, email.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.EmailsTable, account.EmailsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFollowing queries the following edge of a Account.
+func (c *AccountClient) QueryFollowing(a *Account) *AccountFollowQuery {
+	query := (&AccountFollowClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(accountfollow.Table, accountfollow.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.FollowingTable, account.FollowingColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFollowedBy queries the followed_by edge of a Account.
+func (c *AccountClient) QueryFollowedBy(a *Account) *AccountFollowQuery {
+	query := (&AccountFollowClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(accountfollow.Table, accountfollow.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.FollowedByTable, account.FollowedByColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -630,6 +670,171 @@ func (c *AccountClient) mutate(ctx context.Context, m *AccountMutation) (Value, 
 		return (&AccountDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Account mutation op: %q", m.Op())
+	}
+}
+
+// AccountFollowClient is a client for the AccountFollow schema.
+type AccountFollowClient struct {
+	config
+}
+
+// NewAccountFollowClient returns a client for the AccountFollow from the given config.
+func NewAccountFollowClient(c config) *AccountFollowClient {
+	return &AccountFollowClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `accountfollow.Hooks(f(g(h())))`.
+func (c *AccountFollowClient) Use(hooks ...Hook) {
+	c.hooks.AccountFollow = append(c.hooks.AccountFollow, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `accountfollow.Intercept(f(g(h())))`.
+func (c *AccountFollowClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AccountFollow = append(c.inters.AccountFollow, interceptors...)
+}
+
+// Create returns a builder for creating a AccountFollow entity.
+func (c *AccountFollowClient) Create() *AccountFollowCreate {
+	mutation := newAccountFollowMutation(c.config, OpCreate)
+	return &AccountFollowCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AccountFollow entities.
+func (c *AccountFollowClient) CreateBulk(builders ...*AccountFollowCreate) *AccountFollowCreateBulk {
+	return &AccountFollowCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AccountFollowClient) MapCreateBulk(slice any, setFunc func(*AccountFollowCreate, int)) *AccountFollowCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AccountFollowCreateBulk{err: fmt.Errorf("calling to AccountFollowClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AccountFollowCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AccountFollowCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AccountFollow.
+func (c *AccountFollowClient) Update() *AccountFollowUpdate {
+	mutation := newAccountFollowMutation(c.config, OpUpdate)
+	return &AccountFollowUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AccountFollowClient) UpdateOne(af *AccountFollow) *AccountFollowUpdateOne {
+	mutation := newAccountFollowMutation(c.config, OpUpdateOne, withAccountFollow(af))
+	return &AccountFollowUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AccountFollowClient) UpdateOneID(id xid.ID) *AccountFollowUpdateOne {
+	mutation := newAccountFollowMutation(c.config, OpUpdateOne, withAccountFollowID(id))
+	return &AccountFollowUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AccountFollow.
+func (c *AccountFollowClient) Delete() *AccountFollowDelete {
+	mutation := newAccountFollowMutation(c.config, OpDelete)
+	return &AccountFollowDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AccountFollowClient) DeleteOne(af *AccountFollow) *AccountFollowDeleteOne {
+	return c.DeleteOneID(af.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AccountFollowClient) DeleteOneID(id xid.ID) *AccountFollowDeleteOne {
+	builder := c.Delete().Where(accountfollow.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AccountFollowDeleteOne{builder}
+}
+
+// Query returns a query builder for AccountFollow.
+func (c *AccountFollowClient) Query() *AccountFollowQuery {
+	return &AccountFollowQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAccountFollow},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AccountFollow entity by its id.
+func (c *AccountFollowClient) Get(ctx context.Context, id xid.ID) (*AccountFollow, error) {
+	return c.Query().Where(accountfollow.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AccountFollowClient) GetX(ctx context.Context, id xid.ID) *AccountFollow {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryFollower queries the follower edge of a AccountFollow.
+func (c *AccountFollowClient) QueryFollower(af *AccountFollow) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := af.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(accountfollow.Table, accountfollow.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, accountfollow.FollowerTable, accountfollow.FollowerColumn),
+		)
+		fromV = sqlgraph.Neighbors(af.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFollowing queries the following edge of a AccountFollow.
+func (c *AccountFollowClient) QueryFollowing(af *AccountFollow) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := af.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(accountfollow.Table, accountfollow.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, accountfollow.FollowingTable, accountfollow.FollowingColumn),
+		)
+		fromV = sqlgraph.Neighbors(af.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *AccountFollowClient) Hooks() []Hook {
+	return c.hooks.AccountFollow
+}
+
+// Interceptors returns the client interceptors.
+func (c *AccountFollowClient) Interceptors() []Interceptor {
+	return c.inters.AccountFollow
+}
+
+func (c *AccountFollowClient) mutate(ctx context.Context, m *AccountFollowMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AccountFollowCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AccountFollowUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AccountFollowUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AccountFollowDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AccountFollow mutation op: %q", m.Op())
 	}
 }
 
@@ -3546,14 +3751,14 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Account, Asset, Authentication, Category, Collection, CollectionNode,
-		CollectionPost, Email, LikePost, Link, Node, Notification, Post, React, Role,
-		Setting, Tag []ent.Hook
+		Account, AccountFollow, Asset, Authentication, Category, Collection,
+		CollectionNode, CollectionPost, Email, LikePost, Link, Node, Notification,
+		Post, React, Role, Setting, Tag []ent.Hook
 	}
 	inters struct {
-		Account, Asset, Authentication, Category, Collection, CollectionNode,
-		CollectionPost, Email, LikePost, Link, Node, Notification, Post, React, Role,
-		Setting, Tag []ent.Interceptor
+		Account, AccountFollow, Asset, Authentication, Category, Collection,
+		CollectionNode, CollectionPost, Email, LikePost, Link, Node, Notification,
+		Post, React, Role, Setting, Tag []ent.Interceptor
 	}
 )
 

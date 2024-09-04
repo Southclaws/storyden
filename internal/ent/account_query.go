@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/accountfollow"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/collection"
@@ -34,6 +35,8 @@ type AccountQuery struct {
 	inters             []Interceptor
 	predicates         []predicate.Account
 	withEmails         *EmailQuery
+	withFollowing      *AccountFollowQuery
+	withFollowedBy     *AccountFollowQuery
 	withPosts          *PostQuery
 	withReacts         *ReactQuery
 	withLikes          *LikePostQuery
@@ -95,6 +98,50 @@ func (aq *AccountQuery) QueryEmails() *EmailQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(email.Table, email.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.EmailsTable, account.EmailsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryFollowing chains the current query on the "following" edge.
+func (aq *AccountQuery) QueryFollowing() *AccountFollowQuery {
+	query := (&AccountFollowClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(accountfollow.Table, accountfollow.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.FollowingTable, account.FollowingColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryFollowedBy chains the current query on the "followed_by" edge.
+func (aq *AccountQuery) QueryFollowedBy() *AccountFollowQuery {
+	query := (&AccountFollowClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(accountfollow.Table, accountfollow.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.FollowedByTable, account.FollowedByColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -493,6 +540,8 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		inters:             append([]Interceptor{}, aq.inters...),
 		predicates:         append([]predicate.Account{}, aq.predicates...),
 		withEmails:         aq.withEmails.Clone(),
+		withFollowing:      aq.withFollowing.Clone(),
+		withFollowedBy:     aq.withFollowedBy.Clone(),
 		withPosts:          aq.withPosts.Clone(),
 		withReacts:         aq.withReacts.Clone(),
 		withLikes:          aq.withLikes.Clone(),
@@ -516,6 +565,28 @@ func (aq *AccountQuery) WithEmails(opts ...func(*EmailQuery)) *AccountQuery {
 		opt(query)
 	}
 	aq.withEmails = query
+	return aq
+}
+
+// WithFollowing tells the query-builder to eager-load the nodes that are connected to
+// the "following" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithFollowing(opts ...func(*AccountFollowQuery)) *AccountQuery {
+	query := (&AccountFollowClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withFollowing = query
+	return aq
+}
+
+// WithFollowedBy tells the query-builder to eager-load the nodes that are connected to
+// the "followed_by" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithFollowedBy(opts ...func(*AccountFollowQuery)) *AccountQuery {
+	query := (&AccountFollowClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withFollowedBy = query
 	return aq
 }
 
@@ -696,8 +767,10 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [10]bool{
+		loadedTypes = [12]bool{
 			aq.withEmails != nil,
+			aq.withFollowing != nil,
+			aq.withFollowedBy != nil,
 			aq.withPosts != nil,
 			aq.withReacts != nil,
 			aq.withLikes != nil,
@@ -734,6 +807,20 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := aq.loadEmails(ctx, query, nodes,
 			func(n *Account) { n.Edges.Emails = []*Email{} },
 			func(n *Account, e *Email) { n.Edges.Emails = append(n.Edges.Emails, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withFollowing; query != nil {
+		if err := aq.loadFollowing(ctx, query, nodes,
+			func(n *Account) { n.Edges.Following = []*AccountFollow{} },
+			func(n *Account, e *AccountFollow) { n.Edges.Following = append(n.Edges.Following, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withFollowedBy; query != nil {
+		if err := aq.loadFollowedBy(ctx, query, nodes,
+			func(n *Account) { n.Edges.FollowedBy = []*AccountFollow{} },
+			func(n *Account, e *AccountFollow) { n.Edges.FollowedBy = append(n.Edges.FollowedBy, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -831,6 +918,66 @@ func (aq *AccountQuery) loadEmails(ctx context.Context, query *EmailQuery, nodes
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadFollowing(ctx context.Context, query *AccountFollowQuery, nodes []*Account, init func(*Account), assign func(*Account, *AccountFollow)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(accountfollow.FieldFollowerAccountID)
+	}
+	query.Where(predicate.AccountFollow(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.FollowingColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.FollowerAccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "follower_account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadFollowedBy(ctx context.Context, query *AccountFollowQuery, nodes []*Account, init func(*Account), assign func(*Account, *AccountFollow)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(accountfollow.FieldFollowingAccountID)
+	}
+	query.Where(predicate.AccountFollow(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.FollowedByColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.FollowingAccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "following_account_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

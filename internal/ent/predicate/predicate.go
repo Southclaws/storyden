@@ -9,6 +9,9 @@ import (
 // Account is the predicate function for account builders.
 type Account func(*sql.Selector)
 
+// AccountFollow is the predicate function for accountfollow builders.
+type AccountFollow func(*sql.Selector)
+
 // Asset is the predicate function for asset builders.
 type Asset func(*sql.Selector)
 

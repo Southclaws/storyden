@@ -621,6 +621,56 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ProfileGetOK" }
 
+  /profiles/{account_handle}/followers:
+    get:
+      operationId: ProfileFollowersGet
+      description: Get the followers and following details for a profile.
+      tags: [profiles]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/AccountHandleParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ProfileFollowersGetOK" }
+    put:
+      operationId: ProfileFollowersAdd
+      description: Follow the specified profile as the authenticated account.
+      tags: [profiles]
+      parameters: [$ref: "#/components/parameters/AccountHandleParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
+    delete:
+      operationId: ProfileFollowersRemove
+      description: Unfollow the specified profile as the authenticated account.
+      tags: [profiles]
+      parameters: [$ref: "#/components/parameters/AccountHandleParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
+
+  /profiles/{account_handle}/following:
+    get:
+      operationId: ProfileFollowingGet
+      description: Get the profiles that this account is following.
+      tags: [profiles]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/AccountHandleParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ProfileFollowingGetOK" }
+
   #
   #                   888                                      d8b
   #                   888                                      Y8P
@@ -1869,6 +1919,20 @@ components:
           schema:
             $ref: "#/components/schemas/PublicProfile"
 
+    ProfileFollowersGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PublicProfileFollowersResult"
+
+    ProfileFollowingGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PublicProfileFollowingResult"
+
     CategoryCreateOK:
       description: OK
       content:
@@ -2895,7 +2959,16 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - required: [createdAt, handle, name, bio, interests, links, meta]
+        - required:
+            - createdAt
+            - handle
+            - name
+            - bio
+            - followers
+            - following
+            - interests
+            - links
+            - meta
           properties:
             createdAt:
               type: string
@@ -2907,12 +2980,32 @@ components:
               $ref: "#/components/schemas/AccountBio"
             image:
               type: string
+            followers:
+              $ref: "#/components/schemas/ProfileFollowersCount"
+            following:
+              $ref: "#/components/schemas/ProfileFollowingCount"
             interests:
               $ref: "#/components/schemas/TagList"
             links:
               $ref: "#/components/schemas/ProfileExternalLinkList"
             meta:
               $ref: "#/components/schemas/Metadata"
+
+    PublicProfileFollowersResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [followers]
+          properties:
+            followers: { $ref: "#/components/schemas/ProfileFollowersList" }
+
+    PublicProfileFollowingResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [following]
+          properties:
+            following: { $ref: "#/components/schemas/ProfileFollowingList" }
 
     ProfileExternalLinkList:
       type: array
@@ -2939,6 +3032,20 @@ components:
     PublicProfileList:
       type: array
       items: { $ref: "#/components/schemas/PublicProfile" }
+
+    ProfileFollowersList:
+      type: array
+      items: { $ref: "#/components/schemas/ProfileReference" }
+
+    ProfileFollowingList:
+      type: array
+      items: { $ref: "#/components/schemas/ProfileReference" }
+
+    ProfileFollowersCount:
+      type: integer
+
+    ProfileFollowingCount:
+      type: integer
 
     #
     #  .d8888b.           888

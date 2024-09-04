@@ -21,6 +21,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
+	"github.com/Southclaws/storyden/app/resources/profile/follow_writer"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/react"
@@ -53,6 +55,8 @@ func Build() fx.Option {
 			link_querier.New,
 			link_writer.New,
 			profile_search.New,
+			follow_writer.New,
+			follow_querier.New,
 			mailtemplate.New,
 		),
 	)
