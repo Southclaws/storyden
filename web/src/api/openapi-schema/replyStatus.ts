@@ -7,16 +7,12 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { CategoryReference } from "./categoryReference";
-import type { LinkReference } from "./linkReference";
-import type { ReplyStatus } from "./replyStatus";
 
-export interface ThreadReferenceProps {
-  category: CategoryReference;
-  link?: LinkReference;
-  /** Whether the thread is pinned in this category. */
-  pinned: boolean;
-  reply_status: ReplyStatus;
-  /** A list of tags associated with the thread. */
-  tags: string[];
+export interface ReplyStatus {
+  /** If requested by an authenticated account, the number of replies that
+were made by that account to the thread.
+ */
+  replied: number;
+  /** The total number of replies to the thread. */
+  replies: number;
 }

@@ -113,7 +113,7 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(nil)(p)
+	return FromModel(nil, nil)(p)
 }
 
 // func (d *database) createTags(ctx context.Context, tags []string) ([]db.TagWhereParam, error) {
@@ -163,8 +163,19 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(nil)(p)
+	return FromModel(nil, nil)(p)
 }
+
+const repliesCountManyQuery = `select
+  p.id        post_id, -- post ID
+  count(r.id) replies, -- number of replies,
+  count(a.id) replied  -- has this account replied
+from
+  posts p
+  inner join posts r on r.root_post_id = p.id
+  left join accounts a on a.id = p.account_posts and a.id = $1
+group by p.id
+`
 
 const likesCountManyQuery = `select
   p.id        post_id, -- the post (thread or reply) ID
@@ -236,13 +247,19 @@ func (d *database) List(
 		result = result[:len(result)-1]
 	}
 
+	var replies post.PostRepliesResults
+	err = d.raw.SelectContext(ctx, &replies, repliesCountManyQuery, accountID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	var likes post.PostLikesResults
 	err = d.raw.SelectContext(ctx, &likes, likesCountManyQuery, accountID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	threads, err := dt.MapErr(result, FromModel(likes.Map()))
+	threads, err := dt.MapErr(result, FromModel(likes.Map(), replies.Map()))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -277,7 +294,7 @@ func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Opti
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	post, err := d.db.Post.
+	r, err := d.db.Post.
 		Query().
 		Where(
 			ent_post.First(true),
@@ -322,7 +339,22 @@ func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Opti
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	p, err := FromModel(likes.Map())(post)
+	replies := post.PostRepliesMap{
+		xid.ID(threadID): post.PostRepliesResult{
+			PostID: xid.ID(threadID),
+			Count:  len(r.Edges.Posts),
+			Replied: opt.Map(accountID, func(a account.AccountID) (replied int) {
+				for _, p := range r.Edges.Posts {
+					if p.Edges.Author.ID == xid.ID(a) {
+						replied++
+					}
+				}
+				return
+			}).OrZero(),
+		},
+	}
+
+	p, err := FromModel(likes.Map(), replies)(r)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
