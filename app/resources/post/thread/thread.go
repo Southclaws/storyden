@@ -27,6 +27,7 @@ type Thread struct {
 	Short  string
 	Pinned bool
 
+	ReplyStatus post.ReplyStatus
 	Replies     []*reply.Reply
 	Category    category.Category
 	Visibility  visibility.Visibility
@@ -41,7 +42,7 @@ func (t *Thread) GetName() string { return t.Title }
 func (t *Thread) GetSlug() string { return t.Slug }
 func (t *Thread) GetDesc() string { return t.Short }
 
-func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Thread, error) {
+func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (*Thread, error) {
 	return func(m *ent.Post) (*Thread, error) {
 		categoryEdge, err := m.Edges.CategoryOrErr()
 		if err != nil {
@@ -109,6 +110,7 @@ func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Thread, error) {
 			Short:  m.Short,
 			Pinned: m.Pinned,
 
+			ReplyStatus: rs.Status(m.ID),
 			Replies:     replies,
 			Category:    *category,
 			Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),

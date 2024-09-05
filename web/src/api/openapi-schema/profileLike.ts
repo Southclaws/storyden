@@ -7,16 +7,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { CategoryReference } from "./categoryReference";
-import type { LinkReference } from "./linkReference";
-import type { ReplyStatus } from "./replyStatus";
+import type { LikeProps } from "./likeProps";
+import type { ProfileLikeAllOf } from "./profileLikeAllOf";
 
-export interface ThreadReferenceProps {
-  category: CategoryReference;
-  link?: LinkReference;
-  /** Whether the thread is pinned in this category. */
-  pinned: boolean;
-  reply_status: ReplyStatus;
-  /** A list of tags associated with the thread. */
-  tags: string[];
-}
+/**
+ * A like on an item, contains the item only.
+ */
+export type ProfileLike = LikeProps & ProfileLikeAllOf;
