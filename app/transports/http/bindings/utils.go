@@ -55,8 +55,6 @@ func serialiseExternalLinks(in []account.ExternalLink) openapi.ProfileExternalLi
 }
 
 func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
-	postCount := len(t.Replies)
-
 	return openapi.ThreadReference{
 		Id:        openapi.Identifier(xid.ID(t.ID).String()),
 		CreatedAt: t.CreatedAt,
@@ -72,7 +70,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 
 		Category:    serialiseCategoryReference(&t.Category),
 		Pinned:      t.Pinned,
-		PostCount:   &postCount,
+		ReplyStatus: serialiseReplyStatus(t.ReplyStatus),
 		Likes:       serialiseLikeStatus(&t.Likes),
 		Reacts:      reacts(t.Reacts),
 		Tags:        t.Tags,
@@ -87,7 +85,6 @@ func serialiseContentHTML(c content.Rich) string {
 }
 
 func serialiseThread(t *thread.Thread) openapi.Thread {
-	posts := len(t.Replies)
 	return openapi.Thread{
 		Assets:         dt.Map(t.Assets, serialiseAssetPtr),
 		Author:         serialiseProfileReference(t.Author),
@@ -102,7 +99,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Link:           opt.Map(t.WebLink, serialiseLinkRef).Ptr(),
 		Meta:           (*openapi.Metadata)(&t.Meta),
 		Pinned:         t.Pinned,
-		PostCount:      &posts,
+		ReplyStatus:    serialiseReplyStatus(t.ReplyStatus),
 		Reacts:         dt.Map(t.Reacts, serialiseReact),
 		Recomentations: dt.Map(t.Related, serialiseDatagraphItem),
 		Replies:        dt.Map(t.Replies, serialiseReply),
@@ -110,6 +107,13 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Tags:           t.Tags,
 		Title:          t.Title,
 		UpdatedAt:      t.UpdatedAt,
+	}
+}
+
+func serialiseReplyStatus(s post.ReplyStatus) openapi.ReplyStatus {
+	return openapi.ReplyStatus{
+		Replies: s.Count,
+		Replied: s.Replied,
 	}
 }
 
