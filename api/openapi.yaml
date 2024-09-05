@@ -3193,7 +3193,7 @@ components:
       required:
         - pinned
         - tags
-        - post_count
+        - reply_status
         - category
         - collections
       properties:
@@ -3205,12 +3205,22 @@ components:
           items:
             type: string
           description: A list of tags associated with the thread.
-        post_count:
-          type: integer
-          readOnly: true
-          description: The number of posts under this thread.
+        reply_status: { $ref: "#/components/schemas/ReplyStatus" }
         category: { $ref: "#/components/schemas/CategoryReference" }
         link: { $ref: "#/components/schemas/LinkReference" }
+
+    ReplyStatus:
+      type: object
+      required: [replies, replied]
+      properties:
+        replies:
+          description: The total number of replies to the thread.
+          type: integer
+        replied:
+          description: |
+            If requested by an authenticated account, the number of replies that
+            were made by that account to the thread.
+          type: integer
 
     ThreadList:
       type: array

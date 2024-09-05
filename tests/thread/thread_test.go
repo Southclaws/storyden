@@ -75,6 +75,8 @@ func TestThreads(t *testing.T) {
 			a.Equal(cat1create.JSON200.Name, thread1create.JSON200.Category.Name)
 			a.Len(thread1create.JSON200.Replies, 0, "a newly created thread has zero replies")
 			a.Len(thread1create.JSON200.Reacts, 0)
+			a.Equal(thread1create.JSON200.ReplyStatus.Replies, 0)
+			a.Equal(thread1create.JSON200.ReplyStatus.Replied, 0)
 
 			// Get list of all threads
 
@@ -98,13 +100,18 @@ func TestThreads(t *testing.T) {
 			a.Equal(acc2.ID.String(), reply1create.JSON200.Author.Id)
 
 			thread1get, err := cl.ThreadGetWithResponse(ctx, thread1create.JSON200.Slug)
-			r.NoError(err)
-			r.NotNil(thread1get)
-			r.Equal(http.StatusOK, thread1get.StatusCode())
+			tests.Ok(t, err, thread1get)
 
 			a.Len(thread1get.JSON200.Replies, 1)
 			replyids := dt.Map(thread1get.JSON200.Replies, func(p openapi.Reply) string { return p.Id })
 			a.Contains(replyids, reply1create.JSON200.Id)
+			a.Equal(thread1get.JSON200.ReplyStatus.Replies, 1)
+			a.Equal(thread1get.JSON200.ReplyStatus.Replied, 0)
+
+			thread2get, err := cl.ThreadGetWithResponse(ctx, thread1create.JSON200.Slug, e2e.WithSession(ctx2, cj))
+			tests.Ok(t, err, thread2get)
+			a.Equal(thread2get.JSON200.ReplyStatus.Replies, 1)
+			a.Equal(thread2get.JSON200.ReplyStatus.Replied, 1, "ctx2 replied")
 		}))
 	}))
 }
