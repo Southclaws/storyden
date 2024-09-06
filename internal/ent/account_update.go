@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/accountfollow"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/collection"
@@ -175,6 +176,36 @@ func (au *AccountUpdate) AddEmails(e ...*Email) *AccountUpdate {
 	return au.AddEmailIDs(ids...)
 }
 
+// AddFollowingIDs adds the "following" edge to the AccountFollow entity by IDs.
+func (au *AccountUpdate) AddFollowingIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.AddFollowingIDs(ids...)
+	return au
+}
+
+// AddFollowing adds the "following" edges to the AccountFollow entity.
+func (au *AccountUpdate) AddFollowing(a ...*AccountFollow) *AccountUpdate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.AddFollowingIDs(ids...)
+}
+
+// AddFollowedByIDs adds the "followed_by" edge to the AccountFollow entity by IDs.
+func (au *AccountUpdate) AddFollowedByIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.AddFollowedByIDs(ids...)
+	return au
+}
+
+// AddFollowedBy adds the "followed_by" edges to the AccountFollow entity.
+func (au *AccountUpdate) AddFollowedBy(a ...*AccountFollow) *AccountUpdate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.AddFollowedByIDs(ids...)
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
 func (au *AccountUpdate) AddPostIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddPostIDs(ids...)
@@ -334,6 +365,48 @@ func (au *AccountUpdate) RemoveEmails(e ...*Email) *AccountUpdate {
 		ids[i] = e[i].ID
 	}
 	return au.RemoveEmailIDs(ids...)
+}
+
+// ClearFollowing clears all "following" edges to the AccountFollow entity.
+func (au *AccountUpdate) ClearFollowing() *AccountUpdate {
+	au.mutation.ClearFollowing()
+	return au
+}
+
+// RemoveFollowingIDs removes the "following" edge to AccountFollow entities by IDs.
+func (au *AccountUpdate) RemoveFollowingIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.RemoveFollowingIDs(ids...)
+	return au
+}
+
+// RemoveFollowing removes "following" edges to AccountFollow entities.
+func (au *AccountUpdate) RemoveFollowing(a ...*AccountFollow) *AccountUpdate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.RemoveFollowingIDs(ids...)
+}
+
+// ClearFollowedBy clears all "followed_by" edges to the AccountFollow entity.
+func (au *AccountUpdate) ClearFollowedBy() *AccountUpdate {
+	au.mutation.ClearFollowedBy()
+	return au
+}
+
+// RemoveFollowedByIDs removes the "followed_by" edge to AccountFollow entities by IDs.
+func (au *AccountUpdate) RemoveFollowedByIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.RemoveFollowedByIDs(ids...)
+	return au
+}
+
+// RemoveFollowedBy removes "followed_by" edges to AccountFollow entities.
+func (au *AccountUpdate) RemoveFollowedBy(a ...*AccountFollow) *AccountUpdate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.RemoveFollowedByIDs(ids...)
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
@@ -673,6 +746,96 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.FollowingCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowingTable,
+			Columns: []string{account.FollowingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedFollowingIDs(); len(nodes) > 0 && !au.mutation.FollowingCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowingTable,
+			Columns: []string{account.FollowingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.FollowingIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowingTable,
+			Columns: []string{account.FollowingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.FollowedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowedByTable,
+			Columns: []string{account.FollowedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedFollowedByIDs(); len(nodes) > 0 && !au.mutation.FollowedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowedByTable,
+			Columns: []string{account.FollowedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.FollowedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowedByTable,
+			Columns: []string{account.FollowedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1240,6 +1403,36 @@ func (auo *AccountUpdateOne) AddEmails(e ...*Email) *AccountUpdateOne {
 	return auo.AddEmailIDs(ids...)
 }
 
+// AddFollowingIDs adds the "following" edge to the AccountFollow entity by IDs.
+func (auo *AccountUpdateOne) AddFollowingIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.AddFollowingIDs(ids...)
+	return auo
+}
+
+// AddFollowing adds the "following" edges to the AccountFollow entity.
+func (auo *AccountUpdateOne) AddFollowing(a ...*AccountFollow) *AccountUpdateOne {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.AddFollowingIDs(ids...)
+}
+
+// AddFollowedByIDs adds the "followed_by" edge to the AccountFollow entity by IDs.
+func (auo *AccountUpdateOne) AddFollowedByIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.AddFollowedByIDs(ids...)
+	return auo
+}
+
+// AddFollowedBy adds the "followed_by" edges to the AccountFollow entity.
+func (auo *AccountUpdateOne) AddFollowedBy(a ...*AccountFollow) *AccountUpdateOne {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.AddFollowedByIDs(ids...)
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
 func (auo *AccountUpdateOne) AddPostIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddPostIDs(ids...)
@@ -1399,6 +1592,48 @@ func (auo *AccountUpdateOne) RemoveEmails(e ...*Email) *AccountUpdateOne {
 		ids[i] = e[i].ID
 	}
 	return auo.RemoveEmailIDs(ids...)
+}
+
+// ClearFollowing clears all "following" edges to the AccountFollow entity.
+func (auo *AccountUpdateOne) ClearFollowing() *AccountUpdateOne {
+	auo.mutation.ClearFollowing()
+	return auo
+}
+
+// RemoveFollowingIDs removes the "following" edge to AccountFollow entities by IDs.
+func (auo *AccountUpdateOne) RemoveFollowingIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.RemoveFollowingIDs(ids...)
+	return auo
+}
+
+// RemoveFollowing removes "following" edges to AccountFollow entities.
+func (auo *AccountUpdateOne) RemoveFollowing(a ...*AccountFollow) *AccountUpdateOne {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.RemoveFollowingIDs(ids...)
+}
+
+// ClearFollowedBy clears all "followed_by" edges to the AccountFollow entity.
+func (auo *AccountUpdateOne) ClearFollowedBy() *AccountUpdateOne {
+	auo.mutation.ClearFollowedBy()
+	return auo
+}
+
+// RemoveFollowedByIDs removes the "followed_by" edge to AccountFollow entities by IDs.
+func (auo *AccountUpdateOne) RemoveFollowedByIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.RemoveFollowedByIDs(ids...)
+	return auo
+}
+
+// RemoveFollowedBy removes "followed_by" edges to AccountFollow entities.
+func (auo *AccountUpdateOne) RemoveFollowedBy(a ...*AccountFollow) *AccountUpdateOne {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.RemoveFollowedByIDs(ids...)
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
@@ -1768,6 +2003,96 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.FollowingCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowingTable,
+			Columns: []string{account.FollowingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedFollowingIDs(); len(nodes) > 0 && !auo.mutation.FollowingCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowingTable,
+			Columns: []string{account.FollowingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.FollowingIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowingTable,
+			Columns: []string{account.FollowingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.FollowedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowedByTable,
+			Columns: []string{account.FollowedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedFollowedByIDs(); len(nodes) > 0 && !auo.mutation.FollowedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowedByTable,
+			Columns: []string{account.FollowedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.FollowedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowedByTable,
+			Columns: []string{account.FollowedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

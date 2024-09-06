@@ -8,6 +8,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type {
+  ProfileFollowersGetOKResponse,
+  ProfileFollowersGetParams,
+  ProfileFollowingGetOKResponse,
+  ProfileFollowingGetParams,
   ProfileGetOKResponse,
   ProfileListOKResponse,
   ProfileListParams,
@@ -66,4 +70,132 @@ export const profileGet = async (
     ...options,
     method: "GET",
   });
+};
+
+/**
+ * Get the followers and following details for a profile.
+ */
+export type profileFollowersGetResponse = {
+  data: ProfileFollowersGetOKResponse;
+  status: number;
+};
+
+export const getProfileFollowersGetUrl = (
+  accountHandle: string,
+  params?: ProfileFollowersGetParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return `/profiles/${accountHandle}/followers?${normalizedParams.toString()}`;
+};
+
+export const profileFollowersGet = async (
+  accountHandle: string,
+  params?: ProfileFollowersGetParams,
+  options?: RequestInit,
+): Promise<profileFollowersGetResponse> => {
+  return fetcher<Promise<profileFollowersGetResponse>>(
+    getProfileFollowersGetUrl(accountHandle, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Follow the specified profile as the authenticated account.
+ */
+export type profileFollowersAddResponse = {
+  data: void;
+  status: number;
+};
+
+export const getProfileFollowersAddUrl = (accountHandle: string) => {
+  return `/profiles/${accountHandle}/followers`;
+};
+
+export const profileFollowersAdd = async (
+  accountHandle: string,
+  options?: RequestInit,
+): Promise<profileFollowersAddResponse> => {
+  return fetcher<Promise<profileFollowersAddResponse>>(
+    getProfileFollowersAddUrl(accountHandle),
+    {
+      ...options,
+      method: "PUT",
+    },
+  );
+};
+
+/**
+ * Unfollow the specified profile as the authenticated account.
+ */
+export type profileFollowersRemoveResponse = {
+  data: void;
+  status: number;
+};
+
+export const getProfileFollowersRemoveUrl = (accountHandle: string) => {
+  return `/profiles/${accountHandle}/followers`;
+};
+
+export const profileFollowersRemove = async (
+  accountHandle: string,
+  options?: RequestInit,
+): Promise<profileFollowersRemoveResponse> => {
+  return fetcher<Promise<profileFollowersRemoveResponse>>(
+    getProfileFollowersRemoveUrl(accountHandle),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+/**
+ * Get the profiles that this account is following.
+ */
+export type profileFollowingGetResponse = {
+  data: ProfileFollowingGetOKResponse;
+  status: number;
+};
+
+export const getProfileFollowingGetUrl = (
+  accountHandle: string,
+  params?: ProfileFollowingGetParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return `/profiles/${accountHandle}/following?${normalizedParams.toString()}`;
+};
+
+export const profileFollowingGet = async (
+  accountHandle: string,
+  params?: ProfileFollowingGetParams,
+  options?: RequestInit,
+): Promise<profileFollowingGetResponse> => {
+  return fetcher<Promise<profileFollowingGetResponse>>(
+    getProfileFollowingGetUrl(accountHandle, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
 };

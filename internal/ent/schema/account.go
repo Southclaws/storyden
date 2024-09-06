@@ -36,6 +36,12 @@ func (Account) Edges() []ent.Edge {
 		edge.To("emails", Email.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
+		edge.To("following", AccountFollow.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("followed_by", AccountFollow.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
 		edge.To("posts", Post.Type),
 
 		edge.To("reacts", React.Type).

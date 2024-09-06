@@ -28,6 +28,40 @@ var (
 		Columns:    AccountsColumns,
 		PrimaryKey: []*schema.Column{AccountsColumns[0]},
 	}
+	// AccountFollowsColumns holds the columns for the "account_follows" table.
+	AccountFollowsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "follower_account_id", Type: field.TypeString, Size: 20},
+		{Name: "following_account_id", Type: field.TypeString, Size: 20},
+	}
+	// AccountFollowsTable holds the schema information for the "account_follows" table.
+	AccountFollowsTable = &schema.Table{
+		Name:       "account_follows",
+		Columns:    AccountFollowsColumns,
+		PrimaryKey: []*schema.Column{AccountFollowsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "account_follows_accounts_following",
+				Columns:    []*schema.Column{AccountFollowsColumns[2]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "account_follows_accounts_followed_by",
+				Columns:    []*schema.Column{AccountFollowsColumns[3]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "unique_following_pair",
+				Unique:  true,
+				Columns: []*schema.Column{AccountFollowsColumns[2], AccountFollowsColumns[3]},
+			},
+		},
+	}
 	// AssetsColumns holds the columns for the "assets" table.
 	AssetsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -713,6 +747,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AccountsTable,
+		AccountFollowsTable,
 		AssetsTable,
 		AuthenticationsTable,
 		CategoriesTable,
@@ -742,6 +777,8 @@ var (
 )
 
 func init() {
+	AccountFollowsTable.ForeignKeys[0].RefTable = AccountsTable
+	AccountFollowsTable.ForeignKeys[1].RefTable = AccountsTable
 	AssetsTable.ForeignKeys[0].RefTable = AccountsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
 	CollectionsTable.ForeignKeys[0].RefTable = AccountsTable

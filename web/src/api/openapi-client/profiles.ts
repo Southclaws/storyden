@@ -8,12 +8,18 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
-import type { Key, SWRConfiguration } from "swr";
+import type { Arguments, Key, SWRConfiguration } from "swr";
+import useSWRMutation from "swr/mutation";
+import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
   InternalServerErrorResponse,
   NotFoundResponse,
+  ProfileFollowersGetOKResponse,
+  ProfileFollowersGetParams,
+  ProfileFollowingGetOKResponse,
+  ProfileFollowingGetParams,
   ProfileGetOKResponse,
   ProfileListOKResponse,
   ProfileListParams,
@@ -117,6 +123,254 @@ export const useProfileGet = <
     swrOptions?.swrKey ??
     (() => (isEnabled ? getProfileGetKey(accountHandle) : null));
   const swrFn = () => profileGet(accountHandle);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Get the followers and following details for a profile.
+ */
+export const profileFollowersGet = (
+  accountHandle: string,
+  params?: ProfileFollowersGetParams,
+) => {
+  return fetcher<ProfileFollowersGetOKResponse>({
+    url: `/profiles/${accountHandle}/followers`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getProfileFollowersGetKey = (
+  accountHandle: string,
+  params?: ProfileFollowersGetParams,
+) =>
+  [
+    `/profiles/${accountHandle}/followers`,
+    ...(params ? [params] : []),
+  ] as const;
+
+export type ProfileFollowersGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof profileFollowersGet>>
+>;
+export type ProfileFollowersGetQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useProfileFollowersGet = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountHandle: string,
+  params?: ProfileFollowersGetParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof profileFollowersGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!accountHandle;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() =>
+      isEnabled ? getProfileFollowersGetKey(accountHandle, params) : null);
+  const swrFn = () => profileFollowersGet(accountHandle, params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Follow the specified profile as the authenticated account.
+ */
+export const profileFollowersAdd = (accountHandle: string) => {
+  return fetcher<void>({
+    url: `/profiles/${accountHandle}/followers`,
+    method: "PUT",
+  });
+};
+
+export const getProfileFollowersAddMutationFetcher = (
+  accountHandle: string,
+) => {
+  return (_: string, __: { arg: Arguments }): Promise<void> => {
+    return profileFollowersAdd(accountHandle);
+  };
+};
+export const getProfileFollowersAddMutationKey = (accountHandle: string) =>
+  `/profiles/${accountHandle}/followers` as const;
+
+export type ProfileFollowersAddMutationResult = NonNullable<
+  Awaited<ReturnType<typeof profileFollowersAdd>>
+>;
+export type ProfileFollowersAddMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useProfileFollowersAdd = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountHandle: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof profileFollowersAdd>>,
+      TError,
+      string,
+      Arguments,
+      Awaited<ReturnType<typeof profileFollowersAdd>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getProfileFollowersAddMutationKey(accountHandle);
+  const swrFn = getProfileFollowersAddMutationFetcher(accountHandle);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Unfollow the specified profile as the authenticated account.
+ */
+export const profileFollowersRemove = (accountHandle: string) => {
+  return fetcher<void>({
+    url: `/profiles/${accountHandle}/followers`,
+    method: "DELETE",
+  });
+};
+
+export const getProfileFollowersRemoveMutationFetcher = (
+  accountHandle: string,
+) => {
+  return (_: string, __: { arg: Arguments }): Promise<void> => {
+    return profileFollowersRemove(accountHandle);
+  };
+};
+export const getProfileFollowersRemoveMutationKey = (accountHandle: string) =>
+  `/profiles/${accountHandle}/followers` as const;
+
+export type ProfileFollowersRemoveMutationResult = NonNullable<
+  Awaited<ReturnType<typeof profileFollowersRemove>>
+>;
+export type ProfileFollowersRemoveMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useProfileFollowersRemove = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountHandle: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof profileFollowersRemove>>,
+      TError,
+      string,
+      Arguments,
+      Awaited<ReturnType<typeof profileFollowersRemove>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getProfileFollowersRemoveMutationKey(accountHandle);
+  const swrFn = getProfileFollowersRemoveMutationFetcher(accountHandle);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Get the profiles that this account is following.
+ */
+export const profileFollowingGet = (
+  accountHandle: string,
+  params?: ProfileFollowingGetParams,
+) => {
+  return fetcher<ProfileFollowingGetOKResponse>({
+    url: `/profiles/${accountHandle}/following`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getProfileFollowingGetKey = (
+  accountHandle: string,
+  params?: ProfileFollowingGetParams,
+) =>
+  [
+    `/profiles/${accountHandle}/following`,
+    ...(params ? [params] : []),
+  ] as const;
+
+export type ProfileFollowingGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof profileFollowingGet>>
+>;
+export type ProfileFollowingGetQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useProfileFollowingGet = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountHandle: string,
+  params?: ProfileFollowingGetParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof profileFollowingGet>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!accountHandle;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() =>
+      isEnabled ? getProfileFollowingGetKey(accountHandle, params) : null);
+  const swrFn = () => profileFollowingGet(accountHandle, params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

@@ -24,6 +24,8 @@ type Account struct {
 	Name           string
 	Bio            content.Rich
 	Admin          bool
+	Followers      int
+	Following      int
 	Auths          []string
 	EmailAddresses []*EmailAddress
 	VerifiedStatus VerifiedStatus
