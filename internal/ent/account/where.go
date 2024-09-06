@@ -479,6 +479,52 @@ func HasEmailsWith(preds ...predicate.Email) predicate.Account {
 	})
 }
 
+// HasFollowing applies the HasEdge predicate on the "following" edge.
+func HasFollowing() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, FollowingTable, FollowingColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasFollowingWith applies the HasEdge predicate on the "following" edge with a given conditions (other predicates).
+func HasFollowingWith(preds ...predicate.AccountFollow) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newFollowingStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasFollowedBy applies the HasEdge predicate on the "followed_by" edge.
+func HasFollowedBy() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, FollowedByTable, FollowedByColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasFollowedByWith applies the HasEdge predicate on the "followed_by" edge with a given conditions (other predicates).
+func HasFollowedByWith(preds ...predicate.AccountFollow) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newFollowedByStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasPosts applies the HasEdge predicate on the "posts" edge.
 func HasPosts() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

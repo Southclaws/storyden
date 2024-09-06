@@ -24,6 +24,8 @@ type Public struct {
 	Name          string
 	Bio           content.Rich
 	Admin         bool
+	Followers     int
+	Following     int
 	Interests     []*tag.Tag
 	ExternalLinks []account.ExternalLink
 	Metadata      map[string]any
@@ -73,6 +75,8 @@ func ProfileFromAccount(a *account.Account) *Public {
 		Name:          a.Name,
 		Bio:           a.Bio,
 		Admin:         a.Admin,
+		Followers:     a.Followers,
+		Following:     a.Following,
 		Interests:     nil,
 		ExternalLinks: a.ExternalLinks,
 		Metadata:      a.Metadata,

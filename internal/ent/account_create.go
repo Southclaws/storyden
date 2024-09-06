@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/accountfollow"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/collection"
@@ -156,6 +157,36 @@ func (ac *AccountCreate) AddEmails(e ...*Email) *AccountCreate {
 		ids[i] = e[i].ID
 	}
 	return ac.AddEmailIDs(ids...)
+}
+
+// AddFollowingIDs adds the "following" edge to the AccountFollow entity by IDs.
+func (ac *AccountCreate) AddFollowingIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddFollowingIDs(ids...)
+	return ac
+}
+
+// AddFollowing adds the "following" edges to the AccountFollow entity.
+func (ac *AccountCreate) AddFollowing(a ...*AccountFollow) *AccountCreate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ac.AddFollowingIDs(ids...)
+}
+
+// AddFollowedByIDs adds the "followed_by" edge to the AccountFollow entity by IDs.
+func (ac *AccountCreate) AddFollowedByIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddFollowedByIDs(ids...)
+	return ac
+}
+
+// AddFollowedBy adds the "followed_by" edges to the AccountFollow entity.
+func (ac *AccountCreate) AddFollowedBy(a ...*AccountFollow) *AccountCreate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ac.AddFollowedByIDs(ids...)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -459,6 +490,38 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.FollowingIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowingTable,
+			Columns: []string{account.FollowingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.FollowedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.FollowedByTable,
+			Columns: []string{account.FollowedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

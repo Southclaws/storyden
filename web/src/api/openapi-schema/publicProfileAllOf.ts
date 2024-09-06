@@ -12,11 +12,15 @@ import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 import type { Metadata } from "./metadata";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
+import type { ProfileFollowersCount } from "./profileFollowersCount";
+import type { ProfileFollowingCount } from "./profileFollowingCount";
 import type { TagList } from "./tagList";
 
 export type PublicProfileAllOf = {
   bio: AccountBio;
   createdAt: string;
+  followers: ProfileFollowersCount;
+  following: ProfileFollowingCount;
   handle: AccountHandle;
   image?: string;
   interests: TagList;

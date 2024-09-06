@@ -37,7 +37,17 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return account.MapAccount(result)
+	acc, err := account.MapAccount(result)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err = queryFollows(ctx, result, acc)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return acc, nil
 }
 
 func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.Account, bool, error) {
@@ -67,5 +77,27 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.A
 	// u.ThreadCount = threads
 	// u.PostCount = posts
 
+	acc, err = queryFollows(ctx, result, acc)
+	if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return acc, true, nil
+}
+
+func queryFollows(ctx context.Context, a *ent.Account, acc *account.Account) (*account.Account, error) {
+	following, err := a.QueryFollowing().Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	followers, err := a.QueryFollowedBy().Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc.Followers = followers
+	acc.Following = following
+
+	return acc, nil
 }
