@@ -7,6 +7,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -45,4 +46,10 @@ type LikePost struct {
 
 type UnlikePost struct {
 	PostID post.ID
+}
+
+type Notification struct {
+	Event    notification.Event
+	Item     *datagraph.Ref
+	TargetID account.AccountID
 }

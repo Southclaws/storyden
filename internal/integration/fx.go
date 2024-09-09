@@ -51,6 +51,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 
 	ctx, cf := context.WithCancel(context.Background())
 	t.Cleanup(func() {
+		fmt.Println("integration test cleanup")
 		cf()
 	})
 
@@ -81,7 +82,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 // application gives you some basics needed by most components.
 func application() fx.Option {
 	return fx.Options(
-		fx.NopLogger,
+		// fx.NopLogger,
 
 		infrastructure.Build(),
 		resources.Build(),

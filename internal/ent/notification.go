@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/rs/xid"
 )
@@ -20,15 +21,57 @@ type Notification struct {
 	ID xid.ID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
-	// Title holds the value of the "title" field.
-	Title string `json:"title,omitempty"`
-	// Description holds the value of the "description" field.
-	Description string `json:"description,omitempty"`
-	// Link holds the value of the "link" field.
-	Link string `json:"link,omitempty"`
+	// DeletedAt holds the value of the "deleted_at" field.
+	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	// EventType holds the value of the "event_type" field.
+	EventType string `json:"event_type,omitempty"`
+	// DatagraphKind holds the value of the "datagraph_kind" field.
+	DatagraphKind *string `json:"datagraph_kind,omitempty"`
+	// The ID of the resource that this notification relates to. This is not a foreign key as notifications can refer to a variety of sources, discriminated by the 'datagraph_kind' field.
+	DatagraphID *xid.ID `json:"datagraph_id,omitempty"`
 	// Read holds the value of the "read" field.
-	Read         bool `json:"read,omitempty"`
+	Read bool `json:"read,omitempty"`
+	// OwnerAccountID holds the value of the "owner_account_id" field.
+	OwnerAccountID xid.ID `json:"owner_account_id,omitempty"`
+	// SourceAccountID holds the value of the "source_account_id" field.
+	SourceAccountID *xid.ID `json:"source_account_id,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the NotificationQuery when eager-loading is set.
+	Edges        NotificationEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// NotificationEdges holds the relations/edges for other nodes in the graph.
+type NotificationEdges struct {
+	// Owner holds the value of the owner edge.
+	Owner *Account `json:"owner,omitempty"`
+	// Source holds the value of the source edge.
+	Source *Account `json:"source,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// OwnerOrErr returns the Owner value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e NotificationEdges) OwnerOrErr() (*Account, error) {
+	if e.Owner != nil {
+		return e.Owner, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: account.Label}
+	}
+	return nil, &NotLoadedError{edge: "owner"}
+}
+
+// SourceOrErr returns the Source value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e NotificationEdges) SourceOrErr() (*Account, error) {
+	if e.Source != nil {
+		return e.Source, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: account.Label}
+	}
+	return nil, &NotLoadedError{edge: "source"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -36,13 +79,15 @@ func (*Notification) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case notification.FieldDatagraphID, notification.FieldSourceAccountID:
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case notification.FieldRead:
 			values[i] = new(sql.NullBool)
-		case notification.FieldTitle, notification.FieldDescription, notification.FieldLink:
+		case notification.FieldEventType, notification.FieldDatagraphKind:
 			values[i] = new(sql.NullString)
-		case notification.FieldCreatedAt:
+		case notification.FieldCreatedAt, notification.FieldDeletedAt:
 			values[i] = new(sql.NullTime)
-		case notification.FieldID:
+		case notification.FieldID, notification.FieldOwnerAccountID:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -71,29 +116,51 @@ func (n *Notification) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				n.CreatedAt = value.Time
 			}
-		case notification.FieldTitle:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field title", values[i])
+		case notification.FieldDeletedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				n.Title = value.String
+				n.DeletedAt = new(time.Time)
+				*n.DeletedAt = value.Time
 			}
-		case notification.FieldDescription:
+		case notification.FieldEventType:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field description", values[i])
+				return fmt.Errorf("unexpected type %T for field event_type", values[i])
 			} else if value.Valid {
-				n.Description = value.String
+				n.EventType = value.String
 			}
-		case notification.FieldLink:
+		case notification.FieldDatagraphKind:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field link", values[i])
+				return fmt.Errorf("unexpected type %T for field datagraph_kind", values[i])
 			} else if value.Valid {
-				n.Link = value.String
+				n.DatagraphKind = new(string)
+				*n.DatagraphKind = value.String
+			}
+		case notification.FieldDatagraphID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field datagraph_id", values[i])
+			} else if value.Valid {
+				n.DatagraphID = new(xid.ID)
+				*n.DatagraphID = *value.S.(*xid.ID)
 			}
 		case notification.FieldRead:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field read", values[i])
 			} else if value.Valid {
 				n.Read = value.Bool
+			}
+		case notification.FieldOwnerAccountID:
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field owner_account_id", values[i])
+			} else if value != nil {
+				n.OwnerAccountID = *value
+			}
+		case notification.FieldSourceAccountID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field source_account_id", values[i])
+			} else if value.Valid {
+				n.SourceAccountID = new(xid.ID)
+				*n.SourceAccountID = *value.S.(*xid.ID)
 			}
 		default:
 			n.selectValues.Set(columns[i], values[i])
@@ -106,6 +173,16 @@ func (n *Notification) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (n *Notification) Value(name string) (ent.Value, error) {
 	return n.selectValues.Get(name)
+}
+
+// QueryOwner queries the "owner" edge of the Notification entity.
+func (n *Notification) QueryOwner() *AccountQuery {
+	return NewNotificationClient(n.config).QueryOwner(n)
+}
+
+// QuerySource queries the "source" edge of the Notification entity.
+func (n *Notification) QuerySource() *AccountQuery {
+	return NewNotificationClient(n.config).QuerySource(n)
 }
 
 // Update returns a builder for updating this Notification.
@@ -134,17 +211,34 @@ func (n *Notification) String() string {
 	builder.WriteString("created_at=")
 	builder.WriteString(n.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("title=")
-	builder.WriteString(n.Title)
+	if v := n.DeletedAt; v != nil {
+		builder.WriteString("deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
-	builder.WriteString("description=")
-	builder.WriteString(n.Description)
+	builder.WriteString("event_type=")
+	builder.WriteString(n.EventType)
 	builder.WriteString(", ")
-	builder.WriteString("link=")
-	builder.WriteString(n.Link)
+	if v := n.DatagraphKind; v != nil {
+		builder.WriteString("datagraph_kind=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := n.DatagraphID; v != nil {
+		builder.WriteString("datagraph_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("read=")
 	builder.WriteString(fmt.Sprintf("%v", n.Read))
+	builder.WriteString(", ")
+	builder.WriteString("owner_account_id=")
+	builder.WriteString(fmt.Sprintf("%v", n.OwnerAccountID))
+	builder.WriteString(", ")
+	if v := n.SourceAccountID; v != nil {
+		builder.WriteString("source_account_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

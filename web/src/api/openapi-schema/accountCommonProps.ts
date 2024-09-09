@@ -13,6 +13,7 @@ import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 import type { AccountVerifiedStatus } from "./accountVerifiedStatus";
 import type { Metadata } from "./metadata";
+import type { NotificationCount } from "./notificationCount";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
 import type { TagList } from "./tagList";
 
@@ -25,5 +26,6 @@ export interface AccountCommonProps {
   links: ProfileExternalLinkList;
   meta: Metadata;
   name: AccountName;
+  notifications?: NotificationCount;
   verified_status: AccountVerifiedStatus;
 }

@@ -118,10 +118,13 @@ erDiagram
     Notification {
         xidDOTID id
         timeDOTTime created_at
-        string title
-        string description
-        string link
+        timeDOTTime deleted_at
+        string event_type
+        string datagraph_kind
+        xidDOTID datagraph_id
         bool read
+        xidDOTID owner_account_id
+        xidDOTID source_account_id
     }
     Post {
         xidDOTID id
@@ -165,6 +168,8 @@ erDiagram
         string name
     }
     	Account |o--o{ Email : "emails/account"
+    	Account |o--o{ Notification : "notifications/owner"
+    	Account |o--o{ Notification : "triggered_notifications/source"
     	Account |o--o{ AccountFollow : "following/follower"
     	Account |o--o{ AccountFollow : "followed_by/following"
     	Account |o--o{ Post : "posts/author"

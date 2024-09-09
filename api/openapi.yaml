@@ -48,6 +48,8 @@ tags:
     description: Authentication resources.
   - name: accounts
     description: User accounts.
+  - name: notifications
+    description: Event notifications.
   - name: profiles
     description: Public profiles.
   - name: categories
@@ -578,6 +580,44 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountGetAvatar" }
+
+  #
+  #                   888    d8b  .d888 d8b                   888    d8b
+  #                   888    Y8P d88P"  Y8P                   888    Y8P
+  #                   888        888                          888
+  # 88888b.   .d88b.  888888 888 888888 888  .d8888b  8888b.  888888 888  .d88b.  88888b.  .d8888b
+  # 888 "88b d88""88b 888    888 888    888 d88P"        "88b 888    888 d88""88b 888 "88b 88K
+  # 888  888 888  888 888    888 888    888 888      .d888888 888    888 888  888 888  888 "Y8888b.
+  # 888  888 Y88..88P Y88b.  888 888    888 Y88b.    888  888 Y88b.  888 Y88..88P 888  888      X88
+  # 888  888  "Y88P"   "Y888 888 888    888  "Y8888P "Y888888  "Y888 888  "Y88P"  888  888  88888P'
+  #
+
+  /notifications:
+    get:
+      operationId: NotificationList
+      description: Retreive all notifications.
+      tags: [notifications]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/NotificationStatusQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NotificationListOK" }
+
+  /notifications/{notification_id}:
+    patch:
+      operationId: NotificationUpdate
+      description: Change the read status for a notification.
+      tags: [categories]
+      parameters: [$ref: "#/components/parameters/NotificationIDParam"]
+      requestBody: { $ref: "#/components/requestBodies/NotificationUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NotificationUpdateOK" }
 
   #
   #                           .d888 d8b 888
@@ -1453,6 +1493,22 @@ components:
       schema:
         $ref: "#/components/schemas/AccountHandle"
 
+    NotificationStatusQuery:
+      description: Notification status.
+      name: status
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/NotificationStatusList"
+
+    NotificationIDParam:
+      description: Unique notification ID.
+      name: notification_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     ThreadMarkParam:
       description: Thread unique and permanent identifier.
       name: thread_mark
@@ -1713,6 +1769,11 @@ components:
             type: string
             format: binary
 
+    NotificationUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NotificationMutableProps" }
+
     CategoryCreate:
       content:
         application/json:
@@ -1904,6 +1965,20 @@ components:
           schema:
             type: string
             format: binary
+
+    NotificationListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NotificationListResult"
+
+    NotificationUpdateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Notification"
 
     ProfileListOK:
       description: OK
@@ -2867,6 +2942,8 @@ components:
           $ref: "#/components/schemas/AccountVerifiedStatus"
         email_addresses:
           $ref: "#/components/schemas/AccountEmailAddressList"
+        notifications:
+          $ref: "#/components/schemas/NotificationCount"
         admin:
           type: boolean
 
@@ -2943,6 +3020,67 @@ components:
         is_auth:
           description: Is the email used for authenticating to the platform?
           type: boolean
+
+    #
+    # 888b    888          888    d8b  .d888 d8b                   888    d8b
+    # 8888b   888          888    Y8P d88P"  Y8P                   888    Y8P
+    # 88888b  888          888        888                          888
+    # 888Y88b 888  .d88b.  888888 888 888888 888  .d8888b  8888b.  888888 888  .d88b.  88888b.
+    # 888 Y88b888 d88""88b 888    888 888    888 d88P"        "88b 888    888 d88""88b 888 "88b
+    # 888  Y88888 888  888 888    888 888    888 888      .d888888 888    888 888  888 888  888
+    # 888   Y8888 Y88..88P Y88b.  888 888    888 Y88b.    888  888 Y88b.  888 Y88..88P 888  888
+    # 888    Y888  "Y88P"   "Y888 888 888    888  "Y8888P "Y888888  "Y888 888  "Y88P"  888  888
+    #
+
+    Notification:
+      type: object
+      required: [id, created_at, event, status]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        created_at:
+          type: string
+          format: date-time
+          description: The time the resource was created.
+        event: { $ref: "#/components/schemas/NotificationEvent" }
+        item: { $ref: "#/components/schemas/DatagraphItem" }
+        source: { $ref: "#/components/schemas/ProfileReference" }
+        status: { $ref: "#/components/schemas/NotificationStatus" }
+
+    NotificationMutableProps:
+      type: object
+      properties:
+        status: { $ref: "#/components/schemas/NotificationStatus" }
+
+    NotificationList:
+      type: array
+      items: { $ref: "#/components/schemas/Notification" }
+
+    NotificationListResult:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [notifications]
+          properties:
+            notifications: { $ref: "#/components/schemas/NotificationList" }
+
+    NotificationEvent:
+      description: |
+        The kind of event that triggered the notification.
+        Identical to the `notification.Event` enumerated type.
+      type: string
+      enum: [thread_reply, post_like, follow]
+
+    NotificationStatus:
+      type: string
+      enum: [unread, read]
+
+    NotificationStatusList:
+      type: array
+      items: { $ref: "#/components/schemas/NotificationStatus" }
+
+    NotificationCount:
+      type: integer
 
     #
     # 8888888b.                   .d888 d8b 888

@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -157,6 +158,36 @@ func (ac *AccountCreate) AddEmails(e ...*Email) *AccountCreate {
 		ids[i] = e[i].ID
 	}
 	return ac.AddEmailIDs(ids...)
+}
+
+// AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
+func (ac *AccountCreate) AddNotificationIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddNotificationIDs(ids...)
+	return ac
+}
+
+// AddNotifications adds the "notifications" edges to the Notification entity.
+func (ac *AccountCreate) AddNotifications(n ...*Notification) *AccountCreate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return ac.AddNotificationIDs(ids...)
+}
+
+// AddTriggeredNotificationIDs adds the "triggered_notifications" edge to the Notification entity by IDs.
+func (ac *AccountCreate) AddTriggeredNotificationIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddTriggeredNotificationIDs(ids...)
+	return ac
+}
+
+// AddTriggeredNotifications adds the "triggered_notifications" edges to the Notification entity.
+func (ac *AccountCreate) AddTriggeredNotifications(n ...*Notification) *AccountCreate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return ac.AddTriggeredNotificationIDs(ids...)
 }
 
 // AddFollowingIDs adds the "following" edge to the AccountFollow entity by IDs.
@@ -490,6 +521,38 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.NotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationsTable,
+			Columns: []string{account.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.TriggeredNotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TriggeredNotificationsTable,
+			Columns: []string{account.TriggeredNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

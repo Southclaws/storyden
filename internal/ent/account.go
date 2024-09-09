@@ -48,6 +48,10 @@ type Account struct {
 type AccountEdges struct {
 	// Emails holds the value of the emails edge.
 	Emails []*Email `json:"emails,omitempty"`
+	// Notifications holds the value of the notifications edge.
+	Notifications []*Notification `json:"notifications,omitempty"`
+	// TriggeredNotifications holds the value of the triggered_notifications edge.
+	TriggeredNotifications []*Notification `json:"triggered_notifications,omitempty"`
 	// Following holds the value of the following edge.
 	Following []*AccountFollow `json:"following,omitempty"`
 	// FollowedBy holds the value of the followed_by edge.
@@ -72,7 +76,7 @@ type AccountEdges struct {
 	Assets []*Asset `json:"assets,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [12]bool
+	loadedTypes [14]bool
 }
 
 // EmailsOrErr returns the Emails value or an error if the edge
@@ -84,10 +88,28 @@ func (e AccountEdges) EmailsOrErr() ([]*Email, error) {
 	return nil, &NotLoadedError{edge: "emails"}
 }
 
+// NotificationsOrErr returns the Notifications value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) NotificationsOrErr() ([]*Notification, error) {
+	if e.loadedTypes[1] {
+		return e.Notifications, nil
+	}
+	return nil, &NotLoadedError{edge: "notifications"}
+}
+
+// TriggeredNotificationsOrErr returns the TriggeredNotifications value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) TriggeredNotificationsOrErr() ([]*Notification, error) {
+	if e.loadedTypes[2] {
+		return e.TriggeredNotifications, nil
+	}
+	return nil, &NotLoadedError{edge: "triggered_notifications"}
+}
+
 // FollowingOrErr returns the Following value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) FollowingOrErr() ([]*AccountFollow, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[3] {
 		return e.Following, nil
 	}
 	return nil, &NotLoadedError{edge: "following"}
@@ -96,7 +118,7 @@ func (e AccountEdges) FollowingOrErr() ([]*AccountFollow, error) {
 // FollowedByOrErr returns the FollowedBy value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) FollowedByOrErr() ([]*AccountFollow, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[4] {
 		return e.FollowedBy, nil
 	}
 	return nil, &NotLoadedError{edge: "followed_by"}
@@ -105,7 +127,7 @@ func (e AccountEdges) FollowedByOrErr() ([]*AccountFollow, error) {
 // PostsOrErr returns the Posts value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) PostsOrErr() ([]*Post, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[5] {
 		return e.Posts, nil
 	}
 	return nil, &NotLoadedError{edge: "posts"}
@@ -114,7 +136,7 @@ func (e AccountEdges) PostsOrErr() ([]*Post, error) {
 // ReactsOrErr returns the Reacts value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) ReactsOrErr() ([]*React, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[6] {
 		return e.Reacts, nil
 	}
 	return nil, &NotLoadedError{edge: "reacts"}
@@ -123,7 +145,7 @@ func (e AccountEdges) ReactsOrErr() ([]*React, error) {
 // LikesOrErr returns the Likes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) LikesOrErr() ([]*LikePost, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[7] {
 		return e.Likes, nil
 	}
 	return nil, &NotLoadedError{edge: "likes"}
@@ -132,7 +154,7 @@ func (e AccountEdges) LikesOrErr() ([]*LikePost, error) {
 // RolesOrErr returns the Roles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RolesOrErr() ([]*Role, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[8] {
 		return e.Roles, nil
 	}
 	return nil, &NotLoadedError{edge: "roles"}
@@ -141,7 +163,7 @@ func (e AccountEdges) RolesOrErr() ([]*Role, error) {
 // AuthenticationOrErr returns the Authentication value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AuthenticationOrErr() ([]*Authentication, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[9] {
 		return e.Authentication, nil
 	}
 	return nil, &NotLoadedError{edge: "authentication"}
@@ -150,7 +172,7 @@ func (e AccountEdges) AuthenticationOrErr() ([]*Authentication, error) {
 // TagsOrErr returns the Tags value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) TagsOrErr() ([]*Tag, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[10] {
 		return e.Tags, nil
 	}
 	return nil, &NotLoadedError{edge: "tags"}
@@ -159,7 +181,7 @@ func (e AccountEdges) TagsOrErr() ([]*Tag, error) {
 // CollectionsOrErr returns the Collections value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) CollectionsOrErr() ([]*Collection, error) {
-	if e.loadedTypes[9] {
+	if e.loadedTypes[11] {
 		return e.Collections, nil
 	}
 	return nil, &NotLoadedError{edge: "collections"}
@@ -168,7 +190,7 @@ func (e AccountEdges) CollectionsOrErr() ([]*Collection, error) {
 // NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) NodesOrErr() ([]*Node, error) {
-	if e.loadedTypes[10] {
+	if e.loadedTypes[12] {
 		return e.Nodes, nil
 	}
 	return nil, &NotLoadedError{edge: "nodes"}
@@ -177,7 +199,7 @@ func (e AccountEdges) NodesOrErr() ([]*Node, error) {
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[11] {
+	if e.loadedTypes[13] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -294,6 +316,16 @@ func (a *Account) Value(name string) (ent.Value, error) {
 // QueryEmails queries the "emails" edge of the Account entity.
 func (a *Account) QueryEmails() *EmailQuery {
 	return NewAccountClient(a.config).QueryEmails(a)
+}
+
+// QueryNotifications queries the "notifications" edge of the Account entity.
+func (a *Account) QueryNotifications() *NotificationQuery {
+	return NewAccountClient(a.config).QueryNotifications(a)
+}
+
+// QueryTriggeredNotifications queries the "triggered_notifications" edge of the Account entity.
+func (a *Account) QueryTriggeredNotifications() *NotificationQuery {
+	return NewAccountClient(a.config).QueryTriggeredNotifications(a)
 }
 
 // QueryFollowing queries the "following" edge of the Account entity.

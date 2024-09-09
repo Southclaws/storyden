@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
 )
@@ -60,24 +61,39 @@ func CreatedAt(v time.Time) predicate.Notification {
 	return predicate.Notification(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
-func Title(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldEQ(FieldTitle, v))
+// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
+func DeletedAt(v time.Time) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldDeletedAt, v))
 }
 
-// Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
-func Description(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldEQ(FieldDescription, v))
+// EventType applies equality check predicate on the "event_type" field. It's identical to EventTypeEQ.
+func EventType(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldEventType, v))
 }
 
-// Link applies equality check predicate on the "link" field. It's identical to LinkEQ.
-func Link(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldEQ(FieldLink, v))
+// DatagraphKind applies equality check predicate on the "datagraph_kind" field. It's identical to DatagraphKindEQ.
+func DatagraphKind(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldDatagraphKind, v))
+}
+
+// DatagraphID applies equality check predicate on the "datagraph_id" field. It's identical to DatagraphIDEQ.
+func DatagraphID(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldDatagraphID, v))
 }
 
 // Read applies equality check predicate on the "read" field. It's identical to ReadEQ.
 func Read(v bool) predicate.Notification {
 	return predicate.Notification(sql.FieldEQ(FieldRead, v))
+}
+
+// OwnerAccountID applies equality check predicate on the "owner_account_id" field. It's identical to OwnerAccountIDEQ.
+func OwnerAccountID(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldOwnerAccountID, v))
+}
+
+// SourceAccountID applies equality check predicate on the "source_account_id" field. It's identical to SourceAccountIDEQ.
+func SourceAccountID(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldSourceAccountID, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -120,199 +136,274 @@ func CreatedAtLTE(v time.Time) predicate.Notification {
 	return predicate.Notification(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// TitleEQ applies the EQ predicate on the "title" field.
-func TitleEQ(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldEQ(FieldTitle, v))
+// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
+func DeletedAtEQ(v time.Time) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldDeletedAt, v))
 }
 
-// TitleNEQ applies the NEQ predicate on the "title" field.
-func TitleNEQ(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldNEQ(FieldTitle, v))
+// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
+func DeletedAtNEQ(v time.Time) predicate.Notification {
+	return predicate.Notification(sql.FieldNEQ(FieldDeletedAt, v))
 }
 
-// TitleIn applies the In predicate on the "title" field.
-func TitleIn(vs ...string) predicate.Notification {
-	return predicate.Notification(sql.FieldIn(FieldTitle, vs...))
+// DeletedAtIn applies the In predicate on the "deleted_at" field.
+func DeletedAtIn(vs ...time.Time) predicate.Notification {
+	return predicate.Notification(sql.FieldIn(FieldDeletedAt, vs...))
 }
 
-// TitleNotIn applies the NotIn predicate on the "title" field.
-func TitleNotIn(vs ...string) predicate.Notification {
-	return predicate.Notification(sql.FieldNotIn(FieldTitle, vs...))
+// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
+func DeletedAtNotIn(vs ...time.Time) predicate.Notification {
+	return predicate.Notification(sql.FieldNotIn(FieldDeletedAt, vs...))
 }
 
-// TitleGT applies the GT predicate on the "title" field.
-func TitleGT(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldGT(FieldTitle, v))
+// DeletedAtGT applies the GT predicate on the "deleted_at" field.
+func DeletedAtGT(v time.Time) predicate.Notification {
+	return predicate.Notification(sql.FieldGT(FieldDeletedAt, v))
 }
 
-// TitleGTE applies the GTE predicate on the "title" field.
-func TitleGTE(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldGTE(FieldTitle, v))
+// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
+func DeletedAtGTE(v time.Time) predicate.Notification {
+	return predicate.Notification(sql.FieldGTE(FieldDeletedAt, v))
 }
 
-// TitleLT applies the LT predicate on the "title" field.
-func TitleLT(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldLT(FieldTitle, v))
+// DeletedAtLT applies the LT predicate on the "deleted_at" field.
+func DeletedAtLT(v time.Time) predicate.Notification {
+	return predicate.Notification(sql.FieldLT(FieldDeletedAt, v))
 }
 
-// TitleLTE applies the LTE predicate on the "title" field.
-func TitleLTE(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldLTE(FieldTitle, v))
+// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
+func DeletedAtLTE(v time.Time) predicate.Notification {
+	return predicate.Notification(sql.FieldLTE(FieldDeletedAt, v))
 }
 
-// TitleContains applies the Contains predicate on the "title" field.
-func TitleContains(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldContains(FieldTitle, v))
+// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
+func DeletedAtIsNil() predicate.Notification {
+	return predicate.Notification(sql.FieldIsNull(FieldDeletedAt))
 }
 
-// TitleHasPrefix applies the HasPrefix predicate on the "title" field.
-func TitleHasPrefix(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldHasPrefix(FieldTitle, v))
+// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
+func DeletedAtNotNil() predicate.Notification {
+	return predicate.Notification(sql.FieldNotNull(FieldDeletedAt))
 }
 
-// TitleHasSuffix applies the HasSuffix predicate on the "title" field.
-func TitleHasSuffix(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldHasSuffix(FieldTitle, v))
+// EventTypeEQ applies the EQ predicate on the "event_type" field.
+func EventTypeEQ(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldEventType, v))
 }
 
-// TitleEqualFold applies the EqualFold predicate on the "title" field.
-func TitleEqualFold(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldEqualFold(FieldTitle, v))
+// EventTypeNEQ applies the NEQ predicate on the "event_type" field.
+func EventTypeNEQ(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldNEQ(FieldEventType, v))
 }
 
-// TitleContainsFold applies the ContainsFold predicate on the "title" field.
-func TitleContainsFold(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldContainsFold(FieldTitle, v))
+// EventTypeIn applies the In predicate on the "event_type" field.
+func EventTypeIn(vs ...string) predicate.Notification {
+	return predicate.Notification(sql.FieldIn(FieldEventType, vs...))
 }
 
-// DescriptionEQ applies the EQ predicate on the "description" field.
-func DescriptionEQ(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldEQ(FieldDescription, v))
+// EventTypeNotIn applies the NotIn predicate on the "event_type" field.
+func EventTypeNotIn(vs ...string) predicate.Notification {
+	return predicate.Notification(sql.FieldNotIn(FieldEventType, vs...))
 }
 
-// DescriptionNEQ applies the NEQ predicate on the "description" field.
-func DescriptionNEQ(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldNEQ(FieldDescription, v))
+// EventTypeGT applies the GT predicate on the "event_type" field.
+func EventTypeGT(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldGT(FieldEventType, v))
 }
 
-// DescriptionIn applies the In predicate on the "description" field.
-func DescriptionIn(vs ...string) predicate.Notification {
-	return predicate.Notification(sql.FieldIn(FieldDescription, vs...))
+// EventTypeGTE applies the GTE predicate on the "event_type" field.
+func EventTypeGTE(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldGTE(FieldEventType, v))
 }
 
-// DescriptionNotIn applies the NotIn predicate on the "description" field.
-func DescriptionNotIn(vs ...string) predicate.Notification {
-	return predicate.Notification(sql.FieldNotIn(FieldDescription, vs...))
+// EventTypeLT applies the LT predicate on the "event_type" field.
+func EventTypeLT(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldLT(FieldEventType, v))
 }
 
-// DescriptionGT applies the GT predicate on the "description" field.
-func DescriptionGT(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldGT(FieldDescription, v))
+// EventTypeLTE applies the LTE predicate on the "event_type" field.
+func EventTypeLTE(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldLTE(FieldEventType, v))
 }
 
-// DescriptionGTE applies the GTE predicate on the "description" field.
-func DescriptionGTE(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldGTE(FieldDescription, v))
+// EventTypeContains applies the Contains predicate on the "event_type" field.
+func EventTypeContains(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldContains(FieldEventType, v))
 }
 
-// DescriptionLT applies the LT predicate on the "description" field.
-func DescriptionLT(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldLT(FieldDescription, v))
+// EventTypeHasPrefix applies the HasPrefix predicate on the "event_type" field.
+func EventTypeHasPrefix(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldHasPrefix(FieldEventType, v))
 }
 
-// DescriptionLTE applies the LTE predicate on the "description" field.
-func DescriptionLTE(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldLTE(FieldDescription, v))
+// EventTypeHasSuffix applies the HasSuffix predicate on the "event_type" field.
+func EventTypeHasSuffix(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldHasSuffix(FieldEventType, v))
 }
 
-// DescriptionContains applies the Contains predicate on the "description" field.
-func DescriptionContains(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldContains(FieldDescription, v))
+// EventTypeEqualFold applies the EqualFold predicate on the "event_type" field.
+func EventTypeEqualFold(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldEqualFold(FieldEventType, v))
 }
 
-// DescriptionHasPrefix applies the HasPrefix predicate on the "description" field.
-func DescriptionHasPrefix(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldHasPrefix(FieldDescription, v))
+// EventTypeContainsFold applies the ContainsFold predicate on the "event_type" field.
+func EventTypeContainsFold(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldContainsFold(FieldEventType, v))
 }
 
-// DescriptionHasSuffix applies the HasSuffix predicate on the "description" field.
-func DescriptionHasSuffix(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldHasSuffix(FieldDescription, v))
+// DatagraphKindEQ applies the EQ predicate on the "datagraph_kind" field.
+func DatagraphKindEQ(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldDatagraphKind, v))
 }
 
-// DescriptionEqualFold applies the EqualFold predicate on the "description" field.
-func DescriptionEqualFold(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldEqualFold(FieldDescription, v))
+// DatagraphKindNEQ applies the NEQ predicate on the "datagraph_kind" field.
+func DatagraphKindNEQ(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldNEQ(FieldDatagraphKind, v))
 }
 
-// DescriptionContainsFold applies the ContainsFold predicate on the "description" field.
-func DescriptionContainsFold(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldContainsFold(FieldDescription, v))
+// DatagraphKindIn applies the In predicate on the "datagraph_kind" field.
+func DatagraphKindIn(vs ...string) predicate.Notification {
+	return predicate.Notification(sql.FieldIn(FieldDatagraphKind, vs...))
 }
 
-// LinkEQ applies the EQ predicate on the "link" field.
-func LinkEQ(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldEQ(FieldLink, v))
+// DatagraphKindNotIn applies the NotIn predicate on the "datagraph_kind" field.
+func DatagraphKindNotIn(vs ...string) predicate.Notification {
+	return predicate.Notification(sql.FieldNotIn(FieldDatagraphKind, vs...))
 }
 
-// LinkNEQ applies the NEQ predicate on the "link" field.
-func LinkNEQ(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldNEQ(FieldLink, v))
+// DatagraphKindGT applies the GT predicate on the "datagraph_kind" field.
+func DatagraphKindGT(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldGT(FieldDatagraphKind, v))
 }
 
-// LinkIn applies the In predicate on the "link" field.
-func LinkIn(vs ...string) predicate.Notification {
-	return predicate.Notification(sql.FieldIn(FieldLink, vs...))
+// DatagraphKindGTE applies the GTE predicate on the "datagraph_kind" field.
+func DatagraphKindGTE(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldGTE(FieldDatagraphKind, v))
 }
 
-// LinkNotIn applies the NotIn predicate on the "link" field.
-func LinkNotIn(vs ...string) predicate.Notification {
-	return predicate.Notification(sql.FieldNotIn(FieldLink, vs...))
+// DatagraphKindLT applies the LT predicate on the "datagraph_kind" field.
+func DatagraphKindLT(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldLT(FieldDatagraphKind, v))
 }
 
-// LinkGT applies the GT predicate on the "link" field.
-func LinkGT(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldGT(FieldLink, v))
+// DatagraphKindLTE applies the LTE predicate on the "datagraph_kind" field.
+func DatagraphKindLTE(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldLTE(FieldDatagraphKind, v))
 }
 
-// LinkGTE applies the GTE predicate on the "link" field.
-func LinkGTE(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldGTE(FieldLink, v))
+// DatagraphKindContains applies the Contains predicate on the "datagraph_kind" field.
+func DatagraphKindContains(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldContains(FieldDatagraphKind, v))
 }
 
-// LinkLT applies the LT predicate on the "link" field.
-func LinkLT(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldLT(FieldLink, v))
+// DatagraphKindHasPrefix applies the HasPrefix predicate on the "datagraph_kind" field.
+func DatagraphKindHasPrefix(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldHasPrefix(FieldDatagraphKind, v))
 }
 
-// LinkLTE applies the LTE predicate on the "link" field.
-func LinkLTE(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldLTE(FieldLink, v))
+// DatagraphKindHasSuffix applies the HasSuffix predicate on the "datagraph_kind" field.
+func DatagraphKindHasSuffix(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldHasSuffix(FieldDatagraphKind, v))
 }
 
-// LinkContains applies the Contains predicate on the "link" field.
-func LinkContains(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldContains(FieldLink, v))
+// DatagraphKindIsNil applies the IsNil predicate on the "datagraph_kind" field.
+func DatagraphKindIsNil() predicate.Notification {
+	return predicate.Notification(sql.FieldIsNull(FieldDatagraphKind))
 }
 
-// LinkHasPrefix applies the HasPrefix predicate on the "link" field.
-func LinkHasPrefix(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldHasPrefix(FieldLink, v))
+// DatagraphKindNotNil applies the NotNil predicate on the "datagraph_kind" field.
+func DatagraphKindNotNil() predicate.Notification {
+	return predicate.Notification(sql.FieldNotNull(FieldDatagraphKind))
 }
 
-// LinkHasSuffix applies the HasSuffix predicate on the "link" field.
-func LinkHasSuffix(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldHasSuffix(FieldLink, v))
+// DatagraphKindEqualFold applies the EqualFold predicate on the "datagraph_kind" field.
+func DatagraphKindEqualFold(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldEqualFold(FieldDatagraphKind, v))
 }
 
-// LinkEqualFold applies the EqualFold predicate on the "link" field.
-func LinkEqualFold(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldEqualFold(FieldLink, v))
+// DatagraphKindContainsFold applies the ContainsFold predicate on the "datagraph_kind" field.
+func DatagraphKindContainsFold(v string) predicate.Notification {
+	return predicate.Notification(sql.FieldContainsFold(FieldDatagraphKind, v))
 }
 
-// LinkContainsFold applies the ContainsFold predicate on the "link" field.
-func LinkContainsFold(v string) predicate.Notification {
-	return predicate.Notification(sql.FieldContainsFold(FieldLink, v))
+// DatagraphIDEQ applies the EQ predicate on the "datagraph_id" field.
+func DatagraphIDEQ(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldDatagraphID, v))
+}
+
+// DatagraphIDNEQ applies the NEQ predicate on the "datagraph_id" field.
+func DatagraphIDNEQ(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldNEQ(FieldDatagraphID, v))
+}
+
+// DatagraphIDIn applies the In predicate on the "datagraph_id" field.
+func DatagraphIDIn(vs ...xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldIn(FieldDatagraphID, vs...))
+}
+
+// DatagraphIDNotIn applies the NotIn predicate on the "datagraph_id" field.
+func DatagraphIDNotIn(vs ...xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldNotIn(FieldDatagraphID, vs...))
+}
+
+// DatagraphIDGT applies the GT predicate on the "datagraph_id" field.
+func DatagraphIDGT(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldGT(FieldDatagraphID, v))
+}
+
+// DatagraphIDGTE applies the GTE predicate on the "datagraph_id" field.
+func DatagraphIDGTE(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldGTE(FieldDatagraphID, v))
+}
+
+// DatagraphIDLT applies the LT predicate on the "datagraph_id" field.
+func DatagraphIDLT(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldLT(FieldDatagraphID, v))
+}
+
+// DatagraphIDLTE applies the LTE predicate on the "datagraph_id" field.
+func DatagraphIDLTE(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldLTE(FieldDatagraphID, v))
+}
+
+// DatagraphIDContains applies the Contains predicate on the "datagraph_id" field.
+func DatagraphIDContains(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldContains(FieldDatagraphID, vc))
+}
+
+// DatagraphIDHasPrefix applies the HasPrefix predicate on the "datagraph_id" field.
+func DatagraphIDHasPrefix(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldHasPrefix(FieldDatagraphID, vc))
+}
+
+// DatagraphIDHasSuffix applies the HasSuffix predicate on the "datagraph_id" field.
+func DatagraphIDHasSuffix(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldHasSuffix(FieldDatagraphID, vc))
+}
+
+// DatagraphIDIsNil applies the IsNil predicate on the "datagraph_id" field.
+func DatagraphIDIsNil() predicate.Notification {
+	return predicate.Notification(sql.FieldIsNull(FieldDatagraphID))
+}
+
+// DatagraphIDNotNil applies the NotNil predicate on the "datagraph_id" field.
+func DatagraphIDNotNil() predicate.Notification {
+	return predicate.Notification(sql.FieldNotNull(FieldDatagraphID))
+}
+
+// DatagraphIDEqualFold applies the EqualFold predicate on the "datagraph_id" field.
+func DatagraphIDEqualFold(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldEqualFold(FieldDatagraphID, vc))
+}
+
+// DatagraphIDContainsFold applies the ContainsFold predicate on the "datagraph_id" field.
+func DatagraphIDContainsFold(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldContainsFold(FieldDatagraphID, vc))
 }
 
 // ReadEQ applies the EQ predicate on the "read" field.
@@ -323,6 +414,202 @@ func ReadEQ(v bool) predicate.Notification {
 // ReadNEQ applies the NEQ predicate on the "read" field.
 func ReadNEQ(v bool) predicate.Notification {
 	return predicate.Notification(sql.FieldNEQ(FieldRead, v))
+}
+
+// OwnerAccountIDEQ applies the EQ predicate on the "owner_account_id" field.
+func OwnerAccountIDEQ(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldOwnerAccountID, v))
+}
+
+// OwnerAccountIDNEQ applies the NEQ predicate on the "owner_account_id" field.
+func OwnerAccountIDNEQ(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldNEQ(FieldOwnerAccountID, v))
+}
+
+// OwnerAccountIDIn applies the In predicate on the "owner_account_id" field.
+func OwnerAccountIDIn(vs ...xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldIn(FieldOwnerAccountID, vs...))
+}
+
+// OwnerAccountIDNotIn applies the NotIn predicate on the "owner_account_id" field.
+func OwnerAccountIDNotIn(vs ...xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldNotIn(FieldOwnerAccountID, vs...))
+}
+
+// OwnerAccountIDGT applies the GT predicate on the "owner_account_id" field.
+func OwnerAccountIDGT(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldGT(FieldOwnerAccountID, v))
+}
+
+// OwnerAccountIDGTE applies the GTE predicate on the "owner_account_id" field.
+func OwnerAccountIDGTE(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldGTE(FieldOwnerAccountID, v))
+}
+
+// OwnerAccountIDLT applies the LT predicate on the "owner_account_id" field.
+func OwnerAccountIDLT(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldLT(FieldOwnerAccountID, v))
+}
+
+// OwnerAccountIDLTE applies the LTE predicate on the "owner_account_id" field.
+func OwnerAccountIDLTE(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldLTE(FieldOwnerAccountID, v))
+}
+
+// OwnerAccountIDContains applies the Contains predicate on the "owner_account_id" field.
+func OwnerAccountIDContains(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldContains(FieldOwnerAccountID, vc))
+}
+
+// OwnerAccountIDHasPrefix applies the HasPrefix predicate on the "owner_account_id" field.
+func OwnerAccountIDHasPrefix(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldHasPrefix(FieldOwnerAccountID, vc))
+}
+
+// OwnerAccountIDHasSuffix applies the HasSuffix predicate on the "owner_account_id" field.
+func OwnerAccountIDHasSuffix(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldHasSuffix(FieldOwnerAccountID, vc))
+}
+
+// OwnerAccountIDEqualFold applies the EqualFold predicate on the "owner_account_id" field.
+func OwnerAccountIDEqualFold(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldEqualFold(FieldOwnerAccountID, vc))
+}
+
+// OwnerAccountIDContainsFold applies the ContainsFold predicate on the "owner_account_id" field.
+func OwnerAccountIDContainsFold(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldContainsFold(FieldOwnerAccountID, vc))
+}
+
+// SourceAccountIDEQ applies the EQ predicate on the "source_account_id" field.
+func SourceAccountIDEQ(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldEQ(FieldSourceAccountID, v))
+}
+
+// SourceAccountIDNEQ applies the NEQ predicate on the "source_account_id" field.
+func SourceAccountIDNEQ(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldNEQ(FieldSourceAccountID, v))
+}
+
+// SourceAccountIDIn applies the In predicate on the "source_account_id" field.
+func SourceAccountIDIn(vs ...xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldIn(FieldSourceAccountID, vs...))
+}
+
+// SourceAccountIDNotIn applies the NotIn predicate on the "source_account_id" field.
+func SourceAccountIDNotIn(vs ...xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldNotIn(FieldSourceAccountID, vs...))
+}
+
+// SourceAccountIDGT applies the GT predicate on the "source_account_id" field.
+func SourceAccountIDGT(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldGT(FieldSourceAccountID, v))
+}
+
+// SourceAccountIDGTE applies the GTE predicate on the "source_account_id" field.
+func SourceAccountIDGTE(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldGTE(FieldSourceAccountID, v))
+}
+
+// SourceAccountIDLT applies the LT predicate on the "source_account_id" field.
+func SourceAccountIDLT(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldLT(FieldSourceAccountID, v))
+}
+
+// SourceAccountIDLTE applies the LTE predicate on the "source_account_id" field.
+func SourceAccountIDLTE(v xid.ID) predicate.Notification {
+	return predicate.Notification(sql.FieldLTE(FieldSourceAccountID, v))
+}
+
+// SourceAccountIDContains applies the Contains predicate on the "source_account_id" field.
+func SourceAccountIDContains(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldContains(FieldSourceAccountID, vc))
+}
+
+// SourceAccountIDHasPrefix applies the HasPrefix predicate on the "source_account_id" field.
+func SourceAccountIDHasPrefix(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldHasPrefix(FieldSourceAccountID, vc))
+}
+
+// SourceAccountIDHasSuffix applies the HasSuffix predicate on the "source_account_id" field.
+func SourceAccountIDHasSuffix(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldHasSuffix(FieldSourceAccountID, vc))
+}
+
+// SourceAccountIDIsNil applies the IsNil predicate on the "source_account_id" field.
+func SourceAccountIDIsNil() predicate.Notification {
+	return predicate.Notification(sql.FieldIsNull(FieldSourceAccountID))
+}
+
+// SourceAccountIDNotNil applies the NotNil predicate on the "source_account_id" field.
+func SourceAccountIDNotNil() predicate.Notification {
+	return predicate.Notification(sql.FieldNotNull(FieldSourceAccountID))
+}
+
+// SourceAccountIDEqualFold applies the EqualFold predicate on the "source_account_id" field.
+func SourceAccountIDEqualFold(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldEqualFold(FieldSourceAccountID, vc))
+}
+
+// SourceAccountIDContainsFold applies the ContainsFold predicate on the "source_account_id" field.
+func SourceAccountIDContainsFold(v xid.ID) predicate.Notification {
+	vc := v.String()
+	return predicate.Notification(sql.FieldContainsFold(FieldSourceAccountID, vc))
+}
+
+// HasOwner applies the HasEdge predicate on the "owner" edge.
+func HasOwner() predicate.Notification {
+	return predicate.Notification(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOwnerWith applies the HasEdge predicate on the "owner" edge with a given conditions (other predicates).
+func HasOwnerWith(preds ...predicate.Account) predicate.Notification {
+	return predicate.Notification(func(s *sql.Selector) {
+		step := newOwnerStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSource applies the HasEdge predicate on the "source" edge.
+func HasSource() predicate.Notification {
+	return predicate.Notification(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, SourceTable, SourceColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSourceWith applies the HasEdge predicate on the "source" edge with a given conditions (other predicates).
+func HasSourceWith(preds ...predicate.Account) predicate.Notification {
+	return predicate.Notification(func(s *sql.Selector) {
+		step := newSourceStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.
