@@ -385,16 +385,33 @@ var (
 	NotificationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
-		{Name: "title", Type: field.TypeString},
-		{Name: "description", Type: field.TypeString},
-		{Name: "link", Type: field.TypeString},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "event_type", Type: field.TypeString},
+		{Name: "datagraph_kind", Type: field.TypeString, Nullable: true},
+		{Name: "datagraph_id", Type: field.TypeString, Nullable: true},
 		{Name: "read", Type: field.TypeBool},
+		{Name: "owner_account_id", Type: field.TypeString, Size: 20},
+		{Name: "source_account_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// NotificationsTable holds the schema information for the "notifications" table.
 	NotificationsTable = &schema.Table{
 		Name:       "notifications",
 		Columns:    NotificationsColumns,
 		PrimaryKey: []*schema.Column{NotificationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "notifications_accounts_notifications",
+				Columns:    []*schema.Column{NotificationsColumns[7]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "notifications_accounts_triggered_notifications",
+				Columns:    []*schema.Column{NotificationsColumns[8]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
 	}
 	// PostsColumns holds the columns for the "posts" table.
 	PostsColumns = []*schema.Column{
@@ -795,6 +812,8 @@ func init() {
 	NodesTable.ForeignKeys[0].RefTable = AccountsTable
 	NodesTable.ForeignKeys[1].RefTable = LinksTable
 	NodesTable.ForeignKeys[2].RefTable = NodesTable
+	NotificationsTable.ForeignKeys[0].RefTable = AccountsTable
+	NotificationsTable.ForeignKeys[1].RefTable = AccountsTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[1].RefTable = CategoriesTable
 	PostsTable.ForeignKeys[2].RefTable = LinksTable

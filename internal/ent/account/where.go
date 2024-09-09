@@ -479,6 +479,52 @@ func HasEmailsWith(preds ...predicate.Email) predicate.Account {
 	})
 }
 
+// HasNotifications applies the HasEdge predicate on the "notifications" edge.
+func HasNotifications() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, NotificationsTable, NotificationsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNotificationsWith applies the HasEdge predicate on the "notifications" edge with a given conditions (other predicates).
+func HasNotificationsWith(preds ...predicate.Notification) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newNotificationsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasTriggeredNotifications applies the HasEdge predicate on the "triggered_notifications" edge.
+func HasTriggeredNotifications() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TriggeredNotificationsTable, TriggeredNotificationsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTriggeredNotificationsWith applies the HasEdge predicate on the "triggered_notifications" edge with a given conditions (other predicates).
+func HasTriggeredNotificationsWith(preds ...predicate.Notification) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newTriggeredNotificationsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasFollowing applies the HasEdge predicate on the "following" edge.
 func HasFollowing() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

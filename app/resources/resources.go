@@ -4,6 +4,8 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
+	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -15,7 +17,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/mailtemplate"
-	"github.com/Southclaws/storyden/app/resources/notification"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
@@ -38,13 +39,14 @@ func Build() fx.Option {
 			asset.New,
 			authentication.New,
 			category.New,
+			notify_querier.New,
+			notify_writer.New,
 			reply.New,
 			tag.New,
 			thread.New,
 			react.New,
 			like_querier.New,
 			like_writer.New,
-			notification.New,
 			post_search.New,
 			post_writer.New,
 			collection.New,

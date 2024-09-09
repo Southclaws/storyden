@@ -35,6 +35,10 @@ const (
 	FieldMetadata = "metadata"
 	// EdgeEmails holds the string denoting the emails edge name in mutations.
 	EdgeEmails = "emails"
+	// EdgeNotifications holds the string denoting the notifications edge name in mutations.
+	EdgeNotifications = "notifications"
+	// EdgeTriggeredNotifications holds the string denoting the triggered_notifications edge name in mutations.
+	EdgeTriggeredNotifications = "triggered_notifications"
 	// EdgeFollowing holds the string denoting the following edge name in mutations.
 	EdgeFollowing = "following"
 	// EdgeFollowedBy holds the string denoting the followed_by edge name in mutations.
@@ -66,6 +70,20 @@ const (
 	EmailsInverseTable = "emails"
 	// EmailsColumn is the table column denoting the emails relation/edge.
 	EmailsColumn = "account_id"
+	// NotificationsTable is the table that holds the notifications relation/edge.
+	NotificationsTable = "notifications"
+	// NotificationsInverseTable is the table name for the Notification entity.
+	// It exists in this package in order to avoid circular dependency with the "notification" package.
+	NotificationsInverseTable = "notifications"
+	// NotificationsColumn is the table column denoting the notifications relation/edge.
+	NotificationsColumn = "owner_account_id"
+	// TriggeredNotificationsTable is the table that holds the triggered_notifications relation/edge.
+	TriggeredNotificationsTable = "notifications"
+	// TriggeredNotificationsInverseTable is the table name for the Notification entity.
+	// It exists in this package in order to avoid circular dependency with the "notification" package.
+	TriggeredNotificationsInverseTable = "notifications"
+	// TriggeredNotificationsColumn is the table column denoting the triggered_notifications relation/edge.
+	TriggeredNotificationsColumn = "source_account_id"
 	// FollowingTable is the table that holds the following relation/edge.
 	FollowingTable = "account_follows"
 	// FollowingInverseTable is the table name for the AccountFollow entity.
@@ -250,6 +268,34 @@ func ByEmails(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByNotificationsCount orders the results by notifications count.
+func ByNotificationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newNotificationsStep(), opts...)
+	}
+}
+
+// ByNotifications orders the results by notifications terms.
+func ByNotifications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNotificationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByTriggeredNotificationsCount orders the results by triggered_notifications count.
+func ByTriggeredNotificationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTriggeredNotificationsStep(), opts...)
+	}
+}
+
+// ByTriggeredNotifications orders the results by triggered_notifications terms.
+func ByTriggeredNotifications(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTriggeredNotificationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByFollowingCount orders the results by following count.
 func ByFollowingCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -408,6 +454,20 @@ func newEmailsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EmailsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, EmailsTable, EmailsColumn),
+	)
+}
+func newNotificationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NotificationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, NotificationsTable, NotificationsColumn),
+	)
+}
+func newTriggeredNotificationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TriggeredNotificationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, TriggeredNotificationsTable, TriggeredNotificationsColumn),
 	)
 }
 func newFollowingStep() *sqlgraph.Step {
