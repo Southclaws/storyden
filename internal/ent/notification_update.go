@@ -6,12 +6,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
+	"github.com/rs/xid"
 )
 
 // NotificationUpdate is the builder for updating Notification entities.
@@ -28,45 +31,77 @@ func (nu *NotificationUpdate) Where(ps ...predicate.Notification) *NotificationU
 	return nu
 }
 
-// SetTitle sets the "title" field.
-func (nu *NotificationUpdate) SetTitle(s string) *NotificationUpdate {
-	nu.mutation.SetTitle(s)
+// SetDeletedAt sets the "deleted_at" field.
+func (nu *NotificationUpdate) SetDeletedAt(t time.Time) *NotificationUpdate {
+	nu.mutation.SetDeletedAt(t)
 	return nu
 }
 
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (nu *NotificationUpdate) SetNillableTitle(s *string) *NotificationUpdate {
-	if s != nil {
-		nu.SetTitle(*s)
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableDeletedAt(t *time.Time) *NotificationUpdate {
+	if t != nil {
+		nu.SetDeletedAt(*t)
 	}
 	return nu
 }
 
-// SetDescription sets the "description" field.
-func (nu *NotificationUpdate) SetDescription(s string) *NotificationUpdate {
-	nu.mutation.SetDescription(s)
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (nu *NotificationUpdate) ClearDeletedAt() *NotificationUpdate {
+	nu.mutation.ClearDeletedAt()
 	return nu
 }
 
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (nu *NotificationUpdate) SetNillableDescription(s *string) *NotificationUpdate {
+// SetEventType sets the "event_type" field.
+func (nu *NotificationUpdate) SetEventType(s string) *NotificationUpdate {
+	nu.mutation.SetEventType(s)
+	return nu
+}
+
+// SetNillableEventType sets the "event_type" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableEventType(s *string) *NotificationUpdate {
 	if s != nil {
-		nu.SetDescription(*s)
+		nu.SetEventType(*s)
 	}
 	return nu
 }
 
-// SetLink sets the "link" field.
-func (nu *NotificationUpdate) SetLink(s string) *NotificationUpdate {
-	nu.mutation.SetLink(s)
+// SetDatagraphKind sets the "datagraph_kind" field.
+func (nu *NotificationUpdate) SetDatagraphKind(s string) *NotificationUpdate {
+	nu.mutation.SetDatagraphKind(s)
 	return nu
 }
 
-// SetNillableLink sets the "link" field if the given value is not nil.
-func (nu *NotificationUpdate) SetNillableLink(s *string) *NotificationUpdate {
+// SetNillableDatagraphKind sets the "datagraph_kind" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableDatagraphKind(s *string) *NotificationUpdate {
 	if s != nil {
-		nu.SetLink(*s)
+		nu.SetDatagraphKind(*s)
 	}
+	return nu
+}
+
+// ClearDatagraphKind clears the value of the "datagraph_kind" field.
+func (nu *NotificationUpdate) ClearDatagraphKind() *NotificationUpdate {
+	nu.mutation.ClearDatagraphKind()
+	return nu
+}
+
+// SetDatagraphID sets the "datagraph_id" field.
+func (nu *NotificationUpdate) SetDatagraphID(x xid.ID) *NotificationUpdate {
+	nu.mutation.SetDatagraphID(x)
+	return nu
+}
+
+// SetNillableDatagraphID sets the "datagraph_id" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableDatagraphID(x *xid.ID) *NotificationUpdate {
+	if x != nil {
+		nu.SetDatagraphID(*x)
+	}
+	return nu
+}
+
+// ClearDatagraphID clears the value of the "datagraph_id" field.
+func (nu *NotificationUpdate) ClearDatagraphID() *NotificationUpdate {
+	nu.mutation.ClearDatagraphID()
 	return nu
 }
 
@@ -84,9 +119,85 @@ func (nu *NotificationUpdate) SetNillableRead(b *bool) *NotificationUpdate {
 	return nu
 }
 
+// SetOwnerAccountID sets the "owner_account_id" field.
+func (nu *NotificationUpdate) SetOwnerAccountID(x xid.ID) *NotificationUpdate {
+	nu.mutation.SetOwnerAccountID(x)
+	return nu
+}
+
+// SetNillableOwnerAccountID sets the "owner_account_id" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableOwnerAccountID(x *xid.ID) *NotificationUpdate {
+	if x != nil {
+		nu.SetOwnerAccountID(*x)
+	}
+	return nu
+}
+
+// SetSourceAccountID sets the "source_account_id" field.
+func (nu *NotificationUpdate) SetSourceAccountID(x xid.ID) *NotificationUpdate {
+	nu.mutation.SetSourceAccountID(x)
+	return nu
+}
+
+// SetNillableSourceAccountID sets the "source_account_id" field if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableSourceAccountID(x *xid.ID) *NotificationUpdate {
+	if x != nil {
+		nu.SetSourceAccountID(*x)
+	}
+	return nu
+}
+
+// ClearSourceAccountID clears the value of the "source_account_id" field.
+func (nu *NotificationUpdate) ClearSourceAccountID() *NotificationUpdate {
+	nu.mutation.ClearSourceAccountID()
+	return nu
+}
+
+// SetOwnerID sets the "owner" edge to the Account entity by ID.
+func (nu *NotificationUpdate) SetOwnerID(id xid.ID) *NotificationUpdate {
+	nu.mutation.SetOwnerID(id)
+	return nu
+}
+
+// SetOwner sets the "owner" edge to the Account entity.
+func (nu *NotificationUpdate) SetOwner(a *Account) *NotificationUpdate {
+	return nu.SetOwnerID(a.ID)
+}
+
+// SetSourceID sets the "source" edge to the Account entity by ID.
+func (nu *NotificationUpdate) SetSourceID(id xid.ID) *NotificationUpdate {
+	nu.mutation.SetSourceID(id)
+	return nu
+}
+
+// SetNillableSourceID sets the "source" edge to the Account entity by ID if the given value is not nil.
+func (nu *NotificationUpdate) SetNillableSourceID(id *xid.ID) *NotificationUpdate {
+	if id != nil {
+		nu = nu.SetSourceID(*id)
+	}
+	return nu
+}
+
+// SetSource sets the "source" edge to the Account entity.
+func (nu *NotificationUpdate) SetSource(a *Account) *NotificationUpdate {
+	return nu.SetSourceID(a.ID)
+}
+
 // Mutation returns the NotificationMutation object of the builder.
 func (nu *NotificationUpdate) Mutation() *NotificationMutation {
 	return nu.mutation
+}
+
+// ClearOwner clears the "owner" edge to the Account entity.
+func (nu *NotificationUpdate) ClearOwner() *NotificationUpdate {
+	nu.mutation.ClearOwner()
+	return nu
+}
+
+// ClearSource clears the "source" edge to the Account entity.
+func (nu *NotificationUpdate) ClearSource() *NotificationUpdate {
+	nu.mutation.ClearSource()
+	return nu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -116,6 +227,14 @@ func (nu *NotificationUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (nu *NotificationUpdate) check() error {
+	if _, ok := nu.mutation.OwnerID(); nu.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Notification.owner"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (nu *NotificationUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NotificationUpdate {
 	nu.modifiers = append(nu.modifiers, modifiers...)
@@ -123,6 +242,9 @@ func (nu *NotificationUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *N
 }
 
 func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := nu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(notification.Table, notification.Columns, sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString))
 	if ps := nu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -131,17 +253,87 @@ func (nu *NotificationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := nu.mutation.Title(); ok {
-		_spec.SetField(notification.FieldTitle, field.TypeString, value)
+	if value, ok := nu.mutation.DeletedAt(); ok {
+		_spec.SetField(notification.FieldDeletedAt, field.TypeTime, value)
 	}
-	if value, ok := nu.mutation.Description(); ok {
-		_spec.SetField(notification.FieldDescription, field.TypeString, value)
+	if nu.mutation.DeletedAtCleared() {
+		_spec.ClearField(notification.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := nu.mutation.Link(); ok {
-		_spec.SetField(notification.FieldLink, field.TypeString, value)
+	if value, ok := nu.mutation.EventType(); ok {
+		_spec.SetField(notification.FieldEventType, field.TypeString, value)
+	}
+	if value, ok := nu.mutation.DatagraphKind(); ok {
+		_spec.SetField(notification.FieldDatagraphKind, field.TypeString, value)
+	}
+	if nu.mutation.DatagraphKindCleared() {
+		_spec.ClearField(notification.FieldDatagraphKind, field.TypeString)
+	}
+	if value, ok := nu.mutation.DatagraphID(); ok {
+		_spec.SetField(notification.FieldDatagraphID, field.TypeString, value)
+	}
+	if nu.mutation.DatagraphIDCleared() {
+		_spec.ClearField(notification.FieldDatagraphID, field.TypeString)
 	}
 	if value, ok := nu.mutation.Read(); ok {
 		_spec.SetField(notification.FieldRead, field.TypeBool, value)
+	}
+	if nu.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.OwnerTable,
+			Columns: []string{notification.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.OwnerTable,
+			Columns: []string{notification.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nu.mutation.SourceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.SourceTable,
+			Columns: []string{notification.SourceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.SourceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.SourceTable,
+			Columns: []string{notification.SourceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(nu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, nu.driver, _spec); err != nil {
@@ -165,45 +357,77 @@ type NotificationUpdateOne struct {
 	modifiers []func(*sql.UpdateBuilder)
 }
 
-// SetTitle sets the "title" field.
-func (nuo *NotificationUpdateOne) SetTitle(s string) *NotificationUpdateOne {
-	nuo.mutation.SetTitle(s)
+// SetDeletedAt sets the "deleted_at" field.
+func (nuo *NotificationUpdateOne) SetDeletedAt(t time.Time) *NotificationUpdateOne {
+	nuo.mutation.SetDeletedAt(t)
 	return nuo
 }
 
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (nuo *NotificationUpdateOne) SetNillableTitle(s *string) *NotificationUpdateOne {
-	if s != nil {
-		nuo.SetTitle(*s)
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableDeletedAt(t *time.Time) *NotificationUpdateOne {
+	if t != nil {
+		nuo.SetDeletedAt(*t)
 	}
 	return nuo
 }
 
-// SetDescription sets the "description" field.
-func (nuo *NotificationUpdateOne) SetDescription(s string) *NotificationUpdateOne {
-	nuo.mutation.SetDescription(s)
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (nuo *NotificationUpdateOne) ClearDeletedAt() *NotificationUpdateOne {
+	nuo.mutation.ClearDeletedAt()
 	return nuo
 }
 
-// SetNillableDescription sets the "description" field if the given value is not nil.
-func (nuo *NotificationUpdateOne) SetNillableDescription(s *string) *NotificationUpdateOne {
+// SetEventType sets the "event_type" field.
+func (nuo *NotificationUpdateOne) SetEventType(s string) *NotificationUpdateOne {
+	nuo.mutation.SetEventType(s)
+	return nuo
+}
+
+// SetNillableEventType sets the "event_type" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableEventType(s *string) *NotificationUpdateOne {
 	if s != nil {
-		nuo.SetDescription(*s)
+		nuo.SetEventType(*s)
 	}
 	return nuo
 }
 
-// SetLink sets the "link" field.
-func (nuo *NotificationUpdateOne) SetLink(s string) *NotificationUpdateOne {
-	nuo.mutation.SetLink(s)
+// SetDatagraphKind sets the "datagraph_kind" field.
+func (nuo *NotificationUpdateOne) SetDatagraphKind(s string) *NotificationUpdateOne {
+	nuo.mutation.SetDatagraphKind(s)
 	return nuo
 }
 
-// SetNillableLink sets the "link" field if the given value is not nil.
-func (nuo *NotificationUpdateOne) SetNillableLink(s *string) *NotificationUpdateOne {
+// SetNillableDatagraphKind sets the "datagraph_kind" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableDatagraphKind(s *string) *NotificationUpdateOne {
 	if s != nil {
-		nuo.SetLink(*s)
+		nuo.SetDatagraphKind(*s)
 	}
+	return nuo
+}
+
+// ClearDatagraphKind clears the value of the "datagraph_kind" field.
+func (nuo *NotificationUpdateOne) ClearDatagraphKind() *NotificationUpdateOne {
+	nuo.mutation.ClearDatagraphKind()
+	return nuo
+}
+
+// SetDatagraphID sets the "datagraph_id" field.
+func (nuo *NotificationUpdateOne) SetDatagraphID(x xid.ID) *NotificationUpdateOne {
+	nuo.mutation.SetDatagraphID(x)
+	return nuo
+}
+
+// SetNillableDatagraphID sets the "datagraph_id" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableDatagraphID(x *xid.ID) *NotificationUpdateOne {
+	if x != nil {
+		nuo.SetDatagraphID(*x)
+	}
+	return nuo
+}
+
+// ClearDatagraphID clears the value of the "datagraph_id" field.
+func (nuo *NotificationUpdateOne) ClearDatagraphID() *NotificationUpdateOne {
+	nuo.mutation.ClearDatagraphID()
 	return nuo
 }
 
@@ -221,9 +445,85 @@ func (nuo *NotificationUpdateOne) SetNillableRead(b *bool) *NotificationUpdateOn
 	return nuo
 }
 
+// SetOwnerAccountID sets the "owner_account_id" field.
+func (nuo *NotificationUpdateOne) SetOwnerAccountID(x xid.ID) *NotificationUpdateOne {
+	nuo.mutation.SetOwnerAccountID(x)
+	return nuo
+}
+
+// SetNillableOwnerAccountID sets the "owner_account_id" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableOwnerAccountID(x *xid.ID) *NotificationUpdateOne {
+	if x != nil {
+		nuo.SetOwnerAccountID(*x)
+	}
+	return nuo
+}
+
+// SetSourceAccountID sets the "source_account_id" field.
+func (nuo *NotificationUpdateOne) SetSourceAccountID(x xid.ID) *NotificationUpdateOne {
+	nuo.mutation.SetSourceAccountID(x)
+	return nuo
+}
+
+// SetNillableSourceAccountID sets the "source_account_id" field if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableSourceAccountID(x *xid.ID) *NotificationUpdateOne {
+	if x != nil {
+		nuo.SetSourceAccountID(*x)
+	}
+	return nuo
+}
+
+// ClearSourceAccountID clears the value of the "source_account_id" field.
+func (nuo *NotificationUpdateOne) ClearSourceAccountID() *NotificationUpdateOne {
+	nuo.mutation.ClearSourceAccountID()
+	return nuo
+}
+
+// SetOwnerID sets the "owner" edge to the Account entity by ID.
+func (nuo *NotificationUpdateOne) SetOwnerID(id xid.ID) *NotificationUpdateOne {
+	nuo.mutation.SetOwnerID(id)
+	return nuo
+}
+
+// SetOwner sets the "owner" edge to the Account entity.
+func (nuo *NotificationUpdateOne) SetOwner(a *Account) *NotificationUpdateOne {
+	return nuo.SetOwnerID(a.ID)
+}
+
+// SetSourceID sets the "source" edge to the Account entity by ID.
+func (nuo *NotificationUpdateOne) SetSourceID(id xid.ID) *NotificationUpdateOne {
+	nuo.mutation.SetSourceID(id)
+	return nuo
+}
+
+// SetNillableSourceID sets the "source" edge to the Account entity by ID if the given value is not nil.
+func (nuo *NotificationUpdateOne) SetNillableSourceID(id *xid.ID) *NotificationUpdateOne {
+	if id != nil {
+		nuo = nuo.SetSourceID(*id)
+	}
+	return nuo
+}
+
+// SetSource sets the "source" edge to the Account entity.
+func (nuo *NotificationUpdateOne) SetSource(a *Account) *NotificationUpdateOne {
+	return nuo.SetSourceID(a.ID)
+}
+
 // Mutation returns the NotificationMutation object of the builder.
 func (nuo *NotificationUpdateOne) Mutation() *NotificationMutation {
 	return nuo.mutation
+}
+
+// ClearOwner clears the "owner" edge to the Account entity.
+func (nuo *NotificationUpdateOne) ClearOwner() *NotificationUpdateOne {
+	nuo.mutation.ClearOwner()
+	return nuo
+}
+
+// ClearSource clears the "source" edge to the Account entity.
+func (nuo *NotificationUpdateOne) ClearSource() *NotificationUpdateOne {
+	nuo.mutation.ClearSource()
+	return nuo
 }
 
 // Where appends a list predicates to the NotificationUpdate builder.
@@ -266,6 +566,14 @@ func (nuo *NotificationUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (nuo *NotificationUpdateOne) check() error {
+	if _, ok := nuo.mutation.OwnerID(); nuo.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Notification.owner"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (nuo *NotificationUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NotificationUpdateOne {
 	nuo.modifiers = append(nuo.modifiers, modifiers...)
@@ -273,6 +581,9 @@ func (nuo *NotificationUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)
 }
 
 func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notification, err error) {
+	if err := nuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(notification.Table, notification.Columns, sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString))
 	id, ok := nuo.mutation.ID()
 	if !ok {
@@ -298,17 +609,87 @@ func (nuo *NotificationUpdateOne) sqlSave(ctx context.Context) (_node *Notificat
 			}
 		}
 	}
-	if value, ok := nuo.mutation.Title(); ok {
-		_spec.SetField(notification.FieldTitle, field.TypeString, value)
+	if value, ok := nuo.mutation.DeletedAt(); ok {
+		_spec.SetField(notification.FieldDeletedAt, field.TypeTime, value)
 	}
-	if value, ok := nuo.mutation.Description(); ok {
-		_spec.SetField(notification.FieldDescription, field.TypeString, value)
+	if nuo.mutation.DeletedAtCleared() {
+		_spec.ClearField(notification.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := nuo.mutation.Link(); ok {
-		_spec.SetField(notification.FieldLink, field.TypeString, value)
+	if value, ok := nuo.mutation.EventType(); ok {
+		_spec.SetField(notification.FieldEventType, field.TypeString, value)
+	}
+	if value, ok := nuo.mutation.DatagraphKind(); ok {
+		_spec.SetField(notification.FieldDatagraphKind, field.TypeString, value)
+	}
+	if nuo.mutation.DatagraphKindCleared() {
+		_spec.ClearField(notification.FieldDatagraphKind, field.TypeString)
+	}
+	if value, ok := nuo.mutation.DatagraphID(); ok {
+		_spec.SetField(notification.FieldDatagraphID, field.TypeString, value)
+	}
+	if nuo.mutation.DatagraphIDCleared() {
+		_spec.ClearField(notification.FieldDatagraphID, field.TypeString)
 	}
 	if value, ok := nuo.mutation.Read(); ok {
 		_spec.SetField(notification.FieldRead, field.TypeBool, value)
+	}
+	if nuo.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.OwnerTable,
+			Columns: []string{notification.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.OwnerTable,
+			Columns: []string{notification.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nuo.mutation.SourceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.SourceTable,
+			Columns: []string{notification.SourceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.SourceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.SourceTable,
+			Columns: []string{notification.SourceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(nuo.modifiers...)
 	_node = &Notification{config: nuo.config}

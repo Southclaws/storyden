@@ -44,6 +44,12 @@ type Item interface {
 	WithProps
 }
 
+// ItemRef describes a type which knows its ID and kind, but nothing else.
+type ItemRef interface {
+	Identifiable
+	GetKind() Kind
+}
+
 type ItemList []Item
 
 // Ref is a non-hydrated type to express a result type from semdex operations
@@ -53,6 +59,14 @@ type Ref struct {
 	ID        xid.ID
 	Kind      Kind
 	Relevance float64
+}
+
+func (r *Ref) GetID() xid.ID {
+	return r.ID
+}
+
+func (r *Ref) GetKind() Kind {
+	return r.Kind
 }
 
 type RefList []*Ref

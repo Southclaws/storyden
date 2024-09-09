@@ -472,6 +472,38 @@ func (c *AccountClient) QueryEmails(a *Account) *EmailQuery {
 	return query
 }
 
+// QueryNotifications queries the notifications edge of a Account.
+func (c *AccountClient) QueryNotifications(a *Account) *NotificationQuery {
+	query := (&NotificationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(notification.Table, notification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.NotificationsTable, account.NotificationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTriggeredNotifications queries the triggered_notifications edge of a Account.
+func (c *AccountClient) QueryTriggeredNotifications(a *Account) *NotificationQuery {
+	query := (&NotificationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(notification.Table, notification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.TriggeredNotificationsTable, account.TriggeredNotificationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryFollowing queries the following edge of a Account.
 func (c *AccountClient) QueryFollowing(a *Account) *AccountFollowQuery {
 	query := (&AccountFollowClient{config: c.config}).Query()
@@ -2752,6 +2784,38 @@ func (c *NotificationClient) GetX(ctx context.Context, id xid.ID) *Notification 
 		panic(err)
 	}
 	return obj
+}
+
+// QueryOwner queries the owner edge of a Notification.
+func (c *NotificationClient) QueryOwner(n *Notification) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(notification.Table, notification.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, notification.OwnerTable, notification.OwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySource queries the source edge of a Notification.
+func (c *NotificationClient) QuerySource(n *Notification) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(notification.Table, notification.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, notification.SourceTable, notification.SourceColumn),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

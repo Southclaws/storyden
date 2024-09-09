@@ -67,6 +67,7 @@ type Bindings struct {
 	WebAuthn
 	PhoneAuth
 	Accounts
+	Notifications
 	Profiles
 	Categories
 	Posts
@@ -94,6 +95,7 @@ func bindingsProviders() fx.Option {
 		NewWebAuthn,
 		NewPhoneAuth,
 		NewAccounts,
+		NewNotifications,
 		NewProfiles,
 		NewCategories,
 		NewPosts,

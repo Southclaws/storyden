@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/rs/xid"
 )
 
@@ -16,26 +17,53 @@ const (
 	FieldID = "id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldTitle holds the string denoting the title field in the database.
-	FieldTitle = "title"
-	// FieldDescription holds the string denoting the description field in the database.
-	FieldDescription = "description"
-	// FieldLink holds the string denoting the link field in the database.
-	FieldLink = "link"
+	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
+	FieldDeletedAt = "deleted_at"
+	// FieldEventType holds the string denoting the event_type field in the database.
+	FieldEventType = "event_type"
+	// FieldDatagraphKind holds the string denoting the datagraph_kind field in the database.
+	FieldDatagraphKind = "datagraph_kind"
+	// FieldDatagraphID holds the string denoting the datagraph_id field in the database.
+	FieldDatagraphID = "datagraph_id"
 	// FieldRead holds the string denoting the read field in the database.
 	FieldRead = "read"
+	// FieldOwnerAccountID holds the string denoting the owner_account_id field in the database.
+	FieldOwnerAccountID = "owner_account_id"
+	// FieldSourceAccountID holds the string denoting the source_account_id field in the database.
+	FieldSourceAccountID = "source_account_id"
+	// EdgeOwner holds the string denoting the owner edge name in mutations.
+	EdgeOwner = "owner"
+	// EdgeSource holds the string denoting the source edge name in mutations.
+	EdgeSource = "source"
 	// Table holds the table name of the notification in the database.
 	Table = "notifications"
+	// OwnerTable is the table that holds the owner relation/edge.
+	OwnerTable = "notifications"
+	// OwnerInverseTable is the table name for the Account entity.
+	// It exists in this package in order to avoid circular dependency with the "account" package.
+	OwnerInverseTable = "accounts"
+	// OwnerColumn is the table column denoting the owner relation/edge.
+	OwnerColumn = "owner_account_id"
+	// SourceTable is the table that holds the source relation/edge.
+	SourceTable = "notifications"
+	// SourceInverseTable is the table name for the Account entity.
+	// It exists in this package in order to avoid circular dependency with the "account" package.
+	SourceInverseTable = "accounts"
+	// SourceColumn is the table column denoting the source relation/edge.
+	SourceColumn = "source_account_id"
 )
 
 // Columns holds all SQL columns for notification fields.
 var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
-	FieldTitle,
-	FieldDescription,
-	FieldLink,
+	FieldDeletedAt,
+	FieldEventType,
+	FieldDatagraphKind,
+	FieldDatagraphID,
 	FieldRead,
+	FieldOwnerAccountID,
+	FieldSourceAccountID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -70,22 +98,65 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
-// ByTitle orders the results by the title field.
-func ByTitle(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTitle, opts...).ToFunc()
+// ByDeletedAt orders the results by the deleted_at field.
+func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
 }
 
-// ByDescription orders the results by the description field.
-func ByDescription(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+// ByEventType orders the results by the event_type field.
+func ByEventType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEventType, opts...).ToFunc()
 }
 
-// ByLink orders the results by the link field.
-func ByLink(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldLink, opts...).ToFunc()
+// ByDatagraphKind orders the results by the datagraph_kind field.
+func ByDatagraphKind(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDatagraphKind, opts...).ToFunc()
+}
+
+// ByDatagraphID orders the results by the datagraph_id field.
+func ByDatagraphID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDatagraphID, opts...).ToFunc()
 }
 
 // ByRead orders the results by the read field.
 func ByRead(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRead, opts...).ToFunc()
+}
+
+// ByOwnerAccountID orders the results by the owner_account_id field.
+func ByOwnerAccountID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOwnerAccountID, opts...).ToFunc()
+}
+
+// BySourceAccountID orders the results by the source_account_id field.
+func BySourceAccountID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSourceAccountID, opts...).ToFunc()
+}
+
+// ByOwnerField orders the results by owner field.
+func ByOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOwnerStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// BySourceField orders the results by source field.
+func BySourceField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSourceStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newOwnerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OwnerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+	)
+}
+func newSourceStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SourceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SourceTable, SourceColumn),
+	)
 }

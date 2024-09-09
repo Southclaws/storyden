@@ -18,7 +18,9 @@ import (
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
 	"github.com/Southclaws/storyden/app/services/like/post_liker"
 	"github.com/Southclaws/storyden/app/services/link"
+	"github.com/Southclaws/storyden/app/services/notification/notify_job"
 	"github.com/Southclaws/storyden/app/services/onboarding"
+	"github.com/Southclaws/storyden/app/services/profile/following"
 	"github.com/Southclaws/storyden/app/services/react"
 	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
@@ -47,10 +49,12 @@ func Build() fx.Option {
 		thread_mark.Build(),
 		collection.Build(),
 		link.Build(),
+		notify_job.Build(),
 		semdexer.Build(),
 		index_job.Build(),
 		summarise_job.Build(),
 		fx.Provide(avatar_gen.New),
 		fx.Provide(node_read.New, node_mutate.New, nodetree.New, node_visibility.New),
+		fx.Provide(following.New),
 	)
 }

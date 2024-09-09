@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
+	"github.com/Southclaws/storyden/app/services/notification/notify"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -58,6 +59,7 @@ type service struct {
 	post_repo    reply.Repository
 	fetcher      *fetcher.Fetcher
 	indexQueue   pubsub.Topic[mq.IndexPost]
+	notifier     *notify.Notifier
 }
 
 func New(
@@ -68,6 +70,7 @@ func New(
 	post_repo reply.Repository,
 	fetcher *fetcher.Fetcher,
 	indexQueue pubsub.Topic[mq.IndexPost],
+	notifier *notify.Notifier,
 ) Service {
 	return &service{
 		l:            l.With(zap.String("service", "reply")),
@@ -76,5 +79,6 @@ func New(
 		post_repo:    post_repo,
 		fetcher:      fetcher,
 		indexQueue:   indexQueue,
+		notifier:     notifier,
 	}
 }

@@ -22,9 +22,77 @@ import type {
   CategoryUpdateOKResponse,
   CategoryUpdateOrderBody,
   InternalServerErrorResponse,
+  NotificationUpdateBody,
+  NotificationUpdateOKResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
+/**
+ * Change the read status for a notification.
+ */
+export const notificationUpdate = (
+  notificationId: string,
+  notificationUpdateBody: NotificationUpdateBody,
+) => {
+  return fetcher<NotificationUpdateOKResponse>({
+    url: `/notifications/${notificationId}`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: notificationUpdateBody,
+  });
+};
+
+export const getNotificationUpdateMutationFetcher = (
+  notificationId: string,
+) => {
+  return (
+    _: string,
+    { arg }: { arg: NotificationUpdateBody },
+  ): Promise<NotificationUpdateOKResponse> => {
+    return notificationUpdate(notificationId, arg);
+  };
+};
+export const getNotificationUpdateMutationKey = (notificationId: string) =>
+  `/notifications/${notificationId}` as const;
+
+export type NotificationUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof notificationUpdate>>
+>;
+export type NotificationUpdateMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useNotificationUpdate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(
+  notificationId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof notificationUpdate>>,
+      TError,
+      string,
+      NotificationUpdateBody,
+      Awaited<ReturnType<typeof notificationUpdate>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNotificationUpdateMutationKey(notificationId);
+  const swrFn = getNotificationUpdateMutationFetcher(notificationId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
 /**
  * Create a category for organising posts.
  */
