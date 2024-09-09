@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -30,23 +31,25 @@ import (
 // AccountQuery is the builder for querying Account entities.
 type AccountQuery struct {
 	config
-	ctx                *QueryContext
-	order              []account.OrderOption
-	inters             []Interceptor
-	predicates         []predicate.Account
-	withEmails         *EmailQuery
-	withFollowing      *AccountFollowQuery
-	withFollowedBy     *AccountFollowQuery
-	withPosts          *PostQuery
-	withReacts         *ReactQuery
-	withLikes          *LikePostQuery
-	withRoles          *RoleQuery
-	withAuthentication *AuthenticationQuery
-	withTags           *TagQuery
-	withCollections    *CollectionQuery
-	withNodes          *NodeQuery
-	withAssets         *AssetQuery
-	modifiers          []func(*sql.Selector)
+	ctx                        *QueryContext
+	order                      []account.OrderOption
+	inters                     []Interceptor
+	predicates                 []predicate.Account
+	withEmails                 *EmailQuery
+	withNotifications          *NotificationQuery
+	withTriggeredNotifications *NotificationQuery
+	withFollowing              *AccountFollowQuery
+	withFollowedBy             *AccountFollowQuery
+	withPosts                  *PostQuery
+	withReacts                 *ReactQuery
+	withLikes                  *LikePostQuery
+	withRoles                  *RoleQuery
+	withAuthentication         *AuthenticationQuery
+	withTags                   *TagQuery
+	withCollections            *CollectionQuery
+	withNodes                  *NodeQuery
+	withAssets                 *AssetQuery
+	modifiers                  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -98,6 +101,50 @@ func (aq *AccountQuery) QueryEmails() *EmailQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(email.Table, email.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.EmailsTable, account.EmailsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryNotifications chains the current query on the "notifications" edge.
+func (aq *AccountQuery) QueryNotifications() *NotificationQuery {
+	query := (&NotificationClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(notification.Table, notification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.NotificationsTable, account.NotificationsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTriggeredNotifications chains the current query on the "triggered_notifications" edge.
+func (aq *AccountQuery) QueryTriggeredNotifications() *NotificationQuery {
+	query := (&NotificationClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(notification.Table, notification.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.TriggeredNotificationsTable, account.TriggeredNotificationsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -534,23 +581,25 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		return nil
 	}
 	return &AccountQuery{
-		config:             aq.config,
-		ctx:                aq.ctx.Clone(),
-		order:              append([]account.OrderOption{}, aq.order...),
-		inters:             append([]Interceptor{}, aq.inters...),
-		predicates:         append([]predicate.Account{}, aq.predicates...),
-		withEmails:         aq.withEmails.Clone(),
-		withFollowing:      aq.withFollowing.Clone(),
-		withFollowedBy:     aq.withFollowedBy.Clone(),
-		withPosts:          aq.withPosts.Clone(),
-		withReacts:         aq.withReacts.Clone(),
-		withLikes:          aq.withLikes.Clone(),
-		withRoles:          aq.withRoles.Clone(),
-		withAuthentication: aq.withAuthentication.Clone(),
-		withTags:           aq.withTags.Clone(),
-		withCollections:    aq.withCollections.Clone(),
-		withNodes:          aq.withNodes.Clone(),
-		withAssets:         aq.withAssets.Clone(),
+		config:                     aq.config,
+		ctx:                        aq.ctx.Clone(),
+		order:                      append([]account.OrderOption{}, aq.order...),
+		inters:                     append([]Interceptor{}, aq.inters...),
+		predicates:                 append([]predicate.Account{}, aq.predicates...),
+		withEmails:                 aq.withEmails.Clone(),
+		withNotifications:          aq.withNotifications.Clone(),
+		withTriggeredNotifications: aq.withTriggeredNotifications.Clone(),
+		withFollowing:              aq.withFollowing.Clone(),
+		withFollowedBy:             aq.withFollowedBy.Clone(),
+		withPosts:                  aq.withPosts.Clone(),
+		withReacts:                 aq.withReacts.Clone(),
+		withLikes:                  aq.withLikes.Clone(),
+		withRoles:                  aq.withRoles.Clone(),
+		withAuthentication:         aq.withAuthentication.Clone(),
+		withTags:                   aq.withTags.Clone(),
+		withCollections:            aq.withCollections.Clone(),
+		withNodes:                  aq.withNodes.Clone(),
+		withAssets:                 aq.withAssets.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -565,6 +614,28 @@ func (aq *AccountQuery) WithEmails(opts ...func(*EmailQuery)) *AccountQuery {
 		opt(query)
 	}
 	aq.withEmails = query
+	return aq
+}
+
+// WithNotifications tells the query-builder to eager-load the nodes that are connected to
+// the "notifications" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithNotifications(opts ...func(*NotificationQuery)) *AccountQuery {
+	query := (&NotificationClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withNotifications = query
+	return aq
+}
+
+// WithTriggeredNotifications tells the query-builder to eager-load the nodes that are connected to
+// the "triggered_notifications" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithTriggeredNotifications(opts ...func(*NotificationQuery)) *AccountQuery {
+	query := (&NotificationClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withTriggeredNotifications = query
 	return aq
 }
 
@@ -767,8 +838,10 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [12]bool{
+		loadedTypes = [14]bool{
 			aq.withEmails != nil,
+			aq.withNotifications != nil,
+			aq.withTriggeredNotifications != nil,
 			aq.withFollowing != nil,
 			aq.withFollowedBy != nil,
 			aq.withPosts != nil,
@@ -807,6 +880,22 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := aq.loadEmails(ctx, query, nodes,
 			func(n *Account) { n.Edges.Emails = []*Email{} },
 			func(n *Account, e *Email) { n.Edges.Emails = append(n.Edges.Emails, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withNotifications; query != nil {
+		if err := aq.loadNotifications(ctx, query, nodes,
+			func(n *Account) { n.Edges.Notifications = []*Notification{} },
+			func(n *Account, e *Notification) { n.Edges.Notifications = append(n.Edges.Notifications, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withTriggeredNotifications; query != nil {
+		if err := aq.loadTriggeredNotifications(ctx, query, nodes,
+			func(n *Account) { n.Edges.TriggeredNotifications = []*Notification{} },
+			func(n *Account, e *Notification) {
+				n.Edges.TriggeredNotifications = append(n.Edges.TriggeredNotifications, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -918,6 +1007,69 @@ func (aq *AccountQuery) loadEmails(ctx context.Context, query *EmailQuery, nodes
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadNotifications(ctx context.Context, query *NotificationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Notification)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(notification.FieldOwnerAccountID)
+	}
+	query.Where(predicate.Notification(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.NotificationsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.OwnerAccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "owner_account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadTriggeredNotifications(ctx context.Context, query *NotificationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Notification)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(notification.FieldSourceAccountID)
+	}
+	query.Where(predicate.Notification(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.TriggeredNotificationsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.SourceAccountID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "source_account_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "source_account_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

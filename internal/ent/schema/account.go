@@ -36,6 +36,12 @@ func (Account) Edges() []ent.Edge {
 		edge.To("emails", Email.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
+		edge.To("notifications", Notification.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("triggered_notifications", Notification.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
 		edge.To("following", AccountFollow.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
@@ -67,5 +73,6 @@ func (Account) Edges() []ent.Edge {
 
 		edge.To("assets", Asset.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)), // TODO: Don't cascade but do something more clever
+
 	}
 }

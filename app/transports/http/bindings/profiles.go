@@ -15,9 +15,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
-	"github.com/Southclaws/storyden/app/resources/profile/follow_writer"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/profile/following"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 )
@@ -27,7 +27,7 @@ type Profiles struct {
 	accountQuery  account_querier.Querier
 	ps            profile_search.Repository
 	followQuerier *follow_querier.Querier
-	followWriter  *follow_writer.Writer
+	followManager *following.FollowManager
 }
 
 func NewProfiles(
@@ -35,14 +35,14 @@ func NewProfiles(
 	accountQuery account_querier.Querier,
 	ps profile_search.Repository,
 	followQuerier *follow_querier.Querier,
-	followWriter *follow_writer.Writer,
+	followManager *following.FollowManager,
 ) Profiles {
 	return Profiles{
 		apiAddress:    cfg.PublicWebAddress,
 		accountQuery:  accountQuery,
 		ps:            ps,
 		followQuerier: followQuerier,
-		followWriter:  followWriter,
+		followManager: followManager,
 	}
 }
 
@@ -212,7 +212,7 @@ func (p *Profiles) ProfileFollowersAdd(ctx context.Context, request openapi.Prof
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = p.followWriter.Follow(ctx, accountID, targetID)
+	err = p.followManager.Follow(ctx, accountID, targetID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -231,7 +231,7 @@ func (p *Profiles) ProfileFollowersRemove(ctx context.Context, request openapi.P
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = p.followWriter.Unfollow(ctx, accountID, targetID)
+	err = p.followManager.Unfollow(ctx, accountID, targetID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
@@ -22,6 +23,8 @@ type NotificationQuery struct {
 	order      []notification.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Notification
+	withOwner  *AccountQuery
+	withSource *AccountQuery
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -57,6 +60,50 @@ func (nq *NotificationQuery) Unique(unique bool) *NotificationQuery {
 func (nq *NotificationQuery) Order(o ...notification.OrderOption) *NotificationQuery {
 	nq.order = append(nq.order, o...)
 	return nq
+}
+
+// QueryOwner chains the current query on the "owner" edge.
+func (nq *NotificationQuery) QueryOwner() *AccountQuery {
+	query := (&AccountClient{config: nq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := nq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := nq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(notification.Table, notification.FieldID, selector),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, notification.OwnerTable, notification.OwnerColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySource chains the current query on the "source" edge.
+func (nq *NotificationQuery) QuerySource() *AccountQuery {
+	query := (&AccountClient{config: nq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := nq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := nq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(notification.Table, notification.FieldID, selector),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, notification.SourceTable, notification.SourceColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Notification entity from the query.
@@ -251,10 +298,34 @@ func (nq *NotificationQuery) Clone() *NotificationQuery {
 		order:      append([]notification.OrderOption{}, nq.order...),
 		inters:     append([]Interceptor{}, nq.inters...),
 		predicates: append([]predicate.Notification{}, nq.predicates...),
+		withOwner:  nq.withOwner.Clone(),
+		withSource: nq.withSource.Clone(),
 		// clone intermediate query.
 		sql:  nq.sql.Clone(),
 		path: nq.path,
 	}
+}
+
+// WithOwner tells the query-builder to eager-load the nodes that are connected to
+// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NotificationQuery) WithOwner(opts ...func(*AccountQuery)) *NotificationQuery {
+	query := (&AccountClient{config: nq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	nq.withOwner = query
+	return nq
+}
+
+// WithSource tells the query-builder to eager-load the nodes that are connected to
+// the "source" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NotificationQuery) WithSource(opts ...func(*AccountQuery)) *NotificationQuery {
+	query := (&AccountClient{config: nq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	nq.withSource = query
+	return nq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -333,8 +404,12 @@ func (nq *NotificationQuery) prepareQuery(ctx context.Context) error {
 
 func (nq *NotificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Notification, error) {
 	var (
-		nodes = []*Notification{}
-		_spec = nq.querySpec()
+		nodes       = []*Notification{}
+		_spec       = nq.querySpec()
+		loadedTypes = [2]bool{
+			nq.withOwner != nil,
+			nq.withSource != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Notification).scanValues(nil, columns)
@@ -342,6 +417,7 @@ func (nq *NotificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Notification{config: nq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(nq.modifiers) > 0 {
@@ -356,7 +432,81 @@ func (nq *NotificationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := nq.withOwner; query != nil {
+		if err := nq.loadOwner(ctx, query, nodes, nil,
+			func(n *Notification, e *Account) { n.Edges.Owner = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := nq.withSource; query != nil {
+		if err := nq.loadSource(ctx, query, nodes, nil,
+			func(n *Notification, e *Account) { n.Edges.Source = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (nq *NotificationQuery) loadOwner(ctx context.Context, query *AccountQuery, nodes []*Notification, init func(*Notification), assign func(*Notification, *Account)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Notification)
+	for i := range nodes {
+		fk := nodes[i].OwnerAccountID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(account.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "owner_account_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (nq *NotificationQuery) loadSource(ctx context.Context, query *AccountQuery, nodes []*Notification, init func(*Notification), assign func(*Notification, *Account)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Notification)
+	for i := range nodes {
+		if nodes[i].SourceAccountID == nil {
+			continue
+		}
+		fk := *nodes[i].SourceAccountID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(account.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "source_account_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (nq *NotificationQuery) sqlCount(ctx context.Context) (int, error) {
@@ -386,6 +536,12 @@ func (nq *NotificationQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != notification.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if nq.withOwner != nil {
+			_spec.Node.AddColumnOnce(notification.FieldOwnerAccountID)
+		}
+		if nq.withSource != nil {
+			_spec.Node.AddColumnOnce(notification.FieldSourceAccountID)
 		}
 	}
 	if ps := nq.predicates; len(ps) > 0 {

@@ -23,6 +23,7 @@ type Reply struct {
 	RootPostID      post.ID
 	RootThreadMark  string
 	RootThreadTitle string
+	RootAuthor      profile.Public
 	ReplyTo         opt.Optional[post.ID]
 }
 
@@ -75,24 +76,11 @@ func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Reply, error) {
 
 		replyTo := replyTo(m)
 
-		var rootPostID post.ID
-		var rootThreadMark string
-		var rootThreadTitle string
-		if m.RootPostID == xid.NilID() {
-			// A root post was passed, which is still valid in some cases.
-			rootThreadMark = m.Slug
-			rootThreadTitle = m.Title
-		} else {
-			rootPostID = post.ID(m.RootPostID)
-			rootThreadMark = opt.NewPtr(m.Edges.Root).OrZero().Slug
-			rootThreadTitle = opt.NewPtr(m.Edges.Root).OrZero().Title
-		}
-
 		link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
 			return *link_ref.Map(&in)
 		})
 
-		return &Reply{
+		reply := &Reply{
 			Post: post.Post{
 				ID: post.ID(m.ID),
 
@@ -109,10 +97,24 @@ func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Reply, error) {
 				DeletedAt: opt.NewPtr(m.DeletedAt),
 			},
 			ReplyTo: replyTo,
+		}
 
-			RootPostID:      rootPostID,
-			RootThreadMark:  rootThreadMark,
-			RootThreadTitle: rootThreadTitle,
-		}, nil
+		if m.Edges.Root != nil {
+			rootPostID := post.ID(m.RootPostID)
+			rootThreadMark := opt.NewPtr(m.Edges.Root).OrZero().Slug
+			rootThreadTitle := opt.NewPtr(m.Edges.Root).OrZero().Title
+
+			rootAuthor, err := profile.ProfileFromModel(m.Edges.Root.Edges.Author)
+			if err != nil {
+				return nil, fault.Wrap(err)
+			}
+
+			reply.RootPostID = rootPostID
+			reply.RootThreadMark = rootThreadMark
+			reply.RootThreadTitle = rootThreadTitle
+			reply.RootAuthor = *rootAuthor
+		}
+
+		return reply, nil
 	}
 }

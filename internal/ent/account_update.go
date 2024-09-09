@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -174,6 +175,36 @@ func (au *AccountUpdate) AddEmails(e ...*Email) *AccountUpdate {
 		ids[i] = e[i].ID
 	}
 	return au.AddEmailIDs(ids...)
+}
+
+// AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
+func (au *AccountUpdate) AddNotificationIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.AddNotificationIDs(ids...)
+	return au
+}
+
+// AddNotifications adds the "notifications" edges to the Notification entity.
+func (au *AccountUpdate) AddNotifications(n ...*Notification) *AccountUpdate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return au.AddNotificationIDs(ids...)
+}
+
+// AddTriggeredNotificationIDs adds the "triggered_notifications" edge to the Notification entity by IDs.
+func (au *AccountUpdate) AddTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.AddTriggeredNotificationIDs(ids...)
+	return au
+}
+
+// AddTriggeredNotifications adds the "triggered_notifications" edges to the Notification entity.
+func (au *AccountUpdate) AddTriggeredNotifications(n ...*Notification) *AccountUpdate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return au.AddTriggeredNotificationIDs(ids...)
 }
 
 // AddFollowingIDs adds the "following" edge to the AccountFollow entity by IDs.
@@ -365,6 +396,48 @@ func (au *AccountUpdate) RemoveEmails(e ...*Email) *AccountUpdate {
 		ids[i] = e[i].ID
 	}
 	return au.RemoveEmailIDs(ids...)
+}
+
+// ClearNotifications clears all "notifications" edges to the Notification entity.
+func (au *AccountUpdate) ClearNotifications() *AccountUpdate {
+	au.mutation.ClearNotifications()
+	return au
+}
+
+// RemoveNotificationIDs removes the "notifications" edge to Notification entities by IDs.
+func (au *AccountUpdate) RemoveNotificationIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.RemoveNotificationIDs(ids...)
+	return au
+}
+
+// RemoveNotifications removes "notifications" edges to Notification entities.
+func (au *AccountUpdate) RemoveNotifications(n ...*Notification) *AccountUpdate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return au.RemoveNotificationIDs(ids...)
+}
+
+// ClearTriggeredNotifications clears all "triggered_notifications" edges to the Notification entity.
+func (au *AccountUpdate) ClearTriggeredNotifications() *AccountUpdate {
+	au.mutation.ClearTriggeredNotifications()
+	return au
+}
+
+// RemoveTriggeredNotificationIDs removes the "triggered_notifications" edge to Notification entities by IDs.
+func (au *AccountUpdate) RemoveTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.RemoveTriggeredNotificationIDs(ids...)
+	return au
+}
+
+// RemoveTriggeredNotifications removes "triggered_notifications" edges to Notification entities.
+func (au *AccountUpdate) RemoveTriggeredNotifications(n ...*Notification) *AccountUpdate {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return au.RemoveTriggeredNotificationIDs(ids...)
 }
 
 // ClearFollowing clears all "following" edges to the AccountFollow entity.
@@ -746,6 +819,96 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.NotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationsTable,
+			Columns: []string{account.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedNotificationsIDs(); len(nodes) > 0 && !au.mutation.NotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationsTable,
+			Columns: []string{account.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.NotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationsTable,
+			Columns: []string{account.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.TriggeredNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TriggeredNotificationsTable,
+			Columns: []string{account.TriggeredNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedTriggeredNotificationsIDs(); len(nodes) > 0 && !au.mutation.TriggeredNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TriggeredNotificationsTable,
+			Columns: []string{account.TriggeredNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.TriggeredNotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TriggeredNotificationsTable,
+			Columns: []string{account.TriggeredNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1403,6 +1566,36 @@ func (auo *AccountUpdateOne) AddEmails(e ...*Email) *AccountUpdateOne {
 	return auo.AddEmailIDs(ids...)
 }
 
+// AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
+func (auo *AccountUpdateOne) AddNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.AddNotificationIDs(ids...)
+	return auo
+}
+
+// AddNotifications adds the "notifications" edges to the Notification entity.
+func (auo *AccountUpdateOne) AddNotifications(n ...*Notification) *AccountUpdateOne {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return auo.AddNotificationIDs(ids...)
+}
+
+// AddTriggeredNotificationIDs adds the "triggered_notifications" edge to the Notification entity by IDs.
+func (auo *AccountUpdateOne) AddTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.AddTriggeredNotificationIDs(ids...)
+	return auo
+}
+
+// AddTriggeredNotifications adds the "triggered_notifications" edges to the Notification entity.
+func (auo *AccountUpdateOne) AddTriggeredNotifications(n ...*Notification) *AccountUpdateOne {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return auo.AddTriggeredNotificationIDs(ids...)
+}
+
 // AddFollowingIDs adds the "following" edge to the AccountFollow entity by IDs.
 func (auo *AccountUpdateOne) AddFollowingIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddFollowingIDs(ids...)
@@ -1592,6 +1785,48 @@ func (auo *AccountUpdateOne) RemoveEmails(e ...*Email) *AccountUpdateOne {
 		ids[i] = e[i].ID
 	}
 	return auo.RemoveEmailIDs(ids...)
+}
+
+// ClearNotifications clears all "notifications" edges to the Notification entity.
+func (auo *AccountUpdateOne) ClearNotifications() *AccountUpdateOne {
+	auo.mutation.ClearNotifications()
+	return auo
+}
+
+// RemoveNotificationIDs removes the "notifications" edge to Notification entities by IDs.
+func (auo *AccountUpdateOne) RemoveNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.RemoveNotificationIDs(ids...)
+	return auo
+}
+
+// RemoveNotifications removes "notifications" edges to Notification entities.
+func (auo *AccountUpdateOne) RemoveNotifications(n ...*Notification) *AccountUpdateOne {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return auo.RemoveNotificationIDs(ids...)
+}
+
+// ClearTriggeredNotifications clears all "triggered_notifications" edges to the Notification entity.
+func (auo *AccountUpdateOne) ClearTriggeredNotifications() *AccountUpdateOne {
+	auo.mutation.ClearTriggeredNotifications()
+	return auo
+}
+
+// RemoveTriggeredNotificationIDs removes the "triggered_notifications" edge to Notification entities by IDs.
+func (auo *AccountUpdateOne) RemoveTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.RemoveTriggeredNotificationIDs(ids...)
+	return auo
+}
+
+// RemoveTriggeredNotifications removes "triggered_notifications" edges to Notification entities.
+func (auo *AccountUpdateOne) RemoveTriggeredNotifications(n ...*Notification) *AccountUpdateOne {
+	ids := make([]xid.ID, len(n))
+	for i := range n {
+		ids[i] = n[i].ID
+	}
+	return auo.RemoveTriggeredNotificationIDs(ids...)
 }
 
 // ClearFollowing clears all "following" edges to the AccountFollow entity.
@@ -2003,6 +2238,96 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.NotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationsTable,
+			Columns: []string{account.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedNotificationsIDs(); len(nodes) > 0 && !auo.mutation.NotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationsTable,
+			Columns: []string{account.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.NotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationsTable,
+			Columns: []string{account.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.TriggeredNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TriggeredNotificationsTable,
+			Columns: []string{account.TriggeredNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedTriggeredNotificationsIDs(); len(nodes) > 0 && !auo.mutation.TriggeredNotificationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TriggeredNotificationsTable,
+			Columns: []string{account.TriggeredNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.TriggeredNotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.TriggeredNotificationsTable,
+			Columns: []string{account.TriggeredNotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/rs/xid"
 )
@@ -38,27 +39,77 @@ func (nc *NotificationCreate) SetNillableCreatedAt(t *time.Time) *NotificationCr
 	return nc
 }
 
-// SetTitle sets the "title" field.
-func (nc *NotificationCreate) SetTitle(s string) *NotificationCreate {
-	nc.mutation.SetTitle(s)
+// SetDeletedAt sets the "deleted_at" field.
+func (nc *NotificationCreate) SetDeletedAt(t time.Time) *NotificationCreate {
+	nc.mutation.SetDeletedAt(t)
 	return nc
 }
 
-// SetDescription sets the "description" field.
-func (nc *NotificationCreate) SetDescription(s string) *NotificationCreate {
-	nc.mutation.SetDescription(s)
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (nc *NotificationCreate) SetNillableDeletedAt(t *time.Time) *NotificationCreate {
+	if t != nil {
+		nc.SetDeletedAt(*t)
+	}
 	return nc
 }
 
-// SetLink sets the "link" field.
-func (nc *NotificationCreate) SetLink(s string) *NotificationCreate {
-	nc.mutation.SetLink(s)
+// SetEventType sets the "event_type" field.
+func (nc *NotificationCreate) SetEventType(s string) *NotificationCreate {
+	nc.mutation.SetEventType(s)
+	return nc
+}
+
+// SetDatagraphKind sets the "datagraph_kind" field.
+func (nc *NotificationCreate) SetDatagraphKind(s string) *NotificationCreate {
+	nc.mutation.SetDatagraphKind(s)
+	return nc
+}
+
+// SetNillableDatagraphKind sets the "datagraph_kind" field if the given value is not nil.
+func (nc *NotificationCreate) SetNillableDatagraphKind(s *string) *NotificationCreate {
+	if s != nil {
+		nc.SetDatagraphKind(*s)
+	}
+	return nc
+}
+
+// SetDatagraphID sets the "datagraph_id" field.
+func (nc *NotificationCreate) SetDatagraphID(x xid.ID) *NotificationCreate {
+	nc.mutation.SetDatagraphID(x)
+	return nc
+}
+
+// SetNillableDatagraphID sets the "datagraph_id" field if the given value is not nil.
+func (nc *NotificationCreate) SetNillableDatagraphID(x *xid.ID) *NotificationCreate {
+	if x != nil {
+		nc.SetDatagraphID(*x)
+	}
 	return nc
 }
 
 // SetRead sets the "read" field.
 func (nc *NotificationCreate) SetRead(b bool) *NotificationCreate {
 	nc.mutation.SetRead(b)
+	return nc
+}
+
+// SetOwnerAccountID sets the "owner_account_id" field.
+func (nc *NotificationCreate) SetOwnerAccountID(x xid.ID) *NotificationCreate {
+	nc.mutation.SetOwnerAccountID(x)
+	return nc
+}
+
+// SetSourceAccountID sets the "source_account_id" field.
+func (nc *NotificationCreate) SetSourceAccountID(x xid.ID) *NotificationCreate {
+	nc.mutation.SetSourceAccountID(x)
+	return nc
+}
+
+// SetNillableSourceAccountID sets the "source_account_id" field if the given value is not nil.
+func (nc *NotificationCreate) SetNillableSourceAccountID(x *xid.ID) *NotificationCreate {
+	if x != nil {
+		nc.SetSourceAccountID(*x)
+	}
 	return nc
 }
 
@@ -74,6 +125,36 @@ func (nc *NotificationCreate) SetNillableID(x *xid.ID) *NotificationCreate {
 		nc.SetID(*x)
 	}
 	return nc
+}
+
+// SetOwnerID sets the "owner" edge to the Account entity by ID.
+func (nc *NotificationCreate) SetOwnerID(id xid.ID) *NotificationCreate {
+	nc.mutation.SetOwnerID(id)
+	return nc
+}
+
+// SetOwner sets the "owner" edge to the Account entity.
+func (nc *NotificationCreate) SetOwner(a *Account) *NotificationCreate {
+	return nc.SetOwnerID(a.ID)
+}
+
+// SetSourceID sets the "source" edge to the Account entity by ID.
+func (nc *NotificationCreate) SetSourceID(id xid.ID) *NotificationCreate {
+	nc.mutation.SetSourceID(id)
+	return nc
+}
+
+// SetNillableSourceID sets the "source" edge to the Account entity by ID if the given value is not nil.
+func (nc *NotificationCreate) SetNillableSourceID(id *xid.ID) *NotificationCreate {
+	if id != nil {
+		nc = nc.SetSourceID(*id)
+	}
+	return nc
+}
+
+// SetSource sets the "source" edge to the Account entity.
+func (nc *NotificationCreate) SetSource(a *Account) *NotificationCreate {
+	return nc.SetSourceID(a.ID)
 }
 
 // Mutation returns the NotificationMutation object of the builder.
@@ -126,22 +207,22 @@ func (nc *NotificationCreate) check() error {
 	if _, ok := nc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Notification.created_at"`)}
 	}
-	if _, ok := nc.mutation.Title(); !ok {
-		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Notification.title"`)}
-	}
-	if _, ok := nc.mutation.Description(); !ok {
-		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Notification.description"`)}
-	}
-	if _, ok := nc.mutation.Link(); !ok {
-		return &ValidationError{Name: "link", err: errors.New(`ent: missing required field "Notification.link"`)}
+	if _, ok := nc.mutation.EventType(); !ok {
+		return &ValidationError{Name: "event_type", err: errors.New(`ent: missing required field "Notification.event_type"`)}
 	}
 	if _, ok := nc.mutation.Read(); !ok {
 		return &ValidationError{Name: "read", err: errors.New(`ent: missing required field "Notification.read"`)}
+	}
+	if _, ok := nc.mutation.OwnerAccountID(); !ok {
+		return &ValidationError{Name: "owner_account_id", err: errors.New(`ent: missing required field "Notification.owner_account_id"`)}
 	}
 	if v, ok := nc.mutation.ID(); ok {
 		if err := notification.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Notification.id": %w`, err)}
 		}
+	}
+	if _, ok := nc.mutation.OwnerID(); !ok {
+		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Notification.owner"`)}
 	}
 	return nil
 }
@@ -183,21 +264,59 @@ func (nc *NotificationCreate) createSpec() (*Notification, *sqlgraph.CreateSpec)
 		_spec.SetField(notification.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := nc.mutation.Title(); ok {
-		_spec.SetField(notification.FieldTitle, field.TypeString, value)
-		_node.Title = value
+	if value, ok := nc.mutation.DeletedAt(); ok {
+		_spec.SetField(notification.FieldDeletedAt, field.TypeTime, value)
+		_node.DeletedAt = &value
 	}
-	if value, ok := nc.mutation.Description(); ok {
-		_spec.SetField(notification.FieldDescription, field.TypeString, value)
-		_node.Description = value
+	if value, ok := nc.mutation.EventType(); ok {
+		_spec.SetField(notification.FieldEventType, field.TypeString, value)
+		_node.EventType = value
 	}
-	if value, ok := nc.mutation.Link(); ok {
-		_spec.SetField(notification.FieldLink, field.TypeString, value)
-		_node.Link = value
+	if value, ok := nc.mutation.DatagraphKind(); ok {
+		_spec.SetField(notification.FieldDatagraphKind, field.TypeString, value)
+		_node.DatagraphKind = &value
+	}
+	if value, ok := nc.mutation.DatagraphID(); ok {
+		_spec.SetField(notification.FieldDatagraphID, field.TypeString, value)
+		_node.DatagraphID = &value
 	}
 	if value, ok := nc.mutation.Read(); ok {
 		_spec.SetField(notification.FieldRead, field.TypeBool, value)
 		_node.Read = value
+	}
+	if nodes := nc.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.OwnerTable,
+			Columns: []string{notification.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.OwnerAccountID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := nc.mutation.SourceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   notification.SourceTable,
+			Columns: []string{notification.SourceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.SourceAccountID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
@@ -251,39 +370,69 @@ type (
 	}
 )
 
-// SetTitle sets the "title" field.
-func (u *NotificationUpsert) SetTitle(v string) *NotificationUpsert {
-	u.Set(notification.FieldTitle, v)
+// SetDeletedAt sets the "deleted_at" field.
+func (u *NotificationUpsert) SetDeletedAt(v time.Time) *NotificationUpsert {
+	u.Set(notification.FieldDeletedAt, v)
 	return u
 }
 
-// UpdateTitle sets the "title" field to the value that was provided on create.
-func (u *NotificationUpsert) UpdateTitle() *NotificationUpsert {
-	u.SetExcluded(notification.FieldTitle)
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *NotificationUpsert) UpdateDeletedAt() *NotificationUpsert {
+	u.SetExcluded(notification.FieldDeletedAt)
 	return u
 }
 
-// SetDescription sets the "description" field.
-func (u *NotificationUpsert) SetDescription(v string) *NotificationUpsert {
-	u.Set(notification.FieldDescription, v)
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *NotificationUpsert) ClearDeletedAt() *NotificationUpsert {
+	u.SetNull(notification.FieldDeletedAt)
 	return u
 }
 
-// UpdateDescription sets the "description" field to the value that was provided on create.
-func (u *NotificationUpsert) UpdateDescription() *NotificationUpsert {
-	u.SetExcluded(notification.FieldDescription)
+// SetEventType sets the "event_type" field.
+func (u *NotificationUpsert) SetEventType(v string) *NotificationUpsert {
+	u.Set(notification.FieldEventType, v)
 	return u
 }
 
-// SetLink sets the "link" field.
-func (u *NotificationUpsert) SetLink(v string) *NotificationUpsert {
-	u.Set(notification.FieldLink, v)
+// UpdateEventType sets the "event_type" field to the value that was provided on create.
+func (u *NotificationUpsert) UpdateEventType() *NotificationUpsert {
+	u.SetExcluded(notification.FieldEventType)
 	return u
 }
 
-// UpdateLink sets the "link" field to the value that was provided on create.
-func (u *NotificationUpsert) UpdateLink() *NotificationUpsert {
-	u.SetExcluded(notification.FieldLink)
+// SetDatagraphKind sets the "datagraph_kind" field.
+func (u *NotificationUpsert) SetDatagraphKind(v string) *NotificationUpsert {
+	u.Set(notification.FieldDatagraphKind, v)
+	return u
+}
+
+// UpdateDatagraphKind sets the "datagraph_kind" field to the value that was provided on create.
+func (u *NotificationUpsert) UpdateDatagraphKind() *NotificationUpsert {
+	u.SetExcluded(notification.FieldDatagraphKind)
+	return u
+}
+
+// ClearDatagraphKind clears the value of the "datagraph_kind" field.
+func (u *NotificationUpsert) ClearDatagraphKind() *NotificationUpsert {
+	u.SetNull(notification.FieldDatagraphKind)
+	return u
+}
+
+// SetDatagraphID sets the "datagraph_id" field.
+func (u *NotificationUpsert) SetDatagraphID(v xid.ID) *NotificationUpsert {
+	u.Set(notification.FieldDatagraphID, v)
+	return u
+}
+
+// UpdateDatagraphID sets the "datagraph_id" field to the value that was provided on create.
+func (u *NotificationUpsert) UpdateDatagraphID() *NotificationUpsert {
+	u.SetExcluded(notification.FieldDatagraphID)
+	return u
+}
+
+// ClearDatagraphID clears the value of the "datagraph_id" field.
+func (u *NotificationUpsert) ClearDatagraphID() *NotificationUpsert {
+	u.SetNull(notification.FieldDatagraphID)
 	return u
 }
 
@@ -296,6 +445,36 @@ func (u *NotificationUpsert) SetRead(v bool) *NotificationUpsert {
 // UpdateRead sets the "read" field to the value that was provided on create.
 func (u *NotificationUpsert) UpdateRead() *NotificationUpsert {
 	u.SetExcluded(notification.FieldRead)
+	return u
+}
+
+// SetOwnerAccountID sets the "owner_account_id" field.
+func (u *NotificationUpsert) SetOwnerAccountID(v xid.ID) *NotificationUpsert {
+	u.Set(notification.FieldOwnerAccountID, v)
+	return u
+}
+
+// UpdateOwnerAccountID sets the "owner_account_id" field to the value that was provided on create.
+func (u *NotificationUpsert) UpdateOwnerAccountID() *NotificationUpsert {
+	u.SetExcluded(notification.FieldOwnerAccountID)
+	return u
+}
+
+// SetSourceAccountID sets the "source_account_id" field.
+func (u *NotificationUpsert) SetSourceAccountID(v xid.ID) *NotificationUpsert {
+	u.Set(notification.FieldSourceAccountID, v)
+	return u
+}
+
+// UpdateSourceAccountID sets the "source_account_id" field to the value that was provided on create.
+func (u *NotificationUpsert) UpdateSourceAccountID() *NotificationUpsert {
+	u.SetExcluded(notification.FieldSourceAccountID)
+	return u
+}
+
+// ClearSourceAccountID clears the value of the "source_account_id" field.
+func (u *NotificationUpsert) ClearSourceAccountID() *NotificationUpsert {
+	u.SetNull(notification.FieldSourceAccountID)
 	return u
 }
 
@@ -350,45 +529,80 @@ func (u *NotificationUpsertOne) Update(set func(*NotificationUpsert)) *Notificat
 	return u
 }
 
-// SetTitle sets the "title" field.
-func (u *NotificationUpsertOne) SetTitle(v string) *NotificationUpsertOne {
+// SetDeletedAt sets the "deleted_at" field.
+func (u *NotificationUpsertOne) SetDeletedAt(v time.Time) *NotificationUpsertOne {
 	return u.Update(func(s *NotificationUpsert) {
-		s.SetTitle(v)
+		s.SetDeletedAt(v)
 	})
 }
 
-// UpdateTitle sets the "title" field to the value that was provided on create.
-func (u *NotificationUpsertOne) UpdateTitle() *NotificationUpsertOne {
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *NotificationUpsertOne) UpdateDeletedAt() *NotificationUpsertOne {
 	return u.Update(func(s *NotificationUpsert) {
-		s.UpdateTitle()
+		s.UpdateDeletedAt()
 	})
 }
 
-// SetDescription sets the "description" field.
-func (u *NotificationUpsertOne) SetDescription(v string) *NotificationUpsertOne {
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *NotificationUpsertOne) ClearDeletedAt() *NotificationUpsertOne {
 	return u.Update(func(s *NotificationUpsert) {
-		s.SetDescription(v)
+		s.ClearDeletedAt()
 	})
 }
 
-// UpdateDescription sets the "description" field to the value that was provided on create.
-func (u *NotificationUpsertOne) UpdateDescription() *NotificationUpsertOne {
+// SetEventType sets the "event_type" field.
+func (u *NotificationUpsertOne) SetEventType(v string) *NotificationUpsertOne {
 	return u.Update(func(s *NotificationUpsert) {
-		s.UpdateDescription()
+		s.SetEventType(v)
 	})
 }
 
-// SetLink sets the "link" field.
-func (u *NotificationUpsertOne) SetLink(v string) *NotificationUpsertOne {
+// UpdateEventType sets the "event_type" field to the value that was provided on create.
+func (u *NotificationUpsertOne) UpdateEventType() *NotificationUpsertOne {
 	return u.Update(func(s *NotificationUpsert) {
-		s.SetLink(v)
+		s.UpdateEventType()
 	})
 }
 
-// UpdateLink sets the "link" field to the value that was provided on create.
-func (u *NotificationUpsertOne) UpdateLink() *NotificationUpsertOne {
+// SetDatagraphKind sets the "datagraph_kind" field.
+func (u *NotificationUpsertOne) SetDatagraphKind(v string) *NotificationUpsertOne {
 	return u.Update(func(s *NotificationUpsert) {
-		s.UpdateLink()
+		s.SetDatagraphKind(v)
+	})
+}
+
+// UpdateDatagraphKind sets the "datagraph_kind" field to the value that was provided on create.
+func (u *NotificationUpsertOne) UpdateDatagraphKind() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateDatagraphKind()
+	})
+}
+
+// ClearDatagraphKind clears the value of the "datagraph_kind" field.
+func (u *NotificationUpsertOne) ClearDatagraphKind() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearDatagraphKind()
+	})
+}
+
+// SetDatagraphID sets the "datagraph_id" field.
+func (u *NotificationUpsertOne) SetDatagraphID(v xid.ID) *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetDatagraphID(v)
+	})
+}
+
+// UpdateDatagraphID sets the "datagraph_id" field to the value that was provided on create.
+func (u *NotificationUpsertOne) UpdateDatagraphID() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateDatagraphID()
+	})
+}
+
+// ClearDatagraphID clears the value of the "datagraph_id" field.
+func (u *NotificationUpsertOne) ClearDatagraphID() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearDatagraphID()
 	})
 }
 
@@ -403,6 +617,41 @@ func (u *NotificationUpsertOne) SetRead(v bool) *NotificationUpsertOne {
 func (u *NotificationUpsertOne) UpdateRead() *NotificationUpsertOne {
 	return u.Update(func(s *NotificationUpsert) {
 		s.UpdateRead()
+	})
+}
+
+// SetOwnerAccountID sets the "owner_account_id" field.
+func (u *NotificationUpsertOne) SetOwnerAccountID(v xid.ID) *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetOwnerAccountID(v)
+	})
+}
+
+// UpdateOwnerAccountID sets the "owner_account_id" field to the value that was provided on create.
+func (u *NotificationUpsertOne) UpdateOwnerAccountID() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateOwnerAccountID()
+	})
+}
+
+// SetSourceAccountID sets the "source_account_id" field.
+func (u *NotificationUpsertOne) SetSourceAccountID(v xid.ID) *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetSourceAccountID(v)
+	})
+}
+
+// UpdateSourceAccountID sets the "source_account_id" field to the value that was provided on create.
+func (u *NotificationUpsertOne) UpdateSourceAccountID() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateSourceAccountID()
+	})
+}
+
+// ClearSourceAccountID clears the value of the "source_account_id" field.
+func (u *NotificationUpsertOne) ClearSourceAccountID() *NotificationUpsertOne {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearSourceAccountID()
 	})
 }
 
@@ -624,45 +873,80 @@ func (u *NotificationUpsertBulk) Update(set func(*NotificationUpsert)) *Notifica
 	return u
 }
 
-// SetTitle sets the "title" field.
-func (u *NotificationUpsertBulk) SetTitle(v string) *NotificationUpsertBulk {
+// SetDeletedAt sets the "deleted_at" field.
+func (u *NotificationUpsertBulk) SetDeletedAt(v time.Time) *NotificationUpsertBulk {
 	return u.Update(func(s *NotificationUpsert) {
-		s.SetTitle(v)
+		s.SetDeletedAt(v)
 	})
 }
 
-// UpdateTitle sets the "title" field to the value that was provided on create.
-func (u *NotificationUpsertBulk) UpdateTitle() *NotificationUpsertBulk {
+// UpdateDeletedAt sets the "deleted_at" field to the value that was provided on create.
+func (u *NotificationUpsertBulk) UpdateDeletedAt() *NotificationUpsertBulk {
 	return u.Update(func(s *NotificationUpsert) {
-		s.UpdateTitle()
+		s.UpdateDeletedAt()
 	})
 }
 
-// SetDescription sets the "description" field.
-func (u *NotificationUpsertBulk) SetDescription(v string) *NotificationUpsertBulk {
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (u *NotificationUpsertBulk) ClearDeletedAt() *NotificationUpsertBulk {
 	return u.Update(func(s *NotificationUpsert) {
-		s.SetDescription(v)
+		s.ClearDeletedAt()
 	})
 }
 
-// UpdateDescription sets the "description" field to the value that was provided on create.
-func (u *NotificationUpsertBulk) UpdateDescription() *NotificationUpsertBulk {
+// SetEventType sets the "event_type" field.
+func (u *NotificationUpsertBulk) SetEventType(v string) *NotificationUpsertBulk {
 	return u.Update(func(s *NotificationUpsert) {
-		s.UpdateDescription()
+		s.SetEventType(v)
 	})
 }
 
-// SetLink sets the "link" field.
-func (u *NotificationUpsertBulk) SetLink(v string) *NotificationUpsertBulk {
+// UpdateEventType sets the "event_type" field to the value that was provided on create.
+func (u *NotificationUpsertBulk) UpdateEventType() *NotificationUpsertBulk {
 	return u.Update(func(s *NotificationUpsert) {
-		s.SetLink(v)
+		s.UpdateEventType()
 	})
 }
 
-// UpdateLink sets the "link" field to the value that was provided on create.
-func (u *NotificationUpsertBulk) UpdateLink() *NotificationUpsertBulk {
+// SetDatagraphKind sets the "datagraph_kind" field.
+func (u *NotificationUpsertBulk) SetDatagraphKind(v string) *NotificationUpsertBulk {
 	return u.Update(func(s *NotificationUpsert) {
-		s.UpdateLink()
+		s.SetDatagraphKind(v)
+	})
+}
+
+// UpdateDatagraphKind sets the "datagraph_kind" field to the value that was provided on create.
+func (u *NotificationUpsertBulk) UpdateDatagraphKind() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateDatagraphKind()
+	})
+}
+
+// ClearDatagraphKind clears the value of the "datagraph_kind" field.
+func (u *NotificationUpsertBulk) ClearDatagraphKind() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearDatagraphKind()
+	})
+}
+
+// SetDatagraphID sets the "datagraph_id" field.
+func (u *NotificationUpsertBulk) SetDatagraphID(v xid.ID) *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetDatagraphID(v)
+	})
+}
+
+// UpdateDatagraphID sets the "datagraph_id" field to the value that was provided on create.
+func (u *NotificationUpsertBulk) UpdateDatagraphID() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateDatagraphID()
+	})
+}
+
+// ClearDatagraphID clears the value of the "datagraph_id" field.
+func (u *NotificationUpsertBulk) ClearDatagraphID() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearDatagraphID()
 	})
 }
 
@@ -677,6 +961,41 @@ func (u *NotificationUpsertBulk) SetRead(v bool) *NotificationUpsertBulk {
 func (u *NotificationUpsertBulk) UpdateRead() *NotificationUpsertBulk {
 	return u.Update(func(s *NotificationUpsert) {
 		s.UpdateRead()
+	})
+}
+
+// SetOwnerAccountID sets the "owner_account_id" field.
+func (u *NotificationUpsertBulk) SetOwnerAccountID(v xid.ID) *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetOwnerAccountID(v)
+	})
+}
+
+// UpdateOwnerAccountID sets the "owner_account_id" field to the value that was provided on create.
+func (u *NotificationUpsertBulk) UpdateOwnerAccountID() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateOwnerAccountID()
+	})
+}
+
+// SetSourceAccountID sets the "source_account_id" field.
+func (u *NotificationUpsertBulk) SetSourceAccountID(v xid.ID) *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.SetSourceAccountID(v)
+	})
+}
+
+// UpdateSourceAccountID sets the "source_account_id" field to the value that was provided on create.
+func (u *NotificationUpsertBulk) UpdateSourceAccountID() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.UpdateSourceAccountID()
+	})
+}
+
+// ClearSourceAccountID clears the value of the "source_account_id" field.
+func (u *NotificationUpsertBulk) ClearSourceAccountID() *NotificationUpsertBulk {
+	return u.Update(func(s *NotificationUpsert) {
+		s.ClearSourceAccountID()
 	})
 }
 
