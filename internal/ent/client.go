@@ -27,6 +27,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -65,6 +66,8 @@ type Client struct {
 	LikePost *LikePostClient
 	// Link is the client for interacting with the Link builders.
 	Link *LinkClient
+	// MentionProfile is the client for interacting with the MentionProfile builders.
+	MentionProfile *MentionProfileClient
 	// Node is the client for interacting with the Node builders.
 	Node *NodeClient
 	// Notification is the client for interacting with the Notification builders.
@@ -101,6 +104,7 @@ func (c *Client) init() {
 	c.Email = NewEmailClient(c.config)
 	c.LikePost = NewLikePostClient(c.config)
 	c.Link = NewLinkClient(c.config)
+	c.MentionProfile = NewMentionProfileClient(c.config)
 	c.Node = NewNodeClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
 	c.Post = NewPostClient(c.config)
@@ -211,6 +215,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Email:          NewEmailClient(cfg),
 		LikePost:       NewLikePostClient(cfg),
 		Link:           NewLinkClient(cfg),
+		MentionProfile: NewMentionProfileClient(cfg),
 		Node:           NewNodeClient(cfg),
 		Notification:   NewNotificationClient(cfg),
 		Post:           NewPostClient(cfg),
@@ -248,6 +253,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Email:          NewEmailClient(cfg),
 		LikePost:       NewLikePostClient(cfg),
 		Link:           NewLinkClient(cfg),
+		MentionProfile: NewMentionProfileClient(cfg),
 		Node:           NewNodeClient(cfg),
 		Notification:   NewNotificationClient(cfg),
 		Post:           NewPostClient(cfg),
@@ -285,8 +291,9 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Account, c.AccountFollow, c.Asset, c.Authentication, c.Category, c.Collection,
-		c.CollectionNode, c.CollectionPost, c.Email, c.LikePost, c.Link, c.Node,
-		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
+		c.CollectionNode, c.CollectionPost, c.Email, c.LikePost, c.Link,
+		c.MentionProfile, c.Node, c.Notification, c.Post, c.React, c.Role, c.Setting,
+		c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -297,8 +304,9 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Account, c.AccountFollow, c.Asset, c.Authentication, c.Category, c.Collection,
-		c.CollectionNode, c.CollectionPost, c.Email, c.LikePost, c.Link, c.Node,
-		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
+		c.CollectionNode, c.CollectionPost, c.Email, c.LikePost, c.Link,
+		c.MentionProfile, c.Node, c.Notification, c.Post, c.React, c.Role, c.Setting,
+		c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -329,6 +337,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.LikePost.mutate(ctx, m)
 	case *LinkMutation:
 		return c.Link.mutate(ctx, m)
+	case *MentionProfileMutation:
+		return c.MentionProfile.mutate(ctx, m)
 	case *NodeMutation:
 		return c.Node.mutate(ctx, m)
 	case *NotificationMutation:
@@ -577,6 +587,22 @@ func (c *AccountClient) QueryLikes(a *Account) *LikePostQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(likepost.Table, likepost.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.LikesTable, account.LikesColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMentions queries the mentions edge of a Account.
+func (c *AccountClient) QueryMentions(a *Account) *MentionProfileQuery {
+	query := (&MentionProfileClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(mentionprofile.Table, mentionprofile.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.MentionsTable, account.MentionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -2401,6 +2427,171 @@ func (c *LinkClient) mutate(ctx context.Context, m *LinkMutation) (Value, error)
 	}
 }
 
+// MentionProfileClient is a client for the MentionProfile schema.
+type MentionProfileClient struct {
+	config
+}
+
+// NewMentionProfileClient returns a client for the MentionProfile from the given config.
+func NewMentionProfileClient(c config) *MentionProfileClient {
+	return &MentionProfileClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `mentionprofile.Hooks(f(g(h())))`.
+func (c *MentionProfileClient) Use(hooks ...Hook) {
+	c.hooks.MentionProfile = append(c.hooks.MentionProfile, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `mentionprofile.Intercept(f(g(h())))`.
+func (c *MentionProfileClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MentionProfile = append(c.inters.MentionProfile, interceptors...)
+}
+
+// Create returns a builder for creating a MentionProfile entity.
+func (c *MentionProfileClient) Create() *MentionProfileCreate {
+	mutation := newMentionProfileMutation(c.config, OpCreate)
+	return &MentionProfileCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MentionProfile entities.
+func (c *MentionProfileClient) CreateBulk(builders ...*MentionProfileCreate) *MentionProfileCreateBulk {
+	return &MentionProfileCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MentionProfileClient) MapCreateBulk(slice any, setFunc func(*MentionProfileCreate, int)) *MentionProfileCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MentionProfileCreateBulk{err: fmt.Errorf("calling to MentionProfileClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MentionProfileCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MentionProfileCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MentionProfile.
+func (c *MentionProfileClient) Update() *MentionProfileUpdate {
+	mutation := newMentionProfileMutation(c.config, OpUpdate)
+	return &MentionProfileUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MentionProfileClient) UpdateOne(mp *MentionProfile) *MentionProfileUpdateOne {
+	mutation := newMentionProfileMutation(c.config, OpUpdateOne, withMentionProfile(mp))
+	return &MentionProfileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MentionProfileClient) UpdateOneID(id xid.ID) *MentionProfileUpdateOne {
+	mutation := newMentionProfileMutation(c.config, OpUpdateOne, withMentionProfileID(id))
+	return &MentionProfileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MentionProfile.
+func (c *MentionProfileClient) Delete() *MentionProfileDelete {
+	mutation := newMentionProfileMutation(c.config, OpDelete)
+	return &MentionProfileDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MentionProfileClient) DeleteOne(mp *MentionProfile) *MentionProfileDeleteOne {
+	return c.DeleteOneID(mp.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MentionProfileClient) DeleteOneID(id xid.ID) *MentionProfileDeleteOne {
+	builder := c.Delete().Where(mentionprofile.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MentionProfileDeleteOne{builder}
+}
+
+// Query returns a query builder for MentionProfile.
+func (c *MentionProfileClient) Query() *MentionProfileQuery {
+	return &MentionProfileQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMentionProfile},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MentionProfile entity by its id.
+func (c *MentionProfileClient) Get(ctx context.Context, id xid.ID) (*MentionProfile, error) {
+	return c.Query().Where(mentionprofile.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MentionProfileClient) GetX(ctx context.Context, id xid.ID) *MentionProfile {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a MentionProfile.
+func (c *MentionProfileClient) QueryAccount(mp *MentionProfile) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := mp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mentionprofile.Table, mentionprofile.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mentionprofile.AccountTable, mentionprofile.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(mp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPost queries the Post edge of a MentionProfile.
+func (c *MentionProfileClient) QueryPost(mp *MentionProfile) *PostQuery {
+	query := (&PostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := mp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(mentionprofile.Table, mentionprofile.FieldID, id),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, mentionprofile.PostTable, mentionprofile.PostColumn),
+		)
+		fromV = sqlgraph.Neighbors(mp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *MentionProfileClient) Hooks() []Hook {
+	return c.hooks.MentionProfile
+}
+
+// Interceptors returns the client interceptors.
+func (c *MentionProfileClient) Interceptors() []Interceptor {
+	return c.inters.MentionProfile
+}
+
+func (c *MentionProfileClient) mutate(ctx context.Context, m *MentionProfileMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MentionProfileCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MentionProfileUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MentionProfileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MentionProfileDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MentionProfile mutation op: %q", m.Op())
+	}
+}
+
 // NodeClient is a client for the Node schema.
 type NodeClient struct {
 	config
@@ -3088,6 +3279,22 @@ func (c *PostClient) QueryLikes(po *Post) *LikePostQuery {
 			sqlgraph.From(post.Table, post.FieldID, id),
 			sqlgraph.To(likepost.Table, likepost.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, post.LikesTable, post.LikesColumn),
+		)
+		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryMentions queries the mentions edge of a Post.
+func (c *PostClient) QueryMentions(po *Post) *MentionProfileQuery {
+	query := (&MentionProfileClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := po.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, id),
+			sqlgraph.To(mentionprofile.Table, mentionprofile.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.MentionsTable, post.MentionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
 		return fromV, nil
@@ -3816,13 +4023,13 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 type (
 	hooks struct {
 		Account, AccountFollow, Asset, Authentication, Category, Collection,
-		CollectionNode, CollectionPost, Email, LikePost, Link, Node, Notification,
-		Post, React, Role, Setting, Tag []ent.Hook
+		CollectionNode, CollectionPost, Email, LikePost, Link, MentionProfile, Node,
+		Notification, Post, React, Role, Setting, Tag []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, Asset, Authentication, Category, Collection,
-		CollectionNode, CollectionPost, Email, LikePost, Link, Node, Notification,
-		Post, React, Role, Setting, Tag []ent.Interceptor
+		CollectionNode, CollectionPost, Email, LikePost, Link, MentionProfile, Node,
+		Notification, Post, React, Role, Setting, Tag []ent.Interceptor
 	}
 )
 

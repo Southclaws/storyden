@@ -9,12 +9,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/minimaxir/big-list-of-naughty-strings/naughtystrings"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/content"
+
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -29,7 +30,7 @@ var (
 		Post: post.Post{
 			ID:     post.ID(id("00000000000000000010")),
 			Author: profile.Public{ID: Account_001_Odin.ID},
-			Content: utils.Must(content.NewRichText(`Storyden is a platform for building communities.
+			Content: utils.Must(datagraph.NewRichText(`Storyden is a platform for building communities.
 
 But not just another chat app or another forum site. Storyden is a modern take on oldschool bulletin board forums you may remember from the earlier days of the internet.
 
@@ -69,7 +70,7 @@ Storyden is still in development so please give the repository a watch if you're
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000001010")),
 					Author:  profile.Public{ID: Account_004_Loki.ID},
-					Content: utils.Must(content.NewRichText("first 😁")),
+					Content: utils.Must(datagraph.NewRichText("first 😁")),
 				},
 				RootPostID: post.ID(id("00000000000000000010")),
 			},
@@ -77,7 +78,7 @@ Storyden is still in development so please give the repository a watch if you're
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000002010")),
 					Author:  profile.Public{ID: Account_002_Frigg.ID},
-					Content: utils.Must(content.NewRichText("Nice! One question: what kind of formatting can you use in posts? Is it like the old days with [b]tags[/b] and [color=red]cool stuff[/color] like that?")),
+					Content: utils.Must(datagraph.NewRichText("Nice! One question: what kind of formatting can you use in posts? Is it like the old days with [b]tags[/b] and [color=red]cool stuff[/color] like that?")),
 				},
 				RootPostID: post.ID(id("00000000000000000010")),
 			},
@@ -85,7 +86,7 @@ Storyden is still in development so please give the repository a watch if you're
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000003010")),
 					Author:  profile.Public{ID: Account_001_Odin.ID},
-					Content: utils.Must(content.NewRichText("Good question @frigg, we're probably going to use Markdown with some basic extensions but nothing is set in stone yet.")),
+					Content: utils.Must(datagraph.NewRichText("Good question @frigg, we're probably going to use Markdown with some basic extensions but nothing is set in stone yet.")),
 				},
 				RootPostID: post.ID(id("00000000000000000010")),
 			},
@@ -93,7 +94,7 @@ Storyden is still in development so please give the repository a watch if you're
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000004010")),
 					Author:  profile.Public{ID: Account_008_Heimdallr.ID},
-					Content: utils.Must(content.NewRichText("What about images and stuff?")),
+					Content: utils.Must(datagraph.NewRichText("What about images and stuff?")),
 				},
 				RootPostID: post.ID(id("00000000000000000010")),
 			},
@@ -101,7 +102,7 @@ Storyden is still in development so please give the repository a watch if you're
 				Post: post.Post{
 					ID:     post.ID(id("00000000000000005010")),
 					Author: profile.Public{ID: Account_004_Loki.ID},
-					Content: utils.Must(content.NewRichText(`oh you can do that like this:
+					Content: utils.Must(datagraph.NewRichText(`oh you can do that like this:
 					
 					![https://i.imgur.com/gl39KB7.png](https://i.imgur.com/gl39KB7.png)
 					`)),
@@ -112,7 +113,7 @@ Storyden is still in development so please give the repository a watch if you're
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000006010")),
 					Author:  profile.Public{ID: Account_005_Þórr.ID},
-					Content: utils.Must(content.NewRichText(`how did you do that??`)),
+					Content: utils.Must(datagraph.NewRichText(`how did you do that??`)),
 				},
 				RootPostID: post.ID(id("00000000000000000010")),
 			},
@@ -120,7 +121,7 @@ Storyden is still in development so please give the repository a watch if you're
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000007010")),
 					Author:  profile.Public{ID: Account_004_Loki.ID},
-					Content: utils.Must(content.NewRichText(`haha secret 😉`)),
+					Content: utils.Must(datagraph.NewRichText(`haha secret 😉`)),
 				},
 				RootPostID: post.ID(id("00000000000000000010")),
 			},
@@ -128,7 +129,7 @@ Storyden is still in development so please give the repository a watch if you're
 				Post: post.Post{
 					ID:     post.ID(id("00000000000000008010")),
 					Author: profile.Public{ID: Account_002_Frigg.ID},
-					Content: utils.Must(content.NewRichText(`It was mentioned above, use markdown:
+					Content: utils.Must(datagraph.NewRichText(`It was mentioned above, use markdown:
 					
 					https://daringfireball.net/markdown
 					`)),
@@ -139,7 +140,7 @@ Storyden is still in development so please give the repository a watch if you're
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000009010")),
 					Author:  profile.Public{ID: Account_008_Heimdallr.ID},
-					Content: utils.Must(content.NewRichText("Thanks guys!")),
+					Content: utils.Must(datagraph.NewRichText("Thanks guys!")),
 				},
 				RootPostID: post.ID(id("00000000000000000010")),
 			},
@@ -149,7 +150,7 @@ Storyden is still in development so please give the repository a watch if you're
 		Post: post.Post{
 			ID:     post.ID(id("00000000000000000020")),
 			Author: profile.Public{ID: Account_001_Odin.ID},
-			Content: utils.Must(content.NewRichText(`This post contains a list of resources for those of you who wish to contribute to Storyden.
+			Content: utils.Must(datagraph.NewRichText(`This post contains a list of resources for those of you who wish to contribute to Storyden.
 	
 	What does contribution mean? Anything, large or small! Even if you spot a typo in the home page or in this demo data you can report it or even take a swing at fixing it!
 	
@@ -176,7 +177,7 @@ Storyden is still in development so please give the repository a watch if you're
 			{
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000001020")),
-					Content: utils.Must(content.NewRichText("Is there a wiki?")),
+					Content: utils.Must(datagraph.NewRichText("Is there a wiki?")),
 					Author:  profile.Public{ID: Account_006_Freyja.ID},
 				},
 				RootPostID: post.ID(id("00000000000000000020")),
@@ -184,7 +185,7 @@ Storyden is still in development so please give the repository a watch if you're
 			{
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000002020")),
-					Content: utils.Must(content.NewRichText("Not yet but they're working on it!")),
+					Content: utils.Must(datagraph.NewRichText("Not yet but they're working on it!")),
 					Author:  profile.Public{ID: Account_002_Frigg.ID},
 				},
 				RootPostID: post.ID(id("00000000000000000020")),
@@ -196,7 +197,7 @@ Storyden is still in development so please give the repository a watch if you're
 		Post: post.Post{
 			ID:     post.ID(id("00000000000000000030")),
 			Author: profile.Public{ID: Account_005_Þórr.ID},
-			Content: utils.Must(content.NewRichText(`In this thread:
+			Content: utils.Must(datagraph.NewRichText(`In this thread:
 	
 	Try to break storyden with large amounts of text, hacky strings, etc! GO!`)),
 		},
@@ -206,7 +207,7 @@ Storyden is still in development so please give the repository a watch if you're
 			{
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000001030")),
-					Content: utils.Must(content.NewRichText("ooh fun! my favourite tool for this is: https://jaspervdj.be/lorem-markdownum/\n\n" + markdownTest01)),
+					Content: utils.Must(datagraph.NewRichText("ooh fun! my favourite tool for this is: https://jaspervdj.be/lorem-markdownum/\n\n" + markdownTest01)),
 					Author:  profile.Public{ID: Account_006_Freyja.ID},
 				},
 				RootPostID: post.ID(id("00000000000000000030")),
@@ -214,7 +215,7 @@ Storyden is still in development so please give the repository a watch if you're
 			{
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000002030")),
-					Content: utils.Must(content.NewRichText(markdownTest03)),
+					Content: utils.Must(datagraph.NewRichText(markdownTest03)),
 					Author:  profile.Public{ID: Account_002_Frigg.ID},
 				},
 				RootPostID: post.ID(id("00000000000000000030")),
@@ -222,7 +223,7 @@ Storyden is still in development so please give the repository a watch if you're
 			{
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000003030")),
-					Content: utils.Must(content.NewRichText("That's pretty useful, here's mine:\n\n" + markdownTest02)),
+					Content: utils.Must(datagraph.NewRichText("That's pretty useful, here's mine:\n\n" + markdownTest02)),
 					Author:  profile.Public{ID: Account_007_Freyr.ID},
 				},
 				RootPostID: post.ID(id("00000000000000000030")),
@@ -230,7 +231,7 @@ Storyden is still in development so please give the repository a watch if you're
 			{
 				Post: post.Post{
 					ID:      post.ID(id("00000000000000004030")),
-					Content: utils.Must(content.NewRichText("nah that's useless, you guys need some real hacky stuff to properly test:\n\n" + strings.Join(naughtystrings.Unencoded(), "\n\n"))),
+					Content: utils.Must(datagraph.NewRichText("nah that's useless, you guys need some real hacky stuff to properly test:\n\n" + strings.Join(naughtystrings.Unencoded(), "\n\n"))),
 					Author:  profile.Public{ID: Account_004_Loki.ID},
 				},
 				RootPostID: post.ID(id("00000000000000000030")),
@@ -253,7 +254,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar 
 		for i, a := range t.Assets {
 			id := fmt.Sprintf("%s-asset-%d", t.ID, i)
 
-			a, err := ar.Add(ctx, t.Author.ID, asset.NewFilename(id), a.Size)
+			a, err := ar.Add(ctx, xid.ID(t.Author.ID), asset.NewFilename(id), a.Size)
 			if err != nil {
 				panic(err)
 			}

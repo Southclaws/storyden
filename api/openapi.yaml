@@ -3069,7 +3069,7 @@ components:
         The kind of event that triggered the notification.
         Identical to the `notification.Event` enumerated type.
       type: string
-      enum: [thread_reply, post_like, follow]
+      enum: [thread_reply, post_like, follow, profile_mention]
 
     NotificationStatus:
       type: string

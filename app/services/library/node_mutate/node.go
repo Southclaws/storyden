@@ -16,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/mq"
@@ -43,7 +43,7 @@ type Partial struct {
 	Name         opt.Optional[string]
 	Slug         opt.Optional[string]
 	URL          opt.Optional[url.URL]
-	Content      opt.Optional[content.Rich]
+	Content      opt.Optional[datagraph.Content]
 	Parent       opt.Optional[library.NodeSlug]
 	Visibility   opt.Optional[visibility.Visibility]
 	Metadata     opt.Optional[map[string]any]
@@ -60,7 +60,7 @@ type DeleteOptions struct {
 func (p Partial) Opts() (opts []library.Option) {
 	p.Name.Call(func(value string) { opts = append(opts, library.WithName(value)) })
 	p.Slug.Call(func(value string) { opts = append(opts, library.WithSlug(value)) })
-	p.Content.Call(func(value content.Rich) { opts = append(opts, library.WithContent(value)) })
+	p.Content.Call(func(value datagraph.Content) { opts = append(opts, library.WithContent(value)) })
 	p.Metadata.Call(func(value map[string]any) { opts = append(opts, library.WithMetadata(value)) })
 	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, library.WithAssets(value)) })
 	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, library.WithAssetsRemoved(value)) })

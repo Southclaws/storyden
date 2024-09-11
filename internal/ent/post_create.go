@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/tag"
@@ -351,6 +352,21 @@ func (pc *PostCreate) AddLikes(l ...*LikePost) *PostCreate {
 		ids[i] = l[i].ID
 	}
 	return pc.AddLikeIDs(ids...)
+}
+
+// AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
+func (pc *PostCreate) AddMentionIDs(ids ...xid.ID) *PostCreate {
+	pc.mutation.AddMentionIDs(ids...)
+	return pc
+}
+
+// AddMentions adds the "mentions" edges to the MentionProfile entity.
+func (pc *PostCreate) AddMentions(m ...*MentionProfile) *PostCreate {
+	ids := make([]xid.ID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return pc.AddMentionIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -717,6 +733,22 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.MentionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.MentionsTable,
+			Columns: []string{post.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

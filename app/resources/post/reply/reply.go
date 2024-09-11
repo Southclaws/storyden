@@ -6,12 +6,13 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/content"
+
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -69,7 +70,7 @@ func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Reply, error) {
 			return nil, fault.Wrap(err)
 		}
 
-		content, err := content.NewRichText(m.Body)
+		content, err := datagraph.NewRichText(m.Body)
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}

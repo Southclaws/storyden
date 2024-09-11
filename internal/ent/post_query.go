@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -40,6 +41,7 @@ type PostQuery struct {
 	withReplies      *PostQuery
 	withReacts       *ReactQuery
 	withLikes        *LikePostQuery
+	withMentions     *MentionProfileQuery
 	withAssets       *AssetQuery
 	withCollections  *CollectionQuery
 	withLink         *LinkQuery
@@ -273,6 +275,28 @@ func (pq *PostQuery) QueryLikes() *LikePostQuery {
 			sqlgraph.From(post.Table, post.FieldID, selector),
 			sqlgraph.To(likepost.Table, likepost.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, post.LikesTable, post.LikesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryMentions chains the current query on the "mentions" edge.
+func (pq *PostQuery) QueryMentions() *MentionProfileQuery {
+	query := (&MentionProfileClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, selector),
+			sqlgraph.To(mentionprofile.Table, mentionprofile.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.MentionsTable, post.MentionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -569,6 +593,7 @@ func (pq *PostQuery) Clone() *PostQuery {
 		withReplies:      pq.withReplies.Clone(),
 		withReacts:       pq.withReacts.Clone(),
 		withLikes:        pq.withLikes.Clone(),
+		withMentions:     pq.withMentions.Clone(),
 		withAssets:       pq.withAssets.Clone(),
 		withCollections:  pq.withCollections.Clone(),
 		withLink:         pq.withLink.Clone(),
@@ -675,6 +700,17 @@ func (pq *PostQuery) WithLikes(opts ...func(*LikePostQuery)) *PostQuery {
 		opt(query)
 	}
 	pq.withLikes = query
+	return pq
+}
+
+// WithMentions tells the query-builder to eager-load the nodes that are connected to
+// the "mentions" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PostQuery) WithMentions(opts ...func(*MentionProfileQuery)) *PostQuery {
+	query := (&MentionProfileClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withMentions = query
 	return pq
 }
 
@@ -801,7 +837,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		nodes       = []*Post{}
 		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
-		loadedTypes = [13]bool{
+		loadedTypes = [14]bool{
 			pq.withAuthor != nil,
 			pq.withCategory != nil,
 			pq.withTags != nil,
@@ -811,6 +847,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 			pq.withReplies != nil,
 			pq.withReacts != nil,
 			pq.withLikes != nil,
+			pq.withMentions != nil,
 			pq.withAssets != nil,
 			pq.withCollections != nil,
 			pq.withLink != nil,
@@ -900,6 +937,13 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		if err := pq.loadLikes(ctx, query, nodes,
 			func(n *Post) { n.Edges.Likes = []*LikePost{} },
 			func(n *Post, e *LikePost) { n.Edges.Likes = append(n.Edges.Likes, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withMentions; query != nil {
+		if err := pq.loadMentions(ctx, query, nodes,
+			func(n *Post) { n.Edges.Mentions = []*MentionProfile{} },
+			func(n *Post, e *MentionProfile) { n.Edges.Mentions = append(n.Edges.Mentions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1220,6 +1264,36 @@ func (pq *PostQuery) loadLikes(ctx context.Context, query *LikePostQuery, nodes 
 	}
 	query.Where(predicate.LikePost(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(post.LikesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.PostID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "post_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (pq *PostQuery) loadMentions(ctx context.Context, query *MentionProfileQuery, nodes []*Post, init func(*Post), assign func(*Post, *MentionProfile)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Post)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(mentionprofile.FieldPostID)
+	}
+	query.Where(predicate.MentionProfile(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(post.MentionsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

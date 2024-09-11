@@ -10,7 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
@@ -35,13 +35,13 @@ type Service interface {
 }
 
 type Partial struct {
-	Content opt.Optional[content.Rich]
+	Content opt.Optional[datagraph.Content]
 	ReplyTo opt.Optional[post.ID]
 	Meta    opt.Optional[map[string]any]
 }
 
 func (p Partial) Opts() (opts []reply.Option) {
-	p.Content.Call(func(v content.Rich) { opts = append(opts, reply.WithContent(v)) })
+	p.Content.Call(func(v datagraph.Content) { opts = append(opts, reply.WithContent(v)) })
 	p.ReplyTo.Call(func(v post.ID) { opts = append(opts, reply.WithReplyTo(v)) })
 	p.Meta.Call(func(v map[string]any) { opts = append(opts, reply.WithMeta(v)) })
 	return

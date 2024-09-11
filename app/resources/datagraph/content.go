@@ -1,21 +1,44 @@
-package content
+package datagraph
 
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"math"
 	"net/url"
+	"regexp"
 	"strings"
 	"unicode"
 
 	"github.com/Southclaws/fault"
+	"github.com/cixtor/readability"
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/samber/lo"
+	"go.uber.org/zap"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
-var policy = bluemonday.UGCPolicy()
+// RefScheme is used as a scheme for URIs to reference resources.
+// These can be used in content to refer to profiles, posts, nodes, etc.
+const RefScheme = "sdr"
+
+var policy = func() *bluemonday.Policy {
+	p := bluemonday.UGCPolicy()
+
+	p.AllowURLSchemes(
+		"mailto",
+		"http",
+		"https",
+		RefScheme,
+	)
+
+	p.AllowDataAttributes()
+
+	return p
+}()
+
+var spaces = regexp.MustCompile(`\s+`)
 
 // MaxSummaryLength is the maximum length of the short summary text
 const MaxSummaryLength = 128
@@ -24,14 +47,15 @@ const MaxSummaryLength = 128
 // string but on the read path, it'll get turned into this either way.
 const EmptyState = `<body></body>`
 
-type Rich struct {
+type Content struct {
 	html  *html.Node
 	short string
 	links []string
+	sdrs  RefList
 }
 
-func (r Rich) HTML() string {
-	if r.html == nil {
+func (r Content) HTML() string {
+	if r.html == nil || r.html.FirstChild == nil {
 		return EmptyState
 	}
 
@@ -45,34 +69,72 @@ func (r Rich) HTML() string {
 	return w.String()
 }
 
-func (r Rich) HTMLTree() *html.Node {
+func (r Content) HTMLTree() *html.Node {
 	return r.html
 }
 
-func (r Rich) Short() string {
+func (r Content) Short() string {
 	return r.short
 }
 
-func (r Rich) Links() []string {
+func (r Content) Links() []string {
 	return r.links
 }
 
-// NewRichText will pull out any meaningful structured information from markdown
-// document this includes a summary of the text and all link URLs for hydrating.
-func NewRichText(raw string) (Rich, error) {
-	sanitised := policy.Sanitize(raw)
-	htmlTree, err := html.Parse(strings.NewReader(sanitised))
-	if err != nil {
-		return Rich{}, fault.Wrap(err)
-	}
-
-	return NewRichTextFromHTML(htmlTree)
+func (r Content) References() RefList {
+	return r.sdrs
 }
 
-func NewRichTextFromHTML(htmlTree *html.Node) (Rich, error) {
+type options struct {
+	baseURL string
+}
+type option func(*options)
+
+// NewRichText will pull out any meaningful structured information from markdown
+// document this includes a summary of the text and all link URLs for hydrating.
+func NewRichText(raw string) (Content, error) {
+	return NewRichTextFromReader(strings.NewReader(raw))
+}
+
+func NewRichTextFromReader(r io.Reader, opts ...option) (Content, error) {
+	o := options{baseURL: "ignore:"}
+	for _, opt := range opts {
+		opt(&o)
+	}
+
+	buf, err := io.ReadAll(r)
+	if err != nil {
+		return Content{}, fault.Wrap(err)
+	}
+
+	sanitised := policy.SanitizeBytes(buf)
+
+	htmlTree, err := html.Parse(bytes.NewReader(sanitised))
+	if err != nil {
+		return Content{}, fault.Wrap(err)
+	}
+
+	result, err := readability.New().Parse(bytes.NewReader(sanitised), o.baseURL)
+	if err != nil {
+		return Content{}, fault.Wrap(err)
+	}
+
+	short := getSummary(result)
+
+	bodyTree, links, refs := extractReferences(htmlTree)
+
+	return Content{
+		html:  bodyTree,
+		short: short,
+		links: links,
+		sdrs:  refs,
+	}, nil
+}
+
+func extractReferences(htmlTree *html.Node) (*html.Node, []string, RefList) {
 	bodyTree := &html.Node{}
-	textonly := strings.Builder{}
 	links := []string{}
+	sdrs := []url.URL{}
 
 	if htmlTree.DataAtom == atom.Body {
 		bodyTree = htmlTree
@@ -89,17 +151,13 @@ func NewRichTextFromHTML(htmlTree *html.Node) (Rich, error) {
 
 				if hasHref {
 					if parsed, err := url.Parse(href.Val); err == nil {
-						links = append(links, parsed.String())
+						switch parsed.Scheme {
+						case "http", "https":
+							links = append(links, parsed.String())
+						case RefScheme:
+							sdrs = append(sdrs, *parsed)
+						}
 					}
-				}
-
-			case atom.P:
-				if n.Type == html.TextNode && len(n.Data) > 0 {
-
-					oneline := strings.ReplaceAll(n.Data, "\n", " ")
-					textonly.Write([]byte(oneline))
-					textonly.WriteByte(' ')
-					return
 				}
 			}
 		}
@@ -115,7 +173,24 @@ func NewRichTextFromHTML(htmlTree *html.Node) (Rich, error) {
 	}
 	walk(htmlTree)
 
-	paragraphs := []rune(strings.TrimSpace(textonly.String()))
+	var refs RefList
+	for _, v := range sdrs {
+		r, err := NewRefFromSDR(v)
+		if err != nil {
+			zap.L().Warn("invalid SDR in content", zap.Error(err))
+			continue
+		}
+		refs = append(refs, r)
+	}
+
+	return bodyTree, links, refs
+}
+
+func getSummary(article readability.Article) string {
+	trimmed := strings.TrimSpace(article.TextContent)
+	collapsed := spaces.ReplaceAllString(trimmed, " ")
+
+	paragraphs := []rune(collapsed)
 	end := int(math.Min(float64(len(paragraphs)-1), MaxSummaryLength))
 
 	var short string
@@ -147,9 +222,5 @@ func NewRichTextFromHTML(htmlTree *html.Node) (Rich, error) {
 		short = string(paragraphs)
 	}
 
-	return Rich{
-		html:  bodyTree,
-		short: short,
-		links: links,
-	}, nil
+	return short
 }

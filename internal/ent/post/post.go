@@ -64,6 +64,8 @@ const (
 	EdgeReacts = "reacts"
 	// EdgeLikes holds the string denoting the likes edge name in mutations.
 	EdgeLikes = "likes"
+	// EdgeMentions holds the string denoting the mentions edge name in mutations.
+	EdgeMentions = "mentions"
 	// EdgeAssets holds the string denoting the assets edge name in mutations.
 	EdgeAssets = "assets"
 	// EdgeCollections holds the string denoting the collections edge name in mutations.
@@ -123,6 +125,13 @@ const (
 	LikesInverseTable = "like_posts"
 	// LikesColumn is the table column denoting the likes relation/edge.
 	LikesColumn = "post_id"
+	// MentionsTable is the table that holds the mentions relation/edge.
+	MentionsTable = "mention_profiles"
+	// MentionsInverseTable is the table name for the MentionProfile entity.
+	// It exists in this package in order to avoid circular dependency with the "mentionprofile" package.
+	MentionsInverseTable = "mention_profiles"
+	// MentionsColumn is the table column denoting the mentions relation/edge.
+	MentionsColumn = "post_id"
 	// AssetsTable is the table that holds the assets relation/edge. The primary key declared below.
 	AssetsTable = "post_assets"
 	// AssetsInverseTable is the table name for the Asset entity.
@@ -422,6 +431,20 @@ func ByLikes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByMentionsCount orders the results by mentions count.
+func ByMentionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newMentionsStep(), opts...)
+	}
+}
+
+// ByMentions orders the results by mentions terms.
+func ByMentions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMentionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByAssetsCount orders the results by assets count.
 func ByAssetsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -531,6 +554,13 @@ func newLikesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(LikesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, LikesTable, LikesColumn),
+	)
+}
+func newMentionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MentionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, MentionsTable, MentionsColumn),
 	)
 }
 func newAssetsStep() *sqlgraph.Step {

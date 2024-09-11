@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -499,6 +500,37 @@ func init() {
 	// link.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	link.IDValidator = func() func(string) error {
 		validators := linkDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	mentionprofileMixin := schema.MentionProfile{}.Mixin()
+	mentionprofileMixinFields0 := mentionprofileMixin[0].Fields()
+	_ = mentionprofileMixinFields0
+	mentionprofileMixinFields1 := mentionprofileMixin[1].Fields()
+	_ = mentionprofileMixinFields1
+	mentionprofileFields := schema.MentionProfile{}.Fields()
+	_ = mentionprofileFields
+	// mentionprofileDescCreatedAt is the schema descriptor for created_at field.
+	mentionprofileDescCreatedAt := mentionprofileMixinFields1[0].Descriptor()
+	// mentionprofile.DefaultCreatedAt holds the default value on creation for the created_at field.
+	mentionprofile.DefaultCreatedAt = mentionprofileDescCreatedAt.Default.(func() time.Time)
+	// mentionprofileDescID is the schema descriptor for id field.
+	mentionprofileDescID := mentionprofileMixinFields0[0].Descriptor()
+	// mentionprofile.DefaultID holds the default value on creation for the id field.
+	mentionprofile.DefaultID = mentionprofileDescID.Default.(func() xid.ID)
+	// mentionprofile.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	mentionprofile.IDValidator = func() func(string) error {
+		validators := mentionprofileDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

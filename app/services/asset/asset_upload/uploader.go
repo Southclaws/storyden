@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -58,7 +59,7 @@ func (s *Uploader) Upload(ctx context.Context, r io.Reader, size int64, name ass
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	a, err := s.assets.Add(ctx, accountID, name, int(size))
+	a, err := s.assets.Add(ctx, xid.ID(accountID), name, int(size))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

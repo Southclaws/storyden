@@ -13,7 +13,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -22,6 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
+	"github.com/Southclaws/storyden/app/services/mention/mentioner"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -57,7 +58,7 @@ type Service interface {
 
 type Partial struct {
 	Title      opt.Optional[string]
-	Content    opt.Optional[content.Rich]
+	Content    opt.Optional[datagraph.Content]
 	Tags       opt.Optional[[]xid.ID]
 	Category   opt.Optional[xid.ID]
 	Visibility opt.Optional[visibility.Visibility]
@@ -67,7 +68,7 @@ type Partial struct {
 
 func (p Partial) Opts() (opts []thread.Option) {
 	p.Title.Call(func(v string) { opts = append(opts, thread.WithTitle(v)) })
-	p.Content.Call(func(v content.Rich) { opts = append(opts, thread.WithContent(v)) })
+	p.Content.Call(func(v datagraph.Content) { opts = append(opts, thread.WithContent(v)) })
 	p.Tags.Call(func(v []xid.ID) { opts = append(opts, thread.WithTags(v)) })
 	p.Category.Call(func(v xid.ID) { opts = append(opts, thread.WithCategory(xid.ID(v))) })
 	p.Visibility.Call(func(v visibility.Visibility) { opts = append(opts, thread.WithVisibility(v)) })
@@ -88,6 +89,7 @@ type service struct {
 	fetcher      *fetcher.Fetcher
 	recommender  semdex.Recommender
 	indexQueue   pubsub.Topic[mq.IndexPost]
+	mentioner    *mentioner.Mentioner
 }
 
 func New(
@@ -99,6 +101,7 @@ func New(
 	fetcher *fetcher.Fetcher,
 	recommender semdex.Recommender,
 	indexQueue pubsub.Topic[mq.IndexPost],
+	mentioner *mentioner.Mentioner,
 ) Service {
 	return &service{
 		l:            l.With(zap.String("service", "thread")),
@@ -108,5 +111,6 @@ func New(
 		fetcher:      fetcher,
 		recommender:  recommender,
 		indexQueue:   indexQueue,
+		mentioner:    mentioner,
 	}
 }

@@ -10,10 +10,9 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/cixtor/readability"
 	"golang.org/x/net/html"
 
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
 func (s *webScraper) postprocess(ctx context.Context, addr url.URL, r io.Reader) (*WebContent, error) {
@@ -28,10 +27,12 @@ func (s *webScraper) postprocess(ctx context.Context, addr url.URL, r io.Reader)
 	}
 
 	t := metatable(doc)
-	rc, text, err := getArticleContent(bytes.NewReader(buf), addr)
+	rc, err := getArticleContent(bytes.NewReader(buf), addr)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	text := rc.Short()
 
 	withBaseURL := func(urlOrPath string) string {
 		if urlOrPath == "" {
@@ -62,18 +63,13 @@ func (s *webScraper) postprocess(ctx context.Context, addr url.URL, r io.Reader)
 	return wc, nil
 }
 
-func getArticleContent(r io.Reader, pageURL url.URL) (content.Rich, string, error) {
-	result, err := readability.New().Parse(r, pageURL.String())
+func getArticleContent(r io.Reader, pageURL url.URL) (datagraph.Content, error) {
+	rc, err := datagraph.NewRichTextFromReader(r)
 	if err != nil {
-		return content.Rich{}, "", fault.Wrap(err)
+		return datagraph.Content{}, nil
 	}
 
-	rc, err := content.NewRichTextFromHTML(result.Node)
-	if err != nil {
-		return content.Rich{}, result.TextContent, nil
-	}
-
-	return rc, result.TextContent, nil
+	return rc, nil
 }
 
 func metatable(doc *goquery.Document) map[string]string {

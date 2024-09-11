@@ -7,8 +7,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
 var errFailedToScrape = fault.New("failed to scrape")
@@ -23,7 +22,7 @@ type WebContent struct {
 	Text        string
 	Favicon     string
 	Image       string
-	Content     content.Rich
+	Content     datagraph.Content
 }
 
 type webScraper struct{}

@@ -7,7 +7,6 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -15,7 +14,7 @@ var errInvalidFormat = fault.New("invalid format")
 
 type Repository interface {
 	Add(ctx context.Context,
-		owner account.AccountID,
+		owner xid.ID,
 		filename Filename,
 		size int,
 	) (*Asset, error)
@@ -23,7 +22,7 @@ type Repository interface {
 	Get(ctx context.Context, id Filename) (*Asset, error)
 	GetByID(ctx context.Context, id AssetID) (*Asset, error)
 
-	Remove(ctx context.Context, owner account.AccountID, id Filename) error
+	Remove(ctx context.Context, owner xid.ID, id Filename) error
 }
 
 type AssetID = xid.ID

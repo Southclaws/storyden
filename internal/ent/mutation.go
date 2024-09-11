@@ -22,6 +22,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -54,6 +55,7 @@ const (
 	TypeEmail          = "Email"
 	TypeLikePost       = "LikePost"
 	TypeLink           = "Link"
+	TypeMentionProfile = "MentionProfile"
 	TypeNode           = "Node"
 	TypeNotification   = "Notification"
 	TypePost           = "Post"
@@ -104,6 +106,9 @@ type AccountMutation struct {
 	likes                          map[xid.ID]struct{}
 	removedlikes                   map[xid.ID]struct{}
 	clearedlikes                   bool
+	mentions                       map[xid.ID]struct{}
+	removedmentions                map[xid.ID]struct{}
+	clearedmentions                bool
 	roles                          map[xid.ID]struct{}
 	removedroles                   map[xid.ID]struct{}
 	clearedroles                   bool
@@ -1055,6 +1060,60 @@ func (m *AccountMutation) ResetLikes() {
 	m.removedlikes = nil
 }
 
+// AddMentionIDs adds the "mentions" edge to the MentionProfile entity by ids.
+func (m *AccountMutation) AddMentionIDs(ids ...xid.ID) {
+	if m.mentions == nil {
+		m.mentions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.mentions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMentions clears the "mentions" edge to the MentionProfile entity.
+func (m *AccountMutation) ClearMentions() {
+	m.clearedmentions = true
+}
+
+// MentionsCleared reports if the "mentions" edge to the MentionProfile entity was cleared.
+func (m *AccountMutation) MentionsCleared() bool {
+	return m.clearedmentions
+}
+
+// RemoveMentionIDs removes the "mentions" edge to the MentionProfile entity by IDs.
+func (m *AccountMutation) RemoveMentionIDs(ids ...xid.ID) {
+	if m.removedmentions == nil {
+		m.removedmentions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.mentions, ids[i])
+		m.removedmentions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMentions returns the removed IDs of the "mentions" edge to the MentionProfile entity.
+func (m *AccountMutation) RemovedMentionsIDs() (ids []xid.ID) {
+	for id := range m.removedmentions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MentionsIDs returns the "mentions" edge IDs in the mutation.
+func (m *AccountMutation) MentionsIDs() (ids []xid.ID) {
+	for id := range m.mentions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMentions resets all changes to the "mentions" edge.
+func (m *AccountMutation) ResetMentions() {
+	m.mentions = nil
+	m.clearedmentions = false
+	m.removedmentions = nil
+}
+
 // AddRoleIDs adds the "roles" edge to the Role entity by ids.
 func (m *AccountMutation) AddRoleIDs(ids ...xid.ID) {
 	if m.roles == nil {
@@ -1675,7 +1734,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 14)
+	edges := make([]string, 0, 15)
 	if m.emails != nil {
 		edges = append(edges, account.EdgeEmails)
 	}
@@ -1699,6 +1758,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.likes != nil {
 		edges = append(edges, account.EdgeLikes)
+	}
+	if m.mentions != nil {
+		edges = append(edges, account.EdgeMentions)
 	}
 	if m.roles != nil {
 		edges = append(edges, account.EdgeRoles)
@@ -1773,6 +1835,12 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeMentions:
+		ids := make([]ent.Value, 0, len(m.mentions))
+		for id := range m.mentions {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeRoles:
 		ids := make([]ent.Value, 0, len(m.roles))
 		for id := range m.roles {
@@ -1815,7 +1883,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 14)
+	edges := make([]string, 0, 15)
 	if m.removedemails != nil {
 		edges = append(edges, account.EdgeEmails)
 	}
@@ -1839,6 +1907,9 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedlikes != nil {
 		edges = append(edges, account.EdgeLikes)
+	}
+	if m.removedmentions != nil {
+		edges = append(edges, account.EdgeMentions)
 	}
 	if m.removedroles != nil {
 		edges = append(edges, account.EdgeRoles)
@@ -1913,6 +1984,12 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeMentions:
+		ids := make([]ent.Value, 0, len(m.removedmentions))
+		for id := range m.removedmentions {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeRoles:
 		ids := make([]ent.Value, 0, len(m.removedroles))
 		for id := range m.removedroles {
@@ -1955,7 +2032,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 14)
+	edges := make([]string, 0, 15)
 	if m.clearedemails {
 		edges = append(edges, account.EdgeEmails)
 	}
@@ -1979,6 +2056,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedlikes {
 		edges = append(edges, account.EdgeLikes)
+	}
+	if m.clearedmentions {
+		edges = append(edges, account.EdgeMentions)
 	}
 	if m.clearedroles {
 		edges = append(edges, account.EdgeRoles)
@@ -2021,6 +2101,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedreacts
 	case account.EdgeLikes:
 		return m.clearedlikes
+	case account.EdgeMentions:
+		return m.clearedmentions
 	case account.EdgeRoles:
 		return m.clearedroles
 	case account.EdgeAuthentication:
@@ -2072,6 +2154,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeLikes:
 		m.ResetLikes()
+		return nil
+	case account.EdgeMentions:
+		m.ResetMentions()
 		return nil
 	case account.EdgeRoles:
 		m.ResetRoles()
@@ -9620,6 +9705,546 @@ func (m *LinkMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Link edge %s", name)
 }
 
+// MentionProfileMutation represents an operation that mutates the MentionProfile nodes in the graph.
+type MentionProfileMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *xid.ID
+	created_at     *time.Time
+	clearedFields  map[string]struct{}
+	account        *xid.ID
+	clearedaccount bool
+	_Post          *xid.ID
+	cleared_Post   bool
+	done           bool
+	oldValue       func(context.Context) (*MentionProfile, error)
+	predicates     []predicate.MentionProfile
+}
+
+var _ ent.Mutation = (*MentionProfileMutation)(nil)
+
+// mentionprofileOption allows management of the mutation configuration using functional options.
+type mentionprofileOption func(*MentionProfileMutation)
+
+// newMentionProfileMutation creates new mutation for the MentionProfile entity.
+func newMentionProfileMutation(c config, op Op, opts ...mentionprofileOption) *MentionProfileMutation {
+	m := &MentionProfileMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeMentionProfile,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withMentionProfileID sets the ID field of the mutation.
+func withMentionProfileID(id xid.ID) mentionprofileOption {
+	return func(m *MentionProfileMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *MentionProfile
+		)
+		m.oldValue = func(ctx context.Context) (*MentionProfile, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().MentionProfile.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withMentionProfile sets the old MentionProfile of the mutation.
+func withMentionProfile(node *MentionProfile) mentionprofileOption {
+	return func(m *MentionProfileMutation) {
+		m.oldValue = func(context.Context) (*MentionProfile, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m MentionProfileMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m MentionProfileMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of MentionProfile entities.
+func (m *MentionProfileMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *MentionProfileMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *MentionProfileMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().MentionProfile.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *MentionProfileMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *MentionProfileMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the MentionProfile entity.
+// If the MentionProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MentionProfileMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *MentionProfileMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *MentionProfileMutation) SetAccountID(x xid.ID) {
+	m.account = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *MentionProfileMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.account
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the MentionProfile entity.
+// If the MentionProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MentionProfileMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *MentionProfileMutation) ResetAccountID() {
+	m.account = nil
+}
+
+// SetPostID sets the "post_id" field.
+func (m *MentionProfileMutation) SetPostID(x xid.ID) {
+	m._Post = &x
+}
+
+// PostID returns the value of the "post_id" field in the mutation.
+func (m *MentionProfileMutation) PostID() (r xid.ID, exists bool) {
+	v := m._Post
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPostID returns the old "post_id" field's value of the MentionProfile entity.
+// If the MentionProfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *MentionProfileMutation) OldPostID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPostID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPostID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPostID: %w", err)
+	}
+	return oldValue.PostID, nil
+}
+
+// ResetPostID resets all changes to the "post_id" field.
+func (m *MentionProfileMutation) ResetPostID() {
+	m._Post = nil
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *MentionProfileMutation) ClearAccount() {
+	m.clearedaccount = true
+	m.clearedFields[mentionprofile.FieldAccountID] = struct{}{}
+}
+
+// AccountCleared reports if the "account" edge to the Account entity was cleared.
+func (m *MentionProfileMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *MentionProfileMutation) AccountIDs() (ids []xid.ID) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *MentionProfileMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
+// ClearPost clears the "Post" edge to the Post entity.
+func (m *MentionProfileMutation) ClearPost() {
+	m.cleared_Post = true
+	m.clearedFields[mentionprofile.FieldPostID] = struct{}{}
+}
+
+// PostCleared reports if the "Post" edge to the Post entity was cleared.
+func (m *MentionProfileMutation) PostCleared() bool {
+	return m.cleared_Post
+}
+
+// PostIDs returns the "Post" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PostID instead. It exists only for internal usage by the builders.
+func (m *MentionProfileMutation) PostIDs() (ids []xid.ID) {
+	if id := m._Post; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPost resets all changes to the "Post" edge.
+func (m *MentionProfileMutation) ResetPost() {
+	m._Post = nil
+	m.cleared_Post = false
+}
+
+// Where appends a list predicates to the MentionProfileMutation builder.
+func (m *MentionProfileMutation) Where(ps ...predicate.MentionProfile) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the MentionProfileMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *MentionProfileMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.MentionProfile, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *MentionProfileMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *MentionProfileMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (MentionProfile).
+func (m *MentionProfileMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *MentionProfileMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.created_at != nil {
+		fields = append(fields, mentionprofile.FieldCreatedAt)
+	}
+	if m.account != nil {
+		fields = append(fields, mentionprofile.FieldAccountID)
+	}
+	if m._Post != nil {
+		fields = append(fields, mentionprofile.FieldPostID)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *MentionProfileMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case mentionprofile.FieldCreatedAt:
+		return m.CreatedAt()
+	case mentionprofile.FieldAccountID:
+		return m.AccountID()
+	case mentionprofile.FieldPostID:
+		return m.PostID()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *MentionProfileMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case mentionprofile.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case mentionprofile.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case mentionprofile.FieldPostID:
+		return m.OldPostID(ctx)
+	}
+	return nil, fmt.Errorf("unknown MentionProfile field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MentionProfileMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case mentionprofile.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case mentionprofile.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case mentionprofile.FieldPostID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPostID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown MentionProfile field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *MentionProfileMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *MentionProfileMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *MentionProfileMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown MentionProfile numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *MentionProfileMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *MentionProfileMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *MentionProfileMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown MentionProfile nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *MentionProfileMutation) ResetField(name string) error {
+	switch name {
+	case mentionprofile.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case mentionprofile.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case mentionprofile.FieldPostID:
+		m.ResetPostID()
+		return nil
+	}
+	return fmt.Errorf("unknown MentionProfile field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *MentionProfileMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.account != nil {
+		edges = append(edges, mentionprofile.EdgeAccount)
+	}
+	if m._Post != nil {
+		edges = append(edges, mentionprofile.EdgePost)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *MentionProfileMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case mentionprofile.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
+	case mentionprofile.EdgePost:
+		if id := m._Post; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *MentionProfileMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *MentionProfileMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *MentionProfileMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedaccount {
+		edges = append(edges, mentionprofile.EdgeAccount)
+	}
+	if m.cleared_Post {
+		edges = append(edges, mentionprofile.EdgePost)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *MentionProfileMutation) EdgeCleared(name string) bool {
+	switch name {
+	case mentionprofile.EdgeAccount:
+		return m.clearedaccount
+	case mentionprofile.EdgePost:
+		return m.cleared_Post
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *MentionProfileMutation) ClearEdge(name string) error {
+	switch name {
+	case mentionprofile.EdgeAccount:
+		m.ClearAccount()
+		return nil
+	case mentionprofile.EdgePost:
+		m.ClearPost()
+		return nil
+	}
+	return fmt.Errorf("unknown MentionProfile unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *MentionProfileMutation) ResetEdge(name string) error {
+	switch name {
+	case mentionprofile.EdgeAccount:
+		m.ResetAccount()
+		return nil
+	case mentionprofile.EdgePost:
+		m.ResetPost()
+		return nil
+	}
+	return fmt.Errorf("unknown MentionProfile edge %s", name)
+}
+
 // NodeMutation represents an operation that mutates the Node nodes in the graph.
 type NodeMutation struct {
 	config
@@ -12208,6 +12833,9 @@ type PostMutation struct {
 	likes                map[xid.ID]struct{}
 	removedlikes         map[xid.ID]struct{}
 	clearedlikes         bool
+	mentions             map[xid.ID]struct{}
+	removedmentions      map[xid.ID]struct{}
+	clearedmentions      bool
 	assets               map[xid.ID]struct{}
 	removedassets        map[xid.ID]struct{}
 	clearedassets        bool
@@ -13388,6 +14016,60 @@ func (m *PostMutation) ResetLikes() {
 	m.removedlikes = nil
 }
 
+// AddMentionIDs adds the "mentions" edge to the MentionProfile entity by ids.
+func (m *PostMutation) AddMentionIDs(ids ...xid.ID) {
+	if m.mentions == nil {
+		m.mentions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.mentions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearMentions clears the "mentions" edge to the MentionProfile entity.
+func (m *PostMutation) ClearMentions() {
+	m.clearedmentions = true
+}
+
+// MentionsCleared reports if the "mentions" edge to the MentionProfile entity was cleared.
+func (m *PostMutation) MentionsCleared() bool {
+	return m.clearedmentions
+}
+
+// RemoveMentionIDs removes the "mentions" edge to the MentionProfile entity by IDs.
+func (m *PostMutation) RemoveMentionIDs(ids ...xid.ID) {
+	if m.removedmentions == nil {
+		m.removedmentions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.mentions, ids[i])
+		m.removedmentions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedMentions returns the removed IDs of the "mentions" edge to the MentionProfile entity.
+func (m *PostMutation) RemovedMentionsIDs() (ids []xid.ID) {
+	for id := range m.removedmentions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// MentionsIDs returns the "mentions" edge IDs in the mutation.
+func (m *PostMutation) MentionsIDs() (ids []xid.ID) {
+	for id := range m.mentions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetMentions resets all changes to the "mentions" edge.
+func (m *PostMutation) ResetMentions() {
+	m.mentions = nil
+	m.clearedmentions = false
+	m.removedmentions = nil
+}
+
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
 func (m *PostMutation) AddAssetIDs(ids ...xid.ID) {
 	if m.assets == nil {
@@ -13999,7 +14681,7 @@ func (m *PostMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PostMutation) AddedEdges() []string {
-	edges := make([]string, 0, 13)
+	edges := make([]string, 0, 14)
 	if m.author != nil {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -14026,6 +14708,9 @@ func (m *PostMutation) AddedEdges() []string {
 	}
 	if m.likes != nil {
 		edges = append(edges, post.EdgeLikes)
+	}
+	if m.mentions != nil {
+		edges = append(edges, post.EdgeMentions)
 	}
 	if m.assets != nil {
 		edges = append(edges, post.EdgeAssets)
@@ -14092,6 +14777,12 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgeMentions:
+		ids := make([]ent.Value, 0, len(m.mentions))
+		for id := range m.mentions {
+			ids = append(ids, id)
+		}
+		return ids
 	case post.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.assets))
 		for id := range m.assets {
@@ -14120,7 +14811,7 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PostMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 13)
+	edges := make([]string, 0, 14)
 	if m.removedtags != nil {
 		edges = append(edges, post.EdgeTags)
 	}
@@ -14135,6 +14826,9 @@ func (m *PostMutation) RemovedEdges() []string {
 	}
 	if m.removedlikes != nil {
 		edges = append(edges, post.EdgeLikes)
+	}
+	if m.removedmentions != nil {
+		edges = append(edges, post.EdgeMentions)
 	}
 	if m.removedassets != nil {
 		edges = append(edges, post.EdgeAssets)
@@ -14182,6 +14876,12 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgeMentions:
+		ids := make([]ent.Value, 0, len(m.removedmentions))
+		for id := range m.removedmentions {
+			ids = append(ids, id)
+		}
+		return ids
 	case post.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.removedassets))
 		for id := range m.removedassets {
@@ -14206,7 +14906,7 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PostMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 13)
+	edges := make([]string, 0, 14)
 	if m.clearedauthor {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -14233,6 +14933,9 @@ func (m *PostMutation) ClearedEdges() []string {
 	}
 	if m.clearedlikes {
 		edges = append(edges, post.EdgeLikes)
+	}
+	if m.clearedmentions {
+		edges = append(edges, post.EdgeMentions)
 	}
 	if m.clearedassets {
 		edges = append(edges, post.EdgeAssets)
@@ -14271,6 +14974,8 @@ func (m *PostMutation) EdgeCleared(name string) bool {
 		return m.clearedreacts
 	case post.EdgeLikes:
 		return m.clearedlikes
+	case post.EdgeMentions:
+		return m.clearedmentions
 	case post.EdgeAssets:
 		return m.clearedassets
 	case post.EdgeCollections:
@@ -14336,6 +15041,9 @@ func (m *PostMutation) ResetEdge(name string) error {
 		return nil
 	case post.EdgeLikes:
 		m.ResetLikes()
+		return nil
+	case post.EdgeMentions:
+		m.ResetMentions()
 		return nil
 	case post.EdgeAssets:
 		m.ResetAssets()

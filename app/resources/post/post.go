@@ -9,7 +9,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/content"
+
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/like"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
@@ -29,7 +29,7 @@ type Post struct {
 
 	Title   string
 	Slug    string
-	Content content.Rich
+	Content datagraph.Content
 	Author  profile.Public
 	Likes   like.Status
 	Reacts  []*react.React
@@ -42,14 +42,14 @@ type Post struct {
 	DeletedAt opt.Optional[time.Time]
 }
 
-func (p *Post) GetID() xid.ID             { return xid.ID(p.ID) }
-func (p *Post) GetKind() datagraph.Kind   { return datagraph.KindPost }
-func (p *Post) GetName() string           { return p.Title }
-func (p *Post) GetSlug() string           { return p.Slug }
-func (p *Post) GetContent() content.Rich  { return p.Content }
-func (p *Post) GetDesc() string           { return p.Content.Short() }
-func (p *Post) GetProps() map[string]any  { return p.Meta }
-func (p *Post) GetAssets() []*asset.Asset { return p.Assets }
+func (p *Post) GetID() xid.ID                 { return xid.ID(p.ID) }
+func (p *Post) GetKind() datagraph.Kind       { return datagraph.KindPost }
+func (p *Post) GetName() string               { return p.Title }
+func (p *Post) GetSlug() string               { return p.Slug }
+func (p *Post) GetContent() datagraph.Content { return p.Content }
+func (p *Post) GetDesc() string               { return p.Content.Short() }
+func (p *Post) GetProps() map[string]any      { return p.Meta }
+func (p *Post) GetAssets() []*asset.Asset     { return p.Assets }
 
 func Map(in *ent.Post) (*Post, error) {
 	rootID, title, slug := func() (ID, string, string) {
@@ -70,7 +70,7 @@ func Map(in *ent.Post) (*Post, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	content, err := content.NewRichText(in.Body)
+	content, err := datagraph.NewRichText(in.Body)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

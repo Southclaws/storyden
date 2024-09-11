@@ -2,12 +2,16 @@ package analyse
 
 import (
 	"context"
+	"io"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"golang.org/x/net/html"
+
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
+
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
 )
@@ -28,7 +32,13 @@ func (a *Analyser) analysePDF(ctx context.Context, buf []byte, fillrule opt.Opti
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	rich, err := content.NewRichTextFromHTML(result.HTML)
+	pr, pw := io.Pipe()
+	err = html.Render(pw, result.HTML)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	rich, err := datagraph.NewRichTextFromReader(pr)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
