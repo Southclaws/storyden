@@ -114,6 +114,7 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 			Image:     &avatarURL,
 			Followers: acc.Followers,
 			Following: acc.Following,
+			LikeScore: acc.LikeScore,
 			Name:      acc.Name,
 			Links:     serialiseExternalLinks(acc.ExternalLinks),
 			Meta:      acc.Metadata,
@@ -249,6 +250,7 @@ func serialiseProfile(in *profile.Public) openapi.PublicProfile {
 		Name:      in.Name,
 		Followers: in.Followers,
 		Following: in.Following,
+		LikeScore: in.LikeScore,
 		Links:     serialiseExternalLinks(in.ExternalLinks),
 		Meta:      in.Metadata,
 	}
