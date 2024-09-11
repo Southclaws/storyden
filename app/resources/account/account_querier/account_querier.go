@@ -96,8 +96,14 @@ func queryFollows(ctx context.Context, a *ent.Account, acc *account.Account) (*a
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	likes, err := a.QueryPosts().QueryLikes().Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	acc.Followers = followers
 	acc.Following = following
+	acc.LikeScore = likes
 
 	return acc, nil
 }

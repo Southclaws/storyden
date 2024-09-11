@@ -133,6 +133,7 @@ export * from "./likePostGetOKResponse";
 export * from "./likeProfileGetOKResponse";
 export * from "./likeProfileGetParams";
 export * from "./likeProps";
+export * from "./likeScore";
 export * from "./likeStatus";
 export * from "./link";
 export * from "./linkCreateBody";

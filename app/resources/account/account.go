@@ -26,6 +26,7 @@ type Account struct {
 	Admin          bool
 	Followers      int
 	Following      int
+	LikeScore      int
 	Auths          []string
 	EmailAddresses []*EmailAddress
 	VerifiedStatus VerifiedStatus

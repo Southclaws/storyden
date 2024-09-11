@@ -3104,6 +3104,7 @@ components:
             - bio
             - followers
             - following
+            - like_score
             - interests
             - links
             - meta
@@ -3122,6 +3123,8 @@ components:
               $ref: "#/components/schemas/ProfileFollowersCount"
             following:
               $ref: "#/components/schemas/ProfileFollowingCount"
+            like_score:
+              $ref: "#/components/schemas/LikeScore"
             interests:
               $ref: "#/components/schemas/TagList"
             links:
@@ -3674,6 +3677,10 @@ components:
       description: |
         A simple count of likes for contexts where pulling the full list would
         be overkill. For use on minimal item reference schemas.
+      type: integer
+
+    LikeScore:
+      description: The total number of likes received by a member.
       type: integer
 
     LikeStatus:
