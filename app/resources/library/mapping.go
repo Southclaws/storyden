@@ -6,7 +6,8 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
+
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -47,7 +48,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 
 	assets := dt.Map(c.Edges.Assets, asset.FromModel)
 
-	richContent, err := opt.MapErr(opt.NewPtr(c.Content), content.NewRichText)
+	richContent, err := opt.MapErr(opt.NewPtr(c.Content), datagraph.NewRichText)
 	if err != nil {
 		return nil, err
 	}

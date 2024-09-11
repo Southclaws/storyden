@@ -13,7 +13,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 )
@@ -47,7 +47,7 @@ func WithName(name string) Option {
 	}
 }
 
-func WithBio(v content.Rich) Option {
+func WithBio(v datagraph.Content) Option {
 	return func(a *account.Account) {
 		a.Bio = v
 	}

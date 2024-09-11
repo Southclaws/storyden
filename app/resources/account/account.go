@@ -7,9 +7,8 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/rs/xid"
-
-	"github.com/Southclaws/storyden/app/resources/content"
 )
 
 var errSuspended = fault.Wrap(fault.New("suspended"), ftag.With(ftag.PermissionDenied))
@@ -22,7 +21,7 @@ type Account struct {
 	ID             AccountID
 	Handle         string
 	Name           string
-	Bio            content.Rich
+	Bio            datagraph.Content
 	Admin          bool
 	Followers      int
 	Following      int

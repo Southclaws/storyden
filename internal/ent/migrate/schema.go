@@ -332,6 +332,40 @@ var (
 			},
 		},
 	}
+	// MentionProfilesColumns holds the columns for the "mention_profiles" table.
+	MentionProfilesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "post_id", Type: field.TypeString, Size: 20},
+	}
+	// MentionProfilesTable holds the schema information for the "mention_profiles" table.
+	MentionProfilesTable = &schema.Table{
+		Name:       "mention_profiles",
+		Columns:    MentionProfilesColumns,
+		PrimaryKey: []*schema.Column{MentionProfilesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "mention_profiles_accounts_mentions",
+				Columns:    []*schema.Column{MentionProfilesColumns[2]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "mention_profiles_posts_mentions",
+				Columns:    []*schema.Column{MentionProfilesColumns[3]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "unique_mentions_post",
+				Unique:  true,
+				Columns: []*schema.Column{MentionProfilesColumns[2], MentionProfilesColumns[3]},
+			},
+		},
+	}
 	// NodesColumns holds the columns for the "nodes" table.
 	NodesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -774,6 +808,7 @@ var (
 		EmailsTable,
 		LikePostsTable,
 		LinksTable,
+		MentionProfilesTable,
 		NodesTable,
 		NotificationsTable,
 		PostsTable,
@@ -809,6 +844,8 @@ func init() {
 	LikePostsTable.ForeignKeys[1].RefTable = PostsTable
 	LinksTable.ForeignKeys[0].RefTable = AssetsTable
 	LinksTable.ForeignKeys[1].RefTable = AssetsTable
+	MentionProfilesTable.ForeignKeys[0].RefTable = AccountsTable
+	MentionProfilesTable.ForeignKeys[1].RefTable = PostsTable
 	NodesTable.ForeignKeys[0].RefTable = AccountsTable
 	NodesTable.ForeignKeys[1].RefTable = LinksTable
 	NodesTable.ForeignKeys[2].RefTable = NodesTable

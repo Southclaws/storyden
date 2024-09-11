@@ -21,4 +21,5 @@ export const NotificationEvent = {
   thread_reply: "thread_reply",
   post_like: "post_like",
   follow: "follow",
+  profile_mention: "profile_mention",
 } as const;

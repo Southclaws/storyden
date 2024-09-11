@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 )
@@ -18,7 +18,7 @@ func MapAccount(a *ent.Account) (*Account, error) {
 		return a.Service
 	})
 
-	bio, err := content.NewRichText(a.Bio)
+	bio, err := datagraph.NewRichText(a.Bio)
 	if err != nil {
 		return nil, err
 	}

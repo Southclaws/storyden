@@ -100,6 +100,12 @@ erDiagram
         xidDOTID primary_asset_id
         xidDOTID favicon_asset_id
     }
+    MentionProfile {
+        xidDOTID id
+        timeDOTTime created_at
+        xidDOTID account_id
+        xidDOTID post_id
+    }
     Node {
         xidDOTID id
         timeDOTTime created_at
@@ -175,6 +181,7 @@ erDiagram
     	Account |o--o{ Post : "posts/author"
     	Account |o--o{ React : "reacts/account"
     	Account |o--o{ LikePost : "likes/account"
+    	Account |o--o{ MentionProfile : "mentions/account"
     	Account |o--o{ Authentication : "authentication/account"
     	Account }o--o{ Tag : "tags/accounts"
     	Account |o--o{ Collection : "collections/owner"
@@ -201,6 +208,7 @@ erDiagram
     	Post |o--o{ Post : "replies/replyTo"
     	Post |o--o{ React : "reacts/Post"
     	Post |o--o{ LikePost : "likes/Post"
+    	Post |o--o{ MentionProfile : "mentions/Post"
     	Post }o--o{ Asset : "assets/posts"
     	Role }o--o{ Account : "accounts/roles"
     	Tag }o--o{ Post : "posts/tags"

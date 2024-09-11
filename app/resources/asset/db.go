@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 )
@@ -22,7 +21,7 @@ func New(db *ent.Client) Repository {
 }
 
 func (d *database) Add(ctx context.Context,
-	accountID account.AccountID,
+	accountID xid.ID,
 	filename Filename,
 	size int,
 ) (*Asset, error) {
@@ -68,7 +67,7 @@ func (d *database) GetByID(ctx context.Context, id AssetID) (*Asset, error) {
 	return FromModel(asset), nil
 }
 
-func (d *database) Remove(ctx context.Context, accountID account.AccountID, id Filename) error {
+func (d *database) Remove(ctx context.Context, accountID xid.ID, id Filename) error {
 	q := d.db.Asset.
 		Delete().Where(
 		asset.Filename(id.name),

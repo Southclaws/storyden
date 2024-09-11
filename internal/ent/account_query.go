@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
+	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -43,6 +44,7 @@ type AccountQuery struct {
 	withPosts                  *PostQuery
 	withReacts                 *ReactQuery
 	withLikes                  *LikePostQuery
+	withMentions               *MentionProfileQuery
 	withRoles                  *RoleQuery
 	withAuthentication         *AuthenticationQuery
 	withTags                   *TagQuery
@@ -255,6 +257,28 @@ func (aq *AccountQuery) QueryLikes() *LikePostQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(likepost.Table, likepost.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.LikesTable, account.LikesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryMentions chains the current query on the "mentions" edge.
+func (aq *AccountQuery) QueryMentions() *MentionProfileQuery {
+	query := (&MentionProfileClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(mentionprofile.Table, mentionprofile.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.MentionsTable, account.MentionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -594,6 +618,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		withPosts:                  aq.withPosts.Clone(),
 		withReacts:                 aq.withReacts.Clone(),
 		withLikes:                  aq.withLikes.Clone(),
+		withMentions:               aq.withMentions.Clone(),
 		withRoles:                  aq.withRoles.Clone(),
 		withAuthentication:         aq.withAuthentication.Clone(),
 		withTags:                   aq.withTags.Clone(),
@@ -691,6 +716,17 @@ func (aq *AccountQuery) WithLikes(opts ...func(*LikePostQuery)) *AccountQuery {
 		opt(query)
 	}
 	aq.withLikes = query
+	return aq
+}
+
+// WithMentions tells the query-builder to eager-load the nodes that are connected to
+// the "mentions" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithMentions(opts ...func(*MentionProfileQuery)) *AccountQuery {
+	query := (&MentionProfileClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withMentions = query
 	return aq
 }
 
@@ -838,7 +874,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [14]bool{
+		loadedTypes = [15]bool{
 			aq.withEmails != nil,
 			aq.withNotifications != nil,
 			aq.withTriggeredNotifications != nil,
@@ -847,6 +883,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			aq.withPosts != nil,
 			aq.withReacts != nil,
 			aq.withLikes != nil,
+			aq.withMentions != nil,
 			aq.withRoles != nil,
 			aq.withAuthentication != nil,
 			aq.withTags != nil,
@@ -931,6 +968,13 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := aq.loadLikes(ctx, query, nodes,
 			func(n *Account) { n.Edges.Likes = []*LikePost{} },
 			func(n *Account, e *LikePost) { n.Edges.Likes = append(n.Edges.Likes, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withMentions; query != nil {
+		if err := aq.loadMentions(ctx, query, nodes,
+			func(n *Account) { n.Edges.Mentions = []*MentionProfile{} },
+			func(n *Account, e *MentionProfile) { n.Edges.Mentions = append(n.Edges.Mentions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1211,6 +1255,36 @@ func (aq *AccountQuery) loadLikes(ctx context.Context, query *LikePostQuery, nod
 	}
 	query.Where(predicate.LikePost(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(account.LikesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadMentions(ctx context.Context, query *MentionProfileQuery, nodes []*Account, init func(*Account), assign func(*Account, *MentionProfile)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(mentionprofile.FieldAccountID)
+	}
+	query.Where(predicate.MentionProfile(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.MentionsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

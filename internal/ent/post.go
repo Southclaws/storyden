@@ -79,6 +79,8 @@ type PostEdges struct {
 	Reacts []*React `json:"reacts,omitempty"`
 	// Likes holds the value of the likes edge.
 	Likes []*LikePost `json:"likes,omitempty"`
+	// Mentions holds the value of the mentions edge.
+	Mentions []*MentionProfile `json:"mentions,omitempty"`
 	// Assets holds the value of the assets edge.
 	Assets []*Asset `json:"assets,omitempty"`
 	// Collections holds the value of the collections edge.
@@ -89,7 +91,7 @@ type PostEdges struct {
 	ContentLinks []*Link `json:"content_links,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [13]bool
+	loadedTypes [14]bool
 }
 
 // AuthorOrErr returns the Author value or an error if the edge
@@ -181,10 +183,19 @@ func (e PostEdges) LikesOrErr() ([]*LikePost, error) {
 	return nil, &NotLoadedError{edge: "likes"}
 }
 
+// MentionsOrErr returns the Mentions value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) MentionsOrErr() ([]*MentionProfile, error) {
+	if e.loadedTypes[9] {
+		return e.Mentions, nil
+	}
+	return nil, &NotLoadedError{edge: "mentions"}
+}
+
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e PostEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[9] {
+	if e.loadedTypes[10] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -193,7 +204,7 @@ func (e PostEdges) AssetsOrErr() ([]*Asset, error) {
 // CollectionsOrErr returns the Collections value or an error if the edge
 // was not loaded in eager-loading.
 func (e PostEdges) CollectionsOrErr() ([]*Collection, error) {
-	if e.loadedTypes[10] {
+	if e.loadedTypes[11] {
 		return e.Collections, nil
 	}
 	return nil, &NotLoadedError{edge: "collections"}
@@ -204,7 +215,7 @@ func (e PostEdges) CollectionsOrErr() ([]*Collection, error) {
 func (e PostEdges) LinkOrErr() (*Link, error) {
 	if e.Link != nil {
 		return e.Link, nil
-	} else if e.loadedTypes[11] {
+	} else if e.loadedTypes[12] {
 		return nil, &NotFoundError{label: link.Label}
 	}
 	return nil, &NotLoadedError{edge: "link"}
@@ -213,7 +224,7 @@ func (e PostEdges) LinkOrErr() (*Link, error) {
 // ContentLinksOrErr returns the ContentLinks value or an error if the edge
 // was not loaded in eager-loading.
 func (e PostEdges) ContentLinksOrErr() ([]*Link, error) {
-	if e.loadedTypes[12] {
+	if e.loadedTypes[13] {
 		return e.ContentLinks, nil
 	}
 	return nil, &NotLoadedError{edge: "content_links"}
@@ -413,6 +424,11 @@ func (po *Post) QueryReacts() *ReactQuery {
 // QueryLikes queries the "likes" edge of the Post entity.
 func (po *Post) QueryLikes() *LikePostQuery {
 	return NewPostClient(po.config).QueryLikes(po)
+}
+
+// QueryMentions queries the "mentions" edge of the Post entity.
+func (po *Post) QueryMentions() *MentionProfileQuery {
+	return NewPostClient(po.config).QueryMentions(po)
 }
 
 // QueryAssets queries the "assets" edge of the Post entity.
