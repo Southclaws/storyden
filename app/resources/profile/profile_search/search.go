@@ -31,15 +31,20 @@ type Repository interface {
 
 func WithDisplayNameContains(q string) Filter {
 	return func(pq *ent.AccountQuery) {
-		pq.Where(account.And(
-			account.NameContainsFold(q),
-		))
+		pq.Where(account.NameContainsFold(q))
 	}
 }
 
 func WithHandleContains(q string) Filter {
 	return func(pq *ent.AccountQuery) {
-		pq.Where(account.And(
+		pq.Where(account.HandleContainsFold(q))
+	}
+}
+
+func WithNamesLike(q string) Filter {
+	return func(pq *ent.AccountQuery) {
+		pq.Where(account.Or(
+			account.NameContainsFold(q),
 			account.HandleContainsFold(q),
 		))
 	}
@@ -59,7 +64,7 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	q := d.db.Account.Query().
+	q := d.db.Debug().Account.Query().
 		Limit(size + 1).
 		Offset(page * size).
 		Order(ent.Desc(account.FieldCreatedAt))
