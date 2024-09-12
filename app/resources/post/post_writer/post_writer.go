@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
@@ -28,7 +28,7 @@ func New(db *ent.Client) *PostWriter {
 
 type Option func(*ent.PostMutation)
 
-func WithContent(v content.Rich) Option {
+func WithContent(v datagraph.Content) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetBody(v.HTML())
 		pm.SetShort(v.Short())

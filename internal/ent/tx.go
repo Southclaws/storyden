@@ -36,6 +36,8 @@ type Tx struct {
 	LikePost *LikePostClient
 	// Link is the client for interacting with the Link builders.
 	Link *LinkClient
+	// MentionProfile is the client for interacting with the MentionProfile builders.
+	MentionProfile *MentionProfileClient
 	// Node is the client for interacting with the Node builders.
 	Node *NodeClient
 	// Notification is the client for interacting with the Notification builders.
@@ -192,6 +194,7 @@ func (tx *Tx) init() {
 	tx.Email = NewEmailClient(tx.config)
 	tx.LikePost = NewLikePostClient(tx.config)
 	tx.Link = NewLinkClient(tx.config)
+	tx.MentionProfile = NewMentionProfileClient(tx.config)
 	tx.Node = NewNodeClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)
 	tx.Post = NewPostClient(tx.config)

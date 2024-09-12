@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	reply_service "github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
@@ -45,7 +45,7 @@ func (p *Replies) ReplyCreate(ctx context.Context, request openapi.ReplyCreateRe
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	richContent, err := content.NewRichText(request.Body.Body)
+	richContent, err := datagraph.NewRichText(request.Body.Body)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}

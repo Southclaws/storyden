@@ -7,7 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection"
-	"github.com/Southclaws/storyden/app/resources/content"
+
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -83,7 +83,7 @@ func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (
 			return *link_ref.Map(&in)
 		})
 
-		content, err := content.NewRichText(m.Body)
+		content, err := datagraph.NewRichText(m.Body)
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}

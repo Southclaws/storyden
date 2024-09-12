@@ -13,7 +13,8 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
+
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -55,7 +56,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 
 	tags := opt.NewPtr(request.Body.Tags)
 
-	richContent, err := content.NewRichText(request.Body.Body)
+	richContent, err := datagraph.NewRichText(request.Body.Body)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -103,7 +104,7 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	richContent, err := opt.MapErr(opt.NewPtr(request.Body.Body), content.NewRichText)
+	richContent, err := opt.MapErr(opt.NewPtr(request.Body.Body), datagraph.NewRichText)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}

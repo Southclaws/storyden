@@ -3,16 +3,18 @@ package datagraph
 import (
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/fault"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/content"
 )
+
+var ErrInvalidReferenceScheme = fault.New("invalid reference scheme")
 
 type (
 	Identifiable interface{ GetID() xid.ID }             // Has a unique ID
 	Slugged      interface{ GetSlug() string }           // Has a URL slug for web browser access
 	Named        interface{ GetName() string }           // Has a renderable display name
 	Described    interface{ GetDesc() string }           // Has a short description of some sort
-	WithContent  interface{ GetContent() content.Rich }  // Has long-form rich-text content
+	WithContent  interface{ GetContent() Content }       // Has long-form rich-text content
 	WithProps    interface{ GetProps() map[string]any }  // Has arbitrary metadata
 	WithAssets   interface{ GetAssets() []*asset.Asset } // Has media assets
 )
@@ -51,29 +53,3 @@ type ItemRef interface {
 }
 
 type ItemList []Item
-
-// Ref is a non-hydrated type to express a result type from semdex operations
-// such as searching or recommendations. It can be hydrated into an Item using
-// the Kind field to select a relevant resource querier to find the full object.
-type Ref struct {
-	ID        xid.ID
-	Kind      Kind
-	Relevance float64
-}
-
-func (r *Ref) GetID() xid.ID {
-	return r.ID
-}
-
-func (r *Ref) GetKind() Kind {
-	return r.Kind
-}
-
-type RefList []*Ref
-
-func NewRef(i Item) *Ref {
-	return &Ref{
-		ID:   i.GetID(),
-		Kind: i.GetKind(),
-	}
-}

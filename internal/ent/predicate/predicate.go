@@ -39,6 +39,9 @@ type LikePost func(*sql.Selector)
 // Link is the predicate function for link builders.
 type Link func(*sql.Selector)
 
+// MentionProfile is the predicate function for mentionprofile builders.
+type MentionProfile func(*sql.Selector)
+
 // Node is the predicate function for node builders.
 type Node func(*sql.Selector)
 

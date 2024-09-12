@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
+	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -263,6 +264,21 @@ func (ac *AccountCreate) AddLikes(l ...*LikePost) *AccountCreate {
 		ids[i] = l[i].ID
 	}
 	return ac.AddLikeIDs(ids...)
+}
+
+// AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
+func (ac *AccountCreate) AddMentionIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddMentionIDs(ids...)
+	return ac
+}
+
+// AddMentions adds the "mentions" edges to the MentionProfile entity.
+func (ac *AccountCreate) AddMentions(m ...*MentionProfile) *AccountCreate {
+	ids := make([]xid.ID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return ac.AddMentionIDs(ids...)
 }
 
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
@@ -633,6 +649,22 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.MentionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.MentionsTable,
+			Columns: []string{account.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
