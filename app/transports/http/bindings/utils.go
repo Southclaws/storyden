@@ -8,7 +8,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
@@ -80,7 +80,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 	}
 }
 
-func serialiseContentHTML(c content.Rich) string {
+func serialiseContentHTML(c datagraph.Content) string {
 	return c.HTML()
 }
 

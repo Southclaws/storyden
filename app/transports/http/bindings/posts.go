@@ -9,7 +9,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	reply_service "github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
@@ -40,7 +40,7 @@ func (p *Posts) PostUpdate(ctx context.Context, request openapi.PostUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	richContent, err := opt.MapErr(opt.NewPtr(request.Body.Body), content.NewRichText)
+	richContent, err := opt.MapErr(opt.NewPtr(request.Body.Body), datagraph.NewRichText)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}

@@ -9,7 +9,6 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/content"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 )
@@ -39,7 +38,7 @@ type Node struct {
 	Slug           string
 	Assets         []*asset.Asset
 	WebLink        opt.Optional[link_ref.LinkRef]
-	Content        opt.Optional[content.Rich]
+	Content        opt.Optional[datagraph.Content]
 	Description    opt.Optional[string]
 	Owner          profile.Public
 	Parent         opt.Optional[Node]
@@ -68,6 +67,6 @@ func (c *Node) GetDesc() string {
 
 	return ""
 }
-func (c *Node) GetContent() content.Rich  { return c.Content.OrZero() }
-func (c *Node) GetProps() map[string]any  { return c.Metadata }
-func (c *Node) GetAssets() []*asset.Asset { return c.Assets }
+func (c *Node) GetContent() datagraph.Content { return c.Content.OrZero() }
+func (c *Node) GetProps() map[string]any      { return c.Metadata }
+func (c *Node) GetAssets() []*asset.Asset     { return c.Assets }

@@ -5,7 +5,8 @@ package notification
 type eventEnum string
 
 const (
-	eventThreadReply eventEnum = "thread_reply"
-	eventPostLike    eventEnum = "post_like"
-	eventFollow      eventEnum = "follow"
+	eventThreadReply    eventEnum = "thread_reply"
+	eventPostLike       eventEnum = "post_like"
+	eventFollow         eventEnum = "follow"
+	eventProfileMention eventEnum = "profile_mention"
 )

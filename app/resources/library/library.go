@@ -7,7 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/content"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -81,7 +81,7 @@ func WithContentLinks(ids ...xid.ID) Option {
 	}
 }
 
-func WithContent(v content.Rich) Option {
+func WithContent(v datagraph.Content) Option {
 	return func(c *ent.NodeMutation) {
 		c.SetContent(v.HTML())
 		c.SetDescription(v.Short())

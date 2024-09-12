@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
+	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -395,6 +396,21 @@ func (pu *PostUpdate) AddLikes(l ...*LikePost) *PostUpdate {
 	return pu.AddLikeIDs(ids...)
 }
 
+// AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
+func (pu *PostUpdate) AddMentionIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.AddMentionIDs(ids...)
+	return pu
+}
+
+// AddMentions adds the "mentions" edges to the MentionProfile entity.
+func (pu *PostUpdate) AddMentions(m ...*MentionProfile) *PostUpdate {
+	ids := make([]xid.ID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return pu.AddMentionIDs(ids...)
+}
+
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
 func (pu *PostUpdate) AddAssetIDs(ids ...xid.ID) *PostUpdate {
 	pu.mutation.AddAssetIDs(ids...)
@@ -577,6 +593,27 @@ func (pu *PostUpdate) RemoveLikes(l ...*LikePost) *PostUpdate {
 		ids[i] = l[i].ID
 	}
 	return pu.RemoveLikeIDs(ids...)
+}
+
+// ClearMentions clears all "mentions" edges to the MentionProfile entity.
+func (pu *PostUpdate) ClearMentions() *PostUpdate {
+	pu.mutation.ClearMentions()
+	return pu
+}
+
+// RemoveMentionIDs removes the "mentions" edge to MentionProfile entities by IDs.
+func (pu *PostUpdate) RemoveMentionIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.RemoveMentionIDs(ids...)
+	return pu
+}
+
+// RemoveMentions removes "mentions" edges to MentionProfile entities.
+func (pu *PostUpdate) RemoveMentions(m ...*MentionProfile) *PostUpdate {
+	ids := make([]xid.ID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return pu.RemoveMentionIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -1091,6 +1128,51 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.MentionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.MentionsTable,
+			Columns: []string{post.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !pu.mutation.MentionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.MentionsTable,
+			Columns: []string{post.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.MentionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.MentionsTable,
+			Columns: []string{post.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1641,6 +1723,21 @@ func (puo *PostUpdateOne) AddLikes(l ...*LikePost) *PostUpdateOne {
 	return puo.AddLikeIDs(ids...)
 }
 
+// AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
+func (puo *PostUpdateOne) AddMentionIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.AddMentionIDs(ids...)
+	return puo
+}
+
+// AddMentions adds the "mentions" edges to the MentionProfile entity.
+func (puo *PostUpdateOne) AddMentions(m ...*MentionProfile) *PostUpdateOne {
+	ids := make([]xid.ID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return puo.AddMentionIDs(ids...)
+}
+
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
 func (puo *PostUpdateOne) AddAssetIDs(ids ...xid.ID) *PostUpdateOne {
 	puo.mutation.AddAssetIDs(ids...)
@@ -1823,6 +1920,27 @@ func (puo *PostUpdateOne) RemoveLikes(l ...*LikePost) *PostUpdateOne {
 		ids[i] = l[i].ID
 	}
 	return puo.RemoveLikeIDs(ids...)
+}
+
+// ClearMentions clears all "mentions" edges to the MentionProfile entity.
+func (puo *PostUpdateOne) ClearMentions() *PostUpdateOne {
+	puo.mutation.ClearMentions()
+	return puo
+}
+
+// RemoveMentionIDs removes the "mentions" edge to MentionProfile entities by IDs.
+func (puo *PostUpdateOne) RemoveMentionIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.RemoveMentionIDs(ids...)
+	return puo
+}
+
+// RemoveMentions removes "mentions" edges to MentionProfile entities.
+func (puo *PostUpdateOne) RemoveMentions(m ...*MentionProfile) *PostUpdateOne {
+	ids := make([]xid.ID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return puo.RemoveMentionIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -2367,6 +2485,51 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.MentionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.MentionsTable,
+			Columns: []string{post.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !puo.mutation.MentionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.MentionsTable,
+			Columns: []string{post.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.MentionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.MentionsTable,
+			Columns: []string{post.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

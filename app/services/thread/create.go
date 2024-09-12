@@ -11,6 +11,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -71,6 +72,8 @@ func (s *service) Create(ctx context.Context,
 	}
 
 	s.fetcher.HydrateContentURLs(ctx, thr)
+
+	s.mentioner.Send(ctx, *datagraph.NewRef(thr), thr.Content.References()...)
 
 	return thr, nil
 }

@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
+	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -282,6 +283,21 @@ func (au *AccountUpdate) AddLikes(l ...*LikePost) *AccountUpdate {
 	return au.AddLikeIDs(ids...)
 }
 
+// AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
+func (au *AccountUpdate) AddMentionIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.AddMentionIDs(ids...)
+	return au
+}
+
+// AddMentions adds the "mentions" edges to the MentionProfile entity.
+func (au *AccountUpdate) AddMentions(m ...*MentionProfile) *AccountUpdate {
+	ids := make([]xid.ID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return au.AddMentionIDs(ids...)
+}
+
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
 func (au *AccountUpdate) AddRoleIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddRoleIDs(ids...)
@@ -543,6 +559,27 @@ func (au *AccountUpdate) RemoveLikes(l ...*LikePost) *AccountUpdate {
 		ids[i] = l[i].ID
 	}
 	return au.RemoveLikeIDs(ids...)
+}
+
+// ClearMentions clears all "mentions" edges to the MentionProfile entity.
+func (au *AccountUpdate) ClearMentions() *AccountUpdate {
+	au.mutation.ClearMentions()
+	return au
+}
+
+// RemoveMentionIDs removes the "mentions" edge to MentionProfile entities by IDs.
+func (au *AccountUpdate) RemoveMentionIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.RemoveMentionIDs(ids...)
+	return au
+}
+
+// RemoveMentions removes "mentions" edges to MentionProfile entities.
+func (au *AccountUpdate) RemoveMentions(m ...*MentionProfile) *AccountUpdate {
+	ids := make([]xid.ID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return au.RemoveMentionIDs(ids...)
 }
 
 // ClearRoles clears all "roles" edges to the Role entity.
@@ -1141,6 +1178,51 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.MentionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.MentionsTable,
+			Columns: []string{account.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !au.mutation.MentionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.MentionsTable,
+			Columns: []string{account.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.MentionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.MentionsTable,
+			Columns: []string{account.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if au.mutation.RolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -1671,6 +1753,21 @@ func (auo *AccountUpdateOne) AddLikes(l ...*LikePost) *AccountUpdateOne {
 	return auo.AddLikeIDs(ids...)
 }
 
+// AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
+func (auo *AccountUpdateOne) AddMentionIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.AddMentionIDs(ids...)
+	return auo
+}
+
+// AddMentions adds the "mentions" edges to the MentionProfile entity.
+func (auo *AccountUpdateOne) AddMentions(m ...*MentionProfile) *AccountUpdateOne {
+	ids := make([]xid.ID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return auo.AddMentionIDs(ids...)
+}
+
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
 func (auo *AccountUpdateOne) AddRoleIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddRoleIDs(ids...)
@@ -1932,6 +2029,27 @@ func (auo *AccountUpdateOne) RemoveLikes(l ...*LikePost) *AccountUpdateOne {
 		ids[i] = l[i].ID
 	}
 	return auo.RemoveLikeIDs(ids...)
+}
+
+// ClearMentions clears all "mentions" edges to the MentionProfile entity.
+func (auo *AccountUpdateOne) ClearMentions() *AccountUpdateOne {
+	auo.mutation.ClearMentions()
+	return auo
+}
+
+// RemoveMentionIDs removes the "mentions" edge to MentionProfile entities by IDs.
+func (auo *AccountUpdateOne) RemoveMentionIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.RemoveMentionIDs(ids...)
+	return auo
+}
+
+// RemoveMentions removes "mentions" edges to MentionProfile entities.
+func (auo *AccountUpdateOne) RemoveMentions(m ...*MentionProfile) *AccountUpdateOne {
+	ids := make([]xid.ID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return auo.RemoveMentionIDs(ids...)
 }
 
 // ClearRoles clears all "roles" edges to the Role entity.
@@ -2553,6 +2671,51 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.MentionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.MentionsTable,
+			Columns: []string{account.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !auo.mutation.MentionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.MentionsTable,
+			Columns: []string{account.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.MentionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.MentionsTable,
+			Columns: []string{account.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

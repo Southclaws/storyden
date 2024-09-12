@@ -640,6 +640,29 @@ func HasLikesWith(preds ...predicate.LikePost) predicate.Account {
 	})
 }
 
+// HasMentions applies the HasEdge predicate on the "mentions" edge.
+func HasMentions() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, MentionsTable, MentionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasMentionsWith applies the HasEdge predicate on the "mentions" edge with a given conditions (other predicates).
+func HasMentionsWith(preds ...predicate.MentionProfile) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newMentionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasRoles applies the HasEdge predicate on the "roles" edge.
 func HasRoles() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

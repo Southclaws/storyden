@@ -53,3 +53,8 @@ type Notification struct {
 	Item     *datagraph.Ref
 	TargetID account.AccountID
 }
+
+type Mention struct {
+	Source datagraph.Ref
+	Item   datagraph.Ref
+}

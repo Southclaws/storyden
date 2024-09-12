@@ -141,6 +141,18 @@ func (f LinkFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LinkMutation", m)
 }
 
+// The MentionProfileFunc type is an adapter to allow the use of ordinary
+// function as MentionProfile mutator.
+type MentionProfileFunc func(context.Context, *ent.MentionProfileMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MentionProfileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MentionProfileMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MentionProfileMutation", m)
+}
+
 // The NodeFunc type is an adapter to allow the use of ordinary
 // function as Node mutator.
 type NodeFunc func(context.Context, *ent.NodeMutation) (ent.Value, error)

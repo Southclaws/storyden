@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
 	"github.com/Southclaws/storyden/app/services/like/post_liker"
 	"github.com/Southclaws/storyden/app/services/link"
+	"github.com/Southclaws/storyden/app/services/mention/mention_job"
 	"github.com/Southclaws/storyden/app/services/notification/notify_job"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/profile/following"
@@ -50,6 +51,7 @@ func Build() fx.Option {
 		collection.Build(),
 		link.Build(),
 		notify_job.Build(),
+		mention_job.Build(),
 		semdexer.Build(),
 		index_job.Build(),
 		summarise_job.Build(),
