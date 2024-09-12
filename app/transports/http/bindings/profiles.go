@@ -62,8 +62,7 @@ func (p *Profiles) ProfileList(ctx context.Context, request openapi.ProfileListR
 
 	if request.Params.Q != nil {
 		opts = append(opts,
-			profile_search.WithDisplayNameContains(*request.Params.Q),
-			profile_search.WithHandleContains(*request.Params.Q),
+			profile_search.WithNamesLike(*request.Params.Q),
 		)
 	}
 
