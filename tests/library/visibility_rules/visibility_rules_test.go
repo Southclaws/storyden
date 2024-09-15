@@ -28,7 +28,7 @@ func TestNodesVisibilityRules_Draft(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session.Jar,
-		aw account_writer.Writer,
+		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			ctxAdmin, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
@@ -97,7 +97,7 @@ func TestNodesVisibilityRules_Unlisted(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session.Jar,
-		aw account_writer.Writer,
+		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			ctxAdmin, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
@@ -166,7 +166,7 @@ func TestNodesVisibilityRules_Review(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session.Jar,
-		aw account_writer.Writer,
+		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			ctxAdmin, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
@@ -235,7 +235,7 @@ func TestNodesVisibilityRules_Published(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session.Jar,
-		aw account_writer.Writer,
+		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			ctxAdmin, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)

@@ -34,14 +34,14 @@ var errNoCookie = fault.New("no webauthn session cookie")
 
 type WebAuthn struct {
 	cj           *session.Jar
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 	wa           *waprovider.Provider
 	address      url.URL
 }
 
 func NewWebAuthn(
 	cfg config.Config,
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	cj *session.Jar,
 	wa *waprovider.Provider,
 	router *echo.Echo,

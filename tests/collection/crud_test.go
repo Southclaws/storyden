@@ -31,7 +31,7 @@ func TestCollectionCRUD(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session1.Jar,
-		aw account_writer.Writer,
+		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)

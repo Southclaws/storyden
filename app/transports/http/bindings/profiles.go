@@ -24,7 +24,7 @@ import (
 
 type Profiles struct {
 	apiAddress    url.URL
-	accountQuery  account_querier.Querier
+	accountQuery  *account_querier.Querier
 	ps            profile_search.Repository
 	followQuerier *follow_querier.Querier
 	followManager *following.FollowManager
@@ -32,7 +32,7 @@ type Profiles struct {
 
 func NewProfiles(
 	cfg config.Config,
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	ps profile_search.Repository,
 	followQuerier *follow_querier.Querier,
 	followManager *following.FollowManager,

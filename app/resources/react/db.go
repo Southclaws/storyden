@@ -52,17 +52,11 @@ func (d *database) Add(ctx context.Context, accountID account.AccountID, postID 
 }
 
 func (d *database) Remove(ctx context.Context, accountID account.AccountID, reactID ReactID) (*React, error) {
-	// First, look up the react to check if this account has permissions to remove.
 	p, err := d.db.React.Get(ctx, xid.ID(reactID))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	if !p.Edges.Account.Admin && p.Edges.Account.ID != xid.ID(accountID) {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
-	}
-
-	// the account has permission, remove it.
 	if err := d.db.React.DeleteOneID(xid.ID(reactID)).Exec(ctx); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}

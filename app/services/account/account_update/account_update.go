@@ -20,7 +20,7 @@ type Updater struct {
 	fx.In
 
 	Log        *zap.Logger
-	Writer     account_writer.Writer
+	Writer     *account_writer.Writer
 	IndexQueue pubsub.Topic[mq.IndexProfile]
 }
 

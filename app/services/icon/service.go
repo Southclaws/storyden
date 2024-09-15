@@ -24,10 +24,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/asset/asset_download"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
 )
@@ -57,10 +55,7 @@ var sizeMap = map[Size]int{
 	"32x32":   32,
 }
 
-var (
-	errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
-	errBadFormat     = fault.Wrap(fault.New("bad format"), ftag.With(ftag.InvalidArgument))
-)
+var errBadFormat = fault.Wrap(fault.New("bad format"), ftag.With(ftag.InvalidArgument))
 
 type Service interface {
 	Upload(ctx context.Context, r io.Reader) error
@@ -72,10 +67,9 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l    *zap.Logger
-	rbac rbac.AccessManager
+	l *zap.Logger
 
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 	uploader     *asset_upload.Uploader
 	downloader   *asset_download.Downloader
 	thread_repo  thread.Repository
@@ -87,9 +81,8 @@ type service struct {
 
 func New(
 	l *zap.Logger,
-	rbac rbac.AccessManager,
 
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	uploader *asset_upload.Uploader,
 	downloader *asset_download.Downloader,
 	thread_repo thread.Repository,
@@ -98,8 +91,8 @@ func New(
 	cfg config.Config,
 ) Service {
 	return &service{
-		l:            l.With(zap.String("service", "icon")),
-		rbac:         rbac,
+		l: l.With(zap.String("service", "icon")),
+
 		accountQuery: accountQuery,
 		uploader:     uploader,
 		downloader:   downloader,
@@ -110,20 +103,6 @@ func New(
 }
 
 func (s *service) Upload(ctx context.Context, r io.Reader) error {
-	accountID, err := session.GetAccountID(ctx)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	acc, err := s.accountQuery.GetByID(ctx, accountID)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if !acc.Admin {
-		return fault.Wrap(errNotAuthorised, fctx.With(ctx))
-	}
-
 	return s.uploadSizes(ctx, r, sizes)
 }
 

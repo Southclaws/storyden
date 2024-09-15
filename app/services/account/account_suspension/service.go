@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	authentication_repo "github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication"
 )
 
@@ -27,27 +26,24 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l    *zap.Logger
-	rbac rbac.AccessManager
+	l *zap.Logger
 
 	auth_repo      authentication_repo.Repository
-	account_writer account_writer.Writer
+	account_writer *account_writer.Writer
 
 	auth_svc *authentication.Manager
 }
 
 func New(
 	l *zap.Logger,
-	rbac rbac.AccessManager,
 
 	auth_repo authentication_repo.Repository,
-	account_writer account_writer.Writer,
+	account_writer *account_writer.Writer,
 
 	auth_svc *authentication.Manager,
 ) Service {
 	return &service{
 		l:              l.With(zap.String("service", "account")),
-		rbac:           rbac,
 		auth_repo:      auth_repo,
 		account_writer: account_writer,
 		auth_svc:       auth_svc,

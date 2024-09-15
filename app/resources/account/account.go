@@ -4,11 +4,13 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/rs/xid"
+
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/rs/xid"
 )
 
 var errSuspended = fault.Wrap(fault.New("suspended"), ftag.With(ftag.PermissionDenied))
@@ -26,6 +28,7 @@ type Account struct {
 	Followers      int
 	Following      int
 	LikeScore      int
+	Roles          role.Roles
 	Auths          []string
 	EmailAddresses []*EmailAddress
 	VerifiedStatus VerifiedStatus
@@ -53,16 +56,3 @@ func (a *Account) RejectSuspended() error {
 
 	return nil
 }
-
-// Name is the role/resource name.
-const Name = "Account"
-
-func (a *Account) GetRole() string {
-	if a.Admin {
-		return "everyone"
-	}
-
-	return "owner"
-}
-
-func (*Account) GetResourceName() string { return Name }

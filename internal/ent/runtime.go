@@ -707,6 +707,10 @@ func init() {
 	role.DefaultUpdatedAt = roleDescUpdatedAt.Default.(func() time.Time)
 	// role.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	role.UpdateDefaultUpdatedAt = roleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// roleDescColour is the schema descriptor for colour field.
+	roleDescColour := roleFields[1].Descriptor()
+	// role.DefaultColour holds the default value on creation for the colour field.
+	role.DefaultColour = roleDescColour.Default.(string)
 	// roleDescID is the schema descriptor for id field.
 	roleDescID := roleMixinFields0[0].Descriptor()
 	// role.DefaultID holds the default value on creation for the id field.

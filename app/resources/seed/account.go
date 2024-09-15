@@ -45,7 +45,7 @@ var (
 	}
 )
 
-func accounts(r account_writer.Writer, auth authentication.Repository) {
+func accounts(r *account_writer.Writer, auth authentication.Repository) {
 	ctx := context.Background()
 
 	for _, v := range Accounts {
@@ -63,7 +63,7 @@ func accounts(r account_writer.Writer, auth authentication.Repository) {
 	fmt.Println("created seed users")
 }
 
-func SeedAccount(ctx context.Context, r account_writer.Writer, auth authentication.Repository, v account.Account) {
+func SeedAccount(ctx context.Context, r *account_writer.Writer, auth authentication.Repository, v account.Account) {
 	acc, err := r.Create(ctx, v.Handle,
 		account_writer.WithID(v.ID),
 		account_writer.WithName(v.Name),
@@ -82,7 +82,7 @@ func SeedAccount(ctx context.Context, r account_writer.Writer, auth authenticati
 	}
 }
 
-func SeedAccountUnique(ctx context.Context, r account_writer.Writer, auth authentication.Repository, opts ...account_writer.Option) {
+func SeedAccountUnique(ctx context.Context, r *account_writer.Writer, auth authentication.Repository, opts ...account_writer.Option) {
 	id := account.AccountID(xid.New())
 	handle := fmt.Sprintf("acc%s", id.String())
 

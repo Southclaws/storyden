@@ -13,15 +13,13 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Uploader struct {
-	l    *zap.Logger
-	rbac rbac.AccessManager
+	l *zap.Logger
 
 	nodewriter library.Repository
 	assets     asset.Repository
@@ -31,7 +29,6 @@ type Uploader struct {
 
 func New(
 	l *zap.Logger,
-	rbac rbac.AccessManager,
 
 	nodewriter library.Repository,
 	assets asset.Repository,
@@ -39,8 +36,7 @@ func New(
 	queue pubsub.Topic[mq.AnalyseAsset],
 ) *Uploader {
 	return &Uploader{
-		l:    l.With(zap.String("service", "asset")),
-		rbac: rbac,
+		l: l.With(zap.String("service", "asset")),
 
 		nodewriter: nodewriter,
 		assets:     assets,

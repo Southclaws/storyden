@@ -34,13 +34,13 @@ const template = `Your unique one-time login code is: %s`
 
 type Provider struct {
 	auth     authentication.Repository
-	account  account_querier.Querier
+	account  *account_querier.Querier
 	register *register.Registrar
 
 	sms sms.Sender
 }
 
-func New(auth authentication.Repository, account account_querier.Querier, register *register.Registrar, sms sms.Sender) *Provider {
+func New(auth authentication.Repository, account *account_querier.Querier, register *register.Registrar, sms sms.Sender) *Provider {
 	return &Provider{auth, account, register, sms}
 }
 

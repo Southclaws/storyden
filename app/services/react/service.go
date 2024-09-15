@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/react"
 )
 
@@ -26,8 +25,7 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l    *zap.Logger
-	rbac rbac.AccessManager
+	l *zap.Logger
 
 	post_repo  reply.Repository
 	react_repo react.Repository
@@ -35,14 +33,13 @@ type service struct {
 
 func New(
 	l *zap.Logger,
-	rbac rbac.AccessManager,
 
 	post_repo reply.Repository,
 	react_repo react.Repository,
 ) Service {
 	return &service{
-		l:          l.With(zap.String("service", "react")),
-		rbac:       rbac,
+		l: l.With(zap.String("service", "react")),
+
 		post_repo:  post_repo,
 		react_repo: react_repo,
 	}

@@ -12,9 +12,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	library_service "github.com/Southclaws/storyden/app/services/library"
 )
-
-var errNotAuthorised = fault.New("not authorised", ftag.With(ftag.PermissionDenied))
 
 var (
 	ErrIdenticalParentChild = fault.New("cannot relate a node to itself", ftag.With(ftag.InvalidArgument))
@@ -32,10 +31,10 @@ type Graph interface {
 
 type service struct {
 	nr           library.Repository
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 }
 
-func New(nr library.Repository, accountQuery account_querier.Querier) Graph {
+func New(nr library.Repository, accountQuery *account_querier.Querier) Graph {
 	return &service{nr: nr, accountQuery: accountQuery}
 }
 
@@ -64,16 +63,14 @@ func (s *service) Move(ctx context.Context, child library.NodeSlug, parent libra
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := library_service.AuthoriseNodeParentChildMutation(ctx, acc, cnode, pnode); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	passesVisibilityRules := visibilityRules[pnode.Visibility][cnode.Visibility]
 
 	if !passesVisibilityRules {
 		return nil, fault.Wrap(ErrVisibilityRules, fctx.With(ctx))
-	}
-
-	if !acc.Admin {
-		if cnode.Owner.ID != accountID && pnode.Owner.ID != accountID {
-			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
-		}
 	}
 
 	// If the target parent is actually a child of the target child, sever this
@@ -104,29 +101,31 @@ func (s *service) Sever(ctx context.Context, child library.NodeSlug, parent libr
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	n, err := s.nr.Get(ctx, child)
+	acc, err := s.accountQuery.GetByID(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pclus, err := s.nr.Get(ctx, parent)
+	cnode, err := s.nr.Get(ctx, child)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if !n.Owner.Admin {
-		if n.Owner.ID != accountID && pclus.Owner.ID != accountID {
-			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
-		}
-	}
-
-	pclus, err = s.nr.Update(ctx, pclus.ID, library.WithChildNodeRemove(xid.ID(n.ID)))
+	pnode, err := s.nr.Get(ctx, parent)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return pclus, nil
+	if err := library_service.AuthoriseNodeParentChildMutation(ctx, acc, cnode, pnode); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	pnode, err = s.nr.Update(ctx, pnode.ID, library.WithChildNodeRemove(xid.ID(cnode.ID)))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return pnode, nil
 }
 
 // visibilityRules defines the rules for which visibility levels can be nested.

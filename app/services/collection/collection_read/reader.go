@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/account/session"
 )
@@ -42,7 +43,7 @@ func (r *CollectionQuerier) GetCollection(ctx context.Context, id collection.Col
 	}
 
 	// The owner and admins can always read the unlisted collection items
-	canReadUnlisted := acc.Admin || acc.ID == col.Owner.ID
+	canReadUnlisted := acc.Roles.Permissions().HasAny(rbac.PermissionAdministrator) || acc.ID == col.Owner.ID
 
 	col.Items = dt.Filter(col.Items, func(i *collection.CollectionItem) bool {
 		if canReadUnlisted {

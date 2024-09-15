@@ -5,18 +5,13 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/post/category"
-	"github.com/Southclaws/storyden/app/resources/rbac"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
-
-var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
 
 type Service interface {
 	Create(ctx context.Context, name string, description string, colour string, admin bool) (*category.Category, error)
@@ -38,33 +33,27 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l    *zap.Logger
-	rbac rbac.AccessManager
+	l *zap.Logger
 
-	accountQuery  account_querier.Querier
+	accountQuery  *account_querier.Querier
 	category_repo category.Repository
 }
 
 func New(
 	l *zap.Logger,
-	rbac rbac.AccessManager,
 
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	category_repo category.Repository,
 ) Service {
 	return &service{
-		l:             l.With(zap.String("service", "collection")),
-		rbac:          rbac,
+		l: l.With(zap.String("service", "collection")),
+
 		accountQuery:  accountQuery,
 		category_repo: category_repo,
 	}
 }
 
 func (s *service) Create(ctx context.Context, name string, description string, colour string, admin bool) (*category.Category, error) {
-	if err := s.authorise(ctx); err != nil {
-		return nil, err
-	}
-
 	cat, err := s.category_repo.CreateCategory(ctx, name, description, colour, 0, admin)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -74,10 +63,6 @@ func (s *service) Create(ctx context.Context, name string, description string, c
 }
 
 func (s *service) Reorder(ctx context.Context, ids []category.CategoryID) ([]*category.Category, error) {
-	if err := s.authorise(ctx); err != nil {
-		return nil, err
-	}
-
 	cats, err := s.category_repo.Reorder(ctx, ids)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -87,10 +72,6 @@ func (s *service) Reorder(ctx context.Context, ids []category.CategoryID) ([]*ca
 }
 
 func (s *service) Update(ctx context.Context, id category.CategoryID, partial Partial) (*category.Category, error) {
-	if err := s.authorise(ctx); err != nil {
-		return nil, err
-	}
-
 	opts := []category.Option{}
 
 	if v, ok := partial.Name.Get(); ok {
@@ -118,22 +99,4 @@ func (s *service) Update(ctx context.Context, id category.CategoryID, partial Pa
 	}
 
 	return cat, nil
-}
-
-func (s *service) authorise(ctx context.Context) error {
-	aid, err := session.GetAccountID(ctx)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	acc, err := s.accountQuery.GetByID(ctx, aid)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if !acc.Admin {
-		return fault.Wrap(errNotAuthorised, fctx.With(ctx))
-	}
-
-	return nil
 }

@@ -29,7 +29,7 @@ func TestEmailPasswordAuth(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session1.Jar,
-		accountQuery account_querier.Querier,
+		accountQuery *account_querier.Querier,
 		mail mailer.Sender,
 	) {
 		inbox := mail.(*mailer.Mock)
