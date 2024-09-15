@@ -8,12 +8,19 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 )
 
 func MapAccount(a *ent.Account) (*Account, error) {
+	rolesEdge, err := a.Edges.RolesOrErr()
+	if err != nil {
+		return nil, err
+	}
+
 	auths := dt.Map(a.Edges.Authentication, func(a *ent.Authentication) string {
 		return a.Service
 	})
@@ -24,6 +31,11 @@ func MapAccount(a *ent.Account) (*Account, error) {
 	}
 
 	links, err := dt.MapErr(a.Links, MapExternalLink)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	roles, err := role.Map(rolesEdge, a.Admin)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -40,7 +52,8 @@ func MapAccount(a *ent.Account) (*Account, error) {
 		Handle:         a.Handle,
 		Name:           a.Name,
 		Bio:            bio,
-		Admin:          a.Admin,
+		Admin:          roles.Permissions().HasAll(rbac.PermissionAdministrator),
+		Roles:          roles,
 		Auths:          auths,
 		EmailAddresses: emails,
 		VerifiedStatus: verifiedStatus,

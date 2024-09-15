@@ -18,12 +18,12 @@ import (
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
 
 type Admin struct {
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 	as           account_suspension.Service
 	sr           settings.Repository
 }
 
-func NewAdmin(accountQuery account_querier.Querier, as account_suspension.Service, sr settings.Repository) Admin {
+func NewAdmin(accountQuery *account_querier.Querier, as account_suspension.Service, sr settings.Repository) Admin {
 	return Admin{accountQuery, as, sr}
 }
 

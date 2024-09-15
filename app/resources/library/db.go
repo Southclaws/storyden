@@ -61,7 +61,9 @@ func (d *database) Create(
 func (d *database) List(ctx context.Context, filters ...Filter) ([]*Node, error) {
 	q := d.db.Node.
 		Query().
-		WithOwner().
+		WithOwner(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithAssets().
 		WithLink(func(lq *ent.LinkQuery) {
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
@@ -89,7 +91,9 @@ func (d *database) Get(ctx context.Context, slug NodeSlug) (*Node, error) {
 	col, err := d.db.Node.
 		Query().
 		Where(node.Slug(string(slug))).
-		WithOwner().
+		WithOwner(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithAssets().
 		WithLink(func(lq *ent.LinkQuery) {
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
@@ -97,13 +101,17 @@ func (d *database) Get(ctx context.Context, slug NodeSlug) (*Node, error) {
 		WithNodes(func(cq *ent.NodeQuery) {
 			cq.
 				WithAssets().
-				WithOwner().
+				WithOwner(func(aq *ent.AccountQuery) {
+					aq.WithRoles()
+				}).
 				Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
 		}).
 		WithParent(func(cq *ent.NodeQuery) {
 			cq.
 				WithAssets().
-				WithOwner()
+				WithOwner(func(aq *ent.AccountQuery) {
+					aq.WithRoles()
+				})
 		}).
 		Only(ctx)
 	if err != nil {
@@ -122,7 +130,9 @@ func (d *database) GetByID(ctx context.Context, id NodeID) (*Node, error) {
 	col, err := d.db.Node.
 		Query().
 		Where(node.ID(xid.ID(id))).
-		WithOwner().
+		WithOwner(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithAssets().
 		WithLink(func(lq *ent.LinkQuery) {
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
@@ -130,7 +140,9 @@ func (d *database) GetByID(ctx context.Context, id NodeID) (*Node, error) {
 		WithNodes(func(cq *ent.NodeQuery) {
 			cq.
 				WithAssets().
-				WithOwner().
+				WithOwner(func(aq *ent.AccountQuery) {
+					aq.WithRoles()
+				}).
 				Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
 		}).
 		Only(ctx)

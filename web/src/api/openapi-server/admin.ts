@@ -8,6 +8,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type {
+  AccountGetOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
 } from "../openapi-schema";
@@ -35,6 +36,60 @@ export const adminSettingsUpdate = async (
       ...options,
       method: "PATCH",
       body: JSON.stringify(adminSettingsUpdateBody),
+    },
+  );
+};
+
+/**
+ * Suspend an account - soft delete. This disables the ability for the
+account owner to log in and use the platform. It keeps the account on
+record for linkage to content so UI doesn't break. It does not change
+anything else about the account such as the avatar, name, etc.
+
+ */
+export type adminAccountBanCreateResponse = {
+  data: AccountGetOKResponse;
+  status: number;
+};
+
+export const getAdminAccountBanCreateUrl = (accountHandle: string) => {
+  return `/admin/bans/${accountHandle}`;
+};
+
+export const adminAccountBanCreate = async (
+  accountHandle: string,
+  options?: RequestInit,
+): Promise<adminAccountBanCreateResponse> => {
+  return fetcher<Promise<adminAccountBanCreateResponse>>(
+    getAdminAccountBanCreateUrl(accountHandle),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+};
+
+/**
+ * Given the account is suspended, remove the suspended state.
+ */
+export type adminAccountBanRemoveResponse = {
+  data: AccountGetOKResponse;
+  status: number;
+};
+
+export const getAdminAccountBanRemoveUrl = (accountHandle: string) => {
+  return `/admin/bans/${accountHandle}`;
+};
+
+export const adminAccountBanRemove = async (
+  accountHandle: string,
+  options?: RequestInit,
+): Promise<adminAccountBanRemoveResponse> => {
+  return fetcher<Promise<adminAccountBanRemoveResponse>>(
+    getAdminAccountBanRemoveUrl(accountHandle),
+    {
+      ...options,
+      method: "DELETE",
     },
   );
 };

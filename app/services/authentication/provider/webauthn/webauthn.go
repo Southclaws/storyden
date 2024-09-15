@@ -32,7 +32,7 @@ const (
 
 type Provider struct {
 	auth_repo    authentication.Repository
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 	reg          *register.Registrar
 
 	wa *webauthn.WebAuthn
@@ -40,7 +40,7 @@ type Provider struct {
 
 func New(
 	auth_repo authentication.Repository,
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	reg *register.Registrar,
 
 	wa *webauthn.WebAuthn,

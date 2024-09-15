@@ -6,7 +6,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/el-mike/restrict"
 	"github.com/rs/xid"
 	"go.uber.org/zap"
 
@@ -15,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
@@ -28,19 +26,6 @@ func (s *service) Create(ctx context.Context,
 	meta map[string]any,
 	partial Partial,
 ) (*thread.Thread, error) {
-	acc, err := s.accountQuery.GetByID(ctx, authorID)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
-	}
-
-	if err := s.rbac.Authorize(&restrict.AccessRequest{
-		Subject:  acc,
-		Resource: &thread.Thread{},
-		Actions:  []string{rbac.ActionCreate},
-	}); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to authorize"))
-	}
-
 	opts := partial.Opts()
 	opts = append(opts,
 		thread.WithVisibility(status),

@@ -3,6 +3,8 @@ package resources
 import (
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
@@ -25,7 +27,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_writer"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/resources/tag"
@@ -33,9 +34,10 @@ import (
 
 func Build() fx.Option {
 	return fx.Options(
-		rbac.Build(),
 		fx.Provide(
 			settings.New,
+			account_querier.New,
+			account_writer.New,
 			asset.New,
 			authentication.New,
 			category.New,

@@ -18,6 +18,8 @@ func (Role) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").
 			Unique(),
+		field.String("colour").Default("hsl(157, 65%, 44%)"),
+		field.Strings("permissions"),
 	}
 }
 

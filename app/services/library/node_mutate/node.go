@@ -20,8 +20,10 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	library_service "github.com/Southclaws/storyden/app/services/library"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -64,11 +66,12 @@ func (p Partial) Opts() (opts []library.Option) {
 	p.Metadata.Call(func(value map[string]any) { opts = append(opts, library.WithMetadata(value)) })
 	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, library.WithAssets(value)) })
 	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, library.WithAssetsRemoved(value)) })
+	p.Visibility.Call(func(value visibility.Visibility) { opts = append(opts, library.WithVisibility(value)) })
 	return
 }
 
 type service struct {
-	accountQuery      account_querier.Querier
+	accountQuery      *account_querier.Querier
 	nr                library.Repository
 	nc                node_children.Repository
 	fetcher           *fetcher.Fetcher
@@ -78,7 +81,7 @@ type service struct {
 }
 
 func New(
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	nr library.Repository,
 	nc node_children.Repository,
 	fetcher *fetcher.Fetcher,
@@ -109,8 +112,8 @@ func (s *service) Create(ctx context.Context,
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 
-			if !acc.Admin {
-				return nil, fault.Wrap(errNotAuthorised,
+			if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionManageLibrary); err != nil {
+				return nil, fault.Wrap(err,
 					fctx.With(ctx),
 					fmsg.WithDesc("non admin cannot publish nodes", "You do not have permission to publish, please submit as draft, review or unlisted."),
 				)
@@ -163,15 +166,18 @@ func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	acc, err := s.accountQuery.GetByID(ctx, accountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	n, err := s.nr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if !n.Owner.Admin {
-		if n.Owner.ID != accountID {
-			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
-		}
+	if err := library_service.AuthoriseNodeMutation(ctx, acc, n); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	opts, err := s.applyOpts(ctx, p)
@@ -233,15 +239,18 @@ func (s *service) Delete(ctx context.Context, slug library.NodeSlug, d DeleteOpt
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	acc, err := s.accountQuery.GetByID(ctx, accountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	n, err := s.nr.Get(ctx, slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if !n.Owner.Admin {
-		if n.Owner.ID != accountID {
-			return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
-		}
+	if err := library_service.AuthoriseNodeMutation(ctx, acc, n); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	destination, err := opt.MapErr(d.NewParent, func(target library.NodeSlug) (library.Node, error) {
@@ -265,13 +274,6 @@ func (s *service) Delete(ctx context.Context, slug library.NodeSlug, d DeleteOpt
 }
 
 func (s *service) applyOpts(ctx context.Context, p Partial) ([]library.Option, error) {
-	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (*account.Account, error) {
-		return s.accountQuery.GetByID(ctx, aid)
-	})
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	opts := p.Opts()
 
 	if parentSlug, ok := p.Parent.Get(); ok {
@@ -281,17 +283,6 @@ func (s *service) applyOpts(ctx context.Context, p Partial) ([]library.Option, e
 		}
 
 		opts = append(opts, library.WithParent(parent.ID))
-	}
-
-	if acc, ok := acc.Get(); ok {
-		p.Visibility.Call(func(value visibility.Visibility) {
-			// Only admins can immediately post to the public feed.
-			if value == visibility.VisibilityPublished && !acc.Admin {
-				return
-			}
-
-			opts = append(opts, library.WithVisibility(value))
-		})
 	}
 
 	return opts, nil

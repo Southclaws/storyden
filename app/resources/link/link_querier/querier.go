@@ -56,7 +56,9 @@ func (d *LinkQuerier) Get(ctx context.Context, slug string) (*link.Link, error) 
 		Where(link_ent.SlugEqualFold(slug)).
 		WithAssets().
 		WithPosts(func(pq *ent.PostQuery) {
-			pq.WithAuthor()
+			pq.WithAuthor(func(aq *ent.AccountQuery) {
+				aq.WithRoles()
+			})
 			pq.WithCategory()
 			pq.WithRoot()
 		}).

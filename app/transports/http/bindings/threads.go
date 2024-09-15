@@ -27,13 +27,13 @@ import (
 type Threads struct {
 	thread_svc      thread_service.Service
 	thread_mark_svc thread_mark.Service
-	accountQuery    account_querier.Querier
+	accountQuery    *account_querier.Querier
 }
 
 func NewThreads(
 	thread_svc thread_service.Service,
 	thread_mark_svc thread_mark.Service,
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 ) Threads {
 	return Threads{thread_svc, thread_mark_svc, accountQuery}
 }

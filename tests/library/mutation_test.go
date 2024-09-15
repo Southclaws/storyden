@@ -28,7 +28,7 @@ func TestNodesTreeMutations(t *testing.T) {
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session.Jar,
-		aw account_writer.Writer,
+		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)

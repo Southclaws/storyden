@@ -63,6 +63,7 @@ type Bindings struct {
 	Spec
 	Info
 	Admin
+	Roles
 	Authentication
 	WebAuthn
 	PhoneAuth
@@ -91,6 +92,7 @@ func bindingsProviders() fx.Option {
 		NewSpec,
 		NewInfo,
 		NewAdmin,
+		NewRoles,
 		NewAuthentication,
 		NewWebAuthn,
 		NewPhoneAuth,
@@ -140,7 +142,7 @@ func bindings(s Bindings) openapi.StrictServerInterface {
 func mount(
 	l *zap.Logger,
 	router *echo.Echo,
-	auth Authentication,
+	auth *Authorisation,
 	si openapi.StrictServerInterface,
 ) error {
 	spec, err := openapi.GetSwagger()
@@ -193,6 +195,8 @@ func Build() fx.Option {
 		// interface by composing together all of the service bindings into a
 		// single struct.
 		fx.Provide(bindings),
+
+		fx.Provide(newAuthorisation),
 
 		// Provide the Echo router.
 		fx.Provide(newRouter),

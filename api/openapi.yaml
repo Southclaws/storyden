@@ -44,6 +44,8 @@ tags:
     description: General metadata for the instance and uncategorised routes.
   - name: admin
     description: Administration and configuration settings.
+  - name: roles
+    description: Roles for permissions and aesthetics.
   - name: auth
     description: Authentication resources.
   - name: accounts
@@ -198,7 +200,7 @@ paths:
         account owner to log in and use the platform. It keeps the account on
         record for linkage to content so UI doesn't break. It does not change
         anything else about the account such as the avatar, name, etc.
-      tags: [accounts]
+      tags: [admin]
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -208,13 +210,61 @@ paths:
     delete:
       operationId: AdminAccountBanRemove
       description: Given the account is suspended, remove the suspended state.
-      tags: [accounts]
+      tags: [admin]
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountGetOK" }
+
+  #
+  #                 888
+  #                 888
+  #                 888
+  # 888d888 .d88b.  888  .d88b.  .d8888b
+  # 888P"  d88""88b 888 d8P  Y8b 88K
+  # 888    888  888 888 88888888 "Y8888b.
+  # 888    Y88..88P 888 Y8b.          X88
+  # 888     "Y88P"  888  "Y8888   88888P'
+  #
+
+  /roles:
+    post:
+      operationId: RoleCreate
+      description: Creates a role with the specified permissions granted.
+      tags: [roles]
+      requestBody: { $ref: "#/components/requestBodies/RoleCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RoleCreateOK" }
+
+  /roles/{role_id}:
+    get:
+      operationId: RoleGet
+      description: Retreives a role and all its permissions.
+      tags: [roles]
+      parameters: [{ $ref: "#/components/parameters/RoleIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RoleGetOK" }
+    patch:
+      operationId: RoleUpdate
+      description: Updates a role's attributes.
+      tags: [roles]
+      parameters: [{ $ref: "#/components/parameters/RoleIDParam" }]
+      requestBody: { $ref: "#/components/requestBodies/RoleUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/RoleGetOK" }
+
+    # delete: {}
 
   #
   #                   888    888
@@ -1475,6 +1525,14 @@ components:
       schema:
         type: number
 
+    RoleIDParam:
+      description: Role ID
+      in: path
+      name: role_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     AccountHandleParam:
       description: Account handle.
       example: southclaws
@@ -1702,6 +1760,16 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AdminSettingsMutableProps" }
 
+    RoleCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RoleInitialProps" }
+
+    RoleUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/RoleMutableProps" }
+
     AuthPassword:
       content:
         application/json:
@@ -1893,6 +1961,20 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/AdminSettingsProps"
+
+    RoleCreateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Role"
+
+    RoleGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Role"
 
     AuthSuccessOK:
       description: OK
@@ -2533,6 +2615,82 @@ components:
           type: string
         accent_colour:
           type: string
+
+    #
+    # 8888888b.          888
+    # 888   Y88b         888
+    # 888    888         888
+    # 888   d88P .d88b.  888  .d88b.
+    # 8888888P" d88""88b 888 d8P  Y8b
+    # 888 T88b  888  888 888 88888888
+    # 888  T88b Y88..88P 888 Y8b.
+    # 888   T88b "Y88P"  888  "Y8888
+    #
+
+    Role:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/RoleProps"
+
+    RoleProps:
+      type: object
+      properties:
+        name:
+          type: string
+        colour:
+          type: string
+        permissions:
+          $ref: "#/components/schemas/PermissionList"
+
+    RoleInitialProps:
+      type: object
+      properties:
+        name:
+          type: string
+        colour:
+          type: string
+        permissions:
+          $ref: "#/components/schemas/PermissionList"
+
+    RoleMutableProps:
+      type: object
+      properties:
+        name:
+          type: string
+        colour:
+          type: string
+        permissions:
+          $ref: "#/components/schemas/PermissionList"
+
+    Permission:
+      type: string
+      enum:
+        - "CREATE_POST"
+        - "READ_PUBLISHED_THREADS"
+        - "CREATE_REACTION"
+        - "MANAGE_POSTS"
+        - "MANAGE_CATEGORIES"
+        - "READ_PUBLISHED_LIBRARY"
+        - "MANAGE_LIBRARY"
+        - "SUBMIT_LIBRARY_NODE"
+        - "UPLOAD_ASSET"
+        - "LIST_PROFILES"
+        - "READ_PROFILE"
+        - "CREATE_COLLECTION"
+        - "LIST_COLLECTIONS"
+        - "READ_COLLECTION"
+        - "MANAGE_COLLECTIONS"
+        - "COLLECTION_SUBMIT"
+        - "MANAGE_SETTINGS"
+        - "MANAGE_SUSPENSIONS"
+        - "MANAGE_ROLES"
+        - "ADMINISTRATOR"
+
+    PermissionList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Permission"
 
     #
     #        d8888          888    888

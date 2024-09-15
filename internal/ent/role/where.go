@@ -71,6 +71,11 @@ func Name(v string) predicate.Role {
 	return predicate.Role(sql.FieldEQ(FieldName, v))
 }
 
+// Colour applies equality check predicate on the "colour" field. It's identical to ColourEQ.
+func Colour(v string) predicate.Role {
+	return predicate.Role(sql.FieldEQ(FieldColour, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Role {
 	return predicate.Role(sql.FieldEQ(FieldCreatedAt, v))
@@ -214,6 +219,71 @@ func NameEqualFold(v string) predicate.Role {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Role {
 	return predicate.Role(sql.FieldContainsFold(FieldName, v))
+}
+
+// ColourEQ applies the EQ predicate on the "colour" field.
+func ColourEQ(v string) predicate.Role {
+	return predicate.Role(sql.FieldEQ(FieldColour, v))
+}
+
+// ColourNEQ applies the NEQ predicate on the "colour" field.
+func ColourNEQ(v string) predicate.Role {
+	return predicate.Role(sql.FieldNEQ(FieldColour, v))
+}
+
+// ColourIn applies the In predicate on the "colour" field.
+func ColourIn(vs ...string) predicate.Role {
+	return predicate.Role(sql.FieldIn(FieldColour, vs...))
+}
+
+// ColourNotIn applies the NotIn predicate on the "colour" field.
+func ColourNotIn(vs ...string) predicate.Role {
+	return predicate.Role(sql.FieldNotIn(FieldColour, vs...))
+}
+
+// ColourGT applies the GT predicate on the "colour" field.
+func ColourGT(v string) predicate.Role {
+	return predicate.Role(sql.FieldGT(FieldColour, v))
+}
+
+// ColourGTE applies the GTE predicate on the "colour" field.
+func ColourGTE(v string) predicate.Role {
+	return predicate.Role(sql.FieldGTE(FieldColour, v))
+}
+
+// ColourLT applies the LT predicate on the "colour" field.
+func ColourLT(v string) predicate.Role {
+	return predicate.Role(sql.FieldLT(FieldColour, v))
+}
+
+// ColourLTE applies the LTE predicate on the "colour" field.
+func ColourLTE(v string) predicate.Role {
+	return predicate.Role(sql.FieldLTE(FieldColour, v))
+}
+
+// ColourContains applies the Contains predicate on the "colour" field.
+func ColourContains(v string) predicate.Role {
+	return predicate.Role(sql.FieldContains(FieldColour, v))
+}
+
+// ColourHasPrefix applies the HasPrefix predicate on the "colour" field.
+func ColourHasPrefix(v string) predicate.Role {
+	return predicate.Role(sql.FieldHasPrefix(FieldColour, v))
+}
+
+// ColourHasSuffix applies the HasSuffix predicate on the "colour" field.
+func ColourHasSuffix(v string) predicate.Role {
+	return predicate.Role(sql.FieldHasSuffix(FieldColour, v))
+}
+
+// ColourEqualFold applies the EqualFold predicate on the "colour" field.
+func ColourEqualFold(v string) predicate.Role {
+	return predicate.Role(sql.FieldEqualFold(FieldColour, v))
+}
+
+// ColourContainsFold applies the ContainsFold predicate on the "colour" field.
+func ColourContainsFold(v string) predicate.Role {
+	return predicate.Role(sql.FieldContainsFold(FieldColour, v))
 }
 
 // HasAccounts applies the HasEdge predicate on the "accounts" edge.

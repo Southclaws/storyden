@@ -29,7 +29,7 @@ import (
 )
 
 type Nodes struct {
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 	nodeMutator  node_mutate.Manager
 	nodeReader   *node_read.HydratedQuerier
 	nv           *node_visibility.Controller
@@ -38,7 +38,7 @@ type Nodes struct {
 }
 
 func NewNodes(
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	nodeMutator node_mutate.Manager,
 	nodeReader *node_read.HydratedQuerier,
 	nv *node_visibility.Controller,

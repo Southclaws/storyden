@@ -23,7 +23,7 @@ type indexerConsumer struct {
 
 	replyRepo    reply.Repository
 	nodeRepo     library.Repository
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 
 	qnode    pubsub.Topic[mq.IndexNode]
 	qnodesum pubsub.Topic[mq.SummariseNode]
@@ -38,7 +38,7 @@ func newIndexConsumer(
 
 	replyRepo reply.Repository,
 	nodeRepo library.Repository,
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 
 	qnode pubsub.Topic[mq.IndexNode],
 	qnodesum pubsub.Topic[mq.SummariseNode],

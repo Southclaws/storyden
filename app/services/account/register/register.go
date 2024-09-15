@@ -12,12 +12,12 @@ import (
 )
 
 type Registrar struct {
-	writer     account_writer.Writer
+	writer     *account_writer.Writer
 	onboarding onboarding.Service
 }
 
 func New(
-	writer account_writer.Writer,
+	writer *account_writer.Writer,
 	onboarding onboarding.Service,
 ) *Registrar {
 	return &Registrar{

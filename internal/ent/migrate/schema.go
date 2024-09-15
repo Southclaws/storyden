@@ -539,6 +539,8 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "colour", Type: field.TypeString, Default: "hsl(157, 65%, 44%)"},
+		{Name: "permissions", Type: field.TypeJSON},
 	}
 	// RolesTable holds the schema information for the "roles" table.
 	RolesTable = &schema.Table{

@@ -46,7 +46,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		}
 		defaultConfig.DatabaseURL = url
 	} else {
-		defaultConfig.DatabaseURL = "sqlite://data.db?_pragma=foreign_keys(1)&_pragma=busy_timeout(1000)"
+		defaultConfig.DatabaseURL = "sqlite://data.db?_pragma=foreign_keys(1)&_pragma=busy_timeout(10000)&_pragma=journal_mode(WAL)"
 	}
 
 	ctx, cf := context.WithCancel(context.Background())
