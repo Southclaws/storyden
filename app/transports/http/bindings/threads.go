@@ -182,11 +182,12 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 	}
 
 	page = result.CurrentPage + 1
+	nextPage := opt.Map(result.NextPage, func(i int) int { return i + 1 })
 
 	return openapi.ThreadList200JSONResponse{
 		ThreadListOKJSONResponse: openapi.ThreadListOKJSONResponse{
 			CurrentPage: page,
-			NextPage:    result.NextPage.Ptr(),
+			NextPage:    nextPage.Ptr(),
 			PageSize:    result.PageSize,
 			Results:     result.Results,
 			Threads:     dt.Map(result.Threads, serialiseThreadReference),
