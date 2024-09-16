@@ -42,6 +42,9 @@ func Map(r *ent.Notification) (*NotificationRef, error) {
 
 	source, err := opt.MapErr(sourceEdge, func(a ent.Account) (profile.Public, error) {
 		p, err := profile.ProfileFromModel(&a)
+		if err != nil {
+			return profile.Public{}, err
+		}
 		return *p, err
 	})
 	if err != nil {
