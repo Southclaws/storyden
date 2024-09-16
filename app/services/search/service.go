@@ -12,7 +12,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 )
 
 type Service interface {
@@ -30,22 +29,20 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l    *zap.Logger
-	rbac rbac.AccessManager
+	l *zap.Logger
 
 	post_search_repo post_search.Repository
 }
 
 func New(
 	l *zap.Logger,
-	rbac rbac.AccessManager,
 
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	post_search_repo post_search.Repository,
 ) Service {
 	return &service{
-		l:                l.With(zap.String("service", "search")),
-		rbac:             rbac,
+		l: l.With(zap.String("service", "search")),
+
 		post_search_repo: post_search_repo,
 	}
 }

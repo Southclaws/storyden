@@ -6,9 +6,10 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/el-mike/restrict"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
@@ -30,12 +31,8 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.rbac.Authorize(&restrict.AccessRequest{
-		Subject:  acc,
-		Resource: thr,
-		Actions:  []string{rbac.ActionDelete},
-	}); err != nil {
-		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to authorize"))
+	if err := s.authoriseThreadDelete(ctx, acc, thr); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	err = s.thread_repo.Delete(ctx, id)
@@ -50,4 +47,16 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 	// }
 
 	return nil
+}
+
+func (s *service) authoriseThreadDelete(ctx context.Context, acc *account.Account, thr *thread.Thread) error {
+	return acc.Roles.Permissions().Authorise(ctx, func() error {
+		if thr.Author.ID != acc.ID {
+			return fault.Wrap(rbac.ErrPermissions,
+				fctx.With(ctx),
+				fmsg.WithDesc("not author", "You are not the author of the thread and do not have the Manage Posts permission."),
+			)
+		}
+		return nil
+	}, rbac.PermissionManagePosts)
 }

@@ -7,7 +7,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
-	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -15,17 +14,20 @@ import (
 )
 
 type Querier struct {
-	fx.In
+	db *ent.Client
+}
 
-	Ent *ent.Client
+func New(db *ent.Client) *Querier {
+	return &Querier{db: db}
 }
 
 func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.Account, error) {
-	q := d.Ent.Account.
+	q := d.db.Account.
 		Query().
 		Where(account_ent.ID(xid.ID(id))).
 		WithTags().
 		WithEmails().
+		WithRoles().
 		WithAuthentication()
 
 	result, err := q.Only(ctx)
@@ -51,10 +53,11 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 }
 
 func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.Account, bool, error) {
-	q := d.Ent.Account.
+	q := d.db.Account.
 		Query().
 		Where(account_ent.Handle(handle)).
-		WithAuthentication()
+		WithAuthentication().
+		WithRoles()
 
 	result, err := q.Only(ctx)
 	if err != nil {

@@ -10,18 +10,21 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 )
 
 type Writer struct {
-	fx.In
+	db             *ent.Client
+	accountQuerier *account_querier.Querier
+}
 
-	Ent *ent.Client
+func New(db *ent.Client, accountQuerier *account_querier.Querier) *Writer {
+	return &Writer{db: db, accountQuerier: accountQuerier}
 }
 
 type (
@@ -120,7 +123,7 @@ func (d *Writer) Create(ctx context.Context, handle string, opts ...Option) (*ac
 		v(&withrequired)
 	}
 
-	create := d.Ent.Account.Create()
+	create := d.db.Account.Create()
 
 	if !xid.ID(withrequired.ID).IsNil() {
 		create.SetID(xid.ID(withrequired.ID))
@@ -140,11 +143,11 @@ func (d *Writer) Create(ctx context.Context, handle string, opts ...Option) (*ac
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return account.MapAccount(a)
+	return d.accountQuerier.GetByID(ctx, account.AccountID(a.ID))
 }
 
 func (d *Writer) Update(ctx context.Context, id account.AccountID, opts ...Mutation) (*account.Account, error) {
-	update := d.Ent.Account.UpdateOneID(xid.ID(id))
+	update := d.db.Account.UpdateOneID(xid.ID(id))
 
 	for _, fn := range opts {
 		fn(update)
@@ -155,5 +158,5 @@ func (d *Writer) Update(ctx context.Context, id account.AccountID, opts ...Mutat
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return account.MapAccount(acc)
+	return d.accountQuerier.GetByID(ctx, account.AccountID(acc.ID))
 }

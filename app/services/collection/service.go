@@ -6,8 +6,8 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/el-mike/restrict"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -19,6 +19,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
+
+var ErrNotResourcesOwner = fault.New("not the owner of either collection or item", ftag.With(ftag.PermissionDenied))
 
 type Service interface {
 	Update(ctx context.Context, cid collection.CollectionID, partial Partial) (*collection.CollectionWithItems, error)
@@ -41,23 +43,21 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l    *zap.Logger
-	rbac rbac.AccessManager
+	l *zap.Logger
 
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 	repo         collection.Repository
 }
 
 func New(
 	l *zap.Logger,
-	rbac rbac.AccessManager,
 
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	repo collection.Repository,
 ) Service {
 	return &service{
-		l:            l.With(zap.String("service", "collection")),
-		rbac:         rbac,
+		l: l.With(zap.String("service", "collection")),
+
 		accountQuery: accountQuery,
 		repo:         repo,
 	}
@@ -109,10 +109,6 @@ func (s *service) PostAdd(ctx context.Context, cid collection.CollectionID, pid 
 }
 
 func (s *service) PostRemove(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.CollectionWithItems, error) {
-	if err := s.authoriseDirectUpdate(ctx, cid); err != nil {
-		return nil, err
-	}
-
 	col, err := s.repo.UpdateItems(ctx, cid, collection.WithPostRemove(pid))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -164,12 +160,16 @@ func (s *service) authoriseDirectUpdate(ctx context.Context, cid collection.Coll
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.rbac.Authorize(&restrict.AccessRequest{
-		Subject:  acc,
-		Resource: &col.Collection,
-		Actions:  []string{rbac.ActionUpdate},
-	}); err != nil {
-		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to authorize"))
+	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
+		if acc.ID != col.Owner.ID {
+			return fault.Wrap(rbac.ErrPermissions,
+				fctx.With(ctx),
+				fmsg.WithDesc("not owner", "You are not the owner of the collection and do not have the Manage Collections permission."),
+			)
+		}
+		return nil
+	}, rbac.PermissionManageCollections); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return nil
@@ -191,21 +191,17 @@ func (s *service) authoriseSubmission(ctx context.Context, cid collection.Collec
 		return fault.Wrap(err, fctx.With(ctx)), collection.MembershipType{}
 	}
 
-	if err := s.rbac.Authorize(&restrict.AccessRequest{
-		Subject:  acc,
-		Resource: &col.Collection,
-		Actions:  []string{rbac.ActionSubmit},
-	}); err != nil {
-		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to authorize")), collection.MembershipType{}
+	if item, ok := col.Item.Get(); ok && item.Author.ID != acc.ID {
+		return nil, collection.MembershipTypeSubmissionAccepted
 	}
 
 	if col.Collection.Owner.ID != acc.ID {
 		return nil, collection.MembershipTypeSubmissionReview
 	}
 
-	if item, ok := col.Item.Get(); ok && item.Author.ID != acc.ID {
-		return nil, collection.MembershipTypeSubmissionAccepted
+	if acc.ID == col.Collection.Owner.ID {
+		return nil, collection.MembershipTypeNormal
 	}
 
-	return nil, collection.MembershipTypeNormal
+	return fault.Wrap(ErrNotResourcesOwner, fctx.With(ctx)), collection.MembershipType{}
 }

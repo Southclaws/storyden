@@ -30,7 +30,7 @@ func TestAccountAuth(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session1.Jar,
-		accountQuery account_querier.Querier,
+		accountQuery *account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
@@ -107,7 +107,7 @@ func TestAccountAdmin(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session1.Jar,
-		accountWrite account_writer.Writer,
+		accountWrite *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
@@ -150,7 +150,7 @@ func TestAccountAdmin(t *testing.T) {
 			suspend2, err := cl.AdminAccountBanCreateWithResponse(root, victim.JSON200.Id, randomSession)
 			r.NoError(err)
 			r.NotNil(suspend2)
-			r.Equal(http.StatusUnauthorized, suspend2.StatusCode())
+			r.Equal(http.StatusForbidden, suspend2.StatusCode())
 
 			// Try to suspend the account as an admin - succeeds
 
@@ -179,7 +179,7 @@ func TestAccountAdmin(t *testing.T) {
 			reinstate2, err := cl.AdminAccountBanRemoveWithResponse(root, victim.JSON200.Id, randomSession)
 			r.NoError(err)
 			r.NotNil(reinstate2)
-			r.Equal(http.StatusUnauthorized, reinstate2.StatusCode())
+			r.Equal(http.StatusForbidden, reinstate2.StatusCode())
 
 			// Try to reinstate the account as an admin - succeeds
 

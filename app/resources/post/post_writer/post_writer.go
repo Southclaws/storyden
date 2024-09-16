@@ -57,7 +57,9 @@ func (p *PostWriter) Update(ctx context.Context, id post.ID, opts ...Option) (*p
 	r, err := p.db.Post.
 		Query().
 		Where(ent_post.IDEQ(xid.ID(id))).
-		WithAuthor().
+		WithAuthor(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithCategory().
 		WithTags().
 		WithAssets().

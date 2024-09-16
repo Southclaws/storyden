@@ -64,7 +64,8 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	q := d.db.Debug().Account.Query().
+	q := d.db.Account.Query().
+		WithRoles().
 		Limit(size + 1).
 		Offset(page * size).
 		Order(ent.Desc(account.FieldCreatedAt))

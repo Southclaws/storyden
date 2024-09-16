@@ -40,7 +40,9 @@ func New(db *ent.Client, raw *sqlx.DB) Repository {
 func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, error) {
 	query := d.db.Node.Query().
 		Where(node.ParentNodeIDIsNil()).
-		WithOwner().
+		WithOwner(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithAssets()
 
 	f := filters{}
@@ -178,7 +180,8 @@ func fromRow(r subtreeRow) (*library.Node, error) {
 			Handle:  r.OwnerHandle,
 			Name:    r.OwnerName,
 			Bio:     bio.OrZero(),
-			Admin:   r.OwnerAdmin,
+			// Roles not inclucded because silly flat query result...
+			// to be hydrated elsewhere via second query.
 		},
 		Metadata: meta.OrZero(),
 	}, nil

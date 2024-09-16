@@ -15658,19 +15658,22 @@ func (m *ReactMutation) ResetEdge(name string) error {
 // RoleMutation represents an operation that mutates the Role nodes in the graph.
 type RoleMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *xid.ID
-	created_at      *time.Time
-	updated_at      *time.Time
-	name            *string
-	clearedFields   map[string]struct{}
-	accounts        map[xid.ID]struct{}
-	removedaccounts map[xid.ID]struct{}
-	clearedaccounts bool
-	done            bool
-	oldValue        func(context.Context) (*Role, error)
-	predicates      []predicate.Role
+	op                Op
+	typ               string
+	id                *xid.ID
+	created_at        *time.Time
+	updated_at        *time.Time
+	name              *string
+	colour            *string
+	permissions       *[]string
+	appendpermissions []string
+	clearedFields     map[string]struct{}
+	accounts          map[xid.ID]struct{}
+	removedaccounts   map[xid.ID]struct{}
+	clearedaccounts   bool
+	done              bool
+	oldValue          func(context.Context) (*Role, error)
+	predicates        []predicate.Role
 }
 
 var _ ent.Mutation = (*RoleMutation)(nil)
@@ -15885,6 +15888,93 @@ func (m *RoleMutation) ResetName() {
 	m.name = nil
 }
 
+// SetColour sets the "colour" field.
+func (m *RoleMutation) SetColour(s string) {
+	m.colour = &s
+}
+
+// Colour returns the value of the "colour" field in the mutation.
+func (m *RoleMutation) Colour() (r string, exists bool) {
+	v := m.colour
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldColour returns the old "colour" field's value of the Role entity.
+// If the Role object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RoleMutation) OldColour(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldColour is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldColour requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldColour: %w", err)
+	}
+	return oldValue.Colour, nil
+}
+
+// ResetColour resets all changes to the "colour" field.
+func (m *RoleMutation) ResetColour() {
+	m.colour = nil
+}
+
+// SetPermissions sets the "permissions" field.
+func (m *RoleMutation) SetPermissions(s []string) {
+	m.permissions = &s
+	m.appendpermissions = nil
+}
+
+// Permissions returns the value of the "permissions" field in the mutation.
+func (m *RoleMutation) Permissions() (r []string, exists bool) {
+	v := m.permissions
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPermissions returns the old "permissions" field's value of the Role entity.
+// If the Role object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RoleMutation) OldPermissions(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPermissions is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPermissions requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPermissions: %w", err)
+	}
+	return oldValue.Permissions, nil
+}
+
+// AppendPermissions adds s to the "permissions" field.
+func (m *RoleMutation) AppendPermissions(s []string) {
+	m.appendpermissions = append(m.appendpermissions, s...)
+}
+
+// AppendedPermissions returns the list of values that were appended to the "permissions" field in this mutation.
+func (m *RoleMutation) AppendedPermissions() ([]string, bool) {
+	if len(m.appendpermissions) == 0 {
+		return nil, false
+	}
+	return m.appendpermissions, true
+}
+
+// ResetPermissions resets all changes to the "permissions" field.
+func (m *RoleMutation) ResetPermissions() {
+	m.permissions = nil
+	m.appendpermissions = nil
+}
+
 // AddAccountIDs adds the "accounts" edge to the Account entity by ids.
 func (m *RoleMutation) AddAccountIDs(ids ...xid.ID) {
 	if m.accounts == nil {
@@ -15973,7 +16063,7 @@ func (m *RoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RoleMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 5)
 	if m.created_at != nil {
 		fields = append(fields, role.FieldCreatedAt)
 	}
@@ -15982,6 +16072,12 @@ func (m *RoleMutation) Fields() []string {
 	}
 	if m.name != nil {
 		fields = append(fields, role.FieldName)
+	}
+	if m.colour != nil {
+		fields = append(fields, role.FieldColour)
+	}
+	if m.permissions != nil {
+		fields = append(fields, role.FieldPermissions)
 	}
 	return fields
 }
@@ -15997,6 +16093,10 @@ func (m *RoleMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case role.FieldName:
 		return m.Name()
+	case role.FieldColour:
+		return m.Colour()
+	case role.FieldPermissions:
+		return m.Permissions()
 	}
 	return nil, false
 }
@@ -16012,6 +16112,10 @@ func (m *RoleMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUpdatedAt(ctx)
 	case role.FieldName:
 		return m.OldName(ctx)
+	case role.FieldColour:
+		return m.OldColour(ctx)
+	case role.FieldPermissions:
+		return m.OldPermissions(ctx)
 	}
 	return nil, fmt.Errorf("unknown Role field %s", name)
 }
@@ -16041,6 +16145,20 @@ func (m *RoleMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case role.FieldColour:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetColour(v)
+		return nil
+	case role.FieldPermissions:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPermissions(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Role field %s", name)
@@ -16099,6 +16217,12 @@ func (m *RoleMutation) ResetField(name string) error {
 		return nil
 	case role.FieldName:
 		m.ResetName()
+		return nil
+	case role.FieldColour:
+		m.ResetColour()
+		return nil
+	case role.FieldPermissions:
+		m.ResetPermissions()
 		return nil
 	}
 	return fmt.Errorf("unknown Role field %s", name)

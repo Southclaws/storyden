@@ -6,9 +6,9 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/el-mike/restrict"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -32,12 +32,8 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.rbac.Authorize(&restrict.AccessRequest{
-		Subject:  acc,
-		Resource: thr,
-		Actions:  []string{rbac.ActionUpdate},
-	}); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to authorize"))
+	if err := authoriseThreadUpdate(ctx, acc, thr); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	opts := partial.Opts()
@@ -54,4 +50,16 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 	}
 
 	return thr, nil
+}
+
+func authoriseThreadUpdate(ctx context.Context, acc *account.Account, thr *thread.Thread) error {
+	return acc.Roles.Permissions().Authorise(ctx, func() error {
+		if thr.Author.ID != acc.ID {
+			return fault.Wrap(rbac.ErrPermissions,
+				fctx.With(ctx),
+				fmsg.WithDesc("not author", "You are not the author of the thread and do not have the Manage Posts permission."),
+			)
+		}
+		return nil
+	}, rbac.PermissionManagePosts)
 }

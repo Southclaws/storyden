@@ -51,7 +51,7 @@ func New(
 	database *sql.DB,
 	client *ent.Client,
 	settings settings.Repository,
-	account_writer account_writer.Writer,
+	account_writer *account_writer.Writer,
 	auth_repo authentication.Repository,
 	category_repo category.Repository,
 	thread_repo thread.Repository,

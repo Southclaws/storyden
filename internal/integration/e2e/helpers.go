@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
-func WithAccount(ctx context.Context, aw account_writer.Writer, template account.Account, opts ...account_writer.Option) (context.Context, *account.Account) {
+func WithAccount(ctx context.Context, aw *account_writer.Writer, template account.Account, opts ...account_writer.Option) (context.Context, *account.Account) {
 	unique := xid.New()
 	template.ID = account.AccountID(unique)
 	template.Handle = template.Handle + "-" + unique.String()

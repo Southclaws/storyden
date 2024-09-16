@@ -30,7 +30,7 @@ func TestPublicProfiles(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session1.Jar,
-		ar account_querier.Querier,
+		ar *account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
@@ -90,7 +90,7 @@ func TestUpdateProfile(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session1.Jar,
-		accountQuery account_querier.Querier,
+		accountQuery *account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
 			handle1 := "user-" + xid.New().String()
@@ -174,7 +174,7 @@ func TestUpdateProfile(t *testing.T) {
 	}))
 }
 
-func newAccount(t *testing.T, ctx context.Context, cl *openapi.ClientWithResponses, ar account_querier.Querier, handle string) account.Account {
+func newAccount(t *testing.T, ctx context.Context, cl *openapi.ClientWithResponses, ar *account_querier.Querier, handle string) account.Account {
 	r := require.New(t)
 
 	hand1 := handle + "-" + xid.New().String()

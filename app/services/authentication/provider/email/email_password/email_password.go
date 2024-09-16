@@ -38,7 +38,7 @@ const (
 
 type Provider struct {
 	auth         authentication.Repository
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 	er           email.EmailRepo
 	register     *register.Registrar
 
@@ -48,7 +48,7 @@ type Provider struct {
 
 func New(
 	auth authentication.Repository,
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	er email.EmailRepo,
 	register *register.Registrar,
 	sender email_verify.Verifier,

@@ -26,7 +26,7 @@ func Build() fx.Option {
 type service struct {
 	l *zap.Logger
 
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 	generator    avatar_gen.AvatarGenerator
 	storage      object.Storer
 }
@@ -34,7 +34,7 @@ type service struct {
 func New(
 	l *zap.Logger,
 
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	generator avatar_gen.AvatarGenerator,
 	storage object.Storer,
 ) Service {

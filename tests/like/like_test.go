@@ -26,7 +26,7 @@ func TestLikeThreads(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session.Jar,
-		aw account_writer.Writer,
+		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
@@ -119,7 +119,7 @@ func TestLikeReplies(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session.Jar,
-		aw account_writer.Writer,
+		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)

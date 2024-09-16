@@ -9,13 +9,11 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
 )
 
 type Downloader struct {
-	l    *zap.Logger
-	rbac rbac.AccessManager
+	l *zap.Logger
 
 	assets  asset.Repository
 	objects object.Storer
@@ -23,14 +21,12 @@ type Downloader struct {
 
 func New(
 	l *zap.Logger,
-	rbac rbac.AccessManager,
 
 	assets asset.Repository,
 	objects object.Storer,
 ) *Downloader {
 	return &Downloader{
 		l:       l.With(zap.String("service", "asset")),
-		rbac:    rbac,
 		assets:  assets,
 		objects: objects,
 	}

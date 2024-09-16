@@ -150,17 +150,23 @@ func (d *database) UpdateItems(ctx context.Context, id CollectionID, opts ...Ite
 func (d *database) ProbeItem(ctx context.Context, id CollectionID, itemID xid.ID) (*CollectionItemStatus, error) {
 	r, err := d.db.Collection.Query().
 		Where(collection.ID(xid.ID(id))).
-		WithOwner().
+		WithOwner(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithCollectionPosts(func(cnq *ent.CollectionPostQuery) {
 			cnq.Where(collectionpost.PostID(itemID)).
 				WithPost(func(pq *ent.PostQuery) {
-					pq.WithAuthor()
+					pq.WithAuthor(func(aq *ent.AccountQuery) {
+						aq.WithRoles()
+					})
 				})
 		}).
 		WithCollectionNodes(func(cnq *ent.CollectionNodeQuery) {
 			cnq.Where(collectionnode.NodeID(itemID)).
 				WithNode(func(nq *ent.NodeQuery) {
-					nq.WithOwner()
+					nq.WithOwner(func(aq *ent.AccountQuery) {
+						aq.WithRoles()
+					})
 				})
 		}).
 		Only(ctx)
