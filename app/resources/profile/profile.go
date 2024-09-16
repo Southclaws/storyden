@@ -4,10 +4,12 @@ import (
 	"time"
 
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/asset"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -27,6 +29,7 @@ type Public struct {
 	Followers     int
 	Following     int
 	LikeScore     int
+	Roles         role.Roles
 	Interests     []*tag.Tag
 	ExternalLinks []account.ExternalLink
 	Metadata      map[string]any
@@ -42,6 +45,16 @@ func (p *Public) GetProps() map[string]any      { return p.Metadata }
 func (p *Public) GetAssets() []*asset.Asset     { return []*asset.Asset{} }
 
 func ProfileFromModel(a *ent.Account) (*Public, error) {
+	rolesEdge, err := a.Edges.RolesOrErr()
+	if err != nil {
+		return nil, err
+	}
+
+	roles, err := role.Map(rolesEdge, a.Admin)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
 	interests := dt.Map(a.Edges.Tags, func(t *ent.Tag) *tag.Tag {
 		return &tag.Tag{
 			ID:   t.ID.String(),
@@ -61,7 +74,7 @@ func ProfileFromModel(a *ent.Account) (*Public, error) {
 		Handle:    a.Handle,
 		Name:      a.Name,
 		Bio:       bio,
-		Admin:     a.Admin,
+		Roles:     roles,
 		Interests: interests,
 		Metadata:  a.Metadata,
 	}, nil
@@ -79,6 +92,7 @@ func ProfileFromAccount(a *account.Account) *Public {
 		Followers:     a.Followers,
 		Following:     a.Following,
 		LikeScore:     a.LikeScore,
+		Roles:         a.Roles,
 		Interests:     nil,
 		ExternalLinks: a.ExternalLinks,
 		Metadata:      a.Metadata,

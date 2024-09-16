@@ -21,6 +21,10 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldColour holds the string denoting the colour field in the database.
+	FieldColour = "colour"
+	// FieldPermissions holds the string denoting the permissions field in the database.
+	FieldPermissions = "permissions"
 	// EdgeAccounts holds the string denoting the accounts edge name in mutations.
 	EdgeAccounts = "accounts"
 	// Table holds the table name of the role in the database.
@@ -38,6 +42,8 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldName,
+	FieldColour,
+	FieldPermissions,
 }
 
 var (
@@ -63,6 +69,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultColour holds the default value on creation for the "colour" field.
+	DefaultColour string
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -90,6 +98,11 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByColour orders the results by the colour field.
+func ByColour(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldColour, opts...).ToFunc()
 }
 
 // ByAccountsCount orders the results by accounts count.

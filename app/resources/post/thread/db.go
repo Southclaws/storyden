@@ -101,7 +101,9 @@ func (d *database) Create(
 	p, err = d.db.Post.
 		Query().
 		Where(ent_post.IDEQ(p.ID)).
-		WithAuthor().
+		WithAuthor(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithCategory().
 		WithTags().
 		WithAssets().
@@ -151,7 +153,9 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 	p, err := d.db.Post.
 		Query().
 		Where(ent_post.IDEQ(xid.ID(id))).
-		WithAuthor().
+		WithAuthor(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithCategory().
 		WithTags().
 		WithAssets().
@@ -212,12 +216,16 @@ func (d *database) List(
 
 	query.
 		WithCategory().
-		WithAuthor().
+		WithAuthor(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithAssets(func(aq *ent.AssetQuery) {
 			aq.Order(asset.ByUpdatedAt(), asset.ByCreatedAt())
 		}).
 		WithCollections(func(cq *ent.CollectionQuery) {
-			cq.WithOwner().Order(collection.ByUpdatedAt(), collection.ByCreatedAt())
+			cq.WithOwner(func(aq *ent.AccountQuery) {
+				aq.WithRoles()
+			}).Order(collection.ByUpdatedAt(), collection.ByCreatedAt())
 		}).
 		WithLink(func(lq *ent.LinkQuery) {
 			lq.WithFaviconImage().WithPrimaryImage()
@@ -306,10 +314,14 @@ func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Opti
 					ent_post.DeletedAtIsNil(),
 				).
 				WithReplyTo(func(pq *ent.PostQuery) {
-					pq.WithAuthor()
+					pq.WithAuthor(func(aq *ent.AccountQuery) {
+						aq.WithRoles()
+					})
 				}).
 				WithReacts().
-				WithAuthor().
+				WithAuthor(func(aq *ent.AccountQuery) {
+					aq.WithRoles()
+				}).
 				WithAssets().
 				WithLink(func(lq *ent.LinkQuery) {
 					lq.WithFaviconImage().WithPrimaryImage()
@@ -317,7 +329,9 @@ func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Opti
 				}).
 				Order(ent.Asc(ent_post.FieldCreatedAt))
 		}).
-		WithAuthor().
+		WithAuthor(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithCategory().
 		WithTags(func(tq *ent.TagQuery) {
 			tq.Order(tag.ByCreatedAt())

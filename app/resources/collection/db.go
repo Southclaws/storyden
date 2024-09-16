@@ -44,15 +44,21 @@ func (d *database) Create(ctx context.Context, owner account.AccountID, name str
 func (d *database) List(ctx context.Context, filters ...Filter) ([]*Collection, error) {
 	q := d.db.Collection.
 		Query().
-		WithOwner().
+		WithOwner(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithPosts(func(pq *ent.PostQuery) {
-			pq.WithAuthor()
+			pq.WithAuthor(func(aq *ent.AccountQuery) {
+				aq.WithRoles()
+			})
 			pq.WithCategory()
 			pq.WithTags()
 			pq.WithRoot()
 		}).
 		WithNodes(func(nq *ent.NodeQuery) {
-			nq.WithOwner()
+			nq.WithOwner(func(aq *ent.AccountQuery) {
+				aq.WithRoles()
+			})
 			nq.WithAssets()
 			nq.WithTags()
 		})
@@ -78,7 +84,9 @@ func (d *database) Get(ctx context.Context, id CollectionID, filters ...ItemFilt
 	filters = append(filters, func(pcq *ent.CollectionPostQuery, ncq *ent.CollectionNodeQuery) {
 		if pcq != nil {
 			pcq.WithPost(func(pq *ent.PostQuery) {
-				pq.WithAuthor()
+				pq.WithAuthor(func(aq *ent.AccountQuery) {
+					aq.WithRoles()
+				})
 				pq.WithCategory()
 				pq.WithTags()
 				pq.WithRoot()
@@ -87,7 +95,9 @@ func (d *database) Get(ctx context.Context, id CollectionID, filters ...ItemFilt
 
 		if ncq != nil {
 			ncq.WithNode(func(nq *ent.NodeQuery) {
-				nq.WithOwner()
+				nq.WithOwner(func(aq *ent.AccountQuery) {
+					aq.WithRoles()
+				})
 				nq.WithAssets()
 				nq.WithTags()
 			})
@@ -97,7 +107,9 @@ func (d *database) Get(ctx context.Context, id CollectionID, filters ...ItemFilt
 	col, err := d.db.Collection.
 		Query().
 		Where(collection.ID(xid.ID(id))).
-		WithOwner().
+		WithOwner(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithCollectionPosts(func(pq *ent.CollectionPostQuery) {
 			for _, fn := range filters {
 				fn(pq, nil)

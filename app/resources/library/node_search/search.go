@@ -62,9 +62,13 @@ func (s *service) Search(ctx context.Context, opts ...Option) ([]*library.Node, 
 			node.NameContainsFold(q.qs),
 			// TODO: more query/filter params
 		).
-		WithOwner().
+		WithOwner(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		WithNodes(func(cq *ent.NodeQuery) {
-			cq.WithOwner()
+			cq.WithOwner(func(aq *ent.AccountQuery) {
+				aq.WithRoles()
+			})
 		}).
 		WithAssets().
 		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))

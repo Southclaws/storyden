@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -48,6 +49,32 @@ func (ru *RoleUpdate) SetNillableName(s *string) *RoleUpdate {
 	if s != nil {
 		ru.SetName(*s)
 	}
+	return ru
+}
+
+// SetColour sets the "colour" field.
+func (ru *RoleUpdate) SetColour(s string) *RoleUpdate {
+	ru.mutation.SetColour(s)
+	return ru
+}
+
+// SetNillableColour sets the "colour" field if the given value is not nil.
+func (ru *RoleUpdate) SetNillableColour(s *string) *RoleUpdate {
+	if s != nil {
+		ru.SetColour(*s)
+	}
+	return ru
+}
+
+// SetPermissions sets the "permissions" field.
+func (ru *RoleUpdate) SetPermissions(s []string) *RoleUpdate {
+	ru.mutation.SetPermissions(s)
+	return ru
+}
+
+// AppendPermissions appends s to the "permissions" field.
+func (ru *RoleUpdate) AppendPermissions(s []string) *RoleUpdate {
+	ru.mutation.AppendPermissions(s)
 	return ru
 }
 
@@ -149,6 +176,17 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ru.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
 	}
+	if value, ok := ru.mutation.Colour(); ok {
+		_spec.SetField(role.FieldColour, field.TypeString, value)
+	}
+	if value, ok := ru.mutation.Permissions(); ok {
+		_spec.SetField(role.FieldPermissions, field.TypeJSON, value)
+	}
+	if value, ok := ru.mutation.AppendedPermissions(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, role.FieldPermissions, value)
+		})
+	}
 	if ru.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -233,6 +271,32 @@ func (ruo *RoleUpdateOne) SetNillableName(s *string) *RoleUpdateOne {
 	if s != nil {
 		ruo.SetName(*s)
 	}
+	return ruo
+}
+
+// SetColour sets the "colour" field.
+func (ruo *RoleUpdateOne) SetColour(s string) *RoleUpdateOne {
+	ruo.mutation.SetColour(s)
+	return ruo
+}
+
+// SetNillableColour sets the "colour" field if the given value is not nil.
+func (ruo *RoleUpdateOne) SetNillableColour(s *string) *RoleUpdateOne {
+	if s != nil {
+		ruo.SetColour(*s)
+	}
+	return ruo
+}
+
+// SetPermissions sets the "permissions" field.
+func (ruo *RoleUpdateOne) SetPermissions(s []string) *RoleUpdateOne {
+	ruo.mutation.SetPermissions(s)
+	return ruo
+}
+
+// AppendPermissions appends s to the "permissions" field.
+func (ruo *RoleUpdateOne) AppendPermissions(s []string) *RoleUpdateOne {
+	ruo.mutation.AppendPermissions(s)
 	return ruo
 }
 
@@ -363,6 +427,17 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 	}
 	if value, ok := ruo.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
+	}
+	if value, ok := ruo.mutation.Colour(); ok {
+		_spec.SetField(role.FieldColour, field.TypeString, value)
+	}
+	if value, ok := ruo.mutation.Permissions(); ok {
+		_spec.SetField(role.FieldPermissions, field.TypeJSON, value)
+	}
+	if value, ok := ruo.mutation.AppendedPermissions(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, role.FieldPermissions, value)
+		})
 	}
 	if ruo.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{

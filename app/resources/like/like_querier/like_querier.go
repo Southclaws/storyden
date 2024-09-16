@@ -41,7 +41,9 @@ func (l *LikeQuerier) GetPostLikes(ctx context.Context, postID post.ID) ([]*item
 	r, err := l.db.LikePost.
 		Query().
 		Where(entlikepost.HasPostWith(entpost.ID(xid.ID(postID)))).
-		WithAccount().
+		WithAccount(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -67,7 +69,9 @@ func (l *LikeQuerier) GetProfileLikes(ctx context.Context, accountID account.Acc
 		Order(ent.Desc(entlikepost.FieldCreatedAt)).
 		Where(entlikepost.HasAccountWith(entaccount.ID(xid.ID(accountID)))).
 		WithPost(func(pq *ent.PostQuery) {
-			pq.WithAuthor()
+			pq.WithAuthor(func(aq *ent.AccountQuery) {
+				aq.WithRoles()
+			})
 			pq.WithCategory()
 			pq.WithTags()
 			pq.WithRoot()

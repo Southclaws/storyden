@@ -33,11 +33,11 @@ const (
 
 type Provider struct {
 	auth         authentication.Repository
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 	register     *register.Registrar
 }
 
-func New(auth authentication.Repository, accountQuery account_querier.Querier, register *register.Registrar) *Provider {
+func New(auth authentication.Repository, accountQuery *account_querier.Querier, register *register.Registrar) *Provider {
 	return &Provider{auth, accountQuery, register}
 }
 

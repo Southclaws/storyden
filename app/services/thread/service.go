@@ -19,7 +19,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/mention/mentioner"
@@ -81,10 +80,9 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l    *zap.Logger
-	rbac rbac.AccessManager
+	l *zap.Logger
 
-	accountQuery account_querier.Querier
+	accountQuery *account_querier.Querier
 	thread_repo  thread.Repository
 	fetcher      *fetcher.Fetcher
 	recommender  semdex.Recommender
@@ -94,9 +92,8 @@ type service struct {
 
 func New(
 	l *zap.Logger,
-	rbac rbac.AccessManager,
 
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	thread_repo thread.Repository,
 	fetcher *fetcher.Fetcher,
 	recommender semdex.Recommender,
@@ -104,8 +101,8 @@ func New(
 	mentioner *mentioner.Mentioner,
 ) Service {
 	return &service{
-		l:            l.With(zap.String("service", "thread")),
-		rbac:         rbac,
+		l: l.With(zap.String("service", "thread")),
+
 		accountQuery: accountQuery,
 		thread_repo:  thread_repo,
 		fetcher:      fetcher,

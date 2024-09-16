@@ -24,7 +24,7 @@ import (
 type Accounts struct {
 	avatarService avatar.Service
 	authManager   *authentication.Manager
-	accountQuery  account_querier.Querier
+	accountQuery  *account_querier.Querier
 	accountUpdate account_update.Updater
 	accountAuth   account_auth.Manager
 }
@@ -32,7 +32,7 @@ type Accounts struct {
 func NewAccounts(
 	avatarService avatar.Service,
 	authManager *authentication.Manager,
-	accountQuery account_querier.Querier,
+	accountQuery *account_querier.Querier,
 	accountUpdate account_update.Updater,
 	accountAuth account_auth.Manager,
 ) Accounts {

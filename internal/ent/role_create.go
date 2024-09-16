@@ -59,6 +59,26 @@ func (rc *RoleCreate) SetName(s string) *RoleCreate {
 	return rc
 }
 
+// SetColour sets the "colour" field.
+func (rc *RoleCreate) SetColour(s string) *RoleCreate {
+	rc.mutation.SetColour(s)
+	return rc
+}
+
+// SetNillableColour sets the "colour" field if the given value is not nil.
+func (rc *RoleCreate) SetNillableColour(s *string) *RoleCreate {
+	if s != nil {
+		rc.SetColour(*s)
+	}
+	return rc
+}
+
+// SetPermissions sets the "permissions" field.
+func (rc *RoleCreate) SetPermissions(s []string) *RoleCreate {
+	rc.mutation.SetPermissions(s)
+	return rc
+}
+
 // SetID sets the "id" field.
 func (rc *RoleCreate) SetID(x xid.ID) *RoleCreate {
 	rc.mutation.SetID(x)
@@ -131,6 +151,10 @@ func (rc *RoleCreate) defaults() {
 		v := role.DefaultUpdatedAt()
 		rc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := rc.mutation.Colour(); !ok {
+		v := role.DefaultColour
+		rc.mutation.SetColour(v)
+	}
 	if _, ok := rc.mutation.ID(); !ok {
 		v := role.DefaultID()
 		rc.mutation.SetID(v)
@@ -147,6 +171,12 @@ func (rc *RoleCreate) check() error {
 	}
 	if _, ok := rc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Role.name"`)}
+	}
+	if _, ok := rc.mutation.Colour(); !ok {
+		return &ValidationError{Name: "colour", err: errors.New(`ent: missing required field "Role.colour"`)}
+	}
+	if _, ok := rc.mutation.Permissions(); !ok {
+		return &ValidationError{Name: "permissions", err: errors.New(`ent: missing required field "Role.permissions"`)}
 	}
 	if v, ok := rc.mutation.ID(); ok {
 		if err := role.IDValidator(v.String()); err != nil {
@@ -200,6 +230,14 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 	if value, ok := rc.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := rc.mutation.Colour(); ok {
+		_spec.SetField(role.FieldColour, field.TypeString, value)
+		_node.Colour = value
+	}
+	if value, ok := rc.mutation.Permissions(); ok {
+		_spec.SetField(role.FieldPermissions, field.TypeJSON, value)
+		_node.Permissions = value
 	}
 	if nodes := rc.mutation.AccountsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -293,6 +331,30 @@ func (u *RoleUpsert) UpdateName() *RoleUpsert {
 	return u
 }
 
+// SetColour sets the "colour" field.
+func (u *RoleUpsert) SetColour(v string) *RoleUpsert {
+	u.Set(role.FieldColour, v)
+	return u
+}
+
+// UpdateColour sets the "colour" field to the value that was provided on create.
+func (u *RoleUpsert) UpdateColour() *RoleUpsert {
+	u.SetExcluded(role.FieldColour)
+	return u
+}
+
+// SetPermissions sets the "permissions" field.
+func (u *RoleUpsert) SetPermissions(v []string) *RoleUpsert {
+	u.Set(role.FieldPermissions, v)
+	return u
+}
+
+// UpdatePermissions sets the "permissions" field to the value that was provided on create.
+func (u *RoleUpsert) UpdatePermissions() *RoleUpsert {
+	u.SetExcluded(role.FieldPermissions)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -369,6 +431,34 @@ func (u *RoleUpsertOne) SetName(v string) *RoleUpsertOne {
 func (u *RoleUpsertOne) UpdateName() *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetColour sets the "colour" field.
+func (u *RoleUpsertOne) SetColour(v string) *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetColour(v)
+	})
+}
+
+// UpdateColour sets the "colour" field to the value that was provided on create.
+func (u *RoleUpsertOne) UpdateColour() *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateColour()
+	})
+}
+
+// SetPermissions sets the "permissions" field.
+func (u *RoleUpsertOne) SetPermissions(v []string) *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetPermissions(v)
+	})
+}
+
+// UpdatePermissions sets the "permissions" field to the value that was provided on create.
+func (u *RoleUpsertOne) UpdatePermissions() *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdatePermissions()
 	})
 }
 
@@ -615,6 +705,34 @@ func (u *RoleUpsertBulk) SetName(v string) *RoleUpsertBulk {
 func (u *RoleUpsertBulk) UpdateName() *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdateName()
+	})
+}
+
+// SetColour sets the "colour" field.
+func (u *RoleUpsertBulk) SetColour(v string) *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetColour(v)
+	})
+}
+
+// UpdateColour sets the "colour" field to the value that was provided on create.
+func (u *RoleUpsertBulk) UpdateColour() *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateColour()
+	})
+}
+
+// SetPermissions sets the "permissions" field.
+func (u *RoleUpsertBulk) SetPermissions(v []string) *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetPermissions(v)
+	})
+}
+
+// UpdatePermissions sets the "permissions" field to the value that was provided on create.
+func (u *RoleUpsertBulk) UpdatePermissions() *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdatePermissions()
 	})
 }
 

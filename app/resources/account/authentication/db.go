@@ -57,7 +57,9 @@ func (d *database) Create(ctx context.Context,
 	r, err = d.db.Authentication.
 		Query().
 		Where(authentication.ID(r.ID)).
-		WithAccount().
+		WithAccount(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -77,7 +79,9 @@ func (d *database) LookupByIdentifier(ctx context.Context, service Service, iden
 			authentication.IdentifierEQ(identifier),
 			authentication.ServiceEQ(string(service)),
 		).
-		WithAccount().
+		WithAccount(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -102,7 +106,9 @@ func (d *database) LookupByHandle(ctx context.Context, service Service, handle s
 			authentication.ServiceEQ(string(service)),
 			authentication.HasAccountWith(model_account.Handle(handle)),
 		).
-		WithAccount().
+		WithAccount(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		Order(authentication.ByCreatedAt(sql.OrderDesc())).
 		// NOTE: We pick the latest here and don't handle multiple providers of
 		// the same type very well (it's quite an edge case...)
@@ -127,7 +133,9 @@ func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]
 	r, err := d.db.Authentication.
 		Query().
 		Where(authentication.HasAccountWith(model_account.IDEQ(xid.ID(id)))).
-		WithAccount().
+		WithAccount(func(aq *ent.AccountQuery) {
+			aq.WithRoles()
+		}).
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
@@ -158,7 +166,9 @@ func (d *database) Update(ctx context.Context, id ID, opts ...Option) (*Authenti
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	r, err = d.db.Authentication.Query().Where(authentication.ID(r.ID)).WithAccount().Only(ctx)
+	r, err = d.db.Authentication.Query().Where(authentication.ID(r.ID)).WithAccount(func(aq *ent.AccountQuery) {
+		aq.WithRoles()
+	}).Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

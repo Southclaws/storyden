@@ -15,7 +15,7 @@ import (
 
 type SessionProvider struct {
 	fx.In
-	Repo account_querier.Querier
+	Repo *account_querier.Querier
 }
 
 func (s *SessionProvider) Account(ctx context.Context) (*account.Account, error) {
