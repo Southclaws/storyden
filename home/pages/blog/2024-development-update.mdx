@@ -1,0 +1,93 @@
+---
+date: 2024-09-21
+description: >
+  AI buzzwords, social primitives and directories: A brief update on the development of Storyden from the past year.
+---
+
+I ([Barney](https://barney.is)) started this project for a few reasons. Partly to scratch an itch I had for building a product end-to-end, do the design, the branding, the marketing and development; releasing the whole process as an open-source endeavour. Another reason was I was frustrated with the state of forum software on the market while searching for platforms for communities I'm involved in.
+
+These goals have evolved over 2024 as I've narrowed the focus of the project, found a direction where I'm happy with the long term viability and market fit. I've also had the opportunity to dogfood the product in a few production scenarios, which has lead to some areas to advance a lot faster than others, more on that later.
+
+## Let's get the buzzword out of the way first
+
+Unless you've been living under a rock, you know generative transformers and language models are the thing right now. As with most of my peers, I'm not of the opinion this stuff is going to replace software engineers, copywriters, artists or any other profession. There's a lot of power behind GPTs which isn't just generating mediocre blog posts. (as I'm writing this, copilot is giving me the most mid suggestions and mundane sentances)
+
+Storyden, so far, does not have any form of content generation aside from a single summarisation prompt, which honestly isn't very good. It'll probably stay like that as my target audience and existing early users simply aren't interested. I've had the opportunity to chat to a lot of people in various industries, primarily people who hold writing as a core part of their strategy (whether its thought leadership, community building, newsletters, content marketing, etc.) this year and a common sentiment is that their writing must come from them, it's very personal and that personal touch matters.
+
+Where I think language models can shine is surprisingly not so much in the spotlight: recommendation algorithms and (very) fuzzy search.
+
+### The Semdex
+
+In classic fashion, I invented a term in the codebase, semantic + index = semdex. Silly, I know. The Semdex is essentially a big graph database, but there are no edges connecting nodes. Instead, use vector embeddings much like RAG search. I have some strong opinions on search, but more on that in the next section.
+
+Throwing everything into a vector database and not worrying too much about building complex edge relationships has been quite a nice mental model for me. It's also very fast, even with a few thousand items (though, further benchmarking with larger datasets is needed.)
+
+What this unlocks is an almost democratisation of recommendation algorithms. One weekend I dumped a ton of vertical videos from TikTok into the Semdex, wired up watch time, likes and comments and as I scrolled through the feed, it gradually became more and more tailored to my "interests". I would have never imagined I could build a "recommendation algorithm" when I studied machine learning in university, it all went over my head and seemed so much like a black box with an awfully slow test-train feedback loop. I've started to think of LLMs as a sort of higher level abstraction on top of ML fundamentals (well, it sort of is I guess, but I'm no expert!)
+
+Of course you wouldn't really want to launch a endless scroll vertical video app built on a single Go server, there's a ton more to consider like not feeding previously viewed videos, content moderation, performance, etc. TikTok itself put out a [great paper](https://arxiv.org/pdf/2209.07663) which is obviously a lot more sophisticated but it does share some DNA.
+
+And this had me thinking a lot about social platforms in general, particularly over-recommendation. Why recommend _only_ things you like, what about recommending things you may not like or agree with. Which are all things you can do if you own the data and the algorithm. And yes, pluggable algorithms are something I've toyed with.
+
+Which is really what Storyden is all about, get your community off Reddit and stop feeding them free training data. Self host your data, your embedding engine, own it all.
+
+## Forum?
+
+So the landing page says "A forum for the modern world" and so far I've just talked about LLM nonsense like every other VC backed tech product over the last year (Storyden is not VC backed, for the record...) am I straying from the original path?
+
+Well, a little. I've gone back and forth on the forum idea quite a bit, but I keep seeing people on various platforms say things along the lines of "what happened to all the old internet forums, why is everything just reddit now?" so I think there's still a place for a product like this.
+
+What I'm trying to balance is innovating a _little_ on the timeless idea while keeping the DNA of what made the forums I grew up on so fun.
+
+A common indie hacker trope is that you're just building to solve your own problems and somewhere along the way, it becomes a viable business endeavour. But a pitfall is you're building for your echo chamber, your age group, your demographic. [You are the average of the 5 people you associate with most](https://www.businessinsider.com/jim-rohn-youre-the-average-of-the-five-people-you-spend-the-most-time-with-2012-7) and all that. I've framed this project as something for the future, so I can only borrow so much from the past before it alienates the next era of internet users. If a WordPress of the 2030s is to exist, what attributes should it borrow from the social media platforms most of the youth are using today? On top of that, what are the most _useful_ features that are actually valuable to people, and what's just marketing fluff. (_something something AI powered blockchain NFTs_)
+
+## Social Primitives
+
+The last 15 years has seen a small assortment of ideas that permiate almost all "social" products. The likes, the shares, the threads, etc. Most of this stuff is not technically challenging at all, you can clone Twitter in a weekend and if you get past the cold-start problem by hitting the right niche with the right messaging, you can build a fairly active and successful space, [posts.cv](https://posts.cv/) did this and it's a wonderful breath of fresh air compared to what Twitter has evolved into. Substack is another example that carved out a niche that became a fairly large successful platform rivalling WordPress and similar.
+
+So with this, I believe it's important to pick the primitive building blocks that make sense because familiarity matters. Then innovate on top of that with "nice UX" (whatever that means today) and a light sprinkling of features that lead to [popsicle moments](https://blog.joinodin.com/p/popsicle-moments).
+
+It's not social at all, but I think [Linear](https://linear.app/) is a fantastic example of a beautiful product in a boring space that manages to be a joy to use. Outside of the impressive technical implementation (CRDTs and such) the experience of using Linear adds a layer of delight on top of what's normally quite a boring process (product and project management.)
+
+These are my north stars for Storyden, a product that's a joy to use, that's familiar enough to not alienate, but innovative enough to be useful for the next era of internet culture.
+
+## Information directories and curation
+
+I use TikTok, every day, it's my digital junk food and in moderation I think it's fine. [TikTok has become a search engine](https://www.nytimes.com/2022/09/16/technology/gen-z-tiktok-search-engine.html), and what started as a dancing video app eventually competing with Google, the monopoly that totally isn't (😉) a monopoly was not on my 2024 bingo card.
+
+Most of the value I derive from this app is rooted in curation. Primarily clothes and music. I've discovered artists I never would have with Spotify's obsession with playing the same songs. (which I think is that over-recommendation problem I mentioned earlier) and independent fashion brands that I would have never found on Instagram. Some creators I follow do both music and fashion all on the same account.
+
+The problem is while TikTok is becoming a macro-level search engine for the next generation, it's actually not great at the micro level. If I want to find a video [ZAGUA](https://www.tiktok.com/@zagua999) made about a particularly interesting brand 6 months ago, that's just not happening.
+
+A lot of creators get around this by setting up a Notion database, like [this research archive](https://quickthoughts.notion.site/) by [QuickThoughts](https://www.tiktok.com/@lthlnkso) where he's painstakingly listed every uploaded video along with detailed research notes. And if I want to drop a comment or chat with other fans, I have to go back to TikTok, find the video then leave a comment which will be lost to the void because anything older than a day is essentially nonexistent on the platform.
+
+So, a common indie hacker trope is that you're just building to solve your own problems? I suppose so. This area of Storyden is more on the experimental muse side of things. Figuring out the marketing messaging for this feature is a little tough, "social Notion"? "WordPress with spreadsheets"? It's also a feature that I haven't actually validated, as far as I know, nobody is asking for this. But I'm building it anyway because I _feel_ like there's a success trajectory somewhere along the way. It's also just fun, for some reason.
+
+## The Backend x Frontend race
+
+Due to how I'm using Storyden with a few existing "customers" (I use that term lightly, revenue is zero and probably will be for a long time) I'm often building bespoke frontends rather than using the reference implementation in the open source repository. The benefit here is the API-driven design is really proving itself, as I can just pull the OpenAPI specification, generate a client and build out a fairly nice React frontend in a weekend. The downside here is that the backend is _way_ ahead of what the reference frontend exposes. Everything in this post is a feature implemented, tested and (somewhat) documented in the backend Golang codebase. The frontend, and thus the public "demo" at [makeroom.club](https://makeroom.club) is a little behind.
+
+There are a few early features in development that will most likely land before the end of the year. And if you're building a bespoke frontend implementation on top of the Storyden platform API, you can already start using them.
+
+## Events
+
+A few early users have mentioned event organisation in-product, a sort of Luma alternative that's built in with all the normal things you'd expect from an events platform, like invites, RSVPs, ical integration. This one is still early and build started in the summer.
+
+## Roles
+
+For an embarrassingly long time, there was a single boolean flag called `admin`. That was the role-based-access-control mechanism. Last month, I finally got around to replacing this with a proper role system with granular permissions. I've modelled roles after the Discord permission system, which I think is a good balance between flexibility and simplicity. Roles can hold permissions, or they can just be aesthetic and give a bit of colour to your username.
+
+## Authentication
+
+Emails landed as an optional way to authenticate. If you've read any of the other blog posts about core values, you know that I consider email addresses to be optional. Privacy conscious hosts can omit the need for an email address for sign-up and opt for just dealing with handles. But for those who want to use Storyden as a more traditional forum, emails are now an option.
+
+There's also an unfinished branch called `saml`... #enterprise
+
+Web3 is something I put on the home page back when I designed that over 2 years ago. That claim, I am sad to say, still has not come to fruition. Mostly because I know absolutely nothing about Web3 technology. Fake it 'til you make it, right? I should probably remove that claim for now...
+
+## The future
+
+After doing almost zero marketing (apart from these sporadic blog posts) the GitHub repository still has almost 100 stars, so that's neat. Not huge numbers but it's something of a signal that there's _some_ interest. I will eventually do the usual Hacker News, Reddit, Product Hunt rounds, but in classic perfectionism mindset I am hesitant to try until a few more forum basics (which I keep putting off) are implemented.
+
+As for business plans, there's none yet, Storyden will always remain open source and I am very aware of the recent license shenanigans with Redis, ElasticSearch and friends. This is mostly blocked by the frontend issue mentioned above, movement there will unlock usability of the more powerful features and make the product a more compelling offering. Also, multi-tenant hosted instances are hard. If you want to chat, offer advice or help in any way, shoot me an email `barney` at symbol `hey dot com`.
+
+And that's it, 2024 in a nutshell so far. I'm cautiously excited about the next chapter of Storyden, and I hope you are too.
