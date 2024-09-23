@@ -1,4 +1,4 @@
-FROM golang:1.22
+FROM golang:1.23
 
 RUN git config --global --add safe.directory /server
 
