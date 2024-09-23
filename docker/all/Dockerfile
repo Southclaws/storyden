@@ -1,4 +1,4 @@
-FROM golang:1.22 AS api-builder
+FROM golang:1.23 AS api-builder
 
 RUN git config --global --add safe.directory /server
 
