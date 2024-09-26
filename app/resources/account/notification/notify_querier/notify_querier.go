@@ -71,6 +71,12 @@ func (n *Querier) hydrateRefs(ctx context.Context, refs notification.Notificatio
 		switch r.ItemRef.OrZero().Kind {
 		case datagraph.KindPost:
 			p := pg[post.ID(r.ItemRef.OrZero().ID)]
+
+			if p == nil {
+				// Post was deleted, skip.
+				return nil
+			}
+
 			return &notification.Notification{
 				ID:     r.ID,
 				Event:  r.Event,
@@ -88,6 +94,10 @@ func (n *Querier) hydrateRefs(ctx context.Context, refs notification.Notificatio
 			Time:   r.Time,
 			Read:   r.Read,
 		}
+	})
+
+	ns = dt.Filter(ns, func(n *notification.Notification) bool {
+		return n != nil
 	})
 
 	sort.Sort(notification.Notifications(ns))
