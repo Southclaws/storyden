@@ -26,7 +26,8 @@ export function useReactList(props: Props) {
 
   async function handleSelect(event: EmojiSelectEvent) {
     await postReactAdd(props.id, { emoji: event.native });
-    props.slug && mutate(getThreadGetKey(props.slug));
+
+    mutate(getThreadGetKey(props.slug));
 
     onClose();
   }

@@ -17,20 +17,17 @@ export type ThreadScreenContextShape = {
   setEditingContent: (content: string) => void;
 };
 
-const noop = (_: unknown) => {
-  _;
-};
-
-export const ThreadScreenContext = createContext<ThreadScreenContextShape>({
-  thread: undefined,
-  editingPostID: undefined,
-  setEditingPostID: noop,
-  editingTitle: undefined,
-  setEditingTitle: noop,
-  editingContent: undefined,
-  setEditingContent: noop,
-});
+export const ThreadScreenContext =
+  createContext<ThreadScreenContextShape | null>(null);
 
 export function useThreadScreenContext() {
-  return useContext(ThreadScreenContext);
+  const ctx = useContext(ThreadScreenContext);
+
+  if (!ctx) {
+    throw new Error(
+      "useThreadScreenContext must be used within a ThreadScreenContext.Provider",
+    );
+  }
+
+  return ctx;
 }
