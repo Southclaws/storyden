@@ -6,7 +6,8 @@
   ],
   "rules": {
     "@typescript-eslint/no-explicit-any": "off",
-    "@typescript-eslint/no-unused-vars": "off"
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-empty-object-type": "off"
   },
   "ignorePatterns": ["src/api/openapi/**/*.ts"],
   "parser": "@typescript-eslint/parser",
