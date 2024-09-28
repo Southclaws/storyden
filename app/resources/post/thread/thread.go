@@ -7,14 +7,13 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection"
-
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/profile"
-	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -88,6 +87,11 @@ func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (
 			return nil, fault.Wrap(err)
 		}
 
+		reacts, err := reaction.MapList(m.Edges.Reacts)
+		if err != nil {
+			return nil, err
+		}
+
 		return &Thread{
 			Post: post.Post{
 				ID: post.ID(m.ID),
@@ -95,7 +99,7 @@ func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (
 				Content: content,
 				Author:  *pro,
 				Likes:   ls.Status(m.ID),
-				Reacts:  dt.Map(m.Edges.Reacts, react.FromModel),
+				Reacts:  reacts,
 				Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
 				WebLink: link,
 				Meta:    m.Metadata,

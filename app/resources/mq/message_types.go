@@ -58,3 +58,7 @@ type Mention struct {
 	Source datagraph.Ref
 	Item   datagraph.Ref
 }
+
+type ReactToPost struct {
+	PostID post.ID
+}

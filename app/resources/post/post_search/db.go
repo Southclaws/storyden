@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/react"
 )
 
 type database struct {
@@ -31,7 +32,11 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*post.Post,
 		WithAuthor(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
-		WithReacts().
+		WithReacts(func(rq *ent.ReactQuery) {
+			rq.WithAccount(func(aq *ent.AccountQuery) {
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+			}).Order(react.ByCreatedAt())
+		}).
 		WithTags().
 		WithRoot().
 		Order(ent.Asc(ent_post.FieldCreatedAt))
@@ -70,7 +75,11 @@ func (d *database) GetMany(ctx context.Context, ids ...post.ID) ([]*post.Post, e
 		WithAuthor(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
-		WithReacts().
+		WithReacts(func(rq *ent.ReactQuery) {
+			rq.WithAccount(func(aq *ent.AccountQuery) {
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+			}).Order(react.ByCreatedAt())
+		}).
 		WithTags().
 		WithRoot().
 		Order(ent.Asc(ent_post.FieldCreatedAt))

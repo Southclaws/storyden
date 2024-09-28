@@ -22,7 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/notification/notify_job"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/profile/following"
-	"github.com/Southclaws/storyden/app/services/react"
+	"github.com/Southclaws/storyden/app/services/react_manager"
 	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
 	"github.com/Southclaws/storyden/app/services/semdex/index_job"
@@ -43,7 +43,7 @@ func Build() fx.Option {
 		thread.Build(),
 		reply.Build(),
 		post_liker.Build(),
-		react.Build(),
+		react_manager.Build(),
 		search.Build(),
 		avatar.Build(),
 		asset.Build(),
