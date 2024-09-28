@@ -318,7 +318,11 @@ func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Opti
 						aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 					})
 				}).
-				WithReacts().
+				WithReacts(func(rq *ent.ReactQuery) {
+					rq.WithAccount(func(aq *ent.AccountQuery) {
+						aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+					}).Order(react.ByCreatedAt())
+				}).
 				WithAuthor(func(aq *ent.AccountQuery) {
 					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 				}).
@@ -337,7 +341,9 @@ func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Opti
 			tq.Order(tag.ByCreatedAt())
 		}).
 		WithReacts(func(rq *ent.ReactQuery) {
-			rq.Order(react.ByCreatedAt())
+			rq.WithAccount(func(aq *ent.AccountQuery) {
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+			}).Order(react.ByCreatedAt())
 		}).
 		WithAssets().
 		WithLink(func(lq *ent.LinkQuery) {

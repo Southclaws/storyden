@@ -13,9 +13,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
-	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure/db"
@@ -56,7 +56,7 @@ func New(
 	category_repo category.Repository,
 	thread_repo thread.Repository,
 	post_repo reply.Repository,
-	react_repo react.Repository,
+	react_repo *reaction.Writer,
 	asset_repo asset.Repository,
 	node_repo library.Repository,
 ) (r Ready) {

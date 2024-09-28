@@ -9,20 +9,19 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/profile"
-	"github.com/minimaxir/big-list-of-naughty-strings/naughtystrings"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
-	"github.com/Southclaws/storyden/app/resources/react"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/utils"
+	"github.com/minimaxir/big-list-of-naughty-strings/naughtystrings"
 )
 
 var (
@@ -246,7 +245,7 @@ Storyden is still in development so please give the repository a watch if you're
 	}
 )
 
-func threads(tr thread.Repository, pr reply.Repository, rr react.Repository, ar asset.Repository) {
+func threads(tr thread.Repository, pr reply.Repository, rr *reaction.Writer, ar asset.Repository) {
 	ctx := context.Background()
 
 	for _, t := range Threads {

@@ -8,8 +8,11 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type { Identifier } from "./identifier";
+import type { ProfileReference } from "./profileReference";
+import type { ReactEmoji } from "./reactEmoji";
 
 export interface React {
-  emoji?: string;
-  id?: Identifier;
+  author: ProfileReference;
+  emoji: ReactEmoji;
+  id: Identifier;
 }
