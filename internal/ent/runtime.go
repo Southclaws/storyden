@@ -743,10 +743,6 @@ func init() {
 	roleDescColour := roleFields[1].Descriptor()
 	// role.DefaultColour holds the default value on creation for the colour field.
 	role.DefaultColour = roleDescColour.Default.(string)
-	// roleDescSortKey is the schema descriptor for sort_key field.
-	roleDescSortKey := roleFields[3].Descriptor()
-	// role.DefaultSortKey holds the default value on creation for the sort_key field.
-	role.DefaultSortKey = roleDescSortKey.Default.(float64)
 	// roleDescID is the schema descriptor for id field.
 	roleDescID := roleMixinFields0[0].Descriptor()
 	// role.DefaultID holds the default value on creation for the id field.

@@ -21,7 +21,7 @@ func (Role) Fields() []ent.Field {
 			Unique(),
 		field.String("colour").Default("hsl(157, 65%, 44%)"),
 		field.Strings("permissions"),
-		field.Float("sort_key").Default(0),
+		field.Float("sort_key").Annotations(entsql.Default("0.0")),
 	}
 }
 

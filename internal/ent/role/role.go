@@ -83,8 +83,6 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultColour holds the default value on creation for the "colour" field.
 	DefaultColour string
-	// DefaultSortKey holds the default value on creation for the "sort_key" field.
-	DefaultSortKey float64
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
