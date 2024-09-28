@@ -11,6 +11,8 @@ import "./global.css";
 
 import { Providers } from "./providers";
 
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en">
