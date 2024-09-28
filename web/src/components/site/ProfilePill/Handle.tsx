@@ -1,6 +1,6 @@
 import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
-import { ProfileReference } from "src/api/openapi-schema";
+import { Permission, ProfileReference } from "src/api/openapi-schema";
 
 import { styled } from "@/styled-system/jsx";
 
@@ -10,6 +10,10 @@ export type Props = {
 };
 
 export function Handle({ profileReference, size }: Props) {
+  const isAdmin = profileReference.roles.find((role) =>
+    role.permissions.includes(Permission.ADMINISTRATOR),
+  );
+
   return (
     <styled.p fontSize={size === "lg" ? "md" : "sm"} display="flex" gap="1">
       <styled.span
@@ -20,7 +24,7 @@ export function Handle({ profileReference, size }: Props) {
         @{profileReference.handle}
       </styled.span>
 
-      {profileReference.admin && (
+      {isAdmin && (
         <styled.span
           display="flex"
           justifyContent="center"
