@@ -153,7 +153,9 @@ export const FloatingMenu = (props: FloatingMenuProps) => {
     });
 
     menuEditor.registerPlugin(plugin);
-    return () => menuEditor.unregisterPlugin(PLUGIN_KEY);
+    return () => {
+      menuEditor.unregisterPlugin(PLUGIN_KEY);
+    };
   }, [props.editor, currentEditor, element]);
 
   return (
