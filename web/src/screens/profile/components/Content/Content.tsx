@@ -26,10 +26,7 @@ export function Content(props: PublicProfile) {
         </Tabs.List>
 
         <Tabs.Content value="posts">
-          <TextPostList
-            posts={content.data.threads.threads}
-            onDelete={content.handlers.handleDeleteThread}
-          />
+          <TextPostList threads={content.data.threads} />
         </Tabs.Content>
 
         <Tabs.Content value="replies">

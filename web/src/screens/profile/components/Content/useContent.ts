@@ -4,7 +4,7 @@ import { PublicProfile } from "src/api/openapi-schema";
 import { useFeed } from "src/components/feed/useFeed";
 
 export function useContent(props: PublicProfile) {
-  const threads = useFeed({ params: { threads: { author: props.handle } } });
+  const threads = useFeed({ params: { author: props.handle } });
   const posts = usePostSearch({ author: props.handle, kind: ["post"] });
   const collections = useCollectionList();
 
@@ -19,6 +19,5 @@ export function useContent(props: PublicProfile) {
       posts: posts.data.results,
       collections: collections.data.collections,
     },
-    handlers: threads.handlers,
   };
 }

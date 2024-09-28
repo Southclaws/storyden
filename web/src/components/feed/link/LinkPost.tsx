@@ -11,7 +11,6 @@ import { FeedItemByline } from "../common/FeedItemByline/FeedItemByline";
 
 type Props = {
   thread: ThreadReference;
-  onDelete: () => void;
 };
 
 export function LinkPost(props: Props) {
@@ -61,7 +60,7 @@ export function LinkPost(props: Props) {
       </Box>
 
       <Box px="2" pb="2">
-        <FeedItemByline thread={props.thread} onDelete={props.onDelete} />
+        <FeedItemByline thread={props.thread} />
       </Box>
     </styled.article>
   );

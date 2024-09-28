@@ -63,7 +63,7 @@ export function ThreadIndexView(props: Props) {
         pageSize={data.threads.page_size}
       />
 
-      <TextPostList posts={data.threads.threads} />
+      <TextPostList threads={data.threads.threads} />
     </VStack>
   );
 }
