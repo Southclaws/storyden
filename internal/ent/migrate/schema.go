@@ -62,6 +62,46 @@ var (
 			},
 		},
 	}
+	// AccountRolesColumns holds the columns for the "account_roles" table.
+	AccountRolesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "badge", Type: field.TypeBool, Nullable: true},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "role_id", Type: field.TypeString, Size: 20},
+	}
+	// AccountRolesTable holds the schema information for the "account_roles" table.
+	AccountRolesTable = &schema.Table{
+		Name:       "account_roles",
+		Columns:    AccountRolesColumns,
+		PrimaryKey: []*schema.Column{AccountRolesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "account_roles_accounts_account",
+				Columns:    []*schema.Column{AccountRolesColumns[3]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "account_roles_roles_role",
+				Columns:    []*schema.Column{AccountRolesColumns[4]},
+				RefColumns: []*schema.Column{RolesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "unique_account_role",
+				Unique:  true,
+				Columns: []*schema.Column{AccountRolesColumns[3], AccountRolesColumns[4]},
+			},
+			{
+				Name:    "accountroles_account_id_badge",
+				Unique:  true,
+				Columns: []*schema.Column{AccountRolesColumns[3], AccountRolesColumns[2]},
+			},
+		},
+	}
 	// AssetsColumns holds the columns for the "assets" table.
 	AssetsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -541,6 +581,7 @@ var (
 		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "colour", Type: field.TypeString, Default: "hsl(157, 65%, 44%)"},
 		{Name: "permissions", Type: field.TypeJSON},
+		{Name: "sort_key", Type: field.TypeFloat64, Default: 0},
 	}
 	// RolesTable holds the schema information for the "roles" table.
 	RolesTable = &schema.Table{
@@ -722,31 +763,6 @@ var (
 			},
 		},
 	}
-	// RoleAccountsColumns holds the columns for the "role_accounts" table.
-	RoleAccountsColumns = []*schema.Column{
-		{Name: "role_id", Type: field.TypeString, Size: 20},
-		{Name: "account_id", Type: field.TypeString, Size: 20},
-	}
-	// RoleAccountsTable holds the schema information for the "role_accounts" table.
-	RoleAccountsTable = &schema.Table{
-		Name:       "role_accounts",
-		Columns:    RoleAccountsColumns,
-		PrimaryKey: []*schema.Column{RoleAccountsColumns[0], RoleAccountsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "role_accounts_role_id",
-				Columns:    []*schema.Column{RoleAccountsColumns[0]},
-				RefColumns: []*schema.Column{RolesColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "role_accounts_account_id",
-				Columns:    []*schema.Column{RoleAccountsColumns[1]},
-				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// TagPostsColumns holds the columns for the "tag_posts" table.
 	TagPostsColumns = []*schema.Column{
 		{Name: "tag_id", Type: field.TypeString, Size: 20},
@@ -801,6 +817,7 @@ var (
 	Tables = []*schema.Table{
 		AccountsTable,
 		AccountFollowsTable,
+		AccountRolesTable,
 		AssetsTable,
 		AuthenticationsTable,
 		CategoriesTable,
@@ -824,7 +841,6 @@ var (
 		LinkAssetsTable,
 		NodeAssetsTable,
 		PostAssetsTable,
-		RoleAccountsTable,
 		TagPostsTable,
 		TagNodesTable,
 	}
@@ -833,6 +849,8 @@ var (
 func init() {
 	AccountFollowsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountFollowsTable.ForeignKeys[1].RefTable = AccountsTable
+	AccountRolesTable.ForeignKeys[0].RefTable = AccountsTable
+	AccountRolesTable.ForeignKeys[1].RefTable = RolesTable
 	AssetsTable.ForeignKeys[0].RefTable = AccountsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
 	CollectionsTable.ForeignKeys[0].RefTable = AccountsTable
@@ -873,8 +891,6 @@ func init() {
 	NodeAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	PostAssetsTable.ForeignKeys[0].RefTable = PostsTable
 	PostAssetsTable.ForeignKeys[1].RefTable = AssetsTable
-	RoleAccountsTable.ForeignKeys[0].RefTable = RolesTable
-	RoleAccountsTable.ForeignKeys[1].RefTable = AccountsTable
 	TagPostsTable.ForeignKeys[0].RefTable = TagsTable
 	TagPostsTable.ForeignKeys[1].RefTable = PostsTable
 	TagNodesTable.ForeignKeys[0].RefTable = TagsTable

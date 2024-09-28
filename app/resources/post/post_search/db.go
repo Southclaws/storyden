@@ -29,7 +29,7 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*post.Post,
 	q := d.db.Post.
 		Query().
 		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithReacts().
 		WithTags().
@@ -68,7 +68,7 @@ func (d *database) GetMany(ctx context.Context, ids ...post.ID) ([]*post.Post, e
 			ent_post.IDIn(rawids...),
 		).
 		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithReacts().
 		WithTags().

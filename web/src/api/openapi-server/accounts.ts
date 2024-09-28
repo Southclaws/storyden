@@ -161,3 +161,62 @@ export const accountGetAvatar = async (
     },
   );
 };
+
+/**
+ * Adds a role to an account. Members without the MANAGE_ROLES permission
+cannot use this operation.
+
+ */
+export type accountAddRoleResponse = {
+  data: AccountUpdateOKResponse;
+  status: number;
+};
+
+export const getAccountAddRoleUrl = (accountHandle: string, roleId: string) => {
+  return `/accounts/${accountHandle}/roles/${roleId}`;
+};
+
+export const accountAddRole = async (
+  accountHandle: string,
+  roleId: string,
+  options?: RequestInit,
+): Promise<accountAddRoleResponse> => {
+  return fetcher<Promise<accountAddRoleResponse>>(
+    getAccountAddRoleUrl(accountHandle, roleId),
+    {
+      ...options,
+      method: "PUT",
+    },
+  );
+};
+
+/**
+ * Removes a role from an account. Members without the MANAGE_ROLES cannot
+use this operation. Admins cannot remove the admin role from themselves.
+
+ */
+export type accountRemoveRoleResponse = {
+  data: AccountUpdateOKResponse;
+  status: number;
+};
+
+export const getAccountRemoveRoleUrl = (
+  accountHandle: string,
+  roleId: string,
+) => {
+  return `/accounts/${accountHandle}/roles/${roleId}`;
+};
+
+export const accountRemoveRole = async (
+  accountHandle: string,
+  roleId: string,
+  options?: RequestInit,
+): Promise<accountRemoveRoleResponse> => {
+  return fetcher<Promise<accountRemoveRoleResponse>>(
+    getAccountRemoveRoleUrl(accountHandle, roleId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};

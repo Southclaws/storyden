@@ -10,7 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { PermissionList } from "./permissionList";
 
 export interface RoleProps {
-  colour?: string;
-  name?: string;
-  permissions?: PermissionList;
+  colour: string;
+  name: string;
+  permissions: PermissionList;
 }

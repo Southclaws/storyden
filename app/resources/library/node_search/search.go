@@ -63,11 +63,11 @@ func (s *service) Search(ctx context.Context, opts ...Option) ([]*library.Node, 
 			// TODO: more query/filter params
 		).
 		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithNodes(func(cq *ent.NodeQuery) {
 			cq.WithOwner(func(aq *ent.AccountQuery) {
-				aq.WithRoles()
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 			})
 		}).
 		WithAssets().

@@ -4,12 +4,12 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/rs/xid"
-
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/rs/xid"
+
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
@@ -28,7 +28,7 @@ type Account struct {
 	Followers      int
 	Following      int
 	LikeScore      int
-	Roles          role.Roles
+	Roles          held.Roles
 	Auths          []string
 	EmailAddresses []*EmailAddress
 	VerifiedStatus VerifiedStatus

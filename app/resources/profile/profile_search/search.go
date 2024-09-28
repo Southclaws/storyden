@@ -65,7 +65,7 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 	}
 
 	q := d.db.Account.Query().
-		WithRoles().
+		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		Limit(size + 1).
 		Offset(page * size).
 		Order(ent.Desc(account.FieldCreatedAt))

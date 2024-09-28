@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/accountfollow"
+	"github.com/Southclaws/storyden/internal/ent/accountroles"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
@@ -46,6 +47,7 @@ const (
 	// Node types.
 	TypeAccount        = "Account"
 	TypeAccountFollow  = "AccountFollow"
+	TypeAccountRoles   = "AccountRoles"
 	TypeAsset          = "Asset"
 	TypeAuthentication = "Authentication"
 	TypeCategory       = "Category"
@@ -127,6 +129,9 @@ type AccountMutation struct {
 	assets                         map[xid.ID]struct{}
 	removedassets                  map[xid.ID]struct{}
 	clearedassets                  bool
+	account_roles                  map[xid.ID]struct{}
+	removedaccount_roles           map[xid.ID]struct{}
+	clearedaccount_roles           bool
 	done                           bool
 	oldValue                       func(context.Context) (*Account, error)
 	predicates                     []predicate.Account
@@ -1438,6 +1443,60 @@ func (m *AccountMutation) ResetAssets() {
 	m.removedassets = nil
 }
 
+// AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by ids.
+func (m *AccountMutation) AddAccountRoleIDs(ids ...xid.ID) {
+	if m.account_roles == nil {
+		m.account_roles = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.account_roles[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAccountRoles clears the "account_roles" edge to the AccountRoles entity.
+func (m *AccountMutation) ClearAccountRoles() {
+	m.clearedaccount_roles = true
+}
+
+// AccountRolesCleared reports if the "account_roles" edge to the AccountRoles entity was cleared.
+func (m *AccountMutation) AccountRolesCleared() bool {
+	return m.clearedaccount_roles
+}
+
+// RemoveAccountRoleIDs removes the "account_roles" edge to the AccountRoles entity by IDs.
+func (m *AccountMutation) RemoveAccountRoleIDs(ids ...xid.ID) {
+	if m.removedaccount_roles == nil {
+		m.removedaccount_roles = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.account_roles, ids[i])
+		m.removedaccount_roles[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAccountRoles returns the removed IDs of the "account_roles" edge to the AccountRoles entity.
+func (m *AccountMutation) RemovedAccountRolesIDs() (ids []xid.ID) {
+	for id := range m.removedaccount_roles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AccountRolesIDs returns the "account_roles" edge IDs in the mutation.
+func (m *AccountMutation) AccountRolesIDs() (ids []xid.ID) {
+	for id := range m.account_roles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAccountRoles resets all changes to the "account_roles" edge.
+func (m *AccountMutation) ResetAccountRoles() {
+	m.account_roles = nil
+	m.clearedaccount_roles = false
+	m.removedaccount_roles = nil
+}
+
 // Where appends a list predicates to the AccountMutation builder.
 func (m *AccountMutation) Where(ps ...predicate.Account) {
 	m.predicates = append(m.predicates, ps...)
@@ -1734,7 +1793,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 15)
+	edges := make([]string, 0, 16)
 	if m.emails != nil {
 		edges = append(edges, account.EdgeEmails)
 	}
@@ -1779,6 +1838,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.assets != nil {
 		edges = append(edges, account.EdgeAssets)
+	}
+	if m.account_roles != nil {
+		edges = append(edges, account.EdgeAccountRoles)
 	}
 	return edges
 }
@@ -1877,13 +1939,19 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeAccountRoles:
+		ids := make([]ent.Value, 0, len(m.account_roles))
+		for id := range m.account_roles {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 15)
+	edges := make([]string, 0, 16)
 	if m.removedemails != nil {
 		edges = append(edges, account.EdgeEmails)
 	}
@@ -1928,6 +1996,9 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedassets != nil {
 		edges = append(edges, account.EdgeAssets)
+	}
+	if m.removedaccount_roles != nil {
+		edges = append(edges, account.EdgeAccountRoles)
 	}
 	return edges
 }
@@ -2026,13 +2097,19 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeAccountRoles:
+		ids := make([]ent.Value, 0, len(m.removedaccount_roles))
+		for id := range m.removedaccount_roles {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 15)
+	edges := make([]string, 0, 16)
 	if m.clearedemails {
 		edges = append(edges, account.EdgeEmails)
 	}
@@ -2078,6 +2155,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	if m.clearedassets {
 		edges = append(edges, account.EdgeAssets)
 	}
+	if m.clearedaccount_roles {
+		edges = append(edges, account.EdgeAccountRoles)
+	}
 	return edges
 }
 
@@ -2115,6 +2195,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearednodes
 	case account.EdgeAssets:
 		return m.clearedassets
+	case account.EdgeAccountRoles:
+		return m.clearedaccount_roles
 	}
 	return false
 }
@@ -2175,6 +2257,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeAssets:
 		m.ResetAssets()
+		return nil
+	case account.EdgeAccountRoles:
+		m.ResetAccountRoles()
 		return nil
 	}
 	return fmt.Errorf("unknown Account edge %s", name)
@@ -2744,6 +2829,622 @@ func (m *AccountFollowMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown AccountFollow edge %s", name)
+}
+
+// AccountRolesMutation represents an operation that mutates the AccountRoles nodes in the graph.
+type AccountRolesMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *xid.ID
+	created_at     *time.Time
+	badge          *bool
+	clearedFields  map[string]struct{}
+	account        *xid.ID
+	clearedaccount bool
+	role           *xid.ID
+	clearedrole    bool
+	done           bool
+	oldValue       func(context.Context) (*AccountRoles, error)
+	predicates     []predicate.AccountRoles
+}
+
+var _ ent.Mutation = (*AccountRolesMutation)(nil)
+
+// accountrolesOption allows management of the mutation configuration using functional options.
+type accountrolesOption func(*AccountRolesMutation)
+
+// newAccountRolesMutation creates new mutation for the AccountRoles entity.
+func newAccountRolesMutation(c config, op Op, opts ...accountrolesOption) *AccountRolesMutation {
+	m := &AccountRolesMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAccountRoles,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAccountRolesID sets the ID field of the mutation.
+func withAccountRolesID(id xid.ID) accountrolesOption {
+	return func(m *AccountRolesMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *AccountRoles
+		)
+		m.oldValue = func(ctx context.Context) (*AccountRoles, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().AccountRoles.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAccountRoles sets the old AccountRoles of the mutation.
+func withAccountRoles(node *AccountRoles) accountrolesOption {
+	return func(m *AccountRolesMutation) {
+		m.oldValue = func(context.Context) (*AccountRoles, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AccountRolesMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AccountRolesMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of AccountRoles entities.
+func (m *AccountRolesMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *AccountRolesMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *AccountRolesMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().AccountRoles.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *AccountRolesMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *AccountRolesMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the AccountRoles entity.
+// If the AccountRoles object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountRolesMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *AccountRolesMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *AccountRolesMutation) SetAccountID(x xid.ID) {
+	m.account = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *AccountRolesMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.account
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the AccountRoles entity.
+// If the AccountRoles object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountRolesMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *AccountRolesMutation) ResetAccountID() {
+	m.account = nil
+}
+
+// SetRoleID sets the "role_id" field.
+func (m *AccountRolesMutation) SetRoleID(x xid.ID) {
+	m.role = &x
+}
+
+// RoleID returns the value of the "role_id" field in the mutation.
+func (m *AccountRolesMutation) RoleID() (r xid.ID, exists bool) {
+	v := m.role
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRoleID returns the old "role_id" field's value of the AccountRoles entity.
+// If the AccountRoles object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountRolesMutation) OldRoleID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRoleID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRoleID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRoleID: %w", err)
+	}
+	return oldValue.RoleID, nil
+}
+
+// ResetRoleID resets all changes to the "role_id" field.
+func (m *AccountRolesMutation) ResetRoleID() {
+	m.role = nil
+}
+
+// SetBadge sets the "badge" field.
+func (m *AccountRolesMutation) SetBadge(b bool) {
+	m.badge = &b
+}
+
+// Badge returns the value of the "badge" field in the mutation.
+func (m *AccountRolesMutation) Badge() (r bool, exists bool) {
+	v := m.badge
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBadge returns the old "badge" field's value of the AccountRoles entity.
+// If the AccountRoles object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountRolesMutation) OldBadge(ctx context.Context) (v *bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBadge is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBadge requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBadge: %w", err)
+	}
+	return oldValue.Badge, nil
+}
+
+// ClearBadge clears the value of the "badge" field.
+func (m *AccountRolesMutation) ClearBadge() {
+	m.badge = nil
+	m.clearedFields[accountroles.FieldBadge] = struct{}{}
+}
+
+// BadgeCleared returns if the "badge" field was cleared in this mutation.
+func (m *AccountRolesMutation) BadgeCleared() bool {
+	_, ok := m.clearedFields[accountroles.FieldBadge]
+	return ok
+}
+
+// ResetBadge resets all changes to the "badge" field.
+func (m *AccountRolesMutation) ResetBadge() {
+	m.badge = nil
+	delete(m.clearedFields, accountroles.FieldBadge)
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *AccountRolesMutation) ClearAccount() {
+	m.clearedaccount = true
+	m.clearedFields[accountroles.FieldAccountID] = struct{}{}
+}
+
+// AccountCleared reports if the "account" edge to the Account entity was cleared.
+func (m *AccountRolesMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *AccountRolesMutation) AccountIDs() (ids []xid.ID) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *AccountRolesMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
+// ClearRole clears the "role" edge to the Role entity.
+func (m *AccountRolesMutation) ClearRole() {
+	m.clearedrole = true
+	m.clearedFields[accountroles.FieldRoleID] = struct{}{}
+}
+
+// RoleCleared reports if the "role" edge to the Role entity was cleared.
+func (m *AccountRolesMutation) RoleCleared() bool {
+	return m.clearedrole
+}
+
+// RoleIDs returns the "role" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// RoleID instead. It exists only for internal usage by the builders.
+func (m *AccountRolesMutation) RoleIDs() (ids []xid.ID) {
+	if id := m.role; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRole resets all changes to the "role" edge.
+func (m *AccountRolesMutation) ResetRole() {
+	m.role = nil
+	m.clearedrole = false
+}
+
+// Where appends a list predicates to the AccountRolesMutation builder.
+func (m *AccountRolesMutation) Where(ps ...predicate.AccountRoles) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the AccountRolesMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *AccountRolesMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.AccountRoles, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *AccountRolesMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *AccountRolesMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (AccountRoles).
+func (m *AccountRolesMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AccountRolesMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.created_at != nil {
+		fields = append(fields, accountroles.FieldCreatedAt)
+	}
+	if m.account != nil {
+		fields = append(fields, accountroles.FieldAccountID)
+	}
+	if m.role != nil {
+		fields = append(fields, accountroles.FieldRoleID)
+	}
+	if m.badge != nil {
+		fields = append(fields, accountroles.FieldBadge)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AccountRolesMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case accountroles.FieldCreatedAt:
+		return m.CreatedAt()
+	case accountroles.FieldAccountID:
+		return m.AccountID()
+	case accountroles.FieldRoleID:
+		return m.RoleID()
+	case accountroles.FieldBadge:
+		return m.Badge()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AccountRolesMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case accountroles.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case accountroles.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case accountroles.FieldRoleID:
+		return m.OldRoleID(ctx)
+	case accountroles.FieldBadge:
+		return m.OldBadge(ctx)
+	}
+	return nil, fmt.Errorf("unknown AccountRoles field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AccountRolesMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case accountroles.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case accountroles.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case accountroles.FieldRoleID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRoleID(v)
+		return nil
+	case accountroles.FieldBadge:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBadge(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AccountRoles field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AccountRolesMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AccountRolesMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AccountRolesMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown AccountRoles numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AccountRolesMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(accountroles.FieldBadge) {
+		fields = append(fields, accountroles.FieldBadge)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AccountRolesMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AccountRolesMutation) ClearField(name string) error {
+	switch name {
+	case accountroles.FieldBadge:
+		m.ClearBadge()
+		return nil
+	}
+	return fmt.Errorf("unknown AccountRoles nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AccountRolesMutation) ResetField(name string) error {
+	switch name {
+	case accountroles.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case accountroles.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case accountroles.FieldRoleID:
+		m.ResetRoleID()
+		return nil
+	case accountroles.FieldBadge:
+		m.ResetBadge()
+		return nil
+	}
+	return fmt.Errorf("unknown AccountRoles field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AccountRolesMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.account != nil {
+		edges = append(edges, accountroles.EdgeAccount)
+	}
+	if m.role != nil {
+		edges = append(edges, accountroles.EdgeRole)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AccountRolesMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case accountroles.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
+	case accountroles.EdgeRole:
+		if id := m.role; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AccountRolesMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AccountRolesMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AccountRolesMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedaccount {
+		edges = append(edges, accountroles.EdgeAccount)
+	}
+	if m.clearedrole {
+		edges = append(edges, accountroles.EdgeRole)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AccountRolesMutation) EdgeCleared(name string) bool {
+	switch name {
+	case accountroles.EdgeAccount:
+		return m.clearedaccount
+	case accountroles.EdgeRole:
+		return m.clearedrole
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AccountRolesMutation) ClearEdge(name string) error {
+	switch name {
+	case accountroles.EdgeAccount:
+		m.ClearAccount()
+		return nil
+	case accountroles.EdgeRole:
+		m.ClearRole()
+		return nil
+	}
+	return fmt.Errorf("unknown AccountRoles unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AccountRolesMutation) ResetEdge(name string) error {
+	switch name {
+	case accountroles.EdgeAccount:
+		m.ResetAccount()
+		return nil
+	case accountroles.EdgeRole:
+		m.ResetRole()
+		return nil
+	}
+	return fmt.Errorf("unknown AccountRoles edge %s", name)
 }
 
 // AssetMutation represents an operation that mutates the Asset nodes in the graph.
@@ -15658,22 +16359,27 @@ func (m *ReactMutation) ResetEdge(name string) error {
 // RoleMutation represents an operation that mutates the Role nodes in the graph.
 type RoleMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *xid.ID
-	created_at        *time.Time
-	updated_at        *time.Time
-	name              *string
-	colour            *string
-	permissions       *[]string
-	appendpermissions []string
-	clearedFields     map[string]struct{}
-	accounts          map[xid.ID]struct{}
-	removedaccounts   map[xid.ID]struct{}
-	clearedaccounts   bool
-	done              bool
-	oldValue          func(context.Context) (*Role, error)
-	predicates        []predicate.Role
+	op                   Op
+	typ                  string
+	id                   *xid.ID
+	created_at           *time.Time
+	updated_at           *time.Time
+	name                 *string
+	colour               *string
+	permissions          *[]string
+	appendpermissions    []string
+	sort_key             *float64
+	addsort_key          *float64
+	clearedFields        map[string]struct{}
+	accounts             map[xid.ID]struct{}
+	removedaccounts      map[xid.ID]struct{}
+	clearedaccounts      bool
+	account_roles        map[xid.ID]struct{}
+	removedaccount_roles map[xid.ID]struct{}
+	clearedaccount_roles bool
+	done                 bool
+	oldValue             func(context.Context) (*Role, error)
+	predicates           []predicate.Role
 }
 
 var _ ent.Mutation = (*RoleMutation)(nil)
@@ -15975,6 +16681,62 @@ func (m *RoleMutation) ResetPermissions() {
 	m.appendpermissions = nil
 }
 
+// SetSortKey sets the "sort_key" field.
+func (m *RoleMutation) SetSortKey(f float64) {
+	m.sort_key = &f
+	m.addsort_key = nil
+}
+
+// SortKey returns the value of the "sort_key" field in the mutation.
+func (m *RoleMutation) SortKey() (r float64, exists bool) {
+	v := m.sort_key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSortKey returns the old "sort_key" field's value of the Role entity.
+// If the Role object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RoleMutation) OldSortKey(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSortKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSortKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSortKey: %w", err)
+	}
+	return oldValue.SortKey, nil
+}
+
+// AddSortKey adds f to the "sort_key" field.
+func (m *RoleMutation) AddSortKey(f float64) {
+	if m.addsort_key != nil {
+		*m.addsort_key += f
+	} else {
+		m.addsort_key = &f
+	}
+}
+
+// AddedSortKey returns the value that was added to the "sort_key" field in this mutation.
+func (m *RoleMutation) AddedSortKey() (r float64, exists bool) {
+	v := m.addsort_key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSortKey resets all changes to the "sort_key" field.
+func (m *RoleMutation) ResetSortKey() {
+	m.sort_key = nil
+	m.addsort_key = nil
+}
+
 // AddAccountIDs adds the "accounts" edge to the Account entity by ids.
 func (m *RoleMutation) AddAccountIDs(ids ...xid.ID) {
 	if m.accounts == nil {
@@ -16029,6 +16791,60 @@ func (m *RoleMutation) ResetAccounts() {
 	m.removedaccounts = nil
 }
 
+// AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by ids.
+func (m *RoleMutation) AddAccountRoleIDs(ids ...xid.ID) {
+	if m.account_roles == nil {
+		m.account_roles = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.account_roles[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAccountRoles clears the "account_roles" edge to the AccountRoles entity.
+func (m *RoleMutation) ClearAccountRoles() {
+	m.clearedaccount_roles = true
+}
+
+// AccountRolesCleared reports if the "account_roles" edge to the AccountRoles entity was cleared.
+func (m *RoleMutation) AccountRolesCleared() bool {
+	return m.clearedaccount_roles
+}
+
+// RemoveAccountRoleIDs removes the "account_roles" edge to the AccountRoles entity by IDs.
+func (m *RoleMutation) RemoveAccountRoleIDs(ids ...xid.ID) {
+	if m.removedaccount_roles == nil {
+		m.removedaccount_roles = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.account_roles, ids[i])
+		m.removedaccount_roles[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAccountRoles returns the removed IDs of the "account_roles" edge to the AccountRoles entity.
+func (m *RoleMutation) RemovedAccountRolesIDs() (ids []xid.ID) {
+	for id := range m.removedaccount_roles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AccountRolesIDs returns the "account_roles" edge IDs in the mutation.
+func (m *RoleMutation) AccountRolesIDs() (ids []xid.ID) {
+	for id := range m.account_roles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAccountRoles resets all changes to the "account_roles" edge.
+func (m *RoleMutation) ResetAccountRoles() {
+	m.account_roles = nil
+	m.clearedaccount_roles = false
+	m.removedaccount_roles = nil
+}
+
 // Where appends a list predicates to the RoleMutation builder.
 func (m *RoleMutation) Where(ps ...predicate.Role) {
 	m.predicates = append(m.predicates, ps...)
@@ -16063,7 +16879,7 @@ func (m *RoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RoleMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.created_at != nil {
 		fields = append(fields, role.FieldCreatedAt)
 	}
@@ -16078,6 +16894,9 @@ func (m *RoleMutation) Fields() []string {
 	}
 	if m.permissions != nil {
 		fields = append(fields, role.FieldPermissions)
+	}
+	if m.sort_key != nil {
+		fields = append(fields, role.FieldSortKey)
 	}
 	return fields
 }
@@ -16097,6 +16916,8 @@ func (m *RoleMutation) Field(name string) (ent.Value, bool) {
 		return m.Colour()
 	case role.FieldPermissions:
 		return m.Permissions()
+	case role.FieldSortKey:
+		return m.SortKey()
 	}
 	return nil, false
 }
@@ -16116,6 +16937,8 @@ func (m *RoleMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldColour(ctx)
 	case role.FieldPermissions:
 		return m.OldPermissions(ctx)
+	case role.FieldSortKey:
+		return m.OldSortKey(ctx)
 	}
 	return nil, fmt.Errorf("unknown Role field %s", name)
 }
@@ -16160,6 +16983,13 @@ func (m *RoleMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPermissions(v)
 		return nil
+	case role.FieldSortKey:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSortKey(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Role field %s", name)
 }
@@ -16167,13 +16997,21 @@ func (m *RoleMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *RoleMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addsort_key != nil {
+		fields = append(fields, role.FieldSortKey)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *RoleMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case role.FieldSortKey:
+		return m.AddedSortKey()
+	}
 	return nil, false
 }
 
@@ -16182,6 +17020,13 @@ func (m *RoleMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *RoleMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case role.FieldSortKey:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSortKey(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Role numeric field %s", name)
 }
@@ -16224,15 +17069,21 @@ func (m *RoleMutation) ResetField(name string) error {
 	case role.FieldPermissions:
 		m.ResetPermissions()
 		return nil
+	case role.FieldSortKey:
+		m.ResetSortKey()
+		return nil
 	}
 	return fmt.Errorf("unknown Role field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RoleMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.accounts != nil {
 		edges = append(edges, role.EdgeAccounts)
+	}
+	if m.account_roles != nil {
+		edges = append(edges, role.EdgeAccountRoles)
 	}
 	return edges
 }
@@ -16247,15 +17098,24 @@ func (m *RoleMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case role.EdgeAccountRoles:
+		ids := make([]ent.Value, 0, len(m.account_roles))
+		for id := range m.account_roles {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RoleMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedaccounts != nil {
 		edges = append(edges, role.EdgeAccounts)
+	}
+	if m.removedaccount_roles != nil {
+		edges = append(edges, role.EdgeAccountRoles)
 	}
 	return edges
 }
@@ -16270,15 +17130,24 @@ func (m *RoleMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case role.EdgeAccountRoles:
+		ids := make([]ent.Value, 0, len(m.removedaccount_roles))
+		for id := range m.removedaccount_roles {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RoleMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedaccounts {
 		edges = append(edges, role.EdgeAccounts)
+	}
+	if m.clearedaccount_roles {
+		edges = append(edges, role.EdgeAccountRoles)
 	}
 	return edges
 }
@@ -16289,6 +17158,8 @@ func (m *RoleMutation) EdgeCleared(name string) bool {
 	switch name {
 	case role.EdgeAccounts:
 		return m.clearedaccounts
+	case role.EdgeAccountRoles:
+		return m.clearedaccount_roles
 	}
 	return false
 }
@@ -16307,6 +17178,9 @@ func (m *RoleMutation) ResetEdge(name string) error {
 	switch name {
 	case role.EdgeAccounts:
 		m.ResetAccounts()
+		return nil
+	case role.EdgeAccountRoles:
+		m.ResetAccountRoles()
 		return nil
 	}
 	return fmt.Errorf("unknown Role edge %s", name)

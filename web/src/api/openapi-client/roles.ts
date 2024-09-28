@@ -8,7 +8,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
-import type { Key, SWRConfiguration } from "swr";
+import type { Arguments, Key, SWRConfiguration } from "swr";
 import useSWRMutation from "swr/mutation";
 import type { SWRMutationConfiguration } from "swr/mutation";
 
@@ -19,6 +19,7 @@ import type {
   RoleCreateBody,
   RoleCreateOKResponse,
   RoleGetOKResponse,
+  RoleListOKResponse,
   RoleUpdateBody,
   UnauthorisedResponse,
 } from "../openapi-schema";
@@ -73,6 +74,44 @@ export const useRoleCreate = <
   const swrFn = getRoleCreateMutationFetcher();
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List all roles and their permissions.
+ */
+export const roleList = () => {
+  return fetcher<RoleListOKResponse>({ url: `/roles`, method: "GET" });
+};
+
+export const getRoleListKey = () => [`/roles`] as const;
+
+export type RoleListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof roleList>>
+>;
+export type RoleListQueryError = InternalServerErrorResponse;
+
+export const useRoleList = <TError = InternalServerErrorResponse>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof roleList>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getRoleListKey() : null));
+  const swrFn = () => roleList();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
 
   return {
     swrKey,
@@ -180,6 +219,58 @@ export const useRoleUpdate = <
 
   const swrKey = swrOptions?.swrKey ?? getRoleUpdateMutationKey(roleId);
   const swrFn = getRoleUpdateMutationFetcher(roleId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Deletes a role.
+ */
+export const roleDelete = (roleId: string) => {
+  return fetcher<void>({ url: `/roles/${roleId}`, method: "DELETE" });
+};
+
+export const getRoleDeleteMutationFetcher = (roleId: string) => {
+  return (_: string, __: { arg: Arguments }): Promise<void> => {
+    return roleDelete(roleId);
+  };
+};
+export const getRoleDeleteMutationKey = (roleId: string) =>
+  `/roles/${roleId}` as const;
+
+export type RoleDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof roleDelete>>
+>;
+export type RoleDeleteMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useRoleDelete = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  roleId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof roleDelete>>,
+      TError,
+      string,
+      Arguments,
+      Awaited<ReturnType<typeof roleDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getRoleDeleteMutationKey(roleId);
+  const swrFn = getRoleDeleteMutationFetcher(roleId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

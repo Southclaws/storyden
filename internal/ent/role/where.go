@@ -76,6 +76,11 @@ func Colour(v string) predicate.Role {
 	return predicate.Role(sql.FieldEQ(FieldColour, v))
 }
 
+// SortKey applies equality check predicate on the "sort_key" field. It's identical to SortKeyEQ.
+func SortKey(v float64) predicate.Role {
+	return predicate.Role(sql.FieldEQ(FieldSortKey, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Role {
 	return predicate.Role(sql.FieldEQ(FieldCreatedAt, v))
@@ -286,6 +291,46 @@ func ColourContainsFold(v string) predicate.Role {
 	return predicate.Role(sql.FieldContainsFold(FieldColour, v))
 }
 
+// SortKeyEQ applies the EQ predicate on the "sort_key" field.
+func SortKeyEQ(v float64) predicate.Role {
+	return predicate.Role(sql.FieldEQ(FieldSortKey, v))
+}
+
+// SortKeyNEQ applies the NEQ predicate on the "sort_key" field.
+func SortKeyNEQ(v float64) predicate.Role {
+	return predicate.Role(sql.FieldNEQ(FieldSortKey, v))
+}
+
+// SortKeyIn applies the In predicate on the "sort_key" field.
+func SortKeyIn(vs ...float64) predicate.Role {
+	return predicate.Role(sql.FieldIn(FieldSortKey, vs...))
+}
+
+// SortKeyNotIn applies the NotIn predicate on the "sort_key" field.
+func SortKeyNotIn(vs ...float64) predicate.Role {
+	return predicate.Role(sql.FieldNotIn(FieldSortKey, vs...))
+}
+
+// SortKeyGT applies the GT predicate on the "sort_key" field.
+func SortKeyGT(v float64) predicate.Role {
+	return predicate.Role(sql.FieldGT(FieldSortKey, v))
+}
+
+// SortKeyGTE applies the GTE predicate on the "sort_key" field.
+func SortKeyGTE(v float64) predicate.Role {
+	return predicate.Role(sql.FieldGTE(FieldSortKey, v))
+}
+
+// SortKeyLT applies the LT predicate on the "sort_key" field.
+func SortKeyLT(v float64) predicate.Role {
+	return predicate.Role(sql.FieldLT(FieldSortKey, v))
+}
+
+// SortKeyLTE applies the LTE predicate on the "sort_key" field.
+func SortKeyLTE(v float64) predicate.Role {
+	return predicate.Role(sql.FieldLTE(FieldSortKey, v))
+}
+
 // HasAccounts applies the HasEdge predicate on the "accounts" edge.
 func HasAccounts() predicate.Role {
 	return predicate.Role(func(s *sql.Selector) {
@@ -301,6 +346,29 @@ func HasAccounts() predicate.Role {
 func HasAccountsWith(preds ...predicate.Account) predicate.Role {
 	return predicate.Role(func(s *sql.Selector) {
 		step := newAccountsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAccountRoles applies the HasEdge predicate on the "account_roles" edge.
+func HasAccountRoles() predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, AccountRolesTable, AccountRolesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAccountRolesWith applies the HasEdge predicate on the "account_roles" edge with a given conditions (other predicates).
+func HasAccountRolesWith(preds ...predicate.AccountRoles) predicate.Role {
+	return predicate.Role(func(s *sql.Selector) {
+		step := newAccountRolesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

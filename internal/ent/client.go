@@ -18,6 +18,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/accountfollow"
+	"github.com/Southclaws/storyden/internal/ent/accountroles"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
@@ -48,6 +49,8 @@ type Client struct {
 	Account *AccountClient
 	// AccountFollow is the client for interacting with the AccountFollow builders.
 	AccountFollow *AccountFollowClient
+	// AccountRoles is the client for interacting with the AccountRoles builders.
+	AccountRoles *AccountRolesClient
 	// Asset is the client for interacting with the Asset builders.
 	Asset *AssetClient
 	// Authentication is the client for interacting with the Authentication builders.
@@ -95,6 +98,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Account = NewAccountClient(c.config)
 	c.AccountFollow = NewAccountFollowClient(c.config)
+	c.AccountRoles = NewAccountRolesClient(c.config)
 	c.Asset = NewAssetClient(c.config)
 	c.Authentication = NewAuthenticationClient(c.config)
 	c.Category = NewCategoryClient(c.config)
@@ -206,6 +210,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:         cfg,
 		Account:        NewAccountClient(cfg),
 		AccountFollow:  NewAccountFollowClient(cfg),
+		AccountRoles:   NewAccountRolesClient(cfg),
 		Asset:          NewAssetClient(cfg),
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
@@ -244,6 +249,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:         cfg,
 		Account:        NewAccountClient(cfg),
 		AccountFollow:  NewAccountFollowClient(cfg),
+		AccountRoles:   NewAccountRolesClient(cfg),
 		Asset:          NewAssetClient(cfg),
 		Authentication: NewAuthenticationClient(cfg),
 		Category:       NewCategoryClient(cfg),
@@ -290,10 +296,10 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Account, c.AccountFollow, c.Asset, c.Authentication, c.Category, c.Collection,
-		c.CollectionNode, c.CollectionPost, c.Email, c.LikePost, c.Link,
-		c.MentionProfile, c.Node, c.Notification, c.Post, c.React, c.Role, c.Setting,
-		c.Tag,
+		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
+		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email,
+		c.LikePost, c.Link, c.MentionProfile, c.Node, c.Notification, c.Post, c.React,
+		c.Role, c.Setting, c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -303,10 +309,10 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Account, c.AccountFollow, c.Asset, c.Authentication, c.Category, c.Collection,
-		c.CollectionNode, c.CollectionPost, c.Email, c.LikePost, c.Link,
-		c.MentionProfile, c.Node, c.Notification, c.Post, c.React, c.Role, c.Setting,
-		c.Tag,
+		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
+		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email,
+		c.LikePost, c.Link, c.MentionProfile, c.Node, c.Notification, c.Post, c.React,
+		c.Role, c.Setting, c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -319,6 +325,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Account.mutate(ctx, m)
 	case *AccountFollowMutation:
 		return c.AccountFollow.mutate(ctx, m)
+	case *AccountRolesMutation:
+		return c.AccountRoles.mutate(ctx, m)
 	case *AssetMutation:
 		return c.Asset.mutate(ctx, m)
 	case *AuthenticationMutation:
@@ -706,6 +714,22 @@ func (c *AccountClient) QueryAssets(a *Account) *AssetQuery {
 	return query
 }
 
+// QueryAccountRoles queries the account_roles edge of a Account.
+func (c *AccountClient) QueryAccountRoles(a *Account) *AccountRolesQuery {
+	query := (&AccountRolesClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(accountroles.Table, accountroles.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, account.AccountRolesTable, account.AccountRolesColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AccountClient) Hooks() []Hook {
 	return c.hooks.Account
@@ -893,6 +917,171 @@ func (c *AccountFollowClient) mutate(ctx context.Context, m *AccountFollowMutati
 		return (&AccountFollowDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AccountFollow mutation op: %q", m.Op())
+	}
+}
+
+// AccountRolesClient is a client for the AccountRoles schema.
+type AccountRolesClient struct {
+	config
+}
+
+// NewAccountRolesClient returns a client for the AccountRoles from the given config.
+func NewAccountRolesClient(c config) *AccountRolesClient {
+	return &AccountRolesClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `accountroles.Hooks(f(g(h())))`.
+func (c *AccountRolesClient) Use(hooks ...Hook) {
+	c.hooks.AccountRoles = append(c.hooks.AccountRoles, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `accountroles.Intercept(f(g(h())))`.
+func (c *AccountRolesClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AccountRoles = append(c.inters.AccountRoles, interceptors...)
+}
+
+// Create returns a builder for creating a AccountRoles entity.
+func (c *AccountRolesClient) Create() *AccountRolesCreate {
+	mutation := newAccountRolesMutation(c.config, OpCreate)
+	return &AccountRolesCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AccountRoles entities.
+func (c *AccountRolesClient) CreateBulk(builders ...*AccountRolesCreate) *AccountRolesCreateBulk {
+	return &AccountRolesCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AccountRolesClient) MapCreateBulk(slice any, setFunc func(*AccountRolesCreate, int)) *AccountRolesCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AccountRolesCreateBulk{err: fmt.Errorf("calling to AccountRolesClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AccountRolesCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AccountRolesCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AccountRoles.
+func (c *AccountRolesClient) Update() *AccountRolesUpdate {
+	mutation := newAccountRolesMutation(c.config, OpUpdate)
+	return &AccountRolesUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AccountRolesClient) UpdateOne(ar *AccountRoles) *AccountRolesUpdateOne {
+	mutation := newAccountRolesMutation(c.config, OpUpdateOne, withAccountRoles(ar))
+	return &AccountRolesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AccountRolesClient) UpdateOneID(id xid.ID) *AccountRolesUpdateOne {
+	mutation := newAccountRolesMutation(c.config, OpUpdateOne, withAccountRolesID(id))
+	return &AccountRolesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AccountRoles.
+func (c *AccountRolesClient) Delete() *AccountRolesDelete {
+	mutation := newAccountRolesMutation(c.config, OpDelete)
+	return &AccountRolesDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AccountRolesClient) DeleteOne(ar *AccountRoles) *AccountRolesDeleteOne {
+	return c.DeleteOneID(ar.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AccountRolesClient) DeleteOneID(id xid.ID) *AccountRolesDeleteOne {
+	builder := c.Delete().Where(accountroles.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AccountRolesDeleteOne{builder}
+}
+
+// Query returns a query builder for AccountRoles.
+func (c *AccountRolesClient) Query() *AccountRolesQuery {
+	return &AccountRolesQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAccountRoles},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AccountRoles entity by its id.
+func (c *AccountRolesClient) Get(ctx context.Context, id xid.ID) (*AccountRoles, error) {
+	return c.Query().Where(accountroles.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AccountRolesClient) GetX(ctx context.Context, id xid.ID) *AccountRoles {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a AccountRoles.
+func (c *AccountRolesClient) QueryAccount(ar *AccountRoles) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ar.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(accountroles.Table, accountroles.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, accountroles.AccountTable, accountroles.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(ar.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRole queries the role edge of a AccountRoles.
+func (c *AccountRolesClient) QueryRole(ar *AccountRoles) *RoleQuery {
+	query := (&RoleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ar.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(accountroles.Table, accountroles.FieldID, id),
+			sqlgraph.To(role.Table, role.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, accountroles.RoleTable, accountroles.RoleColumn),
+		)
+		fromV = sqlgraph.Neighbors(ar.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *AccountRolesClient) Hooks() []Hook {
+	return c.hooks.AccountRoles
+}
+
+// Interceptors returns the client interceptors.
+func (c *AccountRolesClient) Interceptors() []Interceptor {
+	return c.inters.AccountRoles
+}
+
+func (c *AccountRolesClient) mutate(ctx context.Context, m *AccountRolesMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AccountRolesCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AccountRolesUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AccountRolesUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AccountRolesDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AccountRoles mutation op: %q", m.Op())
 	}
 }
 
@@ -3680,6 +3869,22 @@ func (c *RoleClient) QueryAccounts(r *Role) *AccountQuery {
 	return query
 }
 
+// QueryAccountRoles queries the account_roles edge of a Role.
+func (c *RoleClient) QueryAccountRoles(r *Role) *AccountRolesQuery {
+	query := (&AccountRolesClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(role.Table, role.FieldID, id),
+			sqlgraph.To(accountroles.Table, accountroles.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, role.AccountRolesTable, role.AccountRolesColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *RoleClient) Hooks() []Hook {
 	return c.hooks.Role
@@ -4022,14 +4227,15 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Account, AccountFollow, Asset, Authentication, Category, Collection,
-		CollectionNode, CollectionPost, Email, LikePost, Link, MentionProfile, Node,
-		Notification, Post, React, Role, Setting, Tag []ent.Hook
+		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
+		Collection, CollectionNode, CollectionPost, Email, LikePost, Link,
+		MentionProfile, Node, Notification, Post, React, Role, Setting, Tag []ent.Hook
 	}
 	inters struct {
-		Account, AccountFollow, Asset, Authentication, Category, Collection,
-		CollectionNode, CollectionPost, Email, LikePost, Link, MentionProfile, Node,
-		Notification, Post, React, Role, Setting, Tag []ent.Interceptor
+		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
+		Collection, CollectionNode, CollectionPost, Email, LikePost, Link,
+		MentionProfile, Node, Notification, Post, React, Role, Setting,
+		Tag []ent.Interceptor
 	}
 )
 

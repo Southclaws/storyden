@@ -33,7 +33,7 @@ func (n *Querier) ListNotifications(ctx context.Context, accountID account.Accou
 	r, err := n.db.Notification.Query().
 		Where(entnotification.HasOwnerWith(entaccount.ID(xid.ID(accountID)))).
 		WithSource(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		All(ctx)
 	if err != nil {

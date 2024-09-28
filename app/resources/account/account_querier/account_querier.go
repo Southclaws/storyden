@@ -27,7 +27,7 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 		Where(account_ent.ID(xid.ID(id))).
 		WithTags().
 		WithEmails().
-		WithRoles().
+		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		WithAuthentication()
 
 	result, err := q.Only(ctx)
@@ -57,7 +57,7 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.A
 		Query().
 		Where(account_ent.Handle(handle)).
 		WithAuthentication().
-		WithRoles()
+		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 
 	result, err := q.Only(ctx)
 	if err != nil {

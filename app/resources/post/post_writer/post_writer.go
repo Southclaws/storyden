@@ -58,7 +58,7 @@ func (p *PostWriter) Update(ctx context.Context, id post.ID, opts ...Option) (*p
 		Query().
 		Where(ent_post.IDEQ(xid.ID(id))).
 		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithCategory().
 		WithTags().

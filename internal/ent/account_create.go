@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/accountfollow"
+	"github.com/Southclaws/storyden/internal/ent/accountroles"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/collection"
@@ -371,6 +372,21 @@ func (ac *AccountCreate) AddAssets(a ...*Asset) *AccountCreate {
 	return ac.AddAssetIDs(ids...)
 }
 
+// AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
+func (ac *AccountCreate) AddAccountRoleIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddAccountRoleIDs(ids...)
+	return ac
+}
+
+// AddAccountRoles adds the "account_roles" edges to the AccountRoles entity.
+func (ac *AccountCreate) AddAccountRoles(a ...*AccountRoles) *AccountCreate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ac.AddAccountRoleIDs(ids...)
+}
+
 // Mutation returns the AccountMutation object of the builder.
 func (ac *AccountCreate) Mutation() *AccountMutation {
 	return ac.mutation
@@ -686,6 +702,13 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &AccountRolesCreate{config: ac.config, mutation: newAccountRolesMutation(ac.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ac.mutation.AuthenticationIDs(); len(nodes) > 0 {
@@ -761,6 +784,22 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.AccountRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   account.AccountRolesTable,
+			Columns: []string{account.AccountRolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountroles.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

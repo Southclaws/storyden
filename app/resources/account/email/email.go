@@ -68,7 +68,7 @@ func (r *EmailRepo) LookupCode(ctx context.Context, emailAddress mail.Address, c
 				email_ent.VerificationCode(code),
 			),
 		).
-		WithRoles().
+		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		WithTags().
 		WithEmails().
 		WithAuthentication()
@@ -106,7 +106,7 @@ func (r *EmailRepo) LookupAccount(ctx context.Context, emailAddress mail.Address
 	q := r.Ent.Account.
 		Query().
 		Where(account_ent.HasEmailsWith(email_ent.EmailAddress(emailAddress.Address))).
-		WithRoles().
+		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		WithTags().
 		WithEmails().
 		WithAuthentication()
