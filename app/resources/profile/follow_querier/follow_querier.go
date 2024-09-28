@@ -46,7 +46,7 @@ func (q *Querier) GetFollowers(ctx context.Context, id account.AccountID, page, 
 		Offset(page * size).
 		Order(ent.Desc(accountfollow.FieldCreatedAt)).
 		WithFollower(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		All(ctx)
 	if err != nil {
@@ -88,7 +88,7 @@ func (q *Querier) GetFollowing(ctx context.Context, id account.AccountID, page, 
 		Offset(page * size).
 		Order(ent.Desc(accountfollow.FieldCreatedAt)).
 		WithFollowing(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		All(ctx)
 	if err != nil {

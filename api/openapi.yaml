@@ -240,6 +240,14 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/RoleCreateOK" }
+    get:
+      operationId: RoleList
+      description: List all roles and their permissions.
+      tags: [roles]
+      security: []
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/RoleListOK" }
 
   /roles/{role_id}:
     get:
@@ -263,8 +271,16 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/RoleGetOK" }
-
-    # delete: {}
+    delete:
+      operationId: RoleDelete
+      description: Deletes a role.
+      tags: [roles]
+      parameters: [{ $ref: "#/components/parameters/RoleIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
 
   #
   #                   888    888
@@ -630,6 +646,36 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountGetAvatar" }
+
+  /accounts/{account_handle}/roles/{role_id}:
+    put:
+      operationId: AccountAddRole
+      description: |
+        Adds a role to an account. Members without the MANAGE_ROLES permission
+        cannot use this operation.
+      tags: [accounts]
+      parameters:
+        - $ref: "#/components/parameters/RoleIDParam"
+        - $ref: "#/components/parameters/AccountHandleParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AccountUpdateOK" }
+    delete:
+      operationId: AccountRemoveRole
+      description: |
+        Removes a role from an account. Members without the MANAGE_ROLES cannot
+        use this operation. Admins cannot remove the admin role from themselves.
+      tags: [accounts]
+      parameters:
+        - $ref: "#/components/parameters/RoleIDParam"
+        - $ref: "#/components/parameters/AccountHandleParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AccountUpdateOK" }
 
   #
   #                   888    d8b  .d888 d8b                   888    d8b
@@ -1969,6 +2015,13 @@ components:
           schema:
             $ref: "#/components/schemas/Role"
 
+    RoleListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RoleListResult"
+
     RoleGetOK:
       description: OK
       content:
@@ -2533,13 +2586,12 @@ components:
     ProfileReference:
       type: object
       description: A minimal reference to an account.
-      required: [id, handle, name, admin]
+      required: [id, handle, name, roles]
       properties:
         id: { $ref: "#/components/schemas/Identifier" }
         handle: { $ref: "#/components/schemas/AccountHandle" }
         name: { $ref: "#/components/schemas/AccountName" }
-        admin:
-          type: boolean
+        roles: { $ref: "#/components/schemas/AccountRoleList" }
 
     ThreadTitle:
       type: string
@@ -2633,8 +2685,46 @@ components:
         - $ref: "#/components/schemas/CommonProperties"
         - $ref: "#/components/schemas/RoleProps"
 
+    RoleListResult:
+      type: object
+      required: [roles]
+      properties:
+        roles: { $ref: "#/components/schemas/RoleList" }
+
+    RoleList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Role"
+
+    AccountRole:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Role"
+        - $ref: "#/components/schemas/AccountRoleProps"
+
+    AccountRoleList:
+      type: array
+      items:
+        $ref: "#/components/schemas/AccountRole"
+
+    AccountRoleProps:
+      type: object
+      required: [badge, default]
+      properties:
+        badge:
+          description: |
+            One role may be designated as a badge for the account. If ture, it
+            should be displayed prominently on the profile or in other contexts.
+          type: boolean
+        default:
+          description: |
+            There are two built-in roles: everyone and admin, this boolean flag
+            is set if this role is one of the default built-in roles.
+          type: boolean
+
     RoleProps:
       type: object
+      required: [name, colour, permissions]
       properties:
         name:
           type: string
@@ -2645,6 +2735,7 @@ components:
 
     RoleInitialProps:
       type: object
+      required: [name, colour, permissions]
       properties:
         name:
           type: string
@@ -3076,6 +3167,7 @@ components:
         [
           handle,
           name,
+          roles,
           bio,
           links,
           meta,
@@ -3088,6 +3180,8 @@ components:
           $ref: "#/components/schemas/AccountHandle"
         name:
           $ref: "#/components/schemas/AccountName"
+        roles:
+          $ref: "#/components/schemas/AccountRoleList"
         bio:
           $ref: "#/components/schemas/AccountBio"
         interests:
@@ -3259,6 +3353,7 @@ components:
             - createdAt
             - handle
             - name
+            - roles
             - bio
             - followers
             - following
@@ -3273,6 +3368,8 @@ components:
               $ref: "#/components/schemas/AccountHandle"
             name:
               $ref: "#/components/schemas/AccountName"
+            roles:
+              $ref: "#/components/schemas/AccountRoleList"
             bio:
               $ref: "#/components/schemas/AccountBio"
             image:

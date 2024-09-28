@@ -9,14 +9,15 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
+import type { AccountRoleList } from "./accountRoleList";
 import type { Identifier } from "./identifier";
 
 /**
  * A minimal reference to an account.
  */
 export interface ProfileReference {
-  admin: boolean;
   handle: AccountHandle;
   id: Identifier;
   name: AccountName;
+  roles: AccountRoleList;
 }

@@ -1,14 +1,21 @@
 package role
 
 import (
+	"math"
+
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/rs/xid"
 )
 
+var (
+	DefaultRoleEveryoneID = RoleID(utils.Must(xid.FromString("00000000000000000010")))
+	DefaultRoleAdminID    = RoleID(utils.Must(xid.FromString("00000000000000000020")))
+)
+
 var DefaultRoleEveryone = Role{
-	ID:     RoleID(utils.Must(xid.FromString("00000000000000000010"))),
-	Name:   "Everyone",
+	ID:     DefaultRoleEveryoneID,
+	Name:   "Member",
 	Colour: "green",
 	Permissions: rbac.NewList(
 		rbac.PermissionCreatePost,
@@ -24,11 +31,13 @@ var DefaultRoleEveryone = Role{
 		rbac.PermissionReadCollection,
 		rbac.PermissionCollectionSubmit,
 	),
+	SortKey: 0,
 }
 
 var DefaultRoleAdmin = Role{
-	ID:          RoleID(utils.Must(xid.FromString("00000000000000000020"))),
+	ID:          DefaultRoleAdminID,
 	Name:        "Admin",
 	Colour:      "red",
 	Permissions: rbac.NewList(rbac.PermissionAdministrator),
+	SortKey:     math.MaxFloat64,
 }

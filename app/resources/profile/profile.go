@@ -9,7 +9,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/asset"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -29,7 +29,7 @@ type Public struct {
 	Followers     int
 	Following     int
 	LikeScore     int
-	Roles         role.Roles
+	Roles         held.Roles
 	Interests     []*tag.Tag
 	ExternalLinks []account.ExternalLink
 	Metadata      map[string]any
@@ -45,12 +45,12 @@ func (p *Public) GetProps() map[string]any      { return p.Metadata }
 func (p *Public) GetAssets() []*asset.Asset     { return []*asset.Asset{} }
 
 func ProfileFromModel(a *ent.Account) (*Public, error) {
-	rolesEdge, err := a.Edges.RolesOrErr()
+	rolesEdge, err := a.Edges.AccountRolesOrErr()
 	if err != nil {
 		return nil, err
 	}
 
-	roles, err := role.Map(rolesEdge, a.Admin)
+	roles, err := held.MapList(rolesEdge, a.Admin)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

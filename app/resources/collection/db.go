@@ -45,11 +45,11 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*Collection, 
 	q := d.db.Collection.
 		Query().
 		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithPosts(func(pq *ent.PostQuery) {
 			pq.WithAuthor(func(aq *ent.AccountQuery) {
-				aq.WithRoles()
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 			})
 			pq.WithCategory()
 			pq.WithTags()
@@ -57,7 +57,7 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*Collection, 
 		}).
 		WithNodes(func(nq *ent.NodeQuery) {
 			nq.WithOwner(func(aq *ent.AccountQuery) {
-				aq.WithRoles()
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 			})
 			nq.WithAssets()
 			nq.WithTags()
@@ -85,7 +85,7 @@ func (d *database) Get(ctx context.Context, id CollectionID, filters ...ItemFilt
 		if pcq != nil {
 			pcq.WithPost(func(pq *ent.PostQuery) {
 				pq.WithAuthor(func(aq *ent.AccountQuery) {
-					aq.WithRoles()
+					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 				})
 				pq.WithCategory()
 				pq.WithTags()
@@ -96,7 +96,7 @@ func (d *database) Get(ctx context.Context, id CollectionID, filters ...ItemFilt
 		if ncq != nil {
 			ncq.WithNode(func(nq *ent.NodeQuery) {
 				nq.WithOwner(func(aq *ent.AccountQuery) {
-					aq.WithRoles()
+					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 				})
 				nq.WithAssets()
 				nq.WithTags()
@@ -108,7 +108,7 @@ func (d *database) Get(ctx context.Context, id CollectionID, filters ...ItemFilt
 		Query().
 		Where(collection.ID(xid.ID(id))).
 		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithCollectionPosts(func(pq *ent.CollectionPostQuery) {
 			for _, fn := range filters {

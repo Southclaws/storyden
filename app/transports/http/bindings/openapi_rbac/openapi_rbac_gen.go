@@ -12,8 +12,10 @@ type OperationPermissions interface {
 	AdminAccountBanCreate() (bool, *rbac.Permission)
 	AdminAccountBanRemove() (bool, *rbac.Permission)
 	RoleCreate() (bool, *rbac.Permission)
+	RoleList() (bool, *rbac.Permission)
 	RoleGet() (bool, *rbac.Permission)
 	RoleUpdate() (bool, *rbac.Permission)
+	RoleDelete() (bool, *rbac.Permission)
 	AuthProviderList() (bool, *rbac.Permission)
 	AuthPasswordSignup() (bool, *rbac.Permission)
 	AuthPasswordSignin() (bool, *rbac.Permission)
@@ -38,6 +40,8 @@ type OperationPermissions interface {
 	AccountAuthMethodDelete() (bool, *rbac.Permission)
 	AccountSetAvatar() (bool, *rbac.Permission)
 	AccountGetAvatar() (bool, *rbac.Permission)
+	AccountAddRole() (bool, *rbac.Permission)
+	AccountRemoveRole() (bool, *rbac.Permission)
 	NotificationList() (bool, *rbac.Permission)
 	NotificationUpdate() (bool, *rbac.Permission)
 	ProfileList() (bool, *rbac.Permission)
@@ -111,10 +115,14 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AdminAccountBanRemove()
 	case "RoleCreate":
 		return optable.RoleCreate()
+	case "RoleList":
+		return optable.RoleList()
 	case "RoleGet":
 		return optable.RoleGet()
 	case "RoleUpdate":
 		return optable.RoleUpdate()
+	case "RoleDelete":
+		return optable.RoleDelete()
 	case "AuthProviderList":
 		return optable.AuthProviderList()
 	case "AuthPasswordSignup":
@@ -163,6 +171,10 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AccountSetAvatar()
 	case "AccountGetAvatar":
 		return optable.AccountGetAvatar()
+	case "AccountAddRole":
+		return optable.AccountAddRole()
+	case "AccountRemoveRole":
+		return optable.AccountRemoveRole()
 	case "NotificationList":
 		return optable.NotificationList()
 	case "NotificationUpdate":

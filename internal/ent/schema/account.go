@@ -60,7 +60,9 @@ func (Account) Edges() []ent.Edge {
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.From("roles", Role.Type).
-			Ref("accounts"),
+			Ref("accounts").
+			Through("account_roles", AccountRoles.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("authentication", Authentication.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),

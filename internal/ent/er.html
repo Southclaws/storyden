@@ -24,6 +24,13 @@ erDiagram
         xidDOTID follower_account_id
         xidDOTID following_account_id
     }
+    AccountRoles {
+        xidDOTID id
+        timeDOTTime created_at
+        xidDOTID account_id
+        xidDOTID role_id
+        bool badge
+    }
     Asset {
         xidDOTID id
         timeDOTTime created_at
@@ -164,6 +171,7 @@ erDiagram
         string name
         string colour
         LBRACKRBRACKstring permissions
+        float64 sort_key
     }
     Setting {
         string id
@@ -189,6 +197,8 @@ erDiagram
     	Account |o--o{ Collection : "collections/owner"
     	Account |o--o{ Node : "nodes/owner"
     	Account |o--o{ Asset : "assets/owner"
+    	AccountRoles }o--o| Account : "account"
+    	AccountRoles }o--o| Role : "role"
     	Authentication |o--o{ Email : "email_address/authentication"
     	Category |o--o{ Post : "posts/category"
     	Collection }o--o{ Post : "posts/collections"

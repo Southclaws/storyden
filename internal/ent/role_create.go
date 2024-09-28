@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/accountroles"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/rs/xid"
 )
@@ -79,6 +80,20 @@ func (rc *RoleCreate) SetPermissions(s []string) *RoleCreate {
 	return rc
 }
 
+// SetSortKey sets the "sort_key" field.
+func (rc *RoleCreate) SetSortKey(f float64) *RoleCreate {
+	rc.mutation.SetSortKey(f)
+	return rc
+}
+
+// SetNillableSortKey sets the "sort_key" field if the given value is not nil.
+func (rc *RoleCreate) SetNillableSortKey(f *float64) *RoleCreate {
+	if f != nil {
+		rc.SetSortKey(*f)
+	}
+	return rc
+}
+
 // SetID sets the "id" field.
 func (rc *RoleCreate) SetID(x xid.ID) *RoleCreate {
 	rc.mutation.SetID(x)
@@ -106,6 +121,21 @@ func (rc *RoleCreate) AddAccounts(a ...*Account) *RoleCreate {
 		ids[i] = a[i].ID
 	}
 	return rc.AddAccountIDs(ids...)
+}
+
+// AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
+func (rc *RoleCreate) AddAccountRoleIDs(ids ...xid.ID) *RoleCreate {
+	rc.mutation.AddAccountRoleIDs(ids...)
+	return rc
+}
+
+// AddAccountRoles adds the "account_roles" edges to the AccountRoles entity.
+func (rc *RoleCreate) AddAccountRoles(a ...*AccountRoles) *RoleCreate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return rc.AddAccountRoleIDs(ids...)
 }
 
 // Mutation returns the RoleMutation object of the builder.
@@ -155,6 +185,10 @@ func (rc *RoleCreate) defaults() {
 		v := role.DefaultColour
 		rc.mutation.SetColour(v)
 	}
+	if _, ok := rc.mutation.SortKey(); !ok {
+		v := role.DefaultSortKey
+		rc.mutation.SetSortKey(v)
+	}
 	if _, ok := rc.mutation.ID(); !ok {
 		v := role.DefaultID()
 		rc.mutation.SetID(v)
@@ -177,6 +211,9 @@ func (rc *RoleCreate) check() error {
 	}
 	if _, ok := rc.mutation.Permissions(); !ok {
 		return &ValidationError{Name: "permissions", err: errors.New(`ent: missing required field "Role.permissions"`)}
+	}
+	if _, ok := rc.mutation.SortKey(); !ok {
+		return &ValidationError{Name: "sort_key", err: errors.New(`ent: missing required field "Role.sort_key"`)}
 	}
 	if v, ok := rc.mutation.ID(); ok {
 		if err := role.IDValidator(v.String()); err != nil {
@@ -239,6 +276,10 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		_spec.SetField(role.FieldPermissions, field.TypeJSON, value)
 		_node.Permissions = value
 	}
+	if value, ok := rc.mutation.SortKey(); ok {
+		_spec.SetField(role.FieldSortKey, field.TypeFloat64, value)
+		_node.SortKey = value
+	}
 	if nodes := rc.mutation.AccountsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -248,6 +289,29 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &AccountRolesCreate{config: rc.config, mutation: newAccountRolesMutation(rc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.AccountRolesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   role.AccountRolesTable,
+			Columns: []string{role.AccountRolesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(accountroles.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -355,6 +419,24 @@ func (u *RoleUpsert) UpdatePermissions() *RoleUpsert {
 	return u
 }
 
+// SetSortKey sets the "sort_key" field.
+func (u *RoleUpsert) SetSortKey(v float64) *RoleUpsert {
+	u.Set(role.FieldSortKey, v)
+	return u
+}
+
+// UpdateSortKey sets the "sort_key" field to the value that was provided on create.
+func (u *RoleUpsert) UpdateSortKey() *RoleUpsert {
+	u.SetExcluded(role.FieldSortKey)
+	return u
+}
+
+// AddSortKey adds v to the "sort_key" field.
+func (u *RoleUpsert) AddSortKey(v float64) *RoleUpsert {
+	u.Add(role.FieldSortKey, v)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -459,6 +541,27 @@ func (u *RoleUpsertOne) SetPermissions(v []string) *RoleUpsertOne {
 func (u *RoleUpsertOne) UpdatePermissions() *RoleUpsertOne {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdatePermissions()
+	})
+}
+
+// SetSortKey sets the "sort_key" field.
+func (u *RoleUpsertOne) SetSortKey(v float64) *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetSortKey(v)
+	})
+}
+
+// AddSortKey adds v to the "sort_key" field.
+func (u *RoleUpsertOne) AddSortKey(v float64) *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.AddSortKey(v)
+	})
+}
+
+// UpdateSortKey sets the "sort_key" field to the value that was provided on create.
+func (u *RoleUpsertOne) UpdateSortKey() *RoleUpsertOne {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateSortKey()
 	})
 }
 
@@ -733,6 +836,27 @@ func (u *RoleUpsertBulk) SetPermissions(v []string) *RoleUpsertBulk {
 func (u *RoleUpsertBulk) UpdatePermissions() *RoleUpsertBulk {
 	return u.Update(func(s *RoleUpsert) {
 		s.UpdatePermissions()
+	})
+}
+
+// SetSortKey sets the "sort_key" field.
+func (u *RoleUpsertBulk) SetSortKey(v float64) *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.SetSortKey(v)
+	})
+}
+
+// AddSortKey adds v to the "sort_key" field.
+func (u *RoleUpsertBulk) AddSortKey(v float64) *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.AddSortKey(v)
+	})
+}
+
+// UpdateSortKey sets the "sort_key" field to the value that was provided on create.
+func (u *RoleUpsertBulk) UpdateSortKey() *RoleUpsertBulk {
+	return u.Update(func(s *RoleUpsert) {
+		s.UpdateSortKey()
 	})
 }
 

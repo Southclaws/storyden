@@ -34,6 +34,7 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 		Admin:          acc.Admin,
 		VerifiedStatus: openapi.AccountVerifiedStatus(acc.VerifiedStatus.String()),
 		EmailAddresses: dt.Map(acc.EmailAddresses, serialiseEmailAddress),
+		Roles:          serialiseHeldRoleList(acc.Roles),
 	}
 }
 
@@ -189,7 +190,7 @@ func serialiseProfileReference(a profile.Public) openapi.ProfileReference {
 		Id:     *openapi.IdentifierFrom(xid.ID(a.ID)),
 		Handle: (openapi.AccountHandle)(a.Handle),
 		Name:   a.Name,
-		Admin:  a.Admin,
+		Roles:  serialiseHeldRoleList(a.Roles),
 	}
 }
 

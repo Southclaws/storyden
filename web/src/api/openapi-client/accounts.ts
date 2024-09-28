@@ -346,3 +346,138 @@ export const useAccountGetAvatar = <
     ...query,
   };
 };
+/**
+ * Adds a role to an account. Members without the MANAGE_ROLES permission
+cannot use this operation.
+
+ */
+export const accountAddRole = (accountHandle: string, roleId: string) => {
+  return fetcher<AccountUpdateOKResponse>({
+    url: `/accounts/${accountHandle}/roles/${roleId}`,
+    method: "PUT",
+  });
+};
+
+export const getAccountAddRoleMutationFetcher = (
+  accountHandle: string,
+  roleId: string,
+) => {
+  return (
+    _: string,
+    __: { arg: Arguments },
+  ): Promise<AccountUpdateOKResponse> => {
+    return accountAddRole(accountHandle, roleId);
+  };
+};
+export const getAccountAddRoleMutationKey = (
+  accountHandle: string,
+  roleId: string,
+) => `/accounts/${accountHandle}/roles/${roleId}` as const;
+
+export type AccountAddRoleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountAddRole>>
+>;
+export type AccountAddRoleMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountAddRole = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountHandle: string,
+  roleId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountAddRole>>,
+      TError,
+      string,
+      Arguments,
+      Awaited<ReturnType<typeof accountAddRole>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAccountAddRoleMutationKey(accountHandle, roleId);
+  const swrFn = getAccountAddRoleMutationFetcher(accountHandle, roleId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Removes a role from an account. Members without the MANAGE_ROLES cannot
+use this operation. Admins cannot remove the admin role from themselves.
+
+ */
+export const accountRemoveRole = (accountHandle: string, roleId: string) => {
+  return fetcher<AccountUpdateOKResponse>({
+    url: `/accounts/${accountHandle}/roles/${roleId}`,
+    method: "DELETE",
+  });
+};
+
+export const getAccountRemoveRoleMutationFetcher = (
+  accountHandle: string,
+  roleId: string,
+) => {
+  return (
+    _: string,
+    __: { arg: Arguments },
+  ): Promise<AccountUpdateOKResponse> => {
+    return accountRemoveRole(accountHandle, roleId);
+  };
+};
+export const getAccountRemoveRoleMutationKey = (
+  accountHandle: string,
+  roleId: string,
+) => `/accounts/${accountHandle}/roles/${roleId}` as const;
+
+export type AccountRemoveRoleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountRemoveRole>>
+>;
+export type AccountRemoveRoleMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountRemoveRole = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountHandle: string,
+  roleId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountRemoveRole>>,
+      TError,
+      string,
+      Arguments,
+      Awaited<ReturnType<typeof accountRemoveRole>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getAccountRemoveRoleMutationKey(accountHandle, roleId);
+  const swrFn = getAccountRemoveRoleMutationFetcher(accountHandle, roleId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};

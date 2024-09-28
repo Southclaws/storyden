@@ -11,6 +11,7 @@ import type {
   RoleCreateBody,
   RoleCreateOKResponse,
   RoleGetOKResponse,
+  RoleListOKResponse,
   RoleUpdateBody,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -35,6 +36,27 @@ export const roleCreate = async (
     ...options,
     method: "POST",
     body: JSON.stringify(roleCreateBody),
+  });
+};
+
+/**
+ * List all roles and their permissions.
+ */
+export type roleListResponse = {
+  data: RoleListOKResponse;
+  status: number;
+};
+
+export const getRoleListUrl = () => {
+  return `/roles`;
+};
+
+export const roleList = async (
+  options?: RequestInit,
+): Promise<roleListResponse> => {
+  return fetcher<Promise<roleListResponse>>(getRoleListUrl(), {
+    ...options,
+    method: "GET",
   });
 };
 
@@ -81,5 +103,27 @@ export const roleUpdate = async (
     ...options,
     method: "PATCH",
     body: JSON.stringify(roleUpdateBody),
+  });
+};
+
+/**
+ * Deletes a role.
+ */
+export type roleDeleteResponse = {
+  data: void;
+  status: number;
+};
+
+export const getRoleDeleteUrl = (roleId: string) => {
+  return `/roles/${roleId}`;
+};
+
+export const roleDelete = async (
+  roleId: string,
+  options?: RequestInit,
+): Promise<roleDeleteResponse> => {
+  return fetcher<Promise<roleDeleteResponse>>(getRoleDeleteUrl(roleId), {
+    ...options,
+    method: "DELETE",
   });
 };
