@@ -372,7 +372,7 @@ func (nc *NodeCreate) check() error {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Node.id": %w`, err)}
 		}
 	}
-	if _, ok := nc.mutation.OwnerID(); !ok {
+	if len(nc.mutation.OwnerIDs()) == 0 {
 		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Node.owner"`)}
 	}
 	return nil

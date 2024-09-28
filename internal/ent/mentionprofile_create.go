@@ -137,10 +137,10 @@ func (mpc *MentionProfileCreate) check() error {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "MentionProfile.id": %w`, err)}
 		}
 	}
-	if _, ok := mpc.mutation.AccountID(); !ok {
+	if len(mpc.mutation.AccountIDs()) == 0 {
 		return &ValidationError{Name: "account", err: errors.New(`ent: missing required edge "MentionProfile.account"`)}
 	}
-	if _, ok := mpc.mutation.PostID(); !ok {
+	if len(mpc.mutation.PostIDs()) == 0 {
 		return &ValidationError{Name: "Post", err: errors.New(`ent: missing required edge "MentionProfile.Post"`)}
 	}
 	return nil

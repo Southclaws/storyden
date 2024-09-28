@@ -168,10 +168,10 @@ func (cnc *CollectionNodeCreate) check() error {
 	if _, ok := cnc.mutation.MembershipType(); !ok {
 		return &ValidationError{Name: "membership_type", err: errors.New(`ent: missing required field "CollectionNode.membership_type"`)}
 	}
-	if _, ok := cnc.mutation.CollectionID(); !ok {
+	if len(cnc.mutation.CollectionIDs()) == 0 {
 		return &ValidationError{Name: "collection", err: errors.New(`ent: missing required edge "CollectionNode.collection"`)}
 	}
-	if _, ok := cnc.mutation.NodeID(); !ok {
+	if len(cnc.mutation.NodeIDs()) == 0 {
 		return &ValidationError{Name: "node", err: errors.New(`ent: missing required edge "CollectionNode.node"`)}
 	}
 	return nil

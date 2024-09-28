@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -109,7 +110,7 @@ func (afq *AccountFollowQuery) QueryFollowing() *AccountQuery {
 // First returns the first AccountFollow entity from the query.
 // Returns a *NotFoundError when no AccountFollow was found.
 func (afq *AccountFollowQuery) First(ctx context.Context) (*AccountFollow, error) {
-	nodes, err := afq.Limit(1).All(setContextOp(ctx, afq.ctx, "First"))
+	nodes, err := afq.Limit(1).All(setContextOp(ctx, afq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +133,7 @@ func (afq *AccountFollowQuery) FirstX(ctx context.Context) *AccountFollow {
 // Returns a *NotFoundError when no AccountFollow ID was found.
 func (afq *AccountFollowQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = afq.Limit(1).IDs(setContextOp(ctx, afq.ctx, "FirstID")); err != nil {
+	if ids, err = afq.Limit(1).IDs(setContextOp(ctx, afq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -155,7 +156,7 @@ func (afq *AccountFollowQuery) FirstIDX(ctx context.Context) xid.ID {
 // Returns a *NotSingularError when more than one AccountFollow entity is found.
 // Returns a *NotFoundError when no AccountFollow entities are found.
 func (afq *AccountFollowQuery) Only(ctx context.Context) (*AccountFollow, error) {
-	nodes, err := afq.Limit(2).All(setContextOp(ctx, afq.ctx, "Only"))
+	nodes, err := afq.Limit(2).All(setContextOp(ctx, afq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +184,7 @@ func (afq *AccountFollowQuery) OnlyX(ctx context.Context) *AccountFollow {
 // Returns a *NotFoundError when no entities are found.
 func (afq *AccountFollowQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = afq.Limit(2).IDs(setContextOp(ctx, afq.ctx, "OnlyID")); err != nil {
+	if ids, err = afq.Limit(2).IDs(setContextOp(ctx, afq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -208,7 +209,7 @@ func (afq *AccountFollowQuery) OnlyIDX(ctx context.Context) xid.ID {
 
 // All executes the query and returns a list of AccountFollows.
 func (afq *AccountFollowQuery) All(ctx context.Context) ([]*AccountFollow, error) {
-	ctx = setContextOp(ctx, afq.ctx, "All")
+	ctx = setContextOp(ctx, afq.ctx, ent.OpQueryAll)
 	if err := afq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -230,7 +231,7 @@ func (afq *AccountFollowQuery) IDs(ctx context.Context) (ids []xid.ID, err error
 	if afq.ctx.Unique == nil && afq.path != nil {
 		afq.Unique(true)
 	}
-	ctx = setContextOp(ctx, afq.ctx, "IDs")
+	ctx = setContextOp(ctx, afq.ctx, ent.OpQueryIDs)
 	if err = afq.Select(accountfollow.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -248,7 +249,7 @@ func (afq *AccountFollowQuery) IDsX(ctx context.Context) []xid.ID {
 
 // Count returns the count of the given query.
 func (afq *AccountFollowQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, afq.ctx, "Count")
+	ctx = setContextOp(ctx, afq.ctx, ent.OpQueryCount)
 	if err := afq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -266,7 +267,7 @@ func (afq *AccountFollowQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (afq *AccountFollowQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, afq.ctx, "Exist")
+	ctx = setContextOp(ctx, afq.ctx, ent.OpQueryExist)
 	switch _, err := afq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -301,8 +302,9 @@ func (afq *AccountFollowQuery) Clone() *AccountFollowQuery {
 		withFollower:  afq.withFollower.Clone(),
 		withFollowing: afq.withFollowing.Clone(),
 		// clone intermediate query.
-		sql:  afq.sql.Clone(),
-		path: afq.path,
+		sql:       afq.sql.Clone(),
+		path:      afq.path,
+		modifiers: append([]func(*sql.Selector){}, afq.modifiers...),
 	}
 }
 
@@ -619,7 +621,7 @@ func (afgb *AccountFollowGroupBy) Aggregate(fns ...AggregateFunc) *AccountFollow
 
 // Scan applies the selector query and scans the result into the given value.
 func (afgb *AccountFollowGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, afgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, afgb.build.ctx, ent.OpQueryGroupBy)
 	if err := afgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -667,7 +669,7 @@ func (afs *AccountFollowSelect) Aggregate(fns ...AggregateFunc) *AccountFollowSe
 
 // Scan applies the selector query and scans the result into the given value.
 func (afs *AccountFollowSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, afs.ctx, "Select")
+	ctx = setContextOp(ctx, afs.ctx, ent.OpQuerySelect)
 	if err := afs.prepareQuery(ctx); err != nil {
 		return err
 	}

@@ -146,10 +146,10 @@ func (rc *ReactCreate) check() error {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "React.id": %w`, err)}
 		}
 	}
-	if _, ok := rc.mutation.AccountID(); !ok {
+	if len(rc.mutation.AccountIDs()) == 0 {
 		return &ValidationError{Name: "account", err: errors.New(`ent: missing required edge "React.account"`)}
 	}
-	if _, ok := rc.mutation.PostID(); !ok {
+	if len(rc.mutation.PostIDs()) == 0 {
 		return &ValidationError{Name: "Post", err: errors.New(`ent: missing required edge "React.Post"`)}
 	}
 	return nil

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -110,7 +111,7 @@ func (mpq *MentionProfileQuery) QueryPost() *PostQuery {
 // First returns the first MentionProfile entity from the query.
 // Returns a *NotFoundError when no MentionProfile was found.
 func (mpq *MentionProfileQuery) First(ctx context.Context) (*MentionProfile, error) {
-	nodes, err := mpq.Limit(1).All(setContextOp(ctx, mpq.ctx, "First"))
+	nodes, err := mpq.Limit(1).All(setContextOp(ctx, mpq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +134,7 @@ func (mpq *MentionProfileQuery) FirstX(ctx context.Context) *MentionProfile {
 // Returns a *NotFoundError when no MentionProfile ID was found.
 func (mpq *MentionProfileQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = mpq.Limit(1).IDs(setContextOp(ctx, mpq.ctx, "FirstID")); err != nil {
+	if ids, err = mpq.Limit(1).IDs(setContextOp(ctx, mpq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -156,7 +157,7 @@ func (mpq *MentionProfileQuery) FirstIDX(ctx context.Context) xid.ID {
 // Returns a *NotSingularError when more than one MentionProfile entity is found.
 // Returns a *NotFoundError when no MentionProfile entities are found.
 func (mpq *MentionProfileQuery) Only(ctx context.Context) (*MentionProfile, error) {
-	nodes, err := mpq.Limit(2).All(setContextOp(ctx, mpq.ctx, "Only"))
+	nodes, err := mpq.Limit(2).All(setContextOp(ctx, mpq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +185,7 @@ func (mpq *MentionProfileQuery) OnlyX(ctx context.Context) *MentionProfile {
 // Returns a *NotFoundError when no entities are found.
 func (mpq *MentionProfileQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = mpq.Limit(2).IDs(setContextOp(ctx, mpq.ctx, "OnlyID")); err != nil {
+	if ids, err = mpq.Limit(2).IDs(setContextOp(ctx, mpq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -209,7 +210,7 @@ func (mpq *MentionProfileQuery) OnlyIDX(ctx context.Context) xid.ID {
 
 // All executes the query and returns a list of MentionProfiles.
 func (mpq *MentionProfileQuery) All(ctx context.Context) ([]*MentionProfile, error) {
-	ctx = setContextOp(ctx, mpq.ctx, "All")
+	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryAll)
 	if err := mpq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -231,7 +232,7 @@ func (mpq *MentionProfileQuery) IDs(ctx context.Context) (ids []xid.ID, err erro
 	if mpq.ctx.Unique == nil && mpq.path != nil {
 		mpq.Unique(true)
 	}
-	ctx = setContextOp(ctx, mpq.ctx, "IDs")
+	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryIDs)
 	if err = mpq.Select(mentionprofile.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -249,7 +250,7 @@ func (mpq *MentionProfileQuery) IDsX(ctx context.Context) []xid.ID {
 
 // Count returns the count of the given query.
 func (mpq *MentionProfileQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, mpq.ctx, "Count")
+	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryCount)
 	if err := mpq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -267,7 +268,7 @@ func (mpq *MentionProfileQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (mpq *MentionProfileQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, mpq.ctx, "Exist")
+	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryExist)
 	switch _, err := mpq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -302,8 +303,9 @@ func (mpq *MentionProfileQuery) Clone() *MentionProfileQuery {
 		withAccount: mpq.withAccount.Clone(),
 		withPost:    mpq.withPost.Clone(),
 		// clone intermediate query.
-		sql:  mpq.sql.Clone(),
-		path: mpq.path,
+		sql:       mpq.sql.Clone(),
+		path:      mpq.path,
+		modifiers: append([]func(*sql.Selector){}, mpq.modifiers...),
 	}
 }
 
@@ -620,7 +622,7 @@ func (mpgb *MentionProfileGroupBy) Aggregate(fns ...AggregateFunc) *MentionProfi
 
 // Scan applies the selector query and scans the result into the given value.
 func (mpgb *MentionProfileGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mpgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, mpgb.build.ctx, ent.OpQueryGroupBy)
 	if err := mpgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -668,7 +670,7 @@ func (mps *MentionProfileSelect) Aggregate(fns ...AggregateFunc) *MentionProfile
 
 // Scan applies the selector query and scans the result into the given value.
 func (mps *MentionProfileSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mps.ctx, "Select")
+	ctx = setContextOp(ctx, mps.ctx, ent.OpQuerySelect)
 	if err := mps.prepareQuery(ctx); err != nil {
 		return err
 	}

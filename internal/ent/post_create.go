@@ -509,7 +509,7 @@ func (pc *PostCreate) check() error {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Post.id": %w`, err)}
 		}
 	}
-	if _, ok := pc.mutation.AuthorID(); !ok {
+	if len(pc.mutation.AuthorIDs()) == 0 {
 		return &ValidationError{Name: "author", err: errors.New(`ent: missing required edge "Post.author"`)}
 	}
 	return nil

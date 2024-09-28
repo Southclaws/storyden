@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -184,7 +185,7 @@ func (cq *CollectionQuery) QueryCollectionNodes() *CollectionNodeQuery {
 // First returns the first Collection entity from the query.
 // Returns a *NotFoundError when no Collection was found.
 func (cq *CollectionQuery) First(ctx context.Context) (*Collection, error) {
-	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, "First"))
+	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -207,7 +208,7 @@ func (cq *CollectionQuery) FirstX(ctx context.Context) *Collection {
 // Returns a *NotFoundError when no Collection ID was found.
 func (cq *CollectionQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
+	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -230,7 +231,7 @@ func (cq *CollectionQuery) FirstIDX(ctx context.Context) xid.ID {
 // Returns a *NotSingularError when more than one Collection entity is found.
 // Returns a *NotFoundError when no Collection entities are found.
 func (cq *CollectionQuery) Only(ctx context.Context) (*Collection, error) {
-	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, "Only"))
+	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -258,7 +259,7 @@ func (cq *CollectionQuery) OnlyX(ctx context.Context) *Collection {
 // Returns a *NotFoundError when no entities are found.
 func (cq *CollectionQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
+	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -283,7 +284,7 @@ func (cq *CollectionQuery) OnlyIDX(ctx context.Context) xid.ID {
 
 // All executes the query and returns a list of Collections.
 func (cq *CollectionQuery) All(ctx context.Context) ([]*Collection, error) {
-	ctx = setContextOp(ctx, cq.ctx, "All")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryAll)
 	if err := cq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -305,7 +306,7 @@ func (cq *CollectionQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
 	if cq.ctx.Unique == nil && cq.path != nil {
 		cq.Unique(true)
 	}
-	ctx = setContextOp(ctx, cq.ctx, "IDs")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryIDs)
 	if err = cq.Select(collection.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -323,7 +324,7 @@ func (cq *CollectionQuery) IDsX(ctx context.Context) []xid.ID {
 
 // Count returns the count of the given query.
 func (cq *CollectionQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, cq.ctx, "Count")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryCount)
 	if err := cq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -341,7 +342,7 @@ func (cq *CollectionQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (cq *CollectionQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, cq.ctx, "Exist")
+	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryExist)
 	switch _, err := cq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -379,8 +380,9 @@ func (cq *CollectionQuery) Clone() *CollectionQuery {
 		withCollectionPosts: cq.withCollectionPosts.Clone(),
 		withCollectionNodes: cq.withCollectionNodes.Clone(),
 		// clone intermediate query.
-		sql:  cq.sql.Clone(),
-		path: cq.path,
+		sql:       cq.sql.Clone(),
+		path:      cq.path,
+		modifiers: append([]func(*sql.Selector){}, cq.modifiers...),
 	}
 }
 
@@ -912,7 +914,7 @@ func (cgb *CollectionGroupBy) Aggregate(fns ...AggregateFunc) *CollectionGroupBy
 
 // Scan applies the selector query and scans the result into the given value.
 func (cgb *CollectionGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, cgb.build.ctx, ent.OpQueryGroupBy)
 	if err := cgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -960,7 +962,7 @@ func (cs *CollectionSelect) Aggregate(fns ...AggregateFunc) *CollectionSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (cs *CollectionSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cs.ctx, "Select")
+	ctx = setContextOp(ctx, cs.ctx, ent.OpQuerySelect)
 	if err := cs.prepareQuery(ctx); err != nil {
 		return err
 	}

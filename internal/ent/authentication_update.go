@@ -202,7 +202,7 @@ func (au *AuthenticationUpdate) check() error {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "Authentication.token": %w`, err)}
 		}
 	}
-	if _, ok := au.mutation.AccountID(); au.mutation.AccountCleared() && !ok {
+	if au.mutation.AccountCleared() && len(au.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Authentication.account"`)
 	}
 	return nil
@@ -527,7 +527,7 @@ func (auo *AuthenticationUpdateOne) check() error {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "Authentication.token": %w`, err)}
 		}
 	}
-	if _, ok := auo.mutation.AccountID(); auo.mutation.AccountCleared() && !ok {
+	if auo.mutation.AccountCleared() && len(auo.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Authentication.account"`)
 	}
 	return nil

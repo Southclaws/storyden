@@ -137,10 +137,10 @@ func (lpc *LikePostCreate) check() error {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "LikePost.id": %w`, err)}
 		}
 	}
-	if _, ok := lpc.mutation.AccountID(); !ok {
+	if len(lpc.mutation.AccountIDs()) == 0 {
 		return &ValidationError{Name: "account", err: errors.New(`ent: missing required edge "LikePost.account"`)}
 	}
-	if _, ok := lpc.mutation.PostID(); !ok {
+	if len(lpc.mutation.PostIDs()) == 0 {
 		return &ValidationError{Name: "Post", err: errors.New(`ent: missing required edge "LikePost.Post"`)}
 	}
 	return nil

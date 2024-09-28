@@ -148,10 +148,10 @@ func (afc *AccountFollowCreate) check() error {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "AccountFollow.id": %w`, err)}
 		}
 	}
-	if _, ok := afc.mutation.FollowerID(); !ok {
+	if len(afc.mutation.FollowerIDs()) == 0 {
 		return &ValidationError{Name: "follower", err: errors.New(`ent: missing required edge "AccountFollow.follower"`)}
 	}
-	if _, ok := afc.mutation.FollowingID(); !ok {
+	if len(afc.mutation.FollowingIDs()) == 0 {
 		return &ValidationError{Name: "following", err: errors.New(`ent: missing required edge "AccountFollow.following"`)}
 	}
 	return nil

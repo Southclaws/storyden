@@ -151,10 +151,10 @@ func (arc *AccountRolesCreate) check() error {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "AccountRoles.id": %w`, err)}
 		}
 	}
-	if _, ok := arc.mutation.AccountID(); !ok {
+	if len(arc.mutation.AccountIDs()) == 0 {
 		return &ValidationError{Name: "account", err: errors.New(`ent: missing required edge "AccountRoles.account"`)}
 	}
-	if _, ok := arc.mutation.RoleID(); !ok {
+	if len(arc.mutation.RoleIDs()) == 0 {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required edge "AccountRoles.role"`)}
 	}
 	return nil

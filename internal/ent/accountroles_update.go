@@ -135,10 +135,10 @@ func (aru *AccountRolesUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (aru *AccountRolesUpdate) check() error {
-	if _, ok := aru.mutation.AccountID(); aru.mutation.AccountCleared() && !ok {
+	if aru.mutation.AccountCleared() && len(aru.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountRoles.account"`)
 	}
-	if _, ok := aru.mutation.RoleID(); aru.mutation.RoleCleared() && !ok {
+	if aru.mutation.RoleCleared() && len(aru.mutation.RoleIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountRoles.role"`)
 	}
 	return nil
@@ -365,10 +365,10 @@ func (aruo *AccountRolesUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (aruo *AccountRolesUpdateOne) check() error {
-	if _, ok := aruo.mutation.AccountID(); aruo.mutation.AccountCleared() && !ok {
+	if aruo.mutation.AccountCleared() && len(aruo.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountRoles.account"`)
 	}
-	if _, ok := aruo.mutation.RoleID(); aruo.mutation.RoleCleared() && !ok {
+	if aruo.mutation.RoleCleared() && len(aruo.mutation.RoleIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountRoles.role"`)
 	}
 	return nil

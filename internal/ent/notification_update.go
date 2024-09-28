@@ -229,7 +229,7 @@ func (nu *NotificationUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (nu *NotificationUpdate) check() error {
-	if _, ok := nu.mutation.OwnerID(); nu.mutation.OwnerCleared() && !ok {
+	if nu.mutation.OwnerCleared() && len(nu.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Notification.owner"`)
 	}
 	return nil
@@ -568,7 +568,7 @@ func (nuo *NotificationUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (nuo *NotificationUpdateOne) check() error {
-	if _, ok := nuo.mutation.OwnerID(); nuo.mutation.OwnerCleared() && !ok {
+	if nuo.mutation.OwnerCleared() && len(nuo.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Notification.owner"`)
 	}
 	return nil
