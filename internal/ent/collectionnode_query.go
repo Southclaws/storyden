@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/internal/ent/collection"
@@ -109,7 +110,7 @@ func (cnq *CollectionNodeQuery) QueryNode() *NodeQuery {
 // First returns the first CollectionNode entity from the query.
 // Returns a *NotFoundError when no CollectionNode was found.
 func (cnq *CollectionNodeQuery) First(ctx context.Context) (*CollectionNode, error) {
-	nodes, err := cnq.Limit(1).All(setContextOp(ctx, cnq.ctx, "First"))
+	nodes, err := cnq.Limit(1).All(setContextOp(ctx, cnq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +133,7 @@ func (cnq *CollectionNodeQuery) FirstX(ctx context.Context) *CollectionNode {
 // Returns a *NotSingularError when more than one CollectionNode entity is found.
 // Returns a *NotFoundError when no CollectionNode entities are found.
 func (cnq *CollectionNodeQuery) Only(ctx context.Context) (*CollectionNode, error) {
-	nodes, err := cnq.Limit(2).All(setContextOp(ctx, cnq.ctx, "Only"))
+	nodes, err := cnq.Limit(2).All(setContextOp(ctx, cnq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +158,7 @@ func (cnq *CollectionNodeQuery) OnlyX(ctx context.Context) *CollectionNode {
 
 // All executes the query and returns a list of CollectionNodes.
 func (cnq *CollectionNodeQuery) All(ctx context.Context) ([]*CollectionNode, error) {
-	ctx = setContextOp(ctx, cnq.ctx, "All")
+	ctx = setContextOp(ctx, cnq.ctx, ent.OpQueryAll)
 	if err := cnq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -176,7 +177,7 @@ func (cnq *CollectionNodeQuery) AllX(ctx context.Context) []*CollectionNode {
 
 // Count returns the count of the given query.
 func (cnq *CollectionNodeQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, cnq.ctx, "Count")
+	ctx = setContextOp(ctx, cnq.ctx, ent.OpQueryCount)
 	if err := cnq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -194,7 +195,7 @@ func (cnq *CollectionNodeQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (cnq *CollectionNodeQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, cnq.ctx, "Exist")
+	ctx = setContextOp(ctx, cnq.ctx, ent.OpQueryExist)
 	switch _, err := cnq.First(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -229,8 +230,9 @@ func (cnq *CollectionNodeQuery) Clone() *CollectionNodeQuery {
 		withCollection: cnq.withCollection.Clone(),
 		withNode:       cnq.withNode.Clone(),
 		// clone intermediate query.
-		sql:  cnq.sql.Clone(),
-		path: cnq.path,
+		sql:       cnq.sql.Clone(),
+		path:      cnq.path,
+		modifiers: append([]func(*sql.Selector){}, cnq.modifiers...),
 	}
 }
 
@@ -542,7 +544,7 @@ func (cngb *CollectionNodeGroupBy) Aggregate(fns ...AggregateFunc) *CollectionNo
 
 // Scan applies the selector query and scans the result into the given value.
 func (cngb *CollectionNodeGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cngb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, cngb.build.ctx, ent.OpQueryGroupBy)
 	if err := cngb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -590,7 +592,7 @@ func (cns *CollectionNodeSelect) Aggregate(fns ...AggregateFunc) *CollectionNode
 
 // Scan applies the selector query and scans the result into the given value.
 func (cns *CollectionNodeSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cns.ctx, "Select")
+	ctx = setContextOp(ctx, cns.ctx, ent.OpQuerySelect)
 	if err := cns.prepareQuery(ctx); err != nil {
 		return err
 	}

@@ -168,10 +168,10 @@ func (cpc *CollectionPostCreate) check() error {
 	if _, ok := cpc.mutation.MembershipType(); !ok {
 		return &ValidationError{Name: "membership_type", err: errors.New(`ent: missing required field "CollectionPost.membership_type"`)}
 	}
-	if _, ok := cpc.mutation.CollectionID(); !ok {
+	if len(cpc.mutation.CollectionIDs()) == 0 {
 		return &ValidationError{Name: "collection", err: errors.New(`ent: missing required edge "CollectionPost.collection"`)}
 	}
-	if _, ok := cpc.mutation.PostID(); !ok {
+	if len(cpc.mutation.PostIDs()) == 0 {
 		return &ValidationError{Name: "post", err: errors.New(`ent: missing required edge "CollectionPost.post"`)}
 	}
 	return nil

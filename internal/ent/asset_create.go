@@ -221,7 +221,7 @@ func (ac *AssetCreate) check() error {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Asset.id": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.OwnerID(); !ok {
+	if len(ac.mutation.OwnerIDs()) == 0 {
 		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Asset.owner"`)}
 	}
 	return nil

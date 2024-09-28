@@ -5,13 +5,13 @@ go 1.23.0
 toolchain go1.23.1
 
 require (
-	ariga.io/atlas v0.22.0 // indirect
+	ariga.io/atlas v0.27.0 // indirect
 	dario.cat/mergo v1.0.0
-	entgo.io/ent v0.13.1
+	entgo.io/ent v0.14.1
 	github.com/Southclaws/dt v1.0.1
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/forPelevin/gomoji v1.2.0
-	github.com/getkin/kin-openapi v0.126.0
+	github.com/getkin/kin-openapi v0.127.0
 	github.com/gosimple/slug v1.14.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -53,7 +53,7 @@ require (
 	github.com/mileusna/useragent v1.3.4
 	github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d
 	github.com/oapi-codegen/echo-middleware v1.0.2
-	github.com/oapi-codegen/oapi-codegen/v2 v2.3.0
+	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/pb33f/libopenapi v0.18.1
 	github.com/rs/cors v1.11.0
@@ -61,7 +61,7 @@ require (
 	github.com/twilio/twilio-go v1.22.3
 	github.com/weaviate/weaviate v1.26.0-rc.0
 	github.com/weaviate/weaviate-go-client/v4 v4.14.1
-	golang.org/x/sync v0.7.0
+	golang.org/x/sync v0.8.0
 	google.golang.org/api v0.188.0
 )
 
@@ -119,6 +119,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
+	github.com/speakeasy-api/openapi-overlay v0.9.0 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/tetratelabs/wazero v1.7.3 // indirect
 	github.com/ugorji/go/codec v1.2.12 // indirect
@@ -133,7 +134,7 @@ require (
 	go.opentelemetry.io/otel/metric v1.26.0 // indirect
 	go.opentelemetry.io/otel/trace v1.26.0 // indirect
 	golang.org/x/image v0.16.0 // indirect
-	golang.org/x/tools v0.21.1-0.20240508182429-e35e4ccd0d2d // indirect
+	golang.org/x/tools v0.25.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240708141625-4ad9e859172b // indirect
 	google.golang.org/grpc v1.64.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -168,7 +169,7 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
-	github.com/hashicorp/hcl/v2 v2.20.1 // indirect
+	github.com/hashicorp/hcl/v2 v2.22.0 // indirect
 	github.com/invopop/yaml v0.3.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20231201235250-de7065d80cb9 // indirect
@@ -184,13 +185,13 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	github.com/zclconf/go-cty v1.14.4 // indirect
+	github.com/zclconf/go-cty v1.15.0 // indirect
 	go.uber.org/multierr v1.11.0
-	golang.org/x/crypto v0.25.0
-	golang.org/x/mod v0.17.0 // indirect
-	golang.org/x/net v0.27.0
-	golang.org/x/sys v0.22.0 // indirect
-	golang.org/x/text v0.16.0 // indirect
+	golang.org/x/crypto v0.27.0
+	golang.org/x/mod v0.21.0 // indirect
+	golang.org/x/net v0.29.0
+	golang.org/x/sys v0.25.0 // indirect
+	golang.org/x/text v0.18.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

@@ -139,10 +139,10 @@ func (cnu *CollectionNodeUpdate) check() error {
 			return &ValidationError{Name: "node_id", err: fmt.Errorf(`ent: validator failed for field "CollectionNode.node_id": %w`, err)}
 		}
 	}
-	if _, ok := cnu.mutation.CollectionID(); cnu.mutation.CollectionCleared() && !ok {
+	if cnu.mutation.CollectionCleared() && len(cnu.mutation.CollectionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionNode.collection"`)
 	}
-	if _, ok := cnu.mutation.NodeID(); cnu.mutation.NodeCleared() && !ok {
+	if cnu.mutation.NodeCleared() && len(cnu.mutation.NodeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionNode.node"`)
 	}
 	return nil
@@ -370,10 +370,10 @@ func (cnuo *CollectionNodeUpdateOne) check() error {
 			return &ValidationError{Name: "node_id", err: fmt.Errorf(`ent: validator failed for field "CollectionNode.node_id": %w`, err)}
 		}
 	}
-	if _, ok := cnuo.mutation.CollectionID(); cnuo.mutation.CollectionCleared() && !ok {
+	if cnuo.mutation.CollectionCleared() && len(cnuo.mutation.CollectionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionNode.collection"`)
 	}
-	if _, ok := cnuo.mutation.NodeID(); cnuo.mutation.NodeCleared() && !ok {
+	if cnuo.mutation.NodeCleared() && len(cnuo.mutation.NodeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionNode.node"`)
 	}
 	return nil

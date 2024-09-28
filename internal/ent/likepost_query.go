@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -110,7 +111,7 @@ func (lpq *LikePostQuery) QueryPost() *PostQuery {
 // First returns the first LikePost entity from the query.
 // Returns a *NotFoundError when no LikePost was found.
 func (lpq *LikePostQuery) First(ctx context.Context) (*LikePost, error) {
-	nodes, err := lpq.Limit(1).All(setContextOp(ctx, lpq.ctx, "First"))
+	nodes, err := lpq.Limit(1).All(setContextOp(ctx, lpq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +134,7 @@ func (lpq *LikePostQuery) FirstX(ctx context.Context) *LikePost {
 // Returns a *NotFoundError when no LikePost ID was found.
 func (lpq *LikePostQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = lpq.Limit(1).IDs(setContextOp(ctx, lpq.ctx, "FirstID")); err != nil {
+	if ids, err = lpq.Limit(1).IDs(setContextOp(ctx, lpq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -156,7 +157,7 @@ func (lpq *LikePostQuery) FirstIDX(ctx context.Context) xid.ID {
 // Returns a *NotSingularError when more than one LikePost entity is found.
 // Returns a *NotFoundError when no LikePost entities are found.
 func (lpq *LikePostQuery) Only(ctx context.Context) (*LikePost, error) {
-	nodes, err := lpq.Limit(2).All(setContextOp(ctx, lpq.ctx, "Only"))
+	nodes, err := lpq.Limit(2).All(setContextOp(ctx, lpq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +185,7 @@ func (lpq *LikePostQuery) OnlyX(ctx context.Context) *LikePost {
 // Returns a *NotFoundError when no entities are found.
 func (lpq *LikePostQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = lpq.Limit(2).IDs(setContextOp(ctx, lpq.ctx, "OnlyID")); err != nil {
+	if ids, err = lpq.Limit(2).IDs(setContextOp(ctx, lpq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -209,7 +210,7 @@ func (lpq *LikePostQuery) OnlyIDX(ctx context.Context) xid.ID {
 
 // All executes the query and returns a list of LikePosts.
 func (lpq *LikePostQuery) All(ctx context.Context) ([]*LikePost, error) {
-	ctx = setContextOp(ctx, lpq.ctx, "All")
+	ctx = setContextOp(ctx, lpq.ctx, ent.OpQueryAll)
 	if err := lpq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -231,7 +232,7 @@ func (lpq *LikePostQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
 	if lpq.ctx.Unique == nil && lpq.path != nil {
 		lpq.Unique(true)
 	}
-	ctx = setContextOp(ctx, lpq.ctx, "IDs")
+	ctx = setContextOp(ctx, lpq.ctx, ent.OpQueryIDs)
 	if err = lpq.Select(likepost.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -249,7 +250,7 @@ func (lpq *LikePostQuery) IDsX(ctx context.Context) []xid.ID {
 
 // Count returns the count of the given query.
 func (lpq *LikePostQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, lpq.ctx, "Count")
+	ctx = setContextOp(ctx, lpq.ctx, ent.OpQueryCount)
 	if err := lpq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -267,7 +268,7 @@ func (lpq *LikePostQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (lpq *LikePostQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, lpq.ctx, "Exist")
+	ctx = setContextOp(ctx, lpq.ctx, ent.OpQueryExist)
 	switch _, err := lpq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -302,8 +303,9 @@ func (lpq *LikePostQuery) Clone() *LikePostQuery {
 		withAccount: lpq.withAccount.Clone(),
 		withPost:    lpq.withPost.Clone(),
 		// clone intermediate query.
-		sql:  lpq.sql.Clone(),
-		path: lpq.path,
+		sql:       lpq.sql.Clone(),
+		path:      lpq.path,
+		modifiers: append([]func(*sql.Selector){}, lpq.modifiers...),
 	}
 }
 
@@ -620,7 +622,7 @@ func (lpgb *LikePostGroupBy) Aggregate(fns ...AggregateFunc) *LikePostGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (lpgb *LikePostGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, lpgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, lpgb.build.ctx, ent.OpQueryGroupBy)
 	if err := lpgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -668,7 +670,7 @@ func (lps *LikePostSelect) Aggregate(fns ...AggregateFunc) *LikePostSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (lps *LikePostSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, lps.ctx, "Select")
+	ctx = setContextOp(ctx, lps.ctx, ent.OpQuerySelect)
 	if err := lps.prepareQuery(ctx); err != nil {
 		return err
 	}

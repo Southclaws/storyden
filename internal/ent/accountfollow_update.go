@@ -126,10 +126,10 @@ func (afu *AccountFollowUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (afu *AccountFollowUpdate) check() error {
-	if _, ok := afu.mutation.FollowerID(); afu.mutation.FollowerCleared() && !ok {
+	if afu.mutation.FollowerCleared() && len(afu.mutation.FollowerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountFollow.follower"`)
 	}
-	if _, ok := afu.mutation.FollowingID(); afu.mutation.FollowingCleared() && !ok {
+	if afu.mutation.FollowingCleared() && len(afu.mutation.FollowingIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountFollow.following"`)
 	}
 	return nil
@@ -342,10 +342,10 @@ func (afuo *AccountFollowUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (afuo *AccountFollowUpdateOne) check() error {
-	if _, ok := afuo.mutation.FollowerID(); afuo.mutation.FollowerCleared() && !ok {
+	if afuo.mutation.FollowerCleared() && len(afuo.mutation.FollowerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountFollow.follower"`)
 	}
-	if _, ok := afuo.mutation.FollowingID(); afuo.mutation.FollowingCleared() && !ok {
+	if afuo.mutation.FollowingCleared() && len(afuo.mutation.FollowingIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountFollow.following"`)
 	}
 	return nil

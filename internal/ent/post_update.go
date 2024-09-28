@@ -728,7 +728,7 @@ func (pu *PostUpdate) check() error {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Post.visibility": %w`, err)}
 		}
 	}
-	if _, ok := pu.mutation.AuthorID(); pu.mutation.AuthorCleared() && !ok {
+	if pu.mutation.AuthorCleared() && len(pu.mutation.AuthorIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Post.author"`)
 	}
 	return nil
@@ -2068,7 +2068,7 @@ func (puo *PostUpdateOne) check() error {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Post.visibility": %w`, err)}
 		}
 	}
-	if _, ok := puo.mutation.AuthorID(); puo.mutation.AuthorCleared() && !ok {
+	if puo.mutation.AuthorCleared() && len(puo.mutation.AuthorIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Post.author"`)
 	}
 	return nil

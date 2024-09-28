@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -110,7 +111,7 @@ func (arq *AccountRolesQuery) QueryRole() *RoleQuery {
 // First returns the first AccountRoles entity from the query.
 // Returns a *NotFoundError when no AccountRoles was found.
 func (arq *AccountRolesQuery) First(ctx context.Context) (*AccountRoles, error) {
-	nodes, err := arq.Limit(1).All(setContextOp(ctx, arq.ctx, "First"))
+	nodes, err := arq.Limit(1).All(setContextOp(ctx, arq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +134,7 @@ func (arq *AccountRolesQuery) FirstX(ctx context.Context) *AccountRoles {
 // Returns a *NotFoundError when no AccountRoles ID was found.
 func (arq *AccountRolesQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = arq.Limit(1).IDs(setContextOp(ctx, arq.ctx, "FirstID")); err != nil {
+	if ids, err = arq.Limit(1).IDs(setContextOp(ctx, arq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -156,7 +157,7 @@ func (arq *AccountRolesQuery) FirstIDX(ctx context.Context) xid.ID {
 // Returns a *NotSingularError when more than one AccountRoles entity is found.
 // Returns a *NotFoundError when no AccountRoles entities are found.
 func (arq *AccountRolesQuery) Only(ctx context.Context) (*AccountRoles, error) {
-	nodes, err := arq.Limit(2).All(setContextOp(ctx, arq.ctx, "Only"))
+	nodes, err := arq.Limit(2).All(setContextOp(ctx, arq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -184,7 +185,7 @@ func (arq *AccountRolesQuery) OnlyX(ctx context.Context) *AccountRoles {
 // Returns a *NotFoundError when no entities are found.
 func (arq *AccountRolesQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = arq.Limit(2).IDs(setContextOp(ctx, arq.ctx, "OnlyID")); err != nil {
+	if ids, err = arq.Limit(2).IDs(setContextOp(ctx, arq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -209,7 +210,7 @@ func (arq *AccountRolesQuery) OnlyIDX(ctx context.Context) xid.ID {
 
 // All executes the query and returns a list of AccountRolesSlice.
 func (arq *AccountRolesQuery) All(ctx context.Context) ([]*AccountRoles, error) {
-	ctx = setContextOp(ctx, arq.ctx, "All")
+	ctx = setContextOp(ctx, arq.ctx, ent.OpQueryAll)
 	if err := arq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -231,7 +232,7 @@ func (arq *AccountRolesQuery) IDs(ctx context.Context) (ids []xid.ID, err error)
 	if arq.ctx.Unique == nil && arq.path != nil {
 		arq.Unique(true)
 	}
-	ctx = setContextOp(ctx, arq.ctx, "IDs")
+	ctx = setContextOp(ctx, arq.ctx, ent.OpQueryIDs)
 	if err = arq.Select(accountroles.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -249,7 +250,7 @@ func (arq *AccountRolesQuery) IDsX(ctx context.Context) []xid.ID {
 
 // Count returns the count of the given query.
 func (arq *AccountRolesQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, arq.ctx, "Count")
+	ctx = setContextOp(ctx, arq.ctx, ent.OpQueryCount)
 	if err := arq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -267,7 +268,7 @@ func (arq *AccountRolesQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (arq *AccountRolesQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, arq.ctx, "Exist")
+	ctx = setContextOp(ctx, arq.ctx, ent.OpQueryExist)
 	switch _, err := arq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -302,8 +303,9 @@ func (arq *AccountRolesQuery) Clone() *AccountRolesQuery {
 		withAccount: arq.withAccount.Clone(),
 		withRole:    arq.withRole.Clone(),
 		// clone intermediate query.
-		sql:  arq.sql.Clone(),
-		path: arq.path,
+		sql:       arq.sql.Clone(),
+		path:      arq.path,
+		modifiers: append([]func(*sql.Selector){}, arq.modifiers...),
 	}
 }
 
@@ -620,7 +622,7 @@ func (argb *AccountRolesGroupBy) Aggregate(fns ...AggregateFunc) *AccountRolesGr
 
 // Scan applies the selector query and scans the result into the given value.
 func (argb *AccountRolesGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, argb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, argb.build.ctx, ent.OpQueryGroupBy)
 	if err := argb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -668,7 +670,7 @@ func (ars *AccountRolesSelect) Aggregate(fns ...AggregateFunc) *AccountRolesSele
 
 // Scan applies the selector query and scans the result into the given value.
 func (ars *AccountRolesSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ars.ctx, "Select")
+	ctx = setContextOp(ctx, ars.ctx, ent.OpQuerySelect)
 	if err := ars.prepareQuery(ctx); err != nil {
 		return err
 	}

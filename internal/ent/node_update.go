@@ -490,7 +490,7 @@ func (nu *NodeUpdate) check() error {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Node.visibility": %w`, err)}
 		}
 	}
-	if _, ok := nu.mutation.OwnerID(); nu.mutation.OwnerCleared() && !ok {
+	if nu.mutation.OwnerCleared() && len(nu.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Node.owner"`)
 	}
 	return nil
@@ -1364,7 +1364,7 @@ func (nuo *NodeUpdateOne) check() error {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Node.visibility": %w`, err)}
 		}
 	}
-	if _, ok := nuo.mutation.OwnerID(); nuo.mutation.OwnerCleared() && !ok {
+	if nuo.mutation.OwnerCleared() && len(nuo.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Node.owner"`)
 	}
 	return nil

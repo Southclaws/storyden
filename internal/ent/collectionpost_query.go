@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/internal/ent/collection"
@@ -109,7 +110,7 @@ func (cpq *CollectionPostQuery) QueryPost() *PostQuery {
 // First returns the first CollectionPost entity from the query.
 // Returns a *NotFoundError when no CollectionPost was found.
 func (cpq *CollectionPostQuery) First(ctx context.Context) (*CollectionPost, error) {
-	nodes, err := cpq.Limit(1).All(setContextOp(ctx, cpq.ctx, "First"))
+	nodes, err := cpq.Limit(1).All(setContextOp(ctx, cpq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +133,7 @@ func (cpq *CollectionPostQuery) FirstX(ctx context.Context) *CollectionPost {
 // Returns a *NotSingularError when more than one CollectionPost entity is found.
 // Returns a *NotFoundError when no CollectionPost entities are found.
 func (cpq *CollectionPostQuery) Only(ctx context.Context) (*CollectionPost, error) {
-	nodes, err := cpq.Limit(2).All(setContextOp(ctx, cpq.ctx, "Only"))
+	nodes, err := cpq.Limit(2).All(setContextOp(ctx, cpq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +158,7 @@ func (cpq *CollectionPostQuery) OnlyX(ctx context.Context) *CollectionPost {
 
 // All executes the query and returns a list of CollectionPosts.
 func (cpq *CollectionPostQuery) All(ctx context.Context) ([]*CollectionPost, error) {
-	ctx = setContextOp(ctx, cpq.ctx, "All")
+	ctx = setContextOp(ctx, cpq.ctx, ent.OpQueryAll)
 	if err := cpq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -176,7 +177,7 @@ func (cpq *CollectionPostQuery) AllX(ctx context.Context) []*CollectionPost {
 
 // Count returns the count of the given query.
 func (cpq *CollectionPostQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, cpq.ctx, "Count")
+	ctx = setContextOp(ctx, cpq.ctx, ent.OpQueryCount)
 	if err := cpq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -194,7 +195,7 @@ func (cpq *CollectionPostQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (cpq *CollectionPostQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, cpq.ctx, "Exist")
+	ctx = setContextOp(ctx, cpq.ctx, ent.OpQueryExist)
 	switch _, err := cpq.First(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -229,8 +230,9 @@ func (cpq *CollectionPostQuery) Clone() *CollectionPostQuery {
 		withCollection: cpq.withCollection.Clone(),
 		withPost:       cpq.withPost.Clone(),
 		// clone intermediate query.
-		sql:  cpq.sql.Clone(),
-		path: cpq.path,
+		sql:       cpq.sql.Clone(),
+		path:      cpq.path,
+		modifiers: append([]func(*sql.Selector){}, cpq.modifiers...),
 	}
 }
 
@@ -542,7 +544,7 @@ func (cpgb *CollectionPostGroupBy) Aggregate(fns ...AggregateFunc) *CollectionPo
 
 // Scan applies the selector query and scans the result into the given value.
 func (cpgb *CollectionPostGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cpgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, cpgb.build.ctx, ent.OpQueryGroupBy)
 	if err := cpgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -590,7 +592,7 @@ func (cps *CollectionPostSelect) Aggregate(fns ...AggregateFunc) *CollectionPost
 
 // Scan applies the selector query and scans the result into the given value.
 func (cps *CollectionPostSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cps.ctx, "Select")
+	ctx = setContextOp(ctx, cps.ctx, ent.OpQuerySelect)
 	if err := cps.prepareQuery(ctx); err != nil {
 		return err
 	}

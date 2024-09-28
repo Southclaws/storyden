@@ -115,10 +115,10 @@ func (lpu *LikePostUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (lpu *LikePostUpdate) check() error {
-	if _, ok := lpu.mutation.AccountID(); lpu.mutation.AccountCleared() && !ok {
+	if lpu.mutation.AccountCleared() && len(lpu.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "LikePost.account"`)
 	}
-	if _, ok := lpu.mutation.PostID(); lpu.mutation.PostCleared() && !ok {
+	if lpu.mutation.PostCleared() && len(lpu.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "LikePost.Post"`)
 	}
 	return nil
@@ -319,10 +319,10 @@ func (lpuo *LikePostUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (lpuo *LikePostUpdateOne) check() error {
-	if _, ok := lpuo.mutation.AccountID(); lpuo.mutation.AccountCleared() && !ok {
+	if lpuo.mutation.AccountCleared() && len(lpuo.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "LikePost.account"`)
 	}
-	if _, ok := lpuo.mutation.PostID(); lpuo.mutation.PostCleared() && !ok {
+	if lpuo.mutation.PostCleared() && len(lpuo.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "LikePost.Post"`)
 	}
 	return nil

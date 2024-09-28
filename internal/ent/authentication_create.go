@@ -192,7 +192,7 @@ func (ac *AuthenticationCreate) check() error {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Authentication.id": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.AccountID(); !ok {
+	if len(ac.mutation.AccountIDs()) == 0 {
 		return &ValidationError{Name: "account", err: errors.New(`ent: missing required edge "Authentication.account"`)}
 	}
 	return nil

@@ -115,10 +115,10 @@ func (mpu *MentionProfileUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mpu *MentionProfileUpdate) check() error {
-	if _, ok := mpu.mutation.AccountID(); mpu.mutation.AccountCleared() && !ok {
+	if mpu.mutation.AccountCleared() && len(mpu.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MentionProfile.account"`)
 	}
-	if _, ok := mpu.mutation.PostID(); mpu.mutation.PostCleared() && !ok {
+	if mpu.mutation.PostCleared() && len(mpu.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MentionProfile.Post"`)
 	}
 	return nil
@@ -319,10 +319,10 @@ func (mpuo *MentionProfileUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mpuo *MentionProfileUpdateOne) check() error {
-	if _, ok := mpuo.mutation.AccountID(); mpuo.mutation.AccountCleared() && !ok {
+	if mpuo.mutation.AccountCleared() && len(mpuo.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MentionProfile.account"`)
 	}
-	if _, ok := mpuo.mutation.PostID(); mpuo.mutation.PostCleared() && !ok {
+	if mpuo.mutation.PostCleared() && len(mpuo.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MentionProfile.Post"`)
 	}
 	return nil

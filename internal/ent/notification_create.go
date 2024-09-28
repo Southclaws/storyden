@@ -221,7 +221,7 @@ func (nc *NotificationCreate) check() error {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Notification.id": %w`, err)}
 		}
 	}
-	if _, ok := nc.mutation.OwnerID(); !ok {
+	if len(nc.mutation.OwnerIDs()) == 0 {
 		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Notification.owner"`)}
 	}
 	return nil

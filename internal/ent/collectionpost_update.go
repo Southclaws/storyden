@@ -139,10 +139,10 @@ func (cpu *CollectionPostUpdate) check() error {
 			return &ValidationError{Name: "post_id", err: fmt.Errorf(`ent: validator failed for field "CollectionPost.post_id": %w`, err)}
 		}
 	}
-	if _, ok := cpu.mutation.CollectionID(); cpu.mutation.CollectionCleared() && !ok {
+	if cpu.mutation.CollectionCleared() && len(cpu.mutation.CollectionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionPost.collection"`)
 	}
-	if _, ok := cpu.mutation.PostID(); cpu.mutation.PostCleared() && !ok {
+	if cpu.mutation.PostCleared() && len(cpu.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionPost.post"`)
 	}
 	return nil
@@ -370,10 +370,10 @@ func (cpuo *CollectionPostUpdateOne) check() error {
 			return &ValidationError{Name: "post_id", err: fmt.Errorf(`ent: validator failed for field "CollectionPost.post_id": %w`, err)}
 		}
 	}
-	if _, ok := cpuo.mutation.CollectionID(); cpuo.mutation.CollectionCleared() && !ok {
+	if cpuo.mutation.CollectionCleared() && len(cpuo.mutation.CollectionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionPost.collection"`)
 	}
-	if _, ok := cpuo.mutation.PostID(); cpuo.mutation.PostCleared() && !ok {
+	if cpuo.mutation.PostCleared() && len(cpuo.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionPost.post"`)
 	}
 	return nil

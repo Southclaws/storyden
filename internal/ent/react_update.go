@@ -129,10 +129,10 @@ func (ru *ReactUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ru *ReactUpdate) check() error {
-	if _, ok := ru.mutation.AccountID(); ru.mutation.AccountCleared() && !ok {
+	if ru.mutation.AccountCleared() && len(ru.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "React.account"`)
 	}
-	if _, ok := ru.mutation.PostID(); ru.mutation.PostCleared() && !ok {
+	if ru.mutation.PostCleared() && len(ru.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "React.Post"`)
 	}
 	return nil
@@ -350,10 +350,10 @@ func (ruo *ReactUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ruo *ReactUpdateOne) check() error {
-	if _, ok := ruo.mutation.AccountID(); ruo.mutation.AccountCleared() && !ok {
+	if ruo.mutation.AccountCleared() && len(ruo.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "React.account"`)
 	}
-	if _, ok := ruo.mutation.PostID(); ruo.mutation.PostCleared() && !ok {
+	if ruo.mutation.PostCleared() && len(ruo.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "React.Post"`)
 	}
 	return nil
