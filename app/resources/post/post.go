@@ -13,8 +13,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/like"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
+	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/profile"
-	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -32,7 +32,7 @@ type Post struct {
 	Content datagraph.Content
 	Author  profile.Public
 	Likes   like.Status
-	Reacts  []*react.React
+	Reacts  []*reaction.React
 	Assets  []*asset.Asset
 	WebLink opt.Optional[link_ref.LinkRef]
 	Meta    map[string]any
@@ -81,7 +81,11 @@ func Map(in *ent.Post) (*Post, error) {
 	})
 
 	// These edges are arrays so if not loaded, nothing bad happens.
-	reacts := dt.Map(in.Edges.Reacts, react.FromModel)
+	reacts, err := reaction.MapList(in.Edges.Reacts)
+	if err != nil {
+		return nil, err
+	}
+
 	assets := dt.Map(in.Edges.Assets, asset.FromModel)
 
 	return &Post{

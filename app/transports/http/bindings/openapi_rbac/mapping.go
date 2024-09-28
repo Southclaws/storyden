@@ -250,6 +250,10 @@ func (m *Mapping) PostReactAdd() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionCreateReaction
 }
 
+func (m *Mapping) PostReactRemove() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionCreateReaction
+}
+
 func (m *Mapping) AssetUpload() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionUploadAsset
 }

@@ -1057,6 +1057,19 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/PostReactAddOK" }
 
+  /posts/{post_id}/reacts/{react_id}:
+    delete:
+      operationId: PostReactRemove
+      description: Remove a reaction from a post.
+      tags: [posts]
+      parameters:
+        - $ref: "#/components/parameters/PostIDParam"
+        - $ref: "#/components/parameters/ReactIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
   #
   #                                     888
   #                                     888
@@ -1624,6 +1637,14 @@ components:
     PostIDParam:
       description: Unique post ID.
       name: post_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    ReactIDParam:
+      description: Unique react ID.
+      name: react_id
       in: path
       required: true
       schema:
@@ -3770,7 +3791,7 @@ components:
 
     ReplyProps:
       type: object
-      required: [root_id, root_slug, body, author, reacts, assets, links]
+      required: [root_id, root_slug]
       properties:
         root_id: { $ref: "#/components/schemas/Identifier" }
         root_slug: { $ref: "#/components/schemas/ThreadMark" }
@@ -3798,22 +3819,29 @@ components:
 
     React:
       type: object
+      required: [id, emoji, author]
       properties:
         id: { $ref: "#/components/schemas/Identifier" }
-        emoji:
-          type: string
+        emoji: { $ref: "#/components/schemas/ReactEmoji" }
+        author: { $ref: "#/components/schemas/ProfileReference" }
 
     ReactInitialProps:
       description: Reactions are currently just simple emoji characters.
       type: object
+      required: [emoji]
       properties:
-        emoji:
-          type: string
+        emoji: { $ref: "#/components/schemas/ReactEmoji" }
 
     ReactList:
       description: A list of reactions this post has had from people.
       type: array
       items: { $ref: "#/components/schemas/React" }
+
+    ReactEmoji:
+      description: |
+        A single emoji character representing a reaction. In future, this will
+        be augmented with a more fully fledged custom emoji system.
+      type: string
 
     #
     # 888b     d888               888 d8b

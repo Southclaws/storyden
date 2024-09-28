@@ -254,3 +254,65 @@ export const usePostReactAdd = <
     ...query,
   };
 };
+/**
+ * Remove a reaction from a post.
+ */
+export const postReactRemove = (postId: string, reactId: string) => {
+  return fetcher<void>({
+    url: `/posts/${postId}/reacts/${reactId}`,
+    method: "DELETE",
+  });
+};
+
+export const getPostReactRemoveMutationFetcher = (
+  postId: string,
+  reactId: string,
+) => {
+  return (_: string, __: { arg: Arguments }): Promise<void> => {
+    return postReactRemove(postId, reactId);
+  };
+};
+export const getPostReactRemoveMutationKey = (
+  postId: string,
+  reactId: string,
+) => `/posts/${postId}/reacts/${reactId}` as const;
+
+export type PostReactRemoveMutationResult = NonNullable<
+  Awaited<ReturnType<typeof postReactRemove>>
+>;
+export type PostReactRemoveMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const usePostReactRemove = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  postId: string,
+  reactId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof postReactRemove>>,
+      TError,
+      string,
+      Arguments,
+      Awaited<ReturnType<typeof postReactRemove>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getPostReactRemoveMutationKey(postId, reactId);
+  const swrFn = getPostReactRemoveMutationFetcher(postId, reactId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
