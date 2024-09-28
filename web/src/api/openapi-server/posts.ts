@@ -118,3 +118,29 @@ export const postReactAdd = async (
     body: JSON.stringify(postReactAddBody),
   });
 };
+
+/**
+ * Remove a reaction from a post.
+ */
+export type postReactRemoveResponse = {
+  data: void;
+  status: number;
+};
+
+export const getPostReactRemoveUrl = (postId: string, reactId: string) => {
+  return `/posts/${postId}/reacts/${reactId}`;
+};
+
+export const postReactRemove = async (
+  postId: string,
+  reactId: string,
+  options?: RequestInit,
+): Promise<postReactRemoveResponse> => {
+  return fetcher<Promise<postReactRemoveResponse>>(
+    getPostReactRemoveUrl(postId, reactId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};

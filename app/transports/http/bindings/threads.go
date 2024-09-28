@@ -16,7 +16,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 
 	"github.com/Southclaws/storyden/app/resources/post/category"
-	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	thread_service "github.com/Southclaws/storyden/app/services/thread"
@@ -137,10 +136,6 @@ func (i *Threads) ThreadDelete(ctx context.Context, request openapi.ThreadDelete
 	}
 
 	return openapi.ThreadDelete200Response{}, nil
-}
-
-func reacts(reacts []*react.React) []openapi.React {
-	return (dt.Map(reacts, serialiseReact))
 }
 
 func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequestObject) (openapi.ThreadListResponseObject, error) {

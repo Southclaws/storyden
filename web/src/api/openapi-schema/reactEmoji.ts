@@ -7,11 +7,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { ReactEmoji } from "./reactEmoji";
 
 /**
- * Reactions are currently just simple emoji characters.
+ * A single emoji character representing a reaction. In future, this will
+be augmented with a more fully fledged custom emoji system.
+
  */
-export interface ReactInitialProps {
-  emoji: ReactEmoji;
-}
+export type ReactEmoji = string;

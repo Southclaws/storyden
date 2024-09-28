@@ -15,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/profile"
-	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -73,7 +72,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Pinned:      t.Pinned,
 		ReplyStatus: serialiseReplyStatus(t.ReplyStatus),
 		Likes:       serialiseLikeStatus(&t.Likes),
-		Reacts:      reacts(t.Reacts),
+		Reacts:      serialiseReactList(t.Reacts),
 		Tags:        t.Tags,
 		Assets:      dt.Map(t.Assets, serialiseAssetPtr),
 		Collections: dt.Map(t.Collections, serialiseCollection),
@@ -222,13 +221,6 @@ func serialiseCategoryReference(c *category.Category) openapi.CategoryReference 
 		Description: c.Description,
 		Sort:        c.Sort,
 		Meta:        (*openapi.Metadata)(&c.Metadata),
-	}
-}
-
-func serialiseReact(r *react.React) openapi.React {
-	return openapi.React{
-		Id:    openapi.IdentifierFrom(xid.ID(r.ID)),
-		Emoji: &r.Emoji,
 	}
 }
 

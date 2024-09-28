@@ -25,12 +25,12 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
+	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_writer"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
-	"github.com/Southclaws/storyden/app/resources/react"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/resources/tag"
 )
@@ -52,7 +52,7 @@ func Build() fx.Option {
 			reply.New,
 			tag.New,
 			thread.New,
-			react.New,
+			reaction.New,
 			like_querier.New,
 			like_writer.New,
 			post_search.New,

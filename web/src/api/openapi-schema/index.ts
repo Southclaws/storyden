@@ -264,6 +264,7 @@ export * from "./publicProfileList";
 export * from "./publicProfileListResult";
 export * from "./publicProfileListResultAllOf";
 export * from "./react";
+export * from "./reactEmoji";
 export * from "./reactInitialProps";
 export * from "./reactList";
 export * from "./relevanceScore";
