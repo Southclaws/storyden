@@ -2,7 +2,6 @@ package bindings
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 	"strconv"
 	"time"
@@ -100,24 +99,10 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO: Make this a bit more well designed and less coupled to the hostname
-	avatarURL := fmt.Sprintf("%s/api/accounts/%s/avatar", p.apiAddress.String(), acc.Handle)
+	pro := profile.ProfileFromAccount(acc)
 
 	return openapi.ProfileGet200JSONResponse{
-		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
-			Id:        openapi.Identifier(acc.ID.String()),
-			CreatedAt: acc.CreatedAt.Format(time.RFC3339),
-			DeletedAt: acc.DeletedAt.Ptr(),
-			Bio:       acc.Bio.HTML(),
-			Handle:    acc.Handle,
-			Image:     &avatarURL,
-			Followers: acc.Followers,
-			Following: acc.Following,
-			LikeScore: acc.LikeScore,
-			Name:      acc.Name,
-			Links:     serialiseExternalLinks(acc.ExternalLinks),
-			Meta:      acc.Metadata,
-		},
+		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse(serialiseProfile(pro)),
 	}, nil
 }
 
@@ -247,6 +232,7 @@ func serialiseProfile(in *profile.Public) openapi.PublicProfile {
 		Bio:       in.Bio.HTML(),
 		Handle:    in.Handle,
 		Name:      in.Name,
+		Roles:     serialiseHeldRoleList(in.Roles),
 		Followers: in.Followers,
 		Following: in.Following,
 		LikeScore: in.LikeScore,

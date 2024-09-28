@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/accountfollow"
+	"github.com/Southclaws/storyden/internal/ent/accountroles"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
@@ -101,6 +102,37 @@ func init() {
 	// accountfollow.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	accountfollow.IDValidator = func() func(string) error {
 		validators := accountfollowDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	accountrolesMixin := schema.AccountRoles{}.Mixin()
+	accountrolesMixinFields0 := accountrolesMixin[0].Fields()
+	_ = accountrolesMixinFields0
+	accountrolesMixinFields1 := accountrolesMixin[1].Fields()
+	_ = accountrolesMixinFields1
+	accountrolesFields := schema.AccountRoles{}.Fields()
+	_ = accountrolesFields
+	// accountrolesDescCreatedAt is the schema descriptor for created_at field.
+	accountrolesDescCreatedAt := accountrolesMixinFields1[0].Descriptor()
+	// accountroles.DefaultCreatedAt holds the default value on creation for the created_at field.
+	accountroles.DefaultCreatedAt = accountrolesDescCreatedAt.Default.(func() time.Time)
+	// accountrolesDescID is the schema descriptor for id field.
+	accountrolesDescID := accountrolesMixinFields0[0].Descriptor()
+	// accountroles.DefaultID holds the default value on creation for the id field.
+	accountroles.DefaultID = accountrolesDescID.Default.(func() xid.ID)
+	// accountroles.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	accountroles.IDValidator = func() func(string) error {
+		validators := accountrolesDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
@@ -711,6 +743,10 @@ func init() {
 	roleDescColour := roleFields[1].Descriptor()
 	// role.DefaultColour holds the default value on creation for the colour field.
 	role.DefaultColour = roleDescColour.Default.(string)
+	// roleDescSortKey is the schema descriptor for sort_key field.
+	roleDescSortKey := roleFields[3].Descriptor()
+	// role.DefaultSortKey holds the default value on creation for the sort_key field.
+	role.DefaultSortKey = roleDescSortKey.Default.(float64)
 	// roleDescID is the schema descriptor for id field.
 	roleDescID := roleMixinFields0[0].Descriptor()
 	// role.DefaultID holds the default value on creation for the id field.

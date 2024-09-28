@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -16,7 +16,7 @@ import (
 )
 
 func MapAccount(a *ent.Account) (*Account, error) {
-	rolesEdge, err := a.Edges.RolesOrErr()
+	rolesEdge, err := a.Edges.AccountRolesOrErr()
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +35,7 @@ func MapAccount(a *ent.Account) (*Account, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	roles, err := role.Map(rolesEdge, a.Admin)
+	roles, err := held.MapList(rolesEdge, a.Admin)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

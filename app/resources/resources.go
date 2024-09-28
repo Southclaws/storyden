@@ -8,6 +8,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -38,6 +41,9 @@ func Build() fx.Option {
 			settings.New,
 			account_querier.New,
 			account_writer.New,
+			role_assign.New,
+			role_querier.New,
+			role_writer.New,
 			asset.New,
 			authentication.New,
 			category.New,

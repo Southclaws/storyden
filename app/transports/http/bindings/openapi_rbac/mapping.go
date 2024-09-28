@@ -42,11 +42,19 @@ func (m *Mapping) RoleCreate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageRoles
 }
 
+func (m *Mapping) RoleList() (bool, *rbac.Permission) {
+	return false, nil // Public
+}
+
 func (m *Mapping) RoleGet() (bool, *rbac.Permission) {
 	return true, nil
 }
 
 func (m *Mapping) RoleUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRoles
+}
+
+func (m *Mapping) RoleDelete() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageRoles
 }
 
@@ -144,6 +152,14 @@ func (m *Mapping) AccountSetAvatar() (bool, *rbac.Permission) {
 
 func (m *Mapping) AccountGetAvatar() (bool, *rbac.Permission) {
 	return true, nil
+}
+
+func (m *Mapping) AccountAddRole() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRoles
+}
+
+func (m *Mapping) AccountRemoveRole() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageRoles
 }
 
 func (m *Mapping) NotificationList() (bool, *rbac.Permission) {

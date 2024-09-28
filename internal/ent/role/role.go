@@ -25,15 +25,26 @@ const (
 	FieldColour = "colour"
 	// FieldPermissions holds the string denoting the permissions field in the database.
 	FieldPermissions = "permissions"
+	// FieldSortKey holds the string denoting the sort_key field in the database.
+	FieldSortKey = "sort_key"
 	// EdgeAccounts holds the string denoting the accounts edge name in mutations.
 	EdgeAccounts = "accounts"
+	// EdgeAccountRoles holds the string denoting the account_roles edge name in mutations.
+	EdgeAccountRoles = "account_roles"
 	// Table holds the table name of the role in the database.
 	Table = "roles"
 	// AccountsTable is the table that holds the accounts relation/edge. The primary key declared below.
-	AccountsTable = "role_accounts"
+	AccountsTable = "account_roles"
 	// AccountsInverseTable is the table name for the Account entity.
 	// It exists in this package in order to avoid circular dependency with the "account" package.
 	AccountsInverseTable = "accounts"
+	// AccountRolesTable is the table that holds the account_roles relation/edge.
+	AccountRolesTable = "account_roles"
+	// AccountRolesInverseTable is the table name for the AccountRoles entity.
+	// It exists in this package in order to avoid circular dependency with the "accountroles" package.
+	AccountRolesInverseTable = "account_roles"
+	// AccountRolesColumn is the table column denoting the account_roles relation/edge.
+	AccountRolesColumn = "role_id"
 )
 
 // Columns holds all SQL columns for role fields.
@@ -44,6 +55,7 @@ var Columns = []string{
 	FieldName,
 	FieldColour,
 	FieldPermissions,
+	FieldSortKey,
 }
 
 var (
@@ -71,6 +83,8 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultColour holds the default value on creation for the "colour" field.
 	DefaultColour string
+	// DefaultSortKey holds the default value on creation for the "sort_key" field.
+	DefaultSortKey float64
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -105,6 +119,11 @@ func ByColour(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldColour, opts...).ToFunc()
 }
 
+// BySortKey orders the results by the sort_key field.
+func BySortKey(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSortKey, opts...).ToFunc()
+}
+
 // ByAccountsCount orders the results by accounts count.
 func ByAccountsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -118,10 +137,31 @@ func ByAccounts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAccountsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByAccountRolesCount orders the results by account_roles count.
+func ByAccountRolesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAccountRolesStep(), opts...)
+	}
+}
+
+// ByAccountRoles orders the results by account_roles terms.
+func ByAccountRoles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAccountRolesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newAccountsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AccountsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, AccountsTable, AccountsPrimaryKey...),
+	)
+}
+func newAccountRolesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AccountRolesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, AccountRolesTable, AccountRolesColumn),
 	)
 }

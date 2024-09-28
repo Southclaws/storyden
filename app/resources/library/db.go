@@ -62,7 +62,7 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*Node, error)
 	q := d.db.Node.
 		Query().
 		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithAssets().
 		WithLink(func(lq *ent.LinkQuery) {
@@ -92,7 +92,7 @@ func (d *database) Get(ctx context.Context, slug NodeSlug) (*Node, error) {
 		Query().
 		Where(node.Slug(string(slug))).
 		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithAssets().
 		WithLink(func(lq *ent.LinkQuery) {
@@ -102,7 +102,7 @@ func (d *database) Get(ctx context.Context, slug NodeSlug) (*Node, error) {
 			cq.
 				WithAssets().
 				WithOwner(func(aq *ent.AccountQuery) {
-					aq.WithRoles()
+					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 				}).
 				Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
 		}).
@@ -110,7 +110,7 @@ func (d *database) Get(ctx context.Context, slug NodeSlug) (*Node, error) {
 			cq.
 				WithAssets().
 				WithOwner(func(aq *ent.AccountQuery) {
-					aq.WithRoles()
+					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 				})
 		}).
 		Only(ctx)
@@ -131,7 +131,7 @@ func (d *database) GetByID(ctx context.Context, id NodeID) (*Node, error) {
 		Query().
 		Where(node.ID(xid.ID(id))).
 		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithAssets().
 		WithLink(func(lq *ent.LinkQuery) {
@@ -141,7 +141,7 @@ func (d *database) GetByID(ctx context.Context, id NodeID) (*Node, error) {
 			cq.
 				WithAssets().
 				WithOwner(func(aq *ent.AccountQuery) {
-					aq.WithRoles()
+					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 				}).
 				Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
 		}).

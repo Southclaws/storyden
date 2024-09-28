@@ -236,6 +236,7 @@ type Account struct {
 	// Name The account owners display name.
 	Name          AccountName        `json:"name"`
 	Notifications *NotificationCount `json:"notifications,omitempty"`
+	Roles         AccountRoleList    `json:"roles"`
 
 	// UpdatedAt The time the resource was updated.
 	UpdatedAt      time.Time             `json:"updatedAt"`
@@ -296,6 +297,7 @@ type AccountCommonProps struct {
 	// Name The account owners display name.
 	Name           AccountName           `json:"name"`
 	Notifications  *NotificationCount    `json:"notifications,omitempty"`
+	Roles          AccountRoleList       `json:"roles"`
 	VerifiedStatus AccountVerifiedStatus `json:"verified_status"`
 }
 
@@ -338,6 +340,49 @@ type AccountMutableProps struct {
 
 // AccountName The account owners display name.
 type AccountName = string
+
+// AccountRole defines model for AccountRole.
+type AccountRole struct {
+	// Badge One role may be designated as a badge for the account. If ture, it
+	// should be displayed prominently on the profile or in other contexts.
+	Badge  bool   `json:"badge"`
+	Colour string `json:"colour"`
+
+	// CreatedAt The time the resource was created.
+	CreatedAt time.Time `json:"createdAt"`
+
+	// Default There are two built-in roles: everyone and admin, this boolean flag
+	// is set if this role is one of the default built-in roles.
+	Default bool `json:"default"`
+
+	// DeletedAt The time the resource was soft-deleted.
+	DeletedAt *time.Time `json:"deletedAt,omitempty"`
+
+	// Id A unique identifier for this resource.
+	Id Identifier `json:"id"`
+
+	// Misc Arbitrary extra data stored with the resource.
+	Misc        *map[string]interface{} `json:"misc,omitempty"`
+	Name        string                  `json:"name"`
+	Permissions PermissionList          `json:"permissions"`
+
+	// UpdatedAt The time the resource was updated.
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// AccountRoleList defines model for AccountRoleList.
+type AccountRoleList = []AccountRole
+
+// AccountRoleProps defines model for AccountRoleProps.
+type AccountRoleProps struct {
+	// Badge One role may be designated as a badge for the account. If ture, it
+	// should be displayed prominently on the profile or in other contexts.
+	Badge bool `json:"badge"`
+
+	// Default There are two built-in roles: everyone and admin, this boolean flag
+	// is set if this role is one of the default built-in roles.
+	Default bool `json:"default"`
+}
 
 // AccountVerifiedStatus defines model for AccountVerifiedStatus.
 type AccountVerifiedStatus string
@@ -1510,8 +1555,6 @@ type ProfileLikeListResult struct {
 
 // ProfileReference A minimal reference to an account.
 type ProfileReference struct {
-	Admin bool `json:"admin"`
-
 	// Handle The unique @ handle of an account.
 	Handle AccountHandle `json:"handle"`
 
@@ -1519,7 +1562,8 @@ type ProfileReference struct {
 	Id Identifier `json:"id"`
 
 	// Name The account owners display name.
-	Name AccountName `json:"name"`
+	Name  AccountName     `json:"name"`
+	Roles AccountRoleList `json:"roles"`
 }
 
 // PublicKeyCredential https://www.w3.org/TR/webauthn-2/#iface-pkcredential
@@ -1636,7 +1680,8 @@ type PublicProfile struct {
 	Misc *map[string]interface{} `json:"misc,omitempty"`
 
 	// Name The account owners display name.
-	Name AccountName `json:"name"`
+	Name  AccountName     `json:"name"`
+	Roles AccountRoleList `json:"roles"`
 
 	// UpdatedAt The time the resource was updated.
 	UpdatedAt time.Time `json:"updatedAt"`
@@ -1817,7 +1862,7 @@ type ResidentKeyRequirement string
 
 // Role defines model for Role.
 type Role struct {
-	Colour *string `json:"colour,omitempty"`
+	Colour string `json:"colour"`
 
 	// CreatedAt The time the resource was created.
 	CreatedAt time.Time `json:"createdAt"`
@@ -1830,8 +1875,8 @@ type Role struct {
 
 	// Misc Arbitrary extra data stored with the resource.
 	Misc        *map[string]interface{} `json:"misc,omitempty"`
-	Name        *string                 `json:"name,omitempty"`
-	Permissions *PermissionList         `json:"permissions,omitempty"`
+	Name        string                  `json:"name"`
+	Permissions PermissionList          `json:"permissions"`
 
 	// UpdatedAt The time the resource was updated.
 	UpdatedAt time.Time `json:"updatedAt"`
@@ -1839,9 +1884,17 @@ type Role struct {
 
 // RoleInitialProps defines model for RoleInitialProps.
 type RoleInitialProps struct {
-	Colour      *string         `json:"colour,omitempty"`
-	Name        *string         `json:"name,omitempty"`
-	Permissions *PermissionList `json:"permissions,omitempty"`
+	Colour      string         `json:"colour"`
+	Name        string         `json:"name"`
+	Permissions PermissionList `json:"permissions"`
+}
+
+// RoleList defines model for RoleList.
+type RoleList = []Role
+
+// RoleListResult defines model for RoleListResult.
+type RoleListResult struct {
+	Roles RoleList `json:"roles"`
 }
 
 // RoleMutableProps defines model for RoleMutableProps.
@@ -1853,9 +1906,9 @@ type RoleMutableProps struct {
 
 // RoleProps defines model for RoleProps.
 type RoleProps struct {
-	Colour      *string         `json:"colour,omitempty"`
-	Name        *string         `json:"name,omitempty"`
-	Permissions *PermissionList `json:"permissions,omitempty"`
+	Colour      string         `json:"colour"`
+	Name        string         `json:"name"`
+	Permissions PermissionList `json:"permissions"`
 }
 
 // Slug A URL-safe slug for uniquely identifying resources.
@@ -2381,6 +2434,9 @@ type RoleCreateOK = Role
 // RoleGetOK defines model for RoleGetOK.
 type RoleGetOK = Role
 
+// RoleListOK defines model for RoleListOK.
+type RoleListOK = RoleListResult
+
 // ThreadCreateOK defines model for ThreadCreateOK.
 type ThreadCreateOK = Thread
 
@@ -2853,6 +2909,12 @@ type ClientInterface interface {
 	// AccountGetAvatar request
 	AccountGetAvatar(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// AccountRemoveRole request
+	AccountRemoveRole(ctx context.Context, accountHandle AccountHandleParam, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// AccountAddRole request
+	AccountAddRole(ctx context.Context, accountHandle AccountHandleParam, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// AdminSettingsUpdateWithBody request with any body
 	AdminSettingsUpdateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -3117,10 +3179,16 @@ type ClientInterface interface {
 	// ProfileFollowingGet request
 	ProfileFollowingGet(ctx context.Context, accountHandle AccountHandleParam, params *ProfileFollowingGetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// RoleList request
+	RoleList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// RoleCreateWithBody request with any body
 	RoleCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	RoleCreate(ctx context.Context, body RoleCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// RoleDelete request
+	RoleDelete(ctx context.Context, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RoleGet request
 	RoleGet(ctx context.Context, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -3232,6 +3300,30 @@ func (c *Client) AccountSetAvatarWithBody(ctx context.Context, params *AccountSe
 
 func (c *Client) AccountGetAvatar(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAccountGetAvatarRequest(c.Server, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AccountRemoveRole(ctx context.Context, accountHandle AccountHandleParam, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountRemoveRoleRequest(c.Server, accountHandle, roleId)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) AccountAddRole(ctx context.Context, accountHandle AccountHandleParam, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewAccountAddRoleRequest(c.Server, accountHandle, roleId)
 	if err != nil {
 		return nil, err
 	}
@@ -4406,6 +4498,18 @@ func (c *Client) ProfileFollowingGet(ctx context.Context, accountHandle AccountH
 	return c.Client.Do(req)
 }
 
+func (c *Client) RoleList(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRoleListRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) RoleCreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRoleCreateRequestWithBody(c.Server, contentType, body)
 	if err != nil {
@@ -4420,6 +4524,18 @@ func (c *Client) RoleCreateWithBody(ctx context.Context, contentType string, bod
 
 func (c *Client) RoleCreate(ctx context.Context, body RoleCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRoleCreateRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) RoleDelete(ctx context.Context, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRoleDeleteRequest(c.Server, roleId)
 	if err != nil {
 		return nil, err
 	}
@@ -4783,6 +4899,88 @@ func NewAccountGetAvatarRequest(server string, accountHandle AccountHandleParam)
 	}
 
 	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAccountRemoveRoleRequest generates requests for AccountRemoveRole
+func NewAccountRemoveRoleRequest(server string, accountHandle AccountHandleParam, roleId RoleIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "account_handle", runtime.ParamLocationPath, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "role_id", runtime.ParamLocationPath, roleId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/accounts/%s/roles/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewAccountAddRoleRequest generates requests for AccountAddRole
+func NewAccountAddRoleRequest(server string, accountHandle AccountHandleParam, roleId RoleIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "account_handle", runtime.ParamLocationPath, accountHandle)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "role_id", runtime.ParamLocationPath, roleId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/accounts/%s/roles/%s", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("PUT", queryURL.String(), nil)
 	if err != nil {
 		return nil, err
 	}
@@ -7893,6 +8091,33 @@ func NewProfileFollowingGetRequest(server string, accountHandle AccountHandlePar
 	return req, nil
 }
 
+// NewRoleListRequest generates requests for RoleList
+func NewRoleListRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/roles")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewRoleCreateRequest calls the generic RoleCreate builder with application/json body
 func NewRoleCreateRequest(server string, body RoleCreateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
@@ -7929,6 +8154,40 @@ func NewRoleCreateRequestWithBody(server string, contentType string, body io.Rea
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewRoleDeleteRequest generates requests for RoleDelete
+func NewRoleDeleteRequest(server string, roleId RoleIDParam) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "role_id", runtime.ParamLocationPath, roleId)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/roles/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -8419,6 +8678,12 @@ type ClientWithResponsesInterface interface {
 	// AccountGetAvatarWithResponse request
 	AccountGetAvatarWithResponse(ctx context.Context, accountHandle AccountHandleParam, reqEditors ...RequestEditorFn) (*AccountGetAvatarResponse, error)
 
+	// AccountRemoveRoleWithResponse request
+	AccountRemoveRoleWithResponse(ctx context.Context, accountHandle AccountHandleParam, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*AccountRemoveRoleResponse, error)
+
+	// AccountAddRoleWithResponse request
+	AccountAddRoleWithResponse(ctx context.Context, accountHandle AccountHandleParam, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*AccountAddRoleResponse, error)
+
 	// AdminSettingsUpdateWithBodyWithResponse request with any body
 	AdminSettingsUpdateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AdminSettingsUpdateResponse, error)
 
@@ -8683,10 +8948,16 @@ type ClientWithResponsesInterface interface {
 	// ProfileFollowingGetWithResponse request
 	ProfileFollowingGetWithResponse(ctx context.Context, accountHandle AccountHandleParam, params *ProfileFollowingGetParams, reqEditors ...RequestEditorFn) (*ProfileFollowingGetResponse, error)
 
+	// RoleListWithResponse request
+	RoleListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RoleListResponse, error)
+
 	// RoleCreateWithBodyWithResponse request with any body
 	RoleCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RoleCreateResponse, error)
 
 	RoleCreateWithResponse(ctx context.Context, body RoleCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*RoleCreateResponse, error)
+
+	// RoleDeleteWithResponse request
+	RoleDeleteWithResponse(ctx context.Context, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*RoleDeleteResponse, error)
 
 	// RoleGetWithResponse request
 	RoleGetWithResponse(ctx context.Context, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*RoleGetResponse, error)
@@ -8854,6 +9125,52 @@ func (r AccountGetAvatarResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r AccountGetAvatarResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AccountRemoveRoleResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AccountUpdateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AccountRemoveRoleResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AccountRemoveRoleResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type AccountAddRoleResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *AccountUpdateOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r AccountAddRoleResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r AccountAddRoleResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -10459,6 +10776,29 @@ func (r ProfileFollowingGetResponse) StatusCode() int {
 	return 0
 }
 
+type RoleListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *RoleListOK
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RoleListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RoleListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type RoleCreateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -10476,6 +10816,28 @@ func (r RoleCreateResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r RoleCreateResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type RoleDeleteResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r RoleDeleteResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r RoleDeleteResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -10747,6 +11109,24 @@ func (c *ClientWithResponses) AccountGetAvatarWithResponse(ctx context.Context, 
 		return nil, err
 	}
 	return ParseAccountGetAvatarResponse(rsp)
+}
+
+// AccountRemoveRoleWithResponse request returning *AccountRemoveRoleResponse
+func (c *ClientWithResponses) AccountRemoveRoleWithResponse(ctx context.Context, accountHandle AccountHandleParam, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*AccountRemoveRoleResponse, error) {
+	rsp, err := c.AccountRemoveRole(ctx, accountHandle, roleId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAccountRemoveRoleResponse(rsp)
+}
+
+// AccountAddRoleWithResponse request returning *AccountAddRoleResponse
+func (c *ClientWithResponses) AccountAddRoleWithResponse(ctx context.Context, accountHandle AccountHandleParam, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*AccountAddRoleResponse, error) {
+	rsp, err := c.AccountAddRole(ctx, accountHandle, roleId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseAccountAddRoleResponse(rsp)
 }
 
 // AdminSettingsUpdateWithBodyWithResponse request with arbitrary body returning *AdminSettingsUpdateResponse
@@ -11595,6 +11975,15 @@ func (c *ClientWithResponses) ProfileFollowingGetWithResponse(ctx context.Contex
 	return ParseProfileFollowingGetResponse(rsp)
 }
 
+// RoleListWithResponse request returning *RoleListResponse
+func (c *ClientWithResponses) RoleListWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*RoleListResponse, error) {
+	rsp, err := c.RoleList(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRoleListResponse(rsp)
+}
+
 // RoleCreateWithBodyWithResponse request with arbitrary body returning *RoleCreateResponse
 func (c *ClientWithResponses) RoleCreateWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RoleCreateResponse, error) {
 	rsp, err := c.RoleCreateWithBody(ctx, contentType, body, reqEditors...)
@@ -11610,6 +11999,15 @@ func (c *ClientWithResponses) RoleCreateWithResponse(ctx context.Context, body R
 		return nil, err
 	}
 	return ParseRoleCreateResponse(rsp)
+}
+
+// RoleDeleteWithResponse request returning *RoleDeleteResponse
+func (c *ClientWithResponses) RoleDeleteWithResponse(ctx context.Context, roleId RoleIDParam, reqEditors ...RequestEditorFn) (*RoleDeleteResponse, error) {
+	rsp, err := c.RoleDelete(ctx, roleId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseRoleDeleteResponse(rsp)
 }
 
 // RoleGetWithResponse request returning *RoleGetResponse
@@ -11897,6 +12295,72 @@ func ParseAccountGetAvatarResponse(rsp *http.Response) (*AccountGetAvatarRespons
 	}
 
 	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAccountRemoveRoleResponse parses an HTTP response from a AccountRemoveRoleWithResponse call
+func ParseAccountRemoveRoleResponse(rsp *http.Response) (*AccountRemoveRoleResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AccountRemoveRoleResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AccountUpdateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseAccountAddRoleResponse parses an HTTP response from a AccountAddRoleWithResponse call
+func ParseAccountAddRoleResponse(rsp *http.Response) (*AccountAddRoleResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &AccountAddRoleResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest AccountUpdateOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest InternalServerError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -14142,6 +14606,39 @@ func ParseProfileFollowingGetResponse(rsp *http.Response) (*ProfileFollowingGetR
 	return response, nil
 }
 
+// ParseRoleListResponse parses an HTTP response from a RoleListWithResponse call
+func ParseRoleListResponse(rsp *http.Response) (*RoleListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RoleListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest RoleListOK
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseRoleCreateResponse parses an HTTP response from a RoleCreateWithResponse call
 func ParseRoleCreateResponse(rsp *http.Response) (*RoleCreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -14163,6 +14660,32 @@ func ParseRoleCreateResponse(rsp *http.Response) (*RoleCreateResponse, error) {
 		}
 		response.JSON200 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseRoleDeleteResponse parses an HTTP response from a RoleDeleteWithResponse call
+func ParseRoleDeleteResponse(rsp *http.Response) (*RoleDeleteResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &RoleDeleteResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest InternalServerError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -14479,6 +15002,12 @@ type ServerInterface interface {
 	// (GET /accounts/{account_handle}/avatar)
 	AccountGetAvatar(ctx echo.Context, accountHandle AccountHandleParam) error
 
+	// (DELETE /accounts/{account_handle}/roles/{role_id})
+	AccountRemoveRole(ctx echo.Context, accountHandle AccountHandleParam, roleId RoleIDParam) error
+
+	// (PUT /accounts/{account_handle}/roles/{role_id})
+	AccountAddRole(ctx echo.Context, accountHandle AccountHandleParam, roleId RoleIDParam) error
+
 	// (PATCH /admin)
 	AdminSettingsUpdate(ctx echo.Context) error
 
@@ -14689,8 +15218,14 @@ type ServerInterface interface {
 	// (GET /profiles/{account_handle}/following)
 	ProfileFollowingGet(ctx echo.Context, accountHandle AccountHandleParam, params ProfileFollowingGetParams) error
 
+	// (GET /roles)
+	RoleList(ctx echo.Context) error
+
 	// (POST /roles)
 	RoleCreate(ctx echo.Context) error
+
+	// (DELETE /roles/{role_id})
+	RoleDelete(ctx echo.Context, roleId RoleIDParam) error
 
 	// (GET /roles/{role_id})
 	RoleGet(ctx echo.Context, roleId RoleIDParam) error
@@ -14822,6 +15357,58 @@ func (w *ServerInterfaceWrapper) AccountGetAvatar(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.AccountGetAvatar(ctx, accountHandle)
+	return err
+}
+
+// AccountRemoveRole converts echo context to params.
+func (w *ServerInterfaceWrapper) AccountRemoveRole(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "account_handle" -------------
+	var accountHandle AccountHandleParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "account_handle", ctx.Param("account_handle"), &accountHandle, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter account_handle: %s", err))
+	}
+
+	// ------------- Path parameter "role_id" -------------
+	var roleId RoleIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "role_id", ctx.Param("role_id"), &roleId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter role_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AccountRemoveRole(ctx, accountHandle, roleId)
+	return err
+}
+
+// AccountAddRole converts echo context to params.
+func (w *ServerInterfaceWrapper) AccountAddRole(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "account_handle" -------------
+	var accountHandle AccountHandleParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "account_handle", ctx.Param("account_handle"), &accountHandle, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter account_handle: %s", err))
+	}
+
+	// ------------- Path parameter "role_id" -------------
+	var roleId RoleIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "role_id", ctx.Param("role_id"), &roleId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter role_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.AccountAddRole(ctx, accountHandle, roleId)
 	return err
 }
 
@@ -16117,6 +16704,15 @@ func (w *ServerInterfaceWrapper) ProfileFollowingGet(ctx echo.Context) error {
 	return err
 }
 
+// RoleList converts echo context to params.
+func (w *ServerInterfaceWrapper) RoleList(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RoleList(ctx)
+	return err
+}
+
 // RoleCreate converts echo context to params.
 func (w *ServerInterfaceWrapper) RoleCreate(ctx echo.Context) error {
 	var err error
@@ -16125,6 +16721,24 @@ func (w *ServerInterfaceWrapper) RoleCreate(ctx echo.Context) error {
 
 	// Invoke the callback with all the unmarshaled arguments
 	err = w.Handler.RoleCreate(ctx)
+	return err
+}
+
+// RoleDelete converts echo context to params.
+func (w *ServerInterfaceWrapper) RoleDelete(ctx echo.Context) error {
+	var err error
+	// ------------- Path parameter "role_id" -------------
+	var roleId RoleIDParam
+
+	err = runtime.BindStyledParameterWithOptions("simple", "role_id", ctx.Param("role_id"), &roleId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter role_id: %s", err))
+	}
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.RoleDelete(ctx, roleId)
 	return err
 }
 
@@ -16334,6 +16948,8 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.DELETE(baseURL+"/accounts/self/auth-methods/:auth_method_id", wrapper.AccountAuthMethodDelete)
 	router.POST(baseURL+"/accounts/self/avatar", wrapper.AccountSetAvatar)
 	router.GET(baseURL+"/accounts/:account_handle/avatar", wrapper.AccountGetAvatar)
+	router.DELETE(baseURL+"/accounts/:account_handle/roles/:role_id", wrapper.AccountRemoveRole)
+	router.PUT(baseURL+"/accounts/:account_handle/roles/:role_id", wrapper.AccountAddRole)
 	router.PATCH(baseURL+"/admin", wrapper.AdminSettingsUpdate)
 	router.DELETE(baseURL+"/admin/bans/:account_handle", wrapper.AdminAccountBanRemove)
 	router.POST(baseURL+"/admin/bans/:account_handle", wrapper.AdminAccountBanCreate)
@@ -16404,7 +17020,9 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.GET(baseURL+"/profiles/:account_handle/followers", wrapper.ProfileFollowersGet)
 	router.PUT(baseURL+"/profiles/:account_handle/followers", wrapper.ProfileFollowersAdd)
 	router.GET(baseURL+"/profiles/:account_handle/following", wrapper.ProfileFollowingGet)
+	router.GET(baseURL+"/roles", wrapper.RoleList)
 	router.POST(baseURL+"/roles", wrapper.RoleCreate)
+	router.DELETE(baseURL+"/roles/:role_id", wrapper.RoleDelete)
 	router.GET(baseURL+"/roles/:role_id", wrapper.RoleGet)
 	router.PATCH(baseURL+"/roles/:role_id", wrapper.RoleUpdate)
 	router.GET(baseURL+"/threads", wrapper.ThreadList)
@@ -16544,6 +17162,8 @@ type ReplyCreateOKJSONResponse Reply
 type RoleCreateOKJSONResponse Role
 
 type RoleGetOKJSONResponse Role
+
+type RoleListOKJSONResponse RoleListResult
 
 type ThreadCreateOKJSONResponse Thread
 
@@ -16823,6 +17443,94 @@ type AccountGetAvatardefaultJSONResponse struct {
 }
 
 func (response AccountGetAvatardefaultJSONResponse) VisitAccountGetAvatarResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AccountRemoveRoleRequestObject struct {
+	AccountHandle AccountHandleParam `json:"account_handle"`
+	RoleId        RoleIDParam        `json:"role_id"`
+}
+
+type AccountRemoveRoleResponseObject interface {
+	VisitAccountRemoveRoleResponse(w http.ResponseWriter) error
+}
+
+type AccountRemoveRole200JSONResponse struct{ AccountUpdateOKJSONResponse }
+
+func (response AccountRemoveRole200JSONResponse) VisitAccountRemoveRoleResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AccountRemoveRole401Response = UnauthorisedResponse
+
+func (response AccountRemoveRole401Response) VisitAccountRemoveRoleResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type AccountRemoveRole404Response = NotFoundResponse
+
+func (response AccountRemoveRole404Response) VisitAccountRemoveRoleResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type AccountRemoveRoledefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AccountRemoveRoledefaultJSONResponse) VisitAccountRemoveRoleResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type AccountAddRoleRequestObject struct {
+	AccountHandle AccountHandleParam `json:"account_handle"`
+	RoleId        RoleIDParam        `json:"role_id"`
+}
+
+type AccountAddRoleResponseObject interface {
+	VisitAccountAddRoleResponse(w http.ResponseWriter) error
+}
+
+type AccountAddRole200JSONResponse struct{ AccountUpdateOKJSONResponse }
+
+func (response AccountAddRole200JSONResponse) VisitAccountAddRoleResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type AccountAddRole401Response = UnauthorisedResponse
+
+func (response AccountAddRole401Response) VisitAccountAddRoleResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type AccountAddRole404Response = NotFoundResponse
+
+func (response AccountAddRole404Response) VisitAccountAddRoleResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type AccountAddRoledefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response AccountAddRoledefaultJSONResponse) VisitAccountAddRoleResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -19719,6 +20427,34 @@ func (response ProfileFollowingGetdefaultJSONResponse) VisitProfileFollowingGetR
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type RoleListRequestObject struct {
+}
+
+type RoleListResponseObject interface {
+	VisitRoleListResponse(w http.ResponseWriter) error
+}
+
+type RoleList200JSONResponse struct{ RoleListOKJSONResponse }
+
+func (response RoleList200JSONResponse) VisitRoleListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type RoleListdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RoleListdefaultJSONResponse) VisitRoleListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type RoleCreateRequestObject struct {
 	Body *RoleCreateJSONRequestBody
 }
@@ -19756,6 +20492,48 @@ type RoleCreatedefaultJSONResponse struct {
 }
 
 func (response RoleCreatedefaultJSONResponse) VisitRoleCreateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type RoleDeleteRequestObject struct {
+	RoleId RoleIDParam `json:"role_id"`
+}
+
+type RoleDeleteResponseObject interface {
+	VisitRoleDeleteResponse(w http.ResponseWriter) error
+}
+
+type RoleDelete200Response struct {
+}
+
+func (response RoleDelete200Response) VisitRoleDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type RoleDelete401Response = UnauthorisedResponse
+
+func (response RoleDelete401Response) VisitRoleDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type RoleDelete404Response = NotFoundResponse
+
+func (response RoleDelete404Response) VisitRoleDeleteResponse(w http.ResponseWriter) error {
+	w.WriteHeader(404)
+	return nil
+}
+
+type RoleDeletedefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response RoleDeletedefaultJSONResponse) VisitRoleDeleteResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(response.StatusCode)
 
@@ -20158,6 +20936,12 @@ type StrictServerInterface interface {
 	// (GET /accounts/{account_handle}/avatar)
 	AccountGetAvatar(ctx context.Context, request AccountGetAvatarRequestObject) (AccountGetAvatarResponseObject, error)
 
+	// (DELETE /accounts/{account_handle}/roles/{role_id})
+	AccountRemoveRole(ctx context.Context, request AccountRemoveRoleRequestObject) (AccountRemoveRoleResponseObject, error)
+
+	// (PUT /accounts/{account_handle}/roles/{role_id})
+	AccountAddRole(ctx context.Context, request AccountAddRoleRequestObject) (AccountAddRoleResponseObject, error)
+
 	// (PATCH /admin)
 	AdminSettingsUpdate(ctx context.Context, request AdminSettingsUpdateRequestObject) (AdminSettingsUpdateResponseObject, error)
 
@@ -20368,8 +21152,14 @@ type StrictServerInterface interface {
 	// (GET /profiles/{account_handle}/following)
 	ProfileFollowingGet(ctx context.Context, request ProfileFollowingGetRequestObject) (ProfileFollowingGetResponseObject, error)
 
+	// (GET /roles)
+	RoleList(ctx context.Context, request RoleListRequestObject) (RoleListResponseObject, error)
+
 	// (POST /roles)
 	RoleCreate(ctx context.Context, request RoleCreateRequestObject) (RoleCreateResponseObject, error)
+
+	// (DELETE /roles/{role_id})
+	RoleDelete(ctx context.Context, request RoleDeleteRequestObject) (RoleDeleteResponseObject, error)
 
 	// (GET /roles/{role_id})
 	RoleGet(ctx context.Context, request RoleGetRequestObject) (RoleGetResponseObject, error)
@@ -20557,6 +21347,58 @@ func (sh *strictHandler) AccountGetAvatar(ctx echo.Context, accountHandle Accoun
 		return err
 	} else if validResponse, ok := response.(AccountGetAvatarResponseObject); ok {
 		return validResponse.VisitAccountGetAvatarResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AccountRemoveRole operation middleware
+func (sh *strictHandler) AccountRemoveRole(ctx echo.Context, accountHandle AccountHandleParam, roleId RoleIDParam) error {
+	var request AccountRemoveRoleRequestObject
+
+	request.AccountHandle = accountHandle
+	request.RoleId = roleId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AccountRemoveRole(ctx.Request().Context(), request.(AccountRemoveRoleRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AccountRemoveRole")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AccountRemoveRoleResponseObject); ok {
+		return validResponse.VisitAccountRemoveRoleResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// AccountAddRole operation middleware
+func (sh *strictHandler) AccountAddRole(ctx echo.Context, accountHandle AccountHandleParam, roleId RoleIDParam) error {
+	var request AccountAddRoleRequestObject
+
+	request.AccountHandle = accountHandle
+	request.RoleId = roleId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.AccountAddRole(ctx.Request().Context(), request.(AccountAddRoleRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "AccountAddRole")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(AccountAddRoleResponseObject); ok {
+		return validResponse.VisitAccountAddRoleResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
@@ -22446,6 +23288,29 @@ func (sh *strictHandler) ProfileFollowingGet(ctx echo.Context, accountHandle Acc
 	return nil
 }
 
+// RoleList operation middleware
+func (sh *strictHandler) RoleList(ctx echo.Context) error {
+	var request RoleListRequestObject
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RoleList(ctx.Request().Context(), request.(RoleListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RoleList")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RoleListResponseObject); ok {
+		return validResponse.VisitRoleListResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
 // RoleCreate operation middleware
 func (sh *strictHandler) RoleCreate(ctx echo.Context) error {
 	var request RoleCreateRequestObject
@@ -22469,6 +23334,31 @@ func (sh *strictHandler) RoleCreate(ctx echo.Context) error {
 		return err
 	} else if validResponse, ok := response.(RoleCreateResponseObject); ok {
 		return validResponse.VisitRoleCreateResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// RoleDelete operation middleware
+func (sh *strictHandler) RoleDelete(ctx echo.Context, roleId RoleIDParam) error {
+	var request RoleDeleteRequestObject
+
+	request.RoleId = roleId
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.RoleDelete(ctx.Request().Context(), request.(RoleDeleteRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RoleDelete")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(RoleDeleteResponseObject); ok {
+		return validResponse.VisitRoleDeleteResponse(ctx.Response())
 	} else if response != nil {
 		return fmt.Errorf("unexpected response type: %T", response)
 	}
@@ -22723,272 +23613,279 @@ func (sh *strictHandler) GetVersion(ctx echo.Context) error {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
