@@ -30,7 +30,6 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
       maxW="prose"
       borderRadius="2xl"
       bgColor={complete ? "green.3" : "gray.2"}
-      color="gray.8"
     >
       <HStack w="full" gap="2">
         <Box>
@@ -56,21 +55,11 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
             {!complete &&
               isCurrent &&
               (props.url ? (
-                <LinkButton
-                  href={props.url}
-                  bgColor="green.3"
-                  color="gray.8"
-                  size="xs"
-                >
+                <LinkButton href={props.url} colorPalette="green" size="xs">
                   Complete
                 </LinkButton>
               ) : (
-                <Button
-                  bgColor="green.3"
-                  color="gray.8"
-                  size="xs"
-                  onClick={props.onClick}
-                >
+                <Button colorPalette="green" size="xs" onClick={props.onClick}>
                   Complete
                 </Button>
               ))}
