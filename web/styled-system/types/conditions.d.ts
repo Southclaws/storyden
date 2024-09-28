@@ -124,7 +124,7 @@ export interface Conditions {
 	"_required": string
 	/** `&:is(:valid, [data-valid])` */
 	"_valid": string
-	/** `&:is(:invalid, [data-invalid])` */
+	/** `&:is([aria-invalid])` */
 	"_invalid": string
 	/** `&:autofill` */
 	"_autofill": string
