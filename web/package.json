@@ -53,7 +53,7 @@
     "ts-pattern": "^5.4.0",
     "unified": "^11.0.5",
     "usehooks-ts": "^3.1.0",
-    "vaul": "^0.9.9",
+    "vaul": "^1.0.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -65,7 +65,7 @@
     "@types/chroma-js": "^2.4.4",
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.9",
-    "@types/node": "^20.16.10",
+    "@types/node": "^22.7.4",
     "@types/react": "^18.3.10",
     "@types/react-avatar-editor": "^13.0.3",
     "@typescript-eslint/eslint-plugin": "^8.7.0",
