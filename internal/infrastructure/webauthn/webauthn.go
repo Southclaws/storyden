@@ -13,7 +13,7 @@ func New(cfg config.Config) (*webauthn.WebAuthn, error) {
 	wa, err := webauthn.New(&webauthn.Config{
 		RPDisplayName:         "Storyden",
 		RPID:                  cfg.PublicWebAddress.Host,
-		RPOrigin:              cfg.PublicWebAddress.String(),
+		RPOrigins:             []string{cfg.PublicWebAddress.String()},
 		AttestationPreference: protocol.PreferIndirectAttestation,
 	})
 	if err != nil {

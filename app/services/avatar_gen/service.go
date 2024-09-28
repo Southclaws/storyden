@@ -7,8 +7,8 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/lucasb-eyer/go-colorful"
 	"github.com/mazznoer/colorgrad"
+	"github.com/mazznoer/csscolorparser"
 )
 
 type AvatarGenerator interface {
@@ -21,12 +21,12 @@ func New() AvatarGenerator {
 
 type service struct{}
 
-var start = colorful.Hsl(216.0, 0.1, 0.2)
+var start = csscolorparser.FromHsl(216.0, 0.1, 0.2, 1.0)
 
 func (s *service) Generate(ctx context.Context, handle string) (image.Image, error) {
 	hash := hashfunction(handle)
 
-	c2 := colorful.Hsl(float64(hash), 0.69, 0.4)
+	c2 := csscolorparser.FromHsl(float64(hash), 0.69, 0.4, 1.0)
 
 	grad, err := colorgrad.
 		NewGradient().
