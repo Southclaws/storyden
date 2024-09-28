@@ -35,6 +35,7 @@ require (
 	github.com/ThreeDotsLabs/watermill-amqp/v2 v2.1.2
 	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
 	github.com/cixtor/readability v1.0.0
+	github.com/dave/jennifer v1.7.1
 	github.com/dboslee/lru v0.0.1
 	github.com/disintegration/imaging v1.6.2
 	github.com/dustinkirkland/golang-petname v0.0.0-20240428194347-eebcea082ee0
@@ -45,7 +46,6 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/k3a/html2text v1.2.1
 	github.com/klippa-app/go-pdfium v1.12.2
-	github.com/kr/pretty v0.3.1
 	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/mazznoer/colorgrad v0.9.1
@@ -79,7 +79,6 @@ require (
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
-	github.com/dave/jennifer v1.7.1 // indirect
 	github.com/dprotaso/go-yit v0.0.0-20240618133044-5a0af90af097 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
@@ -108,7 +107,6 @@ require (
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20180606194806-57d518f124b0 // indirect
 	github.com/jolestar/go-commons-pool/v2 v2.1.2 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
 	github.com/mattn/go-runewidth v0.0.14 // indirect
 	github.com/mazznoer/csscolorparser v0.1.3 // indirect
@@ -119,7 +117,6 @@ require (
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/rabbitmq/amqp091-go v1.9.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
