@@ -86,14 +86,6 @@ func (rc *RoleCreate) SetSortKey(f float64) *RoleCreate {
 	return rc
 }
 
-// SetNillableSortKey sets the "sort_key" field if the given value is not nil.
-func (rc *RoleCreate) SetNillableSortKey(f *float64) *RoleCreate {
-	if f != nil {
-		rc.SetSortKey(*f)
-	}
-	return rc
-}
-
 // SetID sets the "id" field.
 func (rc *RoleCreate) SetID(x xid.ID) *RoleCreate {
 	rc.mutation.SetID(x)
@@ -184,10 +176,6 @@ func (rc *RoleCreate) defaults() {
 	if _, ok := rc.mutation.Colour(); !ok {
 		v := role.DefaultColour
 		rc.mutation.SetColour(v)
-	}
-	if _, ok := rc.mutation.SortKey(); !ok {
-		v := role.DefaultSortKey
-		rc.mutation.SetSortKey(v)
 	}
 	if _, ok := rc.mutation.ID(); !ok {
 		v := role.DefaultID()
