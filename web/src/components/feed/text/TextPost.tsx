@@ -30,7 +30,7 @@ export function TextPost({ thread, onDelete }: Props) {
         session && (
           <HStack>
             <CollectionMenu thread={thread} />
-            <FeedItemMenu thread={thread} onDelete={onDelete} />
+            <FeedItemMenu thread={thread} />
           </HStack>
         )
       }

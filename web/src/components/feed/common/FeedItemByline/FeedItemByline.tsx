@@ -9,7 +9,6 @@ import { FeedItemMenu } from "../FeedItemMenu/FeedItemMenu";
 
 type Props = {
   thread: ThreadReference;
-  onDelete?: () => void;
 };
 
 export function FeedItemByline(props: Props) {
@@ -27,9 +26,7 @@ export function FeedItemByline(props: Props) {
 
       <HStack>
         {session && <CollectionMenu thread={props.thread} />}
-        {props.onDelete && (
-          <FeedItemMenu thread={props.thread} onDelete={props.onDelete} />
-        )}
+        <FeedItemMenu thread={props.thread} />
       </HStack>
     </Flex>
   );

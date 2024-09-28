@@ -6,18 +6,18 @@ import { styled } from "@/styled-system/jsx";
 import { TextPost } from "./TextPost";
 
 type Props = {
-  posts: ThreadReference[];
+  threads: ThreadReference[];
   onDelete?: (id: string) => void;
 };
 
 export function TextPostList(props: Props) {
-  if (props.posts.length === 0) {
+  if (props.threads.length === 0) {
     return <EmptyState />;
   }
 
   return (
     <styled.ol width="full" display="flex" flexDirection="column" gap="3">
-      {props.posts.map((t) => (
+      {props.threads.map((t) => (
         <TextPost
           key={t.id}
           thread={t}
