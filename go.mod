@@ -46,9 +46,9 @@ require (
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/k3a/html2text v1.2.1
 	github.com/klippa-app/go-pdfium v1.12.3
-	github.com/lucasb-eyer/go-colorful v1.2.0
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/mazznoer/colorgrad v0.10.0
+	github.com/mazznoer/csscolorparser v0.1.5
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/mileusna/useragent v1.3.5
 	github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d
@@ -73,7 +73,6 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
 	github.com/andybalholm/cascadia v1.3.2 // indirect
-	github.com/aokoli/goutils v1.1.1 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
@@ -110,7 +109,6 @@ require (
 	github.com/jolestar/go-commons-pool/v2 v2.1.2 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
-	github.com/mazznoer/csscolorparser v0.1.5 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
@@ -168,7 +166,6 @@ require (
 	github.com/go-resty/resty/v2 v2.15.3
 	github.com/go-webauthn/webauthn v0.11.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
-	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1 // indirect
