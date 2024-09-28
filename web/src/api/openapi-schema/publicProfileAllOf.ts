@@ -10,6 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { AccountBio } from "./accountBio";
 import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
+import type { AccountRoleList } from "./accountRoleList";
 import type { LikeScore } from "./likeScore";
 import type { Metadata } from "./metadata";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
@@ -29,4 +30,5 @@ export type PublicProfileAllOf = {
   links: ProfileExternalLinkList;
   meta: Metadata;
   name: AccountName;
+  roles: AccountRoleList;
 };

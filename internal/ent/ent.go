@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/accountfollow"
+	"github.com/Southclaws/storyden/internal/ent/accountroles"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/category"
@@ -93,6 +94,7 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			account.Table:        account.ValidColumn,
 			accountfollow.Table:  accountfollow.ValidColumn,
+			accountroles.Table:   accountroles.ValidColumn,
 			asset.Table:          asset.ValidColumn,
 			authentication.Table: authentication.ValidColumn,
 			category.Table:       category.ValidColumn,

@@ -63,6 +63,8 @@ const (
 	EdgeNodes = "nodes"
 	// EdgeAssets holds the string denoting the assets edge name in mutations.
 	EdgeAssets = "assets"
+	// EdgeAccountRoles holds the string denoting the account_roles edge name in mutations.
+	EdgeAccountRoles = "account_roles"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
 	// EmailsTable is the table that holds the emails relation/edge.
@@ -129,7 +131,7 @@ const (
 	// MentionsColumn is the table column denoting the mentions relation/edge.
 	MentionsColumn = "account_id"
 	// RolesTable is the table that holds the roles relation/edge. The primary key declared below.
-	RolesTable = "role_accounts"
+	RolesTable = "account_roles"
 	// RolesInverseTable is the table name for the Role entity.
 	// It exists in this package in order to avoid circular dependency with the "role" package.
 	RolesInverseTable = "roles"
@@ -166,6 +168,13 @@ const (
 	AssetsInverseTable = "assets"
 	// AssetsColumn is the table column denoting the assets relation/edge.
 	AssetsColumn = "account_id"
+	// AccountRolesTable is the table that holds the account_roles relation/edge.
+	AccountRolesTable = "account_roles"
+	// AccountRolesInverseTable is the table name for the AccountRoles entity.
+	// It exists in this package in order to avoid circular dependency with the "accountroles" package.
+	AccountRolesInverseTable = "account_roles"
+	// AccountRolesColumn is the table column denoting the account_roles relation/edge.
+	AccountRolesColumn = "account_id"
 )
 
 // Columns holds all SQL columns for account fields.
@@ -472,6 +481,20 @@ func ByAssets(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAssetsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByAccountRolesCount orders the results by account_roles count.
+func ByAccountRolesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAccountRolesStep(), opts...)
+	}
+}
+
+// ByAccountRoles orders the results by account_roles terms.
+func ByAccountRoles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAccountRolesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newEmailsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -575,5 +598,12 @@ func newAssetsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AssetsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AssetsTable, AssetsColumn),
+	)
+}
+func newAccountRolesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AccountRolesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, AccountRolesTable, AccountRolesColumn),
 	)
 }

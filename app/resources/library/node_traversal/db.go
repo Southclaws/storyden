@@ -41,7 +41,7 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, err
 	query := d.db.Node.Query().
 		Where(node.ParentNodeIDIsNil()).
 		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithAssets()
 

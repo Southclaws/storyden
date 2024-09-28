@@ -7,12 +7,15 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
 	"github.com/Southclaws/storyden/app/services/account/account_auth"
 	"github.com/Southclaws/storyden/app/services/account/account_update"
 	"github.com/Southclaws/storyden/app/services/authentication"
@@ -27,6 +30,7 @@ type Accounts struct {
 	accountQuery  *account_querier.Querier
 	accountUpdate account_update.Updater
 	accountAuth   account_auth.Manager
+	roleAssign    *role_assign.Assignment
 }
 
 func NewAccounts(
@@ -35,15 +39,22 @@ func NewAccounts(
 	accountQuery *account_querier.Querier,
 	accountUpdate account_update.Updater,
 	accountAuth account_auth.Manager,
+	roleAssign *role_assign.Assignment,
 ) Accounts {
 	return Accounts{
-		avatarService,
-		authManager,
-		accountQuery,
-		accountUpdate,
-		accountAuth,
+		avatarService: avatarService,
+		authManager:   authManager,
+		accountQuery:  accountQuery,
+		accountUpdate: accountUpdate,
+		accountAuth:   accountAuth,
+		roleAssign:    roleAssign,
 	}
 }
+
+var (
+	ErrSelfAdminRoleChange = fault.New("cannot change own admin role", ftag.With(ftag.InvalidArgument), fmsg.WithDesc("admin role", "You cannot change your own admin role."))
+	ErrEveryoneRole        = fault.New("cannot change default role", ftag.With(ftag.InvalidArgument), fmsg.WithDesc("default role", "You cannot change the default role."))
+)
 
 func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetRequestObject) (openapi.AccountGetResponseObject, error) {
 	accountID, err := session.GetAccountID(ctx)
@@ -203,6 +214,80 @@ func (i *Accounts) AccountSetAvatar(ctx context.Context, request openapi.Account
 	}
 
 	return openapi.AccountSetAvatar200Response{}, nil
+}
+
+func (h *Accounts) AccountRemoveRole(ctx context.Context, request openapi.AccountRemoveRoleRequestObject) (openapi.AccountRemoveRoleResponseObject, error) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, found, err := h.accountQuery.LookupByHandle(ctx, request.AccountHandle)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !found {
+		return nil, fault.New("account not found", fctx.With(ctx), ftag.With(ftag.NotFound))
+	}
+
+	roleID := role.RoleID(openapi.ParseID(request.RoleId))
+
+	if accountID == acc.ID {
+		// Updating self roles
+		if roleID == role.DefaultRoleAdminID {
+			return nil, fault.Wrap(ErrSelfAdminRoleChange, fctx.With(ctx))
+		}
+	}
+	if roleID == role.DefaultRoleEveryoneID {
+		return nil, fault.Wrap(ErrEveryoneRole, fctx.With(ctx))
+	}
+
+	acc, err = h.roleAssign.UpdateRoles(ctx, acc.ID, role_assign.Remove(roleID))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountRemoveRole200JSONResponse{
+		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(acc)),
+	}, nil
+}
+
+func (h *Accounts) AccountAddRole(ctx context.Context, request openapi.AccountAddRoleRequestObject) (openapi.AccountAddRoleResponseObject, error) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, found, err := h.accountQuery.LookupByHandle(ctx, request.AccountHandle)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !found {
+		return nil, fault.New("account not found", fctx.With(ctx), ftag.With(ftag.NotFound))
+	}
+
+	roleID := role.RoleID(openapi.ParseID(request.RoleId))
+
+	if accountID == acc.ID {
+		// Updating self roles
+		if roleID == role.DefaultRoleAdminID {
+			return nil, fault.Wrap(ErrSelfAdminRoleChange, fctx.With(ctx))
+		}
+	}
+	if roleID == role.DefaultRoleEveryoneID {
+		return nil, fault.Wrap(ErrEveryoneRole, fctx.With(ctx))
+	}
+
+	acc, err = h.roleAssign.UpdateRoles(ctx, acc.ID, role_assign.Add(roleID))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountAddRole200JSONResponse{
+		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(acc)),
+	}, nil
 }
 
 func serialiseAuthMethod(in *account_auth.AuthMethod) (openapi.AccountAuthMethod, error) {

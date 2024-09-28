@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -20,11 +21,14 @@ func (Role) Fields() []ent.Field {
 			Unique(),
 		field.String("colour").Default("hsl(157, 65%, 44%)"),
 		field.Strings("permissions"),
+		field.Float("sort_key").Default(0),
 	}
 }
 
 func (Role) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("accounts", Account.Type),
+		edge.To("accounts", Account.Type).
+			Through("account_roles", AccountRoles.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 	}
 }

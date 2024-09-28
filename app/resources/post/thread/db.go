@@ -102,7 +102,7 @@ func (d *database) Create(
 		Query().
 		Where(ent_post.IDEQ(p.ID)).
 		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithCategory().
 		WithTags().
@@ -154,7 +154,7 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 		Query().
 		Where(ent_post.IDEQ(xid.ID(id))).
 		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithCategory().
 		WithTags().
@@ -217,14 +217,14 @@ func (d *database) List(
 	query.
 		WithCategory().
 		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithAssets(func(aq *ent.AssetQuery) {
 			aq.Order(asset.ByUpdatedAt(), asset.ByCreatedAt())
 		}).
 		WithCollections(func(cq *ent.CollectionQuery) {
 			cq.WithOwner(func(aq *ent.AccountQuery) {
-				aq.WithRoles()
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 			}).Order(collection.ByUpdatedAt(), collection.ByCreatedAt())
 		}).
 		WithLink(func(lq *ent.LinkQuery) {
@@ -315,12 +315,12 @@ func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Opti
 				).
 				WithReplyTo(func(pq *ent.PostQuery) {
 					pq.WithAuthor(func(aq *ent.AccountQuery) {
-						aq.WithRoles()
+						aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 					})
 				}).
 				WithReacts().
 				WithAuthor(func(aq *ent.AccountQuery) {
-					aq.WithRoles()
+					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 				}).
 				WithAssets().
 				WithLink(func(lq *ent.LinkQuery) {
@@ -330,7 +330,7 @@ func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Opti
 				Order(ent.Asc(ent_post.FieldCreatedAt))
 		}).
 		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithCategory().
 		WithTags(func(tq *ent.TagQuery) {

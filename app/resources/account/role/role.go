@@ -1,6 +1,8 @@
 package role
 
 import (
+	"sort"
+
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 
@@ -19,9 +21,14 @@ type Role struct {
 	Name        string
 	Colour      string
 	Permissions rbac.Permissions
+	SortKey     float64
 }
 
 type Roles []*Role
+
+func (a Roles) Len() int           { return len(a) }
+func (a Roles) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a Roles) Less(i, j int) bool { return a[i].SortKey < a[j].SortKey }
 
 func (r Roles) Permissions() rbac.Permissions {
 	set := map[rbac.Permission]bool{}
@@ -37,28 +44,27 @@ func (r Roles) Permissions() rbac.Permissions {
 	return rbac.NewList(flat...)
 }
 
-func Map(in []*ent.Role, admin bool) (Roles, error) {
-	mapped, err := dt.MapErr(in, func(r *ent.Role) (*Role, error) {
-		perms, err := rbac.NewPermissions(r.Permissions)
-		if err != nil {
-			return nil, err
-		}
+func Map(r *ent.Role) (*Role, error) {
+	perms, err := rbac.NewPermissions(r.Permissions)
+	if err != nil {
+		return nil, err
+	}
 
-		return &Role{
-			ID:          RoleID(r.ID),
-			Name:        r.Name,
-			Colour:      r.Colour,
-			Permissions: *perms,
-		}, nil
-	})
+	return &Role{
+		ID:          RoleID(r.ID),
+		Name:        r.Name,
+		Colour:      r.Colour,
+		Permissions: *perms,
+	}, nil
+}
+
+func MapList(in []*ent.Role) (Roles, error) {
+	mapped, err := dt.MapErr(in, Map)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	mapped = append(mapped, &DefaultRoleEveryone)
-	if admin {
-		mapped = append(mapped, &DefaultRoleAdmin)
-	}
+	sort.Sort(Roles(mapped))
 
 	return mapped, nil
 }

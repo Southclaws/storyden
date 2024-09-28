@@ -151,13 +151,13 @@ func (d *database) ProbeItem(ctx context.Context, id CollectionID, itemID xid.ID
 	r, err := d.db.Collection.Query().
 		Where(collection.ID(xid.ID(id))).
 		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithCollectionPosts(func(cnq *ent.CollectionPostQuery) {
 			cnq.Where(collectionpost.PostID(itemID)).
 				WithPost(func(pq *ent.PostQuery) {
 					pq.WithAuthor(func(aq *ent.AccountQuery) {
-						aq.WithRoles()
+						aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 					})
 				})
 		}).
@@ -165,7 +165,7 @@ func (d *database) ProbeItem(ctx context.Context, id CollectionID, itemID xid.ID
 			cnq.Where(collectionnode.NodeID(itemID)).
 				WithNode(func(nq *ent.NodeQuery) {
 					nq.WithOwner(func(aq *ent.AccountQuery) {
-						aq.WithRoles()
+						aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 					})
 				})
 		}).

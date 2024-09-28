@@ -11,6 +11,7 @@ import type { AccountBio } from "./accountBio";
 import type { AccountEmailAddressList } from "./accountEmailAddressList";
 import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
+import type { AccountRoleList } from "./accountRoleList";
 import type { AccountVerifiedStatus } from "./accountVerifiedStatus";
 import type { Metadata } from "./metadata";
 import type { NotificationCount } from "./notificationCount";
@@ -27,5 +28,6 @@ export interface AccountCommonProps {
   meta: Metadata;
   name: AccountName;
   notifications?: NotificationCount;
+  roles: AccountRoleList;
   verified_status: AccountVerifiedStatus;
 }
