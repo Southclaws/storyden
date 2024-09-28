@@ -25,7 +25,8 @@ func Test_service_Generate(t *testing.T) {
 		panic(err.Error())
 	}
 	defer file.Close()
-	png.Encode(file, img)
+	err = png.Encode(file, img)
+	r.NoError(err)
 }
 
 func Test_hashfunction(t *testing.T) {
