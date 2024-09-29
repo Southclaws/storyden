@@ -9,6 +9,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
@@ -252,4 +253,8 @@ func deserialiseVisibilityList(in []openapi.Visibility) ([]visibility.Visibility
 	}
 
 	return v, nil
+}
+
+func deserialiseMark(s string) mark.Queryable {
+	return mark.NewQueryKey(s)
 }

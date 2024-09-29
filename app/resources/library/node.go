@@ -30,12 +30,11 @@ func NodeIDFromString(id string) (NodeID, error) {
 func (i NodeID) String() string { return xid.ID(i).String() }
 
 type Node struct {
-	ID        NodeID
+	Mark      Mark
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
 	Name           string
-	Slug           string
 	Assets         []*asset.Asset
 	WebLink        opt.Optional[link_ref.LinkRef]
 	Content        opt.Optional[datagraph.Content]
@@ -51,10 +50,10 @@ type Node struct {
 
 func (*Node) GetResourceName() string { return "node" }
 
-func (c *Node) GetID() xid.ID           { return xid.ID(c.ID) }
+func (c *Node) GetID() xid.ID           { return c.Mark.ID() }
 func (c *Node) GetKind() datagraph.Kind { return datagraph.KindNode }
 func (c *Node) GetName() string         { return c.Name }
-func (c *Node) GetSlug() string         { return c.Slug }
+func (c *Node) GetSlug() string         { return c.Mark.Slug() }
 func (c *Node) GetDesc() string {
 	if d, ok := c.Description.Get(); ok && d != "" {
 		return d

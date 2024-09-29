@@ -37,8 +37,8 @@ type Manager interface {
 		p Partial,
 	) (*library.Node, error)
 
-	Update(ctx context.Context, slug library.NodeSlug, p Partial) (*library.Node, error)
-	Delete(ctx context.Context, slug library.NodeSlug, d DeleteOptions) (*library.Node, error)
+	Update(ctx context.Context, slug library.QueryKey, p Partial) (*library.Node, error)
+	Delete(ctx context.Context, slug library.QueryKey, d DeleteOptions) (*library.Node, error)
 }
 
 type Partial struct {
@@ -46,7 +46,7 @@ type Partial struct {
 	Slug         opt.Optional[string]
 	URL          opt.Optional[url.URL]
 	Content      opt.Optional[datagraph.Content]
-	Parent       opt.Optional[library.NodeSlug]
+	Parent       opt.Optional[library.QueryKey]
 	Visibility   opt.Optional[visibility.Visibility]
 	Metadata     opt.Optional[map[string]any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
@@ -56,7 +56,7 @@ type Partial struct {
 }
 
 type DeleteOptions struct {
-	NewParent opt.Optional[library.NodeSlug]
+	NewParent opt.Optional[library.QueryKey]
 }
 
 func (p Partial) Opts() (opts []library.Option) {
@@ -151,7 +151,7 @@ func (s *service) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: n.ID}); err != nil {
+	if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: library.NodeID(n.Mark.ID())}); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -160,7 +160,7 @@ func (s *service) Create(ctx context.Context,
 	return n, nil
 }
 
-func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) (*library.Node, error) {
+func (s *service) Update(ctx context.Context, qk library.QueryKey, p Partial) (*library.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -171,7 +171,7 @@ func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := s.nr.Get(ctx, slug)
+	n, err := s.nr.Get(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -219,12 +219,12 @@ func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) 
 		}
 	}
 
-	n, err = s.nr.Update(ctx, n.ID, opts...)
+	n, err = s.nr.Update(ctx, qk, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: n.ID}); err != nil {
+	if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: library.NodeID(n.Mark.ID())}); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -233,7 +233,7 @@ func (s *service) Update(ctx context.Context, slug library.NodeSlug, p Partial) 
 	return n, nil
 }
 
-func (s *service) Delete(ctx context.Context, slug library.NodeSlug, d DeleteOptions) (*library.Node, error) {
+func (s *service) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptions) (*library.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -244,7 +244,7 @@ func (s *service) Delete(ctx context.Context, slug library.NodeSlug, d DeleteOpt
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := s.nr.Get(ctx, slug)
+	n, err := s.nr.Get(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -253,8 +253,8 @@ func (s *service) Delete(ctx context.Context, slug library.NodeSlug, d DeleteOpt
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	destination, err := opt.MapErr(d.NewParent, func(target library.NodeSlug) (library.Node, error) {
-		destination, err := s.nc.Move(ctx, slug, target)
+	destination, err := opt.MapErr(d.NewParent, func(target library.QueryKey) (library.Node, error) {
+		destination, err := s.nc.Move(ctx, qk, target)
 		if err != nil {
 			return library.Node{}, fault.Wrap(err, fctx.With(ctx))
 		}
@@ -265,7 +265,7 @@ func (s *service) Delete(ctx context.Context, slug library.NodeSlug, d DeleteOpt
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = s.nr.Delete(ctx, slug)
+	err = s.nr.Delete(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -282,7 +282,7 @@ func (s *service) applyOpts(ctx context.Context, p Partial) ([]library.Option, e
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		opts = append(opts, library.WithParent(parent.ID))
+		opts = append(opts, library.WithParent(library.NodeID(parent.Mark.ID())))
 	}
 
 	return opts, nil

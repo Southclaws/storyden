@@ -59,11 +59,10 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 	})
 
 	return &Node{
-		ID:          NodeID(c.ID),
+		Mark:        NewMark(c.ID, c.Slug),
 		CreatedAt:   c.CreatedAt,
 		UpdatedAt:   c.UpdatedAt,
 		Name:        c.Name,
-		Slug:        c.Slug,
 		Assets:      assets,
 		WebLink:     link,
 		Content:     richContent,

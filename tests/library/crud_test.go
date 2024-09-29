@@ -94,6 +94,24 @@ func TestNodesHappyPath(t *testing.T) {
 			r.NotNil(node1update.JSON200.Link)
 			a.Equal(url1, node1update.JSON200.Link.Url)
 			a.Equal(prop1, node1update.JSON200.Meta)
+
+			t.Run("empty_slug", func(t *testing.T) {
+				name2 := "Testing Node Number Two" + uuid.NewString()
+				slug2 := ""
+				node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+					Name:       name2,
+					Slug:       &slug2,
+					Visibility: &visibility,
+				}, e2e.WithSession(ctx, cj))
+				tests.Ok(t, err, node2)
+
+				a.Equal(name2, node2.JSON200.Name)
+				a.Contains(node2.JSON200.Slug, "testing-node-number-two")
+				a.Equal("", node2.JSON200.Description)
+				a.Nil(node2.JSON200.Content)
+				a.Nil(node2.JSON200.Link)
+				a.Equal(acc.ID.String(), string(node2.JSON200.Owner.Id))
+			})
 		}))
 	}))
 }
