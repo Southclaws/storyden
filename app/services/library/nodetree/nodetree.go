@@ -23,10 +23,10 @@ var (
 type Graph interface {
 	// Move moves a node from either orphan state or belonging to one node
 	// to another node essentially setting its parent slug to some/new value.
-	Move(ctx context.Context, child library.NodeSlug, parent library.NodeSlug) (*library.Node, error)
+	Move(ctx context.Context, child library.QueryKey, parent library.QueryKey) (*library.Node, error)
 
 	// Sever orphans a node by removing it from its parent to the root level.
-	Sever(ctx context.Context, child library.NodeSlug, parent library.NodeSlug) (*library.Node, error)
+	Sever(ctx context.Context, child library.QueryKey, parent library.QueryKey) (*library.Node, error)
 }
 
 type service struct {
@@ -38,8 +38,8 @@ func New(nr library.Repository, accountQuery *account_querier.Querier) Graph {
 	return &service{nr: nr, accountQuery: accountQuery}
 }
 
-func (s *service) Move(ctx context.Context, child library.NodeSlug, parent library.NodeSlug) (*library.Node, error) {
-	if child == parent {
+func (s *service) Move(ctx context.Context, child library.QueryKey, parent library.QueryKey) (*library.Node, error) {
+	if child.Equal(parent.Queryable) {
 		return nil, fault.Wrap(ErrIdenticalParentChild, fctx.With(ctx))
 	}
 
@@ -76,15 +76,15 @@ func (s *service) Move(ctx context.Context, child library.NodeSlug, parent libra
 	// If the target parent is actually a child of the target child, sever this
 	// connection before adding the target child to the target parent.
 	if parentParent, ok := pnode.Parent.Get(); ok {
-		if parentParent.ID == cnode.ID {
-			cnode, err = s.nr.Update(ctx, cnode.ID, library.WithChildNodeRemove(xid.ID(pnode.ID)))
+		if parentParent.Mark.ID() == cnode.Mark.ID() {
+			cnode, err = s.nr.Update(ctx, library.QueryKey{cnode.Mark.Queryable()}, library.WithChildNodeRemove(xid.ID(pnode.Mark.ID())))
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 		}
 	}
 
-	pnode, err = s.nr.Update(ctx, pnode.ID, library.WithChildNodeAdd(xid.ID(cnode.ID)))
+	pnode, err = s.nr.Update(ctx, library.QueryKey{pnode.Mark.Queryable()}, library.WithChildNodeAdd(xid.ID(cnode.Mark.ID())))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -92,8 +92,8 @@ func (s *service) Move(ctx context.Context, child library.NodeSlug, parent libra
 	return pnode, nil
 }
 
-func (s *service) Sever(ctx context.Context, child library.NodeSlug, parent library.NodeSlug) (*library.Node, error) {
-	if child == parent {
+func (s *service) Sever(ctx context.Context, child library.QueryKey, parent library.QueryKey) (*library.Node, error) {
+	if child.Equal(parent.Queryable) {
 		return nil, fault.Wrap(ErrIdenticalParentChild, fctx.With(ctx))
 	}
 
@@ -120,7 +120,7 @@ func (s *service) Sever(ctx context.Context, child library.NodeSlug, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pnode, err = s.nr.Update(ctx, pnode.ID, library.WithChildNodeRemove(xid.ID(cnode.ID)))
+	pnode, err = s.nr.Update(ctx, library.QueryKey{pnode.Mark.Queryable()}, library.WithChildNodeRemove(xid.ID(cnode.Mark.ID())))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
