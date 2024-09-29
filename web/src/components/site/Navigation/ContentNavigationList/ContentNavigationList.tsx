@@ -11,7 +11,7 @@ import { DatagraphNavTree } from "../DatagraphNavTree/DatagraphNavTree";
 import { useNavigation } from "../useNavigation";
 
 export function ContentNavigationList() {
-  const { isAdmin } = useNavigation();
+  const { isAdmin, nodeSlug } = useNavigation();
 
   return (
     <styled.nav
@@ -38,7 +38,7 @@ export function ContentNavigationList() {
           <CategoryList />
         </Box>
 
-        <DatagraphNavTree />
+        <DatagraphNavTree currentNode={nodeSlug} />
       </LStack>
 
       <LStack gap="1">
