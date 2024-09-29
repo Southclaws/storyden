@@ -36,17 +36,17 @@ func New(
 	}
 }
 
-func (q *HydratedQuerier) GetBySlug(ctx context.Context, slug library.NodeSlug) (*library.Node, error) {
+func (q *HydratedQuerier) GetBySlug(ctx context.Context, qk library.QueryKey) (*library.Node, error) {
 	session := q.session.AccountOpt(ctx)
 
-	n, err := q.nodereader.Get(ctx, slug)
+	n, err := q.nodereader.Get(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if acc, ok := session.Get(); ok && q.scorer != nil {
 		pro := profile.ProfileFromAccount(&acc)
-		nid := xid.ID(n.ID)
+		nid := xid.ID(n.Mark.ID())
 
 		scores, err := q.scorer.ScoreRelevance(ctx, pro, nid)
 		if err != nil {

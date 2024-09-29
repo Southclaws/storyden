@@ -26,17 +26,13 @@ type Repository interface {
 		opts ...Option,
 	) (*Node, error)
 
-	Get(ctx context.Context, slug NodeSlug) (*Node, error)
+	Get(ctx context.Context, qk QueryKey) (*Node, error)
 	GetByID(ctx context.Context, id NodeID) (*Node, error)
 
-	// Update a node by ID.
-	// NOTE: slug based update is not supported at the repo level because you'll
-	// probably always have a node ID in context anyway and it makes changing
-	// the actual slug a bit more complex due to the naïve implementation.
-	Update(ctx context.Context, id NodeID, opts ...Option) (*Node, error)
+	Update(ctx context.Context, qk QueryKey, opts ...Option) (*Node, error)
 
 	// Delete removes a node permanently, it does not manage children.
-	Delete(ctx context.Context, slug NodeSlug) error
+	Delete(ctx context.Context, qk QueryKey) error
 }
 
 func WithID(id NodeID) Option {

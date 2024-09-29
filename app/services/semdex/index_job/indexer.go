@@ -81,7 +81,7 @@ func (i *indexerConsumer) indexNode(ctx context.Context, id library.NodeID) erro
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = i.qnodesum.Publish(ctx, mq.SummariseNode{ID: n.ID})
+	err = i.qnodesum.Publish(ctx, mq.SummariseNode{ID: library.NodeID(n.Mark.ID())})
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

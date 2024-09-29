@@ -1,0 +1,31 @@
+package library
+
+import (
+	"github.com/rs/xid"
+
+	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/predicate"
+)
+
+type (
+	Mark     struct{ mark.Mark }
+	QueryKey struct{ mark.Queryable }
+)
+
+func NewMark(id xid.ID, slug string) Mark { return Mark{*mark.NewMark(id, slug)} }
+func NewKey(in string) QueryKey           { return QueryKey{mark.NewQueryKey(in)} }
+
+func (m QueryKey) Predicate() (p predicate.Node) {
+	m.Apply(
+		func(i xid.ID) { p = node.ID(i) },
+		func(s string) { p = node.Slug(s) })
+	return
+}
+
+func (m QueryKey) Set(em *ent.NodeMutation) {
+	m.Apply(
+		func(i xid.ID) { em.SetID(i) },
+		func(s string) { em.SetSlug(s) })
+}

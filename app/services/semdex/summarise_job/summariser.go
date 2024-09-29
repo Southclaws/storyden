@@ -9,8 +9,10 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/rs/xid"
 )
 
 type summariseConsumer struct {
@@ -43,12 +45,13 @@ func newSummariseConsumer(
 }
 
 func (i *summariseConsumer) summariseNode(ctx context.Context, id library.NodeID) error {
-	summary, err := i.summariser.Summarise(ctx, &library.Node{ID: id})
+	summary, err := i.summariser.Summarise(ctx, &library.Node{Mark: library.NewMark(xid.ID(id), "")})
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = i.nodeRepo.Update(ctx, id, library.WithDescription(summary))
+	qk := library.QueryKey{mark.NewQueryKeyID(xid.ID(id))}
+	_, err = i.nodeRepo.Update(ctx, qk, library.WithDescription(summary))
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

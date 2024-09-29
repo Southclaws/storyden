@@ -56,7 +56,7 @@ func (a *Analyser) analysePDF(ctx context.Context, buf []byte, fillrule opt.Opti
 		// rich = rich
 	}
 
-	_, err = a.nodewriter.Update(ctx, library.NodeSlug(node.Slug), node_mutate.Partial{
+	_, err = a.nodewriter.Update(ctx, library.QueryKey{node.Mark.Queryable()}, node_mutate.Partial{
 		Content: opt.New(rich),
 	})
 	if err != nil {

@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
@@ -61,7 +62,7 @@ func (s *Uploader) Upload(ctx context.Context, r io.Reader, size int64, name ass
 	}
 
 	if cfr, ok := opts.ContentFill.Get(); ok {
-		nodeID := library.NodeID(cfr.TargetNodeID)
+		nodeID := library.QueryKey{mark.NewQueryKeyID(cfr.TargetNodeID)}
 
 		_, err := s.nodewriter.Update(ctx, nodeID, library.WithAssets([]asset.AssetID{a.ID}))
 		if err != nil {
