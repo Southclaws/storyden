@@ -1,6 +1,7 @@
 "use client";
 
 import { FocusClasses } from "@tiptap/extension-focus";
+import { Link } from "@tiptap/extension-link";
 import Placeholder from "@tiptap/extension-placeholder";
 import { generateHTML, generateJSON } from "@tiptap/html";
 import { useEditor } from "@tiptap/react";
@@ -32,6 +33,7 @@ export function useContentComposer(props: ContentComposerProps) {
   const extensions = [
     StarterKit,
     FocusClasses,
+    Link,
     ImageExtended.configure({
       allowBase64: false,
       HTMLAttributes: {
