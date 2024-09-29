@@ -85,7 +85,7 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		session,
 		request.Body.Name,
 		node_mutate.Partial{
-			Slug:         opt.NewPtr(request.Body.Slug),
+			Slug:         deserialiseInputSlug(request.Body.Slug),
 			Content:      richContent,
 			Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
 			URL:          url,
@@ -220,7 +220,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 
 	node, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
 		Name:         opt.NewPtr(request.Body.Name),
-		Slug:         opt.NewPtr(request.Body.Slug),
+		Slug:         deserialiseInputSlug(request.Body.Slug),
 		AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 		AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
 		URL:          url,
@@ -381,4 +381,16 @@ func deserialiseAssetSources(in openapi.AssetSourceList) []string {
 
 func deserialiseAssetSourceURL(in openapi.AssetSourceURL) string {
 	return string(in)
+}
+
+func deserialiseInputSlug(in *string) opt.Optional[string] {
+	if in == nil {
+		return opt.NewEmpty[string]()
+	}
+
+	if *in == "" {
+		return opt.NewEmpty[string]()
+	}
+
+	return opt.NewPtr(in)
 }
