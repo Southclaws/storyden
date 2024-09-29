@@ -93,7 +93,14 @@ body {
   }
 
   a {
-    color: var(--colors-blue-500);
+    color: var(--colors-blue-10);
+  }
+  a:hover {
+    color: var(--colors-blue-9);
+    text-decoration: underline;
+  }
+  a:visited {
+    color: var(--colors-blue-11);
   }
 
   h1,
