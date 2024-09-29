@@ -1,5 +1,7 @@
 "use client";
 
+import { useParams } from "next/navigation";
+
 import { useGetInfo } from "src/api/openapi-client/misc";
 import { useSession } from "src/auth";
 
@@ -10,11 +12,15 @@ import { useSession } from "src/auth";
 export function useNavigation() {
   const { data: infoResult } = useGetInfo();
   const session = useSession();
+  const { slug } = useParams();
+
+  const nodeSlug = slug?.[0];
 
   const title = infoResult?.title ?? "Storyden";
 
   return {
     isAdmin: session?.admin ?? false,
     title,
+    nodeSlug,
   };
 }

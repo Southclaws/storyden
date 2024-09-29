@@ -1,10 +1,60 @@
 import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mjs';
 import { createRecipe } from './create-recipe.mjs';
 
-const treeViewDefaultVariants = {}
+const treeViewDefaultVariants = {
+  "variant": "clamped"
+}
 const treeViewCompoundVariants = []
 
 const treeViewSlotNames = [
+  [
+    "root",
+    "treeView__root"
+  ],
+  [
+    "label",
+    "treeView__label"
+  ],
+  [
+    "tree",
+    "treeView__tree"
+  ],
+  [
+    "item",
+    "treeView__item"
+  ],
+  [
+    "itemIndicator",
+    "treeView__itemIndicator"
+  ],
+  [
+    "itemText",
+    "treeView__itemText"
+  ],
+  [
+    "branch",
+    "treeView__branch"
+  ],
+  [
+    "branchControl",
+    "treeView__branchControl"
+  ],
+  [
+    "branchTrigger",
+    "treeView__branchTrigger"
+  ],
+  [
+    "branchContent",
+    "treeView__branchContent"
+  ],
+  [
+    "branchText",
+    "treeView__branchText"
+  ],
+  [
+    "branchIndicator",
+    "treeView__branchIndicator"
+  ],
   [
     "root",
     "treeView__root"
@@ -108,7 +158,9 @@ const treeViewFn = memo((props = {}) => {
   return Object.fromEntries(treeViewSlotFns.map(([slotName, slotFn]) => [slotName, slotFn.recipeFn(props)]))
 })
 
-const treeViewVariantKeys = []
+const treeViewVariantKeys = [
+  "variant"
+]
 const getVariantProps = (variants) => ({ ...treeViewDefaultVariants, ...compact(variants) })
 
 export const treeView = /* @__PURE__ */ Object.assign(treeViewFn, {
@@ -116,7 +168,12 @@ export const treeView = /* @__PURE__ */ Object.assign(treeViewFn, {
   __name__: 'treeView',
   raw: (props) => props,
   variantKeys: treeViewVariantKeys,
-  variantMap: {},
+  variantMap: {
+  "variant": [
+    "clamped",
+    "scrollable"
+  ]
+},
   splitVariantProps(props) {
     return splitProps(props, treeViewVariantKeys)
   },
