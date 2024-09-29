@@ -8,6 +8,7 @@ export type Props = {
   node: DatagraphNode;
   onVisibilityChange?: (v: Visibility) => Promise<void>;
   onDelete: (slug: string) => void;
+  onClose?: () => void;
 };
 
 export function useDatagraphNodeMenu(props: Props) {

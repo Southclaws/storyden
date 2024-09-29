@@ -14,7 +14,7 @@ export function FeedItemMenu(props: Props) {
   return (
     <Menu.Root lazyMount onSelect={handleSelect}>
       <Menu.Trigger asChild>
-        <MoreAction />
+        <MoreAction size="xs" />
       </Menu.Trigger>
       <Portal>
         <Menu.Positioner>

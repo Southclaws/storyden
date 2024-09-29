@@ -8,6 +8,7 @@ import { range } from "lodash";
 import { map } from "lodash/fp";
 
 import { admonition } from "@/recipes/admonition";
+import { button } from "@/recipes/button";
 import { headingInput } from "@/recipes/heading-input";
 import { richCard } from "@/recipes/rich-card";
 import { treeView } from "@/recipes/tree-view";
@@ -225,16 +226,17 @@ export default defineConfig({
   // NOTE: There may be some parts of global.css that reference tokens generated
   // by Panda, this is best avoided but it's some leftovers from the early days.
   theme: {
-    recipes: {
-      admonition: admonition,
-      headingInput: headingInput,
-      typographyHeading: typographyHeading,
-      richCard: richCard,
-    },
-    slotRecipes: {
-      treeView: treeView,
-    },
     extend: {
+      recipes: {
+        admonition: admonition,
+        button: button,
+        headingInput: headingInput,
+        typographyHeading: typographyHeading,
+        richCard: richCard,
+      },
+      slotRecipes: {
+        treeView: treeView,
+      },
       semanticTokens,
       tokens: defineTokens({
         zIndex: {
