@@ -11,6 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
@@ -49,7 +50,8 @@ func (s *scrapeConsumer) scrapeLink(ctx context.Context, u url.URL, item opt.Opt
 			}
 
 		case datagraph.KindNode:
-			_, err := s.nodes.Update(ctx, library.NodeID(i.ID), library.WithContentLinks(xid.ID(ln.ID)))
+			qk := library.QueryKey{mark.NewQueryKeyID(i.ID)}
+			_, err := s.nodes.Update(ctx, qk, library.WithContentLinks(xid.ID(ln.ID)))
 			if err != nil {
 				return fault.Wrap(err, fctx.With(ctx))
 			}

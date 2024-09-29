@@ -12,6 +12,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -55,7 +56,7 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return d.Get(ctx, NodeSlug(col.Slug))
+	return d.Get(ctx, QueryKey{mark.NewQueryKeyID(col.ID)})
 }
 
 func (d *database) List(ctx context.Context, filters ...Filter) ([]*Node, error) {
@@ -87,10 +88,12 @@ func (d *database) List(ctx context.Context, filters ...Filter) ([]*Node, error)
 	return all, nil
 }
 
-func (d *database) Get(ctx context.Context, slug NodeSlug) (*Node, error) {
-	col, err := d.db.Node.
-		Query().
-		Where(node.Slug(string(slug))).
+func (d *database) Get(ctx context.Context, qk QueryKey) (*Node, error) {
+	query := d.db.Node.Query()
+
+	query.Where(qk.Predicate())
+
+	query.
 		WithOwner(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
@@ -112,8 +115,9 @@ func (d *database) Get(ctx context.Context, slug NodeSlug) (*Node, error) {
 				WithOwner(func(aq *ent.AccountQuery) {
 					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 				})
-		}).
-		Only(ctx)
+		})
+
+	col, err := query.Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -158,26 +162,38 @@ func (d *database) GetByID(ctx context.Context, id NodeID) (*Node, error) {
 	return r, nil
 }
 
-func (d *database) Update(ctx context.Context, id NodeID, opts ...Option) (*Node, error) {
-	create := d.db.Node.UpdateOneID(xid.ID(id))
-	mutate := create.Mutation()
-
-	for _, fn := range opts {
-		fn(mutate)
-	}
-
-	c, err := create.Save(ctx)
+func (d *database) Update(ctx context.Context, qk QueryKey, opts ...Option) (*Node, error) {
+	// NOTE: Should be a probe not a full read. Query is necessary because of
+	// the Mark being used (id or slug) for updates. Cannot use UpdateOneID.
+	pre, err := d.Get(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return d.Get(ctx, NodeSlug(c.Slug))
+	update := d.db.Node.Update()
+	update.Where(qk.Predicate())
+
+	mutate := update.Mutation()
+	for _, fn := range opts {
+		fn(mutate)
+	}
+
+	err = update.Exec(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	qk = QueryKey{mark.NewQueryKeyID(pre.Mark.ID())}
+
+	return d.Get(ctx, qk)
 }
 
-func (d *database) Delete(ctx context.Context, slug NodeSlug) error {
-	update := d.db.Node.Delete().Where(node.Slug(string(slug)))
+func (d *database) Delete(ctx context.Context, qk QueryKey) error {
+	delete := d.db.Node.Delete()
 
-	_, err := update.Exec(ctx)
+	delete.Where(qk.Predicate())
+
+	_, err := delete.Exec(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

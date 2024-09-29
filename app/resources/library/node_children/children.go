@@ -7,5 +7,5 @@ import (
 )
 
 type Repository interface {
-	Move(ctx context.Context, slug library.NodeSlug, parentSlug library.NodeSlug) (*library.Node, error)
+	Move(ctx context.Context, slug library.QueryKey, parentSlug library.QueryKey) (*library.Node, error)
 }

@@ -35,7 +35,7 @@ func New(
 	}
 }
 
-func (m *Controller) ChangeVisibility(ctx context.Context, slug library.NodeSlug, vis visibility.Visibility) (*library.Node, error) {
+func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, vis visibility.Visibility) (*library.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -46,7 +46,7 @@ func (m *Controller) ChangeVisibility(ctx context.Context, slug library.NodeSlug
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := m.nr.Get(ctx, slug)
+	n, err := m.nr.Get(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -60,7 +60,7 @@ func (m *Controller) ChangeVisibility(ctx context.Context, slug library.NodeSlug
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err = m.nr.Update(ctx, n.ID, library.WithVisibility(vis))
+	n, err = m.nr.Update(ctx, qk, library.WithVisibility(vis))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

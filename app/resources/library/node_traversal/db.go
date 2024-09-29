@@ -127,25 +127,26 @@ order by
 `
 
 type subtreeRow struct {
-	NodeId           xid.ID                `db:"node_id"`
-	NodeCreatedAt    time.Time             `db:"node_created_at"`
-	NodeUpdatedAt    time.Time             `db:"node_updated_at"`
-	NodeDeletedAt    *time.Time            `db:"node_deleted_at"`
-	NodeName         string                `db:"node_name"`
-	NodeSlug         string                `db:"node_slug"`
-	NodeParentNodeId xid.ID                `db:"node_parent_node_id"`
-	NodeAccountId    xid.ID                `db:"node_account_id"`
-	NodeVisibility   visibility.Visibility `db:"node_visibility"`
-	NodeMetadata     *[]byte               `db:"node_metadata"`
-	OwnerId          xid.ID                `db:"owner_id"`
-	OwnerCreatedAt   time.Time             `db:"owner_created_at"`
-	OwnerUpdatedAt   time.Time             `db:"owner_updated_at"`
-	OwnerDeletedAt   *time.Time            `db:"owner_deleted_at"`
-	OwnerHandle      string                `db:"owner_handle"`
-	OwnerName        string                `db:"owner_name"`
-	OwnerBio         *string               `db:"owner_bio"`
-	OwnerAdmin       bool                  `db:"owner_admin"`
-	Depth            int                   `db:"depth"`
+	NodeId             xid.ID                `db:"node_id"`
+	NodeCreatedAt      time.Time             `db:"node_created_at"`
+	NodeUpdatedAt      time.Time             `db:"node_updated_at"`
+	NodeDeletedAt      *time.Time            `db:"node_deleted_at"`
+	NodeName           string                `db:"node_name"`
+	NodeSlug           string                `db:"node_slug"`
+	NodeParentNodeId   xid.ID                `db:"node_parent_node_id"`
+	NodeParentNodeSlug xid.ID                `db:"node_parent_node_slug"`
+	NodeAccountId      xid.ID                `db:"node_account_id"`
+	NodeVisibility     visibility.Visibility `db:"node_visibility"`
+	NodeMetadata       *[]byte               `db:"node_metadata"`
+	OwnerId            xid.ID                `db:"owner_id"`
+	OwnerCreatedAt     time.Time             `db:"owner_created_at"`
+	OwnerUpdatedAt     time.Time             `db:"owner_updated_at"`
+	OwnerDeletedAt     *time.Time            `db:"owner_deleted_at"`
+	OwnerHandle        string                `db:"owner_handle"`
+	OwnerName          string                `db:"owner_name"`
+	OwnerBio           *string               `db:"owner_bio"`
+	OwnerAdmin         bool                  `db:"owner_admin"`
+	Depth              int                   `db:"depth"`
 }
 
 func fromRow(r subtreeRow) (*library.Node, error) {
@@ -165,14 +166,13 @@ func fromRow(r subtreeRow) (*library.Node, error) {
 	})
 
 	return &library.Node{
-		ID:         library.NodeID(r.NodeId),
+		Mark:       library.NewMark(r.NodeId, r.NodeSlug),
 		CreatedAt:  r.NodeCreatedAt,
 		UpdatedAt:  r.NodeUpdatedAt,
 		Name:       r.NodeName,
-		Slug:       r.NodeSlug,
 		Visibility: r.NodeVisibility,
 		Parent: opt.NewSafe(library.Node{
-			ID: library.NodeID(r.NodeParentNodeId),
+			Mark: library.NewMark(r.NodeParentNodeId, ""),
 		}, !r.NodeParentNodeId.IsNil()),
 		Owner: profile.Public{
 			ID:      account_repo.AccountID(r.OwnerId),
@@ -271,7 +271,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 		}
 	})
 
-	ids := dt.Map(filtered, func(n *library.Node) xid.ID { return xid.ID(n.ID) })
+	ids := dt.Map(filtered, func(n *library.Node) xid.ID { return xid.ID(n.Mark.ID()) })
 
 	// TODO: Build a table of pointers to look up each asset via node ID
 
@@ -302,7 +302,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 		filteredParent, isFilteringParent := id.Get()
 
 		return dt.Reduce(hydrated, func(prev []*library.Node, curr *library.Node) []*library.Node {
-			if p, ok := curr.Parent.Get(); ok && p.ID == parent.ID {
+			if p, ok := curr.Parent.Get(); ok && p.Mark.ID() == parent.Mark.ID() {
 				// Take a copy because our mutations cannot apply to `flat`.
 				copy := *curr
 
@@ -311,7 +311,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 				// If the current iteration is not the root node of a parent
 				// node (a subtree query) then blank out the parent field since
 				// it's a waste to store this information in tree children.
-				if isFilteringParent && filteredParent != copy.ID {
+				if isFilteringParent && filteredParent != library.NodeID(copy.Mark.ID()) {
 					copy.Parent = opt.NewEmpty[library.Node]()
 				}
 
@@ -327,7 +327,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 		// If we're filtering for a specific node and the current iteration is
 		// that node, the children are aggregated for this node regardless.
 		filteredParent, ok := id.Get()
-		if ok && curr.ID == filteredParent {
+		if ok && library.NodeID(curr.Mark.ID()) == filteredParent {
 			curr.Nodes = linkChildrenForParent(*curr)
 			return append(prev, curr)
 		}

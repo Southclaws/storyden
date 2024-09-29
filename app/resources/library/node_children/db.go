@@ -23,13 +23,13 @@ func New(db *ent.Client, nr library.Repository) Repository {
 	return &database{db, nr}
 }
 
-func (d *database) Move(ctx context.Context, fromSlug library.NodeSlug, toSlug library.NodeSlug) (*library.Node, error) {
-	fromNode, err := d.nr.Get(ctx, fromSlug)
+func (d *database) Move(ctx context.Context, from library.QueryKey, to library.QueryKey) (*library.Node, error) {
+	fromNode, err := d.nr.Get(ctx, from)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	toNode, err := d.nr.Get(ctx, toSlug)
+	toNode, err := d.nr.Get(ctx, to)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -41,7 +41,7 @@ func (d *database) Move(ctx context.Context, fromSlug library.NodeSlug, toSlug l
 
 	nodes, err := d.db.Node.Query().
 		Select(node.FieldID).
-		Where(node.ParentNodeID(xid.ID(fromNode.ID))).
+		Where(node.ParentNodeID(xid.ID(fromNode.Mark.ID()))).
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -49,7 +49,7 @@ func (d *database) Move(ctx context.Context, fromSlug library.NodeSlug, toSlug l
 	childNodeIDs := dt.Map(nodes, func(c *ent.Node) xid.ID { return c.ID })
 
 	err = d.db.Node.Update().
-		SetParentID(xid.ID(toNode.ID)).
+		SetParentID(xid.ID(toNode.Mark.ID())).
 		Where(node.IDIn(childNodeIDs...)).
 		Exec(ctx)
 	if err != nil {

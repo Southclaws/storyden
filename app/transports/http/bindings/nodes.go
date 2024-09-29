@@ -16,7 +16,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -86,13 +85,13 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		session,
 		request.Body.Name,
 		node_mutate.Partial{
-			Slug:         opt.NewPtr(request.Body.Slug),
+			Slug:         deserialiseInputSlug(request.Body.Slug),
 			Content:      richContent,
 			Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
 			URL:          url,
 			AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 			AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
-			Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
+			Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
 			Visibility:   vis,
 		},
 	)
@@ -192,7 +191,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 }
 
 func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObject) (openapi.NodeGetResponseObject, error) {
-	node, err := c.nodeReader.GetBySlug(ctx, library.NodeSlug(request.NodeSlug))
+	node, err := c.nodeReader.GetBySlug(ctx, deserialiseNodeMark(request.NodeSlug))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -219,14 +218,14 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	node, err := c.nodeMutator.Update(ctx, library.NodeSlug(request.NodeSlug), node_mutate.Partial{
+	node, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
 		Name:         opt.NewPtr(request.Body.Name),
-		Slug:         opt.NewPtr(request.Body.Slug),
+		Slug:         deserialiseInputSlug(request.Body.Slug),
 		AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 		AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
 		URL:          url,
 		Content:      richContent,
-		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeSlug),
+		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	})
 	if err != nil {
@@ -244,7 +243,7 @@ func (c *Nodes) NodeUpdateVisibility(ctx context.Context, request openapi.NodeUp
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	node, err := c.nv.ChangeVisibility(ctx, library.NodeSlug(request.NodeSlug), v)
+	node, err := c.nv.ChangeVisibility(ctx, deserialiseNodeMark(request.NodeSlug), v)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -255,8 +254,8 @@ func (c *Nodes) NodeUpdateVisibility(ctx context.Context, request openapi.NodeUp
 }
 
 func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteRequestObject) (openapi.NodeDeleteResponseObject, error) {
-	destinationNode, err := c.nodeMutator.Delete(ctx, library.NodeSlug(request.NodeSlug), node_mutate.DeleteOptions{
-		NewParent: opt.NewPtr((*library.NodeSlug)(request.Params.TargetNode)),
+	destinationNode, err := c.nodeMutator.Delete(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.DeleteOptions{
+		NewParent: opt.NewPtrMap(request.Params.TargetNode, deserialiseNodeMark),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -279,7 +278,7 @@ func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRe
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	node, err := c.nodeMutator.Update(ctx, library.NodeSlug(request.NodeSlug), node_mutate.Partial{
+	node, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
 		AssetsAdd:   opt.New([]asset.AssetID{id}),
 		ContentFill: contentFillCmd,
 	})
@@ -295,7 +294,7 @@ func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRe
 func (c *Nodes) NodeRemoveAsset(ctx context.Context, request openapi.NodeRemoveAssetRequestObject) (openapi.NodeRemoveAssetResponseObject, error) {
 	id := openapi.ParseID(request.AssetId)
 
-	node, err := c.nodeMutator.Update(ctx, library.NodeSlug(request.NodeSlug), node_mutate.Partial{
+	node, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
 		AssetsRemove: opt.New([]asset.AssetID{id}),
 	})
 	if err != nil {
@@ -308,7 +307,7 @@ func (c *Nodes) NodeRemoveAsset(ctx context.Context, request openapi.NodeRemoveA
 }
 
 func (c *Nodes) NodeAddNode(ctx context.Context, request openapi.NodeAddNodeRequestObject) (openapi.NodeAddNodeResponseObject, error) {
-	node, err := c.ntree.Move(ctx, library.NodeSlug(request.NodeSlugChild), library.NodeSlug(request.NodeSlug))
+	node, err := c.ntree.Move(ctx, deserialiseNodeMark(request.NodeSlugChild), deserialiseNodeMark(request.NodeSlug))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -319,7 +318,7 @@ func (c *Nodes) NodeAddNode(ctx context.Context, request openapi.NodeAddNodeRequ
 }
 
 func (c *Nodes) NodeRemoveNode(ctx context.Context, request openapi.NodeRemoveNodeRequestObject) (openapi.NodeRemoveNodeResponseObject, error) {
-	node, err := c.ntree.Sever(ctx, library.NodeSlug(request.NodeSlugChild), library.NodeSlug(request.NodeSlug))
+	node, err := c.ntree.Sever(ctx, deserialiseNodeMark(request.NodeSlugChild), deserialiseNodeMark(request.NodeSlug))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -331,11 +330,11 @@ func (c *Nodes) NodeRemoveNode(ctx context.Context, request openapi.NodeRemoveNo
 
 func serialiseNode(in *library.Node) openapi.Node {
 	return openapi.Node{
-		Id:          in.ID.String(),
+		Id:          in.Mark.ID().String(),
 		CreatedAt:   in.CreatedAt,
 		UpdatedAt:   in.UpdatedAt,
 		Name:        in.Name,
-		Slug:        in.Slug,
+		Slug:        in.Mark.Slug(),
 		Assets:      dt.Map(in.Assets, serialiseAssetPtr),
 		Link:        opt.Map(in.WebLink, serialiseLinkRef).Ptr(),
 		Description: in.GetDesc(),
@@ -352,11 +351,11 @@ func serialiseNode(in *library.Node) openapi.Node {
 func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 	rs := opt.Map(in.RelevanceScore, func(v float64) float32 { return float32(v) })
 	return openapi.NodeWithChildren{
-		Id:          in.ID.String(),
+		Id:          in.Mark.ID().String(),
 		CreatedAt:   in.CreatedAt,
 		UpdatedAt:   in.UpdatedAt,
 		Name:        in.Name,
-		Slug:        in.Slug,
+		Slug:        in.Mark.Slug(),
 		Assets:      dt.Map(in.Assets, serialiseAssetPtr),
 		Link:        opt.Map(in.WebLink, serialiseLinkRef).Ptr(),
 		Description: in.GetDesc(),
@@ -372,8 +371,8 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 	}
 }
 
-func deserialiseNodeSlug(in string) library.NodeSlug {
-	return library.NodeSlug(in)
+func deserialiseNodeMark(in string) library.QueryKey {
+	return library.QueryKey{deserialiseMark(in)}
 }
 
 func deserialiseAssetSources(in openapi.AssetSourceList) []string {
@@ -382,4 +381,16 @@ func deserialiseAssetSources(in openapi.AssetSourceList) []string {
 
 func deserialiseAssetSourceURL(in openapi.AssetSourceURL) string {
 	return string(in)
+}
+
+func deserialiseInputSlug(in *string) opt.Optional[string] {
+	if in == nil {
+		return opt.NewEmpty[string]()
+	}
+
+	if *in == "" {
+		return opt.NewEmpty[string]()
+	}
+
+	return opt.NewPtr(in)
 }
