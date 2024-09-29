@@ -4,11 +4,11 @@ import {
   type TreeViewRootProps,
 } from "@ark-ui/react/tree-view";
 import Link from "next/link";
-import { forwardRef } from "react";
+import { forwardRef, useState } from "react";
 
 import { NodeWithChildren } from "@/api/openapi-schema";
 import { css, cx } from "@/styled-system/css";
-import { splitCssProps } from "@/styled-system/jsx";
+import { Box, splitCssProps } from "@/styled-system/jsx";
 import { type TreeViewVariantProps, treeView } from "@/styled-system/recipes";
 import { token } from "@/styled-system/tokens";
 import type { JsxStyleProps } from "@/styled-system/types";
@@ -117,8 +117,14 @@ type BranchProps = {
 };
 
 function TreeBranch({ styles, child, handleDelete }: BranchProps) {
+  // NOTE: We need some state here to track open/close of the menu because CSS
+  // isn't quite enough to track this nicely. The reason for this is that when
+  // the mouse moves away from the branch control, the container that holds the
+  // menu trigger moves to display: none; and the menu closes unexpectedly.
+  const [menuOpen, setOpen] = useState(false);
+
   return (
-    <ArkTreeView.BranchControl className={cx(styles.branchControl)}>
+    <ArkTreeView.BranchControl className={cx("group", styles.branchControl)}>
       <ArkTreeView.BranchIndicator className={styles.branchIndicator}>
         {child.children?.length ? <ChevronRightIcon /> : <BulletIcon />}
       </ArkTreeView.BranchIndicator>
@@ -127,7 +133,20 @@ function TreeBranch({ styles, child, handleDelete }: BranchProps) {
         <Link href={`/directory/${child.slug}`}>{child.name}</Link>
       </ArkTreeView.BranchText>
 
-      <DatagraphNodeMenu node={child} onDelete={handleDelete} />
+      <Box
+        display={{
+          base: menuOpen ? "block" : "none",
+          _groupHover: "block",
+          _active: "block",
+        }}
+        onClick={() => setOpen(true)}
+      >
+        <DatagraphNodeMenu
+          onClose={() => setOpen(false)}
+          node={child}
+          onDelete={handleDelete}
+        />
+      </Box>
     </ArkTreeView.BranchControl>
   );
 }

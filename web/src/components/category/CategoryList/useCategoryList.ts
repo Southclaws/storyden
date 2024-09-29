@@ -17,6 +17,8 @@ import {
 import { Category } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
+import { hasPermission } from "@/utils/permissions";
+
 export function useCategoryList() {
   const session = useSession();
   const categoryListResponse = useGetCategoryList();
@@ -24,7 +26,11 @@ export function useCategoryList() {
   const [categories, setCategories] = useState<Category[]>([]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 4,
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     }),
@@ -65,8 +71,10 @@ export function useCategoryList() {
     setCategories(newCategoriesFromServer.categories);
   }
 
+  const canManageCategories = hasPermission(session, "MANAGE_CATEGORIES");
+
   return {
-    isAdmin: session?.admin ?? false,
+    canManageCategories,
     // always use the items array as the source of truth for ordering.
     categories: reorder(items)(categories),
     items,

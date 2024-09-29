@@ -35,6 +35,8 @@ export const treeView = defineSlotRecipe({
       gap: "1",
       ps: "calc((var(--depth) - 1) * 22px)",
       py: "1",
+      pr: "1",
+      h: "8",
       textStyle: "sm",
       transitionDuration: "normal",
       transitionProperty: "background, color",
@@ -110,6 +112,12 @@ export const treeView = defineSlotRecipe({
           zIndex: "1",
         },
       },
+    },
+    itemText: {
+      fontSize: "xs",
+    },
+    branchText: {
+      fontSize: "xs",
     },
     tree: {
       display: "flex",
