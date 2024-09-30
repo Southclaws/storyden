@@ -45,12 +45,14 @@ func (CollectionPost) Edges() []ent.Edge {
 		edge.To("collection", Collection.Type).
 			Unique().
 			Required().
-			Field("collection_id"),
+			Field("collection_id").
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("post", Post.Type).
 			Unique().
 			Required().
-			Field("post_id"),
+			Field("post_id").
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 	}
 }
 

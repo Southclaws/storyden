@@ -225,13 +225,13 @@ var (
 				Symbol:     "collection_nodes_collections_collection",
 				Columns:    []*schema.Column{CollectionNodesColumns[2]},
 				RefColumns: []*schema.Column{CollectionsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "collection_nodes_nodes_node",
 				Columns:    []*schema.Column{CollectionNodesColumns[3]},
 				RefColumns: []*schema.Column{NodesColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -259,13 +259,13 @@ var (
 				Symbol:     "collection_posts_collections_collection",
 				Columns:    []*schema.Column{CollectionPostsColumns[2]},
 				RefColumns: []*schema.Column{CollectionsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "collection_posts_posts_post",
 				Columns:    []*schema.Column{CollectionPostsColumns[3]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{
