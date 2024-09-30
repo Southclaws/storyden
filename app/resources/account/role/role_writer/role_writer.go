@@ -49,6 +49,7 @@ func (w *Writer) Create(ctx context.Context, name string, colour string, perms r
 		SetName(name).
 		SetColour(colour).
 		SetPermissions(ps).
+		SetSortKey(0.0).
 		Save(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

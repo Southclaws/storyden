@@ -220,3 +220,67 @@ export const accountRemoveRole = async (
     },
   );
 };
+
+/**
+ * Desgiantes the specified role as a badge for the profile. Only one role
+may be set as a badge for the profile. Setting a role as a badge is
+entirely aesthetic and does not grant any additional permissions. Roles
+may be created without any permissions in order to be used as badges.
+
+ */
+export type accountRoleSetBadgeResponse = {
+  data: AccountUpdateOKResponse;
+  status: number;
+};
+
+export const getAccountRoleSetBadgeUrl = (
+  accountHandle: string,
+  roleId: string,
+) => {
+  return `/accounts/${accountHandle}/roles/${roleId}/badge`;
+};
+
+export const accountRoleSetBadge = async (
+  accountHandle: string,
+  roleId: string,
+  options?: RequestInit,
+): Promise<accountRoleSetBadgeResponse> => {
+  return fetcher<Promise<accountRoleSetBadgeResponse>>(
+    getAccountRoleSetBadgeUrl(accountHandle, roleId),
+    {
+      ...options,
+      method: "PUT",
+    },
+  );
+};
+
+/**
+ * Removes the badge from the profile. This does not remove the role from
+the account, only the visual badge-status representation of the role.
+
+ */
+export type accountRoleRemoveBadgeResponse = {
+  data: AccountUpdateOKResponse;
+  status: number;
+};
+
+export const getAccountRoleRemoveBadgeUrl = (
+  accountHandle: string,
+  roleId: string,
+) => {
+  return `/accounts/${accountHandle}/roles/${roleId}/badge`;
+};
+
+export const accountRoleRemoveBadge = async (
+  accountHandle: string,
+  roleId: string,
+  options?: RequestInit,
+): Promise<accountRoleRemoveBadgeResponse> => {
+  return fetcher<Promise<accountRoleRemoveBadgeResponse>>(
+    getAccountRoleRemoveBadgeUrl(accountHandle, roleId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};

@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -48,6 +49,7 @@ func Build() fx.Option {
 			role_assign.New,
 			role_querier.New,
 			role_writer.New,
+			role_badge.New,
 			asset.New,
 			authentication.New,
 			category.New,
