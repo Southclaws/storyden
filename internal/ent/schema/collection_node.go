@@ -45,20 +45,22 @@ func (CollectionNode) Edges() []ent.Edge {
 		edge.To("collection", Collection.Type).
 			Unique().
 			Required().
-			Field("collection_id"),
+			Field("collection_id").
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("node", Node.Type).
 			Unique().
 			Required().
-			Field("node_id"),
+			Field("node_id").
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 	}
 }
 
 func (CollectionNode) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("collection_id", "node_id").
-		Unique().
-		StorageKey("unique_collection_node"),
+			Unique().
+			StorageKey("unique_collection_node"),
 	}
 }
 
