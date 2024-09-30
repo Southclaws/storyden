@@ -162,6 +162,14 @@ func (m *Mapping) AccountRemoveRole() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageRoles
 }
 
+func (m *Mapping) AccountRoleSetBadge() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) AccountRoleRemoveBadge() (bool, *rbac.Permission) {
+	return true, nil
+}
+
 func (m *Mapping) NotificationList() (bool, *rbac.Permission) {
 	return true, nil
 }

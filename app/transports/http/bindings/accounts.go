@@ -16,6 +16,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/account/account_auth"
 	"github.com/Southclaws/storyden/app/services/account/account_update"
 	"github.com/Southclaws/storyden/app/services/authentication"
@@ -31,6 +33,7 @@ type Accounts struct {
 	accountUpdate account_update.Updater
 	accountAuth   account_auth.Manager
 	roleAssign    *role_assign.Assignment
+	roleBadge     *role_badge.Writer
 }
 
 func NewAccounts(
@@ -40,6 +43,7 @@ func NewAccounts(
 	accountUpdate account_update.Updater,
 	accountAuth account_auth.Manager,
 	roleAssign *role_assign.Assignment,
+	roleBadge *role_badge.Writer,
 ) Accounts {
 	return Accounts{
 		avatarService: avatarService,
@@ -48,6 +52,7 @@ func NewAccounts(
 		accountUpdate: accountUpdate,
 		accountAuth:   accountAuth,
 		roleAssign:    roleAssign,
+		roleBadge:     roleBadge,
 	}
 }
 
@@ -286,6 +291,74 @@ func (h *Accounts) AccountAddRole(ctx context.Context, request openapi.AccountAd
 	}
 
 	return openapi.AccountAddRole200JSONResponse{
+		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(acc)),
+	}, nil
+}
+
+func (h *Accounts) AccountRoleSetBadge(ctx context.Context, request openapi.AccountRoleSetBadgeRequestObject) (openapi.AccountRoleSetBadgeResponseObject, error) {
+	roleID := role.RoleID(openapi.ParseID(request.RoleId))
+
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err := h.accountQuery.GetByID(ctx, accountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	updatingSelf := acc.Handle == request.AccountHandle
+
+	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
+		if updatingSelf {
+			return nil
+		}
+		return errNotAuthorised
+	}, rbac.PermissionManageRoles); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err = h.roleBadge.Update(ctx, accountID, roleID, true)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountRoleSetBadge200JSONResponse{
+		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(acc)),
+	}, nil
+}
+
+func (h *Accounts) AccountRoleRemoveBadge(ctx context.Context, request openapi.AccountRoleRemoveBadgeRequestObject) (openapi.AccountRoleRemoveBadgeResponseObject, error) {
+	roleID := role.RoleID(openapi.ParseID(request.RoleId))
+
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err := h.accountQuery.GetByID(ctx, accountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	updatingSelf := acc.Handle == request.AccountHandle
+
+	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
+		if updatingSelf {
+			return nil
+		}
+		return errNotAuthorised
+	}, rbac.PermissionManageRoles); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err = h.roleBadge.Update(ctx, accountID, roleID, false)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountRoleRemoveBadge200JSONResponse{
 		AccountUpdateOKJSONResponse: openapi.AccountUpdateOKJSONResponse(serialiseAccount(acc)),
 	}, nil
 }

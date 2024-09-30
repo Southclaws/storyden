@@ -679,6 +679,38 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountUpdateOK" }
 
+  /accounts/{account_handle}/roles/{role_id}/badge:
+    put:
+      operationId: AccountRoleSetBadge
+      description: |
+        Desgiantes the specified role as a badge for the profile. Only one role
+        may be set as a badge for the profile. Setting a role as a badge is
+        entirely aesthetic and does not grant any additional permissions. Roles
+        may be created without any permissions in order to be used as badges.
+      tags: [accounts]
+      parameters:
+        - $ref: "#/components/parameters/RoleIDParam"
+        - $ref: "#/components/parameters/AccountHandleParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AccountUpdateOK" }
+    delete:
+      operationId: AccountRoleRemoveBadge
+      description: |
+        Removes the badge from the profile. This does not remove the role from
+        the account, only the visual badge-status representation of the role.
+      tags: [accounts]
+      parameters:
+        - $ref: "#/components/parameters/RoleIDParam"
+        - $ref: "#/components/parameters/AccountHandleParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AccountUpdateOK" }
+
   #
   #                   888    d8b  .d888 d8b                   888    d8b
   #                   888    Y8P d88P"  Y8P                   888    Y8P

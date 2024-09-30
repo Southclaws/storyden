@@ -481,3 +481,144 @@ export const useAccountRemoveRole = <
     ...query,
   };
 };
+/**
+ * Desgiantes the specified role as a badge for the profile. Only one role
+may be set as a badge for the profile. Setting a role as a badge is
+entirely aesthetic and does not grant any additional permissions. Roles
+may be created without any permissions in order to be used as badges.
+
+ */
+export const accountRoleSetBadge = (accountHandle: string, roleId: string) => {
+  return fetcher<AccountUpdateOKResponse>({
+    url: `/accounts/${accountHandle}/roles/${roleId}/badge`,
+    method: "PUT",
+  });
+};
+
+export const getAccountRoleSetBadgeMutationFetcher = (
+  accountHandle: string,
+  roleId: string,
+) => {
+  return (
+    _: string,
+    __: { arg: Arguments },
+  ): Promise<AccountUpdateOKResponse> => {
+    return accountRoleSetBadge(accountHandle, roleId);
+  };
+};
+export const getAccountRoleSetBadgeMutationKey = (
+  accountHandle: string,
+  roleId: string,
+) => `/accounts/${accountHandle}/roles/${roleId}/badge` as const;
+
+export type AccountRoleSetBadgeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountRoleSetBadge>>
+>;
+export type AccountRoleSetBadgeMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountRoleSetBadge = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountHandle: string,
+  roleId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountRoleSetBadge>>,
+      TError,
+      string,
+      Arguments,
+      Awaited<ReturnType<typeof accountRoleSetBadge>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getAccountRoleSetBadgeMutationKey(accountHandle, roleId);
+  const swrFn = getAccountRoleSetBadgeMutationFetcher(accountHandle, roleId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Removes the badge from the profile. This does not remove the role from
+the account, only the visual badge-status representation of the role.
+
+ */
+export const accountRoleRemoveBadge = (
+  accountHandle: string,
+  roleId: string,
+) => {
+  return fetcher<AccountUpdateOKResponse>({
+    url: `/accounts/${accountHandle}/roles/${roleId}/badge`,
+    method: "DELETE",
+  });
+};
+
+export const getAccountRoleRemoveBadgeMutationFetcher = (
+  accountHandle: string,
+  roleId: string,
+) => {
+  return (
+    _: string,
+    __: { arg: Arguments },
+  ): Promise<AccountUpdateOKResponse> => {
+    return accountRoleRemoveBadge(accountHandle, roleId);
+  };
+};
+export const getAccountRoleRemoveBadgeMutationKey = (
+  accountHandle: string,
+  roleId: string,
+) => `/accounts/${accountHandle}/roles/${roleId}/badge` as const;
+
+export type AccountRoleRemoveBadgeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountRoleRemoveBadge>>
+>;
+export type AccountRoleRemoveBadgeMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountRoleRemoveBadge = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountHandle: string,
+  roleId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountRoleRemoveBadge>>,
+      TError,
+      string,
+      Arguments,
+      Awaited<ReturnType<typeof accountRoleRemoveBadge>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ??
+    getAccountRoleRemoveBadgeMutationKey(accountHandle, roleId);
+  const swrFn = getAccountRoleRemoveBadgeMutationFetcher(accountHandle, roleId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
