@@ -54,7 +54,7 @@ func (w *Writer) Add(ctx context.Context, mk event_ref.QueryKey, accountID accou
 		opt(mutation)
 	}
 
-	err = create.OnConflict().UpdateNewValues().Exec(ctx)
+	err = create.OnConflictColumns(eventparticipant.FieldAccountID, eventparticipant.FieldEventID).UpdateNewValues().Exec(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
