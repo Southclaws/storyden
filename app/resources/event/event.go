@@ -1,6 +1,8 @@
 package event
 
 import (
+	"time"
+
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/event/event_ref"
@@ -30,6 +32,8 @@ func (e *Event) GetAssets() []*asset.Asset {
 	}
 	return nil
 }
+func (e *Event) GetCreated() time.Time { return e.CreatedAt }
+func (e *Event) GetUpdated() time.Time { return e.UpdatedAt }
 
 func Map(in *ent.Event) (*Event, error) {
 	threadEdge, err := in.Edges.ThreadOrErr()
