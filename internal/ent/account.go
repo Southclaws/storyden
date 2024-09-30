@@ -76,11 +76,13 @@ type AccountEdges struct {
 	Nodes []*Node `json:"nodes,omitempty"`
 	// Assets holds the value of the assets edge.
 	Assets []*Asset `json:"assets,omitempty"`
+	// Events holds the value of the events edge.
+	Events []*EventParticipant `json:"events,omitempty"`
 	// AccountRoles holds the value of the account_roles edge.
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [16]bool
+	loadedTypes [17]bool
 }
 
 // EmailsOrErr returns the Emails value or an error if the edge
@@ -218,10 +220,19 @@ func (e AccountEdges) AssetsOrErr() ([]*Asset, error) {
 	return nil, &NotLoadedError{edge: "assets"}
 }
 
+// EventsOrErr returns the Events value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) EventsOrErr() ([]*EventParticipant, error) {
+	if e.loadedTypes[15] {
+		return e.Events, nil
+	}
+	return nil, &NotLoadedError{edge: "events"}
+}
+
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[15] {
+	if e.loadedTypes[16] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -408,6 +419,11 @@ func (a *Account) QueryNodes() *NodeQuery {
 // QueryAssets queries the "assets" edge of the Account entity.
 func (a *Account) QueryAssets() *AssetQuery {
 	return NewAccountClient(a.config).QueryAssets(a)
+}
+
+// QueryEvents queries the "events" edge of the Account entity.
+func (a *Account) QueryEvents() *EventParticipantQuery {
+	return NewAccountClient(a.config).QueryEvents(a)
 }
 
 // QueryAccountRoles queries the "account_roles" edge of the Account entity.

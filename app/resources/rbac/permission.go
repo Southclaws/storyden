@@ -40,6 +40,9 @@ const (
 	// Assets
 	permissionUploadAsset permissionEnum = "UPLOAD_ASSET"
 
+	// Events
+	permissionManageEvents permissionEnum = "MANAGE_EVENTS"
+
 	// Profiles (listing and viewing member profiles)
 	permissionListProfiles permissionEnum = "LIST_PROFILES"
 	permissionReadProfile  permissionEnum = "READ_PROFILE"

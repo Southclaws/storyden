@@ -1,6 +1,8 @@
 package bindings
 
 import (
+	"net/url"
+
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/ftag"
@@ -257,4 +259,20 @@ func deserialiseVisibilityList(in []openapi.Visibility) ([]visibility.Visibility
 
 func deserialiseMark(s string) mark.Queryable {
 	return mark.NewQueryKey(s)
+}
+
+func deserialiseFloat(in float32) float64 {
+	return float64(in)
+}
+
+func deserialiseOptionalFloat(in *float32) opt.Optional[float64] {
+	return opt.NewPtrMap(in, func(s float32) float64 { return float64(s) })
+}
+
+func serialiseOptionalFloat(in opt.Optional[float64]) *float32 {
+	return opt.PtrMap(in, func(s float64) float32 { return float32(s) })
+}
+
+func seraliseOptionalURL(in opt.Optional[url.URL]) *string {
+	return opt.PtrMap(in, func(s url.URL) string { return s.String() })
 }

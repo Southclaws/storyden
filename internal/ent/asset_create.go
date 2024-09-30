@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
+	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -148,6 +149,21 @@ func (ac *AssetCreate) SetOwnerID(id xid.ID) *AssetCreate {
 // SetOwner sets the "owner" edge to the Account entity.
 func (ac *AssetCreate) SetOwner(a *Account) *AssetCreate {
 	return ac.SetOwnerID(a.ID)
+}
+
+// AddEventIDs adds the "event" edge to the Event entity by IDs.
+func (ac *AssetCreate) AddEventIDs(ids ...xid.ID) *AssetCreate {
+	ac.mutation.AddEventIDs(ids...)
+	return ac
+}
+
+// AddEvent adds the "event" edges to the Event entity.
+func (ac *AssetCreate) AddEvent(e ...*Event) *AssetCreate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return ac.AddEventIDs(ids...)
 }
 
 // Mutation returns the AssetMutation object of the builder.
@@ -343,6 +359,22 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.AccountID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.EventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   asset.EventTable,
+			Columns: []string{asset.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

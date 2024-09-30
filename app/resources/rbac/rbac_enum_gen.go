@@ -21,6 +21,7 @@ var (
 	PermissionManageLibrary        = Permission{permissionManageLibrary}
 	PermissionSubmitLibraryNode    = Permission{permissionSubmitLibraryNode}
 	PermissionUploadAsset          = Permission{permissionUploadAsset}
+	PermissionManageEvents         = Permission{permissionManageEvents}
 	PermissionListProfiles         = Permission{permissionListProfiles}
 	PermissionReadProfile          = Permission{permissionReadProfile}
 	PermissionCreateCollection     = Permission{permissionCreateCollection}
@@ -89,6 +90,8 @@ func NewPermission(__iNpUt__ string) (Permission, error) {
 		return PermissionSubmitLibraryNode, nil
 	case string(permissionUploadAsset):
 		return PermissionUploadAsset, nil
+	case string(permissionManageEvents):
+		return PermissionManageEvents, nil
 	case string(permissionListProfiles):
 		return PermissionListProfiles, nil
 	case string(permissionReadProfile):

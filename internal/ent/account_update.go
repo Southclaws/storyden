@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -389,6 +390,21 @@ func (au *AccountUpdate) AddAssets(a ...*Asset) *AccountUpdate {
 	return au.AddAssetIDs(ids...)
 }
 
+// AddEventIDs adds the "events" edge to the EventParticipant entity by IDs.
+func (au *AccountUpdate) AddEventIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.AddEventIDs(ids...)
+	return au
+}
+
+// AddEvents adds the "events" edges to the EventParticipant entity.
+func (au *AccountUpdate) AddEvents(e ...*EventParticipant) *AccountUpdate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.AddEventIDs(ids...)
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
 func (au *AccountUpdate) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddAccountRoleIDs(ids...)
@@ -722,6 +738,27 @@ func (au *AccountUpdate) RemoveAssets(a ...*Asset) *AccountUpdate {
 		ids[i] = a[i].ID
 	}
 	return au.RemoveAssetIDs(ids...)
+}
+
+// ClearEvents clears all "events" edges to the EventParticipant entity.
+func (au *AccountUpdate) ClearEvents() *AccountUpdate {
+	au.mutation.ClearEvents()
+	return au
+}
+
+// RemoveEventIDs removes the "events" edge to EventParticipant entities by IDs.
+func (au *AccountUpdate) RemoveEventIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.RemoveEventIDs(ids...)
+	return au
+}
+
+// RemoveEvents removes "events" edges to EventParticipant entities.
+func (au *AccountUpdate) RemoveEvents(e ...*EventParticipant) *AccountUpdate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.RemoveEventIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
@@ -1551,6 +1588,51 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.EventsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EventsTable,
+			Columns: []string{account.EventsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedEventsIDs(); len(nodes) > 0 && !au.mutation.EventsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EventsTable,
+			Columns: []string{account.EventsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.EventsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EventsTable,
+			Columns: []string{account.EventsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if au.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -1961,6 +2043,21 @@ func (auo *AccountUpdateOne) AddAssets(a ...*Asset) *AccountUpdateOne {
 	return auo.AddAssetIDs(ids...)
 }
 
+// AddEventIDs adds the "events" edge to the EventParticipant entity by IDs.
+func (auo *AccountUpdateOne) AddEventIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.AddEventIDs(ids...)
+	return auo
+}
+
+// AddEvents adds the "events" edges to the EventParticipant entity.
+func (auo *AccountUpdateOne) AddEvents(e ...*EventParticipant) *AccountUpdateOne {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.AddEventIDs(ids...)
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
 func (auo *AccountUpdateOne) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddAccountRoleIDs(ids...)
@@ -2294,6 +2391,27 @@ func (auo *AccountUpdateOne) RemoveAssets(a ...*Asset) *AccountUpdateOne {
 		ids[i] = a[i].ID
 	}
 	return auo.RemoveAssetIDs(ids...)
+}
+
+// ClearEvents clears all "events" edges to the EventParticipant entity.
+func (auo *AccountUpdateOne) ClearEvents() *AccountUpdateOne {
+	auo.mutation.ClearEvents()
+	return auo
+}
+
+// RemoveEventIDs removes the "events" edge to EventParticipant entities by IDs.
+func (auo *AccountUpdateOne) RemoveEventIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.RemoveEventIDs(ids...)
+	return auo
+}
+
+// RemoveEvents removes "events" edges to EventParticipant entities.
+func (auo *AccountUpdateOne) RemoveEvents(e ...*EventParticipant) *AccountUpdateOne {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.RemoveEventIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
@@ -3146,6 +3264,51 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.EventsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EventsTable,
+			Columns: []string{account.EventsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedEventsIDs(); len(nodes) > 0 && !auo.mutation.EventsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EventsTable,
+			Columns: []string{account.EventsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.EventsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EventsTable,
+			Columns: []string{account.EventsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

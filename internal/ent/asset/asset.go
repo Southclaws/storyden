@@ -35,6 +35,8 @@ const (
 	EdgeLinks = "links"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
+	// EdgeEvent holds the string denoting the event edge name in mutations.
+	EdgeEvent = "event"
 	// Table holds the table name of the asset in the database.
 	Table = "assets"
 	// PostsTable is the table that holds the posts relation/edge. The primary key declared below.
@@ -59,6 +61,13 @@ const (
 	OwnerInverseTable = "accounts"
 	// OwnerColumn is the table column denoting the owner relation/edge.
 	OwnerColumn = "account_id"
+	// EventTable is the table that holds the event relation/edge.
+	EventTable = "events"
+	// EventInverseTable is the table name for the Event entity.
+	// It exists in this package in order to avoid circular dependency with the "event" package.
+	EventInverseTable = "events"
+	// EventColumn is the table column denoting the event relation/edge.
+	EventColumn = "asset_event"
 )
 
 // Columns holds all SQL columns for asset fields.
@@ -188,6 +197,20 @@ func ByOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newOwnerStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByEventCount orders the results by event count.
+func ByEventCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEventStep(), opts...)
+	}
+}
+
+// ByEvent orders the results by event terms.
+func ByEvent(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newPostsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -214,5 +237,12 @@ func newOwnerStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OwnerInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+	)
+}
+func newEventStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventTable, EventColumn),
 	)
 }

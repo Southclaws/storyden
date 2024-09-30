@@ -4,7 +4,6 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 )
@@ -22,10 +21,4 @@ func (m QueryKey) Predicate() (p predicate.Node) {
 		func(i xid.ID) { p = node.ID(i) },
 		func(s string) { p = node.Slug(s) })
 	return
-}
-
-func (m QueryKey) Set(em *ent.NodeMutation) {
-	m.Apply(
-		func(i xid.ID) { em.SetID(i) },
-		func(s string) { em.SetSlug(s) })
 }

@@ -15,6 +15,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/event"
+	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
@@ -470,6 +472,76 @@ func init() {
 	// email.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	email.IDValidator = func() func(string) error {
 		validators := emailDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	eventMixin := schema.Event{}.Mixin()
+	eventMixinFields0 := eventMixin[0].Fields()
+	_ = eventMixinFields0
+	eventMixinFields1 := eventMixin[1].Fields()
+	_ = eventMixinFields1
+	eventMixinFields2 := eventMixin[2].Fields()
+	_ = eventMixinFields2
+	eventFields := schema.Event{}.Fields()
+	_ = eventFields
+	// eventDescCreatedAt is the schema descriptor for created_at field.
+	eventDescCreatedAt := eventMixinFields1[0].Descriptor()
+	// event.DefaultCreatedAt holds the default value on creation for the created_at field.
+	event.DefaultCreatedAt = eventDescCreatedAt.Default.(func() time.Time)
+	// eventDescUpdatedAt is the schema descriptor for updated_at field.
+	eventDescUpdatedAt := eventMixinFields2[0].Descriptor()
+	// event.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	event.DefaultUpdatedAt = eventDescUpdatedAt.Default.(func() time.Time)
+	// event.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	event.UpdateDefaultUpdatedAt = eventDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// eventDescID is the schema descriptor for id field.
+	eventDescID := eventMixinFields0[0].Descriptor()
+	// event.DefaultID holds the default value on creation for the id field.
+	event.DefaultID = eventDescID.Default.(func() xid.ID)
+	// event.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	event.IDValidator = func() func(string) error {
+		validators := eventDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	eventparticipantMixin := schema.EventParticipant{}.Mixin()
+	eventparticipantMixinFields0 := eventparticipantMixin[0].Fields()
+	_ = eventparticipantMixinFields0
+	eventparticipantMixinFields1 := eventparticipantMixin[1].Fields()
+	_ = eventparticipantMixinFields1
+	eventparticipantFields := schema.EventParticipant{}.Fields()
+	_ = eventparticipantFields
+	// eventparticipantDescCreatedAt is the schema descriptor for created_at field.
+	eventparticipantDescCreatedAt := eventparticipantMixinFields1[0].Descriptor()
+	// eventparticipant.DefaultCreatedAt holds the default value on creation for the created_at field.
+	eventparticipant.DefaultCreatedAt = eventparticipantDescCreatedAt.Default.(func() time.Time)
+	// eventparticipantDescID is the schema descriptor for id field.
+	eventparticipantDescID := eventparticipantMixinFields0[0].Descriptor()
+	// eventparticipant.DefaultID holds the default value on creation for the id field.
+	eventparticipant.DefaultID = eventparticipantDescID.Default.(func() xid.ID)
+	// eventparticipant.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	eventparticipant.IDValidator = func() func(string) error {
+		validators := eventparticipantDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
