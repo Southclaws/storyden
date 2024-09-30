@@ -2,6 +2,7 @@ package reply
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -57,6 +58,9 @@ func replyTo(m *ent.Post) opt.Optional[post.ID] {
 
 	return opt.NewEmpty[post.ID]()
 }
+
+func (r *Reply) GetCreated() time.Time { return r.CreatedAt }
+func (r *Reply) GetUpdated() time.Time { return r.UpdatedAt }
 
 func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Reply, error) {
 	return func(m *ent.Post) (*Reply, error) {

@@ -1,6 +1,8 @@
 package datagraph
 
 import (
+	"time"
+
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/fault"
@@ -17,6 +19,8 @@ type (
 	WithContent  interface{ GetContent() Content }       // Has long-form rich-text content
 	WithProps    interface{ GetProps() map[string]any }  // Has arbitrary metadata
 	WithAssets   interface{ GetAssets() []*asset.Asset } // Has media assets
+	WithCreated  interface{ GetCreated() time.Time }     // Has a creation timestamp
+	WithUpdated  interface{ GetUpdated() time.Time }     // Has an update timestamp
 )
 
 // Addressable describes a type that can be uniquely identified via either an ID
@@ -31,6 +35,8 @@ type Addressable interface {
 // APIs and it is uniquely addressable as well as contains rich text content.
 type Publishable interface {
 	Addressable
+	WithCreated
+	WithUpdated
 	Described
 	WithContent
 	WithAssets

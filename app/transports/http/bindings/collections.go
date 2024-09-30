@@ -190,6 +190,8 @@ func serialiseCollectionItem(in *collection.CollectionItem) openapi.CollectionIt
 	return openapi.CollectionItem{
 		Id:             in.Item.GetID().String(),
 		AddedAt:        in.Added,
+		CreatedAt:      in.Item.GetCreated(),
+		UpdatedAt:      in.Item.GetUpdated(),
 		MembershipType: openapi.CollectionItemMembershipType(in.MembershipType.String()),
 		Owner:          serialiseProfileReference(in.Author), // Invalid, wrong owner
 		Kind:           serialiseDatagraphKind(in.Item.GetKind()),

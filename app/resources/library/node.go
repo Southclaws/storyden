@@ -69,3 +69,5 @@ func (c *Node) GetDesc() string {
 func (c *Node) GetContent() datagraph.Content { return c.Content.OrZero() }
 func (c *Node) GetProps() map[string]any      { return c.Metadata }
 func (c *Node) GetAssets() []*asset.Asset     { return c.Assets }
+func (c *Node) GetCreated() time.Time         { return c.CreatedAt }
+func (c *Node) GetUpdated() time.Time         { return c.UpdatedAt }

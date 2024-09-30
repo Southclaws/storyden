@@ -50,6 +50,8 @@ func (p *Post) GetContent() datagraph.Content { return p.Content }
 func (p *Post) GetDesc() string               { return p.Content.Short() }
 func (p *Post) GetProps() map[string]any      { return p.Meta }
 func (p *Post) GetAssets() []*asset.Asset     { return p.Assets }
+func (p *Post) GetCreated() time.Time         { return p.CreatedAt }
+func (p *Post) GetUpdated() time.Time         { return p.UpdatedAt }
 
 func Map(in *ent.Post) (*Post, error) {
 	rootID, title, slug := func() (ID, string, string) {
