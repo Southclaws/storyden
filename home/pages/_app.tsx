@@ -7,6 +7,7 @@ import localFont from "next/font/local";
 import Head from "next/head";
 
 import { seo } from "../seo";
+import Script from "next/script";
 
 const monasans = localFont({
   src: "./mona-sans.woff2",
@@ -43,6 +44,14 @@ export default function MyApp({ Component, pageProps }) {
         />
         <link rel="manifest" href="/site.webmanifest" />
         <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#303030" />
+
+        <Script type="text/javascript">
+          {`(function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "obgioniw76");`}
+        </Script>
       </Head>
 
       <style jsx global>
