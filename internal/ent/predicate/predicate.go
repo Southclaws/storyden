@@ -36,6 +36,12 @@ type CollectionPost func(*sql.Selector)
 // Email is the predicate function for email builders.
 type Email func(*sql.Selector)
 
+// Event is the predicate function for event builders.
+type Event func(*sql.Selector)
+
+// EventParticipant is the predicate function for eventparticipant builders.
+type EventParticipant func(*sql.Selector)
+
 // LikePost is the predicate function for likepost builders.
 type LikePost func(*sql.Selector)
 

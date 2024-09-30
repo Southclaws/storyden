@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/event/event_ref"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 )
@@ -61,4 +62,8 @@ type Mention struct {
 
 type ReactToPost struct {
 	PostID post.ID
+}
+
+type CreateEvent struct {
+	ID event_ref.EventID
 }

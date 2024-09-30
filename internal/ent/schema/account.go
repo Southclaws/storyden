@@ -79,5 +79,7 @@ func (Account) Edges() []ent.Edge {
 		edge.To("assets", Asset.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)), // TODO: Don't cascade but do something more clever
 
+		edge.To("events", EventParticipant.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 	}
 }

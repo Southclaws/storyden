@@ -74,6 +74,8 @@ tags:
     description: Social bookmarks.
   - name: datagraph
     description: Content graph (posts, nodes, links) APIs.
+  - name: events
+    description: Event scheduling, invites and management.
 
 #
 # 8888888b.     d8888 88888888888 888    888  .d8888b.
@@ -1547,6 +1549,132 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/DatagraphSearchOK" }
 
+  #
+  #                                     888
+  #                                     888
+  #                                     888
+  #  .d88b.  888  888  .d88b.  88888b.  888888 .d8888b
+  # d8P  Y8b 888  888 d8P  Y8b 888 "88b 888    88K
+  # 88888888 Y88  88P 88888888 888  888 888    "Y8888b.
+  # Y8b.      Y8bd8P  Y8b.     888  888 Y88b.       X88
+  #  "Y8888    Y88P    "Y8888  888  888  "Y888  88888P'
+  #
+
+  /events:
+    get:
+      operationId: EventList
+      description: List all events using the filtering options.
+      tags: [events]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/EventListOK" }
+    post:
+      operationId: EventCreate
+      description: |
+        Create a new event. When an event is created, a thread is also created
+        which provides the means for discussion via the thread and reply APIs.
+      tags: [events]
+      requestBody: { $ref: "#/components/requestBodies/EventCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/EventCreateOK" }
+
+  /events/{event_mark}:
+    get:
+      operationId: EventGet
+      description: Get an event by its ID.
+      tags: [events]
+      security: []
+      parameters: [$ref: "#/components/parameters/EventMarkParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/EventGetOK" }
+    patch:
+      operationId: EventUpdate
+      description: |
+        Update an event. If the content field is updated, this is stored on the
+        thread associated with the event, rather than the event itself. It's 
+        possible to update that thread directly using `threads` operations.
+      tags: [events]
+      parameters: [$ref: "#/components/parameters/EventMarkParam"]
+      requestBody: { $ref: "#/components/requestBodies/EventUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/EventUpdateOK" }
+    delete:
+      operationId: EventDelete
+      description: Delete an event.
+      tags: [events]
+      parameters: [$ref: "#/components/parameters/EventMarkParam"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
+
+  /events/{event_mark}/participants/{account_id}:
+    put:
+      operationId: EventParticipantUpdate
+      description: |
+        Add a participant to an event or change an existing participant's state.
+
+        If the requesting account is an admin or holds MANAGE_EVENTS permission,
+        they can change the participation properties of any account. Otherwise,
+        they can only change their own participation properties.
+
+        For non-managing members (i.e. not an admin and not a host) this will
+        follow a stricter state machine for the participation status. If the
+        participation status is not set (no participation record is present) or
+        set to "declined", the member may only set their status to "requested"
+        if the event policy is set to "invite_only". Otherwise, they may set it
+        to "attending". If the member is already set to one of these states,
+        they may change it to "declined".
+
+        A non-managing member cannot change their role and the default is
+        "attendee", only managing members can change participant roles.
+
+        If the event participation policy is set to "invite_only" then members
+        can only set their status to "requested" or delete their participation.
+
+        If the event participation policy is set to "closed", it's a no-op.
+
+        Requests to this resource are idempotent given identical request bodies.
+        It acts as a create-or-update action as participation is account-unique.
+      tags: [events]
+      parameters:
+        - $ref: "#/components/parameters/EventMarkParam"
+        - $ref: "#/components/parameters/AccountIDParam"
+      requestBody: { $ref: "#/components/requestBodies/EventParticipantUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
+    delete:
+      operationId: EventParticipantRemove
+      description: |
+        Remove a participant from an event. Same rules as EventParticipantUpdate
+        where non-managing members may only remove themselves. Not soft-delete.
+      tags: [events]
+      parameters:
+        - $ref: "#/components/parameters/EventMarkParam"
+        - $ref: "#/components/parameters/AccountIDParam"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
+
 components:
   #
   # 8888888b.     d8888 8888888b.         d8888 888b     d888 8888888888 88888888888 8888888888 8888888b.   .d8888b.
@@ -1588,6 +1716,14 @@ components:
       description: Role ID
       in: path
       name: role_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    AccountIDParam:
+      description: Account ID.
+      name: account_id
+      in: path
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
@@ -1809,6 +1945,18 @@ components:
       schema:
         type: string
 
+    EventMarkParam:
+      description: |
+        Either:
+        - The unique event ID.
+        - The unique event slug.
+        - A string of the form <id>-<slug>
+      name: event_mark
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Mark"
+
   #
   # 8888888b.  8888888888 .d88888b.  888     888 8888888888 .d8888b. 88888888888 .d8888b.
   # 888   Y88b 888       d88P" "Y88b 888     888 888       d88P  Y88b    888    d88P  Y88b
@@ -1989,6 +2137,21 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/VisibilityMutationProps" }
+
+    EventCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/EventInitialProps" }
+
+    EventUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/EventMutableProps" }
+
+    EventParticipantUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/EventParticipantMutableProps" }
 
   #
   # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
@@ -2407,6 +2570,30 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/DatagraphSearchResult" }
 
+    EventListOK:
+      description: Event list.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/EventListResult" }
+
+    EventCreateOK:
+      description: Event create.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Event" }
+
+    EventGetOK:
+      description: Event get.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Event" }
+
+    EventUpdateOK:
+      description: Event update.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Event" }
+
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
   # d88P  Y88b d88P  Y88b 888    888 888        8888b   d8888       d88888 d88P  Y88b
@@ -2442,6 +2629,29 @@ components:
       #   path: github.com/rs/xid
       example: "cc5lnd2s1s4652adtu50"
       description: A unique identifier for this resource.
+
+    Mark:
+      description: |
+        A polymorphic identifier which is either a raw ID, a slug or both values
+        combined and separated by a hyphen. This allows endpoints to respond to
+        varying forms of a resource's ID which may be present in different app
+        contexts. For example, a slug may be used in a URL but raw IDs are often
+        exposed as part of API responses or in certain endpoint parameters. This
+        type allows flexibility in user experience as well as the API surface
+        while ensuring performance during database queries and other operations.
+
+        For example, given a thread with the ID `cc5lnd2s1s4652adtu50` and the
+        slug `top-10-movies-thread`, Storyden will understand both the forms:
+        `cc5lnd2s1s4652adtu50-top-10-movies-thread` or `cc5lnd2s1s4652adtu50` or
+        `top-10-movies-thread` as the identifier for that thread.
+
+        Marks are only ever used on the read path as they are a derivative data
+        type and are not stored in the database as-is, while IDs and slugs are.
+        The write path typically exposes slugs as writable and IDs as immutable.
+      x-go-type: string
+      type: string
+      format: xid-prefixed-kebab-case-string
+      example: "cc5lnd2s1s4652adtu50-top-10-movies-thread"
 
     Info:
       description: Basic public information about the Storyden installation.
@@ -4310,6 +4520,236 @@ components:
       required: [recomentations]
       properties:
         recomentations: { $ref: "#/components/schemas/DatagraphItemList" }
+
+    #
+    # 8888888888                           888
+    # 888                                  888
+    # 888                                  888
+    # 8888888   888  888  .d88b.  88888b.  888888
+    # 888       888  888 d8P  Y8b 888 "88b 888
+    # 888       Y88  88P 88888888 888  888 888
+    # 888        Y8bd8P  Y8b.     888  888 Y88b.
+    # 8888888888  Y88P    "Y8888  888  888  "Y888
+    #
+
+    Event:
+      description: |
+        An event represents any kind of event, such as an online or in-person
+        gathering, a conference, a workshop, a webinar, etc. Events will contain
+        a start and end timestamp and may have a location and other metadata.
+
+        Each event also gets its own thread for discussion and planning. This is
+        automatically created for every new event and is linked to the event.
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/CommonProperties" }
+        - { $ref: "#/components/schemas/EventReferenceProps" }
+        - { $ref: "#/components/schemas/EventProps" }
+
+    EventReference:
+      description: |
+        A minimal object used to refer to an event without providing all data.
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/CommonProperties" }
+        - { $ref: "#/components/schemas/EventReferenceProps" }
+
+    EventList:
+      type: array
+      items: { $ref: "#/components/schemas/EventReference" }
+
+    EventListResult:
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [events]
+          properties:
+            events: { $ref: "#/components/schemas/EventList" }
+
+    EventProps:
+      type: object
+      required: [thread]
+      properties:
+        thread: { $ref: "#/components/schemas/Thread" }
+
+    EventReferenceProps:
+      type: object
+      required:
+        - name
+        - slug
+        - description
+        - time_range
+        - participants
+        - participation_policy
+        - visibility
+        - location
+      properties:
+        name: { $ref: "#/components/schemas/EventName" }
+        slug: { $ref: "#/components/schemas/EventSlug" }
+        description: { $ref: "#/components/schemas/EventDescription" }
+        time_range: { $ref: "#/components/schemas/EventTimeRange" }
+        primary_image: { $ref: "#/components/schemas/Asset" }
+        participants: { $ref: "#/components/schemas/EventParticipantList" }
+        participation_policy:
+          { $ref: "#/components/schemas/EventParticipationPolicy" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
+        location: { $ref: "#/components/schemas/EventLocation" }
+        capacity: { $ref: "#/components/schemas/EventCapacity" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    EventInitialProps:
+      type: object
+      required:
+        - name
+        - content
+        - time_range
+        - participation_policy
+        - visibility
+        - thread_category_id
+      properties:
+        name: { $ref: "#/components/schemas/EventName" }
+        slug: { $ref: "#/components/schemas/EventSlug" }
+        description: { $ref: "#/components/schemas/EventDescription" }
+        content: { $ref: "#/components/schemas/PostContent" }
+        time_range: { $ref: "#/components/schemas/EventTimeRange" }
+        primary_image_asset_id: { $ref: "#/components/schemas/AssetID" }
+        participation_policy:
+          { $ref: "#/components/schemas/EventParticipationPolicy" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
+        location: { $ref: "#/components/schemas/EventLocation" }
+        capacity: { $ref: "#/components/schemas/EventCapacity" }
+        thread_category_id: { $ref: "#/components/schemas/Identifier" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    EventMutableProps:
+      type: object
+      properties:
+        name: { $ref: "#/components/schemas/EventName" }
+        slug: { $ref: "#/components/schemas/EventSlug" }
+        description: { $ref: "#/components/schemas/EventDescription" }
+        content: { $ref: "#/components/schemas/PostContent" }
+        time_range: { $ref: "#/components/schemas/EventTimeRange" }
+        primary_image_asset_id: { $ref: "#/components/schemas/AssetID" }
+        participation_policy:
+          { $ref: "#/components/schemas/EventParticipationPolicy" }
+        visibility: { $ref: "#/components/schemas/Visibility" }
+        location: { $ref: "#/components/schemas/EventLocation" }
+        capacity: { $ref: "#/components/schemas/EventCapacity" }
+        meta: { $ref: "#/components/schemas/Metadata" }
+
+    EventName:
+      type: string
+      example: "Friday beers, coding and design hack night"
+
+    EventSlug:
+      type: string
+      example: friday-beers-coding-design-hack-night
+
+    EventDescription:
+      type: string
+      example: "Join us for a night of coding, design and beers!"
+
+    EventTimeRange:
+      description: |
+        A time range for an event, which may span multiple days or times of day.
+      type: object
+      required: [start, end]
+      properties:
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+
+    EventParticipantList:
+      description: A list of attendees, hosts and invites for an event.
+      type: array
+      items: { $ref: "#/components/schemas/EventParticipant" }
+
+    EventParticipant:
+      type: object
+      required: [profile, role, status]
+      properties:
+        profile: { $ref: "#/components/schemas/ProfileReference" }
+        role: { $ref: "#/components/schemas/EventParticipantRole" }
+        status: { $ref: "#/components/schemas/EventParticipationStatus" }
+
+    EventParticipantMutableProps:
+      type: object
+      default: { status: "requested", role: "attendee" }
+      properties:
+        role: { $ref: "#/components/schemas/EventParticipantRole" }
+        status: { $ref: "#/components/schemas/EventParticipationStatus" }
+
+    EventParticipantRole:
+      type: string
+      enum: [attendee, host]
+
+    EventParticipationStatus:
+      type: string
+      enum: [requested, invited, attending, declined]
+
+    EventParticipationPolicy:
+      type: string
+      enum: [open, closed, invite_only]
+
+    EventLocation:
+      description: |
+        An event location can be either physical or virtual. A physical location
+        may have an address or coordinates. A virtual location may have a link.
+      type: object
+      discriminator:
+        propertyName: location_type
+        mapping:
+          physical: "#/components/schemas/EventLocationPhysical"
+          virtual: "#/components/schemas/EventLocationVirtual"
+      oneOf:
+        - $ref: "#/components/schemas/EventLocationPhysical"
+        - $ref: "#/components/schemas/EventLocationVirtual"
+
+    EventLocationType:
+      type: string
+      enum: [physical, virtual]
+
+    EventLocationPhysical:
+      description: |
+        A physical location for an event, such as a venue, a park, a street
+        address, etc. This location may have a name, address, and coordinates.
+        A URL may also be added for a Google maps link etc.
+      type: object
+      required: [location_type, name]
+      properties:
+        location_type:
+          $ref: "#/components/schemas/EventLocationType"
+        name:
+          type: string
+        address:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        url:
+          type: string
+
+    EventLocationVirtual:
+      description: |
+        A virtual location for an event, such as a URL, a video conference
+        link, a Discord server, etc. This location may have a URL.
+      type: object
+      required: [location_type, name]
+      properties:
+        location_type:
+          $ref: "#/components/schemas/EventLocationType"
+        name:
+          type: string
+        url:
+          type: string
+
+    EventCapacity:
+      description: The maximum number of attendees that can attend the event.
+      type: integer
 
   securitySchemes:
     browser:

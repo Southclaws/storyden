@@ -96,5 +96,7 @@ func (Post) Edges() []ent.Edge {
 
 		edge.From("content_links", Link.Type).
 			Ref("post_content_references"),
+
+		edge.To("event", Event.Type),
 	}
 }

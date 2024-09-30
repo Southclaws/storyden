@@ -90,6 +90,35 @@ erDiagram
         string verification_code
         bool verified
     }
+    Event {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        timeDOTTime deleted_at
+        string name
+        string slug
+        string description
+        timeDOTTime start_time
+        timeDOTTime end_time
+        string participation_policy
+        eventDOTVisibility visibility
+        string location_type
+        string location_name
+        string location_address
+        float64 location_latitude
+        float64 location_longitude
+        string location_url
+        int capacity
+        mapLBRACKstringRBRACKinterface {} metadata
+    }
+    EventParticipant {
+        xidDOTID id
+        timeDOTTime created_at
+        string role
+        string status
+        xidDOTID account_id
+        xidDOTID event_id
+    }
     LikePost {
         xidDOTID id
         timeDOTTime created_at
@@ -197,8 +226,10 @@ erDiagram
     	Account |o--o{ Collection : "collections/owner"
     	Account |o--o{ Node : "nodes/owner"
     	Account |o--o{ Asset : "assets/owner"
+    	Account |o--o{ EventParticipant : "events/account"
     	AccountRoles }o--o| Account : "account"
     	AccountRoles }o--o| Role : "role"
+    	Asset |o--o{ Event : "event/primary_image"
     	Authentication |o--o{ Email : "email_address/authentication"
     	Category |o--o{ Post : "posts/category"
     	Collection }o--o{ Post : "posts/collections"
@@ -207,6 +238,7 @@ erDiagram
     	CollectionNode }o--o| Node : "node"
     	CollectionPost }o--o| Collection : "collection"
     	CollectionPost }o--o| Post : "post"
+    	Event |o--o{ EventParticipant : "participants/event"
     	Link |o--o{ Post : "posts/link"
     	Link }o--o{ Post : "post_content_references/content_links"
     	Link |o--o{ Node : "nodes/link"
@@ -222,6 +254,7 @@ erDiagram
     	Post |o--o{ LikePost : "likes/Post"
     	Post |o--o{ MentionProfile : "mentions/Post"
     	Post }o--o{ Asset : "assets/posts"
+    	Post |o--o{ Event : "event/thread"
     	Role }o--o{ Account : "accounts/roles"
     	Tag }o--o{ Post : "posts/tags"
     	Tag }o--o{ Node : "nodes/tags"

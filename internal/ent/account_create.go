@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -370,6 +371,21 @@ func (ac *AccountCreate) AddAssets(a ...*Asset) *AccountCreate {
 		ids[i] = a[i].ID
 	}
 	return ac.AddAssetIDs(ids...)
+}
+
+// AddEventIDs adds the "events" edge to the EventParticipant entity by IDs.
+func (ac *AccountCreate) AddEventIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddEventIDs(ids...)
+	return ac
+}
+
+// AddEvents adds the "events" edges to the EventParticipant entity.
+func (ac *AccountCreate) AddEvents(e ...*EventParticipant) *AccountCreate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return ac.AddEventIDs(ids...)
 }
 
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
@@ -784,6 +800,22 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.EventsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.EventsTable,
+			Columns: []string{account.EventsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
