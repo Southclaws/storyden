@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -53,6 +54,7 @@ type AccountQuery struct {
 	withCollections            *CollectionQuery
 	withNodes                  *NodeQuery
 	withAssets                 *AssetQuery
+	withEvents                 *EventParticipantQuery
 	withAccountRoles           *AccountRolesQuery
 	modifiers                  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -421,6 +423,28 @@ func (aq *AccountQuery) QueryAssets() *AssetQuery {
 	return query
 }
 
+// QueryEvents chains the current query on the "events" edge.
+func (aq *AccountQuery) QueryEvents() *EventParticipantQuery {
+	query := (&EventParticipantClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(eventparticipant.Table, eventparticipant.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.EventsTable, account.EventsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryAccountRoles chains the current query on the "account_roles" edge.
 func (aq *AccountQuery) QueryAccountRoles() *AccountRolesQuery {
 	query := (&AccountRolesClient{config: aq.config}).Query()
@@ -650,6 +674,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		withCollections:            aq.withCollections.Clone(),
 		withNodes:                  aq.withNodes.Clone(),
 		withAssets:                 aq.withAssets.Clone(),
+		withEvents:                 aq.withEvents.Clone(),
 		withAccountRoles:           aq.withAccountRoles.Clone(),
 		// clone intermediate query.
 		sql:       aq.sql.Clone(),
@@ -823,6 +848,17 @@ func (aq *AccountQuery) WithAssets(opts ...func(*AssetQuery)) *AccountQuery {
 	return aq
 }
 
+// WithEvents tells the query-builder to eager-load the nodes that are connected to
+// the "events" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithEvents(opts ...func(*EventParticipantQuery)) *AccountQuery {
+	query := (&EventParticipantClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withEvents = query
+	return aq
+}
+
 // WithAccountRoles tells the query-builder to eager-load the nodes that are connected to
 // the "account_roles" edge. The optional arguments are used to configure the query builder of the edge.
 func (aq *AccountQuery) WithAccountRoles(opts ...func(*AccountRolesQuery)) *AccountQuery {
@@ -912,7 +948,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [16]bool{
+		loadedTypes = [17]bool{
 			aq.withEmails != nil,
 			aq.withNotifications != nil,
 			aq.withTriggeredNotifications != nil,
@@ -928,6 +964,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			aq.withCollections != nil,
 			aq.withNodes != nil,
 			aq.withAssets != nil,
+			aq.withEvents != nil,
 			aq.withAccountRoles != nil,
 		}
 	)
@@ -1056,6 +1093,13 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := aq.loadAssets(ctx, query, nodes,
 			func(n *Account) { n.Edges.Assets = []*Asset{} },
 			func(n *Account, e *Asset) { n.Edges.Assets = append(n.Edges.Assets, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withEvents; query != nil {
+		if err := aq.loadEvents(ctx, query, nodes,
+			func(n *Account) { n.Edges.Events = []*EventParticipant{} },
+			func(n *Account, e *EventParticipant) { n.Edges.Events = append(n.Edges.Events, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1575,6 +1619,36 @@ func (aq *AccountQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes
 	}
 	query.Where(predicate.Asset(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(account.AssetsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadEvents(ctx context.Context, query *EventParticipantQuery, nodes []*Account, init func(*Account), assign func(*Account, *EventParticipant)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(eventparticipant.FieldAccountID)
+	}
+	query.Where(predicate.EventParticipant(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.EventsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

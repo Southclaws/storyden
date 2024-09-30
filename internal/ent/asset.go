@@ -48,9 +48,11 @@ type AssetEdges struct {
 	Links []*Link `json:"links,omitempty"`
 	// Owner holds the value of the owner edge.
 	Owner *Account `json:"owner,omitempty"`
+	// Event holds the value of the event edge.
+	Event []*Event `json:"event,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -89,6 +91,15 @@ func (e AssetEdges) OwnerOrErr() (*Account, error) {
 		return nil, &NotFoundError{label: account.Label}
 	}
 	return nil, &NotLoadedError{edge: "owner"}
+}
+
+// EventOrErr returns the Event value or an error if the edge
+// was not loaded in eager-loading.
+func (e AssetEdges) EventOrErr() ([]*Event, error) {
+	if e.loadedTypes[4] {
+		return e.Event, nil
+	}
+	return nil, &NotLoadedError{edge: "event"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -196,6 +207,11 @@ func (a *Asset) QueryLinks() *LinkQuery {
 // QueryOwner queries the "owner" edge of the Asset entity.
 func (a *Asset) QueryOwner() *AccountQuery {
 	return NewAssetClient(a.config).QueryOwner(a)
+}
+
+// QueryEvent queries the "event" edge of the Asset entity.
+func (a *Asset) QueryEvent() *EventQuery {
+	return NewAssetClient(a.config).QueryEvent(a)
 }
 
 // Update returns a builder for updating this Asset.

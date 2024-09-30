@@ -306,6 +306,93 @@ var (
 			},
 		},
 	}
+	// EventsColumns holds the columns for the "events" table.
+	EventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "slug", Type: field.TypeString, Unique: true},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "start_time", Type: field.TypeTime},
+		{Name: "end_time", Type: field.TypeTime},
+		{Name: "participation_policy", Type: field.TypeString},
+		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "unlisted", "review", "published"}, Default: "draft"},
+		{Name: "location_type", Type: field.TypeString, Nullable: true},
+		{Name: "location_name", Type: field.TypeString, Nullable: true},
+		{Name: "location_address", Type: field.TypeString, Nullable: true},
+		{Name: "location_latitude", Type: field.TypeFloat64, Nullable: true},
+		{Name: "location_longitude", Type: field.TypeFloat64, Nullable: true},
+		{Name: "location_url", Type: field.TypeString, Nullable: true},
+		{Name: "capacity", Type: field.TypeInt, Nullable: true},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
+		{Name: "asset_event", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "post_event", Type: field.TypeString, Size: 20},
+	}
+	// EventsTable holds the schema information for the "events" table.
+	EventsTable = &schema.Table{
+		Name:       "events",
+		Columns:    EventsColumns,
+		PrimaryKey: []*schema.Column{EventsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "events_assets_event",
+				Columns:    []*schema.Column{EventsColumns[19]},
+				RefColumns: []*schema.Column{AssetsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "events_posts_event",
+				Columns:    []*schema.Column{EventsColumns[20]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "event_slug",
+				Unique:  true,
+				Columns: []*schema.Column{EventsColumns[5]},
+			},
+		},
+	}
+	// EventParticipantsColumns holds the columns for the "event_participants" table.
+	EventParticipantsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "role", Type: field.TypeString},
+		{Name: "status", Type: field.TypeString},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "event_id", Type: field.TypeString, Size: 20},
+	}
+	// EventParticipantsTable holds the schema information for the "event_participants" table.
+	EventParticipantsTable = &schema.Table{
+		Name:       "event_participants",
+		Columns:    EventParticipantsColumns,
+		PrimaryKey: []*schema.Column{EventParticipantsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "event_participants_accounts_events",
+				Columns:    []*schema.Column{EventParticipantsColumns[4]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "event_participants_events_participants",
+				Columns:    []*schema.Column{EventParticipantsColumns[5]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "unique_event_participant",
+				Unique:  true,
+				Columns: []*schema.Column{EventParticipantsColumns[4], EventParticipantsColumns[5]},
+			},
+		},
+	}
 	// LikePostsColumns holds the columns for the "like_posts" table.
 	LikePostsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -825,6 +912,8 @@ var (
 		CollectionNodesTable,
 		CollectionPostsTable,
 		EmailsTable,
+		EventsTable,
+		EventParticipantsTable,
 		LikePostsTable,
 		LinksTable,
 		MentionProfilesTable,
@@ -860,6 +949,10 @@ func init() {
 	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
 	EmailsTable.ForeignKeys[0].RefTable = AccountsTable
 	EmailsTable.ForeignKeys[1].RefTable = AuthenticationsTable
+	EventsTable.ForeignKeys[0].RefTable = AssetsTable
+	EventsTable.ForeignKeys[1].RefTable = PostsTable
+	EventParticipantsTable.ForeignKeys[0].RefTable = AccountsTable
+	EventParticipantsTable.ForeignKeys[1].RefTable = EventsTable
 	LikePostsTable.ForeignKeys[0].RefTable = AccountsTable
 	LikePostsTable.ForeignKeys[1].RefTable = PostsTable
 	LinksTable.ForeignKeys[0].RefTable = AssetsTable

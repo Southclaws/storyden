@@ -53,5 +53,7 @@ func (Asset) Edges() []ent.Edge {
 			Ref("assets").
 			Unique().
 			Required(),
+
+		edge.To("event", Event.Type),
 	}
 }

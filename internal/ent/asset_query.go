@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
+	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -32,6 +33,7 @@ type AssetQuery struct {
 	withNodes  *NodeQuery
 	withLinks  *LinkQuery
 	withOwner  *AccountQuery
+	withEvent  *EventQuery
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -150,6 +152,28 @@ func (aq *AssetQuery) QueryOwner() *AccountQuery {
 			sqlgraph.From(asset.Table, asset.FieldID, selector),
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, asset.OwnerTable, asset.OwnerColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEvent chains the current query on the "event" edge.
+func (aq *AssetQuery) QueryEvent() *EventQuery {
+	query := (&EventClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(asset.Table, asset.FieldID, selector),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, asset.EventTable, asset.EventColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -353,6 +377,7 @@ func (aq *AssetQuery) Clone() *AssetQuery {
 		withNodes:  aq.withNodes.Clone(),
 		withLinks:  aq.withLinks.Clone(),
 		withOwner:  aq.withOwner.Clone(),
+		withEvent:  aq.withEvent.Clone(),
 		// clone intermediate query.
 		sql:       aq.sql.Clone(),
 		path:      aq.path,
@@ -401,6 +426,17 @@ func (aq *AssetQuery) WithOwner(opts ...func(*AccountQuery)) *AssetQuery {
 		opt(query)
 	}
 	aq.withOwner = query
+	return aq
+}
+
+// WithEvent tells the query-builder to eager-load the nodes that are connected to
+// the "event" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AssetQuery) WithEvent(opts ...func(*EventQuery)) *AssetQuery {
+	query := (&EventClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withEvent = query
 	return aq
 }
 
@@ -482,11 +518,12 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 	var (
 		nodes       = []*Asset{}
 		_spec       = aq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			aq.withPosts != nil,
 			aq.withNodes != nil,
 			aq.withLinks != nil,
 			aq.withOwner != nil,
+			aq.withEvent != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -534,6 +571,13 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 	if query := aq.withOwner; query != nil {
 		if err := aq.loadOwner(ctx, query, nodes, nil,
 			func(n *Asset, e *Account) { n.Edges.Owner = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withEvent; query != nil {
+		if err := aq.loadEvent(ctx, query, nodes,
+			func(n *Asset) { n.Edges.Event = []*Event{} },
+			func(n *Asset, e *Event) { n.Edges.Event = append(n.Edges.Event, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -749,6 +793,37 @@ func (aq *AssetQuery) loadOwner(ctx context.Context, query *AccountQuery, nodes 
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (aq *AssetQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Event)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Asset)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(asset.EventColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.asset_event
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "asset_event" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "asset_event" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

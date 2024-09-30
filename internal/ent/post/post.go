@@ -74,6 +74,8 @@ const (
 	EdgeLink = "link"
 	// EdgeContentLinks holds the string denoting the content_links edge name in mutations.
 	EdgeContentLinks = "content_links"
+	// EdgeEvent holds the string denoting the event edge name in mutations.
+	EdgeEvent = "event"
 	// Table holds the table name of the post in the database.
 	Table = "posts"
 	// AuthorTable is the table that holds the author relation/edge.
@@ -154,6 +156,13 @@ const (
 	// ContentLinksInverseTable is the table name for the Link entity.
 	// It exists in this package in order to avoid circular dependency with the "link" package.
 	ContentLinksInverseTable = "links"
+	// EventTable is the table that holds the event relation/edge.
+	EventTable = "events"
+	// EventInverseTable is the table name for the Event entity.
+	// It exists in this package in order to avoid circular dependency with the "event" package.
+	EventInverseTable = "events"
+	// EventColumn is the table column denoting the event relation/edge.
+	EventColumn = "post_event"
 )
 
 // Columns holds all SQL columns for post fields.
@@ -493,6 +502,20 @@ func ByContentLinks(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newContentLinksStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByEventCount orders the results by event count.
+func ByEventCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEventStep(), opts...)
+	}
+}
+
+// ByEvent orders the results by event terms.
+func ByEvent(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newAuthorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -589,5 +612,12 @@ func newContentLinksStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ContentLinksInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, ContentLinksTable, ContentLinksPrimaryKey...),
+	)
+}
+func newEventStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventTable, EventColumn),
 	)
 }

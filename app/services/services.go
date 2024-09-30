@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
 	"github.com/Southclaws/storyden/app/services/category"
 	"github.com/Southclaws/storyden/app/services/collection"
+	"github.com/Southclaws/storyden/app/services/event"
 	"github.com/Southclaws/storyden/app/services/icon"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
 	"github.com/Southclaws/storyden/app/services/library/node_read"
@@ -55,6 +56,7 @@ func Build() fx.Option {
 		semdexer.Build(),
 		index_job.Build(),
 		summarise_job.Build(),
+		event.Build(),
 		fx.Provide(avatar_gen.New),
 		fx.Provide(node_read.New, node_mutate.New, nodetree.New, node_visibility.New),
 		fx.Provide(following.New),

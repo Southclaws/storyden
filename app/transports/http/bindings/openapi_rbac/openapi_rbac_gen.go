@@ -94,6 +94,13 @@ type OperationPermissions interface {
 	LinkList() (bool, *rbac.Permission)
 	LinkGet() (bool, *rbac.Permission)
 	DatagraphSearch() (bool, *rbac.Permission)
+	EventList() (bool, *rbac.Permission)
+	EventCreate() (bool, *rbac.Permission)
+	EventGet() (bool, *rbac.Permission)
+	EventUpdate() (bool, *rbac.Permission)
+	EventDelete() (bool, *rbac.Permission)
+	EventParticipantUpdate() (bool, *rbac.Permission)
+	EventParticipantRemove() (bool, *rbac.Permission)
 }
 
 func GetOperationPermission(optable OperationPermissions, op string) (bool, *rbac.Permission) {
@@ -280,6 +287,20 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.LinkGet()
 	case "DatagraphSearch":
 		return optable.DatagraphSearch()
+	case "EventList":
+		return optable.EventList()
+	case "EventCreate":
+		return optable.EventCreate()
+	case "EventGet":
+		return optable.EventGet()
+	case "EventUpdate":
+		return optable.EventUpdate()
+	case "EventDelete":
+		return optable.EventDelete()
+	case "EventParticipantUpdate":
+		return optable.EventParticipantUpdate()
+	case "EventParticipantRemove":
+		return optable.EventParticipantRemove()
 	default:
 		panic("unknown operation, must re-run rbacgen")
 	}
