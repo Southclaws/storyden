@@ -26,6 +26,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 	"github.com/Southclaws/storyden/internal/ent/email"
+	"github.com/Southclaws/storyden/internal/ent/event"
+	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
@@ -65,6 +67,10 @@ type Client struct {
 	CollectionPost *CollectionPostClient
 	// Email is the client for interacting with the Email builders.
 	Email *EmailClient
+	// Event is the client for interacting with the Event builders.
+	Event *EventClient
+	// EventParticipant is the client for interacting with the EventParticipant builders.
+	EventParticipant *EventParticipantClient
 	// LikePost is the client for interacting with the LikePost builders.
 	LikePost *LikePostClient
 	// Link is the client for interacting with the Link builders.
@@ -106,6 +112,8 @@ func (c *Client) init() {
 	c.CollectionNode = NewCollectionNodeClient(c.config)
 	c.CollectionPost = NewCollectionPostClient(c.config)
 	c.Email = NewEmailClient(c.config)
+	c.Event = NewEventClient(c.config)
+	c.EventParticipant = NewEventParticipantClient(c.config)
 	c.LikePost = NewLikePostClient(c.config)
 	c.Link = NewLinkClient(c.config)
 	c.MentionProfile = NewMentionProfileClient(c.config)
@@ -206,28 +214,30 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:            ctx,
-		config:         cfg,
-		Account:        NewAccountClient(cfg),
-		AccountFollow:  NewAccountFollowClient(cfg),
-		AccountRoles:   NewAccountRolesClient(cfg),
-		Asset:          NewAssetClient(cfg),
-		Authentication: NewAuthenticationClient(cfg),
-		Category:       NewCategoryClient(cfg),
-		Collection:     NewCollectionClient(cfg),
-		CollectionNode: NewCollectionNodeClient(cfg),
-		CollectionPost: NewCollectionPostClient(cfg),
-		Email:          NewEmailClient(cfg),
-		LikePost:       NewLikePostClient(cfg),
-		Link:           NewLinkClient(cfg),
-		MentionProfile: NewMentionProfileClient(cfg),
-		Node:           NewNodeClient(cfg),
-		Notification:   NewNotificationClient(cfg),
-		Post:           NewPostClient(cfg),
-		React:          NewReactClient(cfg),
-		Role:           NewRoleClient(cfg),
-		Setting:        NewSettingClient(cfg),
-		Tag:            NewTagClient(cfg),
+		ctx:              ctx,
+		config:           cfg,
+		Account:          NewAccountClient(cfg),
+		AccountFollow:    NewAccountFollowClient(cfg),
+		AccountRoles:     NewAccountRolesClient(cfg),
+		Asset:            NewAssetClient(cfg),
+		Authentication:   NewAuthenticationClient(cfg),
+		Category:         NewCategoryClient(cfg),
+		Collection:       NewCollectionClient(cfg),
+		CollectionNode:   NewCollectionNodeClient(cfg),
+		CollectionPost:   NewCollectionPostClient(cfg),
+		Email:            NewEmailClient(cfg),
+		Event:            NewEventClient(cfg),
+		EventParticipant: NewEventParticipantClient(cfg),
+		LikePost:         NewLikePostClient(cfg),
+		Link:             NewLinkClient(cfg),
+		MentionProfile:   NewMentionProfileClient(cfg),
+		Node:             NewNodeClient(cfg),
+		Notification:     NewNotificationClient(cfg),
+		Post:             NewPostClient(cfg),
+		React:            NewReactClient(cfg),
+		Role:             NewRoleClient(cfg),
+		Setting:          NewSettingClient(cfg),
+		Tag:              NewTagClient(cfg),
 	}, nil
 }
 
@@ -245,28 +255,30 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:            ctx,
-		config:         cfg,
-		Account:        NewAccountClient(cfg),
-		AccountFollow:  NewAccountFollowClient(cfg),
-		AccountRoles:   NewAccountRolesClient(cfg),
-		Asset:          NewAssetClient(cfg),
-		Authentication: NewAuthenticationClient(cfg),
-		Category:       NewCategoryClient(cfg),
-		Collection:     NewCollectionClient(cfg),
-		CollectionNode: NewCollectionNodeClient(cfg),
-		CollectionPost: NewCollectionPostClient(cfg),
-		Email:          NewEmailClient(cfg),
-		LikePost:       NewLikePostClient(cfg),
-		Link:           NewLinkClient(cfg),
-		MentionProfile: NewMentionProfileClient(cfg),
-		Node:           NewNodeClient(cfg),
-		Notification:   NewNotificationClient(cfg),
-		Post:           NewPostClient(cfg),
-		React:          NewReactClient(cfg),
-		Role:           NewRoleClient(cfg),
-		Setting:        NewSettingClient(cfg),
-		Tag:            NewTagClient(cfg),
+		ctx:              ctx,
+		config:           cfg,
+		Account:          NewAccountClient(cfg),
+		AccountFollow:    NewAccountFollowClient(cfg),
+		AccountRoles:     NewAccountRolesClient(cfg),
+		Asset:            NewAssetClient(cfg),
+		Authentication:   NewAuthenticationClient(cfg),
+		Category:         NewCategoryClient(cfg),
+		Collection:       NewCollectionClient(cfg),
+		CollectionNode:   NewCollectionNodeClient(cfg),
+		CollectionPost:   NewCollectionPostClient(cfg),
+		Email:            NewEmailClient(cfg),
+		Event:            NewEventClient(cfg),
+		EventParticipant: NewEventParticipantClient(cfg),
+		LikePost:         NewLikePostClient(cfg),
+		Link:             NewLinkClient(cfg),
+		MentionProfile:   NewMentionProfileClient(cfg),
+		Node:             NewNodeClient(cfg),
+		Notification:     NewNotificationClient(cfg),
+		Post:             NewPostClient(cfg),
+		React:            NewReactClient(cfg),
+		Role:             NewRoleClient(cfg),
+		Setting:          NewSettingClient(cfg),
+		Tag:              NewTagClient(cfg),
 	}, nil
 }
 
@@ -297,9 +309,9 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
-		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email,
-		c.LikePost, c.Link, c.MentionProfile, c.Node, c.Notification, c.Post, c.React,
-		c.Role, c.Setting, c.Tag,
+		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
+		c.EventParticipant, c.LikePost, c.Link, c.MentionProfile, c.Node,
+		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -310,9 +322,9 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
-		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email,
-		c.LikePost, c.Link, c.MentionProfile, c.Node, c.Notification, c.Post, c.React,
-		c.Role, c.Setting, c.Tag,
+		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
+		c.EventParticipant, c.LikePost, c.Link, c.MentionProfile, c.Node,
+		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -341,6 +353,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.CollectionPost.mutate(ctx, m)
 	case *EmailMutation:
 		return c.Email.mutate(ctx, m)
+	case *EventMutation:
+		return c.Event.mutate(ctx, m)
+	case *EventParticipantMutation:
+		return c.EventParticipant.mutate(ctx, m)
 	case *LikePostMutation:
 		return c.LikePost.mutate(ctx, m)
 	case *LinkMutation:
@@ -707,6 +723,22 @@ func (c *AccountClient) QueryAssets(a *Account) *AssetQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(asset.Table, asset.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.AssetsTable, account.AssetsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEvents queries the events edge of a Account.
+func (c *AccountClient) QueryEvents(a *Account) *EventParticipantQuery {
+	query := (&EventParticipantClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(eventparticipant.Table, eventparticipant.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.EventsTable, account.EventsColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -1250,6 +1282,22 @@ func (c *AssetClient) QueryOwner(a *Asset) *AccountQuery {
 			sqlgraph.From(asset.Table, asset.FieldID, id),
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, asset.OwnerTable, asset.OwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEvent queries the event edge of a Asset.
+func (c *AssetClient) QueryEvent(a *Asset) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(asset.Table, asset.FieldID, id),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, asset.EventTable, asset.EventColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -2203,6 +2251,352 @@ func (c *EmailClient) mutate(ctx context.Context, m *EmailMutation) (Value, erro
 		return (&EmailDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Email mutation op: %q", m.Op())
+	}
+}
+
+// EventClient is a client for the Event schema.
+type EventClient struct {
+	config
+}
+
+// NewEventClient returns a client for the Event from the given config.
+func NewEventClient(c config) *EventClient {
+	return &EventClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `event.Hooks(f(g(h())))`.
+func (c *EventClient) Use(hooks ...Hook) {
+	c.hooks.Event = append(c.hooks.Event, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `event.Intercept(f(g(h())))`.
+func (c *EventClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Event = append(c.inters.Event, interceptors...)
+}
+
+// Create returns a builder for creating a Event entity.
+func (c *EventClient) Create() *EventCreate {
+	mutation := newEventMutation(c.config, OpCreate)
+	return &EventCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Event entities.
+func (c *EventClient) CreateBulk(builders ...*EventCreate) *EventCreateBulk {
+	return &EventCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EventClient) MapCreateBulk(slice any, setFunc func(*EventCreate, int)) *EventCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EventCreateBulk{err: fmt.Errorf("calling to EventClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EventCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EventCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Event.
+func (c *EventClient) Update() *EventUpdate {
+	mutation := newEventMutation(c.config, OpUpdate)
+	return &EventUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EventClient) UpdateOne(e *Event) *EventUpdateOne {
+	mutation := newEventMutation(c.config, OpUpdateOne, withEvent(e))
+	return &EventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EventClient) UpdateOneID(id xid.ID) *EventUpdateOne {
+	mutation := newEventMutation(c.config, OpUpdateOne, withEventID(id))
+	return &EventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Event.
+func (c *EventClient) Delete() *EventDelete {
+	mutation := newEventMutation(c.config, OpDelete)
+	return &EventDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EventClient) DeleteOne(e *Event) *EventDeleteOne {
+	return c.DeleteOneID(e.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EventClient) DeleteOneID(id xid.ID) *EventDeleteOne {
+	builder := c.Delete().Where(event.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EventDeleteOne{builder}
+}
+
+// Query returns a query builder for Event.
+func (c *EventClient) Query() *EventQuery {
+	return &EventQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEvent},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Event entity by its id.
+func (c *EventClient) Get(ctx context.Context, id xid.ID) (*Event, error) {
+	return c.Query().Where(event.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EventClient) GetX(ctx context.Context, id xid.ID) *Event {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryParticipants queries the participants edge of a Event.
+func (c *EventClient) QueryParticipants(e *Event) *EventParticipantQuery {
+	query := (&EventParticipantClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(eventparticipant.Table, eventparticipant.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.ParticipantsTable, event.ParticipantsColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryThread queries the thread edge of a Event.
+func (c *EventClient) QueryThread(e *Event) *PostQuery {
+	query := (&PostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, event.ThreadTable, event.ThreadColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPrimaryImage queries the primary_image edge of a Event.
+func (c *EventClient) QueryPrimaryImage(e *Event) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, event.PrimaryImageTable, event.PrimaryImageColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EventClient) Hooks() []Hook {
+	return c.hooks.Event
+}
+
+// Interceptors returns the client interceptors.
+func (c *EventClient) Interceptors() []Interceptor {
+	return c.inters.Event
+}
+
+func (c *EventClient) mutate(ctx context.Context, m *EventMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EventCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EventUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Event mutation op: %q", m.Op())
+	}
+}
+
+// EventParticipantClient is a client for the EventParticipant schema.
+type EventParticipantClient struct {
+	config
+}
+
+// NewEventParticipantClient returns a client for the EventParticipant from the given config.
+func NewEventParticipantClient(c config) *EventParticipantClient {
+	return &EventParticipantClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `eventparticipant.Hooks(f(g(h())))`.
+func (c *EventParticipantClient) Use(hooks ...Hook) {
+	c.hooks.EventParticipant = append(c.hooks.EventParticipant, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `eventparticipant.Intercept(f(g(h())))`.
+func (c *EventParticipantClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EventParticipant = append(c.inters.EventParticipant, interceptors...)
+}
+
+// Create returns a builder for creating a EventParticipant entity.
+func (c *EventParticipantClient) Create() *EventParticipantCreate {
+	mutation := newEventParticipantMutation(c.config, OpCreate)
+	return &EventParticipantCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EventParticipant entities.
+func (c *EventParticipantClient) CreateBulk(builders ...*EventParticipantCreate) *EventParticipantCreateBulk {
+	return &EventParticipantCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EventParticipantClient) MapCreateBulk(slice any, setFunc func(*EventParticipantCreate, int)) *EventParticipantCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EventParticipantCreateBulk{err: fmt.Errorf("calling to EventParticipantClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EventParticipantCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EventParticipantCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EventParticipant.
+func (c *EventParticipantClient) Update() *EventParticipantUpdate {
+	mutation := newEventParticipantMutation(c.config, OpUpdate)
+	return &EventParticipantUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EventParticipantClient) UpdateOne(ep *EventParticipant) *EventParticipantUpdateOne {
+	mutation := newEventParticipantMutation(c.config, OpUpdateOne, withEventParticipant(ep))
+	return &EventParticipantUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EventParticipantClient) UpdateOneID(id xid.ID) *EventParticipantUpdateOne {
+	mutation := newEventParticipantMutation(c.config, OpUpdateOne, withEventParticipantID(id))
+	return &EventParticipantUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EventParticipant.
+func (c *EventParticipantClient) Delete() *EventParticipantDelete {
+	mutation := newEventParticipantMutation(c.config, OpDelete)
+	return &EventParticipantDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EventParticipantClient) DeleteOne(ep *EventParticipant) *EventParticipantDeleteOne {
+	return c.DeleteOneID(ep.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EventParticipantClient) DeleteOneID(id xid.ID) *EventParticipantDeleteOne {
+	builder := c.Delete().Where(eventparticipant.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EventParticipantDeleteOne{builder}
+}
+
+// Query returns a query builder for EventParticipant.
+func (c *EventParticipantClient) Query() *EventParticipantQuery {
+	return &EventParticipantQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEventParticipant},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a EventParticipant entity by its id.
+func (c *EventParticipantClient) Get(ctx context.Context, id xid.ID) (*EventParticipant, error) {
+	return c.Query().Where(eventparticipant.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EventParticipantClient) GetX(ctx context.Context, id xid.ID) *EventParticipant {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a EventParticipant.
+func (c *EventParticipantClient) QueryAccount(ep *EventParticipant) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ep.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(eventparticipant.Table, eventparticipant.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, eventparticipant.AccountTable, eventparticipant.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(ep.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEvent queries the event edge of a EventParticipant.
+func (c *EventParticipantClient) QueryEvent(ep *EventParticipant) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ep.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(eventparticipant.Table, eventparticipant.FieldID, id),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, eventparticipant.EventTable, eventparticipant.EventColumn),
+		)
+		fromV = sqlgraph.Neighbors(ep.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EventParticipantClient) Hooks() []Hook {
+	return c.hooks.EventParticipant
+}
+
+// Interceptors returns the client interceptors.
+func (c *EventParticipantClient) Interceptors() []Interceptor {
+	return c.inters.EventParticipant
+}
+
+func (c *EventParticipantClient) mutate(ctx context.Context, m *EventParticipantMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EventParticipantCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EventParticipantUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EventParticipantUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EventParticipantDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown EventParticipant mutation op: %q", m.Op())
 	}
 }
 
@@ -3555,6 +3949,22 @@ func (c *PostClient) QueryContentLinks(po *Post) *LinkQuery {
 	return query
 }
 
+// QueryEvent queries the event edge of a Post.
+func (c *PostClient) QueryEvent(po *Post) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := po.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, id),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.EventTable, post.EventColumn),
+		)
+		fromV = sqlgraph.Neighbors(po.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *PostClient) Hooks() []Hook {
 	return c.hooks.Post
@@ -4228,13 +4638,14 @@ func (c *TagClient) mutate(ctx context.Context, m *TagMutation) (Value, error) {
 type (
 	hooks struct {
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
-		Collection, CollectionNode, CollectionPost, Email, LikePost, Link,
-		MentionProfile, Node, Notification, Post, React, Role, Setting, Tag []ent.Hook
+		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
+		LikePost, Link, MentionProfile, Node, Notification, Post, React, Role, Setting,
+		Tag []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
-		Collection, CollectionNode, CollectionPost, Email, LikePost, Link,
-		MentionProfile, Node, Notification, Post, React, Role, Setting,
+		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
+		LikePost, Link, MentionProfile, Node, Notification, Post, React, Role, Setting,
 		Tag []ent.Interceptor
 	}
 )

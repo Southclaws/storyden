@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
@@ -461,6 +462,21 @@ func (pu *PostUpdate) AddContentLinks(l ...*Link) *PostUpdate {
 	return pu.AddContentLinkIDs(ids...)
 }
 
+// AddEventIDs adds the "event" edge to the Event entity by IDs.
+func (pu *PostUpdate) AddEventIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.AddEventIDs(ids...)
+	return pu
+}
+
+// AddEvent adds the "event" edges to the Event entity.
+func (pu *PostUpdate) AddEvent(e ...*Event) *PostUpdate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return pu.AddEventIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (pu *PostUpdate) Mutation() *PostMutation {
 	return pu.mutation
@@ -683,6 +699,27 @@ func (pu *PostUpdate) RemoveContentLinks(l ...*Link) *PostUpdate {
 		ids[i] = l[i].ID
 	}
 	return pu.RemoveContentLinkIDs(ids...)
+}
+
+// ClearEvent clears all "event" edges to the Event entity.
+func (pu *PostUpdate) ClearEvent() *PostUpdate {
+	pu.mutation.ClearEvent()
+	return pu
+}
+
+// RemoveEventIDs removes the "event" edge to Event entities by IDs.
+func (pu *PostUpdate) RemoveEventIDs(ids ...xid.ID) *PostUpdate {
+	pu.mutation.RemoveEventIDs(ids...)
+	return pu
+}
+
+// RemoveEvent removes "event" edges to Event entities.
+func (pu *PostUpdate) RemoveEvent(e ...*Event) *PostUpdate {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return pu.RemoveEventIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1344,6 +1381,51 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if pu.mutation.EventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.EventTable,
+			Columns: []string{post.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedEventIDs(); len(nodes) > 0 && !pu.mutation.EventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.EventTable,
+			Columns: []string{post.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.EventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.EventTable,
+			Columns: []string{post.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(pu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -1788,6 +1870,21 @@ func (puo *PostUpdateOne) AddContentLinks(l ...*Link) *PostUpdateOne {
 	return puo.AddContentLinkIDs(ids...)
 }
 
+// AddEventIDs adds the "event" edge to the Event entity by IDs.
+func (puo *PostUpdateOne) AddEventIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.AddEventIDs(ids...)
+	return puo
+}
+
+// AddEvent adds the "event" edges to the Event entity.
+func (puo *PostUpdateOne) AddEvent(e ...*Event) *PostUpdateOne {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return puo.AddEventIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (puo *PostUpdateOne) Mutation() *PostMutation {
 	return puo.mutation
@@ -2010,6 +2107,27 @@ func (puo *PostUpdateOne) RemoveContentLinks(l ...*Link) *PostUpdateOne {
 		ids[i] = l[i].ID
 	}
 	return puo.RemoveContentLinkIDs(ids...)
+}
+
+// ClearEvent clears all "event" edges to the Event entity.
+func (puo *PostUpdateOne) ClearEvent() *PostUpdateOne {
+	puo.mutation.ClearEvent()
+	return puo
+}
+
+// RemoveEventIDs removes the "event" edge to Event entities by IDs.
+func (puo *PostUpdateOne) RemoveEventIDs(ids ...xid.ID) *PostUpdateOne {
+	puo.mutation.RemoveEventIDs(ids...)
+	return puo
+}
+
+// RemoveEvent removes "event" edges to Event entities.
+func (puo *PostUpdateOne) RemoveEvent(e ...*Event) *PostUpdateOne {
+	ids := make([]xid.ID, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return puo.RemoveEventIDs(ids...)
 }
 
 // Where appends a list predicates to the PostUpdate builder.
@@ -2694,6 +2812,51 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(link.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.EventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.EventTable,
+			Columns: []string{post.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedEventIDs(); len(nodes) > 0 && !puo.mutation.EventCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.EventTable,
+			Columns: []string{post.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.EventIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.EventTable,
+			Columns: []string{post.EventColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

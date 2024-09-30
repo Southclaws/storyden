@@ -369,3 +369,33 @@ func (m *Mapping) LinkGet() (bool, *rbac.Permission) {
 func (m *Mapping) DatagraphSearch() (bool, *rbac.Permission) {
 	return true, nil
 }
+
+func (m *Mapping) EventList() (bool, *rbac.Permission) {
+	return false, nil
+}
+
+func (m *Mapping) EventCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageEvents
+}
+
+func (m *Mapping) EventGet() (bool, *rbac.Permission) {
+	return false, nil
+}
+
+func (m *Mapping) EventUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageEvents
+}
+
+func (m *Mapping) EventDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageEvents
+}
+
+func (m *Mapping) EventParticipantUpdate() (bool, *rbac.Permission) {
+	// Requires PermissionManageEvents unless updating self
+	return true, nil
+}
+
+func (m *Mapping) EventParticipantRemove() (bool, *rbac.Permission) {
+	// Requires PermissionManageEvents unless deleting self
+	return true, nil
+}

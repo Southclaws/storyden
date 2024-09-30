@@ -13,6 +13,10 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection"
+	"github.com/Southclaws/storyden/app/resources/event/event_querier"
+	"github.com/Southclaws/storyden/app/resources/event/event_writer"
+	"github.com/Southclaws/storyden/app/resources/event/participation/participant_querier"
+	"github.com/Southclaws/storyden/app/resources/event/participation/participant_writer"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_search"
@@ -68,6 +72,10 @@ func Build() fx.Option {
 			follow_writer.New,
 			follow_querier.New,
 			mailtemplate.New,
+			event_querier.New,
+			event_writer.New,
+			participant_querier.New,
+			participant_writer.New,
 		),
 	)
 }

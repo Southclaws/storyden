@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
+	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
@@ -47,6 +48,7 @@ type PostQuery struct {
 	withCollections  *CollectionQuery
 	withLink         *LinkQuery
 	withContentLinks *LinkQuery
+	withEvent        *EventQuery
 	withFKs          bool
 	modifiers        []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -393,6 +395,28 @@ func (pq *PostQuery) QueryContentLinks() *LinkQuery {
 	return query
 }
 
+// QueryEvent chains the current query on the "event" edge.
+func (pq *PostQuery) QueryEvent() *EventQuery {
+	query := (&EventClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, selector),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.EventTable, post.EventColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Post entity from the query.
 // Returns a *NotFoundError when no Post was found.
 func (pq *PostQuery) First(ctx context.Context) (*Post, error) {
@@ -599,6 +623,7 @@ func (pq *PostQuery) Clone() *PostQuery {
 		withCollections:  pq.withCollections.Clone(),
 		withLink:         pq.withLink.Clone(),
 		withContentLinks: pq.withContentLinks.Clone(),
+		withEvent:        pq.withEvent.Clone(),
 		// clone intermediate query.
 		sql:       pq.sql.Clone(),
 		path:      pq.path,
@@ -760,6 +785,17 @@ func (pq *PostQuery) WithContentLinks(opts ...func(*LinkQuery)) *PostQuery {
 	return pq
 }
 
+// WithEvent tells the query-builder to eager-load the nodes that are connected to
+// the "event" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PostQuery) WithEvent(opts ...func(*EventQuery)) *PostQuery {
+	query := (&EventClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withEvent = query
+	return pq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -839,7 +875,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		nodes       = []*Post{}
 		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
-		loadedTypes = [14]bool{
+		loadedTypes = [15]bool{
 			pq.withAuthor != nil,
 			pq.withCategory != nil,
 			pq.withTags != nil,
@@ -854,6 +890,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 			pq.withCollections != nil,
 			pq.withLink != nil,
 			pq.withContentLinks != nil,
+			pq.withEvent != nil,
 		}
 	)
 	if pq.withAuthor != nil {
@@ -973,6 +1010,13 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		if err := pq.loadContentLinks(ctx, query, nodes,
 			func(n *Post) { n.Edges.ContentLinks = []*Link{} },
 			func(n *Post, e *Link) { n.Edges.ContentLinks = append(n.Edges.ContentLinks, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withEvent; query != nil {
+		if err := pq.loadEvent(ctx, query, nodes,
+			func(n *Post) { n.Edges.Event = []*Event{} },
+			func(n *Post, e *Event) { n.Edges.Event = append(n.Edges.Event, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1520,6 +1564,37 @@ func (pq *PostQuery) loadContentLinks(ctx context.Context, query *LinkQuery, nod
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (pq *PostQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*Post, init func(*Post), assign func(*Post, *Event)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Post)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(post.EventColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.post_event
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "post_event" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "post_event" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

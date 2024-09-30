@@ -12,10 +12,14 @@ type Event struct {
 }
 
 var (
-	EventThreadReply    = Event{eventThreadReply}
-	EventPostLike       = Event{eventPostLike}
-	EventFollow         = Event{eventFollow}
-	EventProfileMention = Event{eventProfileMention}
+	EventThreadReply          = Event{eventThreadReply}
+	EventPostLike             = Event{eventPostLike}
+	EventFollow               = Event{eventFollow}
+	EventProfileMention       = Event{eventProfileMention}
+	EventEventHostAdded       = Event{eventEventHostAdded}
+	EventMemberAttendingEvent = Event{eventMemberAttendingEvent}
+	EventMemberDeclinedEvent  = Event{eventMemberDeclinedEvent}
+	EventAttendeeRemoved      = Event{eventAttendeeRemoved}
 )
 
 func (r Event) Format(f fmt.State, verb rune) {
@@ -63,6 +67,14 @@ func NewEvent(__iNpUt__ string) (Event, error) {
 		return EventFollow, nil
 	case string(eventProfileMention):
 		return EventProfileMention, nil
+	case string(eventEventHostAdded):
+		return EventEventHostAdded, nil
+	case string(eventMemberAttendingEvent):
+		return EventMemberAttendingEvent, nil
+	case string(eventMemberDeclinedEvent):
+		return EventMemberDeclinedEvent, nil
+	case string(eventAttendeeRemoved):
+		return EventAttendeeRemoved, nil
 	default:
 		return Event{}, fmt.Errorf("invalid value for type 'Event': '%s'", __iNpUt__)
 	}

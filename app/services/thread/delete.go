@@ -37,7 +37,7 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 
 	err = s.thread_repo.Delete(ctx, id)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))
+		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to delete thread"))
 	}
 
 	// if err := s.indexQueue.Publish(ctx, mq.DeindexPost{
