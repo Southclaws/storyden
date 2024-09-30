@@ -43,6 +43,8 @@ func (p *Public) GetDesc() string               { return p.Bio.Short() }
 func (p *Public) GetContent() datagraph.Content { return p.Bio }
 func (p *Public) GetProps() map[string]any      { return p.Metadata }
 func (p *Public) GetAssets() []*asset.Asset     { return []*asset.Asset{} }
+func (p *Public) GetCreated() time.Time         { return p.Created }
+func (p *Public) GetUpdated() time.Time         { return p.Created }
 
 func ProfileFromModel(a *ent.Account) (*Public, error) {
 	rolesEdge, err := a.Edges.AccountRolesOrErr()

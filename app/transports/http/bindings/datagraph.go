@@ -47,11 +47,14 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 func serialiseDatagraphItem(v datagraph.Item) openapi.DatagraphItem {
 	desc := v.GetDesc()
 	return openapi.DatagraphItem{
-		Kind:        serialiseDatagraphKind(v.GetKind()),
-		Id:          v.GetID().String(),
+		Kind: serialiseDatagraphKind(v.GetKind()),
+		Id:   v.GetID().String(),
+		// CreatedAt:      in.Item.GetCreated(),
+		// UpdatedAt:      in.Item.GetUpdated(),
 		Name:        v.GetName(),
 		Slug:        v.GetSlug(),
 		Description: &desc,
+		Assets:      dt.Map(v.GetAssets(), serialiseAssetPtr),
 	}
 }
 
