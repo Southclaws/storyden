@@ -51,7 +51,7 @@ func (s *service) Search(ctx context.Context, q Query) ([]*post.Post, error) {
 	filters := []post_search.Filter{}
 
 	q.Body.Call(func(v string) {
-		filters = append(filters, post_search.WithBodyContains(v))
+		filters = append(filters, post_search.WithKeywords(v))
 	})
 	q.Author.Call(func(v string) {
 		filters = append(filters, post_search.WithAuthorHandle(v))

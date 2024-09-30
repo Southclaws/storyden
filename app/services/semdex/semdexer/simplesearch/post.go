@@ -16,7 +16,7 @@ type postSearcher struct {
 }
 
 func (s *postSearcher) Search(ctx context.Context, query string) (datagraph.ItemList, error) {
-	rs, err := s.post_search.Search(ctx, post_search.WithTitleContains(query), post_search.WithBodyContains(query))
+	rs, err := s.post_search.Search(ctx, post_search.WithKeywords(query))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

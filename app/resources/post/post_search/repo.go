@@ -49,18 +49,16 @@ func WithKinds(ks ...Kind) Filter {
 	}
 }
 
-func WithTitleContains(q string) Filter {
+func WithKeywords(q string) Filter {
 	return func(pq *ent.PostQuery) {
-		pq.Where(ent_post.And(
-			ent_post.First(true),
-			ent_post.TitleContainsFold(q),
-		))
-	}
-}
-
-func WithBodyContains(q string) Filter {
-	return func(pq *ent.PostQuery) {
-		pq.Where(ent_post.BodyContains(q))
+		pq.Where(
+			ent_post.Or(
+				ent_post.And(
+					ent_post.First(true),
+					ent_post.TitleContainsFold(q),
+				),
+				ent_post.BodyContainsFold(q),
+			))
 	}
 }
 
