@@ -55,6 +55,6 @@ function buildPermalink(d: DatagraphItem): string {
     case "profile":
       return `/t/${d.slug}`;
     case "node":
-      return `/directory/${d.slug}`;
+      return `/l/${d.slug}`;
   }
 }

@@ -30,16 +30,14 @@ export function ContentNavigationList() {
       </LStack>
 
       <LStack gap="1">
-        {isAdmin && <CategoryCreateTrigger />}
-
-        <LinkButton w="full" size="xs" variant="ghost" href="/directory">
+        <LinkButton w="full" size="xs" variant="ghost" href="/l">
           <BookOpenIcon />
-          Knowledgebase
+          Library
         </LinkButton>
 
-        <LinkButton w="full" size="xs" variant="ghost" href="/p">
+        <LinkButton w="full" size="xs" variant="ghost" href="/m">
           <UsersIcon />
-          Member directory
+          Members
         </LinkButton>
       </LStack>
     </styled.nav>

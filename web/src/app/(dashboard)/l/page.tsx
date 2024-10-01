@@ -1,17 +1,9 @@
-import { LinkIndexScreen } from "src/screens/directory/links/LinkIndexScreen/LinkIndexScreen";
+import { linkList } from "@/api/openapi-server/links";
+import { nodeList } from "@/api/openapi-server/nodes";
+import { LibraryIndexScreen } from "@/screens/library/LibraryIndexScreen";
 
-type Props = {
-  searchParams: {
-    q: string;
-    page: number;
-  };
-};
+export default async function Page() {
+  const [nodes, links] = await Promise.all([nodeList(), linkList()]);
 
-export default function Page(props: Props) {
-  return (
-    <LinkIndexScreen
-      query={props.searchParams.q}
-      page={props.searchParams.page}
-    />
-  );
+  return <LibraryIndexScreen nodes={nodes.data} links={links.data} />;
 }

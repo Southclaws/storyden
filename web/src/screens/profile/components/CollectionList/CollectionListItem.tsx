@@ -9,7 +9,7 @@ export function CollectionListItem(props: Collection) {
       <styled.li key={props.id} listStyleType="none">
         <Flex id={props.id} flexDir="column" gap="1">
           <LinkOverlay
-            href={`/p/${props.owner.handle}/collections/${props.id}`}
+            href={`/m/${props.owner.handle}/collections/${props.id}`}
           >
             <Heading size="md">{props.name}</Heading>
           </LinkOverlay>
