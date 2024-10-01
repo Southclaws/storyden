@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/rs/xid"
 )
 
@@ -36,5 +37,13 @@ func (React) Edges() []ent.Edge {
 			Field("post_id").
 			Unique().
 			Required(),
+	}
+}
+
+func (React) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("account_id", "post_id", "emoji").
+			Unique().
+			StorageKey("unique_react_post_emoji"),
 	}
 }
