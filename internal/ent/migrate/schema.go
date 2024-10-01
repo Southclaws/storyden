@@ -659,6 +659,13 @@ var (
 				OnDelete:   schema.Cascade,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "unique_react_post_emoji",
+				Unique:  true,
+				Columns: []*schema.Column{ReactsColumns[3], ReactsColumns[4], ReactsColumns[2]},
+			},
+		},
 	}
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{

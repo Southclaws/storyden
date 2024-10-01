@@ -137,6 +137,14 @@ func TestReactions(t *testing.T) {
 				tests.Ok(t, err, r2)
 				r3, err := cl.PostReactAddWithResponse(root, threadID, openapi.PostReactAddJSONRequestBody{Emoji: "👻"}, session2)
 				tests.Ok(t, err, r3)
+
+				r4, err := cl.PostReactAddWithResponse(root, threadID, openapi.PostReactAddJSONRequestBody{Emoji: "🥶"}, session2)
+				tests.Ok(t, err, r4)
+
+				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug)
+				tests.Ok(t, err, thread1get)
+
+				r.Len(thread1get.JSON200.Reacts, 2, "2 reacts because 👻 is ignored after the first react, reactions are unique by (post, account, emoji) constraint")
 			})
 		}))
 	}))

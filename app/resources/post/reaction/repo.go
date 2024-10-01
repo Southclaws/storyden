@@ -2,8 +2,8 @@ package reaction
 
 import (
 	"context"
+	"database/sql"
 
-	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
@@ -39,6 +39,22 @@ func (q *Querier) Get(ctx context.Context, reactID ReactID) (*React, error) {
 	return Map(r)
 }
 
+func (q *Querier) Lookup(ctx context.Context, accountID account.AccountID, postID xid.ID, e string) (*React, error) {
+	r, err := q.db.React.Query().
+		Where(
+			react.AccountID(xid.ID(accountID)),
+			react.PostID(xid.ID(postID)),
+			react.Emoji(e),
+		).
+		WithAccount(func(aq *ent.AccountQuery) { aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }) }).
+		Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return Map(r)
+}
+
 type Writer struct {
 	db      *ent.Client
 	querier *Querier
@@ -50,22 +66,38 @@ func (w *Writer) Add(ctx context.Context, accountID account.AccountID, postID xi
 		return nil, fault.Wrap(ErrInvalidEmoji, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	reactID, err := w.tryAdd(ctx, accountID, postID, e)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if reactID == nil {
+		return w.querier.Lookup(ctx, accountID, postID, e)
+	}
+
+	return w.querier.Get(ctx, ReactID(*reactID))
+}
+
+func (w *Writer) tryAdd(ctx context.Context, accountID account.AccountID, postID xid.ID, e string) (*xid.ID, error) {
 	reactID, err := w.db.React.
 		Create().
 		SetEmoji(e).
 		SetAccountID(xid.ID(accountID)).
 		SetPostID(xid.ID(postID)).
-		OnConflict(sql.DoNothing()).
+		OnConflictColumns(react.FieldPostID, react.FieldAccountID, react.FieldEmoji).DoNothing().
 		ID(ctx)
 	if err != nil {
-		if ent.IsConstraintError(err) {
+		// NOTE: Not found is a red herring here, due to SQL being as weird as
+		// it normally is, on-conflict-do-nothing doesn't return anything.
+		// NOTE 2: but, ent.IsNotFound(err) does not work, wrong sentinel error.
+		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
 		}
 
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return w.querier.Get(ctx, ReactID(reactID))
+	return &reactID, nil
 }
 
 func (w *Writer) Remove(ctx context.Context, accountID account.AccountID, reactID ReactID) error {
