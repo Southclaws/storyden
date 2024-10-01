@@ -4,8 +4,8 @@ import Link from "next/link";
 
 import { useNodeList } from "@/api/openapi-client/nodes";
 import { useSession } from "@/auth";
-import { DatagraphNodeTree } from "@/components/directory/datagraph/DatagraphNodeTree/DatagraphNodeTree";
-import { LStack, styled } from "@/styled-system/jsx";
+import { LibraryPageTree } from "@/components/library/LibraryPageTree/LibraryPageTree";
+import { LStack } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
 
 import { AddAction } from "../../Action/Add";
@@ -46,7 +46,7 @@ export function DatagraphNavTree({ currentNode }: Props) {
       <NavigationHeader
         controls={
           canManageLibrary && (
-            <Link href="/directory/new">
+            <Link href="/l/new">
               <AddAction size="xs" color="fg.subtle" title="Add a node" />
             </Link>
           )
@@ -55,10 +55,10 @@ export function DatagraphNavTree({ currentNode }: Props) {
         Library
       </NavigationHeader>
 
-      <DatagraphNodeTree
+      <LibraryPageTree
         currentNode={currentNode}
         data={{
-          label: "Directory",
+          label: "Library",
           children: data.nodes,
         }}
       />

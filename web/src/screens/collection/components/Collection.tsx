@@ -20,7 +20,7 @@ export function Collection(props: CollectionWithItems) {
             <Timestamp
               created={props.createdAt}
               updated={props.updatedAt}
-              href={`/p/${props.owner.handle}/collections/${props.id}`}
+              href={`/m/${props.owner.handle}/collections/${props.id}`}
             />
           </styled.span>
         </styled.p>

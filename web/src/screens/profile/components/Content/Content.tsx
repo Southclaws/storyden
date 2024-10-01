@@ -20,19 +20,13 @@ export function Content(props: PublicProfile) {
       <Tabs.Root width="full" variant="line" defaultValue="posts">
         <Tabs.List>
           <Tabs.Trigger value="posts">Posts</Tabs.Trigger>
-          <Tabs.Trigger value="replies">Replies</Tabs.Trigger>
+          {/* <Tabs.Trigger value="replies">Replies</Tabs.Trigger> */}
           <Tabs.Trigger value="collections">Collections</Tabs.Trigger>
           <Tabs.Indicator />
         </Tabs.List>
 
         <Tabs.Content value="posts">
           <TextPostList threads={content.data.threads} />
-        </Tabs.Content>
-
-        <Tabs.Content value="replies">
-          <Box>
-            <PostList posts={content.data.posts} />
-          </Box>
         </Tabs.Content>
 
         <Tabs.Content value="collections">

@@ -5,21 +5,21 @@ import { Presence } from "@ark-ui/react";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 
+import { HStack } from "@/styled-system/jsx";
+import { vstack } from "@/styled-system/patterns";
+
 import { CloseAction } from "../../Action/Close";
 import { AdminAction } from "../Anchors/Admin";
 import { ComposeAction } from "../Anchors/Compose";
 import { DashboardAction } from "../Anchors/Dashboard";
 import { DraftsAction } from "../Anchors/Drafts";
 import { HomeAction } from "../Anchors/Home";
-import { KnowledgebaseAction } from "../Anchors/Knowledgebase";
+import { LibraryAction } from "../Anchors/Library";
 import { LoginAction } from "../Anchors/Login";
 import { LogoutAction } from "../Anchors/Logout";
 import { SettingsAction } from "../Anchors/Settings";
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
 import { Search } from "../Search/Search";
-
-import { HStack } from "@/styled-system/jsx";
-import { vstack } from "@/styled-system/patterns";
 
 import { useNavpill } from "./useNavpill";
 
@@ -72,7 +72,7 @@ export function Navpill() {
               <ProfilePill profileReference={account} showHandle={false} />
               <HomeAction />
               <ComposeAction />
-              <KnowledgebaseAction />
+              <LibraryAction />
               <DashboardAction onClick={onExpand} />
             </>
           )}

@@ -1,18 +1,18 @@
 "use client";
 
-import { NodeCardRows } from "src/components/directory/datagraph/NodeCardList";
 import { Unready } from "src/components/site/Unready";
 
+import { NodeCardRows } from "@/components/library/NodeCardList";
 import { Heading } from "@/components/ui/heading";
 import { VStack } from "@/styled-system/jsx";
 
-import { useDirectoryPath } from "../directory/datagraph/useDirectoryPath";
+import { useLibraryPath } from "../library/useLibraryPath";
 
 import { Props, useDraftListScreen } from "./useDraftListScreen";
 
 export function DraftListScreen(props: Props) {
   const { ready, data, error } = useDraftListScreen(props);
-  const directoryPath = useDirectoryPath();
+  const libraryPath = useLibraryPath();
 
   if (!ready) return <Unready {...error} />;
 
@@ -21,7 +21,7 @@ export function DraftListScreen(props: Props) {
       <Heading>Your drafts</Heading>
 
       <NodeCardRows
-        directoryPath={directoryPath}
+        libraryPath={libraryPath}
         context="generic"
         nodes={data.nodes.data.nodes}
       />
