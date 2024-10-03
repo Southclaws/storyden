@@ -32,8 +32,8 @@ func (w *Writer) Update(ctx context.Context, accountID account.AccountID, roleID
 	// Only one role can be set as a badge, clear all first, then set if true.
 
 	err := w.db.AccountRoles.Update().
-		Where(predicate...).
-		SetBadge(false).
+		Where(accountroles.AccountIDEQ(xid.ID(accountID))).
+		ClearBadge().
 		Exec(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
