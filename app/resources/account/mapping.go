@@ -47,6 +47,25 @@ func MapAccount(a *ent.Account) (*Account, error) {
 
 	emails := dt.Map(a.Edges.Emails, MapEmail)
 
+	invitedByEdge := opt.NewPtr(a.Edges.InvitedBy)
+
+	invitedBy, err := opt.MapErr(invitedByEdge, func(i ent.Invitation) (Account, error) {
+		c, err := i.Edges.CreatorOrErr()
+		if err != nil {
+			return Account{}, err
+		}
+
+		ib, err := MapAccount(c)
+		if err != nil {
+			return Account{}, err
+		}
+
+		return *ib, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	return &Account{
 		ID:             AccountID(a.ID),
 		Handle:         a.Handle,
@@ -58,6 +77,7 @@ func MapAccount(a *ent.Account) (*Account, error) {
 		EmailAddresses: emails,
 		VerifiedStatus: verifiedStatus,
 		ExternalLinks:  links,
+		InvitedBy:      invitedBy,
 		Metadata:       a.Metadata,
 
 		CreatedAt: a.CreatedAt,

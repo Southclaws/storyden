@@ -65,7 +65,7 @@ func main() {
 					return e2e.WithSession(ctx, cj), nil
 				}
 
-				signup, err := client.AuthPasswordSignupWithResponse(ctx, openapi.AuthPair{
+				signup, err := client.AuthPasswordSignupWithResponse(ctx, nil, openapi.AuthPair{
 					Identifier: username,
 					Token:      "password",
 				})

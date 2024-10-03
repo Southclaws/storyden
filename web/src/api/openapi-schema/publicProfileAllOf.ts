@@ -16,6 +16,7 @@ import type { Metadata } from "./metadata";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
 import type { ProfileFollowersCount } from "./profileFollowersCount";
 import type { ProfileFollowingCount } from "./profileFollowingCount";
+import type { ProfileReference } from "./profileReference";
 import type { TagList } from "./tagList";
 
 export type PublicProfileAllOf = {
@@ -26,6 +27,7 @@ export type PublicProfileAllOf = {
   handle: AccountHandle;
   image?: string;
   interests: TagList;
+  invited_by?: ProfileReference;
   like_score: LikeScore;
   links: ProfileExternalLinkList;
   meta: Metadata;

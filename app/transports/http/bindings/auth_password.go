@@ -27,7 +27,12 @@ func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi
 }
 
 func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi.AuthPasswordSignupRequestObject) (openapi.AuthPasswordSignupResponseObject, error) {
-	u, err := i.p.Register(ctx, request.Body.Identifier, request.Body.Token)
+	invitedBy, err := deserialiseInvitationID(request.Params.InvitationId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	u, err := i.p.Register(ctx, request.Body.Identifier, request.Body.Token, invitedBy)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

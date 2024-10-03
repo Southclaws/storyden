@@ -23,6 +23,11 @@ import (
 )
 
 func serialiseAccount(acc *account.Account) openapi.Account {
+	invitedBy := opt.Map(acc.InvitedBy, func(ib account.Account) openapi.ProfileReference {
+		pro := profile.ProfileFromAccount(&ib)
+		return serialiseProfileReference(*pro)
+	})
+
 	return openapi.Account{
 		Id:             openapi.Identifier(acc.ID.String()),
 		Handle:         acc.Handle,
@@ -37,6 +42,7 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 		VerifiedStatus: openapi.AccountVerifiedStatus(acc.VerifiedStatus.String()),
 		EmailAddresses: dt.Map(acc.EmailAddresses, serialiseEmailAddress),
 		Roles:          serialiseHeldRoleList(acc.Roles),
+		InvitedBy:      invitedBy.Ptr(),
 	}
 }
 

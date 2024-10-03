@@ -31,6 +31,7 @@ const (
 	permissionCreateReaction       permissionEnum = "CREATE_REACTION"
 	permissionManagePosts          permissionEnum = "MANAGE_POSTS"
 	permissionManageCategories     permissionEnum = "MANAGE_CATEGORIES"
+	permissionCreateInvitation     permissionEnum = "CREATE_INVITATION"
 
 	// Library (Page tree nodes)
 	permissionReadPublishedLibrary permissionEnum = "READ_PUBLISHED_LIBRARY"

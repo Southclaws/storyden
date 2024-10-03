@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/rs/xid"
 )
@@ -38,6 +39,8 @@ type Account struct {
 	Links []schema.ExternalLink `json:"links,omitempty"`
 	// Metadata holds the value of the "metadata" field.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	// InvitedByID holds the value of the "invited_by_id" field.
+	InvitedByID *xid.ID `json:"invited_by_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AccountQuery when eager-loading is set.
 	Edges        AccountEdges `json:"edges"`
@@ -56,6 +59,10 @@ type AccountEdges struct {
 	Following []*AccountFollow `json:"following,omitempty"`
 	// FollowedBy holds the value of the followed_by edge.
 	FollowedBy []*AccountFollow `json:"followed_by,omitempty"`
+	// Invitations holds the value of the invitations edge.
+	Invitations []*Invitation `json:"invitations,omitempty"`
+	// InvitedBy holds the value of the invited_by edge.
+	InvitedBy *Invitation `json:"invited_by,omitempty"`
 	// Posts holds the value of the posts edge.
 	Posts []*Post `json:"posts,omitempty"`
 	// Reacts holds the value of the reacts edge.
@@ -82,7 +89,7 @@ type AccountEdges struct {
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [17]bool
+	loadedTypes [19]bool
 }
 
 // EmailsOrErr returns the Emails value or an error if the edge
@@ -130,10 +137,30 @@ func (e AccountEdges) FollowedByOrErr() ([]*AccountFollow, error) {
 	return nil, &NotLoadedError{edge: "followed_by"}
 }
 
+// InvitationsOrErr returns the Invitations value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) InvitationsOrErr() ([]*Invitation, error) {
+	if e.loadedTypes[5] {
+		return e.Invitations, nil
+	}
+	return nil, &NotLoadedError{edge: "invitations"}
+}
+
+// InvitedByOrErr returns the InvitedBy value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AccountEdges) InvitedByOrErr() (*Invitation, error) {
+	if e.InvitedBy != nil {
+		return e.InvitedBy, nil
+	} else if e.loadedTypes[6] {
+		return nil, &NotFoundError{label: invitation.Label}
+	}
+	return nil, &NotLoadedError{edge: "invited_by"}
+}
+
 // PostsOrErr returns the Posts value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) PostsOrErr() ([]*Post, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[7] {
 		return e.Posts, nil
 	}
 	return nil, &NotLoadedError{edge: "posts"}
@@ -142,7 +169,7 @@ func (e AccountEdges) PostsOrErr() ([]*Post, error) {
 // ReactsOrErr returns the Reacts value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) ReactsOrErr() ([]*React, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[8] {
 		return e.Reacts, nil
 	}
 	return nil, &NotLoadedError{edge: "reacts"}
@@ -151,7 +178,7 @@ func (e AccountEdges) ReactsOrErr() ([]*React, error) {
 // LikesOrErr returns the Likes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) LikesOrErr() ([]*LikePost, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[9] {
 		return e.Likes, nil
 	}
 	return nil, &NotLoadedError{edge: "likes"}
@@ -160,7 +187,7 @@ func (e AccountEdges) LikesOrErr() ([]*LikePost, error) {
 // MentionsOrErr returns the Mentions value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) MentionsOrErr() ([]*MentionProfile, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[10] {
 		return e.Mentions, nil
 	}
 	return nil, &NotLoadedError{edge: "mentions"}
@@ -169,7 +196,7 @@ func (e AccountEdges) MentionsOrErr() ([]*MentionProfile, error) {
 // RolesOrErr returns the Roles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RolesOrErr() ([]*Role, error) {
-	if e.loadedTypes[9] {
+	if e.loadedTypes[11] {
 		return e.Roles, nil
 	}
 	return nil, &NotLoadedError{edge: "roles"}
@@ -178,7 +205,7 @@ func (e AccountEdges) RolesOrErr() ([]*Role, error) {
 // AuthenticationOrErr returns the Authentication value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AuthenticationOrErr() ([]*Authentication, error) {
-	if e.loadedTypes[10] {
+	if e.loadedTypes[12] {
 		return e.Authentication, nil
 	}
 	return nil, &NotLoadedError{edge: "authentication"}
@@ -187,7 +214,7 @@ func (e AccountEdges) AuthenticationOrErr() ([]*Authentication, error) {
 // TagsOrErr returns the Tags value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) TagsOrErr() ([]*Tag, error) {
-	if e.loadedTypes[11] {
+	if e.loadedTypes[13] {
 		return e.Tags, nil
 	}
 	return nil, &NotLoadedError{edge: "tags"}
@@ -196,7 +223,7 @@ func (e AccountEdges) TagsOrErr() ([]*Tag, error) {
 // CollectionsOrErr returns the Collections value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) CollectionsOrErr() ([]*Collection, error) {
-	if e.loadedTypes[12] {
+	if e.loadedTypes[14] {
 		return e.Collections, nil
 	}
 	return nil, &NotLoadedError{edge: "collections"}
@@ -205,7 +232,7 @@ func (e AccountEdges) CollectionsOrErr() ([]*Collection, error) {
 // NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) NodesOrErr() ([]*Node, error) {
-	if e.loadedTypes[13] {
+	if e.loadedTypes[15] {
 		return e.Nodes, nil
 	}
 	return nil, &NotLoadedError{edge: "nodes"}
@@ -214,7 +241,7 @@ func (e AccountEdges) NodesOrErr() ([]*Node, error) {
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[14] {
+	if e.loadedTypes[16] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -223,7 +250,7 @@ func (e AccountEdges) AssetsOrErr() ([]*Asset, error) {
 // EventsOrErr returns the Events value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) EventsOrErr() ([]*EventParticipant, error) {
-	if e.loadedTypes[15] {
+	if e.loadedTypes[17] {
 		return e.Events, nil
 	}
 	return nil, &NotLoadedError{edge: "events"}
@@ -232,7 +259,7 @@ func (e AccountEdges) EventsOrErr() ([]*EventParticipant, error) {
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[16] {
+	if e.loadedTypes[18] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -243,6 +270,8 @@ func (*Account) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case account.FieldInvitedByID:
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case account.FieldLinks, account.FieldMetadata:
 			values[i] = new([]byte)
 		case account.FieldAdmin:
@@ -333,6 +362,13 @@ func (a *Account) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
+		case account.FieldInvitedByID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field invited_by_id", values[i])
+			} else if value.Valid {
+				a.InvitedByID = new(xid.ID)
+				*a.InvitedByID = *value.S.(*xid.ID)
+			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
 		}
@@ -369,6 +405,16 @@ func (a *Account) QueryFollowing() *AccountFollowQuery {
 // QueryFollowedBy queries the "followed_by" edge of the Account entity.
 func (a *Account) QueryFollowedBy() *AccountFollowQuery {
 	return NewAccountClient(a.config).QueryFollowedBy(a)
+}
+
+// QueryInvitations queries the "invitations" edge of the Account entity.
+func (a *Account) QueryInvitations() *InvitationQuery {
+	return NewAccountClient(a.config).QueryInvitations(a)
+}
+
+// QueryInvitedBy queries the "invited_by" edge of the Account entity.
+func (a *Account) QueryInvitedBy() *InvitationQuery {
+	return NewAccountClient(a.config).QueryInvitedBy(a)
 }
 
 // QueryPosts queries the "posts" edge of the Account entity.
@@ -482,6 +528,11 @@ func (a *Account) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", a.Metadata))
+	builder.WriteString(", ")
+	if v := a.InvitedByID; v != nil {
+		builder.WriteString("invited_by_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

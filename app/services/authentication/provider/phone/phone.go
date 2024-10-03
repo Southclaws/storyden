@@ -8,10 +8,13 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/internal/infrastructure/sms"
@@ -48,7 +51,7 @@ func (p *Provider) Enabled() bool { return p.sms != nil }
 func (p *Provider) ID() string    { return id }
 func (p *Provider) Name() string  { return name }
 
-func (p *Provider) Register(ctx context.Context, handle string, phone string) (*account.Account, error) {
+func (p *Provider) Register(ctx context.Context, handle string, phone string, inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
 	//
 	// STEP 1.
 	//
@@ -109,7 +112,11 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string) (*
 		// If there isn't an account already with this phone number, we create
 		// a new one using the @handle specified in the request.
 		//
-		acc, err = p.register.Create(ctx, handle)
+
+		opts := []account_writer.Option{}
+		inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
+
+		acc, err = p.register.Create(ctx, handle, opts...)
 		if err != nil {
 			if ftag.Get(err) == ftag.AlreadyExists {
 				return nil, fault.Wrap(err,

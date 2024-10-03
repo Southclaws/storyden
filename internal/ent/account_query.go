@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
+	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -44,6 +45,8 @@ type AccountQuery struct {
 	withTriggeredNotifications *NotificationQuery
 	withFollowing              *AccountFollowQuery
 	withFollowedBy             *AccountFollowQuery
+	withInvitations            *InvitationQuery
+	withInvitedBy              *InvitationQuery
 	withPosts                  *PostQuery
 	withReacts                 *ReactQuery
 	withLikes                  *LikePostQuery
@@ -196,6 +199,50 @@ func (aq *AccountQuery) QueryFollowedBy() *AccountFollowQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(accountfollow.Table, accountfollow.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.FollowedByTable, account.FollowedByColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryInvitations chains the current query on the "invitations" edge.
+func (aq *AccountQuery) QueryInvitations() *InvitationQuery {
+	query := (&InvitationClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(invitation.Table, invitation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.InvitationsTable, account.InvitationsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryInvitedBy chains the current query on the "invited_by" edge.
+func (aq *AccountQuery) QueryInvitedBy() *InvitationQuery {
+	query := (&InvitationClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(invitation.Table, invitation.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, account.InvitedByTable, account.InvitedByColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -664,6 +711,8 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		withTriggeredNotifications: aq.withTriggeredNotifications.Clone(),
 		withFollowing:              aq.withFollowing.Clone(),
 		withFollowedBy:             aq.withFollowedBy.Clone(),
+		withInvitations:            aq.withInvitations.Clone(),
+		withInvitedBy:              aq.withInvitedBy.Clone(),
 		withPosts:                  aq.withPosts.Clone(),
 		withReacts:                 aq.withReacts.Clone(),
 		withLikes:                  aq.withLikes.Clone(),
@@ -735,6 +784,28 @@ func (aq *AccountQuery) WithFollowedBy(opts ...func(*AccountFollowQuery)) *Accou
 		opt(query)
 	}
 	aq.withFollowedBy = query
+	return aq
+}
+
+// WithInvitations tells the query-builder to eager-load the nodes that are connected to
+// the "invitations" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithInvitations(opts ...func(*InvitationQuery)) *AccountQuery {
+	query := (&InvitationClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withInvitations = query
+	return aq
+}
+
+// WithInvitedBy tells the query-builder to eager-load the nodes that are connected to
+// the "invited_by" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithInvitedBy(opts ...func(*InvitationQuery)) *AccountQuery {
+	query := (&InvitationClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withInvitedBy = query
 	return aq
 }
 
@@ -948,12 +1019,14 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [17]bool{
+		loadedTypes = [19]bool{
 			aq.withEmails != nil,
 			aq.withNotifications != nil,
 			aq.withTriggeredNotifications != nil,
 			aq.withFollowing != nil,
 			aq.withFollowedBy != nil,
+			aq.withInvitations != nil,
+			aq.withInvitedBy != nil,
 			aq.withPosts != nil,
 			aq.withReacts != nil,
 			aq.withLikes != nil,
@@ -1023,6 +1096,19 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := aq.loadFollowedBy(ctx, query, nodes,
 			func(n *Account) { n.Edges.FollowedBy = []*AccountFollow{} },
 			func(n *Account, e *AccountFollow) { n.Edges.FollowedBy = append(n.Edges.FollowedBy, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withInvitations; query != nil {
+		if err := aq.loadInvitations(ctx, query, nodes,
+			func(n *Account) { n.Edges.Invitations = []*Invitation{} },
+			func(n *Account, e *Invitation) { n.Edges.Invitations = append(n.Edges.Invitations, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withInvitedBy; query != nil {
+		if err := aq.loadInvitedBy(ctx, query, nodes, nil,
+			func(n *Account, e *Invitation) { n.Edges.InvitedBy = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -1266,6 +1352,68 @@ func (aq *AccountQuery) loadFollowedBy(ctx context.Context, query *AccountFollow
 			return fmt.Errorf(`unexpected referenced foreign-key "following_account_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadInvitations(ctx context.Context, query *InvitationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Invitation)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(invitation.FieldCreatorAccountID)
+	}
+	query.Where(predicate.Invitation(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.InvitationsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatorAccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "creator_account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadInvitedBy(ctx context.Context, query *InvitationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Invitation)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Account)
+	for i := range nodes {
+		if nodes[i].InvitedByID == nil {
+			continue
+		}
+		fk := *nodes[i].InvitedByID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(invitation.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "invited_by_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
@@ -1722,6 +1870,9 @@ func (aq *AccountQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != account.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if aq.withInvitedBy != nil {
+			_spec.Node.AddColumnOnce(account.FieldInvitedByID)
 		}
 	}
 	if ps := aq.predicates; len(ps) > 0 {

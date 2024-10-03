@@ -44,6 +44,10 @@ type OperationPermissions interface {
 	AccountRemoveRole() (bool, *rbac.Permission)
 	AccountRoleSetBadge() (bool, *rbac.Permission)
 	AccountRoleRemoveBadge() (bool, *rbac.Permission)
+	InvitationList() (bool, *rbac.Permission)
+	InvitationCreate() (bool, *rbac.Permission)
+	InvitationGet() (bool, *rbac.Permission)
+	InvitationDelete() (bool, *rbac.Permission)
 	NotificationList() (bool, *rbac.Permission)
 	NotificationUpdate() (bool, *rbac.Permission)
 	ProfileList() (bool, *rbac.Permission)
@@ -189,6 +193,14 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AccountRoleSetBadge()
 	case "AccountRoleRemoveBadge":
 		return optable.AccountRoleRemoveBadge()
+	case "InvitationList":
+		return optable.InvitationList()
+	case "InvitationCreate":
+		return optable.InvitationCreate()
+	case "InvitationGet":
+		return optable.InvitationGet()
+	case "InvitationDelete":
+		return optable.InvitationDelete()
 	case "NotificationList":
 		return optable.NotificationList()
 	case "NotificationUpdate":

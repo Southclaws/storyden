@@ -50,6 +50,8 @@ tags:
     description: Authentication resources.
   - name: accounts
     description: User accounts.
+  - name: invitations
+    description: Account invitations.
   - name: notifications
     description: Event notifications.
   - name: profiles
@@ -315,6 +317,7 @@ paths:
       description: Register a new account with a username and password.
       tags: [auth]
       security: []
+      parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -368,6 +371,7 @@ paths:
       description: Register a new account with a email and password.
       tags: [auth]
       security: []
+      parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/AuthEmailPassword" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -412,6 +416,7 @@ paths:
         be sent to any public address, it MUST be heavily rate limited.
       tags: [auth]
       security: []
+      parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/AuthEmail" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -485,6 +490,7 @@ paths:
       description: Complete WebAuthn registration by creating a new credential.
       tags: [auth]
       security: [webauthn: []]
+      parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/WebAuthnMakeCredential" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -527,6 +533,7 @@ paths:
         the other phone endpoint to verify the number and validate the account.
       tags: [auth]
       security: []
+      parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/PhoneRequestCode" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -710,6 +717,79 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountUpdateOK" }
+
+  #
+  # d8b                   d8b 888             888    d8b
+  # Y8P                   Y8P 888             888    Y8P
+  #                           888             888
+  # 888 88888b.  888  888 888 888888  8888b.  888888 888  .d88b.  88888b.  .d8888b
+  # 888 888 "88b 888  888 888 888        "88b 888    888 d88""88b 888 "88b 88K
+  # 888 888  888 Y88  88P 888 888    .d888888 888    888 888  888 888  888 "Y8888b.
+  # 888 888  888  Y8bd8P  888 Y88b.  888  888 Y88b.  888 Y88..88P 888  888      X88
+  # 888 888  888   Y88P   888  "Y888 "Y888888  "Y888 888  "Y88P"  888  888  88888P'
+  #
+
+  /invitations:
+    get:
+      operationId: InvitationList
+      description: |
+        Retrieve all invitations for the authenticated account. This endpoint
+        is useful for showing the user which invitations they have sent out and
+        which ones have been accepted.
+
+        If the requesting account is not an admin, the account_id query param 
+        must be equal to the ID of the requesting session account's ID.
+
+        If the requesting account is an admin, the account_id query param may
+        be used to retrieve invitations for a specific account. Otherwise, the
+        endpoint will return all invitations for all accounts.
+      tags: [invitations]
+      parameters:
+        - { $ref: "#/components/parameters/AccountIDQueryParam" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/InvitationListOK" }
+    post:
+      operationId: InvitationCreate
+      description: |
+        Create an invitation for the authenticated account. Responds with the
+        invitation data which can be used to construct a public vendor-specific
+        registration URL using the invitation's identifier which can be used in
+        calls to registration operations to indicate the account was invited.
+      tags: [invitations]
+      requestBody: { $ref: "#/components/requestBodies/InvitationCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/InvitationCreateOK" }
+
+  /invitations/{invitation_id}:
+    get:
+      operationId: InvitationGet
+      description: |
+        Retrieve the details of an invitation by its identifier. This endpoint
+        is publicly accessible and can be used to show invitation details before
+        the client's registration flow.
+      tags: [invitations]
+      parameters: [{ $ref: "#/components/parameters/InvitationIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/InvitationGetOK" }
+    delete:
+      operationId: InvitationDelete
+      description: Delete an invitation. After deletion, it cannot be used.
+      tags: [invitations]
+      parameters: [{ $ref: "#/components/parameters/InvitationIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: "OK" }
 
   #
   #                   888    d8b  .d888 d8b                   888    d8b
@@ -1778,6 +1858,30 @@ components:
       schema:
         $ref: "#/components/schemas/AccountHandle"
 
+    AccountIDQueryParam:
+      description: Account ID.
+      name: account_id
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    InvitationIDParam:
+      description: Unique invitation ID.
+      name: invitation_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    InvitationIDQueryParam:
+      description: Unique invitation ID.
+      name: invitation_id
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     NotificationStatusQuery:
       description: Notification status.
       name: status
@@ -2084,6 +2188,11 @@ components:
             type: string
             format: binary
 
+    InvitationCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/InvitationInitialProps" }
+
     NotificationUpdate:
       content:
         application/json:
@@ -2316,6 +2425,27 @@ components:
           schema:
             type: string
             format: binary
+
+    InvitationListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InvitationListResult"
+
+    InvitationCreateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Invitation"
+
+    InvitationGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Invitation"
 
     NotificationListOK:
       description: OK
@@ -3461,6 +3591,8 @@ components:
           $ref: "#/components/schemas/NotificationCount"
         admin:
           type: boolean
+        invited_by:
+          $ref: "#/components/schemas/ProfileReference"
 
     AccountMutableProps:
       type: object
@@ -3535,6 +3667,50 @@ components:
         is_auth:
           description: Is the email used for authenticating to the platform?
           type: boolean
+
+    #
+    # 8888888                   d8b 888             888    d8b
+    #   888                     Y8P 888             888    Y8P
+    #   888                         888             888
+    #   888   88888b.  888  888 888 888888  8888b.  888888 888  .d88b.  88888b.
+    #   888   888 "88b 888  888 888 888        "88b 888    888 d88""88b 888 "88b
+    #   888   888  888 Y88  88P 888 888    .d888888 888    888 888  888 888  888
+    #   888   888  888  Y8bd8P  888 Y88b.  888  888 Y88b.  888 Y88..88P 888  888
+    # 8888888 888  888   Y88P   888  "Y888 "Y888888  "Y888 888  "Y88P"  888  888
+    #
+
+    Invitation:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/InvitationProps"
+
+    InvitationList:
+      type: array
+      items: { $ref: "#/components/schemas/Invitation" }
+
+    InvitationListResult:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [invitations]
+          properties:
+            invitations: { $ref: "#/components/schemas/InvitationList" }
+
+    InvitationProps:
+      type: object
+      required: [creator]
+      properties:
+        creator: { $ref: "#/components/schemas/ProfileReference" }
+        message:
+          type: string
+
+    InvitationInitialProps:
+      type: object
+      properties:
+        message:
+          type: string
 
     #
     # 888b    888          888    d8b  .d888 d8b                   888    d8b
@@ -3647,6 +3823,8 @@ components:
               $ref: "#/components/schemas/TagList"
             links:
               $ref: "#/components/schemas/ProfileExternalLinkList"
+            invited_by:
+              $ref: "#/components/schemas/ProfileReference"
             meta:
               $ref: "#/components/schemas/Metadata"
 

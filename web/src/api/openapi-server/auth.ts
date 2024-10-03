@@ -10,18 +10,23 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   AuthEmailBody,
   AuthEmailPasswordBody,
+  AuthEmailPasswordSignupParams,
+  AuthEmailSignupParams,
   AuthEmailVerifyBody,
   AuthPasswordBody,
   AuthPasswordCreateBody,
+  AuthPasswordSignupParams,
   AuthPasswordUpdateBody,
   AuthProviderListOKResponse,
   AuthSuccessOKResponse,
   OAuthProviderCallbackBody,
   PhoneRequestCodeBody,
+  PhoneRequestCodeParams,
   PhoneSubmitCodeBody,
   WebAuthnGetAssertionOKResponse,
   WebAuthnMakeAssertionBody,
   WebAuthnMakeCredentialBody,
+  WebAuthnMakeCredentialParams,
   WebAuthnRequestCredentialOKResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -58,16 +63,27 @@ export type authPasswordSignupResponse = {
   status: number;
 };
 
-export const getAuthPasswordSignupUrl = () => {
-  return `/auth/password/signup`;
+export const getAuthPasswordSignupUrl = (params?: AuthPasswordSignupParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return `/auth/password/signup?${normalizedParams.toString()}`;
 };
 
 export const authPasswordSignup = async (
   authPasswordBody: AuthPasswordBody,
+  params?: AuthPasswordSignupParams,
   options?: RequestInit,
 ): Promise<authPasswordSignupResponse> => {
   return fetcher<Promise<authPasswordSignupResponse>>(
-    getAuthPasswordSignupUrl(),
+    getAuthPasswordSignupUrl(params),
     {
       ...options,
       method: "POST",
@@ -166,16 +182,29 @@ export type authEmailPasswordSignupResponse = {
   status: number;
 };
 
-export const getAuthEmailPasswordSignupUrl = () => {
-  return `/auth/email-password/signup`;
+export const getAuthEmailPasswordSignupUrl = (
+  params?: AuthEmailPasswordSignupParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return `/auth/email-password/signup?${normalizedParams.toString()}`;
 };
 
 export const authEmailPasswordSignup = async (
   authEmailPasswordBody: AuthEmailPasswordBody,
+  params?: AuthEmailPasswordSignupParams,
   options?: RequestInit,
 ): Promise<authEmailPasswordSignupResponse> => {
   return fetcher<Promise<authEmailPasswordSignupResponse>>(
-    getAuthEmailPasswordSignupUrl(),
+    getAuthEmailPasswordSignupUrl(params),
     {
       ...options,
       method: "POST",
@@ -237,19 +266,33 @@ export type authEmailSignupResponse = {
   status: number;
 };
 
-export const getAuthEmailSignupUrl = () => {
-  return `/auth/email/signup`;
+export const getAuthEmailSignupUrl = (params?: AuthEmailSignupParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return `/auth/email/signup?${normalizedParams.toString()}`;
 };
 
 export const authEmailSignup = async (
   authEmailBody: AuthEmailBody,
+  params?: AuthEmailSignupParams,
   options?: RequestInit,
 ): Promise<authEmailSignupResponse> => {
-  return fetcher<Promise<authEmailSignupResponse>>(getAuthEmailSignupUrl(), {
-    ...options,
-    method: "POST",
-    body: JSON.stringify(authEmailBody),
-  });
+  return fetcher<Promise<authEmailSignupResponse>>(
+    getAuthEmailSignupUrl(params),
+    {
+      ...options,
+      method: "POST",
+      body: JSON.stringify(authEmailBody),
+    },
+  );
 };
 
 /**
@@ -365,16 +408,29 @@ export type webAuthnMakeCredentialResponse = {
   status: number;
 };
 
-export const getWebAuthnMakeCredentialUrl = () => {
-  return `/auth/webauthn/make`;
+export const getWebAuthnMakeCredentialUrl = (
+  params?: WebAuthnMakeCredentialParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return `/auth/webauthn/make?${normalizedParams.toString()}`;
 };
 
 export const webAuthnMakeCredential = async (
   webAuthnMakeCredentialBody: WebAuthnMakeCredentialBody,
+  params?: WebAuthnMakeCredentialParams,
   options?: RequestInit,
 ): Promise<webAuthnMakeCredentialResponse> => {
   return fetcher<Promise<webAuthnMakeCredentialResponse>>(
-    getWebAuthnMakeCredentialUrl(),
+    getWebAuthnMakeCredentialUrl(params),
     {
       ...options,
       method: "POST",
@@ -445,19 +501,33 @@ export type phoneRequestCodeResponse = {
   status: number;
 };
 
-export const getPhoneRequestCodeUrl = () => {
-  return `/auth/phone`;
+export const getPhoneRequestCodeUrl = (params?: PhoneRequestCodeParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return `/auth/phone?${normalizedParams.toString()}`;
 };
 
 export const phoneRequestCode = async (
   phoneRequestCodeBody: PhoneRequestCodeBody,
+  params?: PhoneRequestCodeParams,
   options?: RequestInit,
 ): Promise<phoneRequestCodeResponse> => {
-  return fetcher<Promise<phoneRequestCodeResponse>>(getPhoneRequestCodeUrl(), {
-    ...options,
-    method: "POST",
-    body: JSON.stringify(phoneRequestCodeBody),
-  });
+  return fetcher<Promise<phoneRequestCodeResponse>>(
+    getPhoneRequestCodeUrl(params),
+    {
+      ...options,
+      method: "POST",
+      body: JSON.stringify(phoneRequestCodeBody),
+    },
+  );
 };
 
 /**

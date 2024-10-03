@@ -16,6 +16,7 @@ import type { AccountVerifiedStatus } from "./accountVerifiedStatus";
 import type { Metadata } from "./metadata";
 import type { NotificationCount } from "./notificationCount";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
+import type { ProfileReference } from "./profileReference";
 import type { TagList } from "./tagList";
 
 export interface AccountCommonProps {
@@ -24,6 +25,7 @@ export interface AccountCommonProps {
   email_addresses: AccountEmailAddressList;
   handle: AccountHandle;
   interests?: TagList;
+  invited_by?: ProfileReference;
   links: ProfileExternalLinkList;
   meta: Metadata;
   name: AccountName;
