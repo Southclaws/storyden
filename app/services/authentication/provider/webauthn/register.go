@@ -7,11 +7,13 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
@@ -70,6 +72,7 @@ func (p *Provider) BeginRegistration(ctx context.Context, handle string) (*proto
 				ResidentKey:             protocol.ResidentKeyRequirementRequired,
 				UserVerification:        protocol.VerificationPreferred,
 			}),
+
 		// webauthn.WithConveyancePreference(protocol.ConveyancePreference(attType)),
 	)
 	if err != nil {
@@ -83,6 +86,7 @@ func (p *Provider) FinishRegistration(ctx context.Context,
 	handle string,
 	session webauthn.SessionData,
 	parsedResponse *protocol.ParsedCredentialCreationData,
+	inviteCode opt.Optional[xid.ID],
 ) (*webauthn.Credential, account.AccountID, error) {
 	t := temporary{handle: handle}
 
@@ -92,7 +96,7 @@ func (p *Provider) FinishRegistration(ctx context.Context,
 		return nil, account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
 	}
 
-	a, err := p.createOrUpdateAccount(ctx, handle, credential)
+	a, err := p.createOrUpdateAccount(ctx, handle, credential, inviteCode)
 	if err != nil {
 		return nil, account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
 	}
@@ -103,6 +107,7 @@ func (p *Provider) FinishRegistration(ctx context.Context,
 func (p *Provider) createOrUpdateAccount(ctx context.Context,
 	handle string,
 	credential *webauthn.Credential,
+	inviteCode opt.Optional[xid.ID],
 ) (account.AccountID, error) {
 	accountID := session.GetOptAccountID(ctx)
 
@@ -118,7 +123,10 @@ func (p *Provider) createOrUpdateAccount(ctx context.Context,
 		return acc.ID, nil
 	}
 
-	acc, err := p.register(ctx, handle, credential)
+	opts := []account_writer.Option{}
+	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
+
+	acc, err := p.register(ctx, handle, credential, inviteCode)
 	if err != nil {
 		return account.AccountID(xid.NilID()), fault.Wrap(err, fctx.With(ctx))
 	}

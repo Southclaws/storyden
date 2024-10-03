@@ -94,12 +94,12 @@ func TestUpdateProfile(t *testing.T) {
 	) {
 		lc.Append(fx.StartHook(func() {
 			handle1 := "user-" + xid.New().String()
-			acc1, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{handle1, "password"})
+			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle1, "password"})
 			tests.Ok(t, err, acc1)
 			session1 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))), cj)
 
 			handle2 := "user-" + xid.New().String()
-			acc2, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{handle2, "password"})
+			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle2, "password"})
 			tests.Ok(t, err, acc2)
 			session2 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))), cj)
 
@@ -179,7 +179,7 @@ func newAccount(t *testing.T, ctx context.Context, cl *openapi.ClientWithRespons
 
 	hand1 := handle + "-" + xid.New().String()
 
-	response, err := cl.AuthPasswordSignupWithResponse(ctx, openapi.AuthPair{
+	response, err := cl.AuthPasswordSignupWithResponse(ctx, nil, openapi.AuthPair{
 		Identifier: hand1,
 		Token:      "password",
 	})

@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 )
 
 type Account struct {
@@ -28,6 +29,11 @@ func (Account) Fields() []ent.Field {
 		field.Bool("admin").Default(false),
 		field.JSON("links", []ExternalLink{}).Optional(),
 		field.JSON("metadata", map[string]any{}).Optional(),
+
+		field.String("invited_by_id").
+			GoType(xid.ID{}).
+			Optional().
+			Nillable(),
 	}
 }
 
@@ -47,6 +53,14 @@ func (Account) Edges() []ent.Edge {
 
 		edge.To("followed_by", AccountFollow.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("invitations", Invitation.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.From("invited_by", Invitation.Type).
+			Ref("invited").
+			Field("invited_by_id").
+			Unique(),
 
 		edge.To("posts", Post.Type),
 

@@ -21,12 +21,21 @@ var (
 		{Name: "admin", Type: field.TypeBool, Default: false},
 		{Name: "links", Type: field.TypeJSON, Nullable: true},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
+		{Name: "invited_by_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// AccountsTable holds the schema information for the "accounts" table.
 	AccountsTable = &schema.Table{
 		Name:       "accounts",
 		Columns:    AccountsColumns,
 		PrimaryKey: []*schema.Column{AccountsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "accounts_invitations_invited",
+				Columns:    []*schema.Column{AccountsColumns[10]},
+				RefColumns: []*schema.Column{InvitationsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// AccountFollowsColumns holds the columns for the "account_follows" table.
 	AccountFollowsColumns = []*schema.Column{
@@ -390,6 +399,29 @@ var (
 				Name:    "unique_event_participant",
 				Unique:  true,
 				Columns: []*schema.Column{EventParticipantsColumns[4], EventParticipantsColumns[5]},
+			},
+		},
+	}
+	// InvitationsColumns holds the columns for the "invitations" table.
+	InvitationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "message", Type: field.TypeString, Nullable: true},
+		{Name: "creator_account_id", Type: field.TypeString, Size: 20},
+	}
+	// InvitationsTable holds the schema information for the "invitations" table.
+	InvitationsTable = &schema.Table{
+		Name:       "invitations",
+		Columns:    InvitationsColumns,
+		PrimaryKey: []*schema.Column{InvitationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "invitations_accounts_invitations",
+				Columns:    []*schema.Column{InvitationsColumns[5]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
 			},
 		},
 	}
@@ -921,6 +953,7 @@ var (
 		EmailsTable,
 		EventsTable,
 		EventParticipantsTable,
+		InvitationsTable,
 		LikePostsTable,
 		LinksTable,
 		MentionProfilesTable,
@@ -943,6 +976,7 @@ var (
 )
 
 func init() {
+	AccountsTable.ForeignKeys[0].RefTable = InvitationsTable
 	AccountFollowsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountFollowsTable.ForeignKeys[1].RefTable = AccountsTable
 	AccountRolesTable.ForeignKeys[0].RefTable = AccountsTable
@@ -960,6 +994,7 @@ func init() {
 	EventsTable.ForeignKeys[1].RefTable = PostsTable
 	EventParticipantsTable.ForeignKeys[0].RefTable = AccountsTable
 	EventParticipantsTable.ForeignKeys[1].RefTable = EventsTable
+	InvitationsTable.ForeignKeys[0].RefTable = AccountsTable
 	LikePostsTable.ForeignKeys[0].RefTable = AccountsTable
 	LikePostsTable.ForeignKeys[1].RefTable = PostsTable
 	LinksTable.ForeignKeys[0].RefTable = AssetsTable

@@ -37,12 +37,12 @@ func TestCollectionCRUD(t *testing.T) {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 
 			handle1 := xid.New().String()
-			acc1, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{handle1, "password"})
+			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle1, "password"})
 			tests.Ok(t, err, acc1)
 			session1 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))), cj)
 
 			handle2 := xid.New().String()
-			acc2, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{handle2, "password"})
+			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle2, "password"})
 			tests.Ok(t, err, acc2)
 			session2 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))), cj)
 

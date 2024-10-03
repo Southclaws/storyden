@@ -139,7 +139,12 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.With(pe.DevInfo))
 	}
 
-	_, accountID, err := a.wa.FinishRegistration(ctx, string(session.UserID), *session, cr)
+	invitedBy, err := deserialiseInvitationID(request.Params.InvitationId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, accountID, err := a.wa.FinishRegistration(ctx, string(session.UserID), *session, cr, invitedBy)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

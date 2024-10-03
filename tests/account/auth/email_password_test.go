@@ -44,7 +44,7 @@ func TestEmailPasswordAuth(t *testing.T) {
 				password := "password"
 
 				// Sign up with email
-				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Handle: &handle, Password: password})
+				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Handle: &handle, Password: password})
 				tests.Ok(t, err, signup)
 
 				// Sign in with email
@@ -75,7 +75,7 @@ func TestEmailPasswordAuth(t *testing.T) {
 				password := "password"
 
 				// Sign up with email
-				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Handle: &handle, Password: password})
+				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Handle: &handle, Password: password})
 				tests.Ok(t, err, signup)
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))

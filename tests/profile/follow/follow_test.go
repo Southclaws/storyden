@@ -175,7 +175,7 @@ func newAccount(t *testing.T, ctx context.Context, cl *openapi.ClientWithRespons
 
 	hand1 := handle + "-" + xid.New().String()
 
-	response, err := cl.AuthPasswordSignupWithResponse(ctx, openapi.AuthPair{
+	response, err := cl.AuthPasswordSignupWithResponse(ctx, nil, openapi.AuthPair{
 		Identifier: hand1,
 		Token:      "password",
 	})

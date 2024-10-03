@@ -56,6 +56,12 @@ func WithBio(v datagraph.Content) Option {
 	}
 }
 
+func WithInvitedBy(id xid.ID) Option {
+	return func(a *account.Account) {
+		a.InvitedByID = &id
+	}
+}
+
 func SetHandle(handle string) Mutation {
 	return func(u *ent.AccountUpdateOne) {
 		u.SetHandle(handle)
@@ -134,6 +140,7 @@ func (d *Writer) Create(ctx context.Context, handle string, opts ...Option) (*ac
 		SetName(withrequired.Name).
 		SetBio(withrequired.Bio.HTML()).
 		SetAdmin(withrequired.Admin).
+		SetNillableInvitedByID(withrequired.InvitedByID).
 		Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {

@@ -14,6 +14,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
 	"github.com/Southclaws/storyden/app/services/account/register"
@@ -52,7 +53,7 @@ func (p *Provider) Enabled() bool { return true } // TODO: Allow disabling.
 func (p *Provider) ID() string    { return id }
 func (p *Provider) Name() string  { return name }
 
-func (b *Provider) Register(ctx context.Context, email mail.Address, handle opt.Optional[string]) (*account.Account, error) {
+func (b *Provider) Register(ctx context.Context, email mail.Address, handle opt.Optional[string], inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
 	_, exists, err := b.er.LookupAccount(ctx, email)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -75,7 +76,10 @@ func (b *Provider) Register(ctx context.Context, email mail.Address, handle opt.
 	// account which is a simple placeholder that the owner can overwrite later.
 	identifier := handle.Or(petname.Generate(2, "-"))
 
-	account, err := b.register.Create(ctx, identifier)
+	opts := []account_writer.Option{}
+	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
+
+	account, err := b.register.Create(ctx, identifier, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}

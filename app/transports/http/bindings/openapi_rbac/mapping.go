@@ -170,6 +170,22 @@ func (m *Mapping) AccountRoleRemoveBadge() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) InvitationList() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) InvitationCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionCreateInvitation
+}
+
+func (m *Mapping) InvitationGet() (bool, *rbac.Permission) {
+	return false, nil
+}
+
+func (m *Mapping) InvitationDelete() (bool, *rbac.Permission) {
+	return true, nil
+}
+
 func (m *Mapping) NotificationList() (bool, *rbac.Permission) {
 	return true, nil
 }

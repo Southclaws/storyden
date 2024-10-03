@@ -42,6 +42,9 @@ type Event func(*sql.Selector)
 // EventParticipant is the predicate function for eventparticipant builders.
 type EventParticipant func(*sql.Selector)
 
+// Invitation is the predicate function for invitation builders.
+type Invitation func(*sql.Selector)
+
 // LikePost is the predicate function for likepost builders.
 type LikePost func(*sql.Selector)
 

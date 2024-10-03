@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
+	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -165,6 +166,26 @@ func (au *AccountUpdate) ClearMetadata() *AccountUpdate {
 	return au
 }
 
+// SetInvitedByID sets the "invited_by_id" field.
+func (au *AccountUpdate) SetInvitedByID(x xid.ID) *AccountUpdate {
+	au.mutation.SetInvitedByID(x)
+	return au
+}
+
+// SetNillableInvitedByID sets the "invited_by_id" field if the given value is not nil.
+func (au *AccountUpdate) SetNillableInvitedByID(x *xid.ID) *AccountUpdate {
+	if x != nil {
+		au.SetInvitedByID(*x)
+	}
+	return au
+}
+
+// ClearInvitedByID clears the value of the "invited_by_id" field.
+func (au *AccountUpdate) ClearInvitedByID() *AccountUpdate {
+	au.mutation.ClearInvitedByID()
+	return au
+}
+
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
 func (au *AccountUpdate) AddEmailIDs(ids ...xid.ID) *AccountUpdate {
 	au.mutation.AddEmailIDs(ids...)
@@ -238,6 +259,26 @@ func (au *AccountUpdate) AddFollowedBy(a ...*AccountFollow) *AccountUpdate {
 		ids[i] = a[i].ID
 	}
 	return au.AddFollowedByIDs(ids...)
+}
+
+// AddInvitationIDs adds the "invitations" edge to the Invitation entity by IDs.
+func (au *AccountUpdate) AddInvitationIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.AddInvitationIDs(ids...)
+	return au
+}
+
+// AddInvitations adds the "invitations" edges to the Invitation entity.
+func (au *AccountUpdate) AddInvitations(i ...*Invitation) *AccountUpdate {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return au.AddInvitationIDs(ids...)
+}
+
+// SetInvitedBy sets the "invited_by" edge to the Invitation entity.
+func (au *AccountUpdate) SetInvitedBy(i *Invitation) *AccountUpdate {
+	return au.SetInvitedByID(i.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -528,6 +569,33 @@ func (au *AccountUpdate) RemoveFollowedBy(a ...*AccountFollow) *AccountUpdate {
 		ids[i] = a[i].ID
 	}
 	return au.RemoveFollowedByIDs(ids...)
+}
+
+// ClearInvitations clears all "invitations" edges to the Invitation entity.
+func (au *AccountUpdate) ClearInvitations() *AccountUpdate {
+	au.mutation.ClearInvitations()
+	return au
+}
+
+// RemoveInvitationIDs removes the "invitations" edge to Invitation entities by IDs.
+func (au *AccountUpdate) RemoveInvitationIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.RemoveInvitationIDs(ids...)
+	return au
+}
+
+// RemoveInvitations removes "invitations" edges to Invitation entities.
+func (au *AccountUpdate) RemoveInvitations(i ...*Invitation) *AccountUpdate {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return au.RemoveInvitationIDs(ids...)
+}
+
+// ClearInvitedBy clears the "invited_by" edge to the Invitation entity.
+func (au *AccountUpdate) ClearInvitedBy() *AccountUpdate {
+	au.mutation.ClearInvitedBy()
+	return au
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
@@ -1110,6 +1178,80 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.InvitationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.InvitationsTable,
+			Columns: []string{account.InvitationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedInvitationsIDs(); len(nodes) > 0 && !au.mutation.InvitationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.InvitationsTable,
+			Columns: []string{account.InvitationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.InvitationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.InvitationsTable,
+			Columns: []string{account.InvitationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.InvitedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   account.InvitedByTable,
+			Columns: []string{account.InvitedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.InvitedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   account.InvitedByTable,
+			Columns: []string{account.InvitedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1818,6 +1960,26 @@ func (auo *AccountUpdateOne) ClearMetadata() *AccountUpdateOne {
 	return auo
 }
 
+// SetInvitedByID sets the "invited_by_id" field.
+func (auo *AccountUpdateOne) SetInvitedByID(x xid.ID) *AccountUpdateOne {
+	auo.mutation.SetInvitedByID(x)
+	return auo
+}
+
+// SetNillableInvitedByID sets the "invited_by_id" field if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableInvitedByID(x *xid.ID) *AccountUpdateOne {
+	if x != nil {
+		auo.SetInvitedByID(*x)
+	}
+	return auo
+}
+
+// ClearInvitedByID clears the value of the "invited_by_id" field.
+func (auo *AccountUpdateOne) ClearInvitedByID() *AccountUpdateOne {
+	auo.mutation.ClearInvitedByID()
+	return auo
+}
+
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
 func (auo *AccountUpdateOne) AddEmailIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddEmailIDs(ids...)
@@ -1891,6 +2053,26 @@ func (auo *AccountUpdateOne) AddFollowedBy(a ...*AccountFollow) *AccountUpdateOn
 		ids[i] = a[i].ID
 	}
 	return auo.AddFollowedByIDs(ids...)
+}
+
+// AddInvitationIDs adds the "invitations" edge to the Invitation entity by IDs.
+func (auo *AccountUpdateOne) AddInvitationIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.AddInvitationIDs(ids...)
+	return auo
+}
+
+// AddInvitations adds the "invitations" edges to the Invitation entity.
+func (auo *AccountUpdateOne) AddInvitations(i ...*Invitation) *AccountUpdateOne {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return auo.AddInvitationIDs(ids...)
+}
+
+// SetInvitedBy sets the "invited_by" edge to the Invitation entity.
+func (auo *AccountUpdateOne) SetInvitedBy(i *Invitation) *AccountUpdateOne {
+	return auo.SetInvitedByID(i.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -2181,6 +2363,33 @@ func (auo *AccountUpdateOne) RemoveFollowedBy(a ...*AccountFollow) *AccountUpdat
 		ids[i] = a[i].ID
 	}
 	return auo.RemoveFollowedByIDs(ids...)
+}
+
+// ClearInvitations clears all "invitations" edges to the Invitation entity.
+func (auo *AccountUpdateOne) ClearInvitations() *AccountUpdateOne {
+	auo.mutation.ClearInvitations()
+	return auo
+}
+
+// RemoveInvitationIDs removes the "invitations" edge to Invitation entities by IDs.
+func (auo *AccountUpdateOne) RemoveInvitationIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.RemoveInvitationIDs(ids...)
+	return auo
+}
+
+// RemoveInvitations removes "invitations" edges to Invitation entities.
+func (auo *AccountUpdateOne) RemoveInvitations(i ...*Invitation) *AccountUpdateOne {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return auo.RemoveInvitationIDs(ids...)
+}
+
+// ClearInvitedBy clears the "invited_by" edge to the Invitation entity.
+func (auo *AccountUpdateOne) ClearInvitedBy() *AccountUpdateOne {
+	auo.mutation.ClearInvitedBy()
+	return auo
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
@@ -2793,6 +3002,80 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.InvitationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.InvitationsTable,
+			Columns: []string{account.InvitationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedInvitationsIDs(); len(nodes) > 0 && !auo.mutation.InvitationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.InvitationsTable,
+			Columns: []string{account.InvitationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.InvitationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.InvitationsTable,
+			Columns: []string{account.InvitationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.InvitedByCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   account.InvitedByTable,
+			Columns: []string{account.InvitedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.InvitedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   account.InvitedByTable,
+			Columns: []string{account.InvitedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

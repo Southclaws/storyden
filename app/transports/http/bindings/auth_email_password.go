@@ -18,9 +18,14 @@ func (i *Authentication) AuthEmailPasswordSignup(ctx context.Context, request op
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	invitedBy, err := deserialiseInvitationID(request.Params.InvitationId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	handle := opt.NewPtr(request.Body.Handle)
 
-	acc, err := i.epp.Register(ctx, *address, request.Body.Password, handle)
+	acc, err := i.epp.Register(ctx, *address, request.Body.Password, handle, invitedBy)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

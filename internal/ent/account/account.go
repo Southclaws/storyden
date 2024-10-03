@@ -33,6 +33,8 @@ const (
 	FieldLinks = "links"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
+	// FieldInvitedByID holds the string denoting the invited_by_id field in the database.
+	FieldInvitedByID = "invited_by_id"
 	// EdgeEmails holds the string denoting the emails edge name in mutations.
 	EdgeEmails = "emails"
 	// EdgeNotifications holds the string denoting the notifications edge name in mutations.
@@ -43,6 +45,10 @@ const (
 	EdgeFollowing = "following"
 	// EdgeFollowedBy holds the string denoting the followed_by edge name in mutations.
 	EdgeFollowedBy = "followed_by"
+	// EdgeInvitations holds the string denoting the invitations edge name in mutations.
+	EdgeInvitations = "invitations"
+	// EdgeInvitedBy holds the string denoting the invited_by edge name in mutations.
+	EdgeInvitedBy = "invited_by"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
 	// EdgeReacts holds the string denoting the reacts edge name in mutations.
@@ -104,6 +110,20 @@ const (
 	FollowedByInverseTable = "account_follows"
 	// FollowedByColumn is the table column denoting the followed_by relation/edge.
 	FollowedByColumn = "following_account_id"
+	// InvitationsTable is the table that holds the invitations relation/edge.
+	InvitationsTable = "invitations"
+	// InvitationsInverseTable is the table name for the Invitation entity.
+	// It exists in this package in order to avoid circular dependency with the "invitation" package.
+	InvitationsInverseTable = "invitations"
+	// InvitationsColumn is the table column denoting the invitations relation/edge.
+	InvitationsColumn = "creator_account_id"
+	// InvitedByTable is the table that holds the invited_by relation/edge.
+	InvitedByTable = "accounts"
+	// InvitedByInverseTable is the table name for the Invitation entity.
+	// It exists in this package in order to avoid circular dependency with the "invitation" package.
+	InvitedByInverseTable = "invitations"
+	// InvitedByColumn is the table column denoting the invited_by relation/edge.
+	InvitedByColumn = "invited_by_id"
 	// PostsTable is the table that holds the posts relation/edge.
 	PostsTable = "posts"
 	// PostsInverseTable is the table name for the Post entity.
@@ -198,6 +218,7 @@ var Columns = []string{
 	FieldAdmin,
 	FieldLinks,
 	FieldMetadata,
+	FieldInvitedByID,
 }
 
 var (
@@ -281,6 +302,11 @@ func ByAdmin(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAdmin, opts...).ToFunc()
 }
 
+// ByInvitedByID orders the results by the invited_by_id field.
+func ByInvitedByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldInvitedByID, opts...).ToFunc()
+}
+
 // ByEmailsCount orders the results by emails count.
 func ByEmailsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -348,6 +374,27 @@ func ByFollowedByCount(opts ...sql.OrderTermOption) OrderOption {
 func ByFollowedBy(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newFollowedByStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByInvitationsCount orders the results by invitations count.
+func ByInvitationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newInvitationsStep(), opts...)
+	}
+}
+
+// ByInvitations orders the results by invitations terms.
+func ByInvitations(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newInvitationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByInvitedByField orders the results by invited_by field.
+func ByInvitedByField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newInvitedByStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -551,6 +598,20 @@ func newFollowedByStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(FollowedByInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, FollowedByTable, FollowedByColumn),
+	)
+}
+func newInvitationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(InvitationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, InvitationsTable, InvitationsColumn),
+	)
+}
+func newInvitedByStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(InvitedByInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, InvitedByTable, InvitedByColumn),
 	)
 }
 func newPostsStep() *sqlgraph.Step {
