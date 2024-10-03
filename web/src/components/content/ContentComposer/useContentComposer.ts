@@ -56,6 +56,7 @@ export function useContentComposer(props: ContentComposerProps) {
   const initialValueHTML = generateHTML(initialValueJSON, extensions);
 
   const editor = useEditor({
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class: css({
