@@ -24,7 +24,7 @@
     "@tiptap/extension-dropcursor": "^2.4.0",
     "@tiptap/extension-focus": "^2.4.0",
     "@tiptap/extension-image": "^2.4.0",
-    "@tiptap/extension-link": "^2.7.4",
+    "@tiptap/extension-link": "^2.4.0",
     "@tiptap/extension-list-item": "^2.4.0",
     "@tiptap/extension-mention": "^2.4.0",
     "@tiptap/extension-ordered-list": "^2.4.0",

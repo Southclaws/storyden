@@ -2342,15 +2342,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tiptap/extension-link@npm:^2.7.4":
-  version: 2.7.4
-  resolution: "@tiptap/extension-link@npm:2.7.4"
+"@tiptap/extension-link@npm:^2.4.0":
+  version: 2.8.0
+  resolution: "@tiptap/extension-link@npm:2.8.0"
   dependencies:
     linkifyjs: "npm:^4.1.0"
   peerDependencies:
     "@tiptap/core": ^2.7.0
     "@tiptap/pm": ^2.7.0
-  checksum: 10c0/043741757b0285cbd0b129d7b69fac250bc59fe9e4896490f8435291c980dbf87f0bd8fcd0ab94a87bc4d31ca3f81de9ed33c43363e5539719019434f2603b37
+  checksum: 10c0/c6c2271239bee47b44a2ca550ad69fffc3343385c7a3f2ed3d65a5c7677c6a8e87c459eb7f0bbb295be34fe62c16fe93fc866d7e899f668ed070afd89017f567
   languageName: node
   linkType: hard
 
@@ -10609,7 +10609,7 @@ __metadata:
     "@tiptap/extension-dropcursor": "npm:^2.4.0"
     "@tiptap/extension-focus": "npm:^2.4.0"
     "@tiptap/extension-image": "npm:^2.4.0"
-    "@tiptap/extension-link": "npm:^2.7.4"
+    "@tiptap/extension-link": "npm:^2.4.0"
     "@tiptap/extension-list-item": "npm:^2.4.0"
     "@tiptap/extension-mention": "npm:^2.4.0"
     "@tiptap/extension-ordered-list": "npm:^2.4.0"
