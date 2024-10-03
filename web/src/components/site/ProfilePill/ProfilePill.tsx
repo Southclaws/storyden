@@ -29,7 +29,7 @@ export function ProfilePill({
   return (
     <Anchor
       title={title}
-      href={`/p/${profileReference.handle}`}
+      href={`/m/${profileReference.handle}`}
       className={css({
         flexShrink: 1,
         pr: showHandle ? "1" : "0",

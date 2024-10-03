@@ -21,7 +21,7 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
   } = useSortable({ id: props.id });
   const pathname = usePathname();
 
-  const href = `/c/${props.slug}`;
+  const href = `/d/${props.slug}`;
   const selected = href === pathname;
 
   const style = {
