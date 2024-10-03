@@ -40,7 +40,7 @@ func TestAccountAuth(t *testing.T) {
 
 			// Sign up for a new account with a password
 
-			a1, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{
+			a1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{
 				Identifier: hand1,
 				Token:      "password",
 			})
@@ -118,7 +118,7 @@ func TestAccountAdmin(t *testing.T) {
 
 			// Sign up for a new account with a password
 
-			admin, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{Identifier: adminHandle, Token: "password"})
+			admin, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: adminHandle, Token: "password"})
 			r.NoError(err)
 			r.Equal(http.StatusOK, admin.StatusCode())
 			adminID := account.AccountID(utils.Must(xid.FromString(admin.JSON200.Id)))
@@ -126,13 +126,13 @@ func TestAccountAdmin(t *testing.T) {
 
 			accountWrite.Update(root, adminID, account_writer.SetAdmin(true))
 
-			victim, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{Identifier: victimHandle, Token: "password"})
+			victim, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: victimHandle, Token: "password"})
 			r.NoError(err)
 			r.Equal(http.StatusOK, victim.StatusCode())
 			victimID := account.AccountID(utils.Must(xid.FromString(victim.JSON200.Id)))
 			victimSession := e2e.WithSession(session.WithAccountID(root, victimID), cj)
 
-			random, err := cl.AuthPasswordSignupWithResponse(root, openapi.AuthPair{Identifier: randomHandle, Token: "password"})
+			random, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: randomHandle, Token: "password"})
 			r.NoError(err)
 			r.Equal(http.StatusOK, random.StatusCode())
 			randomID := account.AccountID(utils.Must(xid.FromString(random.JSON200.Id)))

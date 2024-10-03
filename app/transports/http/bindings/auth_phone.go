@@ -21,7 +21,12 @@ func NewPhoneAuth(pp *phone.Provider, cj *session.Jar) PhoneAuth {
 }
 
 func (i *PhoneAuth) PhoneRequestCode(ctx context.Context, request openapi.PhoneRequestCodeRequestObject) (openapi.PhoneRequestCodeResponseObject, error) {
-	acc, err := i.pp.Register(ctx, request.Body.Identifier, request.Body.PhoneNumber)
+	invitedBy, err := deserialiseInvitationID(request.Params.InvitationId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err := i.pp.Register(ctx, request.Body.Identifier, request.Body.PhoneNumber, invitedBy)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

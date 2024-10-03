@@ -9,10 +9,13 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
 	"github.com/go-webauthn/webauthn/webauthn"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/useragent"
@@ -65,7 +68,7 @@ func (p *Provider) Login(ctx context.Context, handle, pubkey string) (*account.A
 	return nil, nil
 }
 
-func (p *Provider) register(ctx context.Context, handle string, credential *webauthn.Credential) (*account.Account, error) {
+func (p *Provider) register(ctx context.Context, handle string, credential *webauthn.Credential, inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
 	acc, exists, err := p.accountQuery.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -82,7 +85,10 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 		)
 	}
 
-	acc, err = p.reg.Create(ctx, handle)
+	opts := []account_writer.Option{}
+	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
+
+	acc, err = p.reg.Create(ctx, handle, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

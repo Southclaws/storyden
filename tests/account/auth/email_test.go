@@ -43,7 +43,7 @@ func TestEmailOnlyAuth(t *testing.T) {
 				address := xid.New().String() + "@storyden.org"
 
 				// Sign up with email
-				signup, err := cl.AuthEmailSignupWithResponse(root, openapi.AuthEmailSignupJSONRequestBody{Email: address})
+				signup, err := cl.AuthEmailSignupWithResponse(root, nil, openapi.AuthEmailSignupJSONRequestBody{Email: address})
 				tests.Ok(t, err, signup)
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
@@ -83,11 +83,11 @@ func TestEmailOnlyAuth(t *testing.T) {
 				address := xid.New().String() + "@storyden.org"
 
 				// Sign up with email
-				signup, err := cl.AuthEmailSignupWithResponse(root, openapi.AuthEmailSignupJSONRequestBody{Email: address})
+				signup, err := cl.AuthEmailSignupWithResponse(root, nil, openapi.AuthEmailSignupJSONRequestBody{Email: address})
 				tests.Ok(t, err, signup)
 
 				// Sign up with email, again, resulting in a 202 Accepted and no cookie session
-				signup2, err := cl.AuthEmailSignupWithResponse(root, openapi.AuthEmailSignupJSONRequestBody{Email: address})
+				signup2, err := cl.AuthEmailSignupWithResponse(root, nil, openapi.AuthEmailSignupJSONRequestBody{Email: address})
 				tests.Status(t, err, signup2, http.StatusUnprocessableEntity)
 
 				a.Empty(signup2.HTTPResponse.Header.Get("Set-Cookie"))
@@ -100,7 +100,7 @@ func TestEmailOnlyAuth(t *testing.T) {
 				address := xid.New().String() + "@storyden.org"
 
 				// Sign up with email
-				signup, err := cl.AuthEmailSignupWithResponse(root, openapi.AuthEmailSignupJSONRequestBody{Email: address})
+				signup, err := cl.AuthEmailSignupWithResponse(root, nil, openapi.AuthEmailSignupJSONRequestBody{Email: address})
 				tests.Ok(t, err, signup)
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))

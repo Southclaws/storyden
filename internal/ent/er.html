@@ -17,6 +17,7 @@ erDiagram
         bool admin
         LBRACKRBRACKschemaDOTExternalLink links
         mapLBRACKstringRBRACKinterface {} metadata
+        xidDOTID invited_by_id
     }
     AccountFollow {
         xidDOTID id
@@ -119,6 +120,14 @@ erDiagram
         xidDOTID account_id
         xidDOTID event_id
     }
+    Invitation {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        timeDOTTime deleted_at
+        string message
+        xidDOTID creator_account_id
+    }
     LikePost {
         xidDOTID id
         timeDOTTime created_at
@@ -217,6 +226,7 @@ erDiagram
     	Account |o--o{ Notification : "triggered_notifications/source"
     	Account |o--o{ AccountFollow : "following/follower"
     	Account |o--o{ AccountFollow : "followed_by/following"
+    	Account |o--o{ Invitation : "invitations/creator"
     	Account |o--o{ Post : "posts/author"
     	Account |o--o{ React : "reacts/account"
     	Account |o--o{ LikePost : "likes/account"
@@ -239,6 +249,7 @@ erDiagram
     	CollectionPost }o--o| Collection : "collection"
     	CollectionPost }o--o| Post : "post"
     	Event |o--o{ EventParticipant : "participants/event"
+    	Invitation |o--o{ Account : "invited/invited_by"
     	Link |o--o{ Post : "posts/link"
     	Link }o--o{ Post : "post_content_references/content_links"
     	Link |o--o{ Node : "nodes/link"

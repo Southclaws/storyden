@@ -28,6 +28,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/event"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
+	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
@@ -71,6 +72,8 @@ type Client struct {
 	Event *EventClient
 	// EventParticipant is the client for interacting with the EventParticipant builders.
 	EventParticipant *EventParticipantClient
+	// Invitation is the client for interacting with the Invitation builders.
+	Invitation *InvitationClient
 	// LikePost is the client for interacting with the LikePost builders.
 	LikePost *LikePostClient
 	// Link is the client for interacting with the Link builders.
@@ -114,6 +117,7 @@ func (c *Client) init() {
 	c.Email = NewEmailClient(c.config)
 	c.Event = NewEventClient(c.config)
 	c.EventParticipant = NewEventParticipantClient(c.config)
+	c.Invitation = NewInvitationClient(c.config)
 	c.LikePost = NewLikePostClient(c.config)
 	c.Link = NewLinkClient(c.config)
 	c.MentionProfile = NewMentionProfileClient(c.config)
@@ -228,6 +232,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Email:            NewEmailClient(cfg),
 		Event:            NewEventClient(cfg),
 		EventParticipant: NewEventParticipantClient(cfg),
+		Invitation:       NewInvitationClient(cfg),
 		LikePost:         NewLikePostClient(cfg),
 		Link:             NewLinkClient(cfg),
 		MentionProfile:   NewMentionProfileClient(cfg),
@@ -269,6 +274,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Email:            NewEmailClient(cfg),
 		Event:            NewEventClient(cfg),
 		EventParticipant: NewEventParticipantClient(cfg),
+		Invitation:       NewInvitationClient(cfg),
 		LikePost:         NewLikePostClient(cfg),
 		Link:             NewLinkClient(cfg),
 		MentionProfile:   NewMentionProfileClient(cfg),
@@ -310,7 +316,7 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
 		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
-		c.EventParticipant, c.LikePost, c.Link, c.MentionProfile, c.Node,
+		c.EventParticipant, c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.Node,
 		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Use(hooks...)
@@ -323,7 +329,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
 		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
-		c.EventParticipant, c.LikePost, c.Link, c.MentionProfile, c.Node,
+		c.EventParticipant, c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.Node,
 		c.Notification, c.Post, c.React, c.Role, c.Setting, c.Tag,
 	} {
 		n.Intercept(interceptors...)
@@ -357,6 +363,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Event.mutate(ctx, m)
 	case *EventParticipantMutation:
 		return c.EventParticipant.mutate(ctx, m)
+	case *InvitationMutation:
+		return c.Invitation.mutate(ctx, m)
 	case *LikePostMutation:
 		return c.LikePost.mutate(ctx, m)
 	case *LinkMutation:
@@ -563,6 +571,38 @@ func (c *AccountClient) QueryFollowedBy(a *Account) *AccountFollowQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(accountfollow.Table, accountfollow.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.FollowedByTable, account.FollowedByColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryInvitations queries the invitations edge of a Account.
+func (c *AccountClient) QueryInvitations(a *Account) *InvitationQuery {
+	query := (&InvitationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(invitation.Table, invitation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.InvitationsTable, account.InvitationsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryInvitedBy queries the invited_by edge of a Account.
+func (c *AccountClient) QueryInvitedBy(a *Account) *InvitationQuery {
+	query := (&InvitationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(invitation.Table, invitation.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, account.InvitedByTable, account.InvitedByColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -2597,6 +2637,171 @@ func (c *EventParticipantClient) mutate(ctx context.Context, m *EventParticipant
 		return (&EventParticipantDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown EventParticipant mutation op: %q", m.Op())
+	}
+}
+
+// InvitationClient is a client for the Invitation schema.
+type InvitationClient struct {
+	config
+}
+
+// NewInvitationClient returns a client for the Invitation from the given config.
+func NewInvitationClient(c config) *InvitationClient {
+	return &InvitationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `invitation.Hooks(f(g(h())))`.
+func (c *InvitationClient) Use(hooks ...Hook) {
+	c.hooks.Invitation = append(c.hooks.Invitation, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `invitation.Intercept(f(g(h())))`.
+func (c *InvitationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Invitation = append(c.inters.Invitation, interceptors...)
+}
+
+// Create returns a builder for creating a Invitation entity.
+func (c *InvitationClient) Create() *InvitationCreate {
+	mutation := newInvitationMutation(c.config, OpCreate)
+	return &InvitationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Invitation entities.
+func (c *InvitationClient) CreateBulk(builders ...*InvitationCreate) *InvitationCreateBulk {
+	return &InvitationCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *InvitationClient) MapCreateBulk(slice any, setFunc func(*InvitationCreate, int)) *InvitationCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &InvitationCreateBulk{err: fmt.Errorf("calling to InvitationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*InvitationCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &InvitationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Invitation.
+func (c *InvitationClient) Update() *InvitationUpdate {
+	mutation := newInvitationMutation(c.config, OpUpdate)
+	return &InvitationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *InvitationClient) UpdateOne(i *Invitation) *InvitationUpdateOne {
+	mutation := newInvitationMutation(c.config, OpUpdateOne, withInvitation(i))
+	return &InvitationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *InvitationClient) UpdateOneID(id xid.ID) *InvitationUpdateOne {
+	mutation := newInvitationMutation(c.config, OpUpdateOne, withInvitationID(id))
+	return &InvitationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Invitation.
+func (c *InvitationClient) Delete() *InvitationDelete {
+	mutation := newInvitationMutation(c.config, OpDelete)
+	return &InvitationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *InvitationClient) DeleteOne(i *Invitation) *InvitationDeleteOne {
+	return c.DeleteOneID(i.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *InvitationClient) DeleteOneID(id xid.ID) *InvitationDeleteOne {
+	builder := c.Delete().Where(invitation.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &InvitationDeleteOne{builder}
+}
+
+// Query returns a query builder for Invitation.
+func (c *InvitationClient) Query() *InvitationQuery {
+	return &InvitationQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeInvitation},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Invitation entity by its id.
+func (c *InvitationClient) Get(ctx context.Context, id xid.ID) (*Invitation, error) {
+	return c.Query().Where(invitation.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *InvitationClient) GetX(ctx context.Context, id xid.ID) *Invitation {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a Invitation.
+func (c *InvitationClient) QueryCreator(i *Invitation) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := i.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invitation.Table, invitation.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, invitation.CreatorTable, invitation.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryInvited queries the invited edge of a Invitation.
+func (c *InvitationClient) QueryInvited(i *Invitation) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := i.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(invitation.Table, invitation.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, invitation.InvitedTable, invitation.InvitedColumn),
+		)
+		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *InvitationClient) Hooks() []Hook {
+	return c.hooks.Invitation
+}
+
+// Interceptors returns the client interceptors.
+func (c *InvitationClient) Interceptors() []Interceptor {
+	return c.inters.Invitation
+}
+
+func (c *InvitationClient) mutate(ctx context.Context, m *InvitationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&InvitationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&InvitationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&InvitationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&InvitationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Invitation mutation op: %q", m.Op())
 	}
 }
 
@@ -4639,14 +4844,14 @@ type (
 	hooks struct {
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		LikePost, Link, MentionProfile, Node, Notification, Post, React, Role, Setting,
-		Tag []ent.Hook
+		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, React,
+		Role, Setting, Tag []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		LikePost, Link, MentionProfile, Node, Notification, Post, React, Role, Setting,
-		Tag []ent.Interceptor
+		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, React,
+		Role, Setting, Tag []ent.Interceptor
 	}
 )
 

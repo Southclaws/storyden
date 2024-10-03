@@ -32,6 +32,7 @@ type Public struct {
 	Roles         held.Roles
 	Interests     []*tag.Tag
 	ExternalLinks []account.ExternalLink
+	InvitedBy     opt.Optional[Public]
 	Metadata      map[string]any
 }
 
@@ -69,6 +70,25 @@ func ProfileFromModel(a *ent.Account) (*Public, error) {
 		return nil, err
 	}
 
+	invitedByEdge := opt.NewPtr(a.Edges.InvitedBy)
+
+	invitedBy, err := opt.MapErr(invitedByEdge, func(i ent.Invitation) (Public, error) {
+		c, err := i.Edges.CreatorOrErr()
+		if err != nil {
+			return Public{}, err
+		}
+
+		ib, err := account.MapAccount(c)
+		if err != nil {
+			return Public{}, err
+		}
+
+		return *ProfileFromAccount(ib), nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
 	return &Public{
 		ID:        account.AccountID(a.ID),
 		Created:   a.CreatedAt,
@@ -78,6 +98,7 @@ func ProfileFromModel(a *ent.Account) (*Public, error) {
 		Bio:       bio,
 		Roles:     roles,
 		Interests: interests,
+		InvitedBy: invitedBy,
 		Metadata:  a.Metadata,
 	}, nil
 }
@@ -97,6 +118,9 @@ func ProfileFromAccount(a *account.Account) *Public {
 		Roles:         a.Roles,
 		Interests:     nil,
 		ExternalLinks: a.ExternalLinks,
-		Metadata:      a.Metadata,
+		InvitedBy: opt.Map(a.InvitedBy, func(a account.Account) Public {
+			return *ProfileFromAccount(&a)
+		}),
+		Metadata: a.Metadata,
 	}
 }

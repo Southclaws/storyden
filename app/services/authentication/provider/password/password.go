@@ -7,12 +7,14 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
 	"github.com/alexedwards/argon2id"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/services/account/register"
 )
@@ -45,7 +47,7 @@ func (p *Provider) Enabled() bool { return true } // TODO: Allow disabling.
 func (p *Provider) ID() string    { return id }
 func (p *Provider) Name() string  { return name }
 
-func (b *Provider) Register(ctx context.Context, identifier string, password string) (*account.Account, error) {
+func (b *Provider) Register(ctx context.Context, identifier string, password string, inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
 	if len(password) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,
 			fctx.With(ctx),
@@ -65,7 +67,10 @@ func (b *Provider) Register(ctx context.Context, identifier string, password str
 			fmsg.WithDesc("exists", "The specified handle has already been registered."))
 	}
 
-	account, err := b.register.Create(ctx, identifier)
+	opts := []account_writer.Option{}
+	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
+
+	account, err := b.register.Create(ctx, identifier, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}

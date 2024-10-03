@@ -28,6 +28,11 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 		WithTags().
 		WithEmails().
 		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
+		WithInvitedBy(func(iq *ent.InvitationQuery) {
+			iq.WithCreator(func(aq *ent.AccountQuery) {
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+			})
+		}).
 		WithAuthentication()
 
 	result, err := q.Only(ctx)

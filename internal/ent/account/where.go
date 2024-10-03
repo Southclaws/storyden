@@ -91,6 +91,11 @@ func Admin(v bool) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldAdmin, v))
 }
 
+// InvitedByID applies equality check predicate on the "invited_by_id" field. It's identical to InvitedByIDEQ.
+func InvitedByID(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldInvitedByID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldCreatedAt, v))
@@ -456,6 +461,86 @@ func MetadataNotNil() predicate.Account {
 	return predicate.Account(sql.FieldNotNull(FieldMetadata))
 }
 
+// InvitedByIDEQ applies the EQ predicate on the "invited_by_id" field.
+func InvitedByIDEQ(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldInvitedByID, v))
+}
+
+// InvitedByIDNEQ applies the NEQ predicate on the "invited_by_id" field.
+func InvitedByIDNEQ(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldNEQ(FieldInvitedByID, v))
+}
+
+// InvitedByIDIn applies the In predicate on the "invited_by_id" field.
+func InvitedByIDIn(vs ...xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldIn(FieldInvitedByID, vs...))
+}
+
+// InvitedByIDNotIn applies the NotIn predicate on the "invited_by_id" field.
+func InvitedByIDNotIn(vs ...xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldNotIn(FieldInvitedByID, vs...))
+}
+
+// InvitedByIDGT applies the GT predicate on the "invited_by_id" field.
+func InvitedByIDGT(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldGT(FieldInvitedByID, v))
+}
+
+// InvitedByIDGTE applies the GTE predicate on the "invited_by_id" field.
+func InvitedByIDGTE(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldGTE(FieldInvitedByID, v))
+}
+
+// InvitedByIDLT applies the LT predicate on the "invited_by_id" field.
+func InvitedByIDLT(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldLT(FieldInvitedByID, v))
+}
+
+// InvitedByIDLTE applies the LTE predicate on the "invited_by_id" field.
+func InvitedByIDLTE(v xid.ID) predicate.Account {
+	return predicate.Account(sql.FieldLTE(FieldInvitedByID, v))
+}
+
+// InvitedByIDContains applies the Contains predicate on the "invited_by_id" field.
+func InvitedByIDContains(v xid.ID) predicate.Account {
+	vc := v.String()
+	return predicate.Account(sql.FieldContains(FieldInvitedByID, vc))
+}
+
+// InvitedByIDHasPrefix applies the HasPrefix predicate on the "invited_by_id" field.
+func InvitedByIDHasPrefix(v xid.ID) predicate.Account {
+	vc := v.String()
+	return predicate.Account(sql.FieldHasPrefix(FieldInvitedByID, vc))
+}
+
+// InvitedByIDHasSuffix applies the HasSuffix predicate on the "invited_by_id" field.
+func InvitedByIDHasSuffix(v xid.ID) predicate.Account {
+	vc := v.String()
+	return predicate.Account(sql.FieldHasSuffix(FieldInvitedByID, vc))
+}
+
+// InvitedByIDIsNil applies the IsNil predicate on the "invited_by_id" field.
+func InvitedByIDIsNil() predicate.Account {
+	return predicate.Account(sql.FieldIsNull(FieldInvitedByID))
+}
+
+// InvitedByIDNotNil applies the NotNil predicate on the "invited_by_id" field.
+func InvitedByIDNotNil() predicate.Account {
+	return predicate.Account(sql.FieldNotNull(FieldInvitedByID))
+}
+
+// InvitedByIDEqualFold applies the EqualFold predicate on the "invited_by_id" field.
+func InvitedByIDEqualFold(v xid.ID) predicate.Account {
+	vc := v.String()
+	return predicate.Account(sql.FieldEqualFold(FieldInvitedByID, vc))
+}
+
+// InvitedByIDContainsFold applies the ContainsFold predicate on the "invited_by_id" field.
+func InvitedByIDContainsFold(v xid.ID) predicate.Account {
+	vc := v.String()
+	return predicate.Account(sql.FieldContainsFold(FieldInvitedByID, vc))
+}
+
 // HasEmails applies the HasEdge predicate on the "emails" edge.
 func HasEmails() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
@@ -563,6 +648,52 @@ func HasFollowedBy() predicate.Account {
 func HasFollowedByWith(preds ...predicate.AccountFollow) predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {
 		step := newFollowedByStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasInvitations applies the HasEdge predicate on the "invitations" edge.
+func HasInvitations() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, InvitationsTable, InvitationsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasInvitationsWith applies the HasEdge predicate on the "invitations" edge with a given conditions (other predicates).
+func HasInvitationsWith(preds ...predicate.Invitation) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newInvitationsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasInvitedBy applies the HasEdge predicate on the "invited_by" edge.
+func HasInvitedBy() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, InvitedByTable, InvitedByColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasInvitedByWith applies the HasEdge predicate on the "invited_by" edge with a given conditions (other predicates).
+func HasInvitedByWith(preds ...predicate.Invitation) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newInvitedByStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

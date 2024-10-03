@@ -103,7 +103,7 @@ func main() {
 
 				fmt.Println("USERNAME", username)
 
-				signup, err := client.AuthPasswordSignupWithResponse(ctx, openapi.AuthPair{
+				signup, err := client.AuthPasswordSignupWithResponse(ctx, nil, openapi.AuthPair{
 					Identifier: username,
 					Token:      "password",
 				})
