@@ -2,7 +2,14 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 
 import { APIError } from "src/api/openapi-schema";
 
-import { Flex, styled } from "@/styled-system/jsx";
+import { Box, CardBox, Center, HStack, styled } from "@/styled-system/jsx";
+import { deriveError } from "@/utils/error";
+
+import { Spinner } from "../ui/Spinner";
+
+type Props = {
+  error?: unknown;
+};
 
 export default function ErrorBanner({
   message,
@@ -12,14 +19,14 @@ export default function ErrorBanner({
   const showDetails = error !== undefined || metadata !== undefined;
 
   return (
-    <Flex width="full" justifyContent="center">
-      <Flex flexDir="column" gap="2" bgColor="bg.error" borderRadius="xl" p="4">
-        <Flex id="error__heading" gap="2" alignItems="center">
+    <Center width="full" justifyContent="center">
+      <CardBox maxW="xs">
+        <HStack id="error__heading" gap="2" alignItems="center">
           <ExclamationTriangleIcon width={32} height={32} />
           <styled.h1 fontSize="md" fontWeight="bold" my="0">
-            that&apos;s a yikes from me
+            Something went wrong
           </styled.h1>
-        </Flex>
+        </HStack>
 
         <styled.p id="error__message">
           <span>{message ?? "something bad happened :("}</span>
@@ -36,8 +43,37 @@ export default function ErrorBanner({
             </pre>
           </details>
         )}
-      </Flex>
-    </Flex>
+      </CardBox>
+    </Center>
+  );
+}
+
+export function Unready({ error }: Props) {
+  if (error) {
+    const message = deriveError(error);
+
+    return (
+      <CardBox maxW="xs" alignItems="center">
+        <Box w="8" color="fg.subtle">
+          <ExclamationTriangleIcon />
+        </Box>
+        {message}
+      </CardBox>
+    );
+  }
+
+  return (
+    <Center h="full">
+      <Spinner />
+    </Center>
+  );
+}
+
+export function UnreadyBanner(props: Props) {
+  return (
+    <Center w="full" height="96">
+      <Unready {...props} />
+    </Center>
   );
 }
 
