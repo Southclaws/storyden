@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/rs/xid"
+	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
@@ -147,52 +148,65 @@ func TestRoleBadges(t *testing.T) {
 			guestCtx, guest1 := e2e.WithAccount(root, aw, seed.Account_004_Loki)
 			guest1Session := e2e.WithSession(guestCtx, cj)
 
-			name := "badge-role-" + xid.New().String()
 			colour := "green"
 			permissions := openapi.PermissionList{ /* purely aesthetic role, no permissions*/ }
 
-			role, err := cl.RoleCreateWithResponse(adminCtx, openapi.RoleCreateJSONRequestBody{Name: name, Colour: colour, Permissions: permissions}, adminSession)
-			tests.Ok(t, err, role)
-			roleID := role.JSON200.Id
+			role1, err := cl.RoleCreateWithResponse(adminCtx, openapi.RoleCreateJSONRequestBody{Name: "badge-role-" + xid.New().String(), Colour: colour, Permissions: permissions}, adminSession)
+			tests.Ok(t, err, role1)
+			role1ID := role1.JSON200.Id
 
-			addRole1, err := cl.AccountAddRoleWithResponse(adminCtx, guest1.Handle, role.JSON200.Id, adminSession)
+			role2, err := cl.RoleCreateWithResponse(adminCtx, openapi.RoleCreateJSONRequestBody{Name: "badge-role-" + xid.New().String(), Colour: colour, Permissions: permissions}, adminSession)
+			tests.Ok(t, err, role2)
+			role2ID := role2.JSON200.Id
+
+			addRole1, err := cl.AccountAddRoleWithResponse(adminCtx, guest1.Handle, role1ID, adminSession)
 			tests.Ok(t, err, addRole1)
+
+			addRole2, err := cl.AccountAddRoleWithResponse(adminCtx, guest1.Handle, role2ID, adminSession)
+			tests.Ok(t, err, addRole2)
 
 			t.Run("set_own_role_as_badge", func(t *testing.T) {
 				t.Parallel()
 
-				guest1Set, err := cl.AccountRoleSetBadgeWithResponse(guestCtx, guest1.Handle, roleID, guest1Session)
+				guest1Set, err := cl.AccountRoleSetBadgeWithResponse(guestCtx, guest1.Handle, role1ID, guest1Session)
 				tests.Ok(t, err, guest1Set)
-				r.Len(guest1Set.JSON200.Roles, 2, "1 default roles, 1 new role")
-				role1 := guest1Set.JSON200.Roles[0] // custom roles are always first, default roles always last
-				a.Equal(role.JSON200.Id, role1.Id)
+				r.Len(guest1Set.JSON200.Roles, 3, "1 default roles, 1 new role")
+				role1, _ := lo.Find(guest1Set.JSON200.Roles, func(r openapi.AccountRole) bool { return r.Id == role1ID })
+				a.Equal(role1ID, role1.Id)
 				a.True(role1.Badge)
 
-				guest1Remove, err := cl.AccountRoleRemoveBadgeWithResponse(guestCtx, guest1.Handle, roleID, guest1Session)
+				guest2Set, err := cl.AccountRoleSetBadgeWithResponse(guestCtx, guest1.Handle, role2ID, guest1Session)
+				tests.Ok(t, err, guest2Set)
+				r.Len(guest2Set.JSON200.Roles, 3, "1 default roles, 1 new role")
+				role2, _ := lo.Find(guest2Set.JSON200.Roles, func(r openapi.AccountRole) bool { return r.Id == role2ID })
+				a.Equal(role2ID, role2.Id)
+				a.True(role2.Badge)
+
+				guest1Remove, err := cl.AccountRoleRemoveBadgeWithResponse(guestCtx, guest1.Handle, role1ID, guest1Session)
 				tests.Ok(t, err, guest1Remove)
-				r.Len(guest1Remove.JSON200.Roles, 2, "1 default roles, 1 new role")
-				role1 = guest1Remove.JSON200.Roles[0] // custom roles are always first, default roles always last
-				a.Equal(role.JSON200.Id, role1.Id)
+				r.Len(guest1Remove.JSON200.Roles, 3, "1 default roles, 1 new role")
+				role1, _ = lo.Find(guest1Remove.JSON200.Roles, func(r openapi.AccountRole) bool { return r.Id == role1ID })
+				a.Equal(role1ID, role1.Id)
 				a.False(role1.Badge)
 			})
 
 			t.Run("non_role_manager_cannot_set_other_member_badges", func(t *testing.T) {
 				t.Parallel()
 
-				guest1Set, err := cl.AccountRoleSetBadgeWithResponse(guestCtx, admin.Handle, roleID, guest1Session)
+				guest1Set, err := cl.AccountRoleSetBadgeWithResponse(guestCtx, admin.Handle, role1ID, guest1Session)
 				tests.Status(t, err, guest1Set, http.StatusUnauthorized)
 
-				guest1Remove, err := cl.AccountRoleRemoveBadgeWithResponse(guestCtx, admin.Handle, roleID, guest1Session)
+				guest1Remove, err := cl.AccountRoleRemoveBadgeWithResponse(guestCtx, admin.Handle, role1ID, guest1Session)
 				tests.Status(t, err, guest1Remove, http.StatusUnauthorized)
 			})
 
 			t.Run("role_manager_can_set_other_member_badges", func(t *testing.T) {
 				t.Parallel()
 
-				guest1Set, err := cl.AccountRoleSetBadgeWithResponse(guestCtx, guest1.Handle, roleID, adminSession)
+				guest1Set, err := cl.AccountRoleSetBadgeWithResponse(guestCtx, guest1.Handle, role1ID, adminSession)
 				tests.Ok(t, err, guest1Set)
 
-				guest1Remove, err := cl.AccountRoleRemoveBadgeWithResponse(guestCtx, guest1.Handle, roleID, adminSession)
+				guest1Remove, err := cl.AccountRoleRemoveBadgeWithResponse(guestCtx, guest1.Handle, role1ID, adminSession)
 				tests.Ok(t, err, guest1Remove)
 			})
 		}))
