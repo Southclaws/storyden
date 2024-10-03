@@ -16,9 +16,12 @@ import { fetcher } from "../client";
 import type {
   AuthEmailBody,
   AuthEmailPasswordBody,
+  AuthEmailPasswordSignupParams,
+  AuthEmailSignupParams,
   AuthEmailVerifyBody,
   AuthPasswordBody,
   AuthPasswordCreateBody,
+  AuthPasswordSignupParams,
   AuthPasswordUpdateBody,
   AuthProviderListOKResponse,
   AuthSuccessOKResponse,
@@ -27,11 +30,13 @@ import type {
   NotFoundResponse,
   OAuthProviderCallbackBody,
   PhoneRequestCodeBody,
+  PhoneRequestCodeParams,
   PhoneSubmitCodeBody,
   UnauthorisedResponse,
   WebAuthnGetAssertionOKResponse,
   WebAuthnMakeAssertionBody,
   WebAuthnMakeCredentialBody,
+  WebAuthnMakeCredentialParams,
   WebAuthnRequestCredentialOKResponse,
 } from "../openapi-schema";
 
@@ -83,21 +88,27 @@ export const useAuthProviderList = <
 /**
  * Register a new account with a username and password.
  */
-export const authPasswordSignup = (authPasswordBody: AuthPasswordBody) => {
+export const authPasswordSignup = (
+  authPasswordBody: AuthPasswordBody,
+  params?: AuthPasswordSignupParams,
+) => {
   return fetcher<AuthSuccessOKResponse>({
     url: `/auth/password/signup`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: authPasswordBody,
+    params,
   });
 };
 
-export const getAuthPasswordSignupMutationFetcher = () => {
+export const getAuthPasswordSignupMutationFetcher = (
+  params?: AuthPasswordSignupParams,
+) => {
   return (
     _: string,
     { arg }: { arg: AuthPasswordBody },
   ): Promise<AuthSuccessOKResponse> => {
-    return authPasswordSignup(arg);
+    return authPasswordSignup(arg, params);
   };
 };
 export const getAuthPasswordSignupMutationKey = () =>
@@ -112,19 +123,22 @@ export type AuthPasswordSignupMutationError =
 
 export const useAuthPasswordSignup = <
   TError = BadRequestResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRMutationConfiguration<
-    Awaited<ReturnType<typeof authPasswordSignup>>,
-    TError,
-    string,
-    AuthPasswordBody,
-    Awaited<ReturnType<typeof authPasswordSignup>>
-  > & { swrKey?: string };
-}) => {
+>(
+  params?: AuthPasswordSignupParams,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof authPasswordSignup>>,
+      TError,
+      string,
+      AuthPasswordBody,
+      Awaited<ReturnType<typeof authPasswordSignup>>
+    > & { swrKey?: string };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const swrKey = swrOptions?.swrKey ?? getAuthPasswordSignupMutationKey();
-  const swrFn = getAuthPasswordSignupMutationFetcher();
+  const swrFn = getAuthPasswordSignupMutationFetcher(params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -315,21 +329,25 @@ export const useAuthPasswordUpdate = <
  */
 export const authEmailPasswordSignup = (
   authEmailPasswordBody: AuthEmailPasswordBody,
+  params?: AuthEmailPasswordSignupParams,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
     url: `/auth/email-password/signup`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: authEmailPasswordBody,
+    params,
   });
 };
 
-export const getAuthEmailPasswordSignupMutationFetcher = () => {
+export const getAuthEmailPasswordSignupMutationFetcher = (
+  params?: AuthEmailPasswordSignupParams,
+) => {
   return (
     _: string,
     { arg }: { arg: AuthEmailPasswordBody },
   ): Promise<AuthSuccessOKResponse> => {
-    return authEmailPasswordSignup(arg);
+    return authEmailPasswordSignup(arg, params);
   };
 };
 export const getAuthEmailPasswordSignupMutationKey = () =>
@@ -344,19 +362,22 @@ export type AuthEmailPasswordSignupMutationError =
 
 export const useAuthEmailPasswordSignup = <
   TError = BadRequestResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRMutationConfiguration<
-    Awaited<ReturnType<typeof authEmailPasswordSignup>>,
-    TError,
-    string,
-    AuthEmailPasswordBody,
-    Awaited<ReturnType<typeof authEmailPasswordSignup>>
-  > & { swrKey?: string };
-}) => {
+>(
+  params?: AuthEmailPasswordSignupParams,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof authEmailPasswordSignup>>,
+      TError,
+      string,
+      AuthEmailPasswordBody,
+      Awaited<ReturnType<typeof authEmailPasswordSignup>>
+    > & { swrKey?: string };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const swrKey = swrOptions?.swrKey ?? getAuthEmailPasswordSignupMutationKey();
-  const swrFn = getAuthEmailPasswordSignupMutationFetcher();
+  const swrFn = getAuthEmailPasswordSignupMutationFetcher(params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -446,21 +467,27 @@ Given that this is an unauthenticated endpoint that triggers an email to
 be sent to any public address, it MUST be heavily rate limited.
 
  */
-export const authEmailSignup = (authEmailBody: AuthEmailBody) => {
+export const authEmailSignup = (
+  authEmailBody: AuthEmailBody,
+  params?: AuthEmailSignupParams,
+) => {
   return fetcher<AuthSuccessOKResponse>({
     url: `/auth/email/signup`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: authEmailBody,
+    params,
   });
 };
 
-export const getAuthEmailSignupMutationFetcher = () => {
+export const getAuthEmailSignupMutationFetcher = (
+  params?: AuthEmailSignupParams,
+) => {
   return (
     _: string,
     { arg }: { arg: AuthEmailBody },
   ): Promise<AuthSuccessOKResponse> => {
-    return authEmailSignup(arg);
+    return authEmailSignup(arg, params);
   };
 };
 export const getAuthEmailSignupMutationKey = () =>
@@ -476,19 +503,22 @@ export type AuthEmailSignupMutationError =
 
 export const useAuthEmailSignup = <
   TError = BadRequestResponse | void | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRMutationConfiguration<
-    Awaited<ReturnType<typeof authEmailSignup>>,
-    TError,
-    string,
-    AuthEmailBody,
-    Awaited<ReturnType<typeof authEmailSignup>>
-  > & { swrKey?: string };
-}) => {
+>(
+  params?: AuthEmailSignupParams,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof authEmailSignup>>,
+      TError,
+      string,
+      AuthEmailBody,
+      Awaited<ReturnType<typeof authEmailSignup>>
+    > & { swrKey?: string };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const swrKey = swrOptions?.swrKey ?? getAuthEmailSignupMutationKey();
-  const swrFn = getAuthEmailSignupMutationFetcher();
+  const swrFn = getAuthEmailSignupMutationFetcher(params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -739,21 +769,25 @@ export const useWebAuthnRequestCredential = <
  */
 export const webAuthnMakeCredential = (
   webAuthnMakeCredentialBody: WebAuthnMakeCredentialBody,
+  params?: WebAuthnMakeCredentialParams,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
     url: `/auth/webauthn/make`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: webAuthnMakeCredentialBody,
+    params,
   });
 };
 
-export const getWebAuthnMakeCredentialMutationFetcher = () => {
+export const getWebAuthnMakeCredentialMutationFetcher = (
+  params?: WebAuthnMakeCredentialParams,
+) => {
   return (
     _: string,
     { arg }: { arg: WebAuthnMakeCredentialBody },
   ): Promise<AuthSuccessOKResponse> => {
-    return webAuthnMakeCredential(arg);
+    return webAuthnMakeCredential(arg, params);
   };
 };
 export const getWebAuthnMakeCredentialMutationKey = () =>
@@ -768,19 +802,22 @@ export type WebAuthnMakeCredentialMutationError =
 
 export const useWebAuthnMakeCredential = <
   TError = BadRequestResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRMutationConfiguration<
-    Awaited<ReturnType<typeof webAuthnMakeCredential>>,
-    TError,
-    string,
-    WebAuthnMakeCredentialBody,
-    Awaited<ReturnType<typeof webAuthnMakeCredential>>
-  > & { swrKey?: string };
-}) => {
+>(
+  params?: WebAuthnMakeCredentialParams,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof webAuthnMakeCredential>>,
+      TError,
+      string,
+      WebAuthnMakeCredentialBody,
+      Awaited<ReturnType<typeof webAuthnMakeCredential>>
+    > & { swrKey?: string };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const swrKey = swrOptions?.swrKey ?? getWebAuthnMakeCredentialMutationKey();
-  const swrFn = getWebAuthnMakeCredentialMutationFetcher();
+  const swrFn = getWebAuthnMakeCredentialMutationFetcher(params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -910,21 +947,25 @@ the other phone endpoint to verify the number and validate the account.
  */
 export const phoneRequestCode = (
   phoneRequestCodeBody: PhoneRequestCodeBody,
+  params?: PhoneRequestCodeParams,
 ) => {
   return fetcher<AuthSuccessOKResponse>({
     url: `/auth/phone`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: phoneRequestCodeBody,
+    params,
   });
 };
 
-export const getPhoneRequestCodeMutationFetcher = () => {
+export const getPhoneRequestCodeMutationFetcher = (
+  params?: PhoneRequestCodeParams,
+) => {
   return (
     _: string,
     { arg }: { arg: PhoneRequestCodeBody },
   ): Promise<AuthSuccessOKResponse> => {
-    return phoneRequestCode(arg);
+    return phoneRequestCode(arg, params);
   };
 };
 export const getPhoneRequestCodeMutationKey = () => `/auth/phone` as const;
@@ -938,19 +979,22 @@ export type PhoneRequestCodeMutationError =
 
 export const usePhoneRequestCode = <
   TError = BadRequestResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRMutationConfiguration<
-    Awaited<ReturnType<typeof phoneRequestCode>>,
-    TError,
-    string,
-    PhoneRequestCodeBody,
-    Awaited<ReturnType<typeof phoneRequestCode>>
-  > & { swrKey?: string };
-}) => {
+>(
+  params?: PhoneRequestCodeParams,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof phoneRequestCode>>,
+      TError,
+      string,
+      PhoneRequestCodeBody,
+      Awaited<ReturnType<typeof phoneRequestCode>>
+    > & { swrKey?: string };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const swrKey = swrOptions?.swrKey ?? getPhoneRequestCodeMutationKey();
-  const swrFn = getPhoneRequestCodeMutationFetcher();
+  const swrFn = getPhoneRequestCodeMutationFetcher(params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

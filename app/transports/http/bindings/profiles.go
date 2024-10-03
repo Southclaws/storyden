@@ -225,6 +225,10 @@ func (p *Profiles) ProfileFollowersRemove(ctx context.Context, request openapi.P
 }
 
 func serialiseProfile(in *profile.Public) openapi.PublicProfile {
+	invitedBy := opt.Map(in.InvitedBy, func(ib profile.Public) openapi.ProfileReference {
+		return serialiseProfileReference(ib)
+	})
+
 	return openapi.PublicProfile{
 		Id:        openapi.Identifier(in.ID.String()),
 		CreatedAt: in.Created.Format(time.RFC3339),
@@ -237,6 +241,7 @@ func serialiseProfile(in *profile.Public) openapi.PublicProfile {
 		Following: in.Following,
 		LikeScore: in.LikeScore,
 		Links:     serialiseExternalLinks(in.ExternalLinks),
+		InvitedBy: invitedBy.Ptr(),
 		Meta:      in.Metadata,
 	}
 }

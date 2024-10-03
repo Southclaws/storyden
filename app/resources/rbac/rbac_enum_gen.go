@@ -17,6 +17,7 @@ var (
 	PermissionCreateReaction       = Permission{permissionCreateReaction}
 	PermissionManagePosts          = Permission{permissionManagePosts}
 	PermissionManageCategories     = Permission{permissionManageCategories}
+	PermissionCreateInvitation     = Permission{permissionCreateInvitation}
 	PermissionReadPublishedLibrary = Permission{permissionReadPublishedLibrary}
 	PermissionManageLibrary        = Permission{permissionManageLibrary}
 	PermissionSubmitLibraryNode    = Permission{permissionSubmitLibraryNode}
@@ -82,6 +83,8 @@ func NewPermission(__iNpUt__ string) (Permission, error) {
 		return PermissionManagePosts, nil
 	case string(permissionManageCategories):
 		return PermissionManageCategories, nil
+	case string(permissionCreateInvitation):
+		return PermissionCreateInvitation, nil
 	case string(permissionReadPublishedLibrary):
 		return PermissionReadPublishedLibrary, nil
 	case string(permissionManageLibrary):

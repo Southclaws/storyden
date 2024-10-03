@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/eventparticipant"
+	"github.com/Southclaws/storyden/internal/ent/invitation"
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -134,6 +135,20 @@ func (ac *AccountCreate) SetMetadata(m map[string]interface{}) *AccountCreate {
 	return ac
 }
 
+// SetInvitedByID sets the "invited_by_id" field.
+func (ac *AccountCreate) SetInvitedByID(x xid.ID) *AccountCreate {
+	ac.mutation.SetInvitedByID(x)
+	return ac
+}
+
+// SetNillableInvitedByID sets the "invited_by_id" field if the given value is not nil.
+func (ac *AccountCreate) SetNillableInvitedByID(x *xid.ID) *AccountCreate {
+	if x != nil {
+		ac.SetInvitedByID(*x)
+	}
+	return ac
+}
+
 // SetID sets the "id" field.
 func (ac *AccountCreate) SetID(x xid.ID) *AccountCreate {
 	ac.mutation.SetID(x)
@@ -221,6 +236,26 @@ func (ac *AccountCreate) AddFollowedBy(a ...*AccountFollow) *AccountCreate {
 		ids[i] = a[i].ID
 	}
 	return ac.AddFollowedByIDs(ids...)
+}
+
+// AddInvitationIDs adds the "invitations" edge to the Invitation entity by IDs.
+func (ac *AccountCreate) AddInvitationIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddInvitationIDs(ids...)
+	return ac
+}
+
+// AddInvitations adds the "invitations" edges to the Invitation entity.
+func (ac *AccountCreate) AddInvitations(i ...*Invitation) *AccountCreate {
+	ids := make([]xid.ID, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return ac.AddInvitationIDs(ids...)
+}
+
+// SetInvitedBy sets the "invited_by" edge to the Invitation entity.
+func (ac *AccountCreate) SetInvitedBy(i *Invitation) *AccountCreate {
+	return ac.SetInvitedByID(i.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -640,6 +675,39 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := ac.mutation.InvitationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.InvitationsTable,
+			Columns: []string{account.InvitationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.InvitedByIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   account.InvitedByTable,
+			Columns: []string{account.InvitedByColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.InvitedByID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := ac.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -1011,6 +1079,24 @@ func (u *AccountUpsert) ClearMetadata() *AccountUpsert {
 	return u
 }
 
+// SetInvitedByID sets the "invited_by_id" field.
+func (u *AccountUpsert) SetInvitedByID(v xid.ID) *AccountUpsert {
+	u.Set(account.FieldInvitedByID, v)
+	return u
+}
+
+// UpdateInvitedByID sets the "invited_by_id" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateInvitedByID() *AccountUpsert {
+	u.SetExcluded(account.FieldInvitedByID)
+	return u
+}
+
+// ClearInvitedByID clears the value of the "invited_by_id" field.
+func (u *AccountUpsert) ClearInvitedByID() *AccountUpsert {
+	u.SetNull(account.FieldInvitedByID)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -1199,6 +1285,27 @@ func (u *AccountUpsertOne) UpdateMetadata() *AccountUpsertOne {
 func (u *AccountUpsertOne) ClearMetadata() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearMetadata()
+	})
+}
+
+// SetInvitedByID sets the "invited_by_id" field.
+func (u *AccountUpsertOne) SetInvitedByID(v xid.ID) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetInvitedByID(v)
+	})
+}
+
+// UpdateInvitedByID sets the "invited_by_id" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateInvitedByID() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateInvitedByID()
+	})
+}
+
+// ClearInvitedByID clears the value of the "invited_by_id" field.
+func (u *AccountUpsertOne) ClearInvitedByID() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearInvitedByID()
 	})
 }
 
@@ -1557,6 +1664,27 @@ func (u *AccountUpsertBulk) UpdateMetadata() *AccountUpsertBulk {
 func (u *AccountUpsertBulk) ClearMetadata() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearMetadata()
+	})
+}
+
+// SetInvitedByID sets the "invited_by_id" field.
+func (u *AccountUpsertBulk) SetInvitedByID(v xid.ID) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetInvitedByID(v)
+	})
+}
+
+// UpdateInvitedByID sets the "invited_by_id" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateInvitedByID() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateInvitedByID()
+	})
+}
+
+// ClearInvitedByID clears the value of the "invited_by_id" field.
+func (u *AccountUpsertBulk) ClearInvitedByID() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearInvitedByID()
 	})
 }
 
