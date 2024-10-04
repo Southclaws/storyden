@@ -7471,6 +7471,10 @@ const tokens = {
     "value": "env(safe-area-inset-bottom)",
     "variable": "var(--spacing-safe-bottom)"
   },
+  "spacing.scrollGutter": {
+    "value": "var(--spacing-2)",
+    "variable": "var(--spacing-scroll-gutter)"
+  },
   "spacing.-1": {
     "value": "calc(var(--spacing-1) * -1)",
     "variable": "var(--spacing-1)"
@@ -7610,6 +7614,10 @@ const tokens = {
   "spacing.-safeBottom": {
     "value": "calc(var(--spacing-safe-bottom) * -1)",
     "variable": "var(--spacing-safe-bottom)"
+  },
+  "spacing.-scrollGutter": {
+    "value": "calc(var(--spacing-scroll-gutter) * -1)",
+    "variable": "var(--spacing-scroll-gutter)"
   },
   "shadows.xs": {
     "value": "var(--shadows-xs)",

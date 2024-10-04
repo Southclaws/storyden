@@ -159,10 +159,10 @@ export const button = defineRecipe({
         },
       },
       sm: {
-        h: "9",
-        minW: "9",
+        h: "8",
+        minW: "8",
         textStyle: "sm",
-        px: "3.5",
+        px: "2",
         gap: "2",
         "& svg": {
           width: "4",

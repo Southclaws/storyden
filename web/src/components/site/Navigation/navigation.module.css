@@ -214,8 +214,8 @@
 }
 
 .navigation__container *::-webkit-scrollbar {
-  width: 0.45rem;
-  height: 0.45rem;
+  width: var(--spacing-scroll-gutter);
+  height: var(--spacing-scroll-gutter);
 }
 .navigation__container *::-webkit-scrollbar-thumb {
   background-color: var(--colors-bg-muted);

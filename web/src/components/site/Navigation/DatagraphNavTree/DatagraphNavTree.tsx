@@ -44,6 +44,7 @@ export function DatagraphNavTree({ currentNode }: Props) {
   return (
     <LStack gap="1">
       <NavigationHeader
+        href="/l"
         controls={
           canManageLibrary && (
             <Link href="/l/new">

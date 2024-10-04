@@ -38,7 +38,8 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
       ref={setNodeRef}
       w="full"
       height="8"
-      p="1"
+      py="1"
+      px="2"
       justifyContent="space-between"
       borderRadius="md"
       bgColor={selected ? "gray.a2" : undefined}
