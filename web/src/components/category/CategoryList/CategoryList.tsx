@@ -35,6 +35,7 @@ export function CategoryList() {
       onDragEnd={handleDragEnd}
     >
       <NavigationHeader
+        href="/d"
         controls={
           canManageCategories && (
             <CategoryCreateTrigger>

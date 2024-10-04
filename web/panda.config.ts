@@ -109,6 +109,7 @@ const semanticTokens = defineSemanticTokens({
   },
   spacing: {
     safeBottom: { value: "env(safe-area-inset-bottom)" },
+    scrollGutter: { value: "var(--spacing-2)" },
   },
 });
 
