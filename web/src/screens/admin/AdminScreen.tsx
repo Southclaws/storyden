@@ -1,7 +1,6 @@
 "use client";
 
-import ErrorBanner from "src/components/site/ErrorBanner";
-import { Unready } from "src/components/site/Unready";
+import { Unready, UnreadyBanner } from "src/components/site/Unready";
 
 import { Heading } from "@/components/ui/heading";
 import { VStack } from "@/styled-system/jsx";
@@ -11,10 +10,10 @@ import { useAdminScreen } from "./useAdminScreen";
 
 export function AdminScreen() {
   const { data, error } = useAdminScreen();
-  if (!data) return <Unready {...error} />;
+  if (!data) return <Unready error={error} />;
 
   if (!data.admin)
-    return <ErrorBanner message="Not authorised to view this page" />;
+    return <UnreadyBanner error="Not authorised to view this page" />;
 
   return (
     <VStack alignItems="start" gap="4">

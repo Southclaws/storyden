@@ -14,7 +14,7 @@ export function DraftListScreen(props: Props) {
   const { ready, data, error } = useDraftListScreen(props);
   const libraryPath = useLibraryPath();
 
-  if (!ready) return <Unready {...error} />;
+  if (!ready) return <Unready error={error} />;
 
   return (
     <VStack w="full" alignItems="start">

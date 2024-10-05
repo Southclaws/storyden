@@ -12,7 +12,7 @@ export function Client(props: { slug: string; thread: Thread }) {
     },
   });
 
-  if (!data) return <Unready {...error} />;
+  if (!data) return <Unready error={error} />;
 
   return <ThreadView {...data} />;
 }

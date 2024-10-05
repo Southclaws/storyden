@@ -16,7 +16,7 @@ export function Client(props: {
     props.results,
   );
 
-  if (!data) return <Unready {...error} />;
+  if (!data) return <Unready error={error} />;
 
   return <DatagraphSearchResults result={data} />;
 }

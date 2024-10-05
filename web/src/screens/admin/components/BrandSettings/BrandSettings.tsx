@@ -135,7 +135,7 @@ function BrandSettingsForm(props: Props) {
 
 export function BrandSettings() {
   const { data, error } = useGetInfo();
-  if (!data) return <Unready {...error} />;
+  if (!data) return <Unready error={error} />;
 
   return <BrandSettingsForm {...data} />;
 }

@@ -5,7 +5,8 @@ import { FormEvent, useState } from "react";
 import { replyCreate } from "src/api/openapi-client/replies";
 import { useThreadGet } from "src/api/openapi-client/threads";
 import { Thread } from "src/api/openapi-schema";
-import { handleError } from "src/components/site/ErrorBanner";
+
+import { handle } from "@/api/client";
 
 type Value = {
   body: string;
@@ -33,10 +34,11 @@ export function useReplyBox(thread: Thread) {
       return;
     }
 
-    setLoading(true);
-    await replyCreate(thread.id, { body: value.body })
-      .catch(handleError)
-      .then(async () => {
+    await handle(
+      async () => {
+        setLoading(true);
+        await replyCreate(thread.id, { body: value.body });
+
         await mutate();
         setValue({
           body: "",
@@ -48,7 +50,6 @@ export function useReplyBox(thread: Thread) {
         // done it with a hook but... meh this is simpler (albeit not idiomatic)
         setResetKey(new Date().toISOString());
 
-        setLoading(false);
         setTimeout(
           () =>
             window.scrollTo({
@@ -57,7 +58,11 @@ export function useReplyBox(thread: Thread) {
             }),
           100,
         );
-      });
+      },
+      {
+        cleanup: async () => setLoading(false),
+      },
+    );
   }
 
   async function onReply(e: FormEvent) {

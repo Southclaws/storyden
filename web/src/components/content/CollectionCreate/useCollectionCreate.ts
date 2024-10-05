@@ -7,9 +7,9 @@ import {
   collectionCreate,
   getCollectionListKey,
 } from "src/api/openapi-client/collections";
-import { APIError } from "src/api/openapi-schema";
-import { handleError } from "src/components/site/ErrorBanner";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
+
+import { handle } from "@/api/client";
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name for the collection."),
@@ -23,13 +23,11 @@ export function useCollectionCreate(props: UseDisclosureProps) {
   });
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
+    await handle(async () => {
       await collectionCreate(data);
       props.onClose?.();
       mutate(getCollectionListKey());
-    } catch (e: unknown) {
-      handleError(e as APIError);
-    }
+    });
   });
 
   return {
