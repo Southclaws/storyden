@@ -6,7 +6,7 @@ import { Account, React, ReactList, Reply, Thread } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { useThreadMutations } from "@/lib/thread/mutation";
 
-export const REACTION_THROTTLE = 2500;
+export const REACTION_THROTTLE = 180;
 
 export type Props = {
   thread: Thread;
@@ -52,10 +52,6 @@ export function useReactionList({ thread, reply }: Props) {
 
   const reacts = groupReactions(session, reply.reacts);
 
-  const hasAlreadyReacted = reply.reacts.find(
-    (react) => react.author?.id === session?.id,
-  );
-
   const handleAdd = async (emoji: string) => {
     await handle(
       async () => {
@@ -74,7 +70,7 @@ export function useReactionList({ thread, reply }: Props) {
     );
   };
 
-  const handleReactExisting = (emoji: string) => {
+  const handleReactExisting = (emoji: string, retry?: boolean) => {
     const currentReactions = postReactions.current;
     const grouped = groupBy<React>(currentReactions, "emoji");
     const reactions = grouped[emoji];
@@ -84,7 +80,16 @@ export function useReactionList({ thread, reply }: Props) {
     );
 
     if (existing) {
-      handleRemove(existing.id);
+      if (existing.id.startsWith("optimistic") && !retry) {
+        // If the selected reaction is not yet hydrated from the server, set a
+        // timeout to re-try the deletion, ensuring that it's post-revalidation.
+        setTimeout(
+          () => handleReactExisting(emoji, true),
+          REACTION_THROTTLE * 2,
+        );
+      } else {
+        handleRemove(existing.id);
+      }
     } else {
       handleAdd(emoji);
     }
@@ -110,7 +115,6 @@ export function useReactionList({ thread, reply }: Props) {
 
   return {
     data: {
-      hasAlreadyReacted,
       reacts,
     },
     handlers: {

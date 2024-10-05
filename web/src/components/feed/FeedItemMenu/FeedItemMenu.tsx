@@ -32,7 +32,7 @@ export function FeedItemMenu(props: Props) {
                 <styled.span>{`Post by ${props.thread.author.name}`}</styled.span>
 
                 <styled.time fontWeight="normal">
-                  {format(new Date(props.thread.createdAt), "yyyy-mm-dd")}
+                  {format(new Date(props.thread.createdAt), "yyyy-MM-dd")}
                 </styled.time>
               </Menu.ItemGroupLabel>
 

@@ -13,7 +13,7 @@ import { HStack, styled } from "@/styled-system/jsx";
 import { Props, useReplyMenu } from "./useReplyMenu";
 
 export function ReplyMenu(props: Props) {
-  const { isSharingEnabled, isEditingEnabled, isDeletingenabled, handlers } =
+  const { isSharingEnabled, isEditingEnabled, isDeletingEnabled, handlers } =
     useReplyMenu(props);
 
   return (
@@ -34,7 +34,7 @@ export function ReplyMenu(props: Props) {
                 <styled.span>{`Post by ${props.reply.author.name}`}</styled.span>
 
                 <styled.time fontWeight="normal">
-                  {format(new Date(props.reply.createdAt), "yyyy-mm-dd")}
+                  {format(new Date(props.reply.createdAt), "yyyy-MM-dd")}
                 </styled.time>
               </Menu.ItemGroupLabel>
 
@@ -62,7 +62,7 @@ export function ReplyMenu(props: Props) {
                 </Menu.Item>
               )}
 
-              {isDeletingenabled && (
+              {isDeletingEnabled && (
                 <Menu.Item value="delete" onClick={handlers.handleDelete}>
                   <HStack gap="1">
                     <TrashIcon width="1.4em" /> Delete

@@ -2,7 +2,7 @@
 
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 
-import { threadDelete } from "@/api/openapi-client/threads";
+import { handle } from "@/api/client";
 import { PostReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { WEB_ADDRESS } from "@/config";
@@ -13,28 +13,28 @@ export type Props = {
   thread: PostReference;
 };
 
-export function useFeedItemMenu(props: Props) {
+export function useFeedItemMenu({ thread }: Props) {
   const account = useSession();
-  const permalink = getPermalinkForThread(props.thread.slug);
+  const permalink = getPermalinkForThread(thread.slug);
   const [, copyToClipboard] = useCopyToClipboard();
 
-  const mutate = useFeedMutations();
+  const { deleteThread, revalidate } = useFeedMutations();
 
   const shareEnabled = isShareEnabled();
-  const deleteEnabled =
-    account?.admin || account?.id === props.thread.author.id;
+  const deleteEnabled = account?.admin || account?.id === thread.author.id;
 
   async function share() {
     await navigator.share({
-      title: `A post by ${props.thread.author.name}`,
-      url: `#${props.thread.id}`,
-      text: props.thread.description,
+      title: `A post by ${thread.author.name}`,
+      url: permalink,
+      text: thread.description,
     });
   }
 
   async function handleDeleteThread() {
-    await threadDelete(props.thread.id);
-    mutate();
+    handle(async () => await deleteThread(thread.id), {
+      cleanup: async () => await revalidate(),
+    });
   }
 
   function handleSelect({ value }: { value: string }) {

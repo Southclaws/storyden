@@ -27,7 +27,7 @@ export function useReplyMenu({ thread, reply, onEdit }: Props) {
 
   const isSharingEnabled = isShareEnabled();
   const isEditingEnabled = account?.id === reply.author.id;
-  const isDeletingenabled = account?.id === reply.author.id;
+  const isDeletingEnabled = account?.id === reply.author.id;
 
   async function handleCopyURL() {
     copyToClipboard(permalink);
@@ -36,7 +36,7 @@ export function useReplyMenu({ thread, reply, onEdit }: Props) {
   async function handleShare() {
     await navigator.share({
       title: `A post by ${reply.author.name}`,
-      url: `#${reply.id}`,
+      url: permalink,
       text: reply.body,
     });
   }
@@ -54,7 +54,7 @@ export function useReplyMenu({ thread, reply, onEdit }: Props) {
   return {
     isSharingEnabled,
     isEditingEnabled,
-    isDeletingenabled,
+    isDeletingEnabled,
     handlers: {
       handleCopyURL,
       handleShare,
