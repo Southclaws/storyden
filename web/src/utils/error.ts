@@ -1,21 +1,38 @@
-import { ZodError } from "zod";
+import { RequestError } from "@/api/common";
+
+const ErrUnexpected = "An unexpected error occurred";
 
 /**
  * Derives an end-user message from an error/exception value.
  * @param e exception or any error type
  */
 export function deriveError(e: unknown): string {
-  if (e instanceof Error) {
-    return e.message;
+  if (e === null || e === undefined) {
+    return "";
   }
 
-  console.error("unhandled error", e, typeof e);
+  if (typeof e === "string") {
+    return e;
+  }
 
-  return "unknown error occurred";
-}
+  if (e instanceof Error) {
+    if (e instanceof RequestError) {
+      return e.message;
+    }
 
-export function zodFormError(error: ZodError) {
-  return {
-    message: error.issues.reduce((i, c) => [c.message, ...i], [""]).join(", "),
-  };
+    if (e instanceof TypeError) {
+      console.error(e);
+      return ErrUnexpected;
+    }
+
+    if (e.message.includes("React")) {
+      // React prints these by default.
+      return "Something went wrong while rendering data.";
+    }
+
+    return e.message ?? ErrUnexpected;
+  }
+
+  console.error("unable to derive error text:", e);
+  return "An unknown error occurred";
 }

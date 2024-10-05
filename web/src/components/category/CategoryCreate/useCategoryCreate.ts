@@ -7,9 +7,9 @@ import {
   categoryCreate,
   getCategoryListKey,
 } from "src/api/openapi-client/categories";
-import { APIError } from "src/api/openapi-schema";
-import { handleError } from "src/components/site/ErrorBanner";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
+
+import { handle } from "@/api/client";
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name for the category."),
@@ -25,13 +25,11 @@ export function useCategoryCreate(props: UseDisclosureProps) {
   });
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
+    await handle(async () => {
       await categoryCreate(data);
       props.onClose?.();
       mutate(getCategoryListKey());
-    } catch (e: unknown) {
-      handleError(e as APIError);
-    }
+    });
   });
 
   return {

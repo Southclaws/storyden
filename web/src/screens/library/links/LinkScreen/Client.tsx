@@ -8,7 +8,7 @@ import { Props, useLinkScreen } from "./useLinkScreen";
 export function Client(props: Props) {
   const { ready, data, error } = useLinkScreen(props);
 
-  if (!ready) return <Unready {...error} />;
+  if (!ready) return <Unready error={error} />;
 
   return <LinkView link={data} />;
 }

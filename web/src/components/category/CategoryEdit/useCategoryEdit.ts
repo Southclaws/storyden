@@ -8,8 +8,9 @@ import {
 } from "src/api/openapi-client/categories";
 import { useGetInfo } from "src/api/openapi-client/misc";
 import { APIError, Category } from "src/api/openapi-schema";
-import { handleError } from "src/components/site/ErrorBanner";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
+
+import { handle } from "@/api/client";
 
 export type Props = {
   category: Category;
@@ -42,7 +43,7 @@ export function useCategoryEdit(props: Props) {
   const { mutate: mutateInfoStatus } = useGetInfo();
 
   const onSubmit = handleSubmit(async (data) => {
-    try {
+    await handle(async () => {
       const collection = await categoryUpdate(props.category.id, data);
       const updated = [...(existing?.categories ?? []), collection];
 
@@ -53,9 +54,7 @@ export function useCategoryEdit(props: Props) {
       );
 
       props.onClose?.();
-    } catch (e: unknown) {
-      handleError(e as APIError);
-    }
+    });
   });
 
   function onCancel() {

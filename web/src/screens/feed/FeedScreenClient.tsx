@@ -8,7 +8,7 @@ import { TextPostList } from "@/components/feed/text/TextPostList";
 export function FeedScreenClient(props: Props) {
   const { data, error } = useFeed(props);
 
-  if (!data) return <Unready {...error} />;
+  if (!data) return <Unready error={error} />;
 
   return <TextPostList threads={data.threads} />;
 }

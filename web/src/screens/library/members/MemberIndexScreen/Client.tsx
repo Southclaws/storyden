@@ -8,7 +8,7 @@ import { Props, useMemberIndexScreen } from "./useMemberIndexScreen";
 export function Client(props: Props) {
   const { ready, data, mutate, error } = useMemberIndexScreen(props);
 
-  if (!ready) return <Unready {...error} />;
+  if (!ready) return <Unready error={error} />;
 
   return (
     <MemberIndexView

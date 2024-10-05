@@ -62,7 +62,8 @@ export function LibraryPageMenu(props: Props) {
                   {reviewFlow.draftToReview && (
                     <Menu.Item value="review">Submit for review</Menu.Item>
                   )}
-                  {reviewFlow.reviewToPublish && (
+                  {(reviewFlow.reviewToPublish ||
+                    reviewFlow.draftToPublish) && (
                     <Menu.Item value="publish">Publish</Menu.Item>
                   )}
                   {reviewFlow.publishToReview && (
@@ -70,9 +71,6 @@ export function LibraryPageMenu(props: Props) {
                   )}
                   {reviewFlow.reviewToDraft && (
                     <Menu.Item value="draft">Revert to draft</Menu.Item>
-                  )}
-                  {reviewFlow.draftToPublish && (
-                    <Menu.Item value="publish">Force publish</Menu.Item>
                   )}
                 </>
               )}
