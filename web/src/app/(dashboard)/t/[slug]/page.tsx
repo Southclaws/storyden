@@ -1,7 +1,8 @@
-import { ThreadScreen } from "src/screens/thread/ThreadScreen";
 import { getInfo } from "src/utils/info";
 
 import { threadGet } from "@/api/openapi-server/threads";
+import { UnreadyBanner } from "@/components/site/Unready";
+import { ThreadScreen } from "@/screens/thread/ThreadScreen/ThreadScreen";
 
 export type Props = {
   params: {
@@ -9,8 +10,16 @@ export type Props = {
   };
 };
 
-export default function Page(props: Props) {
-  return <ThreadScreen slug={props.params.slug} />;
+export default async function Page(props: Props) {
+  const { slug } = props.params;
+
+  try {
+    const { data } = await threadGet(slug);
+
+    return <ThreadScreen slug={slug} thread={data} />;
+  } catch (e) {
+    return <UnreadyBanner error={e} />;
+  }
 }
 
 export async function generateMetadata({ params }: Props) {

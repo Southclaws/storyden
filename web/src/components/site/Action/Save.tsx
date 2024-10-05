@@ -8,7 +8,7 @@ export function SaveAction({
   ...props
 }: PropsWithChildren<ButtonProps>) {
   return (
-    <Button variant="ghost" size="xs" {...props}>
+    <Button variant="subtle" size="xs" {...props}>
       <CloudArrowUpIcon width="1.4em" /> {children}
     </Button>
   );

@@ -6,7 +6,6 @@ import * as Tabs from "@/components/ui/tabs";
 import { Box, VStack } from "@/styled-system/jsx";
 
 import { CollectionList } from "../CollectionList/CollectionList";
-import { PostList } from "../PostList/PostList";
 
 import { useContent } from "./useContent";
 
