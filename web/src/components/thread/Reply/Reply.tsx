@@ -1,40 +1,109 @@
-import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
+import { Controller, ControllerProps } from "react-hook-form";
 
-import { Thread } from "src/api/openapi-schema";
-import { Anchor } from "src/components/site/Anchor";
+import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 
-import { Box, HStack } from "@/styled-system/jsx";
+import { CancelAction } from "@/components/site/Action/Cancel";
+import { SaveAction } from "@/components/site/Action/Save";
+import { CardBox, HStack, styled } from "@/styled-system/jsx";
 
-import { ReplyBox } from "./ReplyBox/ReplyBox";
-import { useReply } from "./useReply";
+import { Byline } from "../../content/Byline";
+import { ReactList } from "../ReactList/ReactList";
+import { ReplyMenu } from "../ReplyMenu/ReplyMenu";
 
-export function Reply(props: Thread) {
-  const { loggedIn } = useReply();
+import { Form, Props, useReply } from "./useReply";
+
+export function Reply(props: Props) {
+  const { isEmpty, isEditing, resetKey, form, handlers } = useReply(props);
+
+  const { thread, reply } = props;
 
   return (
-    <Box
-      w="full"
-      pb="12" // Provide spacing at the bottom for the editor's menu + navbar.
-    >
-      {loggedIn ? <ReplyBox {...props} /> : <LoginToReply />}
-    </Box>
+    <CardBox id={reply.id}>
+      <styled.form
+        display="flex"
+        flexDirection="column"
+        gap="2"
+        onSubmit={handlers.handleSave}
+      >
+        <HStack w="full" justify="space-between">
+          <Byline
+            href={`#${reply.id}`}
+            author={reply.author}
+            time={new Date(reply.createdAt)}
+            updated={new Date(reply.updatedAt)}
+          />
+
+          {isEditing ? (
+            <HStack>
+              <>
+                <CancelAction
+                  type="button"
+                  onClick={handlers.handleDiscardChanges}
+                >
+                  Discard
+                </CancelAction>
+                <SaveAction type="submit" disabled={isEmpty}>
+                  Save
+                </SaveAction>
+              </>
+            </HStack>
+          ) : (
+            <ReplyMenu
+              thread={thread}
+              reply={reply}
+              onEdit={handlers.handleSetEditing}
+            />
+          )}
+        </HStack>
+
+        <ReplyBodyInput
+          control={form.control}
+          name="body"
+          initialValue={reply.body}
+          resetKey={resetKey}
+          disabled={!isEditing}
+          handleEmptyStateChange={handlers.handleEmptyStateChange}
+        />
+      </styled.form>
+
+      <ReactList thread={thread} reply={reply} />
+    </CardBox>
   );
 }
 
-function LoginToReply() {
-  return (
-    <HStack
-      w="full"
-      p="8"
-      borderRadius="xl"
-      bgColor="blackAlpha.50"
-      justifyContent="center"
-    >
-      <ChatBubbleLeftRightIcon width="1.5em" />
+type ReplyBodyInputProps = Omit<ControllerProps<Form>, "render"> & {
+  initialValue: string;
+  resetKey: string;
+  handleEmptyStateChange: (isEmpty: boolean) => void;
+};
 
-      <p>
-        Please <Anchor href="/register">sign up or log in</Anchor> to reply
-      </p>
-    </HStack>
+function ReplyBodyInput({
+  control,
+  name,
+  initialValue,
+  resetKey,
+  disabled,
+  handleEmptyStateChange,
+}: ReplyBodyInputProps) {
+  return (
+    <Controller<Form>
+      render={({ field: { onChange } }) => {
+        function handleChange(value: string, isEmpty: boolean) {
+          handleEmptyStateChange(isEmpty);
+          onChange(value);
+        }
+
+        return (
+          <ContentComposer
+            initialValue={initialValue}
+            onChange={handleChange}
+            resetKey={resetKey}
+            disabled={disabled}
+          />
+        );
+      }}
+      control={control}
+      name={name}
+    />
   );
 }

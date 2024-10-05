@@ -1,18 +1,17 @@
 import { formatDate, formatDistance, formatDistanceStrict } from "date-fns";
 import { Fragment } from "react";
 
-import { Post } from "src/api/openapi-schema";
+import { Thread } from "src/api/openapi-schema";
 
 import { VStack, styled } from "@/styled-system/jsx";
 
-import { PostView } from "./PostView/PostView";
+import { Reply } from "../Reply/Reply";
 
 type Props = {
-  slug?: string;
-  posts: Post[];
+  thread: Thread;
 };
 
-export function PostListView(props: Props) {
+export function ReplyList({ thread }: Props) {
   return (
     <styled.ol
       listStyleType="none"
@@ -22,17 +21,17 @@ export function PostListView(props: Props) {
       flexDir="column"
       width="full"
     >
-      {props.posts.map((p, i) => {
-        const previous = props.posts[i - 1];
+      {thread.replies.map((reply, i) => {
+        const previous = thread.replies[i - 1];
         const start = previous ? new Date(previous.createdAt) : undefined;
-        const end = new Date(p.createdAt);
+        const end = new Date(reply.createdAt);
 
         return (
-          <Fragment key={p.id}>
+          <Fragment key={reply.id}>
             {start && <IntervalDivider interval={{ start, end }} />}
 
             <styled.li listStyleType="none" m="0">
-              <PostView {...p} />
+              <Reply thread={thread} reply={reply} />
             </styled.li>
           </Fragment>
         );
