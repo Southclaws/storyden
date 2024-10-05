@@ -224,3 +224,14 @@ body {
   height: 0;
   pointer-events: none;
 }
+
+/* Nice scrollbars for everything but the main browser viewport. */
+body *::-webkit-scrollbar {
+  width: var(--spacing-scroll-gutter);
+  height: var(--spacing-scroll-gutter);
+}
+body *::-webkit-scrollbar-thumb {
+  background-color: var(--colors-bg-muted);
+  border-radius: var(--radii-lg);
+  border: 0.1rem solid var(--colors-bg-subtle);
+}

@@ -4,7 +4,7 @@ import { EmptyState } from "src/components/feed/EmptyState";
 import { Heading } from "@/components/ui/heading";
 import { Box, Flex, LinkOverlay, styled } from "@/styled-system/jsx";
 
-import { FeedItem } from "../feed/common/FeedItem/FeedItem";
+import { FeedItem } from "../feed/FeedItem/FeedItem";
 
 type Props = {
   result: DatagraphSearchResult;

@@ -7,16 +7,17 @@ import {
   useCollectionList,
 } from "src/api/openapi-client/collections";
 import {
+  Account,
   Collection,
   CollectionList,
   PostReference,
 } from "src/api/openapi-schema";
-import { useSession } from "src/auth";
 import { useDisclosure } from "src/utils/useDisclosure";
 
-import { useFeedMutation } from "@/components/feed/useFeed";
+import { useFeedMutations } from "@/lib/feed/mutation";
 
 export type Props = {
+  account: Account;
   thread: PostReference;
 };
 
@@ -38,10 +39,9 @@ const hydrateState = (
   return m(collections);
 };
 
-export function useCollectionMenu({ thread }: Props) {
-  const account = useSession();
-  const { data, error } = useCollectionList();
-  const mutate = useFeedMutation();
+export function useCollectionMenu({ account, thread }: Props) {
+  const { data, error } = useCollectionList({ account_handle: account.handle });
+  const { revalidate } = useFeedMutations();
 
   const [multiSelect, setMultiSelect] = useState(false);
   const [selected, setSelected] = useState(0);
@@ -65,7 +65,7 @@ export function useCollectionMenu({ thread }: Props) {
   }
 
   const isAlreadySaved = Boolean(
-    thread.collections.filter((c) => c.owner.id === account?.id).length,
+    thread.collections.filter((c) => c.owner.id === account.id).length,
   );
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -94,7 +94,8 @@ export function useCollectionMenu({ thread }: Props) {
           await collectionAddPost(id, thread.id);
         }
 
-        await mutate();
+        // TODO: Optimistic mutation for collection changes.
+        await revalidate();
     }
   };
 

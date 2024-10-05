@@ -1,9 +1,9 @@
 import { XMarkIcon } from "@heroicons/react/24/solid";
 
-import { TextPostList } from "src/components/feed/text/TextPostList";
 import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
 import { Unready } from "src/components/site/Unready";
 
+import { ThreadItemList } from "@/components/feed/ThreadItemList";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { VStack, styled } from "@/styled-system/jsx";
@@ -63,7 +63,7 @@ export function ThreadIndexView(props: Props) {
         pageSize={data.threads.page_size}
       />
 
-      <TextPostList threads={data.threads.threads} />
+      <ThreadItemList threads={data.threads.threads} />
     </VStack>
   );
 }
