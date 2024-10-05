@@ -22,13 +22,14 @@ import { HStack, LStack, styled } from "@/styled-system/jsx";
 import { Form, Props, useThreadScreen } from "./useThreadScreen";
 
 export function ThreadScreen(props: Props) {
-  const { ready, error, data, handlers } = useThreadScreen(props);
+  const { ready, error, form, isEditing, isEmpty, resetKey, data, handlers } =
+    useThreadScreen(props);
 
   if (!ready) {
     return <Unready error={error} />;
   }
 
-  const { form, thread, isEditing } = data;
+  const { thread } = data;
 
   return (
     <LStack gap="4">
@@ -50,7 +51,9 @@ export function ThreadScreen(props: Props) {
                 >
                   Discard
                 </CancelAction>
-                <SaveAction type="submit">Save</SaveAction>
+                <SaveAction type="submit" disabled={isEmpty}>
+                  Save
+                </SaveAction>
               </>
             )}
 
@@ -75,10 +78,13 @@ export function ThreadScreen(props: Props) {
           </Heading>
         )}
 
-        <ContentComposer
+        <ThreadBodyInput
+          control={form.control}
+          name="body"
           initialValue={thread.body}
+          resetKey={resetKey}
           disabled={!isEditing}
-          // onChange={handlers.handleBodyChange}
+          handleEmptyStateChange={handlers.handleEmptyStateChange}
         />
       </styled.form>
 
@@ -128,6 +134,43 @@ export function TitleInput({ control }: TitleInputProps) {
       }}
       control={control}
       name="title"
+    />
+  );
+}
+
+type ThreadBodyInputProps = Omit<ControllerProps<Form>, "render"> & {
+  initialValue: string;
+  resetKey: string;
+  handleEmptyStateChange: (isEmpty: boolean) => void;
+};
+
+function ThreadBodyInput({
+  control,
+  name,
+  initialValue,
+  resetKey,
+  disabled,
+  handleEmptyStateChange,
+}: ThreadBodyInputProps) {
+  return (
+    <Controller<Form>
+      render={({ field: { onChange } }) => {
+        function handleChange(value: string, isEmpty: boolean) {
+          handleEmptyStateChange(isEmpty);
+          onChange(value);
+        }
+
+        return (
+          <ContentComposer
+            initialValue={initialValue}
+            onChange={handleChange}
+            resetKey={resetKey}
+            disabled={disabled}
+          />
+        );
+      }}
+      control={control}
+      name={name}
     />
   );
 }
