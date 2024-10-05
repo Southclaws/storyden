@@ -38,7 +38,7 @@ export function useDatagraphNavTree() {
 export function DatagraphNavTree({ currentNode }: Props) {
   const { ready, error, data, canManageLibrary } = useDatagraphNavTree();
   if (!ready) {
-    return <Unready {...error} />;
+    return <Unready error={error} />;
   }
 
   return (

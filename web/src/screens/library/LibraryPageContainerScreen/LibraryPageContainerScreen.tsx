@@ -12,7 +12,7 @@ import {
 export function LibraryPageContainerScreen(props: Props) {
   const { ready, data, handlers, error } = useLibraryPageContainerScreen(props);
 
-  if (!ready) return <Unready {...error} />;
+  if (!ready) return <Unready error={error} />;
 
   return (
     <LibraryPageScreen

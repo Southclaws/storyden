@@ -8,7 +8,7 @@ import { Props, useThreadIndexScreen } from "./useThreadIndexScreen";
 export function ThreadIndexScreen(props: Props) {
   const { ready, data, mutate, error } = useThreadIndexScreen(props);
 
-  if (!ready) return <Unready {...error} />;
+  if (!ready) return <Unready error={error} />;
 
   return (
     <ThreadIndexView

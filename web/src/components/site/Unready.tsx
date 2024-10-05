@@ -1,34 +1,62 @@
 "use client";
 
-import { PropsWithChildren } from "react";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 
-import { APIError } from "src/api/openapi-schema";
+import { Box, CardBox, Center, HStack, styled } from "@/styled-system/jsx";
+import { deriveError } from "@/utils/error";
 
-import { Skeleton } from "@/components/ui/skeleton";
-import { Flex } from "@/styled-system/jsx";
+import { Spinner } from "../ui/Spinner";
 
-import ErrorBanner from "./ErrorBanner";
+type Props = {
+  error?: unknown;
+};
 
-export function Unready(props: PropsWithChildren<Partial<APIError>>) {
-  if (!props.error) {
+export function Unready({ error }: Props) {
+  if (!error) {
     return (
-      <Flex
-        flexDirection="column"
-        width="full"
-        justifyContent="center"
-        p="4"
-        gap="4"
-      >
-        {props.children ?? (
-          <>
-            <Skeleton />
-            <Skeleton />
-            <Skeleton />
-          </>
-        )}
-      </Flex>
+      <Center w="full" h="full">
+        <Spinner />
+      </Center>
     );
   }
 
-  return <ErrorBanner {...props} />;
+  const message = deriveError(error);
+
+  return (
+    <HStack maxW="xs" alignItems="center" color="fg.subtle">
+      <Box w="5" flexShrink="0">
+        <ExclamationTriangleIcon />
+      </Box>
+      <p id="error__message">{message}</p>
+    </HStack>
+  );
+}
+
+export function UnreadyBanner({ error }: Props) {
+  if (!error) {
+    return (
+      <Center w="full" height="96">
+        <Spinner />
+      </Center>
+    );
+  }
+
+  const message = deriveError(error);
+
+  return (
+    <Center width="full" justifyContent="center">
+      <CardBox maxW="xs">
+        <HStack id="error__heading" gap="2" alignItems="center">
+          <ExclamationTriangleIcon width={24} height={24} />
+          <styled.h1 fontSize="md" fontWeight="bold" my="0">
+            Something went wrong
+          </styled.h1>
+        </HStack>
+
+        <styled.p id="error__message">
+          <span>{message}</span>
+        </styled.p>
+      </CardBox>
+    </Center>
+  );
 }

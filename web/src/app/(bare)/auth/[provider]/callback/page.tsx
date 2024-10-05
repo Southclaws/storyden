@@ -4,10 +4,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { oAuthProviderCallback } from "src/api/openapi-client/auth";
-import { Unready } from "src/components/site/Unready";
+import { UnreadyBanner } from "src/components/site/Unready";
 
 import { LinkButton } from "@/components/ui/link-button";
-import { Center, HStack, VStack } from "@/styled-system/jsx";
+import { HStack, VStack } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
 export type Props = {
@@ -50,12 +50,7 @@ export default function Page(props: Props) {
 
   return (
     <VStack w="full" height="dvh" justify="center" p="10">
-      <Unready error={error} message={error && "Something went wrong"}>
-        <Center>
-          <em>Please wait...</em>
-        </Center>
-      </Unready>
-
+      <UnreadyBanner error={error} />;
       <HStack>
         <LinkButton href="/register">Back to register</LinkButton>
         <LinkButton href="/login">Back to login</LinkButton>

@@ -1,7 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import slugify from "@sindresorhus/slugify";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { P, match } from "ts-pattern";
 import { z } from "zod";
 
 import { nodeAddAsset, nodeRemoveAsset } from "src/api/openapi-client/nodes";
@@ -13,6 +15,9 @@ import {
   Visibility,
 } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
+
+import { handle } from "@/api/client";
+import { useLibraryMutation } from "@/lib/library/library";
 
 import { useLibraryPath } from "../useLibraryPath";
 
@@ -44,7 +49,7 @@ export function useLibraryPageScreen({
   const account = useSession();
   const router = useRouter();
   const [editing, setEditing] = useState(initialEditingState);
-  const [isSaving, setIsSaving] = useState(false);
+  const { revalidate } = useLibraryMutation();
   const isNew = !node.id;
 
   const isAllowedToEdit =
@@ -70,36 +75,69 @@ export function useLibraryPageScreen({
     defaultValues: defaults,
   });
 
-  function triggerSavingPopover() {
-    setIsSaving(true);
-    setTimeout(() => setIsSaving(false), 3000);
-  }
+  const { name } = form.watch();
+
+  useEffect(() => {
+    if (isNew && !form.getFieldState("slug").isDirty) {
+      const autoSlug = slugify(name);
+      form.setValue("slug", autoSlug);
+    }
+  }, [isNew, form, name]);
 
   function handleEditMode() {
     if (editing) {
+      setEditing(false);
+      form.reset(node);
+
       if (isNew) {
         router.back();
       }
+    } else {
+      if (!isAllowedToEdit) return;
 
-      return;
+      setEditing(true);
+      form.reset(node);
     }
-    if (!isAllowedToEdit) return;
-
-    setEditing(true);
-    form.reset(node);
   }
 
   function handleSave(payload: Form) {
     if (!editing) return;
 
-    triggerSavingPopover();
-    setEditing(false);
-    onSave(payload);
+    handle(
+      async () => {
+        await onSave(payload);
+        setEditing(false);
+      },
+      {
+        promiseToast: {
+          loading: "Saving...",
+          success: "Page saved!",
+        },
+        cleanup: () => revalidate(),
+      },
+    );
   }
 
   async function handleVisibilityChange(v: Visibility) {
-    triggerSavingPopover();
-    onVisibilityChange?.(v);
+    if (!onVisibilityChange) return;
+
+    handle(
+      async () => {
+        onVisibilityChange(v);
+      },
+      {
+        promiseToast: {
+          loading: "Saving...",
+          success: match(v)
+            .with(Visibility.published, () => "Published")
+            .with(Visibility.draft, () => "Set to draft")
+            .with(Visibility.review, () => "Submitted for review")
+            .with(Visibility.unlisted, () => "Set to unlisted")
+            .exhaustive(),
+        },
+        cleanup: () => revalidate(),
+      },
+    );
   }
 
   function handleDelete() {
@@ -114,7 +152,6 @@ export function useLibraryPageScreen({
     // We only want to run these updates for edits of existing nodes.
     if (!node.id) return;
 
-    triggerSavingPopover();
     await nodeAddAsset(node.slug, asset.id);
   }
 
@@ -122,7 +159,6 @@ export function useLibraryPageScreen({
     if (!editing) return;
     if (!node.id) return;
 
-    triggerSavingPopover();
     await nodeRemoveAsset(node.slug, asset.id);
   }
 
@@ -142,7 +178,7 @@ export function useLibraryPageScreen({
     editing,
     node,
     isAllowedToEdit,
-    isSaving,
+    isSaving: form.formState.isSubmitting,
     isAllowedToDelete,
   };
 }
