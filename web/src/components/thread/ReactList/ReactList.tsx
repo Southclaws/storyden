@@ -112,7 +112,7 @@ function ReactTrigger({ react, onClick }: ReactionProps) {
       }
       onClick(react.emoji);
     }, REACTION_THROTTLE),
-    [hasReacted],
+    [react, hasReacted.current],
   );
 
   // When removing an emoji completely (its count has reached zero) we need to
