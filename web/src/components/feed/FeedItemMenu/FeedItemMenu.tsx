@@ -1,8 +1,7 @@
 import { Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
 
-import { MoreAction } from "src/components/site/Action/More";
-
+import { MoreAction } from "@/components/site/Action/More";
 import * as Menu from "@/components/ui/menu";
 import { styled } from "@/styled-system/jsx";
 
@@ -14,7 +13,12 @@ export function FeedItemMenu(props: Props) {
   return (
     <Menu.Root lazyMount onSelect={handleSelect}>
       <Menu.Trigger asChild>
-        <MoreAction size="xs" />
+        <MoreAction
+          variant="solid"
+          bgColor="bg.muted"
+          color="fg.default"
+          size="xs"
+        />
       </Menu.Trigger>
       <Portal>
         <Menu.Positioner>

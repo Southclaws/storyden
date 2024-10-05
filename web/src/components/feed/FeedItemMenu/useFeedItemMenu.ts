@@ -2,14 +2,12 @@
 
 import { useCopyToClipboard } from "@uidotdev/usehooks";
 
-import { PostReference } from "src/api/openapi-schema";
-import { useSession } from "src/auth";
-import { WEB_ADDRESS } from "src/config";
-import { isShareEnabled } from "src/utils/client";
-
 import { threadDelete } from "@/api/openapi-client/threads";
-
-import { useFeedMutation } from "../../useFeed";
+import { PostReference } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
+import { WEB_ADDRESS } from "@/config";
+import { useFeedMutations } from "@/lib/feed/mutation";
+import { isShareEnabled } from "@/utils/client";
 
 export type Props = {
   thread: PostReference;
@@ -20,7 +18,7 @@ export function useFeedItemMenu(props: Props) {
   const permalink = getPermalinkForThread(props.thread.slug);
   const [, copyToClipboard] = useCopyToClipboard();
 
-  const mutate = useFeedMutation();
+  const mutate = useFeedMutations();
 
   const shareEnabled = isShareEnabled();
   const deleteEnabled =

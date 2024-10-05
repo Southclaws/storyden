@@ -101,16 +101,16 @@ export function useLinkIndexView(props: Props) {
   }, [url]);
 
   const handlePage = async (page: number) => {
-    router.push(`/l?q=${q}&page=${page}`);
+    router.push(`/links?q=${q}&page=${page}`);
   };
 
   const handleSubmission = form.handleSubmit(async (payload) => {
-    router.push(`/l?q=${payload.q}`);
+    router.push(`/links?q=${payload.q}`);
   });
 
   const handleReset = async () => {
     form.reset();
-    router.push("/l");
+    router.push("/links");
   };
 
   const handleMutate = async () => {

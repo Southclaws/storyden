@@ -2,7 +2,7 @@ import { ProfileReference } from "src/api/openapi-schema";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Timestamp } from "src/components/site/Timestamp";
 
-import { Flex, styled } from "@/styled-system/jsx";
+import { HStack, styled } from "@/styled-system/jsx";
 
 type Props = {
   href: string;
@@ -14,8 +14,8 @@ type Props = {
 
 export function Byline(props: Props) {
   return (
-    <Flex alignItems="start" justify="space-between" minWidth="0">
-      <Flex
+    <HStack alignItems="start" minWidth="0" w="full">
+      <HStack
         alignItems="center"
         gap="0"
         minWidth="0"
@@ -29,9 +29,9 @@ export function Byline(props: Props) {
           updated={props.updated}
           href={props.href}
         />
-      </Flex>
+      </HStack>
 
       {props.more}
-    </Flex>
+    </HStack>
   );
 }

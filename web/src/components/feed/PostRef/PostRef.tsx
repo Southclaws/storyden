@@ -1,13 +1,7 @@
-import {
-  Post,
-  PostProps,
-  PostReference,
-  ThreadReference,
-} from "src/api/openapi-schema";
-import { useSession } from "src/auth";
-import { Byline } from "src/components/content/Byline";
-import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
-
+import { PostReference } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
+import { Byline } from "@/components/content/Byline";
+import { CollectionMenu } from "@/components/content/CollectionMenu/CollectionMenu";
 import { Card } from "@/components/ui/rich-card";
 import { HStack } from "@/styled-system/jsx";
 
@@ -32,7 +26,7 @@ export function PostRef({ item }: Props) {
       controls={
         session && (
           <HStack>
-            <CollectionMenu thread={item} />
+            <CollectionMenu account={session} thread={item} />
             <FeedItemMenu thread={item} />
           </HStack>
         )

@@ -1,8 +1,7 @@
 import { PostReference } from "src/api/openapi-schema";
 
+import { Empty } from "@/components/site/Empty";
 import { styled } from "@/styled-system/jsx";
-
-import { Empty } from "../../../site/Empty";
 
 import { PostRef } from "./PostRef";
 
