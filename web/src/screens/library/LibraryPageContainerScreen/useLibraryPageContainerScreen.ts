@@ -71,7 +71,7 @@ export function useLibraryPageContainerScreen(props: Props) {
       const newPath = replaceLibraryPath(libraryPath, slug, destination.slug);
       router.push(newPath);
     } else {
-      router.push("/library");
+      router.push("/l");
     }
   }
 

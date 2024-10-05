@@ -19,7 +19,7 @@ const mapCategories = map((c: Category) => (
 export function CategorySelect() {
   const { control, fieldError, categories, error } = useCategorySelect();
 
-  if (!categories) return <Unready {...error} />;
+  if (!categories) return <Unready error={error} />;
 
   return (
     <FormControl>

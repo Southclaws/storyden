@@ -6,7 +6,8 @@ import { z } from "zod";
 import { useCategoryList } from "src/api/openapi-client/categories";
 import { threadCreate, threadUpdate } from "src/api/openapi-client/threads";
 import { Thread, ThreadInitialProps, Visibility } from "src/api/openapi-schema";
-import { handleError } from "src/components/site/ErrorBanner";
+
+import { handle } from "@/api/client";
 
 export type Props = { editing?: string; initialDraft?: Thread };
 
@@ -93,12 +94,16 @@ export function useComposeForm({ initialDraft, editing }: Props) {
 
   const onAssetUpload = async () => {
     const state = formContext.getValues();
-    await doSave(state).catch(handleError);
+    await handle(async () => {
+      await doSave(state);
+    });
   };
 
   const onAssetDelete = async () => {
     const state = formContext.getValues();
-    await doSave(state).catch(handleError);
+    await handle(async () => {
+      await doSave(state);
+    });
   };
 
   function onBack() {
@@ -106,11 +111,15 @@ export function useComposeForm({ initialDraft, editing }: Props) {
   }
 
   const onSave = formContext.handleSubmit((data) =>
-    doSave(data).catch(handleError),
+    handle(async () => {
+      await doSave(data);
+    }),
   );
 
   const onPublish = formContext.handleSubmit((data) =>
-    doPublish(data).catch(handleError),
+    handle(async () => {
+      await doPublish(data);
+    }),
   );
 
   return {

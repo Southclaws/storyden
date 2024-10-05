@@ -46,16 +46,6 @@ export function LibraryPageScreen(props: Props) {
       alignItems="start"
       onSubmit={handleSubmit}
     >
-      <Admonition
-        value={!isEmpty(form.formState.errors)}
-        title="Errors"
-        kind="failure"
-      >
-        {Object.values(form.formState.errors).map((error, i) => (
-          <p key={i}>{error.message}</p>
-        ))}
-      </Admonition>
-
       <FormProvider {...form}>
         <LStack h="full">
           <HStack w="full" justify="space-between">
@@ -72,7 +62,7 @@ export function LibraryPageScreen(props: Props) {
                   <HStack>
                     {editing ? (
                       <>
-                        <CancelAction onClick={handleEditMode}>
+                        <CancelAction type="button" onClick={handleEditMode}>
                           Cancel
                         </CancelAction>
                         <SaveAction type="submit">Save</SaveAction>

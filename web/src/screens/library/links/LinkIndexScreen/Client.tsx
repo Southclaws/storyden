@@ -8,7 +8,7 @@ import { Props, useLinkIndexScreen } from "./useLinkIndexScreen";
 export function Client(props: Props) {
   const { ready, data, mutate, error } = useLinkIndexScreen(props);
 
-  if (!ready) return <Unready {...error} />;
+  if (!ready) return <Unready error={error} />;
 
   return (
     <LinkIndexView
