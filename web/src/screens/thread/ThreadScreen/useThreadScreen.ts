@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { parseAsBoolean, useQueryState } from "nuqs";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -20,6 +21,8 @@ export type Form = z.infer<typeof FormSchema>;
 
 export function useThreadScreen({ slug, thread }: Props) {
   const [editing, setEditing] = useQueryState("edit", parseAsBoolean);
+  const [resetKey, setResetKey] = useState("");
+  const [isEmpty, setEmpty] = useState(true);
 
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
@@ -47,10 +50,15 @@ export function useThreadScreen({ slug, thread }: Props) {
     setEditing(true);
   }
 
+  function handleEmptyStateChange(isEmpty: boolean) {
+    setEmpty(isEmpty);
+  }
+
   function handleDiscardChanges() {
     // TODO: useConfirmation
     form.reset(thread);
     setEditing(false);
+    setResetKey(Date.now().toString());
   }
 
   const handleSave = form.handleSubmit(async (data) => {
@@ -81,13 +89,16 @@ export function useThreadScreen({ slug, thread }: Props) {
 
   return {
     ready: true as const,
+    isEditing: editing,
+    isEmpty,
+    resetKey,
+    form,
     data: {
-      form,
-      isEditing: editing,
       thread: data,
     },
     handlers: {
       handleEditing,
+      handleEmptyStateChange,
       handleDiscardChanges,
       handleSave,
     },
