@@ -27,11 +27,10 @@ export function LinkButton({
     <NextLink className={cn} href={href}>
       <styled.span
         display="flex"
+        // Supports overflowing children and text ellipsis
+        maxW="full"
         alignItems="center"
         gap="1"
-        textOverflow="ellipsis"
-        overflowX="hidden"
-        textWrap="nowrap"
       >
         {children}
       </styled.span>

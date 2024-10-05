@@ -1,12 +1,11 @@
 import { PublicProfile } from "src/api/openapi-schema";
-import { TextPostList } from "src/components/feed/text/TextPostList";
 import { Unready } from "src/components/site/Unready";
 
+import { ThreadItemList } from "@/components/feed/ThreadItemList";
 import * as Tabs from "@/components/ui/tabs";
 import { Box, VStack } from "@/styled-system/jsx";
 
 import { CollectionList } from "../CollectionList/CollectionList";
-import { PostList } from "../PostList/PostList";
 
 import { useContent } from "./useContent";
 
@@ -20,13 +19,12 @@ export function Content(props: PublicProfile) {
       <Tabs.Root width="full" variant="line" defaultValue="posts">
         <Tabs.List>
           <Tabs.Trigger value="posts">Posts</Tabs.Trigger>
-          {/* <Tabs.Trigger value="replies">Replies</Tabs.Trigger> */}
           <Tabs.Trigger value="collections">Collections</Tabs.Trigger>
           <Tabs.Indicator />
         </Tabs.List>
 
         <Tabs.Content value="posts">
-          <TextPostList threads={content.data.threads} />
+          <ThreadItemList threads={content.data.threads} />
         </Tabs.Content>
 
         <Tabs.Content value="collections">

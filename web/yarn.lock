@@ -510,23 +510,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@emoji-mart/data@npm:^1.2.1":
-  version: 1.2.1
-  resolution: "@emoji-mart/data@npm:1.2.1"
-  checksum: 10c0/6784b97bf49a0d3ff110d8447bbd3b0449fcbc497294be3d1c3a6cb1609308776895c7520200be604cbecaa5e172c76927e47f34419c72ba8a76fd4e5a53674b
-  languageName: node
-  linkType: hard
-
-"@emoji-mart/react@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "@emoji-mart/react@npm:1.1.1"
-  peerDependencies:
-    emoji-mart: ^5.2
-    react: ^16.8 || ^17 || ^18
-  checksum: 10c0/88a9c8c24bbc5695f0ed2458734c9982c965a16db1999bc731c7cce77f9bf228f1871e899744f9a3f9fdd36a11db7ad6c0e049d710cb91c66c69a2cd4d2ee40a
-  languageName: node
-  linkType: hard
-
 "@esbuild/aix-ppc64@npm:0.19.12":
   version: 0.19.12
   resolution: "@esbuild/aix-ppc64@npm:0.19.12"
@@ -5506,10 +5489,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"emoji-mart@npm:^5.6.0":
-  version: 5.6.0
-  resolution: "emoji-mart@npm:5.6.0"
-  checksum: 10c0/23e68ab10984f101b696d8f8e103e553ffa8e4d644e9a315190a9657903f71b833db09aac51b05de20f33bb9eef5bc1425eecdb2437042b25aff2dad0231f029
+"emoji-picker-react@npm:^4.12.0":
+  version: 4.12.0
+  resolution: "emoji-picker-react@npm:4.12.0"
+  dependencies:
+    flairup: "npm:1.0.0"
+  peerDependencies:
+    react: ">=16"
+  checksum: 10c0/e2e3bc9a3665a3908b8c8d0a6d456633efa36e422455c80f7b7d63c7fd5157c682b18cdab7f5c36a736155bfc09fd876b38033f2404bb2f8710900c699608376
   languageName: node
   linkType: hard
 
@@ -6384,6 +6371,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"flairup@npm:1.0.0":
+  version: 1.0.0
+  resolution: "flairup@npm:1.0.0"
+  checksum: 10c0/2d9fe1f1c890383be65ae0ec95d57b96f3ff42eecffaf493f8a39f09f4982e12109a865e79baca051e784919eecd72fa6cf620cfae8a4663b98deaa6d883d7ba
+  languageName: node
+  linkType: hard
+
 "flat-cache@npm:^3.0.4":
   version: 3.2.0
   resolution: "flat-cache@npm:3.2.0"
@@ -6436,6 +6430,26 @@ __metadata:
     cross-spawn: "npm:^7.0.0"
     signal-exit: "npm:^4.0.1"
   checksum: 10c0/028f1d41000553fcfa6c4bb5c372963bf3d9bf0b1f25a87d1a6253014343fb69dfb1b42d9625d7cf44c8ba429940f3d0ff718b62105d4d4a4f6ef8ca0a53faa2
+  languageName: node
+  linkType: hard
+
+"framer-motion@npm:^11.11.1":
+  version: 11.11.1
+  resolution: "framer-motion@npm:11.11.1"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0
+    react-dom: ^18.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 10c0/ef02a4194fcc791c31c1dc00db7eeeebd5c39aa594fd999b91dcc4036e08870d512c9a743132f2914e36ea39839ee1ea723850b920acedb3b545b1b50194b28a
   languageName: node
   linkType: hard
 
@@ -8242,6 +8256,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mitt@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "mitt@npm:3.0.1"
+  checksum: 10c0/3ab4fdecf3be8c5255536faa07064d05caa3dd332bd318ff02e04621f7b3069ca1de9106cfe8e7ced675abfc2bec2ce4c4ef321c4a1bb1fb29df8ae090741913
+  languageName: node
+  linkType: hard
+
 "mkdirp@npm:^1.0.3":
   version: 1.0.4
   resolution: "mkdirp@npm:1.0.4"
@@ -8471,6 +8492,17 @@ __metadata:
   dependencies:
     path-key: "npm:^3.0.0"
   checksum: 10c0/6f9353a95288f8455cf64cbeb707b28826a7f29690244c1e4bb61ec573256e021b6ad6651b394eb1ccfd00d6ec50147253aba2c5fe58a57ceb111fad62c519ac
+  languageName: node
+  linkType: hard
+
+"nuqs@npm:^1.19.3":
+  version: 1.19.3
+  resolution: "nuqs@npm:1.19.3"
+  dependencies:
+    mitt: "npm:^3.0.1"
+  peerDependencies:
+    next: ">=13.4 <14.0.2 || ^14.0.3"
+  checksum: 10c0/e2dc4241626181cf78edba6816c60a17a6dab9bcecb326c0ddeb0c030e2ff66d8409ee74b0112509efc5645641f9e7c271abcf4cb2f389459efeb5f8ace3e1b9
   languageName: node
   linkType: hard
 
@@ -10666,8 +10698,6 @@ __metadata:
     "@ark-ui/react": "npm:4.0.0"
     "@dnd-kit/core": "npm:^6.1.0"
     "@dnd-kit/sortable": "npm:^8.0.0"
-    "@emoji-mart/data": "npm:^1.2.1"
-    "@emoji-mart/react": "npm:^1.1.1"
     "@heroicons/react": "npm:^2.1.5"
     "@hookform/resolvers": "npm:^3.9.0"
     "@pandacss/dev": "npm:^0.46.1"
@@ -10704,13 +10734,15 @@ __metadata:
     "@uidotdev/usehooks": "npm:^2.4.1"
     chroma-js: "npm:^3.1.1"
     date-fns: "npm:^4.1.0"
-    emoji-mart: "npm:^5.6.0"
+    emoji-picker-react: "npm:^4.12.0"
     eslint: "npm:^8.57.1"
     eslint-config-next: "npm:^14.2.13"
+    framer-motion: "npm:^11.11.1"
     js-cookie: "npm:^3.0.5"
     lodash: "npm:^4.17.21"
     lucide-react: "npm:^0.446.0"
     next: "npm:^14.2.13"
+    nuqs: "npm:^1.19.3"
     orval: "npm:^6.31.0"
     polished: "npm:^4.3.1"
     prettier: "npm:^3.3.3"

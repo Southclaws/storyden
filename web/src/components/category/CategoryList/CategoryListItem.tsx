@@ -46,7 +46,7 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
       _hover={{
         backgroundColor: "gray.a2",
       }}
-      cursor={isDragging ? "grabbing" : "grab"}
+      cursor={isDragging ? "grabbing" : undefined}
     >
       <Anchor
         href={href}

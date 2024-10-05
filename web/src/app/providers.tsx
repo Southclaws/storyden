@@ -2,6 +2,7 @@
 
 import { PropsWithChildren } from "react";
 import { Toaster, toast } from "sonner";
+import { SWRConfig } from "swr";
 
 import { AuthProvider } from "src/auth/AuthProvider";
 

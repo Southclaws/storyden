@@ -1,7 +1,7 @@
 import { UnreadyBanner } from "src/components/site/Unready";
-import { FeedScreenClient } from "src/screens/feed/FeedScreenClient";
 
 import { threadList } from "@/api/openapi-server/threads";
+import { FeedScreen } from "@/screens/feed/FeedScreen";
 
 type Props = {
   params: {
@@ -16,7 +16,7 @@ export default async function Page(props: Props) {
     });
 
     return (
-      <FeedScreenClient
+      <FeedScreen
         params={{
           categories: [props.params.category],
         }}

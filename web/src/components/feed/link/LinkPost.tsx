@@ -1,13 +1,13 @@
 import { Link as LinkSchema, ThreadReference } from "src/api/openapi-schema";
 import { Anchor } from "src/components/site/Anchor";
 
+import { Empty } from "@/components/site/Empty";
 import { Heading } from "@/components/ui/heading";
 import { Box, Flex, VStack, styled } from "@/styled-system/jsx";
 import { CardBox } from "@/styled-system/patterns";
 import { getAssetURL } from "@/utils/asset";
 
-import { Empty } from "../../site/Empty";
-import { FeedItemByline } from "../common/FeedItemByline/FeedItemByline";
+import { FeedItemByline } from "../FeedItemByline/FeedItemByline";
 
 type Props = {
   thread: ThreadReference;
