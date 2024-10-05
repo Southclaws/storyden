@@ -4,51 +4,17 @@ import { Portal } from "@ark-ui/react";
 import { LinkIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { ShareIcon } from "@heroicons/react/24/solid";
 import { format } from "date-fns/format";
-import { parseAsBoolean, useQueryState } from "nuqs";
 
-import { Thread } from "src/api/openapi-schema";
 import { MoreAction } from "src/components/site/Action/More";
 
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
 
-export type Props = {
-  thread: Thread;
-};
-
-export function usePostMenu(props: Props) {
-  const [editing, setEditing] = useQueryState("edit", parseAsBoolean);
-
-  function handleCopyLink() {
-    //
-  }
-  function handleShare() {
-    //
-  }
-
-  function handleEdit() {
-    setEditing(true);
-  }
-  function handleDelete() {
-    //
-  }
-
-  return {
-    isShareEnabled: true,
-    isEditingEnabled: true,
-    isDeletingEnabled: true,
-    handlers: {
-      handleCopyLink,
-      handleShare,
-      handleEdit,
-      handleDelete,
-    },
-  };
-}
+import { Props, useThreadMenu } from "./useThreadMenu";
 
 export function ThreadMenu(props: Props) {
-  const { isShareEnabled, isEditingEnabled, isDeletingEnabled, handlers } =
-    usePostMenu(props);
+  const { isSharingEnabled, isEditingEnabled, isDeletingEnabled, handlers } =
+    useThreadMenu(props);
 
   const { thread } = props;
 
@@ -70,7 +36,7 @@ export function ThreadMenu(props: Props) {
                 <styled.span>{`Post by ${thread.author.name}`}</styled.span>
 
                 <styled.time fontWeight="normal">
-                  {format(new Date(thread.createdAt), "yyyy-mm-dd")}
+                  {format(new Date(thread.createdAt), "yyyy-MM-dd")}
                 </styled.time>
               </Menu.ItemGroupLabel>
 
@@ -82,7 +48,7 @@ export function ThreadMenu(props: Props) {
                 </HStack>
               </Menu.Item>
 
-              {isShareEnabled && (
+              {isSharingEnabled && (
                 <Menu.Item value="share" onClick={handlers.handleShare}>
                   <HStack gap="1">
                     <ShareIcon width="1.4em" /> Share

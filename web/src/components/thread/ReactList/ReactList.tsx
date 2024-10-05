@@ -66,7 +66,10 @@ function ReactTrigger({ react, onClick }: ReactionProps) {
 
   // Ref the has-reacted state, in order for the debounce to not capture value.
   const hasReacted = useRef(false);
-  hasReacted.current = react.hasReacted;
+  useEffect(() => {
+    hasReacted.current = react.hasReacted;
+    setCount(react.count);
+  }, [react]);
 
   // Prevents the animation from playing on first render. Unfortunately also has
   // the unintended effect of not playing the animation on the first reaction.
@@ -109,7 +112,7 @@ function ReactTrigger({ react, onClick }: ReactionProps) {
       }
       onClick(react.emoji);
     }, REACTION_THROTTLE),
-    [],
+    [hasReacted],
   );
 
   // When removing an emoji completely (its count has reached zero) we need to

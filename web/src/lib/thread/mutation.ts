@@ -1,4 +1,5 @@
 import { uniqueId } from "lodash";
+import { useEffect, useRef } from "react";
 import { MutatorCallback, useSWRConfig } from "swr";
 
 import {
@@ -21,13 +22,20 @@ import {
 import { useSession } from "@/auth";
 
 export function useThreadMutations(thread: Thread) {
-  const session = useSession();
+  const sessionInitial = useSession();
+  const sessionRef = useRef(sessionInitial);
+  useEffect(() => {
+    sessionRef.current = sessionInitial;
+  }, [sessionInitial]);
+
   const { mutate } = useSWRConfig();
 
   const key = getThreadGetKey(thread.slug);
 
   const createReply = async (reply: ReplyInitialProps) => {
     const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
+      const session = sessionRef.current;
+
       if (!data || !session) return;
 
       const newReply = {
@@ -103,6 +111,7 @@ export function useThreadMutations(thread: Thread) {
   };
 
   const reactionAdd = async (replyID: Identifier, emoji: string) => {
+    const session = sessionRef.current;
     if (!session) return;
 
     const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
@@ -139,7 +148,9 @@ export function useThreadMutations(thread: Thread) {
 
     await postReactAdd(replyID, { emoji });
   };
+
   const reactionRemove = async (replyID: Identifier, reactID: Identifier) => {
+    const session = sessionRef.current;
     if (!session) return;
 
     const mutator: MutatorCallback<ThreadGetResponse> = (data) => {

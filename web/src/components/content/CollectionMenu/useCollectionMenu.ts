@@ -41,7 +41,7 @@ const hydrateState = (
 
 export function useCollectionMenu({ account, thread }: Props) {
   const { data, error } = useCollectionList({ account_handle: account.handle });
-  const mutate = useFeedMutations();
+  const { revalidate } = useFeedMutations();
 
   const [multiSelect, setMultiSelect] = useState(false);
   const [selected, setSelected] = useState(0);
@@ -94,7 +94,8 @@ export function useCollectionMenu({ account, thread }: Props) {
           await collectionAddPost(id, thread.id);
         }
 
-        await mutate();
+        // TODO: Optimistic mutation for collection changes.
+        await revalidate();
     }
   };
 
