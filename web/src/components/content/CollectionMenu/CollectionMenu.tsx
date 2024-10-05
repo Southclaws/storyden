@@ -23,18 +23,32 @@ export function CollectionMenu(props: Props) {
         closeOnSelect={!multiSelect}
         onOpenChange={handlers.handleOpenChange}
         onSelect={handlers.handleSelect}
+        positioning={{
+          slide: true,
+          fitViewport: true,
+        }}
       >
         <Menu.Trigger asChild>
-          <BookmarkAction bookmarked={isAlreadySaved} />
+          <BookmarkAction
+            variant="solid"
+            bgColor="bg.muted"
+            color="fg.default"
+            size="xs"
+            bookmarked={isAlreadySaved}
+          />
         </Menu.Trigger>
 
         <Portal>
           <Menu.Positioner>
-            <Menu.Content userSelect="none">
-              <Menu.ItemGroup id="group">
-                <Menu.ItemGroupLabel>Add to collections</Menu.ItemGroupLabel>
-
-                <Menu.Separator />
+            <Menu.Content userSelect="none" overflowY="scroll" maxH="60">
+              <Menu.ItemGroup>
+                <Menu.Item
+                  value="create-collection"
+                  closeOnSelect={false}
+                  asChild
+                >
+                  <CollectionCreateTrigger variant="ghost" />
+                </Menu.Item>
 
                 {collections.map((c) => (
                   <Menu.Item key={c.id} value={c.id}>
@@ -50,12 +64,6 @@ export function CollectionMenu(props: Props) {
                     </HStack>
                   </Menu.Item>
                 ))}
-              </Menu.ItemGroup>
-
-              <Menu.ItemGroup id="create">
-                <Menu.Item value="create-collection" closeOnSelect={false}>
-                  <CollectionCreateTrigger variant="ghost" />
-                </Menu.Item>
               </Menu.ItemGroup>
             </Menu.Content>
           </Menu.Positioner>

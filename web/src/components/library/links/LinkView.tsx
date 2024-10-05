@@ -1,8 +1,8 @@
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
 import { Link } from "src/api/openapi-schema";
-import { PostRefList } from "src/components/feed/common/PostRef/PostRefList";
 
+import { PostRefList } from "@/components/feed/PostRef/PostRefList";
 import { LinkButton } from "@/components/ui/link-button";
 import { Box, Flex, HStack, LinkOverlay, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
@@ -17,7 +17,7 @@ export function LinkView({ link }: Props) {
     ? link.assets.slice(1).map((v) => getAssetURL(v.filename))
     : undefined;
 
-  const domainSearch = `/l?q=${link.domain}`;
+  const domainSearch = `/links?q=${link.domain}`;
 
   return (
     <Flex flexDir="column" gap="2">

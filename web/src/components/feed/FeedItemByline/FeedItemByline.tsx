@@ -1,8 +1,7 @@
-import { ThreadReference } from "src/api/openapi-schema";
-import { useSession } from "src/auth";
-import { Byline } from "src/components/content/Byline";
-import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
-
+import { ThreadReference } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
+import { Byline } from "@/components/content/Byline";
+import { CollectionMenu } from "@/components/content/CollectionMenu/CollectionMenu";
 import { Flex, HStack } from "@/styled-system/jsx";
 
 import { FeedItemMenu } from "../FeedItemMenu/FeedItemMenu";
@@ -25,7 +24,7 @@ export function FeedItemByline(props: Props) {
       />
 
       <HStack>
-        {session && <CollectionMenu thread={props.thread} />}
+        {session && <CollectionMenu account={session} thread={props.thread} />}
         <FeedItemMenu thread={props.thread} />
       </HStack>
     </Flex>

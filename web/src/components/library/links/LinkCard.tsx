@@ -12,7 +12,7 @@ export type Props = {
 
 export function LinkCard({ link, ...rest }: Props) {
   const asset = link.primary_image;
-  const domainSearch = `/l?q=${link.domain}`;
+  const domainSearch = `/links?q=${link.domain}`;
 
   return (
     <Card
@@ -25,7 +25,7 @@ export function LinkCard({ link, ...rest }: Props) {
       {...rest}
     >
       <HStack>
-        <LinkButton size="xs" href={`/l/${link.slug}`} variant="ghost">
+        <LinkButton size="xs" href={`/links/${link.slug}`} variant="ghost">
           View in library
         </LinkButton>
         <LinkButton size="xs" href={domainSearch} variant="ghost">
