@@ -25,7 +25,7 @@ export function Toolbar({ session }: Props) {
     <HStack w="full" gap="2" alignItems="center">
       {account ? (
         <HStack w="full" alignItems="center" justify="end">
-          <ComposeAction>New</ComposeAction>
+          <ComposeAction>Post</ComposeAction>
           {account.admin && (
             <>
               <AdminAction />
