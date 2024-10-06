@@ -169,7 +169,7 @@ func TestNodesTreeMutations(t *testing.T) {
 				a := assert.New(t)
 				// r := require.New(t)
 
-				nameP1 := "test-node-P1"
+				nameP1 := "test-node-p1"
 				slugP1 := nameP1 + uuid.NewString()
 				nodeP1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 					Name:       nameP1,
@@ -178,7 +178,7 @@ func TestNodesTreeMutations(t *testing.T) {
 				}, e2e.WithSession(ctx, cj))
 				tests.Ok(t, err, nodeP1)
 
-				nameC1 := "test-node-C1"
+				nameC1 := "test-node-c1"
 				slugC1 := nameC1 + uuid.NewString()
 				nodeC1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 					Name:       nameC1,
