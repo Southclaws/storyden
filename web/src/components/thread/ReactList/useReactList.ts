@@ -45,6 +45,8 @@ export function useReactionList({ thread, reply }: Props) {
   const { reactionAdd, reactionRemove, revalidate } =
     useThreadMutations(thread);
 
+  const isLoggedIn = Boolean(session);
+
   const postReactions = useRef(reply.reacts);
   useEffect(() => {
     postReactions.current = reply.reacts;
@@ -115,6 +117,7 @@ export function useReactionList({ thread, reply }: Props) {
 
   return {
     data: {
+      isLoggedIn,
       reacts,
     },
     handlers: {

@@ -36,30 +36,32 @@ const reactButtonStyles = css({
 export function ReactList(props: Props) {
   const { data, handlers } = useReactionList(props);
 
-  const { reacts } = data;
+  const { isLoggedIn, reacts } = data;
   const { handleReactExisting, handleReactPicker } = handlers;
 
   return (
-    <HStack flexWrap="wrap">
+    <HStack flexWrap="wrap" gap="1">
       {reacts.map((react) => (
         <ReactTrigger
           key={react.emoji}
           react={react}
+          disabled={!isLoggedIn}
           onClick={handleReactExisting}
         />
       ))}
 
-      <ReactionPickerTrigger onSelect={handleReactPicker} />
+      {isLoggedIn && <ReactionPickerTrigger onSelect={handleReactPicker} />}
     </HStack>
   );
 }
 
 type ReactionProps = {
   react: ReactCount;
+  disabled: boolean;
   onClick: (emoji: string) => void;
 };
 
-function ReactTrigger({ react, onClick }: ReactionProps) {
+function ReactTrigger({ react, disabled, onClick }: ReactionProps) {
   const [count, setCount] = useState(react.count);
   const [direction, setDirection] = useState(1); // To track up or down animation
   const [hasMounted, setHasMounted] = useState(false);
@@ -105,6 +107,10 @@ function ReactTrigger({ react, onClick }: ReactionProps) {
   //
   const handleClick = useCallback(
     throttle(() => {
+      if (disabled) {
+        return;
+      }
+
       if (hasReacted.current) {
         handleRemove();
       } else {
@@ -126,6 +132,9 @@ function ReactTrigger({ react, onClick }: ReactionProps) {
     return null;
   }
 
+  const reacters = react.reactions.map((r) => r.author?.handle);
+  const buttonLabel = `${react.emoji}: ${reacters.join(", ")}`;
+
   return (
     <Button
       className={reactButtonStyles}
@@ -136,6 +145,7 @@ function ReactTrigger({ react, onClick }: ReactionProps) {
       color="fg.subtle"
       onClick={handleClick}
       fontVariantNumeric="tabular-nums"
+      title={buttonLabel}
     >
       {react.emoji}
       <motion.span
