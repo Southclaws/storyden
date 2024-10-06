@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
@@ -162,6 +163,14 @@ func (d *Writer) Update(ctx context.Context, id account.AccountID, opts ...Mutat
 
 	acc, err := update.Save(ctx)
 	if err != nil {
+		if ent.IsConstraintError(err) {
+			// Currently the only valid constraint worth checking is the handle.
+			return nil, fault.Wrap(err,
+				fctx.With(ctx),
+				ftag.With(ftag.AlreadyExists),
+				fmsg.WithDesc("unique constraint violation", "The specified handle has already been used."))
+		}
+
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

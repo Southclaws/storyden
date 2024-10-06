@@ -23,6 +23,7 @@ export type ContentComposerProps = {
   disabled?: boolean;
   resetKey?: string;
   initialValue?: string;
+  placeholder?: string;
   onChange?: (value: string, isEmpty: boolean) => void;
   onAssetUpload?: (asset: Asset) => void;
 };
@@ -42,7 +43,7 @@ export function useContentComposer(props: ContentComposerProps) {
       handleFiles,
     }),
     Placeholder.configure({
-      placeholder: "Write your heart out...",
+      placeholder: props.placeholder ?? "Write your heart out...",
       includeChildren: true,
       showOnlyCurrent: false,
     }),
