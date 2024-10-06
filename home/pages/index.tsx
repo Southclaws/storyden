@@ -148,9 +148,9 @@ function Hero() {
               className={linkButton({
                 backgroundColor: "white",
               })}
-              href="/docs"
+              href="https://makeroom.club"
             >
-              Get started
+              Live demo
             </Link>
             <Link
               className={cx(
