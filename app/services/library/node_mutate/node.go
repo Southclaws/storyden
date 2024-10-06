@@ -10,7 +10,6 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/gosimple/slug"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -19,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -43,7 +43,7 @@ type Manager interface {
 
 type Partial struct {
 	Name         opt.Optional[string]
-	Slug         opt.Optional[string]
+	Slug         opt.Optional[mark.Slug]
 	URL          opt.Optional[url.URL]
 	Content      opt.Optional[datagraph.Content]
 	Parent       opt.Optional[library.QueryKey]
@@ -61,7 +61,7 @@ type DeleteOptions struct {
 
 func (p Partial) Opts() (opts []library.Option) {
 	p.Name.Call(func(value string) { opts = append(opts, library.WithName(value)) })
-	p.Slug.Call(func(value string) { opts = append(opts, library.WithSlug(value)) })
+	p.Slug.Call(func(value mark.Slug) { opts = append(opts, library.WithSlug(value.String())) })
 	p.Content.Call(func(value datagraph.Content) { opts = append(opts, library.WithContent(value)) })
 	p.Metadata.Call(func(value map[string]any) { opts = append(opts, library.WithMetadata(value)) })
 	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, library.WithAssets(value)) })
@@ -137,7 +137,7 @@ func (s *service) Create(ctx context.Context,
 		}
 	}
 
-	nodeSlug := p.Slug.Or(slug.Make(name))
+	nodeSlug := p.Slug.Or(mark.NewSlugFromName(name))
 
 	if u, ok := p.URL.Get(); ok {
 		ln, err := s.fetcher.Fetch(ctx, u)

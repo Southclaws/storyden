@@ -146,6 +146,16 @@ func TestNodesErrors(t *testing.T) {
 			r.NoError(err)
 			r.NotNil(update404)
 			a.Equal(http.StatusNotFound, update404.StatusCode())
+
+			t.Run("invalid_slug", func(t *testing.T) {
+				name := "Testing Node Bad Slug" + uuid.NewString()
+				slug := "not@a/good'slug]"
+				create, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+					Name: name,
+					Slug: &slug,
+				}, e2e.WithSession(ctx, cj))
+				tests.Status(t, err, create, http.StatusBadRequest)
+			})
 		}))
 	}))
 }

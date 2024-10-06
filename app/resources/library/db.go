@@ -30,7 +30,7 @@ func (d *database) Create(
 	ctx context.Context,
 	owner account.AccountID,
 	name string,
-	slug string,
+	slug mark.Slug,
 	opts ...Option,
 ) (*Node, error) {
 	create := d.db.Node.Create()
@@ -38,7 +38,7 @@ func (d *database) Create(
 
 	mutate.SetOwnerID(xid.ID(owner))
 	mutate.SetName(name)
-	mutate.SetSlug(slug)
+	mutate.SetSlug(slug.String())
 
 	for _, fn := range opts {
 		fn(mutate)
