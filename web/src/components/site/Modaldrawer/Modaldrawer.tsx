@@ -10,6 +10,7 @@ import { CloseAction } from "../Action/Close";
 
 type Props = {
   title?: string;
+  dismissable?: boolean;
 } & UseDisclosureProps;
 
 export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
@@ -25,6 +26,7 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
         onOpenChange={onOpenChange}
         // TODO: Scale background only on mobile.
         shouldScaleBackground={false}
+        dismissible={props.dismissable}
       >
         <Drawer.Portal>
           <Drawer.Overlay className="modaldrawer__overlay" />
@@ -40,7 +42,9 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
               p="4"
             >
               <HStack w="full" justify="space-between">
-                <Heading size="md">{props.title}</Heading>
+                <Drawer.Title asChild>
+                  <Heading size="md">{props.title}</Heading>
+                </Drawer.Title>
                 <CloseAction onClick={props.onClose} />
               </HStack>
 
