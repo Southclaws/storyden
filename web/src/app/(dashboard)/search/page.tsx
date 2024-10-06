@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { EmptyState } from "src/components/feed/EmptyState";
+import { EmptyState } from "src/components/site/EmptyState";
 import { SearchScreen } from "src/screens/search/SearchScreen";
 
 type Props = {

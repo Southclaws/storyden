@@ -36,9 +36,10 @@ export function Search(props: Props) {
 
       {(props.query || data.q) && (
         <Button
-          variant="ghost"
+          variant="outline"
           borderX="none"
           borderRadius="none"
+          borderColor="border.default"
           type="reset"
           onClick={handlers.handleReset}
         >
