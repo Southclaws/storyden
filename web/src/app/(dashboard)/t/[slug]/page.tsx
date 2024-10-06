@@ -23,11 +23,18 @@ export default async function Page(props: Props) {
 }
 
 export async function generateMetadata({ params }: Props) {
-  const info = await getInfo();
-  const { data } = await threadGet(params.slug);
+  try {
+    const info = await getInfo();
+    const { data } = await threadGet(params.slug);
 
-  return {
-    title: `${data.title} | ${info.title}`,
-    description: data.description,
-  };
+    return {
+      title: `${data.title} | ${info.title}`,
+      description: data.description,
+    };
+  } catch (e) {
+    return {
+      title: "Thread Not Found",
+      description: "The thread you are looking for does not exist.",
+    };
+  }
 }

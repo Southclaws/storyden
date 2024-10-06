@@ -1,5 +1,3 @@
-"use client";
-
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 
 import { Box, CardBox, Center, HStack, styled } from "@/styled-system/jsx";

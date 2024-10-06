@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/dboslee/lru"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
@@ -12,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 )
 
-var ErrInvalidThreadMark = fault.New("invalid thread mark: thread mark did not point to a valid thread ID")
+var ErrInvalidThreadMark = fault.New("invalid thread mark: thread mark did not point to a valid thread ID", ftag.With(ftag.NotFound))
 
 // from xid
 const xidEncodedLength = 20
