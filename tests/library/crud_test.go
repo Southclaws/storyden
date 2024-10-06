@@ -71,7 +71,7 @@ func TestNodesHappyPath(t *testing.T) {
 
 			// Update the one just created
 
-			name1 = "test-node-1-UPDATED"
+			name1 = "test-node-1-updated"
 			slug1 = name1 + uuid.NewString()
 			cont1 := "<h1>Nodes</h1><p>Newly changed content.</p>"
 			url1 = "https://cla.ws"
