@@ -1,17 +1,18 @@
-"use client";
-
-import { useParams } from "next/navigation";
-
-import { Unready } from "src/components/site/Unready";
+import { UnreadyBanner } from "src/components/site/Unready";
 import { ProfileScreen } from "src/screens/profile/ProfileScreen";
 
-import { ParamSchema } from "./utils";
+import { profileGet } from "@/api/openapi-server/profiles";
 
-export default function Page() {
-  const params = useParams();
-  const { handle } = ParamSchema.parse(params);
+type Props = {
+  params: { handle: string };
+};
 
-  if (!handle) return <Unready />;
-
-  return <ProfileScreen handle={handle} />;
+export default async function Page({ params }: Props) {
+  try {
+    const { handle } = params;
+    const { data } = await profileGet(handle);
+    return <ProfileScreen profile={data} />;
+  } catch (e) {
+    return <UnreadyBanner error={e} />;
+  }
 }
