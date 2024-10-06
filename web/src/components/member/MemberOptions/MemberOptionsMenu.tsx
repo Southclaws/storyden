@@ -1,11 +1,14 @@
-import { Portal } from "@ark-ui/react";
+import { MenuSelectionDetails, Portal } from "@ark-ui/react";
+import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { PropsWithChildren } from "react";
+import { toast } from "sonner";
 
 import { useSession } from "src/auth";
 import { Avatar } from "src/components/site/Avatar/Avatar";
 import { WithDisclosure } from "src/utils/useDisclosure";
 
 import * as Menu from "@/components/ui/menu";
+import { WEB_ADDRESS } from "@/config";
 import { VStack, styled } from "@/styled-system/jsx";
 
 import { MemberSuspensionTrigger } from "../MemberSuspension/MemberSuspensionTrigger";
@@ -17,11 +20,23 @@ export function MemberOptionsMenu({
   ...props
 }: PropsWithChildren<WithDisclosure<Props>>) {
   const session = useSession();
+  const [_, copy] = useCopyToClipboard();
+
+  const permalink = `${WEB_ADDRESS}/m/${props.handle}`;
 
   const showAdminOptions = session?.admin && props.handle !== session.handle;
 
+  function handleSelect(value: MenuSelectionDetails) {
+    switch (value.value) {
+      case "copy-link":
+        copy(permalink);
+        toast("Link copied to clipboard");
+        break;
+    }
+  }
+
   return (
-    <Menu.Root onOpenChange={props.onOpenChange}>
+    <Menu.Root onOpenChange={props.onOpenChange} onSelect={handleSelect}>
       <Menu.Trigger asChild>{children}</Menu.Trigger>
 
       <Portal>
@@ -37,6 +52,8 @@ export function MemberOptionsMenu({
               </Menu.ItemGroupLabel>
 
               <Menu.Separator />
+
+              <Menu.Item value="copy-link">Copy link</Menu.Item>
 
               {showAdminOptions && (
                 <MemberSuspensionTrigger {...props}>
