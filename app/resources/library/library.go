@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -22,7 +23,7 @@ type Repository interface {
 	Create(ctx context.Context,
 		owner account.AccountID,
 		name string,
-		slug string,
+		slug mark.Slug,
 		opts ...Option,
 	) (*Node, error)
 

@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
@@ -81,11 +82,16 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	slug, err := deserialiseInputSlug(request.Body.Slug)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	node, err := c.nodeMutator.Create(ctx,
 		session,
 		request.Body.Name,
 		node_mutate.Partial{
-			Slug:         deserialiseInputSlug(request.Body.Slug),
+			Slug:         slug,
 			Content:      richContent,
 			Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
 			URL:          url,
@@ -218,9 +224,14 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	slug, err := deserialiseInputSlug(request.Body.Slug)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	node, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
 		Name:         opt.NewPtr(request.Body.Name),
-		Slug:         deserialiseInputSlug(request.Body.Slug),
+		Slug:         slug,
 		AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 		AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
 		URL:          url,
@@ -383,14 +394,19 @@ func deserialiseAssetSourceURL(in openapi.AssetSourceURL) string {
 	return string(in)
 }
 
-func deserialiseInputSlug(in *string) opt.Optional[string] {
+func deserialiseInputSlug(in *string) (opt.Optional[mark.Slug], error) {
 	if in == nil {
-		return opt.NewEmpty[string]()
+		return opt.NewEmpty[mark.Slug](), nil
 	}
 
 	if *in == "" {
-		return opt.NewEmpty[string]()
+		return opt.NewEmpty[mark.Slug](), nil
 	}
 
-	return opt.NewPtr(in)
+	slug, err := mark.NewSlug(*in)
+	if err != nil {
+		return nil, err
+	}
+
+	return opt.New(*slug), nil
 }
