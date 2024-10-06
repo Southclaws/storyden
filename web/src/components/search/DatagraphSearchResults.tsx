@@ -1,5 +1,5 @@
 import { DatagraphItem, DatagraphSearchResult } from "src/api/openapi-schema";
-import { EmptyState } from "src/components/feed/EmptyState";
+import { EmptyState } from "src/components/site/EmptyState";
 
 import { Heading } from "@/components/ui/heading";
 import { Box, Flex, LinkOverlay, styled } from "@/styled-system/jsx";
