@@ -20,9 +20,10 @@ export async function Top() {
   return (
     <HStack
       className={cx(Floating(), styles["topbar"])}
+      borderRadius="md"
       justify="space-between"
       alignItems="center"
-      px="4"
+      px="1"
     >
       <HStack className={styles["topbar-left"]}>
         <SidebarToggle initialValue={initialSidebarState} />

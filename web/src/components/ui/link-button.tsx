@@ -11,6 +11,8 @@ export type LinkProps = Partial<ButtonVariantProps> &
   NextLinkProps &
   JsxStyleProps;
 
+export type LinkButtonStyleProps = Partial<ButtonVariantProps> & JsxStyleProps;
+
 export function LinkButton({
   children,
   href,

@@ -31,7 +31,7 @@ conic-gradient(
 
 const semanticTokens = defineSemanticTokens({
   blurs: {
-    frosted: { value: "8px" },
+    frosted: { value: "10px" },
   },
   opacity: {
     0: { value: "0" },
@@ -168,7 +168,7 @@ export default defineConfig({
         properties: {},
         transform() {
           return {
-            backgroundColor: "bg.opaque/60",
+            backgroundColor: "bg.opaque/90",
             backdropBlur: "frosted",
             backdropFilter: "auto",
           };
@@ -179,10 +179,9 @@ export default defineConfig({
         properties: {},
         transform() {
           return {
-            backgroundColor: "bg.opaque/80",
+            backgroundColor: "bg.opaque/90",
             backdropBlur: "frosted",
             backdropFilter: "auto",
-            borderRadius: "lg",
             boxShadow: "sm",
           };
         },
