@@ -14,9 +14,12 @@ export const LogoutIcon = <LogoutGraphic />;
 type Props = AnchorProps & LinkButtonStyleProps;
 
 export function LogoutAnchor({ hideLabel, ...props }: Props) {
-  // TODO: Use <a> for this
   return (
-    <a className={button(props)} href={LogoutRoute} title={LogoutLabel}>
+    <a
+      className={button({ variant: "ghost", ...props })}
+      href={LogoutRoute}
+      title={LogoutLabel}
+    >
       {LogoutIcon}
       {!hideLabel && (
         <>

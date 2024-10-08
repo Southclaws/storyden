@@ -37,7 +37,7 @@ export function Navpill() {
               <HStack>
                 <HomeAnchor hideLabel />
                 <DraftsAnchor hideLabel />
-                <LogoutAnchor hideLabel />
+                <LogoutAnchor hideLabel size="xs" />
               </HStack>
               <HStack>
                 {account.admin && (
