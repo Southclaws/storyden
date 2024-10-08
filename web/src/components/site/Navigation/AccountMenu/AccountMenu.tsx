@@ -18,18 +18,10 @@ type Props = {
 };
 
 export function AccountMenu({ account }: Props) {
-  function handleSelect(value: MenuSelectionDetails) {
-    switch (
-      value.value
-      //
-    ) {
-    }
-  }
-
   const isAdmin = hasPermission(account, "ADMINISTRATOR");
 
   return (
-    <Menu.Root onSelect={handleSelect}>
+    <Menu.Root>
       <Menu.Trigger cursor="pointer">
         <MemberAvatar profile={account} size="md" />
       </Menu.Trigger>
