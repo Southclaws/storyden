@@ -4,10 +4,9 @@ import { css } from '../css/index.mjs';
 const FloatingConfig = {
 transform() {
   return {
-    backgroundColor: "bg.opaque/80",
+    backgroundColor: "bg.opaque/90",
     backdropBlur: "frosted",
     backdropFilter: "auto",
-    borderRadius: "lg",
     boxShadow: "sm"
   };
 }}

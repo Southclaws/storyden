@@ -1,19 +1,16 @@
 "use client";
 
 import { useSession } from "src/auth";
-import { AdminAction } from "src/components/site/Navigation/Anchors/Admin";
 import {
-  LoginAction,
-  RegisterAction,
+  LoginAnchor,
+  RegisterAnchor,
 } from "src/components/site/Navigation/Anchors/Login";
-import { SettingsAction } from "src/components/site/Navigation/Anchors/Settings";
-import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 
 import { Account } from "@/api/openapi-schema";
 import { HStack } from "@/styled-system/jsx";
 
-import { ComposeAction } from "../Anchors/Compose";
-import { DraftsAction } from "../Anchors/Drafts";
+import { AccountMenu } from "../AccountMenu/AccountMenu";
+import { ComposeAnchor } from "../Anchors/Compose";
 
 type Props = {
   session: Account | undefined;
@@ -22,31 +19,18 @@ type Props = {
 export function Toolbar({ session }: Props) {
   const account = useSession(session);
   return (
-    <HStack w="full" gap="2" alignItems="center">
+    <HStack w="full" gap="2" alignItems="center" justify="end" pr="1">
       {account ? (
-        <HStack w="full" alignItems="center" justify="end">
-          <ComposeAction>Post</ComposeAction>
-          {account.admin && (
-            <>
-              <AdminAction />
-              {/* TODO: Move public drafts for admin review to /queue */}
-              {/* <QueueAction /> */}
-            </>
-          )}
-          <DraftsAction />
-          <SettingsAction />
+        <>
+          <ComposeAnchor>Post</ComposeAnchor>
 
-          <ProfilePill
-            profileReference={account}
-            size="lg"
-            showHandle={false}
-          />
-        </HStack>
+          <AccountMenu account={account} />
+        </>
       ) : (
-        <HStack>
-          <RegisterAction w="full" />
-          <LoginAction flexShrink={0} />
-        </HStack>
+        <>
+          <RegisterAnchor w="full" />
+          <LoginAnchor flexShrink={0} />
+        </>
       )}
     </HStack>
   );

@@ -87,7 +87,7 @@
 
     grid-template-rows:
       var(--grid-row-padding-outer)
-      4rem
+      3rem
       var(--grid-row-padding-inner)
       1fr
       var(--grid-row-padding-outer);
@@ -98,7 +98,9 @@
       minmax(var(--grid-col-padding-inner), 1fr)
       minmax(0, var(--sizes-breakpoint-lg))
       minmax(var(--grid-col-padding-inner-right), 1fr)
-      18rem
+      /* only difference to the 1280 width version, this makes sure the title
+      section is centered between the search bar and the profile area. */
+      auto
       var(--grid-col-padding-outer);
 
     grid-template-areas:
@@ -198,6 +200,15 @@
 
 @media screen and (min-width: 1280px) {
   .navgrid {
+    grid-template-columns:
+      var(--grid-col-padding-outer)
+      18rem
+      minmax(var(--grid-col-padding-inner), 1fr)
+      minmax(0, var(--sizes-breakpoint-lg))
+      minmax(var(--grid-col-padding-inner-right), 1fr)
+      18rem
+      var(--grid-col-padding-outer);
+
     grid-template-areas:
       " padtl    padtop    padtop   padtop   padtop   padtop    padtr    "
       " padleft  topbar    topbar   topbar   topbar   topbar    padright "
