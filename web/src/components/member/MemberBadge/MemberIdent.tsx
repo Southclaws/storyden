@@ -8,7 +8,7 @@ import { MemberAvatar } from "./MemberAvatar";
 export type Props = {
   profile: ProfileReference;
   size?: "sm" | "md" | "lg";
-  name?: "hidden" | "handle" | "full";
+  name?: "hidden" | "handle" | "full-horizontal" | "full-vertical";
   roles?: "hidden" | "badge" | "all";
   avatar?: "hidden" | "visible";
 };
@@ -40,16 +40,12 @@ export function MemberName({
   roles = "hidden",
 }: Props) {
   switch (name) {
-    case "full":
+    case "full-horizontal":
       return (
-        <Flex
-          direction={size === "lg" ? "column" : "row"}
-          gap={size === "lg" ? "0" : "1"}
-          alignItems={size === "lg" ? "start" : "center"}
-        >
+        <Flex direction="row" gap="1" alignItems="center">
           <styled.p
             minW="0"
-            fontSize={size === "lg" ? "lg" : "sm"}
+            fontSize={size === "lg" ? "md" : "sm"}
             fontWeight={size === "lg" ? "bold" : "medium"}
             overflowX="hidden"
             textWrap="nowrap"
@@ -61,7 +57,31 @@ export function MemberName({
           >
             {profile.name}
           </styled.p>
-          <styled.p textWrap="nowrap" color="fg.muted">
+          <styled.p fontWeight="normal" textWrap="nowrap" color="fg.subtle">
+            @{profile.handle}
+          </styled.p>
+          <Roles profile={profile} roles={roles} />
+        </Flex>
+      );
+
+    case "full-vertical":
+      return (
+        <Flex direction="column" gap="0" alignItems="start">
+          <styled.p
+            minW="0"
+            fontSize={size === "lg" ? "md" : "sm"}
+            fontWeight={size === "lg" ? "bold" : "medium"}
+            overflowX="hidden"
+            textWrap="nowrap"
+            textOverflow="ellipsis"
+            color="fg.default"
+            _containerSmall={{
+              display: "none",
+            }}
+          >
+            {profile.name}
+          </styled.p>
+          <styled.p fontWeight="normal" textWrap="nowrap" color="fg.subtle">
             @{profile.handle}
           </styled.p>
           <Roles profile={profile} roles={roles} />
@@ -71,7 +91,9 @@ export function MemberName({
     case "handle":
       return (
         <HStack gap="1">
-          <styled.p color="fg.muted">@{profile.handle}</styled.p>
+          <styled.p fontWeight="normal" textWrap="nowrap" color="fg.subtle">
+            @{profile.handle}
+          </styled.p>
           <Roles profile={profile} roles={roles} />
         </HStack>
       );

@@ -4,7 +4,7 @@ import { css } from '../css/index.mjs';
 const FrostedGlassConfig = {
 transform() {
   return {
-    backgroundColor: "bg.opaque/60",
+    backgroundColor: "bg.opaque/90",
     backdropBlur: "frosted",
     backdropFilter: "auto"
   };

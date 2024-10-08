@@ -67,7 +67,12 @@ export function ProfileScreen(props: Props) {
               </LStack>
             </HStack>
           ) : (
-            <MemberIdent profile={profile} size="lg" name="full" roles="all" />
+            <MemberIdent
+              profile={profile}
+              size="lg"
+              name="full-vertical"
+              roles="all"
+            />
           )}
 
           <HStack justify="end">

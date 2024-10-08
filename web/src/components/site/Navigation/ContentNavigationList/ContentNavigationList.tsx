@@ -1,11 +1,9 @@
 "use client";
 
-import { BookOpenIcon, UsersIcon } from "@heroicons/react/24/outline";
-
 import { CategoryList } from "@/components/category/CategoryList/CategoryList";
-import { LinkButton } from "@/components/ui/link-button";
 import { LStack, styled } from "@/styled-system/jsx";
 
+import { MembersAnchor } from "../Anchors/Members";
 import { DatagraphNavTree } from "../DatagraphNavTree/DatagraphNavTree";
 import { useNavigation } from "../useNavigation";
 
@@ -24,20 +22,11 @@ export function ContentNavigationList() {
     >
       <LStack gap="1">
         <CategoryList />
-
         <DatagraphNavTree currentNode={nodeSlug} />
       </LStack>
 
       <LStack gap="1">
-        <LinkButton w="full" size="xs" variant="ghost" href="/l">
-          <BookOpenIcon />
-          Library
-        </LinkButton>
-
-        <LinkButton w="full" size="xs" variant="ghost" href="/m">
-          <UsersIcon />
-          Members
-        </LinkButton>
+        <MembersAnchor />
       </LStack>
     </styled.nav>
   );

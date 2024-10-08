@@ -87,7 +87,7 @@
 
     grid-template-rows:
       var(--grid-row-padding-outer)
-      4rem
+      3rem
       var(--grid-row-padding-inner)
       1fr
       var(--grid-row-padding-outer);

@@ -11,8 +11,6 @@ export function SettingsScreen() {
     <VStack alignItems="start" gap="4">
       <Heading size="lg">Settings</Heading>
 
-      <IdentitySettings />
-
       <AuthMethodSettings />
     </VStack>
   );
