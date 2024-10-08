@@ -17,7 +17,7 @@ import { MemberIdent } from "./MemberIdent";
 export type Props = {
   profile: ProfileReference;
   size?: "sm" | "md" | "lg";
-  name?: "hidden" | "handle" | "full";
+  name?: "hidden" | "handle" | "full-horizontal" | "full-vertical";
   roles?: "hidden" | "badge" | "all";
   avatar?: "hidden" | "visible";
 
@@ -35,7 +35,7 @@ export function useMemberBadge(profile: ProfileReference) {
 
   const isRoleChangeEnabled = hasPermission(session, "MANAGE_ROLES");
 
-  const permalink = `${WEB_ADDRESS}/${profile.handle}`;
+  const permalink = `${WEB_ADDRESS}/m/${profile.handle}`;
 
   // TODO: Add member suspension to API
   // const isMemberSuspended = profile.deletedAt !== null;

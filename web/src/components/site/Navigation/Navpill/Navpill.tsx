@@ -9,15 +9,15 @@ import { HStack } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 
 import { CloseAction } from "../../Action/Close";
-import { AdminAction } from "../Anchors/Admin";
-import { ComposeAction } from "../Anchors/Compose";
-import { DashboardAction } from "../Anchors/Dashboard";
-import { DraftsAction } from "../Anchors/Drafts";
-import { HomeAction } from "../Anchors/Home";
-import { LibraryAction } from "../Anchors/Library";
-import { LoginAction } from "../Anchors/Login";
-import { LogoutAction } from "../Anchors/Logout";
-import { SettingsAction } from "../Anchors/Settings";
+import { MenuAction } from "../Actions/Menu";
+import { AdminAnchor } from "../Anchors/Admin";
+import { ComposeAnchor } from "../Anchors/Compose";
+import { DraftsAnchor } from "../Anchors/Drafts";
+import { HomeAnchor } from "../Anchors/Home";
+import { LibraryAnchor } from "../Anchors/Library";
+import { LoginAnchor } from "../Anchors/Login";
+import { LogoutAnchor } from "../Anchors/Logout";
+import { SettingsAnchor } from "../Anchors/Settings";
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
 import { Search } from "../Search/Search";
 
@@ -35,23 +35,23 @@ export function Navpill() {
           {account ? (
             <>
               <HStack>
-                <HomeAction />
-                <DraftsAction />
-                <LogoutAction />
+                <HomeAnchor hideLabel />
+                <DraftsAnchor hideLabel />
+                <LogoutAnchor hideLabel />
               </HStack>
               <HStack>
                 {account.admin && (
                   <>
-                    <AdminAction />
+                    <AdminAnchor hideLabel />
                     {/* TODO: Move public drafts for admin review to /queue */}
                     {/* <QueueAction /> */}
                   </>
                 )}
-                <SettingsAction />
+                <SettingsAnchor hideLabel />
               </HStack>
             </>
           ) : (
-            <LoginAction />
+            <LoginAnchor />
           )}
         </HStack>
 
@@ -70,10 +70,10 @@ export function Navpill() {
           ) : (
             <>
               <ProfilePill profileReference={account} showHandle={false} />
-              <HomeAction />
-              <ComposeAction />
-              <LibraryAction />
-              <DashboardAction onClick={onExpand} />
+              <HomeAnchor hideLabel />
+              <ComposeAnchor hideLabel />
+              <LibraryAnchor hideLabel />
+              <MenuAction onClick={onExpand} />
             </>
           )}
         </HStack>
@@ -81,15 +81,15 @@ export function Navpill() {
         <HStack gap="4" w="full" justifyContent="space-between">
           {isExpanded ? (
             <>
-              <HomeAction />
+              <HomeAnchor hideLabel />
               <Search />
               <CloseAction onClick={onClose} />
             </>
           ) : (
             <>
-              <HomeAction />
-              <LoginAction />
-              <DashboardAction onClick={onExpand} />
+              <HomeAnchor hideLabel />
+              <LoginAnchor />
+              <MenuAction onClick={onExpand} />
             </>
           )}
         </HStack>

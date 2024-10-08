@@ -1,7 +1,7 @@
 import { PropsWithChildren } from "react";
 
 import { Box, Flex, FlexProps } from "@/styled-system/jsx";
-import { FrostedGlass } from "@/styled-system/patterns";
+import { Floating, FrostedGlass } from "@/styled-system/patterns";
 
 import { Props, useToolpill } from "./useToolpill";
 
@@ -33,7 +33,7 @@ export function Toolpill({
         <Flex
           id="toolpill-content-container"
           ref={ref}
-          className={FrostedGlass()}
+          className={Floating()}
           p="1"
           gap="2"
           flexDirection="column"

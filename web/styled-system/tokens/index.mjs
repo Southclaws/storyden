@@ -7324,7 +7324,7 @@ const tokens = {
     "variable": "var(--radii-l3)"
   },
   "blurs.frosted": {
-    "value": "8px",
+    "value": "10px",
     "variable": "var(--blurs-frosted)"
   },
   "opacity.0": {

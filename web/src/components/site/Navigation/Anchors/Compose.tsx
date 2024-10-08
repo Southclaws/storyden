@@ -1,12 +1,33 @@
 import { PlusIcon } from "lucide-react";
-import { PropsWithChildren } from "react";
 
-import { LinkButton } from "@/components/ui/link-button";
+import { LinkButtonStyleProps } from "@/components/ui/link-button";
 
-export function ComposeAction(props: PropsWithChildren) {
+import { Anchor, AnchorProps, MenuItem } from "./Anchor";
+
+export const ComposeID = "compose";
+export const ComposeRoute = "/new";
+export const ComposeLabel = "Post";
+export const ComposeIcon = <PlusIcon />;
+
+export function ComposeAnchor(props: AnchorProps & LinkButtonStyleProps) {
   return (
-    <LinkButton href="/new" variant="ghost" size="sm">
-      <PlusIcon /> {props.children}
-    </LinkButton>
+    <Anchor
+      id={ComposeID}
+      route={ComposeRoute}
+      label={ComposeLabel}
+      icon={ComposeIcon}
+      {...props}
+    />
+  );
+}
+
+export function ComposeMenuItem() {
+  return (
+    <MenuItem
+      id={ComposeID}
+      route={ComposeRoute}
+      label={ComposeLabel}
+      icon={ComposeIcon}
+    />
   );
 }
