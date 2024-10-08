@@ -9,7 +9,7 @@ export type Props = {
 
 export function useProfileContent({ profile }: Props) {
   const threads = useThreadList({ author: profile.handle });
-  const collections = useCollectionList();
+  const collections = useCollectionList({ account_handle: profile.handle });
 
   if (!threads.data) {
     return { ready: false as const, error: threads.error };
