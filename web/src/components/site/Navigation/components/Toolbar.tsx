@@ -7,6 +7,7 @@ import {
 } from "src/components/site/Navigation/Anchors/Login";
 
 import { Account } from "@/api/openapi-schema";
+import { NotificationsMenu } from "@/components/notifications/NotificationsMenu";
 import { HStack } from "@/styled-system/jsx";
 
 import { AccountMenu } from "../AccountMenu/AccountMenu";
@@ -23,7 +24,7 @@ export function Toolbar({ session }: Props) {
       {account ? (
         <>
           <ComposeAnchor>Post</ComposeAnchor>
-
+          <NotificationsMenu status="unread" />
           <AccountMenu account={account} />
         </>
       ) : (
