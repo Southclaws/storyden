@@ -1,8 +1,10 @@
 import { ProfileReference } from "src/api/openapi-schema";
-import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Timestamp } from "src/components/site/Timestamp";
 
-import { HStack, styled } from "@/styled-system/jsx";
+import { HStack } from "@/styled-system/jsx";
+
+import { MemberBadge } from "../member/MemberBadge/MemberBadge";
+import { DotSeparator } from "../site/Dot";
 
 type Props = {
   href: string;
@@ -22,13 +24,9 @@ export function Byline(props: Props) {
         fontSize="sm"
         color="fg.subtle"
       >
-        <ProfilePill profileReference={props.author} />
-        <styled.span pr="2">•</styled.span>
-        <Timestamp
-          created={props.time}
-          updated={props.updated}
-          href={props.href}
-        />
+        <MemberBadge profile={props.author} size="sm" name="handle" />
+        <DotSeparator />
+        <Timestamp created={props.time} href={props.href} />
       </HStack>
 
       {props.more}
