@@ -22,7 +22,18 @@ export function ContentNavigationList() {
     >
       <LStack gap="1">
         <CategoryList />
-        <DatagraphNavTree currentNode={nodeSlug} />
+        <DatagraphNavTree
+          label="Library"
+          href="/l"
+          currentNode={nodeSlug}
+          visibility={["published"]}
+        />
+        <DatagraphNavTree
+          label="Private"
+          href="/drafts"
+          currentNode={nodeSlug}
+          visibility={["draft", "review", "unlisted"]}
+        />
       </LStack>
 
       <LStack gap="1">
