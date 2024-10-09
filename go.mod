@@ -2,7 +2,7 @@ module github.com/Southclaws/storyden
 
 go 1.23.0
 
-toolchain go1.23.1
+toolchain go1.23.2
 
 require (
 	ariga.io/atlas v0.27.0 // indirect
@@ -11,7 +11,7 @@ require (
 	github.com/Southclaws/dt v1.0.1
 	github.com/alexedwards/argon2id v1.0.0
 	github.com/forPelevin/gomoji v1.2.0
-	github.com/getkin/kin-openapi v0.127.0
+	github.com/getkin/kin-openapi v0.128.0
 	github.com/gosimple/slug v1.14.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
@@ -55,18 +55,18 @@ require (
 	github.com/oapi-codegen/echo-middleware v1.0.2
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/pb33f/libopenapi v0.18.1
+	github.com/pb33f/libopenapi v0.18.3
 	github.com/rs/cors v1.11.1
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
-	github.com/twilio/twilio-go v1.23.2
-	github.com/weaviate/weaviate v1.26.5
+	github.com/twilio/twilio-go v1.23.3
+	github.com/weaviate/weaviate v1.26.6
 	github.com/weaviate/weaviate-go-client/v4 v4.15.1
 	golang.org/x/sync v0.8.0
-	google.golang.org/api v0.199.0
+	google.golang.org/api v0.200.0
 )
 
 require (
-	cloud.google.com/go/auth v0.9.5 // indirect
+	cloud.google.com/go/auth v0.9.8 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.4 // indirect
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
@@ -137,8 +137,8 @@ require (
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0 // indirect
 	golang.org/x/image v0.20.0 // indirect
 	golang.org/x/tools v0.25.0 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240924160255-9d4c2d233b61 // indirect
-	google.golang.org/grpc v1.67.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241007155032-5fefd90f89a9 // indirect
+	google.golang.org/grpc v1.67.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	modernc.org/libc v1.61.0 // indirect
 	modernc.org/mathutil v1.6.0 // indirect
@@ -188,12 +188,12 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zclconf/go-cty v1.15.0 // indirect
 	go.uber.org/multierr v1.11.0
-	golang.org/x/crypto v0.27.0
+	golang.org/x/crypto v0.28.0
 	golang.org/x/mod v0.21.0 // indirect
-	golang.org/x/net v0.29.0
-	golang.org/x/sys v0.25.0 // indirect
-	golang.org/x/text v0.18.0 // indirect
-	golang.org/x/time v0.6.0 // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
+	golang.org/x/net v0.30.0
+	golang.org/x/sys v0.26.0 // indirect
+	golang.org/x/text v0.19.0 // indirect
+	golang.org/x/time v0.7.0 // indirect
+	google.golang.org/protobuf v1.35.1 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
