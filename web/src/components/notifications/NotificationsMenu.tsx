@@ -73,7 +73,12 @@ export function NotificationsMenu(props: Props) {
                 </Center>
               ) : (
                 notifications.map((notification) => (
-                  <Menu.Item value={notification.id} height="auto" py="1">
+                  <Menu.Item
+                    key={notification.id}
+                    value={notification.id}
+                    height="auto"
+                    py="1"
+                  >
                     <HStack w="full" justify="space-between">
                       <Link
                         className={hstack({
