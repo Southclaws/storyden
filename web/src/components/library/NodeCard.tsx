@@ -35,19 +35,10 @@ export function NodeCard({ node, libraryPath, context, ...rest }: Props) {
         <HStack color="fg.muted">
           <LibraryBadge />
 
-          <Timestamp
-            created={node.createdAt}
-            updated={node.updatedAt}
-            href={url}
-          />
+          <Timestamp created={node.createdAt} href={url} />
         </HStack>
       ) : (
-        <Timestamp
-          created={node.createdAt}
-          updated={node.updatedAt}
-          large
-          href={url}
-        />
+        <Timestamp created={node.createdAt} large href={url} />
       )}
     </Card>
   );

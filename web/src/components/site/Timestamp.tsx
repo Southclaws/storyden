@@ -6,21 +6,16 @@ import { Anchor } from "./Anchor";
 
 type Props = {
   created: string | Date;
-  updated?: string | Date | undefined;
   href?: string;
   large?: boolean;
 };
 
 export function Timestamp(props: Props) {
-  const { created, updated } = props;
+  const { created } = props;
 
   const createdDate = normaliseDate(created);
-  const updatedDate = normaliseDate(updated);
-
-  const showUpdated = isUpdatedLongerThanADay(createdDate, updatedDate);
 
   const createdAt = timestamp(createdDate, !props.large);
-  const updatedAt = updated ? timestamp(updated, !props.large) : null;
 
   return (
     <styled.span>
@@ -34,7 +29,6 @@ export function Timestamp(props: Props) {
       ) : (
         <styled.span>{createdAt}</styled.span>
       )}
-      {showUpdated && <> (updated {updatedAt})</>}
     </styled.span>
   );
 }
@@ -45,10 +39,4 @@ function normaliseDate(date: string | Date | undefined) {
   }
 
   return date instanceof Date ? date : new Date(date);
-}
-
-function isUpdatedLongerThanADay(created: Date, updated?: Date) {
-  if (!updated) return false;
-
-  return updated.getTime() - created.getTime() > 1000 * 60 * 60 * 24;
 }
