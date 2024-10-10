@@ -39,7 +39,13 @@ export const Breadcrumbs_ = (
   const current = last(paths);
 
   return (
-    <HStack w="full" color="fg.subtle" overflowX="scroll" py="2">
+    <HStack
+      w="full"
+      color="fg.subtle"
+      overflowX="scroll"
+      pt="scrollGutter"
+      mt="-scrollGutter"
+    >
       <LinkButton
         size="xs"
         variant="subtle"

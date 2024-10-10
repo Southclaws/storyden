@@ -44,7 +44,13 @@ export function Breadcrumbs({ thread }: Props) {
     : [];
 
   return (
-    <HStack w="full" color="fg.subtle" overflowX="scroll" py="2">
+    <HStack
+      w="full"
+      color="fg.subtle"
+      overflowX="scroll"
+      pt="scrollGutter"
+      mt="-scrollGutter"
+    >
       <LinkButton
         size="xs"
         variant="subtle"
