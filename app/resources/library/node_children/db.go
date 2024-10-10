@@ -10,16 +10,17 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
 )
 
 type database struct {
 	db *ent.Client
-	nr library.Repository
+	nr *node_querier.Querier
 }
 
-func New(db *ent.Client, nr library.Repository) Repository {
+func New(db *ent.Client, nr *node_querier.Querier) Repository {
 	return &database{db, nr}
 }
 
