@@ -34,7 +34,7 @@ export function LibraryPageMenu(props: Props) {
       onOpenChange={handleOpenChange}
     >
       <Menu.Trigger asChild>
-        <MoreAction size="xs" />
+        <MoreAction variant="subtle" size="xs" />
       </Menu.Trigger>
 
       <Portal>
