@@ -18,6 +18,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
+	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -59,20 +61,21 @@ type DeleteOptions struct {
 	NewParent opt.Optional[library.QueryKey]
 }
 
-func (p Partial) Opts() (opts []library.Option) {
-	p.Name.Call(func(value string) { opts = append(opts, library.WithName(value)) })
-	p.Slug.Call(func(value mark.Slug) { opts = append(opts, library.WithSlug(value.String())) })
-	p.Content.Call(func(value datagraph.Content) { opts = append(opts, library.WithContent(value)) })
-	p.Metadata.Call(func(value map[string]any) { opts = append(opts, library.WithMetadata(value)) })
-	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, library.WithAssets(value)) })
-	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, library.WithAssetsRemoved(value)) })
-	p.Visibility.Call(func(value visibility.Visibility) { opts = append(opts, library.WithVisibility(value)) })
+func (p Partial) Opts() (opts []node_writer.Option) {
+	p.Name.Call(func(value string) { opts = append(opts, node_writer.WithName(value)) })
+	p.Slug.Call(func(value mark.Slug) { opts = append(opts, node_writer.WithSlug(value.String())) })
+	p.Content.Call(func(value datagraph.Content) { opts = append(opts, node_writer.WithContent(value)) })
+	p.Metadata.Call(func(value map[string]any) { opts = append(opts, node_writer.WithMetadata(value)) })
+	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, node_writer.WithAssets(value)) })
+	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, node_writer.WithAssetsRemoved(value)) })
+	p.Visibility.Call(func(value visibility.Visibility) { opts = append(opts, node_writer.WithVisibility(value)) })
 	return
 }
 
 type service struct {
 	accountQuery      *account_querier.Querier
-	nr                library.Repository
+	nodeQuerier       *node_querier.Querier
+	nodeWriter        *node_writer.Writer
 	nc                node_children.Repository
 	fetcher           *fetcher.Fetcher
 	fs                *fetcher.Fetcher
@@ -82,7 +85,8 @@ type service struct {
 
 func New(
 	accountQuery *account_querier.Querier,
-	nr library.Repository,
+	nodeQuerier *node_querier.Querier,
+	nodeWriter *node_writer.Writer,
 	nc node_children.Repository,
 	fetcher *fetcher.Fetcher,
 	fs *fetcher.Fetcher,
@@ -91,7 +95,8 @@ func New(
 ) Manager {
 	return &service{
 		accountQuery:      accountQuery,
-		nr:                nr,
+		nodeQuerier:       nodeQuerier,
+		nodeWriter:        nodeWriter,
 		nc:                nc,
 		fetcher:           fetcher,
 		fs:                fs,
@@ -133,7 +138,7 @@ func (s *service) Create(ctx context.Context,
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 
-			opts = append(opts, library.WithAssets([]asset.AssetID{a.ID}))
+			opts = append(opts, node_writer.WithAssets([]asset.AssetID{a.ID}))
 		}
 	}
 
@@ -142,11 +147,11 @@ func (s *service) Create(ctx context.Context,
 	if u, ok := p.URL.Get(); ok {
 		ln, err := s.fetcher.Fetch(ctx, u)
 		if err == nil {
-			opts = append(opts, library.WithLink(xid.ID(ln.ID)))
+			opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
 		}
 	}
 
-	n, err := s.nr.Create(ctx, owner, name, nodeSlug, opts...)
+	n, err := s.nodeWriter.Create(ctx, owner, name, nodeSlug, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -171,7 +176,7 @@ func (s *service) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := s.nr.Get(ctx, qk)
+	n, err := s.nodeQuerier.Get(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -193,7 +198,7 @@ func (s *service) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 
-			opts = append(opts, library.WithAssets([]asset.AssetID{a.ID}))
+			opts = append(opts, node_writer.WithAssets([]asset.AssetID{a.ID}))
 		}
 	}
 
@@ -215,11 +220,11 @@ func (s *service) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 	if u, ok := p.URL.Get(); ok {
 		ln, err := s.fetcher.Fetch(ctx, u)
 		if err == nil {
-			opts = append(opts, library.WithLink(xid.ID(ln.ID)))
+			opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
 		}
 	}
 
-	n, err = s.nr.Update(ctx, qk, opts...)
+	n, err = s.nodeWriter.Update(ctx, qk, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -244,7 +249,7 @@ func (s *service) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := s.nr.Get(ctx, qk)
+	n, err := s.nodeQuerier.Get(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -265,7 +270,7 @@ func (s *service) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = s.nr.Delete(ctx, qk)
+	err = s.nodeWriter.Delete(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -273,16 +278,16 @@ func (s *service) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 	return destination.Ptr(), nil
 }
 
-func (s *service) applyOpts(ctx context.Context, p Partial) ([]library.Option, error) {
+func (s *service) applyOpts(ctx context.Context, p Partial) ([]node_writer.Option, error) {
 	opts := p.Opts()
 
 	if parentSlug, ok := p.Parent.Get(); ok {
-		parent, err := s.nr.Get(ctx, parentSlug)
+		parent, err := s.nodeQuerier.Get(ctx, parentSlug)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		opts = append(opts, library.WithParent(library.NodeID(parent.Mark.ID())))
+		opts = append(opts, node_writer.WithParent(library.NodeID(parent.Mark.ID())))
 	}
 
 	return opts, nil

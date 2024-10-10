@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -18,7 +19,7 @@ import (
 type summariseConsumer struct {
 	l *zap.Logger
 
-	nodeRepo library.Repository
+	nodeWriter *node_writer.Writer
 
 	qnode pubsub.Topic[mq.SummariseNode]
 
@@ -28,7 +29,7 @@ type summariseConsumer struct {
 func newSummariseConsumer(
 	l *zap.Logger,
 
-	nodeRepo library.Repository,
+	nodeWriter *node_writer.Writer,
 
 	qnode pubsub.Topic[mq.SummariseNode],
 
@@ -37,7 +38,7 @@ func newSummariseConsumer(
 	return &summariseConsumer{
 		l: l,
 
-		nodeRepo: nodeRepo,
+		nodeWriter: nodeWriter,
 
 		qnode:      qnode,
 		summariser: summariser,
@@ -51,7 +52,7 @@ func (i *summariseConsumer) summariseNode(ctx context.Context, id library.NodeID
 	}
 
 	qk := library.QueryKey{mark.NewQueryKeyID(xid.ID(id))}
-	_, err = i.nodeRepo.Update(ctx, qk, library.WithDescription(summary))
+	_, err = i.nodeWriter.Update(ctx, qk, node_writer.WithDescription(summary))
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

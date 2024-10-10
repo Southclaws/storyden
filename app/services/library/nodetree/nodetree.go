@@ -10,6 +10,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
+	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	library_service "github.com/Southclaws/storyden/app/services/library"
@@ -30,12 +32,21 @@ type Graph interface {
 }
 
 type service struct {
-	nr           library.Repository
+	nodeQuerier  *node_querier.Querier
+	nodeWriter   *node_writer.Writer
 	accountQuery *account_querier.Querier
 }
 
-func New(nr library.Repository, accountQuery *account_querier.Querier) Graph {
-	return &service{nr: nr, accountQuery: accountQuery}
+func New(
+	nodeQuerier *node_querier.Querier,
+	nodeWriter *node_writer.Writer,
+	accountQuery *account_querier.Querier,
+) Graph {
+	return &service{
+		nodeQuerier:  nodeQuerier,
+		nodeWriter:   nodeWriter,
+		accountQuery: accountQuery,
+	}
 }
 
 func (s *service) Move(ctx context.Context, child library.QueryKey, parent library.QueryKey) (*library.Node, error) {
@@ -53,12 +64,12 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cnode, err := s.nr.Get(ctx, child)
+	cnode, err := s.nodeQuerier.Get(ctx, child)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pnode, err := s.nr.Get(ctx, parent)
+	pnode, err := s.nodeQuerier.Get(ctx, parent)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -77,14 +88,14 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 	// connection before adding the target child to the target parent.
 	if parentParent, ok := pnode.Parent.Get(); ok {
 		if parentParent.Mark.ID() == cnode.Mark.ID() {
-			cnode, err = s.nr.Update(ctx, library.QueryKey{cnode.Mark.Queryable()}, library.WithChildNodeRemove(xid.ID(pnode.Mark.ID())))
+			cnode, err = s.nodeWriter.Update(ctx, library.QueryKey{cnode.Mark.Queryable()}, node_writer.WithChildNodeRemove(xid.ID(pnode.Mark.ID())))
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 		}
 	}
 
-	pnode, err = s.nr.Update(ctx, library.QueryKey{pnode.Mark.Queryable()}, library.WithChildNodeAdd(xid.ID(cnode.Mark.ID())))
+	pnode, err = s.nodeWriter.Update(ctx, library.QueryKey{pnode.Mark.Queryable()}, node_writer.WithChildNodeAdd(xid.ID(cnode.Mark.ID())))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -106,12 +117,12 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	cnode, err := s.nr.Get(ctx, child)
+	cnode, err := s.nodeQuerier.Get(ctx, child)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pnode, err := s.nr.Get(ctx, parent)
+	pnode, err := s.nodeQuerier.Get(ctx, parent)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -120,7 +131,7 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pnode, err = s.nr.Update(ctx, library.QueryKey{pnode.Mark.Queryable()}, library.WithChildNodeRemove(xid.ID(cnode.Mark.ID())))
+	pnode, err = s.nodeWriter.Update(ctx, library.QueryKey{pnode.Mark.Queryable()}, node_writer.WithChildNodeRemove(xid.ID(cnode.Mark.ID())))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

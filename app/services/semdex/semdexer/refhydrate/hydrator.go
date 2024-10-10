@@ -14,26 +14,27 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 )
 
 type Hydrator struct {
-	threads thread.Repository
-	replies reply.Repository
-	library library.Repository
+	threads     thread.Repository
+	replies     reply.Repository
+	nodeQuerier *node_querier.Querier
 }
 
 func New(
 	threads thread.Repository,
 	replies reply.Repository,
-	library library.Repository,
+	nodeQuerier *node_querier.Querier,
 ) *Hydrator {
 	return &Hydrator{
-		threads: threads,
-		replies: replies,
-		library: library,
+		threads:     threads,
+		replies:     replies,
+		nodeQuerier: nodeQuerier,
 	}
 }
 
@@ -50,7 +51,7 @@ func (h *Hydrator) Hydrate(ctx context.Context, refs ...*datagraph.Ref) ([]datag
 	}
 
 	nodes, err := dt.MapErr(parts[datagraph.KindNode], func(r *datagraph.Ref) (datagraph.Item, error) {
-		return h.library.GetByID(ctx, library.NodeID(r.ID))
+		return h.nodeQuerier.Probe(ctx, library.NodeID(r.ID))
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

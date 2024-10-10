@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
@@ -22,7 +23,7 @@ type indexerConsumer struct {
 	l *zap.Logger
 
 	replyRepo    reply.Repository
-	nodeRepo     library.Repository
+	nodeQuerier  *node_querier.Querier
 	accountQuery *account_querier.Querier
 
 	qnode    pubsub.Topic[mq.IndexNode]
@@ -37,7 +38,7 @@ func newIndexConsumer(
 	l *zap.Logger,
 
 	replyRepo reply.Repository,
-	nodeRepo library.Repository,
+	nodeQuerier *node_querier.Querier,
 	accountQuery *account_querier.Querier,
 
 	qnode pubsub.Topic[mq.IndexNode],
@@ -51,7 +52,7 @@ func newIndexConsumer(
 	return &indexerConsumer{
 		l:            l,
 		replyRepo:    replyRepo,
-		nodeRepo:     nodeRepo,
+		nodeQuerier:  nodeQuerier,
 		accountQuery: accountQuery,
 		qnode:        qnode,
 		qnodesum:     qnodesum,
@@ -71,7 +72,7 @@ func (i *indexerConsumer) indexPost(ctx context.Context, id post.ID) error {
 }
 
 func (i *indexerConsumer) indexNode(ctx context.Context, id library.NodeID) error {
-	n, err := i.nodeRepo.GetByID(ctx, id)
+	n, err := i.nodeQuerier.Probe(ctx, id)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

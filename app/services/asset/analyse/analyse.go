@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/services/asset/asset_download"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
 	"github.com/Southclaws/storyden/internal/infrastructure/pdf"
@@ -17,14 +17,14 @@ import (
 
 type Analyser struct {
 	downloader   *asset_download.Downloader
-	nodereader   library.Repository
+	nodereader   *node_querier.Querier
 	nodewriter   node_mutate.Manager
 	pdfextractor *pdf.Extractor
 }
 
 func New(
 	downloader *asset_download.Downloader,
-	nodereader library.Repository,
+	nodereader *node_querier.Querier,
 	nodewriter node_mutate.Manager,
 	pdfextractor *pdf.Extractor,
 ) *Analyser {

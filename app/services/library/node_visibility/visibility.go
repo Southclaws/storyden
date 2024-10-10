@@ -10,6 +10,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
+	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -19,18 +21,21 @@ var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.Pe
 
 type Controller struct {
 	accountQuery *account_querier.Querier
-	nr           library.Repository
+	nodeQuerier  *node_querier.Querier
+	nodeWriter   *node_writer.Writer
 	nc           node_children.Repository
 }
 
 func New(
 	accountQuery *account_querier.Querier,
-	nr library.Repository,
+	nodeQuerier *node_querier.Querier,
+	nodeWriter *node_writer.Writer,
 	nc node_children.Repository,
 ) *Controller {
 	return &Controller{
 		accountQuery: accountQuery,
-		nr:           nr,
+		nodeQuerier:  nodeQuerier,
+		nodeWriter:   nodeWriter,
 		nc:           nc,
 	}
 }
@@ -46,7 +51,7 @@ func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err := m.nr.Get(ctx, qk)
+	n, err := m.nodeQuerier.Get(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -60,7 +65,7 @@ func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	n, err = m.nr.Update(ctx, qk, library.WithVisibility(vis))
+	n, err = m.nodeWriter.Update(ctx, qk, node_writer.WithVisibility(vis))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
