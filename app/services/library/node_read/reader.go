@@ -9,8 +9,10 @@ import (
 	"github.com/rs/xid"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/services/account/session"
 )
@@ -18,14 +20,14 @@ import (
 type HydratedQuerier struct {
 	logger     *zap.Logger
 	session    session.SessionProvider
-	nodereader library.Repository
+	nodereader *node_querier.Querier
 	scorer     semdex.RelevanceScorer
 }
 
 func New(
 	logger *zap.Logger,
 	session session.SessionProvider,
-	nodereader library.Repository,
+	nodereader *node_querier.Querier,
 	scorer semdex.RelevanceScorer,
 ) *HydratedQuerier {
 	return &HydratedQuerier{
@@ -39,7 +41,13 @@ func New(
 func (q *HydratedQuerier) GetBySlug(ctx context.Context, qk library.QueryKey) (*library.Node, error) {
 	session := q.session.AccountOpt(ctx)
 
-	n, err := q.nodereader.Get(ctx, qk)
+	opts := []node_querier.Option{}
+
+	session.Call(func(acc account.Account) {
+		opts = append(opts, node_querier.WithChildren(&acc.ID))
+	})
+
+	n, err := q.nodereader.Get(ctx, qk, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

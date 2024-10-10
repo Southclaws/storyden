@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -22,7 +23,7 @@ import (
 type Uploader struct {
 	l *zap.Logger
 
-	nodewriter library.Repository
+	nodewriter *node_writer.Writer
 	assets     asset.Repository
 	objects    object.Storer
 	queue      pubsub.Topic[mq.AnalyseAsset]
@@ -31,7 +32,7 @@ type Uploader struct {
 func New(
 	l *zap.Logger,
 
-	nodewriter library.Repository,
+	nodewriter *node_writer.Writer,
 	assets asset.Repository,
 	objects object.Storer,
 	queue pubsub.Topic[mq.AnalyseAsset],
@@ -64,7 +65,7 @@ func (s *Uploader) Upload(ctx context.Context, r io.Reader, size int64, name ass
 	if cfr, ok := opts.ContentFill.Get(); ok {
 		nodeID := library.QueryKey{mark.NewQueryKeyID(cfr.TargetNodeID)}
 
-		_, err := s.nodewriter.Update(ctx, nodeID, library.WithAssets([]asset.AssetID{a.ID}))
+		_, err := s.nodewriter.Update(ctx, nodeID, node_writer.WithAssets([]asset.AssetID{a.ID}))
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
