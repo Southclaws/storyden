@@ -24,15 +24,17 @@ func New(db *ent.Client) *Querier {
 }
 
 type options struct {
-	withChildren      bool
+	visibilityRules   bool
 	requestingAccount *account.AccountID
 }
 
 type Option func(*options)
 
-func WithChildren(accountID *account.AccountID) Option {
+// WithVisibilityRulesApplied ensures ownership and visibility rules are applied
+// if not set the default behaviour is no rules applied, all nodes are returned.
+func WithVisibilityRulesApplied(accountID *account.AccountID) Option {
 	return func(o *options) {
-		o.withChildren = true
+		o.visibilityRules = true
 		o.requestingAccount = accountID
 	}
 }
@@ -63,8 +65,19 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 				})
 		})
 
-	if o.withChildren {
-		query.WithNodes(func(cq *ent.NodeQuery) {
+	if o.visibilityRules {
+		if o.requestingAccount == nil {
+			query.Where(node.VisibilityEQ(node.VisibilityPublished))
+		} else {
+			query.Where(node.Or(
+				node.AccountID(xid.ID(*o.requestingAccount)),
+				node.VisibilityEQ(node.VisibilityPublished),
+			))
+		}
+	}
+
+	query.WithNodes(func(cq *ent.NodeQuery) {
+		if o.visibilityRules {
 			// Apply visibility rules:
 			// - published nodes are visible to everyone
 			// - non-published nodes are not visible to anyone except the owner
@@ -76,15 +89,15 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 					node.VisibilityEQ(node.VisibilityPublished),
 				))
 			}
+		}
 
-			cq.
-				WithAssets().
-				WithOwner(func(aq *ent.AccountQuery) {
-					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-				}).
-				Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
-		})
-	}
+		cq.
+			WithAssets().
+			WithOwner(func(aq *ent.AccountQuery) {
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+			}).
+			Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
+	})
 
 	col, err := query.Only(ctx)
 	if err != nil {

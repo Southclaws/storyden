@@ -285,6 +285,25 @@ func TestNodesVisibility(t *testing.T) {
 				a.NotContains(ids, node2.JSON200.Id, "guest cannot see node2 as it is not published")
 				a.NotContains(ids, node3.JSON200.Id, "guest cannot see node3 as it is not published")
 			})
+
+			t.Run("visibility_non_published_non_owner_404", func(t *testing.T) {
+				t.Parallel()
+
+				published := openapi.Published
+				draft := openapi.Draft
+
+				node1 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, adminSession))(t, http.StatusOK)
+				node2 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft, Parent: &node1.JSON200.Slug}, authorSession))(t, http.StatusOK)
+
+				get1asAuthor, err := cl.NodeGetWithResponse(root, node2.JSON200.Slug, authorSession)
+				tests.Ok(t, err, get1asAuthor)
+
+				get1asRando, err := cl.NodeGetWithResponse(root, node2.JSON200.Slug, randoSession)
+				tests.Status(t, err, get1asRando, http.StatusNotFound)
+
+				get1asGuest, err := cl.NodeGetWithResponse(root, node2.JSON200.Slug)
+				tests.Status(t, err, get1asGuest, http.StatusNotFound)
+			})
 		}))
 	}))
 }
