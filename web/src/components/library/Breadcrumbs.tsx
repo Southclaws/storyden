@@ -40,7 +40,13 @@ export const Breadcrumbs_ = (
 
   return (
     <HStack w="full" color="fg.subtle" overflowX="scroll" py="2">
-      <LinkButton minW="min" href="/l" size="xs">
+      <LinkButton
+        size="xs"
+        variant="subtle"
+        flexShrink="0"
+        minW="min"
+        href="/l"
+      >
         Library
       </LinkButton>
       {paths.map((p) => {
@@ -52,7 +58,10 @@ export const Breadcrumbs_ = (
               <ChevronRightIcon width="1rem" />
             </Box>
             <LinkButton
+              size="xs"
+              variant="subtle"
               flexShrink="0"
+              minW="min"
               borderColor={
                 isCurrent && visibility === "published"
                   ? "white"
@@ -68,7 +77,6 @@ export const Breadcrumbs_ = (
               }
               key={p}
               href={`/l/${joinLibraryPath(paths, p)}`}
-              size="xs"
             >
               {p}{" "}
               {isCurrent && visibility && visibility !== "published" && (
