@@ -48,7 +48,7 @@ export function LibraryPageScreen(props: Props) {
     >
       <FormProvider {...form}>
         <LStack h="full">
-          <HStack w="full" justify="space-between">
+          <HStack w="full" justify="space-between" alignItems="start">
             <Breadcrumbs
               libraryPath={libraryPath}
               visibility={node.visibility}

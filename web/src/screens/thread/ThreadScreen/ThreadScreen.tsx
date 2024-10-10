@@ -39,7 +39,7 @@ export function ThreadScreen(props: Props) {
         width="full"
         onSubmit={handlers.handleSave}
       >
-        <HStack w="full" justify="space-between">
+        <HStack w="full" justify="space-between" alignItems="start">
           <Breadcrumbs thread={thread} />
 
           <HStack>
