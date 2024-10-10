@@ -110,6 +110,7 @@ export const Breadcrumbs_ = (
             w="full"
             minW="32"
             size="xs"
+            height="6" // TODO: Make this default for size="xs"
             placeholder="URL slug"
             defaultValue={defaultValue}
             value={value}
