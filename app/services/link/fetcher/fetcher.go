@@ -14,7 +14,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
@@ -38,7 +37,6 @@ type Fetcher struct {
 func New(
 	l *zap.Logger,
 	uploader *asset_upload.Uploader,
-	nr library.Repository,
 	lq *link_querier.LinkQuerier,
 	lr *link_writer.LinkWriter,
 	sc scrape.Scraper,
