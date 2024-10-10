@@ -9,7 +9,6 @@ import (
 	"github.com/rs/xid"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
@@ -43,9 +42,11 @@ func (q *HydratedQuerier) GetBySlug(ctx context.Context, qk library.QueryKey) (*
 
 	opts := []node_querier.Option{}
 
-	session.Call(func(acc account.Account) {
-		opts = append(opts, node_querier.WithChildren(&acc.ID))
-	})
+	if s, ok := session.Get(); ok {
+		opts = append(opts, node_querier.WithVisibilityRulesApplied(&s.ID))
+	} else {
+		opts = append(opts, node_querier.WithVisibilityRulesApplied(nil))
+	}
 
 	n, err := q.nodereader.Get(ctx, qk, opts...)
 	if err != nil {
