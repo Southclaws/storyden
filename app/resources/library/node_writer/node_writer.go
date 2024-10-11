@@ -123,6 +123,11 @@ func (w *Writer) Create(
 	slug mark.Slug,
 	opts ...Option,
 ) (*library.Node, error) {
+	// TODO: Use a Node Mark for this.
+	if slug.String() == "" {
+		return nil, fault.New("slug cannot be empty", fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	create := w.db.Node.Create()
 	mutate := create.Mutation()
 
