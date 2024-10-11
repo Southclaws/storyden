@@ -5595,7 +5595,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dequal@npm:^2.0.0":
+"dequal@npm:^2.0.0, dequal@npm:^2.0.3":
   version: 2.0.3
   resolution: "dequal@npm:2.0.3"
   checksum: 10c0/f98860cdf58b64991ae10205137c0e97d384c3a4edc7f807603887b7c4b850af1224a33d88012009f150861cbee4fa2d322c4cc04b9313bee312e47f6ecaa888
@@ -10914,6 +10914,7 @@ __metadata:
     "@use-gesture/react": "npm:^10.3.1"
     chroma-js: "npm:^3.1.1"
     date-fns: "npm:^4.1.0"
+    dequal: "npm:^2.0.3"
     emoji-picker-react: "npm:^4.12.0"
     eslint: "npm:^8.57.1"
     eslint-config-next: "npm:^14.2.14"
@@ -10940,6 +10941,7 @@ __metadata:
     unified: "npm:^11.0.5"
     usehooks-ts: "npm:^3.1.0"
     vaul: "npm:^1.0.0"
+    xid-ts: "npm:^1.1.4"
     zod: "npm:^3.23.8"
   languageName: unknown
   linkType: soft
@@ -11074,6 +11076,13 @@ __metadata:
   version: 1.0.2
   resolution: "wrappy@npm:1.0.2"
   checksum: 10c0/56fece1a4018c6a6c8e28fbc88c87e0fbf4ea8fd64fc6c63b18f4acc4bd13e0ad2515189786dd2c30d3eec9663d70f4ecf699330002f8ccb547e4a18231fc9f0
+  languageName: node
+  linkType: hard
+
+"xid-ts@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "xid-ts@npm:1.1.4"
+  checksum: 10c0/93198a23164ed1c6317e85aacc37ba80ab268eacdd7990d5157c7c9e52f0d44576b2acd37b413e16cf277229b1429ff32c8e452dfd0ec2c5ec723e09f8ff4bef
   languageName: node
   linkType: hard
 

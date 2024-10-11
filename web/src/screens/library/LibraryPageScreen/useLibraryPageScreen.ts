@@ -1,23 +1,24 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import slugify from "@sindresorhus/slugify";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { parseAsBoolean, useQueryState } from "nuqs";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
-import { P, match } from "ts-pattern";
+import { match } from "ts-pattern";
 import { z } from "zod";
 
 import { nodeAddAsset, nodeRemoveAsset } from "src/api/openapi-client/nodes";
 import {
   Asset,
-  Node,
-  NodeInitialProps,
   NodeWithChildren,
+  Permission,
   Visibility,
 } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
 import { handle } from "@/api/client";
 import { useLibraryMutation } from "@/lib/library/library";
+import { hasPermissionOr } from "@/utils/permissions";
 
 import { useLibraryPath } from "../useLibraryPath";
 
@@ -38,35 +39,30 @@ export type Form = z.infer<typeof FormSchema>;
 
 export type Props = {
   node: NodeWithChildren;
-  initialEditingState?: boolean;
-  editable?: boolean;
-  onVisibilityChange?: (v: Visibility) => Promise<void>;
-  onSave: (c: NodeInitialProps) => Promise<void>;
-  onDelete?: (c: Node) => Promise<void>;
 };
 
-export function useLibraryPageScreen({
-  node,
-  initialEditingState = false,
-  editable = true,
-  onVisibilityChange,
-  onSave,
-  onDelete,
-}: Props) {
+export function useLibraryPageScreen({ node }: Props) {
+  const [editing, setEditing] = useQueryState("edit", {
+    ...parseAsBoolean,
+    defaultValue: false,
+    clearOnDefault: true,
+  });
   const libraryPath = useLibraryPath();
   const account = useSession();
-  const router = useRouter();
-  const [editing, setEditing] = useState(initialEditingState);
-  const { revalidate } = useLibraryMutation();
-  const isNew = !node.id;
+  const { revalidate, updateNode, updateNodeVisibility, deleteNode } =
+    useLibraryMutation();
 
-  const isAllowedToEdit =
-    editable && Boolean(account?.id === node.owner.id || account?.admin);
+  const isAllowedToEdit = hasPermissionOr(
+    account,
+    () => account?.id === node.owner.id,
+    Permission.MANAGE_LIBRARY,
+  );
 
-  const isAllowedToDelete =
-    editable &&
-    Boolean(account?.id === node.owner.id || account?.admin) &&
-    onDelete;
+  const isAllowedToDelete = hasPermissionOr(
+    account,
+    () => account?.id === node.owner.id,
+    Permission.MANAGE_LIBRARY,
+  );
 
   const defaults: Form = useMemo(
     () => ({
@@ -87,29 +83,27 @@ export function useLibraryPageScreen({
   const { name } = form.watch();
 
   useEffect(() => {
-    if (isNew && !form.getFieldState("slug").isDirty) {
+    if (!form.getFieldState("slug").isDirty) {
       const autoSlug = slugify(name);
       form.setValue("slug", autoSlug);
     }
-  }, [isNew, form, name]);
+  }, [form, name]);
 
   function handleEditMode() {
     if (editing) {
       setEditing(false);
+
       form.reset({
         name: node.name,
         slug: node.slug,
         link: node.link?.url,
         content: node.content,
       });
-
-      if (isNew) {
-        router.back();
-      }
     } else {
       if (!isAllowedToEdit) return;
 
       setEditing(true);
+
       form.reset({
         name: node.name,
         slug: node.slug,
@@ -119,16 +113,21 @@ export function useLibraryPageScreen({
     }
   }
 
-  function handleSave(payload: Form) {
-    if (!editing) return;
-
-    handle(
+  const handleSubmit = form.handleSubmit(async (payload: Form) => {
+    await handle(
       async () => {
-        await onSave({
+        const isRedirecting = await updateNode(node.slug, {
           ...payload,
           url: payload.link,
         });
-        setEditing(false);
+
+        if (!isRedirecting) {
+          // NOTE: This modifies the previous URL state, if updateNode received
+          // a new slug, it will redirect to the new path automatically. This
+          // causes the page to reload before the new slug is pushed to the URL.
+          // So to fix this, we only call setEditing if the slug hasn't changed.
+          setEditing(false);
+        }
       },
       {
         promiseToast: {
@@ -138,14 +137,12 @@ export function useLibraryPageScreen({
         cleanup: () => revalidate(),
       },
     );
-  }
+  });
 
   async function handleVisibilityChange(v: Visibility) {
-    if (!onVisibilityChange) return;
-
-    handle(
+    await handle(
       async () => {
-        onVisibilityChange(v);
+        await updateNodeVisibility(node.id, v);
       },
       {
         promiseToast: {
@@ -162,29 +159,32 @@ export function useLibraryPageScreen({
     );
   }
 
-  function handleDelete() {
-    if (editing) return;
-
-    onDelete?.(node);
+  async function handleDelete() {
+    await handle(
+      async () => {
+        await deleteNode(node.slug);
+      },
+      {
+        promiseToast: {
+          loading: "Deleting...",
+          success: "Page deleted!",
+        },
+        cleanup: () => revalidate(),
+      },
+    );
   }
 
   async function handleAssetUpload(asset: Asset) {
-    if (!editing) return;
-
-    // We only want to run these updates for edits of existing nodes.
-    if (!node.id) return;
-
-    await nodeAddAsset(node.slug, asset.id);
+    await handle(async () => {
+      await nodeAddAsset(node.slug, asset.id);
+    });
   }
 
   async function handleAssetRemove(asset: Asset) {
-    if (!editing) return;
-    if (!node.id) return;
-
-    await nodeRemoveAsset(node.slug, asset.id);
+    await handle(async () => {
+      await nodeRemoveAsset(node.slug, asset.id);
+    });
   }
-
-  const handleSubmit = form.handleSubmit(handleSave);
 
   return {
     form,

@@ -1,7 +1,7 @@
 "use client";
 
 import { PropsWithChildren } from "react";
-import { Toaster, toast } from "sonner";
+import { Toaster } from "sonner";
 import { SWRConfig } from "swr";
 
 import { AuthProvider } from "src/auth/AuthProvider";
@@ -9,11 +9,17 @@ import { AuthProvider } from "src/auth/AuthProvider";
 export function Providers({ children }: PropsWithChildren) {
   return (
     <AuthProvider>
-      <Toaster />
+      <SWRConfig
+        value={{
+          keepPreviousData: true,
+        }}
+      >
+        <Toaster />
 
-      {/* -- */}
-      {children}
-      {/* -- */}
+        {/* -- */}
+        {children}
+        {/* -- */}
+      </SWRConfig>
     </AuthProvider>
   );
 }

@@ -1,19 +1,11 @@
 import { indexOf } from "lodash";
+import { uniq } from "lodash/fp";
 import { z } from "zod";
 
 export const ParamsSchema = z.object({
   slug: z.string().array().min(1),
 });
 export type Params = z.infer<typeof ParamsSchema>;
-export const QuerySchema = z.object({
-  bulk: z
-    .string()
-    .optional()
-    .transform((v) => {
-      return v !== undefined || v != null;
-    }),
-});
-export type Query = z.infer<typeof QuerySchema>;
 
 export type LibraryPath = string[];
 
@@ -49,7 +41,7 @@ export function joinLibraryPath(onto: LibraryPath, end: string): string {
 
   const list = inPath === -1 ? [...onto, end] : onto.slice(0, inPath + 1);
 
-  return list.join("/");
+  return uniq(list).join("/");
 }
 
 /**

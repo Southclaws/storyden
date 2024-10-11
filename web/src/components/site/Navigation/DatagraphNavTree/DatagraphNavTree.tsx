@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import { useNodeList } from "@/api/openapi-client/nodes";
 import { Visibility } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
@@ -9,8 +7,8 @@ import { LibraryPageTree } from "@/components/library/LibraryPageTree/LibraryPag
 import { LStack } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
 
-import { AddAction } from "../../Action/Add";
 import { Unready } from "../../Unready";
+import { CreatePageAction } from "../Actions/CreatePage";
 import { NavigationHeader } from "../ContentNavigationList/NavigationHeader";
 
 type Props = {
@@ -55,9 +53,7 @@ export function DatagraphNavTree(props: Props) {
         href={href}
         controls={
           canManageLibrary && (
-            <Link href="/l/new">
-              <AddAction size="xs" color="fg.subtle" title="Add a node" />
-            </Link>
+            <CreatePageAction color="fg.subtle" variant="ghost" hideLabel />
           )
         }
       >
