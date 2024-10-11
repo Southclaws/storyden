@@ -11,6 +11,7 @@ import { admonition } from "@/recipes/admonition";
 import { button } from "@/recipes/button";
 import { headingInput } from "@/recipes/heading-input";
 import { input } from "@/recipes/input";
+import { menu } from "@/recipes/menu";
 import { popover } from "@/recipes/popover";
 import { richCard } from "@/recipes/rich-card";
 import { table } from "@/recipes/table";
@@ -239,6 +240,7 @@ export default defineConfig({
         richCard: richCard,
       },
       slotRecipes: {
+        menu: menu,
         popover: popover,
         table: table,
         treeView: treeView,
