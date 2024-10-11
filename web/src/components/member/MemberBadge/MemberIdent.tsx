@@ -21,12 +21,7 @@ export function MemberIdent({
   roles = "hidden",
 }: Props) {
   return (
-    <HStack
-      minW="0"
-      w="full"
-      overflowY="hidden"
-      gap={size === "lg" ? "2" : "1"}
-    >
+    <HStack minW="0" w="full" overflow="hidden" gap={size === "lg" ? "2" : "1"}>
       {avatar === "visible" && <MemberAvatar profile={profile} size={size} />}
       <MemberName profile={profile} size={size} name={name} roles={roles} />
     </HStack>
