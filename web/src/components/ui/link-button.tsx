@@ -23,7 +23,9 @@ export function LinkButton({
 
   const cn = cx(button(vp), css(stripped));
 
-  const isExternal = !href.toString().startsWith("/");
+  const isExternal = !(
+    href.toString().startsWith("/") || href.toString().startsWith("#")
+  );
 
   const target = isExternal ? "_blank" : undefined;
 

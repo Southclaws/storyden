@@ -13,6 +13,7 @@ import { headingInput } from "@/recipes/heading-input";
 import { input } from "@/recipes/input";
 import { popover } from "@/recipes/popover";
 import { richCard } from "@/recipes/rich-card";
+import { table } from "@/recipes/table";
 import { treeView } from "@/recipes/tree-view";
 import { typographyHeading } from "@/recipes/typography-heading";
 
@@ -239,6 +240,7 @@ export default defineConfig({
       },
       slotRecipes: {
         popover: popover,
+        table: table,
         treeView: treeView,
       },
       semanticTokens,

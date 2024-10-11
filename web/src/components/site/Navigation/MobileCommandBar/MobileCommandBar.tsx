@@ -21,10 +21,10 @@ import { SettingsAnchor } from "../Anchors/Settings";
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
 import { Search } from "../Search/Search";
 
-import { useNavpill } from "./useNavpill";
+import { useMobileCommandBar } from "./useMobileCommandBar";
 
-export function Navpill() {
-  const { isExpanded, onExpand, onClose, account } = useNavpill();
+export function MobileCommandBar() {
+  const { isExpanded, onExpand, onClose, account } = useMobileCommandBar();
   return (
     <Toolpill onClickOutside={onClose}>
       <Presence

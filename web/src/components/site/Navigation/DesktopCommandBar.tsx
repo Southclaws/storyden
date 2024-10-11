@@ -4,14 +4,15 @@ import { HStack } from "@/styled-system/jsx";
 import { Floating } from "@/styled-system/patterns";
 import { getInfo } from "@/utils/info";
 
-import { Search } from "../Search/Search";
-import { SidebarToggle } from "../Sidebar/SidebarToggle";
-import { getServerSidebarState } from "../Sidebar/server";
-import { Title } from "../components/Title";
-import { Toolbar } from "../components/Toolbar";
-import styles from "../navigation.module.css";
+import styles from "./navigation.module.css";
 
-export async function Top() {
+import { MemberActions } from "./MemberActions";
+import { SidebarToggle } from "./NavigationPane/SidebarToggle";
+import { getServerSidebarState } from "./NavigationPane/server";
+import { Search } from "./Search/Search";
+import { Title } from "./Title";
+
+export async function DesktopCommandBar() {
   const { title } = await getInfo();
   const initialSidebarState = await getServerSidebarState();
 
@@ -35,7 +36,7 @@ export async function Top() {
       </HStack>
 
       <HStack className={styles["topbar-right"]}>
-        <Toolbar session={session} />
+        <MemberActions session={session} />
       </HStack>
     </HStack>
   );
