@@ -54,7 +54,7 @@ export async function Navigation({
           <NavigationPane />
         </Box>
 
-        <Box className={styles["contextpane"]}>
+        <Box className={styles["rightbar"]}>
           <ContextPane>{contextpane}</ContextPane>
         </Box>
 
