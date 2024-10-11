@@ -1,10 +1,17 @@
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, ReactNode } from "react";
 
 import { Navigation } from "src/components/site/Navigation/Navigation";
 
 import { Box, Flex, styled } from "@/styled-system/jsx";
 
-export async function Default(props: PropsWithChildren) {
+type Props = {
+  contextpane: ReactNode;
+};
+
+export async function Default({
+  contextpane,
+  children,
+}: PropsWithChildren<Props>) {
   return (
     <Flex
       minHeight="dvh"
@@ -13,14 +20,14 @@ export async function Default(props: PropsWithChildren) {
       backgroundColor="bg.site"
       vaul-drawer-wrapper=""
     >
-      <Navigation>
+      <Navigation contextpane={contextpane}>
         <styled.main
           containerType="inline-size"
           width="full"
           height="full"
           minW="0"
         >
-          {props.children}
+          {children}
           <Box height="24"></Box>
         </styled.main>
       </Navigation>

@@ -21,12 +21,7 @@ export function MemberIdent({
   roles = "hidden",
 }: Props) {
   return (
-    <HStack
-      minW="0"
-      w="full"
-      overflowY="hidden"
-      gap={size === "lg" ? "2" : "1"}
-    >
+    <HStack minW="0" w="full" overflow="hidden" gap={size === "lg" ? "2" : "1"}>
       {avatar === "visible" && <MemberAvatar profile={profile} size={size} />}
       <MemberName profile={profile} size={size} name={name} roles={roles} />
     </HStack>
@@ -47,7 +42,7 @@ export function MemberName({
             minW="0"
             fontSize={size === "lg" ? "md" : "sm"}
             fontWeight={size === "lg" ? "bold" : "medium"}
-            overflowX="hidden"
+            overflow="hidden"
             textWrap="nowrap"
             textOverflow="ellipsis"
             color="fg.default"

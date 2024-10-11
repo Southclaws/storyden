@@ -20,8 +20,6 @@
   --grid-col-padding-inner: var(--spacing-3);
   --grid-col-padding-inner-right: 0px;
 
-  --navgrid-right-bar-display: none;
-
   min-height: 100dvh;
 }
 
@@ -66,6 +64,10 @@
 }
 
 .leftbar {
+  display: none;
+}
+
+.rightbar {
   display: none;
 }
 
@@ -143,54 +145,84 @@
     padding: 15px;
   }
 
+  .rightbar {
+    opacity: 0;
+    display: block;
+    grid-area: rightbar;
+    overflow: hidden;
+
+    /* NOTE: This maintains the shadow bleed despite the overflow hidden prop. */
+    margin: -15px;
+    padding: 15px;
+  }
+
   .navigation__container[data-leftbar-shown="false"] .leftbar {
     opacity: 0;
     pointer-events: none;
     /* NOTE: Doesn't work properly on initial page load, causes the sidebar to
     flicker visible and play the animation, need a way to not do this soon. */
-    /* animation: fadeOut 0.2s ease-in-out; */
+    /* animation: fadeOutLeft 0.2s ease-in-out; */
   }
 
   .navigation__container[data-leftbar-shown="true"] .leftbar {
     opacity: 1;
     pointer-events: all;
 
-    animation: fadeIn 0.2s ease-in-out;
+    animation: fadeInLeft 0.2s ease-in-out;
   }
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateX(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0px);
-    }
-  }
-  @keyframes fadeOut {
-    from {
-      opacity: 1;
-      transform: translateX(0px);
-    }
-    to {
-      opacity: 0;
-      transform: translateX(-10px);
-    }
-  }
-
-  .rightbar {
-    display: var(--navgrid-right-bar-display);
-    grid-area: rightbar;
-
-    /* TODO: Remove this when the right is actually used */
+  .navigation__container[data-leftbar-shown="false"] .rightbar {
+    opacity: 0;
     pointer-events: none;
+  }
 
-    overflow: hidden;
+  .navigation__container[data-leftbar-shown="true"] .rightbar {
+    opacity: 1;
+    pointer-events: all;
 
-    /* NOTE: This maintains the shadow bleed despite the overflow hidden prop. */
-    margin: -15px;
-    padding: 15px;
+    animation: fadeInRight 0.2s ease-in-out;
+  }
+
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0px);
+    }
+  }
+  @keyframes fadeOutLeft {
+    from {
+      opacity: 1;
+      transform: translateX(0px);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+  }
+
+  @keyframes fadeInRight {
+    from {
+      opacity: 0;
+      transform: translateX(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0px);
+    }
+  }
+  @keyframes fadeOutRight {
+    from {
+      opacity: 1;
+      transform: translateX(0px);
+    }
+    to {
+      opacity: 0;
+      transform: translateX(10px);
+    }
   }
 
   .navpill {
@@ -221,6 +253,11 @@
 @media screen and (min-width: 768px) and (max-width: 1280px) {
   .navigation__container[data-leftbar-shown="false"] .main {
     grid-column: leftbar / main;
+  }
+
+  /* Hide the context pane when the screen is at "tablet" size */
+  .rightbar {
+    display: none;
   }
 }
 

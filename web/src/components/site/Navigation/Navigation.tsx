@@ -1,4 +1,4 @@
-import { PropsWithChildren } from "react";
+import React, { PropsWithChildren } from "react";
 
 import { Box } from "@/styled-system/jsx";
 
@@ -6,12 +6,20 @@ import { Onboarding } from "../Onboarding/Onboarding";
 
 import styles from "./navigation.module.css";
 
-import { Left } from "./Left/Left";
-import { Navpill } from "./Navpill/Navpill";
-import { getServerSidebarState } from "./Sidebar/server";
-import { Top } from "./Top/Top";
+import { ContextPane } from "./ContextPane";
+import { DesktopCommandBar } from "./DesktopCommandBar";
+import { MobileCommandBar } from "./MobileCommandBar/MobileCommandBar";
+import { NavigationPane } from "./NavigationPane/NavigationPane";
+import { getServerSidebarState } from "./NavigationPane/server";
 
-export async function Navigation({ children }: PropsWithChildren) {
+type Props = {
+  contextpane: React.ReactNode;
+};
+
+export async function Navigation({
+  contextpane,
+  children,
+}: PropsWithChildren<Props>) {
   const showLeftBar = await getServerSidebarState();
 
   return (
@@ -40,19 +48,18 @@ export async function Navigation({ children }: PropsWithChildren) {
         className={styles["navgrid"]}
         pointerEvents="none"
       >
-        <Top />
+        <DesktopCommandBar />
 
         <Box className={styles["leftbar"]}>
-          <Left />
+          <NavigationPane />
         </Box>
 
         <Box className={styles["rightbar"]}>
-          {/* RIGHT BAR NOT DONE YET */}
-          {/* <Right /> */}
+          <ContextPane>{contextpane}</ContextPane>
         </Box>
 
         <Box className={styles["navpill"]}>
-          <Navpill />
+          <MobileCommandBar />
         </Box>
       </Box>
     </Box>
