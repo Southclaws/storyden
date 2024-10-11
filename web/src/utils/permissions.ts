@@ -16,3 +16,22 @@ export function hasPermission(account?: Account, ...permissions: Permission[]) {
 
   return permissions.every((permission) => accountPermissions.has(permission));
 }
+
+export function hasPermissionOr(
+  account?: Account,
+  fn?: () => boolean,
+  ...permissions: Permission[]
+) {
+  if (!account) return false;
+
+  const hasPerm = hasPermission(account, ...permissions);
+  if (hasPerm) {
+    return true;
+  }
+
+  if (fn?.()) {
+    return true;
+  }
+
+  return false;
+}

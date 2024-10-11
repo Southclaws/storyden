@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { PropsWithChildren, ReactNode } from "react";
 
 import { Empty } from "src/components/site/Empty";
@@ -64,9 +65,9 @@ export function Card({
       <div className={styles.contentContainer}>
         <div className={styles.textArea}>
           <Heading className={cx("fluid-font-size")}>
-            <a href={url} className={styles.title}>
+            <Link href={url} className={styles.title}>
               {title || "(untitled)"}
-            </a>
+            </Link>
           </Heading>
 
           {text && <p className={styles.text}>{text}</p>}

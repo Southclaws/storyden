@@ -1,7 +1,7 @@
 "use client";
 
 import { CategoryList } from "@/components/category/CategoryList/CategoryList";
-import { LStack, styled } from "@/styled-system/jsx";
+import { Divider, LStack, styled } from "@/styled-system/jsx";
 
 import { MembersAnchor } from "../Anchors/Members";
 import { DatagraphNavTree } from "../DatagraphNavTree/DatagraphNavTree";
@@ -14,6 +14,7 @@ export function ContentNavigationList() {
     <styled.nav
       display="flex"
       flexDir="column"
+      gap="4"
       height="full"
       width="full"
       alignItems="start"
@@ -37,6 +38,7 @@ export function ContentNavigationList() {
       </LStack>
 
       <LStack gap="1">
+        <Divider />
         <MembersAnchor />
       </LStack>
     </styled.nav>

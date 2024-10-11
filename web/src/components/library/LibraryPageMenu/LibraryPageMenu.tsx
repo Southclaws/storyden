@@ -4,25 +4,37 @@ import { format } from "date-fns/format";
 import { DeleteConfirmation } from "src/components/site/Action/Delete";
 import { MoreAction } from "src/components/site/Action/More";
 
+import { ButtonProps } from "@/components/ui/button";
 import * as Menu from "@/components/ui/menu";
 import { styled } from "@/styled-system/jsx";
 
 import { Props, useLibraryPageMenu } from "./useLibraryPageMenu";
 
-export function LibraryPageMenu(props: Props) {
+export function LibraryPageMenu({
+  node,
+  onVisibilityChange,
+  onDelete,
+  onClose,
+  ...props
+}: Props & ButtonProps) {
   const { reviewFlow, deleteEnabled, deleteProps, handleSelect } =
-    useLibraryPageMenu(props);
+    useLibraryPageMenu({
+      node,
+      onVisibilityChange,
+      onDelete,
+      onClose,
+    });
 
   function handleOpenChange(d: MenuOpenChangeDetails) {
     if (!d.open) {
-      props.onClose?.();
+      onClose?.();
     }
   }
 
   const statusText =
-    props.node.visibility === "draft"
+    node.visibility === "draft"
       ? "(draft)"
-      : props.node.visibility === "review"
+      : node.visibility === "review"
         ? "(in review)"
         : "";
 
@@ -34,7 +46,7 @@ export function LibraryPageMenu(props: Props) {
       onOpenChange={handleOpenChange}
     >
       <Menu.Trigger asChild>
-        <MoreAction variant="subtle" size="xs" />
+        <MoreAction variant="subtle" size="xs" {...props} />
       </Menu.Trigger>
 
       <Portal>
@@ -47,11 +59,11 @@ export function LibraryPageMenu(props: Props) {
                 userSelect="none"
               >
                 <styled.span>
-                  {`Created by ${props.node.owner.name}`} {statusText}
+                  {`Created by ${node.owner.name}`} {statusText}
                 </styled.span>
 
                 <styled.time fontWeight="normal">
-                  {format(new Date(props.node.createdAt), "yyyy-mm-dd")}
+                  {format(new Date(node.createdAt), "yyyy-mm-dd")}
                 </styled.time>
               </Menu.ItemGroupLabel>
 

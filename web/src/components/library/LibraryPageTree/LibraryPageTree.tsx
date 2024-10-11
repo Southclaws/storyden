@@ -7,8 +7,9 @@ import Link from "next/link";
 import { forwardRef, useState } from "react";
 
 import { NodeWithChildren } from "@/api/openapi-schema";
+import { CreatePageAction } from "@/components/site/Navigation/Actions/CreatePage";
 import { css, cx } from "@/styled-system/css";
-import { Box, splitCssProps } from "@/styled-system/jsx";
+import { Box, HStack, splitCssProps } from "@/styled-system/jsx";
 import { type TreeViewVariantProps, treeView } from "@/styled-system/recipes";
 import { token } from "@/styled-system/tokens";
 import type { JsxStyleProps } from "@/styled-system/types";
@@ -133,20 +134,25 @@ function TreeBranch({ styles, child, handleDelete }: BranchProps) {
         <Link href={`/l/${child.slug}`}>{child.name}</Link>
       </ArkTreeView.BranchText>
 
-      <Box
+      <HStack
         display={{
-          base: menuOpen ? "block" : "none",
-          _groupHover: "block",
-          _active: "block",
+          base: menuOpen ? "flex" : "none",
+          _groupHover: "flex",
+          _active: "flex",
         }}
+        gap="1"
+        minW="min"
+        flexShrink="0"
         onClick={() => setOpen(true)}
       >
+        <CreatePageAction variant="ghost" hideLabel parentSlug={child.slug} />
         <LibraryPageMenu
+          variant="ghost"
           onClose={() => setOpen(false)}
           node={child}
           onDelete={handleDelete}
         />
-      </Box>
+      </HStack>
     </ArkTreeView.BranchControl>
   );
 }
