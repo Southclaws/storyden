@@ -67,6 +67,10 @@
   display: none;
 }
 
+.rightbar {
+  display: none;
+}
+
 .navpill {
   display: block;
   grid-area: navpill;
@@ -249,6 +253,11 @@
 @media screen and (min-width: 768px) and (max-width: 1280px) {
   .navigation__container[data-leftbar-shown="false"] .main {
     grid-column: leftbar / main;
+  }
+
+  /* Hide the context pane when the screen is at "tablet" size */
+  .rightbar {
+    display: none;
   }
 }
 
