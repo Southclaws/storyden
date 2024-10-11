@@ -1,7 +1,7 @@
 import { BellIcon } from "@heroicons/react/24/outline";
 
+import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
-import { LinkButtonStyleProps } from "@/components/ui/link-button";
 import { Box } from "@/styled-system/jsx";
 
 import { AnchorProps, MenuItem } from "../Anchors/Anchor";
@@ -12,14 +12,14 @@ export const NotificationsLabel = "Notifications";
 export const NotificationsIcon = <BellIcon />;
 
 type Props = {
-  unread: boolean;
+  unread?: boolean;
 };
 
 export function NotificationAction({
   hideLabel,
   unread,
   ...props
-}: AnchorProps & LinkButtonStyleProps & Props) {
+}: AnchorProps & ButtonProps & Props) {
   return (
     <IconButton size="sm" {...props}>
       {NotificationsIcon}

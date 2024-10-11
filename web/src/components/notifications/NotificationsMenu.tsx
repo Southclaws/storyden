@@ -5,10 +5,10 @@ import Link from "next/link";
 import * as Menu from "@/components/ui/menu";
 import { Center, HStack, LStack, styled } from "@/styled-system/jsx";
 import { hstack } from "@/styled-system/patterns";
+import { deriveError } from "@/utils/error";
 
 import { MemberAvatar } from "../member/MemberBadge/MemberAvatar";
 import { NotificationAction } from "../site/Navigation/Actions/Notifications";
-import { Unready } from "../site/Unready";
 import { Button } from "../ui/button";
 import { LinkButton } from "../ui/link-button";
 
@@ -18,7 +18,15 @@ import { Props, useNotifications } from "./useNotifications";
 export function NotificationsMenu(props: Props) {
   const { ready, error, data, handlers } = useNotifications(props);
   if (!ready) {
-    return <Unready error={error} />;
+    return (
+      <NotificationAction
+        hideLabel
+        size="md"
+        variant="ghost"
+        disabled
+        title={deriveError(error)}
+      />
+    );
   }
 
   const { unreads, notifications } = data;
