@@ -42,7 +42,7 @@ export function MemberName({
             minW="0"
             fontSize={size === "lg" ? "md" : "sm"}
             fontWeight={size === "lg" ? "bold" : "medium"}
-            overflowX="hidden"
+            overflow="hidden"
             textWrap="nowrap"
             textOverflow="ellipsis"
             color="fg.default"
