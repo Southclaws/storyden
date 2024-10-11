@@ -8,7 +8,7 @@ export function EmptyState() {
     <VStack height="full" justify="center" pb="32">
       <ThreadStaircase width="100%" />
       <styled.p textAlign="center" fontStyle="italic" color="gray.5">
-        *tumbleweed*&nbsp;there&nbsp;&apos;s&nbsp;nothing&nbsp;here...
+        *tumbleweed*&nbsp;there&apos;s&nbsp;nothing&nbsp;here...
       </styled.p>
     </VStack>
   );
