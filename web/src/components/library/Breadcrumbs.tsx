@@ -1,5 +1,6 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { last } from "lodash";
+import { uniq } from "lodash/fp";
 import { FormEventHandler, ForwardedRef, Fragment, forwardRef } from "react";
 
 import { Visibility } from "src/api/openapi-schema";
@@ -10,7 +11,7 @@ import { LinkButton } from "@/components/ui/link-button";
 import { LibraryPath, joinLibraryPath } from "@/screens/library/library-path";
 import { Box, HStack } from "@/styled-system/jsx";
 
-import { LibraryPageCreateTrigger } from "./LibraryPageCreateTrigger/LibraryPageCreateTrigger";
+import { CreatePageAction } from "../site/Navigation/Actions/CreatePage";
 
 type Props = {
   libraryPath: LibraryPath;
@@ -35,7 +36,12 @@ export const Breadcrumbs_ = (
 ) => {
   const session = useSession();
   const isEditing = session && create == "edit" && onChange !== undefined;
-  const paths = libraryPath.filter((p) => p !== "new");
+
+  // Sometimes, due to bugs, the path can contain duplicate slug entries.
+  const uniquePaths = uniq(libraryPath);
+
+  // When editing, the slug edit input takes the place of the last breadcrumb.
+  const paths = isEditing ? uniquePaths.slice(0, -1) : uniquePaths;
   const current = last(paths);
 
   return (
@@ -97,7 +103,7 @@ export const Breadcrumbs_ = (
           <Box flexShrink="0">
             <ChevronRightIcon width="1rem" />
           </Box>
-          <LibraryPageCreateTrigger />
+          <CreatePageAction parentSlug={current} />
         </>
       )}
       {isEditing && (
@@ -111,6 +117,7 @@ export const Breadcrumbs_ = (
             minW="32"
             size="xs"
             height="6" // TODO: Make this default for size="xs"
+            borderRadius="sm"
             placeholder="URL slug"
             defaultValue={defaultValue}
             value={value}

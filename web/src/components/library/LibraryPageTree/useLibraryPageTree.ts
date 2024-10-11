@@ -1,17 +1,30 @@
 import { useRouter } from "next/navigation";
-import { mutate } from "swr";
 
-import { getNodeListKey, nodeDelete } from "@/api/openapi-client/nodes";
+import { handle } from "@/api/client";
+import { useLibraryMutation } from "@/lib/library/library";
 
 export function useLibraryPageTree(currentNode: string | undefined) {
   const router = useRouter();
-  async function handleDelete(slug: string) {
-    await nodeDelete(slug);
-    await mutate(getNodeListKey());
+  const { deleteNode, revalidate } = useLibraryMutation();
 
-    if (currentNode === slug) {
-      router.push("/l");
-    }
+  async function handleDelete(slug: string) {
+    handle(
+      async () => {
+        await deleteNode(slug);
+        if (currentNode === slug) {
+          router.push("/l");
+        }
+      },
+      {
+        promiseToast: {
+          loading: "Deleting page...",
+          success: "Page deleted.",
+        },
+        cleanup: async () => {
+          revalidate();
+        },
+      },
+    );
   }
 
   return {
