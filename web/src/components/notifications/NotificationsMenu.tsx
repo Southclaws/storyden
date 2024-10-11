@@ -3,7 +3,7 @@ import { ArchiveBoxIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 import * as Menu from "@/components/ui/menu";
-import { Box, Center, HStack, LStack, styled } from "@/styled-system/jsx";
+import { Center, HStack, LStack, styled } from "@/styled-system/jsx";
 import { hstack } from "@/styled-system/patterns";
 
 import { MemberAvatar } from "../member/MemberBadge/MemberAvatar";
@@ -27,20 +27,8 @@ export function NotificationsMenu(props: Props) {
 
   return (
     <Menu.Root closeOnSelect={false}>
-      <Menu.Trigger cursor="pointer" position="relative">
-        <NotificationAction hideLabel size="md" variant="ghost" />
-
-        {!isEmpty && (
-          <Box
-            position="absolute"
-            top="1"
-            right="1"
-            bgColor="red.8"
-            borderRadius="full"
-            w="2"
-            h="2"
-          />
-        )}
+      <Menu.Trigger cursor="pointer" position="relative" asChild>
+        <NotificationAction hideLabel size="md" variant="ghost" unread />
       </Menu.Trigger>
 
       <Portal>
