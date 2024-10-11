@@ -10,6 +10,8 @@ import { map } from "lodash/fp";
 import { admonition } from "@/recipes/admonition";
 import { button } from "@/recipes/button";
 import { headingInput } from "@/recipes/heading-input";
+import { input } from "@/recipes/input";
+import { popover } from "@/recipes/popover";
 import { richCard } from "@/recipes/rich-card";
 import { treeView } from "@/recipes/tree-view";
 import { typographyHeading } from "@/recipes/typography-heading";
@@ -228,6 +230,7 @@ export default defineConfig({
   theme: {
     extend: {
       recipes: {
+        input: input,
         admonition: admonition,
         button: button,
         headingInput: headingInput,
@@ -235,6 +238,7 @@ export default defineConfig({
         richCard: richCard,
       },
       slotRecipes: {
+        popover: popover,
         treeView: treeView,
       },
       semanticTokens,

@@ -7,6 +7,10 @@ interface InputVariant {
  * @default "md"
  */
 size: "2xs" | "xs" | "sm" | "md" | "lg" | "xl" | "2xl"
+/**
+ * @default "outline"
+ */
+variant: "outline" | "ghost"
 }
 
 type InputVariantMap = {

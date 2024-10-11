@@ -24,6 +24,14 @@ import { useLibraryPath } from "../useLibraryPath";
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name."),
   slug: z.string().optional(),
+  link: z.preprocess((v) => {
+    if (typeof v === "string" && v === "") {
+      return undefined;
+    }
+
+    return v;
+  }, z.string().url("Invalid URL").optional()),
+
   content: z.string().optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
@@ -64,6 +72,7 @@ export function useLibraryPageScreen({
     () => ({
       name: node.name,
       slug: node.slug,
+      link: node.link?.url,
       description: node.description,
       content: node.content,
     }),
@@ -87,7 +96,12 @@ export function useLibraryPageScreen({
   function handleEditMode() {
     if (editing) {
       setEditing(false);
-      form.reset(node);
+      form.reset({
+        name: node.name,
+        slug: node.slug,
+        link: node.link?.url,
+        content: node.content,
+      });
 
       if (isNew) {
         router.back();
@@ -96,7 +110,12 @@ export function useLibraryPageScreen({
       if (!isAllowedToEdit) return;
 
       setEditing(true);
-      form.reset(node);
+      form.reset({
+        name: node.name,
+        slug: node.slug,
+        link: node.link?.url,
+        content: node.content,
+      });
     }
   }
 
@@ -105,7 +124,10 @@ export function useLibraryPageScreen({
 
     handle(
       async () => {
-        await onSave(payload);
+        await onSave({
+          ...payload,
+          url: payload.link,
+        });
         setEditing(false);
       },
       {
