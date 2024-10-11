@@ -5,7 +5,7 @@ import { Floating } from "@/styled-system/patterns";
 
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
 
-export function Left() {
+export function NavigationPane() {
   return (
     <styled.header
       display="flex"

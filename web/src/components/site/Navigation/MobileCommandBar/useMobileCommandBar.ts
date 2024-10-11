@@ -3,9 +3,9 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { useSession } from "src/auth";
+import { useSession } from "@/auth";
 
-export function useNavpill() {
+export function useMobileCommandBar() {
   const pathname = usePathname();
   const [isExpanded, setExpanded] = useState(false);
   const account = useSession();
