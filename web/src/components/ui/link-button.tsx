@@ -25,8 +25,10 @@ export function LinkButton({
 
   const isExternal = !href.toString().startsWith("/");
 
+  const target = isExternal ? "_blank" : undefined;
+
   return (
-    <NextLink className={cn} href={href}>
+    <NextLink className={cn} href={href} target={target}>
       <styled.span
         display="flex"
         // Supports overflowing children and text ellipsis
