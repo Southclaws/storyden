@@ -12,6 +12,7 @@ export async function getInfo(): Promise<Info> {
     return {
       title: "Storyden",
       description: "A forum for the modern age.",
+      content: "",
       accent_colour: FALLBACK_COLOUR,
       onboarding_status: "complete",
     };
