@@ -1,32 +1,61 @@
-import { PlusIcon } from "@heroicons/react/24/solid";
-import { Children, PropsWithChildren, ReactElement, cloneElement } from "react";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 import { useDisclosure } from "src/utils/useDisclosure";
 
-import { Button } from "@/components/ui/button";
-import { ButtonVariantProps } from "@/styled-system/recipes";
+import { ButtonProps } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { Item } from "@/components/ui/menu";
 
 import { CategoryCreateModal } from "./CategoryCreateModal";
 
-export function CategoryCreateTrigger(
-  props: PropsWithChildren<ButtonVariantProps>,
-) {
+type Props = ButtonProps & {
+  parentSlug?: string;
+  hideLabel?: boolean;
+};
+
+export const CreateCategoryID = "create-category";
+export const CreateCategoryLabel = "Create";
+export const CreateCategoryIcon = <PlusIcon />;
+
+export function CategoryCreateTrigger({
+  parentSlug,
+  hideLabel,
+  ...props
+}: Props) {
   const { onOpen, isOpen, onClose } = useDisclosure();
 
   return (
     <>
-      {props.children ? (
-        Children.map(props.children, (child) => {
-          return cloneElement(child as ReactElement<any>, {
-            onClick: onOpen,
-          });
-        })
-      ) : (
-        <Button w="full" size="xs" variant="ghost" onClick={onOpen} {...props}>
-          <PlusIcon /> Create category
-        </Button>
-      )}
+      <IconButton
+        type="button"
+        size="xs"
+        variant="ghost"
+        px={hideLabel ? "0" : "1"}
+        onClick={onOpen}
+        {...props}
+      >
+        {CreateCategoryIcon}
+        {!hideLabel && (
+          <>
+            <span>{CreateCategoryLabel}</span>
+          </>
+        )}
+      </IconButton>
+
       <CategoryCreateModal isOpen={isOpen} onClose={onClose} {...props} />
     </>
+  );
+}
+
+export function CreateCategoryMenuItem({ hideLabel }: Props) {
+  return (
+    <Item value={CreateCategoryID}>
+      {CreateCategoryIcon}
+      {!hideLabel && (
+        <>
+          &nbsp;<span>{CreateCategoryLabel}</span>
+        </>
+      )}
+    </Item>
   );
 }
