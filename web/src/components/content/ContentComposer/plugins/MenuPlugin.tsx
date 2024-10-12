@@ -103,7 +103,7 @@ export class FloatingMenuView {
 
     const { state } = view;
     const { doc, selection } = state;
-    const { from, to } = selection;
+
     const isSame =
       oldState && oldState.doc.eq(doc) && oldState.selection.eq(selection);
 
@@ -111,16 +111,32 @@ export class FloatingMenuView {
       return;
     }
 
-    const { top: containerTop } = view.dom.getBoundingClientRect();
-    const { bottom: caretY } = posToDOMRect(view, from, to);
-    const offsetY = caretY - containerTop + 16;
+    const { offsetX, offsetY } = this.getMenuOffset(view);
 
-    // NOTE: Left is -1px for optical alignment due to the border radius.
-    this.element.setAttribute("style", `top: ${offsetY}px; left: -1px;`);
+    this.element.setAttribute(
+      "style",
+      `top: ${offsetY}px; left: ${offsetX - 1}px;`,
+    );
   }
 
   hide() {
-    this.element.setAttribute("style", "visibility: hidden;");
+    const style = this.element.getAttribute("style");
+    this.element.setAttribute("style", `${style} visibility: hidden;`);
+  }
+
+  getMenuOffset(view: EditorView) {
+    const { state } = view;
+    const { selection } = state;
+    const { from, to } = selection;
+
+    const { top: containerTop } = view.dom.getBoundingClientRect();
+    const { bottom: caretY } = posToDOMRect(view, from, to);
+
+    // NOTE: Left is -1px for optical alignment due to the border radius.
+    const offsetX = -1;
+    const offsetY = caretY - containerTop + 8;
+
+    return { offsetX, offsetY };
   }
 }
 

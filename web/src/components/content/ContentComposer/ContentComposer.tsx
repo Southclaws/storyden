@@ -32,14 +32,16 @@ import { FloatingMenu } from "./plugins/MenuPlugin";
 import { ContentComposerProps, useContentComposer } from "./useContentComposer";
 
 export function ContentComposer(props: ContentComposerProps) {
-  const { editor, initialValueHTML, handlers, format } =
+  const { editor, initialValueHTML, uniqueID, handlers, format } =
     useContentComposer(props);
 
   return (
     <LStack
-      id="rich-text-editor"
+      id={`rich-text-editor-${uniqueID}`}
       containerType="inline-size"
       className="typography"
+      // NOTE: Relative positioning is for the floating menu to work.
+      position="relative"
       w="full"
       h="full"
       gap="1"
@@ -197,13 +199,13 @@ export function ContentComposer(props: ContentComposerProps) {
               size: "xs",
               variant: "ghost",
             })}
-            htmlFor="filepicker"
+            htmlFor={`filepicker-${uniqueID}`}
             title="Insert an image"
           >
             <ImageIcon />
           </label>
           <styled.input
-            id="filepicker"
+            id={`filepicker-${uniqueID}`}
             type="file"
             multiple
             display="none"
@@ -215,7 +217,7 @@ export function ContentComposer(props: ContentComposerProps) {
       )}
 
       <EditorContent
-        id="editor-content"
+        id={`editor-content-${uniqueID}`}
         className={css({
           // NOTE: We want to make the clickable area expand to the full height.
           height: "full",
