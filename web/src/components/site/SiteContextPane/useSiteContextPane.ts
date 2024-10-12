@@ -6,9 +6,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { handle } from "@/api/client";
-import { adminSettingsUpdate } from "@/api/openapi-client/admin";
 import { useGetInfo } from "@/api/openapi-client/misc";
 import { Account, Info, Permission } from "@/api/openapi-schema";
+import { useInfoMutation } from "@/lib/settings/mutation";
 import { getIconURL } from "@/utils/icon";
 import { hasPermission } from "@/utils/permissions";
 
@@ -48,7 +48,9 @@ export function useSiteContextPane({ session, info }: Props) {
     defaultValues: info,
   });
 
-  const { data, error, mutate } = useGetInfo({ swr: { fallbackData: info } });
+  const { revalidate, updateSettings } = useInfoMutation(info);
+
+  const { data, error } = useGetInfo({ swr: { fallbackData: info } });
   if (!data) {
     return {
       ready: false as const,
@@ -66,13 +68,9 @@ export function useSiteContextPane({ session, info }: Props) {
   }
 
   const handleSaveSettings = form.handleSubmit(async (value) => {
-    console.log("handleSaveSettings", value);
-
     await handle(
       async () => {
-        const newInfo = { ...data, ...value };
-        await mutate(newInfo, { revalidate: false });
-        await adminSettingsUpdate(newInfo);
+        await updateSettings(value);
         setEditing(null);
       },
       {
@@ -81,7 +79,7 @@ export function useSiteContextPane({ session, info }: Props) {
           success: "Settings saved",
         },
         cleanup: async () => {
-          await mutate();
+          await revalidate();
         },
       },
     );

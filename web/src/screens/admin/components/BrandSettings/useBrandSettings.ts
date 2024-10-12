@@ -1,14 +1,14 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { mutate } from "swr";
 import { z } from "zod";
 
-import { adminSettingsUpdate } from "src/api/openapi-client/admin";
-import { getGetInfoKey, iconUpload } from "src/api/openapi-client/misc";
+import { iconUpload } from "src/api/openapi-client/misc";
 import { Info } from "src/api/openapi-schema";
 import { getColourVariants } from "src/utils/colour";
 
+import { handle } from "@/api/client";
+import { useInfoMutation } from "@/lib/settings/mutation";
 import { getIconURL } from "@/utils/icon";
 
 export type Props = Info;
@@ -16,16 +16,19 @@ export type Props = Info;
 export const FormSchema = z.object({
   title: z.string(),
   description: z.string(),
+  content: z.string().optional(),
   accentColour: z.string(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
 export function useBrandSettings(props: Props) {
+  const { revalidate, updateSettings } = useInfoMutation(props);
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       title: props.title,
       description: props.description,
+      content: props.content,
       accentColour: props.accent_colour,
     },
   });
@@ -58,13 +61,26 @@ export function useBrandSettings(props: Props) {
   };
 
   const onSubmit = form.handleSubmit(async (data) => {
-    updateColour(data.accentColour);
-    await adminSettingsUpdate({
-      title: data.title,
-      description: data.description,
-      accent_colour: data.accentColour,
-    });
-    mutate(getGetInfoKey());
+    handle(
+      async () => {
+        updateColour(data.accentColour);
+        await updateSettings({
+          title: data.title,
+          description: data.description,
+          content: data.content,
+          accent_colour: data.accentColour,
+        });
+      },
+      {
+        promiseToast: {
+          loading: "Saving settings...",
+          success: "Settings saved",
+        },
+        cleanup: async () => {
+          await revalidate();
+        },
+      },
+    );
   });
 
   const onSaveIcon = async (file: Blob | null) => {
@@ -73,7 +89,7 @@ export function useBrandSettings(props: Props) {
     }
 
     await iconUpload(file);
-    mutate(getGetInfoKey());
+    revalidate();
   };
 
   const onColourChangePreview = (colour: string) => {
@@ -88,6 +104,7 @@ export function useBrandSettings(props: Props) {
   return {
     register: form.register,
     control: form.control,
+    formState: form.formState,
     onSubmit: onSubmit,
     currentIcon,
     onSaveIcon,
