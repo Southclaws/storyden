@@ -5,20 +5,24 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Southclaws/enumerator/generate"
 	"github.com/dave/jennifer/jen"
+	"github.com/iancoleman/strcase"
 	"github.com/pb33f/libopenapi"
 )
 
 func main() {
 	schemaFlag := flag.String("schema", "api/openapi.yaml", "path to openapi schema")
 	outputFlag := flag.String("output", "app/transports/http/bindings/openapi_rbac/openapi_rbac_gen.go", "path to output file")
+	enumFlag := flag.String("enum", "app/resources/rbac/rbac_enum_gen.go", "path to enum output file")
 
 	flag.Parse()
 
 	filename := *schemaFlag
 	outfile := *outputFlag
+	enumOutfile := *enumFlag
 
-	if err := run(filename, outfile); err != nil {
+	if err := run(filename, outfile, enumOutfile); err != nil {
 		fmt.Printf("Error: %e\n", err)
 		os.Exit(1)
 	}
@@ -28,7 +32,7 @@ type Operation struct {
 	Name string
 }
 
-func run(filename, outfile string) error {
+func run(filename, outfile, enumOutfilePath string) error {
 	spec, err := os.ReadFile(filename)
 	if err != nil {
 		return err
@@ -56,6 +60,32 @@ func run(filename, outfile string) error {
 				Name: op.OperationId,
 			})
 		}
+	}
+
+	enum := generate.Enum{
+		Name:       "Permission",
+		Values:     []generate.Value{},
+		Sourcename: "string",
+	}
+	for name, schema := range docModel.Model.Components.Schemas.FromOldest() {
+		if name == "Permission" {
+			for _, v := range schema.Schema().Enum {
+				enum.Values = append(enum.Values, generate.Value{
+					Symbol: fmt.Sprintf("Permission%s", strcase.ToCamel(v.Value)),
+					Value:  fmt.Sprintf("`%s`", v.Value),
+				})
+			}
+		}
+	}
+
+	enumOutfile, err := os.Create(enumOutfilePath)
+	if err != nil {
+		return err
+	}
+
+	err = generate.Generate("rbac", []generate.Enum{enum}, enumOutfile)
+	if err != nil {
+		return err
 	}
 
 	f := jen.NewFile("openapi_rbac")
