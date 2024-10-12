@@ -8,6 +8,7 @@ import { z } from "zod";
 import { handle } from "@/api/client";
 import { useGetInfo } from "@/api/openapi-client/misc";
 import { Account, Info, Permission } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
 import { useInfoMutation } from "@/lib/settings/mutation";
 import { getIconURL } from "@/utils/icon";
 import { hasPermission } from "@/utils/permissions";
@@ -37,6 +38,7 @@ export const EditingSchema = z.preprocess(
 export type Editing = z.infer<typeof EditingSchema>;
 
 export function useSiteContextPane({ session, info }: Props) {
+  session = useSession(session);
   const [editing, setEditing] = useQueryState<null | "settings">("editing", {
     defaultValue: null,
     clearOnDefault: true,
