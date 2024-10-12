@@ -18,6 +18,7 @@ import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Heading } from "@/components/ui/heading";
 import { HeadingInput } from "@/components/ui/heading-input";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
+import { LStack as lstack } from "@/styled-system/patterns";
 
 import { Form, Props, useThreadScreen } from "./useThreadScreen";
 
@@ -34,8 +35,10 @@ export function ThreadScreen(props: Props) {
   return (
     <LStack gap="4">
       <styled.form
+        display="flex"
+        flexDirection="column"
         alignItems="start"
-        gap="4"
+        gap="1"
         width="full"
         onSubmit={handlers.handleSave}
       >
