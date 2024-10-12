@@ -40,6 +40,8 @@ export function ContentComposer(props: ContentComposerProps) {
       id={`rich-text-editor-${uniqueID}`}
       containerType="inline-size"
       className="typography"
+      // NOTE: Relative positioning is for the floating menu to work.
+      position="relative"
       w="full"
       h="full"
       gap="1"
