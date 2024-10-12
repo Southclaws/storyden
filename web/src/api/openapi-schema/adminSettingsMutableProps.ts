@@ -7,9 +7,11 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { PostContent } from "./postContent";
 
 export interface AdminSettingsMutableProps {
   accent_colour?: string;
+  content?: PostContent;
   description?: string;
   title?: string;
 }

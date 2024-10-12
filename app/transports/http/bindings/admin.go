@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -42,9 +43,15 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		return nil, fault.Wrap(errNotAuthorised, fctx.With(ctx))
 	}
 
+	content, err := opt.MapErr(opt.NewPtr(request.Body.Content), datagraph.NewRichText)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	settings, err := a.sr.Set(ctx, settings.Partial{
 		Title:        opt.NewPtr(request.Body.Title),
 		Description:  opt.NewPtr(request.Body.Description),
+		Content:      content,
 		AccentColour: opt.NewPtr(request.Body.AccentColour),
 	})
 	if err != nil {
@@ -120,6 +127,7 @@ func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 	return openapi.AdminSettingsProps{
 		AccentColour: in.AccentColour.Get(),
 		Description:  in.Description.Get(),
+		Content:      in.Content.Get().HTML(),
 		Title:        in.Title.Get(),
 	}
 }
