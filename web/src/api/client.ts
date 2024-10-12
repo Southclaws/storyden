@@ -38,19 +38,24 @@ export async function handle<T>(
 
   if (promiseToast) {
     return new Promise((resolve, reject) => {
-      toast.promise<T>(fn(), {
-        loading: promiseToast.loading,
-        success: (data: T) => {
-          resolve(data);
-          return promiseToast.success;
+      toast.promise<T>(
+        async () => {
+          return await fn();
         },
-        error: (error: unknown) => {
-          reject(error);
-          return deriveError(error);
+        {
+          loading: promiseToast.loading,
+          success: (data: T) => {
+            resolve(data);
+            return promiseToast.success;
+          },
+          error: (error: unknown) => {
+            reject(error);
+            return deriveError(error);
+          },
+          finally: cleanup,
+          action: action,
         },
-        finally: cleanup,
-        action: action,
-      });
+      );
     });
   }
 
