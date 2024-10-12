@@ -6,7 +6,8 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { generateHTML, generateJSON } from "@tiptap/html";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent, useEffect, useId, useMemo } from "react";
+import { Xid } from "xid-ts";
 
 import { Asset } from "src/api/openapi-schema";
 
@@ -60,10 +61,14 @@ export function useContentComposer(props: ContentComposerProps) {
   );
   const initialValueHTML = generateHTML(initialValueJSON, extensions);
 
+  // Each editor needs a unique ID for the menu's file upload input ID.
+  const uniqueID = useId();
+
   const editor = useEditor({
     immediatelyRender: false,
     editorProps: {
       attributes: {
+        "data-editor-id": uniqueID,
         class: css({
           height: "full",
           width: "full",
@@ -190,6 +195,7 @@ export function useContentComposer(props: ContentComposerProps) {
 
   return {
     editor,
+    uniqueID,
     initialValueHTML,
     handlers: {
       handleFileUpload,
