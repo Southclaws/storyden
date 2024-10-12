@@ -3156,25 +3156,35 @@ components:
     Permission:
       type: string
       enum:
+        # Posts (Threads, replies and posts)
         - "CREATE_POST"
         - "READ_PUBLISHED_THREADS"
         - "CREATE_REACTION"
         - "MANAGE_POSTS"
         - "MANAGE_CATEGORIES"
+        - "CREATE_INVITATION"
+        # Library (Page tree nodes)
         - "READ_PUBLISHED_LIBRARY"
         - "MANAGE_LIBRARY"
         - "SUBMIT_LIBRARY_NODE"
+        # Assets
         - "UPLOAD_ASSET"
+        # Events
+        - "MANAGE_EVENTS"
+        # Profiles (listing and viewing member profiles)
         - "LIST_PROFILES"
         - "READ_PROFILE"
+        # Collections
         - "CREATE_COLLECTION"
         - "LIST_COLLECTIONS"
         - "READ_COLLECTION"
         - "MANAGE_COLLECTIONS"
         - "COLLECTION_SUBMIT"
+        # Administrative (Settings, bans, etc)
         - "MANAGE_SETTINGS"
         - "MANAGE_SUSPENSIONS"
         - "MANAGE_ROLES"
+        # Administrator implicitly has all permissions.
         - "ADMINISTRATOR"
 
     PermissionList:
