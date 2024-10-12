@@ -820,7 +820,7 @@ paths:
     patch:
       operationId: NotificationUpdate
       description: Change the read status for a notification.
-      tags: [categories]
+      tags: [notifications]
       parameters: [$ref: "#/components/parameters/NotificationIDParam"]
       requestBody: { $ref: "#/components/requestBodies/NotificationUpdate" }
       responses:

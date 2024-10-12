@@ -8,7 +8,9 @@ import { range } from "lodash";
 import { map } from "lodash/fp";
 
 import { admonition } from "@/recipes/admonition";
+import { badge } from "@/recipes/badge";
 import { button } from "@/recipes/button";
+import { colorPicker } from "@/recipes/color-picker";
 import { headingInput } from "@/recipes/heading-input";
 import { input } from "@/recipes/input";
 import { menu } from "@/recipes/menu";
@@ -232,6 +234,7 @@ export default defineConfig({
   theme: {
     extend: {
       recipes: {
+        badge: badge,
         input: input,
         admonition: admonition,
         button: button,
@@ -240,6 +243,7 @@ export default defineConfig({
         richCard: richCard,
       },
       slotRecipes: {
+        colorPicker: colorPicker,
         menu: menu,
         popover: popover,
         table: table,

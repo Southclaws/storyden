@@ -4,7 +4,7 @@ import { useCopyToClipboard } from "@uidotdev/usehooks";
 
 import { Reply, Thread } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
-import { isShareEnabled } from "src/utils/client";
+import { useShare } from "src/utils/client";
 
 import { handle } from "@/api/client";
 import { useThreadMutations } from "@/lib/thread/mutation";
@@ -25,7 +25,7 @@ export function useReplyMenu({ thread, reply, onEdit }: Props) {
 
   const permalink = getPermalinkForPost(thread.slug, reply.id);
 
-  const isSharingEnabled = isShareEnabled();
+  const isSharingEnabled = useShare();
   const isEditingEnabled = account?.id === reply.author.id;
   const isDeletingEnabled = account?.id === reply.author.id;
 

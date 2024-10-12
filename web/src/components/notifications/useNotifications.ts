@@ -1,8 +1,10 @@
 import { filter, flow, map } from "lodash/fp";
 
 import { handle } from "@/api/client";
-import { notificationUpdate } from "@/api/openapi-client/categories";
-import { useNotificationList } from "@/api/openapi-client/notifications";
+import {
+  notificationUpdate,
+  useNotificationList,
+} from "@/api/openapi-client/notifications";
 import {
   Notification,
   NotificationListResult,
