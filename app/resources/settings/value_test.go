@@ -18,6 +18,7 @@ func Test_fromEnt(t *testing.T) {
 	in := []*ent.Setting{
 		{ID: "Title", Value: "Storyden"},
 		{ID: "Description", Value: "A forum for the modern age."},
+		{ID: "Content", Value: "<body><h1>Welcome to Storyden</h1></body>"},
 		{ID: "AccentColour", Value: "27482225"},
 	}
 
@@ -27,5 +28,6 @@ func Test_fromEnt(t *testing.T) {
 
 	a.Equal("Storyden", out.Title.value)
 	a.Equal("A forum for the modern age.", out.Description.value)
+	a.Equal("<body><h1>Welcome to Storyden</h1></body>", out.Content.value.HTML())
 	a.Equal("27482225", out.AccentColour.value)
 }

@@ -2818,12 +2818,14 @@ components:
     Info:
       description: Basic public information about the Storyden installation.
       type: object
-      required: [title, description, accent_colour, onboarding_status]
+      required: [title, description, content, accent_colour, onboarding_status]
       properties:
         title:
           type: string
         description:
           type: string
+        content:
+          $ref: "#/components/schemas/PostContent"
         accent_colour:
           type: string
         onboarding_status:
@@ -3042,12 +3044,14 @@ components:
     AdminSettingsProps:
       description: Storyden installation and administration settings.
       type: object
-      required: [title, description, accent_colour]
+      required: [title, description, content, accent_colour]
       properties:
         title:
           type: string
         description:
           type: string
+        content:
+          $ref: "#/components/schemas/PostContent"
         accent_colour:
           type: string
 
@@ -3058,6 +3062,8 @@ components:
           type: string
         description:
           type: string
+        content:
+          $ref: "#/components/schemas/PostContent"
         accent_colour:
           type: string
 

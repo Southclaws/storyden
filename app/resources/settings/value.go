@@ -11,10 +11,11 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/samber/lo"
 
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-type Value[T ~string | ~int | ~float64 | ~uint32 | bool] struct {
+type Value[T ~string | ~int | ~float64 | ~uint32 | bool | datagraph.Content] struct {
 	value T // value must remain as field 0 for simple reflection code
 	key   string
 }
@@ -75,6 +76,35 @@ func fromEnt(raw []*ent.Setting) (*Settings, error) {
 	return &s, nil
 }
 
+type keyval struct {
+	key   string
+	value string
+}
+
+func toEnt(s Partial) ([]keyval, error) {
+	kv := []keyval{}
+
+	// NOTE: This could be automated with reflection but... more likely that
+	// we'll just move to storing all settings in a single JSON field.
+	if v, ok := s.Title.Get(); ok {
+		kv = append(kv, keyval{key: "Title", value: v})
+	}
+	if v, ok := s.Description.Get(); ok {
+		kv = append(kv, keyval{key: "Description", value: v})
+	}
+	if v, ok := s.Content.Get(); ok {
+		kv = append(kv, keyval{key: "Content", value: v.HTML()})
+	}
+	if v, ok := s.AccentColour.Get(); ok {
+		kv = append(kv, keyval{key: "AccentColour", value: v})
+	}
+	if v, ok := s.Public.Get(); ok {
+		kv = append(kv, keyval{key: "Public", value: strconv.FormatBool(v)})
+	}
+
+	return kv, nil
+}
+
 // bindEntry takes some field `f` as well as a key and a value in string form
 // which represent a single setting row from the database (or elsewhere) and
 // switches on the field type in order to use the correct decoding method.
@@ -86,7 +116,9 @@ func fromEnt(raw []*ent.Setting) (*Settings, error) {
 // Also note that the value parameter is a pointer that may be nil. This is just
 // to allow use of this for empty/default values without lots of duplicate code.
 func bindEntry(f reflect.Value, key string, value *string) (v reflect.Value, err error) {
-	k := f.Type().Field(0).Type.Kind()
+	t := f.Type().Field(0).Type
+	k := t.Kind()
+
 	switch k {
 	case reflect.String:
 		var s string
@@ -114,6 +146,19 @@ func bindEntry(f reflect.Value, key string, value *string) (v reflect.Value, err
 		}
 
 		v = reflect.ValueOf(Value[uint32]{key: key, value: uint32(u64)})
+
+	case reflect.Struct:
+		switch t {
+		case reflect.TypeOf(datagraph.Content{}):
+			var c datagraph.Content
+			if value != nil {
+				c, err = datagraph.NewRichText(*value)
+				if err != nil {
+					panic(err)
+				}
+			}
+			v = reflect.ValueOf(Value[datagraph.Content]{key: key, value: c})
+		}
 
 	default:
 		err = fault.Newf("cannot auto bind type: '%s'", k.String())
