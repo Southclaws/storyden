@@ -1,24 +1,37 @@
-import React, { PropsWithChildren } from "react";
+import { PropsWithChildren } from "react";
 
-import { Box, styled } from "@/styled-system/jsx";
+import { Box, HStack, styled } from "@/styled-system/jsx";
 import { Floating } from "@/styled-system/patterns";
 
 export function ContextPane({ children }: PropsWithChildren) {
   return (
     <styled.nav
-      className={Floating()}
       display="flex"
-      borderRadius="md"
       flexDir="column"
-      gap="4"
+      alignItems="center"
+      gap="2"
       width="full"
-      alignItems="start"
-      justifyContent="space-between"
-      overflowY="scroll"
+      height="full"
     >
-      <Box id="desktop-nav-right" w="full" height="full" p="2" pr="0">
-        <styled.aside w="full">{children}</styled.aside>
+      <Box
+        id="desktop-nav-right"
+        className={Floating()}
+        borderRadius="md"
+        w="full"
+        height="min"
+        p="2"
+        pr="0"
+        overflowY="scroll"
+      >
+        {children}
       </Box>
+
+      <HStack color="fg.subtle" fontSize="xs">
+        {/* TODO: Provide links to privacy/terms/etc custom pages */}
+        {/* <p>copyright {info.owner}</p> */}
+        {/* <a href={PrivacyRoute}>privacy</a> */}
+        <p>powered by storyden</p>
+      </HStack>
     </styled.nav>
   );
 }
