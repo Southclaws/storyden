@@ -84,6 +84,7 @@ function BrandSettingsForm(props: Props) {
             <ContentFormField
               control={control}
               name="content"
+              // NOTE: Does not update if sidebar is changed. Doesn't matter...
               initialValue={props.content}
               placeholder="About your community..."
             />

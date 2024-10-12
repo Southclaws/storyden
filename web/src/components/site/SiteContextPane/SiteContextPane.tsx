@@ -91,7 +91,13 @@ export function SiteContextPane(props: Props) {
           </FormErrorText>
         </FormControl>
       ) : (
-        info.content && <ContentComposer initialValue={info.content} disabled />
+        info.content && (
+          <ContentComposer
+            initialValue={info.content}
+            value={info.content}
+            disabled
+          />
+        )
       )}
 
       {isEditingEnabled && (
