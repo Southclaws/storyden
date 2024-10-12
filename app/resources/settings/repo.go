@@ -4,11 +4,14 @@ import (
 	"context"
 
 	"github.com/Southclaws/opt"
+
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
 type Settings struct {
 	Title        Value[string]
 	Description  Value[string]
+	Content      Value[datagraph.Content]
 	AccentColour Value[string]
 	Public       Value[bool]
 }
@@ -16,6 +19,7 @@ type Settings struct {
 type Partial struct {
 	Title        opt.Optional[string]
 	Description  opt.Optional[string]
+	Content      opt.Optional[datagraph.Content]
 	AccentColour opt.Optional[string]
 	Public       opt.Optional[bool]
 }

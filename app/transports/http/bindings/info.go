@@ -38,12 +38,7 @@ func (i Info) GetInfo(ctx context.Context, request openapi.GetInfoRequestObject)
 	}
 
 	return openapi.GetInfo200JSONResponse{
-		GetInfoOKJSONResponse: openapi.GetInfoOKJSONResponse{
-			Title:            settings.Title.Get(),
-			Description:      settings.Description.Get(),
-			AccentColour:     settings.AccentColour.Get(),
-			OnboardingStatus: openapi.OnboardingStatus(status.String()),
-		},
+		GetInfoOKJSONResponse: openapi.GetInfoOKJSONResponse(serialiseInfo(settings, *status)),
 	}, nil
 }
 
@@ -69,4 +64,14 @@ func (i Info) IconUpload(ctx context.Context, request openapi.IconUploadRequestO
 	}
 
 	return openapi.IconUpload200Response{}, nil
+}
+
+func serialiseInfo(s *settings.Settings, status onboarding.Status) openapi.Info {
+	return openapi.Info{
+		Title:            s.Title.Get(),
+		Description:      s.Description.Get(),
+		Content:          s.Content.Get().HTML(),
+		AccentColour:     s.AccentColour.Get(),
+		OnboardingStatus: openapi.OnboardingStatus(status.String()),
+	}
 }

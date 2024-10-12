@@ -7,7 +7,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"go.uber.org/fx"
-	"go.uber.org/multierr"
 
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/setting"
@@ -31,6 +30,8 @@ func New(ctx context.Context, lc fx.Lifecycle, db *ent.Client) (Repository, erro
 	return d, nil
 }
 
+// Init is one of the only database writes that happens on first boot. It sets
+// up some basic configuration settings for a brand new empty installation.
 func (d *database) Init(ctx context.Context) error {
 	r, err := d.db.Setting.Query().Count(ctx)
 	if err != nil {
@@ -41,13 +42,16 @@ func (d *database) Init(ctx context.Context) error {
 		return nil
 	}
 
-	if err := d.SetValue(ctx, "Title", "Storyden"); err != nil {
+	if err := d.SetValue(ctx, "Title", DefaultTitle); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
-	if err := d.SetValue(ctx, "Description", "A forum for the modern age"); err != nil {
+	if err := d.SetValue(ctx, "Description", DefaultDescription); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
-	if err := d.SetValue(ctx, "AccentColour", "hsl(157, 65%, 44%)"); err != nil {
+	if err := d.SetValue(ctx, "Content", DefaultContent); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if err := d.SetValue(ctx, "AccentColour", DefaultColour); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -64,22 +68,15 @@ func (d *database) Get(ctx context.Context) (*Settings, error) {
 }
 
 func (d *database) Set(ctx context.Context, s Partial) (*Settings, error) {
-	var err error
-
-	if v, ok := s.Title.Get(); ok {
-		err = multierr.Append(err, d.SetValue(ctx, "Title", v))
-	}
-
-	if v, ok := s.Description.Get(); ok {
-		err = multierr.Append(err, d.SetValue(ctx, "Description", v))
-	}
-
-	if v, ok := s.AccentColour.Get(); ok {
-		err = multierr.Append(err, d.SetValue(ctx, "AccentColour", v))
-	}
-
+	kvs, err := toEnt(s)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	for _, entry := range kvs {
+		if err := d.SetValue(ctx, entry.key, entry.value); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	return d.Get(ctx)
