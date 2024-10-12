@@ -37,7 +37,7 @@ export function SiteContextPane(props: Props) {
       <HStack w="full" justify="space-between" alignItems="start">
         {isEditingSettings ? (
           <FormControl>
-            <Input {...form.register("title")} />
+            <Input placeholder="Site title..." {...form.register("title")} />
             <FormErrorText>
               {form.formState.errors.title?.message}
             </FormErrorText>
@@ -65,7 +65,11 @@ export function SiteContextPane(props: Props) {
 
       {isEditingSettings ? (
         <FormControl>
-          <Input size="xs" {...form.register("description")} />
+          <Input
+            size="xs"
+            placeholder="Site description..."
+            {...form.register("description")}
+          />
           <FormErrorText>
             {form.formState.errors.description?.message}
           </FormErrorText>
