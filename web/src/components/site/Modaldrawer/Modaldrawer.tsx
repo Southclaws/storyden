@@ -35,13 +35,13 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
               minHeight={{ base: "full", md: "0" }}
               minWidth={{ base: "full", md: "md" }}
               maxWidth={{ base: "full", md: "prose" }}
-              borderTopRadius="xl"
-              borderBottomRadius={{ base: "none", md: "xl" }}
+              borderTopRadius={{ base: "xl", md: "md" }}
+              borderBottomRadius={{ base: "none", md: "md" }}
               bgColor="bg.default"
               boxShadow="lg"
-              p="4"
+              p={{ base: "4", md: "3" }}
             >
-              <HStack w="full" justify="space-between">
+              <HStack w="full" justify="space-between" alignItems="start">
                 <Drawer.Title asChild>
                   <Heading size="md">{props.title}</Heading>
                 </Drawer.Title>

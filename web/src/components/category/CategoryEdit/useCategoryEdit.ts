@@ -7,10 +7,11 @@ import {
   useCategoryList,
 } from "src/api/openapi-client/categories";
 import { useGetInfo } from "src/api/openapi-client/misc";
-import { APIError, Category } from "src/api/openapi-schema";
+import { Category } from "src/api/openapi-schema";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 
 import { handle } from "@/api/client";
+import { useCategoryMutations } from "@/lib/category/mutation";
 
 export type Props = {
   category: Category;
@@ -19,53 +20,49 @@ export type Props = {
 export const FormSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
-  colour: z.string().default("#fff"), // not implemented yet
-  admin: z.boolean().default(false), // not implemented yet
+  colour: z.string().default("#fff"),
 });
 export type Form = z.infer<typeof FormSchema>;
 
 export function useCategoryEdit(props: Props) {
-  const {
-    reset,
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<Form>({
+  const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     values: {
       name: props.category.name,
       description: props.category.description,
       colour: props.category.colour,
-      admin: props.category.admin,
     },
   });
-  const { mutate, data: existing } = useCategoryList();
-  const { mutate: mutateInfoStatus } = useGetInfo();
 
-  const onSubmit = handleSubmit(async (data) => {
-    await handle(async () => {
-      const collection = await categoryUpdate(props.category.id, data);
-      const updated = [...(existing?.categories ?? []), collection];
+  const { revalidateList, updateCategory } = useCategoryMutations();
 
-      mutateInfoStatus();
-      mutate(
-        { categories: updated },
-        { populateCache: true, rollbackOnError: true },
-      );
+  const handleSubmit = form.handleSubmit(async (data) => {
+    await handle(
+      async () => {
+        await updateCategory(props.category.id, data);
 
-      props.onClose?.();
-    });
+        props.onClose?.();
+      },
+      {
+        promiseToast: {
+          loading: "Updating category...",
+          success: "Category updated.",
+        },
+        cleanup: () => revalidateList(),
+      },
+    );
   });
 
-  function onCancel() {
-    reset();
+  function handleCancel() {
+    form.reset();
     props.onClose?.();
   }
 
   return {
-    onSubmit,
-    onCancel,
-    register,
-    errors,
+    form,
+    handlers: {
+      handleSubmit,
+      handleCancel,
+    },
   };
 }

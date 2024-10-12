@@ -10,6 +10,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   NotificationListOKResponse,
   NotificationListParams,
+  NotificationUpdateBody,
+  NotificationUpdateOKResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
 
@@ -44,6 +46,33 @@ export const notificationList = async (
     {
       ...options,
       method: "GET",
+    },
+  );
+};
+
+/**
+ * Change the read status for a notification.
+ */
+export type notificationUpdateResponse = {
+  data: NotificationUpdateOKResponse;
+  status: number;
+};
+
+export const getNotificationUpdateUrl = (notificationId: string) => {
+  return `/notifications/${notificationId}`;
+};
+
+export const notificationUpdate = async (
+  notificationId: string,
+  notificationUpdateBody: NotificationUpdateBody,
+  options?: RequestInit,
+): Promise<notificationUpdateResponse> => {
+  return fetcher<Promise<notificationUpdateResponse>>(
+    getNotificationUpdateUrl(notificationId),
+    {
+      ...options,
+      method: "PATCH",
+      body: JSON.stringify(notificationUpdateBody),
     },
   );
 };
