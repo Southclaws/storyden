@@ -9,8 +9,7 @@ import { Thread } from "src/api/openapi-schema";
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";
 import { useFeedMutations } from "@/lib/feed/mutation";
-import { useThreadMutations } from "@/lib/thread/mutation";
-import { isShareEnabled } from "@/utils/client";
+import { useShare } from "@/utils/client";
 
 import { getPermalinkForThread } from "../utils";
 
@@ -26,7 +25,7 @@ export function useThreadMenu({ thread }: Props) {
 
   const { deleteThread, revalidate } = useFeedMutations();
 
-  const isSharingEnabled = isShareEnabled();
+  const isSharingEnabled = useShare();
   const isEditingEnabled = account?.id === thread.author.id;
   const isDeletingEnabled = account?.id === thread.author.id;
 

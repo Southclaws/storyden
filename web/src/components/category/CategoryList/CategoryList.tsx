@@ -8,7 +8,6 @@ import { map } from "lodash/fp";
 import { Category } from "src/api/openapi-schema";
 import { Unready } from "src/components/site/Unready";
 
-import { AddAction } from "@/components/site/Action/Add";
 import { NavigationHeader } from "@/components/site/Navigation/ContentNavigationList/NavigationHeader";
 import { styled } from "@/styled-system/jsx";
 
@@ -36,13 +35,7 @@ export function CategoryList() {
     >
       <NavigationHeader
         href="/d"
-        controls={
-          canManageCategories && (
-            <CategoryCreateTrigger>
-              <AddAction size="xs" color="fg.subtle" title="Add a category" />
-            </CategoryCreateTrigger>
-          )
-        }
+        controls={canManageCategories && <CategoryCreateTrigger hideLabel />}
       >
         Discussion
       </NavigationHeader>

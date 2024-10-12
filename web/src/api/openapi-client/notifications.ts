@@ -9,13 +9,18 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import useSwr from "swr";
 import type { Key, SWRConfiguration } from "swr";
+import useSWRMutation from "swr/mutation";
+import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
+  BadRequestResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   NotificationListOKResponse,
   NotificationListParams,
+  NotificationUpdateBody,
+  NotificationUpdateOKResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
@@ -68,6 +73,72 @@ export const useNotificationList = <
     swrFn,
     swrOptions,
   );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Change the read status for a notification.
+ */
+export const notificationUpdate = (
+  notificationId: string,
+  notificationUpdateBody: NotificationUpdateBody,
+) => {
+  return fetcher<NotificationUpdateOKResponse>({
+    url: `/notifications/${notificationId}`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: notificationUpdateBody,
+  });
+};
+
+export const getNotificationUpdateMutationFetcher = (
+  notificationId: string,
+) => {
+  return (
+    _: string,
+    { arg }: { arg: NotificationUpdateBody },
+  ): Promise<NotificationUpdateOKResponse> => {
+    return notificationUpdate(notificationId, arg);
+  };
+};
+export const getNotificationUpdateMutationKey = (notificationId: string) =>
+  `/notifications/${notificationId}` as const;
+
+export type NotificationUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof notificationUpdate>>
+>;
+export type NotificationUpdateMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useNotificationUpdate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(
+  notificationId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof notificationUpdate>>,
+      TError,
+      string,
+      NotificationUpdateBody,
+      Awaited<ReturnType<typeof notificationUpdate>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNotificationUpdateMutationKey(notificationId);
+  const swrFn = getNotificationUpdateMutationFetcher(notificationId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
   return {
     swrKey,

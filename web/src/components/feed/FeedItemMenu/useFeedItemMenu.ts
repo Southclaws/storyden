@@ -7,7 +7,7 @@ import { PostReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { WEB_ADDRESS } from "@/config";
 import { useFeedMutations } from "@/lib/feed/mutation";
-import { isShareEnabled } from "@/utils/client";
+import { useShare } from "@/utils/client";
 
 export type Props = {
   thread: PostReference;
@@ -20,7 +20,7 @@ export function useFeedItemMenu({ thread }: Props) {
 
   const { deleteThread, revalidate } = useFeedMutations();
 
-  const shareEnabled = isShareEnabled();
+  const shareEnabled = useShare();
   const deleteEnabled = account?.admin || account?.id === thread.author.id;
 
   async function share() {

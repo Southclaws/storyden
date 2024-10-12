@@ -1,5 +1,6 @@
 import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
 
+import { ColourPickerField } from "@/components/ui/ColourPickerField";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/FormControl";
 import { FormFeedback } from "@/components/ui/form/FormFeedback";
@@ -10,7 +11,7 @@ import { HStack, VStack, styled } from "@/styled-system/jsx";
 import { Props, useCategoryEdit } from "./useCategoryEdit";
 
 export function CategoryEditModal(props: Props) {
-  const { register, onSubmit, onCancel, errors } = useCategoryEdit(props);
+  const { form, handlers } = useCategoryEdit(props);
 
   return (
     <ModalDrawer
@@ -24,29 +25,42 @@ export function CategoryEditModal(props: Props) {
         justifyContent="space-between"
         alignItems="start"
         height="full"
-        onSubmit={onSubmit}
+        onSubmit={handlers.handleSubmit}
         gap="2"
       >
         <VStack w="full">
           <FormControl>
             <FormLabel>Name</FormLabel>
-            <Input {...register("name")} type="text" />
-            <FormFeedback error={errors["name"]?.message}>
+            <Input {...form.register("name")} type="text" />
+            <FormFeedback error={form.formState.errors["name"]?.message}>
               The name of the category.
             </FormFeedback>
           </FormControl>
 
           <FormControl>
             <FormLabel>Description</FormLabel>
-            <Input {...register("description")} type="text" />
-            <FormFeedback error={errors["description"]?.message}>
+            <Input {...form.register("description")} type="text" />
+            <FormFeedback error={form.formState.errors["description"]?.message}>
               The description for the category.
+            </FormFeedback>
+          </FormControl>
+
+          <FormControl>
+            <FormLabel>Colour</FormLabel>
+            <ColourPickerField control={form.control} name="colour" />
+            <FormFeedback error={form.formState.errors["colour"]?.message}>
+              The colour for the category.
             </FormFeedback>
           </FormControl>
         </VStack>
 
         <HStack w="full" alignItems="center" justify="end" pb="3" gap="4">
-          <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handlers.handleCancel}
+          >
             Cancel
           </Button>
           <Button type="submit" size="sm">

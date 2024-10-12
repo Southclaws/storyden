@@ -14,37 +14,8 @@ import type {
   CategoryUpdateBody,
   CategoryUpdateOKResponse,
   CategoryUpdateOrderBody,
-  NotificationUpdateBody,
-  NotificationUpdateOKResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
-
-/**
- * Change the read status for a notification.
- */
-export type notificationUpdateResponse = {
-  data: NotificationUpdateOKResponse;
-  status: number;
-};
-
-export const getNotificationUpdateUrl = (notificationId: string) => {
-  return `/notifications/${notificationId}`;
-};
-
-export const notificationUpdate = async (
-  notificationId: string,
-  notificationUpdateBody: NotificationUpdateBody,
-  options?: RequestInit,
-): Promise<notificationUpdateResponse> => {
-  return fetcher<Promise<notificationUpdateResponse>>(
-    getNotificationUpdateUrl(notificationId),
-    {
-      ...options,
-      method: "PATCH",
-      body: JSON.stringify(notificationUpdateBody),
-    },
-  );
-};
 
 /**
  * Create a category for organising posts.
