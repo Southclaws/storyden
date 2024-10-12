@@ -8,32 +8,32 @@ import (
 )
 
 type Permission struct {
-	v permissionEnum
+	v string
 }
 
 var (
-	PermissionCreatePost           = Permission{permissionCreatePost}
-	PermissionReadPublishedThreads = Permission{permissionReadPublishedThreads}
-	PermissionCreateReaction       = Permission{permissionCreateReaction}
-	PermissionManagePosts          = Permission{permissionManagePosts}
-	PermissionManageCategories     = Permission{permissionManageCategories}
-	PermissionCreateInvitation     = Permission{permissionCreateInvitation}
-	PermissionReadPublishedLibrary = Permission{permissionReadPublishedLibrary}
-	PermissionManageLibrary        = Permission{permissionManageLibrary}
-	PermissionSubmitLibraryNode    = Permission{permissionSubmitLibraryNode}
-	PermissionUploadAsset          = Permission{permissionUploadAsset}
-	PermissionManageEvents         = Permission{permissionManageEvents}
-	PermissionListProfiles         = Permission{permissionListProfiles}
-	PermissionReadProfile          = Permission{permissionReadProfile}
-	PermissionCreateCollection     = Permission{permissionCreateCollection}
-	PermissionListCollections      = Permission{permissionListCollections}
-	PermissionReadCollection       = Permission{permissionReadCollection}
-	PermissionManageCollections    = Permission{permissionManageCollections}
-	PermissionCollectionSubmit     = Permission{permissionCollectionSubmit}
-	PermissionManageSettings       = Permission{permissionManageSettings}
-	PermissionManageSuspensions    = Permission{permissionManageSuspensions}
-	PermissionManageRoles          = Permission{permissionManageRoles}
-	PermissionAdministrator        = Permission{permissionAdministrator}
+	PermissionCreatePost           = Permission{`CREATE_POST`}
+	PermissionReadPublishedThreads = Permission{`READ_PUBLISHED_THREADS`}
+	PermissionCreateReaction       = Permission{`CREATE_REACTION`}
+	PermissionManagePosts          = Permission{`MANAGE_POSTS`}
+	PermissionManageCategories     = Permission{`MANAGE_CATEGORIES`}
+	PermissionCreateInvitation     = Permission{`CREATE_INVITATION`}
+	PermissionReadPublishedLibrary = Permission{`READ_PUBLISHED_LIBRARY`}
+	PermissionManageLibrary        = Permission{`MANAGE_LIBRARY`}
+	PermissionSubmitLibraryNode    = Permission{`SUBMIT_LIBRARY_NODE`}
+	PermissionUploadAsset          = Permission{`UPLOAD_ASSET`}
+	PermissionManageEvents         = Permission{`MANAGE_EVENTS`}
+	PermissionListProfiles         = Permission{`LIST_PROFILES`}
+	PermissionReadProfile          = Permission{`READ_PROFILE`}
+	PermissionCreateCollection     = Permission{`CREATE_COLLECTION`}
+	PermissionListCollections      = Permission{`LIST_COLLECTIONS`}
+	PermissionReadCollection       = Permission{`READ_COLLECTION`}
+	PermissionManageCollections    = Permission{`MANAGE_COLLECTIONS`}
+	PermissionCollectionSubmit     = Permission{`COLLECTION_SUBMIT`}
+	PermissionManageSettings       = Permission{`MANAGE_SETTINGS`}
+	PermissionManageSuspensions    = Permission{`MANAGE_SUSPENSIONS`}
+	PermissionManageRoles          = Permission{`MANAGE_ROLES`}
+	PermissionAdministrator        = Permission{`ADMINISTRATOR`}
 )
 
 func (r Permission) Format(f fmt.State, verb rune) {
@@ -73,49 +73,49 @@ func (r *Permission) Scan(__iNpUt__ any) error {
 }
 func NewPermission(__iNpUt__ string) (Permission, error) {
 	switch __iNpUt__ {
-	case string(permissionCreatePost):
+	case string(`CREATE_POST`):
 		return PermissionCreatePost, nil
-	case string(permissionReadPublishedThreads):
+	case string(`READ_PUBLISHED_THREADS`):
 		return PermissionReadPublishedThreads, nil
-	case string(permissionCreateReaction):
+	case string(`CREATE_REACTION`):
 		return PermissionCreateReaction, nil
-	case string(permissionManagePosts):
+	case string(`MANAGE_POSTS`):
 		return PermissionManagePosts, nil
-	case string(permissionManageCategories):
+	case string(`MANAGE_CATEGORIES`):
 		return PermissionManageCategories, nil
-	case string(permissionCreateInvitation):
+	case string(`CREATE_INVITATION`):
 		return PermissionCreateInvitation, nil
-	case string(permissionReadPublishedLibrary):
+	case string(`READ_PUBLISHED_LIBRARY`):
 		return PermissionReadPublishedLibrary, nil
-	case string(permissionManageLibrary):
+	case string(`MANAGE_LIBRARY`):
 		return PermissionManageLibrary, nil
-	case string(permissionSubmitLibraryNode):
+	case string(`SUBMIT_LIBRARY_NODE`):
 		return PermissionSubmitLibraryNode, nil
-	case string(permissionUploadAsset):
+	case string(`UPLOAD_ASSET`):
 		return PermissionUploadAsset, nil
-	case string(permissionManageEvents):
+	case string(`MANAGE_EVENTS`):
 		return PermissionManageEvents, nil
-	case string(permissionListProfiles):
+	case string(`LIST_PROFILES`):
 		return PermissionListProfiles, nil
-	case string(permissionReadProfile):
+	case string(`READ_PROFILE`):
 		return PermissionReadProfile, nil
-	case string(permissionCreateCollection):
+	case string(`CREATE_COLLECTION`):
 		return PermissionCreateCollection, nil
-	case string(permissionListCollections):
+	case string(`LIST_COLLECTIONS`):
 		return PermissionListCollections, nil
-	case string(permissionReadCollection):
+	case string(`READ_COLLECTION`):
 		return PermissionReadCollection, nil
-	case string(permissionManageCollections):
+	case string(`MANAGE_COLLECTIONS`):
 		return PermissionManageCollections, nil
-	case string(permissionCollectionSubmit):
+	case string(`COLLECTION_SUBMIT`):
 		return PermissionCollectionSubmit, nil
-	case string(permissionManageSettings):
+	case string(`MANAGE_SETTINGS`):
 		return PermissionManageSettings, nil
-	case string(permissionManageSuspensions):
+	case string(`MANAGE_SUSPENSIONS`):
 		return PermissionManageSuspensions, nil
-	case string(permissionManageRoles):
+	case string(`MANAGE_ROLES`):
 		return PermissionManageRoles, nil
-	case string(permissionAdministrator):
+	case string(`ADMINISTRATOR`):
 		return PermissionAdministrator, nil
 	default:
 		return Permission{}, fmt.Errorf("invalid value for type 'Permission': '%s'", __iNpUt__)
