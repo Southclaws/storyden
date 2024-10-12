@@ -89,7 +89,7 @@ body {
   /* BLOCK ELEMENTS */
 
   p {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
   }
 
   a {
@@ -101,6 +101,10 @@ body {
   }
   a:visited {
     color: var(--colors-blue-11);
+  }
+
+  img {
+    margin-bottom: 0.5rem;
   }
 
   h1,
