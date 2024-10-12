@@ -117,12 +117,6 @@ export function useLibraryMutation(params?: NodeListParams) {
 
     const slugChanged = newNode.slug !== undefined && newNode.slug !== slug;
 
-    // Handle slug changes properly by redirecting to the new path.
-    if (slugChanged && newNode.slug /* Needed for TS narrowing */) {
-      const newPath = replaceLibraryPath(libraryPath, slug, newNode.slug);
-      router.push(newPath);
-    }
-
     await mutate(nodeListAllKeyFn, mutator, { revalidate: false });
 
     await nodeUpdate(slug, {
@@ -133,6 +127,12 @@ export function useLibraryMutation(params?: NodeListParams) {
       content: newNode.content,
       meta: newNode.meta,
     });
+
+    // Handle slug changes properly by redirecting to the new path.
+    if (slugChanged && newNode.slug /* Needed for TS narrowing */) {
+      const newPath = replaceLibraryPath(libraryPath, slug, newNode.slug);
+      router.push(newPath);
+    }
 
     return slugChanged;
   };
@@ -174,14 +174,14 @@ export function useLibraryMutation(params?: NodeListParams) {
 
     await mutate(nodeListAllKeyFn, mutator, { revalidate: false });
 
+    await nodeDelete(slug, { target_node: newParent });
+
     if (newParent) {
       const newPath = replaceLibraryPath(libraryPath, slug, newParent);
       router.push(newPath);
     } else {
       router.push("/l");
     }
-
-    await nodeDelete(slug, { target_node: newParent });
   };
 
   const revalidate = async (data?: MutatorCallback<NodeListOKResponse>) => {
