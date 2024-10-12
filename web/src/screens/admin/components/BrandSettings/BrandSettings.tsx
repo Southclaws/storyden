@@ -2,13 +2,15 @@ import { useGetInfo } from "src/api/openapi-client/misc";
 import { ColourField } from "src/components/form/ColourInput/ColourInput";
 import { Unready } from "src/components/site/Unready";
 
+import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
+import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/FormControl";
 import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
-import { Box, HStack, Stack, styled } from "@/styled-system/jsx";
+import { Box, CardBox, HStack, Stack, styled } from "@/styled-system/jsx";
 
 import { SettingsSection } from "../SettingsSection/SettingsSection";
 
@@ -19,6 +21,7 @@ function BrandSettingsForm(props: Props) {
   const {
     register,
     control,
+    formState,
     onSubmit,
     currentIcon,
     onSaveIcon,
@@ -72,6 +75,24 @@ function BrandSettingsForm(props: Props) {
           <FormHelperText>
             Describe your community with a few words here. This will be used for
             Google indexing, social previews and the PWA manifest.
+          </FormHelperText>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>About</FormLabel>
+          <CardBox>
+            <ContentFormField
+              control={control}
+              name="content"
+              // NOTE: Does not update if sidebar is changed. Doesn't matter...
+              initialValue={props.content}
+              placeholder="About your community..."
+            />
+            <FormErrorText>{formState.errors.content?.message}</FormErrorText>
+          </CardBox>
+          <FormHelperText>
+            You can write a longer description about your community here. You
+            can use rich text formatting and include links and images.
           </FormHelperText>
         </FormControl>
 
