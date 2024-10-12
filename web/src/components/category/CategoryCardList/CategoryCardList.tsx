@@ -5,6 +5,7 @@ import { Heading } from "@/components/ui/heading";
 import { CardGrid } from "@/components/ui/rich-card";
 import { categoryColourCSS } from "@/lib/category/colours";
 import { CardBox, HStack, LStack, styled } from "@/styled-system/jsx";
+import { linkOverlay } from "@/styled-system/patterns";
 
 import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
 import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
@@ -36,6 +37,7 @@ export function CategoryCard(props: Category) {
 
   return (
     <CardBox
+      position="relative"
       style={cssProps}
       borderColor="colorPalette.muted"
       borderLeftWidth="thick"
@@ -45,7 +47,7 @@ export function CategoryCard(props: Category) {
     >
       <LStack>
         <HStack w="full" justify="space-between" alignItems="start">
-          <Link href={`/d/${props.slug}`}>
+          <Link className={linkOverlay()} href={`/d/${props.slug}`}>
             <Heading>{props.name}</Heading>
           </Link>
 
