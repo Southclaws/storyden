@@ -52,7 +52,7 @@ export function useSiteContextPane({ session, info }: Props) {
 
   const { revalidate, updateSettings } = useInfoMutation(info);
 
-  const { data, error, isValidating } = useGetInfo({
+  const { data, error } = useGetInfo({
     swr: { fallbackData: info },
   });
   if (!data) {
