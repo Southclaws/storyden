@@ -2,12 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import slugify from "@sindresorhus/slugify";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useEffect, useMemo, useRef } from "react";
-import {
-  ExtendedSettings,
-  FixedCropperRef,
-  FixedCropperSettings,
-} from "react-advanced-cropper";
-import { AbstractCropperRef } from "react-advanced-cropper/dist/components/AbstractCropper";
+import { FixedCropperRef } from "react-advanced-cropper";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
 import { z } from "zod";
@@ -22,7 +17,7 @@ import {
 import { useSession } from "src/auth";
 
 import { handle } from "@/api/client";
-import { assetGet, assetUpload } from "@/api/openapi-client/assets";
+import { assetUpload } from "@/api/openapi-client/assets";
 import { useLibraryMutation } from "@/lib/library/library";
 import {
   CoverImage,
@@ -33,6 +28,9 @@ import { getAssetURL } from "@/utils/asset";
 import { hasPermissionOr } from "@/utils/permissions";
 
 import { useLibraryPath } from "../useLibraryPath";
+
+export const CROP_STENCIL_WIDTH = 1536;
+export const CROP_STENCIL_HEIGHT = 384;
 
 const CoverImageFormSchema = z.union([
   CoverImageSchema,

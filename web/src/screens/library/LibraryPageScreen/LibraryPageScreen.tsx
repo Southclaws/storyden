@@ -24,7 +24,12 @@ import "react-advanced-cropper/dist/style.css";
 
 import { ContentInput } from "./ContentInput";
 import { TitleInput } from "./TitleInput";
-import { Props, useLibraryPageScreen } from "./useLibraryPageScreen";
+import {
+  CROP_STENCIL_HEIGHT,
+  CROP_STENCIL_WIDTH,
+  Props,
+  useLibraryPageScreen,
+} from "./useLibraryPageScreen";
 
 export function LibraryPageScreen(props: Props) {
   const { data, error } = useNodeGet(props.node.slug, {
@@ -141,8 +146,8 @@ export function LibraryPage(props: Props) {
                   resizable: false,
                 }}
                 stencilSize={{
-                  width: 1024,
-                  height: 256,
+                  width: CROP_STENCIL_WIDTH,
+                  height: CROP_STENCIL_HEIGHT,
                 }}
                 imageRestriction={ImageRestriction.stencil}
                 src={primaryAssetEditingURL}
@@ -161,8 +166,8 @@ export function LibraryPage(props: Props) {
                   })}
                   src={primaryAssetURL}
                   alt=""
-                  width="1920"
-                  height="1080"
+                  width={CROP_STENCIL_WIDTH}
+                  height={CROP_STENCIL_HEIGHT}
                 />
               </Box>
             )
