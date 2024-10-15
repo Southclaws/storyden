@@ -27,14 +27,14 @@ export function LibraryPageImportFromURL(
         return (
           <LStack gap="0">
             <HStack w="full" justify="space-between">
-              <Input
+              {/* <Input
                 w="full"
                 size="sm"
                 variant="ghost"
                 color="fg.muted"
                 placeholder="External URL..."
                 {...form.field}
-              />
+              /> */}
 
               {/* <HStack>
                 <InfoTip title="Generating a page from a URL">
