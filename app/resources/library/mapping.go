@@ -53,24 +53,29 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		return nil, err
 	}
 
+	primaryImage := opt.Map(opt.NewPtr(c.Edges.PrimaryImage), func(e ent.Asset) asset.Asset {
+		return *asset.FromModel(&e)
+	})
+
 	// This edge is optional anyway, so if not loaded, nothing bad happens.
 	link := opt.Map(opt.NewPtr(c.Edges.Link), func(in ent.Link) link_ref.LinkRef {
 		return *link_ref.Map(&in)
 	})
 
 	return &Node{
-		Mark:        NewMark(c.ID, c.Slug),
-		CreatedAt:   c.CreatedAt,
-		UpdatedAt:   c.UpdatedAt,
-		Name:        c.Name,
-		Assets:      assets,
-		WebLink:     link,
-		Content:     richContent,
-		Description: opt.NewPtr(c.Description),
-		Owner:       *pro,
-		Parent:      parent,
-		Nodes:       nodes,
-		Visibility:  visibility,
-		Metadata:    c.Metadata,
+		Mark:         NewMark(c.ID, c.Slug),
+		CreatedAt:    c.CreatedAt,
+		UpdatedAt:    c.UpdatedAt,
+		Name:         c.Name,
+		Assets:       assets,
+		WebLink:      link,
+		Content:      richContent,
+		Description:  opt.NewPtr(c.Description),
+		PrimaryImage: primaryImage,
+		Owner:        *pro,
+		Parent:       parent,
+		Nodes:        nodes,
+		Visibility:   visibility,
+		Metadata:     c.Metadata,
 	}, nil
 }

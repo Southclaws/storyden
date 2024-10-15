@@ -39,6 +39,27 @@ func (d *database) Add(ctx context.Context,
 	return FromModel(asset), nil
 }
 
+func (d *database) AddVersion(ctx context.Context,
+	accountID xid.ID,
+	parent AssetID,
+	filename Filename,
+	size int,
+) (*Asset, error) {
+	asset, err := d.db.Asset.
+		Create().
+		SetID(filename.GetID()).
+		SetParentAssetID(parent).
+		SetFilename(filename.name).
+		SetSize(size).
+		SetAccountID(xid.ID(accountID)).
+		Save(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return FromModel(asset), nil
+}
+
 func (d *database) Get(ctx context.Context, id Filename) (*Asset, error) {
 	asset, err := d.db.Asset.Query().Where(
 		asset.Filename(id.name),

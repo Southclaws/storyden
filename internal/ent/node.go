@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/rs/xid"
@@ -39,6 +40,8 @@ type Node struct {
 	ParentNodeID xid.ID `json:"parent_node_id,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
+	// PrimaryAssetID holds the value of the "primary_asset_id" field.
+	PrimaryAssetID *xid.ID `json:"primary_asset_id,omitempty"`
 	// LinkID holds the value of the "link_id" field.
 	LinkID xid.ID `json:"link_id,omitempty"`
 	// Visibility holds the value of the "visibility" field.
@@ -59,6 +62,8 @@ type NodeEdges struct {
 	Parent *Node `json:"parent,omitempty"`
 	// Nodes holds the value of the nodes edge.
 	Nodes []*Node `json:"nodes,omitempty"`
+	// PrimaryImage holds the value of the primary_image edge.
+	PrimaryImage *Asset `json:"primary_image,omitempty"`
 	// Assets holds the value of the assets edge.
 	Assets []*Asset `json:"assets,omitempty"`
 	// Tags holds the value of the tags edge.
@@ -73,7 +78,7 @@ type NodeEdges struct {
 	CollectionNodes []*CollectionNode `json:"collection_nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [9]bool
+	loadedTypes [10]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -107,10 +112,21 @@ func (e NodeEdges) NodesOrErr() ([]*Node, error) {
 	return nil, &NotLoadedError{edge: "nodes"}
 }
 
+// PrimaryImageOrErr returns the PrimaryImage value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e NodeEdges) PrimaryImageOrErr() (*Asset, error) {
+	if e.PrimaryImage != nil {
+		return e.PrimaryImage, nil
+	} else if e.loadedTypes[3] {
+		return nil, &NotFoundError{label: asset.Label}
+	}
+	return nil, &NotLoadedError{edge: "primary_image"}
+}
+
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -119,7 +135,7 @@ func (e NodeEdges) AssetsOrErr() ([]*Asset, error) {
 // TagsOrErr returns the Tags value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) TagsOrErr() ([]*Tag, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[5] {
 		return e.Tags, nil
 	}
 	return nil, &NotLoadedError{edge: "tags"}
@@ -130,7 +146,7 @@ func (e NodeEdges) TagsOrErr() ([]*Tag, error) {
 func (e NodeEdges) LinkOrErr() (*Link, error) {
 	if e.Link != nil {
 		return e.Link, nil
-	} else if e.loadedTypes[5] {
+	} else if e.loadedTypes[6] {
 		return nil, &NotFoundError{label: link.Label}
 	}
 	return nil, &NotLoadedError{edge: "link"}
@@ -139,7 +155,7 @@ func (e NodeEdges) LinkOrErr() (*Link, error) {
 // ContentLinksOrErr returns the ContentLinks value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) ContentLinksOrErr() ([]*Link, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[7] {
 		return e.ContentLinks, nil
 	}
 	return nil, &NotLoadedError{edge: "content_links"}
@@ -148,7 +164,7 @@ func (e NodeEdges) ContentLinksOrErr() ([]*Link, error) {
 // CollectionsOrErr returns the Collections value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) CollectionsOrErr() ([]*Collection, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[8] {
 		return e.Collections, nil
 	}
 	return nil, &NotLoadedError{edge: "collections"}
@@ -157,7 +173,7 @@ func (e NodeEdges) CollectionsOrErr() ([]*Collection, error) {
 // CollectionNodesOrErr returns the CollectionNodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) CollectionNodesOrErr() ([]*CollectionNode, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[9] {
 		return e.CollectionNodes, nil
 	}
 	return nil, &NotLoadedError{edge: "collection_nodes"}
@@ -168,6 +184,8 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case node.FieldPrimaryAssetID:
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case node.FieldMetadata:
 			values[i] = new([]byte)
 		case node.FieldName, node.FieldSlug, node.FieldDescription, node.FieldContent, node.FieldVisibility:
@@ -254,6 +272,13 @@ func (n *Node) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				n.AccountID = *value
 			}
+		case node.FieldPrimaryAssetID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field primary_asset_id", values[i])
+			} else if value.Valid {
+				n.PrimaryAssetID = new(xid.ID)
+				*n.PrimaryAssetID = *value.S.(*xid.ID)
+			}
 		case node.FieldLinkID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field link_id", values[i])
@@ -300,6 +325,11 @@ func (n *Node) QueryParent() *NodeQuery {
 // QueryNodes queries the "nodes" edge of the Node entity.
 func (n *Node) QueryNodes() *NodeQuery {
 	return NewNodeClient(n.config).QueryNodes(n)
+}
+
+// QueryPrimaryImage queries the "primary_image" edge of the Node entity.
+func (n *Node) QueryPrimaryImage() *AssetQuery {
+	return NewNodeClient(n.config).QueryPrimaryImage(n)
 }
 
 // QueryAssets queries the "assets" edge of the Node entity.
@@ -387,6 +417,11 @@ func (n *Node) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", n.AccountID))
+	builder.WriteString(", ")
+	if v := n.PrimaryAssetID; v != nil {
+		builder.WriteString("primary_asset_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("link_id=")
 	builder.WriteString(fmt.Sprintf("%v", n.LinkID))

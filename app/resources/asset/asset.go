@@ -19,6 +19,13 @@ type Repository interface {
 		size int,
 	) (*Asset, error)
 
+	AddVersion(ctx context.Context,
+		owner xid.ID,
+		parent AssetID,
+		filename Filename,
+		size int,
+	) (*Asset, error)
+
 	Get(ctx context.Context, id Filename) (*Asset, error)
 	GetByID(ctx context.Context, id AssetID) (*Asset, error)
 
@@ -36,9 +43,12 @@ type Asset struct {
 	Name     Filename
 	Size     int
 	Metadata Metadata
+	Parent   opt.Optional[Asset]
 }
 
 func FromModel(a *ent.Asset) *Asset {
+	parent := opt.NewPtrMap(a.Edges.Parent, func(a ent.Asset) Asset { return *FromModel(&a) })
+
 	return &Asset{
 		ID: AssetID(a.ID),
 		Name: Filename{
@@ -48,6 +58,7 @@ func FromModel(a *ent.Asset) *Asset {
 		},
 		Size:     a.Size,
 		Metadata: a.Metadata,
+		Parent:   parent,
 	}
 }
 

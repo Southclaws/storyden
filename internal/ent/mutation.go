@@ -3762,6 +3762,11 @@ type AssetMutation struct {
 	clearedlinks  bool
 	owner         *xid.ID
 	clearedowner  bool
+	parent        *xid.ID
+	clearedparent bool
+	assets        map[xid.ID]struct{}
+	removedassets map[xid.ID]struct{}
+	clearedassets bool
 	event         map[xid.ID]struct{}
 	removedevent  map[xid.ID]struct{}
 	clearedevent  bool
@@ -4123,6 +4128,55 @@ func (m *AssetMutation) ResetAccountID() {
 	m.owner = nil
 }
 
+// SetParentAssetID sets the "parent_asset_id" field.
+func (m *AssetMutation) SetParentAssetID(x xid.ID) {
+	m.parent = &x
+}
+
+// ParentAssetID returns the value of the "parent_asset_id" field in the mutation.
+func (m *AssetMutation) ParentAssetID() (r xid.ID, exists bool) {
+	v := m.parent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParentAssetID returns the old "parent_asset_id" field's value of the Asset entity.
+// If the Asset object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AssetMutation) OldParentAssetID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParentAssetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParentAssetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParentAssetID: %w", err)
+	}
+	return oldValue.ParentAssetID, nil
+}
+
+// ClearParentAssetID clears the value of the "parent_asset_id" field.
+func (m *AssetMutation) ClearParentAssetID() {
+	m.parent = nil
+	m.clearedFields[asset.FieldParentAssetID] = struct{}{}
+}
+
+// ParentAssetIDCleared returns if the "parent_asset_id" field was cleared in this mutation.
+func (m *AssetMutation) ParentAssetIDCleared() bool {
+	_, ok := m.clearedFields[asset.FieldParentAssetID]
+	return ok
+}
+
+// ResetParentAssetID resets all changes to the "parent_asset_id" field.
+func (m *AssetMutation) ResetParentAssetID() {
+	m.parent = nil
+	delete(m.clearedFields, asset.FieldParentAssetID)
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
 func (m *AssetMutation) AddPostIDs(ids ...xid.ID) {
 	if m.posts == nil {
@@ -4325,6 +4379,100 @@ func (m *AssetMutation) ResetOwner() {
 	m.clearedowner = false
 }
 
+// SetParentID sets the "parent" edge to the Asset entity by id.
+func (m *AssetMutation) SetParentID(id xid.ID) {
+	m.parent = &id
+}
+
+// ClearParent clears the "parent" edge to the Asset entity.
+func (m *AssetMutation) ClearParent() {
+	m.clearedparent = true
+	m.clearedFields[asset.FieldParentAssetID] = struct{}{}
+}
+
+// ParentCleared reports if the "parent" edge to the Asset entity was cleared.
+func (m *AssetMutation) ParentCleared() bool {
+	return m.ParentAssetIDCleared() || m.clearedparent
+}
+
+// ParentID returns the "parent" edge ID in the mutation.
+func (m *AssetMutation) ParentID() (id xid.ID, exists bool) {
+	if m.parent != nil {
+		return *m.parent, true
+	}
+	return
+}
+
+// ParentIDs returns the "parent" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ParentID instead. It exists only for internal usage by the builders.
+func (m *AssetMutation) ParentIDs() (ids []xid.ID) {
+	if id := m.parent; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetParent resets all changes to the "parent" edge.
+func (m *AssetMutation) ResetParent() {
+	m.parent = nil
+	m.clearedparent = false
+}
+
+// AddAssetIDs adds the "assets" edge to the Asset entity by ids.
+func (m *AssetMutation) AddAssetIDs(ids ...xid.ID) {
+	if m.assets == nil {
+		m.assets = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.assets[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAssets clears the "assets" edge to the Asset entity.
+func (m *AssetMutation) ClearAssets() {
+	m.clearedassets = true
+}
+
+// AssetsCleared reports if the "assets" edge to the Asset entity was cleared.
+func (m *AssetMutation) AssetsCleared() bool {
+	return m.clearedassets
+}
+
+// RemoveAssetIDs removes the "assets" edge to the Asset entity by IDs.
+func (m *AssetMutation) RemoveAssetIDs(ids ...xid.ID) {
+	if m.removedassets == nil {
+		m.removedassets = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.assets, ids[i])
+		m.removedassets[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAssets returns the removed IDs of the "assets" edge to the Asset entity.
+func (m *AssetMutation) RemovedAssetsIDs() (ids []xid.ID) {
+	for id := range m.removedassets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AssetsIDs returns the "assets" edge IDs in the mutation.
+func (m *AssetMutation) AssetsIDs() (ids []xid.ID) {
+	for id := range m.assets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAssets resets all changes to the "assets" edge.
+func (m *AssetMutation) ResetAssets() {
+	m.assets = nil
+	m.clearedassets = false
+	m.removedassets = nil
+}
+
 // AddEventIDs adds the "event" edge to the Event entity by ids.
 func (m *AssetMutation) AddEventIDs(ids ...xid.ID) {
 	if m.event == nil {
@@ -4413,7 +4561,7 @@ func (m *AssetMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AssetMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, asset.FieldCreatedAt)
 	}
@@ -4431,6 +4579,9 @@ func (m *AssetMutation) Fields() []string {
 	}
 	if m.owner != nil {
 		fields = append(fields, asset.FieldAccountID)
+	}
+	if m.parent != nil {
+		fields = append(fields, asset.FieldParentAssetID)
 	}
 	return fields
 }
@@ -4452,6 +4603,8 @@ func (m *AssetMutation) Field(name string) (ent.Value, bool) {
 		return m.Metadata()
 	case asset.FieldAccountID:
 		return m.AccountID()
+	case asset.FieldParentAssetID:
+		return m.ParentAssetID()
 	}
 	return nil, false
 }
@@ -4473,6 +4626,8 @@ func (m *AssetMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldMetadata(ctx)
 	case asset.FieldAccountID:
 		return m.OldAccountID(ctx)
+	case asset.FieldParentAssetID:
+		return m.OldParentAssetID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Asset field %s", name)
 }
@@ -4524,6 +4679,13 @@ func (m *AssetMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAccountID(v)
 		return nil
+	case asset.FieldParentAssetID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParentAssetID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Asset field %s", name)
 }
@@ -4572,6 +4734,9 @@ func (m *AssetMutation) ClearedFields() []string {
 	if m.FieldCleared(asset.FieldMetadata) {
 		fields = append(fields, asset.FieldMetadata)
 	}
+	if m.FieldCleared(asset.FieldParentAssetID) {
+		fields = append(fields, asset.FieldParentAssetID)
+	}
 	return fields
 }
 
@@ -4588,6 +4753,9 @@ func (m *AssetMutation) ClearField(name string) error {
 	switch name {
 	case asset.FieldMetadata:
 		m.ClearMetadata()
+		return nil
+	case asset.FieldParentAssetID:
+		m.ClearParentAssetID()
 		return nil
 	}
 	return fmt.Errorf("unknown Asset nullable field %s", name)
@@ -4615,13 +4783,16 @@ func (m *AssetMutation) ResetField(name string) error {
 	case asset.FieldAccountID:
 		m.ResetAccountID()
 		return nil
+	case asset.FieldParentAssetID:
+		m.ResetParentAssetID()
+		return nil
 	}
 	return fmt.Errorf("unknown Asset field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AssetMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
 	if m.posts != nil {
 		edges = append(edges, asset.EdgePosts)
 	}
@@ -4633,6 +4804,12 @@ func (m *AssetMutation) AddedEdges() []string {
 	}
 	if m.owner != nil {
 		edges = append(edges, asset.EdgeOwner)
+	}
+	if m.parent != nil {
+		edges = append(edges, asset.EdgeParent)
+	}
+	if m.assets != nil {
+		edges = append(edges, asset.EdgeAssets)
 	}
 	if m.event != nil {
 		edges = append(edges, asset.EdgeEvent)
@@ -4666,6 +4843,16 @@ func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 		if id := m.owner; id != nil {
 			return []ent.Value{*id}
 		}
+	case asset.EdgeParent:
+		if id := m.parent; id != nil {
+			return []ent.Value{*id}
+		}
+	case asset.EdgeAssets:
+		ids := make([]ent.Value, 0, len(m.assets))
+		for id := range m.assets {
+			ids = append(ids, id)
+		}
+		return ids
 	case asset.EdgeEvent:
 		ids := make([]ent.Value, 0, len(m.event))
 		for id := range m.event {
@@ -4678,7 +4865,7 @@ func (m *AssetMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AssetMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
 	if m.removedposts != nil {
 		edges = append(edges, asset.EdgePosts)
 	}
@@ -4687,6 +4874,9 @@ func (m *AssetMutation) RemovedEdges() []string {
 	}
 	if m.removedlinks != nil {
 		edges = append(edges, asset.EdgeLinks)
+	}
+	if m.removedassets != nil {
+		edges = append(edges, asset.EdgeAssets)
 	}
 	if m.removedevent != nil {
 		edges = append(edges, asset.EdgeEvent)
@@ -4716,6 +4906,12 @@ func (m *AssetMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case asset.EdgeAssets:
+		ids := make([]ent.Value, 0, len(m.removedassets))
+		for id := range m.removedassets {
+			ids = append(ids, id)
+		}
+		return ids
 	case asset.EdgeEvent:
 		ids := make([]ent.Value, 0, len(m.removedevent))
 		for id := range m.removedevent {
@@ -4728,7 +4924,7 @@ func (m *AssetMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AssetMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
 	if m.clearedposts {
 		edges = append(edges, asset.EdgePosts)
 	}
@@ -4740,6 +4936,12 @@ func (m *AssetMutation) ClearedEdges() []string {
 	}
 	if m.clearedowner {
 		edges = append(edges, asset.EdgeOwner)
+	}
+	if m.clearedparent {
+		edges = append(edges, asset.EdgeParent)
+	}
+	if m.clearedassets {
+		edges = append(edges, asset.EdgeAssets)
 	}
 	if m.clearedevent {
 		edges = append(edges, asset.EdgeEvent)
@@ -4759,6 +4961,10 @@ func (m *AssetMutation) EdgeCleared(name string) bool {
 		return m.clearedlinks
 	case asset.EdgeOwner:
 		return m.clearedowner
+	case asset.EdgeParent:
+		return m.clearedparent
+	case asset.EdgeAssets:
+		return m.clearedassets
 	case asset.EdgeEvent:
 		return m.clearedevent
 	}
@@ -4771,6 +4977,9 @@ func (m *AssetMutation) ClearEdge(name string) error {
 	switch name {
 	case asset.EdgeOwner:
 		m.ClearOwner()
+		return nil
+	case asset.EdgeParent:
+		m.ClearParent()
 		return nil
 	}
 	return fmt.Errorf("unknown Asset unique edge %s", name)
@@ -4791,6 +5000,12 @@ func (m *AssetMutation) ResetEdge(name string) error {
 		return nil
 	case asset.EdgeOwner:
 		m.ResetOwner()
+		return nil
+	case asset.EdgeParent:
+		m.ResetParent()
+		return nil
+	case asset.EdgeAssets:
+		m.ResetAssets()
 		return nil
 	case asset.EdgeEvent:
 		m.ResetEvent()
@@ -14491,6 +14706,8 @@ type NodeMutation struct {
 	nodes                map[xid.ID]struct{}
 	removednodes         map[xid.ID]struct{}
 	clearednodes         bool
+	primary_image        *xid.ID
+	clearedprimary_image bool
 	assets               map[xid.ID]struct{}
 	removedassets        map[xid.ID]struct{}
 	clearedassets        bool
@@ -14990,6 +15207,55 @@ func (m *NodeMutation) ResetAccountID() {
 	m.owner = nil
 }
 
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (m *NodeMutation) SetPrimaryAssetID(x xid.ID) {
+	m.primary_image = &x
+}
+
+// PrimaryAssetID returns the value of the "primary_asset_id" field in the mutation.
+func (m *NodeMutation) PrimaryAssetID() (r xid.ID, exists bool) {
+	v := m.primary_image
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrimaryAssetID returns the old "primary_asset_id" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldPrimaryAssetID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrimaryAssetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrimaryAssetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrimaryAssetID: %w", err)
+	}
+	return oldValue.PrimaryAssetID, nil
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (m *NodeMutation) ClearPrimaryAssetID() {
+	m.primary_image = nil
+	m.clearedFields[node.FieldPrimaryAssetID] = struct{}{}
+}
+
+// PrimaryAssetIDCleared returns if the "primary_asset_id" field was cleared in this mutation.
+func (m *NodeMutation) PrimaryAssetIDCleared() bool {
+	_, ok := m.clearedFields[node.FieldPrimaryAssetID]
+	return ok
+}
+
+// ResetPrimaryAssetID resets all changes to the "primary_asset_id" field.
+func (m *NodeMutation) ResetPrimaryAssetID() {
+	m.primary_image = nil
+	delete(m.clearedFields, node.FieldPrimaryAssetID)
+}
+
 // SetLinkID sets the "link_id" field.
 func (m *NodeMutation) SetLinkID(x xid.ID) {
 	m.link = &x
@@ -15256,6 +15522,46 @@ func (m *NodeMutation) ResetNodes() {
 	m.nodes = nil
 	m.clearednodes = false
 	m.removednodes = nil
+}
+
+// SetPrimaryImageID sets the "primary_image" edge to the Asset entity by id.
+func (m *NodeMutation) SetPrimaryImageID(id xid.ID) {
+	m.primary_image = &id
+}
+
+// ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
+func (m *NodeMutation) ClearPrimaryImage() {
+	m.clearedprimary_image = true
+	m.clearedFields[node.FieldPrimaryAssetID] = struct{}{}
+}
+
+// PrimaryImageCleared reports if the "primary_image" edge to the Asset entity was cleared.
+func (m *NodeMutation) PrimaryImageCleared() bool {
+	return m.PrimaryAssetIDCleared() || m.clearedprimary_image
+}
+
+// PrimaryImageID returns the "primary_image" edge ID in the mutation.
+func (m *NodeMutation) PrimaryImageID() (id xid.ID, exists bool) {
+	if m.primary_image != nil {
+		return *m.primary_image, true
+	}
+	return
+}
+
+// PrimaryImageIDs returns the "primary_image" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PrimaryImageID instead. It exists only for internal usage by the builders.
+func (m *NodeMutation) PrimaryImageIDs() (ids []xid.ID) {
+	if id := m.primary_image; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPrimaryImage resets all changes to the "primary_image" edge.
+func (m *NodeMutation) ResetPrimaryImage() {
+	m.primary_image = nil
+	m.clearedprimary_image = false
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by ids.
@@ -15535,7 +15841,7 @@ func (m *NodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NodeMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.created_at != nil {
 		fields = append(fields, node.FieldCreatedAt)
 	}
@@ -15562,6 +15868,9 @@ func (m *NodeMutation) Fields() []string {
 	}
 	if m.owner != nil {
 		fields = append(fields, node.FieldAccountID)
+	}
+	if m.primary_image != nil {
+		fields = append(fields, node.FieldPrimaryAssetID)
 	}
 	if m.link != nil {
 		fields = append(fields, node.FieldLinkID)
@@ -15598,6 +15907,8 @@ func (m *NodeMutation) Field(name string) (ent.Value, bool) {
 		return m.ParentNodeID()
 	case node.FieldAccountID:
 		return m.AccountID()
+	case node.FieldPrimaryAssetID:
+		return m.PrimaryAssetID()
 	case node.FieldLinkID:
 		return m.LinkID()
 	case node.FieldVisibility:
@@ -15631,6 +15942,8 @@ func (m *NodeMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldParentNodeID(ctx)
 	case node.FieldAccountID:
 		return m.OldAccountID(ctx)
+	case node.FieldPrimaryAssetID:
+		return m.OldPrimaryAssetID(ctx)
 	case node.FieldLinkID:
 		return m.OldLinkID(ctx)
 	case node.FieldVisibility:
@@ -15709,6 +16022,13 @@ func (m *NodeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAccountID(v)
 		return nil
+	case node.FieldPrimaryAssetID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrimaryAssetID(v)
+		return nil
 	case node.FieldLinkID:
 		v, ok := value.(xid.ID)
 		if !ok {
@@ -15772,6 +16092,9 @@ func (m *NodeMutation) ClearedFields() []string {
 	if m.FieldCleared(node.FieldParentNodeID) {
 		fields = append(fields, node.FieldParentNodeID)
 	}
+	if m.FieldCleared(node.FieldPrimaryAssetID) {
+		fields = append(fields, node.FieldPrimaryAssetID)
+	}
 	if m.FieldCleared(node.FieldLinkID) {
 		fields = append(fields, node.FieldLinkID)
 	}
@@ -15803,6 +16126,9 @@ func (m *NodeMutation) ClearField(name string) error {
 		return nil
 	case node.FieldParentNodeID:
 		m.ClearParentNodeID()
+		return nil
+	case node.FieldPrimaryAssetID:
+		m.ClearPrimaryAssetID()
 		return nil
 	case node.FieldLinkID:
 		m.ClearLinkID()
@@ -15845,6 +16171,9 @@ func (m *NodeMutation) ResetField(name string) error {
 	case node.FieldAccountID:
 		m.ResetAccountID()
 		return nil
+	case node.FieldPrimaryAssetID:
+		m.ResetPrimaryAssetID()
+		return nil
 	case node.FieldLinkID:
 		m.ResetLinkID()
 		return nil
@@ -15860,7 +16189,7 @@ func (m *NodeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *NodeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 9)
 	if m.owner != nil {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -15869,6 +16198,9 @@ func (m *NodeMutation) AddedEdges() []string {
 	}
 	if m.nodes != nil {
 		edges = append(edges, node.EdgeNodes)
+	}
+	if m.primary_image != nil {
+		edges = append(edges, node.EdgePrimaryImage)
 	}
 	if m.assets != nil {
 		edges = append(edges, node.EdgeAssets)
@@ -15906,6 +16238,10 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case node.EdgePrimaryImage:
+		if id := m.primary_image; id != nil {
+			return []ent.Value{*id}
+		}
 	case node.EdgeAssets:
 		ids := make([]ent.Value, 0, len(m.assets))
 		for id := range m.assets {
@@ -15940,7 +16276,7 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NodeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 9)
 	if m.removednodes != nil {
 		edges = append(edges, node.EdgeNodes)
 	}
@@ -15999,7 +16335,7 @@ func (m *NodeMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *NodeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 9)
 	if m.clearedowner {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -16008,6 +16344,9 @@ func (m *NodeMutation) ClearedEdges() []string {
 	}
 	if m.clearednodes {
 		edges = append(edges, node.EdgeNodes)
+	}
+	if m.clearedprimary_image {
+		edges = append(edges, node.EdgePrimaryImage)
 	}
 	if m.clearedassets {
 		edges = append(edges, node.EdgeAssets)
@@ -16037,6 +16376,8 @@ func (m *NodeMutation) EdgeCleared(name string) bool {
 		return m.clearedparent
 	case node.EdgeNodes:
 		return m.clearednodes
+	case node.EdgePrimaryImage:
+		return m.clearedprimary_image
 	case node.EdgeAssets:
 		return m.clearedassets
 	case node.EdgeTags:
@@ -16061,6 +16402,9 @@ func (m *NodeMutation) ClearEdge(name string) error {
 	case node.EdgeParent:
 		m.ClearParent()
 		return nil
+	case node.EdgePrimaryImage:
+		m.ClearPrimaryImage()
+		return nil
 	case node.EdgeLink:
 		m.ClearLink()
 		return nil
@@ -16080,6 +16424,9 @@ func (m *NodeMutation) ResetEdge(name string) error {
 		return nil
 	case node.EdgeNodes:
 		m.ResetNodes()
+		return nil
+	case node.EdgePrimaryImage:
+		m.ResetPrimaryImage()
 		return nil
 	case node.EdgeAssets:
 		m.ResetAssets()

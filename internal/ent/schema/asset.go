@@ -28,6 +28,7 @@ func (Asset) Fields() []ent.Field {
 
 		// Edges
 		field.String("account_id").GoType(xid.ID{}),
+		field.String("parent_asset_id").GoType(xid.ID{}).Optional().Nillable(),
 	}
 }
 
@@ -53,6 +54,11 @@ func (Asset) Edges() []ent.Edge {
 			Ref("assets").
 			Unique().
 			Required(),
+
+		edge.To("assets", Asset.Type).
+			From("parent").
+			Unique().
+			Field("parent_asset_id"),
 
 		edge.To("event", Event.Type),
 	}

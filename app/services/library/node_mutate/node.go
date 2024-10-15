@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
@@ -27,10 +26,9 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	library_service "github.com/Southclaws/storyden/app/services/library"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
+	"github.com/Southclaws/storyden/internal/deletable"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
-
-var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
 
 type Manager interface {
 	Create(ctx context.Context,
@@ -47,6 +45,7 @@ type Partial struct {
 	Name         opt.Optional[string]
 	Slug         opt.Optional[mark.Slug]
 	URL          opt.Optional[url.URL]
+	PrimaryImage deletable.Value[asset.AssetID]
 	Content      opt.Optional[datagraph.Content]
 	Parent       opt.Optional[library.QueryKey]
 	Visibility   opt.Optional[visibility.Visibility]
@@ -64,6 +63,11 @@ type DeleteOptions struct {
 func (p Partial) Opts() (opts []node_writer.Option) {
 	p.Name.Call(func(value string) { opts = append(opts, node_writer.WithName(value)) })
 	p.Slug.Call(func(value mark.Slug) { opts = append(opts, node_writer.WithSlug(value.String())) })
+	p.PrimaryImage.Call(func(value xid.ID) {
+		opts = append(opts, node_writer.WithPrimaryImage(value))
+	}, func() {
+		opts = append(opts, node_writer.WithPrimaryImageRemoved())
+	})
 	p.Content.Call(func(value datagraph.Content) { opts = append(opts, node_writer.WithContent(value)) })
 	p.Metadata.Call(func(value map[string]any) { opts = append(opts, node_writer.WithMetadata(value)) })
 	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, node_writer.WithAssets(value)) })

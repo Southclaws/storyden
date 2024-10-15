@@ -33,6 +33,8 @@ type AssetQuery struct {
 	withNodes  *NodeQuery
 	withLinks  *LinkQuery
 	withOwner  *AccountQuery
+	withParent *AssetQuery
+	withAssets *AssetQuery
 	withEvent  *EventQuery
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -152,6 +154,50 @@ func (aq *AssetQuery) QueryOwner() *AccountQuery {
 			sqlgraph.From(asset.Table, asset.FieldID, selector),
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, asset.OwnerTable, asset.OwnerColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryParent chains the current query on the "parent" edge.
+func (aq *AssetQuery) QueryParent() *AssetQuery {
+	query := (&AssetClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(asset.Table, asset.FieldID, selector),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, asset.ParentTable, asset.ParentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAssets chains the current query on the "assets" edge.
+func (aq *AssetQuery) QueryAssets() *AssetQuery {
+	query := (&AssetClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(asset.Table, asset.FieldID, selector),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, asset.AssetsTable, asset.AssetsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -377,6 +423,8 @@ func (aq *AssetQuery) Clone() *AssetQuery {
 		withNodes:  aq.withNodes.Clone(),
 		withLinks:  aq.withLinks.Clone(),
 		withOwner:  aq.withOwner.Clone(),
+		withParent: aq.withParent.Clone(),
+		withAssets: aq.withAssets.Clone(),
 		withEvent:  aq.withEvent.Clone(),
 		// clone intermediate query.
 		sql:       aq.sql.Clone(),
@@ -426,6 +474,28 @@ func (aq *AssetQuery) WithOwner(opts ...func(*AccountQuery)) *AssetQuery {
 		opt(query)
 	}
 	aq.withOwner = query
+	return aq
+}
+
+// WithParent tells the query-builder to eager-load the nodes that are connected to
+// the "parent" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AssetQuery) WithParent(opts ...func(*AssetQuery)) *AssetQuery {
+	query := (&AssetClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withParent = query
+	return aq
+}
+
+// WithAssets tells the query-builder to eager-load the nodes that are connected to
+// the "assets" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AssetQuery) WithAssets(opts ...func(*AssetQuery)) *AssetQuery {
+	query := (&AssetClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withAssets = query
 	return aq
 }
 
@@ -518,11 +588,13 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 	var (
 		nodes       = []*Asset{}
 		_spec       = aq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [7]bool{
 			aq.withPosts != nil,
 			aq.withNodes != nil,
 			aq.withLinks != nil,
 			aq.withOwner != nil,
+			aq.withParent != nil,
+			aq.withAssets != nil,
 			aq.withEvent != nil,
 		}
 	)
@@ -571,6 +643,19 @@ func (aq *AssetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Asset,
 	if query := aq.withOwner; query != nil {
 		if err := aq.loadOwner(ctx, query, nodes, nil,
 			func(n *Asset, e *Account) { n.Edges.Owner = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withParent; query != nil {
+		if err := aq.loadParent(ctx, query, nodes, nil,
+			func(n *Asset, e *Asset) { n.Edges.Parent = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withAssets; query != nil {
+		if err := aq.loadAssets(ctx, query, nodes,
+			func(n *Asset) { n.Edges.Assets = []*Asset{} },
+			func(n *Asset, e *Asset) { n.Edges.Assets = append(n.Edges.Assets, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -796,6 +881,71 @@ func (aq *AssetQuery) loadOwner(ctx context.Context, query *AccountQuery, nodes 
 	}
 	return nil
 }
+func (aq *AssetQuery) loadParent(ctx context.Context, query *AssetQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Asset)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Asset)
+	for i := range nodes {
+		if nodes[i].ParentAssetID == nil {
+			continue
+		}
+		fk := *nodes[i].ParentAssetID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(asset.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "parent_asset_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (aq *AssetQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Asset)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Asset)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(asset.FieldParentAssetID)
+	}
+	query.Where(predicate.Asset(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(asset.AssetsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ParentAssetID
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "parent_asset_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "parent_asset_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 func (aq *AssetQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*Asset, init func(*Asset), assign func(*Asset, *Event)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Asset)
@@ -858,6 +1008,9 @@ func (aq *AssetQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if aq.withOwner != nil {
 			_spec.Node.AddColumnOnce(asset.FieldAccountID)
+		}
+		if aq.withParent != nil {
+			_spec.Node.AddColumnOnce(asset.FieldParentAssetID)
 		}
 	}
 	if ps := aq.predicates; len(ps) > 0 {

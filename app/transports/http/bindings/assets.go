@@ -48,12 +48,15 @@ func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadReq
 	// client can decide on a suitable placeholder or generate a nonsense slug.
 	filename := asset.NewFilename(name.Or("untitled"))
 
+	parentID := opt.NewPtrMap(request.Params.ParentAssetId, deserialiseAssetID)
+
 	contentFillCmd, err := getContentFillRuleCommand(request.Params.ContentFillRule, request.Params.NodeContentFillTarget)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
 	opts := asset_upload.Options{
+		ParentID:    parentID,
 		ContentFill: contentFillCmd,
 	}
 
@@ -99,6 +102,7 @@ func serialiseAsset(a asset.Asset) openapi.Asset {
 		Id:       a.ID.String(),
 		Filename: a.Name.String(),
 		Path:     path,
+		Parent:   opt.Map(a.Parent, serialiseAsset).Ptr(),
 		MimeType: a.Metadata.GetMIMEType(),
 		Width:    float32(a.Metadata.GetWidth()),
 		Height:   float32(a.Metadata.GetHeight()),

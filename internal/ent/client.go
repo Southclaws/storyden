@@ -1329,6 +1329,38 @@ func (c *AssetClient) QueryOwner(a *Asset) *AccountQuery {
 	return query
 }
 
+// QueryParent queries the parent edge of a Asset.
+func (c *AssetClient) QueryParent(a *Asset) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(asset.Table, asset.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, asset.ParentTable, asset.ParentColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAssets queries the assets edge of a Asset.
+func (c *AssetClient) QueryAssets(a *Asset) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(asset.Table, asset.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, asset.AssetsTable, asset.AssetsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryEvent queries the event edge of a Asset.
 func (c *AssetClient) QueryEvent(a *Asset) *EventQuery {
 	query := (&EventClient{config: c.config}).Query()
@@ -3529,6 +3561,22 @@ func (c *NodeClient) QueryNodes(n *Node) *NodeQuery {
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(node.Table, node.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, node.NodesTable, node.NodesColumn),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPrimaryImage queries the primary_image edge of a Node.
+func (c *NodeClient) QueryPrimaryImage(n *Node) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, node.PrimaryImageTable, node.PrimaryImageColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil

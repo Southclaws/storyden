@@ -39,6 +39,7 @@ type Node struct {
 	WebLink        opt.Optional[link_ref.LinkRef]
 	Content        opt.Optional[datagraph.Content]
 	Description    opt.Optional[string]
+	PrimaryImage   opt.Optional[asset.Asset]
 	Owner          profile.Public
 	Parent         opt.Optional[Node]
 	Visibility     visibility.Visibility

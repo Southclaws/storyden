@@ -1,27 +1,48 @@
 "use client";
 
-import Link from "next/link";
+import Image from "next/image";
+import { FixedCropper, ImageRestriction } from "react-advanced-cropper";
 import { FormProvider } from "react-hook-form";
 
 import { CancelAction } from "src/components/site/Action/Cancel";
 import { EditAction } from "src/components/site/Action/Edit";
 import { SaveAction } from "src/components/site/Action/Save";
 
+import { useNodeGet } from "@/api/openapi-client/nodes";
 import { Breadcrumbs } from "@/components/library/Breadcrumbs";
+import { LibraryPageCoverImageControl } from "@/components/library/LibraryPageCoverImageControl/LibraryPageCoverImageControl";
 import { LibraryPageImportFromURL } from "@/components/library/LibraryPageImportFromURL/LibraryPageImportFromURL";
 import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
 import { NodeCardRows } from "@/components/library/NodeCardList";
-import { Anchor } from "@/components/site/Anchor";
+import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
-import * as Popover from "@/components/ui/popover";
-import { HStack, LStack, styled } from "@/styled-system/jsx";
+import { css } from "@/styled-system/css";
+import { Box, HStack, LStack, styled } from "@/styled-system/jsx";
+
+import "react-advanced-cropper/dist/style.css";
 
 import { ContentInput } from "./ContentInput";
 import { TitleInput } from "./TitleInput";
-import { Props, useLibraryPageScreen } from "./useLibraryPageScreen";
+import {
+  CROP_STENCIL_HEIGHT,
+  CROP_STENCIL_WIDTH,
+  Props,
+  useLibraryPageScreen,
+} from "./useLibraryPageScreen";
 
 export function LibraryPageScreen(props: Props) {
+  const { data, error } = useNodeGet(props.node.slug, {
+    swr: { fallbackData: props.node },
+  });
+  if (!data) {
+    return <UnreadyBanner error={error} />;
+  }
+
+  return <LibraryPage node={data} />;
+}
+
+export function LibraryPage(props: Props) {
   const {
     form,
     handlers: {
@@ -34,8 +55,11 @@ export function LibraryPageScreen(props: Props) {
     libraryPath,
     editing,
     node,
+    cropperRef,
+    primaryAssetURL,
+    primaryAssetEditingURL,
+    initialCoverCoordinates,
     isAllowedToEdit,
-    isSaving,
   } = useLibraryPageScreen(props);
 
   return (
@@ -59,35 +83,95 @@ export function LibraryPageScreen(props: Props) {
               {...form.register("slug")}
             />
             {isAllowedToEdit && (
-              <Popover.Root open={isSaving} lazyMount>
-                <Popover.Anchor>
-                  <HStack>
-                    {editing ? (
-                      <>
-                        <CancelAction type="button" onClick={handleEditMode}>
-                          Cancel
-                        </CancelAction>
-                        <SaveAction type="submit">Save</SaveAction>
-                      </>
-                    ) : (
-                      <>
-                        <EditAction onClick={handleEditMode}>Edit</EditAction>
-                      </>
-                    )}
-                    <LibraryPageMenu
-                      node={node}
-                      onVisibilityChange={handleVisibilityChange}
-                      onDelete={handleDelete}
-                    />
-                  </HStack>
-                </Popover.Anchor>
-
-                <Popover.Positioner>
-                  <Popover.Content p="2">Saved!</Popover.Content>
-                </Popover.Positioner>
-              </Popover.Root>
+              <HStack>
+                {editing ? (
+                  <>
+                    <CancelAction type="button" onClick={handleEditMode}>
+                      Cancel
+                    </CancelAction>
+                    <SaveAction type="submit">Save</SaveAction>
+                  </>
+                ) : (
+                  <>
+                    <EditAction onClick={handleEditMode}>Edit</EditAction>
+                  </>
+                )}
+                <LibraryPageMenu
+                  node={node}
+                  onVisibilityChange={handleVisibilityChange}
+                  onDelete={handleDelete}
+                />
+              </HStack>
             )}
           </HStack>
+
+          {editing && (
+            <HStack w="full" justify="end">
+              {/* TODO: Icons/emojis custom for pages too */}
+              {/* <Button size="xs" variant="outline">
+                <SmilePlusIcon /> page icon
+              </Button> */}
+              <LibraryPageCoverImageControl node={node} />
+              {/* TODO: Import from other sources */}
+              {/* <Button size="xs" variant="outline">
+                <ImportIcon /> import
+              </Button> */}
+            </HStack>
+          )}
+
+          {editing && primaryAssetEditingURL ? (
+            <Box width="full" height="64">
+              <FixedCropper
+                ref={cropperRef}
+                className={css({
+                  maxWidth: "full",
+                  maxHeight: "64",
+                  borderRadius: "lg",
+                  // TODO: Remove black background when empty
+                  backgroundColor: "bg.default",
+                })}
+                defaultPosition={
+                  initialCoverCoordinates && {
+                    top: initialCoverCoordinates.top,
+                    left: initialCoverCoordinates.left,
+                  }
+                }
+                backgroundWrapperProps={{
+                  scaleImage: false,
+                }}
+                stencilProps={{
+                  handlers: false,
+                  lines: false,
+                  movable: false,
+                  resizable: false,
+                }}
+                stencilSize={{
+                  width: CROP_STENCIL_WIDTH,
+                  height: CROP_STENCIL_HEIGHT,
+                }}
+                imageRestriction={ImageRestriction.stencil}
+                src={primaryAssetEditingURL}
+              />
+            </Box>
+          ) : (
+            primaryAssetURL && (
+              <Box height="64" width="full">
+                <Image
+                  className={css({
+                    width: "full",
+                    height: "full",
+                    borderRadius: "lg",
+                    objectFit: "cover",
+                    objectPosition: "center",
+                  })}
+                  src={primaryAssetURL}
+                  alt=""
+                  width={CROP_STENCIL_WIDTH}
+                  height={CROP_STENCIL_HEIGHT}
+                />
+              </Box>
+            )
+          )}
 
           <LStack gap="2">
             <LStack minW="0">

@@ -81,6 +81,11 @@ func AccountID(v xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldAccountID, v))
 }
 
+// ParentAssetID applies equality check predicate on the "parent_asset_id" field. It's identical to ParentAssetIDEQ.
+func ParentAssetID(v xid.ID) predicate.Asset {
+	return predicate.Asset(sql.FieldEQ(FieldParentAssetID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldCreatedAt, v))
@@ -346,6 +351,86 @@ func AccountIDContainsFold(v xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldContainsFold(FieldAccountID, vc))
 }
 
+// ParentAssetIDEQ applies the EQ predicate on the "parent_asset_id" field.
+func ParentAssetIDEQ(v xid.ID) predicate.Asset {
+	return predicate.Asset(sql.FieldEQ(FieldParentAssetID, v))
+}
+
+// ParentAssetIDNEQ applies the NEQ predicate on the "parent_asset_id" field.
+func ParentAssetIDNEQ(v xid.ID) predicate.Asset {
+	return predicate.Asset(sql.FieldNEQ(FieldParentAssetID, v))
+}
+
+// ParentAssetIDIn applies the In predicate on the "parent_asset_id" field.
+func ParentAssetIDIn(vs ...xid.ID) predicate.Asset {
+	return predicate.Asset(sql.FieldIn(FieldParentAssetID, vs...))
+}
+
+// ParentAssetIDNotIn applies the NotIn predicate on the "parent_asset_id" field.
+func ParentAssetIDNotIn(vs ...xid.ID) predicate.Asset {
+	return predicate.Asset(sql.FieldNotIn(FieldParentAssetID, vs...))
+}
+
+// ParentAssetIDGT applies the GT predicate on the "parent_asset_id" field.
+func ParentAssetIDGT(v xid.ID) predicate.Asset {
+	return predicate.Asset(sql.FieldGT(FieldParentAssetID, v))
+}
+
+// ParentAssetIDGTE applies the GTE predicate on the "parent_asset_id" field.
+func ParentAssetIDGTE(v xid.ID) predicate.Asset {
+	return predicate.Asset(sql.FieldGTE(FieldParentAssetID, v))
+}
+
+// ParentAssetIDLT applies the LT predicate on the "parent_asset_id" field.
+func ParentAssetIDLT(v xid.ID) predicate.Asset {
+	return predicate.Asset(sql.FieldLT(FieldParentAssetID, v))
+}
+
+// ParentAssetIDLTE applies the LTE predicate on the "parent_asset_id" field.
+func ParentAssetIDLTE(v xid.ID) predicate.Asset {
+	return predicate.Asset(sql.FieldLTE(FieldParentAssetID, v))
+}
+
+// ParentAssetIDContains applies the Contains predicate on the "parent_asset_id" field.
+func ParentAssetIDContains(v xid.ID) predicate.Asset {
+	vc := v.String()
+	return predicate.Asset(sql.FieldContains(FieldParentAssetID, vc))
+}
+
+// ParentAssetIDHasPrefix applies the HasPrefix predicate on the "parent_asset_id" field.
+func ParentAssetIDHasPrefix(v xid.ID) predicate.Asset {
+	vc := v.String()
+	return predicate.Asset(sql.FieldHasPrefix(FieldParentAssetID, vc))
+}
+
+// ParentAssetIDHasSuffix applies the HasSuffix predicate on the "parent_asset_id" field.
+func ParentAssetIDHasSuffix(v xid.ID) predicate.Asset {
+	vc := v.String()
+	return predicate.Asset(sql.FieldHasSuffix(FieldParentAssetID, vc))
+}
+
+// ParentAssetIDIsNil applies the IsNil predicate on the "parent_asset_id" field.
+func ParentAssetIDIsNil() predicate.Asset {
+	return predicate.Asset(sql.FieldIsNull(FieldParentAssetID))
+}
+
+// ParentAssetIDNotNil applies the NotNil predicate on the "parent_asset_id" field.
+func ParentAssetIDNotNil() predicate.Asset {
+	return predicate.Asset(sql.FieldNotNull(FieldParentAssetID))
+}
+
+// ParentAssetIDEqualFold applies the EqualFold predicate on the "parent_asset_id" field.
+func ParentAssetIDEqualFold(v xid.ID) predicate.Asset {
+	vc := v.String()
+	return predicate.Asset(sql.FieldEqualFold(FieldParentAssetID, vc))
+}
+
+// ParentAssetIDContainsFold applies the ContainsFold predicate on the "parent_asset_id" field.
+func ParentAssetIDContainsFold(v xid.ID) predicate.Asset {
+	vc := v.String()
+	return predicate.Asset(sql.FieldContainsFold(FieldParentAssetID, vc))
+}
+
 // HasPosts applies the HasEdge predicate on the "posts" edge.
 func HasPosts() predicate.Asset {
 	return predicate.Asset(func(s *sql.Selector) {
@@ -430,6 +515,52 @@ func HasOwner() predicate.Asset {
 func HasOwnerWith(preds ...predicate.Account) predicate.Asset {
 	return predicate.Asset(func(s *sql.Selector) {
 		step := newOwnerStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasParent applies the HasEdge predicate on the "parent" edge.
+func HasParent() predicate.Asset {
+	return predicate.Asset(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasParentWith applies the HasEdge predicate on the "parent" edge with a given conditions (other predicates).
+func HasParentWith(preds ...predicate.Asset) predicate.Asset {
+	return predicate.Asset(func(s *sql.Selector) {
+		step := newParentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAssets applies the HasEdge predicate on the "assets" edge.
+func HasAssets() predicate.Asset {
+	return predicate.Asset(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AssetsTable, AssetsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAssetsWith applies the HasEdge predicate on the "assets" edge with a given conditions (other predicates).
+func HasAssetsWith(preds ...predicate.Asset) predicate.Asset {
+	return predicate.Asset(func(s *sql.Selector) {
+		step := newAssetsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
