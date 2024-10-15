@@ -101,6 +101,11 @@ func AccountID(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldAccountID, v))
 }
 
+// PrimaryAssetID applies equality check predicate on the "primary_asset_id" field. It's identical to PrimaryAssetIDEQ.
+func PrimaryAssetID(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldPrimaryAssetID, v))
+}
+
 // LinkID applies equality check predicate on the "link_id" field. It's identical to LinkIDEQ.
 func LinkID(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldLinkID, v))
@@ -666,6 +671,86 @@ func AccountIDContainsFold(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldContainsFold(FieldAccountID, vc))
 }
 
+// PrimaryAssetIDEQ applies the EQ predicate on the "primary_asset_id" field.
+func PrimaryAssetIDEQ(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDNEQ applies the NEQ predicate on the "primary_asset_id" field.
+func PrimaryAssetIDNEQ(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldNEQ(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDIn applies the In predicate on the "primary_asset_id" field.
+func PrimaryAssetIDIn(vs ...xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldIn(FieldPrimaryAssetID, vs...))
+}
+
+// PrimaryAssetIDNotIn applies the NotIn predicate on the "primary_asset_id" field.
+func PrimaryAssetIDNotIn(vs ...xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldNotIn(FieldPrimaryAssetID, vs...))
+}
+
+// PrimaryAssetIDGT applies the GT predicate on the "primary_asset_id" field.
+func PrimaryAssetIDGT(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldGT(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDGTE applies the GTE predicate on the "primary_asset_id" field.
+func PrimaryAssetIDGTE(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldGTE(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDLT applies the LT predicate on the "primary_asset_id" field.
+func PrimaryAssetIDLT(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldLT(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDLTE applies the LTE predicate on the "primary_asset_id" field.
+func PrimaryAssetIDLTE(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldLTE(FieldPrimaryAssetID, v))
+}
+
+// PrimaryAssetIDContains applies the Contains predicate on the "primary_asset_id" field.
+func PrimaryAssetIDContains(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldContains(FieldPrimaryAssetID, vc))
+}
+
+// PrimaryAssetIDHasPrefix applies the HasPrefix predicate on the "primary_asset_id" field.
+func PrimaryAssetIDHasPrefix(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldHasPrefix(FieldPrimaryAssetID, vc))
+}
+
+// PrimaryAssetIDHasSuffix applies the HasSuffix predicate on the "primary_asset_id" field.
+func PrimaryAssetIDHasSuffix(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldHasSuffix(FieldPrimaryAssetID, vc))
+}
+
+// PrimaryAssetIDIsNil applies the IsNil predicate on the "primary_asset_id" field.
+func PrimaryAssetIDIsNil() predicate.Node {
+	return predicate.Node(sql.FieldIsNull(FieldPrimaryAssetID))
+}
+
+// PrimaryAssetIDNotNil applies the NotNil predicate on the "primary_asset_id" field.
+func PrimaryAssetIDNotNil() predicate.Node {
+	return predicate.Node(sql.FieldNotNull(FieldPrimaryAssetID))
+}
+
+// PrimaryAssetIDEqualFold applies the EqualFold predicate on the "primary_asset_id" field.
+func PrimaryAssetIDEqualFold(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldEqualFold(FieldPrimaryAssetID, vc))
+}
+
+// PrimaryAssetIDContainsFold applies the ContainsFold predicate on the "primary_asset_id" field.
+func PrimaryAssetIDContainsFold(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldContainsFold(FieldPrimaryAssetID, vc))
+}
+
 // LinkIDEQ applies the EQ predicate on the "link_id" field.
 func LinkIDEQ(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldLinkID, v))
@@ -837,6 +922,29 @@ func HasNodes() predicate.Node {
 func HasNodesWith(preds ...predicate.Node) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := newNodesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasPrimaryImage applies the HasEdge predicate on the "primary_image" edge.
+func HasPrimaryImage() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, PrimaryImageTable, PrimaryImageColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPrimaryImageWith applies the HasEdge predicate on the "primary_image" edge with a given conditions (other predicates).
+func HasPrimaryImageWith(preds ...predicate.Asset) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newPrimaryImageStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

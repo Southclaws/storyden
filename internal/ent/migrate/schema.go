@@ -120,6 +120,7 @@ var (
 		{Name: "size", Type: field.TypeInt, Default: "0"},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "parent_asset_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// AssetsTable holds the schema information for the "assets" table.
 	AssetsTable = &schema.Table{
@@ -132,6 +133,12 @@ var (
 				Columns:    []*schema.Column{AssetsColumns[6]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "assets_assets_assets",
+				Columns:    []*schema.Column{AssetsColumns[7]},
+				RefColumns: []*schema.Column{AssetsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -540,6 +547,7 @@ var (
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 		{Name: "link_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "parent_node_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "primary_asset_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// NodesTable holds the schema information for the "nodes" table.
 	NodesTable = &schema.Table{
@@ -563,6 +571,12 @@ var (
 				Symbol:     "nodes_nodes_nodes",
 				Columns:    []*schema.Column{NodesColumns[12]},
 				RefColumns: []*schema.Column{NodesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "nodes_assets_primary_image",
+				Columns:    []*schema.Column{NodesColumns[13]},
+				RefColumns: []*schema.Column{AssetsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -982,6 +996,7 @@ func init() {
 	AccountRolesTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountRolesTable.ForeignKeys[1].RefTable = RolesTable
 	AssetsTable.ForeignKeys[0].RefTable = AccountsTable
+	AssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
 	CollectionsTable.ForeignKeys[0].RefTable = AccountsTable
 	CollectionNodesTable.ForeignKeys[0].RefTable = CollectionsTable
@@ -1004,6 +1019,7 @@ func init() {
 	NodesTable.ForeignKeys[0].RefTable = AccountsTable
 	NodesTable.ForeignKeys[1].RefTable = LinksTable
 	NodesTable.ForeignKeys[2].RefTable = NodesTable
+	NodesTable.ForeignKeys[3].RefTable = AssetsTable
 	NotificationsTable.ForeignKeys[0].RefTable = AccountsTable
 	NotificationsTable.ForeignKeys[1].RefTable = AccountsTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable

@@ -11,6 +11,7 @@ import { admonition } from "@/recipes/admonition";
 import { badge } from "@/recipes/badge";
 import { button } from "@/recipes/button";
 import { colorPicker } from "@/recipes/color-picker";
+import { fileUpload } from "@/recipes/file-upload";
 import { headingInput } from "@/recipes/heading-input";
 import { input } from "@/recipes/input";
 import { menu } from "@/recipes/menu";
@@ -245,6 +246,7 @@ export default defineConfig({
       slotRecipes: {
         colorPicker: colorPicker,
         menu: menu,
+        fileUpload: fileUpload,
         popover: popover,
         table: table,
         treeView: treeView,

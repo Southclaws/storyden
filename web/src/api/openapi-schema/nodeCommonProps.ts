@@ -7,6 +7,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { Asset } from "./asset";
 import type { AssetList } from "./assetList";
 import type { LinkReference } from "./linkReference";
 import type { Metadata } from "./metadata";
@@ -31,6 +32,7 @@ export interface NodeCommonProps {
   name: NodeName;
   owner: ProfileReference;
   parent?: Node;
+  primary_image?: Asset;
   relevance_score?: RelevanceScore;
   slug: Slug;
   visibility: Visibility;

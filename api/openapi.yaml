@@ -1206,6 +1206,7 @@ paths:
         - $ref: "#/components/parameters/AssetNameQuery"
         - $ref: "#/components/parameters/NodeContentFillRuleQuery"
         - $ref: "#/components/parameters/NodeContentFillTargetQuery"
+        - $ref: "#/components/parameters/ParentAssetIDQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }
@@ -1970,6 +1971,19 @@ components:
       name: asset_id
       in: path
       required: true
+      schema:
+        type: string
+
+    ParentAssetIDQuery:
+      description: |
+        For uploading new versions of an existing asset, set this parameter to
+        the asset ID of the parent asset. This must be an ID and not a filename.
+        This feature is used for situations where you want to replace an asset
+        in its usage context, but retain the original with a way to reference it
+        for features such as editable/croppable images or file version history.
+      name: parent_asset_id
+      in: query
+      required: false
       schema:
         type: string
 
@@ -2789,6 +2803,13 @@ components:
       # x-go-type-import:
       #   name: xid
       #   path: github.com/rs/xid
+      example: "cc5lnd2s1s4652adtu50"
+      description: A unique identifier for this resource.
+
+    NullableIdentifier:
+      type: string
+      format: xid
+      nullable: true
       example: "cc5lnd2s1s4652adtu50"
       description: A unique identifier for this resource.
 
@@ -4319,6 +4340,8 @@ components:
           type: number
         height:
           type: number
+        # NOTE: Presence is dictated by the callee, not the API (currently.)
+        parent: { $ref: "#/components/schemas/Asset" }
 
     AssetSourceURL:
       description:
@@ -4557,6 +4580,7 @@ components:
         assets: { $ref: "#/components/schemas/AssetList" }
         link: { $ref: "#/components/schemas/LinkReference" }
         description: { $ref: "#/components/schemas/NodeDescription" }
+        primary_image: { $ref: "#/components/schemas/Asset" }
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
         parent: { $ref: "#/components/schemas/Node" }
@@ -4589,6 +4613,7 @@ components:
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         asset_sources: { $ref: "#/components/schemas/AssetSourceList" }
         url: { $ref: "#/components/schemas/URL" }
+        primary_image_asset_id: { $ref: "#/components/schemas/AssetID" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
         visibility: { $ref: "#/components/schemas/Visibility" }
@@ -4604,6 +4629,8 @@ components:
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         asset_sources: { $ref: "#/components/schemas/AssetSourceList" }
         url: { $ref: "#/components/schemas/URL" }
+        primary_image_asset_id:
+          { $ref: "#/components/schemas/NullableIdentifier" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
         meta: { $ref: "#/components/schemas/Metadata" }

@@ -26,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/deletable"
 )
 
 type Nodes struct {
@@ -87,11 +88,14 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	primaryImage := opt.Map(opt.NewPtr(request.Body.PrimaryImageAssetId), deserialiseAssetID)
+
 	node, err := c.nodeMutator.Create(ctx,
 		session,
 		request.Body.Name,
 		node_mutate.Partial{
 			Slug:         slug,
+			PrimaryImage: deletable.Skip(primaryImage),
 			Content:      richContent,
 			Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
 			URL:          url,
@@ -229,6 +233,8 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	primaryImage := deletable.NewMap(request.Body.PrimaryImageAssetId, deserialiseAssetID)
+
 	node, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
 		Name:         opt.NewPtr(request.Body.Name),
 		Slug:         slug,
@@ -236,6 +242,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
 		URL:          url,
 		Content:      richContent,
+		PrimaryImage: primaryImage,
 		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	})
@@ -341,16 +348,17 @@ func (c *Nodes) NodeRemoveNode(ctx context.Context, request openapi.NodeRemoveNo
 
 func serialiseNode(in *library.Node) openapi.Node {
 	return openapi.Node{
-		Id:          in.Mark.ID().String(),
-		CreatedAt:   in.CreatedAt,
-		UpdatedAt:   in.UpdatedAt,
-		Name:        in.Name,
-		Slug:        in.Mark.Slug(),
-		Assets:      dt.Map(in.Assets, serialiseAssetPtr),
-		Link:        opt.Map(in.WebLink, serialiseLinkRef).Ptr(),
-		Description: in.GetDesc(),
-		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
-		Owner:       serialiseProfileReference(in.Owner),
+		Id:           in.Mark.ID().String(),
+		CreatedAt:    in.CreatedAt,
+		UpdatedAt:    in.UpdatedAt,
+		Name:         in.Name,
+		Slug:         in.Mark.Slug(),
+		Assets:       dt.Map(in.Assets, serialiseAssetPtr),
+		Link:         opt.Map(in.WebLink, serialiseLinkRef).Ptr(),
+		Description:  in.GetDesc(),
+		PrimaryImage: opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
+		Content:      opt.Map(in.Content, serialiseContentHTML).Ptr(),
+		Owner:        serialiseProfileReference(in.Owner),
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
@@ -362,16 +370,17 @@ func serialiseNode(in *library.Node) openapi.Node {
 func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 	rs := opt.Map(in.RelevanceScore, func(v float64) float32 { return float32(v) })
 	return openapi.NodeWithChildren{
-		Id:          in.Mark.ID().String(),
-		CreatedAt:   in.CreatedAt,
-		UpdatedAt:   in.UpdatedAt,
-		Name:        in.Name,
-		Slug:        in.Mark.Slug(),
-		Assets:      dt.Map(in.Assets, serialiseAssetPtr),
-		Link:        opt.Map(in.WebLink, serialiseLinkRef).Ptr(),
-		Description: in.GetDesc(),
-		Content:     opt.Map(in.Content, serialiseContentHTML).Ptr(),
-		Owner:       serialiseProfileReference(in.Owner),
+		Id:           in.Mark.ID().String(),
+		CreatedAt:    in.CreatedAt,
+		UpdatedAt:    in.UpdatedAt,
+		Name:         in.Name,
+		Slug:         in.Mark.Slug(),
+		Assets:       dt.Map(in.Assets, serialiseAssetPtr),
+		Link:         opt.Map(in.WebLink, serialiseLinkRef).Ptr(),
+		Description:  in.GetDesc(),
+		PrimaryImage: opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
+		Content:      opt.Map(in.Content, serialiseContentHTML).Ptr(),
+		Owner:        serialiseProfileReference(in.Owner),
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
