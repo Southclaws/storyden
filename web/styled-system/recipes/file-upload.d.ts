@@ -16,7 +16,7 @@ export type FileUploadVariantProps = {
 
 export interface FileUploadRecipe {
   __type: FileUploadVariantProps
-  (props?: FileUploadVariantProps): Pretty<Record<"root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger" | "root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger", string>>
+  (props?: FileUploadVariantProps): Pretty<Record<"root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger" | "root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger" | "root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger", string>>
   raw: (props?: FileUploadVariantProps) => FileUploadVariantProps
   variantMap: FileUploadVariantMap
   variantKeys: Array<keyof FileUploadVariant>

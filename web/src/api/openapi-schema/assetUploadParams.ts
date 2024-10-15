@@ -10,6 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { AssetNameQueryParameter } from "./assetNameQueryParameter";
 import type { NodeContentFillRuleQueryParameter } from "./nodeContentFillRuleQueryParameter";
 import type { NodeContentFillTargetQueryParameter } from "./nodeContentFillTargetQueryParameter";
+import type { ParentAssetIDQueryParameter } from "./parentAssetIDQueryParameter";
 
 export type AssetUploadParams = {
   /**
@@ -30,4 +31,13 @@ to specify which node will receive content extracted from the source.
 
  */
   node_content_fill_target?: NodeContentFillTargetQueryParameter;
+  /**
+ * For uploading new versions of an existing asset, set this parameter to
+the asset ID of the parent asset. This must be an ID and not a filename.
+This feature is used for situations where you want to replace an asset
+in its usage context, but retain the original with a way to reference it
+for features such as editable/croppable images or file version history.
+
+ */
+  parent_asset_id?: ParentAssetIDQueryParameter;
 };

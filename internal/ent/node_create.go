@@ -131,6 +131,20 @@ func (nc *NodeCreate) SetAccountID(x xid.ID) *NodeCreate {
 	return nc
 }
 
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (nc *NodeCreate) SetPrimaryAssetID(x xid.ID) *NodeCreate {
+	nc.mutation.SetPrimaryAssetID(x)
+	return nc
+}
+
+// SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
+func (nc *NodeCreate) SetNillablePrimaryAssetID(x *xid.ID) *NodeCreate {
+	if x != nil {
+		nc.SetPrimaryAssetID(*x)
+	}
+	return nc
+}
+
 // SetLinkID sets the "link_id" field.
 func (nc *NodeCreate) SetLinkID(x xid.ID) *NodeCreate {
 	nc.mutation.SetLinkID(x)
@@ -222,6 +236,25 @@ func (nc *NodeCreate) AddNodes(n ...*Node) *NodeCreate {
 		ids[i] = n[i].ID
 	}
 	return nc.AddNodeIDs(ids...)
+}
+
+// SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
+func (nc *NodeCreate) SetPrimaryImageID(id xid.ID) *NodeCreate {
+	nc.mutation.SetPrimaryImageID(id)
+	return nc
+}
+
+// SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
+func (nc *NodeCreate) SetNillablePrimaryImageID(id *xid.ID) *NodeCreate {
+	if id != nil {
+		nc = nc.SetPrimaryImageID(*id)
+	}
+	return nc
+}
+
+// SetPrimaryImage sets the "primary_image" edge to the Asset entity.
+func (nc *NodeCreate) SetPrimaryImage(a *Asset) *NodeCreate {
+	return nc.SetPrimaryImageID(a.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -497,6 +530,23 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := nc.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   node.PrimaryImageTable,
+			Columns: []string{node.PrimaryImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.PrimaryAssetID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := nc.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -754,6 +804,24 @@ func (u *NodeUpsert) UpdateAccountID() *NodeUpsert {
 	return u
 }
 
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (u *NodeUpsert) SetPrimaryAssetID(v xid.ID) *NodeUpsert {
+	u.Set(node.FieldPrimaryAssetID, v)
+	return u
+}
+
+// UpdatePrimaryAssetID sets the "primary_asset_id" field to the value that was provided on create.
+func (u *NodeUpsert) UpdatePrimaryAssetID() *NodeUpsert {
+	u.SetExcluded(node.FieldPrimaryAssetID)
+	return u
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (u *NodeUpsert) ClearPrimaryAssetID() *NodeUpsert {
+	u.SetNull(node.FieldPrimaryAssetID)
+	return u
+}
+
 // SetLinkID sets the "link_id" field.
 func (u *NodeUpsert) SetLinkID(v xid.ID) *NodeUpsert {
 	u.Set(node.FieldLinkID, v)
@@ -990,6 +1058,27 @@ func (u *NodeUpsertOne) SetAccountID(v xid.ID) *NodeUpsertOne {
 func (u *NodeUpsertOne) UpdateAccountID() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (u *NodeUpsertOne) SetPrimaryAssetID(v xid.ID) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetPrimaryAssetID(v)
+	})
+}
+
+// UpdatePrimaryAssetID sets the "primary_asset_id" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdatePrimaryAssetID() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdatePrimaryAssetID()
+	})
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (u *NodeUpsertOne) ClearPrimaryAssetID() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearPrimaryAssetID()
 	})
 }
 
@@ -1404,6 +1493,27 @@ func (u *NodeUpsertBulk) SetAccountID(v xid.ID) *NodeUpsertBulk {
 func (u *NodeUpsertBulk) UpdateAccountID() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (u *NodeUpsertBulk) SetPrimaryAssetID(v xid.ID) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetPrimaryAssetID(v)
+	})
+}
+
+// UpdatePrimaryAssetID sets the "primary_asset_id" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdatePrimaryAssetID() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdatePrimaryAssetID()
+	})
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (u *NodeUpsertBulk) ClearPrimaryAssetID() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearPrimaryAssetID()
 	})
 }
 

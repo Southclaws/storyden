@@ -24,6 +24,7 @@ func (Node) Fields() []ent.Field {
 		field.String("content").Optional().Nillable(),
 		field.String("parent_node_id").GoType(xid.ID{}).Optional(),
 		field.String("account_id").GoType(xid.ID{}),
+		field.String("primary_asset_id").GoType(xid.ID{}).Optional().Nillable(),
 		field.String("link_id").GoType(xid.ID{}).Optional(),
 		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
 		field.JSON("metadata", map[string]any{}).Optional(),
@@ -49,6 +50,10 @@ func (Node) Edges() []ent.Edge {
 			Unique().
 			Field("parent_node_id").
 			Comment("A many-to-many recursive self reference. The parent node, if any."),
+
+		edge.To("primary_image", Asset.Type).
+			Field("primary_asset_id").
+			Unique(),
 
 		edge.To("assets", Asset.Type),
 

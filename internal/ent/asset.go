@@ -32,6 +32,8 @@ type Asset struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
+	// ParentAssetID holds the value of the "parent_asset_id" field.
+	ParentAssetID *xid.ID `json:"parent_asset_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AssetQuery when eager-loading is set.
 	Edges        AssetEdges `json:"edges"`
@@ -48,11 +50,15 @@ type AssetEdges struct {
 	Links []*Link `json:"links,omitempty"`
 	// Owner holds the value of the owner edge.
 	Owner *Account `json:"owner,omitempty"`
+	// Parent holds the value of the parent edge.
+	Parent *Asset `json:"parent,omitempty"`
+	// Assets holds the value of the assets edge.
+	Assets []*Asset `json:"assets,omitempty"`
 	// Event holds the value of the event edge.
 	Event []*Event `json:"event,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [7]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -93,10 +99,30 @@ func (e AssetEdges) OwnerOrErr() (*Account, error) {
 	return nil, &NotLoadedError{edge: "owner"}
 }
 
+// ParentOrErr returns the Parent value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AssetEdges) ParentOrErr() (*Asset, error) {
+	if e.Parent != nil {
+		return e.Parent, nil
+	} else if e.loadedTypes[4] {
+		return nil, &NotFoundError{label: asset.Label}
+	}
+	return nil, &NotLoadedError{edge: "parent"}
+}
+
+// AssetsOrErr returns the Assets value or an error if the edge
+// was not loaded in eager-loading.
+func (e AssetEdges) AssetsOrErr() ([]*Asset, error) {
+	if e.loadedTypes[5] {
+		return e.Assets, nil
+	}
+	return nil, &NotLoadedError{edge: "assets"}
+}
+
 // EventOrErr returns the Event value or an error if the edge
 // was not loaded in eager-loading.
 func (e AssetEdges) EventOrErr() ([]*Event, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[6] {
 		return e.Event, nil
 	}
 	return nil, &NotLoadedError{edge: "event"}
@@ -107,6 +133,8 @@ func (*Asset) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case asset.FieldParentAssetID:
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case asset.FieldMetadata:
 			values[i] = new([]byte)
 		case asset.FieldSize:
@@ -176,6 +204,13 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				a.AccountID = *value
 			}
+		case asset.FieldParentAssetID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field parent_asset_id", values[i])
+			} else if value.Valid {
+				a.ParentAssetID = new(xid.ID)
+				*a.ParentAssetID = *value.S.(*xid.ID)
+			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
 		}
@@ -207,6 +242,16 @@ func (a *Asset) QueryLinks() *LinkQuery {
 // QueryOwner queries the "owner" edge of the Asset entity.
 func (a *Asset) QueryOwner() *AccountQuery {
 	return NewAssetClient(a.config).QueryOwner(a)
+}
+
+// QueryParent queries the "parent" edge of the Asset entity.
+func (a *Asset) QueryParent() *AssetQuery {
+	return NewAssetClient(a.config).QueryParent(a)
+}
+
+// QueryAssets queries the "assets" edge of the Asset entity.
+func (a *Asset) QueryAssets() *AssetQuery {
+	return NewAssetClient(a.config).QueryAssets(a)
 }
 
 // QueryEvent queries the "event" edge of the Asset entity.
@@ -254,6 +299,11 @@ func (a *Asset) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", a.AccountID))
+	builder.WriteString(", ")
+	if v := a.ParentAssetID; v != nil {
+		builder.WriteString("parent_asset_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

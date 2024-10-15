@@ -33,6 +33,7 @@ type NodeQuery struct {
 	withOwner           *AccountQuery
 	withParent          *NodeQuery
 	withNodes           *NodeQuery
+	withPrimaryImage    *AssetQuery
 	withAssets          *AssetQuery
 	withTags            *TagQuery
 	withLink            *LinkQuery
@@ -135,6 +136,28 @@ func (nq *NodeQuery) QueryNodes() *NodeQuery {
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(node.Table, node.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, node.NodesTable, node.NodesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPrimaryImage chains the current query on the "primary_image" edge.
+func (nq *NodeQuery) QueryPrimaryImage() *AssetQuery {
+	query := (&AssetClient{config: nq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := nq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := nq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, selector),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, node.PrimaryImageTable, node.PrimaryImageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -469,6 +492,7 @@ func (nq *NodeQuery) Clone() *NodeQuery {
 		withOwner:           nq.withOwner.Clone(),
 		withParent:          nq.withParent.Clone(),
 		withNodes:           nq.withNodes.Clone(),
+		withPrimaryImage:    nq.withPrimaryImage.Clone(),
 		withAssets:          nq.withAssets.Clone(),
 		withTags:            nq.withTags.Clone(),
 		withLink:            nq.withLink.Clone(),
@@ -512,6 +536,17 @@ func (nq *NodeQuery) WithNodes(opts ...func(*NodeQuery)) *NodeQuery {
 		opt(query)
 	}
 	nq.withNodes = query
+	return nq
+}
+
+// WithPrimaryImage tells the query-builder to eager-load the nodes that are connected to
+// the "primary_image" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithPrimaryImage(opts ...func(*AssetQuery)) *NodeQuery {
+	query := (&AssetClient{config: nq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	nq.withPrimaryImage = query
 	return nq
 }
 
@@ -659,10 +694,11 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 	var (
 		nodes       = []*Node{}
 		_spec       = nq.querySpec()
-		loadedTypes = [9]bool{
+		loadedTypes = [10]bool{
 			nq.withOwner != nil,
 			nq.withParent != nil,
 			nq.withNodes != nil,
+			nq.withPrimaryImage != nil,
 			nq.withAssets != nil,
 			nq.withTags != nil,
 			nq.withLink != nil,
@@ -708,6 +744,12 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 		if err := nq.loadNodes(ctx, query, nodes,
 			func(n *Node) { n.Edges.Nodes = []*Node{} },
 			func(n *Node, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := nq.withPrimaryImage; query != nil {
+		if err := nq.loadPrimaryImage(ctx, query, nodes, nil,
+			func(n *Node, e *Asset) { n.Edges.PrimaryImage = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -840,6 +882,38 @@ func (nq *NodeQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*N
 			return fmt.Errorf(`unexpected referenced foreign-key "parent_node_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (nq *NodeQuery) loadPrimaryImage(ctx context.Context, query *AssetQuery, nodes []*Node, init func(*Node), assign func(*Node, *Asset)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Node)
+	for i := range nodes {
+		if nodes[i].PrimaryAssetID == nil {
+			continue
+		}
+		fk := *nodes[i].PrimaryAssetID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(asset.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "primary_asset_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
@@ -1180,6 +1254,9 @@ func (nq *NodeQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if nq.withParent != nil {
 			_spec.Node.AddColumnOnce(node.FieldParentNodeID)
+		}
+		if nq.withPrimaryImage != nil {
+			_spec.Node.AddColumnOnce(node.FieldPrimaryAssetID)
 		}
 		if nq.withLink != nil {
 			_spec.Node.AddColumnOnce(node.FieldLinkID)

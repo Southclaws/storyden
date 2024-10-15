@@ -163,6 +163,26 @@ func (nu *NodeUpdate) SetNillableAccountID(x *xid.ID) *NodeUpdate {
 	return nu
 }
 
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (nu *NodeUpdate) SetPrimaryAssetID(x xid.ID) *NodeUpdate {
+	nu.mutation.SetPrimaryAssetID(x)
+	return nu
+}
+
+// SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
+func (nu *NodeUpdate) SetNillablePrimaryAssetID(x *xid.ID) *NodeUpdate {
+	if x != nil {
+		nu.SetPrimaryAssetID(*x)
+	}
+	return nu
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (nu *NodeUpdate) ClearPrimaryAssetID() *NodeUpdate {
+	nu.mutation.ClearPrimaryAssetID()
+	return nu
+}
+
 // SetLinkID sets the "link_id" field.
 func (nu *NodeUpdate) SetLinkID(x xid.ID) *NodeUpdate {
 	nu.mutation.SetLinkID(x)
@@ -252,6 +272,25 @@ func (nu *NodeUpdate) AddNodes(n ...*Node) *NodeUpdate {
 		ids[i] = n[i].ID
 	}
 	return nu.AddNodeIDs(ids...)
+}
+
+// SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
+func (nu *NodeUpdate) SetPrimaryImageID(id xid.ID) *NodeUpdate {
+	nu.mutation.SetPrimaryImageID(id)
+	return nu
+}
+
+// SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
+func (nu *NodeUpdate) SetNillablePrimaryImageID(id *xid.ID) *NodeUpdate {
+	if id != nil {
+		nu = nu.SetPrimaryImageID(*id)
+	}
+	return nu
+}
+
+// SetPrimaryImage sets the "primary_image" edge to the Asset entity.
+func (nu *NodeUpdate) SetPrimaryImage(a *Asset) *NodeUpdate {
+	return nu.SetPrimaryImageID(a.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -355,6 +394,12 @@ func (nu *NodeUpdate) RemoveNodes(n ...*Node) *NodeUpdate {
 		ids[i] = n[i].ID
 	}
 	return nu.RemoveNodeIDs(ids...)
+}
+
+// ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
+func (nu *NodeUpdate) ClearPrimaryImage() *NodeUpdate {
+	nu.mutation.ClearPrimaryImage()
+	return nu
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -646,6 +691,35 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nu.mutation.PrimaryImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   node.PrimaryImageTable,
+			Columns: []string{node.PrimaryImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   node.PrimaryImageTable,
+			Columns: []string{node.PrimaryImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -1024,6 +1098,26 @@ func (nuo *NodeUpdateOne) SetNillableAccountID(x *xid.ID) *NodeUpdateOne {
 	return nuo
 }
 
+// SetPrimaryAssetID sets the "primary_asset_id" field.
+func (nuo *NodeUpdateOne) SetPrimaryAssetID(x xid.ID) *NodeUpdateOne {
+	nuo.mutation.SetPrimaryAssetID(x)
+	return nuo
+}
+
+// SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
+func (nuo *NodeUpdateOne) SetNillablePrimaryAssetID(x *xid.ID) *NodeUpdateOne {
+	if x != nil {
+		nuo.SetPrimaryAssetID(*x)
+	}
+	return nuo
+}
+
+// ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
+func (nuo *NodeUpdateOne) ClearPrimaryAssetID() *NodeUpdateOne {
+	nuo.mutation.ClearPrimaryAssetID()
+	return nuo
+}
+
 // SetLinkID sets the "link_id" field.
 func (nuo *NodeUpdateOne) SetLinkID(x xid.ID) *NodeUpdateOne {
 	nuo.mutation.SetLinkID(x)
@@ -1113,6 +1207,25 @@ func (nuo *NodeUpdateOne) AddNodes(n ...*Node) *NodeUpdateOne {
 		ids[i] = n[i].ID
 	}
 	return nuo.AddNodeIDs(ids...)
+}
+
+// SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
+func (nuo *NodeUpdateOne) SetPrimaryImageID(id xid.ID) *NodeUpdateOne {
+	nuo.mutation.SetPrimaryImageID(id)
+	return nuo
+}
+
+// SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
+func (nuo *NodeUpdateOne) SetNillablePrimaryImageID(id *xid.ID) *NodeUpdateOne {
+	if id != nil {
+		nuo = nuo.SetPrimaryImageID(*id)
+	}
+	return nuo
+}
+
+// SetPrimaryImage sets the "primary_image" edge to the Asset entity.
+func (nuo *NodeUpdateOne) SetPrimaryImage(a *Asset) *NodeUpdateOne {
+	return nuo.SetPrimaryImageID(a.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
@@ -1216,6 +1329,12 @@ func (nuo *NodeUpdateOne) RemoveNodes(n ...*Node) *NodeUpdateOne {
 		ids[i] = n[i].ID
 	}
 	return nuo.RemoveNodeIDs(ids...)
+}
+
+// ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
+func (nuo *NodeUpdateOne) ClearPrimaryImage() *NodeUpdateOne {
+	nuo.mutation.ClearPrimaryImage()
+	return nuo
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
@@ -1537,6 +1656,35 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nuo.mutation.PrimaryImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   node.PrimaryImageTable,
+			Columns: []string{node.PrimaryImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   node.PrimaryImageTable,
+			Columns: []string{node.PrimaryImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

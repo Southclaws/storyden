@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import slugify from "@sindresorhus/slugify";
-import { useRouter } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { FixedCropperRef } from "react-advanced-cropper";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
 import { z } from "zod";
@@ -17,10 +17,27 @@ import {
 import { useSession } from "src/auth";
 
 import { handle } from "@/api/client";
+import { assetUpload } from "@/api/openapi-client/assets";
 import { useLibraryMutation } from "@/lib/library/library";
+import {
+  CoverImage,
+  CoverImageSchema,
+  parseNodeMetadata,
+} from "@/lib/library/metadata";
+import { getAssetURL } from "@/utils/asset";
 import { hasPermissionOr } from "@/utils/permissions";
 
 import { useLibraryPath } from "../useLibraryPath";
+
+export const CROP_STENCIL_WIDTH = 1536;
+export const CROP_STENCIL_HEIGHT = 384;
+
+const CoverImageFormSchema = z.union([
+  CoverImageSchema,
+  z.object({
+    asset_id: z.string(),
+  }),
+]);
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name."),
@@ -32,7 +49,7 @@ export const FormSchema = z.object({
 
     return v;
   }, z.string().url("Invalid URL").optional()),
-
+  coverImage: CoverImageFormSchema.optional(),
   content: z.string().optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
@@ -51,6 +68,8 @@ export function useLibraryPageScreen({ node }: Props) {
   const account = useSession();
   const { revalidate, updateNode, updateNodeVisibility, deleteNode } =
     useLibraryMutation();
+
+  const cropperRef = useRef<FixedCropperRef>(null);
 
   const isAllowedToEdit = hasPermissionOr(
     account,
@@ -89,6 +108,18 @@ export function useLibraryPageScreen({ node }: Props) {
     }
   }, [form, name]);
 
+  // This URL is used for the crop editor, it will always be the original image
+  // depending on whether the current primary image has any new versions set.
+  // The parent is always set to the originally uploaded image while the actual
+  // `primary_image` field has whichever version is currently set as the cover.
+  const primaryAssetEditingURL = getAssetURL(
+    node.primary_image?.parent?.path ?? node.primary_image?.path,
+  );
+
+  const primaryAssetURL = getAssetURL(node.primary_image?.path);
+
+  const initialCoverCoordinates = parseNodeMetadata(node.meta).coverImage;
+
   function handleEditMode() {
     if (editing) {
       setEditing(false);
@@ -113,13 +144,81 @@ export function useLibraryPageScreen({ node }: Props) {
     }
   }
 
+  const uploadCroppedCover = async () => {
+    if (!cropperRef.current) {
+      return;
+    }
+
+    const canvas = cropperRef.current.getCanvas();
+    if (!canvas) {
+      throw new Error("An unexpected error occurred with the image editor.");
+    }
+
+    const coordinates =
+      cropperRef.current.getCoordinates() satisfies CoverImage | null;
+    if (!coordinates) {
+      throw new Error(
+        "An unexpected error occurred with the image editor: unable to get crop coordinates.",
+      );
+    }
+
+    const blob = await new Promise<Blob>((resolve, reject) => {
+      canvas.toBlob((blob) => {
+        if (blob == null) {
+          reject("An unexpected error occurred with the image editor.");
+          return;
+        }
+
+        resolve(blob);
+      });
+    });
+
+    if (node.primary_image) {
+      // TODO: Delete the original asset maybe?
+    }
+
+    // The cover image is determined to be a copy of an original if it has a
+    // parent asset associated with it. Original assets do not have parents.
+    const isCopy = node.primary_image?.parent?.id !== undefined;
+
+    const parent_asset_id = isCopy
+      ? // If the primary image is already a copy, use the existing parent.
+        node.primary_image?.parent?.id
+      : // Otherwise, use the primary image asset ID, which will result in
+        // this ID becoming the parent.
+        node.primary_image?.id;
+
+    // The result of this is that when the asset revalidates, the original
+    // asset will be present in the primary image asset object. This means
+    // that users will always edit the originally uploaded image and when
+    // they stop editing, the saved asset will be the cropped version where
+    // the original is still present within the asset's parent property.
+    const asset = await assetUpload(blob, {
+      // TODO: Split filename from ID in API side (Marks) use original name.
+      filename: "cropped-cover",
+      parent_asset_id,
+    });
+
+    return {
+      isReplacement: false,
+      config: coordinates,
+      asset,
+    };
+  };
+
   const handleSubmit = form.handleSubmit(async (payload: Form) => {
     await handle(
       async () => {
-        const isRedirecting = await updateNode(node.slug, {
-          ...payload,
-          url: payload.link,
-        });
+        const coverConfig = await uploadCroppedCover();
+
+        const isRedirecting = await updateNode(
+          node.slug,
+          {
+            ...payload,
+            url: payload.link,
+          },
+          coverConfig,
+        );
 
         if (!isRedirecting) {
           // NOTE: This modifies the previous URL state, if updateNode received
@@ -199,6 +298,10 @@ export function useLibraryPageScreen({ node }: Props) {
     libraryPath,
     editing,
     node,
+    cropperRef,
+    primaryAssetURL,
+    primaryAssetEditingURL,
+    initialCoverCoordinates,
     isAllowedToEdit,
     isSaving: form.formState.isSubmitting,
     isAllowedToDelete,

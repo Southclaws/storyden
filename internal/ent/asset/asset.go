@@ -27,6 +27,8 @@ const (
 	FieldMetadata = "metadata"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
+	// FieldParentAssetID holds the string denoting the parent_asset_id field in the database.
+	FieldParentAssetID = "parent_asset_id"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
 	// EdgeNodes holds the string denoting the nodes edge name in mutations.
@@ -35,6 +37,10 @@ const (
 	EdgeLinks = "links"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
+	// EdgeParent holds the string denoting the parent edge name in mutations.
+	EdgeParent = "parent"
+	// EdgeAssets holds the string denoting the assets edge name in mutations.
+	EdgeAssets = "assets"
 	// EdgeEvent holds the string denoting the event edge name in mutations.
 	EdgeEvent = "event"
 	// Table holds the table name of the asset in the database.
@@ -61,6 +67,14 @@ const (
 	OwnerInverseTable = "accounts"
 	// OwnerColumn is the table column denoting the owner relation/edge.
 	OwnerColumn = "account_id"
+	// ParentTable is the table that holds the parent relation/edge.
+	ParentTable = "assets"
+	// ParentColumn is the table column denoting the parent relation/edge.
+	ParentColumn = "parent_asset_id"
+	// AssetsTable is the table that holds the assets relation/edge.
+	AssetsTable = "assets"
+	// AssetsColumn is the table column denoting the assets relation/edge.
+	AssetsColumn = "parent_asset_id"
 	// EventTable is the table that holds the event relation/edge.
 	EventTable = "events"
 	// EventInverseTable is the table name for the Event entity.
@@ -79,6 +93,7 @@ var Columns = []string{
 	FieldSize,
 	FieldMetadata,
 	FieldAccountID,
+	FieldParentAssetID,
 }
 
 var (
@@ -149,6 +164,11 @@ func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAccountID, opts...).ToFunc()
 }
 
+// ByParentAssetID orders the results by the parent_asset_id field.
+func ByParentAssetID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParentAssetID, opts...).ToFunc()
+}
+
 // ByPostsCount orders the results by posts count.
 func ByPostsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -198,6 +218,27 @@ func ByOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// ByParentField orders the results by parent field.
+func ByParentField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newParentStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByAssetsCount orders the results by assets count.
+func ByAssetsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAssetsStep(), opts...)
+	}
+}
+
+// ByAssets orders the results by assets terms.
+func ByAssets(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAssetsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByEventCount orders the results by event count.
 func ByEventCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -237,6 +278,20 @@ func newOwnerStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OwnerInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+	)
+}
+func newParentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+	)
+}
+func newAssetsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AssetsTable, AssetsColumn),
 	)
 }
 func newEventStep() *sqlgraph.Step {

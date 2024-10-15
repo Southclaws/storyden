@@ -70,6 +70,7 @@ func (s *service) Search(ctx context.Context, opts ...Option) ([]*library.Node, 
 				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 			})
 		}).
+		WithPrimaryImage().
 		WithAssets().
 		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
 

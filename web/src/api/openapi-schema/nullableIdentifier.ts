@@ -7,16 +7,9 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { Identifier } from "./identifier";
 
-export interface Asset {
-  filename: string;
-  height: number;
-  id: Identifier;
-  mime_type: string;
-  parent?: Asset;
-  /** The API path of the asset, conforms to the schema's GET `/assets`.
-   */
-  path: string;
-  width: number;
-}
+/**
+ * A unique identifier for this resource.
+ * @nullable
+ */
+export type NullableIdentifier = string | null;

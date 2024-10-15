@@ -81,6 +81,20 @@ func (ac *AssetCreate) SetAccountID(x xid.ID) *AssetCreate {
 	return ac
 }
 
+// SetParentAssetID sets the "parent_asset_id" field.
+func (ac *AssetCreate) SetParentAssetID(x xid.ID) *AssetCreate {
+	ac.mutation.SetParentAssetID(x)
+	return ac
+}
+
+// SetNillableParentAssetID sets the "parent_asset_id" field if the given value is not nil.
+func (ac *AssetCreate) SetNillableParentAssetID(x *xid.ID) *AssetCreate {
+	if x != nil {
+		ac.SetParentAssetID(*x)
+	}
+	return ac
+}
+
 // SetID sets the "id" field.
 func (ac *AssetCreate) SetID(x xid.ID) *AssetCreate {
 	ac.mutation.SetID(x)
@@ -149,6 +163,40 @@ func (ac *AssetCreate) SetOwnerID(id xid.ID) *AssetCreate {
 // SetOwner sets the "owner" edge to the Account entity.
 func (ac *AssetCreate) SetOwner(a *Account) *AssetCreate {
 	return ac.SetOwnerID(a.ID)
+}
+
+// SetParentID sets the "parent" edge to the Asset entity by ID.
+func (ac *AssetCreate) SetParentID(id xid.ID) *AssetCreate {
+	ac.mutation.SetParentID(id)
+	return ac
+}
+
+// SetNillableParentID sets the "parent" edge to the Asset entity by ID if the given value is not nil.
+func (ac *AssetCreate) SetNillableParentID(id *xid.ID) *AssetCreate {
+	if id != nil {
+		ac = ac.SetParentID(*id)
+	}
+	return ac
+}
+
+// SetParent sets the "parent" edge to the Asset entity.
+func (ac *AssetCreate) SetParent(a *Asset) *AssetCreate {
+	return ac.SetParentID(a.ID)
+}
+
+// AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
+func (ac *AssetCreate) AddAssetIDs(ids ...xid.ID) *AssetCreate {
+	ac.mutation.AddAssetIDs(ids...)
+	return ac
+}
+
+// AddAssets adds the "assets" edges to the Asset entity.
+func (ac *AssetCreate) AddAssets(a ...*Asset) *AssetCreate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ac.AddAssetIDs(ids...)
 }
 
 // AddEventIDs adds the "event" edge to the Event entity by IDs.
@@ -361,6 +409,39 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 		_node.AccountID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := ac.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   asset.ParentTable,
+			Columns: []string{asset.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.ParentAssetID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.AssetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   asset.AssetsTable,
+			Columns: []string{asset.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := ac.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -501,6 +582,24 @@ func (u *AssetUpsert) UpdateAccountID() *AssetUpsert {
 	return u
 }
 
+// SetParentAssetID sets the "parent_asset_id" field.
+func (u *AssetUpsert) SetParentAssetID(v xid.ID) *AssetUpsert {
+	u.Set(asset.FieldParentAssetID, v)
+	return u
+}
+
+// UpdateParentAssetID sets the "parent_asset_id" field to the value that was provided on create.
+func (u *AssetUpsert) UpdateParentAssetID() *AssetUpsert {
+	u.SetExcluded(asset.FieldParentAssetID)
+	return u
+}
+
+// ClearParentAssetID clears the value of the "parent_asset_id" field.
+func (u *AssetUpsert) ClearParentAssetID() *AssetUpsert {
+	u.SetNull(asset.FieldParentAssetID)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -633,6 +732,27 @@ func (u *AssetUpsertOne) SetAccountID(v xid.ID) *AssetUpsertOne {
 func (u *AssetUpsertOne) UpdateAccountID() *AssetUpsertOne {
 	return u.Update(func(s *AssetUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetParentAssetID sets the "parent_asset_id" field.
+func (u *AssetUpsertOne) SetParentAssetID(v xid.ID) *AssetUpsertOne {
+	return u.Update(func(s *AssetUpsert) {
+		s.SetParentAssetID(v)
+	})
+}
+
+// UpdateParentAssetID sets the "parent_asset_id" field to the value that was provided on create.
+func (u *AssetUpsertOne) UpdateParentAssetID() *AssetUpsertOne {
+	return u.Update(func(s *AssetUpsert) {
+		s.UpdateParentAssetID()
+	})
+}
+
+// ClearParentAssetID clears the value of the "parent_asset_id" field.
+func (u *AssetUpsertOne) ClearParentAssetID() *AssetUpsertOne {
+	return u.Update(func(s *AssetUpsert) {
+		s.ClearParentAssetID()
 	})
 }
 
@@ -935,6 +1055,27 @@ func (u *AssetUpsertBulk) SetAccountID(v xid.ID) *AssetUpsertBulk {
 func (u *AssetUpsertBulk) UpdateAccountID() *AssetUpsertBulk {
 	return u.Update(func(s *AssetUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetParentAssetID sets the "parent_asset_id" field.
+func (u *AssetUpsertBulk) SetParentAssetID(v xid.ID) *AssetUpsertBulk {
+	return u.Update(func(s *AssetUpsert) {
+		s.SetParentAssetID(v)
+	})
+}
+
+// UpdateParentAssetID sets the "parent_asset_id" field to the value that was provided on create.
+func (u *AssetUpsertBulk) UpdateParentAssetID() *AssetUpsertBulk {
+	return u.Update(func(s *AssetUpsert) {
+		s.UpdateParentAssetID()
+	})
+}
+
+// ClearParentAssetID clears the value of the "parent_asset_id" field.
+func (u *AssetUpsertBulk) ClearParentAssetID() *AssetUpsertBulk {
+	return u.Update(func(s *AssetUpsert) {
+		s.ClearParentAssetID()
 	})
 }
 
