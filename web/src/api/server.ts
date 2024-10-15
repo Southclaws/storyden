@@ -17,7 +17,7 @@ type Result<T> = {
 export const fetcher = async <T>(url: string, opts: Options): Promise<T> => {
   const req = buildRequest({ url, method: opts.method as any });
 
-  req.headers.set("Cookie", getCookieHeader());
+  req.headers.set("Cookie", await getCookieHeader());
 
   const response = await fetch(req);
   const result = await buildResult<T>(response);
@@ -28,8 +28,9 @@ export const fetcher = async <T>(url: string, opts: Options): Promise<T> => {
   return { data: result, status: response.status } as T;
 };
 
-function getCookieHeader(): string {
-  return cookies()
+async function getCookieHeader(): Promise<string> {
+  const c = await cookies();
+  return c
     .getAll()
     .map((c) => `${c.name}=${c.value}`)
     .join("; ");

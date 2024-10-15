@@ -22,7 +22,7 @@ export function Anchor({ id, route, icon, label, hideLabel, ...props }: Props) {
     <LinkButton href={href} size="xs" p="1" variant="ghost" {...props}>
       {React.cloneElement(icon, {
         width: "1.5rem",
-      })}
+      } as any)}
       {!hideLabel && (
         <>
           &nbsp;<span>{label}</span>

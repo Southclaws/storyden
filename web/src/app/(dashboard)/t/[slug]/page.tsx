@@ -5,13 +5,13 @@ import { UnreadyBanner } from "@/components/site/Unready";
 import { ThreadScreen } from "@/screens/thread/ThreadScreen/ThreadScreen";
 
 export type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
 export default async function Page(props: Props) {
-  const { slug } = props.params;
+  const { slug } = await props.params;
 
   try {
     const { data } = await threadGet(slug);
@@ -22,7 +22,8 @@ export default async function Page(props: Props) {
   }
 }
 
-export async function generateMetadata({ params }: Props) {
+export async function generateMetadata(props: Props) {
+  const params = await props.params;
   try {
     const info = await getInfo();
     const { data } = await threadGet(params.slug);

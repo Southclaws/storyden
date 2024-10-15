@@ -11,9 +11,9 @@ import { HStack, VStack } from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
 export type Props = {
-  params: {
+  params: Promise<{
     provider: string;
-  };
+  }>;
 };
 
 export default function Page(props: Props) {
@@ -22,7 +22,7 @@ export default function Page(props: Props) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const params = Object.fromEntries(searchParams.entries());
+  const query = Object.fromEntries(searchParams.entries());
 
   useEffect(() => {
     if (!initialized.current) {
@@ -30,11 +30,11 @@ export default function Page(props: Props) {
     }
 
     (async () => {
+      const params = await props.params;
+
       try {
-        const { id } = await oAuthProviderCallback(
-          props.params.provider,
-          params as any,
-        );
+        const { provider } = params;
+        const { id } = await oAuthProviderCallback(provider, query as any);
 
         return router.push(`/?id=${id}`);
       } catch (e) {

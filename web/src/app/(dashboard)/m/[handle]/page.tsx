@@ -4,10 +4,11 @@ import { ProfileScreen } from "src/screens/profile/ProfileScreen";
 import { profileGet } from "@/api/openapi-server/profiles";
 
 type Props = {
-  params: { handle: string };
+  params: Promise<{ handle: string }>;
 };
 
-export default async function Page({ params }: Props) {
+export default async function Page(props: Props) {
+  const params = await props.params;
   try {
     const { handle } = params;
     const { data } = await profileGet(handle);

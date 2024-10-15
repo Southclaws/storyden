@@ -8,7 +8,7 @@ export function Slot({ children, ...props }: { children?: React.ReactNode }) {
   if (React.isValidElement(children)) {
     return React.cloneElement(children, {
       ...props,
-      ...children.props,
+      ...(children.props as object),
     });
   }
 

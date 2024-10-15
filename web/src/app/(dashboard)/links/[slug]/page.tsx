@@ -1,11 +1,11 @@
 import { LinkScreen } from "src/screens/library/links/LinkScreen/LinkScreen";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 };
 
-export default function Page(props: Props) {
-  return <LinkScreen slug={props.params.slug} />;
+export default async function Page(props: Props) {
+  return <LinkScreen slug={(await props.params).slug} />;
 }
