@@ -7,7 +7,7 @@ import { MemberAvatar } from "./MemberAvatar";
 
 export type Props = {
   profile: ProfileReference;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   name?: "hidden" | "handle" | "full-horizontal" | "full-vertical";
   roles?: "hidden" | "badge" | "all";
   avatar?: "hidden" | "visible";
@@ -40,7 +40,7 @@ export function MemberName({
         <Flex direction="row" gap="1" alignItems="center">
           <styled.p
             minW="0"
-            fontSize={size === "lg" ? "md" : "sm"}
+            fontSize={size}
             fontWeight={size === "lg" ? "bold" : "medium"}
             overflow="hidden"
             textWrap="nowrap"
@@ -52,7 +52,12 @@ export function MemberName({
           >
             {profile.name}
           </styled.p>
-          <styled.p fontWeight="normal" textWrap="nowrap" color="fg.subtle">
+          <styled.p
+            fontSize={size}
+            fontWeight="normal"
+            textWrap="nowrap"
+            color="fg.subtle"
+          >
             @{profile.handle}
           </styled.p>
           <Roles profile={profile} roles={roles} />
@@ -64,7 +69,7 @@ export function MemberName({
         <Flex direction="column" gap="0" alignItems="start">
           <styled.p
             minW="0"
-            fontSize={size === "lg" ? "md" : "sm"}
+            fontSize={size}
             fontWeight={size === "lg" ? "bold" : "medium"}
             overflowX="hidden"
             textWrap="nowrap"
@@ -76,7 +81,12 @@ export function MemberName({
           >
             {profile.name}
           </styled.p>
-          <styled.p fontWeight="normal" textWrap="nowrap" color="fg.subtle">
+          <styled.p
+            fontSize={size}
+            fontWeight="normal"
+            textWrap="nowrap"
+            color="fg.subtle"
+          >
             @{profile.handle}
           </styled.p>
           <Roles profile={profile} roles={roles} />
@@ -86,7 +96,12 @@ export function MemberName({
     case "handle":
       return (
         <HStack gap="1">
-          <styled.p fontWeight="normal" textWrap="nowrap" color="fg.subtle">
+          <styled.p
+            fontSize={size}
+            fontWeight="normal"
+            textWrap="nowrap"
+            color="fg.subtle"
+          >
             @{profile.handle}
           </styled.p>
           <Roles profile={profile} roles={roles} />

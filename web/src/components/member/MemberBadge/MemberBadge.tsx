@@ -16,7 +16,7 @@ import { MemberIdent } from "./MemberIdent";
 
 export type Props = {
   profile: ProfileReference;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   name?: "hidden" | "handle" | "full-horizontal" | "full-vertical";
   roles?: "hidden" | "badge" | "all";
   avatar?: "hidden" | "visible";

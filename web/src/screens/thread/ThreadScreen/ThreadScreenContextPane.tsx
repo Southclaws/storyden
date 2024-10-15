@@ -57,7 +57,7 @@ export function ThreadScreenContextPane(props: Props) {
       value: (
         <MemberBadge
           profile={thread.author}
-          size="sm"
+          size="xs"
           avatar="hidden"
           name="full-horizontal"
         />
