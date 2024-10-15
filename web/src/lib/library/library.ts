@@ -1,11 +1,12 @@
 import slugify from "@sindresorhus/slugify";
 import { dequal } from "dequal/lite";
-import { last, uniqueId } from "lodash";
+import { omit, uniqueId } from "lodash";
 import { useRouter } from "next/navigation";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 import { Xid } from "xid-ts";
 
 import {
+  getNodeGetKey,
   getNodeListKey,
   nodeCreate,
   nodeDelete,
@@ -13,6 +14,9 @@ import {
   nodeUpdateVisibility,
 } from "@/api/openapi-client/nodes";
 import {
+  Asset,
+  Node,
+  NodeGetOKResponse,
   NodeListOKResponse,
   NodeListParams,
   NodeMutableProps,
@@ -26,10 +30,35 @@ import {
 } from "@/screens/library/library-path";
 import { useLibraryPath } from "@/screens/library/useLibraryPath";
 
+import { CoverImage, NodeMetadata } from "./metadata";
+
 export type CreateNodeArgs = {
   initialName?: string;
   parentSlug?: string;
 };
+
+export type CoverImageArgs =
+  | {
+      /**
+       * The asset to use as the cover image.
+       */
+      asset: Asset;
+
+      /**
+       * The configuration for the cropper, this is used to store the crop coords
+       * for when the user re-enters the edit mode and loads the original image.
+       */
+      config: CoverImage;
+
+      /**
+       * Is this cover image a full replacement or a crop of the original?
+       */
+      isReplacement: false;
+    }
+  | {
+      asset: Asset;
+      isReplacement: true;
+    };
 
 export function useLibraryMutation(params?: NodeListParams) {
   const session = useSession();
@@ -40,7 +69,13 @@ export function useLibraryMutation(params?: NodeListParams) {
   // for revalidating all node list queries (published and private)
   const nodeListKey = getNodeListKey(params);
   const nodeListAllKeyFn = (key: Arguments) => {
-    return Array.isArray(key) && key[0].startsWith(nodeListKey);
+    return (
+      Array.isArray(key) &&
+      key[0].startsWith(nodeListKey) &&
+      // Don't pass for /nodes/<slug> keys
+      // NOTE: This may be buggy for cases with query params...
+      !key[0].startsWith(nodeListKey + "/")
+    );
   };
   // for revalidating only private node list queries
   const nodeListPrivateKey = getNodeListKey({
@@ -97,13 +132,34 @@ export function useLibraryMutation(params?: NodeListParams) {
     router.push(`/l/${newPath}?edit=true`);
   };
 
-  const updateNode = async (slug: string, newNode: NodeMutableProps) => {
-    const mutator: MutatorCallback<NodeListOKResponse> = (data) => {
+  const updateNode = async (
+    slug: string,
+    newNode: NodeMutableProps,
+    cover?: CoverImageArgs,
+  ) => {
+    const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
       if (!data) return;
+
+      const nodeProps = omit(newNode, "parent");
+
+      const withNewCover = cover?.asset && mergePrimaryImageAsset(data, cover);
+
+      const updated = {
+        ...data,
+        ...nodeProps,
+        ...withNewCover,
+      } satisfies NodeWithChildren;
+
+      return updated;
+    };
+
+    const listMutator: MutatorCallback<NodeListOKResponse> = (data) => {
+      if (!data || !data.nodes) return;
 
       const newNodes = data.nodes.map((n) => {
         if (n.slug === slug) {
-          return { ...n, ...newNode } as NodeWithChildren;
+          const updated = nodeMutator(n);
+          return { ...n, ...updated };
         }
 
         return n;
@@ -115,17 +171,32 @@ export function useLibraryMutation(params?: NodeListParams) {
       };
     };
 
+    const nodeKey = getNodeGetKey(slug);
+    const nodeKeyFn = (key: Arguments) => {
+      return Array.isArray(key) && key[0].startsWith(nodeKey);
+    };
+
     const slugChanged = newNode.slug !== undefined && newNode.slug !== slug;
 
-    await mutate(nodeListAllKeyFn, mutator, { revalidate: false });
+    await mutate(nodeListAllKeyFn, listMutator, { revalidate: false });
+    await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
+
+    const newMeta =
+      cover && !cover.isReplacement
+        ? ({
+            // TODO: Spread original node metadata here
+            coverImage: cover.config,
+          } satisfies NodeMetadata)
+        : undefined;
 
     await nodeUpdate(slug, {
-      name: newNode.name,
-      slug: newNode.slug,
-      asset_ids: newNode.asset_ids,
-      url: newNode.url,
-      content: newNode.content,
-      meta: newNode.meta,
+      ...newNode,
+      primary_image_asset_id: cover?.asset.id,
+      // NOTE: We don't have access to the original node's meta, so we have to
+      // fully replace it. Right now no other features use metadata, but this
+      // will need to be fixed eventually. Probably by either calling the API
+      // within this hook to fetch the latest version of the node and spreading.
+      meta: newMeta,
     });
 
     // Handle slug changes properly by redirecting to the new path.
@@ -135,6 +206,29 @@ export function useLibraryMutation(params?: NodeListParams) {
     }
 
     return slugChanged;
+  };
+
+  const removeNodeCoverImage = async (slug: string) => {
+    const nodeKey = getNodeGetKey(slug);
+    const nodeKeyFn = (key: Arguments) => {
+      return Array.isArray(key) && key[0].startsWith(nodeKey);
+    };
+
+    const mutator: MutatorCallback<NodeGetOKResponse> = (data) => {
+      if (!data) return;
+
+      const newNode = { ...data, primary_image: undefined };
+
+      return newNode;
+    };
+
+    await mutate(nodeKeyFn, mutator, { revalidate: false });
+
+    await nodeUpdate(slug, {
+      primary_image_asset_id: null,
+      // NOTE: We don't have access to the original node's meta, so we can't
+      // remove the old cover config, but it doesn't really matter.
+    });
   };
 
   const updateNodeVisibility = async (slug: string, visibility: Visibility) => {
@@ -191,8 +285,30 @@ export function useLibraryMutation(params?: NodeListParams) {
   return {
     createNode,
     updateNode,
+    removeNodeCoverImage,
     updateNodeVisibility,
     deleteNode,
     revalidate,
+  };
+}
+
+// Used purely for optimistic mutation where the asset is swapped out.
+function mergePrimaryImageAsset(
+  oldNode: Node,
+  coverConfig: CoverImageArgs,
+): Pick<Node, "primary_image" | "meta"> {
+  // If replacing the asset, we don't want to keep the old parent.
+  if (coverConfig.isReplacement) {
+    return {
+      primary_image: coverConfig.asset,
+      meta: { ...oldNode.meta, coverImage: null },
+    };
+  }
+
+  const parentAsset = oldNode.primary_image?.parent ?? oldNode.primary_image;
+
+  return {
+    primary_image: { ...coverConfig.asset, parent: parentAsset },
+    meta: { ...oldNode.meta, coverImage: coverConfig.config },
   };
 }

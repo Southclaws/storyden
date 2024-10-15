@@ -11,6 +11,7 @@ import type { AssetIDs } from "./assetIDs";
 import type { AssetSourceList } from "./assetSourceList";
 import type { Metadata } from "./metadata";
 import type { NodeName } from "./nodeName";
+import type { NullableIdentifier } from "./nullableIdentifier";
 import type { PostContent } from "./postContent";
 import type { Slug } from "./slug";
 import type { Url } from "./url";
@@ -26,6 +27,7 @@ export interface NodeMutableProps {
   meta?: Metadata;
   name?: NodeName;
   parent?: Slug;
+  primary_image_asset_id?: NullableIdentifier;
   slug?: Slug;
   url?: Url;
 }

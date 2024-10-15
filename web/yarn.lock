@@ -2659,6 +2659,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/mime-db@npm:^1":
+  version: 1.43.5
+  resolution: "@types/mime-db@npm:1.43.5"
+  checksum: 10c0/226af9f9126d1e4cc7241e8960087fb72b598179fb3aee2d35024d1583e2e83222199c0c63afa23763f1abc575e5514b3677505497608688d25155f8fd828a65
+  languageName: node
+  linkType: hard
+
 "@types/ms@npm:*":
   version: 0.7.34
   resolution: "@types/ms@npm:0.7.34"
@@ -4718,6 +4725,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"advanced-cropper@npm:~0.17.1":
+  version: 0.17.1
+  resolution: "advanced-cropper@npm:0.17.1"
+  dependencies:
+    tslib: "npm:^2.4.0"
+  checksum: 10c0/6e32a7a8c29da96ed707ae5bb1d46b0e4368bd16f60e4d0ad02172fd28be20853122a45525351c5811fce0a3dee5f9015cc89ec6b36067b9aee4f82d3edeed0c
+  languageName: node
+  linkType: hard
+
 "agent-base@npm:^7.0.2, agent-base@npm:^7.1.0, agent-base@npm:^7.1.1":
   version: 7.1.1
   resolution: "agent-base@npm:7.1.1"
@@ -5300,6 +5316,13 @@ __metadata:
   version: 3.1.1
   resolution: "chroma-js@npm:3.1.1"
   checksum: 10c0/fb5e3cd958a954b8cd44017f70aff42ae37bc561cdcea0ebeeb6d2df5989e7402e02c674274af2eefd1478ee172e05ce51ac353e3cbe1db139f599b338523339
+  languageName: node
+  linkType: hard
+
+"classnames@npm:^2.2.6":
+  version: 2.5.1
+  resolution: "classnames@npm:2.5.1"
+  checksum: 10c0/afff4f77e62cea2d79c39962980bf316bacb0d7c49e13a21adaadb9221e1c6b9d3cdb829d8bb1b23c406f4e740507f37e1dcf506f7e3b7113d17c5bab787aa69
   languageName: node
   linkType: hard
 
@@ -8310,6 +8333,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mime-db@npm:^1.53.0":
+  version: 1.53.0
+  resolution: "mime-db@npm:1.53.0"
+  checksum: 10c0/1dcc37ba8ed5d1c179f5c6f0837e8db19371d5f2ea3690c3c2f3fa8c3858f976851d3460b172b4dee78ebd606762cbb407aa398545fbacd539e519f858cd7bf4
+  languageName: node
+  linkType: hard
+
 "mimic-fn@npm:^2.1.0":
   version: 2.1.0
   resolution: "mimic-fn@npm:2.1.0"
@@ -9519,6 +9549,19 @@ __metadata:
   version: 1.2.3
   resolution: "queue-microtask@npm:1.2.3"
   checksum: 10c0/900a93d3cdae3acd7d16f642c29a642aea32c2026446151f0778c62ac089d4b8e6c986811076e1ae180a694cedf077d453a11b58ff0a865629a4f82ab558e102
+  languageName: node
+  linkType: hard
+
+"react-advanced-cropper@npm:^0.20.0":
+  version: 0.20.0
+  resolution: "react-advanced-cropper@npm:0.20.0"
+  dependencies:
+    advanced-cropper: "npm:~0.17.1"
+    classnames: "npm:^2.2.6"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 10c0/372242ea2756612e1b2f5f9d0ffd77e24aba5ea2b5ae4fb100d89946f041823f78f3fc151e8637df9de2078a32e30dce88006c668e12d6e3b7858ef90d0ad6a2
   languageName: node
   linkType: hard
 
@@ -10905,6 +10948,7 @@ __metadata:
     "@types/chroma-js": "npm:^2.4.4"
     "@types/js-cookie": "npm:^3.0.6"
     "@types/lodash": "npm:^4.17.10"
+    "@types/mime-db": "npm:^1"
     "@types/node": "npm:^22.7.5"
     "@types/react": "npm:^18.3.11"
     "@types/react-avatar-editor": "npm:^13.0.3"
@@ -10922,12 +10966,14 @@ __metadata:
     js-cookie: "npm:^3.0.5"
     lodash: "npm:^4.17.21"
     lucide-react: "npm:^0.451.0"
+    mime-db: "npm:^1.53.0"
     next: "npm:^14.2.14"
     nuqs: "npm:^1.20.0"
     orval: "npm:^6.31.0"
     polished: "npm:^4.3.1"
     prettier: "npm:^3.3.3"
     react: "npm:^18.3.1"
+    react-advanced-cropper: "npm:^0.20.0"
     react-avatar-editor: "npm:^13.0.2"
     react-contenteditable: "npm:^3.3.7"
     react-dom: "npm:^18.3.1"

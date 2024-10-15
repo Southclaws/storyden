@@ -49,6 +49,7 @@ func New(
 
 type Options struct {
 	ContentFill opt.Optional[asset.ContentFillCommand]
+	ParentID    opt.Optional[asset.AssetID]
 }
 
 func (s *Uploader) Upload(ctx context.Context, r io.Reader, size int64, name asset.Filename, opts Options) (*asset.Asset, error) {
@@ -57,7 +58,13 @@ func (s *Uploader) Upload(ctx context.Context, r io.Reader, size int64, name ass
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	a, err := s.assets.Add(ctx, xid.ID(accountID), name, int(size))
+	a, err := func() (asset *asset.Asset, err error) {
+		if pid, ok := opts.ParentID.Get(); ok {
+			return s.assets.AddVersion(ctx, xid.ID(accountID), pid, name, int(size))
+		} else {
+			return s.assets.Add(ctx, xid.ID(accountID), name, int(size))
+		}
+	}()
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

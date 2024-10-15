@@ -34,6 +34,8 @@ const (
 	FieldParentNodeID = "parent_node_id"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
+	// FieldPrimaryAssetID holds the string denoting the primary_asset_id field in the database.
+	FieldPrimaryAssetID = "primary_asset_id"
 	// FieldLinkID holds the string denoting the link_id field in the database.
 	FieldLinkID = "link_id"
 	// FieldVisibility holds the string denoting the visibility field in the database.
@@ -46,6 +48,8 @@ const (
 	EdgeParent = "parent"
 	// EdgeNodes holds the string denoting the nodes edge name in mutations.
 	EdgeNodes = "nodes"
+	// EdgePrimaryImage holds the string denoting the primary_image edge name in mutations.
+	EdgePrimaryImage = "primary_image"
 	// EdgeAssets holds the string denoting the assets edge name in mutations.
 	EdgeAssets = "assets"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
@@ -75,6 +79,13 @@ const (
 	NodesTable = "nodes"
 	// NodesColumn is the table column denoting the nodes relation/edge.
 	NodesColumn = "parent_node_id"
+	// PrimaryImageTable is the table that holds the primary_image relation/edge.
+	PrimaryImageTable = "nodes"
+	// PrimaryImageInverseTable is the table name for the Asset entity.
+	// It exists in this package in order to avoid circular dependency with the "asset" package.
+	PrimaryImageInverseTable = "assets"
+	// PrimaryImageColumn is the table column denoting the primary_image relation/edge.
+	PrimaryImageColumn = "primary_asset_id"
 	// AssetsTable is the table that holds the assets relation/edge. The primary key declared below.
 	AssetsTable = "node_assets"
 	// AssetsInverseTable is the table name for the Asset entity.
@@ -123,6 +134,7 @@ var Columns = []string{
 	FieldContent,
 	FieldParentNodeID,
 	FieldAccountID,
+	FieldPrimaryAssetID,
 	FieldLinkID,
 	FieldVisibility,
 	FieldMetadata,
@@ -247,6 +259,11 @@ func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAccountID, opts...).ToFunc()
 }
 
+// ByPrimaryAssetID orders the results by the primary_asset_id field.
+func ByPrimaryAssetID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPrimaryAssetID, opts...).ToFunc()
+}
+
 // ByLinkID orders the results by the link_id field.
 func ByLinkID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLinkID, opts...).ToFunc()
@@ -282,6 +299,13 @@ func ByNodesCount(opts ...sql.OrderTermOption) OrderOption {
 func ByNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByPrimaryImageField orders the results by primary_image field.
+func ByPrimaryImageField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPrimaryImageStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -380,6 +404,13 @@ func newNodesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, NodesTable, NodesColumn),
+	)
+}
+func newPrimaryImageStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PrimaryImageInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, PrimaryImageTable, PrimaryImageColumn),
 	)
 }
 func newAssetsStep() *sqlgraph.Step {

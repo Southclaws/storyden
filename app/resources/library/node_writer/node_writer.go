@@ -73,6 +73,18 @@ func WithContentLinks(ids ...xid.ID) Option {
 	}
 }
 
+func WithPrimaryImage(id asset.AssetID) Option {
+	return func(nm *ent.NodeMutation) {
+		nm.SetPrimaryAssetID(id)
+	}
+}
+
+func WithPrimaryImageRemoved() Option {
+	return func(nm *ent.NodeMutation) {
+		nm.ClearPrimaryAssetID()
+	}
+}
+
 func WithContent(v datagraph.Content) Option {
 	return func(c *ent.NodeMutation) {
 		c.SetContent(v.HTML())

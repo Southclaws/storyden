@@ -53,6 +53,9 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		WithOwner(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
+		WithPrimaryImage(func(aq *ent.AssetQuery) {
+			aq.WithParent()
+		}).
 		WithAssets().
 		WithLink(func(lq *ent.LinkQuery) {
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))

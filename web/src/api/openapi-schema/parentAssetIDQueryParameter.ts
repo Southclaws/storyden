@@ -7,16 +7,13 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { Identifier } from "./identifier";
 
-export interface Asset {
-  filename: string;
-  height: number;
-  id: Identifier;
-  mime_type: string;
-  parent?: Asset;
-  /** The API path of the asset, conforms to the schema's GET `/assets`.
-   */
-  path: string;
-  width: number;
-}
+/**
+ * For uploading new versions of an existing asset, set this parameter to
+the asset ID of the parent asset. This must be an ID and not a filename.
+This feature is used for situations where you want to replace an asset
+in its usage context, but retain the original with a way to reference it
+for features such as editable/croppable images or file version history.
+
+ */
+export type ParentAssetIDQueryParameter = string;

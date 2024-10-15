@@ -102,6 +102,26 @@ func (au *AssetUpdate) SetNillableAccountID(x *xid.ID) *AssetUpdate {
 	return au
 }
 
+// SetParentAssetID sets the "parent_asset_id" field.
+func (au *AssetUpdate) SetParentAssetID(x xid.ID) *AssetUpdate {
+	au.mutation.SetParentAssetID(x)
+	return au
+}
+
+// SetNillableParentAssetID sets the "parent_asset_id" field if the given value is not nil.
+func (au *AssetUpdate) SetNillableParentAssetID(x *xid.ID) *AssetUpdate {
+	if x != nil {
+		au.SetParentAssetID(*x)
+	}
+	return au
+}
+
+// ClearParentAssetID clears the value of the "parent_asset_id" field.
+func (au *AssetUpdate) ClearParentAssetID() *AssetUpdate {
+	au.mutation.ClearParentAssetID()
+	return au
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
 func (au *AssetUpdate) AddPostIDs(ids ...xid.ID) *AssetUpdate {
 	au.mutation.AddPostIDs(ids...)
@@ -156,6 +176,40 @@ func (au *AssetUpdate) SetOwnerID(id xid.ID) *AssetUpdate {
 // SetOwner sets the "owner" edge to the Account entity.
 func (au *AssetUpdate) SetOwner(a *Account) *AssetUpdate {
 	return au.SetOwnerID(a.ID)
+}
+
+// SetParentID sets the "parent" edge to the Asset entity by ID.
+func (au *AssetUpdate) SetParentID(id xid.ID) *AssetUpdate {
+	au.mutation.SetParentID(id)
+	return au
+}
+
+// SetNillableParentID sets the "parent" edge to the Asset entity by ID if the given value is not nil.
+func (au *AssetUpdate) SetNillableParentID(id *xid.ID) *AssetUpdate {
+	if id != nil {
+		au = au.SetParentID(*id)
+	}
+	return au
+}
+
+// SetParent sets the "parent" edge to the Asset entity.
+func (au *AssetUpdate) SetParent(a *Asset) *AssetUpdate {
+	return au.SetParentID(a.ID)
+}
+
+// AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
+func (au *AssetUpdate) AddAssetIDs(ids ...xid.ID) *AssetUpdate {
+	au.mutation.AddAssetIDs(ids...)
+	return au
+}
+
+// AddAssets adds the "assets" edges to the Asset entity.
+func (au *AssetUpdate) AddAssets(a ...*Asset) *AssetUpdate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.AddAssetIDs(ids...)
 }
 
 // AddEventIDs adds the "event" edge to the Event entity by IDs.
@@ -245,6 +299,33 @@ func (au *AssetUpdate) RemoveLinks(l ...*Link) *AssetUpdate {
 func (au *AssetUpdate) ClearOwner() *AssetUpdate {
 	au.mutation.ClearOwner()
 	return au
+}
+
+// ClearParent clears the "parent" edge to the Asset entity.
+func (au *AssetUpdate) ClearParent() *AssetUpdate {
+	au.mutation.ClearParent()
+	return au
+}
+
+// ClearAssets clears all "assets" edges to the Asset entity.
+func (au *AssetUpdate) ClearAssets() *AssetUpdate {
+	au.mutation.ClearAssets()
+	return au
+}
+
+// RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
+func (au *AssetUpdate) RemoveAssetIDs(ids ...xid.ID) *AssetUpdate {
+	au.mutation.RemoveAssetIDs(ids...)
+	return au
+}
+
+// RemoveAssets removes "assets" edges to Asset entities.
+func (au *AssetUpdate) RemoveAssets(a ...*Asset) *AssetUpdate {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.RemoveAssetIDs(ids...)
 }
 
 // ClearEvent clears all "event" edges to the Event entity.
@@ -512,6 +593,80 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   asset.ParentTable,
+			Columns: []string{asset.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   asset.ParentTable,
+			Columns: []string{asset.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.AssetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   asset.AssetsTable,
+			Columns: []string{asset.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !au.mutation.AssetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   asset.AssetsTable,
+			Columns: []string{asset.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.AssetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   asset.AssetsTable,
+			Columns: []string{asset.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if au.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -646,6 +801,26 @@ func (auo *AssetUpdateOne) SetNillableAccountID(x *xid.ID) *AssetUpdateOne {
 	return auo
 }
 
+// SetParentAssetID sets the "parent_asset_id" field.
+func (auo *AssetUpdateOne) SetParentAssetID(x xid.ID) *AssetUpdateOne {
+	auo.mutation.SetParentAssetID(x)
+	return auo
+}
+
+// SetNillableParentAssetID sets the "parent_asset_id" field if the given value is not nil.
+func (auo *AssetUpdateOne) SetNillableParentAssetID(x *xid.ID) *AssetUpdateOne {
+	if x != nil {
+		auo.SetParentAssetID(*x)
+	}
+	return auo
+}
+
+// ClearParentAssetID clears the value of the "parent_asset_id" field.
+func (auo *AssetUpdateOne) ClearParentAssetID() *AssetUpdateOne {
+	auo.mutation.ClearParentAssetID()
+	return auo
+}
+
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
 func (auo *AssetUpdateOne) AddPostIDs(ids ...xid.ID) *AssetUpdateOne {
 	auo.mutation.AddPostIDs(ids...)
@@ -700,6 +875,40 @@ func (auo *AssetUpdateOne) SetOwnerID(id xid.ID) *AssetUpdateOne {
 // SetOwner sets the "owner" edge to the Account entity.
 func (auo *AssetUpdateOne) SetOwner(a *Account) *AssetUpdateOne {
 	return auo.SetOwnerID(a.ID)
+}
+
+// SetParentID sets the "parent" edge to the Asset entity by ID.
+func (auo *AssetUpdateOne) SetParentID(id xid.ID) *AssetUpdateOne {
+	auo.mutation.SetParentID(id)
+	return auo
+}
+
+// SetNillableParentID sets the "parent" edge to the Asset entity by ID if the given value is not nil.
+func (auo *AssetUpdateOne) SetNillableParentID(id *xid.ID) *AssetUpdateOne {
+	if id != nil {
+		auo = auo.SetParentID(*id)
+	}
+	return auo
+}
+
+// SetParent sets the "parent" edge to the Asset entity.
+func (auo *AssetUpdateOne) SetParent(a *Asset) *AssetUpdateOne {
+	return auo.SetParentID(a.ID)
+}
+
+// AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
+func (auo *AssetUpdateOne) AddAssetIDs(ids ...xid.ID) *AssetUpdateOne {
+	auo.mutation.AddAssetIDs(ids...)
+	return auo
+}
+
+// AddAssets adds the "assets" edges to the Asset entity.
+func (auo *AssetUpdateOne) AddAssets(a ...*Asset) *AssetUpdateOne {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.AddAssetIDs(ids...)
 }
 
 // AddEventIDs adds the "event" edge to the Event entity by IDs.
@@ -789,6 +998,33 @@ func (auo *AssetUpdateOne) RemoveLinks(l ...*Link) *AssetUpdateOne {
 func (auo *AssetUpdateOne) ClearOwner() *AssetUpdateOne {
 	auo.mutation.ClearOwner()
 	return auo
+}
+
+// ClearParent clears the "parent" edge to the Asset entity.
+func (auo *AssetUpdateOne) ClearParent() *AssetUpdateOne {
+	auo.mutation.ClearParent()
+	return auo
+}
+
+// ClearAssets clears all "assets" edges to the Asset entity.
+func (auo *AssetUpdateOne) ClearAssets() *AssetUpdateOne {
+	auo.mutation.ClearAssets()
+	return auo
+}
+
+// RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
+func (auo *AssetUpdateOne) RemoveAssetIDs(ids ...xid.ID) *AssetUpdateOne {
+	auo.mutation.RemoveAssetIDs(ids...)
+	return auo
+}
+
+// RemoveAssets removes "assets" edges to Asset entities.
+func (auo *AssetUpdateOne) RemoveAssets(a ...*Asset) *AssetUpdateOne {
+	ids := make([]xid.ID, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.RemoveAssetIDs(ids...)
 }
 
 // ClearEvent clears all "event" edges to the Event entity.
@@ -1079,6 +1315,80 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   asset.ParentTable,
+			Columns: []string{asset.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   asset.ParentTable,
+			Columns: []string{asset.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.AssetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   asset.AssetsTable,
+			Columns: []string{asset.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !auo.mutation.AssetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   asset.AssetsTable,
+			Columns: []string{asset.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.AssetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   asset.AssetsTable,
+			Columns: []string{asset.AssetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
