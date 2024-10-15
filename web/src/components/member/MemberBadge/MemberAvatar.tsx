@@ -16,7 +16,7 @@ const avatarStyles = css({
 
 export type Props = {
   profile: ProfileReference;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   editable?: boolean;
 };
 
@@ -66,6 +66,8 @@ export function getAvatarURL(id: Identifier): string {
 
 export function avatarSize(size: Props["size"]) {
   switch (size) {
+    case "xs":
+      return { width: 16, height: 16 };
     case "sm":
       return { width: 24, height: 24 };
     case "md":
