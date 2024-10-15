@@ -43,9 +43,9 @@ export const input = defineRecipe({
   },
   variants: {
     size: {
-      "2xs": { px: "1.5", h: "7", minW: "7", fontSize: "xs" },
-      xs: { px: "2", h: "8", minW: "8", fontSize: "xs" },
-      sm: { px: "2.5", h: "9", minW: "9", fontSize: "sm" },
+      "2xs": { px: "1.5", h: "6", minW: "7", fontSize: "xs" },
+      xs: { px: "2", h: "7", minW: "8", fontSize: "xs" },
+      sm: { px: "2.5", h: "8", minW: "9", fontSize: "sm" },
       md: { px: "3", h: "10", minW: "10", fontSize: "md" },
       lg: { px: "3.5", h: "11", minW: "11", fontSize: "md" },
       xl: { px: "4", h: "12", minW: "12", fontSize: "lg" },
