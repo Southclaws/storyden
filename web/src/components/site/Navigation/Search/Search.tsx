@@ -20,6 +20,7 @@ export function Search(props: Props) {
     >
       <Input
         w="full"
+        size="sm"
         borderRight="none"
         borderRightRadius="none"
         type="search"
@@ -36,6 +37,7 @@ export function Search(props: Props) {
 
       {(props.query || data.q) && (
         <Button
+          size="sm"
           variant="outline"
           borderX="none"
           borderRadius="none"
@@ -47,6 +49,7 @@ export function Search(props: Props) {
         </Button>
       )}
       <Button
+        size="sm"
         variant="outline"
         flexShrink="0"
         borderLeft="none"

@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -17,6 +17,7 @@ export type Props = {
 export function useSearch(props: Props) {
   const { data: infoResult } = useGetInfo();
   const router = useRouter();
+  const pathname = usePathname();
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -33,8 +34,9 @@ export function useSearch(props: Props) {
 
   const handleReset = async () => {
     form.reset();
-    // TODO: Only push to search if already on /search
-    router.push("/search");
+    if (pathname === "/search") {
+      router.push("/search");
+    }
   };
 
   return {
