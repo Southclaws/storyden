@@ -96,11 +96,7 @@ export function LibraryPage(props: Props) {
                     <EditAction onClick={handleEditMode}>Edit</EditAction>
                   </>
                 )}
-                <LibraryPageMenu
-                  node={node}
-                  onVisibilityChange={handleVisibilityChange}
-                  onDelete={handleDelete}
-                />
+                <LibraryPageMenu node={node} />
               </HStack>
             )}
           </HStack>

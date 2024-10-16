@@ -4,7 +4,7 @@ import { CategoryList } from "@/components/category/CategoryList/CategoryList";
 import { Divider, LStack, styled } from "@/styled-system/jsx";
 
 import { MembersAnchor } from "../Anchors/Members";
-import { DatagraphNavTree } from "../DatagraphNavTree/DatagraphNavTree";
+import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
 import { useNavigation } from "../useNavigation";
 
 export function ContentNavigationList() {
@@ -23,17 +23,11 @@ export function ContentNavigationList() {
     >
       <LStack gap="1">
         <CategoryList />
-        <DatagraphNavTree
+        <LibraryNavigationTree
           label="Library"
           href="/l"
           currentNode={nodeSlug}
-          visibility={["published"]}
-        />
-        <DatagraphNavTree
-          label="Private"
-          href="/drafts"
-          currentNode={nodeSlug}
-          visibility={["draft", "review", "unlisted"]}
+          visibility={["draft", "review", "unlisted", "published"]}
         />
       </LStack>
 

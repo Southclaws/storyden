@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -50,8 +51,8 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, err
 		fn(&f)
 	}
 
-	if f.accountSlug != nil {
-		query.Where(node.HasOwnerWith(account.Handle(*f.accountSlug)))
+	if f.rootAccountHandleFilter != nil {
+		query.Where(node.HasOwnerWith(account.Handle(*f.rootAccountHandleFilter)))
 	}
 
 	if len(f.visibility) > 0 {
@@ -212,12 +213,12 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 		rootPredicate = "parent_node_id is null"
 	}
 
-	if f.accountSlug != nil {
+	if f.rootAccountHandleFilter != nil {
 		predicates = append(predicates, fmt.Sprintf(
 			"a.handle = %s",
 			getPlaceholder()))
 
-		args = append(args, *f.accountSlug)
+		args = append(args, *f.rootAccountHandleFilter)
 	}
 
 	if f.depth != nil {
@@ -256,20 +257,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 		flat = append(flat, n)
 	}
 
-	filtered := dt.Filter(flat, func(n *library.Node) bool {
-		if len(f.visibility) > 0 {
-			// filteringUnlisted := lo.Contains(f.visibility, visibility.VisibilityUnlisted)
-
-			// TODO: Get owner ID from session
-			// if filteringUnlisted && n.Owner.ID != "" {
-			// 	return false
-			// }
-
-			return lo.Contains(f.visibility, n.Visibility)
-		} else {
-			return n.Visibility == visibility.VisibilityPublished
-		}
-	})
+	filtered := dt.Filter(flat, applyFilterRules(f))
 
 	ids := dt.Map(filtered, func(n *library.Node) xid.ID { return xid.ID(n.Mark.ID()) })
 
@@ -348,4 +336,71 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 
 func (d *database) FilterSubtree(ctx context.Context, id library.NodeID, filter string) ([]*library.Node, error) {
 	return nil, nil
+}
+
+// applyFilterRules applies the rather complex filtering logic for nodes in the
+// tree while they are still flattened. This is because implementing this logic
+// directly into the recursive query is a huge pain (especially because of Go.)
+//
+// This may cause a bit of over-querying as the query will, in most cases, pull
+// every node (the full tree) but this can be addressed if it becomes a problem.
+func applyFilterRules(f filters) func(n *library.Node) bool {
+	return func(n *library.Node) bool {
+		// If there are no visibility filters, the default is just published.
+		if len(f.visibility) == 0 {
+			return n.Visibility == visibility.VisibilityPublished
+		}
+
+		includedInVisibilityFilter := lo.Contains(f.visibility, n.Visibility)
+		if !includedInVisibilityFilter {
+			// The request is not interested in this node, regardless of rules.
+			return false
+		}
+
+		// The default yield for this filter is to only show published nodes.
+		// This state is returned after other more complex checks are done.
+		isPublished := n.Visibility == visibility.VisibilityPublished
+
+		// If published and filters include publish, yield this node.
+		if isPublished {
+			return true
+		}
+
+		session, ok := f.requestingAccount.Get()
+		if !ok {
+			// If a guest is making this request, then only filter on published.
+			// If the requesting guest used only other filters they see nothing.
+			return isPublished
+		}
+
+		isOwner := n.Owner.ID == session.ID
+		if isOwner {
+			// If the requesting account owns this node, and it's within the
+			// visibility filter constraint, return it in the list.
+			return includedInVisibilityFilter
+		}
+
+		// The account is not the owner of the node, so we need to check if
+		// they have the manage library permissions.
+
+		isLibraryManager := session.Roles.Permissions().HasAny(rbac.PermissionManageLibrary, rbac.PermissionAdministrator)
+		if !isLibraryManager {
+			// If the requesting account is not the owner, and not a manager,
+			// only yield the node if it's published and the filters include it.
+
+			return n.Visibility == visibility.VisibilityPublished
+		}
+
+		// the account is a library manager, but that still doesn't mean they
+		// can see everything. Ensure that the only nodes not published or not
+		// owned by the requesting account are in-review.
+
+		if n.Visibility == visibility.VisibilityReview {
+			return true
+		}
+
+		// by this point, all logic is applied and the node is either not owned,
+		// the requesting account doesn't have permission, or not in filters.
+		return false
+	}
 }
