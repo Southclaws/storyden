@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 )
@@ -15,21 +16,32 @@ type Repository interface {
 }
 
 type filters struct {
-	accountSlug *string
-	visibility  []visibility.Visibility
-	depth       *uint
+	rootAccountHandleFilter *string
+	requestingAccount       opt.Optional[account.Account]
+	visibility              []visibility.Visibility
+	depth                   *uint
 }
 
 type Filter func(*filters)
 
-func WithOwner(v string) Filter {
+// WithRootOwner filters top level nodes only by the account handle. When this
+// is used, it will only retrieve fully private trees from the top level. If the
+// specified handle either only owns nodes that are children or has no nodes at
+// all, the result will be an empty list. Generally this is only used for use
+// cases where you need to show users their own private root level page trees.
+func WithRootOwner(v string) Filter {
 	return func(f *filters) {
-		f.accountSlug = &v
+		f.rootAccountHandleFilter = &v
 	}
 }
 
-func WithVisibility(v ...visibility.Visibility) Filter {
+// WithVisibility applies permission-based filtering for the given visibilities
+// against the requesting account (if any) to ensure that visibility rules are
+// implemented correctly. Owners can view their own drafts, library managers can
+// view all review items, etc.
+func WithVisibility(acc opt.Optional[account.Account], v ...visibility.Visibility) Filter {
 	return func(f *filters) {
+		f.requestingAccount = acc
 		f.visibility = v
 	}
 }

@@ -1,11 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { Controller, ControllerProps } from "react-hook-form";
 
-import { InfoTip } from "@/components/site/InfoTip";
 import { FormErrorText } from "@/components/ui/FormErrorText";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form } from "@/screens/library/LibraryPageScreen/useLibraryPageScreen";
 import { HStack, LStack } from "@/styled-system/jsx";
@@ -27,14 +24,14 @@ export function LibraryPageImportFromURL(
         return (
           <LStack gap="0">
             <HStack w="full" justify="space-between">
-              {/* <Input
+              <Input
                 w="full"
                 size="sm"
                 variant="ghost"
                 color="fg.muted"
                 placeholder="External URL..."
-                {...form.field}
-              /> */}
+                onChange={form.field.onChange}
+              />
 
               {/* <HStack>
                 <InfoTip title="Generating a page from a URL">
