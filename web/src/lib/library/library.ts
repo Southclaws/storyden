@@ -270,6 +270,7 @@ export function useLibraryMutation(params?: NodeListParams) {
 
     await nodeDelete(slug, { target_node: newParent });
 
+    // TODO: Ensure redirect only happens if you're viewing this actual page.
     if (newParent) {
       const newPath = replaceLibraryPath(libraryPath, slug, newParent);
       router.push(newPath);

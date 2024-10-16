@@ -10,7 +10,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -127,8 +126,13 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (*account.Account, error) {
-		return c.accountQuery.GetByID(ctx, aid)
+	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (account.Account, error) {
+		a, err := c.accountQuery.GetByID(ctx, aid)
+		if err != nil {
+			return account.Account{}, err
+		}
+
+		return *a, nil
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -140,7 +144,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 
 	author := opt.NewPtr(request.Params.Author)
 	if v, ok := author.Get(); ok {
-		opts = append(opts, node_traversal.WithOwner(v))
+		opts = append(opts, node_traversal.WithRootOwner(v))
 	}
 
 	if d, ok := depth.Get(); ok {
@@ -152,35 +156,8 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if a, ok := acc.Get(); ok {
-		// NOTE: We do not want to allow anyone to request ANY node that is
-		// not published, but we also want to allow admins to request nodes
-		// that are in review. So we need to check if the requesting account is
-		// an admin and if they are not, automatically add a WithOwner filter.
-
-		if v, ok := visibilities.Get(); ok {
-			opts = append(opts, node_traversal.WithVisibility(v...))
-
-			authorFilter, filteringByAuthor := author.Get()
-
-			if !filteringByAuthor || authorFilter == a.Handle {
-				if lo.Contains(v, visibility.VisibilityDraft) {
-					// If the result is to contain drafts, only show the account's.
-					opts = append(opts, node_traversal.WithOwner(a.Handle))
-				} else if lo.Contains(v, visibility.VisibilityReview) {
-					// If the result is to contain nodes that are in-review, then
-					// we need to check if the requesting account is an admin first.
-					if !a.Admin {
-						opts = append(opts, node_traversal.WithOwner(a.Handle))
-					}
-				}
-			}
-		}
-	} else {
-		// When the request is not made by an authenticated account, we do not
-		// permit any visibility other than "published".
-
-		opts = append(opts, node_traversal.WithVisibility(visibility.VisibilityPublished))
+	if v, ok := visibilities.Get(); ok {
+		opts = append(opts, node_traversal.WithVisibility(acc, v...))
 	}
 
 	nid, err := opt.MapErr(opt.NewPtr(request.Params.NodeId), library.NodeIDFromString)
