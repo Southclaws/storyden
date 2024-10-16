@@ -12,16 +12,12 @@ import { Props, useLibraryPageMenu } from "./useLibraryPageMenu";
 
 export function LibraryPageMenu({
   node,
-  onVisibilityChange,
-  onDelete,
   onClose,
   ...props
 }: Props & ButtonProps) {
-  const { reviewFlow, deleteEnabled, deleteProps, handleSelect } =
+  const { availableOperations, deleteEnabled, deleteProps, handleSelect } =
     useLibraryPageMenu({
       node,
-      onVisibilityChange,
-      onDelete,
       onClose,
     });
 
@@ -69,23 +65,14 @@ export function LibraryPageMenu({
 
               <Menu.Separator />
 
-              {reviewFlow && (
-                <>
-                  {reviewFlow.draftToReview && (
-                    <Menu.Item value="review">Submit for review</Menu.Item>
-                  )}
-                  {(reviewFlow.reviewToPublish ||
-                    reviewFlow.draftToPublish) && (
-                    <Menu.Item value="publish">Publish</Menu.Item>
-                  )}
-                  {reviewFlow.publishToReview && (
-                    <Menu.Item value="review">Unpublish</Menu.Item>
-                  )}
-                  {reviewFlow.reviewToDraft && (
-                    <Menu.Item value="draft">Revert to draft</Menu.Item>
-                  )}
-                </>
-              )}
+              {availableOperations.map((op) => (
+                <Menu.Item
+                  key={op.targetVisibility}
+                  value={op.targetVisibility}
+                >
+                  {op.label}
+                </Menu.Item>
+              ))}
 
               {deleteEnabled && (
                 <>

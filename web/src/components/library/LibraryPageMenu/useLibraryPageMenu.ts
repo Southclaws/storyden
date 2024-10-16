@@ -1,71 +1,141 @@
-import { Node, Visibility } from "src/api/openapi-schema";
+import { MenuSelectionDetails } from "@ark-ui/react";
+
+import { Account, Node, Permission, Visibility } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { useDeleteAction } from "src/components/site/Action/Delete";
 
+import { handle } from "@/api/client";
+import { useLibraryMutation } from "@/lib/library/library";
+import { hasPermission } from "@/utils/permissions";
+
 export type Props = {
   node: Node;
-  onVisibilityChange?: (v: Visibility) => Promise<void>;
-  onDelete: (slug: string) => void;
   onClose?: () => void;
 };
 
 export function useLibraryPageMenu(props: Props) {
   const account = useSession();
+  const { deleteNode, updateNodeVisibility, revalidate } = useLibraryMutation();
+
   const deleteProps = useDeleteAction({
-    onClick: () => props.onDelete(props.node.slug),
+    onClick: async () =>
+      await handle(async () => {
+        await deleteNode(props.node.slug);
+      }),
   });
 
-  const isVisibilityChangeEnabled = props.onVisibilityChange ?? false;
-  const isAdmin = account?.admin ?? false;
+  const isManager = hasPermission(account, Permission.MANAGE_LIBRARY);
   const isOwner = account?.id === props.node.owner.id;
 
-  // All possible visibility state transitions
-  const draftToReview = props.node.visibility === "draft";
-  const reviewToPublish = props.node.visibility !== "published" && isAdmin;
-  const publishToReview = props.node.visibility === "published" && isAdmin;
-  const reviewToDraft = props.node.visibility === "review";
-  const draftToPublish = props.node.visibility !== "published" && isAdmin;
+  const availableOperations = visibilityStateChanges[
+    props.node.visibility
+  ].filter((c) => account && c.condition(account, props.node));
 
-  // Only enable visibility changes if the event handler was passed in.
-  const reviewFlow = isVisibilityChangeEnabled
-    ? {
-        draftToReview,
-        reviewToPublish,
-        publishToReview,
-        reviewToDraft,
-        draftToPublish,
-      }
-    : undefined;
+  // Managers can delete any page, owners can only delete non-published pages.
+  const deleteEnabled =
+    isManager || (isOwner && props.node.visibility !== Visibility.published);
 
-  const deleteEnabled = isAdmin || isOwner;
+  function handleVisibilityChange(visibility: Visibility) {
+    handle(
+      async () => {
+        await updateNodeVisibility(props.node.slug, visibility);
+      },
+      {
+        cleanup: async () => await revalidate(),
+      },
+    );
+  }
 
-  function handleSelect({ value }: { value: string }) {
-    switch (value) {
+  function handleSelect({ value }: MenuSelectionDetails) {
+    switch (value as Visibility | "delete") {
       case "delete":
-        deleteProps.onOpen();
-        return;
+        return deleteProps.onOpen();
 
-      case "draft":
-        props.onVisibilityChange?.("draft");
-        return;
+      case Visibility.draft:
+        return handleVisibilityChange(Visibility.draft);
 
-      case "review":
-        props.onVisibilityChange?.("review");
-        return;
+      case Visibility.unlisted:
+        return handleVisibilityChange(Visibility.unlisted);
 
-      case "publish":
-        props.onVisibilityChange?.("published");
-        return;
+      case Visibility.review:
+        return handleVisibilityChange(Visibility.review);
 
-      default:
-        throw new Error(`unknown handler ${value}`);
+      case Visibility.published:
+        return handleVisibilityChange(Visibility.published);
     }
   }
 
   return {
-    reviewFlow,
+    availableOperations,
     deleteEnabled,
     deleteProps,
     handleSelect,
   };
 }
+
+type VisibilityStateChangeMenuItem = {
+  label: string;
+  targetVisibility: Visibility;
+  condition: (account: Account, node: Node) => boolean;
+};
+
+const visibilityStateChanges: Record<
+  Visibility,
+  VisibilityStateChangeMenuItem[]
+> = {
+  [Visibility.draft]: [
+    {
+      label: "Publish to library",
+      targetVisibility: Visibility.published,
+      condition: (account) => hasPermission(account, Permission.MANAGE_LIBRARY),
+    },
+    {
+      label: "Submit for review",
+      targetVisibility: Visibility.review,
+      condition: (account, node) => account.id === node.owner.id,
+    },
+    {
+      label: "Publish to profile",
+      targetVisibility: Visibility.unlisted,
+      condition: (account, node) => account.id === node.owner.id,
+    },
+  ],
+  [Visibility.unlisted]: [
+    {
+      label: "Revert to draft",
+      targetVisibility: Visibility.draft,
+      condition: (account, node) => account.id === node.owner.id,
+    },
+    {
+      label: "Submit for review",
+      targetVisibility: Visibility.review,
+      condition: (account, node) => account.id === node.owner.id,
+    },
+  ],
+  [Visibility.review]: [
+    {
+      label: "Publish to library",
+      targetVisibility: Visibility.published,
+      condition: (account) => hasPermission(account, Permission.MANAGE_LIBRARY),
+    },
+    {
+      label: "Reject",
+      targetVisibility: Visibility.draft,
+      condition: (account, node) =>
+        account.id !== node.owner.id &&
+        hasPermission(account, Permission.MANAGE_LIBRARY),
+    },
+    {
+      label: "Revert to draft",
+      targetVisibility: Visibility.draft,
+      condition: (account, node) => account.id === node.owner.id,
+    },
+  ],
+  [Visibility.published]: [
+    {
+      label: "Unpublish",
+      targetVisibility: Visibility.draft,
+      condition: (account) => hasPermission(account, Permission.MANAGE_LIBRARY),
+    },
+  ],
+};
