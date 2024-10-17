@@ -3,55 +3,52 @@ import { defineSlotRecipe } from "@pandacss/dev";
 export const richCard = defineSlotRecipe({
   className: "rich-card",
   slots: [
-    // Global bits (span the entire card)
     "root",
-    "mediaBackdropContainer",
-    "mediaBackdrop",
-
-    // Top level bits
+    "headerContainer",
+    "menuContainer",
+    "titleContainer",
     "contentContainer",
     "mediaContainer",
-
-    // Content container bits
+    "footerContainer",
+    "mediaBackdropContainer",
+    "mediaBackdrop",
     "textArea",
-    "footer",
-    "title",
     "text",
-
-    // Media container bits
     "media",
     "mediaMissing",
-
-    // Overlay bits
-    "controlsOverlayContainer",
-    "controls",
   ],
   base: {
     root: {
-      "--card-image-max-height": "50px",
       "--card-border-radius": "radii.lg",
+      "--card-backdrop-index": "1",
+      "--card-media-index": "2",
+      "--card-content-index": "4",
 
       containerType: "inline-size",
       display: "grid",
       width: "full",
+      minWidth: "0",
+      minHeight: "0",
       gap: "0",
       overflow: "hidden",
       borderRadius: "var(--card-border-radius)",
       boxShadow: "sm",
+      backgroundColor: "bg.default",
+    },
+
+    headerContainer: {
+      minWidth: "0",
       minHeight: "0",
     },
-    mediaBackdropContainer: {
-      contain: "size",
-      zIndex: "1",
+
+    menuContainer: {
+      display: "flex",
+      flexDirection: "column",
     },
-    mediaBackdrop: {
-      width: "full",
-      height: "full",
-      objectPosition: "center",
-      objectFit: "cover",
-      blur: "xl",
-      filter: "auto",
-      opacity: "0.2",
+
+    titleContainer: {
+      lineClamp: "1",
+      fontWeight: "bold",
     },
 
     contentContainer: {
@@ -60,84 +57,266 @@ export const richCard = defineSlotRecipe({
       justifyContent: "space-between",
       gap: "2",
       height: "full",
-      zIndex: "2",
-      padding: "2",
       minWidth: "0",
       overflow: "hidden",
     },
+
     mediaContainer: {
       contain: "size",
-      zIndex: "2",
+    },
+
+    footerContainer: {
+      display: "flex",
+      justifyContent: "start",
+      width: "full",
+    },
+
+    mediaBackdropContainer: {
+      contain: "size",
+      pointerEvents: "none",
+    },
+
+    //
+
+    mediaBackdrop: {
+      width: "full",
+      height: "full",
+      objectPosition: "center",
+      objectFit: "cover",
+      blur: "xl",
+      filter: "auto",
+      opacity: "0.1",
     },
 
     media: {
       width: "full",
       height: "full",
       objectFit: "cover",
+      // This fixes pixelated images in Chrome... for some reason?
+      overflowClipMargin: "unset",
     },
-    textArea: {},
-    footer: {
-      display: "flex",
-      justify: "start",
-      width: "full",
+
+    textArea: {
+      mb: "2",
     },
-    title: {
-      lineClamp: "1",
-      _hover: {
-        textDecoration: "underline",
-      },
-    },
+
     text: {
       lineClamp: "1",
     },
-
-    // The overlay is used to position the controls such as buttons etc. The
-    // container itself should not capture interactions, but the controls do.
-    controlsOverlayContainer: {
-      zIndex: "3",
-      pointerEvents: "none",
-    },
-    controls: {
-      pointerEvents: "auto",
-    },
   },
   variants: {
-    mediaDisplay: {
-      with: {
-        root: {
-          "--card-image-display": "block",
-          "--card-row-areas": `"text text media"`,
-        },
-      },
-      without: {
-        root: {
-          "--card-media-display": "none",
-          "--card-row-areas": `"text text text"`,
-        },
-      },
-    },
     shape: {
+      row: {
+        root: {
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] auto [media-end] 0.5rem [edge-end]`,
+          gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
+        },
+
+        // -
+        // Container slots.
+        // -
+
+        headerContainer: {
+          gridColumn: "content-start / content-end",
+          gridRow: "header-start / header-end",
+        },
+
+        menuContainer: {
+          gridColumn: "media-start / media-end",
+          gridRow: "header-start / header-end",
+          alignSelf: "start",
+          justifySelf: "end",
+        },
+
+        titleContainer: {
+          gridColumn: "content-start / content-end",
+          gridRow: "title-start / title-end",
+        },
+
+        contentContainer: {
+          gridColumn: "content-start / content-start",
+          gridRow: "content-start / content-end",
+          height: "min",
+        },
+
+        mediaContainer: {
+          gridColumn: "media-start / edge-end",
+          gridRow: "edge-start / edge-end",
+
+          aspectRatio: "1.777",
+          minHeight: "0",
+        },
+
+        footerContainer: {
+          gridColumn: "content-start / media-end",
+          gridRow: "footer-start / footer-end",
+        },
+
+        mediaBackdropContainer: {
+          gridColumn: "edge-start / edge-end",
+          gridRow: "edge-start / edge-end",
+          background: "backgroundGradientH",
+        },
+
+        // -
+        // Non-container slots.
+        // -
+
+        mediaMissing: {
+          display: "none",
+        },
+
+        mediaBackdrop: {
+          // This blends the backdrop image horizontally so the backdrop doesn't
+          // cover the entire row and potentially make it too attention-seeking.
+          maskImage:
+            "linear-gradient(90deg, transparent 0%, white 40%, white 100%)",
+        },
+      },
+      responsive: {
+        root: {
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] auto [media-end] 0.5rem [edge-end]`,
+          gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
+          _containerSmall: {
+            gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [edge-end]`,
+            gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [media-start] auto [media-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
+          },
+        },
+
+        // -
+        // Container slots.
+        // -
+
+        headerContainer: {
+          gridColumn: "content-start / content-end",
+          gridRow: "header-start / header-end",
+        },
+
+        menuContainer: {
+          gridColumn: "media-start / media-end",
+          gridRow: "header-start / header-end",
+          alignSelf: "start",
+          justifySelf: "end",
+        },
+
+        titleContainer: {
+          gridColumn: "content-start / content-end",
+          gridRow: "title-start / title-end",
+        },
+
+        contentContainer: {
+          gridColumn: "content-start / content-start",
+          gridRow: "content-start / content-end",
+          height: "min",
+        },
+
+        mediaContainer: {
+          gridColumn: "media-start / edge-end",
+          gridRow: "edge-start / edge-end",
+          _containerSmall: {
+            gridColumn: "content-start / content-end",
+            gridRow: "media-start / media-end",
+            minHeight: "64",
+            marginBottom: "2",
+            aspectRatio: "auto",
+          },
+          aspectRatio: "1.777",
+          minHeight: "0",
+        },
+
+        footerContainer: {
+          gridColumn: "content-start / media-end",
+          _containerSmall: {
+            gridColumn: "content-start / content-end",
+          },
+          gridRow: "footer-start / footer-end",
+        },
+
+        mediaBackdropContainer: {
+          gridColumn: "edge-start / edge-end",
+          gridRow: "edge-start / edge-end",
+          background: "backgroundGradientH",
+        },
+
+        // -
+        // Non-container slots.
+        // -
+
+        media: {
+          _containerSmall: {
+            borderRadius: "sm",
+          },
+        },
+
+        mediaMissing: {
+          display: "none",
+        },
+        text: {},
+      },
       box: {
         root: {
-          gridTemplateRows: "1fr auto",
-          gridTemplateColumns: "1fr",
-          aspectRatio: "1",
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [edge-end]`,
+          gridTemplateRows: `[edge-start] 0.5rem min-content min-content auto auto min-content 0.5rem [edge-end]`,
+          gridTemplateAreas: `
+            ". .       . "
+            ". header  . "
+            ". title   . "
+            ". content . "
+            ". media   . "
+            ". footer  . "
+            ". .       . "
+          `,
         },
-        mediaBackdropContainer: {
-          gridRow: "1 / 3",
-          gridColumn: "1 / 2",
+
+        // -
+        // Container slots.
+        // -
+
+        headerContainer: {
+          gridColumn: "content-start / content-end",
+          gridRow: "header-start / header-end",
         },
+
+        menuContainer: {
+          gridColumn: "media-start / media-end",
+          gridRow: "header-start / header-end",
+          alignSelf: "start",
+          justifySelf: "end",
+        },
+
+        titleContainer: {
+          gridColumn: "content-start / content-end",
+          gridRow: "title-start / title-end",
+        },
+
+        contentContainer: {
+          gridArea: "content",
+        },
+
         mediaContainer: {
-          gridRow: "1 / 3",
-          gridColumn: "1 / 2",
+          gridArea: "media",
+          marginBottom: "2",
+          minHeight: "64",
         },
+
+        footerContainer: {
+          gridArea: "footer",
+        },
+
+        mediaBackdropContainer: {
+          gridRow: "edge-start / edge-end",
+          gridColumn: "edge-start / edge-end",
+        },
+
+        // -
+        // Non-container slots.
+        // -
+
         media: {
-          objectPosition: "top",
-          // NOTE: This solves a small rendering issue on Chrome where the image
-          // ever so slightly overflows the border radius. The cause looks like
-          // it's due to a combination of the overflow hidden and object-fit.
-          borderBottomRadius: "calc(var(--card-border-radius) + 3px)",
+          objectPosition: "center",
+          borderRadius: "sm",
         },
+
         mediaMissing: {
           gridRow: "1 / 2",
           gridColumn: "1 / 2",
@@ -146,94 +325,100 @@ export const richCard = defineSlotRecipe({
           // really perfect but close enough! It's a bit of a hack.
           paddingBottom: "3lh",
         },
-        contentContainer: {
-          gridRow: "2 / 3",
-          gridColumn: "1 / 2",
+
+        text: {
+          _containerSmall: {
+            display: "none",
+          },
+        },
+      },
+      fill: {
+        root: {
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [edge-end]`,
+          gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 300px [content-start] min-content [footer-start] min-content [edge-end]`,
+        },
+
+        // -
+        // Container slots.
+        // -
+
+        headerContainer: {
+          gridColumn: "content-start / content-end",
+          gridRow: "header-start / header-end",
+          borderRadius: "sm",
+          padding: "1",
+
+          background: "bg.canvas/60",
           backdropBlur: "frosted",
           backdropGrayscale: "0.5",
           backdropFilter: "auto",
-          backgroundColor: "bg.opaque/90",
         },
-        text: {
-          _containerSmall: {
-            display: "none",
-          },
-        },
-        controlsOverlayContainer: {
-          gridRow: "1 / 1",
-          gridColumn: "1 / 4",
-          display: "flex",
-          justifyContent: "end",
-          alignItems: "start",
-          padding: "2",
-        },
-      },
-      row: {
-        root: {
-          gridTemplateRows: "minmax(min-content, 1fr)",
-          gridTemplateColumns: "1fr 2fr 1fr",
-          gridTemplateAreas: "var(--card-row-areas)",
-        },
-        mediaBackdropContainer: {
-          gridRow: "1 / 1",
-          gridColumn: "2 / 4",
-        },
-        mediaContainer: {
-          gridArea: "media",
-          maxHeight: "full",
-        },
-        mediaMissing: {
+
+        menuContainer: {
+          // Unused in this variant
           display: "none",
         },
+
+        titleContainer: {
+          // Unused in this variant
+          display: "none",
+        },
+
         contentContainer: {
-          gridArea: "text",
-          background: "backgroundGradientH",
+          gridRow: "content-start / footer-start",
+          gridColumn: "edge-start / edge-end",
+          padding: "2",
+          paddingBottom: "0",
+        },
+
+        mediaContainer: {
+          gridRow: "edge-start / edge-end",
+          gridColumn: "edge-start / edge-end",
+          minHeight: "64",
+        },
+
+        footerContainer: {
+          gridRow: "footer-start / edge-end",
+          gridColumn: "edge-start / edge-end",
+          paddingTop: "0",
+          padding: "2",
+        },
+
+        mediaBackdropContainer: {
+          gridRow: "content-start / edge-end",
+          gridColumn: "edge-start / edge-end",
+          background: "bg.canvas/90",
+          backdropBlur: "frosted",
+          backdropGrayscale: "0.5",
+          backdropFilter: "auto",
+        },
+
+        mediaBackdrop: {
+          display: "none",
+        },
+
+        // -
+        // Non-container slots.
+        // -
+
+        media: {
+          objectPosition: "top",
+          // NOTE: This solves a small rendering issue on Chrome where the image
+          // ever so slightly overflows the border radius. The cause looks like
+          // it's due to a combination of the overflow hidden and object-fit.
+          borderBottomRadius: "calc(var(--card-border-radius) + 3px)",
         },
         text: {
           _containerSmall: {
             display: "none",
           },
         },
-        controlsOverlayContainer: {
-          gridRow: "1 / 1",
-          gridColumn: "1 / 4",
-          display: "flex",
-          justifyContent: "end",
-          alignItems: "end",
-          padding: "2",
-        },
       },
-    },
-    size: {
-      default: {},
-      small: {},
     },
   },
-  compoundVariants: [
-    {
-      size: "small",
-      shape: "row",
-      css: {
-        root: {
-          gridTemplateColumns: "1fr 2fr minmax(0, min-content)",
-        },
-        text: { display: "none" },
-        title: {
-          fontSize: "sm",
-        },
-        controlsOverlayContainer: {
-          display: "flex",
-          justifyContent: "end",
-          alignItems: "start",
-          padding: "2",
-        },
-      },
-    },
-  ],
+  compoundVariants: [],
   defaultVariants: {
-    mediaDisplay: "with",
-    shape: "box",
-    size: "default",
+    shape: "row",
   },
-  jsx: ["Card"],
+  jsx: ["Card", "NodeCard"],
 });

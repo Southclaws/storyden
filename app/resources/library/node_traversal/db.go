@@ -2,30 +2,25 @@ package node_traversal
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
-	"time"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/opt"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 
-	account_repo "github.com/Southclaws/storyden/app/resources/account"
-	asset_repo "github.com/Southclaws/storyden/app/resources/asset"
-
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	"github.com/Southclaws/storyden/internal/ent/asset"
+	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 )
 
@@ -97,23 +92,8 @@ union
 )
 select
     distinct n.id       node_id,
-    n.created_at        node_created_at,
-    n.updated_at        node_updated_at,
-    n.deleted_at        node_deleted_at,
-    n.name              node_name,
-    n.slug              node_slug,
-    n.parent_node_id    node_parent_node_id,
     n.account_id        node_account_id,
     n.visibility        node_visibility,
-    n.metadata        node_metadata,
-    a.id                owner_id,
-    a.created_at        owner_created_at,
-    a.updated_at        owner_updated_at,
-    a.deleted_at        owner_deleted_at,
-    a.handle            owner_handle,
-    a.name              owner_name,
-    a.bio               owner_bio,
-    a.admin             owner_admin,
 	depth
 from
     children
@@ -128,64 +108,10 @@ order by
 `
 
 type subtreeRow struct {
-	NodeId             xid.ID                `db:"node_id"`
-	NodeCreatedAt      time.Time             `db:"node_created_at"`
-	NodeUpdatedAt      time.Time             `db:"node_updated_at"`
-	NodeDeletedAt      *time.Time            `db:"node_deleted_at"`
-	NodeName           string                `db:"node_name"`
-	NodeSlug           string                `db:"node_slug"`
-	NodeParentNodeId   xid.ID                `db:"node_parent_node_id"`
-	NodeParentNodeSlug xid.ID                `db:"node_parent_node_slug"`
-	NodeAccountId      xid.ID                `db:"node_account_id"`
-	NodeVisibility     visibility.Visibility `db:"node_visibility"`
-	NodeMetadata       *[]byte               `db:"node_metadata"`
-	OwnerId            xid.ID                `db:"owner_id"`
-	OwnerCreatedAt     time.Time             `db:"owner_created_at"`
-	OwnerUpdatedAt     time.Time             `db:"owner_updated_at"`
-	OwnerDeletedAt     *time.Time            `db:"owner_deleted_at"`
-	OwnerHandle        string                `db:"owner_handle"`
-	OwnerName          string                `db:"owner_name"`
-	OwnerBio           *string               `db:"owner_bio"`
-	OwnerAdmin         bool                  `db:"owner_admin"`
-	Depth              int                   `db:"depth"`
-}
-
-func fromRow(r subtreeRow) (*library.Node, error) {
-	bio, err := opt.MapErr(opt.NewPtr(r.OwnerBio), datagraph.NewRichText)
-	if err != nil {
-		return nil, err
-	}
-
-	meta := opt.NewPtrMap(r.NodeMetadata, func(b []byte) map[string]any {
-		meta := map[string]any{}
-		err = json.Unmarshal(b, &meta)
-		if err != nil {
-			return nil
-		}
-
-		return meta
-	})
-
-	return &library.Node{
-		Mark:       library.NewMark(r.NodeId, r.NodeSlug),
-		CreatedAt:  r.NodeCreatedAt,
-		UpdatedAt:  r.NodeUpdatedAt,
-		Name:       r.NodeName,
-		Visibility: r.NodeVisibility,
-		Parent: opt.NewSafe(library.Node{
-			Mark: library.NewMark(r.NodeParentNodeId, ""),
-		}, !r.NodeParentNodeId.IsNil()),
-		Owner: profile.Public{
-			ID:      account_repo.AccountID(r.OwnerId),
-			Created: r.OwnerCreatedAt,
-			Handle:  r.OwnerHandle,
-			Name:    r.OwnerName,
-			Bio:     bio.OrZero(),
-			// Roles not inclucded because silly flat query result...
-			// to be hydrated elsewhere via second query.
-		},
-		Metadata: meta.OrZero(),
-	}, nil
+	NodeId         xid.ID                `db:"node_id"`
+	NodeAccountId  xid.ID                `db:"node_account_id"`
+	NodeVisibility visibility.Visibility `db:"node_visibility"`
+	Depth          int                   `db:"depth"`
 }
 
 func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID], fs ...Filter) ([]*library.Node, error) {
@@ -240,8 +166,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	flat := []*library.Node{}
-
+	flat := []subtreeRow{}
 	for r.Next() {
 		c := subtreeRow{}
 		err = r.StructScan(&c)
@@ -249,40 +174,48 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		n, err := fromRow(c)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		flat = append(flat, n)
+		flat = append(flat, c)
 	}
 
 	filtered := dt.Filter(flat, applyFilterRules(f))
 
-	ids := dt.Map(filtered, func(n *library.Node) xid.ID { return xid.ID(n.Mark.ID()) })
+	// Now query every row returned from the recursive query hydrating all data.
+	ids := dt.Map(filtered, func(n subtreeRow) xid.ID { return n.NodeId })
+	nodeRecords, err := d.db.Node.Query().
+		Where(node.IDIn(ids...)).
+		WithOwner(func(aq *ent.AccountQuery) {
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+		}).
+		WithPrimaryImage(func(aq *ent.AssetQuery) {
+			aq.WithParent()
+		}).
+		WithAssets().
+		WithLink(func(lq *ent.LinkQuery) {
+			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+		}).
+		WithParent(func(cq *ent.NodeQuery) {
+			cq.
+				WithAssets().
+				WithOwner(func(aq *ent.AccountQuery) {
+					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+				})
+		}).All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
-	// TODO: Build a table of pointers to look up each asset via node ID
+	hydratedNodeMap := lo.KeyBy(nodeRecords, func(n *ent.Node) xid.ID { return n.ID })
+	hydrated, err := dt.MapErr(filtered, func(n subtreeRow) (*library.Node, error) {
+		hydratedNode, exists := hydratedNodeMap[n.NodeId]
+		if !exists {
+			panic("recursive query result was not present in hydrated node map")
+		}
 
-	relatedAssets := d.db.Asset.Query().
-		Where(asset.HasNodesWith(node.IDIn(ids...))).
-		WithNodes().
-		AllX(ctx)
-
-	hydrated := dt.Map(filtered, func(n *library.Node) *library.Node {
-		// NOTE: This is slow as fuck (2 nested loops lol) needs the
-		// aforementioned hash table lookup for node <> asset relations.
-		assets := dt.Filter(relatedAssets, func(a *ent.Asset) bool {
-			_, found := lo.Find(a.Edges.Nodes, func(an *ent.Node) bool {
-				return n.GetID() == an.ID
-			})
-
-			return found
-		})
-
-		n.Assets = dt.Map(assets, asset_repo.FromModel)
-
-		return n
+		return library.NodeFromModel(hydratedNode)
 	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to hydrate nodes"))
+	}
 
 	var linkChildrenForParent func(library.Node) []*library.Node
 
@@ -344,14 +277,14 @@ func (d *database) FilterSubtree(ctx context.Context, id library.NodeID, filter 
 //
 // This may cause a bit of over-querying as the query will, in most cases, pull
 // every node (the full tree) but this can be addressed if it becomes a problem.
-func applyFilterRules(f filters) func(n *library.Node) bool {
-	return func(n *library.Node) bool {
+func applyFilterRules(f filters) func(n subtreeRow) bool {
+	return func(n subtreeRow) bool {
 		// If there are no visibility filters, the default is just published.
 		if len(f.visibility) == 0 {
-			return n.Visibility == visibility.VisibilityPublished
+			return n.NodeVisibility == visibility.VisibilityPublished
 		}
 
-		includedInVisibilityFilter := lo.Contains(f.visibility, n.Visibility)
+		includedInVisibilityFilter := lo.Contains(f.visibility, n.NodeVisibility)
 		if !includedInVisibilityFilter {
 			// The request is not interested in this node, regardless of rules.
 			return false
@@ -359,7 +292,7 @@ func applyFilterRules(f filters) func(n *library.Node) bool {
 
 		// The default yield for this filter is to only show published nodes.
 		// This state is returned after other more complex checks are done.
-		isPublished := n.Visibility == visibility.VisibilityPublished
+		isPublished := n.NodeVisibility == visibility.VisibilityPublished
 
 		// If published and filters include publish, yield this node.
 		if isPublished {
@@ -373,7 +306,7 @@ func applyFilterRules(f filters) func(n *library.Node) bool {
 			return isPublished
 		}
 
-		isOwner := n.Owner.ID == session.ID
+		isOwner := n.NodeAccountId == xid.ID(session.ID)
 		if isOwner {
 			// If the requesting account owns this node, and it's within the
 			// visibility filter constraint, return it in the list.
@@ -388,14 +321,14 @@ func applyFilterRules(f filters) func(n *library.Node) bool {
 			// If the requesting account is not the owner, and not a manager,
 			// only yield the node if it's published and the filters include it.
 
-			return n.Visibility == visibility.VisibilityPublished
+			return n.NodeVisibility == visibility.VisibilityPublished
 		}
 
 		// the account is a library manager, but that still doesn't mean they
 		// can see everything. Ensure that the only nodes not published or not
 		// owned by the requesting account are in-review.
 
-		if n.Visibility == visibility.VisibilityReview {
+		if n.NodeVisibility == visibility.VisibilityReview {
 			return true
 		}
 
