@@ -17,6 +17,7 @@ import { getAssetURL } from "@/utils/asset";
 import { useImageUpload } from "../useImageUpload";
 
 import { ImageExtended } from "./plugins/ImagePlugin";
+import { LinkPreview } from "./plugins/LinkPreviewPlugin";
 
 export type Block = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
@@ -39,6 +40,7 @@ export function useContentComposer(props: ContentComposerProps) {
   const extensions = [
     StarterKit,
     FocusClasses,
+    LinkPreview.configure({}),
     Link,
     ImageExtended.configure({
       allowBase64: false,
