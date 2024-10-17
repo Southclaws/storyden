@@ -20,7 +20,7 @@ export interface Conditions {
 	"_placeholderShown": string
 	/** `&:is([aria-collapsed=true], [data-collapsed], [data-state="collapsed"])` */
 	"_collapsed": string
-	/** `@container (max-width: 300px)` */
+	/** `@container (max-width: 500px)` */
 	"_containerSmall": string
 	/** `@media (hover: hover) and (pointer: fine) &:is(:hover, [data-hover])` */
 	"_hover": string

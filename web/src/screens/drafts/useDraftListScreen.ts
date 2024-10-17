@@ -1,34 +1,27 @@
 import { useNodeList } from "src/api/openapi-client/nodes";
 import {
+  Account,
   NodeListOKResponse,
   ThreadListOKResponse,
   Visibility,
 } from "src/api/openapi-schema";
-import { useSession } from "src/auth";
 
 export type Props = {
+  session: Account;
   threads: ThreadListOKResponse;
   nodes: NodeListOKResponse;
 };
 
-export function useDraftListScreen(props: Props) {
-  const session = useSession();
-  const {
-    data: nodes,
-    mutate: mutateNodes,
-    error: errorNodes,
-  } = useNodeList(
+export function useDraftListScreen({ session, threads, nodes }: Props) {
+  const { data: nodesData, error: errorNodes } = useNodeList(
     {
+      author: session.handle,
       visibility: [Visibility.draft],
     },
-    {
-      swr: {
-        fallbackData: props.nodes,
-      },
-    },
+    { swr: { fallbackData: nodes } },
   );
 
-  if (!nodes) {
+  if (!nodesData) {
     return {
       ready: false as const,
       error: errorNodes,
@@ -41,14 +34,10 @@ export function useDraftListScreen(props: Props) {
     ready: true as const,
     empty,
     data: {
-      nodes: {
-        data: nodes,
-        mutate: mutateNodes,
-      },
+      nodes: nodesData.nodes,
+      threads: threads.threads,
     },
-    mutate: {
-      mutateNodes,
-    },
+
     session,
   };
 }

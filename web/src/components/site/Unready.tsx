@@ -1,9 +1,18 @@
 import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
+import { PropsWithChildren } from "react";
 
-import { Box, CardBox, Center, HStack, styled } from "@/styled-system/jsx";
+import {
+  Box,
+  CardBox,
+  Center,
+  HStack,
+  LStack,
+  styled,
+} from "@/styled-system/jsx";
 import { deriveError } from "@/utils/error";
 
 import { Spinner } from "../ui/Spinner";
+import { LinkButton } from "../ui/link-button";
 
 type Props = {
   error?: unknown;
@@ -30,7 +39,7 @@ export function Unready({ error }: Props) {
   );
 }
 
-export function UnreadyBanner({ error }: Props) {
+export function UnreadyBanner({ error, children }: PropsWithChildren<Props>) {
   if (!error) {
     return (
       <Center w="full" height="96">
@@ -44,17 +53,36 @@ export function UnreadyBanner({ error }: Props) {
   return (
     <Center width="full" justifyContent="center">
       <CardBox maxW="xs">
-        <HStack id="error__heading" gap="2" alignItems="center">
-          <ExclamationTriangleIcon width={24} height={24} />
-          <styled.h1 fontSize="md" fontWeight="bold" my="0">
-            Something went wrong
-          </styled.h1>
-        </HStack>
+        <LStack>
+          <HStack id="error__heading" gap="2" alignItems="center">
+            <ExclamationTriangleIcon width={24} height={24} />
+            <styled.h1 fontSize="md" fontWeight="bold" my="0">
+              Something went wrong
+            </styled.h1>
+          </HStack>
 
-        <styled.p id="error__message">
-          <span>{message}</span>
-        </styled.p>
+          <styled.p id="error__message">
+            <span>{message}</span>
+          </styled.p>
+
+          <LStack>{children}</LStack>
+        </LStack>
       </CardBox>
     </Center>
+  );
+}
+
+export function UnauthenticatedBanner() {
+  return (
+    <UnreadyBanner error="Please log in to see this page.">
+      <HStack w="full">
+        <LinkButton w="full" size="xs" href="/register">
+          Register
+        </LinkButton>
+        <LinkButton w="full" size="xs" variant="outline" href="/login">
+          Login
+        </LinkButton>
+      </HStack>
+    </UnreadyBanner>
   );
 }

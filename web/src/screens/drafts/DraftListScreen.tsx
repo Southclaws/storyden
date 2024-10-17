@@ -2,6 +2,7 @@
 
 import { Unready } from "src/components/site/Unready";
 
+import { ThreadItemList } from "@/components/feed/ThreadItemList";
 import { NodeCardRows } from "@/components/library/NodeCardList";
 import { Heading } from "@/components/ui/heading";
 import { VStack } from "@/styled-system/jsx";
@@ -16,15 +17,17 @@ export function DraftListScreen(props: Props) {
 
   if (!ready) return <Unready error={error} />;
 
+  const { nodes, threads } = data;
+
   return (
     <VStack w="full" alignItems="start">
       <Heading>Your drafts</Heading>
 
-      <NodeCardRows
-        libraryPath={libraryPath}
-        context="generic"
-        nodes={data.nodes.data.nodes}
-      />
+      <Heading color="fg.subtle">Threads</Heading>
+      <ThreadItemList threads={threads} />
+
+      <Heading color="fg.subtle">Library</Heading>
+      <NodeCardRows libraryPath={libraryPath} context="generic" nodes={nodes} />
     </VStack>
   );
 }

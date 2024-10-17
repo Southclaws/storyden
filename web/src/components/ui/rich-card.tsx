@@ -1,79 +1,130 @@
 import Link from "next/link";
-import { PropsWithChildren, ReactNode } from "react";
+import {
+  DOMAttributes,
+  PropsWithChildren,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-import { Empty } from "src/components/site/Empty";
-
-import { cx } from "@/styled-system/css";
-import { Center, Grid, LStack, styled } from "@/styled-system/jsx";
+import { css } from "@/styled-system/css";
+import { Grid, LStack, styled } from "@/styled-system/jsx";
 import { RichCardVariantProps, richCard } from "@/styled-system/recipes";
+import { isExternalURL } from "@/utils/url";
 
-import { Heading } from "./heading";
+import { ContentComposer } from "../content/ContentComposer/ContentComposer";
 
 export type CardItem = {
   id: string;
-  title: string;
+  title?: string;
   url: string;
   text?: string;
+  content?: string;
   image?: string;
+  header?: React.ReactNode;
+  menu?: React.ReactNode;
   controls?: React.ReactNode;
 };
 
 export type Props = CardItem & RichCardVariantProps;
 
 export function Card({
-  children,
+  id,
   title,
   url,
   text,
+  content,
   image,
+  header,
+  menu,
   controls,
   shape,
-  size,
+  children,
 }: PropsWithChildren<Props>) {
   const hasImage = Boolean(image);
+  const textContainerRef = useRef<HTMLDivElement>(null);
+  const [showingMore, setShowingMore] = useState(false);
+  const [showMore, setShowMore] = useState(false);
+
+  useEffect(() => {
+    if (!textContainerRef.current) return;
+
+    const rect = textContainerRef.current.getBoundingClientRect();
+
+    // 112 = "spacing.28" token * 4
+    if (rect.height >= 112) {
+      setShowMore(true);
+    } else {
+      setShowMore(false);
+    }
+  }, [showingMore, textContainerRef]);
+
+  function handleShowMore() {
+    setShowingMore(!showingMore);
+  }
 
   const styles = richCard({
     shape,
-    size,
-    mediaDisplay: hasImage ? "with" : "without",
   });
 
-  return (
-    <styled.article className={styles.root}>
-      <div className={styles.controlsOverlayContainer}>
-        <div className={styles.controls}>{controls}</div>
-      </div>
+  const longContentStyles = css({
+    maxHeight: showingMore ? "full" : "28",
+    overflow: "hidden",
+  });
 
+  const externalURL = isExternalURL(url);
+
+  return (
+    <styled.article id={id} className={styles.root}>
       {image && (
-        <div className={styles.mediaBackdropContainer}>
-          <styled.img className={styles.mediaBackdrop} src={image} />
-        </div>
+        <>
+          <div className={styles.mediaBackdropContainer}>
+            <styled.img className={styles.mediaBackdrop} src={image} />
+          </div>
+          <div className={styles.mediaContainer}>
+            <styled.img
+              className={styles.media}
+              src={image}
+              maxHeight={showingMore && shape !== "fill" ? "28" : "full"}
+            />
+          </div>
+        </>
       )}
 
-      <div className={styles.mediaContainer}>
-        {image ? (
-          <styled.img className={styles.media} src={image} />
-        ) : (
-          <div className={styles.mediaMissing}>
-            <Center h="full">
-              <Empty>no image</Empty>
-            </Center>
-          </div>
-        )}
-      </div>
+      {header && <div className={styles.headerContainer}>{header}</div>}
+      {menu && <div className={styles.menuContainer}>{menu}</div>}
+
+      {title && (
+        <styled.h1 className={styles.titleContainer}>
+          <Link href={url}>{title}</Link>
+        </styled.h1>
+      )}
 
       <div className={styles.contentContainer}>
         <div className={styles.textArea}>
-          <Heading className={cx("fluid-font-size")}>
-            <Link href={url} className={styles.title}>
-              {title || "(untitled)"}
+          <div ref={textContainerRef} className={longContentStyles}>
+            <Link href={url} className={css({ position: "relative" })}>
+              {text && <p className={styles.text}>{text}</p>}
+              {content && (
+                <>
+                  <ContentComposer
+                    placeholder=""
+                    disabled
+                    initialValue={content}
+                  />
+                </>
+              )}
             </Link>
-          </Heading>
-
-          {text && <p className={styles.text}>{text}</p>}
+          </div>
+          {showMore && (
+            <ShowMore showingMore={showingMore} onClick={handleShowMore} />
+          )}
         </div>
+      </div>
 
-        <div className={styles.footer}>{children}</div>
+      <div className={styles.footerContainer}>
+        {children} {controls}
       </div>
     </styled.article>
   );
@@ -115,5 +166,28 @@ export function CardGrid(props: CardGroupProps) {
         ? props.children
         : props.items.map((i) => <Card key={i.id} shape="box" {...i} />)}
     </Grid>
+  );
+}
+
+function ShowMore({
+  showingMore,
+  ...props
+}: { showingMore: boolean } & DOMAttributes<HTMLAnchorElement>) {
+  return (
+    <styled.p display="flex" justifyContent="space-between">
+      <styled.span color="fg.muted">{showingMore || "..."}</styled.span>
+      <styled.a
+        fontSize="sm"
+        cursor="pointer"
+        color="blue.10"
+        _hover={{
+          textDecoration: "underline",
+        }}
+        onClick={(e) => e.preventDefault()}
+        {...props}
+      >
+        {showingMore ? "hide" : "show more"}
+      </styled.a>
+    </styled.p>
   );
 }

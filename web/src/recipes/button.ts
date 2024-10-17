@@ -122,11 +122,13 @@ export const button = defineRecipe({
         minW: "0!",
       },
       subtle: {
-        background: "colorPalette.a3",
-        color: "colorPalette.text",
         colorPalette: "gray",
+        background: "colorPalette.4/80",
+        color: "fg.muted",
+        backdropBlur: "sm",
+        backdropFilter: "auto",
         _hover: {
-          background: "colorPalette.a4",
+          background: "colorPalette.6",
         },
         _focusVisible: {
           outline: "2px solid",

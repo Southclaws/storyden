@@ -11,13 +11,14 @@ export type Props = {
 } & RichCardVariantProps;
 
 export function LinkCard({ link, ...rest }: Props) {
+  const title = link.title || link.url;
   const asset = link.primary_image;
   const domainSearch = `/links?q=${link.domain}`;
 
   return (
     <Card
       id={link.slug}
-      title={link.title ?? link.url}
+      title={title}
       url={link.url}
       text={link.description}
       image={getAssetURL(asset?.path)}

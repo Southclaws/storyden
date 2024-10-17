@@ -7,24 +7,23 @@ import { LinkCard } from "./LinkCard";
 
 type Props = {
   links: LinkReference[];
-  size?: RichCardVariantProps["size"];
 };
 
-export function LinkCardRows({ links, size }: Props) {
+export function LinkCardRows({ links }: Props) {
   return (
     <CardRows>
       {links.map((l) => (
-        <LinkCard key={l.slug} shape="row" size={size} link={l} />
+        <LinkCard key={l.slug} shape="row" link={l} />
       ))}
     </CardRows>
   );
 }
 
-export function LinkCardGrid({ links, size }: Props) {
+export function LinkCardGrid({ links }: Props) {
   return (
     <CardGrid>
       {links.map((l) => (
-        <LinkCard key={l.slug} shape="row" size={size} link={l} />
+        <LinkCard key={l.slug} shape="row" link={l} />
       ))}
     </CardGrid>
   );

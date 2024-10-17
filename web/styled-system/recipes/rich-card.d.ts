@@ -4,17 +4,9 @@ import type { DistributiveOmit, Pretty } from '../types/system-types';
 
 interface RichCardVariant {
   /**
- * @default "with"
+ * @default "row"
  */
-mediaDisplay: "with" | "without"
-/**
- * @default "box"
- */
-shape: "box" | "row"
-/**
- * @default "default"
- */
-size: "default" | "small"
+shape: "row" | "responsive" | "box" | "fill"
 }
 
 type RichCardVariantMap = {
@@ -22,12 +14,12 @@ type RichCardVariantMap = {
 }
 
 export type RichCardVariantProps = {
-  [key in keyof RichCardVariant]?: RichCardVariant[key] | undefined
+  [key in keyof RichCardVariant]?: ConditionalValue<RichCardVariant[key]> | undefined
 }
 
 export interface RichCardRecipe {
   __type: RichCardVariantProps
-  (props?: RichCardVariantProps): Pretty<Record<"root" | "mediaBackdropContainer" | "mediaBackdrop" | "contentContainer" | "mediaContainer" | "textArea" | "footer" | "title" | "text" | "media" | "mediaMissing" | "controlsOverlayContainer" | "controls", string>>
+  (props?: RichCardVariantProps): Pretty<Record<"root" | "headerContainer" | "menuContainer" | "titleContainer" | "contentContainer" | "mediaContainer" | "footerContainer" | "mediaBackdropContainer" | "mediaBackdrop" | "textArea" | "text" | "media" | "mediaMissing", string>>
   raw: (props?: RichCardVariantProps) => RichCardVariantProps
   variantMap: RichCardVariantMap
   variantKeys: Array<keyof RichCardVariant>

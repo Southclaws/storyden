@@ -3,15 +3,33 @@ import { DraftListScreen } from "src/screens/drafts/DraftListScreen";
 
 import { nodeList } from "@/api/openapi-server/nodes";
 import { threadList } from "@/api/openapi-server/threads";
+import { getServerSession } from "@/auth/server-session";
+import {
+  UnauthenticatedBanner,
+  UnreadyBanner,
+} from "@/components/site/Unready";
 
 export default async function Page() {
-  const [threads, nodes] = await Promise.all([
-    threadList({
-      /* TODO: Visibility param */
-    }),
+  try {
+    const session = await getServerSession();
 
-    nodeList({ visibility: [Visibility.draft] }),
-  ]);
+    if (!session) {
+      return <UnauthenticatedBanner />;
+    }
 
-  return <DraftListScreen threads={threads.data} nodes={nodes.data} />;
+    const [threads, nodes] = await Promise.all([
+      threadList({ author: session.handle, visibility: [Visibility.draft] }),
+      nodeList({ author: session.handle, visibility: [Visibility.draft] }),
+    ]);
+
+    return (
+      <DraftListScreen
+        session={session}
+        threads={threads.data}
+        nodes={nodes.data}
+      />
+    );
+  } catch (e) {
+    return <UnreadyBanner error={e} />;
+  }
 }

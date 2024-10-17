@@ -21,6 +21,8 @@ export function ThreadItem({ thread }: Props) {
   const session = useSession();
   const permalink = `/t/${thread.slug}`;
 
+  const title = thread.title || thread.link?.title || "Untitled post";
+
   const hasReplied = thread.reply_status.replied > 0;
   const replyCount = thread.reply_status.replies;
   const replyCountLabel =
@@ -34,7 +36,7 @@ export function ThreadItem({ thread }: Props) {
     <Card
       shape="row"
       id={thread.id}
-      title={thread.title}
+      title={title}
       text={thread.description}
       url={permalink}
       image={getAssetURL(
