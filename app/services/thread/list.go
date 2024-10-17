@@ -68,7 +68,7 @@ func (s *service) List(ctx context.Context,
 		requestingOwnThreads := filterByAccount == requestedByAccount
 
 		if !requestingOwnThreads {
-			thread.HasStatus(visibility.VisibilityPublished)
+			return thread.HasStatus(visibility.VisibilityPublished)
 		}
 
 		return thread.HasStatus(v...)
