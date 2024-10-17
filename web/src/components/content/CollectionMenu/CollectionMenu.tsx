@@ -30,9 +30,7 @@ export function CollectionMenu(props: Props) {
       >
         <Menu.Trigger asChild>
           <BookmarkAction
-            variant="solid"
-            bgColor="bg.muted"
-            color="fg.default"
+            variant="subtle"
             size="xs"
             bookmarked={isAlreadySaved}
           />

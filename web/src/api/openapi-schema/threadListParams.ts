@@ -12,6 +12,7 @@ import type { CategorySlugList } from "./categorySlugList";
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 import type { SearchQueryParameter } from "./searchQueryParameter";
 import type { TagListIDs } from "./tagListIDs";
+import type { VisibilityParamParameter } from "./visibilityParamParameter";
 
 export type ThreadListParams = {
   /**
@@ -26,6 +27,15 @@ export type ThreadListParams = {
    * Show only results creeated by this user.
    */
   author?: AccountHandle;
+  /**
+ * Filter content with specific visibility values. Note that by default,
+only published items are returned. When 'draft' is specified, only
+drafts owned by the requesting account are included. When 'review' is
+specified, the request will fail if the requesting account does not have
+the necessary permission to view in-review items.
+
+ */
+  visibility?: VisibilityParamParameter;
   /**
    * Show only results with these tags
    */

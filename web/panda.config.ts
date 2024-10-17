@@ -153,7 +153,7 @@ export default defineConfig({
     placeholderShown: "&:is(:placeholder-shown, [data-placeholder-shown])",
     collapsed:
       '&:is([aria-collapsed=true], [data-collapsed], [data-state="collapsed"])',
-    containerSmall: "@container (max-width: 300px)",
+    containerSmall: "@container (max-width: 500px)",
   },
 
   patterns: {

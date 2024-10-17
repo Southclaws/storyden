@@ -7,7 +7,7 @@ import { HStack } from "@/styled-system/jsx";
 import { RichCardVariantProps } from "@/styled-system/recipes";
 import { getAssetURL } from "@/utils/asset";
 
-import { LibraryBadge } from "./LibraryBadge";
+import { LibraryPageMenu } from "./LibraryPageMenu/LibraryPageMenu";
 
 export type NodeCardContext = "library" | "generic";
 
@@ -19,8 +19,8 @@ export type Props = {
 
 export function NodeCard({ node, libraryPath, context, ...rest }: Props) {
   const slug = joinLibraryPath(libraryPath, node.slug);
-  const asset = node.assets?.[0];
   const url = `/l/${slug}`;
+  const image = getAssetURL(node.primary_image?.path);
 
   return (
     <Card
@@ -28,18 +28,15 @@ export function NodeCard({ node, libraryPath, context, ...rest }: Props) {
       title={node.name}
       text={node.description}
       url={url}
-      image={getAssetURL(asset?.path)}
+      image={image}
+      // menu={<LibraryPageMenu node={node} />}
       {...rest}
     >
-      {context === "generic" ? (
-        <HStack color="fg.muted">
-          <LibraryBadge />
+      <HStack w="full" justify="space-between">
+        <Timestamp created={node.createdAt} href={url} large />
 
-          <Timestamp created={node.createdAt} href={url} />
-        </HStack>
-      ) : (
-        <Timestamp created={node.createdAt} large href={url} />
-      )}
+        <LibraryPageMenu node={node} />
+      </HStack>
     </Card>
   );
 }

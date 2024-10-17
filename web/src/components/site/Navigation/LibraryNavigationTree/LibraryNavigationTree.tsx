@@ -23,9 +23,7 @@ export function LibraryNavigationTree(props: Props) {
       <NavigationHeader
         href={href}
         controls={
-          canManageLibrary && (
-            <CreatePageAction color="fg.subtle" variant="ghost" hideLabel />
-          )
+          canManageLibrary && <CreatePageAction variant="ghost" hideLabel />
         }
       >
         {label}
