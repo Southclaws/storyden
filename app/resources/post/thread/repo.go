@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
@@ -162,9 +163,10 @@ func HasCategories(ids []string) Query {
 	}
 }
 
-func HasStatus(status visibility.Visibility) Query {
+func HasStatus(status ...visibility.Visibility) Query {
+	pv := dt.Map(status, func(v visibility.Visibility) ent_post.Visibility { return ent_post.Visibility(v.String()) })
 	return func(q *ent.PostQuery) {
-		q.Where(ent_post.VisibilityEQ(ent_post.Visibility(status.String())))
+		q.Where(ent_post.VisibilityIn(pv...))
 	}
 }
 

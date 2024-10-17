@@ -157,6 +157,11 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	visibilities, err := opt.MapErr(opt.NewPtr(request.Params.Visibility), deserialiseVisibilityList)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	tags := opt.NewPtrMap(request.Params.Tags, func(t []openapi.Identifier) []xid.ID {
 		return dt.Map(t, func(i openapi.Identifier) xid.ID {
 			return openapi.ParseID(i)
@@ -169,6 +174,7 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 	result, err := i.thread_svc.List(ctx, page, pageSize, thread_service.Params{
 		Query:      query,
 		AccountID:  author,
+		Visibility: visibilities,
 		Tags:       tags,
 		Categories: cats,
 	})

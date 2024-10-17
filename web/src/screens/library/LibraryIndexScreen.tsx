@@ -27,12 +27,7 @@ export function LibraryIndexScreen(props: Props) {
       )}
 
       {nodes.data.nodes.length > 0 && (
-        <NodeCardRows
-          libraryPath={[]}
-          context="library"
-          size="small"
-          {...nodes.data}
-        />
+        <NodeCardRows libraryPath={[]} context="library" {...nodes.data} />
       )}
     </LStack>
   );

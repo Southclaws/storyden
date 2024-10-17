@@ -2,33 +2,9 @@ import { compact, getSlotCompoundVariant, memo, splitProps } from '../helpers.mj
 import { createRecipe } from './create-recipe.mjs';
 
 const richCardDefaultVariants = {
-  "mediaDisplay": "with",
-  "shape": "box",
-  "size": "default"
+  "shape": "row"
 }
-const richCardCompoundVariants = [
-  {
-    "size": "small",
-    "shape": "row",
-    "css": {
-      "root": {
-        "gridTemplateColumns": "1fr 2fr minmax(0, min-content)"
-      },
-      "text": {
-        "display": "none"
-      },
-      "title": {
-        "fontSize": "sm"
-      },
-      "controlsOverlayContainer": {
-        "display": "flex",
-        "justifyContent": "end",
-        "alignItems": "start",
-        "padding": "2"
-      }
-    }
-  }
-]
+const richCardCompoundVariants = []
 
 const richCardSlotNames = [
   [
@@ -36,12 +12,16 @@ const richCardSlotNames = [
     "rich-card__root"
   ],
   [
-    "mediaBackdropContainer",
-    "rich-card__mediaBackdropContainer"
+    "headerContainer",
+    "rich-card__headerContainer"
   ],
   [
-    "mediaBackdrop",
-    "rich-card__mediaBackdrop"
+    "menuContainer",
+    "rich-card__menuContainer"
+  ],
+  [
+    "titleContainer",
+    "rich-card__titleContainer"
   ],
   [
     "contentContainer",
@@ -52,16 +32,20 @@ const richCardSlotNames = [
     "rich-card__mediaContainer"
   ],
   [
+    "footerContainer",
+    "rich-card__footerContainer"
+  ],
+  [
+    "mediaBackdropContainer",
+    "rich-card__mediaBackdropContainer"
+  ],
+  [
+    "mediaBackdrop",
+    "rich-card__mediaBackdrop"
+  ],
+  [
     "textArea",
     "rich-card__textArea"
-  ],
-  [
-    "footer",
-    "rich-card__footer"
-  ],
-  [
-    "title",
-    "rich-card__title"
   ],
   [
     "text",
@@ -74,14 +58,6 @@ const richCardSlotNames = [
   [
     "mediaMissing",
     "rich-card__mediaMissing"
-  ],
-  [
-    "controlsOverlayContainer",
-    "rich-card__controlsOverlayContainer"
-  ],
-  [
-    "controls",
-    "rich-card__controls"
   ]
 ]
 const richCardSlotFns = /* @__PURE__ */ richCardSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, richCardDefaultVariants, getSlotCompoundVariant(richCardCompoundVariants, slotName))])
@@ -91,9 +67,7 @@ const richCardFn = memo((props = {}) => {
 })
 
 const richCardVariantKeys = [
-  "mediaDisplay",
-  "shape",
-  "size"
+  "shape"
 ]
 const getVariantProps = (variants) => ({ ...richCardDefaultVariants, ...compact(variants) })
 
@@ -103,17 +77,11 @@ export const richCard = /* @__PURE__ */ Object.assign(richCardFn, {
   raw: (props) => props,
   variantKeys: richCardVariantKeys,
   variantMap: {
-  "mediaDisplay": [
-    "with",
-    "without"
-  ],
   "shape": [
+    "row",
+    "responsive",
     "box",
-    "row"
-  ],
-  "size": [
-    "default",
-    "small"
+    "fill"
   ]
 },
   splitVariantProps(props) {
