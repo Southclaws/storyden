@@ -14,7 +14,8 @@ export const size = {
 
 export const contentType = "image/png";
 
-export default async function Image({ params: { slug } }: Props) {
+export default async function Image({ params }: Props) {
+  const { slug } = await params;
   const { data } = await threadGet(slug);
 
   const { accent_colour } = await getInfo();

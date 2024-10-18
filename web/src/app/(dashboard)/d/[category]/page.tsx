@@ -5,13 +5,13 @@ import { threadList } from "@/api/openapi-server/threads";
 import { CategoryScreen } from "@/screens/category/CategoryScreen";
 
 type Props = {
-  params: {
+  params: Promise<{
     category: string;
-  };
+  }>;
 };
 
 export default async function Page(props: Props) {
-  const slug = props.params.category;
+  const slug = (await props.params).category;
 
   try {
     const { data: categoryListData } = await categoryList();

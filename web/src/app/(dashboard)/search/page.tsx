@@ -4,7 +4,7 @@ import { EmptyState } from "src/components/site/EmptyState";
 import { SearchScreen } from "src/screens/search/SearchScreen";
 
 type Props = {
-  searchParams: Query;
+  searchParams: Promise<Query>;
 };
 
 const QuerySchema = z.object({
@@ -17,8 +17,8 @@ const QuerySchema = z.object({
 
 type Query = z.infer<typeof QuerySchema>;
 
-export default function Page(props: Props) {
-  const params = QuerySchema.parse(props.searchParams);
+export default async function Page(props: Props) {
+  const params = QuerySchema.parse(await props.searchParams);
 
   if (!params.q) {
     return <EmptyState />;
