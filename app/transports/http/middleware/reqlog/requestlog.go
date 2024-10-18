@@ -9,6 +9,16 @@ import (
 	"go.uber.org/zap"
 )
 
+type withStatus struct {
+	http.ResponseWriter
+	statusCode int
+}
+
+func (lrw *withStatus) WriteHeader(code int) {
+	lrw.statusCode = code
+	lrw.ResponseWriter.WriteHeader(code)
+}
+
 func WithLogger(logger *zap.Logger) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -19,6 +29,8 @@ func WithLogger(logger *zap.Logger) func(http.Handler) http.Handler {
 			// log entries should be in the form "GET /a/b/c".
 			title := r.Method + " " + r.URL.Path
 
+			wr := &withStatus{ResponseWriter: w}
+
 			defer func() {
 				log := logger.With(
 					zap.Duration("duration", time.Since(start)),
@@ -26,6 +38,7 @@ func WithLogger(logger *zap.Logger) func(http.Handler) http.Handler {
 					zap.Int64("body", r.ContentLength),
 					zap.String("ip", r.RemoteAddr),
 					zap.String("origin", origin),
+					zap.Int("status", wr.statusCode),
 				)
 
 				if recovery := recover(); recovery != nil {
@@ -48,7 +61,7 @@ func WithLogger(logger *zap.Logger) func(http.Handler) http.Handler {
 				log.Info(title)
 			}()
 
-			next.ServeHTTP(w, r)
+			next.ServeHTTP(wr, r)
 		})
 	}
 }
