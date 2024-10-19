@@ -18,6 +18,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
+// TODO: This should be configurable in settings.
+const MaxPostLength = 60_000
+
 // ID wraps the underlying xid type for all kinds of Storyden Post data type.
 type ID xid.ID
 

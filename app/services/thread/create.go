@@ -26,6 +26,12 @@ func (s *service) Create(ctx context.Context,
 	meta map[string]any,
 	partial Partial,
 ) (*thread.Thread, error) {
+	if content, ok := partial.Content.Get(); ok {
+		if err := s.cpm.CheckContent(ctx, content); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
 	opts := partial.Opts()
 	opts = append(opts,
 		thread.WithVisibility(status),

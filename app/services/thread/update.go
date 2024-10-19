@@ -17,6 +17,12 @@ import (
 )
 
 func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial) (*thread.Thread, error) {
+	if content, ok := partial.Content.Get(); ok {
+		if err := s.cpm.CheckContent(ctx, content); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
 	aid, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

@@ -1,0 +1,71 @@
+IsValidRoleplayName without regex.
+
+[php]
+stock IsValidRoleplayName(const name[], short_name_len = 3) {
+    new 
+        len = strlen(name),
+        underscore_pos = strfind(name, \"_\", true);
+
+    // The name is empty
+    if (isnull(name)) return false;
+
+    // Underscore not found
+    if (underscore_pos == -1) return false;
+    // Firstname and lastname is not capital
+    #define isupper(%0) (%0 != (%0 | 0x20))
+    if (!isupper(name[0]) || !isupper(name[underscore_pos  1])) return false;
+
+    // Firstname is too short
+    if (underscore_pos < short_name_len) return false;
+
+    // Lastname is too short
+    if (((len - 1) - underscore_pos) < short_name_len) return false;
+
+    // Invalid characters
+    for (new i; i != len; i ) {
+            switch (name[i]) {
+                case \'A\'..\'Z\', \'a\'..\'z\', \'_\': continue;
+            default: {
+                            return false;
+            }
+        }
+    }
+    return true;
+}
+[/php]
+
+IsValidRoleplayName with regex (PawnPlus)
+
+[php]
+stock IsValidRoleplayName(const name[])
+{
+    new String:tmp = str_format(name);
+    return str_match(tmp, \"^[A-Z]{1}[a-z]{2,12}_[A-Z]{1}[a-z]{2,12}$\");
+}
+[/php]
+
+
+No Colors/Remove color format
+[php]
+stock NoColors(str[], startPos = \'{\', len = 8) {
+    for (new i = 0; i <= strlen(str) - len; i ) {
+        if (str[i] == startPos) {
+            if (str[i  len - 1] == \'}\' || IsValidHex(str[i  len - 1])) {
+                new 
+                    pass;
+                
+                for (new j = 1; j < len - 1; j ) {
+                                    if (IsValidHex(str[i  j])) {
+                                        pass ;
+                    }
+                }
+                if (pass >= len - 2) {
+                                    strdel(str, i, i  len);
+                    pass = 0;
+                }
+            }
+        }
+    }
+    return 1;
+}
+[/php]

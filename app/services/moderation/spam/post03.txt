@@ -1,0 +1,543 @@
+[color=#202124][size=x-large][font=\"Google Sans\", arial, sans-serif]Hi, I don\'t know how to speak English very well, I\'m from Argentina but ..., How can I save an .ini for this tuning system using AttachObjectToVehicle?[/font][/size][/color]
+
+#include <a_samp>
+#include <zcmd>
+#include <sscanf2>
+#include <streamer>
+#include <mSelection>
+#include <YSI\\y_ini>
+
+
+#define DRAWDISTANCE_DEFAULT 80
+#define SPEEDMULTIPLIER_HIGH    0.20
+#define SPEEDMULTIPLIER_LOW    0.01
+
+
+#define MODE_NONE?        0
+#define MODE_PX 1
+#define MODE_PY    2
+#define MODE_PZ       3
+#define MODE_RX       4
+#define MODE_RY       5
+#define MODE_RZ       6
+#define MAX_OBJVEH?        7
+
+//Defines
+#define PlayerToPoint(%1,%2,%3,%4,%5)? IsPlayerInRangeOfPoint(%2,%1,%3,%4,%5)
+#define       Message                  SendClientMessage
+#define SendFormattedMessage(%0,%1,%2) do{new _str[128]; format(_str,128,%2); SendClientMessageEx(%0,%1,_str);}while(FALSE)
+#define GivePlayerCash GivePlayerMoney
+//Colores
+#define Blanco 5883
+#define iCOL_RED                                          0xFF0000FF
+//Dialogo
+//Textdraws
+
+// News
+//Catalogo
+
+
+
+new objetostu = mS_INVALID_LISTID;
+//Taller
+#define TG_FILE \"Talleres/%d.ini\"
+#define TG_OBJ    \"Objetos/%d.ini\"
+
+#define MAX_TUNE?    5000
+#define MAX_GARAGES? 5000
+
+//Dialogos
+#define DIALOG_TUNING_TALLER 8431 //Ids para evitar bugs :s
+//Enums
+
+
+enum Attaching
+{
+
+ Temp,
+  bool:Saved,
+  Timer,
+  bool:Enabled,
+  Mode,
+  ModelID,
+  ObjectID,
+  VehicleID,
+  Float:P[3],
+  Float:R[3],
+  d_ObjIdInput
+ };
+
+
+
+new Attach[MAX_PLAYERS][Attaching];
+
+enum aaa {
+
+ Float:Position[ 3 ],
+    Text3D:tg3D,
+    tgPickup,
+}
+
+
+
+new Talleres[ MAX_GARAGES ][ aaa ];
+
+//Stocks
+
+public OnFilterScriptInit()
+{    
+
+
+objetostu = LoadModelSelectionMenu(\"objetostu.txt\");
+
+? for(new i = 1; i < MAX_GARAGES; i) {
+
+    new file[ 50 ];
+     format( file, sizeof( file ), TG_FILE, i );
+     if( fexist( file ) ) {
+
+    INI_ParseFile( file, \"LoadTalleres\", .bExtra = true, .extra = i );
+         Talleres[ i ][ tg3D ] = Create3DTextLabel( \"Usa {b9f442}/tuning {FFFFFF}para tunear tu veh?culo\", -1, Talleres[ i ][ Position ][ 0 ], Talleres[ i ][ Position ][ 1 ], Talleres[ i ][ Position ][ 2 ], 15.0, 0, 1 );
+  Talleres[ i ][ tgPickup ] = CreatePickup( 1239, 1, Talleres[ i ][ Position ][ 0 ], Talleres[ i ][ Position ][ 1 ], Talleres[ i ][ Position ][ 2 ], -1 );
+  }
+  }
+  return 1; //se retorna a 1.
+ }
+ 
+
+public OnFilterScriptExit()
+{
+
+ for(new i=0; i<MAX_PLAYERS; i) { KillTimer(Attach[i][Timer]); }
+  print(\"\\n? :C\\n\");
+  
+  return 1;
+ }
+ 
+
+public OnPlayerSpawn(playerid)
+{    
+     return 1;
+ }
+ 
+
+
+public OnPlayerConnect(playerid)
+{
+
+ 
+    Attach[playerid][Saved] = true;
+ return true;
+  
+ }
+ 
+ public OnPlayerModelSelection(playerid, response, listid, modelid)
+{
+
+if(listid == objetostu)
+ {
+
+ if(response)
+  {
+
+?        Atta(playerid, modelid);
+ GivePlayerMoney(playerid, -5000); //dinero
+  SendClientMessage(playerid, 0xFFFFFFFF, \"Compraste un objeto para tu veh?culo.\");
+  }
+  else SendClientMessage(playerid, 0xFFFFFFFF, \"Has salido del catalogo de objetos.\");
+  }
+  return 1;
+  }
+ 
+ 
+
+public OnPlayerDisconnect(playerid, reason)
+{
+
+ KillTimer(Attach[playerid][Timer]);
+  Attach[playerid][Mode] = MODE_NONE;
+    Attach[playerid][Temp] = 0;
+    Attach[playerid][ModelID] = 0;
+    Attach[playerid][ObjectID] = 0;
+    Attach[playerid][VehicleID] = 0;
+    Attach[playerid][Enabled] = false;
+    for(new i=0; i<3; i) { Attach[playerid][P][i] = 0.0; Attach[playerid][R][i] = 0.0;}
+ return true;
+ }
+ 
+ CMD:creditostuning(playerid, params[])
+{
+
+SendClientMessage(playerid, -1, \"Sistema Creador Por Franco Londes, Franco12 en pawnscript.\");
+
+
+
+return 1;
+}
+
+CMD:creartaller( playerid, params[] ) {
+
+    if( !IsPlayerAdmin( playerid ) ) return SendClientMessage( playerid,-1,? \"Debes estar logeado con rcon.\" );
+    new i = NextIDGarage( MAX_GARAGES ), Float:Pos[ 3 ], file[ 40 ];
+ GetPlayerPos( playerid, Pos[ 0 ], Pos[ 1 ], Pos[ 2 ] );
+  format( file, sizeof( file ), TG_FILE, i );
+  if( fexist( file ) ) return SendClientMessage( playerid,-1, \"Esta ID ya existe.\" );
+  Talleres[ i ][ Position ][ 0 ] = Pos[ 0 ];
+  Talleres[ i ][ Position ][ 1 ] = Pos[ 1 ];
+  Talleres[ i ][ Position ][ 2 ] = Pos[ 2 ];
+  Talleres[ i ][ tg3D ] = Create3DTextLabel( \"Usa {b9f442}/tuning {FFFFFF}para tunear tu veh?culo\", -1, Talleres[ i ][ Position ][ 0 ], Talleres[ i ][ Position ][ 1 ], Talleres[ i ][ Position ][ 2 ], 15.0, 0, 1 );
+  Talleres[ i ][ tgPickup ] = CreatePickup( 1239, 1, Talleres[ i ][ Position ][ 0 ], Talleres[ i ][ Position ][ 1 ], Talleres[ i ][ Position ][ 2 ], -1 );
+  SaveTalleres( i );
+  return true;
+ }
+//==============================================================================
+
+
+
+CMD:eliminartaller( playerid, params[] ) {
+
+    if( !IsPlayerAdmin( playerid ) ) return SendClientMessage( playerid, -1, \"Debes estar logeado con rcon.\" );
+ new i = GetNearestTalleres( playerid );
+  if( i == -1 ) return SendClientMessage( playerid, -1,? \"No est?s en el taller (pickup).\" );
+ 
+ Talleres[ i ][ Position ][ 0 ] = 0.0;
+  Talleres[ i ][ Position ][ 1 ] = 0.0;
+  Talleres[ i ][ Position ][ 2 ] = 0.0;
+ 
+ DestroyPickup( Talleres[ i ][ tgPickup ] );
+  Delete3DTextLabel( Talleres[ i ][ tg3D ] );
+ 
+    new file[ 50 ];
+ format( file, sizeof( file ), TG_FILE, i );
+  if( fexist( file ) ) { fremove( file ); }
+ 
+ SendClientMessage( playerid, -1, \"Taller eliminado.\" );
+  return true;
+ }
+ 
+
+CMD:tuning(playerid, params[])
+{
+
+ if( GetNearestTalleres( playerid ) == -1 ) return SendClientMessage( playerid, -1, \"No est?s en el taller de tuning.\" );
+  if( !IsPlayerInAnyVehicle(playerid) ) return SendClientMessage(playerid, 0xFF0000FF, \"No est?s en un veh?culo.\");
+  ShowPlayerDialog(playerid, DIALOG_TUNING_TALLER, DIALOG_STYLE_LIST, \"Menu Tuning\", \"Comprar Objeto\\nEditar Posici?n de Objeto\\nRemover Objeto\", \"Seleccionar\", \"Cancelar\");
+  return 1;
+  }
+ 
+
+
+
+CMD:4532434343(playerid, params[])
+{
+
+    if( !Attach[playerid][Saved] ) {
+
+    ShowModelSelectionMenu(playerid, objetostu, \"Venta de Objetos\");
+ return true;
+  }
+  new modelid;
+  Atta(playerid, modelid);
+  return true;
+  }
+ ? 
+
+
+
+public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
+{
+
+if(response)// Si se pulsa el primer bot?n.
+ {
+
+switch(dialogid)// Si s?lo tiene un cuadro de di?logo, entonces esto no es necesario, pero es m?s Organizado para cuando se implementan m?s cuadros de di?logo.
+{
+
+case DIALOG_TUNING_TALLER:// Nuestro dialogo
+    {
+
+?        switch(listitem)// Comprueba Si a Sido Seleccionado
+    {
+
+       case 0:// El Primer Boton Incluido
+       {
+
+           ShowModelSelectionMenu(playerid, objetostu, \"Venta de Objetos\");
+       }
+       case 1: // Esto es el segundo boton
+       {
+
+ SendClientMessage(playerid, -1, \"Usa /ayudatuning para editar la posici?n del objeto, /terminartuning para acabar\");
+        }
+       case 2: // El Tercer boton
+       {
+
+ SendClientMessage(playerid, -1, \"Has eliminado el objeto\");
+  DestroyObject(Attach[playerid][ObjectID]);
+        }
+    }
+    }
+ }
+    }
+
+
+
+return 1;
+}
+//=========================================================================================================================================================
+
+//=====================================================================================================================================================
+
+
+
+GetNearestTalleres( playerid ) {
+
+    for(new i = 1; i < MAX_GARAGES; i) {
+
+    if( IsPlayerInRangeOfPoint( playerid, 10.0, Talleres[ i ][ Position ][ 0 ], Talleres[ i ][? Position ][ 1 ], Talleres[ i ][ Position ][ 2 ] ) ) { return i; }
+ }
+  return -1;
+ }
+//========================================================================================================================================================
+
+
+
+stock NextIDGarage(const len) {
+
+    new id = (-1);
+    for( new loop = ( 0 ), provjera = ( -1 ), Data_[ 64 ] = \"\\0\"; loop != len;  loop ) {
+
+?    provjera = ( loop );
+?    format( Data_, ( sizeof Data_ ), TG_FILE, provjera );
+?    if(!fexist(Data_)) {
+
+?        id = ( provjera );
+?        break; } }
+? return ( id );
+}
+//==============================================================================
+
+
+
+forward SaveTalleres( id );
+
+
+
+public SaveTalleres( id ) {
+
+ new iFile[ 40 ];
+    format( iFile, sizeof( iFile ), TG_FILE, id );
+ new INI:File = INI_Open( iFile );
+  INI_WriteFloat( File, \"Position1\", Talleres[ id ][ Position ][ 0 ] );
+  INI_WriteFloat( File, \"Position2\", Talleres[ id ][ Position ][ 1 ] );
+  INI_WriteFloat( File, \"Position3\", Talleres[ id ][ Position ][ 2 ] );
+  INI_Close( File );
+  return 1;
+ }
+//==============================================================================
+
+
+
+forward LoadTalleres( id, name[], value[] );
+
+
+
+public LoadTalleres( id, name[], value[] ) {
+
+ INI_Float( \"Position1\", Talleres[ id ][ Position ][ 0 ] );
+  INI_Float( \"Position2\", Talleres[ id ][ Position ][ 1 ] );
+  INI_Float( \"Position3\", Talleres[ id ][ Position ][ 2 ] );
+    return true;
+}
+//==============================================================================
+
+
+
+forward Atta(playerid, modelid);
+//==============================================================
+
+public Atta(playerid, modelid)
+{
+
+    Attach[playerid][Timer] = SetTimerEx(\"OnPlayerUpdateEx\", 50, true, \"d\", playerid);    //==================================================================================
+
+    Attach[playerid][Mode] = MODE_NONE;
+    Attach[playerid][Temp] = 0;
+    Attach[playerid][VehicleID] = 0;
+    for(new i=0; i<3; i) { Attach[playerid][P][i] = 0.0; Attach[playerid][R][i] = 0.0;}    //======================================================================================
+
+    Attach[playerid][Enabled] = true;
+ Attach[playerid][ModelID] = modelid;
+  Attach[playerid][ObjectID] = CreateObject(Attach[playerid][ModelID], 0, 0, -1000, 0, 0, 0, DRAWDISTANCE_DEFAULT);
+  Attach[playerid][VehicleID] = GetPlayerVehicleID(playerid);
+  AttachObjectToVehicle(Attach[playerid][ObjectID], Attach[playerid][VehicleID], 0, 0, 0, 0, 0, 0);
+    EditDynamicObject(playerid, ObjectID);
+ Attach[playerid][Saved] = false;
+  return true;
+ }
+ 
+ CMD:ayudatuning(playerid, params[])
+{
+
+SendClientMessage(playerid, -1, \"Usa /posx, /posy, /posz, para cambiar la posici?n del objeto.\");
+
+
+
+SendClientMessage(playerid, -1, \"Usa /rotx, /roty, /rotz, para cambiar la rotaci?n del objeto. /terminartuning para terminar.\");
+
+
+
+return 1;
+}
+
+CMD:posx(playerid, params[])
+{
+
+    if(!Attach[playerid][Enabled]) { SendClientMessage(playerid, 0xFF0000FF, \"?No est?s en el taller de tuning!.\"); }
+    else { Attach[playerid][Mode] = MODE_PX; SendClientMessage(playerid, -1, \"[X]Bien, usa las teclas Izquierda/Derecha para editar, /terminartuning para acabar.\"); }
+ return true;
+ }
+
+
+
+CMD:posy(playerid, params[])
+{
+
+    if(!Attach[playerid][Enabled]) { SendClientMessage(playerid, 0xFF0000FF, \"?No est?s en el taller de tuning!.\"); }
+    else { Attach[playerid][Mode] = MODE_PY; SendClientMessage(playerid, -1, \"[Y]Bien, usa las teclas Izquierda/Derecha para editar, /terminartuning para acabar.\"); }
+ return true;
+ }
+
+
+
+CMD:posz(playerid, params[])
+{
+
+    if(!Attach[playerid][Enabled]) { SendClientMessage(playerid, 0xFF0000FF, \"?No est?s en el taller de tuning!.\"); }
+    else { Attach[playerid][Mode] = MODE_PZ; SendClientMessage(playerid, -1, \"[Z]Bien, usa las teclas Izquierda/Derecha para editar, /terminartuning para acabar.\"); }
+ return true;
+ }
+
+
+
+CMD:rotx(playerid, params[])
+{
+
+    if(!Attach[playerid][Enabled]) { SendClientMessage(playerid, 0xFF0000FF, \"?No est?s en el taller de tuning!.\"); }
+    else { Attach[playerid][Mode] = MODE_RX; SendClientMessage(playerid, -1, \"[RX]Bien, usa las teclas Izquierda/Derecha para editar, /terminartuning para acabar.\"); }
+ return true;
+ }
+
+
+
+CMD:roty(playerid, params[])
+{
+
+    if(!Attach[playerid][Enabled]) { SendClientMessage(playerid, 0xFF0000FF, \"?No est?s en el taller de tuning!.\"); }
+    else { Attach[playerid][Mode] = MODE_RY; SendClientMessage(playerid, -1, \"[RY]Bien, usa las teclas Izquierda/Derecha para editar, /terminartuning para acabar.\"); }
+ return true;
+ }
+
+
+
+CMD:rotz(playerid, params[])
+{
+
+    if(!Attach[playerid][Enabled]) { SendClientMessage(playerid, 0xFF0000FF, \"?No est?s en el taller de tuning!.\"); }
+    else { Attach[playerid][Mode] = MODE_RZ; SendClientMessage(playerid, -1, \"[RZ]Bien, usa las teclas Izquierda/Derecha para editar, /terminartuning para acabar.\"); }
+ return true;
+ }
+
+
+
+CMD:terminartuning(playerid, params[])
+{
+
+    if(!Attach[playerid][Enabled]) { SendClientMessage(playerid, 0xFF0000FF, \"?No est?s en el taller de tuning!.\"); }
+    else { Attach[playerid][Mode] = MODE_NONE; SendClientMessage(playerid, 0xFF00FFFF, \"Tuning Finalizado.\"); KillTimer(Attach[playerid][Timer]); }
+    return true;
+}
+
+
+
+forward OnPlayerUpdateEx(playerid);
+
+
+
+public OnPlayerUpdateEx(playerid)
+{
+
+ if(Attach[playerid][Mode] == MODE_NONE) return true;
+ 
+    new KEYS, UD, LR; GetPlayerKeys( playerid, KEYS, UD, LR );
+
+ new Float:SPDM = 0.1;
+ 
+ if(KEYS == 128) { SPDM = SPEEDMULTIPLIER_HIGH; }
+  else if (KEYS == 4) { SPDM = SPEEDMULTIPLIER_LOW; }
+ 
+    if(LR > 0) { UpdateVObject(playerid, SPDM); }
+ else if(LR < 0) { UpdateVObject(playerid, -SPDM); }
+    return 1;
+}
+
+
+forward UpdateVObject(playerid, Float:value);
+
+
+
+public UpdateVObject(playerid, Float:value)
+{
+
+ DestroyObject(Attach[playerid][ObjectID]);
+  Attach[playerid][ObjectID] = CreateObject(Attach[playerid][ModelID], 0, 0, 6, 0, 0, 0, DRAWDISTANCE_DEFAULT);
+ 
+ switch(Attach[playerid][Mode])
+  {
+
+    case MODE_PX: {
+
+        Attach[playerid][P][0] = value;
+         new string[64];
+         format(string, sizeof(string), \"Editando Posicion [X]\",Attach[playerid][P][0]);
+         GameTextForPlayer(playerid, string, 10000, 3);
+  }
+  case MODE_PY: {
+
+    Attach[playerid][P][1] = value;
+         new string[64];
+         format(string, sizeof(string), \"Editando Posicion [Y]\",Attach[playerid][P][1]);
+         GameTextForPlayer(playerid, string, 10000, 3);
+  }
+  case MODE_PZ: {
+
+    Attach[playerid][P][2] = value;
+         new string[64];
+         format(string, sizeof(string), \"Editando Posicion [Z]\",Attach[playerid][P][1]);
+         GameTextForPlayer(playerid, string, 10000, 3);
+  }
+  case MODE_RX: {
+
+        if(Attach[playerid][R][0]  value*10 <= 360.0 && Attach[playerid][R][0]  value*10 >= 0.0) { Attach[playerid][R][0] = value*10; }
+         new string[64];
+         format(string, sizeof(string), \"Editando Rotacion [X]\",Attach[playerid][P][0]);
+         GameTextForPlayer(playerid, string, 10000, 3);
+  }
+  case MODE_RY: {
+
+    if(Attach[playerid][R][1]  value*10 <= 360.0 && Attach[playerid][R][1]  value*10 >= 0.0) { Attach[playerid][R][1] = value*10; }
+         new string[64];
+         format(string, sizeof(string), \"Editando Rotacion [Y]\",Attach[playerid][R][1]);
+         GameTextForPlayer(playerid, string, 10000, 3);
+  }
+  case MODE_RZ: {
+
+    if(Attach[playerid][R][2]  value*10 <= 360.0 && Attach[playerid][R][2]  value*10 >= 0.0) { Attach[playerid][R][2] = value*10; }
+         new string[64];
+         format(string, sizeof(string), \"Editando Rotacion [Z]\",Attach[playerid][R][2]);
+         GameTextForPlayer(playerid, string, 10000, 3);
+  }
+  }
+  AttachObjectToVehicle(Attach[playerid][ObjectID], Attach[playerid][VehicleID], Attach[playerid][P][0], Attach[playerid][P][1], Attach[playerid][P][2], Attach[playerid][R][0], Attach[playerid][R][1], Attach[playerid][R][2]);
+  return true;
+ }
