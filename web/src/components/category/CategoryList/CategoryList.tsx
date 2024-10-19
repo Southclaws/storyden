@@ -14,16 +14,16 @@ import { styled } from "@/styled-system/jsx";
 import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
 
 import { CategoryListItem } from "./CategoryListItem";
-import { useCategoryList } from "./useCategoryList";
+import { Props, useCategoryList } from "./useCategoryList";
 
 const mapCategories = (isAdmin: boolean) =>
   map((c: Category) => (
     <CategoryListItem key={c.id} {...c} isAdmin={isAdmin} />
   ));
 
-export function CategoryList() {
+export function CategoryList(props: Props) {
   const { canManageCategories, categories, items, sensors, handleDragEnd } =
-    useCategoryList();
+    useCategoryList(props);
 
   if (!categories) return <Unready />;
 

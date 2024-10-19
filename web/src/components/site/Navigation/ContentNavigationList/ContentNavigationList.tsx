@@ -1,5 +1,6 @@
 "use client";
 
+import { CategoryListOKResponse, NodeListResult } from "@/api/openapi-schema";
 import { CategoryList } from "@/components/category/CategoryList/CategoryList";
 import { Divider, LStack, styled } from "@/styled-system/jsx";
 
@@ -7,7 +8,12 @@ import { MembersAnchor } from "../Anchors/Members";
 import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
 import { useNavigation } from "../useNavigation";
 
-export function ContentNavigationList() {
+type Props = {
+  initialNodeList?: NodeListResult;
+  initialCategoryList?: CategoryListOKResponse;
+};
+
+export function ContentNavigationList(props: Props) {
   const { nodeSlug } = useNavigation();
 
   return (
@@ -22,8 +28,9 @@ export function ContentNavigationList() {
       overflowY="scroll"
     >
       <LStack gap="1">
-        <CategoryList />
+        <CategoryList initialCategoryList={props.initialCategoryList} />
         <LibraryNavigationTree
+          initialNodeList={props.initialNodeList}
           label="Library"
           href="/l"
           currentNode={nodeSlug}

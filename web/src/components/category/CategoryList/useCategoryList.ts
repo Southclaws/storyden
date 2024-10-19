@@ -14,14 +14,20 @@ import {
   categoryUpdateOrder,
   useCategoryList as useGetCategoryList,
 } from "src/api/openapi-client/categories";
-import { Category } from "src/api/openapi-schema";
+import { Category, CategoryListOKResponse } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
 import { hasPermission } from "@/utils/permissions";
 
-export function useCategoryList() {
+export type Props = {
+  initialCategoryList?: CategoryListOKResponse;
+};
+
+export function useCategoryList({ initialCategoryList }: Props) {
   const session = useSession();
-  const categoryListResponse = useGetCategoryList();
+  const categoryListResponse = useGetCategoryList({
+    swr: { fallbackData: initialCategoryList },
+  });
   const [items, setItems] = useState<string[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
 
@@ -73,10 +79,16 @@ export function useCategoryList() {
 
   const canManageCategories = hasPermission(session, "MANAGE_CATEGORIES");
 
+  // Categories are empty on server render, but we still want to show something.
+  const orderedCategories =
+    categories.length > 0
+      ? reorder(items)(categories)
+      : (categoryListResponse.data?.categories ?? []);
+
   return {
     canManageCategories,
     // always use the items array as the source of truth for ordering.
-    categories: reorder(items)(categories),
+    categories: orderedCategories,
     items,
     sensors,
     handleDragEnd,
