@@ -7,6 +7,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/transports/http/middleware/limiter"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/reqlog"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session"
@@ -14,6 +15,8 @@ import (
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 )
+
+const MaxRequestSizeBytes = 10 * 1024 * 1024
 
 // Invoked by fx at runtime to mount the Echo router onto the http multiplexer.
 // This is where all global middleware (not OpenAPI specific) is applied.
@@ -34,6 +37,8 @@ func MountOpenAPI(
 			reqlog.WithLogger(logger),
 			useragent.UserAgentContext,
 			cj.WithAuth,
+			limiter.WithRateLimiter(cfg),
+			limiter.WithRequestSizeLimiter(MaxRequestSizeBytes),
 		)
 
 		// Mounting the Echo router must happen after all Echo's middleware and
