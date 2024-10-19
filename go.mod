@@ -33,6 +33,7 @@ require (
 	github.com/Southclaws/opt v0.6.1
 	github.com/ThreeDotsLabs/watermill v1.3.7
 	github.com/ThreeDotsLabs/watermill-amqp/v2 v2.1.3
+	github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.0
 	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
 	github.com/cixtor/readability v1.0.0
 	github.com/dave/jennifer v1.7.1
@@ -54,6 +55,7 @@ require (
 	github.com/mileusna/useragent v1.3.5
 	github.com/minimaxir/big-list-of-naughty-strings/naughtystrings v0.0.0-20210417190545-db33ec7b1d5d
 	github.com/oapi-codegen/echo-middleware v1.0.2
+	github.com/oapi-codegen/nullable v1.1.0
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/pb33f/libopenapi v0.18.3
@@ -114,7 +116,6 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
-	github.com/oapi-codegen/nullable v1.1.0 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
