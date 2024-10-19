@@ -1,0 +1,58 @@
+Hello friends how are you?
+I come to you because after a long time I have decided to dedicate myself to MAPPER again.
+I tried to open the texture STUDIO and firstly it gave me an error with the addons, well, I downloaded a gta default to use it and I solved it but I got an error.
+Now nothing is loaded from the server, the filescripts are not loaded or anything, could you help me? I would like to map again and with this error I cannot.
+[code]SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+[10:48:47] 
+[10:48:47] Server Plugins
+[10:48:47] --------------
+[10:48:47]? Loading plugin: crashdetect
+[10:48:47]? Failed.
+[10:48:47]? Loading plugin: sscanf
+[10:48:47]? Failed.
+[10:48:47]? Loading plugin: streamer
+[10:48:47] 
+*** Streamer Plugin v2.9.4 by Incognito loaded ***
+[10:48:47]? Loaded.
+[10:48:47]? Loading plugin: filemanager
+[10:48:47] ******************
+[10:48:47] ** FILE MANAGER **
+[10:48:47] **? ? Loaded? ? **
+[10:48:47] ** Version 1.5 **
+[10:48:47] ******************
+[10:48:47]? Loaded.
+[10:48:47]? Loaded 2 plugins.
+[10:48:47] 
+[10:48:47] Filterscripts
+[10:48:47] ---------------
+[10:48:47]? Loading filterscript \'tstudio.amx\'...
+[10:48:47]? Loading filterscript \'fsdebug.amx\'...
+[10:48:47] 
+? *********************
+? * SA:MP DEBUG 0.2? *
+[10:48:47]? * By Simon Campbell *
+? *********************
+[10:48:47]? * Version: 0.5d? ? ? *
+? *********************
+[10:48:47]? * -- LOADED? ? ? ? *
+? *********************
+[10:48:47]? Loaded 2 filterscripts.
+[10:48:47] 
+/*-----------------------------------*\\
+[10:48:47] |*=====[TS Base GameMode Loaded]=====*|
+[10:48:47] \\*-----------------------------------*/
+[10:48:47] Number of vehicle models: 0
+[10:48:55] [connection] 127.0.0.1:51010 requests connection cookie.
+[10:48:56] [connection] incoming connection: 127.0.0.1:51010 id: 0
+[10:48:56] [join] James_Kalashnikov has joined the server (0:127.0.0.1)
+[10:53:48] RCON (In-Game): Player #0 (James_Kalashnikov) has logged in.
+[10:54:39] RCON (In-Game): Player [James_Kalashnikov] sent command: reloadfs
+[10:55:00] RCON (In-Game): Player [James_Kalashnikov] sent command: reloadfs
+[10:55:13] RCON (In-Game): Player [James_Kalashnikov] sent command: loadfs
+[10:55:17] RCON (In-Game): Player [James_Kalashnikov] sent command: unloadfs
+[11:08:49] [part] James_Kalashnikov has left the server (0:1)
+[/code]
+[img]https://i.imgur.com/RbWMi2n.jpg[/img]
+https://i.imgur.com/RbWMi2n.jpg

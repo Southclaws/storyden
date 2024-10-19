@@ -50,6 +50,7 @@ const EmptyState = `<body></body>`
 type Content struct {
 	html  *html.Node
 	short string
+	plain string
 	links []string
 	sdrs  RefList
 }
@@ -75,6 +76,10 @@ func (r Content) HTMLTree() *html.Node {
 
 func (r Content) Short() string {
 	return r.short
+}
+
+func (r Content) Plaintext() string {
+	return r.plain
 }
 
 func (r Content) Links() []string {
@@ -126,6 +131,7 @@ func NewRichTextFromReader(r io.Reader, opts ...option) (Content, error) {
 	return Content{
 		html:  bodyTree,
 		short: short,
+		plain: result.TextContent,
 		links: links,
 		sdrs:  refs,
 	}, nil

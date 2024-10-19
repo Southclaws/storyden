@@ -1,0 +1,173 @@
+By?using PawnPlus & eSelection?
+And then my server crashed any help please?
+
+[code]Loaded log file: \"server_log.txt\".
+----------
+
+\r\nSA-MP Dedicated Server
+----------------------
+\r\nv0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[22:45:46] 
+[22:45:46] Server Plugins
+[22:45:46] --------------
+[22:45:46]? Loading plugin: MapAndreas.so
+[22:45:46]? Loaded.
+[22:45:46]? Loading plugin: crashdetect.so
+[22:45:46]? CrashDetect plugin 4.20
+[22:45:46]? Loaded.
+[22:45:46]? Loading plugin: mysql.so
+[22:45:46]? >> plugin.mysql: R41-4 successfully loaded.
+[22:45:46]? Loaded.
+[22:45:46]? Loading plugin: Whirlpool.so
+[22:45:46]? 
+[22:45:46]? ==================
+[22:45:46]? 
+[22:45:46]? Whirlpool loaded
+[22:45:46]? 
+[22:45:46]? ==================
+[22:45:46]? 
+[22:45:46]? Loaded.
+[22:45:46]? Loading plugin: cec.so
+[22:45:46]? ? < cec 1.0 | Copyright 2020 > 
+[22:45:46]? ? ? Author: Ak-kawit \"leaks666\" Tahae
+[22:45:46]? ? Repository: https://github.com/aktah/cec
+[22:45:46]? 
+[22:45:46]? ? ? --------------------------------
+[22:45:46]? Loaded.
+[22:45:46]? Loading plugin: streamer.so
+[22:45:46] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[22:45:46]? Loaded.
+[22:45:46]? Loading plugin: sscanf.so
+[22:45:46] 
+
+[22:45:46]? ===============================
+
+[22:45:46]? ? ? sscanf plugin loaded.? ? 
+
+[22:45:46]? ? ? ? Version:? 2.10.2? ? ? ? 
+
+[22:45:46]? ? (c) 2020 Alex \"Y_Less\" Cole? 
+
+[22:45:46]? ===============================
+
+[22:45:46]? Loaded.
+[22:45:46]? Loading plugin: pawncmd.so
+[22:45:46] [Pawn.CMD] plugin v3.3.3 by urShadow loaded
+[22:45:46]? Loaded.
+[22:45:46]? Loading plugin: pawnraknet.so
+[22:45:46] [Pawn.RakNet] 
+
+? ? | Pawn.RakNet 1.4.1 | 2016 - 2020
+? ? |--------------------------------
+? ? | Author and maintainer: urShadow
+
+
+? ? | Compiled: Jun 18 2020 at 11:28:17
+? ? |--------------------------------------------------------------
+? ? | Forum thread: https://forum.sa-mp.com/showthread.php?t=640306
+? ? |--------------------------------------------------------------
+? ? | Repository: https://github.com/urShadow/Pawn.RakNet
+? ? |--------------------------------------------------------------
+? ? | Wiki: https://github.com/urShadow/Pawn.RakNet/wiki
+
+[22:45:46]? Loaded.
+[22:45:46]? Loading plugin: sampvoice.so
+[22:45:46] [sv:dbg:network:init] : module initializing...
+[22:45:46] [dbg:raknet:init] : module initializing...
+[22:45:46] [dbg:raknet:init] : installed hook to \'GetRakServerInterface\' function (ptr:0x806ca30)
+[22:45:46] [dbg:raknet:init] : installed hook to \'OnPlayerDisconnect\' function (ptr:0x80a51d0)
+[22:45:46] [dbg:raknet:init] : module initialized
+[22:45:46] [sv:dbg:network:init] : module initialized
+[22:45:46]? -------------------------------------------? ? 
+[22:45:46]? ? ___? ? ? ? ? ? ? ? __? __? ? _? ? ? ? ? ? ? 
+[22:45:46]? / __| __ _ _ __? _ _\\ \\ / /__ (_) __ ___? ? 
+[22:45:46]? \\__ \\/ _` | \'? \\| \'_ \\? / _ \\| |/ _/ -_)
+[22:45:46]? |___/\\__,_|_|_|_| .__/\\_/\\___/|_|\\__\\___|
+[22:45:46]? ? ? ? ? ? ? ? ? |_|? ? ? ? ? ? ? ? ? ? ? ? ? 
+[22:45:46]? -------------------------------------------? ? 
+[22:45:46]? ? ? ? ? ? SampVoice by MOR loaded? ? ? ? ? ? ? 
+[22:45:46]? -------------------------------------------? ? 
+[22:45:46]? Loaded.
+[22:45:46]? Loading plugin: PawnPlus.so
+[22:45:46]? PawnPlus v1.3.2 loaded
+[22:45:46]? Created by IllidanS4
+[22:45:46]? Loaded.
+[22:45:46]? Loading plugin: nativechecker.so
+[22:45:46]? Loaded.
+[22:45:46]? Loaded 12 plugins.
+
+[22:45:46] [debug] Server crashed due to an unknown error
+[22:45:46] [debug] Native backtrace:
+[22:45:46] [debug] #0 f79abf7f in _Z13GetStackTraceRSt6vectorI10StackFrameSaIS0_EEPv () in plugins/crashdetect.so
+[22:45:46] [debug] #1 f79a481d in _ZN11CrashDetect20PrintNativeBacktraceERSoRKN2os7ContextE () in plugins/crashdetect.so
+[22:45:46] [debug] #2 f79a4e48 in _ZN11CrashDetect20PrintNativeBacktraceERKN2os7ContextE () in plugins/crashdetect.so
+[22:45:46] [debug] #3 f79a65dc in _ZN11CrashDetect7OnCrashERKN2os7ContextE () in plugins/crashdetect.so
+[22:45:46] [debug] #4 f79ab79f in ?? () in plugins/crashdetect.so
+[22:45:46] [debug] #5 f7f02b70 in __kernel_rt_sigreturn () in linux-gate.so.1
+[22:45:46] [debug] Registers:
+[22:45:46] [debug] EAX: 00000000 EBX: 098fe160 ECX: f79d6178 EDX: 098d37b8
+[22:45:46] [debug] ESI: f7b68cce EDI: f7b6bee4 EBP: f7b6bee4 ESP: ff85749c
+[22:45:46] [debug] EIP: 00000000 EFLAGS: 00010286
+[22:45:46] [debug] Stack:
+[22:45:46] [debug] ESP퍍㓓䴴: f79a9d43 00000000 20646564 70203231
+[22:45:46] [debug] ESP퍍㓓䶴: efcf5de6 f7b6bee4 f7b68cce f7f16fa9
+[22:45:46] [debug] ESP퍍㓓临: 00000010 0000300c 0000301c efcf5d69
+[22:45:46] [debug] ESP퍍㓓亴: f7affd9b f7b6bee4 f7b68cce 00000099
+[22:45:46] [debug] ESP퍍㓓伴: f7f2f000 00010100 00000101 01010001
+[22:45:46] [debug] ESP퍍㓓䚴: f7ed5972 f7f2f55c 00000001 f7f0f6fd
+[22:45:46] [debug] ESP퍍㓓䜴: f7f0ab1b f7f2f55c 00000000 ff8575e0
+[22:45:46] [debug] ESP퍍㓓䞴: 3fe15d30 00000000 00000000 00000000
+[22:45:46] [debug] ESP퍍㓓崴: ff857ce0 00000006 00001000 f7f2f970
+[22:45:46] [debug] ESP퍍㓓嶴: 00000007 0000301c 098d3f00 f658c000
+[22:45:46] [debug] ESP퍍㓓帴: 00000000 00000802 00000000 efe3e9c0
+[22:45:46] [debug] ESP퍍㓓庴: 000003f4 00000000 00000000 ff8577c4
+[22:45:46] [debug] ESP퍍㓓弴: 00000000 00000000 00000000 00000000
+[22:45:46] [debug] ESP퍍㓓嚴: 098d9f30 098d9f60 098d9f90 098d9fc0
+[22:45:46] [debug] ESP퍍㓓圴: f7bc53c4 ff85768c f7ee9000 000000f0
+[22:45:46] [debug] ESP퍍㓓垴: f7affd30 098da260 098da290 098da2c0
+[22:45:46] [debug] ESP퍍㓓洴: fa84b800 098da3e0 098da410 098da440
+[22:45:46] [debug] ESP퍍㓓涴: f7b001f0 f7bc53c4 f7affd30 098da5c0
+[22:45:46] [debug] ESP퍍㓓渴: f7afed06 098da6e0 098da710 098da740
+[22:45:46] [debug] ESP퍍㓓溴: 098da830 098da860 098da890 098da8c0
+[22:45:46] [debug] ESP퍍㓓漴: 098da9b0 098da9e0 098daa10 098daa40
+[22:45:46] [debug] ESP퍍㓓暴: 098dab30 098dab60 098dab90 098dabc0
+[22:45:46] [debug] ESP퍍㓓朴: 098dacb0 098dace0 098dad10 098dad40
+[22:45:46] [debug] ESP퍍㓓枴: 098dae30 098dae60 098dae90 098daec0
+[22:45:46] [debug] ESP퍍㓓紴: 098dafb0 098dafe0 098db010 098db040
+[22:45:46] [debug] ESP퍍㓓綴: 098db130 098db160 098db190 098db1c0
+[22:45:46] [debug] ESP퍍㓓縴: 08049e9c 098db2e0 098db310 f7bc4818
+[22:45:46] [debug] ESP퍍㓓纴: 00000034 f79d5c80 f7bc2778 ffffffbc
+[22:45:46] [debug] ESP퍍㓓缴: f7ad7816 00000006 00000000 00000005
+[22:45:46] [debug] ESP퍍㓓皴: 0000005b f79e4b2c 00000622 f79e876c
+[22:45:46] [debug] ESP퍍㓓眴: 0000007c 00000005 00000001 00000000
+[22:45:46] [debug] ESP퍍㓓瞴: f7a5ef3e 0a3cbbd0 00000000 0000003c
+[22:45:46] [debug] Loaded modules:
+[22:45:46] [debug] 00000000 - 00187dc3 samp03svr
+[22:45:46] [debug] f7f02000 - f7f02d2c linux-gate.so.1
+[22:45:46] [debug] f7eec000 - f7eeeeec /lib/i386-linux-gnu/libdl.so.2
+[22:45:46] [debug] f7ec9000 - f7ee976b /lib/i386-linux-gnu/libpthread.so.0
+[22:45:46] [debug] f7cea000 - f7ed4f4e /lib/i386-linux-gnu/libstdc.so.6
+[22:45:46] [debug] f7be5000 - f7ce8f08 /lib/i386-linux-gnu/libm.so.6
+[22:45:46] [debug] f7bc6000 - f7be29cc /lib/i386-linux-gnu/libgcc_s.so.1
+[22:45:46] [debug] f79d7000 - f7bcabcf /lib/i386-linux-gnu/libc.so.6
+[22:45:46] [debug] f7f03000 - f7f2deeb /lib/ld-linux.so.2
+[22:45:46] [debug] f7efa000 - f7efbe34 plugins/MapAndreas.so
+[22:45:46] [debug] f798c000 - f79d43d4 plugins/crashdetect.so
+[22:45:46] [debug] f75fb000 - f7990eb2 plugins/mysql.so
+[22:45:46] [debug] f75d7000 - f75fad32 /home/user10/samp/plugins/../log-core.so
+[22:45:46] [debug] f75c1000 - f75c9567 /lib/i386-linux-gnu/librt.so.1
+[22:45:46] [debug] f65aa000 - f65bc4bc /lib/i386-linux-gnu/libnss_files.so.2
+[22:45:46] [debug] f75cd000 - f75d57c4 plugins/Whirlpool.so
+[22:45:46] [debug] f7ef3000 - f7ef75e2 plugins/cec.so
+[22:45:46] [debug] f632d000 - f6401b05 plugins/streamer.so
+[22:45:46] [debug] f6590000 - f65a7834 plugins/sscanf.so
+[22:45:46] [debug] f6178000 - f63370c0 plugins/pawncmd.so
+[22:45:46] [debug] f6043000 - f617c7d8 plugins/pawnraknet.so
+[22:45:46] [debug] f5e99000 - f604d349 plugins/sampvoice.so
+[22:45:46] [debug] efb53000 - eff245c6 plugins/PawnPlus.so
+[22:45:46] [debug] f658c000 - f658df70 plugins/nativechecker.so
+[/code]

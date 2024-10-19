@@ -22,6 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/mention/mentioner"
+	"github.com/Southclaws/storyden/app/services/moderation/content_policy"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -88,6 +89,7 @@ type service struct {
 	recommender  semdex.Recommender
 	indexQueue   pubsub.Topic[mq.IndexPost]
 	mentioner    *mentioner.Mentioner
+	cpm          *content_policy.Manager
 }
 
 func New(
@@ -99,6 +101,7 @@ func New(
 	recommender semdex.Recommender,
 	indexQueue pubsub.Topic[mq.IndexPost],
 	mentioner *mentioner.Mentioner,
+	cpm *content_policy.Manager,
 ) Service {
 	return &service{
 		l: l.With(zap.String("service", "thread")),
@@ -109,5 +112,6 @@ func New(
 		recommender:  recommender,
 		indexQueue:   indexQueue,
 		mentioner:    mentioner,
+		cpm:          cpm,
 	}
 }

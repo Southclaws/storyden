@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
+	"github.com/Southclaws/storyden/app/services/moderation/content_policy"
 	"github.com/Southclaws/storyden/app/services/notification/notify"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -58,6 +59,7 @@ type service struct {
 	fetcher      *fetcher.Fetcher
 	indexQueue   pubsub.Topic[mq.IndexPost]
 	notifier     *notify.Notifier
+	cpm          *content_policy.Manager
 }
 
 func New(
@@ -68,6 +70,7 @@ func New(
 	fetcher *fetcher.Fetcher,
 	indexQueue pubsub.Topic[mq.IndexPost],
 	notifier *notify.Notifier,
+	cpm *content_policy.Manager,
 ) Service {
 	return &service{
 		l: l.With(zap.String("service", "reply")),
@@ -77,5 +80,6 @@ func New(
 		fetcher:      fetcher,
 		indexQueue:   indexQueue,
 		notifier:     notifier,
+		cpm:          cpm,
 	}
 }

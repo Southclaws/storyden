@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/like/post_liker"
 	"github.com/Southclaws/storyden/app/services/link"
 	"github.com/Southclaws/storyden/app/services/mention/mention_job"
+	"github.com/Southclaws/storyden/app/services/moderation"
 	"github.com/Southclaws/storyden/app/services/notification/notify_job"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/app/services/profile/following"
@@ -57,6 +58,7 @@ func Build() fx.Option {
 		index_job.Build(),
 		summarise_job.Build(),
 		event.Build(),
+		moderation.Build(),
 		fx.Provide(avatar_gen.New),
 		fx.Provide(node_read.New, node_mutate.New, nodetree.New, node_visibility.New),
 		fx.Provide(following.New),
