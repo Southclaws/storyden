@@ -36,8 +36,10 @@ import (
 //	}
 func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 	defaultConfig := config.Config{
-		PublicAPIAddress: *utils.Must(url.Parse("http://localhost")),
-		PublicWebAddress: *utils.Must(url.Parse("http://localhost")),
+		PublicAPIAddress:   *utils.Must(url.Parse("http://localhost")),
+		PublicWebAddress:   *utils.Must(url.Parse("http://localhost")),
+		UnauthenticatedRPM: 1000,
+		AuthenticatedRPM:   1000,
 	}
 
 	if url := os.Getenv("DATABASE_URL"); url != "" {
