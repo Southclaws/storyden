@@ -25,4 +25,5 @@ export * from './lstack';
 export * from './frosted-glass';
 export * from './floating';
 export * from './card-box';
+export * from './menu-item-color-palette';
 export type { HTMLStyledProps, StyledComponent } from '../types/jsx';

@@ -1,12 +1,13 @@
 import { MenuOpenChangeDetails, Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
 
-import { DeleteConfirmation } from "src/components/site/Action/Delete";
 import { MoreAction } from "src/components/site/Action/More";
 
+import { CancelAction } from "@/components/site/Action/Cancel";
 import { ButtonProps } from "@/components/ui/button";
 import * as Menu from "@/components/ui/menu";
-import { styled } from "@/styled-system/jsx";
+import { HStack, styled } from "@/styled-system/jsx";
+import { menuItemColorPalette } from "@/styled-system/patterns";
 
 import { Props, useLibraryPageMenu } from "./useLibraryPageMenu";
 
@@ -15,7 +16,7 @@ export function LibraryPageMenu({
   onClose,
   ...props
 }: Props & ButtonProps) {
-  const { availableOperations, deleteEnabled, deleteProps, handleSelect } =
+  const { availableOperations, deleteEnabled, isConfirmingDelete, handlers } =
     useLibraryPageMenu({
       node,
       onClose,
@@ -38,7 +39,7 @@ export function LibraryPageMenu({
     <Menu.Root
       lazyMount
       positioning={{ placement: "right-start", gutter: -2 }}
-      onSelect={handleSelect}
+      onSelect={handlers.handleSelect}
       onOpenChange={handleOpenChange}
     >
       <Menu.Trigger asChild>
@@ -74,12 +75,40 @@ export function LibraryPageMenu({
                 </Menu.Item>
               ))}
 
-              {deleteEnabled && (
-                <>
-                  <Menu.Item value="delete">Delete</Menu.Item>
-                  <DeleteConfirmation {...deleteProps} />
-                </>
-              )}
+              {deleteEnabled &&
+                (isConfirmingDelete ? (
+                  <HStack gap="0">
+                    <Menu.Item
+                      className={menuItemColorPalette()}
+                      colorPalette="red"
+                      value="delete"
+                      w="full"
+                      closeOnSelect={false}
+                    >
+                      Are you sure?
+                    </Menu.Item>
+
+                    <Menu.Item
+                      value="delete-cancel"
+                      closeOnSelect={false}
+                      asChild
+                    >
+                      <CancelAction
+                        borderRadius="md"
+                        onClick={handlers.handleCancelDelete}
+                      />
+                    </Menu.Item>
+                  </HStack>
+                ) : (
+                  <Menu.Item
+                    className={menuItemColorPalette({ colorPalette: "red" })}
+                    colorPalette="red"
+                    value="delete"
+                    closeOnSelect={false}
+                  >
+                    Delete
+                  </Menu.Item>
+                ))}
             </Menu.ItemGroup>
           </Menu.Content>
         </Menu.Positioner>

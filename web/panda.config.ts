@@ -222,6 +222,29 @@ export default defineConfig({
           };
         },
       },
+      menuItemColorPalette: {
+        description: `A color palette for menu items.`,
+        properties: {},
+        transform(props) {
+          return {
+            colorPalette: props["colorPalette"],
+            background: "colorPalette.4",
+            color: "colorPalette.9",
+            _hover: {
+              background: "colorPalette.5",
+              "& :where(svg)": {
+                color: "colorPalette.10",
+              },
+            },
+            _highlighted: {
+              background: "colorPalette.5",
+            },
+            "& :where(svg)": {
+              color: "colorPalette.9",
+            },
+          };
+        },
+      },
     },
   },
 

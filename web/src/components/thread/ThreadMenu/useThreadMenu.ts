@@ -8,7 +8,9 @@ import { Thread } from "src/api/openapi-schema";
 
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";
+import { useConfirmation } from "@/components/site/useConfirmation";
 import { useFeedMutations } from "@/lib/feed/mutation";
+import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
 import { useShare } from "@/utils/client";
 
 import { getPermalinkForThread } from "../utils";
@@ -25,9 +27,15 @@ export function useThreadMenu({ thread }: Props) {
 
   const { deleteThread, revalidate } = useFeedMutations();
 
+  const {
+    isConfirming: isConfirmingDelete,
+    handleConfirmAction: handleConfirmDelete,
+    handleCancelAction: handleCancelDelete,
+  } = useConfirmation(handleDelete);
+
   const isSharingEnabled = useShare();
-  const isEditingEnabled = account?.id === thread.author.id;
-  const isDeletingEnabled = account?.id === thread.author.id;
+  const isEditingEnabled = canEditPost(thread, account);
+  const isDeletingEnabled = canDeletePost(thread, account);
 
   const permalink = getPermalinkForThread(thread.slug);
 
@@ -47,8 +55,8 @@ export function useThreadMenu({ thread }: Props) {
     setEditing(true);
   }
 
-  function handleDelete() {
-    handle(
+  async function handleDelete() {
+    await handle(
       async () => {
         await deleteThread(thread.id);
         router.push("/");
@@ -63,11 +71,13 @@ export function useThreadMenu({ thread }: Props) {
     isSharingEnabled,
     isEditingEnabled,
     isDeletingEnabled,
+    isConfirmingDelete,
     handlers: {
       handleCopyLink,
       handleShare,
       handleEdit,
-      handleDelete,
+      handleConfirmDelete,
+      handleCancelDelete,
     },
   };
 }
