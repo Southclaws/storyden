@@ -6,6 +6,7 @@ import { Controller, ControllerProps } from "react-hook-form";
 
 import { Unready } from "src/components/site/Unready";
 
+import { Thread } from "@/api/openapi-schema";
 import { Byline } from "@/components/content/Byline";
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 import { CancelAction } from "@/components/site/Action/Cancel";
@@ -90,22 +91,7 @@ export function ThreadScreen(props: Props) {
         />
       </styled.form>
 
-      <styled.p display="flex" gap="1" alignItems="center" color="fg.muted">
-        <span>
-          {thread.reply_status.replied ? (
-            <ChatBubbleLeftIconSolid
-              width="1rem"
-              title="You have replied to this thread"
-            />
-          ) : (
-            <ChatBubbleLeftIconOutline
-              width="1rem"
-              title="You have not replied to this thread"
-            />
-          )}
-        </span>
-        <span>{thread.reply_status.replies} replies</span>
-      </styled.p>
+      <ThreadReplyStatus {...thread} />
 
       <ReplyList thread={thread} />
 
@@ -174,5 +160,26 @@ function ThreadBodyInput({
       control={control}
       name={name}
     />
+  );
+}
+
+function ThreadReplyStatus({ reply_status }: Thread) {
+  return (
+    <styled.p display="flex" gap="1" alignItems="center" color="fg.muted">
+      <span>
+        {reply_status.replied ? (
+          <ChatBubbleLeftIconSolid
+            width="1rem"
+            title="You have replied to this thread"
+          />
+        ) : (
+          <ChatBubbleLeftIconOutline
+            width="1rem"
+            title="You have not replied to this thread"
+          />
+        )}
+      </span>
+      <span>{reply_status.replies} replies</span>
+    </styled.p>
   );
 }
