@@ -165,7 +165,9 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	cs, err = c.ntr.Subtree(ctx, nid, opts...)
+	flatten := opt.NewPtr(request.Params.Format).Or(openapi.NodeListParamsFormatTree) == openapi.NodeListParamsFormatFlat
+
+	cs, err = c.ntr.Subtree(ctx, nid, flatten, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

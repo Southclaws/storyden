@@ -2,6 +2,7 @@ import slugify from "@sindresorhus/slugify";
 import { dequal } from "dequal/lite";
 import { omit, uniqueId } from "lodash";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 import { Xid } from "xid-ts";
 
@@ -237,6 +238,19 @@ export function useLibraryMutation(params?: NodeListParams) {
 
       const newNodes = data.nodes.map((node) => {
         if (node.slug === slug) {
+          if (
+            node.parent?.visibility !== Visibility.published &&
+            visibility === Visibility.published
+          ) {
+            toast.warning(
+              "Page is staged for publishing but has not been published yet because this page's parent is not published. When the parent is published, this page be visible on the site.",
+              {
+                duration: 15000,
+                dismissible: true,
+                closeButton: true,
+              },
+            );
+          }
           const newNode = { ...node, visibility };
           return newNode;
         }

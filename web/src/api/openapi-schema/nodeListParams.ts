@@ -9,6 +9,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type { AccountHandle } from "./accountHandle";
 import type { Identifier } from "./identifier";
+import type { NodeListFormatParamParameter } from "./nodeListFormatParamParameter";
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 import type { SearchQueryParameter } from "./searchQueryParameter";
 import type { TreeDepthParamParameter } from "./treeDepthParamParameter";
@@ -48,4 +49,10 @@ only top-level (root) nodes will be returned.
 
  */
   depth?: TreeDepthParamParameter;
+  /**
+ * List format, either a tree where each item contains a children array or
+flat where children items contain an ID that references their parent.
+
+ */
+  format?: NodeListFormatParamParameter;
 };

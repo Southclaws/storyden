@@ -1465,6 +1465,7 @@ paths:
           schema: { $ref: "#/components/schemas/AccountHandle" }
         - $ref: "#/components/parameters/VisibilityParam"
         - $ref: "#/components/parameters/TreeDepthParam"
+        - $ref: "#/components/parameters/NodeListFormatParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -2095,6 +2096,18 @@ components:
       in: query
       schema:
         type: string
+
+    NodeListFormatParam:
+      name: format
+      description: |
+        List format, either a tree where each item contains a children array or
+        flat where children items contain an ID that references their parent.
+      required: false
+      in: query
+      schema:
+        default: tree
+        type: string
+        enum: [tree, flat]
 
     EventMarkParam:
       description: |
