@@ -5,8 +5,10 @@ import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { handle } from "@/api/client";
 import { PostReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
+import { useConfirmation } from "@/components/site/useConfirmation";
 import { WEB_ADDRESS } from "@/config";
 import { useFeedMutations } from "@/lib/feed/mutation";
+import { canDeletePost } from "@/lib/thread/permissions";
 import { useShare } from "@/utils/client";
 
 export type Props = {
@@ -20,8 +22,14 @@ export function useFeedItemMenu({ thread }: Props) {
 
   const { deleteThread, revalidate } = useFeedMutations();
 
-  const shareEnabled = useShare();
-  const deleteEnabled = account?.admin || account?.id === thread.author.id;
+  const {
+    isConfirming: isConfirmingDelete,
+    handleConfirmAction: handleConfirmDelete,
+    handleCancelAction: handleCancelDelete,
+  } = useConfirmation(handleDelete);
+
+  const isSharingEnabled = useShare();
+  const isDeletingEnabled = canDeletePost(thread, account);
 
   async function share() {
     await navigator.share({
@@ -31,7 +39,7 @@ export function useFeedItemMenu({ thread }: Props) {
     });
   }
 
-  async function handleDeleteThread() {
+  async function handleDelete() {
     handle(async () => await deleteThread(thread.id), {
       cleanup: async () => await revalidate(),
     });
@@ -48,7 +56,7 @@ export function useFeedItemMenu({ thread }: Props) {
         return;
 
       case "delete":
-        handleDeleteThread();
+        handleConfirmDelete();
         return;
 
       default:
@@ -57,9 +65,13 @@ export function useFeedItemMenu({ thread }: Props) {
   }
 
   return {
-    handleSelect,
-    shareEnabled,
-    deleteEnabled,
+    isSharingEnabled,
+    isDeletingEnabled,
+    isConfirmingDelete,
+    handlers: {
+      handleSelect,
+      handleCancelDelete,
+    },
   };
 }
 

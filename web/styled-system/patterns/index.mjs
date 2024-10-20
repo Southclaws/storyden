@@ -22,3 +22,4 @@ export * from './lstack.mjs';
 export * from './frosted-glass.mjs';
 export * from './floating.mjs';
 export * from './card-box.mjs';
+export * from './menu-item-color-palette.mjs';

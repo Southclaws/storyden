@@ -7,14 +7,21 @@ import { format } from "date-fns/format";
 
 import { MoreAction } from "src/components/site/Action/More";
 
+import { CancelAction } from "@/components/site/Action/Cancel";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
+import { menuItemColorPalette } from "@/styled-system/patterns";
 
 import { Props, useThreadMenu } from "./useThreadMenu";
 
 export function ThreadMenu(props: Props) {
-  const { isSharingEnabled, isEditingEnabled, isDeletingEnabled, handlers } =
-    useThreadMenu(props);
+  const {
+    isSharingEnabled,
+    isEditingEnabled,
+    isDeletingEnabled,
+    isConfirmingDelete,
+    handlers,
+  } = useThreadMenu(props);
 
   const { thread } = props;
 
@@ -64,13 +71,41 @@ export function ThreadMenu(props: Props) {
                 </Menu.Item>
               )}
 
-              {isDeletingEnabled && (
-                <Menu.Item value="delete" onClick={handlers.handleDelete}>
-                  <HStack gap="1">
-                    <TrashIcon width="1.4em" /> Delete
+              {isDeletingEnabled &&
+                (isConfirmingDelete ? (
+                  <HStack gap="0">
+                    <Menu.Item
+                      className={menuItemColorPalette({ colorPalette: "red" })}
+                      value="delete"
+                      w="full"
+                      closeOnSelect={false}
+                    >
+                      Are you sure?
+                    </Menu.Item>
+
+                    <Menu.Item
+                      value="delete-cancel"
+                      closeOnSelect={false}
+                      asChild
+                    >
+                      <CancelAction
+                        borderRadius="md"
+                        onClick={handlers.handleCancelDelete}
+                      />
+                    </Menu.Item>
                   </HStack>
-                </Menu.Item>
-              )}
+                ) : (
+                  <Menu.Item
+                    className={menuItemColorPalette({ colorPalette: "red" })}
+                    value="delete"
+                    closeOnSelect={false}
+                    onClick={handlers.handleConfirmDelete}
+                  >
+                    <HStack gap="1">
+                      <TrashIcon width="1.4em" /> Delete
+                    </HStack>
+                  </Menu.Item>
+                ))}
             </Menu.ItemGroup>
           </Menu.Content>
         </Menu.Positioner>

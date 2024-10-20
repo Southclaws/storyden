@@ -2,9 +2,9 @@ import { MenuSelectionDetails } from "@ark-ui/react";
 
 import { Account, Node, Permission, Visibility } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
-import { useDeleteAction } from "src/components/site/Action/Delete";
 
 import { handle } from "@/api/client";
+import { useConfirmation } from "@/components/site/useConfirmation";
 import { useLibraryMutation } from "@/lib/library/library";
 import { hasPermission } from "@/utils/permissions";
 
@@ -17,12 +17,11 @@ export function useLibraryPageMenu(props: Props) {
   const account = useSession();
   const { deleteNode, updateNodeVisibility, revalidate } = useLibraryMutation();
 
-  const deleteProps = useDeleteAction({
-    onClick: async () =>
-      await handle(async () => {
-        await deleteNode(props.node.slug);
-      }),
-  });
+  const {
+    isConfirming: isConfirmingDelete,
+    handleConfirmAction: handleConfirmDelete,
+    handleCancelAction: handleCancelDelete,
+  } = useConfirmation(handleDelete);
 
   const isManager = hasPermission(account, Permission.MANAGE_LIBRARY);
   const isOwner = account?.id === props.node.owner.id;
@@ -34,6 +33,17 @@ export function useLibraryPageMenu(props: Props) {
   // Managers can delete any page, owners can only delete non-published pages.
   const deleteEnabled =
     isManager || (isOwner && props.node.visibility !== Visibility.published);
+
+  async function handleDelete() {
+    return handle(
+      async () => {
+        await deleteNode(props.node.slug);
+      },
+      {
+        cleanup: async () => await revalidate(),
+      },
+    );
+  }
 
   function handleVisibilityChange(visibility: Visibility) {
     handle(
@@ -49,7 +59,7 @@ export function useLibraryPageMenu(props: Props) {
   function handleSelect({ value }: MenuSelectionDetails) {
     switch (value as Visibility | "delete") {
       case "delete":
-        return deleteProps.onOpen();
+        return handleConfirmDelete();
 
       case Visibility.draft:
         return handleVisibilityChange(Visibility.draft);
@@ -68,8 +78,11 @@ export function useLibraryPageMenu(props: Props) {
   return {
     availableOperations,
     deleteEnabled,
-    deleteProps,
-    handleSelect,
+    isConfirmingDelete,
+    handlers: {
+      handleCancelDelete,
+      handleSelect,
+    },
   };
 }
 

@@ -1,17 +1,21 @@
 import { Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
+import { LinkIcon, ShareIcon, TrashIcon } from "lucide-react";
 
+import { CancelAction } from "@/components/site/Action/Cancel";
 import { MoreAction } from "@/components/site/Action/More";
 import * as Menu from "@/components/ui/menu";
-import { styled } from "@/styled-system/jsx";
+import { HStack, styled } from "@/styled-system/jsx";
+import { menuItemColorPalette } from "@/styled-system/patterns";
 
 import { Props, useFeedItemMenu } from "./useFeedItemMenu";
 
 export function FeedItemMenu(props: Props) {
-  const { shareEnabled, deleteEnabled, handleSelect } = useFeedItemMenu(props);
+  const { isSharingEnabled, isDeletingEnabled, isConfirmingDelete, handlers } =
+    useFeedItemMenu(props);
 
   return (
-    <Menu.Root lazyMount onSelect={handleSelect}>
+    <Menu.Root lazyMount onSelect={handlers.handleSelect}>
       <Menu.Trigger asChild>
         <MoreAction variant="subtle" size="xs" />
       </Menu.Trigger>
@@ -33,9 +37,54 @@ export function FeedItemMenu(props: Props) {
 
               <Menu.Separator />
 
-              <Menu.Item value="copy-link">Copy link</Menu.Item>
-              {shareEnabled && <Menu.Item value="share">Share</Menu.Item>}
-              {deleteEnabled && <Menu.Item value="delete">Delete</Menu.Item>}
+              <Menu.Item value="copy-link">
+                <HStack gap="1">
+                  <LinkIcon width="1.4em" /> Copy link
+                </HStack>
+              </Menu.Item>
+
+              {isSharingEnabled && (
+                <Menu.Item value="share">
+                  <HStack gap="1">
+                    <ShareIcon width="1.4em" /> Share
+                  </HStack>
+                </Menu.Item>
+              )}
+
+              {isDeletingEnabled &&
+                (isConfirmingDelete ? (
+                  <HStack gap="0">
+                    <Menu.Item
+                      className={menuItemColorPalette({ colorPalette: "red" })}
+                      value="delete"
+                      w="full"
+                      closeOnSelect={false}
+                    >
+                      Are you sure?
+                    </Menu.Item>
+
+                    <Menu.Item
+                      value="delete-cancel"
+                      closeOnSelect={false}
+                      asChild
+                    >
+                      <CancelAction
+                        borderRadius="md"
+                        onClick={handlers.handleCancelDelete}
+                      />
+                    </Menu.Item>
+                  </HStack>
+                ) : (
+                  <Menu.Item
+                    className={menuItemColorPalette({ colorPalette: "red" })}
+                    value="delete"
+                    closeOnSelect={false}
+                  >
+                    <HStack gap="1">
+                      <TrashIcon width="1.4em" /> Delete
+                    </HStack>
+                  </Menu.Item>
+                ))}
             </Menu.ItemGroup>
           </Menu.Content>
         </Menu.Positioner>
