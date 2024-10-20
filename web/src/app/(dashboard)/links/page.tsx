@@ -1,17 +1,17 @@
 import { LinkIndexScreen } from "src/screens/library/links/LinkIndexScreen/LinkIndexScreen";
 
 type Props = {
-  searchParams: {
+  searchParams: Promise<{
     q: string;
     page: number;
-  };
+  }>;
 };
 
-export default function Page(props: Props) {
+export default async function Page(props: Props) {
   return (
     <LinkIndexScreen
-      query={props.searchParams.q}
-      page={props.searchParams.page}
+      query={(await props.searchParams).q}
+      page={(await props.searchParams).page}
     />
   );
 }
