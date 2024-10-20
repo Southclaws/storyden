@@ -18,7 +18,7 @@ export function Timestamp(props: Props) {
   const createdAt = timestamp(createdDate, !props.large);
 
   return (
-    <styled.span>
+    <styled.span textWrap="nowrap">
       {props.href ? (
         <Anchor href={props.href}>
           {props.large && (

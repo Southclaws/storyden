@@ -66,7 +66,7 @@ export function MemberBadge({
 
   if (as === "menu") {
     return (
-      <HStack className="feed-item-byline-menu">
+      <HStack flexShrink="0">
         <Menu.Root
           lazyMount
           positioning={{

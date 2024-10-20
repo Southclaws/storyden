@@ -71,6 +71,9 @@ export const menu = defineSlotRecipe({
     },
     item: itemStyle,
     triggerItem: itemStyle,
+    trigger: {
+      flexShrink: "0",
+    },
   },
   defaultVariants: {
     size: "xs",

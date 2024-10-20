@@ -11,8 +11,7 @@ import (
 
 type Repository interface {
 	Root(ctx context.Context, opts ...Filter) ([]*library.Node, error)
-	Subtree(ctx context.Context, id opt.Optional[library.NodeID], opts ...Filter) ([]*library.Node, error)
-	FilterSubtree(ctx context.Context, id library.NodeID, filter string) ([]*library.Node, error)
+	Subtree(ctx context.Context, id opt.Optional[library.NodeID], flatten bool, opts ...Filter) ([]*library.Node, error)
 }
 
 type filters struct {

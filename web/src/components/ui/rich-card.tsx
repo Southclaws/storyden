@@ -10,6 +10,7 @@ import {
 
 import { css } from "@/styled-system/css";
 import { Grid, LStack, styled } from "@/styled-system/jsx";
+import { linkOverlay } from "@/styled-system/patterns";
 import { RichCardVariantProps, richCard } from "@/styled-system/recipes";
 import { isExternalURL } from "@/utils/url";
 
@@ -97,14 +98,16 @@ export function Card({
 
       {title && (
         <styled.h1 className={styles.titleContainer}>
-          <Link href={url}>{title}</Link>
+          <Link className={linkOverlay()} href={url}>
+            {title}
+          </Link>
         </styled.h1>
       )}
 
       <div className={styles.contentContainer}>
         <div className={styles.textArea}>
           <div ref={textContainerRef} className={longContentStyles}>
-            <Link href={url} className={css({ position: "relative" })}>
+            <Link href={url} className={linkOverlay()}>
               {text && <p className={styles.text}>{text}</p>}
               {content && (
                 <>

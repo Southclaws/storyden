@@ -25,6 +25,7 @@ export const richCard = defineSlotRecipe({
       "--card-content-index": "4",
 
       containerType: "inline-size",
+      position: "relative",
       display: "grid",
       width: "full",
       minWidth: "0",

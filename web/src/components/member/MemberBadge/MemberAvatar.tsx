@@ -26,7 +26,7 @@ export function MemberAvatar({ profile, size, editable }: Props) {
   const { width, height } = avatarSize(size);
 
   return (
-    <Box position="relative">
+    <Box position="relative" flexShrink="0">
       {editable && (
         <Box position="absolute" w="full" h="full">
           <EditAvatarTrigger profile={profile} asChild>

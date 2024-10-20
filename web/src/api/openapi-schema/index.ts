@@ -221,6 +221,7 @@ export * from "./nodeDescription";
 export * from "./nodeGetOKResponse";
 export * from "./nodeInitialProps";
 export * from "./nodeList";
+export * from "./nodeListFormatParamParameter";
 export * from "./nodeListOKResponse";
 export * from "./nodeListParams";
 export * from "./nodeListResult";
