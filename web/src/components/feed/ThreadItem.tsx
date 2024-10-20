@@ -34,7 +34,7 @@ export function ThreadItem({ thread }: Props) {
 
   return (
     <Card
-      shape="row"
+      shape="responsive"
       id={thread.id}
       title={title}
       text={thread.description}
