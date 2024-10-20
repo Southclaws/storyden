@@ -3,16 +3,35 @@ import {
   TreeView as ArkTreeView,
   type TreeViewRootProps,
 } from "@ark-ui/react/tree-view";
+import {
+  DndContext,
+  DragOverlay,
+  KeyboardSensor,
+  Over,
+  PointerSensor,
+  closestCenter,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { keyBy } from "lodash";
 import Link from "next/link";
-import { forwardRef, useState } from "react";
+import { MouseEvent, PropsWithChildren, forwardRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import { NodeWithChildren, Visibility } from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/site/Navigation/Actions/CreatePage";
 import { NavigationHeader } from "@/components/site/Navigation/ContentNavigationList/NavigationHeader";
 import { visibilityColour } from "@/lib/library/visibilityColours";
 import { css, cx } from "@/styled-system/css";
-import { HStack, splitCssProps } from "@/styled-system/jsx";
+import { Box, HStack, splitCssProps } from "@/styled-system/jsx";
 import { type TreeViewVariantProps, treeView } from "@/styled-system/recipes";
 import { token } from "@/styled-system/tokens";
 import type { JsxStyleProps } from "@/styled-system/types";
@@ -95,40 +114,53 @@ export const LibraryPageTree = forwardRef<HTMLDivElement, TreeViewProps>(
       const isHighlighted = child.slug === currentNode;
 
       return (
-        <ArkTreeView.Branch
+        <DroppableBranch
           key={child.id}
-          value={child.slug}
+          child={child}
           className={styles.branch}
-        >
-          {showDivider && (
-            <HStack mb="1">
-              <NavigationHeader href="/drafts">{dividerLabel}</NavigationHeader>
-            </HStack>
-          )}
+          render={({ isOver, over }) => {
+            return (
+              <>
+                {showDivider && (
+                  <HStack mb="1">
+                    <NavigationHeader href="/drafts">
+                      {dividerLabel}
+                    </NavigationHeader>
+                  </HStack>
+                )}
 
-          <TreeBranch
-            styles={styles}
-            child={child}
-            isHighlighted={isHighlighted}
-            isRoot={isRoot}
-          />
-
-          <ArkTreeView.BranchContent className={styles.branchContent}>
-            {child.children?.map((child, i) =>
-              child.children ? (
-                renderChild(child, i)
-              ) : (
-                <TreeItem
-                  key={child.id}
+                <TreeBranch
                   styles={styles}
                   child={child}
+                  isHovered={isOver}
                   isHighlighted={isHighlighted}
                   isRoot={isRoot}
                 />
-              ),
-            )}
-          </ArkTreeView.BranchContent>
-        </ArkTreeView.Branch>
+
+                <ArkTreeView.BranchContent className={styles.branchContent}>
+                  <SortableContext
+                    items={child.children}
+                    // strategy={verticalListSortingStrategy}
+                  >
+                    {child.children?.map((child, i) =>
+                      child.children ? (
+                        renderChild(child, i)
+                      ) : (
+                        <TreeItem
+                          key={child.id}
+                          styles={styles}
+                          child={child}
+                          isHighlighted={isHighlighted}
+                          isRoot={isRoot}
+                        />
+                      ),
+                    )}
+                  </SortableContext>
+                </ArkTreeView.BranchContent>
+              </>
+            );
+          }}
+        />
       );
     };
 
@@ -136,20 +168,48 @@ export const LibraryPageTree = forwardRef<HTMLDivElement, TreeViewProps>(
       return visibilitySortKey[a.visibility] - visibilitySortKey[b.visibility];
     });
 
+    const sensors = useSensors(
+      useSensor(PointerSensor, {
+        activationConstraint: {
+          distance: 4,
+        },
+      }),
+      useSensor(KeyboardSensor, {
+        coordinateGetter: sortableKeyboardCoordinates,
+      }),
+    );
+
+    function handleDragEnd(e) {
+      console.log(e);
+    }
+
     return (
-      <ArkTreeView.Root
-        ref={ref}
-        aria-label={data.label}
-        className={cx(styles.root, css(cssProps), className)}
-        defaultExpandedValue={defaultExpandedValue}
-        selectedValue={defaultExpandedValue}
-        focusedValue={currentNode}
-        {...rootProps}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
       >
-        <ArkTreeView.Tree className={styles.tree}>
-          {sortedByVisibility.map(renderChild)}
-        </ArkTreeView.Tree>
-      </ArkTreeView.Root>
+        <ArkTreeView.Root
+          ref={ref}
+          aria-label={data.label}
+          className={cx(styles.root, css(cssProps), className)}
+          defaultExpandedValue={defaultExpandedValue}
+          selectedValue={defaultExpandedValue}
+          focusedValue={currentNode}
+          {...rootProps}
+        >
+          <ArkTreeView.Tree className={styles.tree}>
+            {sortedByVisibility.map(renderChild)}
+          </ArkTreeView.Tree>
+        </ArkTreeView.Root>
+
+        {createPortal(
+          <DragOverlay>
+            <DragOverlayItem />
+          </DragOverlay>,
+          document.body,
+        )}
+      </DndContext>
     );
   },
 );
@@ -163,7 +223,56 @@ type BranchProps = {
   isRoot: boolean;
 };
 
-function TreeBranch({ styles, child, isHighlighted, isRoot }: BranchProps) {
+function DroppableBranch({
+  child,
+  className,
+  render,
+}: {
+  child: NodeWithChildren;
+  className: string;
+  render: (props: { isOver: boolean; over: Over | null }) => JSX.Element;
+}) {
+  const { setNodeRef, isOver, over } = useDroppable({
+    id: child.id,
+  });
+
+  return (
+    <ArkTreeView.Branch
+      key={child.id}
+      ref={setNodeRef}
+      value={child.slug}
+      className={className}
+    >
+      {render({ isOver, over })}
+    </ArkTreeView.Branch>
+  );
+}
+
+const DragOverlayItem = forwardRef<any, any>(({ children, ...props }, ref) => {
+  return (
+    <Box
+      {...props}
+      ref={ref}
+      borderWidth="thin"
+      borderStyle="dashed"
+      borderColor="gray.a6"
+      height="8"
+      borderRadius="md"
+      backgroundColor="gray.a2"
+    >
+      {children}
+    </Box>
+  );
+});
+DragOverlayItem.displayName = "DragOverlayItem";
+
+function TreeBranch({
+  styles,
+  child,
+  isHighlighted,
+  isRoot,
+  isHovered,
+}: BranchProps) {
   // NOTE: We need some state here to track open/close of the menu because CSS
   // isn't quite enough to track this nicely. The reason for this is that when
   // the mouse moves away from the branch control, the container that holds the
@@ -194,17 +303,43 @@ function TreeBranch({ styles, child, isHighlighted, isRoot }: BranchProps) {
     background: isHighlighted ? "gray.a2" : undefined,
   });
 
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: child.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    cursor: isDragging ? "grabbing" : undefined,
+  };
+
+  function handleClick(e: MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    // if (isDragging) {
+    // }
+  }
+
   return (
     <ArkTreeView.BranchControl
       className={cx("group", styles.branchControl, highlightStyles)}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
     >
       <ArkTreeView.BranchIndicator className={styles.branchIndicator}>
         {child.children?.length ? <ChevronRightIcon /> : <BulletIcon />}
       </ArkTreeView.BranchIndicator>
 
       <ArkTreeView.BranchText asChild className={cx(styles.branchText)}>
-        <Link href={`/l/${child.slug}`}>
-          <span className={visibilityStyles}>{label}</span>
+        <Link href={`/l/${child.slug}`} onClick={handleClick}>
+          <span className={visibilityStyles}>{label}</span>{" "}
+          {isHovered ? "👀" : ""}
         </Link>
       </ArkTreeView.BranchText>
 
