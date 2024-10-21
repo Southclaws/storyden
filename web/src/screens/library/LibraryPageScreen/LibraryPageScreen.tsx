@@ -51,6 +51,7 @@ export function LibraryPage(props: Props) {
       handleVisibilityChange,
       handleDelete,
       handleAssetUpload,
+      handleImportFromLink,
     },
     libraryPath,
     editing,
@@ -186,7 +187,12 @@ export function LibraryPage(props: Props) {
           <LStack gap="2">
             <HStack w="full">
               {editing ? (
-                <LibraryPageImportFromURL control={form.control} name="link" />
+                <LibraryPageImportFromURL
+                  control={form.control}
+                  name="link"
+                  node={node}
+                  onImport={handleImportFromLink}
+                />
               ) : (
                 node.link?.url && (
                   <LinkButton href={node.link?.url} size="xs" variant="subtle">
@@ -198,6 +204,7 @@ export function LibraryPage(props: Props) {
           </LStack>
 
           <ContentInput
+            value={form.getValues().content}
             disabled={!editing}
             onAssetUpload={handleAssetUpload}
             initialValue={

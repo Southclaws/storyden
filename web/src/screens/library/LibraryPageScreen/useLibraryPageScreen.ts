@@ -10,6 +10,8 @@ import { z } from "zod";
 import { nodeAddAsset, nodeRemoveAsset } from "src/api/openapi-client/nodes";
 import {
   Asset,
+  Link,
+  LinkReference,
   NodeWithChildren,
   Permission,
   Visibility,
@@ -206,6 +208,37 @@ export function useLibraryPageScreen({ node }: Props) {
     };
   };
 
+  async function handleImportFromLink(link: LinkReference) {
+    await handle(
+      async () => {
+        const coverConfig = link.primary_image
+          ? {
+              asset: link.primary_image,
+              config: {
+                top: 0,
+                left: 0,
+              },
+              isReplacement: true,
+            }
+          : undefined;
+
+        form.setValue("content", link.description);
+
+        await updateNode(
+          node.slug,
+          {
+            content: link.description,
+            primary_image_asset_id: link.primary_image?.id,
+          },
+          coverConfig,
+        );
+      },
+      {
+        cleanup: async () => await revalidate(),
+      },
+    );
+  }
+
   const handleSubmit = form.handleSubmit(async (payload: Form) => {
     await handle(
       async () => {
@@ -294,6 +327,7 @@ export function useLibraryPageScreen({ node }: Props) {
       handleDelete,
       handleAssetUpload,
       handleAssetRemove,
+      handleImportFromLink,
     },
     libraryPath,
     editing,
