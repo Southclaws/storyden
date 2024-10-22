@@ -5,7 +5,7 @@ import { ThreadIndexScreen } from "src/screens/thread/ThreadIndexScreen/ThreadIn
 import { threadList } from "@/api/openapi-server/threads";
 
 type Props = {
-  searchParams: Query;
+  searchParams: Promise<Query>;
 };
 
 const QuerySchema = z.object({
@@ -18,7 +18,8 @@ const QuerySchema = z.object({
 
 type Query = z.infer<typeof QuerySchema>;
 
-export default async function Page({ searchParams }: Props) {
+export default async function Page(props: Props) {
+  const searchParams = await props.searchParams;
   const { data } = await threadList({
     ...(searchParams.q ? { q: searchParams.q } : {}),
     ...(searchParams.page ? { page: searchParams.page?.toString() } : {}),

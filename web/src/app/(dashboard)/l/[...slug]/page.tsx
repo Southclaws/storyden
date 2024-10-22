@@ -5,12 +5,12 @@ import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPa
 import { Params, ParamsSchema } from "@/screens/library/library-path";
 
 type Props = {
-  params: Params;
+  params: Promise<Params>;
 };
 
 export default async function Page(props: Props) {
   try {
-    const { slug } = ParamsSchema.parse(props.params);
+    const { slug } = ParamsSchema.parse(await props.params);
 
     const targetSlug = getTargetSlug(slug);
 
