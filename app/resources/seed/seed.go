@@ -50,7 +50,7 @@ func Create() fx.Option {
 func New(
 	database *sql.DB,
 	client *ent.Client,
-	settings settings.Repository,
+	settings *settings.SettingsRepository,
 	account_writer *account_writer.Writer,
 	auth_repo authentication.Repository,
 	category_repo category.Repository,
@@ -69,8 +69,6 @@ func New(
 	}
 
 	fmt.Println("seeding database")
-
-	utils.Must[any](nil, settings.Init(context.Background()))
 
 	accounts(account_writer, auth_repo)
 	categories(category_repo)
