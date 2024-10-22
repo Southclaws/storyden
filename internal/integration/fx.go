@@ -9,14 +9,11 @@ import (
 	"testing"
 
 	"dario.cat/mergo"
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fctx"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources"
 	"github.com/Southclaws/storyden/app/services"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure"
 	"github.com/Southclaws/storyden/internal/utils"
 )
@@ -88,10 +85,6 @@ func application() fx.Option {
 		infrastructure.Build(),
 		resources.Build(),
 		services.Build(),
-
-		// Tests can depend on Migrated to trigger migrations pre-test.
-		// This is not parallel safe.
-		fx.Provide(WithMigrated),
 	)
 }
 
@@ -111,14 +104,4 @@ func isMaybeProdDB(url string) bool {
 	}
 
 	return false
-}
-
-type Migrated interface{}
-
-func WithMigrated(ctx context.Context, client *ent.Client) (Migrated, error) {
-	if err := client.Schema.Create(ctx); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return 1, nil
 }

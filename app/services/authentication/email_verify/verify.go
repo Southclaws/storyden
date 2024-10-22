@@ -33,7 +33,7 @@ type Verifier struct {
 	EmailRepo email.EmailRepo
 	Sender    mailer.Sender
 	Template  *mailtemplate.Builder
-	Settings  settings.Repository
+	Settings  *settings.SettingsRepository
 }
 
 // BeginEmailVerification adds an email record for the specified account, sets
@@ -56,13 +56,13 @@ func (s *Verifier) BeginEmailVerification(
 }
 
 func (s *Verifier) sendVerification(ctx context.Context, address mail.Address, code string) error {
-	settings, err := s.Settings.Get(ctx)
+	set, err := s.Settings.Get(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	recipientName := address.Address
-	instanceTitle := settings.Title.Get()
+	instanceTitle := set.Title.Or(settings.DefaultTitle)
 	welcome := fmt.Sprintf("Welcome to %s!", instanceTitle)
 
 	template, err := s.Template.Build(ctx, recipientName, []string{welcome}, []hermes.Action{

@@ -1,5 +1,10 @@
 package settings
 
+import (
+	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
+)
+
 const (
 	DefaultTitle       = "Storyden"
 	DefaultDescription = "A forum for the modern age"
@@ -12,3 +17,13 @@ const (
 </body>`
 )
 const DefaultColour = "hsl(157, 65%, 44%)"
+
+// skip error check, we know it's correct, it's literally above ^^
+var defaultContent, _ = datagraph.NewRichText(DefaultContent)
+
+var DefaultSettings = Settings{
+	Title:        opt.New(DefaultTitle),
+	Description:  opt.New(DefaultDescription),
+	Content:      opt.New(defaultContent),
+	AccentColour: opt.New(DefaultColour),
+}
