@@ -207,7 +207,7 @@ func extractReferences(htmlTree *html.Node) (*html.Node, []string, RefList) {
 	for _, v := range sdrs {
 		r, err := NewRefFromSDR(v)
 		if err != nil {
-			zap.L().Warn("invalid SDR in content", zap.Error(err))
+			zap.L().Warn("invalid SDR in content", zap.Error(err), zap.String("ref", v.Opaque))
 			continue
 		}
 		refs = append(refs, r)
