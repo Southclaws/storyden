@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "prepare": "panda codegen",
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -45,14 +45,14 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.451.0",
     "mime-db": "^1.53.0",
-    "next": "^14.2.14",
+    "next": "15.0.0",
     "nuqs": "^1.20.0",
     "polished": "^4.3.1",
-    "react": "^18.3.1",
+    "react": "19.0.0-rc-65a56d0e-20241020",
     "react-advanced-cropper": "^0.20.0",
     "react-avatar-editor": "^13.0.2",
     "react-contenteditable": "^3.3.7",
-    "react-dom": "^18.3.1",
+    "react-dom": "19.0.0-rc-65a56d0e-20241020",
     "react-hook-form": "^7.53.0",
     "remark-parse": "^11.0.0",
     "server-only": "^0.0.1",
@@ -76,15 +76,18 @@
     "@types/lodash": "^4.17.10",
     "@types/mime-db": "^1",
     "@types/node": "^22.7.5",
-    "@types/react": "^18.3.11",
+    "@types/react": "npm:types-react@19.0.0-rc.1",
     "@types/react-avatar-editor": "^13.0.3",
     "@typescript-eslint/eslint-plugin": "^8.8.1",
     "@typescript-eslint/parser": "^8.8.1",
     "eslint": "^8.57.1",
-    "eslint-config-next": "^14.2.14",
+    "eslint-config-next": "15.0.0",
     "orval": "^6.31.0",
     "prettier": "^3.3.3",
     "typescript": "^5.6.2"
   },
-  "packageManager": "yarn@4.5.0"
+  "packageManager": "yarn@4.5.0",
+  "resolutions": {
+    "@types/react": "npm:types-react@19.0.0-rc.1"
+  }
 }

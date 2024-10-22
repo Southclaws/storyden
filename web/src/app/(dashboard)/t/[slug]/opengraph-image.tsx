@@ -14,7 +14,8 @@ export const size = {
 
 export const contentType = "image/png";
 
-export default async function Image({ params: { slug } }: Props) {
+export default async function Image({ params }: Props) {
+  const { slug } = await params;
   const { data } = await threadGet(slug);
 
   const { accent_colour } = await getInfo();
@@ -37,7 +38,7 @@ export default async function Image({ params: { slug } }: Props) {
       >
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-          <img
+          (<img
             src={getAssetURL(image.path)}
             width="100%"
             height="100%"
@@ -45,7 +46,7 @@ export default async function Image({ params: { slug } }: Props) {
               objectPosition: "center",
               objectFit: "cover",
             }}
-          />
+          />)
         ) : (
           <div></div>
         )}

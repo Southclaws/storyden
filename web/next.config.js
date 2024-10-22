@@ -10,7 +10,6 @@ const apiURL = new URL(API_ADDRESS);
 const nextConfig = {
   output: isStandalone ? "standalone" : undefined,
   reactStrictMode: true,
-  swcMinify: true,
   images: {
     remotePatterns: [
       {
