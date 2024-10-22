@@ -3,6 +3,7 @@ package settings
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -28,6 +29,7 @@ type SettingsRepository struct {
 	// Directly changing settings via external database queries will result in
 	// settings not immediately updating so it's advised to always go via API.
 	cachedSettings *xsync.MapOf[string, any]
+	cacheLastFetch time.Time
 }
 
 func New(ctx context.Context, lc fx.Lifecycle, log *zap.Logger, db *ent.Client) (*SettingsRepository, error) {
@@ -65,17 +67,20 @@ func (d *SettingsRepository) initDefaults(ctx context.Context) error {
 }
 
 func (d *SettingsRepository) Get(ctx context.Context) (*Settings, error) {
-	r, err := d.db.Setting.Get(ctx, StorydenPrimarySettingsKey)
-	if ent.IsNotFound(err) {
-		// Ensure defaults are written to the database if they don't exist.
-		// This should only happen in tests where initDefaults isn't called.
-		return d.setDefaults(ctx)
+	s, ok := d.tryCached()
+	if ok {
+		go d.recache(ctx)
+		return s, nil
 	}
+
+	settings, err := d.get(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return mapSettings(r)
+	d.cache(settings)
+
+	return settings, nil
 }
 
 // Set will merge a partial update into the current settings and save new data.
@@ -103,7 +108,14 @@ func (d *SettingsRepository) Set(ctx context.Context, s Settings) (*Settings, er
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return mapSettings(r)
+	settings, err := mapSettings(r)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	d.cache(settings)
+
+	return settings, nil
 }
 
 func (d *SettingsRepository) setDefaults(ctx context.Context) (*Settings, error) {
@@ -121,6 +133,62 @@ func (d *SettingsRepository) setDefaults(ctx context.Context) (*Settings, error)
 	}
 
 	return mapSettings(s)
+}
+
+func (d *SettingsRepository) get(ctx context.Context) (*Settings, error) {
+	r, err := d.db.Setting.Get(ctx, StorydenPrimarySettingsKey)
+	if ent.IsNotFound(err) {
+		// Ensure defaults are written to the database if they don't exist.
+		// This should only happen in tests where initDefaults isn't called.
+		return d.setDefaults(ctx)
+	}
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	settings, err := mapSettings(r)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return settings, nil
+}
+
+func (d *SettingsRepository) tryCached() (*Settings, bool) {
+	v, ok := d.cachedSettings.Load(StorydenPrimarySettingsKey)
+	if !ok {
+		return nil, false
+	}
+
+	s, ok := v.(*Settings)
+	if !ok {
+		return nil, false
+	}
+
+	return s, true
+}
+
+func (d *SettingsRepository) cache(s *Settings) {
+	d.cachedSettings.Store(StorydenPrimarySettingsKey, s)
+	d.cacheLastFetch = time.Now()
+}
+
+func (d *SettingsRepository) recache(ctx context.Context) {
+	if time.Since(d.cacheLastFetch) < 5*time.Minute {
+		return
+	}
+
+	settings, err := d.get(ctx)
+	if err != nil {
+		d.log.Error("failed to recache settings", zap.Error(err))
+		return
+	}
+
+	// NOTE: There's a small chance of stale data here if an update occurs since
+	// recache was called (via goroutine) but before the cache is updated. This
+	// should be resolved at some point via a database key staleness timestamp.
+
+	d.cache(settings)
 }
 
 // NOTE: There's currently no way to reset/delete or work with non-system data.
