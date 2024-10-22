@@ -21,10 +21,10 @@ var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.Pe
 type Admin struct {
 	accountQuery *account_querier.Querier
 	as           account_suspension.Service
-	sr           settings.Repository
+	sr           *settings.SettingsRepository
 }
 
-func NewAdmin(accountQuery *account_querier.Querier, as account_suspension.Service, sr settings.Repository) Admin {
+func NewAdmin(accountQuery *account_querier.Querier, as account_suspension.Service, sr *settings.SettingsRepository) Admin {
 	return Admin{accountQuery, as, sr}
 }
 
@@ -48,11 +48,12 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	settings, err := a.sr.Set(ctx, settings.Partial{
+	settings, err := a.sr.Set(ctx, settings.Settings{
 		Title:        opt.NewPtr(request.Body.Title),
 		Description:  opt.NewPtr(request.Body.Description),
 		Content:      content,
 		AccentColour: opt.NewPtr(request.Body.AccentColour),
+		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Metadata)),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -125,9 +126,9 @@ func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.Admin
 
 func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 	return openapi.AdminSettingsProps{
-		AccentColour: in.AccentColour.Get(),
-		Description:  in.Description.Get(),
-		Content:      in.Content.Get().HTML(),
-		Title:        in.Title.Get(),
+		AccentColour: in.AccentColour.OrZero(),
+		Description:  in.Description.OrZero(),
+		Content:      in.Content.OrZero().HTML(),
+		Title:        in.Title.OrZero(),
 	}
 }
