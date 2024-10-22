@@ -13,12 +13,12 @@ import (
 )
 
 type Info struct {
-	sr settings.Repository
+	sr *settings.SettingsRepository
 	os onboarding.Service
 	is icon.Service
 }
 
-func NewInfo(sr settings.Repository, os onboarding.Service, is icon.Service) Info {
+func NewInfo(sr *settings.SettingsRepository, os onboarding.Service, is icon.Service) Info {
 	return Info{
 		sr: sr,
 		os: os,
@@ -68,10 +68,10 @@ func (i Info) IconUpload(ctx context.Context, request openapi.IconUploadRequestO
 
 func serialiseInfo(s *settings.Settings, status onboarding.Status) openapi.Info {
 	return openapi.Info{
-		Title:            s.Title.Get(),
-		Description:      s.Description.Get(),
-		Content:          s.Content.Get().HTML(),
-		AccentColour:     s.AccentColour.Get(),
+		Title:            s.Title.OrZero(),
+		Description:      s.Description.OrZero(),
+		Content:          s.Content.OrZero().HTML(),
+		AccentColour:     s.AccentColour.OrZero(),
 		OnboardingStatus: openapi.OnboardingStatus(status.String()),
 	}
 }

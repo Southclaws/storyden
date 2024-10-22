@@ -19,13 +19,13 @@ type Rendered struct {
 
 type Builder struct {
 	instanceURL url.URL
-	settings    settings.Repository
+	settings    *settings.SettingsRepository
 }
 
 func New(
 	ctx context.Context,
 	cfg config.Config,
-	set settings.Repository,
+	set *settings.SettingsRepository,
 ) (*Builder, error) {
 	return &Builder{
 		instanceURL: cfg.PublicWebAddress,
@@ -39,7 +39,7 @@ func (b *Builder) Build(ctx context.Context, name string, intros []string, actio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	instanceTitle := s.Title.Get()
+	instanceTitle := s.Title.Or(settings.DefaultTitle)
 	instanceURL := b.instanceURL
 
 	h := hermes.Hermes{

@@ -3101,6 +3101,11 @@ components:
           $ref: "#/components/schemas/PostContent"
         accent_colour:
           type: string
+        metadata:
+          description: |
+            The settings metadata may be used by frontends to store arbitrary
+            vendor-specific configuration data specific to the frontend itself.
+          $ref: "#/components/schemas/Metadata"
 
     #
     # 8888888b.          888
