@@ -2,6 +2,7 @@ package datagraph
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io"
 	"math"
@@ -53,6 +54,29 @@ type Content struct {
 	plain string
 	links []string
 	sdrs  RefList
+}
+
+func (c Content) MarshalJSON() ([]byte, error) {
+	s := c.HTML()
+
+	return json.Marshal(s)
+}
+
+func (c *Content) UnmarshalJSON(data []byte) error {
+	var s string
+	err := json.Unmarshal(data, &s)
+	if err != nil {
+		return err
+	}
+
+	parsed, err := NewRichText(s)
+	if err != nil {
+		return err
+	}
+
+	*c = parsed
+
+	return nil
 }
 
 func (r Content) HTML() string {

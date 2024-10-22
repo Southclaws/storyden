@@ -1,6 +1,7 @@
 package datagraph
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/Southclaws/storyden/internal/utils"
@@ -58,5 +59,27 @@ func TestNewRichText(t *testing.T) {
 				{Kind: KindProfile, ID: mention},
 			},
 		})(NewRichText(`<h1>heading</h1><p>hey <a href="sdr:profile/cn2h3gfljatbqvjqctdg">@southclaws</a>!</p>`))
+	})
+
+	t.Run("json", func(t *testing.T) {
+		r := require.New(t)
+		a := assert.New(t)
+
+		original, err := NewRichText(`<body><p>a</p></body>`)
+		r.NoError(err)
+		r.NotEmpty(original)
+
+		encoded, err := json.Marshal(original)
+		r.NoError(err)
+		r.NotEmpty(encoded)
+
+		a.Equal(`"\u003cbody\u003e\u003cp\u003ea\u003c/p\u003e\u003c/body\u003e"`, string(encoded))
+
+		var parsed Content
+		err = json.Unmarshal(encoded, &parsed)
+		r.NoError(err)
+		r.NotEmpty(parsed)
+
+		a.Equal(original, parsed)
 	})
 }
