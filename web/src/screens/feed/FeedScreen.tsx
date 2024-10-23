@@ -32,11 +32,15 @@ async function FeedScreenContent({ initialSettings }: Props) {
 
   switch (feedConfig.source.type) {
     case "threads":
-      const threads = await threadList();
-      return <ThreadFeedScreen initialData={threads.data} />;
+      return (async () => {
+        const threads = await threadList();
+        return <ThreadFeedScreen initialData={threads.data} />;
+      })();
 
     case "library":
-      const nodes = await nodeList();
-      return <LibraryFeedScreen initialData={nodes.data} />;
+      return (async () => {
+        const nodes = await nodeList();
+        return <LibraryFeedScreen initialData={nodes.data} />;
+      })();
   }
 }
