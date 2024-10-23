@@ -22,7 +22,7 @@ export const DefaultSettings = {
 // which is untyped on the backend so we provide a schema for validation here.
 export const FrontendConfigurationSchema = z
   .object({
-    feed: FeedConfigSchema.optional(),
+    feed: FeedConfigSchema,
   })
   .default(DefaultFrontendConfig);
 export type FrontendConfiguration = z.infer<typeof FrontendConfigurationSchema>;

@@ -14,7 +14,7 @@ import { Heading } from "@/components/ui/heading";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
 
-import { FeedScreen } from "../feed/FeedScreen";
+import { ThreadFeedScreen } from "../feed/ThreadFeedScreen";
 
 export type Props = {
   initialCategoryList: CategoryListOKResponse;
@@ -95,7 +95,7 @@ export function CategoryScreen(props: Props) {
         <styled.p color="fg.muted">{category.description}</styled.p>
       </LStack>
 
-      <FeedScreen
+      <ThreadFeedScreen
         params={{
           categories: [props.slug],
         }}

@@ -1,28 +1,42 @@
-"use client";
+import { Account } from "@/api/openapi-schema";
+import { nodeList } from "@/api/openapi-server/nodes";
+import { threadList } from "@/api/openapi-server/threads";
+import { getServerSession } from "@/auth/server-session";
+import { FeedConfig } from "@/components/feed/FeedConfig/FeedConfig";
+import { Button } from "@/components/ui/button";
+import { Settings } from "@/lib/settings/settings";
+import { HStack, LStack } from "@/styled-system/jsx";
 
-import { Unready } from "src/components/site/Unready";
-
-import { useThreadList } from "@/api/openapi-client/threads";
-import { ThreadListParams, ThreadListResult } from "@/api/openapi-schema";
-import { EmptyState } from "@/components/feed/EmptyState";
-import { ThreadItemList } from "@/components/feed/ThreadItemList";
+import { LibraryFeedScreen } from "./LibraryFeedScreen";
+import { ThreadFeedScreen } from "./ThreadFeedScreen";
 
 export type Props = {
-  params?: ThreadListParams;
-  initialData?: ThreadListResult;
+  initialSession?: Account;
+  initialSettings: Settings;
 };
 
-export function FeedScreen({ params, initialData }: Props) {
-  const { data, error } = useThreadList(params, {
-    swr: { fallbackData: initialData },
-  });
-  if (!data) {
-    return <Unready error={error} />;
-  }
+export function FeedScreen({ initialSession, initialSettings }: Props) {
+  return (
+    <LStack>
+      <FeedConfig
+        initialSession={initialSession}
+        initialSettings={initialSettings}
+      />
+      <FeedScreenContent initialSettings={initialSettings} />
+    </LStack>
+  );
+}
 
-  if (data.threads.length === 0) {
-    return <EmptyState />;
-  }
+async function FeedScreenContent({ initialSettings }: Props) {
+  const feedConfig = initialSettings.metadata.feed;
 
-  return <ThreadItemList threads={data.threads} />;
+  switch (feedConfig.source.type) {
+    case "threads":
+      const threads = await threadList();
+      return <ThreadFeedScreen initialData={threads.data} />;
+
+    case "library":
+      const nodes = await nodeList();
+      return <LibraryFeedScreen initialData={nodes.data} />;
+  }
 }

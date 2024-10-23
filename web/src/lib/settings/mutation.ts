@@ -6,7 +6,7 @@ import { adminSettingsUpdate } from "@/api/openapi-client/admin";
 import { getGetInfoKey } from "@/api/openapi-client/misc";
 import { AdminSettingsMutableProps, Info } from "@/api/openapi-schema";
 
-export function useInfoMutation(initialValue: Info) {
+export function useSettingsMutation(initialValue: Info) {
   const { mutate } = useSWRConfig();
 
   const infoKey = getGetInfoKey()[0];

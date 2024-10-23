@@ -8,7 +8,7 @@ import { Info } from "src/api/openapi-schema";
 import { getColourVariants } from "src/utils/colour";
 
 import { handle } from "@/api/client";
-import { useInfoMutation } from "@/lib/settings/mutation";
+import { useSettingsMutation } from "@/lib/settings/mutation";
 import { getIconURL } from "@/utils/icon";
 
 export type Props = Info;
@@ -22,7 +22,7 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export function useBrandSettings(props: Props) {
-  const { revalidate, updateSettings } = useInfoMutation(props);
+  const { revalidate, updateSettings } = useSettingsMutation(props);
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
