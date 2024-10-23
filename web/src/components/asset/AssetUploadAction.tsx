@@ -4,6 +4,7 @@ import {
 } from "@ark-ui/react";
 import { ImageIcon, ImagePlusIcon } from "lucide-react";
 import mime from "mime-db";
+import { PropsWithChildren } from "react";
 import { toast } from "sonner";
 
 import { handle } from "@/api/client";
@@ -17,11 +18,15 @@ type AssetUploadActionProps = {
   parentAssetID?: AssetID;
   operation: "add" | "update";
   onFinish: (a: Asset) => Promise<void>;
+  hideLabel?: boolean;
 };
 
 type Props = AssetUploadActionProps & ButtonVariantProps & FileUpload.RootProps;
 
-export function AssetUploadAction(props: Props) {
+export function AssetUploadAction({
+  children,
+  ...props
+}: PropsWithChildren<Props>) {
   const [buttonVariantProps, rest] = button.splitVariantProps(props);
 
   const { onFinish, ...fileUploadProps } = rest;
@@ -102,22 +107,25 @@ export function AssetUploadAction(props: Props) {
       {...fileUploadProps}
     >
       <FileUpload.Trigger w="min" asChild>
-        <Button
-          type="button"
-          size="xs"
-          variant="outline"
-          {...buttonVariantProps}
-        >
-          {props.operation === "add" ? (
-            <>
-              <ImagePlusIcon /> add cover
-            </>
-          ) : (
-            <>
-              <ImageIcon /> replace cover
-            </>
-          )}
-        </Button>
+        {children || (
+          <Button
+            type="button"
+            size="xs"
+            variant="outline"
+            {...buttonVariantProps}
+          >
+            {props.operation === "add" ? (
+              <>
+                <ImagePlusIcon />
+                {props.hideLabel ? "" : "add cover"}
+              </>
+            ) : (
+              <>
+                <ImageIcon /> {props.hideLabel ? "" : "replace cover"}
+              </>
+            )}
+          </Button>
+        )}
       </FileUpload.Trigger>
       <FileUpload.HiddenInput data-testid="input" />
     </FileUpload.Root>

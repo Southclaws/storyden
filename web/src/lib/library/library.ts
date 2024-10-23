@@ -9,13 +9,16 @@ import { Xid } from "xid-ts";
 import {
   getNodeGetKey,
   getNodeListKey,
+  nodeAddAsset,
   nodeCreate,
   nodeDelete,
+  nodeRemoveAsset,
   nodeUpdate,
   nodeUpdateVisibility,
 } from "@/api/openapi-client/nodes";
 import {
   Asset,
+  AssetID,
   Node,
   NodeGetOKResponse,
   NodeListOKResponse,
@@ -268,6 +271,54 @@ export function useLibraryMutation(params?: NodeListParams) {
     await nodeUpdateVisibility(slug, { visibility });
   };
 
+  const addAsset = async (slug: string, asset: Asset) => {
+    const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
+      if (!data) return;
+
+      const assets = [...data.assets, asset];
+
+      const updated = {
+        ...data,
+        assets,
+      } satisfies NodeWithChildren;
+
+      return updated;
+    };
+
+    const nodeKey = getNodeGetKey(slug);
+    const nodeKeyFn = (key: Arguments) => {
+      return Array.isArray(key) && key[0].startsWith(nodeKey);
+    };
+
+    await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
+
+    await nodeAddAsset(slug, asset.id);
+  };
+
+  const removeAsset = async (slug: string, assetID: AssetID) => {
+    const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
+      if (!data) return;
+
+      const assets = data.assets.filter((a) => a.id !== assetID);
+
+      const updated = {
+        ...data,
+        assets,
+      } satisfies NodeWithChildren;
+
+      return updated;
+    };
+
+    const nodeKey = getNodeGetKey(slug);
+    const nodeKeyFn = (key: Arguments) => {
+      return Array.isArray(key) && key[0].startsWith(nodeKey);
+    };
+
+    await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
+
+    await nodeRemoveAsset(slug, assetID);
+  };
+
   const deleteNode = async (slug: string, newParent?: string) => {
     const mutator: MutatorCallback<NodeListOKResponse> = (data) => {
       if (!data) return;
@@ -302,6 +353,8 @@ export function useLibraryMutation(params?: NodeListParams) {
     updateNode,
     removeNodeCoverImage,
     updateNodeVisibility,
+    addAsset,
+    removeAsset,
     deleteNode,
     revalidate,
   };
