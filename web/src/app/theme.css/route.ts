@@ -2,7 +2,8 @@ import { flatten, zip } from "lodash";
 import { NextResponse } from "next/server";
 
 import { getColourVariants } from "src/utils/colour";
-import { getInfo } from "src/utils/info";
+
+import { getSettings } from "@/lib/settings/settings-server";
 
 export const dynamic = "force-dynamic";
 
@@ -13,9 +14,9 @@ export const dynamic = "force-dynamic";
  */
 
 export async function GET() {
-  const info = await getInfo();
+  const settings = await getSettings();
 
-  const cv = getColourVariants(info.accent_colour);
+  const cv = getColourVariants(settings.accent_colour);
 
   const rules = Object.entries(cv).map(([k, v]) => `${k}: ${v};`);
 

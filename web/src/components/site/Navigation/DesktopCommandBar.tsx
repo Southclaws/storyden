@@ -1,8 +1,8 @@
 import { getServerSession } from "@/auth/server-session";
+import { getSettings } from "@/lib/settings/settings-server";
 import { cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { Floating } from "@/styled-system/patterns";
-import { getInfo } from "@/utils/info";
 
 import styles from "./navigation.module.css";
 
@@ -13,7 +13,7 @@ import { Search } from "./Search/Search";
 import { Title } from "./Title";
 
 export async function DesktopCommandBar() {
-  const { title } = await getInfo();
+  const { title } = await getSettings();
   const initialSidebarState = await getServerSidebarState();
 
   const session = await getServerSession();

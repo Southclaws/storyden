@@ -1,12 +1,13 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { useGetInfo } from "src/api/openapi-client/misc";
 import { OnboardingStatus } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
+import { useSettings } from "@/lib/settings/settings-client";
+
 export function useOnboarding() {
-  const { data: info } = useGetInfo();
+  const { settings } = useSettings();
   const session = useSession();
   const pathName = usePathname();
   const [localStatus, setlocalStatus] = useState<string | null>(null);
@@ -17,7 +18,7 @@ export function useOnboarding() {
   // NOTE: local onboarding status value takes priority.
   useEffect(() => {
     setlocalStatus(localStorage.getItem("onboarding-status"));
-  }, [info]);
+  }, [settings]);
 
   function onFinish() {
     localStorage.setItem("onboarding-status", "complete");
@@ -25,7 +26,9 @@ export function useOnboarding() {
   }
 
   const onboardingStatus: OnboardingStatus =
-    (localStatus as OnboardingStatus) ?? info?.onboarding_status ?? "complete";
+    (localStatus as OnboardingStatus) ??
+    settings?.onboarding_status ??
+    "complete";
 
   // Rules: If there's no session and the onboarding has not started, show
   // the onboarding to ANY user. But, once the first account is created, only

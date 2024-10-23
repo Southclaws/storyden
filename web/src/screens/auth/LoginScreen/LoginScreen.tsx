@@ -1,10 +1,10 @@
 import Image from "next/image";
 
 import { LinkButton } from "@/components/ui/link-button";
+import { getSettings } from "@/lib/settings/settings-server";
 import { css } from "@/styled-system/css";
 import { VStack, styled } from "@/styled-system/jsx";
 import { getIconURL } from "@/utils/icon";
-import { getInfo } from "@/utils/info";
 
 import { AuthSelection } from "../components/AuthSelection/AuthSelection";
 import { getProviders } from "../providers";
@@ -12,7 +12,7 @@ import { getProviders } from "../providers";
 import { LoginForm } from "./LoginForm";
 
 export async function LoginScreen() {
-  const info = await getInfo();
+  const settings = await getSettings();
   const { password, webauthn } = await getProviders();
 
   // TODO: Phone login form.
@@ -29,11 +29,11 @@ export async function LoginScreen() {
           src={getIconURL("512x512")}
           width="512"
           height="512"
-          alt={`The ${info.title} logo`}
+          alt={`The ${settings.title} logo`}
         />
 
         <styled.h1 fontWeight="bold" fontSize="lg">
-          {info.title}
+          {settings.title}
         </styled.h1>
       </VStack>
 

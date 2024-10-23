@@ -1,8 +1,7 @@
 import { ImageResponse } from "next/og";
 
-import { getInfo } from "src/utils/info";
-
 import { threadGet } from "@/api/openapi-server/threads";
+import { getSettings } from "@/lib/settings/settings-server";
 import { getAssetURL } from "@/utils/asset";
 
 import { Props } from "./page";
@@ -18,7 +17,7 @@ export default async function Image({ params }: Props) {
   const { slug } = await params;
   const { data } = await threadGet(slug);
 
-  const { accent_colour } = await getInfo();
+  const { accent_colour } = await getSettings();
 
   const image = data.assets[0];
 
@@ -38,7 +37,7 @@ export default async function Image({ params }: Props) {
       >
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
-          (<img
+          <img
             src={getAssetURL(image.path)}
             width="100%"
             height="100%"
@@ -46,7 +45,7 @@ export default async function Image({ params }: Props) {
               objectPosition: "center",
               objectFit: "cover",
             }}
-          />)
+          />
         ) : (
           <div></div>
         )}
