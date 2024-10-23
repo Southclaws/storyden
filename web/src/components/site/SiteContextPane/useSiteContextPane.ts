@@ -8,7 +8,7 @@ import { z } from "zod";
 import { handle } from "@/api/client";
 import { Account, Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
-import { useInfoMutation } from "@/lib/settings/mutation";
+import { useSettingsMutation } from "@/lib/settings/mutation";
 import { Settings } from "@/lib/settings/settings";
 import { useSettings } from "@/lib/settings/settings-client";
 import { getIconURL } from "@/utils/icon";
@@ -34,13 +34,13 @@ export const EditingSchema = z.preprocess(
 
     return v;
   },
-  z.enum(["settings"]),
+  z.enum(["settings", "feed"]),
 );
 export type Editing = z.infer<typeof EditingSchema>;
 
 export function useSiteContextPane({ session, initialSettings }: Props) {
   session = useSession(session);
-  const [editing, setEditing] = useQueryState<null | "settings">("editing", {
+  const [editing, setEditing] = useQueryState<null | Editing>("editing", {
     defaultValue: null,
     clearOnDefault: true,
     parse: EditingSchema.parse,
@@ -51,7 +51,7 @@ export function useSiteContextPane({ session, initialSettings }: Props) {
     defaultValues: initialSettings,
   });
 
-  const { revalidate, updateSettings } = useInfoMutation(initialSettings);
+  const { revalidate, updateSettings } = useSettingsMutation(initialSettings);
 
   const { ready, error, settings } = useSettings(initialSettings);
   if (!ready) {

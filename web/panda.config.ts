@@ -17,6 +17,7 @@ import { input } from "@/recipes/input";
 import { menu } from "@/recipes/menu";
 import { popover } from "@/recipes/popover";
 import { richCard } from "@/recipes/rich-card";
+import { select } from "@/recipes/select";
 import { table } from "@/recipes/table";
 import { treeView } from "@/recipes/tree-view";
 import { typographyHeading } from "@/recipes/typography-heading";
@@ -267,6 +268,7 @@ export default defineConfig({
         richCard: richCard,
       },
       slotRecipes: {
+        select: select,
         colorPicker: colorPicker,
         menu: menu,
         fileUpload: fileUpload,
