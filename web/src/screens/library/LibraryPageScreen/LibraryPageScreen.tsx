@@ -10,6 +10,7 @@ import { SaveAction } from "src/components/site/Action/Save";
 
 import { useNodeGet } from "@/api/openapi-client/nodes";
 import { Breadcrumbs } from "@/components/library/Breadcrumbs";
+import { LibraryPageAssetList } from "@/components/library/LibraryPageAssetList/LibraryPageAssetList";
 import { LibraryPageCoverImageControl } from "@/components/library/LibraryPageCoverImageControl/LibraryPageCoverImageControl";
 import { LibraryPageImportFromURL } from "@/components/library/LibraryPageImportFromURL/LibraryPageImportFromURL";
 import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
@@ -122,7 +123,7 @@ export function LibraryPage(props: Props) {
                 className={css({
                   maxWidth: "full",
                   maxHeight: "64",
-                  borderRadius: "lg",
+                  borderRadius: "md",
                   // TODO: Remove black background when empty
                   backgroundColor: "bg.default",
                 })}
@@ -156,7 +157,7 @@ export function LibraryPage(props: Props) {
                   className={css({
                     width: "full",
                     height: "full",
-                    borderRadius: "lg",
+                    borderRadius: "md",
                     objectFit: "cover",
                     objectPosition: "center",
                   })}
@@ -168,6 +169,8 @@ export function LibraryPage(props: Props) {
               </Box>
             )
           )}
+
+          <LibraryPageAssetList node={node} />
 
           <LStack gap="2">
             <LStack minW="0">
