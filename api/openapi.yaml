@@ -2865,6 +2865,8 @@ components:
           type: string
         onboarding_status:
           $ref: "#/components/schemas/OnboardingStatus"
+        metadata:
+          $ref: "#/components/schemas/Metadata"
 
     OnboardingStatus:
       description: |
@@ -3089,6 +3091,8 @@ components:
           $ref: "#/components/schemas/PostContent"
         accent_colour:
           type: string
+        metadata:
+          $ref: "#/components/schemas/Metadata"
 
     AdminSettingsMutableProps:
       type: object

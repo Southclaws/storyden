@@ -6,16 +6,17 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { handle } from "@/api/client";
-import { useGetInfo } from "@/api/openapi-client/misc";
-import { Account, Info, Permission } from "@/api/openapi-schema";
+import { Account, Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { useInfoMutation } from "@/lib/settings/mutation";
+import { Settings } from "@/lib/settings/settings";
+import { useSettings } from "@/lib/settings/settings-client";
 import { getIconURL } from "@/utils/icon";
 import { hasPermission } from "@/utils/permissions";
 
 export type Props = {
   session: Account | undefined;
-  info: Info;
+  initialSettings: Settings;
 };
 
 export const FormSchema = z.object({
@@ -37,7 +38,7 @@ export const EditingSchema = z.preprocess(
 );
 export type Editing = z.infer<typeof EditingSchema>;
 
-export function useSiteContextPane({ session, info }: Props) {
+export function useSiteContextPane({ session, initialSettings }: Props) {
   session = useSession(session);
   const [editing, setEditing] = useQueryState<null | "settings">("editing", {
     defaultValue: null,
@@ -47,15 +48,13 @@ export function useSiteContextPane({ session, info }: Props) {
 
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
-    defaultValues: info,
+    defaultValues: initialSettings,
   });
 
-  const { revalidate, updateSettings } = useInfoMutation(info);
+  const { revalidate, updateSettings } = useInfoMutation(initialSettings);
 
-  const { data, error } = useGetInfo({
-    swr: { fallbackData: info },
-  });
-  if (!data) {
+  const { ready, error, settings } = useSettings(initialSettings);
+  if (!ready) {
     return {
       ready: false as const,
       error,
@@ -93,7 +92,7 @@ export function useSiteContextPane({ session, info }: Props) {
     ready: true as const,
     form,
     data: {
-      info: data,
+      settings,
       iconURL,
       isEditingEnabled,
       isAdmin,

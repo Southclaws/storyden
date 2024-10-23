@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { PropsWithChildren } from "react";
 
 import { getColourAsHex } from "src/utils/colour";
-import { getInfo } from "src/utils/info";
 
 import { WEB_ADDRESS } from "@/config";
+import { getSettings } from "@/lib/settings/settings-server";
 import { getIconURL } from "@/utils/icon";
 
 import "./global.css";
@@ -34,9 +34,9 @@ export default async function RootLayout({ children }: PropsWithChildren) {
 }
 
 export async function generateViewport(): Promise<Viewport> {
-  const info = await getInfo();
+  const settings = await getSettings();
 
-  const themeColour = getColourAsHex(info.accent_colour);
+  const themeColour = getColourAsHex(settings.accent_colour);
 
   return {
     themeColor: themeColour,
@@ -45,20 +45,20 @@ export async function generateViewport(): Promise<Viewport> {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const info = await getInfo();
+  const settings = await getSettings();
 
   const iconURL = getIconURL("512x512");
 
   const canonical = WEB_ADDRESS;
 
   // TODO: Add another settings field for this.
-  const title = `${info.title} | ${info.description}`;
+  const title = `${settings.title} | ${settings.description}`;
 
   return {
     manifest: "/manifest.json",
     metadataBase: new URL(canonical),
     title: title,
-    description: info.description,
+    description: settings.description,
     icons: {
       icon: iconURL,
       shortcut: iconURL,

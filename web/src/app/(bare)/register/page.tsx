@@ -1,14 +1,15 @@
 import { RegisterScreen } from "src/screens/auth/RegisterScreen/RegisterScreen";
-import { getInfo } from "src/utils/info";
+
+import { getSettings } from "@/lib/settings/settings-server";
 
 export default function Page() {
   return <RegisterScreen />;
 }
 
 export async function generateMetadata() {
-  const info = await getInfo();
+  const settings = await getSettings();
   return {
-    title: `Join the community at ${info.title}`,
-    description: `Log in or sign up to ${info.title} - powered by Storyden`,
+    title: `Join the community at ${settings.title}`,
+    description: `Log in or sign up to ${settings.title} - powered by Storyden`,
   };
 }

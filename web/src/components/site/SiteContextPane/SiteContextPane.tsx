@@ -25,7 +25,7 @@ export function SiteContextPane(props: Props) {
     return <Unready error={error} />;
   }
 
-  const { info, iconURL, isEditingEnabled, isAdmin, editing } = data;
+  const { settings, iconURL, isEditingEnabled, isAdmin, editing } = data;
 
   const isEditingSettings = editing === "settings";
 
@@ -43,7 +43,7 @@ export function SiteContextPane(props: Props) {
             </FormErrorText>
           </FormControl>
         ) : (
-          <Heading textWrap="wrap">{info.title}</Heading>
+          <Heading textWrap="wrap">{settings.title}</Heading>
         )}
 
         <Image
@@ -75,7 +75,7 @@ export function SiteContextPane(props: Props) {
           </FormErrorText>
         </FormControl>
       ) : (
-        <p>{info.description}</p>
+        <p>{settings.description}</p>
       )}
 
       {isEditingSettings ? (
@@ -83,7 +83,7 @@ export function SiteContextPane(props: Props) {
           <ContentFormField<Form>
             control={form.control}
             name="content"
-            initialValue={info.content}
+            initialValue={settings.content}
             placeholder="About your community..."
           />
           <FormErrorText>
@@ -91,10 +91,10 @@ export function SiteContextPane(props: Props) {
           </FormErrorText>
         </FormControl>
       ) : (
-        info.content && (
+        settings.content && (
           <ContentComposer
-            initialValue={info.content}
-            value={info.content}
+            initialValue={settings.content}
+            value={settings.content}
             disabled
           />
         )

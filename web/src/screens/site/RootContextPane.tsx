@@ -1,10 +1,10 @@
 import { getServerSession } from "@/auth/server-session";
 import { SiteContextPane } from "@/components/site/SiteContextPane/SiteContextPane";
-import { getInfo } from "@/utils/info";
+import { getSettings } from "@/lib/settings/settings-server";
 
 export async function RootContextPane() {
   const session = await getServerSession();
-  const info = await getInfo();
+  const settings = await getSettings();
 
-  return <SiteContextPane info={info} session={session} />;
+  return <SiteContextPane initialSettings={settings} session={session} />;
 }

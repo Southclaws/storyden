@@ -7,6 +7,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { Metadata } from "./metadata";
 import type { PostContent } from "./postContent";
 
 /**
@@ -16,5 +17,6 @@ export interface AdminSettingsProps {
   accent_colour: string;
   content: PostContent;
   description: string;
+  metadata?: Metadata;
   title: string;
 }

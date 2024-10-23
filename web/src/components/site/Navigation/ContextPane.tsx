@@ -28,7 +28,7 @@ export function ContextPane({ children }: PropsWithChildren) {
 
       <HStack color="fg.subtle" fontSize="xs">
         {/* TODO: Provide links to privacy/terms/etc custom pages */}
-        {/* <p>copyright {info.owner}</p> */}
+        {/* <p>copyright {settings.owner}</p> */}
         {/* <a href={PrivacyRoute}>privacy</a> */}
         <p>powered by storyden</p>
       </HStack>

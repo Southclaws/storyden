@@ -73,5 +73,6 @@ func serialiseInfo(s *settings.Settings, status onboarding.Status) openapi.Info 
 		Content:          s.Content.OrZero().HTML(),
 		AccentColour:     s.AccentColour.OrZero(),
 		OnboardingStatus: openapi.OnboardingStatus(status.String()),
+		Metadata:         (*openapi.Metadata)(s.Metadata.Ptr()),
 	}
 }

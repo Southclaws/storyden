@@ -2,22 +2,22 @@ import { Manifest } from "next/dist/lib/metadata/types/manifest-types";
 import { NextResponse } from "next/server";
 
 import { getColourAsHex } from "src/utils/colour";
-import { getInfo } from "src/utils/info";
 
 import { API_ADDRESS } from "@/config";
+import { getSettings } from "@/lib/settings/settings-server";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const info = await getInfo();
+  const settings = await getSettings();
 
-  const backgroundColour = getColourAsHex(info.accent_colour);
+  const backgroundColour = getColourAsHex(settings.accent_colour);
 
   const manifest: Manifest = {
     id: "/",
-    name: info.title ?? "Storyden",
-    short_name: info.title ?? "Storyden",
-    description: info.description,
+    name: settings.title ?? "Storyden",
+    short_name: settings.title ?? "Storyden",
+    description: settings.description,
     display: "fullscreen",
     start_url: "/",
     // TODO: figure out a good choice for this.

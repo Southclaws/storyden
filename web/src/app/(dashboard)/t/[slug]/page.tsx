@@ -1,7 +1,6 @@
-import { getInfo } from "src/utils/info";
-
 import { threadGet } from "@/api/openapi-server/threads";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { getSettings } from "@/lib/settings/settings-server";
 import { ThreadScreen } from "@/screens/thread/ThreadScreen/ThreadScreen";
 
 export type Props = {
@@ -25,11 +24,11 @@ export default async function Page(props: Props) {
 export async function generateMetadata(props: Props) {
   const params = await props.params;
   try {
-    const info = await getInfo();
+    const settings = await getSettings();
     const { data } = await threadGet(params.slug);
 
     return {
-      title: `${data.title} | ${info.title}`,
+      title: `${data.title} | ${settings.title}`,
       description: data.description,
     };
   } catch (e) {

@@ -130,5 +130,6 @@ func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 		Description:  in.Description.OrZero(),
 		Content:      in.Content.OrZero().HTML(),
 		Title:        in.Title.OrZero(),
+		Metadata:     (*openapi.Metadata)(in.Metadata.Ptr()),
 	}
 }
