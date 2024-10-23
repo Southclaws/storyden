@@ -21,7 +21,10 @@ export function LibraryPageAssetList(props: Props) {
     defaultValue: false,
     clearOnDefault: true,
   });
+
   const { assets } = props.node;
+  const isEmpty = assets.length === 0;
+  const shouldShow = editing || !isEmpty;
 
   const { revalidate, addAsset, removeAsset } = useLibraryMutation();
 
@@ -53,6 +56,10 @@ export function LibraryPageAssetList(props: Props) {
         cleanup: async () => await revalidate(),
       },
     );
+  }
+
+  if (!shouldShow) {
+    return null;
   }
 
   return (
