@@ -7,6 +7,7 @@ import { z } from "zod";
 import { handle } from "@/api/client";
 import { threadUpdate, useThreadGet } from "@/api/openapi-client/threads";
 import { ThreadGetResponse } from "@/api/openapi-schema";
+import { useThreadSubscription } from "@/lib/thread/subscription";
 
 export type Props = {
   slug: string;
@@ -20,6 +21,8 @@ export const FormSchema = z.object({
 export type Form = z.infer<typeof FormSchema>;
 
 export function useThreadScreen({ slug, thread }: Props) {
+  useThreadSubscription(thread);
+
   const [editing, setEditing] = useQueryState("edit", parseAsBoolean);
   const [resetKey, setResetKey] = useState("");
   const [isEmpty, setEmpty] = useState(true);

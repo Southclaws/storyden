@@ -2969,11 +2969,11 @@ components:
         metadata:
           description: Any additional metadata related to the error.
           type: object
-          additionalProperties: true
+          additionalProperties: {}
 
     Metadata:
       type: object
-      additionalProperties: true
+      additionalProperties: {}
       description: Arbitrary metadata for the resource.
 
     PaginatedResult:
@@ -3494,7 +3494,7 @@ components:
       description: |
         https://www.w3.org/TR/webauthn-2/#dictdef-authenticationextensionsclientinputs
       type: object
-      additionalProperties: true
+      additionalProperties: {}
 
     PublicKeyCredential:
       description: |

@@ -7,10 +7,12 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/transports/http"
+	"github.com/Southclaws/storyden/app/transports/ws"
 )
 
 func Build() fx.Option {
 	return fx.Options(
 		http.Build(),
+		ws.Build(),
 	)
 }

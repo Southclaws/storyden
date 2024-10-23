@@ -9671,6 +9671,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-use-websocket@npm:^4.9.0":
+  version: 4.9.0
+  resolution: "react-use-websocket@npm:4.9.0"
+  checksum: 10c0/ae53a0c047d63a4b0bc983fe2e224c2ce48c2d60450c8e29e2671bd5c021cc2ff5ce4ece1f67afdc9976e1610bedbc18e19a105154ba5c49ac15028b1c46499f
+  languageName: node
+  linkType: hard
+
 "react@npm:^18.3.1":
   version: 18.3.1
   resolution: "react@npm:18.3.1"
@@ -10978,6 +10985,7 @@ __metadata:
     react-contenteditable: "npm:^3.3.7"
     react-dom: "npm:^18.3.1"
     react-hook-form: "npm:^7.53.0"
+    react-use-websocket: "npm:^4.9.0"
     remark-parse: "npm:^11.0.0"
     server-only: "npm:^0.0.1"
     sonner: "npm:^1.5.0"
