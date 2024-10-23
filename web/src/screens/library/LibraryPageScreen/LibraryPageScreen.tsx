@@ -14,7 +14,6 @@ import { LibraryPageAssetList } from "@/components/library/LibraryPageAssetList/
 import { LibraryPageCoverImageControl } from "@/components/library/LibraryPageCoverImageControl/LibraryPageCoverImageControl";
 import { LibraryPageImportFromURL } from "@/components/library/LibraryPageImportFromURL/LibraryPageImportFromURL";
 import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
-import { NodeCardRows } from "@/components/library/NodeCardList";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
@@ -208,17 +207,6 @@ export function LibraryPage(props: Props) {
             }
           />
         </LStack>
-
-        {node && (node.children.length ?? 0) > 0 && (
-          <LStack alignItems="start" w="full">
-            <Heading>Child pages</Heading>
-            <NodeCardRows
-              libraryPath={libraryPath}
-              context="library"
-              nodes={node.children}
-            />
-          </LStack>
-        )}
       </FormProvider>
     </styled.form>
   );
