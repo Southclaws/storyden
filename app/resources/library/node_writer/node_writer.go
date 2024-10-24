@@ -3,6 +3,7 @@ package node_writer
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
@@ -15,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -125,6 +127,20 @@ func WithChildNodeAdd(id xid.ID) Option {
 func WithChildNodeRemove(id xid.ID) Option {
 	return func(c *ent.NodeMutation) {
 		c.RemoveNodeIDs(id)
+	}
+}
+
+func WithTagsAdd(refs ...tag_ref.ID) Option {
+	ids := dt.Map(refs, func(i tag_ref.ID) xid.ID { return xid.ID(i) })
+	return func(c *ent.NodeMutation) {
+		c.AddTagIDs(ids...)
+	}
+}
+
+func WithTagsRemove(refs ...tag_ref.ID) Option {
+	ids := dt.Map(refs, func(i tag_ref.ID) xid.ID { return xid.ID(i) })
+	return func(c *ent.NodeMutation) {
+		c.RemoveTagIDs(ids...)
 	}
 }
 

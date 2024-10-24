@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -32,7 +33,7 @@ type Thread struct {
 	Replies     []*reply.Reply
 	Category    category.Category
 	Visibility  visibility.Visibility
-	Tags        []string
+	Tags        tag_ref.Tags
 	Collections []*collection.Collection
 	Related     datagraph.ItemList
 }
@@ -96,6 +97,8 @@ func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (
 			return nil, err
 		}
 
+		tags := dt.Map(m.Edges.Tags, tag_ref.Map)
+
 		return &Thread{
 			Post: post.Post{
 				ID: post.ID(m.ID),
@@ -122,7 +125,7 @@ func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (
 			Replies:     replies,
 			Category:    *category,
 			Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
-			Tags:        dt.Map(m.Edges.Tags, func(t *ent.Tag) string { return t.Name }),
+			Tags:        tags,
 			Collections: collections.OrZero(),
 		}, nil
 	}

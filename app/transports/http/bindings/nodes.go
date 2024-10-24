@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
@@ -82,6 +83,10 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	tags := opt.Map(opt.NewPtr(request.Body.Tags), func(tags []string) tag_ref.Names {
+		return dt.Map(tags, deserialiseTagName)
+	})
+
 	slug, err := deserialiseInputSlug(request.Body.Slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -101,6 +106,7 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 			AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 			AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
 			Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
+			Tags:         tags,
 			Visibility:   vis,
 		},
 	)
@@ -207,6 +213,10 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	tags := opt.Map(opt.NewPtr(request.Body.Tags), func(tags []string) tag_ref.Names {
+		return dt.Map(tags, deserialiseTagName)
+	})
+
 	slug, err := deserialiseInputSlug(request.Body.Slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -223,6 +233,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		Content:      richContent,
 		PrimaryImage: primaryImage,
 		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
+		Tags:         tags,
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	})
 	if err != nil {
@@ -341,6 +352,7 @@ func serialiseNode(in *library.Node) openapi.Node {
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
+		Tags:       dt.Map(in.Tags, serialiseTag),
 		Visibility: serialiseVisibility(in.Visibility),
 		Meta:       in.Metadata,
 	}
@@ -363,6 +375,7 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
+		Tags:           dt.Map(in.Tags, serialiseTag),
 		Visibility:     serialiseVisibility(in.Visibility),
 		RelevanceScore: rs.Ptr(),
 		Meta:           in.Metadata,

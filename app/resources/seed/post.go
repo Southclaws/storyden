@@ -265,7 +265,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr *reaction.Writer, ar 
 			t.Title,
 			t.Author.ID,
 			t.Category.ID,
-			t.Tags,
+			nil, // TODO
 			thread.WithID(t.ID),
 			thread.WithContent(t.Content),
 			thread.WithVisibility(visibility.VisibilityPublished),

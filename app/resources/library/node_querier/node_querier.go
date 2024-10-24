@@ -66,7 +66,8 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 				WithOwner(func(aq *ent.AccountQuery) {
 					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 				})
-		})
+		}).
+		WithTags()
 
 	if o.visibilityRules {
 		if o.requestingAccount == nil {

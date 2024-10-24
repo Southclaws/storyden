@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/profile"
@@ -35,6 +36,9 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	tagsEdge := c.Edges.Tags
+	tags := dt.Map(tagsEdge, tag_ref.Map)
 
 	nodes, err := dt.MapErr(c.Edges.Nodes, NodeFromModel)
 	if err != nil {
@@ -74,6 +78,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		PrimaryImage: primaryImage,
 		Owner:        *pro,
 		Parent:       parent,
+		Tags:         tags,
 		Nodes:        nodes,
 		Visibility:   visibility,
 		Metadata:     c.Metadata,

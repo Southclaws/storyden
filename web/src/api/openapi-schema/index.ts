@@ -348,6 +348,7 @@ export * from "./tag";
 export * from "./tagList";
 export * from "./tagListIDs";
 export * from "./tagName";
+export * from "./tagNameList";
 export * from "./targetNodeSlugQueryParameter";
 export * from "./thread";
 export * from "./threadAllOf";

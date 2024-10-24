@@ -109,7 +109,6 @@ func (m *Manager) Create(ctx context.Context,
 		cat,
 		visibility.VisibilityUnlisted,
 		nil,
-		nil,
 		thread.Partial{
 			Content: opt.New(content),
 		},

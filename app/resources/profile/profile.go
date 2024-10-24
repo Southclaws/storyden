@@ -11,9 +11,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -30,7 +30,7 @@ type Public struct {
 	Following     int
 	LikeScore     int
 	Roles         held.Roles
-	Interests     []*tag.Tag
+	Interests     []*tag_ref.Tag
 	ExternalLinks []account.ExternalLink
 	InvitedBy     opt.Optional[Public]
 	Metadata      map[string]any
@@ -58,12 +58,7 @@ func ProfileFromModel(a *ent.Account) (*Public, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	interests := dt.Map(a.Edges.Tags, func(t *ent.Tag) *tag.Tag {
-		return &tag.Tag{
-			ID:   t.ID.String(),
-			Name: t.Name,
-		}
-	})
+	interests := dt.Map(a.Edges.Tags, tag_ref.Map)
 
 	bio, err := datagraph.NewRichText(a.Bio)
 	if err != nil {

@@ -19,6 +19,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/mention/mentioner"
@@ -34,7 +36,6 @@ type Service interface {
 		authorID account.AccountID,
 		categoryID category.CategoryID,
 		status visibility.Visibility,
-		tags []string,
 		meta map[string]any,
 		partial Partial,
 	) (*thread.Thread, error)
@@ -59,8 +60,8 @@ type Service interface {
 type Partial struct {
 	Title      opt.Optional[string]
 	Content    opt.Optional[datagraph.Content]
-	Tags       opt.Optional[[]xid.ID]
 	Category   opt.Optional[xid.ID]
+	Tags       opt.Optional[tag_ref.Names]
 	Visibility opt.Optional[visibility.Visibility]
 	URL        opt.Optional[url.URL]
 	Meta       opt.Optional[map[string]any]
@@ -69,7 +70,6 @@ type Partial struct {
 func (p Partial) Opts() (opts []thread.Option) {
 	p.Title.Call(func(v string) { opts = append(opts, thread.WithTitle(v)) })
 	p.Content.Call(func(v datagraph.Content) { opts = append(opts, thread.WithContent(v)) })
-	p.Tags.Call(func(v []xid.ID) { opts = append(opts, thread.WithTags(v)) })
 	p.Category.Call(func(v xid.ID) { opts = append(opts, thread.WithCategory(xid.ID(v))) })
 	p.Visibility.Call(func(v visibility.Visibility) { opts = append(opts, thread.WithVisibility(v)) })
 	p.Meta.Call(func(v map[string]any) { opts = append(opts, thread.WithMeta(v)) })
@@ -85,6 +85,7 @@ type service struct {
 
 	accountQuery *account_querier.Querier
 	thread_repo  thread.Repository
+	tagWriter    *tag_writer.Writer
 	fetcher      *fetcher.Fetcher
 	recommender  semdex.Recommender
 	indexQueue   pubsub.Topic[mq.IndexPost]
@@ -97,6 +98,7 @@ func New(
 
 	accountQuery *account_querier.Querier,
 	thread_repo thread.Repository,
+	tagWriter *tag_writer.Writer,
 	fetcher *fetcher.Fetcher,
 	recommender semdex.Recommender,
 	indexQueue pubsub.Topic[mq.IndexPost],
@@ -108,6 +110,7 @@ func New(
 
 		accountQuery: accountQuery,
 		thread_repo:  thread_repo,
+		tagWriter:    tagWriter,
 		fetcher:      fetcher,
 		recommender:  recommender,
 		indexQueue:   indexQueue,

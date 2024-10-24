@@ -40,7 +40,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/profile/follow_writer"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
 	"github.com/Southclaws/storyden/app/resources/settings"
-	"github.com/Southclaws/storyden/app/resources/tag"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_querier"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
 )
 
 func Build() fx.Option {
@@ -61,7 +62,8 @@ func Build() fx.Option {
 			notify_querier.New,
 			notify_writer.New,
 			reply.New,
-			tag.New,
+			tag_querier.New,
+			tag_writer.New,
 			thread.New,
 			reaction.New,
 			like_querier.New,
