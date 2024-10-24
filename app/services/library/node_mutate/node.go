@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
+	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -22,6 +23,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	library_service "github.com/Southclaws/storyden/app/services/library"
@@ -48,6 +51,7 @@ type Partial struct {
 	PrimaryImage deletable.Value[asset.AssetID]
 	Content      opt.Optional[datagraph.Content]
 	Parent       opt.Optional[library.QueryKey]
+	Tags         opt.Optional[tag_ref.Names]
 	Visibility   opt.Optional[visibility.Visibility]
 	Metadata     opt.Optional[map[string]any]
 	AssetsAdd    opt.Optional[[]asset.AssetID]
@@ -80,6 +84,7 @@ type service struct {
 	accountQuery      *account_querier.Querier
 	nodeQuerier       *node_querier.Querier
 	nodeWriter        *node_writer.Writer
+	tagWriter         *tag_writer.Writer
 	nc                node_children.Repository
 	fetcher           *fetcher.Fetcher
 	fs                *fetcher.Fetcher
@@ -91,6 +96,7 @@ func New(
 	accountQuery *account_querier.Querier,
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
+	tagWriter *tag_writer.Writer,
 	nc node_children.Repository,
 	fetcher *fetcher.Fetcher,
 	fs *fetcher.Fetcher,
@@ -101,6 +107,7 @@ func New(
 		accountQuery:      accountQuery,
 		nodeQuerier:       nodeQuerier,
 		nodeWriter:        nodeWriter,
+		tagWriter:         tagWriter,
 		nc:                nc,
 		fetcher:           fetcher,
 		fs:                fs,
@@ -153,6 +160,17 @@ func (s *service) Create(ctx context.Context,
 		if err == nil {
 			opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
 		}
+	}
+
+	if tags, ok := p.Tags.Get(); ok {
+		newTags, err := s.tagWriter.Add(ctx, tags...)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		tagIDs := dt.Map(newTags, func(t *tag_ref.Tag) tag_ref.ID { return t.ID })
+
+		opts = append(opts, node_writer.WithTagsAdd(tagIDs...))
 	}
 
 	n, err := s.nodeWriter.Create(ctx, owner, name, nodeSlug, opts...)
@@ -226,6 +244,28 @@ func (s *service) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 		if err == nil {
 			opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
 		}
+	}
+
+	if tags, ok := p.Tags.Get(); ok {
+		currentTagNames := n.Tags.Names()
+
+		toCreate, toRemove := lo.Difference(tags, currentTagNames)
+
+		newTags, err := s.tagWriter.Add(ctx, toCreate...)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		addIDs := dt.Map(newTags, func(t *tag_ref.Tag) tag_ref.ID { return t.ID })
+		removeIDs := dt.Reduce(n.Tags, func(acc []tag_ref.ID, prev *tag_ref.Tag) []tag_ref.ID {
+			if lo.Contains(toRemove, prev.Name) {
+				acc = append(acc, prev.ID)
+			}
+			return acc
+		}, []tag_ref.ID{})
+
+		opts = append(opts, node_writer.WithTagsAdd(addIDs...))
+		opts = append(opts, node_writer.WithTagsRemove(removeIDs...))
 	}
 
 	n, err = s.nodeWriter.Update(ctx, qk, opts...)

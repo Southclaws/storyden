@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -42,6 +43,7 @@ type Node struct {
 	PrimaryImage   opt.Optional[asset.Asset]
 	Owner          profile.Public
 	Parent         opt.Optional[Node]
+	Tags           tag_ref.Tags
 	Visibility     visibility.Visibility
 	RelevanceScore opt.Optional[float64]
 	Metadata       map[string]any

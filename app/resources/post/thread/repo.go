@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_account "github.com/Southclaws/storyden/internal/ent/account"
@@ -36,7 +37,6 @@ type Repository interface {
 		title string,
 		authorID account.AccountID,
 		categoryID category.CategoryID,
-		tags []string,
 		opts ...Option,
 	) (*Thread, error)
 
@@ -79,12 +79,6 @@ func WithContent(v datagraph.Content) Option {
 	}
 }
 
-func WithTags(v []xid.ID) Option {
-	return func(pm *ent.PostMutation) {
-		pm.AddTagIDs(v...)
-	}
-}
-
 func WithCategory(v xid.ID) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetCategoryID(v)
@@ -118,6 +112,20 @@ func WithLink(id xid.ID) Option {
 func WithContentLinks(ids ...xid.ID) Option {
 	return func(pm *ent.PostMutation) {
 		pm.AddContentLinkIDs(ids...)
+	}
+}
+
+func WithTagsAdd(refs ...tag_ref.ID) Option {
+	ids := dt.Map(refs, func(i tag_ref.ID) xid.ID { return xid.ID(i) })
+	return func(c *ent.PostMutation) {
+		c.AddTagIDs(ids...)
+	}
+}
+
+func WithTagsRemove(refs ...tag_ref.ID) Option {
+	ids := dt.Map(refs, func(i tag_ref.ID) xid.ID { return xid.ID(i) })
+	return func(c *ent.PostMutation) {
+		c.RemoveTagIDs(ids...)
 	}
 }
 

@@ -10,6 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { CategoryReference } from "./categoryReference";
 import type { LinkReference } from "./linkReference";
 import type { ReplyStatus } from "./replyStatus";
+import type { TagList } from "./tagList";
 
 export interface ThreadReferenceProps {
   category: CategoryReference;
@@ -17,6 +18,5 @@ export interface ThreadReferenceProps {
   /** Whether the thread is pinned in this category. */
   pinned: boolean;
   reply_status: ReplyStatus;
-  /** A list of tags associated with the thread. */
-  tags: string[];
+  tags: TagList;
 }

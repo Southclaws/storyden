@@ -14,7 +14,7 @@ import type { TagName } from "./tagName";
  * A tag which can link profiles or threads via interests.
  */
 export interface Tag {
-  colour?: string;
+  colour: string;
   id: Identifier;
   name: TagName;
 }

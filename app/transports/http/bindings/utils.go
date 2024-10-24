@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -82,7 +83,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		ReplyStatus: serialiseReplyStatus(t.ReplyStatus),
 		Likes:       serialiseLikeStatus(&t.Likes),
 		Reacts:      serialiseReactList(t.Reacts),
-		Tags:        t.Tags,
+		Tags:        dt.Map(t.Tags, serialiseTag),
 		Assets:      dt.Map(t.Assets, serialiseAssetPtr),
 		Collections: dt.Map(t.Collections, serialiseCollection),
 		Link:        opt.Map(t.WebLink, serialiseLinkRef).Ptr(),
@@ -113,7 +114,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Recomentations: dt.Map(t.Related, serialiseDatagraphItem),
 		Replies:        dt.Map(t.Replies, serialiseReply),
 		Slug:           t.Slug,
-		Tags:           t.Tags,
+		Tags:           dt.Map(t.Tags, serialiseTag),
 		Title:          t.Title,
 		UpdatedAt:      t.UpdatedAt,
 	}
@@ -281,4 +282,16 @@ func serialiseOptionalFloat(in opt.Optional[float64]) *float32 {
 
 func seraliseOptionalURL(in opt.Optional[url.URL]) *string {
 	return opt.PtrMap(in, func(s url.URL) string { return s.String() })
+}
+
+func serialiseTag(in *tag_ref.Tag) openapi.Tag {
+	return openapi.Tag{
+		Id:     in.ID.String(),
+		Name:   string(in.Name),
+		Colour: in.Colour,
+	}
+}
+
+func deserialiseTagName(in string) tag_ref.Name {
+	return tag_ref.Name(in)
 }
