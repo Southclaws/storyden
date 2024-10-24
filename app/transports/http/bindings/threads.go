@@ -14,6 +14,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -53,7 +54,9 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		meta = *request.Body.Meta
 	}
 
-	tags := opt.NewPtr(request.Body.Tags)
+	tags := opt.Map(opt.NewPtr(request.Body.Tags), func(tags []string) tag_ref.Names {
+		return dt.Map(tags, deserialiseTagName)
+	})
 
 	richContent, err := datagraph.NewRichText(request.Body.Body)
 	if err != nil {
@@ -76,11 +79,11 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		accountID,
 		category.CategoryID(openapi.ParseID(request.Body.Category)),
 		status,
-		tags.OrZero(),
 		meta,
 		thread_service.Partial{
 			Content: opt.New(richContent),
 			URL:     url,
+			Tags:    tags,
 		},
 	)
 	if err != nil {
@@ -98,6 +101,10 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	tags := opt.Map(opt.NewPtr(request.Body.Tags), func(tags []string) tag_ref.Names {
+		return dt.Map(tags, deserialiseTagName)
+	})
+
 	Visibility, err := opt.MapErr(opt.NewPtr(request.Body.Visibility), deserialiseThreadStatus)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -111,7 +118,7 @@ func (i *Threads) ThreadUpdate(ctx context.Context, request openapi.ThreadUpdate
 	thread, err := i.thread_svc.Update(ctx, postID, thread_service.Partial{
 		Title:      opt.NewPtr(request.Body.Title),
 		Content:    richContent,
-		Tags:       opt.NewPtrMap(request.Body.Tags, tagsIDs),
+		Tags:       tags,
 		Category:   opt.NewPtrMap(request.Body.Category, deserialiseID),
 		Visibility: Visibility,
 	})

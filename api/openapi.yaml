@@ -3033,7 +3033,7 @@ components:
     Tag:
       type: object
       description: A tag which can link profiles or threads via interests.
-      required: [id, name]
+      required: [id, name, colour]
       properties:
         id: { $ref: "#/components/schemas/Identifier" }
         name: { $ref: "#/components/schemas/TagName" }
@@ -3047,6 +3047,10 @@ components:
       type: array
       description: A list of tags.
       items: { $ref: "#/components/schemas/Tag" }
+
+    TagNameList:
+      type: array
+      items: { $ref: "#/components/schemas/TagName" }
 
     TagListIDs:
       type: array
@@ -4164,7 +4168,7 @@ components:
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         body: { $ref: "#/components/schemas/PostContent" }
-        tags: { $ref: "#/components/schemas/TagListIDs" }
+        tags: { $ref: "#/components/schemas/TagNameList" }
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
         visibility: { $ref: "#/components/schemas/Visibility" }
@@ -4175,7 +4179,7 @@ components:
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         body: { $ref: "#/components/schemas/PostContent" }
-        tags: { $ref: "#/components/schemas/TagListIDs" }
+        tags: { $ref: "#/components/schemas/TagNameList" }
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
         visibility: { $ref: "#/components/schemas/Visibility" }
@@ -4204,14 +4208,10 @@ components:
         pinned:
           type: boolean
           description: Whether the thread is pinned in this category.
-        tags:
-          type: array
-          items:
-            type: string
-          description: A list of tags associated with the thread.
         reply_status: { $ref: "#/components/schemas/ReplyStatus" }
         category: { $ref: "#/components/schemas/CategoryReference" }
         link: { $ref: "#/components/schemas/LinkReference" }
+        tags: { $ref: "#/components/schemas/TagList" }
 
     ReplyStatus:
       type: object
@@ -4596,7 +4596,7 @@ components:
     NodeCommonProps:
       description: The main properties of a node.
       type: object
-      required: [name, slug, assets, description, owner, visibility, meta]
+      required: [name, slug, assets, description, owner, tags, visibility, meta]
       properties:
         name: { $ref: "#/components/schemas/NodeName" }
         slug: { $ref: "#/components/schemas/NodeSlug" }
@@ -4607,6 +4607,7 @@ components:
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
         parent: { $ref: "#/components/schemas/Node" }
+        tags: { $ref: "#/components/schemas/TagList" }
         visibility: { $ref: "#/components/schemas/Visibility" }
         relevance_score: { $ref: "#/components/schemas/RelevanceScore" }
         meta: { $ref: "#/components/schemas/Metadata" }
@@ -4639,6 +4640,7 @@ components:
         primary_image_asset_id: { $ref: "#/components/schemas/AssetID" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
+        tags: { $ref: "#/components/schemas/TagNameList" }
         visibility: { $ref: "#/components/schemas/Visibility" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
@@ -4656,6 +4658,7 @@ components:
           { $ref: "#/components/schemas/NullableIdentifier" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
+        tags: { $ref: "#/components/schemas/TagNameList" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
     #
