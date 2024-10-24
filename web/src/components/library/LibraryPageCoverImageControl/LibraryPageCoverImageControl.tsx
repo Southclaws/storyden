@@ -2,6 +2,7 @@ import { ImageMinusIcon } from "lucide-react";
 
 import { AssetUploadAction } from "@/components/asset/AssetUploadAction";
 import { Button } from "@/components/ui/button";
+import { HStack } from "@/styled-system/jsx";
 
 import {
   Props,
@@ -16,7 +17,7 @@ export function LibraryPageCoverImageControl(props: Props) {
 
   // TODO: When we add more options to this editing toolbar, group these up.
   return (
-    <>
+    <HStack>
       {hasCoverImage && (
         <Button
           type="button"
@@ -34,6 +35,6 @@ export function LibraryPageCoverImageControl(props: Props) {
         onFinish={handleUploadCoverImage}
         accept={["image/png", "image/jpeg", "image/gif"]}
       />
-    </>
+    </HStack>
   );
 }

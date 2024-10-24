@@ -11,6 +11,7 @@ import { admonition } from "@/recipes/admonition";
 import { badge } from "@/recipes/badge";
 import { button } from "@/recipes/button";
 import { colorPicker } from "@/recipes/color-picker";
+import { combobox } from "@/recipes/combobox";
 import { fileUpload } from "@/recipes/file-upload";
 import { headingInput } from "@/recipes/heading-input";
 import { input } from "@/recipes/input";
@@ -19,6 +20,7 @@ import { popover } from "@/recipes/popover";
 import { richCard } from "@/recipes/rich-card";
 import { select } from "@/recipes/select";
 import { table } from "@/recipes/table";
+import { tagsInput } from "@/recipes/tags-input";
 import { treeView } from "@/recipes/tree-view";
 import { typographyHeading } from "@/recipes/typography-heading";
 
@@ -270,10 +272,12 @@ export default defineConfig({
       slotRecipes: {
         select: select,
         colorPicker: colorPicker,
+        combobox: combobox,
         menu: menu,
         fileUpload: fileUpload,
         popover: popover,
         table: table,
+        tagsInput: tagsInput,
         treeView: treeView,
       },
       semanticTokens,
