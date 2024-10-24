@@ -1,34 +1,78 @@
-'use client'
+"use client";
 
-import { TagsInput } from '@ark-ui/react/tags-input'
-import type { ComponentProps } from 'react'
-import { styled } from 'styled-system/jsx'
-import { tagsInput } from 'styled-system/recipes'
-import { createStyleContext } from '@/utils/create-style-context'
+import type { Assign } from "@ark-ui/react";
+import { TagsInput } from "@ark-ui/react/tags-input";
 
-const { withProvider, withContext } = createStyleContext(tagsInput)
+import { type TagsInputVariantProps, tagsInput } from "@/styled-system/recipes";
+import type { ComponentProps, HTMLStyledProps } from "@/styled-system/types";
+import { createStyleContext } from "@/utils/create-style-context";
 
-export const Root = withProvider(styled(TagsInput.Root), 'root')
-export const ClearTrigger = withContext(styled(TagsInput.ClearTrigger), 'clearTrigger')
-export const Control = withContext(styled(TagsInput.Control), 'control')
-export const Input = withContext(styled(TagsInput.Input), 'input')
-export const Item = withContext(styled(TagsInput.Item), 'item')
-export const ItemDeleteTrigger = withContext(
-  styled(TagsInput.ItemDeleteTrigger),
-  'itemDeleteTrigger',
-)
-export const ItemInput = withContext(styled(TagsInput.ItemInput), 'itemInput')
-export const ItemPreview = withContext(styled(TagsInput.ItemPreview), 'itemPreview')
-export const ItemText = withContext(styled(TagsInput.ItemText), 'itemText')
-export const Label = withContext(styled(TagsInput.Label), 'label')
+const { withProvider, withContext } = createStyleContext(tagsInput);
 
-export interface RootProps extends ComponentProps<typeof Root> {}
-export interface ClearTriggerProps extends ComponentProps<typeof ClearTrigger> {}
-export interface ControlProps extends ComponentProps<typeof Control> {}
-export interface InputProps extends ComponentProps<typeof Input> {}
-export interface ItemProps extends ComponentProps<typeof Item> {}
-export interface ItemDeleteTriggerProps extends ComponentProps<typeof ItemDeleteTrigger> {}
-export interface ItemInputProps extends ComponentProps<typeof ItemInput> {}
-export interface ItemPreviewProps extends ComponentProps<typeof ItemPreview> {}
-export interface ItemTextProps extends ComponentProps<typeof ItemText> {}
-export interface LabelProps extends ComponentProps<typeof Label> {}
+export type RootProviderProps = ComponentProps<typeof RootProvider>;
+export const RootProvider = withProvider<
+  HTMLDivElement,
+  Assign<
+    Assign<HTMLStyledProps<"div">, TagsInput.RootProviderBaseProps>,
+    TagsInputVariantProps
+  >
+>(TagsInput.RootProvider, "root");
+
+export type RootProps = ComponentProps<typeof Root>;
+export const Root = withProvider<
+  HTMLDivElement,
+  Assign<
+    Assign<HTMLStyledProps<"div">, TagsInput.RootBaseProps>,
+    TagsInputVariantProps
+  >
+>(TagsInput.Root, "root");
+
+export const ClearTrigger = withContext<
+  HTMLButtonElement,
+  Assign<HTMLStyledProps<"button">, TagsInput.ClearTriggerBaseProps>
+>(TagsInput.ClearTrigger, "clearTrigger");
+
+export const Control = withContext<
+  HTMLDivElement,
+  Assign<HTMLStyledProps<"div">, TagsInput.ControlBaseProps>
+>(TagsInput.Control, "control");
+
+export const Input = withContext<
+  HTMLInputElement,
+  Assign<HTMLStyledProps<"input">, TagsInput.InputBaseProps>
+>(TagsInput.Input, "input");
+
+export const ItemDeleteTrigger = withContext<
+  HTMLButtonElement,
+  Assign<HTMLStyledProps<"button">, TagsInput.ItemDeleteTriggerBaseProps>
+>(TagsInput.ItemDeleteTrigger, "itemDeleteTrigger");
+
+export const ItemInput = withContext<
+  HTMLInputElement,
+  Assign<HTMLStyledProps<"input">, TagsInput.ItemInputBaseProps>
+>(TagsInput.ItemInput, "itemInput");
+
+export const ItemPreview = withContext<
+  HTMLDivElement,
+  Assign<HTMLStyledProps<"div">, TagsInput.ItemPreviewBaseProps>
+>(TagsInput.ItemPreview, "itemPreview");
+
+export const Item = withContext<
+  HTMLDivElement,
+  Assign<HTMLStyledProps<"div">, TagsInput.ItemBaseProps>
+>(TagsInput.Item, "item");
+
+export const ItemText = withContext<
+  HTMLSpanElement,
+  Assign<HTMLStyledProps<"span">, TagsInput.ItemTextBaseProps>
+>(TagsInput.ItemText, "itemText");
+
+export const Label = withContext<
+  HTMLLabelElement,
+  Assign<HTMLStyledProps<"label">, TagsInput.LabelBaseProps>
+>(TagsInput.Label, "label");
+
+export {
+  TagsInputContext as Context,
+  TagsInputHiddenInput as HiddenInput,
+} from "@ark-ui/react/tags-input";
