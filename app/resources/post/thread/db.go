@@ -43,14 +43,8 @@ func (d *database) Create(
 	title string,
 	authorID account.AccountID,
 	categoryID category.CategoryID,
-	tags []string,
 	opts ...Option,
 ) (*Thread, error) {
-	// tagset, err := d.createTags(ctx, tags)
-	// if err != nil {
-	// 	return nil, fault.Wrap(err, "failed to upsert tags for linking to post")
-	// }
-
 	cat, err := d.db.Category.Get(ctx, xid.ID(categoryID))
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -117,25 +111,6 @@ func (d *database) Create(
 
 	return FromModel(nil, nil)(p)
 }
-
-// func (d *database) createTags(ctx context.Context, tags []string) ([]db.TagWhereParam, error) {
-// 	setters := []db.TagWhereParam{}
-// 	for _, tag := range tags {
-// 		if len(tag) > 24 {
-// 			return nil, post.ErrTagNameTooLong
-// 		}
-// 		_, err := d.db.Tag.
-// 			UpsertOne(db.Tag.Name.Equals(tag)).
-// 			Update().
-// 			Create(db.Tag.Name.Set(tag)).
-// 			Exec(ctx)
-// 		if err != nil {
-// 			return nil, fault.Wrap(err, "failed to upsert tag")
-// 		}
-// 		setters = append(setters, db.Tag.Name.Equals(tag))
-// 	}
-// 	return setters, nil
-// }
 
 func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thread, error) {
 	update := d.db.Post.UpdateOneID(xid.ID(id))

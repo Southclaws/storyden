@@ -58,6 +58,10 @@ func serialiseDatagraphItem(v datagraph.Item) openapi.DatagraphItem {
 	}
 }
 
+func serialiseDatagraphItemList(in datagraph.ItemList) openapi.DatagraphItemList {
+	return dt.Map(in, serialiseDatagraphItem)
+}
+
 func serialiseDatagraphKind(in datagraph.Kind) openapi.DatagraphItemKind {
 	switch in {
 	case datagraph.KindPost:

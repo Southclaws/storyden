@@ -7,20 +7,9 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { Identifier } from "./identifier";
-import type { Metadata } from "./metadata";
-import type { PostContent } from "./postContent";
-import type { TagNameList } from "./tagNameList";
-import type { ThreadTitle } from "./threadTitle";
-import type { Url } from "./url";
-import type { Visibility } from "./visibility";
+import type { Tag } from "./tag";
 
-export interface ThreadInitialProps {
-  body: PostContent;
-  category: Identifier;
-  meta?: Metadata;
-  tags?: TagNameList;
-  title: ThreadTitle;
-  url?: Url;
-  visibility: Visibility;
-}
+/**
+ * OK
+ */
+export type TagGetOKResponse = Tag;

@@ -234,6 +234,14 @@ func (m *Mapping) CategoryUpdate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageCategories
 }
 
+func (m *Mapping) TagList() (bool, *rbac.Permission) {
+	return false, nil
+}
+
+func (m *Mapping) TagGet() (bool, *rbac.Permission) {
+	return false, nil
+}
+
 func (m *Mapping) ThreadCreate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionCreatePost
 }

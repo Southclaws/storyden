@@ -7,14 +7,15 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { Identifier } from "./identifier";
-import type { TagName } from "./tagName";
+import type { TagProps } from "./tagProps";
+import type { TagReferenceProps } from "./tagReferenceProps";
 
 /**
- * A tag which can link profiles or threads via interests.
+ * A tag is a label that can be applied to posts or pages to organise 
+related content. They can be used to filter and search for content.
+The Tag schema provides all the data for a tag including its items, so
+it's quite a heavy object if referencing a lot of items. For a lighter
+weight version, use a TagReference for use-cases such as tag searches.
+
  */
-export interface Tag {
-  colour?: string;
-  id: Identifier;
-  name: TagName;
-}
+export type Tag = TagReferenceProps & TagProps;

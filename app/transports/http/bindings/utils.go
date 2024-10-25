@@ -82,7 +82,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		ReplyStatus: serialiseReplyStatus(t.ReplyStatus),
 		Likes:       serialiseLikeStatus(&t.Likes),
 		Reacts:      serialiseReactList(t.Reacts),
-		Tags:        t.Tags,
+		Tags:        serialiseTagReferenceList(t.Tags),
 		Assets:      dt.Map(t.Assets, serialiseAssetPtr),
 		Collections: dt.Map(t.Collections, serialiseCollection),
 		Link:        opt.Map(t.WebLink, serialiseLinkRef).Ptr(),
@@ -113,7 +113,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Recomentations: dt.Map(t.Related, serialiseDatagraphItem),
 		Replies:        dt.Map(t.Replies, serialiseReply),
 		Slug:           t.Slug,
-		Tags:           t.Tags,
+		Tags:           serialiseTagReferenceList(t.Tags),
 		Title:          t.Title,
 		UpdatedAt:      t.UpdatedAt,
 	}
@@ -235,10 +235,6 @@ func serialiseCategoryReference(c *category.Category) openapi.CategoryReference 
 
 func deserialiseID(t openapi.Identifier) xid.ID {
 	return openapi.ParseID(t)
-}
-
-func tagsIDs(i openapi.TagListIDs) []xid.ID {
-	return dt.Map(i, deserialiseID)
 }
 
 func deserialiseVisibility(in openapi.Visibility) (visibility.Visibility, error) {

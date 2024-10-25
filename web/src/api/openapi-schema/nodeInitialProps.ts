@@ -14,6 +14,7 @@ import type { Metadata } from "./metadata";
 import type { NodeName } from "./nodeName";
 import type { PostContent } from "./postContent";
 import type { Slug } from "./slug";
+import type { TagNameList } from "./tagNameList";
 import type { Url } from "./url";
 import type { Visibility } from "./visibility";
 
@@ -26,6 +27,7 @@ export interface NodeInitialProps {
   parent?: Slug;
   primary_image_asset_id?: Identifier;
   slug?: Slug;
+  tags?: TagNameList;
   url?: Url;
   visibility?: Visibility;
 }

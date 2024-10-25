@@ -58,6 +58,8 @@ tags:
     description: Public profiles.
   - name: categories
     description: Thread categories.
+  - name: tags
+    description: Organisational tags for discussion posts and library nodes.
   - name: posts
     description: Any operations for any kind of Post resource.
   - name: threads
@@ -976,6 +978,42 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CategoryUpdateOK" }
+
+  #
+  # 888
+  # 888
+  # 888
+  # 888888  8888b.   .d88b.  .d8888b
+  # 888        "88b d88P"88b 88K
+  # 888    .d888888 888  888 "Y8888b.
+  # Y88b.  888  888 Y88b 888      X88
+  #  "Y888 "Y888888  "Y88888  88888P'
+  #                      888
+  #                 Y8b d88P
+  #                  "Y88P"
+  #
+
+  /tags:
+    get:
+      operationId: TagList
+      description: Get a list of all tags on the site.
+      tags: [tags]
+      security: []
+      parameters: [$ref: "#/components/parameters/SearchQuery"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/TagListOK" }
+
+  /tags/{tag_name}:
+    get:
+      operationId: TagGet
+      description: Get information about a tag.
+      tags: [tags]
+      parameters: [{ $ref: "#/components/parameters/TagNameParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/TagGetOK" }
 
   #
   # 888    888                                    888
@@ -2005,6 +2043,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    TagNameParam:
+      description: Tag name.
+      name: tag_name
+      in: path
+      required: true
+      schema:
+        type: string
+
     CollectionIDParam:
       description: Unique collection ID.
       name: collection_id
@@ -2538,6 +2584,20 @@ components:
           schema:
             $ref: "#/components/schemas/CategoryList"
 
+    TagListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TagListResult"
+
+    TagGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Tag"
+
     ThreadCreateOK:
       description: Thread created.
       content:
@@ -3029,29 +3089,6 @@ components:
       type: string
       description: The title of a thread.
       example: Hello world!
-
-    Tag:
-      type: object
-      description: A tag which can link profiles or threads via interests.
-      required: [id, name]
-      properties:
-        id: { $ref: "#/components/schemas/Identifier" }
-        name: { $ref: "#/components/schemas/TagName" }
-        colour: { type: string }
-
-    TagName:
-      type: string
-      description: The name of a tag.
-
-    TagList:
-      type: array
-      description: A list of tags.
-      items: { $ref: "#/components/schemas/Tag" }
-
-    TagListIDs:
-      type: array
-      description: A list of tags IDs.
-      items: { $ref: "#/components/schemas/Identifier" }
 
     PostContent:
       description: |
@@ -3638,7 +3675,7 @@ components:
         bio:
           $ref: "#/components/schemas/AccountBio"
         interests:
-          $ref: "#/components/schemas/TagList"
+          $ref: "#/components/schemas/TagReferenceList"
         links:
           $ref: "#/components/schemas/ProfileExternalLinkList"
         meta:
@@ -3664,7 +3701,7 @@ components:
         bio:
           $ref: "#/components/schemas/AccountBio"
         interests:
-          $ref: "#/components/schemas/TagListIDs"
+          $ref: "#/components/schemas/TagNameList"
         links:
           $ref: "#/components/schemas/ProfileExternalLinkList"
         meta:
@@ -3880,7 +3917,7 @@ components:
             like_score:
               $ref: "#/components/schemas/LikeScore"
             interests:
-              $ref: "#/components/schemas/TagList"
+              $ref: "#/components/schemas/TagReferenceList"
             links:
               $ref: "#/components/schemas/ProfileExternalLinkList"
             invited_by:
@@ -4054,6 +4091,87 @@ components:
       items: { $ref: "#/components/schemas/Identifier" }
 
     #
+    # 88888888888
+    #     888
+    #     888
+    #     888   8888b.   .d88b.
+    #     888      "88b d88P"88b
+    #     888  .d888888 888  888
+    #     888  888  888 Y88b 888
+    #     888  "Y888888  "Y88888
+    #                        888
+    #                   Y8b d88P
+    #                    "Y88P"
+    #
+
+    Tag:
+      type: object
+      description: |
+        A tag is a label that can be applied to posts or pages to organise 
+        related content. They can be used to filter and search for content.
+        The Tag schema provides all the data for a tag including its items, so
+        it's quite a heavy object if referencing a lot of items. For a lighter
+        weight version, use a TagReference for use-cases such as tag searches.
+      allOf:
+        - $ref: "#/components/schemas/TagReferenceProps"
+        - $ref: "#/components/schemas/TagProps"
+
+    TagReference:
+      description: |
+        A minimal representation of a tag for use in most contexts where you
+        don't need the full list of items associated with the tag.
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/TagReferenceProps"
+
+    TagProps:
+      type: object
+      required: [id, items]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        items: { $ref: "#/components/schemas/DatagraphItemList" }
+
+    TagReferenceProps:
+      type: object
+      required: [name, colour, item_count]
+      properties:
+        name: { $ref: "#/components/schemas/TagName" }
+        colour: { $ref: "#/components/schemas/TagColour" }
+        item_count: { $ref: "#/components/schemas/TagItemCount" }
+
+    TagName:
+      type: string
+      description: The name of a tag.
+
+    TagColour:
+      type: string
+      description: The colour of a tag.
+
+    TagItemCount:
+      type: integer
+      description: The number of items tagged with this tag.
+
+    TagReferenceList:
+      type: array
+      description: A list of tags.
+      items: { $ref: "#/components/schemas/TagReference" }
+
+    TagNameList:
+      type: array
+      items: { $ref: "#/components/schemas/TagName" }
+
+    TagListIDs:
+      type: array
+      description: A list of tags IDs.
+      items: { $ref: "#/components/schemas/Identifier" }
+
+    TagListResult:
+      type: object
+      required: [tags]
+      properties:
+        tags: { $ref: "#/components/schemas/TagReferenceList" }
+
+    #
     # 8888888b.                   888
     # 888   Y88b                  888
     # 888    888                  888
@@ -4164,7 +4282,7 @@ components:
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         body: { $ref: "#/components/schemas/PostContent" }
-        tags: { $ref: "#/components/schemas/TagListIDs" }
+        tags: { $ref: "#/components/schemas/TagNameList" }
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
         visibility: { $ref: "#/components/schemas/Visibility" }
@@ -4175,7 +4293,7 @@ components:
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         body: { $ref: "#/components/schemas/PostContent" }
-        tags: { $ref: "#/components/schemas/TagListIDs" }
+        tags: { $ref: "#/components/schemas/TagNameList" }
         meta: { $ref: "#/components/schemas/Metadata" }
         category: { $ref: "#/components/schemas/Identifier" }
         visibility: { $ref: "#/components/schemas/Visibility" }
@@ -4204,14 +4322,10 @@ components:
         pinned:
           type: boolean
           description: Whether the thread is pinned in this category.
-        tags:
-          type: array
-          items:
-            type: string
-          description: A list of tags associated with the thread.
         reply_status: { $ref: "#/components/schemas/ReplyStatus" }
         category: { $ref: "#/components/schemas/CategoryReference" }
         link: { $ref: "#/components/schemas/LinkReference" }
+        tags: { $ref: "#/components/schemas/TagReferenceList" }
 
     ReplyStatus:
       type: object
@@ -4596,7 +4710,7 @@ components:
     NodeCommonProps:
       description: The main properties of a node.
       type: object
-      required: [name, slug, assets, description, owner, visibility, meta]
+      required: [name, slug, assets, description, owner, tags, visibility, meta]
       properties:
         name: { $ref: "#/components/schemas/NodeName" }
         slug: { $ref: "#/components/schemas/NodeSlug" }
@@ -4607,6 +4721,7 @@ components:
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
         parent: { $ref: "#/components/schemas/Node" }
+        tags: { $ref: "#/components/schemas/TagReferenceList" }
         visibility: { $ref: "#/components/schemas/Visibility" }
         relevance_score: { $ref: "#/components/schemas/RelevanceScore" }
         meta: { $ref: "#/components/schemas/Metadata" }
@@ -4639,6 +4754,7 @@ components:
         primary_image_asset_id: { $ref: "#/components/schemas/AssetID" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
+        tags: { $ref: "#/components/schemas/TagNameList" }
         visibility: { $ref: "#/components/schemas/Visibility" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
@@ -4656,6 +4772,7 @@ components:
           { $ref: "#/components/schemas/NullableIdentifier" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
+        tags: { $ref: "#/components/schemas/TagNameList" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
     #
