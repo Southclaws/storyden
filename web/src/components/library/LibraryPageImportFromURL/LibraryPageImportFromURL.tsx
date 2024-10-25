@@ -33,6 +33,7 @@ function useLibraryPageImportFromURL({ node, onImport }: Props) {
   async function handleURL(s: string) {
     if (s === "") {
       setLink(null);
+      return;
     }
 
     await handle(async () => {
