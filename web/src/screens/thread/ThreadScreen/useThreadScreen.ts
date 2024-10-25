@@ -16,11 +16,16 @@ export type Props = {
 export const FormSchema = z.object({
   title: z.string().min(1, "Please enter a title."),
   body: z.string().min(1),
+  tags: z.array(z.string()),
 });
 export type Form = z.infer<typeof FormSchema>;
 
 export function useThreadScreen({ slug, thread }: Props) {
-  const [editing, setEditing] = useQueryState("edit", parseAsBoolean);
+  const [editing, setEditing] = useQueryState("edit", {
+    ...parseAsBoolean,
+    defaultValue: false,
+    clearOnDefault: true,
+  });
   const [resetKey, setResetKey] = useState("");
   const [isEmpty, setEmpty] = useState(true);
 
@@ -56,7 +61,11 @@ export function useThreadScreen({ slug, thread }: Props) {
 
   function handleDiscardChanges() {
     // TODO: useConfirmation
-    form.reset(thread);
+    form.reset({
+      title: thread.title,
+      body: thread.body,
+      tags: thread.tags.map((t) => t.name),
+    });
     setEditing(false);
     setResetKey(Date.now().toString());
   }
