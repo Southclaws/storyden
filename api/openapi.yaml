@@ -58,6 +58,8 @@ tags:
     description: Public profiles.
   - name: categories
     description: Thread categories.
+  - name: tags
+    description: Organisational tags for discussion posts and library nodes.
   - name: posts
     description: Any operations for any kind of Post resource.
   - name: threads
@@ -976,6 +978,31 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CategoryUpdateOK" }
+
+  #
+  # 888
+  # 888
+  # 888
+  # 888888  8888b.   .d88b.  .d8888b
+  # 888        "88b d88P"88b 88K
+  # 888    .d888888 888  888 "Y8888b.
+  # Y88b.  888  888 Y88b 888      X88
+  #  "Y888 "Y888888  "Y88888  88888P'
+  #                      888
+  #                 Y8b d88P
+  #                  "Y88P"
+  #
+
+  /tags:
+    get:
+      operationId: TagList
+      description: Get a list of all tags on the site.
+      tags: [tags]
+      security: []
+      parameters: [$ref: "#/components/parameters/SearchQuery"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/TagListOK" }
 
   #
   # 888    888                                    888
@@ -2538,6 +2565,13 @@ components:
           schema:
             $ref: "#/components/schemas/CategoryList"
 
+    TagListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TagListResult"
+
     ThreadCreateOK:
       description: Thread created.
       content:
@@ -3056,6 +3090,12 @@ components:
       type: array
       description: A list of tags IDs.
       items: { $ref: "#/components/schemas/Identifier" }
+
+    TagListResult:
+      type: object
+      required: [tags]
+      properties:
+        tags: { $ref: "#/components/schemas/TagList" }
 
     PostContent:
       description: |
