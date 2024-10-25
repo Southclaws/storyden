@@ -10,6 +10,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { Tag } from "./tag";
 
 /**
- * A list of tags.
+ * OK
  */
-export type TagList = Tag[];
+export type TagGetOKResponse = Tag;

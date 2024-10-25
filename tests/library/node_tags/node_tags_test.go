@@ -166,9 +166,9 @@ func un(n string) string {
 	return n + " " + xid.New().String()
 }
 
-func find(tags []openapi.Tag) func(string) bool {
+func find(tags []openapi.TagReference) func(string) bool {
 	return func(n string) bool {
-		_, ok := lo.Find(tags, func(t openapi.Tag) bool { return t.Name == n })
+		_, ok := lo.Find(tags, func(t openapi.TagReference) bool { return t.Name == n })
 		return ok
 	}
 }

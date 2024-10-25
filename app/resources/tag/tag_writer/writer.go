@@ -42,7 +42,7 @@ func (w *Writer) Add(ctx context.Context, names ...tag_ref.Name) ([]*tag_ref.Tag
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	tags := dt.Map(r, tag_ref.Map)
+	tags := dt.Map(r, tag_ref.Map(nil))
 
 	return tags, nil
 }

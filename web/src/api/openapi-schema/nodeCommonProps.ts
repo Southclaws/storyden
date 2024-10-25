@@ -18,7 +18,7 @@ import type { PostContent } from "./postContent";
 import type { ProfileReference } from "./profileReference";
 import type { RelevanceScore } from "./relevanceScore";
 import type { Slug } from "./slug";
-import type { TagList } from "./tagList";
+import type { TagReferenceList } from "./tagReferenceList";
 import type { Visibility } from "./visibility";
 
 /**
@@ -36,6 +36,6 @@ export interface NodeCommonProps {
   primary_image?: Asset;
   relevance_score?: RelevanceScore;
   slug: Slug;
-  tags: TagList;
+  tags: TagReferenceList;
   visibility: Visibility;
 }

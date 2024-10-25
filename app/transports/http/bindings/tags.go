@@ -6,7 +6,9 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_querier"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -34,11 +36,52 @@ func (h Tags) TagList(ctx context.Context, request openapi.TagListRequestObject)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	tags := dt.Map(list, serialiseTag)
-
 	return openapi.TagList200JSONResponse{
 		TagListOKJSONResponse: openapi.TagListOKJSONResponse{
-			Tags: tags,
+			Tags: serialiseTagReferenceList(list),
 		},
 	}, nil
+}
+
+func (h Tags) TagGet(ctx context.Context, request openapi.TagGetRequestObject) (openapi.TagGetResponseObject, error) {
+	name := tag_ref.Name(request.TagName)
+
+	tag, err := h.tagQuerier.Get(ctx, name)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.TagGet200JSONResponse{
+		TagGetOKJSONResponse: openapi.TagGetOKJSONResponse(serialiseTag(tag)),
+	}, nil
+}
+
+func serialiseTag(in *tag.Tag) openapi.Tag {
+	return openapi.Tag{
+		Id:        in.ID.String(),
+		Name:      string(in.Name),
+		Colour:    in.Colour,
+		ItemCount: in.ItemCount,
+		Items:     serialiseDatagraphItemList(in.Items),
+	}
+}
+
+func serialiseTagReference(in *tag_ref.Tag) openapi.TagReference {
+	return openapi.TagReference{
+		Name:      string(in.Name),
+		Colour:    in.Colour,
+		ItemCount: in.ItemCount,
+	}
+}
+
+func serialiseTagReferenceList(in tag_ref.Tags) []openapi.TagReference {
+	return dt.Map(in, serialiseTagReference)
+}
+
+func deserialiseTagName(in string) tag_ref.Name {
+	return tag_ref.Name(in)
+}
+
+func tagsIDs(i openapi.TagListIDs) []xid.ID {
+	return dt.Map(i, deserialiseID)
 }
