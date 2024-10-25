@@ -48,6 +48,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       title: data.title ?? "",
       body: data.body ?? "",
       url: data.url ?? "",
+      tags: data.tags ?? [],
 
       visibility: Visibility.draft,
     };
@@ -61,7 +62,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
     }
   };
 
-  const doPublish = async ({ title, body, category, url }: FormShape) => {
+  const doPublish = async ({ title, body, category, tags, url }: FormShape) => {
     if (title.length < 1) {
       formContext.setError("title", {
         message: "Your post must have a title to be published",
@@ -75,7 +76,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
         body,
         category,
         visibility: Visibility.published,
-        tags: [],
+        tags,
         url,
       });
       router.push(`/t/${slug}`);
@@ -85,7 +86,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
         body,
         category,
         visibility: Visibility.published,
-        tags: [],
+        tags,
         url,
       });
       router.push(`/t/${slug}`);

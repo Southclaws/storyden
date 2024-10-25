@@ -22,7 +22,7 @@ export function CategorySelect() {
   if (!categories) return <Unready error={error} />;
 
   return (
-    <FormControl>
+    <FormControl w="min">
       <Controller
         render={() => (
           <styled.select

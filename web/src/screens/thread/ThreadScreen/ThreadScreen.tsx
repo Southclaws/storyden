@@ -11,10 +11,12 @@ import { Byline } from "@/components/content/Byline";
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { SaveAction } from "@/components/site/Action/Save";
+import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { Breadcrumbs } from "@/components/thread/Breadcrumbs";
 import { ReplyBox } from "@/components/thread/ReplyBox/ReplyBox";
 import { ReplyList } from "@/components/thread/ReplyList/ReplyList";
 import { ThreadMenu } from "@/components/thread/ThreadMenu/ThreadMenu";
+import { TagListField, ThreadTagList } from "@/components/thread/ThreadTagList";
 import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Heading } from "@/components/ui/heading";
 import { HeadingInput } from "@/components/ui/heading-input";
@@ -79,6 +81,16 @@ export function ThreadScreen(props: Props) {
           <Heading fontSize="heading.variable.1" fontWeight="bold">
             {thread.title}
           </Heading>
+        )}
+
+        {isEditing ? (
+          <TagListField
+            name="tags"
+            control={form.control}
+            initialTags={thread.tags}
+          />
+        ) : (
+          <TagBadgeList tags={thread.tags} />
         )}
 
         <ThreadBodyInput
