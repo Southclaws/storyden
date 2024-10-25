@@ -14,6 +14,7 @@ import { LibraryPageAssetList } from "@/components/library/LibraryPageAssetList/
 import { LibraryPageCoverImageControl } from "@/components/library/LibraryPageCoverImageControl/LibraryPageCoverImageControl";
 import { LibraryPageImportFromURL } from "@/components/library/LibraryPageImportFromURL/LibraryPageImportFromURL";
 import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
+import { LibraryPageTagsList } from "@/components/library/LibraryPageTagsList/LibraryPageTagsList";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
@@ -184,6 +185,8 @@ export function LibraryPage(props: Props) {
               </HStack>
             </LStack>
           </LStack>
+
+          <LibraryPageTagsList editing={editing} node={node} />
 
           <LStack gap="2">
             <HStack w="full">

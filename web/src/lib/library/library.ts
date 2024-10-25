@@ -25,6 +25,7 @@ import {
   NodeListParams,
   NodeMutableProps,
   NodeWithChildren,
+  TagReference,
   Visibility,
 } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
@@ -64,14 +65,15 @@ export type CoverImageArgs =
       isReplacement: true;
     };
 
-export function useLibraryMutation(params?: NodeListParams) {
+// TODO: Remove slug params from API calls and use the node object instead.
+export function useLibraryMutation(node?: Node) {
   const session = useSession();
   const { mutate } = useSWRConfig();
   const router = useRouter();
   const libraryPath = useLibraryPath();
 
   // for revalidating all node list queries (published and private)
-  const nodeListKey = getNodeListKey(params);
+  const nodeListKey = getNodeListKey();
   const nodeListAllKeyFn = (key: Arguments) => {
     return (
       Array.isArray(key) &&
@@ -89,6 +91,14 @@ export function useLibraryMutation(params?: NodeListParams) {
   const nodeListPrivateKeyFn = (key: Arguments) => {
     return dequal(key, nodeListPrivateKey);
   };
+
+  // For revalidating one specific node.
+  const nodeKey = node && getNodeGetKey(node.slug);
+  const nodeKeyFn =
+    node &&
+    ((key: Arguments) => {
+      return Array.isArray(key) && key[0].startsWith(nodeKey);
+    });
 
   const createNode = async ({ initialName, parentSlug }: CreateNodeArgs) => {
     if (!session) return;
@@ -115,6 +125,7 @@ export function useLibraryMutation(params?: NodeListParams) {
       meta: {},
       children: [],
       assets: [],
+      tags: [],
       visibility: "draft",
       recomentations: [],
     };
@@ -148,10 +159,23 @@ export function useLibraryMutation(params?: NodeListParams) {
 
       const withNewCover = cover?.asset && mergePrimaryImageAsset(data, cover);
 
+      const withTags = {
+        tags:
+          newNode.tags?.map(
+            (t) =>
+              ({
+                name: t,
+                colour: "white",
+                item_count: 1,
+              }) satisfies TagReference,
+          ) ?? [],
+      };
+
       const updated = {
         ...data,
         ...nodeProps,
         ...withNewCover,
+        ...withTags,
       } satisfies NodeWithChildren;
 
       return updated;
@@ -173,11 +197,6 @@ export function useLibraryMutation(params?: NodeListParams) {
         ...data,
         nodes: newNodes,
       };
-    };
-
-    const nodeKey = getNodeGetKey(slug);
-    const nodeKeyFn = (key: Arguments) => {
-      return Array.isArray(key) && key[0].startsWith(nodeKey);
     };
 
     const slugChanged = newNode.slug !== undefined && newNode.slug !== slug;
@@ -346,6 +365,9 @@ export function useLibraryMutation(params?: NodeListParams) {
 
   const revalidate = async (data?: MutatorCallback<NodeListOKResponse>) => {
     await mutate(nodeListAllKeyFn, data);
+    if (node) {
+      await mutate(nodeKeyFn);
+    }
   };
 
   return {

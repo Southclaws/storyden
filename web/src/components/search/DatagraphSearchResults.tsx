@@ -42,7 +42,6 @@ export function DatagraphResultItem(props: DatagraphItem) {
         </Flex>
 
         <styled.p lineClamp={3}>{props.description}</styled.p>
-        <styled.p lineClamp={3}>{props.kind}</styled.p>
       </FeedItem>
     </Box>
   );

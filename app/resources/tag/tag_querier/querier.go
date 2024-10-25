@@ -23,17 +23,6 @@ func New(db *ent.Client, raw *sqlx.DB) *Querier {
 	return &Querier{db, raw}
 }
 
-func (q *Querier) List(ctx context.Context) (tag_ref.Tags, error) {
-	r, err := q.db.Tag.Query().All(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	tags := dt.Map(r, tag_ref.Map(nil))
-
-	return tags, nil
-}
-
 const tagItemsCountManyQuery = `select
   t.id tag_id,                              -- tag ID
   count(tp.tag_id) + count(tn.tag_id) items -- number of items,
@@ -44,6 +33,23 @@ from
 group by
   t.id
 `
+
+func (q *Querier) List(ctx context.Context) (tag_ref.Tags, error) {
+	r, err := q.db.Tag.Query().All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	var counts tag_ref.TagItemsResults
+	err = q.raw.SelectContext(ctx, &counts, tagItemsCountManyQuery)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	tags := dt.Map(r, tag_ref.Map(counts))
+
+	return tags, nil
+}
 
 func (q *Querier) Search(ctx context.Context, query string) (tag_ref.Tags, error) {
 	r, err := q.db.Tag.Query().
