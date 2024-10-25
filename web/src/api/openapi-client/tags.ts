@@ -13,6 +13,8 @@ import type { Key, SWRConfiguration } from "swr";
 import { fetcher } from "../client";
 import type {
   InternalServerErrorResponse,
+  NotFoundResponse,
+  TagGetOKResponse,
   TagListOKResponse,
   TagListParams,
 } from "../openapi-schema";
@@ -47,6 +49,47 @@ export const useTagList = <TError = InternalServerErrorResponse>(
   const swrKey =
     swrOptions?.swrKey ?? (() => (isEnabled ? getTagListKey(params) : null));
   const swrFn = () => tagList(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Get information about a tag.
+ */
+export const tagGet = (tagName: string) => {
+  return fetcher<TagGetOKResponse>({ url: `/tags/${tagName}`, method: "GET" });
+};
+
+export const getTagGetKey = (tagName: string) => [`/tags/${tagName}`] as const;
+
+export type TagGetQueryResult = NonNullable<Awaited<ReturnType<typeof tagGet>>>;
+export type TagGetQueryError = NotFoundResponse | InternalServerErrorResponse;
+
+export const useTagGet = <
+  TError = NotFoundResponse | InternalServerErrorResponse,
+>(
+  tagName: string,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof tagGet>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!tagName;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getTagGetKey(tagName) : null));
+  const swrFn = () => tagGet(tagName);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

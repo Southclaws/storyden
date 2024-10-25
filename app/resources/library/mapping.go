@@ -38,7 +38,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 	}
 
 	tagsEdge := c.Edges.Tags
-	tags := dt.Map(tagsEdge, tag_ref.Map)
+	tags := dt.Map(tagsEdge, tag_ref.Map(nil))
 
 	nodes, err := dt.MapErr(c.Edges.Nodes, NodeFromModel)
 	if err != nil {

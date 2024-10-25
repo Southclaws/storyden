@@ -58,7 +58,7 @@ func ProfileFromModel(a *ent.Account) (*Public, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	interests := dt.Map(a.Edges.Tags, tag_ref.Map)
+	interests := dt.Map(a.Edges.Tags, tag_ref.Map(nil))
 
 	bio, err := datagraph.NewRichText(a.Bio)
 	if err != nil {

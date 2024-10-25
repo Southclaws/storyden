@@ -7,8 +7,11 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { TagReferenceList } from "./tagReferenceList";
+import type { TagReferenceProps } from "./tagReferenceProps";
 
-export interface TagListResult {
-  tags: TagReferenceList;
-}
+/**
+ * A minimal representation of a tag for use in most contexts where you
+don't need the full list of items associated with the tag.
+
+ */
+export type TagReference = TagReferenceProps;

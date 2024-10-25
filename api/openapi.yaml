@@ -1004,6 +1004,17 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/TagListOK" }
 
+  /tags/{tag_name}:
+    get:
+      operationId: TagGet
+      description: Get information about a tag.
+      tags: [tags]
+      parameters: [{ $ref: "#/components/parameters/TagNameParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/TagGetOK" }
+
   #
   # 888    888                                    888
   # 888    888                                    888
@@ -2032,6 +2043,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    TagNameParam:
+      description: Tag name.
+      name: tag_name
+      in: path
+      required: true
+      schema:
+        type: string
+
     CollectionIDParam:
       description: Unique collection ID.
       name: collection_id
@@ -2572,6 +2591,13 @@ components:
           schema:
             $ref: "#/components/schemas/TagListResult"
 
+    TagGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Tag"
+
     ThreadCreateOK:
       description: Thread created.
       content:
@@ -3063,39 +3089,6 @@ components:
       type: string
       description: The title of a thread.
       example: Hello world!
-
-    Tag:
-      type: object
-      description: A tag which can link profiles or threads via interests.
-      required: [id, name, colour]
-      properties:
-        id: { $ref: "#/components/schemas/Identifier" }
-        name: { $ref: "#/components/schemas/TagName" }
-        colour: { type: string }
-
-    TagName:
-      type: string
-      description: The name of a tag.
-
-    TagList:
-      type: array
-      description: A list of tags.
-      items: { $ref: "#/components/schemas/Tag" }
-
-    TagNameList:
-      type: array
-      items: { $ref: "#/components/schemas/TagName" }
-
-    TagListIDs:
-      type: array
-      description: A list of tags IDs.
-      items: { $ref: "#/components/schemas/Identifier" }
-
-    TagListResult:
-      type: object
-      required: [tags]
-      properties:
-        tags: { $ref: "#/components/schemas/TagList" }
 
     PostContent:
       description: |
@@ -3682,7 +3675,7 @@ components:
         bio:
           $ref: "#/components/schemas/AccountBio"
         interests:
-          $ref: "#/components/schemas/TagList"
+          $ref: "#/components/schemas/TagReferenceList"
         links:
           $ref: "#/components/schemas/ProfileExternalLinkList"
         meta:
@@ -3708,7 +3701,7 @@ components:
         bio:
           $ref: "#/components/schemas/AccountBio"
         interests:
-          $ref: "#/components/schemas/TagListIDs"
+          $ref: "#/components/schemas/TagNameList"
         links:
           $ref: "#/components/schemas/ProfileExternalLinkList"
         meta:
@@ -3924,7 +3917,7 @@ components:
             like_score:
               $ref: "#/components/schemas/LikeScore"
             interests:
-              $ref: "#/components/schemas/TagList"
+              $ref: "#/components/schemas/TagReferenceList"
             links:
               $ref: "#/components/schemas/ProfileExternalLinkList"
             invited_by:
@@ -4098,6 +4091,87 @@ components:
       items: { $ref: "#/components/schemas/Identifier" }
 
     #
+    # 88888888888
+    #     888
+    #     888
+    #     888   8888b.   .d88b.
+    #     888      "88b d88P"88b
+    #     888  .d888888 888  888
+    #     888  888  888 Y88b 888
+    #     888  "Y888888  "Y88888
+    #                        888
+    #                   Y8b d88P
+    #                    "Y88P"
+    #
+
+    Tag:
+      type: object
+      description: |
+        A tag is a label that can be applied to posts or pages to organise 
+        related content. They can be used to filter and search for content.
+        The Tag schema provides all the data for a tag including its items, so
+        it's quite a heavy object if referencing a lot of items. For a lighter
+        weight version, use a TagReference for use-cases such as tag searches.
+      allOf:
+        - $ref: "#/components/schemas/TagReferenceProps"
+        - $ref: "#/components/schemas/TagProps"
+
+    TagReference:
+      description: |
+        A minimal representation of a tag for use in most contexts where you
+        don't need the full list of items associated with the tag.
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/TagReferenceProps"
+
+    TagProps:
+      type: object
+      required: [id, items]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        items: { $ref: "#/components/schemas/DatagraphItemList" }
+
+    TagReferenceProps:
+      type: object
+      required: [name, colour, item_count]
+      properties:
+        name: { $ref: "#/components/schemas/TagName" }
+        colour: { $ref: "#/components/schemas/TagColour" }
+        item_count: { $ref: "#/components/schemas/TagItemCount" }
+
+    TagName:
+      type: string
+      description: The name of a tag.
+
+    TagColour:
+      type: string
+      description: The colour of a tag.
+
+    TagItemCount:
+      type: integer
+      description: The number of items tagged with this tag.
+
+    TagReferenceList:
+      type: array
+      description: A list of tags.
+      items: { $ref: "#/components/schemas/TagReference" }
+
+    TagNameList:
+      type: array
+      items: { $ref: "#/components/schemas/TagName" }
+
+    TagListIDs:
+      type: array
+      description: A list of tags IDs.
+      items: { $ref: "#/components/schemas/Identifier" }
+
+    TagListResult:
+      type: object
+      required: [tags]
+      properties:
+        tags: { $ref: "#/components/schemas/TagReferenceList" }
+
+    #
     # 8888888b.                   888
     # 888   Y88b                  888
     # 888    888                  888
@@ -4251,7 +4325,7 @@ components:
         reply_status: { $ref: "#/components/schemas/ReplyStatus" }
         category: { $ref: "#/components/schemas/CategoryReference" }
         link: { $ref: "#/components/schemas/LinkReference" }
-        tags: { $ref: "#/components/schemas/TagList" }
+        tags: { $ref: "#/components/schemas/TagReferenceList" }
 
     ReplyStatus:
       type: object
@@ -4647,7 +4721,7 @@ components:
         content: { $ref: "#/components/schemas/PostContent" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
         parent: { $ref: "#/components/schemas/Node" }
-        tags: { $ref: "#/components/schemas/TagList" }
+        tags: { $ref: "#/components/schemas/TagReferenceList" }
         visibility: { $ref: "#/components/schemas/Visibility" }
         relevance_score: { $ref: "#/components/schemas/RelevanceScore" }
         meta: { $ref: "#/components/schemas/Metadata" }

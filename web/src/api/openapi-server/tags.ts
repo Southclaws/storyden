@@ -7,7 +7,11 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { TagListOKResponse, TagListParams } from "../openapi-schema";
+import type {
+  TagGetOKResponse,
+  TagListOKResponse,
+  TagListParams,
+} from "../openapi-schema";
 import { fetcher } from "../server";
 
 /**
@@ -37,6 +41,28 @@ export const tagList = async (
   options?: RequestInit,
 ): Promise<tagListResponse> => {
   return fetcher<Promise<tagListResponse>>(getTagListUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+/**
+ * Get information about a tag.
+ */
+export type tagGetResponse = {
+  data: TagGetOKResponse;
+  status: number;
+};
+
+export const getTagGetUrl = (tagName: string) => {
+  return `/tags/${tagName}`;
+};
+
+export const tagGet = async (
+  tagName: string,
+  options?: RequestInit,
+): Promise<tagGetResponse> => {
+  return fetcher<Promise<tagGetResponse>>(getTagGetUrl(tagName), {
     ...options,
     method: "GET",
   });

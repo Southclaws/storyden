@@ -352,7 +352,7 @@ func serialiseNode(in *library.Node) openapi.Node {
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
-		Tags:       dt.Map(in.Tags, serialiseTag),
+		Tags:       serialiseTagReferenceList(in.Tags),
 		Visibility: serialiseVisibility(in.Visibility),
 		Meta:       in.Metadata,
 	}
@@ -375,7 +375,7 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
-		Tags:           dt.Map(in.Tags, serialiseTag),
+		Tags:           serialiseTagReferenceList(in.Tags),
 		Visibility:     serialiseVisibility(in.Visibility),
 		RelevanceScore: rs.Ptr(),
 		Meta:           in.Metadata,

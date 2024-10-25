@@ -97,7 +97,7 @@ func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (
 			return nil, err
 		}
 
-		tags := dt.Map(m.Edges.Tags, tag_ref.Map)
+		tags := dt.Map(m.Edges.Tags, tag_ref.Map(nil))
 
 		return &Thread{
 			Post: post.Post{

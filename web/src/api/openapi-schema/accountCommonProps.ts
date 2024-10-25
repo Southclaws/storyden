@@ -17,14 +17,14 @@ import type { Metadata } from "./metadata";
 import type { NotificationCount } from "./notificationCount";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
 import type { ProfileReference } from "./profileReference";
-import type { TagList } from "./tagList";
+import type { TagReferenceList } from "./tagReferenceList";
 
 export interface AccountCommonProps {
   admin: boolean;
   bio: AccountBio;
   email_addresses: AccountEmailAddressList;
   handle: AccountHandle;
-  interests?: TagList;
+  interests?: TagReferenceList;
   invited_by?: ProfileReference;
   links: ProfileExternalLinkList;
   meta: Metadata;
