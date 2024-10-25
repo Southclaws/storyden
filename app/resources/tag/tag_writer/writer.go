@@ -21,7 +21,7 @@ func New(db *ent.Client) *Writer {
 }
 
 func (w *Writer) Add(ctx context.Context, names ...tag_ref.Name) ([]*tag_ref.Tag, error) {
-	nameStrings := dt.Map(names, func(n tag_ref.Name) string { return string(n) })
+	nameStrings := tag_ref.Names(names).Strings()
 
 	newTags := dt.Map(nameStrings, func(n string) *ent.TagCreate {
 		return w.db.Tag.Create().SetName(n)
@@ -48,7 +48,7 @@ func (w *Writer) Add(ctx context.Context, names ...tag_ref.Name) ([]*tag_ref.Tag
 }
 
 func (w *Writer) Remove(ctx context.Context, names ...tag_ref.Name) error {
-	nameStrings := dt.Map(names, func(n tag_ref.Name) string { return string(n) })
+	nameStrings := tag_ref.Names(names).Strings()
 
 	_, err := w.db.Tag.Delete().
 		Where(ent_tag.NameIn(nameStrings...)).
