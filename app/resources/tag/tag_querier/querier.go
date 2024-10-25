@@ -32,6 +32,21 @@ func (q *Querier) List(ctx context.Context) (tag_ref.Tags, error) {
 	return tags, nil
 }
 
+func (q *Querier) Search(ctx context.Context, query string) (tag_ref.Tags, error) {
+	r, err := q.db.Tag.Query().
+		Where(
+			ent_tag.NameContainsFold(query),
+		).
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	tags := dt.Map(r, tag_ref.Map)
+
+	return tags, nil
+}
+
 func (q *Querier) Get(ctx context.Context, name tag_ref.Name) (*tag.Tag, error) {
 	r, err := q.db.Tag.Query().
 		Where(ent_tag.Name(string(name))).
@@ -45,7 +60,7 @@ func (q *Querier) Get(ctx context.Context, name tag_ref.Name) (*tag.Tag, error) 
 
 	tag, err := tag.Map(r)
 	if err != nil {
-		return nil, err
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return tag, nil

@@ -72,6 +72,7 @@ type Bindings struct {
 	Notifications
 	Profiles
 	Categories
+	Tags
 	Posts
 	Threads
 	Replies
@@ -103,6 +104,7 @@ func bindingsProviders() fx.Option {
 		NewNotifications,
 		NewProfiles,
 		NewCategories,
+		NewTags,
 		NewPosts,
 		NewThreads,
 		NewReplies,
