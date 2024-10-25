@@ -21,7 +21,9 @@ export function TagsIndexScreen(props: Props) {
     return <Unready error={error} />;
   }
 
-  const tags = data.tags.sort((a, b) => b.item_count - a.item_count);
+  const tags = data.tags
+    .filter((t) => t.item_count > 0)
+    .sort((a, b) => b.item_count - a.item_count);
 
   return (
     <LStack>
