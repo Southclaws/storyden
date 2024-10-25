@@ -99,7 +99,7 @@ export function useContentComposer(props: ContentComposerProps) {
     }
 
     editor.commands.setContent(props.initialValue ?? "<p></p>");
-  }, [editor, props.initialValue, props.resetKey]);
+  }, [editor, props.initialValue, props.value, props.resetKey]);
 
   useEffect(() => {
     if (!editor) {
