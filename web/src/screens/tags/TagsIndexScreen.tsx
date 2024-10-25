@@ -5,7 +5,6 @@ import { TagListResult } from "@/api/openapi-schema";
 import { Unready } from "@/components/site/Unready";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
-import { Heading } from "@/components/ui/heading";
 import { Text } from "@/components/ui/text";
 import { LStack } from "@/styled-system/jsx";
 
@@ -21,6 +20,8 @@ export function TagsIndexScreen(props: Props) {
   if (!data) {
     return <Unready error={error} />;
   }
+
+  const tags = data.tags.sort((a, b) => b.item_count - a.item_count);
 
   return (
     <LStack>
@@ -38,7 +39,7 @@ export function TagsIndexScreen(props: Props) {
         </Text>
       </LStack>
 
-      <TagBadgeList tags={data.tags} showItemCount />
+      <TagBadgeList tags={tags} showItemCount />
     </LStack>
   );
 }
