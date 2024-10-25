@@ -86,6 +86,46 @@ const tagsInputSlotNames = [
   [
     "itemDeleteTrigger",
     "tagsInput__itemDeleteTrigger"
+  ],
+  [
+    "root",
+    "tagsInput__root"
+  ],
+  [
+    "label",
+    "tagsInput__label"
+  ],
+  [
+    "control",
+    "tagsInput__control"
+  ],
+  [
+    "input",
+    "tagsInput__input"
+  ],
+  [
+    "clearTrigger",
+    "tagsInput__clearTrigger"
+  ],
+  [
+    "item",
+    "tagsInput__item"
+  ],
+  [
+    "itemPreview",
+    "tagsInput__itemPreview"
+  ],
+  [
+    "itemInput",
+    "tagsInput__itemInput"
+  ],
+  [
+    "itemText",
+    "tagsInput__itemText"
+  ],
+  [
+    "itemDeleteTrigger",
+    "tagsInput__itemDeleteTrigger"
   ]
 ]
 const tagsInputSlotFns = /* @__PURE__ */ tagsInputSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, tagsInputDefaultVariants, getSlotCompoundVariant(tagsInputCompoundVariants, slotName))])
@@ -106,6 +146,7 @@ export const tagsInput = /* @__PURE__ */ Object.assign(tagsInputFn, {
   variantKeys: tagsInputVariantKeys,
   variantMap: {
   "size": [
+    "sm",
     "md"
   ]
 },

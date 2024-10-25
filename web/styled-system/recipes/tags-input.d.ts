@@ -6,7 +6,7 @@ interface TagsInputVariant {
   /**
  * @default "md"
  */
-size: "md"
+size: "sm" | "md"
 }
 
 type TagsInputVariantMap = {
@@ -19,7 +19,7 @@ export type TagsInputVariantProps = {
 
 export interface TagsInputRecipe {
   __type: TagsInputVariantProps
-  (props?: TagsInputVariantProps): Pretty<Record<"root" | "label" | "control" | "input" | "clearTrigger" | "item" | "itemPreview" | "itemInput" | "itemText" | "itemDeleteTrigger" | "root" | "label" | "control" | "input" | "clearTrigger" | "item" | "itemPreview" | "itemInput" | "itemText" | "itemDeleteTrigger", string>>
+  (props?: TagsInputVariantProps): Pretty<Record<"root" | "label" | "control" | "input" | "clearTrigger" | "item" | "itemPreview" | "itemInput" | "itemText" | "itemDeleteTrigger" | "root" | "label" | "control" | "input" | "clearTrigger" | "item" | "itemPreview" | "itemInput" | "itemText" | "itemDeleteTrigger" | "root" | "label" | "control" | "input" | "clearTrigger" | "item" | "itemPreview" | "itemInput" | "itemText" | "itemDeleteTrigger", string>>
   raw: (props?: TagsInputVariantProps) => TagsInputVariantProps
   variantMap: TagsInputVariantMap
   variantKeys: Array<keyof TagsInputVariant>
