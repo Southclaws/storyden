@@ -9,7 +9,12 @@ import { Form } from "./useLibraryPageScreen";
 
 type Props = ContentComposerProps;
 
-export function ContentInput({ disabled, initialValue, onAssetUpload }: Props) {
+export function ContentInput({
+  disabled,
+  initialValue,
+  value,
+  onAssetUpload,
+}: Props) {
   const { control } = useFormContext<Form>();
 
   return (
@@ -21,6 +26,7 @@ export function ContentInput({ disabled, initialValue, onAssetUpload }: Props) {
             onChange={field.onChange}
             onAssetUpload={onAssetUpload}
             initialValue={initialValue}
+            value={value}
           />
         )}
         control={control}
