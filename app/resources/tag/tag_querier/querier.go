@@ -68,7 +68,7 @@ func (q *Querier) Search(ctx context.Context, query string) (tag_ref.Tags, error
 
 func (q *Querier) Get(ctx context.Context, name tag_ref.Name) (*tag.Tag, error) {
 	r, err := q.db.Tag.Query().
-		Where(ent_tag.Name(string(name))).
+		Where(ent_tag.Name(name.String())).
 		WithAccounts().
 		WithPosts(func(pq *ent.PostQuery) {
 			pq.WithCategory()

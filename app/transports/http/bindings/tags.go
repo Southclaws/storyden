@@ -44,7 +44,7 @@ func (h Tags) TagList(ctx context.Context, request openapi.TagListRequestObject)
 }
 
 func (h Tags) TagGet(ctx context.Context, request openapi.TagGetRequestObject) (openapi.TagGetResponseObject, error) {
-	name := tag_ref.Name(request.TagName)
+	name := tag_ref.NewName(request.TagName)
 
 	tag, err := h.tagQuerier.Get(ctx, name)
 	if err != nil {
@@ -59,7 +59,7 @@ func (h Tags) TagGet(ctx context.Context, request openapi.TagGetRequestObject) (
 func serialiseTag(in *tag.Tag) openapi.Tag {
 	return openapi.Tag{
 		Id:        in.ID.String(),
-		Name:      string(in.Name),
+		Name:      in.Name.String(),
 		Colour:    in.Colour,
 		ItemCount: in.ItemCount,
 		Items:     serialiseDatagraphItemList(in.Items),
@@ -68,7 +68,7 @@ func serialiseTag(in *tag.Tag) openapi.Tag {
 
 func serialiseTagReference(in *tag_ref.Tag) openapi.TagReference {
 	return openapi.TagReference{
-		Name:      string(in.Name),
+		Name:      in.Name.String(),
 		Colour:    in.Colour,
 		ItemCount: in.ItemCount,
 	}
@@ -79,7 +79,7 @@ func serialiseTagReferenceList(in tag_ref.Tags) []openapi.TagReference {
 }
 
 func deserialiseTagName(in string) tag_ref.Name {
-	return tag_ref.Name(in)
+	return tag_ref.NewName(in)
 }
 
 func tagsIDs(i openapi.TagListIDs) []xid.ID {

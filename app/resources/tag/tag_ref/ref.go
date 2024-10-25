@@ -2,6 +2,7 @@ package tag_ref
 
 import (
 	"github.com/Southclaws/dt"
+	"github.com/gosimple/slug"
 	"github.com/mazznoer/csscolorparser"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -15,9 +16,25 @@ func (id ID) String() string {
 	return xid.ID(id).String()
 }
 
-type Name string
+type Name struct {
+	s string
+}
+
+func NewName(s string) Name {
+	return Name{s: slug.Make(s)}
+}
+
+func (n Name) String() string {
+	return n.s
+}
 
 type Names []Name
+
+func (n Names) Strings() []string {
+	return dt.Map(n, func(n Name) string {
+		return n.String()
+	})
+}
 
 type Tag struct {
 	ID        ID
@@ -38,7 +55,7 @@ func Map(counts TagItemsResults) func(in *ent.Tag) *Tag {
 	return func(in *ent.Tag) *Tag {
 		return &Tag{
 			ID:        ID(in.ID),
-			Name:      Name(in.Name),
+			Name:      NewName(in.Name),
 			Colour:    deriveTagColour(in.Name),
 			ItemCount: counts.Get(in.ID),
 		}
