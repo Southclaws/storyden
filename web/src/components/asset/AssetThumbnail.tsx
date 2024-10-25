@@ -16,9 +16,12 @@ type Props = {
 
 const thumbnailStyles = css({
   borderRadius: "sm",
+  height: "full",
+  objectFit: "cover",
+  overflowClipMargin: "unset",
 });
 
-export function AssetThumbnail({ asset, width = 64, height = 64 }: Props) {
+export function AssetThumbnail({ asset, width = 80, height = 80 }: Props) {
   const [view, setView] = useQueryState<string | null>("view", {
     defaultValue: null,
     clearOnDefault: true,
