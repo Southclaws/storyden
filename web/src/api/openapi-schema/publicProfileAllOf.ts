@@ -17,7 +17,7 @@ import type { ProfileExternalLinkList } from "./profileExternalLinkList";
 import type { ProfileFollowersCount } from "./profileFollowersCount";
 import type { ProfileFollowingCount } from "./profileFollowingCount";
 import type { ProfileReference } from "./profileReference";
-import type { TagList } from "./tagList";
+import type { TagReferenceList } from "./tagReferenceList";
 
 export type PublicProfileAllOf = {
   bio: AccountBio;
@@ -26,7 +26,7 @@ export type PublicProfileAllOf = {
   following: ProfileFollowingCount;
   handle: AccountHandle;
   image?: string;
-  interests: TagList;
+  interests: TagReferenceList;
   invited_by?: ProfileReference;
   like_score: LikeScore;
   links: ProfileExternalLinkList;

@@ -10,7 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
 import type { PostContent } from "./postContent";
-import type { TagListIDs } from "./tagListIDs";
+import type { TagNameList } from "./tagNameList";
 import type { ThreadTitle } from "./threadTitle";
 import type { Url } from "./url";
 import type { Visibility } from "./visibility";
@@ -19,7 +19,7 @@ export interface ThreadMutableProps {
   body?: PostContent;
   category?: Identifier;
   meta?: Metadata;
-  tags?: TagListIDs;
+  tags?: TagNameList;
   title?: ThreadTitle;
   url?: Url;
   visibility?: Visibility;

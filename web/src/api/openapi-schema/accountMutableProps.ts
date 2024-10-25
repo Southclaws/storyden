@@ -12,12 +12,12 @@ import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 import type { Metadata } from "./metadata";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
-import type { TagListIDs } from "./tagListIDs";
+import type { TagNameList } from "./tagNameList";
 
 export interface AccountMutableProps {
   bio?: AccountBio;
   handle?: AccountHandle;
-  interests?: TagListIDs;
+  interests?: TagNameList;
   links?: ProfileExternalLinkList;
   meta?: Metadata;
   name?: AccountName;

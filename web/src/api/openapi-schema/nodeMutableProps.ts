@@ -14,6 +14,7 @@ import type { NodeName } from "./nodeName";
 import type { NullableIdentifier } from "./nullableIdentifier";
 import type { PostContent } from "./postContent";
 import type { Slug } from "./slug";
+import type { TagNameList } from "./tagNameList";
 import type { Url } from "./url";
 
 /**
@@ -29,5 +30,6 @@ export interface NodeMutableProps {
   parent?: Slug;
   primary_image_asset_id?: NullableIdentifier;
   slug?: Slug;
+  tags?: TagNameList;
   url?: Url;
 }

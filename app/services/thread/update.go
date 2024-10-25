@@ -3,9 +3,11 @@ package thread
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/samber/lo"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -13,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
@@ -43,6 +46,28 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 	}
 
 	opts := partial.Opts()
+
+	if tags, ok := partial.Tags.Get(); ok {
+		currentTagNames := thr.Tags.Names()
+
+		toCreate, toRemove := lo.Difference(tags, currentTagNames)
+
+		newTags, err := s.tagWriter.Add(ctx, toCreate...)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		addIDs := dt.Map(newTags, func(t *tag_ref.Tag) tag_ref.ID { return t.ID })
+		removeIDs := dt.Reduce(thr.Tags, func(acc []tag_ref.ID, prev *tag_ref.Tag) []tag_ref.ID {
+			if lo.Contains(toRemove, prev.Name) {
+				acc = append(acc, prev.ID)
+			}
+			return acc
+		}, []tag_ref.ID{})
+
+		opts = append(opts, thread.WithTagsAdd(addIDs...))
+		opts = append(opts, thread.WithTagsRemove(removeIDs...))
+	}
 
 	thr, err = s.thread_repo.Update(ctx, threadID, opts...)
 	if err != nil {
