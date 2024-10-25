@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "prepare": "panda codegen",
-    "dev": "next dev --turbo",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -66,8 +66,8 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@pandacss/dev": "^0.46.1",
-    "@pandacss/types": "^0.46.1",
+    "@pandacss/dev": "^0.47.0",
+    "@pandacss/types": "^0.47.0",
     "@park-ui/panda-preset": "^0.42.0",
     "@simplewebauthn/types": "^10.0.0",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",

@@ -31,7 +31,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       ? {
           title: initialDraft.title,
           body: initialDraft.body,
-          tags: initialDraft.tags,
+          tags: initialDraft.tags.map((t) => t.name),
           url: initialDraft.link?.url,
         }
       : {
