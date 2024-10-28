@@ -14,6 +14,10 @@ import (
 	"github.com/Southclaws/storyden/internal/config"
 )
 
+// DefaultPartSize is the default part size for multipart uploads to S3. This is
+// used only when the content size is unknown and is a low value for small VMs.
+const DefaultPartSize = 1024 * 1024 * 8
+
 type s3Storer struct {
 	bucket      string
 	minioClient *minio.Client
@@ -81,6 +85,7 @@ func (s *s3Storer) Write(ctx context.Context, path string, stream io.Reader, siz
 	if size <= 0 {
 		// If size is unknown Minio needs to compute an md5 hash of the content.
 		opts.SendContentMd5 = true
+		opts.PartSize = DefaultPartSize
 	}
 
 	_, err := s.minioClient.PutObject(ctx, s.bucket, path, stream, size, opts)
