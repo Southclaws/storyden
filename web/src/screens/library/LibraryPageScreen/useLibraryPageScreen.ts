@@ -68,7 +68,7 @@ export function useLibraryPageScreen({ node }: Props) {
   const libraryPath = useLibraryPath();
   const account = useSession();
   const { revalidate, updateNode, updateNodeVisibility, deleteNode } =
-    useLibraryMutation();
+    useLibraryMutation(node);
 
   const cropperRef = useRef<FixedCropperRef>(null);
 

@@ -15,7 +15,9 @@ export type Props = {
 
 export function useLibraryPageMenu(props: Props) {
   const account = useSession();
-  const { deleteNode, updateNodeVisibility, revalidate } = useLibraryMutation();
+  const { deleteNode, updateNodeVisibility, revalidate } = useLibraryMutation(
+    props.node,
+  );
 
   const {
     isConfirming: isConfirmingDelete,

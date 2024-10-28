@@ -7,7 +7,9 @@ export type Props = {
 };
 
 export function useLibraryPageCoverImageControl(props: Props) {
-  const { updateNode, removeNodeCoverImage, revalidate } = useLibraryMutation();
+  const { updateNode, removeNodeCoverImage, revalidate } = useLibraryMutation(
+    props.node,
+  );
 
   const hasCoverImage = Boolean(props.node.primary_image);
 
