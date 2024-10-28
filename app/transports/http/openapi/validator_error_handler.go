@@ -49,11 +49,9 @@ func ValidatorErrorHandler() func(c echo.Context, err *echo.HTTPError) error {
 				return err
 			}
 
-			ctx = fctx.WithMeta(ctx, "reason", re.Reason)
-
 			return fn(ctx, fault.Wrap(re.Err,
 				fctx.With(ctx),
-				fmsg.With("request does not match any path in schema")),
+				fmsg.With(re.Reason)),
 			)
 		}
 
