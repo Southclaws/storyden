@@ -4,6 +4,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { map } from "lodash/fp";
+import { useId } from "react";
 
 import { Category } from "src/api/openapi-schema";
 import { Unready } from "src/components/site/Unready";
@@ -25,10 +26,13 @@ export function CategoryList(props: Props) {
   const { canManageCategories, categories, items, sensors, handleDragEnd } =
     useCategoryList(props);
 
+  const id = useId();
+
   if (!categories) return <Unready />;
 
   return (
     <DndContext
+      id={id}
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
