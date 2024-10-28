@@ -24,6 +24,9 @@ func (Asset) Fields() []ent.Field {
 		field.Int("size").
 			Annotations(entsql.Default("0")),
 
+		field.String("mime_type").
+			Annotations(entsql.Default("application/octet-stream")),
+
 		field.JSON("metadata", map[string]any{}).Optional(),
 
 		// Edges

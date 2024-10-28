@@ -14,7 +14,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
-	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/asset/asset_querier"
+	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/event/event_querier"
 	"github.com/Southclaws/storyden/app/resources/event/event_writer"
@@ -56,7 +57,8 @@ func Build() fx.Option {
 			role_badge.New,
 			invitation_querier.New,
 			invitation_writer.New,
-			asset.New,
+			asset_querier.New,
+			asset_writer.New,
 			authentication.New,
 			category.New,
 			notify_querier.New,

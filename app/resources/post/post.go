@@ -91,7 +91,7 @@ func Map(in *ent.Post) (*Post, error) {
 		return nil, err
 	}
 
-	assets := dt.Map(in.Edges.Assets, asset.FromModel)
+	assets := dt.Map(in.Edges.Assets, asset.Map)
 
 	return &Post{
 		ID:   ID(in.ID),

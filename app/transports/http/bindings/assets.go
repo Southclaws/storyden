@@ -35,7 +35,7 @@ func (i *Assets) AssetGet(ctx context.Context, request openapi.AssetGetRequestOb
 	return openapi.AssetGet200AsteriskResponse{
 		AssetGetOKAsteriskResponse: openapi.AssetGetOKAsteriskResponse{
 			Body:          r,
-			ContentType:   a.Metadata.GetMIMEType(),
+			ContentType:   a.MIME.String(),
 			ContentLength: int64(a.Size),
 		},
 	}, nil
@@ -60,7 +60,7 @@ func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadReq
 		ContentFill: contentFillCmd,
 	}
 
-	a, err := i.uploader.Upload(ctx, request.Body, int64(request.Params.ContentLength), filename, opts)
+	a, err := i.uploader.Upload(ctx, request.Body, request.Params.ContentLength, filename, opts)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -103,7 +103,7 @@ func serialiseAsset(a asset.Asset) openapi.Asset {
 		Filename: a.Name.String(),
 		Path:     path,
 		Parent:   opt.Map(a.Parent, serialiseAsset).Ptr(),
-		MimeType: a.Metadata.GetMIMEType(),
+		MimeType: a.MIME.String(),
 		Width:    float32(a.Metadata.GetWidth()),
 		Height:   float32(a.Metadata.GetHeight()),
 	}

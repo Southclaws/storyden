@@ -23,6 +23,8 @@ const (
 	FieldFilename = "filename"
 	// FieldSize holds the string denoting the size field in the database.
 	FieldSize = "size"
+	// FieldMimeType holds the string denoting the mime_type field in the database.
+	FieldMimeType = "mime_type"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
 	// FieldAccountID holds the string denoting the account_id field in the database.
@@ -91,6 +93,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldFilename,
 	FieldSize,
+	FieldMimeType,
 	FieldMetadata,
 	FieldAccountID,
 	FieldParentAssetID,
@@ -157,6 +160,11 @@ func ByFilename(opts ...sql.OrderTermOption) OrderOption {
 // BySize orders the results by the size field.
 func BySize(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSize, opts...).ToFunc()
+}
+
+// ByMimeType orders the results by the mime_type field.
+func ByMimeType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMimeType, opts...).ToFunc()
 }
 
 // ByAccountID orders the results by the account_id field.

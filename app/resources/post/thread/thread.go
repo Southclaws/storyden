@@ -107,7 +107,7 @@ func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (
 				Author:  *pro,
 				Likes:   ls.Status(m.ID),
 				Reacts:  reacts,
-				Assets:  dt.Map(m.Edges.Assets, asset.FromModel),
+				Assets:  dt.Map(m.Edges.Assets, asset.Map),
 				WebLink: link,
 				Meta:    m.Metadata,
 

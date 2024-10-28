@@ -17,6 +17,10 @@ import (
 )
 
 func (a *Analyser) analysePDF(ctx context.Context, buf []byte, fillrule opt.Optional[asset.ContentFillCommand]) error {
+	// NOTE: See if there's a better way to design the analyser in such a way
+	// that can avoid reading the file into memory before checking the fill rule
+	// because currently, fill rules are the only use-case for analysing the
+	// file but there may be other use-cases in future so it's probably useless.
 	rule, ok := fillrule.Get()
 	if !ok {
 		return nil // no fill rule, nothing to do

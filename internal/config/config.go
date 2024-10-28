@@ -28,6 +28,7 @@ type Config struct {
 
 	AssetStorageType      string `envconfig:"ASSET_STORAGE_TYPE"`
 	AssetStorageLocalPath string `envconfig:"ASSET_STORAGE_LOCAL_PATH"`
+	S3Secure              bool   `envconfig:"S3_SECURE" default:"true"`
 	S3Endpoint            string `envconfig:"S3_ENDPOINT"`
 	S3Bucket              string `envconfig:"S3_BUCKET"`
 	S3Region              string `envconfig:"S3_REGION"`

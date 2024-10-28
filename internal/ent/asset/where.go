@@ -76,6 +76,11 @@ func Size(v int) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldSize, v))
 }
 
+// MimeType applies equality check predicate on the "mime_type" field. It's identical to MimeTypeEQ.
+func MimeType(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldEQ(FieldMimeType, v))
+}
+
 // AccountID applies equality check predicate on the "account_id" field. It's identical to AccountIDEQ.
 func AccountID(v xid.ID) predicate.Asset {
 	return predicate.Asset(sql.FieldEQ(FieldAccountID, v))
@@ -269,6 +274,71 @@ func SizeLT(v int) predicate.Asset {
 // SizeLTE applies the LTE predicate on the "size" field.
 func SizeLTE(v int) predicate.Asset {
 	return predicate.Asset(sql.FieldLTE(FieldSize, v))
+}
+
+// MimeTypeEQ applies the EQ predicate on the "mime_type" field.
+func MimeTypeEQ(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldEQ(FieldMimeType, v))
+}
+
+// MimeTypeNEQ applies the NEQ predicate on the "mime_type" field.
+func MimeTypeNEQ(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldNEQ(FieldMimeType, v))
+}
+
+// MimeTypeIn applies the In predicate on the "mime_type" field.
+func MimeTypeIn(vs ...string) predicate.Asset {
+	return predicate.Asset(sql.FieldIn(FieldMimeType, vs...))
+}
+
+// MimeTypeNotIn applies the NotIn predicate on the "mime_type" field.
+func MimeTypeNotIn(vs ...string) predicate.Asset {
+	return predicate.Asset(sql.FieldNotIn(FieldMimeType, vs...))
+}
+
+// MimeTypeGT applies the GT predicate on the "mime_type" field.
+func MimeTypeGT(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldGT(FieldMimeType, v))
+}
+
+// MimeTypeGTE applies the GTE predicate on the "mime_type" field.
+func MimeTypeGTE(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldGTE(FieldMimeType, v))
+}
+
+// MimeTypeLT applies the LT predicate on the "mime_type" field.
+func MimeTypeLT(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldLT(FieldMimeType, v))
+}
+
+// MimeTypeLTE applies the LTE predicate on the "mime_type" field.
+func MimeTypeLTE(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldLTE(FieldMimeType, v))
+}
+
+// MimeTypeContains applies the Contains predicate on the "mime_type" field.
+func MimeTypeContains(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldContains(FieldMimeType, v))
+}
+
+// MimeTypeHasPrefix applies the HasPrefix predicate on the "mime_type" field.
+func MimeTypeHasPrefix(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldHasPrefix(FieldMimeType, v))
+}
+
+// MimeTypeHasSuffix applies the HasSuffix predicate on the "mime_type" field.
+func MimeTypeHasSuffix(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldHasSuffix(FieldMimeType, v))
+}
+
+// MimeTypeEqualFold applies the EqualFold predicate on the "mime_type" field.
+func MimeTypeEqualFold(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldEqualFold(FieldMimeType, v))
+}
+
+// MimeTypeContainsFold applies the ContainsFold predicate on the "mime_type" field.
+func MimeTypeContainsFold(v string) predicate.Asset {
+	return predicate.Asset(sql.FieldContainsFold(FieldMimeType, v))
 }
 
 // MetadataIsNil applies the IsNil predicate on the "metadata" field.

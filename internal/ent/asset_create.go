@@ -69,6 +69,12 @@ func (ac *AssetCreate) SetSize(i int) *AssetCreate {
 	return ac
 }
 
+// SetMimeType sets the "mime_type" field.
+func (ac *AssetCreate) SetMimeType(s string) *AssetCreate {
+	ac.mutation.SetMimeType(s)
+	return ac
+}
+
 // SetMetadata sets the "metadata" field.
 func (ac *AssetCreate) SetMetadata(m map[string]interface{}) *AssetCreate {
 	ac.mutation.SetMetadata(m)
@@ -277,6 +283,9 @@ func (ac *AssetCreate) check() error {
 	if _, ok := ac.mutation.Size(); !ok {
 		return &ValidationError{Name: "size", err: errors.New(`ent: missing required field "Asset.size"`)}
 	}
+	if _, ok := ac.mutation.MimeType(); !ok {
+		return &ValidationError{Name: "mime_type", err: errors.New(`ent: missing required field "Asset.mime_type"`)}
+	}
 	if _, ok := ac.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "Asset.account_id"`)}
 	}
@@ -339,6 +348,10 @@ func (ac *AssetCreate) createSpec() (*Asset, *sqlgraph.CreateSpec) {
 	if value, ok := ac.mutation.Size(); ok {
 		_spec.SetField(asset.FieldSize, field.TypeInt, value)
 		_node.Size = value
+	}
+	if value, ok := ac.mutation.MimeType(); ok {
+		_spec.SetField(asset.FieldMimeType, field.TypeString, value)
+		_node.MimeType = value
 	}
 	if value, ok := ac.mutation.Metadata(); ok {
 		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)
@@ -552,6 +565,18 @@ func (u *AssetUpsert) AddSize(v int) *AssetUpsert {
 	return u
 }
 
+// SetMimeType sets the "mime_type" field.
+func (u *AssetUpsert) SetMimeType(v string) *AssetUpsert {
+	u.Set(asset.FieldMimeType, v)
+	return u
+}
+
+// UpdateMimeType sets the "mime_type" field to the value that was provided on create.
+func (u *AssetUpsert) UpdateMimeType() *AssetUpsert {
+	u.SetExcluded(asset.FieldMimeType)
+	return u
+}
+
 // SetMetadata sets the "metadata" field.
 func (u *AssetUpsert) SetMetadata(v map[string]interface{}) *AssetUpsert {
 	u.Set(asset.FieldMetadata, v)
@@ -697,6 +722,20 @@ func (u *AssetUpsertOne) AddSize(v int) *AssetUpsertOne {
 func (u *AssetUpsertOne) UpdateSize() *AssetUpsertOne {
 	return u.Update(func(s *AssetUpsert) {
 		s.UpdateSize()
+	})
+}
+
+// SetMimeType sets the "mime_type" field.
+func (u *AssetUpsertOne) SetMimeType(v string) *AssetUpsertOne {
+	return u.Update(func(s *AssetUpsert) {
+		s.SetMimeType(v)
+	})
+}
+
+// UpdateMimeType sets the "mime_type" field to the value that was provided on create.
+func (u *AssetUpsertOne) UpdateMimeType() *AssetUpsertOne {
+	return u.Update(func(s *AssetUpsert) {
+		s.UpdateMimeType()
 	})
 }
 
@@ -1020,6 +1059,20 @@ func (u *AssetUpsertBulk) AddSize(v int) *AssetUpsertBulk {
 func (u *AssetUpsertBulk) UpdateSize() *AssetUpsertBulk {
 	return u.Update(func(s *AssetUpsert) {
 		s.UpdateSize()
+	})
+}
+
+// SetMimeType sets the "mime_type" field.
+func (u *AssetUpsertBulk) SetMimeType(v string) *AssetUpsertBulk {
+	return u.Update(func(s *AssetUpsert) {
+		s.SetMimeType(v)
+	})
+}
+
+// UpdateMimeType sets the "mime_type" field to the value that was provided on create.
+func (u *AssetUpsertBulk) UpdateMimeType() *AssetUpsertBulk {
+	return u.Update(func(s *AssetUpsert) {
+		s.UpdateMimeType()
 	})
 }
 

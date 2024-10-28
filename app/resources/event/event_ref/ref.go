@@ -48,7 +48,7 @@ func Map(in *ent.Event) (*Event, error) {
 	assetEdge := opt.NewPtr(in.Edges.PrimaryImage)
 
 	image := opt.Map(assetEdge, func(a ent.Asset) asset.Asset {
-		return *asset.FromModel(&a)
+		return *asset.Map(&a)
 	})
 
 	policy, err := participation.NewPolicy(in.ParticipationPolicy)

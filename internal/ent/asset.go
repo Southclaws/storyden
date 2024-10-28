@@ -28,6 +28,8 @@ type Asset struct {
 	Filename string `json:"filename,omitempty"`
 	// Size holds the value of the "size" field.
 	Size int `json:"size,omitempty"`
+	// MimeType holds the value of the "mime_type" field.
+	MimeType string `json:"mime_type,omitempty"`
 	// Metadata holds the value of the "metadata" field.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// AccountID holds the value of the "account_id" field.
@@ -139,7 +141,7 @@ func (*Asset) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case asset.FieldSize:
 			values[i] = new(sql.NullInt64)
-		case asset.FieldFilename:
+		case asset.FieldFilename, asset.FieldMimeType:
 			values[i] = new(sql.NullString)
 		case asset.FieldCreatedAt, asset.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -189,6 +191,12 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field size", values[i])
 			} else if value.Valid {
 				a.Size = int(value.Int64)
+			}
+		case asset.FieldMimeType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field mime_type", values[i])
+			} else if value.Valid {
+				a.MimeType = value.String
 			}
 		case asset.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -293,6 +301,9 @@ func (a *Asset) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("size=")
 	builder.WriteString(fmt.Sprintf("%v", a.Size))
+	builder.WriteString(", ")
+	builder.WriteString("mime_type=")
+	builder.WriteString(a.MimeType)
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", a.Metadata))

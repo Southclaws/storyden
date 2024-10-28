@@ -9,20 +9,21 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/asset/asset_querier"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
 )
 
 type Downloader struct {
 	l *zap.Logger
 
-	assets  asset.Repository
+	assets  *asset_querier.Querier
 	objects object.Storer
 }
 
 func New(
 	l *zap.Logger,
 
-	assets asset.Repository,
+	assets *asset_querier.Querier,
 	objects object.Storer,
 ) *Downloader {
 	return &Downloader{

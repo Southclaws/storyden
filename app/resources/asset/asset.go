@@ -1,36 +1,12 @@
 package asset
 
 import (
-	"context"
-
-	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/mime"
 )
-
-var errInvalidFormat = fault.New("invalid format")
-
-type Repository interface {
-	Add(ctx context.Context,
-		owner xid.ID,
-		filename Filename,
-		size int,
-	) (*Asset, error)
-
-	AddVersion(ctx context.Context,
-		owner xid.ID,
-		parent AssetID,
-		filename Filename,
-		size int,
-	) (*Asset, error)
-
-	Get(ctx context.Context, id Filename) (*Asset, error)
-	GetByID(ctx context.Context, id AssetID) (*Asset, error)
-
-	Remove(ctx context.Context, owner xid.ID, id Filename) error
-}
 
 type AssetID = xid.ID
 
@@ -42,12 +18,13 @@ type Asset struct {
 	ID       AssetID
 	Name     Filename
 	Size     int
+	MIME     mime.Type
 	Metadata Metadata
 	Parent   opt.Optional[Asset]
 }
 
-func FromModel(a *ent.Asset) *Asset {
-	parent := opt.NewPtrMap(a.Edges.Parent, func(a ent.Asset) Asset { return *FromModel(&a) })
+func Map(a *ent.Asset) *Asset {
+	parent := opt.NewPtrMap(a.Edges.Parent, func(a ent.Asset) Asset { return *Map(&a) })
 
 	return &Asset{
 		ID: AssetID(a.ID),
@@ -57,26 +34,13 @@ func FromModel(a *ent.Asset) *Asset {
 			hasID: true,
 		},
 		Size:     a.Size,
+		MIME:     mime.New(a.MimeType),
 		Metadata: a.Metadata,
 		Parent:   parent,
 	}
 }
 
 type Metadata map[string]any
-
-func (m Metadata) GetMIMEType() string {
-	v, ok := m["mime_type"]
-	if !ok {
-		return ""
-	}
-
-	s, ok := v.(string)
-	if !ok {
-		return ""
-	}
-
-	return s
-}
 
 func (m Metadata) GetWidth() float64 {
 	v, ok := m["width"]

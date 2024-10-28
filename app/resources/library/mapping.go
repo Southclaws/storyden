@@ -50,7 +50,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	assets := dt.Map(c.Edges.Assets, asset.FromModel)
+	assets := dt.Map(c.Edges.Assets, asset.Map)
 
 	richContent, err := opt.MapErr(opt.NewPtr(c.Content), datagraph.NewRichText)
 	if err != nil {
@@ -58,7 +58,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 	}
 
 	primaryImage := opt.Map(opt.NewPtr(c.Edges.PrimaryImage), func(e ent.Asset) asset.Asset {
-		return *asset.FromModel(&e)
+		return *asset.Map(&e)
 	})
 
 	// This edge is optional anyway, so if not loaded, nothing bad happens.
