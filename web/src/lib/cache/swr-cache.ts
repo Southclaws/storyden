@@ -16,11 +16,15 @@ export function useCacheProvider(): CacheProvider {
     const appCache = loadCache();
     if (appCache) {
       const map = new Map(JSON.parse(appCache) as Iterable<[string, Data]>);
+      console.log("Loading cache", { entries: map.size });
       map.forEach((value, key) => cache.current.set(key, value));
     }
 
     const saveCache = () => {
-      storeCache(JSON.stringify(Array.from(cache.current.entries())));
+      const entries = cache.current.entries();
+      const a = Array.from(entries);
+      console.log("Saving cache", { entries: a.length });
+      storeCache(JSON.stringify(a));
     };
 
     window.addEventListener("beforeunload", saveCache);
