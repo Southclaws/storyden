@@ -220,7 +220,8 @@ export function LibraryPage(props: Props) {
           </LStack>
 
           <ContentInput
-            value={form.getValues().content}
+            // TODO: Fix this via ref
+            // value={form.getValues().content}
             disabled={!editing}
             onAssetUpload={handleAssetUpload}
             initialValue={
