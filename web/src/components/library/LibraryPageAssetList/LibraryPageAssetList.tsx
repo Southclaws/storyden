@@ -26,7 +26,7 @@ export function LibraryPageAssetList(props: Props) {
   const isEmpty = assets.length === 0;
   const shouldShow = editing || !isEmpty;
 
-  const { revalidate, addAsset, removeAsset } = useLibraryMutation();
+  const { revalidate, addAsset, removeAsset } = useLibraryMutation(props.node);
 
   async function handleUpload(a: Asset) {
     await handle(
