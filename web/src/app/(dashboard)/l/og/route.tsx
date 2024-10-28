@@ -2,19 +2,13 @@ import { ImageResponse } from "next/og";
 import { NextRequest, NextResponse } from "next/server";
 
 import { nodeGet } from "@/api/openapi-server/nodes";
-import { getTargetSlug } from "@/components/library/utils";
 import { getSettings } from "@/lib/settings/settings-server";
-import { ParamsSchema } from "@/screens/library/library-path";
 import { getAssetURL } from "@/utils/asset";
 
-import { Props } from "../[...slug]/page";
-
-export const size = {
+const size = {
   width: 1200,
   height: 630,
 };
-
-export const contentType = "image/png";
 
 export async function GET(req: NextRequest) {
   const slug = req.nextUrl.searchParams.get("slug");
