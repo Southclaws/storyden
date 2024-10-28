@@ -14,6 +14,8 @@ import (
 
 const AssetsSubdirectory = "assets"
 
+var errInvalidFormat = fault.New("invalid format")
+
 type Filename struct {
 	id    opt.Optional[xid.ID]
 	name  string

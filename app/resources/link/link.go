@@ -74,7 +74,7 @@ func Map(in *ent.Link) (*Link, error) {
 
 	return &Link{
 		LinkRef: *link_ref.Map(in),
-		Assets:  dt.Map(in.Edges.Assets, asset.FromModel),
+		Assets:  dt.Map(in.Edges.Assets, asset.Map),
 		Posts:   posts,
 		Nodes:   nodes,
 	}, nil

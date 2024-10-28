@@ -76,6 +76,20 @@ func (au *AssetUpdate) AddSize(i int) *AssetUpdate {
 	return au
 }
 
+// SetMimeType sets the "mime_type" field.
+func (au *AssetUpdate) SetMimeType(s string) *AssetUpdate {
+	au.mutation.SetMimeType(s)
+	return au
+}
+
+// SetNillableMimeType sets the "mime_type" field if the given value is not nil.
+func (au *AssetUpdate) SetNillableMimeType(s *string) *AssetUpdate {
+	if s != nil {
+		au.SetMimeType(*s)
+	}
+	return au
+}
+
 // SetMetadata sets the "metadata" field.
 func (au *AssetUpdate) SetMetadata(m map[string]interface{}) *AssetUpdate {
 	au.mutation.SetMetadata(m)
@@ -422,6 +436,9 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := au.mutation.AddedSize(); ok {
 		_spec.AddField(asset.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := au.mutation.MimeType(); ok {
+		_spec.SetField(asset.FieldMimeType, field.TypeString, value)
 	}
 	if value, ok := au.mutation.Metadata(); ok {
 		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)
@@ -772,6 +789,20 @@ func (auo *AssetUpdateOne) SetNillableSize(i *int) *AssetUpdateOne {
 // AddSize adds i to the "size" field.
 func (auo *AssetUpdateOne) AddSize(i int) *AssetUpdateOne {
 	auo.mutation.AddSize(i)
+	return auo
+}
+
+// SetMimeType sets the "mime_type" field.
+func (auo *AssetUpdateOne) SetMimeType(s string) *AssetUpdateOne {
+	auo.mutation.SetMimeType(s)
+	return auo
+}
+
+// SetNillableMimeType sets the "mime_type" field if the given value is not nil.
+func (auo *AssetUpdateOne) SetNillableMimeType(s *string) *AssetUpdateOne {
+	if s != nil {
+		auo.SetMimeType(*s)
+	}
 	return auo
 }
 
@@ -1151,6 +1182,9 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 	}
 	if value, ok := auo.mutation.AddedSize(); ok {
 		_spec.AddField(asset.FieldSize, field.TypeInt, value)
+	}
+	if value, ok := auo.mutation.MimeType(); ok {
+		_spec.SetField(asset.FieldMimeType, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.Metadata(); ok {
 		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)

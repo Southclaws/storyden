@@ -10,7 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
@@ -57,7 +57,7 @@ func New(
 	thread_repo thread.Repository,
 	post_repo reply.Repository,
 	react_repo *reaction.Writer,
-	asset_repo asset.Repository,
+	assetWriter *asset_writer.Writer,
 	node_repo *node_writer.Writer,
 ) (r Ready) {
 	if err := client.Schema.Create(context.Background()); err != nil {
@@ -72,7 +72,7 @@ func New(
 
 	accounts(account_writer, auth_repo)
 	categories(category_repo)
-	threads(thread_repo, post_repo, react_repo, asset_repo)
+	threads(thread_repo, post_repo, react_repo, assetWriter)
 
 	return Ready{}
 }

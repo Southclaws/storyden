@@ -51,7 +51,7 @@ func (i Info) IconGet(ctx context.Context, request openapi.IconGetRequestObject)
 	return openapi.IconGet200AsteriskResponse{
 		AssetGetOKAsteriskResponse: openapi.AssetGetOKAsteriskResponse{
 			Body:          r,
-			ContentType:   a.Metadata.GetMIMEType(),
+			ContentType:   a.MIME.String(),
 			ContentLength: int64(a.Size),
 		},
 	}, nil

@@ -50,11 +50,11 @@ func LinksFromModel(in []*ent.Link) []*LinkRef {
 
 func Map(in *ent.Link) *LinkRef {
 	favicon := opt.NewPtrMap(in.Edges.FaviconImage, func(a ent.Asset) asset.Asset {
-		return *asset.FromModel(&a)
+		return *asset.Map(&a)
 	})
 
 	primary := opt.NewPtrMap(in.Edges.PrimaryImage, func(a ent.Asset) asset.Asset {
-		return *asset.FromModel(&a)
+		return *asset.Map(&a)
 	})
 
 	return &LinkRef{

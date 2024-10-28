@@ -19,20 +19,31 @@ type s3Storer struct {
 	minioClient *minio.Client
 }
 
-func NewS3Storer(cfg config.Config) Storer {
+func NewS3Storer(ctx context.Context, cfg config.Config) (Storer, error) {
 	minioClient, err := minio.New(cfg.S3Endpoint, &minio.Options{
 		Creds:  credentials.NewStaticV4(cfg.S3AccessKey, cfg.S3SecretKey, ""),
 		Region: cfg.S3Region,
-		Secure: true,
+		Secure: cfg.S3Secure,
 	})
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	exists, err := minioClient.BucketExists(ctx, cfg.S3Bucket)
+	if err != nil {
+		return nil, err
+	}
+	if !exists {
+		err := minioClient.MakeBucket(ctx, cfg.S3Bucket, minio.MakeBucketOptions{})
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return &s3Storer{
 		bucket:      cfg.S3Bucket,
 		minioClient: minioClient,
-	}
+	}, nil
 }
 
 func (s *s3Storer) Exists(ctx context.Context, path string) (bool, error) {

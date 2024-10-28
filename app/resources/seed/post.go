@@ -12,6 +12,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
@@ -245,7 +246,7 @@ Storyden is still in development so please give the repository a watch if you're
 	}
 )
 
-func threads(tr thread.Repository, pr reply.Repository, rr *reaction.Writer, ar asset.Repository) {
+func threads(tr thread.Repository, pr reply.Repository, rr *reaction.Writer, ar *asset_writer.Writer) {
 	ctx := context.Background()
 
 	for _, t := range Threads {
@@ -253,7 +254,7 @@ func threads(tr thread.Repository, pr reply.Repository, rr *reaction.Writer, ar 
 		for i, a := range t.Assets {
 			id := fmt.Sprintf("%s-asset-%d", t.ID, i)
 
-			a, err := ar.Add(ctx, xid.ID(t.Author.ID), asset.NewFilename(id), a.Size)
+			a, err := ar.Add(ctx, xid.ID(t.Author.ID), asset.NewFilename(id), a.Size, a.MIME)
 			if err != nil {
 				panic(err)
 			}

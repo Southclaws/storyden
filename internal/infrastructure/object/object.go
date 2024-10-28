@@ -16,13 +16,13 @@ type Storer interface {
 }
 
 func Build() fx.Option {
-	return fx.Provide(func(cfg config.Config) Storer {
+	return fx.Provide(func(ctx context.Context, cfg config.Config) (Storer, error) {
 		switch cfg.AssetStorageType {
 		case "s3":
-			return NewS3Storer(cfg)
+			return NewS3Storer(ctx, cfg)
 
 		default:
-			return NewLocalStorer(cfg)
+			return NewLocalStorer(cfg), nil
 		}
 	})
 }

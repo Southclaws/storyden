@@ -30,6 +30,7 @@
 package bindings
 
 import (
+	"net/http"
 	"strings"
 
 	"github.com/Southclaws/fault"
@@ -158,7 +159,19 @@ func mount(
 
 	// Skips validation for any paths not prefixed with "/api".
 	skipper := func(c echo.Context) bool {
-		return !strings.HasPrefix(c.Path(), apiPathPrefix)
+		if !strings.HasPrefix(c.Path(), apiPathPrefix) {
+			return true
+		}
+
+		// Skip validation for asset upload. This is due to the fact that the
+		// OpenAPI validator performs an io.ReadAll on the request body which
+		// will cause memory usage issues for large file uploads since it will
+		// completely remove the ability to stream request body to the uploader.
+		if c.Path() == "/api/assets" && c.Request().Method == http.MethodPost {
+			return true
+		}
+
+		return false
 	}
 
 	requestValidatorMiddleware := oapi_middleware.OapiRequestValidatorWithOptions(spec, &oapi_middleware.Options{

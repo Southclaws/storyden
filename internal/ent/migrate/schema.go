@@ -118,6 +118,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "filename", Type: field.TypeString},
 		{Name: "size", Type: field.TypeInt, Default: "0"},
+		{Name: "mime_type", Type: field.TypeString, Default: "application/octet-stream"},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Size: 20},
 		{Name: "parent_asset_id", Type: field.TypeString, Nullable: true, Size: 20},
@@ -130,13 +131,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "assets_accounts_assets",
-				Columns:    []*schema.Column{AssetsColumns[6]},
+				Columns:    []*schema.Column{AssetsColumns[7]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "assets_assets_assets",
-				Columns:    []*schema.Column{AssetsColumns[7]},
+				Columns:    []*schema.Column{AssetsColumns[8]},
 				RefColumns: []*schema.Column{AssetsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},

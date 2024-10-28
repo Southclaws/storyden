@@ -17,7 +17,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/disintegration/imaging"
-	"github.com/gabriel-vasile/mimetype"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
@@ -28,6 +27,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
+	"github.com/Southclaws/storyden/internal/mime"
 )
 
 const (
@@ -106,23 +106,11 @@ func (s *service) Upload(ctx context.Context, r io.Reader) error {
 	return s.uploadSizes(ctx, r, sizes)
 }
 
-func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) error {
-	// NOTE: We load the whole file into memory in order to compute a hash first
-	// which isn't the most optimal route as it means 5 people uploading a 100MB
-	// file to a 512MB server would result in a crash but this can be optimised.
-	// There are a few alternatives, one is to upload the whole file now by just
-	// streaming it to its destination then computing hashes and resizes another
-	// time, another way is by using a rolling hash on the stream during upload.
-
-	buf, err := io.ReadAll(r)
+func (s *service) uploadSizes(ctx context.Context, or io.Reader, sizes []Size) error {
+	mt, r, err := mime.Detect(or)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
-
-	// we read r already, but image.Decode needs a reader, so make a new one
-	bufferReader := bytes.NewReader(buf)
-
-	mt := mimetype.Detect(buf)
 	mime := mt.String()
 	ctx = fctx.WithMeta(ctx, "mimetype", mime)
 
@@ -130,7 +118,7 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 		return fault.Wrap(errBadFormat, fctx.With(ctx))
 	}
 
-	source, t, err := image.Decode(bufferReader)
+	source, t, err := image.Decode(r)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -138,7 +126,7 @@ func (s *service) uploadSizes(ctx context.Context, r io.Reader, sizes []Size) er
 	ctx = fctx.WithMeta(ctx, "type", t)
 
 	// re-used across each size
-	resizeBuffer := bytes.NewBuffer(buf)
+	resizeBuffer := bytes.NewBuffer(nil)
 
 	for _, size := range sizes {
 		px := sizeMap[size]

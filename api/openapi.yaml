@@ -1863,7 +1863,8 @@ components:
       in: header
       required: true
       schema:
-        type: number
+        type: integer
+        x-go-type: int64
 
     RoleIDParam:
       description: Role ID

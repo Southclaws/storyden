@@ -10,6 +10,15 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-default}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-default}
 
+  minio:
+    image: quay.io/minio/minio
+    command: server /data --console-address ":9001"
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - ./data/minio:/data
+
   swaggerui:
     image: swaggerapi/swagger-ui
     ports:

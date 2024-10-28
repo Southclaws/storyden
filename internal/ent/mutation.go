@@ -3749,6 +3749,7 @@ type AssetMutation struct {
 	filename      *string
 	size          *int
 	addsize       *int
+	mime_type     *string
 	metadata      *map[string]interface{}
 	clearedFields map[string]struct{}
 	posts         map[xid.ID]struct{}
@@ -4041,6 +4042,42 @@ func (m *AssetMutation) AddedSize() (r int, exists bool) {
 func (m *AssetMutation) ResetSize() {
 	m.size = nil
 	m.addsize = nil
+}
+
+// SetMimeType sets the "mime_type" field.
+func (m *AssetMutation) SetMimeType(s string) {
+	m.mime_type = &s
+}
+
+// MimeType returns the value of the "mime_type" field in the mutation.
+func (m *AssetMutation) MimeType() (r string, exists bool) {
+	v := m.mime_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMimeType returns the old "mime_type" field's value of the Asset entity.
+// If the Asset object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AssetMutation) OldMimeType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMimeType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMimeType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMimeType: %w", err)
+	}
+	return oldValue.MimeType, nil
+}
+
+// ResetMimeType resets all changes to the "mime_type" field.
+func (m *AssetMutation) ResetMimeType() {
+	m.mime_type = nil
 }
 
 // SetMetadata sets the "metadata" field.
@@ -4561,7 +4598,7 @@ func (m *AssetMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AssetMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, asset.FieldCreatedAt)
 	}
@@ -4573,6 +4610,9 @@ func (m *AssetMutation) Fields() []string {
 	}
 	if m.size != nil {
 		fields = append(fields, asset.FieldSize)
+	}
+	if m.mime_type != nil {
+		fields = append(fields, asset.FieldMimeType)
 	}
 	if m.metadata != nil {
 		fields = append(fields, asset.FieldMetadata)
@@ -4599,6 +4639,8 @@ func (m *AssetMutation) Field(name string) (ent.Value, bool) {
 		return m.Filename()
 	case asset.FieldSize:
 		return m.Size()
+	case asset.FieldMimeType:
+		return m.MimeType()
 	case asset.FieldMetadata:
 		return m.Metadata()
 	case asset.FieldAccountID:
@@ -4622,6 +4664,8 @@ func (m *AssetMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldFilename(ctx)
 	case asset.FieldSize:
 		return m.OldSize(ctx)
+	case asset.FieldMimeType:
+		return m.OldMimeType(ctx)
 	case asset.FieldMetadata:
 		return m.OldMetadata(ctx)
 	case asset.FieldAccountID:
@@ -4664,6 +4708,13 @@ func (m *AssetMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetSize(v)
+		return nil
+	case asset.FieldMimeType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMimeType(v)
 		return nil
 	case asset.FieldMetadata:
 		v, ok := value.(map[string]interface{})
@@ -4776,6 +4827,9 @@ func (m *AssetMutation) ResetField(name string) error {
 		return nil
 	case asset.FieldSize:
 		m.ResetSize()
+		return nil
+	case asset.FieldMimeType:
+		m.ResetMimeType()
 		return nil
 	case asset.FieldMetadata:
 		m.ResetMetadata()
