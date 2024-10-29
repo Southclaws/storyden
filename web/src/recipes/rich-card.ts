@@ -3,6 +3,7 @@ import { defineSlotRecipe } from "@pandacss/dev";
 export const richCard = defineSlotRecipe({
   className: "rich-card",
   slots: [
+    "container",
     "root",
     "headerContainer",
     "menuContainer",
@@ -18,16 +19,19 @@ export const richCard = defineSlotRecipe({
     "mediaMissing",
   ],
   base: {
+    container: {
+      containerType: "inline-size",
+    },
     root: {
       "--card-border-radius": "radii.lg",
       "--card-backdrop-index": "1",
       "--card-media-index": "2",
       "--card-content-index": "4",
 
-      containerType: "inline-size",
       position: "relative",
       display: "grid",
       width: "full",
+      height: "full",
       minWidth: "0",
       minHeight: "0",
       gap: "0",

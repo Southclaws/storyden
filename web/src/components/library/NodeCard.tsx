@@ -30,13 +30,14 @@ export function NodeCard({ node, libraryPath, context, ...rest }: Props) {
       url={url}
       image={image}
       // menu={<LibraryPageMenu node={node} />}
-      {...rest}
-    >
-      <HStack w="full" justify="space-between">
-        <Timestamp created={node.createdAt} href={url} large />
+      controls={
+        <HStack w="full" justify="space-between">
+          <Timestamp created={node.createdAt} href={url} large />
 
-        <LibraryPageMenu node={node} />
-      </HStack>
-    </Card>
+          <LibraryPageMenu node={node} />
+        </HStack>
+      }
+      {...rest}
+    ></Card>
   );
 }
