@@ -21,7 +21,14 @@ export function AccountMenu({ account }: Props) {
   const isAdmin = hasPermission(account, "ADMINISTRATOR");
 
   return (
-    <Menu.Root>
+    <Menu.Root
+      positioning={{
+        fitViewport: true,
+        slide: true,
+        placement: "bottom-end",
+        shift: 24,
+      }}
+    >
       <Menu.Trigger cursor="pointer">
         <MemberAvatar profile={account} size="md" />
       </Menu.Trigger>
