@@ -8,6 +8,10 @@ const richCardCompoundVariants = []
 
 const richCardSlotNames = [
   [
+    "container",
+    "rich-card__container"
+  ],
+  [
     "root",
     "rich-card__root"
   ],

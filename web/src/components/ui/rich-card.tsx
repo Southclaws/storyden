@@ -9,7 +9,7 @@ import {
 } from "react";
 
 import { css } from "@/styled-system/css";
-import { Grid, LStack, styled } from "@/styled-system/jsx";
+import { Box, Grid, LStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
 import { RichCardVariantProps, richCard } from "@/styled-system/recipes";
 import { isExternalURL } from "@/utils/url";
@@ -77,57 +77,59 @@ export function Card({
   const externalURL = isExternalURL(url);
 
   return (
-    <styled.article id={id} className={styles.root}>
-      {image && (
-        <>
-          <div className={styles.mediaBackdropContainer}>
-            <styled.img className={styles.mediaBackdrop} src={image} />
-          </div>
-          <div className={styles.mediaContainer}>
-            <styled.img
-              className={styles.media}
-              src={image}
-              maxHeight={showingMore && shape !== "fill" ? "28" : "full"}
-            />
-          </div>
-        </>
-      )}
+    <styled.article id={id} className={styles.container}>
+      <div className={styles.root}>
+        {image && (
+          <>
+            <div className={styles.mediaBackdropContainer}>
+              <styled.img className={styles.mediaBackdrop} src={image} />
+            </div>
+            <div className={styles.mediaContainer}>
+              <styled.img
+                className={styles.media}
+                src={image}
+                maxHeight={showingMore && shape !== "fill" ? "28" : "full"}
+              />
+            </div>
+          </>
+        )}
 
-      {header && <div className={styles.headerContainer}>{header}</div>}
-      {menu && <div className={styles.menuContainer}>{menu}</div>}
+        {header && <div className={styles.headerContainer}>{header}</div>}
+        {menu && <div className={styles.menuContainer}>{menu}</div>}
 
-      {title && (
-        <styled.h1 className={styles.titleContainer}>
-          <Link className={linkOverlay()} href={url}>
-            {title}
-          </Link>
-        </styled.h1>
-      )}
-
-      <div className={styles.contentContainer}>
-        <div className={styles.textArea}>
-          <div ref={textContainerRef} className={longContentStyles}>
-            <Link href={url} className={linkOverlay()}>
-              {text && <p className={styles.text}>{text}</p>}
-              {content && (
-                <>
-                  <ContentComposer
-                    placeholder=""
-                    disabled
-                    initialValue={content}
-                  />
-                </>
-              )}
+        {title && (
+          <styled.h1 className={styles.titleContainer}>
+            <Link className={linkOverlay()} href={url}>
+              {title}
             </Link>
-          </div>
-          {showMore && (
-            <ShowMore showingMore={showingMore} onClick={handleShowMore} />
-          )}
-        </div>
-      </div>
+          </styled.h1>
+        )}
 
-      <div className={styles.footerContainer}>
-        {children} {controls}
+        <div className={styles.contentContainer}>
+          <div className={styles.textArea}>
+            <div ref={textContainerRef} className={longContentStyles}>
+              <Link href={url} className={linkOverlay()}>
+                {text && <p className={styles.text}>{text}</p>}
+                {content && (
+                  <>
+                    <ContentComposer
+                      placeholder=""
+                      disabled
+                      initialValue={content}
+                    />
+                  </>
+                )}
+              </Link>
+            </div>
+            {showMore && (
+              <ShowMore showingMore={showingMore} onClick={handleShowMore} />
+            )}
+          </div>
+        </div>
+
+        <div className={styles.footerContainer}>
+          {children} {controls}
+        </div>
       </div>
     </styled.article>
   );
@@ -154,21 +156,24 @@ export function CardRows(props: CardGroupProps) {
 }
 
 export function CardGrid(props: CardGroupProps) {
-  const items = props.items?.length ?? props.children?.length ?? 0;
-
   return (
-    <Grid
-      w="full"
-      gridTemplateColumns={{
-        base: "2",
-        // Dynamically change the columns based on number of items.
-        md: items === 3 ? "3" : items === 4 ? "4" : "2",
-      }}
-    >
-      {props.children
-        ? props.children
-        : props.items.map((i) => <Card key={i.id} shape="box" {...i} />)}
-    </Grid>
+    <Box containerType="inline-size" containerName="card-grid" w="full">
+      <Grid
+        w="full"
+        gridTemplateColumns={{
+          _containerSmall: "1",
+          _containerMedium: "2",
+          _containerLarge: "3",
+          base: "1",
+          sm: "2",
+          "2xl": "3",
+        }}
+      >
+        {props.children
+          ? props.children
+          : props.items.map((i) => <Card key={i.id} shape="box" {...i} />)}
+      </Grid>
+    </Box>
   );
 }
 

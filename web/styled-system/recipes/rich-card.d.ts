@@ -19,7 +19,7 @@ export type RichCardVariantProps = {
 
 export interface RichCardRecipe {
   __type: RichCardVariantProps
-  (props?: RichCardVariantProps): Pretty<Record<"root" | "headerContainer" | "menuContainer" | "titleContainer" | "contentContainer" | "mediaContainer" | "footerContainer" | "mediaBackdropContainer" | "mediaBackdrop" | "textArea" | "text" | "media" | "mediaMissing", string>>
+  (props?: RichCardVariantProps): Pretty<Record<"container" | "root" | "headerContainer" | "menuContainer" | "titleContainer" | "contentContainer" | "mediaContainer" | "footerContainer" | "mediaBackdropContainer" | "mediaBackdrop" | "textArea" | "text" | "media" | "mediaMissing", string>>
   raw: (props?: RichCardVariantProps) => RichCardVariantProps
   variantMap: RichCardVariantMap
   variantKeys: Array<keyof RichCardVariant>

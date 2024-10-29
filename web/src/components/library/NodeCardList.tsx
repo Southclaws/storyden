@@ -33,7 +33,7 @@ export function NodeCardGrid({ libraryPath, nodes, context }: Props) {
       {nodes.map((c) => (
         <NodeCard
           key={c.id}
-          shape="box"
+          shape="responsive"
           context={context}
           libraryPath={libraryPath}
           node={c}
