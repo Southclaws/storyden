@@ -212,15 +212,19 @@ export function useLibraryMutation(node?: Node) {
           } satisfies NodeMetadata)
         : undefined;
 
-    await nodeUpdate(slug, {
-      ...newNode,
-      primary_image_asset_id: cover?.asset.id,
-      // NOTE: We don't have access to the original node's meta, so we have to
-      // fully replace it. Right now no other features use metadata, but this
-      // will need to be fixed eventually. Probably by either calling the API
-      // within this hook to fetch the latest version of the node and spreading.
-      meta: newMeta,
-    });
+    // Dispatch event
+
+    //
+
+    // await nodeUpdate(slug, {
+    //   ...newNode,
+    //   primary_image_asset_id: cover?.asset.id,
+    //   // NOTE: We don't have access to the original node's meta, so we have to
+    //   // fully replace it. Right now no other features use metadata, but this
+    //   // will need to be fixed eventually. Probably by either calling the API
+    //   // within this hook to fetch the latest version of the node and spreading.
+    //   meta: newMeta,
+    // });
 
     // Handle slug changes properly by redirecting to the new path.
     if (slugChanged && newNode.slug /* Needed for TS narrowing */) {
