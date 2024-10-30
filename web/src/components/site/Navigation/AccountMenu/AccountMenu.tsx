@@ -22,6 +22,7 @@ export function AccountMenu({ account }: Props) {
 
   return (
     <Menu.Root
+      size="md"
       positioning={{
         fitViewport: true,
         slide: true,
@@ -35,7 +36,7 @@ export function AccountMenu({ account }: Props) {
 
       <Portal>
         <Menu.Positioner>
-          <Menu.Content minW="48" userSelect="none">
+          <Menu.Content minW="72" userSelect="none">
             <Menu.ItemGroup id="account">
               <Menu.ItemGroupLabel display="flex" gap="2" alignItems="center">
                 <MemberBadge
