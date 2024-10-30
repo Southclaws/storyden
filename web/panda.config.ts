@@ -75,7 +75,7 @@ const semanticTokens = defineSemanticTokens({
         value: { base: "{colors.accent.500}" },
       },
       opaque: {
-        value: { base: "{colors.white}" },
+        value: { base: "{colors.white.a8}" },
       },
       destructive: {
         value: { base: "{colors.tomato.3}" },
@@ -180,7 +180,7 @@ export default defineConfig({
         properties: {},
         transform() {
           return {
-            backgroundColor: "bg.opaque/90",
+            backgroundColor: "bg.opaque",
             backdropBlur: "frosted",
             backdropFilter: "auto",
           };
@@ -191,7 +191,7 @@ export default defineConfig({
         properties: {},
         transform() {
           return {
-            backgroundColor: "bg.opaque/90",
+            backgroundColor: "bg.opaque",
             backdropBlur: "frosted",
             backdropFilter: "auto",
             boxShadow: "sm",

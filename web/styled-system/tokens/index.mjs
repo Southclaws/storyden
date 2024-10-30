@@ -7404,7 +7404,7 @@ const tokens = {
     "variable": "var(--colors-bg-accent)"
   },
   "colors.bg.opaque": {
-    "value": "var(--colors-white)",
+    "value": "var(--colors-white-a8)",
     "variable": "var(--colors-bg-opaque)"
   },
   "colors.bg.destructive": {
