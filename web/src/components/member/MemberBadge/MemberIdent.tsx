@@ -42,9 +42,11 @@ export function MemberName({
             minW="0"
             fontSize={size}
             fontWeight={size === "lg" ? "bold" : "medium"}
-            overflow="hidden"
+            overflowX="hidden"
+            overflowY="clip"
             textWrap="nowrap"
             textOverflow="ellipsis"
+            lineHeight="tight"
             color="fg.default"
             _containerSmall={{
               display: "none",
@@ -72,8 +74,10 @@ export function MemberName({
             fontSize={size}
             fontWeight={size === "lg" ? "bold" : "medium"}
             overflowX="hidden"
+            overflowY="clip"
             textWrap="nowrap"
             textOverflow="ellipsis"
+            lineHeight="tight"
             color="fg.default"
             _containerSmall={{
               display: "none",
