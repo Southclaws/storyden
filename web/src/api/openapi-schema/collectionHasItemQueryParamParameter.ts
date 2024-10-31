@@ -7,13 +7,11 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { ProfileReference } from "./profileReference";
 
 /**
- * A reference to the collection
+ * When specified, will include a field in the response indicating whether
+or not the specified item is present in the collection. This saves you
+needing to make two queries to check if an item is in a collection.
+
  */
-export interface CollectionCommonProps {
-  description?: string;
-  name: string;
-  owner: ProfileReference;
-}
+export type CollectionHasItemQueryParamParameter = string;

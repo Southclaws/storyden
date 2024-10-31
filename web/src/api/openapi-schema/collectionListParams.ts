@@ -8,10 +8,18 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type { AccountHandleQueryParamParameter } from "./accountHandleQueryParamParameter";
+import type { CollectionHasItemQueryParamParameter } from "./collectionHasItemQueryParamParameter";
 
 export type CollectionListParams = {
   /**
    * Account handle.
    */
   account_handle?: AccountHandleQueryParamParameter;
+  /**
+ * When specified, will include a field in the response indicating whether
+or not the specified item is present in the collection. This saves you
+needing to make two queries to check if an item is in a collection.
+
+ */
+  has_item?: CollectionHasItemQueryParamParameter;
 };

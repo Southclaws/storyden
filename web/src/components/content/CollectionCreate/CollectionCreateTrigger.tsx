@@ -19,8 +19,8 @@ export function CollectionCreateTrigger(
           variant="subtle"
           justifyContent="start"
           size="sm"
-          onClick={onOpen}
           {...props}
+          onClick={onOpen}
         >
           <FolderPlusIcon /> Create collection
         </Button>
