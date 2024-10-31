@@ -7032,7 +7032,7 @@ func (m *CollectionMutation) Description() (r string, exists bool) {
 // OldDescription returns the old "description" field's value of the Collection entity.
 // If the Collection object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CollectionMutation) OldDescription(ctx context.Context) (v string, err error) {
+func (m *CollectionMutation) OldDescription(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
@@ -7046,9 +7046,22 @@ func (m *CollectionMutation) OldDescription(ctx context.Context) (v string, err 
 	return oldValue.Description, nil
 }
 
+// ClearDescription clears the value of the "description" field.
+func (m *CollectionMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[collection.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *CollectionMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[collection.FieldDescription]
+	return ok
+}
+
 // ResetDescription resets all changes to the "description" field.
 func (m *CollectionMutation) ResetDescription() {
 	m.description = nil
+	delete(m.clearedFields, collection.FieldDescription)
 }
 
 // SetVisibility sets the "visibility" field.
@@ -7394,7 +7407,11 @@ func (m *CollectionMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CollectionMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(collection.FieldDescription) {
+		fields = append(fields, collection.FieldDescription)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -7407,6 +7424,11 @@ func (m *CollectionMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CollectionMutation) ClearField(name string) error {
+	switch name {
+	case collection.FieldDescription:
+		m.ClearDescription()
+		return nil
+	}
 	return fmt.Errorf("unknown Collection nullable field %s", name)
 }
 

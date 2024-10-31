@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/collection"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -34,7 +34,6 @@ type Thread struct {
 	Category    category.Category
 	Visibility  visibility.Visibility
 	Tags        tag_ref.Tags
-	Collections []*collection.Collection
 	Related     datagraph.ItemList
 }
 
@@ -46,7 +45,7 @@ func (t *Thread) GetDesc() string       { return t.Short }
 func (t *Thread) GetCreated() time.Time { return t.CreatedAt }
 func (t *Thread) GetUpdated() time.Time { return t.UpdatedAt }
 
-func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (*Thread, error) {
+func FromModel(ls post.PostLikesMap, cs collection_item_status.CollectionStatusMap, rs post.PostRepliesMap) func(m *ent.Post) (*Thread, error) {
 	return func(m *ent.Post) (*Thread, error) {
 		categoryEdge, err := m.Edges.CategoryOrErr()
 		if err != nil {
@@ -66,19 +65,6 @@ func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (
 		}
 
 		replies, err := dt.MapErr(m.Edges.Posts, reply.FromModel(ls))
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-
-		collectionsEdge := opt.NewIf(m.Edges.Collections, func(c []*ent.Collection) bool { return c != nil })
-
-		collections, err := opt.MapErr(collectionsEdge, func(c []*ent.Collection) ([]*collection.Collection, error) {
-			out, err := dt.MapErr(c, collection.MapCollection)
-			if err != nil {
-				return nil, fault.Wrap(err)
-			}
-			return out, nil
-		})
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}
@@ -103,13 +89,14 @@ func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (
 			Post: post.Post{
 				ID: post.ID(m.ID),
 
-				Content: content,
-				Author:  *pro,
-				Likes:   ls.Status(m.ID),
-				Reacts:  reacts,
-				Assets:  dt.Map(m.Edges.Assets, asset.Map),
-				WebLink: link,
-				Meta:    m.Metadata,
+				Content:     content,
+				Author:      *pro,
+				Likes:       ls.Status(m.ID),
+				Collections: cs.Status(m.ID),
+				Reacts:      reacts,
+				Assets:      dt.Map(m.Edges.Assets, asset.Map),
+				WebLink:     link,
+				Meta:        m.Metadata,
 
 				CreatedAt: m.CreatedAt,
 				UpdatedAt: m.UpdatedAt,
@@ -126,7 +113,6 @@ func FromModel(ls post.PostLikesMap, rs post.PostRepliesMap) func(m *ent.Post) (
 			Category:    *category,
 			Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
 			Tags:        tags,
-			Collections: collections.OrZero(),
 		}, nil
 	}
 }

@@ -1357,7 +1357,9 @@ paths:
       description: List all collections using the filtering options.
       tags: [collections]
       security: []
-      parameters: [{ $ref: "#/components/parameters/AccountHandleQueryParam" }]
+      parameters:
+        - { $ref: "#/components/parameters/AccountHandleQueryParam" }
+        - { $ref: "#/components/parameters/CollectionHasItemQueryParam" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -2057,6 +2059,17 @@ components:
       name: collection_id
       in: path
       required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    CollectionHasItemQueryParam:
+      description: |
+        When specified, will include a field in the response indicating whether
+        or not the specified item is present in the collection. This saves you
+        needing to make two queries to check if an item is in a collection.
+      name: has_item
+      in: query
+      required: false
       schema:
         $ref: "#/components/schemas/Identifier"
 
@@ -4223,7 +4236,7 @@ components:
         author: { $ref: "#/components/schemas/ProfileReference" }
         assets: { $ref: "#/components/schemas/AssetList" }
         reacts: { $ref: "#/components/schemas/ReactList" }
-        collections: { $ref: "#/components/schemas/CollectionList" }
+        collections: { $ref: "#/components/schemas/CollectionStatus" }
         likes: { $ref: "#/components/schemas/LikeData" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
@@ -4588,6 +4601,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
         - $ref: "#/components/schemas/CollectionCommonProps"
+        - $ref: "#/components/schemas/CollectionAdditionalProps"
 
     CollectionWithItems:
       description: |
@@ -4605,7 +4619,7 @@ components:
     CollectionCommonProps:
       description: A reference to the collection
       type: object
-      required: [name, description, owner]
+      required: [name, owner]
       properties:
         name:
           type: string
@@ -4613,13 +4627,22 @@ components:
           type: string
         owner: { $ref: "#/components/schemas/ProfileReference" }
 
+    CollectionAdditionalProps:
+      type: object
+      required: [item_count, has_queried_item]
+      properties:
+        item_count:
+          type: integer
+        has_queried_item:
+          type: boolean
+
     CollectionList:
       type: array
       items: { $ref: "#/components/schemas/Collection" }
 
     CollectionInitialProps:
       type: object
-      required: [name, description]
+      required: [name]
       properties:
         name:
           type: string
@@ -4662,6 +4685,22 @@ components:
     CollectionItemMembershipType:
       type: string
       enum: [normal, submission_review, submission_accepted]
+
+    CollectionStatus:
+      type: object
+      required: [in_collections, has_collected]
+      properties:
+        in_collections: { $ref: "#/components/schemas/CollectionCount" }
+        has_collected: { $ref: "#/components/schemas/HasCollected" }
+
+    CollectionCount:
+      description: How many collections has this item been added to?
+      type: integer
+
+    HasCollected:
+      description: |
+        A boolean indicating if the account in context has collected this item.
+      type: boolean
 
     #
     # 888b    888               888
@@ -4814,7 +4853,6 @@ components:
         assets: { $ref: "#/components/schemas/AssetList" }
         posts: { $ref: "#/components/schemas/PostReferenceList" }
         nodes: { $ref: "#/components/schemas/NodeList" }
-        collections: { $ref: "#/components/schemas/CollectionList" }
 
     LinkReferenceProps:
       type: object

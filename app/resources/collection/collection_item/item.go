@@ -1,4 +1,4 @@
-package collection
+package collection_item
 
 import (
 	"context"
@@ -8,25 +8,38 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/collection"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/ent/collection"
+	ent_collection "github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 )
 
+type Repository struct {
+	db      *ent.Client
+	querier *collection_querier.Querier
+}
+
+func New(db *ent.Client, querier *collection_querier.Querier) *Repository {
+	return &Repository{db: db, querier: querier}
+}
+
 type itemChange struct {
 	id     xid.ID
-	mt     MembershipType
+	mt     collection.MembershipType
 	t      datagraph.Kind
 	remove bool
 }
 
 type itemChanges []itemChange
 
-func WithPost(id post.ID, mt MembershipType) ItemOption {
+type ItemOption func(*itemChanges)
+
+func WithPost(id post.ID, mt collection.MembershipType) ItemOption {
 	return func(c *itemChanges) {
 		*c = append(*c, itemChange{
 			id: xid.ID(id),
@@ -46,7 +59,7 @@ func WithPostRemove(id post.ID) ItemOption {
 	}
 }
 
-func WithNode(id library.NodeID, mt MembershipType) ItemOption {
+func WithNode(id library.NodeID, mt collection.MembershipType) ItemOption {
 	return func(c *itemChanges) {
 		*c = append(*c, itemChange{
 			id: xid.ID(id),
@@ -66,7 +79,7 @@ func WithNodeRemove(id library.NodeID) ItemOption {
 	}
 }
 
-func (d *database) UpdateItems(ctx context.Context, id CollectionID, opts ...ItemOption) (*CollectionWithItems, error) {
+func (d *Repository) UpdateItems(ctx context.Context, id collection.CollectionID, opts ...ItemOption) (*collection.CollectionWithItems, error) {
 	options := itemChanges{}
 
 	for _, fn := range opts {
@@ -144,12 +157,12 @@ func (d *database) UpdateItems(ctx context.Context, id CollectionID, opts ...Ite
 		}
 	}
 
-	return d.Get(ctx, id)
+	return d.querier.Get(ctx, id)
 }
 
-func (d *database) ProbeItem(ctx context.Context, id CollectionID, itemID xid.ID) (*CollectionItemStatus, error) {
+func (d *Repository) ProbeItem(ctx context.Context, id collection.CollectionID, itemID xid.ID) (*collection.CollectionItemStatus, error) {
 	r, err := d.db.Collection.Query().
-		Where(collection.ID(xid.ID(id))).
+		Where(ent_collection.ID(xid.ID(id))).
 		WithOwner(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
@@ -174,13 +187,13 @@ func (d *database) ProbeItem(ctx context.Context, id CollectionID, itemID xid.ID
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	item, err := func() (_ opt.Optional[CollectionItem], err error) {
-		var i *CollectionItem
+	item, err := func() (_ opt.Optional[collection.CollectionItem], err error) {
+		var i *collection.CollectionItem
 		if len(r.Edges.CollectionNodes) > 0 {
-			i, err = MapCollectionNode(r.Edges.CollectionNodes[0])
+			i, err = collection.MapNode(r.Edges.CollectionNodes[0])
 		}
 		if len(r.Edges.CollectionPosts) > 0 {
-			i, err = MapCollectionPost(r.Edges.CollectionPosts[0])
+			i, err = collection.MapPost(r.Edges.CollectionPosts[0])
 		}
 		return opt.NewPtr(i), err
 	}()
@@ -188,13 +201,13 @@ func (d *database) ProbeItem(ctx context.Context, id CollectionID, itemID xid.ID
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	collection, err := MapCollection(r)
+	col, err := collection.Map(nil)(r)
 	if err != nil {
 		return nil, err
 	}
 
-	return &CollectionItemStatus{
-		Collection: *collection,
+	return &collection.CollectionItemStatus{
+		Collection: *col,
 		Item:       item,
 	}, nil
 }

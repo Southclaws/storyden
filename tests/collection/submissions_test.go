@@ -83,8 +83,7 @@ func TestCollectionSubmissions(t *testing.T) {
 				a := assert.New(t)
 
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
-					Name:        "c1",
-					Description: "owned by acc1",
+					Name: "c1",
 				}, session1)
 				tests.Ok(t, err, col)
 
@@ -140,8 +139,7 @@ func TestCollectionSubmissions(t *testing.T) {
 				unlisted := openapi.Unlisted
 
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
-					Name:        "c2",
-					Description: "owned by acc1",
+					Name: "c2",
 				}, session1)
 				tests.Ok(t, err, col)
 
@@ -184,8 +182,7 @@ func TestCollectionSubmissions(t *testing.T) {
 				unlisted := openapi.Unlisted
 
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
-					Name:        "c2",
-					Description: "owned by acc1",
+					Name: "c2",
 				}, session1)
 				tests.Ok(t, err, col)
 

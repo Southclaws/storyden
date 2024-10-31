@@ -17,7 +17,7 @@ func (Collection) Mixin() []ent.Mixin {
 func (Collection) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
-		field.String("description"),
+		field.String("description").Optional().Nillable(),
 		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
 	}
 }
