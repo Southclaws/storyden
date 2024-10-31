@@ -67,6 +67,12 @@ func (cu *CollectionUpdate) SetNillableDescription(s *string) *CollectionUpdate 
 	return cu
 }
 
+// ClearDescription clears the value of the "description" field.
+func (cu *CollectionUpdate) ClearDescription() *CollectionUpdate {
+	cu.mutation.ClearDescription()
+	return cu
+}
+
 // SetVisibility sets the "visibility" field.
 func (cu *CollectionUpdate) SetVisibility(c collection.Visibility) *CollectionUpdate {
 	cu.mutation.SetVisibility(c)
@@ -255,6 +261,9 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(collection.FieldDescription, field.TypeString, value)
+	}
+	if cu.mutation.DescriptionCleared() {
+		_spec.ClearField(collection.FieldDescription, field.TypeString)
 	}
 	if value, ok := cu.mutation.Visibility(); ok {
 		_spec.SetField(collection.FieldVisibility, field.TypeEnum, value)
@@ -455,6 +464,12 @@ func (cuo *CollectionUpdateOne) SetNillableDescription(s *string) *CollectionUpd
 	if s != nil {
 		cuo.SetDescription(*s)
 	}
+	return cuo
+}
+
+// ClearDescription clears the value of the "description" field.
+func (cuo *CollectionUpdateOne) ClearDescription() *CollectionUpdateOne {
+	cuo.mutation.ClearDescription()
 	return cuo
 }
 
@@ -676,6 +691,9 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(collection.FieldDescription, field.TypeString, value)
+	}
+	if cuo.mutation.DescriptionCleared() {
+		_spec.ClearField(collection.FieldDescription, field.TypeString)
 	}
 	if value, ok := cuo.mutation.Visibility(); ok {
 		_spec.SetField(collection.FieldVisibility, field.TypeEnum, value)

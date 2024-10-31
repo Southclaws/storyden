@@ -18,6 +18,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -109,7 +110,7 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(nil, nil)(p)
+	return FromModel(nil, nil, nil)(p)
 }
 
 func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thread, error) {
@@ -142,7 +143,7 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(nil, nil)(p)
+	return FromModel(nil, nil, nil)(p)
 }
 
 const repliesCountManyQuery = `select
@@ -164,6 +165,19 @@ from
   like_posts lp
   inner join posts p on p.id = lp.post_id
   left join accounts a on lp.account_id = a.id
+  and a.id = $1
+group by p.id
+`
+
+const collectionsCountManyQuery = `select
+  p.id        item_id,          -- the post (thread or reply) ID
+  count(*)    collections,      -- number of likes
+  count(a.id) has_in_collection -- has the account making the query liked this post?
+from
+  collection_posts cp
+  inner join posts p on p.id = cp.post_id
+  inner join collections c on c.id = cp.collection_id
+  left join accounts a on c.account_collections = a.id
   and a.id = $1
 group by p.id
 `
@@ -242,7 +256,14 @@ func (d *database) List(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	threads, err := dt.MapErr(result, FromModel(likes.Map(), replies.Map()))
+	var collections collection_item_status.CollectionStatusResults
+	err = d.raw.SelectContext(ctx, &collections, collectionsCountManyQuery, accountID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	mapper := FromModel(likes.Map(), collections.Map(), replies.Map())
+	threads, err := dt.MapErr(result, mapper)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -270,9 +291,30 @@ where
 group by p.id
 `
 
+const collectionsCountQuery = `select
+  p.id        item_id,          -- the post (thread or reply) ID
+  count(*)    collections,      -- number of likes
+  count(a.id) has_in_collection -- has the account making the query liked this post?
+from
+  collection_posts cp
+  inner join posts p on p.id = cp.post_id
+  inner join collections c on c.id = cp.collection_id
+  left join accounts a on c.account_collections = a.id
+  and a.id = $2
+where
+  p.id = $1 or p.root_post_id = $1
+group by p.id
+`
+
 func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Optional[account.AccountID]) (*Thread, error) {
 	var likes post.PostLikesResults
 	err := d.raw.SelectContext(ctx, &likes, likesCountQuery, threadID.String(), accountID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	var collections collection_item_status.CollectionStatusResults
+	err = d.raw.SelectContext(ctx, &collections, collectionsCountQuery, threadID.String(), accountID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -349,7 +391,8 @@ func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Opti
 		},
 	}
 
-	p, err := FromModel(likes.Map(), replies)(r)
+	mapper := FromModel(likes.Map(), collections.Map(), replies)
+	p, err := mapper(r)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

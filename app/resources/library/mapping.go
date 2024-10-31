@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 
@@ -79,8 +80,11 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		Owner:        *pro,
 		Parent:       parent,
 		Tags:         tags,
-		Nodes:        nodes,
-		Visibility:   visibility,
-		Metadata:     c.Metadata,
+		Collections:  collection_item_status.Status{
+			// NOTE: Members cannot yet add nodes to collections.
+		},
+		Nodes:      nodes,
+		Visibility: visibility,
+		Metadata:   c.Metadata,
 	}, nil
 }

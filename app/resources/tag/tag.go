@@ -33,7 +33,7 @@ func Map(in *ent.Tag) (*Tag, error) {
 
 	tag.ItemCount = len(postsEdge) + len(nodesEdge)
 
-	posts, err := dt.MapErr(postsEdge, thread.FromModel(nil, nil))
+	posts, err := dt.MapErr(postsEdge, thread.FromModel(nil, nil, nil))
 	if err != nil {
 		return nil, err
 	}

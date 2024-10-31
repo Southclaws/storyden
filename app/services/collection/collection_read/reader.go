@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"go.uber.org/fx"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/dt"
@@ -15,6 +14,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/collection"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -24,20 +24,32 @@ import (
 	"github.com/Southclaws/storyden/app/services/account/session"
 )
 
-type CollectionQuerier struct {
-	fx.In
-
-	Logger  *zap.Logger
-	Repo    collection.Repository
-	Semdex  semdex.RelevanceScorer
-	Session session.SessionProvider
+type Hydrator struct {
+	logger  *zap.Logger
+	querier *collection_querier.Querier
+	semdex  semdex.RelevanceScorer
+	session session.SessionProvider
 }
 
-func (r *CollectionQuerier) GetCollection(ctx context.Context, id collection.CollectionID) (*collection.CollectionWithItems, error) {
-	session := r.Session.AccountOpt(ctx)
+func New(
+	logger *zap.Logger,
+	querier *collection_querier.Querier,
+	semdex semdex.RelevanceScorer,
+	session session.SessionProvider,
+) *Hydrator {
+	return &Hydrator{
+		logger:  logger,
+		querier: querier,
+		semdex:  semdex,
+		session: session,
+	}
+}
+
+func (r *Hydrator) GetCollection(ctx context.Context, id collection.CollectionID) (*collection.CollectionWithItems, error) {
+	session := r.session.AccountOpt(ctx)
 	acc := session.OrZero()
 
-	col, err := r.Repo.Get(ctx, id)
+	col, err := r.querier.Get(ctx, id)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -82,13 +94,13 @@ func (r *CollectionQuerier) GetCollection(ctx context.Context, id collection.Col
 		return true
 	})
 
-	if acc, ok := session.Get(); ok && r.Semdex != nil {
+	if acc, ok := session.Get(); ok && r.semdex != nil {
 		pro := profile.ProfileFromAccount(&acc)
 		ids := dt.Map(col.Items, func(i *collection.CollectionItem) xid.ID { return i.Item.GetID() })
 
-		scores, err := r.Semdex.ScoreRelevance(ctx, pro, ids...)
+		scores, err := r.semdex.ScoreRelevance(ctx, pro, ids...)
 		if err != nil {
-			r.Logger.Warn("failed to score relevance", zap.Error(err))
+			r.logger.Warn("failed to score relevance", zap.Error(err))
 		}
 
 		col.Items = dt.Map(col.Items, func(i *collection.CollectionItem) *collection.CollectionItem {

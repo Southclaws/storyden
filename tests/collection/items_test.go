@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	"github.com/rs/xid"
+	"github.com/samber/lo"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
@@ -45,8 +47,7 @@ func TestCollectionItems(t *testing.T) {
 			session2 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))), cj)
 
 			collection1, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
-				Name:        "c1",
-				Description: "owned by acc1",
+				Name: "c1",
 			}, session1)
 			tests.Ok(t, err, collection1)
 
@@ -128,8 +129,7 @@ func TestCollectionItems(t *testing.T) {
 
 			t.Run("add_idempotent", func(t *testing.T) {
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
-					Name:        "x1",
-					Description: "owned by acc1",
+					Name: "x1",
 				}, session1)
 				tests.Ok(t, err, col)
 
@@ -141,6 +141,125 @@ func TestCollectionItems(t *testing.T) {
 				addPost1again, err := cl.CollectionAddPostWithResponse(root, collection1.JSON200.Id, thread1create.JSON200.Id, session1)
 				tests.Ok(t, err, addPost1again)
 			})
+
+			t.Run("collection_item_status", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
+
+				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
+					Name: "x1",
+				}, session1)
+				tests.Ok(t, err, col)
+
+				thr, err := cl.ThreadCreateWithResponse(root, threadCreateProps, session1)
+				tests.Ok(t, err, thr)
+
+				addThr, err := cl.CollectionAddPostWithResponse(root, col.JSON200.Id, thr.JSON200.Id, session1)
+				tests.Ok(t, err, addThr)
+
+				// Get the thread in a list and directly as the owner of the collection
+
+				ownerlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}, session1)
+				tests.Ok(t, err, ownerlist)
+				fromList, found := lo.Find(ownerlist.JSON200.Threads, func(tr openapi.ThreadReference) bool { return tr.Id == thr.JSON200.Id })
+				r.True(found)
+				a.True(fromList.Collections.HasCollected)
+				a.Equal(1, fromList.Collections.InCollections)
+
+				ownerget, err := cl.ThreadGetWithResponse(root, thr.JSON200.Id, session1)
+				tests.Ok(t, err, ownerget)
+				a.True(ownerget.JSON200.Collections.HasCollected)
+				a.Equal(1, ownerget.JSON200.Collections.InCollections)
+
+				// A different session this time, not the owner of the collection
+
+				randolist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}, session2)
+				tests.Ok(t, err, randolist)
+				fromList, found = lo.Find(randolist.JSON200.Threads, func(tr openapi.ThreadReference) bool { return tr.Id == thr.JSON200.Id })
+				r.True(found)
+				a.False(fromList.Collections.HasCollected)
+				a.Equal(1, fromList.Collections.InCollections)
+
+				randoget, err := cl.ThreadGetWithResponse(root, thr.JSON200.Id, session2)
+				tests.Ok(t, err, randoget)
+				a.False(randoget.JSON200.Collections.HasCollected)
+				a.Equal(1, randoget.JSON200.Collections.InCollections)
+
+				// And finally, as a guest with no session at all
+
+				guestlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
+				tests.Ok(t, err, guestlist)
+				fromList, found = lo.Find(guestlist.JSON200.Threads, func(tr openapi.ThreadReference) bool { return tr.Id == thr.JSON200.Id })
+				r.True(found)
+				a.False(fromList.Collections.HasCollected)
+				a.Equal(1, fromList.Collections.InCollections)
+
+				guestget, err := cl.ThreadGetWithResponse(root, thr.JSON200.Id)
+				tests.Ok(t, err, guestget)
+				a.False(guestget.JSON200.Collections.HasCollected)
+				a.Equal(1, guestget.JSON200.Collections.InCollections)
+			})
+
+			t.Run("query_having_item_by_id", func(t *testing.T) {
+				t.Parallel()
+				a := assert.New(t)
+
+				acc1, err := cl.AccountGetWithResponse(root, session1)
+				tests.Ok(t, err, acc1)
+
+				colHavingItem, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
+					Name: "c1",
+				}, session1)
+				tests.Ok(t, err, colHavingItem)
+
+				// add a post and node
+				addPost1, err := cl.CollectionAddPostWithResponse(root, colHavingItem.JSON200.Id, thread1create.JSON200.Id, session1)
+				tests.Ok(t, err, addPost1)
+				addNode1, err := cl.CollectionAddNodeWithResponse(root, colHavingItem.JSON200.Id, node1create.JSON200.Id, session1)
+				tests.Ok(t, err, addNode1)
+
+				get1, err := cl.CollectionListWithResponse(root, &openapi.CollectionListParams{
+					AccountHandle: &acc1.JSON200.Handle,
+					HasItem:       &thread1create.JSON200.Id,
+				})
+				tests.Ok(t, err, get1)
+				col1 := find(t, get1.JSON200.Collections, colHavingItem.JSON200.Id)
+				a.True(col1.HasQueriedItem)
+
+				get2, err := cl.CollectionListWithResponse(root, &openapi.CollectionListParams{
+					AccountHandle: &acc1.JSON200.Handle,
+					HasItem:       &node1create.JSON200.Id,
+				})
+				tests.Ok(t, err, get2)
+				col2 := find(t, get2.JSON200.Collections, colHavingItem.JSON200.Id)
+				a.True(col2.HasQueriedItem)
+
+				get3, err := cl.CollectionListWithResponse(root, &openapi.CollectionListParams{
+					AccountHandle: &acc1.JSON200.Handle,
+					HasItem:       nil,
+				})
+				tests.Ok(t, err, get3)
+				col3 := find(t, get3.JSON200.Collections, colHavingItem.JSON200.Id)
+				a.False(col3.HasQueriedItem)
+
+				get4, err := cl.CollectionListWithResponse(root, &openapi.CollectionListParams{
+					AccountHandle: &acc1.JSON200.Handle,
+					HasItem:       &[]string{xid.New().String()}[0],
+				})
+				tests.Ok(t, err, get4)
+				col4 := find(t, get4.JSON200.Collections, colHavingItem.JSON200.Id)
+				a.False(col4.HasQueriedItem)
+			})
 		}))
 	}))
+}
+
+func find(t *testing.T, collections []openapi.Collection, cid openapi.CollectionIDParam) *openapi.Collection {
+	for _, c := range collections {
+		if c.Id == cid {
+			return &c
+		}
+	}
+	t.Fatalf("collection not found: %s", cid)
+	return nil
 }

@@ -9,6 +9,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/like"
@@ -30,15 +31,16 @@ type Post struct {
 	ID   ID
 	Root ID // Identical to ID if this is the root.
 
-	Title   string
-	Slug    string
-	Content datagraph.Content
-	Author  profile.Public
-	Likes   like.Status
-	Reacts  []*reaction.React
-	Assets  []*asset.Asset
-	WebLink opt.Optional[link_ref.LinkRef]
-	Meta    map[string]any
+	Title       string
+	Slug        string
+	Content     datagraph.Content
+	Author      profile.Public
+	Likes       like.Status
+	Collections collection_item_status.Status
+	Reacts      []*reaction.React
+	Assets      []*asset.Asset
+	WebLink     opt.Optional[link_ref.LinkRef]
+	Meta        map[string]any
 
 	CreatedAt time.Time
 	UpdatedAt time.Time

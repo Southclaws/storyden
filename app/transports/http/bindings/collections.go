@@ -9,29 +9,35 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/collection"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	collection_svc "github.com/Southclaws/storyden/app/services/collection"
+	"github.com/Southclaws/storyden/app/services/collection/collection_item_manager"
+	"github.com/Southclaws/storyden/app/services/collection/collection_manager"
 	"github.com/Southclaws/storyden/app/services/collection/collection_read"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Collections struct {
-	collection_repo    collection.Repository
-	collection_svc     collection_svc.Service
-	collection_querier collection_read.CollectionQuerier
+	colQuerier     *collection_querier.Querier
+	colReader      *collection_read.Hydrator
+	colManager     *collection_manager.Manager
+	colItemManager *collection_item_manager.Manager
 }
 
 func NewCollections(
-	collection_repo collection.Repository,
-	collection_svc collection_svc.Service,
-	collection_querier collection_read.CollectionQuerier,
+	colQuerier *collection_querier.Querier,
+	colReader *collection_read.Hydrator,
+	colManager *collection_manager.Manager,
+	colItemManager *collection_item_manager.Manager,
 ) Collections {
 	return Collections{
-		collection_repo:    collection_repo,
-		collection_svc:     collection_svc,
-		collection_querier: collection_querier,
+		colQuerier:     colQuerier,
+		colReader:      colReader,
+		colManager:     colManager,
+		colItemManager: colItemManager,
 	}
 }
 
@@ -41,7 +47,9 @@ func (i *Collections) CollectionCreate(ctx context.Context, request openapi.Coll
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	coll, err := i.collection_repo.Create(ctx, accountID, request.Body.Name, request.Body.Description)
+	coll, err := i.colManager.Create(ctx, accountID, request.Body.Name, collection_manager.Partial{
+		Description: opt.NewPtr(request.Body.Description),
+	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -52,13 +60,18 @@ func (i *Collections) CollectionCreate(ctx context.Context, request openapi.Coll
 }
 
 func (i *Collections) CollectionList(ctx context.Context, request openapi.CollectionListRequestObject) (openapi.CollectionListResponseObject, error) {
-	filters := []collection.Filter{}
+	opts := []collection_querier.Option{}
 
 	if v := request.Params.AccountHandle; v != nil {
-		filters = append(filters, collection.WithOwnerHandle(*v))
+		opts = append(opts, collection_querier.WithOwnerHandle(*v))
 	}
 
-	colls, err := i.collection_repo.List(ctx, filters...)
+	itemPresenceQuery := opt.Map(opt.NewPtr(request.Params.HasItem), deserialiseID)
+	if v, ok := itemPresenceQuery.Get(); ok {
+		opts = append(opts, collection_querier.WithItemPresenceQuery(v))
+	}
+
+	colls, err := i.colQuerier.List(ctx, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -73,7 +86,7 @@ func (i *Collections) CollectionList(ctx context.Context, request openapi.Collec
 }
 
 func (i *Collections) CollectionGet(ctx context.Context, request openapi.CollectionGetRequestObject) (openapi.CollectionGetResponseObject, error) {
-	coll, err := i.collection_querier.GetCollection(ctx, collection.CollectionID(deserialiseID(request.CollectionId)))
+	coll, err := i.colReader.GetCollection(ctx, collection.CollectionID(deserialiseID(request.CollectionId)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -84,9 +97,9 @@ func (i *Collections) CollectionGet(ctx context.Context, request openapi.Collect
 }
 
 func (i *Collections) CollectionUpdate(ctx context.Context, request openapi.CollectionUpdateRequestObject) (openapi.CollectionUpdateResponseObject, error) {
-	c, err := i.collection_svc.Update(ctx,
+	c, err := i.colManager.Update(ctx,
 		collection.CollectionID(deserialiseID(request.CollectionId)),
-		collection_svc.Partial{
+		collection_manager.Partial{
 			Name:        opt.NewPtr(request.Body.Name),
 			Description: opt.NewPtr(request.Body.Description),
 		})
@@ -100,7 +113,7 @@ func (i *Collections) CollectionUpdate(ctx context.Context, request openapi.Coll
 }
 
 func (i *Collections) CollectionDelete(ctx context.Context, request openapi.CollectionDeleteRequestObject) (openapi.CollectionDeleteResponseObject, error) {
-	err := i.collection_svc.Delete(ctx, collection.CollectionID(deserialiseID(request.CollectionId)))
+	err := i.colManager.Delete(ctx, collection.CollectionID(deserialiseID(request.CollectionId)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -109,7 +122,7 @@ func (i *Collections) CollectionDelete(ctx context.Context, request openapi.Coll
 }
 
 func (i *Collections) CollectionAddPost(ctx context.Context, request openapi.CollectionAddPostRequestObject) (openapi.CollectionAddPostResponseObject, error) {
-	c, err := i.collection_svc.PostAdd(ctx,
+	c, err := i.colItemManager.PostAdd(ctx,
 		collection.CollectionID(deserialiseID(request.CollectionId)),
 		post.ID(deserialiseID(request.PostId)))
 	if err != nil {
@@ -122,7 +135,7 @@ func (i *Collections) CollectionAddPost(ctx context.Context, request openapi.Col
 }
 
 func (i *Collections) CollectionRemovePost(ctx context.Context, request openapi.CollectionRemovePostRequestObject) (openapi.CollectionRemovePostResponseObject, error) {
-	c, err := i.collection_svc.PostRemove(ctx,
+	c, err := i.colItemManager.PostRemove(ctx,
 		collection.CollectionID(deserialiseID(request.CollectionId)),
 		post.ID(deserialiseID(request.PostId)))
 	if err != nil {
@@ -135,7 +148,7 @@ func (i *Collections) CollectionRemovePost(ctx context.Context, request openapi.
 }
 
 func (i *Collections) CollectionAddNode(ctx context.Context, request openapi.CollectionAddNodeRequestObject) (openapi.CollectionAddNodeResponseObject, error) {
-	c, err := i.collection_svc.NodeAdd(ctx,
+	c, err := i.colItemManager.NodeAdd(ctx,
 		collection.CollectionID(deserialiseID(request.CollectionId)),
 		library.NodeID(deserialiseID(request.NodeId)))
 	if err != nil {
@@ -148,7 +161,7 @@ func (i *Collections) CollectionAddNode(ctx context.Context, request openapi.Col
 }
 
 func (i *Collections) CollectionRemoveNode(ctx context.Context, request openapi.CollectionRemoveNodeRequestObject) (openapi.CollectionRemoveNodeResponseObject, error) {
-	c, err := i.collection_svc.NodeRemove(ctx,
+	c, err := i.colItemManager.NodeRemove(ctx,
 		collection.CollectionID(deserialiseID(request.CollectionId)),
 		library.NodeID(deserialiseID(request.NodeId)))
 	if err != nil {
@@ -162,12 +175,14 @@ func (i *Collections) CollectionRemoveNode(ctx context.Context, request openapi.
 
 func serialiseCollection(in *collection.Collection) openapi.Collection {
 	return openapi.Collection{
-		Id:          in.ID.String(),
-		CreatedAt:   in.CreatedAt,
-		UpdatedAt:   in.UpdatedAt,
-		Owner:       serialiseProfileReference(in.Owner),
-		Name:        in.Name,
-		Description: in.Description,
+		Id:             in.ID.String(),
+		CreatedAt:      in.CreatedAt,
+		UpdatedAt:      in.UpdatedAt,
+		Owner:          serialiseProfileReference(in.Owner),
+		Name:           in.Name,
+		Description:    in.Description.Ptr(),
+		ItemCount:      int(in.ItemCount),
+		HasQueriedItem: in.HasQueriedItem,
 	}
 }
 
@@ -178,7 +193,7 @@ func serialiseCollectionWithItems(in *collection.CollectionWithItems) openapi.Co
 		UpdatedAt:   in.UpdatedAt,
 		Owner:       serialiseProfileReference(in.Owner),
 		Name:        in.Name,
-		Description: in.Description,
+		Description: in.Description.Ptr(),
 		Items:       dt.Map(in.Items, serialiseCollectionItem),
 	}
 }
@@ -201,5 +216,12 @@ func serialiseCollectionItem(in *collection.CollectionItem) openapi.CollectionIt
 		RelevanceScore: score,
 		Meta:           (*openapi.Metadata)(&meta),
 		Assets:         dt.Map(in.Item.GetAssets(), serialiseAssetPtr),
+	}
+}
+
+func serialiseCollectionStatus(in collection_item_status.Status) openapi.CollectionStatus {
+	return openapi.CollectionStatus{
+		InCollections: in.Count,
+		HasCollected:  in.Status,
 	}
 }

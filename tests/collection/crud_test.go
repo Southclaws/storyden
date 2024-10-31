@@ -58,8 +58,7 @@ func TestCollectionCRUD(t *testing.T) {
 				t.Parallel()
 
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
-					Name:        "c1",
-					Description: "c1 desc",
+					Name: "c1",
 				})
 				tests.Status(t, err, col, http.StatusForbidden)
 			})
@@ -68,33 +67,34 @@ func TestCollectionCRUD(t *testing.T) {
 				t.Parallel()
 				a := assert.New(t)
 
+				desc := "c1 desc"
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
 					Name:        "c1",
-					Description: "c1 desc",
+					Description: &desc,
 				}, session1)
 				tests.Ok(t, err, col)
 				a.Equal("c1", col.JSON200.Name)
-				a.Equal("c1 desc", col.JSON200.Description)
+				a.Equal("c1 desc", *col.JSON200.Description)
 
 				// owner
 				get1, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session1)
 				tests.Ok(t, err, get1)
 				a.Equal("c1", get1.JSON200.Name)
-				a.Equal("c1 desc", get1.JSON200.Description)
+				a.Equal("c1 desc", *get1.JSON200.Description)
 				a.Equal(acc1.JSON200.Id, get1.JSON200.Owner.Id)
 
 				// another user
 				get2, err := cl.CollectionGetWithResponse(root, col.JSON200.Id, session2)
 				tests.Ok(t, err, get2)
 				a.Equal("c1", get2.JSON200.Name)
-				a.Equal("c1 desc", get2.JSON200.Description)
+				a.Equal("c1 desc", *get2.JSON200.Description)
 				a.Equal(acc1.JSON200.Id, get2.JSON200.Owner.Id)
 
 				// anonymous/guest
 				get3, err := cl.CollectionGetWithResponse(root, col.JSON200.Id)
 				tests.Ok(t, err, get3)
 				a.Equal("c1", get3.JSON200.Name)
-				a.Equal("c1 desc", get3.JSON200.Description)
+				a.Equal("c1 desc", *get3.JSON200.Description)
 				a.Equal(acc1.JSON200.Id, get3.JSON200.Owner.Id)
 			})
 
@@ -102,13 +102,14 @@ func TestCollectionCRUD(t *testing.T) {
 				t.Parallel()
 				a := assert.New(t)
 
+				desc := "c1 desc"
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
 					Name:        "c1",
-					Description: "c1 desc",
+					Description: &desc,
 				}, session1)
 				tests.Ok(t, err, col)
 				a.Equal("c1", col.JSON200.Name)
-				a.Equal("c1 desc", col.JSON200.Description)
+				a.Equal("c1 desc", *col.JSON200.Description)
 
 				id := col.JSON200.Id
 
@@ -118,12 +119,12 @@ func TestCollectionCRUD(t *testing.T) {
 				}, session1)
 				tests.Ok(t, err, update1)
 				a.Equal("new name", update1.JSON200.Name)
-				a.Equal("new desc", update1.JSON200.Description)
+				a.Equal("new desc", *update1.JSON200.Description)
 
 				col1get, err := cl.CollectionGetWithResponse(root, id, session1)
 				tests.Ok(t, err, col1get)
 				a.Equal("new name", col1get.JSON200.Name)
-				a.Equal("new desc", col1get.JSON200.Description)
+				a.Equal("new desc", *col1get.JSON200.Description)
 
 				updateUnauthorised, err := cl.CollectionUpdateWithResponse(root, id, openapi.CollectionUpdateJSONRequestBody{
 					Description: opt.New("new desc").Ptr(),
@@ -142,9 +143,10 @@ func TestCollectionCRUD(t *testing.T) {
 				t.Parallel()
 				a := assert.New(t)
 
+				desc := "c1 desc"
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
 					Name:        "c1",
-					Description: "c1 desc",
+					Description: &desc,
 				}, session1)
 				tests.Ok(t, err, col)
 
@@ -153,7 +155,7 @@ func TestCollectionCRUD(t *testing.T) {
 				get1, err := cl.CollectionGetWithResponse(root, id, session1)
 				tests.Ok(t, err, get1)
 				a.Equal("c1", get1.JSON200.Name)
-				a.Equal("c1 desc", get1.JSON200.Description)
+				a.Equal("c1 desc", *get1.JSON200.Description)
 
 				del, err := cl.CollectionDeleteWithResponse(root, col.JSON200.Id, session1)
 				tests.Ok(t, err, del)
@@ -166,13 +168,14 @@ func TestCollectionCRUD(t *testing.T) {
 				t.Parallel()
 				a := assert.New(t)
 
+				desc := "c1 desc"
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
 					Name:        "c1",
-					Description: "c1 desc",
+					Description: &desc,
 				}, session1)
 				tests.Ok(t, err, col)
 				a.Equal("c1", col.JSON200.Name)
-				a.Equal("c1 desc", col.JSON200.Description)
+				a.Equal("c1 desc", *col.JSON200.Description)
 
 				id := col.JSON200.Id
 
@@ -182,7 +185,7 @@ func TestCollectionCRUD(t *testing.T) {
 				foundCol, foundOk := lo.Find(list1.JSON200.Collections, func(c openapi.Collection) bool { return c.Id == id })
 				a.True(foundOk)
 				a.Equal("c1", foundCol.Name)
-				a.Equal("c1 desc", foundCol.Description)
+				a.Equal("c1 desc", *foundCol.Description)
 				a.Equal(acc1.JSON200.Id, foundCol.Owner.Id)
 			})
 
@@ -190,13 +193,14 @@ func TestCollectionCRUD(t *testing.T) {
 				t.Parallel()
 				a := assert.New(t)
 
+				desc := "c1 desc"
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
 					Name:        "c1",
-					Description: "c1 desc",
+					Description: &desc,
 				}, session1)
 				tests.Ok(t, err, col)
 				a.Equal("c1", col.JSON200.Name)
-				a.Equal("c1 desc", col.JSON200.Description)
+				a.Equal("c1 desc", *col.JSON200.Description)
 
 				id := col.JSON200.Id
 
@@ -208,7 +212,7 @@ func TestCollectionCRUD(t *testing.T) {
 				foundCol, foundOk := lo.Find(list1.JSON200.Collections, func(c openapi.Collection) bool { return c.Id == id })
 				a.True(foundOk)
 				a.Equal("c1", foundCol.Name)
-				a.Equal("c1 desc", foundCol.Description)
+				a.Equal("c1 desc", *foundCol.Description)
 				a.Equal(acc1.JSON200.Id, foundCol.Owner.Id)
 
 				list2, err := cl.CollectionListWithResponse(root, &openapi.CollectionListParams{

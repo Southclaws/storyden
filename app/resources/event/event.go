@@ -41,7 +41,7 @@ func Map(in *ent.Event) (*Event, error) {
 		return nil, err
 	}
 
-	thr, err := thread.FromModel(nil, nil)(threadEdge)
+	thr, err := thread.FromModel(nil, nil, nil)(threadEdge)
 	if err != nil {
 		return nil, err
 	}
