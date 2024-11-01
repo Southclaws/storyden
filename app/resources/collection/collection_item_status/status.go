@@ -13,13 +13,13 @@ type Status struct {
 type CollectionStatusResult struct {
 	ItemID    xid.ID `db:"item_id"`
 	Count     int    `db:"collections"`
-	Collected bool   `db:"has_in_collection"`
+	Collected int    `db:"has_in_collection"`
 }
 
 func (p CollectionStatusResult) Status() Status {
 	return Status{
 		Count:  p.Count,
-		Status: p.Collected,
+		Status: p.Collected > 0,
 	}
 }
 
