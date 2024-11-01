@@ -34,111 +34,123 @@ export function ProfileScreen(props: Props) {
     return <Unready error={error} />;
   }
 
-  const { profile } = data;
+  const { session, profile } = data;
   const { isSelf, isEditing } = state;
+  const isEmpty =
+    !profile.bio || profile.bio === "" || profile.bio === "<body></body>";
 
   return (
-    <CardBox p="0">
-      <styled.form className={lstack()} p="3" onSubmit={handlers.handleSave}>
-        <Flex
-          direction={{ base: "column-reverse", sm: "row" }}
-          w="full"
-          justify="space-between"
-          alignItems={{ base: "end", sm: "start" }}
-        >
-          {isEditing ? (
-            <HStack w="full" pr={{ base: "0", sm: "24" }}>
-              <MemberAvatar profile={profile} size="lg" editable={isEditing} />
-              <LStack gap="0">
-                <Input
-                  maxW={{ base: "full", sm: "64" }}
-                  size="sm"
-                  borderBottomRadius="none"
-                  fontWeight="bold"
-                  {...form.register("name")}
+    <LStack w="full">
+      <CardBox p="0">
+        <styled.form className={lstack()} p="3" onSubmit={handlers.handleSave}>
+          <Flex
+            direction={{ base: "column-reverse", sm: "row" }}
+            w="full"
+            justify="space-between"
+            alignItems={{ base: "end", sm: "start" }}
+          >
+            {isEditing ? (
+              <HStack w="full" pr={{ base: "0", sm: "24" }}>
+                <MemberAvatar
+                  profile={profile}
+                  size="lg"
+                  editable={isEditing}
                 />
-                <Input
-                  maxW={{ base: "full", sm: "64" }}
-                  size="sm"
-                  borderTop="none"
-                  borderTopRadius="none"
-                  {...form.register("handle")}
-                />
-              </LStack>
+                <LStack gap="0">
+                  <Input
+                    maxW={{ base: "full", sm: "64" }}
+                    size="sm"
+                    borderBottomRadius="none"
+                    fontWeight="bold"
+                    {...form.register("name")}
+                  />
+                  <Input
+                    maxW={{ base: "full", sm: "64" }}
+                    size="sm"
+                    borderTop="none"
+                    borderTopRadius="none"
+                    {...form.register("handle")}
+                  />
+                </LStack>
+              </HStack>
+            ) : (
+              <MemberIdent
+                profile={profile}
+                size="lg"
+                name="full-vertical"
+                roles="all"
+              />
+            )}
+
+            <HStack justify="end">
+              {isSelf &&
+                (isEditing ? (
+                  <SaveAction size="sm">Save</SaveAction>
+                ) : (
+                  <EditAction
+                    size="sm"
+                    variant="ghost"
+                    onClick={handlers.handleSetEditing}
+                  >
+                    Edit
+                  </EditAction>
+                ))}
+              <MemberOptionsMenu {...profile}>
+                <MoreAction size="sm" />
+              </MemberOptionsMenu>
             </HStack>
-          ) : (
-            <MemberIdent
-              profile={profile}
-              size="lg"
-              name="full-vertical"
-              roles="all"
-            />
-          )}
+          </Flex>
 
-          <HStack justify="end">
-            {isSelf &&
-              (isEditing ? (
-                <SaveAction size="sm">Save</SaveAction>
-              ) : (
-                <EditAction
-                  size="sm"
-                  variant="ghost"
-                  onClick={handlers.handleSetEditing}
-                >
-                  Edit
-                </EditAction>
-              ))}
-            <MemberOptionsMenu {...profile}>
-              <MoreAction size="sm" />
-            </MemberOptionsMenu>
-          </HStack>
-        </Flex>
-
-        <HStack gap="1">
-          <styled.p color="fg.muted" wordBreak="keep-all">
-            Joined{" "}
-            <styled.time textWrap="nowrap">
-              {formatDistanceToNow(new Date(profile.createdAt), {
-                addSuffix: true,
-              })}
-            </styled.time>
-          </styled.p>
-          {profile.deletedAt && (
-            <styled.p color="fg.destructive" wordBreak="keep-all">
-              Suspended&nbsp;
+          <HStack gap="1">
+            <styled.p color="fg.muted" wordBreak="keep-all">
+              Joined{" "}
               <styled.time textWrap="nowrap">
-                {formatDistanceToNow(new Date(profile.deletedAt), {
+                {formatDistanceToNow(new Date(profile.createdAt), {
                   addSuffix: true,
                 })}
               </styled.time>
             </styled.p>
-          )}
-          <DotSeparator />
-          <HStack
-            gap="1"
-            color="fg.subtle"
-            wordBreak="keep-all"
-            textWrap="nowrap"
-          >
-            <Box flexShrink="0">
-              <HeartIcon width="1rem" />
-            </Box>
-            <span>{profile.like_score} likes</span>
+            {profile.deletedAt && (
+              <styled.p color="fg.destructive" wordBreak="keep-all">
+                Suspended&nbsp;
+                <styled.time textWrap="nowrap">
+                  {formatDistanceToNow(new Date(profile.deletedAt), {
+                    addSuffix: true,
+                  })}
+                </styled.time>
+              </styled.p>
+            )}
+            <DotSeparator />
+            <HStack
+              gap="1"
+              color="fg.subtle"
+              wordBreak="keep-all"
+              textWrap="nowrap"
+            >
+              <Box flexShrink="0">
+                <HeartIcon width="1rem" />
+              </Box>
+              <span>{profile.like_score} likes</span>
+            </HStack>
           </HStack>
-        </HStack>
 
-        <ContentFormField<Form>
-          control={form.control}
-          name="bio"
-          initialValue={profile.bio}
-          disabled={!isEditing}
-          placeholder="This profile has no bio yet..."
-        />
-      </styled.form>
+          {isEmpty && !isEditing ? (
+            <styled.p color="fg.subtle" fontStyle="italic">
+              This profile has no bio yet...
+            </styled.p>
+          ) : (
+            <ContentFormField<Form>
+              control={form.control}
+              name="bio"
+              initialValue={profile.bio}
+              disabled={!isEditing}
+              placeholder="This profile has no bio yet..."
+            />
+          )}
+        </styled.form>
+      </CardBox>
 
-      <Box p="2">
-        <ProfileContent profile={profile} />
-      </Box>
-    </CardBox>
+      <ProfileContent session={session} profile={profile} />
+    </LStack>
   );
 }
