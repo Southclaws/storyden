@@ -30,7 +30,13 @@ export function CollectionIndexScreen(props: Props) {
         }}
         crumbs={[]}
       >
-        <CollectionCreateTrigger size="xs" label="Create" />
+        {props.session && (
+          <CollectionCreateTrigger
+            session={props.session}
+            size="xs"
+            label="Create"
+          />
+        )}
       </Breadcrumbs>
 
       <CardGrid>

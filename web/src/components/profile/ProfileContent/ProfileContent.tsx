@@ -33,9 +33,9 @@ export function ProfileContent(props: Props) {
         </Tabs.Content>
 
         <Tabs.Content className={LStack()} value="collections">
-          {isSelf && (
+          {isSelf && props.session && (
             <HStack w="full" justify="end">
-              <CollectionCreateTrigger />
+              <CollectionCreateTrigger session={props.session} />
             </HStack>
           )}
 

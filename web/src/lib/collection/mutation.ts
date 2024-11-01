@@ -1,21 +1,123 @@
+import { uniqueId } from "lodash";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 
 import {
   collectionAddNode,
   collectionAddPost,
+  collectionCreate,
+  collectionDelete,
   collectionRemoveNode,
   collectionRemovePost,
+  collectionUpdate,
   getCollectionListKey,
 } from "@/api/openapi-client/collections";
 import { getThreadListKey } from "@/api/openapi-client/threads";
 import {
   Account,
   Collection,
+  CollectionInitialProps,
   CollectionListOKResponse,
+  CollectionMutableProps,
+  Identifier,
   ThreadListOKResponse,
 } from "@/api/openapi-schema";
 
 import { useFeedMutations } from "../feed/mutation";
+
+export function useCollectionMutations(session: Account) {
+  const { mutate } = useSWRConfig();
+
+  const collectionListAnyMutationKey = getCollectionListKey();
+  function collectionListAnyKeyFilterFn(key: Arguments) {
+    return Array.isArray(key) && key[0] == collectionListAnyMutationKey[0];
+  }
+
+  const create = async (create: CollectionInitialProps) => {
+    const mutator: MutatorCallback<CollectionListOKResponse> = (data) => {
+      if (!data) return;
+
+      const newCollection = {
+        id: uniqueId("optimistic_collection_"),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        owner: session,
+        has_queried_item: false,
+        item_count: 0,
+        ...create,
+      } satisfies Collection;
+
+      const newCollections = [...data.collections, newCollection];
+
+      return {
+        ...data,
+        collections: newCollections,
+      };
+    };
+
+    await mutate(collectionListAnyKeyFilterFn, mutator, {
+      revalidate: false,
+    });
+
+    await collectionCreate(create);
+  };
+
+  const update = async (id: Identifier, update: CollectionMutableProps) => {
+    const mutator: MutatorCallback<CollectionListOKResponse> = (data) => {
+      if (!data) return;
+
+      const newCollections = data.collections.map((c) => {
+        if (c.id === id) {
+          return {
+            ...c,
+            ...update,
+          };
+        }
+        return c;
+      });
+
+      return {
+        ...data,
+        collections: newCollections,
+      };
+    };
+
+    await mutate(collectionListAnyKeyFilterFn, mutator, {
+      revalidate: false,
+    });
+
+    await collectionUpdate(id, update);
+  };
+
+  const deleteCollection = async (id: Identifier) => {
+    const mutator: MutatorCallback<CollectionListOKResponse> = (data) => {
+      if (!data) return;
+
+      const newCollections = data.collections.filter((c) => c.id === id);
+
+      return {
+        ...data,
+        collections: newCollections,
+      };
+    };
+
+    await mutate(collectionListAnyKeyFilterFn, mutator, {
+      revalidate: false,
+    });
+
+    await collectionDelete(id);
+  };
+
+  const revalidate = async () => {
+    mutate(collectionListAnyKeyFilterFn);
+  };
+
+  return {
+    create,
+    update,
+    deleteCollection,
+    revalidate,
+  };
+}
 
 export function useCollectionItemMutations(session: Account) {
   const { mutate } = useSWRConfig();
