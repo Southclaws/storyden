@@ -38,7 +38,9 @@ export function CollectionScreen({ session, initialCollection }: Props) {
         }}
         crumbs={[{ label: collection.name, href: url }]}
       >
-        <CollectionCreateTrigger size="xs" label="Create" />
+        {session && (
+          <CollectionCreateTrigger session={session} size="xs" label="Create" />
+        )}
       </Breadcrumbs>
 
       <LStack>

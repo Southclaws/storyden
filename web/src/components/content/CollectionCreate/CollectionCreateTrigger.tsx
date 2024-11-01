@@ -7,13 +7,15 @@ import { Button } from "@/components/ui/button";
 import { ButtonVariantProps } from "@/styled-system/recipes";
 
 import { CollectionCreateModal } from "./CollectionCreateModal";
-
-type Props = {
-  label?: string;
-};
+import { Props } from "./useCollectionCreate";
 
 export function CollectionCreateTrigger(
-  props: PropsWithChildren<ButtonVariantProps & Props>,
+  props: PropsWithChildren<
+    ButtonVariantProps &
+      Props & {
+        label?: string;
+      }
+  >,
 ) {
   const { onOpen, isOpen, onClose } = useDisclosure();
   return (

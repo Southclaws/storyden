@@ -7,9 +7,9 @@ import { FormLabel } from "@/components/ui/form/FormLabel";
 import { Input } from "@/components/ui/input";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
-import { useCollectionCreate } from "./useCollectionCreate";
+import { Props, useCollectionCreate } from "./useCollectionCreate";
 
-export function CollectionCreateScreen(props: UseDisclosureProps) {
+export function CollectionCreateScreen(props: Props) {
   const { register, onSubmit } = useCollectionCreate(props);
 
   return (

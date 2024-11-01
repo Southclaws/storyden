@@ -84,7 +84,7 @@ function LazyLoadedMenuContent(props: LazyLoadedMenuContentProps) {
     <Menu.Content userSelect="none" overflowY="scroll" maxH="60">
       <Menu.ItemGroup>
         <Menu.Item value="create-collection" closeOnSelect={false} asChild>
-          <CollectionCreateTrigger variant="ghost" />
+          <CollectionCreateTrigger session={props.account} variant="ghost" />
         </Menu.Item>
 
         {collections.map((c) => (
