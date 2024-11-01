@@ -44,11 +44,6 @@ export function LibraryPageScreen(props: Props) {
   // is passed as empty, it becomes undefined. Maybe cache or mutate related?
   data.tags = data.tags ?? [];
 
-  console.log("LibraryPageScreen", {
-    fallbackData: props.node.tags,
-    afterRequest: data.tags,
-  });
-
   return <LibraryPage node={data} />;
 }
 
@@ -72,8 +67,6 @@ export function LibraryPage(props: Props) {
     initialCoverCoordinates,
     isAllowedToEdit,
   } = useLibraryPageScreen(props);
-
-  console.log(node.tags);
 
   return (
     <styled.form

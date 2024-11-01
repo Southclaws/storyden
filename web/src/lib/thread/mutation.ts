@@ -45,7 +45,7 @@ export function useThreadMutations(thread: Thread) {
         title: thread.title,
         author: session,
         assets: [],
-        collections: [],
+        collections: { has_collected: false, in_collections: 0 },
         likes: { likes: 0, liked: false },
         reacts: [],
         body_links: [],

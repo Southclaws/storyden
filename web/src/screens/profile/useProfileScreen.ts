@@ -7,13 +7,14 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { useProfileGet } from "src/api/openapi-client/profiles";
-import { ProfileGetOKResponse } from "src/api/openapi-schema";
+import { Account, ProfileGetOKResponse } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
 import { handle } from "@/api/client";
 import { useProfileMutations } from "@/lib/profile/mutation";
 
 export type Props = {
+  initialSession?: Account;
   profile: ProfileGetOKResponse;
 };
 
@@ -35,9 +36,9 @@ export const FormSchema = z.object({
 });
 export type Form = z.infer<typeof FormSchema>;
 
-export function useProfileScreen({ profile }: Props) {
+export function useProfileScreen({ initialSession, profile }: Props) {
   const router = useRouter();
-  const session = useSession();
+  const session = useSession(initialSession);
   const [isEditing, setEditing] = useQueryState("edit", {
     ...parseAsBoolean,
     defaultValue: false,
@@ -100,11 +101,11 @@ export function useProfileScreen({ profile }: Props) {
       isSelf,
     },
     data: {
+      session,
       profile: data,
     },
     handlers: {
       handleSetEditing,
-
       handleSave,
     },
   };

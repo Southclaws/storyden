@@ -13,7 +13,7 @@ import { handle } from "@/api/client";
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name for the collection."),
-  description: z.string().min(1, "Please enter a short description."),
+  description: z.string().optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
