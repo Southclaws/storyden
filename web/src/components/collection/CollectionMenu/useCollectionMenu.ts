@@ -27,11 +27,6 @@ export function useCollectionMenu({ session, collection }: Props) {
   const [, copyToClipboard] = useCopyToClipboard();
 
   const { deleteCollection, revalidate } = useCollectionMutations(session);
-  const {
-    isConfirming: isConfirmingDelete,
-    handleConfirmAction: handleConfirmDelete,
-    handleCancelAction: handleCancelDelete,
-  } = useConfirmation(handleDelete);
 
   const isSharingEnabled = useShare();
   const isEditingEnabled = canEditCollection(collection, account);
@@ -66,12 +61,10 @@ export function useCollectionMenu({ session, collection }: Props) {
     isSharingEnabled,
     isEditingEnabled,
     isDeletingEnabled,
-    isConfirmingDelete,
+
     handlers: {
       handleCopyLink,
       handleShare,
-      handleConfirmDelete,
-      handleCancelDelete,
       handleDelete,
     },
   };

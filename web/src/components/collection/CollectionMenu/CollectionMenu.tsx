@@ -16,7 +16,7 @@ import { menuItemColorPalette } from "@/styled-system/patterns";
 import { Props, useCollectionMenu } from "./useCollectionMenu";
 
 export function CollectionMenu(props: Props) {
-  const { isSharingEnabled, isDeletingEnabled, isConfirmingDelete, handlers } =
+  const { isSharingEnabled, isDeletingEnabled, handlers } =
     useCollectionMenu(props);
 
   const { collection } = props;
@@ -61,9 +61,6 @@ export function CollectionMenu(props: Props) {
 
               {isDeletingEnabled && (
                 <DeleteWithConfirmationMenuItem
-                  isConfirmingDelete={isConfirmingDelete}
-                  onAttemptDelete={handlers.handleConfirmDelete}
-                  onCancelDelete={handlers.handleCancelDelete}
                   onDelete={handlers.handleDelete}
                 />
               )}
