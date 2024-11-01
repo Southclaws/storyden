@@ -218,7 +218,7 @@ export function useCollectionItemMutations(session: Account) {
             ...t,
             collections: {
               in_collections: t.collections.in_collections - 1,
-              has_collected: false,
+              has_collected: t.collections.in_collections - 1 > 0,
             },
           };
 
