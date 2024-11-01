@@ -8,6 +8,7 @@ import { Account, Collection } from "src/api/openapi-schema";
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
+import { useCollectionMutations } from "@/lib/collection/mutation";
 import {
   canDeleteCollection,
   canEditCollection,
@@ -25,8 +26,7 @@ export function useCollectionMenu({ session, collection }: Props) {
   const account = useSession();
   const [, copyToClipboard] = useCopyToClipboard();
 
-  const { deleteThread, revalidate } = useFeedMutations();
-
+  const { deleteCollection, revalidate } = useCollectionMutations(session);
   const {
     isConfirming: isConfirmingDelete,
     handleConfirmAction: handleConfirmDelete,
@@ -54,7 +54,7 @@ export function useCollectionMenu({ session, collection }: Props) {
   async function handleDelete() {
     await handle(
       async () => {
-        // await deleteCollection(collection.id);
+        await deleteCollection(collection.id);
       },
       {
         cleanup: async () => await revalidate(),
@@ -72,6 +72,7 @@ export function useCollectionMenu({ session, collection }: Props) {
       handleShare,
       handleConfirmDelete,
       handleCancelDelete,
+      handleDelete,
     },
   };
 }

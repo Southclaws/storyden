@@ -59,13 +59,14 @@ export function CollectionMenu(props: Props) {
                 </Menu.Item>
               )}
 
-              {/* {isDeletingEnabled && (
+              {isDeletingEnabled && (
                 <DeleteWithConfirmationMenuItem
                   isConfirmingDelete={isConfirmingDelete}
                   onAttemptDelete={handlers.handleConfirmDelete}
                   onCancelDelete={handlers.handleCancelDelete}
+                  onDelete={handlers.handleDelete}
                 />
-              )} */}
+              )}
 
               {/* {isDeletingEnabled &&
                 (isConfirmingDelete ? (

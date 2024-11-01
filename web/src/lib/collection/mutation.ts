@@ -24,7 +24,7 @@ import {
 
 import { useFeedMutations } from "../feed/mutation";
 
-export function useCollectionMutations(session: Account) {
+export function useCollectionMutations(session?: Account) {
   const { mutate } = useSWRConfig();
 
   const collectionListAnyMutationKey = getCollectionListKey();
@@ -35,6 +35,7 @@ export function useCollectionMutations(session: Account) {
   const create = async (create: CollectionInitialProps) => {
     const mutator: MutatorCallback<CollectionListOKResponse> = (data) => {
       if (!data) return;
+      if (!session) return;
 
       const newCollection = {
         id: uniqueId("optimistic_collection_"),
@@ -92,7 +93,7 @@ export function useCollectionMutations(session: Account) {
     const mutator: MutatorCallback<CollectionListOKResponse> = (data) => {
       if (!data) return;
 
-      const newCollections = data.collections.filter((c) => c.id === id);
+      const newCollections = data.collections.filter((c) => c.id !== id);
 
       return {
         ...data,
