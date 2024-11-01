@@ -1,5 +1,5 @@
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { Fragment } from "react";
+import { Fragment, PropsWithChildren } from "react";
 
 import { LinkButton } from "@/components/ui/link-button";
 import { Box, HStack, styled } from "@/styled-system/jsx";
@@ -14,35 +14,50 @@ type Breadcrumb = {
   href: string;
 };
 
-export function Breadcrumbs({ index, crumbs }: Props) {
+export function Breadcrumbs({
+  index,
+  crumbs,
+  children,
+}: PropsWithChildren<Props>) {
   return (
     <HStack
       w="full"
-      color="fg.subtle"
-      overflowX="scroll"
-      pt="scrollGutter"
-      mt="-scrollGutter"
+      gap="1"
+      justify="space-between"
+      // Align top because generally we just want same-height children and the
+      // HStack below is using an offset at the bottom for the scroll gutter.
+      alignItems="start"
     >
-      <LinkButton
-        size="xs"
-        variant="subtle"
-        flexShrink="0"
-        minW="min"
-        href={index.href}
+      <HStack
+        w="full"
+        color="fg.subtle"
+        overflowX="scroll"
+        pt="scrollGutter"
+        mt="-scrollGutter"
       >
-        {index.label}
-      </LinkButton>
-      {crumbs.map((c) => {
-        return (
-          <Fragment key={c.href}>
-            <Box flexShrink="0">
-              <ChevronRightIcon width="1rem" />
-            </Box>
+        <LinkButton
+          size="xs"
+          variant="subtle"
+          flexShrink="0"
+          minW="min"
+          href={index.href}
+        >
+          {index.label}
+        </LinkButton>
+        {crumbs.map((c) => {
+          return (
+            <Fragment key={c.href}>
+              <Box flexShrink="0">
+                <ChevronRightIcon width="1rem" />
+              </Box>
 
-            <BreadcrumbButton crumb={c} />
-          </Fragment>
-        );
-      })}
+              <BreadcrumbButton crumb={c} />
+            </Fragment>
+          );
+        })}
+      </HStack>
+
+      {children}
     </HStack>
   );
 }

@@ -16,7 +16,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_querier"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
-	"github.com/Southclaws/storyden/app/resources/collection"
+	collection_items "github.com/Southclaws/storyden/app/resources/collection/collection_item"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_writer"
 	"github.com/Southclaws/storyden/app/resources/event/event_querier"
 	"github.com/Southclaws/storyden/app/resources/event/event_writer"
 	"github.com/Southclaws/storyden/app/resources/event/participation/participant_querier"
@@ -72,7 +74,9 @@ func Build() fx.Option {
 			like_writer.New,
 			post_search.New,
 			post_writer.New,
-			collection.New,
+			collection_querier.New,
+			collection_writer.New,
+			collection_items.New,
 			node_querier.New,
 			node_writer.New,
 			node_traversal.New,

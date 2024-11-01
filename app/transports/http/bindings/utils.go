@@ -84,7 +84,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Reacts:      serialiseReactList(t.Reacts),
 		Tags:        serialiseTagReferenceList(t.Tags),
 		Assets:      dt.Map(t.Assets, serialiseAssetPtr),
-		Collections: dt.Map(t.Collections, serialiseCollection),
+		Collections: serialiseCollectionStatus(t.Collections),
 		Link:        opt.Map(t.WebLink, serialiseLinkRef).Ptr(),
 	}
 }
@@ -100,7 +100,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Body:           serialiseContentHTML(t.Content),
 		Category:       serialiseCategoryReference(&t.Category),
 		Likes:          serialiseLikeStatus(&t.Likes),
-		Collections:    dt.Map(t.Collections, serialiseCollection),
+		Collections:    serialiseCollectionStatus(t.Collections),
 		CreatedAt:      t.CreatedAt,
 		DeletedAt:      t.DeletedAt.Ptr(),
 		Description:    &t.Short,

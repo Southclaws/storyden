@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -44,6 +45,7 @@ type Node struct {
 	Owner          profile.Public
 	Parent         opt.Optional[Node]
 	Tags           tag_ref.Tags
+	Collections    collection_item_status.Status // NOTE: Not done yet
 	Visibility     visibility.Visibility
 	RelevanceScore opt.Optional[float64]
 	Metadata       map[string]any

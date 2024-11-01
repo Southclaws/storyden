@@ -67,6 +67,14 @@ func (cc *CollectionCreate) SetDescription(s string) *CollectionCreate {
 	return cc
 }
 
+// SetNillableDescription sets the "description" field if the given value is not nil.
+func (cc *CollectionCreate) SetNillableDescription(s *string) *CollectionCreate {
+	if s != nil {
+		cc.SetDescription(*s)
+	}
+	return cc
+}
+
 // SetVisibility sets the "visibility" field.
 func (cc *CollectionCreate) SetVisibility(c collection.Visibility) *CollectionCreate {
 	cc.mutation.SetVisibility(c)
@@ -208,9 +216,6 @@ func (cc *CollectionCreate) check() error {
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Collection.name"`)}
 	}
-	if _, ok := cc.mutation.Description(); !ok {
-		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Collection.description"`)}
-	}
 	if _, ok := cc.mutation.Visibility(); !ok {
 		return &ValidationError{Name: "visibility", err: errors.New(`ent: missing required field "Collection.visibility"`)}
 	}
@@ -274,7 +279,7 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := cc.mutation.Description(); ok {
 		_spec.SetField(collection.FieldDescription, field.TypeString, value)
-		_node.Description = value
+		_node.Description = &value
 	}
 	if value, ok := cc.mutation.Visibility(); ok {
 		_spec.SetField(collection.FieldVisibility, field.TypeEnum, value)
@@ -425,6 +430,12 @@ func (u *CollectionUpsert) UpdateDescription() *CollectionUpsert {
 	return u
 }
 
+// ClearDescription clears the value of the "description" field.
+func (u *CollectionUpsert) ClearDescription() *CollectionUpsert {
+	u.SetNull(collection.FieldDescription)
+	return u
+}
+
 // SetVisibility sets the "visibility" field.
 func (u *CollectionUpsert) SetVisibility(v collection.Visibility) *CollectionUpsert {
 	u.Set(collection.FieldVisibility, v)
@@ -527,6 +538,13 @@ func (u *CollectionUpsertOne) SetDescription(v string) *CollectionUpsertOne {
 func (u *CollectionUpsertOne) UpdateDescription() *CollectionUpsertOne {
 	return u.Update(func(s *CollectionUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *CollectionUpsertOne) ClearDescription() *CollectionUpsertOne {
+	return u.Update(func(s *CollectionUpsert) {
+		s.ClearDescription()
 	})
 }
 
@@ -801,6 +819,13 @@ func (u *CollectionUpsertBulk) SetDescription(v string) *CollectionUpsertBulk {
 func (u *CollectionUpsertBulk) UpdateDescription() *CollectionUpsertBulk {
 	return u.Update(func(s *CollectionUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// ClearDescription clears the value of the "description" field.
+func (u *CollectionUpsertBulk) ClearDescription() *CollectionUpsertBulk {
+	return u.Update(func(s *CollectionUpsert) {
+		s.ClearDescription()
 	})
 }
 

@@ -13,7 +13,7 @@ import type { ProfileReference } from "./profileReference";
  * A reference to the collection
  */
 export interface CollectionCommonProps {
-  description: string;
+  description?: string;
   name: string;
   owner: ProfileReference;
 }

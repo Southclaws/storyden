@@ -8,7 +8,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type { AssetList } from "./assetList";
-import type { CollectionList } from "./collectionList";
+import type { CollectionStatus } from "./collectionStatus";
 import type { LikeData } from "./likeData";
 import type { Metadata } from "./metadata";
 import type { PostDescription } from "./postDescription";
@@ -20,7 +20,7 @@ import type { ThreadTitle } from "./threadTitle";
 export interface PostReferenceProps {
   assets: AssetList;
   author: ProfileReference;
-  collections: CollectionList;
+  collections: CollectionStatus;
   description?: PostDescription;
   likes: LikeData;
   meta?: Metadata;

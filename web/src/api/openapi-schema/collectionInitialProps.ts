@@ -9,6 +9,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 
 export interface CollectionInitialProps {
-  description: string;
+  description?: string;
   name: string;
 }

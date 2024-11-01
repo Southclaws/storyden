@@ -1,19 +1,23 @@
 import { Unready } from "src/components/site/Unready";
 
+import { CollectionCard } from "@/components/collection/CollectionCard";
+import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/CollectionCreateTrigger";
 import { ThreadItemList } from "@/components/feed/ThreadItemList";
+import { CardGrid } from "@/components/ui/rich-card";
 import * as Tabs from "@/components/ui/tabs";
-import { VStack } from "@/styled-system/jsx";
-
-import { CollectionList } from "../CollectionList/CollectionList";
+import { HStack, VStack } from "@/styled-system/jsx";
+import { LStack } from "@/styled-system/patterns";
 
 import { Props, useProfileContent } from "./useProfileContent";
 
 export function ProfileContent(props: Props) {
-  const content = useProfileContent(props);
+  const { ready, error, data, isSelf } = useProfileContent(props);
 
-  if (!content.ready) {
-    return <Unready {...content.error} />;
+  if (!ready) {
+    return <Unready error={error} />;
   }
+
+  const { threads, collections } = data;
 
   return (
     <VStack alignItems="start" w="full">
@@ -25,11 +29,25 @@ export function ProfileContent(props: Props) {
         </Tabs.List>
 
         <Tabs.Content value="threads">
-          <ThreadItemList threads={content.data.threads} />
+          <ThreadItemList threads={threads} />
         </Tabs.Content>
 
-        <Tabs.Content value="collections">
-          <CollectionList collections={content.data.collections} />
+        <Tabs.Content className={LStack()} value="collections">
+          {isSelf && props.session && (
+            <HStack w="full" justify="end">
+              <CollectionCreateTrigger session={props.session} />
+            </HStack>
+          )}
+
+          <CardGrid>
+            {collections.map((collection) => (
+              <CollectionCard
+                key={collection.id}
+                collection={collection}
+                hideOwner
+              />
+            ))}
+          </CardGrid>
         </Tabs.Content>
       </Tabs.Root>
     </VStack>

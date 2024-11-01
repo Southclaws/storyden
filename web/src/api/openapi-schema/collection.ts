@@ -7,6 +7,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { CollectionAdditionalProps } from "./collectionAdditionalProps";
 import type { CollectionCommonProps } from "./collectionCommonProps";
 import type { CommonProperties } from "./commonProperties";
 
@@ -16,4 +17,6 @@ curate their own lists of content from the site. Collections can only
 contain root level posts (threads) with titles and slugs to link to.
 
  */
-export type Collection = CommonProperties & CollectionCommonProps;
+export type Collection = CommonProperties &
+  CollectionCommonProps &
+  CollectionAdditionalProps;
