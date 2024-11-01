@@ -7,16 +7,16 @@ import { FormLabel } from "@/components/ui/form/FormLabel";
 import { Input } from "@/components/ui/input";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
-import { useCollectionCreate } from "./useCollectionCreate";
+import { Props, useCollectionCreate } from "./useCollectionCreate";
 
-export function CollectionCreateScreen(props: UseDisclosureProps) {
+export function CollectionCreateScreen(props: Props) {
   const { register, onSubmit } = useCollectionCreate(props);
 
   return (
     <VStack alignItems="start" gap="4">
       <styled.p>
         Use collections to curate content from the community. Collections can
-        include threads, posts and other items from the community database.
+        include threads, pages and other items from the community knowledgebase.
       </styled.p>
       <styled.form
         display="flex"
@@ -26,7 +26,7 @@ export function CollectionCreateScreen(props: UseDisclosureProps) {
         onSubmit={onSubmit}
       >
         <FormControl>
-          <FormLabel>Name</FormLabel>
+          <FormLabel>Name*</FormLabel>
           <Input {...register("name")} type="text" />
           <FormHelperText>The name for your collection</FormHelperText>
         </FormControl>
@@ -35,11 +35,18 @@ export function CollectionCreateScreen(props: UseDisclosureProps) {
 
           {/* TODO: Make a larger textarea component for this. */}
           <Input {...register("description")} type="text" />
-          <FormHelperText>Describe your collection</FormHelperText>
+          <FormHelperText>
+            Optional description for your collection.
+          </FormHelperText>
         </FormControl>
 
         <HStack w="full" justify="space-between">
-          <Button w="full" type="button">
+          <Button
+            w="full"
+            type="button"
+            variant="outline"
+            onClick={props.onClose}
+          >
             Cancel
           </Button>
           <Button w="full" type="submit">

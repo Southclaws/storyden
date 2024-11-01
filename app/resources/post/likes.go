@@ -10,13 +10,13 @@ import (
 type PostLikesResult struct {
 	PostID xid.ID `db:"post_id"`
 	Count  int    `db:"likes"`
-	Liked  bool   `db:"liked"`
+	Liked  int    `db:"liked"`
 }
 
 func (p PostLikesResult) Status() like.Status {
 	return like.Status{
 		Count:  p.Count,
-		Status: p.Liked,
+		Status: p.Liked > 0,
 	}
 }
 

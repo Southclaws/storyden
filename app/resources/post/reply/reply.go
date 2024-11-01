@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
@@ -94,9 +95,12 @@ func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Reply, error) {
 			Post: post.Post{
 				ID: post.ID(m.ID),
 
-				Content: content,
-				Author:  *pro,
-				Likes:   ls.Status(m.ID),
+				Content:     content,
+				Author:      *pro,
+				Likes:       ls.Status(m.ID),
+				Collections: collection_item_status.Status{
+					// NOTE: Members cannot yet add replies to collections.
+				},
 				Reacts:  reacts,
 				Assets:  dt.Map(m.Edges.Assets, asset.Map),
 				WebLink: link,

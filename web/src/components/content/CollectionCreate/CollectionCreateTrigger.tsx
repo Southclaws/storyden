@@ -7,22 +7,30 @@ import { Button } from "@/components/ui/button";
 import { ButtonVariantProps } from "@/styled-system/recipes";
 
 import { CollectionCreateModal } from "./CollectionCreateModal";
+import { Props } from "./useCollectionCreate";
 
 export function CollectionCreateTrigger(
-  props: PropsWithChildren<ButtonVariantProps>,
+  props: PropsWithChildren<
+    ButtonVariantProps &
+      Props & {
+        label?: string;
+      }
+  >,
 ) {
   const { onOpen, isOpen, onClose } = useDisclosure();
   return (
     <>
       {props.children ?? (
         <Button
+          flexShrink="0"
+          minW="0"
           variant="subtle"
           justifyContent="start"
           size="sm"
-          onClick={onOpen}
           {...props}
+          onClick={onOpen}
         >
-          <FolderPlusIcon /> Create collection
+          <FolderPlusIcon width="1.4rem" /> {props.label ?? "Collection"}
         </Button>
       )}
       <CollectionCreateModal isOpen={isOpen} onClose={onClose} {...props} />

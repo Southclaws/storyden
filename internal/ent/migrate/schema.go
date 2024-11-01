@@ -207,7 +207,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
-		{Name: "description", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "unlisted", "review", "published"}, Default: "draft"},
 		{Name: "account_collections", Type: field.TypeString, Nullable: true, Size: 20},
 	}

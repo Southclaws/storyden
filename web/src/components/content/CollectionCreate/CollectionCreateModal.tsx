@@ -1,9 +1,9 @@
 import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
-import { UseDisclosureProps } from "src/utils/useDisclosure";
 
 import { CollectionCreateScreen } from "./CollectionCreateScreen";
+import { Props } from "./useCollectionCreate";
 
-export function CollectionCreateModal(props: UseDisclosureProps) {
+export function CollectionCreateModal({ session, ...props }: Props) {
   return (
     <>
       <ModalDrawer
@@ -11,7 +11,11 @@ export function CollectionCreateModal(props: UseDisclosureProps) {
         onClose={props.onClose}
         title="Create collection"
       >
-        <CollectionCreateScreen onClose={props.onClose} id={props.id} />
+        <CollectionCreateScreen
+          id={props.id}
+          session={session}
+          onClose={props.onClose}
+        />
       </ModalDrawer>
     </>
   );

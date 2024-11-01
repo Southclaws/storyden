@@ -26,7 +26,7 @@ type Collection struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
-	Description string `json:"description,omitempty"`
+	Description *string `json:"description,omitempty"`
 	// Visibility holds the value of the "visibility" field.
 	Visibility collection.Visibility `json:"visibility,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -156,7 +156,8 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				c.Description = value.String
+				c.Description = new(string)
+				*c.Description = value.String
 			}
 		case collection.FieldVisibility:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -241,8 +242,10 @@ func (c *Collection) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", ")
-	builder.WriteString("description=")
-	builder.WriteString(c.Description)
+	if v := c.Description; v != nil {
+		builder.WriteString("description=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("visibility=")
 	builder.WriteString(fmt.Sprintf("%v", c.Visibility))
