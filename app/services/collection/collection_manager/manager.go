@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"github.com/gosimple/slug"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/collection"
@@ -35,6 +36,7 @@ func New(
 
 type Partial struct {
 	Name        opt.Optional[string]
+	Slug        opt.Optional[string]
 	Description opt.Optional[string]
 }
 
@@ -44,7 +46,9 @@ func (s *Manager) Create(ctx context.Context, accID account.AccountID, name stri
 	partial.Name.Call(func(v string) { opts = append(opts, collection_writer.WithName(v)) })
 	partial.Description.Call(func(v string) { opts = append(opts, collection_writer.WithDescription(v)) })
 
-	col, err := s.colWriter.Create(ctx, accID, name, opts...)
+	slug := partial.Slug.Or(slug.Make(name))
+
+	col, err := s.colWriter.Create(ctx, accID, name, slug, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -52,17 +56,18 @@ func (s *Manager) Create(ctx context.Context, accID account.AccountID, name stri
 	return col, nil
 }
 
-func (s *Manager) Update(ctx context.Context, cid collection.CollectionID, partial Partial) (*collection.CollectionWithItems, error) {
-	if err := s.authoriseDirectUpdate(ctx, cid); err != nil {
+func (s *Manager) Update(ctx context.Context, qk collection.QueryKey, partial Partial) (*collection.CollectionWithItems, error) {
+	if err := s.authoriseDirectUpdate(ctx, qk); err != nil {
 		return nil, err
 	}
 
 	opts := []collection_writer.Option{}
 
 	partial.Name.Call(func(v string) { opts = append(opts, collection_writer.WithName(v)) })
+	partial.Slug.Call(func(v string) { opts = append(opts, collection_writer.WithSlug(v)) })
 	partial.Description.Call(func(v string) { opts = append(opts, collection_writer.WithDescription(v)) })
 
-	col, err := s.colWriter.Update(ctx, cid, opts...)
+	col, err := s.colWriter.Update(ctx, qk, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -70,12 +75,12 @@ func (s *Manager) Update(ctx context.Context, cid collection.CollectionID, parti
 	return col, nil
 }
 
-func (s *Manager) Delete(ctx context.Context, cid collection.CollectionID) error {
-	if err := s.authoriseDirectUpdate(ctx, cid); err != nil {
+func (s *Manager) Delete(ctx context.Context, qk collection.QueryKey) error {
+	if err := s.authoriseDirectUpdate(ctx, qk); err != nil {
 		return err
 	}
 
-	err := s.colWriter.Delete(ctx, cid)
+	err := s.colWriter.Delete(ctx, qk)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -83,8 +88,8 @@ func (s *Manager) Delete(ctx context.Context, cid collection.CollectionID) error
 	return nil
 }
 
-func (m *Manager) authoriseDirectUpdate(ctx context.Context, cid collection.CollectionID) error {
-	col, err := m.colQuerier.Probe(ctx, cid)
+func (m *Manager) authoriseDirectUpdate(ctx context.Context, qk collection.QueryKey) error {
+	col, err := m.colQuerier.Probe(ctx, qk)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

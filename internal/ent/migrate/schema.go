@@ -207,9 +207,11 @@ var (
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString},
+		{Name: "slug", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "unlisted", "review", "published"}, Default: "draft"},
 		{Name: "account_collections", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "cover_asset_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// CollectionsTable holds the schema information for the "collections" table.
 	CollectionsTable = &schema.Table{
@@ -219,9 +221,15 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "collections_accounts_collections",
-				Columns:    []*schema.Column{CollectionsColumns[6]},
+				Columns:    []*schema.Column{CollectionsColumns[7]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "collections_assets_cover_image",
+				Columns:    []*schema.Column{CollectionsColumns[8]},
+				RefColumns: []*schema.Column{AssetsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -1000,6 +1008,7 @@ func init() {
 	AssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
 	CollectionsTable.ForeignKeys[0].RefTable = AccountsTable
+	CollectionsTable.ForeignKeys[1].RefTable = AssetsTable
 	CollectionNodesTable.ForeignKeys[0].RefTable = CollectionsTable
 	CollectionNodesTable.ForeignKeys[1].RefTable = NodesTable
 	CollectionPostsTable.ForeignKeys[0].RefTable = CollectionsTable
