@@ -6781,26 +6781,29 @@ func (m *CategoryMutation) ResetEdge(name string) error {
 // CollectionMutation represents an operation that mutates the Collection nodes in the graph.
 type CollectionMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *xid.ID
-	created_at    *time.Time
-	updated_at    *time.Time
-	name          *string
-	description   *string
-	visibility    *collection.Visibility
-	clearedFields map[string]struct{}
-	owner         *xid.ID
-	clearedowner  bool
-	posts         map[xid.ID]struct{}
-	removedposts  map[xid.ID]struct{}
-	clearedposts  bool
-	nodes         map[xid.ID]struct{}
-	removednodes  map[xid.ID]struct{}
-	clearednodes  bool
-	done          bool
-	oldValue      func(context.Context) (*Collection, error)
-	predicates    []predicate.Collection
+	op                 Op
+	typ                string
+	id                 *xid.ID
+	created_at         *time.Time
+	updated_at         *time.Time
+	name               *string
+	slug               *string
+	description        *string
+	visibility         *collection.Visibility
+	clearedFields      map[string]struct{}
+	owner              *xid.ID
+	clearedowner       bool
+	cover_image        *xid.ID
+	clearedcover_image bool
+	posts              map[xid.ID]struct{}
+	removedposts       map[xid.ID]struct{}
+	clearedposts       bool
+	nodes              map[xid.ID]struct{}
+	removednodes       map[xid.ID]struct{}
+	clearednodes       bool
+	done               bool
+	oldValue           func(context.Context) (*Collection, error)
+	predicates         []predicate.Collection
 }
 
 var _ ent.Mutation = (*CollectionMutation)(nil)
@@ -7015,6 +7018,42 @@ func (m *CollectionMutation) ResetName() {
 	m.name = nil
 }
 
+// SetSlug sets the "slug" field.
+func (m *CollectionMutation) SetSlug(s string) {
+	m.slug = &s
+}
+
+// Slug returns the value of the "slug" field in the mutation.
+func (m *CollectionMutation) Slug() (r string, exists bool) {
+	v := m.slug
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlug returns the old "slug" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldSlug(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlug requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
+	}
+	return oldValue.Slug, nil
+}
+
+// ResetSlug resets all changes to the "slug" field.
+func (m *CollectionMutation) ResetSlug() {
+	m.slug = nil
+}
+
 // SetDescription sets the "description" field.
 func (m *CollectionMutation) SetDescription(s string) {
 	m.description = &s
@@ -7062,6 +7101,55 @@ func (m *CollectionMutation) DescriptionCleared() bool {
 func (m *CollectionMutation) ResetDescription() {
 	m.description = nil
 	delete(m.clearedFields, collection.FieldDescription)
+}
+
+// SetCoverAssetID sets the "cover_asset_id" field.
+func (m *CollectionMutation) SetCoverAssetID(x xid.ID) {
+	m.cover_image = &x
+}
+
+// CoverAssetID returns the value of the "cover_asset_id" field in the mutation.
+func (m *CollectionMutation) CoverAssetID() (r xid.ID, exists bool) {
+	v := m.cover_image
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCoverAssetID returns the old "cover_asset_id" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldCoverAssetID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCoverAssetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCoverAssetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCoverAssetID: %w", err)
+	}
+	return oldValue.CoverAssetID, nil
+}
+
+// ClearCoverAssetID clears the value of the "cover_asset_id" field.
+func (m *CollectionMutation) ClearCoverAssetID() {
+	m.cover_image = nil
+	m.clearedFields[collection.FieldCoverAssetID] = struct{}{}
+}
+
+// CoverAssetIDCleared returns if the "cover_asset_id" field was cleared in this mutation.
+func (m *CollectionMutation) CoverAssetIDCleared() bool {
+	_, ok := m.clearedFields[collection.FieldCoverAssetID]
+	return ok
+}
+
+// ResetCoverAssetID resets all changes to the "cover_asset_id" field.
+func (m *CollectionMutation) ResetCoverAssetID() {
+	m.cover_image = nil
+	delete(m.clearedFields, collection.FieldCoverAssetID)
 }
 
 // SetVisibility sets the "visibility" field.
@@ -7137,6 +7225,46 @@ func (m *CollectionMutation) OwnerIDs() (ids []xid.ID) {
 func (m *CollectionMutation) ResetOwner() {
 	m.owner = nil
 	m.clearedowner = false
+}
+
+// SetCoverImageID sets the "cover_image" edge to the Asset entity by id.
+func (m *CollectionMutation) SetCoverImageID(id xid.ID) {
+	m.cover_image = &id
+}
+
+// ClearCoverImage clears the "cover_image" edge to the Asset entity.
+func (m *CollectionMutation) ClearCoverImage() {
+	m.clearedcover_image = true
+	m.clearedFields[collection.FieldCoverAssetID] = struct{}{}
+}
+
+// CoverImageCleared reports if the "cover_image" edge to the Asset entity was cleared.
+func (m *CollectionMutation) CoverImageCleared() bool {
+	return m.CoverAssetIDCleared() || m.clearedcover_image
+}
+
+// CoverImageID returns the "cover_image" edge ID in the mutation.
+func (m *CollectionMutation) CoverImageID() (id xid.ID, exists bool) {
+	if m.cover_image != nil {
+		return *m.cover_image, true
+	}
+	return
+}
+
+// CoverImageIDs returns the "cover_image" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CoverImageID instead. It exists only for internal usage by the builders.
+func (m *CollectionMutation) CoverImageIDs() (ids []xid.ID) {
+	if id := m.cover_image; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCoverImage resets all changes to the "cover_image" edge.
+func (m *CollectionMutation) ResetCoverImage() {
+	m.cover_image = nil
+	m.clearedcover_image = false
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by ids.
@@ -7281,7 +7409,7 @@ func (m *CollectionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CollectionMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, collection.FieldCreatedAt)
 	}
@@ -7291,8 +7419,14 @@ func (m *CollectionMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, collection.FieldName)
 	}
+	if m.slug != nil {
+		fields = append(fields, collection.FieldSlug)
+	}
 	if m.description != nil {
 		fields = append(fields, collection.FieldDescription)
+	}
+	if m.cover_image != nil {
+		fields = append(fields, collection.FieldCoverAssetID)
 	}
 	if m.visibility != nil {
 		fields = append(fields, collection.FieldVisibility)
@@ -7311,8 +7445,12 @@ func (m *CollectionMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case collection.FieldName:
 		return m.Name()
+	case collection.FieldSlug:
+		return m.Slug()
 	case collection.FieldDescription:
 		return m.Description()
+	case collection.FieldCoverAssetID:
+		return m.CoverAssetID()
 	case collection.FieldVisibility:
 		return m.Visibility()
 	}
@@ -7330,8 +7468,12 @@ func (m *CollectionMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldUpdatedAt(ctx)
 	case collection.FieldName:
 		return m.OldName(ctx)
+	case collection.FieldSlug:
+		return m.OldSlug(ctx)
 	case collection.FieldDescription:
 		return m.OldDescription(ctx)
+	case collection.FieldCoverAssetID:
+		return m.OldCoverAssetID(ctx)
 	case collection.FieldVisibility:
 		return m.OldVisibility(ctx)
 	}
@@ -7364,12 +7506,26 @@ func (m *CollectionMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
+	case collection.FieldSlug:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlug(v)
+		return nil
 	case collection.FieldDescription:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
+		return nil
+	case collection.FieldCoverAssetID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCoverAssetID(v)
 		return nil
 	case collection.FieldVisibility:
 		v, ok := value.(collection.Visibility)
@@ -7411,6 +7567,9 @@ func (m *CollectionMutation) ClearedFields() []string {
 	if m.FieldCleared(collection.FieldDescription) {
 		fields = append(fields, collection.FieldDescription)
 	}
+	if m.FieldCleared(collection.FieldCoverAssetID) {
+		fields = append(fields, collection.FieldCoverAssetID)
+	}
 	return fields
 }
 
@@ -7427,6 +7586,9 @@ func (m *CollectionMutation) ClearField(name string) error {
 	switch name {
 	case collection.FieldDescription:
 		m.ClearDescription()
+		return nil
+	case collection.FieldCoverAssetID:
+		m.ClearCoverAssetID()
 		return nil
 	}
 	return fmt.Errorf("unknown Collection nullable field %s", name)
@@ -7445,8 +7607,14 @@ func (m *CollectionMutation) ResetField(name string) error {
 	case collection.FieldName:
 		m.ResetName()
 		return nil
+	case collection.FieldSlug:
+		m.ResetSlug()
+		return nil
 	case collection.FieldDescription:
 		m.ResetDescription()
+		return nil
+	case collection.FieldCoverAssetID:
+		m.ResetCoverAssetID()
 		return nil
 	case collection.FieldVisibility:
 		m.ResetVisibility()
@@ -7457,9 +7625,12 @@ func (m *CollectionMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CollectionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.owner != nil {
 		edges = append(edges, collection.EdgeOwner)
+	}
+	if m.cover_image != nil {
+		edges = append(edges, collection.EdgeCoverImage)
 	}
 	if m.posts != nil {
 		edges = append(edges, collection.EdgePosts)
@@ -7476,6 +7647,10 @@ func (m *CollectionMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case collection.EdgeOwner:
 		if id := m.owner; id != nil {
+			return []ent.Value{*id}
+		}
+	case collection.EdgeCoverImage:
+		if id := m.cover_image; id != nil {
 			return []ent.Value{*id}
 		}
 	case collection.EdgePosts:
@@ -7496,7 +7671,7 @@ func (m *CollectionMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CollectionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removedposts != nil {
 		edges = append(edges, collection.EdgePosts)
 	}
@@ -7528,9 +7703,12 @@ func (m *CollectionMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CollectionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedowner {
 		edges = append(edges, collection.EdgeOwner)
+	}
+	if m.clearedcover_image {
+		edges = append(edges, collection.EdgeCoverImage)
 	}
 	if m.clearedposts {
 		edges = append(edges, collection.EdgePosts)
@@ -7547,6 +7725,8 @@ func (m *CollectionMutation) EdgeCleared(name string) bool {
 	switch name {
 	case collection.EdgeOwner:
 		return m.clearedowner
+	case collection.EdgeCoverImage:
+		return m.clearedcover_image
 	case collection.EdgePosts:
 		return m.clearedposts
 	case collection.EdgeNodes:
@@ -7562,6 +7742,9 @@ func (m *CollectionMutation) ClearEdge(name string) error {
 	case collection.EdgeOwner:
 		m.ClearOwner()
 		return nil
+	case collection.EdgeCoverImage:
+		m.ClearCoverImage()
+		return nil
 	}
 	return fmt.Errorf("unknown Collection unique edge %s", name)
 }
@@ -7572,6 +7755,9 @@ func (m *CollectionMutation) ResetEdge(name string) error {
 	switch name {
 	case collection.EdgeOwner:
 		m.ResetOwner()
+		return nil
+	case collection.EdgeCoverImage:
+		m.ResetCoverImage()
 		return nil
 	case collection.EdgePosts:
 		m.ResetPosts()

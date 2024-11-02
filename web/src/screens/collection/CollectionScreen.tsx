@@ -9,6 +9,7 @@ import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/C
 import { DatagraphItemCard } from "@/components/datagraph/DatagraphItemCard";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Heading } from "@/components/ui/heading";
 import { CardGrid } from "@/components/ui/rich-card";
 import { LStack, VStack, styled } from "@/styled-system/jsx";
 
@@ -27,7 +28,7 @@ export function CollectionScreen({ session, initialCollection }: Props) {
 
   const collection = data;
 
-  const url = `/c/${collection.id}`;
+  const url = `/c/${collection.slug}`;
 
   return (
     <VStack alignItems="start">
@@ -43,8 +44,19 @@ export function CollectionScreen({ session, initialCollection }: Props) {
         )}
       </Breadcrumbs>
 
-      <LStack>
-        <styled.p fontSize="sm">{collection.description}</styled.p>
+      <LStack gap="1">
+        <Heading size="xl">{collection.name}</Heading>
+
+        <styled.p fontSize="sm">
+          {collection.description ? (
+            <styled.span>{collection.description}</styled.span>
+          ) : (
+            <styled.span color="fg.muted" fontStyle="italic">
+              (no description)
+            </styled.span>
+          )}
+        </styled.p>
+
         <MemberBadge
           profile={collection.owner}
           name="full-horizontal"

@@ -86,7 +86,7 @@ func (i *Collections) CollectionList(ctx context.Context, request openapi.Collec
 }
 
 func (i *Collections) CollectionGet(ctx context.Context, request openapi.CollectionGetRequestObject) (openapi.CollectionGetResponseObject, error) {
-	coll, err := i.colReader.GetCollection(ctx, collection.CollectionID(deserialiseID(request.CollectionId)))
+	coll, err := i.colReader.GetCollection(ctx, collection.NewKey(request.CollectionMark))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -98,7 +98,7 @@ func (i *Collections) CollectionGet(ctx context.Context, request openapi.Collect
 
 func (i *Collections) CollectionUpdate(ctx context.Context, request openapi.CollectionUpdateRequestObject) (openapi.CollectionUpdateResponseObject, error) {
 	c, err := i.colManager.Update(ctx,
-		collection.CollectionID(deserialiseID(request.CollectionId)),
+		collection.NewKey(request.CollectionMark),
 		collection_manager.Partial{
 			Name:        opt.NewPtr(request.Body.Name),
 			Description: opt.NewPtr(request.Body.Description),
@@ -113,7 +113,7 @@ func (i *Collections) CollectionUpdate(ctx context.Context, request openapi.Coll
 }
 
 func (i *Collections) CollectionDelete(ctx context.Context, request openapi.CollectionDeleteRequestObject) (openapi.CollectionDeleteResponseObject, error) {
-	err := i.colManager.Delete(ctx, collection.CollectionID(deserialiseID(request.CollectionId)))
+	err := i.colManager.Delete(ctx, collection.NewKey(request.CollectionMark))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -123,7 +123,7 @@ func (i *Collections) CollectionDelete(ctx context.Context, request openapi.Coll
 
 func (i *Collections) CollectionAddPost(ctx context.Context, request openapi.CollectionAddPostRequestObject) (openapi.CollectionAddPostResponseObject, error) {
 	c, err := i.colItemManager.PostAdd(ctx,
-		collection.CollectionID(deserialiseID(request.CollectionId)),
+		collection.NewKey(request.CollectionMark),
 		post.ID(deserialiseID(request.PostId)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -136,7 +136,7 @@ func (i *Collections) CollectionAddPost(ctx context.Context, request openapi.Col
 
 func (i *Collections) CollectionRemovePost(ctx context.Context, request openapi.CollectionRemovePostRequestObject) (openapi.CollectionRemovePostResponseObject, error) {
 	c, err := i.colItemManager.PostRemove(ctx,
-		collection.CollectionID(deserialiseID(request.CollectionId)),
+		collection.NewKey(request.CollectionMark),
 		post.ID(deserialiseID(request.PostId)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -149,7 +149,7 @@ func (i *Collections) CollectionRemovePost(ctx context.Context, request openapi.
 
 func (i *Collections) CollectionAddNode(ctx context.Context, request openapi.CollectionAddNodeRequestObject) (openapi.CollectionAddNodeResponseObject, error) {
 	c, err := i.colItemManager.NodeAdd(ctx,
-		collection.CollectionID(deserialiseID(request.CollectionId)),
+		collection.NewKey(request.CollectionMark),
 		library.NodeID(deserialiseID(request.NodeId)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -162,7 +162,7 @@ func (i *Collections) CollectionAddNode(ctx context.Context, request openapi.Col
 
 func (i *Collections) CollectionRemoveNode(ctx context.Context, request openapi.CollectionRemoveNodeRequestObject) (openapi.CollectionRemoveNodeResponseObject, error) {
 	c, err := i.colItemManager.NodeRemove(ctx,
-		collection.CollectionID(deserialiseID(request.CollectionId)),
+		collection.NewKey(request.CollectionMark),
 		library.NodeID(deserialiseID(request.NodeId)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -175,12 +175,13 @@ func (i *Collections) CollectionRemoveNode(ctx context.Context, request openapi.
 
 func serialiseCollection(in *collection.Collection) openapi.Collection {
 	return openapi.Collection{
-		Id:             in.ID.String(),
+		Id:             in.Mark.ID().String(),
 		CreatedAt:      in.CreatedAt,
 		UpdatedAt:      in.UpdatedAt,
-		Owner:          serialiseProfileReference(in.Owner),
 		Name:           in.Name,
+		Slug:           in.Mark.String(),
 		Description:    in.Description.Ptr(),
+		Owner:          serialiseProfileReference(in.Owner),
 		ItemCount:      int(in.ItemCount),
 		HasQueriedItem: in.HasQueriedItem,
 	}
@@ -188,12 +189,13 @@ func serialiseCollection(in *collection.Collection) openapi.Collection {
 
 func serialiseCollectionWithItems(in *collection.CollectionWithItems) openapi.CollectionWithItems {
 	return openapi.CollectionWithItems{
-		Id:          in.ID.String(),
+		Id:          in.Mark.ID().String(),
 		CreatedAt:   in.CreatedAt,
 		UpdatedAt:   in.UpdatedAt,
-		Owner:       serialiseProfileReference(in.Owner),
 		Name:        in.Name,
+		Slug:        in.Mark.String(),
 		Description: in.Description.Ptr(),
+		Owner:       serialiseProfileReference(in.Owner),
 		Items:       dt.Map(in.Items, serialiseCollectionItem),
 	}
 }

@@ -1840,6 +1840,22 @@ func (c *CollectionClient) QueryOwner(co *Collection) *AccountQuery {
 	return query
 }
 
+// QueryCoverImage queries the cover_image edge of a Collection.
+func (c *CollectionClient) QueryCoverImage(co *Collection) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(collection.Table, collection.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, collection.CoverImageTable, collection.CoverImageColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryPosts queries the posts edge of a Collection.
 func (c *CollectionClient) QueryPosts(co *Collection) *PostQuery {
 	query := (&PostClient{config: c.config}).Query()

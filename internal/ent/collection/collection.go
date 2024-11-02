@@ -22,12 +22,18 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldSlug holds the string denoting the slug field in the database.
+	FieldSlug = "slug"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldCoverAssetID holds the string denoting the cover_asset_id field in the database.
+	FieldCoverAssetID = "cover_asset_id"
 	// FieldVisibility holds the string denoting the visibility field in the database.
 	FieldVisibility = "visibility"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
+	// EdgeCoverImage holds the string denoting the cover_image edge name in mutations.
+	EdgeCoverImage = "cover_image"
 	// EdgePosts holds the string denoting the posts edge name in mutations.
 	EdgePosts = "posts"
 	// EdgeNodes holds the string denoting the nodes edge name in mutations.
@@ -45,6 +51,13 @@ const (
 	OwnerInverseTable = "accounts"
 	// OwnerColumn is the table column denoting the owner relation/edge.
 	OwnerColumn = "account_collections"
+	// CoverImageTable is the table that holds the cover_image relation/edge.
+	CoverImageTable = "collections"
+	// CoverImageInverseTable is the table name for the Asset entity.
+	// It exists in this package in order to avoid circular dependency with the "asset" package.
+	CoverImageInverseTable = "assets"
+	// CoverImageColumn is the table column denoting the cover_image relation/edge.
+	CoverImageColumn = "cover_asset_id"
 	// PostsTable is the table that holds the posts relation/edge. The primary key declared below.
 	PostsTable = "collection_posts"
 	// PostsInverseTable is the table name for the Post entity.
@@ -77,7 +90,9 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldName,
+	FieldSlug,
 	FieldDescription,
+	FieldCoverAssetID,
 	FieldVisibility,
 }
 
@@ -175,9 +190,19 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
+// BySlug orders the results by the slug field.
+func BySlug(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSlug, opts...).ToFunc()
+}
+
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
+}
+
+// ByCoverAssetID orders the results by the cover_asset_id field.
+func ByCoverAssetID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCoverAssetID, opts...).ToFunc()
 }
 
 // ByVisibility orders the results by the visibility field.
@@ -189,6 +214,13 @@ func ByVisibility(opts ...sql.OrderTermOption) OrderOption {
 func ByOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newOwnerStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByCoverImageField orders the results by cover_image field.
+func ByCoverImageField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCoverImageStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -252,6 +284,13 @@ func newOwnerStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OwnerInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+	)
+}
+func newCoverImageStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CoverImageInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, CoverImageTable, CoverImageColumn),
 	)
 }
 func newPostsStep() *sqlgraph.Step {

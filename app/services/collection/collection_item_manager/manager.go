@@ -34,13 +34,13 @@ func New(
 	}
 }
 
-func (m *Manager) PostAdd(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.CollectionWithItems, error) {
-	mt, err := m.authoriseSubmission(ctx, cid, xid.ID(pid))
+func (m *Manager) PostAdd(ctx context.Context, qk collection.QueryKey, pid post.ID) (*collection.CollectionWithItems, error) {
+	mt, err := m.authoriseSubmission(ctx, qk, xid.ID(pid))
 	if err != nil {
 		return nil, err
 	}
 
-	col, err := m.repo.UpdateItems(ctx, cid, collection_item.WithPost(pid, mt))
+	col, err := m.repo.UpdateItems(ctx, qk, collection_item.WithPost(pid, mt))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -48,8 +48,8 @@ func (m *Manager) PostAdd(ctx context.Context, cid collection.CollectionID, pid 
 	return col, nil
 }
 
-func (m *Manager) PostRemove(ctx context.Context, cid collection.CollectionID, pid post.ID) (*collection.CollectionWithItems, error) {
-	col, err := m.repo.UpdateItems(ctx, cid, collection_item.WithPostRemove(pid))
+func (m *Manager) PostRemove(ctx context.Context, qk collection.QueryKey, pid post.ID) (*collection.CollectionWithItems, error) {
+	col, err := m.repo.UpdateItems(ctx, qk, collection_item.WithPostRemove(pid))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -57,13 +57,13 @@ func (m *Manager) PostRemove(ctx context.Context, cid collection.CollectionID, p
 	return col, nil
 }
 
-func (m *Manager) NodeAdd(ctx context.Context, cid collection.CollectionID, id library.NodeID) (*collection.CollectionWithItems, error) {
-	mt, err := m.authoriseSubmission(ctx, cid, xid.ID(id))
+func (m *Manager) NodeAdd(ctx context.Context, qk collection.QueryKey, id library.NodeID) (*collection.CollectionWithItems, error) {
+	mt, err := m.authoriseSubmission(ctx, qk, xid.ID(id))
 	if err != nil {
 		return nil, err
 	}
 
-	col, err := m.repo.UpdateItems(ctx, cid, collection_item.WithNode(id, mt))
+	col, err := m.repo.UpdateItems(ctx, qk, collection_item.WithNode(id, mt))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -71,12 +71,12 @@ func (m *Manager) NodeAdd(ctx context.Context, cid collection.CollectionID, id l
 	return col, nil
 }
 
-func (m *Manager) NodeRemove(ctx context.Context, cid collection.CollectionID, id library.NodeID) (*collection.CollectionWithItems, error) {
-	if err := m.authoriseDirectUpdate(ctx, cid); err != nil {
+func (m *Manager) NodeRemove(ctx context.Context, qk collection.QueryKey, id library.NodeID) (*collection.CollectionWithItems, error) {
+	if err := m.authoriseDirectUpdate(ctx, qk); err != nil {
 		return nil, err
 	}
 
-	col, err := m.repo.UpdateItems(ctx, cid, collection_item.WithNodeRemove(id))
+	col, err := m.repo.UpdateItems(ctx, qk, collection_item.WithNodeRemove(id))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -84,13 +84,13 @@ func (m *Manager) NodeRemove(ctx context.Context, cid collection.CollectionID, i
 	return col, nil
 }
 
-func (m *Manager) authoriseSubmission(ctx context.Context, cid collection.CollectionID, iid xid.ID) (collection.MembershipType, error) {
+func (m *Manager) authoriseSubmission(ctx context.Context, qk collection.QueryKey, iid xid.ID) (collection.MembershipType, error) {
 	acc, err := m.session.Account(ctx)
 	if err != nil {
 		return collection.MembershipType{}, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	citem, err := m.repo.ProbeItem(ctx, cid, iid)
+	citem, err := m.repo.ProbeItem(ctx, qk, iid)
 	if err != nil {
 		return collection.MembershipType{}, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -98,13 +98,13 @@ func (m *Manager) authoriseSubmission(ctx context.Context, cid collection.Collec
 	return collection_auth.CheckCollectionItemMutationPermissions(ctx, *acc, *citem)
 }
 
-func (m *Manager) authoriseDirectUpdate(ctx context.Context, cid collection.CollectionID) error {
+func (m *Manager) authoriseDirectUpdate(ctx context.Context, qk collection.QueryKey) error {
 	acc, err := m.session.Account(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	col, err := m.colQuerier.Probe(ctx, cid)
+	col, err := m.colQuerier.Probe(ctx, qk)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

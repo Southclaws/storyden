@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/rs/xid"
 )
@@ -25,8 +26,12 @@ type Collection struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// Slug holds the value of the "slug" field.
+	Slug string `json:"slug,omitempty"`
 	// Description holds the value of the "description" field.
 	Description *string `json:"description,omitempty"`
+	// CoverAssetID holds the value of the "cover_asset_id" field.
+	CoverAssetID *xid.ID `json:"cover_asset_id,omitempty"`
 	// Visibility holds the value of the "visibility" field.
 	Visibility collection.Visibility `json:"visibility,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -40,6 +45,8 @@ type Collection struct {
 type CollectionEdges struct {
 	// Owner holds the value of the owner edge.
 	Owner *Account `json:"owner,omitempty"`
+	// CoverImage holds the value of the cover_image edge.
+	CoverImage *Asset `json:"cover_image,omitempty"`
 	// Posts holds the value of the posts edge.
 	Posts []*Post `json:"posts,omitempty"`
 	// Nodes holds the value of the nodes edge.
@@ -50,7 +57,7 @@ type CollectionEdges struct {
 	CollectionNodes []*CollectionNode `json:"collection_nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -64,10 +71,21 @@ func (e CollectionEdges) OwnerOrErr() (*Account, error) {
 	return nil, &NotLoadedError{edge: "owner"}
 }
 
+// CoverImageOrErr returns the CoverImage value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CollectionEdges) CoverImageOrErr() (*Asset, error) {
+	if e.CoverImage != nil {
+		return e.CoverImage, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: asset.Label}
+	}
+	return nil, &NotLoadedError{edge: "cover_image"}
+}
+
 // PostsOrErr returns the Posts value or an error if the edge
 // was not loaded in eager-loading.
 func (e CollectionEdges) PostsOrErr() ([]*Post, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.Posts, nil
 	}
 	return nil, &NotLoadedError{edge: "posts"}
@@ -76,7 +94,7 @@ func (e CollectionEdges) PostsOrErr() ([]*Post, error) {
 // NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e CollectionEdges) NodesOrErr() ([]*Node, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.Nodes, nil
 	}
 	return nil, &NotLoadedError{edge: "nodes"}
@@ -85,7 +103,7 @@ func (e CollectionEdges) NodesOrErr() ([]*Node, error) {
 // CollectionPostsOrErr returns the CollectionPosts value or an error if the edge
 // was not loaded in eager-loading.
 func (e CollectionEdges) CollectionPostsOrErr() ([]*CollectionPost, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.CollectionPosts, nil
 	}
 	return nil, &NotLoadedError{edge: "collection_posts"}
@@ -94,7 +112,7 @@ func (e CollectionEdges) CollectionPostsOrErr() ([]*CollectionPost, error) {
 // CollectionNodesOrErr returns the CollectionNodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e CollectionEdges) CollectionNodesOrErr() ([]*CollectionNode, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[5] {
 		return e.CollectionNodes, nil
 	}
 	return nil, &NotLoadedError{edge: "collection_nodes"}
@@ -105,7 +123,9 @@ func (*Collection) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case collection.FieldName, collection.FieldDescription, collection.FieldVisibility:
+		case collection.FieldCoverAssetID:
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
+		case collection.FieldName, collection.FieldSlug, collection.FieldDescription, collection.FieldVisibility:
 			values[i] = new(sql.NullString)
 		case collection.FieldCreatedAt, collection.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -152,12 +172,25 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Name = value.String
 			}
+		case collection.FieldSlug:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field slug", values[i])
+			} else if value.Valid {
+				c.Slug = value.String
+			}
 		case collection.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
 				c.Description = new(string)
 				*c.Description = value.String
+			}
+		case collection.FieldCoverAssetID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field cover_asset_id", values[i])
+			} else if value.Valid {
+				c.CoverAssetID = new(xid.ID)
+				*c.CoverAssetID = *value.S.(*xid.ID)
 			}
 		case collection.FieldVisibility:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -188,6 +221,11 @@ func (c *Collection) Value(name string) (ent.Value, error) {
 // QueryOwner queries the "owner" edge of the Collection entity.
 func (c *Collection) QueryOwner() *AccountQuery {
 	return NewCollectionClient(c.config).QueryOwner(c)
+}
+
+// QueryCoverImage queries the "cover_image" edge of the Collection entity.
+func (c *Collection) QueryCoverImage() *AssetQuery {
+	return NewCollectionClient(c.config).QueryCoverImage(c)
 }
 
 // QueryPosts queries the "posts" edge of the Collection entity.
@@ -242,9 +280,17 @@ func (c *Collection) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", ")
+	builder.WriteString("slug=")
+	builder.WriteString(c.Slug)
+	builder.WriteString(", ")
 	if v := c.Description; v != nil {
 		builder.WriteString("description=")
 		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	if v := c.CoverAssetID; v != nil {
+		builder.WriteString("cover_asset_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("visibility=")
