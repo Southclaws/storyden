@@ -69,7 +69,9 @@ erDiagram
         timeDOTTime created_at
         timeDOTTime updated_at
         string name
+        string slug
         string description
+        xidDOTID cover_asset_id
         collectionDOTVisibility visibility
     }
     CollectionNode {
@@ -246,6 +248,7 @@ erDiagram
     	Asset |o--o{ Event : "event/primary_image"
     	Authentication |o--o{ Email : "email_address/authentication"
     	Category |o--o{ Post : "posts/category"
+    	Collection }o--o| Asset : "cover_image"
     	Collection }o--o{ Post : "posts/collections"
     	Collection }o--o{ Node : "nodes/collections"
     	CollectionNode }o--o| Collection : "collection"

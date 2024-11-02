@@ -14,7 +14,7 @@ type Props = {
 };
 
 export function CollectionCard({ collection, hideOwner }: Props) {
-  const url = `/c/${collection.id}`;
+  const url = `/c/${collection.slug}`;
 
   return (
     <Card

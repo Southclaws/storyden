@@ -142,15 +142,15 @@ response will depend on which account is making the request and if the
 target collection is public, private, owned or not owned by the account.
 
  */
-export const collectionGet = (collectionId: string) => {
+export const collectionGet = (collectionMark: string) => {
   return fetcher<CollectionGetOKResponse>({
-    url: `/collections/${collectionId}`,
+    url: `/collections/${collectionMark}`,
     method: "GET",
   });
 };
 
-export const getCollectionGetKey = (collectionId: string) =>
-  [`/collections/${collectionId}`] as const;
+export const getCollectionGetKey = (collectionMark: string) =>
+  [`/collections/${collectionMark}`] as const;
 
 export type CollectionGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof collectionGet>>
@@ -166,7 +166,7 @@ export const useCollectionGet = <
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(
-  collectionId: string,
+  collectionMark: string,
   options?: {
     swr?: SWRConfiguration<
       Awaited<ReturnType<typeof collectionGet>>,
@@ -176,11 +176,11 @@ export const useCollectionGet = <
 ) => {
   const { swr: swrOptions } = options ?? {};
 
-  const isEnabled = swrOptions?.enabled !== false && !!collectionId;
+  const isEnabled = swrOptions?.enabled !== false && !!collectionMark;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getCollectionGetKey(collectionId) : null));
-  const swrFn = () => collectionGet(collectionId);
+    (() => (isEnabled ? getCollectionGetKey(collectionMark) : null));
+  const swrFn = () => collectionGet(collectionMark);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
@@ -197,27 +197,27 @@ export const useCollectionGet = <
  * Update a collection owned by the authenticated account.
  */
 export const collectionUpdate = (
-  collectionId: string,
+  collectionMark: string,
   collectionUpdateBody: CollectionUpdateBody,
 ) => {
   return fetcher<CollectionUpdateOKResponse>({
-    url: `/collections/${collectionId}`,
+    url: `/collections/${collectionMark}`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: collectionUpdateBody,
   });
 };
 
-export const getCollectionUpdateMutationFetcher = (collectionId: string) => {
+export const getCollectionUpdateMutationFetcher = (collectionMark: string) => {
   return (
     _: string,
     { arg }: { arg: CollectionUpdateBody },
   ): Promise<CollectionUpdateOKResponse> => {
-    return collectionUpdate(collectionId, arg);
+    return collectionUpdate(collectionMark, arg);
   };
 };
-export const getCollectionUpdateMutationKey = (collectionId: string) =>
-  `/collections/${collectionId}` as const;
+export const getCollectionUpdateMutationKey = (collectionMark: string) =>
+  `/collections/${collectionMark}` as const;
 
 export type CollectionUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionUpdate>>
@@ -233,7 +233,7 @@ export const useCollectionUpdate = <
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(
-  collectionId: string,
+  collectionMark: string,
   options?: {
     swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof collectionUpdate>>,
@@ -247,8 +247,8 @@ export const useCollectionUpdate = <
   const { swr: swrOptions } = options ?? {};
 
   const swrKey =
-    swrOptions?.swrKey ?? getCollectionUpdateMutationKey(collectionId);
-  const swrFn = getCollectionUpdateMutationFetcher(collectionId);
+    swrOptions?.swrKey ?? getCollectionUpdateMutationKey(collectionMark);
+  const swrFn = getCollectionUpdateMutationFetcher(collectionMark);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -260,20 +260,20 @@ export const useCollectionUpdate = <
 /**
  * Delete a collection owned by the authenticated account.
  */
-export const collectionDelete = (collectionId: string) => {
+export const collectionDelete = (collectionMark: string) => {
   return fetcher<void>({
-    url: `/collections/${collectionId}`,
+    url: `/collections/${collectionMark}`,
     method: "DELETE",
   });
 };
 
-export const getCollectionDeleteMutationFetcher = (collectionId: string) => {
+export const getCollectionDeleteMutationFetcher = (collectionMark: string) => {
   return (_: string, __: { arg: Arguments }): Promise<void> => {
-    return collectionDelete(collectionId);
+    return collectionDelete(collectionMark);
   };
 };
-export const getCollectionDeleteMutationKey = (collectionId: string) =>
-  `/collections/${collectionId}` as const;
+export const getCollectionDeleteMutationKey = (collectionMark: string) =>
+  `/collections/${collectionMark}` as const;
 
 export type CollectionDeleteMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionDelete>>
@@ -289,7 +289,7 @@ export const useCollectionDelete = <
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(
-  collectionId: string,
+  collectionMark: string,
   options?: {
     swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof collectionDelete>>,
@@ -303,8 +303,8 @@ export const useCollectionDelete = <
   const { swr: swrOptions } = options ?? {};
 
   const swrKey =
-    swrOptions?.swrKey ?? getCollectionDeleteMutationKey(collectionId);
-  const swrFn = getCollectionDeleteMutationFetcher(collectionId);
+    swrOptions?.swrKey ?? getCollectionDeleteMutationKey(collectionMark);
+  const swrFn = getCollectionDeleteMutationFetcher(collectionMark);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -318,28 +318,28 @@ export const useCollectionDelete = <
 making the request. The post can be any published post of any kind.
 
  */
-export const collectionAddPost = (collectionId: string, postId: string) => {
+export const collectionAddPost = (collectionMark: string, postId: string) => {
   return fetcher<CollectionAddPostOKResponse>({
-    url: `/collections/${collectionId}/posts/${postId}`,
+    url: `/collections/${collectionMark}/posts/${postId}`,
     method: "PUT",
   });
 };
 
 export const getCollectionAddPostMutationFetcher = (
-  collectionId: string,
+  collectionMark: string,
   postId: string,
 ) => {
   return (
     _: string,
     __: { arg: Arguments },
   ): Promise<CollectionAddPostOKResponse> => {
-    return collectionAddPost(collectionId, postId);
+    return collectionAddPost(collectionMark, postId);
   };
 };
 export const getCollectionAddPostMutationKey = (
-  collectionId: string,
+  collectionMark: string,
   postId: string,
-) => `/collections/${collectionId}/posts/${postId}` as const;
+) => `/collections/${collectionMark}/posts/${postId}` as const;
 
 export type CollectionAddPostMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionAddPost>>
@@ -355,7 +355,7 @@ export const useCollectionAddPost = <
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(
-  collectionId: string,
+  collectionMark: string,
   postId: string,
   options?: {
     swr?: SWRMutationConfiguration<
@@ -370,8 +370,9 @@ export const useCollectionAddPost = <
   const { swr: swrOptions } = options ?? {};
 
   const swrKey =
-    swrOptions?.swrKey ?? getCollectionAddPostMutationKey(collectionId, postId);
-  const swrFn = getCollectionAddPostMutationFetcher(collectionId, postId);
+    swrOptions?.swrKey ??
+    getCollectionAddPostMutationKey(collectionMark, postId);
+  const swrFn = getCollectionAddPostMutationFetcher(collectionMark, postId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -385,28 +386,31 @@ export const useCollectionAddPost = <
 account making the request.
 
  */
-export const collectionRemovePost = (collectionId: string, postId: string) => {
+export const collectionRemovePost = (
+  collectionMark: string,
+  postId: string,
+) => {
   return fetcher<CollectionRemovePostOKResponse>({
-    url: `/collections/${collectionId}/posts/${postId}`,
+    url: `/collections/${collectionMark}/posts/${postId}`,
     method: "DELETE",
   });
 };
 
 export const getCollectionRemovePostMutationFetcher = (
-  collectionId: string,
+  collectionMark: string,
   postId: string,
 ) => {
   return (
     _: string,
     __: { arg: Arguments },
   ): Promise<CollectionRemovePostOKResponse> => {
-    return collectionRemovePost(collectionId, postId);
+    return collectionRemovePost(collectionMark, postId);
   };
 };
 export const getCollectionRemovePostMutationKey = (
-  collectionId: string,
+  collectionMark: string,
   postId: string,
-) => `/collections/${collectionId}/posts/${postId}` as const;
+) => `/collections/${collectionMark}/posts/${postId}` as const;
 
 export type CollectionRemovePostMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionRemovePost>>
@@ -422,7 +426,7 @@ export const useCollectionRemovePost = <
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(
-  collectionId: string,
+  collectionMark: string,
   postId: string,
   options?: {
     swr?: SWRMutationConfiguration<
@@ -438,8 +442,8 @@ export const useCollectionRemovePost = <
 
   const swrKey =
     swrOptions?.swrKey ??
-    getCollectionRemovePostMutationKey(collectionId, postId);
-  const swrFn = getCollectionRemovePostMutationFetcher(collectionId, postId);
+    getCollectionRemovePostMutationKey(collectionMark, postId);
+  const swrFn = getCollectionRemovePostMutationFetcher(collectionMark, postId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -454,28 +458,28 @@ making the request. The node can be any published node or any node
 not published but owned by the collection owner.
 
  */
-export const collectionAddNode = (collectionId: string, nodeId: string) => {
+export const collectionAddNode = (collectionMark: string, nodeId: string) => {
   return fetcher<CollectionAddNodeOKResponse>({
-    url: `/collections/${collectionId}/nodes/${nodeId}`,
+    url: `/collections/${collectionMark}/nodes/${nodeId}`,
     method: "PUT",
   });
 };
 
 export const getCollectionAddNodeMutationFetcher = (
-  collectionId: string,
+  collectionMark: string,
   nodeId: string,
 ) => {
   return (
     _: string,
     __: { arg: Arguments },
   ): Promise<CollectionAddNodeOKResponse> => {
-    return collectionAddNode(collectionId, nodeId);
+    return collectionAddNode(collectionMark, nodeId);
   };
 };
 export const getCollectionAddNodeMutationKey = (
-  collectionId: string,
+  collectionMark: string,
   nodeId: string,
-) => `/collections/${collectionId}/nodes/${nodeId}` as const;
+) => `/collections/${collectionMark}/nodes/${nodeId}` as const;
 
 export type CollectionAddNodeMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionAddNode>>
@@ -491,7 +495,7 @@ export const useCollectionAddNode = <
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(
-  collectionId: string,
+  collectionMark: string,
   nodeId: string,
   options?: {
     swr?: SWRMutationConfiguration<
@@ -506,8 +510,9 @@ export const useCollectionAddNode = <
   const { swr: swrOptions } = options ?? {};
 
   const swrKey =
-    swrOptions?.swrKey ?? getCollectionAddNodeMutationKey(collectionId, nodeId);
-  const swrFn = getCollectionAddNodeMutationFetcher(collectionId, nodeId);
+    swrOptions?.swrKey ??
+    getCollectionAddNodeMutationKey(collectionMark, nodeId);
+  const swrFn = getCollectionAddNodeMutationFetcher(collectionMark, nodeId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -521,28 +526,31 @@ export const useCollectionAddNode = <
 account making the request.
 
  */
-export const collectionRemoveNode = (collectionId: string, nodeId: string) => {
+export const collectionRemoveNode = (
+  collectionMark: string,
+  nodeId: string,
+) => {
   return fetcher<CollectionRemoveNodeOKResponse>({
-    url: `/collections/${collectionId}/nodes/${nodeId}`,
+    url: `/collections/${collectionMark}/nodes/${nodeId}`,
     method: "DELETE",
   });
 };
 
 export const getCollectionRemoveNodeMutationFetcher = (
-  collectionId: string,
+  collectionMark: string,
   nodeId: string,
 ) => {
   return (
     _: string,
     __: { arg: Arguments },
   ): Promise<CollectionRemoveNodeOKResponse> => {
-    return collectionRemoveNode(collectionId, nodeId);
+    return collectionRemoveNode(collectionMark, nodeId);
   };
 };
 export const getCollectionRemoveNodeMutationKey = (
-  collectionId: string,
+  collectionMark: string,
   nodeId: string,
-) => `/collections/${collectionId}/nodes/${nodeId}` as const;
+) => `/collections/${collectionMark}/nodes/${nodeId}` as const;
 
 export type CollectionRemoveNodeMutationResult = NonNullable<
   Awaited<ReturnType<typeof collectionRemoveNode>>
@@ -558,7 +566,7 @@ export const useCollectionRemoveNode = <
     | NotFoundResponse
     | InternalServerErrorResponse,
 >(
-  collectionId: string,
+  collectionMark: string,
   nodeId: string,
   options?: {
     swr?: SWRMutationConfiguration<
@@ -574,8 +582,8 @@ export const useCollectionRemoveNode = <
 
   const swrKey =
     swrOptions?.swrKey ??
-    getCollectionRemoveNodeMutationKey(collectionId, nodeId);
-  const swrFn = getCollectionRemoveNodeMutationFetcher(collectionId, nodeId);
+    getCollectionRemoveNodeMutationKey(collectionMark, nodeId);
+  const swrFn = getCollectionRemoveNodeMutationFetcher(collectionMark, nodeId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

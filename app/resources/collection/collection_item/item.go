@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
-	ent_collection "github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
 )
@@ -79,14 +78,17 @@ func WithNodeRemove(id library.NodeID) ItemOption {
 	}
 }
 
-func (d *Repository) UpdateItems(ctx context.Context, id collection.CollectionID, opts ...ItemOption) (*collection.CollectionWithItems, error) {
+func (d *Repository) UpdateItems(ctx context.Context, qk collection.QueryKey, opts ...ItemOption) (*collection.CollectionWithItems, error) {
+	cid, err := d.db.Collection.Query().Where(qk.Predicate()).OnlyID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	options := itemChanges{}
 
 	for _, fn := range opts {
 		fn(&options)
 	}
-
-	cid := xid.ID(id)
 
 	for _, op := range options {
 		var err error
@@ -128,7 +130,7 @@ func (d *Repository) UpdateItems(ctx context.Context, id collection.CollectionID
 
 			if op.remove {
 				_, err = d.db.CollectionNode.Delete().Where(
-					collectionnode.CollectionID(xid.ID(id)),
+					collectionnode.CollectionID(cid),
 					collectionnode.NodeID(op.id),
 				).Exec(ctx)
 			} else {
@@ -157,12 +159,12 @@ func (d *Repository) UpdateItems(ctx context.Context, id collection.CollectionID
 		}
 	}
 
-	return d.querier.Get(ctx, id)
+	return d.querier.Get(ctx, qk)
 }
 
-func (d *Repository) ProbeItem(ctx context.Context, id collection.CollectionID, itemID xid.ID) (*collection.CollectionItemStatus, error) {
+func (d *Repository) ProbeItem(ctx context.Context, qk collection.QueryKey, itemID xid.ID) (*collection.CollectionItemStatus, error) {
 	r, err := d.db.Collection.Query().
-		Where(ent_collection.ID(xid.ID(id))).
+		Where(qk.Predicate()).
 		WithOwner(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).

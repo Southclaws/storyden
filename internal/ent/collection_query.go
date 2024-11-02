@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/collectionpost"
@@ -30,6 +31,7 @@ type CollectionQuery struct {
 	inters              []Interceptor
 	predicates          []predicate.Collection
 	withOwner           *AccountQuery
+	withCoverImage      *AssetQuery
 	withPosts           *PostQuery
 	withNodes           *NodeQuery
 	withCollectionPosts *CollectionPostQuery
@@ -87,6 +89,28 @@ func (cq *CollectionQuery) QueryOwner() *AccountQuery {
 			sqlgraph.From(collection.Table, collection.FieldID, selector),
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, collection.OwnerTable, collection.OwnerColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCoverImage chains the current query on the "cover_image" edge.
+func (cq *CollectionQuery) QueryCoverImage() *AssetQuery {
+	query := (&AssetClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(collection.Table, collection.FieldID, selector),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, collection.CoverImageTable, collection.CoverImageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -375,6 +399,7 @@ func (cq *CollectionQuery) Clone() *CollectionQuery {
 		inters:              append([]Interceptor{}, cq.inters...),
 		predicates:          append([]predicate.Collection{}, cq.predicates...),
 		withOwner:           cq.withOwner.Clone(),
+		withCoverImage:      cq.withCoverImage.Clone(),
 		withPosts:           cq.withPosts.Clone(),
 		withNodes:           cq.withNodes.Clone(),
 		withCollectionPosts: cq.withCollectionPosts.Clone(),
@@ -394,6 +419,17 @@ func (cq *CollectionQuery) WithOwner(opts ...func(*AccountQuery)) *CollectionQue
 		opt(query)
 	}
 	cq.withOwner = query
+	return cq
+}
+
+// WithCoverImage tells the query-builder to eager-load the nodes that are connected to
+// the "cover_image" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CollectionQuery) WithCoverImage(opts ...func(*AssetQuery)) *CollectionQuery {
+	query := (&AssetClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withCoverImage = query
 	return cq
 }
 
@@ -520,8 +556,9 @@ func (cq *CollectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 		nodes       = []*Collection{}
 		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			cq.withOwner != nil,
+			cq.withCoverImage != nil,
 			cq.withPosts != nil,
 			cq.withNodes != nil,
 			cq.withCollectionPosts != nil,
@@ -558,6 +595,12 @@ func (cq *CollectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 	if query := cq.withOwner; query != nil {
 		if err := cq.loadOwner(ctx, query, nodes, nil,
 			func(n *Collection, e *Account) { n.Edges.Owner = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withCoverImage; query != nil {
+		if err := cq.loadCoverImage(ctx, query, nodes, nil,
+			func(n *Collection, e *Asset) { n.Edges.CoverImage = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -617,6 +660,38 @@ func (cq *CollectionQuery) loadOwner(ctx context.Context, query *AccountQuery, n
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "account_collections" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (cq *CollectionQuery) loadCoverImage(ctx context.Context, query *AssetQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Asset)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Collection)
+	for i := range nodes {
+		if nodes[i].CoverAssetID == nil {
+			continue
+		}
+		fk := *nodes[i].CoverAssetID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(asset.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "cover_asset_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -834,6 +909,9 @@ func (cq *CollectionQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != collection.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if cq.withCoverImage != nil {
+			_spec.Node.AddColumnOnce(collection.FieldCoverAssetID)
 		}
 	}
 	if ps := cq.predicates; len(ps) > 0 {

@@ -92,16 +92,16 @@ export type collectionGetResponse = {
   status: number;
 };
 
-export const getCollectionGetUrl = (collectionId: string) => {
-  return `/collections/${collectionId}`;
+export const getCollectionGetUrl = (collectionMark: string) => {
+  return `/collections/${collectionMark}`;
 };
 
 export const collectionGet = async (
-  collectionId: string,
+  collectionMark: string,
   options?: RequestInit,
 ): Promise<collectionGetResponse> => {
   return fetcher<Promise<collectionGetResponse>>(
-    getCollectionGetUrl(collectionId),
+    getCollectionGetUrl(collectionMark),
     {
       ...options,
       method: "GET",
@@ -117,17 +117,17 @@ export type collectionUpdateResponse = {
   status: number;
 };
 
-export const getCollectionUpdateUrl = (collectionId: string) => {
-  return `/collections/${collectionId}`;
+export const getCollectionUpdateUrl = (collectionMark: string) => {
+  return `/collections/${collectionMark}`;
 };
 
 export const collectionUpdate = async (
-  collectionId: string,
+  collectionMark: string,
   collectionUpdateBody: CollectionUpdateBody,
   options?: RequestInit,
 ): Promise<collectionUpdateResponse> => {
   return fetcher<Promise<collectionUpdateResponse>>(
-    getCollectionUpdateUrl(collectionId),
+    getCollectionUpdateUrl(collectionMark),
     {
       ...options,
       method: "PATCH",
@@ -144,16 +144,16 @@ export type collectionDeleteResponse = {
   status: number;
 };
 
-export const getCollectionDeleteUrl = (collectionId: string) => {
-  return `/collections/${collectionId}`;
+export const getCollectionDeleteUrl = (collectionMark: string) => {
+  return `/collections/${collectionMark}`;
 };
 
 export const collectionDelete = async (
-  collectionId: string,
+  collectionMark: string,
   options?: RequestInit,
 ): Promise<collectionDeleteResponse> => {
   return fetcher<Promise<collectionDeleteResponse>>(
-    getCollectionDeleteUrl(collectionId),
+    getCollectionDeleteUrl(collectionMark),
     {
       ...options,
       method: "DELETE",
@@ -172,19 +172,19 @@ export type collectionAddPostResponse = {
 };
 
 export const getCollectionAddPostUrl = (
-  collectionId: string,
+  collectionMark: string,
   postId: string,
 ) => {
-  return `/collections/${collectionId}/posts/${postId}`;
+  return `/collections/${collectionMark}/posts/${postId}`;
 };
 
 export const collectionAddPost = async (
-  collectionId: string,
+  collectionMark: string,
   postId: string,
   options?: RequestInit,
 ): Promise<collectionAddPostResponse> => {
   return fetcher<Promise<collectionAddPostResponse>>(
-    getCollectionAddPostUrl(collectionId, postId),
+    getCollectionAddPostUrl(collectionMark, postId),
     {
       ...options,
       method: "PUT",
@@ -203,19 +203,19 @@ export type collectionRemovePostResponse = {
 };
 
 export const getCollectionRemovePostUrl = (
-  collectionId: string,
+  collectionMark: string,
   postId: string,
 ) => {
-  return `/collections/${collectionId}/posts/${postId}`;
+  return `/collections/${collectionMark}/posts/${postId}`;
 };
 
 export const collectionRemovePost = async (
-  collectionId: string,
+  collectionMark: string,
   postId: string,
   options?: RequestInit,
 ): Promise<collectionRemovePostResponse> => {
   return fetcher<Promise<collectionRemovePostResponse>>(
-    getCollectionRemovePostUrl(collectionId, postId),
+    getCollectionRemovePostUrl(collectionMark, postId),
     {
       ...options,
       method: "DELETE",
@@ -235,19 +235,19 @@ export type collectionAddNodeResponse = {
 };
 
 export const getCollectionAddNodeUrl = (
-  collectionId: string,
+  collectionMark: string,
   nodeId: string,
 ) => {
-  return `/collections/${collectionId}/nodes/${nodeId}`;
+  return `/collections/${collectionMark}/nodes/${nodeId}`;
 };
 
 export const collectionAddNode = async (
-  collectionId: string,
+  collectionMark: string,
   nodeId: string,
   options?: RequestInit,
 ): Promise<collectionAddNodeResponse> => {
   return fetcher<Promise<collectionAddNodeResponse>>(
-    getCollectionAddNodeUrl(collectionId, nodeId),
+    getCollectionAddNodeUrl(collectionMark, nodeId),
     {
       ...options,
       method: "PUT",
@@ -266,19 +266,19 @@ export type collectionRemoveNodeResponse = {
 };
 
 export const getCollectionRemoveNodeUrl = (
-  collectionId: string,
+  collectionMark: string,
   nodeId: string,
 ) => {
-  return `/collections/${collectionId}/nodes/${nodeId}`;
+  return `/collections/${collectionMark}/nodes/${nodeId}`;
 };
 
 export const collectionRemoveNode = async (
-  collectionId: string,
+  collectionMark: string,
   nodeId: string,
   options?: RequestInit,
 ): Promise<collectionRemoveNodeResponse> => {
   return fetcher<Promise<collectionRemoveNodeResponse>>(
-    getCollectionRemoveNodeUrl(collectionId, nodeId),
+    getCollectionRemoveNodeUrl(collectionMark, nodeId),
     {
       ...options,
       method: "DELETE",

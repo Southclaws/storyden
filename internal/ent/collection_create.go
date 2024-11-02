@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -61,6 +62,12 @@ func (cc *CollectionCreate) SetName(s string) *CollectionCreate {
 	return cc
 }
 
+// SetSlug sets the "slug" field.
+func (cc *CollectionCreate) SetSlug(s string) *CollectionCreate {
+	cc.mutation.SetSlug(s)
+	return cc
+}
+
 // SetDescription sets the "description" field.
 func (cc *CollectionCreate) SetDescription(s string) *CollectionCreate {
 	cc.mutation.SetDescription(s)
@@ -71,6 +78,20 @@ func (cc *CollectionCreate) SetDescription(s string) *CollectionCreate {
 func (cc *CollectionCreate) SetNillableDescription(s *string) *CollectionCreate {
 	if s != nil {
 		cc.SetDescription(*s)
+	}
+	return cc
+}
+
+// SetCoverAssetID sets the "cover_asset_id" field.
+func (cc *CollectionCreate) SetCoverAssetID(x xid.ID) *CollectionCreate {
+	cc.mutation.SetCoverAssetID(x)
+	return cc
+}
+
+// SetNillableCoverAssetID sets the "cover_asset_id" field if the given value is not nil.
+func (cc *CollectionCreate) SetNillableCoverAssetID(x *xid.ID) *CollectionCreate {
+	if x != nil {
+		cc.SetCoverAssetID(*x)
 	}
 	return cc
 }
@@ -120,6 +141,25 @@ func (cc *CollectionCreate) SetNillableOwnerID(id *xid.ID) *CollectionCreate {
 // SetOwner sets the "owner" edge to the Account entity.
 func (cc *CollectionCreate) SetOwner(a *Account) *CollectionCreate {
 	return cc.SetOwnerID(a.ID)
+}
+
+// SetCoverImageID sets the "cover_image" edge to the Asset entity by ID.
+func (cc *CollectionCreate) SetCoverImageID(id xid.ID) *CollectionCreate {
+	cc.mutation.SetCoverImageID(id)
+	return cc
+}
+
+// SetNillableCoverImageID sets the "cover_image" edge to the Asset entity by ID if the given value is not nil.
+func (cc *CollectionCreate) SetNillableCoverImageID(id *xid.ID) *CollectionCreate {
+	if id != nil {
+		cc = cc.SetCoverImageID(*id)
+	}
+	return cc
+}
+
+// SetCoverImage sets the "cover_image" edge to the Asset entity.
+func (cc *CollectionCreate) SetCoverImage(a *Asset) *CollectionCreate {
+	return cc.SetCoverImageID(a.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -216,6 +256,9 @@ func (cc *CollectionCreate) check() error {
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Collection.name"`)}
 	}
+	if _, ok := cc.mutation.Slug(); !ok {
+		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Collection.slug"`)}
+	}
 	if _, ok := cc.mutation.Visibility(); !ok {
 		return &ValidationError{Name: "visibility", err: errors.New(`ent: missing required field "Collection.visibility"`)}
 	}
@@ -277,6 +320,10 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 		_spec.SetField(collection.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
+	if value, ok := cc.mutation.Slug(); ok {
+		_spec.SetField(collection.FieldSlug, field.TypeString, value)
+		_node.Slug = value
+	}
 	if value, ok := cc.mutation.Description(); ok {
 		_spec.SetField(collection.FieldDescription, field.TypeString, value)
 		_node.Description = &value
@@ -300,6 +347,23 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.account_collections = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.CoverImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   collection.CoverImageTable,
+			Columns: []string{collection.CoverImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.CoverAssetID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.PostsIDs(); len(nodes) > 0 {
@@ -418,6 +482,18 @@ func (u *CollectionUpsert) UpdateName() *CollectionUpsert {
 	return u
 }
 
+// SetSlug sets the "slug" field.
+func (u *CollectionUpsert) SetSlug(v string) *CollectionUpsert {
+	u.Set(collection.FieldSlug, v)
+	return u
+}
+
+// UpdateSlug sets the "slug" field to the value that was provided on create.
+func (u *CollectionUpsert) UpdateSlug() *CollectionUpsert {
+	u.SetExcluded(collection.FieldSlug)
+	return u
+}
+
 // SetDescription sets the "description" field.
 func (u *CollectionUpsert) SetDescription(v string) *CollectionUpsert {
 	u.Set(collection.FieldDescription, v)
@@ -433,6 +509,24 @@ func (u *CollectionUpsert) UpdateDescription() *CollectionUpsert {
 // ClearDescription clears the value of the "description" field.
 func (u *CollectionUpsert) ClearDescription() *CollectionUpsert {
 	u.SetNull(collection.FieldDescription)
+	return u
+}
+
+// SetCoverAssetID sets the "cover_asset_id" field.
+func (u *CollectionUpsert) SetCoverAssetID(v xid.ID) *CollectionUpsert {
+	u.Set(collection.FieldCoverAssetID, v)
+	return u
+}
+
+// UpdateCoverAssetID sets the "cover_asset_id" field to the value that was provided on create.
+func (u *CollectionUpsert) UpdateCoverAssetID() *CollectionUpsert {
+	u.SetExcluded(collection.FieldCoverAssetID)
+	return u
+}
+
+// ClearCoverAssetID clears the value of the "cover_asset_id" field.
+func (u *CollectionUpsert) ClearCoverAssetID() *CollectionUpsert {
+	u.SetNull(collection.FieldCoverAssetID)
 	return u
 }
 
@@ -527,6 +621,20 @@ func (u *CollectionUpsertOne) UpdateName() *CollectionUpsertOne {
 	})
 }
 
+// SetSlug sets the "slug" field.
+func (u *CollectionUpsertOne) SetSlug(v string) *CollectionUpsertOne {
+	return u.Update(func(s *CollectionUpsert) {
+		s.SetSlug(v)
+	})
+}
+
+// UpdateSlug sets the "slug" field to the value that was provided on create.
+func (u *CollectionUpsertOne) UpdateSlug() *CollectionUpsertOne {
+	return u.Update(func(s *CollectionUpsert) {
+		s.UpdateSlug()
+	})
+}
+
 // SetDescription sets the "description" field.
 func (u *CollectionUpsertOne) SetDescription(v string) *CollectionUpsertOne {
 	return u.Update(func(s *CollectionUpsert) {
@@ -545,6 +653,27 @@ func (u *CollectionUpsertOne) UpdateDescription() *CollectionUpsertOne {
 func (u *CollectionUpsertOne) ClearDescription() *CollectionUpsertOne {
 	return u.Update(func(s *CollectionUpsert) {
 		s.ClearDescription()
+	})
+}
+
+// SetCoverAssetID sets the "cover_asset_id" field.
+func (u *CollectionUpsertOne) SetCoverAssetID(v xid.ID) *CollectionUpsertOne {
+	return u.Update(func(s *CollectionUpsert) {
+		s.SetCoverAssetID(v)
+	})
+}
+
+// UpdateCoverAssetID sets the "cover_asset_id" field to the value that was provided on create.
+func (u *CollectionUpsertOne) UpdateCoverAssetID() *CollectionUpsertOne {
+	return u.Update(func(s *CollectionUpsert) {
+		s.UpdateCoverAssetID()
+	})
+}
+
+// ClearCoverAssetID clears the value of the "cover_asset_id" field.
+func (u *CollectionUpsertOne) ClearCoverAssetID() *CollectionUpsertOne {
+	return u.Update(func(s *CollectionUpsert) {
+		s.ClearCoverAssetID()
 	})
 }
 
@@ -808,6 +937,20 @@ func (u *CollectionUpsertBulk) UpdateName() *CollectionUpsertBulk {
 	})
 }
 
+// SetSlug sets the "slug" field.
+func (u *CollectionUpsertBulk) SetSlug(v string) *CollectionUpsertBulk {
+	return u.Update(func(s *CollectionUpsert) {
+		s.SetSlug(v)
+	})
+}
+
+// UpdateSlug sets the "slug" field to the value that was provided on create.
+func (u *CollectionUpsertBulk) UpdateSlug() *CollectionUpsertBulk {
+	return u.Update(func(s *CollectionUpsert) {
+		s.UpdateSlug()
+	})
+}
+
 // SetDescription sets the "description" field.
 func (u *CollectionUpsertBulk) SetDescription(v string) *CollectionUpsertBulk {
 	return u.Update(func(s *CollectionUpsert) {
@@ -826,6 +969,27 @@ func (u *CollectionUpsertBulk) UpdateDescription() *CollectionUpsertBulk {
 func (u *CollectionUpsertBulk) ClearDescription() *CollectionUpsertBulk {
 	return u.Update(func(s *CollectionUpsert) {
 		s.ClearDescription()
+	})
+}
+
+// SetCoverAssetID sets the "cover_asset_id" field.
+func (u *CollectionUpsertBulk) SetCoverAssetID(v xid.ID) *CollectionUpsertBulk {
+	return u.Update(func(s *CollectionUpsert) {
+		s.SetCoverAssetID(v)
+	})
+}
+
+// UpdateCoverAssetID sets the "cover_asset_id" field to the value that was provided on create.
+func (u *CollectionUpsertBulk) UpdateCoverAssetID() *CollectionUpsertBulk {
+	return u.Update(func(s *CollectionUpsert) {
+		s.UpdateCoverAssetID()
+	})
+}
+
+// ClearCoverAssetID clears the value of the "cover_asset_id" field.
+func (u *CollectionUpsertBulk) ClearCoverAssetID() *CollectionUpsertBulk {
+	return u.Update(func(s *CollectionUpsert) {
+		s.ClearCoverAssetID()
 	})
 }
 

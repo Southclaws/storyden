@@ -45,11 +45,11 @@ func New(
 	}
 }
 
-func (r *Hydrator) GetCollection(ctx context.Context, id collection.CollectionID) (*collection.CollectionWithItems, error) {
+func (r *Hydrator) GetCollection(ctx context.Context, qk collection.QueryKey) (*collection.CollectionWithItems, error) {
 	session := r.session.AccountOpt(ctx)
 	acc := session.OrZero()
 
-	col, err := r.querier.Get(ctx, id)
+	col, err := r.querier.Get(ctx, qk)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

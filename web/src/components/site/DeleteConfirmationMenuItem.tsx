@@ -7,16 +7,17 @@ import * as Menu from "@/components/ui/menu";
 import { HStack } from "@/styled-system/jsx";
 import { menuItemColorPalette } from "@/styled-system/patterns";
 
-export type Props = {
-  isConfirmingDelete: boolean;
+import { useConfirmation } from "./useConfirmation";
 
-  onAttemptDelete: () => void;
-  onCancelDelete: () => void;
-  onDelete?: () => void;
+export type Props = {
+  onDelete: () => Promise<void>;
 };
 
 export function DeleteWithConfirmationMenuItem(props: Props) {
-  if (props.isConfirmingDelete) {
+  const { isConfirming, handleConfirmAction, handleCancelAction } =
+    useConfirmation(props.onDelete);
+
+  if (isConfirming) {
     return (
       <HStack gap="0">
         <Menu.Item
@@ -30,7 +31,7 @@ export function DeleteWithConfirmationMenuItem(props: Props) {
         </Menu.Item>
 
         <Menu.Item value="delete-cancel" closeOnSelect={false} asChild>
-          <CancelAction borderRadius="md" onClick={props.onCancelDelete} />
+          <CancelAction borderRadius="md" onClick={handleCancelAction} />
         </Menu.Item>
       </HStack>
     );
@@ -41,7 +42,7 @@ export function DeleteWithConfirmationMenuItem(props: Props) {
       className={menuItemColorPalette({ colorPalette: "red" })}
       value="delete"
       closeOnSelect={false}
-      onClick={props.onAttemptDelete}
+      onClick={handleConfirmAction}
     >
       <HStack gap="1">
         <TrashIcon width="1.4em" /> Delete

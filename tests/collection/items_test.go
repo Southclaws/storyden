@@ -254,7 +254,7 @@ func TestCollectionItems(t *testing.T) {
 	}))
 }
 
-func find(t *testing.T, collections []openapi.Collection, cid openapi.CollectionIDParam) *openapi.Collection {
+func find(t *testing.T, collections []openapi.Collection, cid openapi.CollectionMarkParam) *openapi.Collection {
 	for _, c := range collections {
 		if c.Id == cid {
 			return &c

@@ -99,7 +99,7 @@ func (d *Querier) List(ctx context.Context, filters ...Option) ([]*collection.Co
 	return all, nil
 }
 
-func (d *Querier) Get(ctx context.Context, id collection.CollectionID, filters ...ItemFilter) (*collection.CollectionWithItems, error) {
+func (d *Querier) Get(ctx context.Context, qk collection.QueryKey, filters ...ItemFilter) (*collection.CollectionWithItems, error) {
 	filters = append(filters, func(pcq *ent.CollectionPostQuery, ncq *ent.CollectionNodeQuery) {
 		if pcq != nil {
 			pcq.WithPost(func(pq *ent.PostQuery) {
@@ -125,7 +125,7 @@ func (d *Querier) Get(ctx context.Context, id collection.CollectionID, filters .
 
 	col, err := d.db.Collection.
 		Query().
-		Where(ent_collection.ID(xid.ID(id))).
+		Where(qk.Predicate()).
 		WithOwner(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
@@ -147,10 +147,10 @@ func (d *Querier) Get(ctx context.Context, id collection.CollectionID, filters .
 	return collection.MapWithItems(col)
 }
 
-func (d *Querier) Probe(ctx context.Context, id collection.CollectionID) (*collection.Collection, error) {
+func (d *Querier) Probe(ctx context.Context, qk collection.QueryKey) (*collection.Collection, error) {
 	col, err := d.db.Collection.
 		Query().
-		Where(ent_collection.ID(xid.ID(id))).
+		Where(qk.Predicate()).
 		WithOwner(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).

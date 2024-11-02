@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -53,6 +54,20 @@ func (cu *CollectionUpdate) SetNillableName(s *string) *CollectionUpdate {
 	return cu
 }
 
+// SetSlug sets the "slug" field.
+func (cu *CollectionUpdate) SetSlug(s string) *CollectionUpdate {
+	cu.mutation.SetSlug(s)
+	return cu
+}
+
+// SetNillableSlug sets the "slug" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableSlug(s *string) *CollectionUpdate {
+	if s != nil {
+		cu.SetSlug(*s)
+	}
+	return cu
+}
+
 // SetDescription sets the "description" field.
 func (cu *CollectionUpdate) SetDescription(s string) *CollectionUpdate {
 	cu.mutation.SetDescription(s)
@@ -70,6 +85,26 @@ func (cu *CollectionUpdate) SetNillableDescription(s *string) *CollectionUpdate 
 // ClearDescription clears the value of the "description" field.
 func (cu *CollectionUpdate) ClearDescription() *CollectionUpdate {
 	cu.mutation.ClearDescription()
+	return cu
+}
+
+// SetCoverAssetID sets the "cover_asset_id" field.
+func (cu *CollectionUpdate) SetCoverAssetID(x xid.ID) *CollectionUpdate {
+	cu.mutation.SetCoverAssetID(x)
+	return cu
+}
+
+// SetNillableCoverAssetID sets the "cover_asset_id" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableCoverAssetID(x *xid.ID) *CollectionUpdate {
+	if x != nil {
+		cu.SetCoverAssetID(*x)
+	}
+	return cu
+}
+
+// ClearCoverAssetID clears the value of the "cover_asset_id" field.
+func (cu *CollectionUpdate) ClearCoverAssetID() *CollectionUpdate {
+	cu.mutation.ClearCoverAssetID()
 	return cu
 }
 
@@ -104,6 +139,25 @@ func (cu *CollectionUpdate) SetNillableOwnerID(id *xid.ID) *CollectionUpdate {
 // SetOwner sets the "owner" edge to the Account entity.
 func (cu *CollectionUpdate) SetOwner(a *Account) *CollectionUpdate {
 	return cu.SetOwnerID(a.ID)
+}
+
+// SetCoverImageID sets the "cover_image" edge to the Asset entity by ID.
+func (cu *CollectionUpdate) SetCoverImageID(id xid.ID) *CollectionUpdate {
+	cu.mutation.SetCoverImageID(id)
+	return cu
+}
+
+// SetNillableCoverImageID sets the "cover_image" edge to the Asset entity by ID if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableCoverImageID(id *xid.ID) *CollectionUpdate {
+	if id != nil {
+		cu = cu.SetCoverImageID(*id)
+	}
+	return cu
+}
+
+// SetCoverImage sets the "cover_image" edge to the Asset entity.
+func (cu *CollectionUpdate) SetCoverImage(a *Asset) *CollectionUpdate {
+	return cu.SetCoverImageID(a.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -144,6 +198,12 @@ func (cu *CollectionUpdate) Mutation() *CollectionMutation {
 // ClearOwner clears the "owner" edge to the Account entity.
 func (cu *CollectionUpdate) ClearOwner() *CollectionUpdate {
 	cu.mutation.ClearOwner()
+	return cu
+}
+
+// ClearCoverImage clears the "cover_image" edge to the Asset entity.
+func (cu *CollectionUpdate) ClearCoverImage() *CollectionUpdate {
+	cu.mutation.ClearCoverImage()
 	return cu
 }
 
@@ -259,6 +319,9 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.SetField(collection.FieldName, field.TypeString, value)
 	}
+	if value, ok := cu.mutation.Slug(); ok {
+		_spec.SetField(collection.FieldSlug, field.TypeString, value)
+	}
 	if value, ok := cu.mutation.Description(); ok {
 		_spec.SetField(collection.FieldDescription, field.TypeString, value)
 	}
@@ -290,6 +353,35 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.CoverImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   collection.CoverImageTable,
+			Columns: []string{collection.CoverImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.CoverImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   collection.CoverImageTable,
+			Columns: []string{collection.CoverImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -453,6 +545,20 @@ func (cuo *CollectionUpdateOne) SetNillableName(s *string) *CollectionUpdateOne 
 	return cuo
 }
 
+// SetSlug sets the "slug" field.
+func (cuo *CollectionUpdateOne) SetSlug(s string) *CollectionUpdateOne {
+	cuo.mutation.SetSlug(s)
+	return cuo
+}
+
+// SetNillableSlug sets the "slug" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableSlug(s *string) *CollectionUpdateOne {
+	if s != nil {
+		cuo.SetSlug(*s)
+	}
+	return cuo
+}
+
 // SetDescription sets the "description" field.
 func (cuo *CollectionUpdateOne) SetDescription(s string) *CollectionUpdateOne {
 	cuo.mutation.SetDescription(s)
@@ -470,6 +576,26 @@ func (cuo *CollectionUpdateOne) SetNillableDescription(s *string) *CollectionUpd
 // ClearDescription clears the value of the "description" field.
 func (cuo *CollectionUpdateOne) ClearDescription() *CollectionUpdateOne {
 	cuo.mutation.ClearDescription()
+	return cuo
+}
+
+// SetCoverAssetID sets the "cover_asset_id" field.
+func (cuo *CollectionUpdateOne) SetCoverAssetID(x xid.ID) *CollectionUpdateOne {
+	cuo.mutation.SetCoverAssetID(x)
+	return cuo
+}
+
+// SetNillableCoverAssetID sets the "cover_asset_id" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableCoverAssetID(x *xid.ID) *CollectionUpdateOne {
+	if x != nil {
+		cuo.SetCoverAssetID(*x)
+	}
+	return cuo
+}
+
+// ClearCoverAssetID clears the value of the "cover_asset_id" field.
+func (cuo *CollectionUpdateOne) ClearCoverAssetID() *CollectionUpdateOne {
+	cuo.mutation.ClearCoverAssetID()
 	return cuo
 }
 
@@ -504,6 +630,25 @@ func (cuo *CollectionUpdateOne) SetNillableOwnerID(id *xid.ID) *CollectionUpdate
 // SetOwner sets the "owner" edge to the Account entity.
 func (cuo *CollectionUpdateOne) SetOwner(a *Account) *CollectionUpdateOne {
 	return cuo.SetOwnerID(a.ID)
+}
+
+// SetCoverImageID sets the "cover_image" edge to the Asset entity by ID.
+func (cuo *CollectionUpdateOne) SetCoverImageID(id xid.ID) *CollectionUpdateOne {
+	cuo.mutation.SetCoverImageID(id)
+	return cuo
+}
+
+// SetNillableCoverImageID sets the "cover_image" edge to the Asset entity by ID if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableCoverImageID(id *xid.ID) *CollectionUpdateOne {
+	if id != nil {
+		cuo = cuo.SetCoverImageID(*id)
+	}
+	return cuo
+}
+
+// SetCoverImage sets the "cover_image" edge to the Asset entity.
+func (cuo *CollectionUpdateOne) SetCoverImage(a *Asset) *CollectionUpdateOne {
+	return cuo.SetCoverImageID(a.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
@@ -544,6 +689,12 @@ func (cuo *CollectionUpdateOne) Mutation() *CollectionMutation {
 // ClearOwner clears the "owner" edge to the Account entity.
 func (cuo *CollectionUpdateOne) ClearOwner() *CollectionUpdateOne {
 	cuo.mutation.ClearOwner()
+	return cuo
+}
+
+// ClearCoverImage clears the "cover_image" edge to the Asset entity.
+func (cuo *CollectionUpdateOne) ClearCoverImage() *CollectionUpdateOne {
+	cuo.mutation.ClearCoverImage()
 	return cuo
 }
 
@@ -689,6 +840,9 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.SetField(collection.FieldName, field.TypeString, value)
 	}
+	if value, ok := cuo.mutation.Slug(); ok {
+		_spec.SetField(collection.FieldSlug, field.TypeString, value)
+	}
 	if value, ok := cuo.mutation.Description(); ok {
 		_spec.SetField(collection.FieldDescription, field.TypeString, value)
 	}
@@ -720,6 +874,35 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.CoverImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   collection.CoverImageTable,
+			Columns: []string{collection.CoverImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.CoverImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   collection.CoverImageTable,
+			Columns: []string{collection.CoverImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
