@@ -1,13 +1,30 @@
-import { profileList } from "@/api/openapi-server/profiles";
+"use client";
 
-import { Client } from "./Client";
-import { Props } from "./useMemberIndexScreen";
+import { Unready } from "src/components/site/Unready";
 
-export async function MemberIndexScreen(props: Omit<Props, "profiles">) {
-  const { data } = await profileList({
-    q: props.query,
-    page: props.page?.toString(),
-  });
+import { MemberList } from "@/components/library/members/MemberList";
+import { PaginatedSearch } from "@/components/site/PaginatedSearch/PaginatedSearch";
+import { VStack } from "@/styled-system/jsx";
 
-  return <Client {...props} profiles={data} />;
+import { Props, useMemberIndexScreen } from "./useMemberIndexScreen";
+
+export function MemberIndexScreen(props: Props) {
+  const { ready, data, error } = useMemberIndexScreen(props);
+  if (!ready) {
+    return <Unready error={error} />;
+  }
+
+  return (
+    <VStack>
+      <PaginatedSearch
+        index="/m"
+        initialQuery={props.query}
+        initialPage={props.page}
+        totalPages={data.total_pages}
+        pageSize={data.page_size}
+      />
+
+      <MemberList profiles={data.profiles} />
+    </VStack>
+  );
 }

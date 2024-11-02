@@ -232,6 +232,8 @@ func serialiseProfile(in *profile.Public) openapi.PublicProfile {
 	return openapi.PublicProfile{
 		Id:        openapi.Identifier(in.ID.String()),
 		CreatedAt: in.Created.Format(time.RFC3339),
+		Joined:    in.Created,
+		Suspended: in.Deleted.Ptr(),
 		DeletedAt: in.Deleted.Ptr(),
 		Bio:       in.Bio.HTML(),
 		Handle:    in.Handle,

@@ -3096,9 +3096,11 @@ components:
     ProfileReference:
       type: object
       description: A minimal reference to an account.
-      required: [id, handle, name, roles]
+      required: [id, joined, handle, name, roles]
       properties:
         id: { $ref: "#/components/schemas/Identifier" }
+        joined: { $ref: "#/components/schemas/MemberJoinedDate" }
+        suspended: { $ref: "#/components/schemas/MemberSuspendedDate" }
         handle: { $ref: "#/components/schemas/AccountHandle" }
         name: { $ref: "#/components/schemas/AccountName" }
         roles: { $ref: "#/components/schemas/AccountRoleList" }
@@ -3673,6 +3675,7 @@ components:
     AccountCommonProps:
       required:
         [
+          joined,
           handle,
           name,
           roles,
@@ -3684,6 +3687,8 @@ components:
           admin,
         ]
       properties:
+        joined: { $ref: "#/components/schemas/MemberJoinedDate" }
+        suspended: { $ref: "#/components/schemas/MemberSuspendedDate" }
         handle:
           $ref: "#/components/schemas/AccountHandle"
         name:
@@ -3905,6 +3910,7 @@ components:
         - $ref: "#/components/schemas/CommonProperties"
         - required:
             - createdAt
+            - joined
             - handle
             - name
             - roles
@@ -3917,7 +3923,10 @@ components:
             - meta
           properties:
             createdAt:
+              deprecated: true
               type: string
+            joined: { $ref: "#/components/schemas/MemberJoinedDate" }
+            suspended: { $ref: "#/components/schemas/MemberSuspendedDate" }
             handle:
               $ref: "#/components/schemas/AccountHandle"
             name:
@@ -3998,6 +4007,16 @@ components:
 
     ProfileFollowingCount:
       type: integer
+
+    MemberJoinedDate:
+      type: string
+      format: date-time
+      description: The time the resource was created.
+
+    MemberSuspendedDate:
+      type: string
+      format: date-time
+      description: The time the resource was created.
 
     #
     #  .d8888b.           888

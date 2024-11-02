@@ -12,6 +12,8 @@ import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 import type { AccountRoleList } from "./accountRoleList";
 import type { LikeScore } from "./likeScore";
+import type { MemberJoinedDate } from "./memberJoinedDate";
+import type { MemberSuspendedDate } from "./memberSuspendedDate";
 import type { Metadata } from "./metadata";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
 import type { ProfileFollowersCount } from "./profileFollowersCount";
@@ -21,6 +23,7 @@ import type { TagReferenceList } from "./tagReferenceList";
 
 export type PublicProfileAllOf = {
   bio: AccountBio;
+  /** @deprecated */
   createdAt: string;
   followers: ProfileFollowersCount;
   following: ProfileFollowingCount;
@@ -28,9 +31,11 @@ export type PublicProfileAllOf = {
   image?: string;
   interests: TagReferenceList;
   invited_by?: ProfileReference;
+  joined: MemberJoinedDate;
   like_score: LikeScore;
   links: ProfileExternalLinkList;
   meta: Metadata;
   name: AccountName;
   roles: AccountRoleList;
+  suspended?: MemberSuspendedDate;
 };

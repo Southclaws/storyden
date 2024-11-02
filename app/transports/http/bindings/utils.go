@@ -30,6 +30,8 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 
 	return openapi.Account{
 		Id:             openapi.Identifier(acc.ID.String()),
+		Joined:         acc.CreatedAt,
+		Suspended:      acc.DeletedAt.Ptr(),
 		Handle:         acc.Handle,
 		Name:           acc.Name,
 		Bio:            acc.Bio.HTML(),
@@ -195,10 +197,12 @@ func deserialiseContentKind(in openapi.ContentKind) (post_search.Kind, error) {
 
 func serialiseProfileReference(a profile.Public) openapi.ProfileReference {
 	return openapi.ProfileReference{
-		Id:     *openapi.IdentifierFrom(xid.ID(a.ID)),
-		Handle: (openapi.AccountHandle)(a.Handle),
-		Name:   a.Name,
-		Roles:  serialiseHeldRoleList(a.Roles),
+		Id:        *openapi.IdentifierFrom(xid.ID(a.ID)),
+		Joined:    a.Created,
+		Suspended: a.Deleted.Ptr(),
+		Handle:    (openapi.AccountHandle)(a.Handle),
+		Name:      a.Name,
+		Roles:     serialiseHeldRoleList(a.Roles),
 	}
 }
 
