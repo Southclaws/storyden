@@ -1,4 +1,6 @@
 import { AccountRoleList } from "@/api/openapi-schema";
+import { Badge } from "@/components/ui/badge";
+import * as Popover from "@/components/ui/popover";
 import { HStack } from "@/styled-system/jsx";
 
 import { RoleBadge } from "./RoleBadge";
@@ -6,18 +8,47 @@ import { RoleBadge } from "./RoleBadge";
 export type Props = {
   roles: AccountRoleList;
   onlyBadgeRole?: boolean;
+  limit?: number;
 };
 
-export function RoleBadgeList({ roles, onlyBadgeRole }: Props) {
+export function RoleBadgeList({ roles, onlyBadgeRole, limit }: Props) {
   const filtered = onlyBadgeRole
     ? filterBadgeRole(roles)
     : filterDefaults(roles);
 
+  const isLimited = limit && filtered.length > limit;
+  const rest = filtered.length - (limit ?? 0);
+
+  const limited = filtered.slice(0, limit);
+
   return (
     <HStack flexWrap="wrap">
-      {filtered.map((r) => (
+      {limited.map((r) => (
         <RoleBadge key={r.id} role={r} />
       ))}
+      {isLimited && (
+        <Popover.Root>
+          <Popover.Trigger>
+            <Badge color="fg.muted" size="sm">
+              +{rest}
+            </Badge>
+          </Popover.Trigger>
+          <Popover.Positioner>
+            <Popover.Content p="2" borderRadius="2xl">
+              <Popover.Arrow>
+                <Popover.ArrowTip />
+              </Popover.Arrow>
+              <Popover.Description>
+                <HStack flexWrap="wrap">
+                  {filtered.map((r) => (
+                    <RoleBadge key={r.id} role={r} />
+                  ))}
+                </HStack>
+              </Popover.Description>
+            </Popover.Content>
+          </Popover.Positioner>
+        </Popover.Root>
+      )}
     </HStack>
   );
 }
