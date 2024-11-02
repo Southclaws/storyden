@@ -12,7 +12,7 @@ export type Props = {
   currentPage: number;
   totalPages: number;
   pageSize: number;
-  onClick: (page: number) => void;
+  onClick?: (page: number) => void;
 };
 
 export function PaginationControls({
@@ -70,7 +70,7 @@ export function PaginationControls({
               ...params,
               page: "1",
             }).toString()}`}
-            onClick={() => onClick(1)}
+            onClick={() => onClick?.(1)}
           >
             {1}
           </LinkButton>
@@ -92,7 +92,7 @@ export function PaginationControls({
             size="xs"
             key={v}
             href={`${path}?${withPage.toString()}`}
-            onClick={() => onClick(v)}
+            onClick={() => onClick?.(v)}
           >
             {pageName}
           </LinkButton>
@@ -109,7 +109,7 @@ export function PaginationControls({
               ...params,
               page: lastPage.toString(),
             }).toString()}`}
-            onClick={() => onClick(lastPage)}
+            onClick={() => onClick?.(lastPage)}
           >
             {lastPage}
           </LinkButton>
