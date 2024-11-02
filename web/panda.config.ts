@@ -75,7 +75,7 @@ const semanticTokens = defineSemanticTokens({
         value: { base: "{colors.accent.500}" },
       },
       opaque: {
-        value: { base: "{colors.white.a8}" },
+        value: { base: "{colors.white.a10}" },
       },
       destructive: {
         value: { base: "{colors.tomato.3}" },

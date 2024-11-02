@@ -95,8 +95,8 @@ export function ProfileScreen(props: Props) {
                     Edit
                   </EditAction>
                 ))}
-              <MemberOptionsMenu {...profile}>
-                <MoreAction size="sm" />
+              <MemberOptionsMenu profile={profile}>
+                <MoreAction type="button" size="sm" />
               </MemberOptionsMenu>
             </HStack>
           </Flex>
