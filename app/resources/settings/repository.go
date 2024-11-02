@@ -3,6 +3,7 @@ package settings
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -180,6 +181,10 @@ func (d *SettingsRepository) recache(ctx context.Context) {
 
 	settings, err := d.get(ctx)
 	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			return
+		}
+
 		d.log.Error("failed to recache settings", zap.Error(err))
 		return
 	}
