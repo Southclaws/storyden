@@ -1365,7 +1365,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "200": { $ref: "#/components/responses/CollectionListOK" }
 
-  /collections/{collection_id}:
+  /collections/{collection_mark}:
     get:
       operationId: CollectionGet
       description: |
@@ -1374,7 +1374,7 @@ paths:
         target collection is public, private, owned or not owned by the account.
       tags: [collections]
       security: []
-      parameters: [$ref: "#/components/parameters/CollectionIDParam"]
+      parameters: [$ref: "#/components/parameters/CollectionMarkParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1384,7 +1384,7 @@ paths:
       operationId: CollectionUpdate
       description: Update a collection owned by the authenticated account.
       tags: [collections]
-      parameters: [$ref: "#/components/parameters/CollectionIDParam"]
+      parameters: [$ref: "#/components/parameters/CollectionMarkParam"]
       requestBody: { $ref: "#/components/requestBodies/CollectionUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1395,14 +1395,14 @@ paths:
       operationId: CollectionDelete
       description: Delete a collection owned by the authenticated account.
       tags: [collections]
-      parameters: [$ref: "#/components/parameters/CollectionIDParam"]
+      parameters: [$ref: "#/components/parameters/CollectionMarkParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: OK }
 
-  /collections/{collection_id}/posts/{post_id}:
+  /collections/{collection_mark}/posts/{post_id}:
     put:
       operationId: CollectionAddPost
       description: |
@@ -1410,7 +1410,7 @@ paths:
         making the request. The post can be any published post of any kind.
       tags: [collections]
       parameters:
-        - $ref: "#/components/parameters/CollectionIDParam"
+        - $ref: "#/components/parameters/CollectionMarkParam"
         - $ref: "#/components/parameters/PostIDParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1424,14 +1424,15 @@ paths:
         account making the request.
       tags: [collections]
       parameters:
-        - $ref: "#/components/parameters/CollectionIDParam"
+        - $ref: "#/components/parameters/CollectionMarkParam"
         - $ref: "#/components/parameters/PostIDParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CollectionRemovePostOK" }
-  /collections/{collection_id}/nodes/{node_id}:
+
+  /collections/{collection_mark}/nodes/{node_id}:
     put:
       operationId: CollectionAddNode
       description: |
@@ -1440,7 +1441,7 @@ paths:
         not published but owned by the collection owner.
       tags: [collections]
       parameters:
-        - $ref: "#/components/parameters/CollectionIDParam"
+        - $ref: "#/components/parameters/CollectionMarkParam"
         - $ref: "#/components/parameters/NodeIDParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1454,7 +1455,7 @@ paths:
         account making the request.
       tags: [collections]
       parameters:
-        - $ref: "#/components/parameters/CollectionIDParam"
+        - $ref: "#/components/parameters/CollectionMarkParam"
         - $ref: "#/components/parameters/NodeIDParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -2054,13 +2055,16 @@ components:
       schema:
         type: string
 
-    CollectionIDParam:
-      description: Unique collection ID.
-      name: collection_id
+    CollectionMarkParam:
+      description: |
+        Either:
+        - The unique collection ID.
+        - A string of the form <id>-<slug>
+      name: collection_mark
       in: path
       required: true
       schema:
-        $ref: "#/components/schemas/Identifier"
+        $ref: "#/components/schemas/Mark"
 
     CollectionHasItemQueryParam:
       description: |
@@ -4619,12 +4623,11 @@ components:
     CollectionCommonProps:
       description: A reference to the collection
       type: object
-      required: [name, owner]
+      required: [name, slug, owner]
       properties:
-        name:
-          type: string
-        description:
-          type: string
+        name: { $ref: "#/components/schemas/CollectionName" }
+        slug: { $ref: "#/components/schemas/CollectionSlug" }
+        description: { $ref: "#/components/schemas/CollectionDescription" }
         owner: { $ref: "#/components/schemas/ProfileReference" }
 
     CollectionAdditionalProps:
@@ -4644,18 +4647,16 @@ components:
       type: object
       required: [name]
       properties:
-        name:
-          type: string
-        description:
-          type: string
+        name: { $ref: "#/components/schemas/CollectionName" }
+        slug: { $ref: "#/components/schemas/CollectionSlug" }
+        description: { $ref: "#/components/schemas/CollectionDescription" }
 
     CollectionMutableProps:
       type: object
       properties:
-        name:
-          type: string
-        description:
-          type: string
+        name: { $ref: "#/components/schemas/CollectionName" }
+        slug: { $ref: "#/components/schemas/CollectionSlug" }
+        description: { $ref: "#/components/schemas/CollectionDescription" }
 
     CollectionItemList:
       type: array
@@ -4701,6 +4702,15 @@ components:
       description: |
         A boolean indicating if the account in context has collected this item.
       type: boolean
+
+    CollectionName:
+      type: string
+
+    CollectionSlug:
+      $ref: "#/components/schemas/Mark"
+
+    CollectionDescription:
+      type: string
 
     #
     # 888b    888               888

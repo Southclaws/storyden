@@ -32,7 +32,7 @@ export function useCollectionMenu({ session, collection }: Props) {
   const isEditingEnabled = canEditCollection(collection, account);
   const isDeletingEnabled = canDeleteCollection(collection, account);
 
-  const permalink = `/c/${collection.id}`;
+  const permalink = `/c/${collection.slug}`;
 
   async function handleCopyLink() {
     copyToClipboard(permalink);

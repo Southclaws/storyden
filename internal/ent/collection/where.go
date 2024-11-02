@@ -71,9 +71,19 @@ func Name(v string) predicate.Collection {
 	return predicate.Collection(sql.FieldEQ(FieldName, v))
 }
 
+// Slug applies equality check predicate on the "slug" field. It's identical to SlugEQ.
+func Slug(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldEQ(FieldSlug, v))
+}
+
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
 func Description(v string) predicate.Collection {
 	return predicate.Collection(sql.FieldEQ(FieldDescription, v))
+}
+
+// CoverAssetID applies equality check predicate on the "cover_asset_id" field. It's identical to CoverAssetIDEQ.
+func CoverAssetID(v xid.ID) predicate.Collection {
+	return predicate.Collection(sql.FieldEQ(FieldCoverAssetID, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -221,6 +231,71 @@ func NameContainsFold(v string) predicate.Collection {
 	return predicate.Collection(sql.FieldContainsFold(FieldName, v))
 }
 
+// SlugEQ applies the EQ predicate on the "slug" field.
+func SlugEQ(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldEQ(FieldSlug, v))
+}
+
+// SlugNEQ applies the NEQ predicate on the "slug" field.
+func SlugNEQ(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldNEQ(FieldSlug, v))
+}
+
+// SlugIn applies the In predicate on the "slug" field.
+func SlugIn(vs ...string) predicate.Collection {
+	return predicate.Collection(sql.FieldIn(FieldSlug, vs...))
+}
+
+// SlugNotIn applies the NotIn predicate on the "slug" field.
+func SlugNotIn(vs ...string) predicate.Collection {
+	return predicate.Collection(sql.FieldNotIn(FieldSlug, vs...))
+}
+
+// SlugGT applies the GT predicate on the "slug" field.
+func SlugGT(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldGT(FieldSlug, v))
+}
+
+// SlugGTE applies the GTE predicate on the "slug" field.
+func SlugGTE(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldGTE(FieldSlug, v))
+}
+
+// SlugLT applies the LT predicate on the "slug" field.
+func SlugLT(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldLT(FieldSlug, v))
+}
+
+// SlugLTE applies the LTE predicate on the "slug" field.
+func SlugLTE(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldLTE(FieldSlug, v))
+}
+
+// SlugContains applies the Contains predicate on the "slug" field.
+func SlugContains(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldContains(FieldSlug, v))
+}
+
+// SlugHasPrefix applies the HasPrefix predicate on the "slug" field.
+func SlugHasPrefix(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldHasPrefix(FieldSlug, v))
+}
+
+// SlugHasSuffix applies the HasSuffix predicate on the "slug" field.
+func SlugHasSuffix(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldHasSuffix(FieldSlug, v))
+}
+
+// SlugEqualFold applies the EqualFold predicate on the "slug" field.
+func SlugEqualFold(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldEqualFold(FieldSlug, v))
+}
+
+// SlugContainsFold applies the ContainsFold predicate on the "slug" field.
+func SlugContainsFold(v string) predicate.Collection {
+	return predicate.Collection(sql.FieldContainsFold(FieldSlug, v))
+}
+
 // DescriptionEQ applies the EQ predicate on the "description" field.
 func DescriptionEQ(v string) predicate.Collection {
 	return predicate.Collection(sql.FieldEQ(FieldDescription, v))
@@ -296,6 +371,86 @@ func DescriptionContainsFold(v string) predicate.Collection {
 	return predicate.Collection(sql.FieldContainsFold(FieldDescription, v))
 }
 
+// CoverAssetIDEQ applies the EQ predicate on the "cover_asset_id" field.
+func CoverAssetIDEQ(v xid.ID) predicate.Collection {
+	return predicate.Collection(sql.FieldEQ(FieldCoverAssetID, v))
+}
+
+// CoverAssetIDNEQ applies the NEQ predicate on the "cover_asset_id" field.
+func CoverAssetIDNEQ(v xid.ID) predicate.Collection {
+	return predicate.Collection(sql.FieldNEQ(FieldCoverAssetID, v))
+}
+
+// CoverAssetIDIn applies the In predicate on the "cover_asset_id" field.
+func CoverAssetIDIn(vs ...xid.ID) predicate.Collection {
+	return predicate.Collection(sql.FieldIn(FieldCoverAssetID, vs...))
+}
+
+// CoverAssetIDNotIn applies the NotIn predicate on the "cover_asset_id" field.
+func CoverAssetIDNotIn(vs ...xid.ID) predicate.Collection {
+	return predicate.Collection(sql.FieldNotIn(FieldCoverAssetID, vs...))
+}
+
+// CoverAssetIDGT applies the GT predicate on the "cover_asset_id" field.
+func CoverAssetIDGT(v xid.ID) predicate.Collection {
+	return predicate.Collection(sql.FieldGT(FieldCoverAssetID, v))
+}
+
+// CoverAssetIDGTE applies the GTE predicate on the "cover_asset_id" field.
+func CoverAssetIDGTE(v xid.ID) predicate.Collection {
+	return predicate.Collection(sql.FieldGTE(FieldCoverAssetID, v))
+}
+
+// CoverAssetIDLT applies the LT predicate on the "cover_asset_id" field.
+func CoverAssetIDLT(v xid.ID) predicate.Collection {
+	return predicate.Collection(sql.FieldLT(FieldCoverAssetID, v))
+}
+
+// CoverAssetIDLTE applies the LTE predicate on the "cover_asset_id" field.
+func CoverAssetIDLTE(v xid.ID) predicate.Collection {
+	return predicate.Collection(sql.FieldLTE(FieldCoverAssetID, v))
+}
+
+// CoverAssetIDContains applies the Contains predicate on the "cover_asset_id" field.
+func CoverAssetIDContains(v xid.ID) predicate.Collection {
+	vc := v.String()
+	return predicate.Collection(sql.FieldContains(FieldCoverAssetID, vc))
+}
+
+// CoverAssetIDHasPrefix applies the HasPrefix predicate on the "cover_asset_id" field.
+func CoverAssetIDHasPrefix(v xid.ID) predicate.Collection {
+	vc := v.String()
+	return predicate.Collection(sql.FieldHasPrefix(FieldCoverAssetID, vc))
+}
+
+// CoverAssetIDHasSuffix applies the HasSuffix predicate on the "cover_asset_id" field.
+func CoverAssetIDHasSuffix(v xid.ID) predicate.Collection {
+	vc := v.String()
+	return predicate.Collection(sql.FieldHasSuffix(FieldCoverAssetID, vc))
+}
+
+// CoverAssetIDIsNil applies the IsNil predicate on the "cover_asset_id" field.
+func CoverAssetIDIsNil() predicate.Collection {
+	return predicate.Collection(sql.FieldIsNull(FieldCoverAssetID))
+}
+
+// CoverAssetIDNotNil applies the NotNil predicate on the "cover_asset_id" field.
+func CoverAssetIDNotNil() predicate.Collection {
+	return predicate.Collection(sql.FieldNotNull(FieldCoverAssetID))
+}
+
+// CoverAssetIDEqualFold applies the EqualFold predicate on the "cover_asset_id" field.
+func CoverAssetIDEqualFold(v xid.ID) predicate.Collection {
+	vc := v.String()
+	return predicate.Collection(sql.FieldEqualFold(FieldCoverAssetID, vc))
+}
+
+// CoverAssetIDContainsFold applies the ContainsFold predicate on the "cover_asset_id" field.
+func CoverAssetIDContainsFold(v xid.ID) predicate.Collection {
+	vc := v.String()
+	return predicate.Collection(sql.FieldContainsFold(FieldCoverAssetID, vc))
+}
+
 // VisibilityEQ applies the EQ predicate on the "visibility" field.
 func VisibilityEQ(v Visibility) predicate.Collection {
 	return predicate.Collection(sql.FieldEQ(FieldVisibility, v))
@@ -331,6 +486,29 @@ func HasOwner() predicate.Collection {
 func HasOwnerWith(preds ...predicate.Account) predicate.Collection {
 	return predicate.Collection(func(s *sql.Selector) {
 		step := newOwnerStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCoverImage applies the HasEdge predicate on the "cover_image" edge.
+func HasCoverImage() predicate.Collection {
+	return predicate.Collection(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, CoverImageTable, CoverImageColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCoverImageWith applies the HasEdge predicate on the "cover_image" edge with a given conditions (other predicates).
+func HasCoverImageWith(preds ...predicate.Asset) predicate.Collection {
+	return predicate.Collection(func(s *sql.Selector) {
+		step := newCoverImageStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

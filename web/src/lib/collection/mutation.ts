@@ -1,3 +1,4 @@
+import slugify from "@sindresorhus/slugify";
 import { uniqueId } from "lodash";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 
@@ -29,7 +30,7 @@ export function useCollectionMutations(session?: Account) {
 
   const collectionListAnyMutationKey = getCollectionListKey();
   function collectionListAnyKeyFilterFn(key: Arguments) {
-    return Array.isArray(key) && key[0] == collectionListAnyMutationKey[0];
+    return Array.isArray(key) && key[0] === collectionListAnyMutationKey[0];
   }
 
   const create = async (create: CollectionInitialProps) => {
@@ -44,6 +45,7 @@ export function useCollectionMutations(session?: Account) {
         owner: session,
         has_queried_item: false,
         item_count: 0,
+        slug: create.slug ?? slugify(create.name),
         ...create,
       } satisfies Collection;
 
@@ -126,14 +128,12 @@ export function useCollectionItemMutations(session: Account) {
 
   const threadQueryMutationKey = getThreadListKey()[0];
   function threadListKeyFilterFn(key: Arguments) {
-    return Array.isArray(key) && key[0].startsWith(threadQueryMutationKey);
+    return Array.isArray(key) && key[0] === threadQueryMutationKey;
   }
 
   const collectionListAnyMutationKey = getCollectionListKey()[0];
   function collectionListAnyKeyFilterFn(key: Arguments) {
-    return (
-      Array.isArray(key) && key[0].startsWith(collectionListAnyMutationKey)
-    );
+    return Array.isArray(key) && key[0] === collectionListAnyMutationKey;
   }
 
   const addPost = async (collection: Collection, postID: string) => {
