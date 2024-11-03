@@ -2,6 +2,9 @@ import { z } from "zod";
 
 import { MemberIndexScreen } from "src/screens/library/members/MemberIndexScreen/MemberIndexScreen";
 
+import { profileList } from "@/api/openapi-server/profiles";
+import { UnreadyBanner } from "@/components/site/Unready";
+
 type Props = {
   searchParams: Promise<{
     q: string;
@@ -18,6 +21,22 @@ const QuerySchema = z.object({
 });
 
 export default async function Page(props: Props) {
-  const params = QuerySchema.parse(await props.searchParams);
-  return <MemberIndexScreen query={params.q} page={params.page} />;
+  try {
+    const params = QuerySchema.parse(await props.searchParams);
+
+    const { data } = await profileList({
+      q: params.q,
+      page: params.page?.toString(),
+    });
+
+    return (
+      <MemberIndexScreen
+        initialResult={data}
+        query={params.q}
+        page={params.page}
+      />
+    );
+  } catch (e) {
+    return <UnreadyBanner error={e} />;
+  }
 }

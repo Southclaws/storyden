@@ -1,30 +1,40 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 import { useCopyToClipboard } from "@uidotdev/usehooks";
+import Link from "next/link";
 import { PropsWithChildren } from "react";
 import { toast } from "sonner";
 
 import { useSession } from "src/auth";
-import { Avatar } from "src/components/site/Avatar/Avatar";
-import { WithDisclosure } from "src/utils/useDisclosure";
 
+import { ProfileReference } from "@/api/openapi-schema";
 import * as Menu from "@/components/ui/menu";
 import { WEB_ADDRESS } from "@/config";
-import { VStack, styled } from "@/styled-system/jsx";
+import { hasPermission } from "@/utils/permissions";
 
+import { MemberIdent } from "../MemberBadge/MemberIdent";
+import { MemberRoleMenu } from "../MemberRoleMenu/MemberRoleMenu";
 import { MemberSuspensionTrigger } from "../MemberSuspension/MemberSuspensionTrigger";
 
-import { Props } from "./useMemberOptionsScreen";
+export type Props = {
+  profile: ProfileReference;
+};
 
 export function MemberOptionsMenu({
   children,
+  profile,
   ...props
-}: PropsWithChildren<WithDisclosure<Props>>) {
+}: PropsWithChildren<Props>) {
   const session = useSession();
   const [_, copy] = useCopyToClipboard();
 
-  const permalink = `${WEB_ADDRESS}/m/${props.handle}`;
+  const permalink = `${WEB_ADDRESS}/m/${profile.handle}`;
 
-  const showAdminOptions = session?.admin && props.handle !== session.handle;
+  const isSelf = session?.id === profile.id;
+
+  const isSuspendEnabled =
+    !isSelf && hasPermission(session, "MANAGE_SUSPENSIONS");
+
+  const isRoleChangeEnabled = hasPermission(session, "MANAGE_ROLES");
 
   function handleSelect(value: MenuSelectionDetails) {
     switch (value.value) {
@@ -36,27 +46,31 @@ export function MemberOptionsMenu({
   }
 
   return (
-    <Menu.Root onOpenChange={props.onOpenChange} onSelect={handleSelect}>
-      <Menu.Trigger asChild>{children}</Menu.Trigger>
+    <Menu.Root onSelect={handleSelect}>
+      <Menu.Trigger cursor="pointer">{children}</Menu.Trigger>
 
       <Portal>
         <Menu.Positioner>
           <Menu.Content minW="48" userSelect="none">
             <Menu.ItemGroup id="group">
               <Menu.ItemGroupLabel display="flex" gap="2" alignItems="center">
-                <Avatar handle={props.handle} />
-                <VStack alignItems="start" gap="0">
-                  <styled.h1 color="fg.default">{props.name}</styled.h1>
-                  <styled.h2 color="fg.subtle">@{props.handle}</styled.h2>
-                </VStack>
+                <MemberIdent profile={profile} size="md" name="full-vertical" />
               </Menu.ItemGroupLabel>
 
               <Menu.Separator />
 
+              <Menu.ItemGroup>
+                <Link href={permalink}>
+                  <Menu.Item value="view">View profile</Menu.Item>
+                </Link>
+              </Menu.ItemGroup>
+
               <Menu.Item value="copy-link">Copy link</Menu.Item>
 
-              {showAdminOptions && (
-                <MemberSuspensionTrigger {...props}>
+              {isRoleChangeEnabled && <MemberRoleMenu profile={profile} />}
+
+              {isSuspendEnabled && (
+                <MemberSuspensionTrigger profile={profile}>
                   <Menu.Item
                     value="suspend"
                     color="fg.destructive"
@@ -65,7 +79,7 @@ export function MemberOptionsMenu({
                       background: "bg.destructive",
                     }}
                   >
-                    {props.deletedAt ? "Reinstate" : "Suspend"}
+                    {profile.suspended ? "Reinstate" : "Suspend"}
                   </Menu.Item>
                 </MemberSuspensionTrigger>
               )}

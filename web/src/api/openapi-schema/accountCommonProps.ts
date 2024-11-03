@@ -13,6 +13,8 @@ import type { AccountHandle } from "./accountHandle";
 import type { AccountName } from "./accountName";
 import type { AccountRoleList } from "./accountRoleList";
 import type { AccountVerifiedStatus } from "./accountVerifiedStatus";
+import type { MemberJoinedDate } from "./memberJoinedDate";
+import type { MemberSuspendedDate } from "./memberSuspendedDate";
 import type { Metadata } from "./metadata";
 import type { NotificationCount } from "./notificationCount";
 import type { ProfileExternalLinkList } from "./profileExternalLinkList";
@@ -26,10 +28,12 @@ export interface AccountCommonProps {
   handle: AccountHandle;
   interests?: TagReferenceList;
   invited_by?: ProfileReference;
+  joined: MemberJoinedDate;
   links: ProfileExternalLinkList;
   meta: Metadata;
   name: AccountName;
   notifications?: NotificationCount;
   roles: AccountRoleList;
+  suspended?: MemberSuspendedDate;
   verified_status: AccountVerifiedStatus;
 }
