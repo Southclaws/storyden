@@ -10,18 +10,20 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
 
   return (
     <VStack alignItems="start">
-      {props.deletedAt ? (
+      {props.profile.suspended ? (
         <styled.p>
-          Do you want to reinstate the suspended account {props.name}?
+          Do you want to reinstate the suspended account {props.profile.name}?
         </styled.p>
       ) : (
-        <styled.p>Do you want to suspend the account {props.name}?</styled.p>
+        <styled.p>
+          Do you want to suspend the account {props.profile.name}?
+        </styled.p>
       )}
 
       <HStack w="full">
         <Button w="full">Cancel</Button>
 
-        {props.deletedAt ? (
+        {props.profile.suspended ? (
           <Button
             w="full"
             colorPalette="red"

@@ -214,6 +214,8 @@ export * from "./linkReferenceProps";
 export * from "./linkSlug";
 export * from "./linkTitle";
 export * from "./mark";
+export * from "./memberJoinedDate";
+export * from "./memberSuspendedDate";
 export * from "./metadata";
 export * from "./node";
 export * from "./nodeAddAssetParams";

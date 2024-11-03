@@ -7,21 +7,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { AccountHandle } from "./accountHandle";
-import type { AccountName } from "./accountName";
-import type { AccountRoleList } from "./accountRoleList";
-import type { Identifier } from "./identifier";
-import type { MemberJoinedDate } from "./memberJoinedDate";
-import type { MemberSuspendedDate } from "./memberSuspendedDate";
 
 /**
- * A minimal reference to an account.
+ * The time the resource was created.
  */
-export interface ProfileReference {
-  handle: AccountHandle;
-  id: Identifier;
-  joined: MemberJoinedDate;
-  name: AccountName;
-  roles: AccountRoleList;
-  suspended?: MemberSuspendedDate;
-}
+export type MemberSuspendedDate = string;

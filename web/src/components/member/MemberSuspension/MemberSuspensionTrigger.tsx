@@ -10,13 +10,13 @@ import { Props } from "./useMemberSuspension";
 
 export function MemberSuspensionTrigger({
   children,
-  ...props
+  profile,
 }: PropsWithChildren<Props>) {
   const { onOpen, isOpen, onClose } = useDisclosure();
 
-  const title = props.deletedAt
-    ? `Reinstate account ${props.name}`
-    : `Suspend account ${props.name}`;
+  const title = profile.suspended
+    ? `Reinstate account ${profile.name}`
+    : `Suspend account ${profile.name}`;
 
   return (
     <>
@@ -30,12 +30,12 @@ export function MemberSuspensionTrigger({
         )
       ) : (
         <Button colorPalette="red" onClick={onOpen}>
-          {props.deletedAt ? "Reinstate" : "Suspend"}
+          {profile.suspended ? "Reinstate" : "Suspend"}
         </Button>
       )}
 
       <ModalDrawer isOpen={isOpen} onClose={onClose} title={title}>
-        <MemberSuspensionConfirmation onClose={onClose} {...props} />
+        <MemberSuspensionConfirmation onClose={onClose} profile={profile} />
       </ModalDrawer>
     </>
   );

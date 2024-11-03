@@ -1,3 +1,5 @@
+import { forwardRef } from "react";
+
 import { ProfileReference } from "@/api/openapi-schema";
 import { Flex, HStack, styled } from "@/styled-system/jsx";
 
@@ -21,7 +23,13 @@ export function MemberIdent({
   roles = "hidden",
 }: Props) {
   return (
-    <HStack minW="0" w="full" overflow="hidden" gap={size === "lg" ? "2" : "1"}>
+    <HStack
+      minW="0"
+      w="full"
+      alignItems="center"
+      overflow="hidden"
+      gap={size === "lg" ? "2" : "1"}
+    >
       {avatar === "visible" && <MemberAvatar profile={profile} size={size} />}
       <MemberName profile={profile} size={size} name={name} roles={roles} />
     </HStack>

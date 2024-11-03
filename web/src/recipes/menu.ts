@@ -12,13 +12,13 @@ const itemStyle = {
   transitionProperty: "background, color",
   transitionTimingFunction: "default",
   _hover: {
-    background: "bg.muted",
+    background: "bg.muted/80",
     "& :where(svg)": {
       color: "fg.default",
     },
   },
   _highlighted: {
-    background: "bg.muted",
+    background: "bg.muted/50",
   },
   "& :where(svg)": {
     color: "fg.muted",
@@ -116,9 +116,10 @@ export const menu = defineSlotRecipe({
           },
         },
         triggerItem: {
-          h: "8",
-          px: "1.5",
+          h: "6",
+          px: "1",
           mx: "1",
+          textStyle: "xs",
           "& :where(svg)": {
             width: "4",
             height: "4",
