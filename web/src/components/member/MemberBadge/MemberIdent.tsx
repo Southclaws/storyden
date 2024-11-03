@@ -1,9 +1,6 @@
-import { forwardRef } from "react";
-
 import { ProfileReference } from "@/api/openapi-schema";
+import { RoleBadgeList } from "@/components/role/RoleBadge/RoleBadgeList";
 import { Flex, HStack, styled } from "@/styled-system/jsx";
-
-import { RoleBadgeList } from "../RoleBadge/RoleBadgeList";
 
 import { MemberAvatar } from "./MemberAvatar";
 

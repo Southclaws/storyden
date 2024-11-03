@@ -48,7 +48,7 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
                 <CloseAction onClick={props.onClose} />
               </HStack>
 
-              <Box h="full" w="full" pb="3">
+              <Box h="full" w="full" pb="3" overflowY="scroll">
                 {children}
               </Box>
             </VStack>
