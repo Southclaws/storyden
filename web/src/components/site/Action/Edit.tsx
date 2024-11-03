@@ -1,4 +1,4 @@
-import { PencilIcon } from "@heroicons/react/24/outline";
+import { EditIcon } from "lucide-react";
 import { PropsWithChildren } from "react";
 
 import { Button, ButtonProps } from "@/components/ui/button";
@@ -9,7 +9,7 @@ export function EditAction({
 }: PropsWithChildren<ButtonProps>) {
   return (
     <Button variant="ghost" size="xs" {...props}>
-      <PencilIcon width="0.5em" height="0.5em" />
+      <EditIcon width="0.5em" height="0.5em" />
       {children}
     </Button>
   );
