@@ -7,8 +7,11 @@ export const popover = defineSlotRecipe({
   base: {
     positioner: {
       position: "relative",
+      maxHeight: "var(--available-height)",
+      height: "min",
     },
     content: {
+      maxHeight: "var(--available-height)",
       background: "bg.default",
       borderRadius: "l3",
       boxShadow: "lg",
@@ -32,6 +35,7 @@ export const popover = defineSlotRecipe({
       textStyle: "sm",
     },
     description: {
+      overflowY: "scroll",
       color: "fg.muted",
       textStyle: "sm",
     },

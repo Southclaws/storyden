@@ -4,7 +4,7 @@ import { ChevronRightIcon, MinusCircleIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import chroma from "chroma-js";
 
-import { RoleBadge } from "@/components/member/RoleBadge/RoleBadge";
+import { RoleBadge } from "@/components/role/RoleBadge/RoleBadge";
 import { Unready } from "@/components/site/Unready";
 import * as Menu from "@/components/ui/menu";
 import { HStack } from "@/styled-system/jsx";

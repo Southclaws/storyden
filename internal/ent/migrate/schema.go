@@ -89,13 +89,13 @@ var (
 				Symbol:     "account_roles_accounts_account",
 				Columns:    []*schema.Column{AccountRolesColumns[3]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "account_roles_roles_role",
 				Columns:    []*schema.Column{AccountRolesColumns[4]},
 				RefColumns: []*schema.Column{RolesColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{

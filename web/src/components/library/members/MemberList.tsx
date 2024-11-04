@@ -2,7 +2,7 @@ import { PublicProfileList } from "src/api/openapi-schema";
 import { Empty } from "src/components/site/Empty";
 
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
-import { RoleBadgeList } from "@/components/member/RoleBadge/RoleBadgeList";
+import { RoleBadgeList } from "@/components/role/RoleBadge/RoleBadgeList";
 import { Timestamp } from "@/components/site/Timestamp";
 import * as Table from "@/components/ui/table";
 import { LStack, styled } from "@/styled-system/jsx";
