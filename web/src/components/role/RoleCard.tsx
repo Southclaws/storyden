@@ -3,6 +3,7 @@ import { Heading } from "@/components/ui/heading";
 import { css } from "@/styled-system/css";
 import { CardBox, HStack } from "@/styled-system/jsx";
 
+import { PermissionSummary } from "./PermissionList";
 import { RoleEditModalTrigger } from "./RoleEdit/RoleEditModal";
 import { badgeColourCSS } from "./colours";
 
@@ -13,8 +14,6 @@ type Props = {
 
 export function RoleCard({ role, editable }: Props) {
   const cssVars = badgeColourCSS(role.colour);
-
-  const permissionCount = role.permissions.length;
 
   return (
     <CardBox
@@ -33,7 +32,7 @@ export function RoleCard({ role, editable }: Props) {
         {editable && <RoleEditModalTrigger role={role} />}
       </HStack>
 
-      <p>{permissionCount} permissions</p>
+      <PermissionSummary permissions={role.permissions} />
     </CardBox>
   );
 }
