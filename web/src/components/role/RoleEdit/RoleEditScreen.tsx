@@ -25,7 +25,7 @@ export function RoleEditScreen(props: Props) {
       justifyContent="space-between"
       onSubmit={handleSave}
     >
-      <LStack px="0.5" maxH="full" overflowY="scroll">
+      <LStack px="0.5" maxH="full" pb="1" overflowY="scroll">
         <FormControl>
           <FormLabel>Name</FormLabel>
           <Input {...form.register("name")} />
