@@ -9,6 +9,7 @@ import { Role } from "@/api/openapi-schema";
 import { AddAction } from "@/components/site/Action/Add";
 import { EditAction } from "@/components/site/Action/Edit";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
+import { isDefaultRole } from "@/lib/role/defaults";
 import { UseDisclosureProps, useDisclosure } from "@/utils/useDisclosure";
 
 import { RoleEditScreen } from "./RoleEditScreen";
@@ -35,9 +36,18 @@ export function RoleEditModal({
 export function RoleEditModalTrigger({ role }: Props) {
   const disclosure = useDisclosure();
 
+  const isDefault = isDefaultRole(role);
+
+  const titleLabel = isDefault ? "You cannot edit a default role" : "Edit role";
+
   return (
     <>
-      <EditAction size="xs" onClick={disclosure.onOpen} />
+      <EditAction
+        size="xs"
+        disabled={isDefault}
+        title={titleLabel}
+        onClick={disclosure.onOpen}
+      />
 
       <RoleEditModal {...disclosure} role={role} />
     </>
