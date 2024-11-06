@@ -8,7 +8,7 @@ import { InfoTip } from "@/components/site/InfoTip";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import { CardGrid } from "@/components/ui/rich-card";
-import { LStack, WStack } from "@/styled-system/jsx";
+import { HStack, LStack, WStack } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
 
 type Props = {
@@ -34,18 +34,18 @@ export function RoleScreen(props: Props) {
         {canEdit && <RoleCreateModalTrigger />}
       </WStack>
 
-      <p>
-        Roles provide granular permission control and profile customisation for
-        members.{" "}
-        <span>
-          <InfoTip title="Aesthetic roles and badges">
-            You can also use Roles as a purely aesthetic tool for providing
-            members with ways to express themselves on their profile. Members
-            can choose one role as a &ldquo;Badge&rdquo; which is displayed next
-            to their name around the site.
-          </InfoTip>
-        </span>
-      </p>
+      <HStack gap="1">
+        <p>
+          Roles provide granular permission control and profile customisation
+          for members.
+        </p>
+        <InfoTip title="Aesthetic roles and badges">
+          You can also use Roles as a purely aesthetic tool for providing
+          members with ways to express themselves on their profile. Members can
+          choose one role as a &ldquo;Badge&rdquo; which is displayed next to
+          their name around the site.
+        </InfoTip>
+      </HStack>
 
       <CardGrid>
         {data.roles.map((r) => (

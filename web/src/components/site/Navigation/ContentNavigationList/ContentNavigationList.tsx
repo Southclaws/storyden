@@ -2,9 +2,10 @@
 
 import { CategoryListOKResponse, NodeListResult } from "@/api/openapi-schema";
 import { CategoryList } from "@/components/category/CategoryList/CategoryList";
-import { Divider, LStack, styled } from "@/styled-system/jsx";
+import { Divider, HStack, LStack, styled } from "@/styled-system/jsx";
 
 import { MembersAnchor } from "../Anchors/Members";
+import { RolesAnchor } from "../Anchors/Roles";
 import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
 import { useNavigation } from "../useNavigation";
 
@@ -40,7 +41,10 @@ export function ContentNavigationList(props: Props) {
 
       <LStack gap="1">
         <Divider />
-        <MembersAnchor />
+        <HStack>
+          <MembersAnchor />
+          <RolesAnchor />
+        </HStack>
       </LStack>
     </styled.nav>
   );
