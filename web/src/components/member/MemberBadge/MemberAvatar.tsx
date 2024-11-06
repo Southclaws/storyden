@@ -1,9 +1,9 @@
-import { ImagePlusIcon } from "lucide-react";
 import Image from "next/image";
 
 import { getAccountGetAvatarKey } from "@/api/openapi-client/accounts";
 import { Identifier, ProfileReference } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
+import { MediaAddIcon } from "@/components/ui/icons/Media";
 import { API_ADDRESS } from "@/config";
 import { css } from "@/styled-system/css";
 import { Box } from "@/styled-system/jsx";
@@ -42,7 +42,7 @@ export function MemberAvatar({ profile, size, editable }: Props) {
               color="bg.default"
               size="2xl"
             >
-              <ImagePlusIcon />
+              <MediaAddIcon />
             </Button>
           </EditAvatarTrigger>
         </Box>

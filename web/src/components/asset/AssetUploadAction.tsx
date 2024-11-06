@@ -2,7 +2,6 @@ import {
   FileUploadFileAcceptDetails,
   FileUploadFileRejectDetails,
 } from "@ark-ui/react";
-import { ImageIcon, ImagePlusIcon } from "lucide-react";
 import mime from "mime-db";
 import { PropsWithChildren } from "react";
 import { toast } from "sonner";
@@ -12,6 +11,7 @@ import { assetUpload } from "@/api/openapi-client/assets";
 import { Asset, AssetID } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
 import * as FileUpload from "@/components/ui/file-upload";
+import { MediaAddIcon, MediaIcon } from "@/components/ui/icons/Media";
 import { ButtonVariantProps, button } from "@/styled-system/recipes";
 
 type AssetUploadActionProps = {
@@ -116,12 +116,12 @@ export function AssetUploadAction({
           >
             {props.operation === "add" ? (
               <>
-                <ImagePlusIcon />
+                <MediaAddIcon />
                 {props.hideLabel ? "" : "add cover"}
               </>
             ) : (
               <>
-                <ImageIcon /> {props.hideLabel ? "" : "replace cover"}
+                <MediaIcon /> {props.hideLabel ? "" : "replace cover"}
               </>
             )}
           </Button>

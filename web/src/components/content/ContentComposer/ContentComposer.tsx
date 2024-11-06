@@ -1,5 +1,8 @@
 import { Portal } from "@ark-ui/react";
 import { EditorContent } from "@tiptap/react";
+import { match } from "ts-pattern";
+
+import { Button } from "@/components/ui/button";
 import {
   BoldIcon,
   CodeIcon,
@@ -17,10 +20,7 @@ import {
   StrikethroughIcon,
   TextIcon,
   TextQuoteIcon,
-} from "lucide-react";
-import { match } from "ts-pattern";
-
-import { Button } from "@/components/ui/button";
+} from "@/components/ui/icons/Typography";
 import * as Menu from "@/components/ui/menu";
 import { css } from "@/styled-system/css";
 import { LStack, styled } from "@/styled-system/jsx";

@@ -1,4 +1,3 @@
-import { ImagePlusIcon } from "lucide-react";
 import { parseAsBoolean, useQueryState } from "nuqs";
 
 import { handle } from "@/api/client";
@@ -8,6 +7,7 @@ import { AssetUploadAction } from "@/components/asset/AssetUploadAction";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { MediaAddIcon } from "@/components/ui/icons/Media";
 import { useLibraryMutation } from "@/lib/library/library";
 import { Box, HStack } from "@/styled-system/jsx";
 
@@ -118,7 +118,7 @@ export function LibraryPageAssetList(props: Props) {
               type="button"
               variant="outline"
             >
-              <ImagePlusIcon />
+              <MediaAddIcon />
             </Button>
           </AssetUploadAction>
         )}
