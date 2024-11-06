@@ -3,10 +3,10 @@
 import { PropsWithChildren } from "react";
 
 import { OnboardingStatus } from "src/api/openapi-schema";
-import { CheckCircle } from "src/components/graphics/CheckCircle";
 
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
+import { CheckCircleIcon } from "@/components/ui/icons/CheckCircle";
 import { LinkButton } from "@/components/ui/link-button";
 import { Box, Circle, HStack, styled } from "@/styled-system/jsx";
 
@@ -41,7 +41,12 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
             }}
           >
             {complete ? (
-              <CheckCircle width="2em" height="2em" />
+              <CheckCircleIcon
+                width="8"
+                height="8"
+                color="green.10"
+                fill="green.5"
+              />
             ) : (
               <styled.p fontWeight="bold">{props.step}</styled.p>
             )}

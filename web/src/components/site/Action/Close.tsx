@@ -1,11 +1,11 @@
-import { XMarkIcon } from "@heroicons/react/24/solid";
-
-import { Button, ButtonProps } from "@/components/ui/button";
+import { ButtonProps } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { CloseIcon } from "@/components/ui/icons/Close";
 
 export function CloseAction(props: ButtonProps) {
   return (
-    <Button variant="ghost" size="sm" {...props}>
-      <XMarkIcon width="1.4em" />
-    </Button>
+    <IconButton variant="ghost" size="sm" {...props}>
+      <CloseIcon />
+    </IconButton>
   );
 }

@@ -8,10 +8,10 @@ import { hstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
 
 import { MemberAvatar } from "../member/MemberBadge/MemberAvatar";
-import { NotificationAction } from "../site/Navigation/Actions/Notifications";
 import { Button } from "../ui/button";
 import { LinkButton } from "../ui/link-button";
 
+import { NotificationsTrigger } from "./NotificationsTrigger";
 import { NotificationItem } from "./item";
 import { Props, useNotifications } from "./useNotifications";
 
@@ -19,7 +19,7 @@ export function NotificationsMenu(props: Props) {
   const { ready, error, data, handlers } = useNotifications(props);
   if (!ready) {
     return (
-      <NotificationAction
+      <NotificationsTrigger
         hideLabel
         size="md"
         variant="ghost"
@@ -36,7 +36,7 @@ export function NotificationsMenu(props: Props) {
   return (
     <Menu.Root closeOnSelect={false}>
       <Menu.Trigger cursor="pointer" position="relative" asChild>
-        <NotificationAction hideLabel size="md" variant="ghost" unread />
+        <NotificationsTrigger hideLabel size="md" variant="ghost" unread />
       </Menu.Trigger>
 
       <Portal>
