@@ -6,9 +6,10 @@ import { useSWRConfig } from "swr";
 import { handle } from "@/api/client";
 import { getRoleListKey, roleCreate } from "@/api/openapi-client/roles";
 import { Role } from "@/api/openapi-schema";
-import { AddAction } from "@/components/site/Action/Add";
 import { EditAction } from "@/components/site/Action/Edit";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
+import { IconButton } from "@/components/ui/icon-button";
+import { CreateIcon } from "@/components/ui/icons/Create";
 import { isDefaultRole } from "@/lib/role/defaults";
 import { UseDisclosureProps, useDisclosure } from "@/utils/useDisclosure";
 
@@ -89,9 +90,9 @@ export function RoleCreateModalTrigger() {
 
   return (
     <>
-      <AddAction px="2" variant="subtle" size="xs" onClick={handleCreate}>
-        Create role
-      </AddAction>
+      <IconButton px="2" variant="subtle" size="xs" onClick={handleCreate}>
+        <CreateIcon /> Create role
+      </IconButton>
 
       {newRole && <RoleEditModal {...disclosure} role={newRole} />}
     </>

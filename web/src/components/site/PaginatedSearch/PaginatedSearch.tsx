@@ -1,6 +1,5 @@
 "use client";
 
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -10,6 +9,7 @@ import { z } from "zod";
 import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
 
 import { Button } from "@/components/ui/button";
+import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
 import { VStack, styled } from "@/styled-system/jsx";
 
@@ -96,7 +96,7 @@ export function PaginatedSearch(props: Props) {
             type="reset"
             onClick={handlers.handleReset}
           >
-            <XMarkIcon />
+            <CancelIcon />
           </Button>
         )}
         <Button

@@ -2,13 +2,13 @@ import {
   ColorPickerValueChangeDetails,
   parseColor,
 } from "@ark-ui/react/color-picker";
-import { PipetteIcon } from "lucide-react";
 import { Control, Controller, FieldValues, Path } from "react-hook-form";
 
 import * as ColorPicker from "@/components/ui/color-picker";
 import { HStack, Stack } from "@/styled-system/jsx";
 
 import { IconButton } from "./icon-button";
+import { ColourPipetteIcon } from "./icons/Colour";
 import { Input } from "./input";
 
 const presets = [
@@ -71,7 +71,7 @@ export function ColourPickerField<T extends FieldValues>(props: Props<T>) {
                               variant="outline"
                               aria-label="Pick a color"
                             >
-                              <PipetteIcon />
+                              <ColourPipetteIcon />
                             </IconButton>
                           </ColorPicker.EyeDropperTrigger>
                           <Stack gap="2" flex="1">

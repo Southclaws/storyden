@@ -1,7 +1,7 @@
-import { EditIcon } from "lucide-react";
 import { PropsWithChildren } from "react";
 
 import { Button, ButtonProps } from "@/components/ui/button";
+import { EditIcon } from "@/components/ui/icons/Edit";
 
 export function EditAction({
   children,
@@ -9,7 +9,7 @@ export function EditAction({
 }: PropsWithChildren<ButtonProps>) {
   return (
     <Button variant="ghost" size="xs" {...props}>
-      <EditIcon width="0.5em" height="0.5em" />
+      <EditIcon width="4" height="4" />
       {children}
     </Button>
   );

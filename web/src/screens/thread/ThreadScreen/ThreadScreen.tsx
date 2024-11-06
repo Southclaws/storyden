@@ -1,7 +1,5 @@
 "use client";
 
-import { ChatBubbleLeftIcon as ChatBubbleLeftIconOutline } from "@heroicons/react/24/outline";
-import { ChatBubbleLeftIcon as ChatBubbleLeftIconSolid } from "@heroicons/react/24/solid";
 import { Controller, ControllerProps } from "react-hook-form";
 
 import { Unready } from "src/components/site/Unready";
@@ -16,10 +14,14 @@ import { Breadcrumbs } from "@/components/thread/Breadcrumbs";
 import { ReplyBox } from "@/components/thread/ReplyBox/ReplyBox";
 import { ReplyList } from "@/components/thread/ReplyList/ReplyList";
 import { ThreadMenu } from "@/components/thread/ThreadMenu/ThreadMenu";
-import { TagListField, ThreadTagList } from "@/components/thread/ThreadTagList";
+import { TagListField } from "@/components/thread/ThreadTagList";
 import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Heading } from "@/components/ui/heading";
 import { HeadingInput } from "@/components/ui/heading-input";
+import {
+  DiscussionIcon,
+  DiscussionParticipatingIcon,
+} from "@/components/ui/icons/Discussion";
 import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { Form, Props, useThreadScreen } from "./useThreadScreen";
@@ -180,13 +182,13 @@ function ThreadReplyStatus({ reply_status }: Thread) {
     <styled.p display="flex" gap="1" alignItems="center" color="fg.muted">
       <span>
         {reply_status.replied ? (
-          <ChatBubbleLeftIconSolid
-            width="1rem"
+          <DiscussionParticipatingIcon
+            width="4"
             title="You have replied to this thread"
           />
         ) : (
-          <ChatBubbleLeftIconOutline
-            width="1rem"
+          <DiscussionIcon
+            width="4"
             title="You have not replied to this thread"
           />
         )}

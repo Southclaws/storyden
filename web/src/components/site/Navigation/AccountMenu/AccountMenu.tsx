@@ -15,9 +15,10 @@ import { SettingsMenuItem } from "../Anchors/Settings";
 
 type Props = {
   account: Account;
+  size?: "sm" | "md";
 };
 
-export function AccountMenu({ account }: Props) {
+export function AccountMenu({ account, size = "md" }: Props) {
   const isAdmin = hasPermission(account, "ADMINISTRATOR");
 
   return (
@@ -27,11 +28,11 @@ export function AccountMenu({ account }: Props) {
         fitViewport: true,
         slide: true,
         placement: "bottom-end",
-        shift: 24,
+        shift: size === "md" ? 24 : 0,
       }}
     >
       <Menu.Trigger cursor="pointer">
-        <MemberAvatar profile={account} size="md" />
+        <MemberAvatar profile={account} size={size} />
       </Menu.Trigger>
 
       <Portal>

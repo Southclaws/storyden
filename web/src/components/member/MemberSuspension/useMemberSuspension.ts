@@ -22,7 +22,6 @@ export function useMemberSuspension({
 
   const profileKey = getProfileListKey()[0];
   const keyFn = (key: Arguments) => {
-    console.log("key");
     return Array.isArray(key) && key[0].startsWith(profileKey);
   };
 

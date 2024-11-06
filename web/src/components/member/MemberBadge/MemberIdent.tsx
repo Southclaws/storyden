@@ -42,7 +42,7 @@ export function MemberName({
   switch (name) {
     case "full-horizontal":
       return (
-        <Flex direction="row" gap="1" alignItems="center">
+        <Flex maxW="full" direction="row" gap="1" alignItems="center">
           <styled.p
             minW="0"
             fontSize={size}
@@ -73,7 +73,7 @@ export function MemberName({
 
     case "full-vertical":
       return (
-        <Flex direction="column" gap="0" alignItems="start">
+        <Flex maxW="full" direction="column" gap="0" alignItems="start">
           <styled.p
             minW="0"
             fontSize={size}
@@ -104,7 +104,7 @@ export function MemberName({
 
     case "handle":
       return (
-        <HStack gap="1">
+        <HStack maxW="full" gap="1">
           <styled.p
             fontSize={size}
             fontWeight="normal"

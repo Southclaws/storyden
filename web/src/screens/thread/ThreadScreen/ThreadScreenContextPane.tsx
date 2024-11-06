@@ -1,17 +1,15 @@
 "use client";
 
 import { formatDate } from "date-fns";
-import {
-  CalendarIcon,
-  HandHeartIcon,
-  PencilLineIcon,
-  TagIcon,
-  UsersIcon,
-} from "lucide-react";
 
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Unready } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
+import { AuthorIcon } from "@/components/ui/icons/Author";
+import { CalendarIcon } from "@/components/ui/icons/Calendar";
+import { MembersIcon } from "@/components/ui/icons/Members";
+import { ParticipatingIcon } from "@/components/ui/icons/Participating";
+import { SlugIcon } from "@/components/ui/icons/Slug";
 import * as Table from "@/components/ui/table";
 import { cva } from "@/styled-system/css";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
@@ -47,13 +45,13 @@ export function ThreadScreenContextPane(props: Props) {
   const tableData = [
     {
       label: "ID",
-      icon: TagIcon,
+      icon: SlugIcon,
       value: thread.id,
       style: "numeric" as const,
     },
     {
       label: "author",
-      icon: PencilLineIcon,
+      icon: AuthorIcon,
       value: (
         <MemberBadge
           profile={thread.author}
@@ -70,12 +68,12 @@ export function ThreadScreenContextPane(props: Props) {
     },
     {
       label: "replies",
-      icon: UsersIcon,
+      icon: MembersIcon,
       value: `${thread.reply_status.replies}`,
     },
     {
       label: "participating",
-      icon: HandHeartIcon,
+      icon: ParticipatingIcon,
       value: thread.reply_status.replied ? "Yes" : "No",
     },
   ];
@@ -85,13 +83,13 @@ export function ThreadScreenContextPane(props: Props) {
       <Heading>{thread.title}</Heading>
       <styled.p color="fg.muted">{thread.description}</styled.p>
 
-      <Table.Root size="sm">
+      <Table.Root size="sm" tableLayout="fixed" w="full" overflow="hidden">
         <Table.Body>
           {tableData.map((item) => (
             <Table.Row key={item.label}>
               <Table.Cell fontWeight="medium" color="fg.muted">
-                <HStack gap="1">
-                  <item.icon width="14" />
+                <HStack gap="1" flexShrink="0">
+                  <item.icon width="4" />
                   <span>{item.label}</span>
                 </HStack>
               </Table.Cell>
@@ -101,6 +99,11 @@ export function ThreadScreenContextPane(props: Props) {
                 justifyContent="flex-end"
                 alignItems="center"
                 textAlign="right"
+                overflow="hidden"
+                textOverflow="ellipsis"
+                width="full"
+                maxWidth="full"
+                minW="0"
               >
                 {item.value}
               </Table.Cell>

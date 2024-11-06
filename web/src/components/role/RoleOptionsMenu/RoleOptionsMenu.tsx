@@ -1,10 +1,10 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
-import { EditIcon } from "lucide-react";
 import { PropsWithChildren } from "react";
 
 import { handle } from "@/api/client";
 import { Role } from "@/api/openapi-schema";
 import { DeleteWithConfirmationMenuItem } from "@/components/site/DeleteConfirmationMenuItem";
+import { EditIcon } from "@/components/ui/icons/Edit";
 import * as Menu from "@/components/ui/menu";
 import { HStack } from "@/styled-system/jsx";
 
