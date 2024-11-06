@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { Category } from "@/api/openapi-schema";
 import { Heading } from "@/components/ui/heading";
+import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { CardGrid } from "@/components/ui/rich-card";
 import { categoryColourCSS } from "@/lib/category/colours";
 import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
@@ -45,19 +46,20 @@ export function CategoryCard(props: Category) {
       display="flex"
       justifyContent="space-between"
     >
-      <LStack>
-        <WStack alignItems="start">
-          <Link className={linkOverlay()} href={`/d/${props.slug}`}>
-            <Heading>{props.name}</Heading>
-          </Link>
+      <WStack alignItems="start">
+        <Link className={linkOverlay()} href={`/d/${props.slug}`}>
+          <Heading>{props.name}</Heading>
+        </Link>
 
-          <CategoryMenu category={props} />
-        </WStack>
+        <CategoryMenu category={props} />
+      </WStack>
 
-        <styled.p color="fg.muted">{props.description}</styled.p>
-      </LStack>
+      <styled.p color="fg.muted">{props.description}</styled.p>
 
-      <styled.p color="fg.subtle">{props.postCount} threads</styled.p>
+      <HStack gap="1" color="fg.subtle">
+        <DiscussionIcon w="4" />
+        <styled.p>{props.postCount} threads</styled.p>
+      </HStack>
     </CardBox>
   );
 }

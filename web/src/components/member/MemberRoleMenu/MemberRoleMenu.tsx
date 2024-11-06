@@ -1,12 +1,14 @@
 "use client";
 
 import { Portal } from "@ark-ui/react";
-import { ChevronRightIcon, MinusCircleIcon } from "@heroicons/react/24/outline";
-import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import chroma from "chroma-js";
 
 import { RoleBadge } from "@/components/role/RoleBadge/RoleBadge";
+import { badgeColourCSS } from "@/components/role/colours";
 import { Unready } from "@/components/site/Unready";
+import { CheckCircleIcon } from "@/components/ui/icons/CheckCircle";
+import { RemoveCircleIcon } from "@/components/ui/icons/Remove";
+import { SubmenuIcon } from "@/components/ui/icons/Submenu";
 import * as Menu from "@/components/ui/menu";
 import { HStack } from "@/styled-system/jsx";
 
@@ -31,23 +33,27 @@ export function MemberRoleMenu(props: Props) {
     >
       <Menu.TriggerItem justifyContent="space-between">
         <HStack gap="2">Roles</HStack>
-        <ChevronRightIcon />
+        <SubmenuIcon />
       </Menu.TriggerItem>
 
       <Portal>
         <Menu.Positioner>
           <Menu.Content>
             {roles.map((r) => {
-              const colour = chroma(r.colour);
-
-              const bgColour = colour.brighten(2).desaturate(1).css();
+              const styles = badgeColourCSS(r.colour);
 
               return (
-                <Menu.Item key={r.id} value={r.id} gap="2">
+                <Menu.Item key={r.id} value={r.id} gap="2" style={styles}>
                   {r.selected ? (
-                    <CheckCircleIcon width="1rem" fill={bgColour} />
+                    <CheckCircleIcon
+                      width="4"
+                      style={{
+                        fill: "var(--colors-color-palette)",
+                        stroke: "var(--colors-color-palette-text)",
+                      }}
+                    />
                   ) : (
-                    <MinusCircleIcon width="1rem" />
+                    <RemoveCircleIcon width="4" />
                   )}
 
                   <RoleBadge role={r} />

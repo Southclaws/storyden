@@ -1,5 +1,4 @@
-import { UsersIcon } from "@heroicons/react/24/outline";
-
+import { MembersIcon } from "@/components/ui/icons/Members";
 import { LinkButtonStyleProps } from "@/components/ui/link-button";
 
 import { Anchor, AnchorProps, MenuItem } from "./Anchor";
@@ -7,7 +6,6 @@ import { Anchor, AnchorProps, MenuItem } from "./Anchor";
 export const MembersID = "members";
 export const MembersRoute = "/m";
 export const MembersLabel = "Members";
-export const MembersIcon = <UsersIcon />;
 
 export function MembersAnchor(props: AnchorProps & LinkButtonStyleProps) {
   return (
@@ -15,7 +13,7 @@ export function MembersAnchor(props: AnchorProps & LinkButtonStyleProps) {
       id={MembersID}
       route={MembersRoute}
       label={MembersLabel}
-      icon={MembersIcon}
+      icon={<MembersIcon />}
       {...props}
     />
   );
@@ -27,7 +25,7 @@ export function MembersMenuItem() {
       id={MembersID}
       route={MembersRoute}
       label={MembersLabel}
-      icon={MembersIcon}
+      icon={<MembersIcon />}
     />
   );
 }

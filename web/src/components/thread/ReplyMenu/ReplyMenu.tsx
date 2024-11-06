@@ -1,12 +1,14 @@
 "use client";
 
 import { Portal } from "@ark-ui/react";
-import { LinkIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { ShareIcon } from "@heroicons/react/24/solid";
 import { format } from "date-fns/format";
 
 import { MoreAction } from "src/components/site/Action/More";
 
+import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { EditIcon } from "@/components/ui/icons/Edit";
+import { LinkIcon } from "@/components/ui/icons/Link";
+import { ShareIcon } from "@/components/ui/icons/Share";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
 
@@ -42,14 +44,14 @@ export function ReplyMenu(props: Props) {
 
               <Menu.Item value="copy-link" onClick={handlers.handleCopyURL}>
                 <HStack gap="1">
-                  <LinkIcon width="1.4em" /> Copy link
+                  <LinkIcon /> Copy link
                 </HStack>
               </Menu.Item>
 
               {isSharingEnabled && (
                 <Menu.Item value="share" onClick={handlers.handleShare}>
                   <HStack gap="1">
-                    <ShareIcon width="1.4em" /> Share
+                    <ShareIcon /> Share
                   </HStack>
                 </Menu.Item>
               )}
@@ -57,7 +59,7 @@ export function ReplyMenu(props: Props) {
               {isEditingEnabled && (
                 <Menu.Item value="edit" onClick={handlers.handleSetEditing}>
                   <HStack gap="1">
-                    <PencilIcon width="1.4em" /> Edit
+                    <EditIcon /> Edit
                   </HStack>
                 </Menu.Item>
               )}
@@ -65,7 +67,7 @@ export function ReplyMenu(props: Props) {
               {isDeletingEnabled && (
                 <Menu.Item value="delete" onClick={handlers.handleDelete}>
                   <HStack gap="1">
-                    <TrashIcon width="1.4em" /> Delete
+                    <DeleteIcon /> Delete
                   </HStack>
                 </Menu.Item>
               )}

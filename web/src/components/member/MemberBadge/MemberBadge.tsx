@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { ProfileReference } from "@/api/openapi-schema";
 import { WEB_ADDRESS } from "@/config";
+import { css } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 
 import { MemberOptionsMenu } from "../MemberOptions/MemberOptionsMenu";
@@ -21,6 +22,11 @@ export type Props = {
   as?: "menu" | "link";
 };
 
+const identContainerStyles = css({
+  maxW: "full",
+  flexShrink: "0",
+});
+
 export function MemberBadge({
   profile,
   size = "md",
@@ -33,7 +39,7 @@ export function MemberBadge({
 
   if (as === "menu") {
     return (
-      <HStack flexShrink="0">
+      <HStack className={identContainerStyles}>
         <MemberOptionsMenu profile={profile}>
           <MemberIdent
             profile={profile}
@@ -48,7 +54,7 @@ export function MemberBadge({
   }
 
   return (
-    <Link className="feed-item-byline-basic" href={permalink}>
+    <Link className={identContainerStyles} href={permalink}>
       <MemberIdent
         profile={profile}
         size={size}

@@ -1,5 +1,4 @@
-import { Cog6ToothIcon } from "@heroicons/react/24/outline";
-
+import { SettingsIcon } from "@/components/ui/icons/Settings";
 import { LinkButtonStyleProps } from "@/components/ui/link-button";
 
 import { Anchor, AnchorProps, MenuItem } from "./Anchor";
@@ -7,7 +6,6 @@ import { Anchor, AnchorProps, MenuItem } from "./Anchor";
 export const SettingsID = "settings";
 export const SettingsRoute = "/settings";
 export const SettingsLabel = "Settings";
-export const SettingsIcon = <Cog6ToothIcon />;
 
 type Props = AnchorProps & LinkButtonStyleProps;
 
@@ -17,7 +15,7 @@ export function SettingsAnchor(props: Props) {
       id={SettingsID}
       route={SettingsRoute}
       label={SettingsLabel}
-      icon={SettingsIcon}
+      icon={<SettingsIcon />}
       {...props}
     />
   );
@@ -29,7 +27,7 @@ export function SettingsMenuItem() {
       id={SettingsID}
       route={SettingsRoute}
       label={SettingsLabel}
-      icon={SettingsIcon}
+      icon={<SettingsIcon />}
     />
   );
 }

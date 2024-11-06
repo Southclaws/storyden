@@ -1,11 +1,12 @@
 import { Portal } from "@ark-ui/react";
-import { MinusIcon, PlusIcon } from "@heroicons/react/24/solid";
 import { KeyboardEvent, useState } from "react";
 
 import { BookmarkAction } from "src/components/site/Action/Bookmark";
 
 import { Unready } from "@/components/site/Unready";
 import { Checkbox } from "@/components/ui/checkbox";
+import { AddIcon } from "@/components/ui/icons/Add";
+import { RemoveIcon } from "@/components/ui/icons/Remove";
 import * as Menu from "@/components/ui/menu";
 import { Box, Center, HStack } from "@/styled-system/jsx";
 import { useDisclosure } from "@/utils/useDisclosure";
@@ -94,7 +95,7 @@ function LazyLoadedMenuContent(props: LazyLoadedMenuContentProps) {
                 <Checkbox checked={c.has_queried_item} />
               ) : (
                 <Center w="5">
-                  {c.has_queried_item ? <MinusIcon /> : <PlusIcon />}
+                  {c.has_queried_item ? <RemoveIcon /> : <AddIcon />}
                 </Center>
               )}
               {c.name}

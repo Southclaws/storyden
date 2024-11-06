@@ -1,5 +1,4 @@
-import { QueueListIcon } from "@heroicons/react/24/outline";
-
+import { QueueIcon } from "@/components/ui/icons/Queue";
 import { LinkButtonStyleProps } from "@/components/ui/link-button";
 
 import { Anchor, MenuItem } from "./Anchor";
@@ -7,7 +6,6 @@ import { Anchor, MenuItem } from "./Anchor";
 export const QueueID = "queue";
 export const QueueRoute = "/queue";
 export const QueueLabel = "Queue";
-export const QueueIcon = <QueueListIcon />;
 
 export function QueueAnchor(props: LinkButtonStyleProps) {
   return (
@@ -15,7 +13,7 @@ export function QueueAnchor(props: LinkButtonStyleProps) {
       id={QueueID}
       route={QueueRoute}
       label={QueueLabel}
-      icon={QueueIcon}
+      icon={<QueueIcon />}
       {...props}
     />
   );
@@ -27,7 +25,7 @@ export function QueueMenuItem() {
       id={QueueID}
       route={QueueRoute}
       label={QueueLabel}
-      icon={QueueIcon}
+      icon={<QueueIcon />}
     />
   );
 }

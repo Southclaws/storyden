@@ -1,8 +1,7 @@
-import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
-
 import { Link } from "src/api/openapi-schema";
 
 import { PostRefList } from "@/components/feed/PostRef/PostRefList";
+import { ExternalLinkIcon } from "@/components/ui/icons/ExternalLink";
 import { LinkButton } from "@/components/ui/link-button";
 import { Box, Flex, HStack, LinkOverlay, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
@@ -30,7 +29,7 @@ export function LinkView({ link }: Props) {
             href={link.url}
           >
             {link.domain}&nbsp;
-            <ArrowTopRightOnSquareIcon height="1rem" />
+            <ExternalLinkIcon w="4" />
           </LinkOverlay>
 
           <LinkButton w="min" size="xs" href={domainSearch}>

@@ -1,9 +1,9 @@
 "use client";
 
-import { TagIcon, UsersIcon } from "lucide-react";
-
 import { CategoryBadge } from "@/components/category/CategoryBadge";
 import { Unready } from "@/components/site/Unready";
+import { DiscussionIcon } from "@/components/ui/icons/Discussion";
+import { SlugIcon } from "@/components/ui/icons/Slug";
 import * as Table from "@/components/ui/table";
 import { cva } from "@/styled-system/css";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
@@ -38,13 +38,13 @@ export function CategoryScreenContextPane(props: Props) {
   const tableData = [
     {
       label: "slug",
-      icon: TagIcon,
+      icon: SlugIcon,
       value: category.slug,
       style: "numeric" as const,
     },
     {
       label: "threads",
-      icon: UsersIcon,
+      icon: DiscussionIcon,
       value: `${category.postCount}`,
     },
   ];
@@ -60,7 +60,7 @@ export function CategoryScreenContextPane(props: Props) {
             <Table.Row key={item.label}>
               <Table.Cell fontWeight="medium" color="fg.muted">
                 <HStack gap="1">
-                  <item.icon width="14" />
+                  <item.icon width="4" />
                   <span>{item.label}</span>
                 </HStack>
               </Table.Cell>

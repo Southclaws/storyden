@@ -2,14 +2,17 @@
 
 import { Presence } from "@ark-ui/react";
 
-import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 
+import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
+import { ButtonProps } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { MenuIcon } from "@/components/ui/icons/Menu";
 import { HStack, WStack } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 
 import { CloseAction } from "../../Action/Close";
-import { MenuAction } from "../Actions/Menu";
+import { AccountMenu } from "../AccountMenu/AccountMenu";
 import { AdminAnchor } from "../Anchors/Admin";
 import { ComposeAnchor } from "../Anchors/Compose";
 import { DraftsAnchor } from "../Anchors/Drafts";
@@ -59,41 +62,53 @@ export function MobileCommandBar() {
       </Presence>
 
       {account ? (
-        <HStack gap="4" w="full" justifyContent="space-between">
+        <WStack alignItems="center">
           {isExpanded ? (
             <>
-              <ProfilePill profileReference={account} showHandle={false} />
-
+              <AccountMenu account={account} size="sm" />
               <Search />
-              <CloseAction onClick={onClose} />
+              <CloseAction onClick={onClose} size="sm" />
             </>
           ) : (
             <>
-              <ProfilePill profileReference={account} showHandle={false} />
-              <HomeAnchor hideLabel />
-              <ComposeAnchor hideLabel />
-              <LibraryAnchor hideLabel />
-              <MenuAction onClick={onExpand} />
+              <AccountMenu account={account} size="sm" />
+              <HomeAnchor hideLabel size="sm" />
+              <ComposeAnchor hideLabel size="sm" />
+              <LibraryAnchor hideLabel size="sm" />
+              <ExpandTrigger onClick={onExpand} />
             </>
           )}
-        </HStack>
+        </WStack>
       ) : (
-        <HStack gap="4" w="full" justifyContent="space-between">
+        <WStack alignItems="center">
           {isExpanded ? (
             <>
-              <HomeAnchor hideLabel />
+              <HomeAnchor hideLabel size="sm" />
               <Search />
-              <CloseAction onClick={onClose} />
+              <CloseAction onClick={onClose} size="sm" />
             </>
           ) : (
             <>
               <HomeAnchor hideLabel />
               <LoginAnchor />
-              <MenuAction onClick={onExpand} />
+              <ExpandTrigger onClick={onExpand} />
             </>
           )}
-        </HStack>
+        </WStack>
       )}
     </Toolpill>
+  );
+}
+
+function ExpandTrigger(props: ButtonProps) {
+  return (
+    <IconButton
+      title="Main navigation menu"
+      variant="ghost"
+      size="sm"
+      {...props}
+    >
+      <MenuIcon />
+    </IconButton>
   );
 }

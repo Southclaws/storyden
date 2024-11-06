@@ -1,10 +1,9 @@
-import { XMarkIcon } from "@heroicons/react/24/solid";
-
 import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
 import { Unready } from "src/components/site/Unready";
 
 import { ThreadItemList } from "@/components/feed/ThreadItemList";
 import { Button } from "@/components/ui/button";
+import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
 import { VStack, styled } from "@/styled-system/jsx";
 
@@ -40,7 +39,7 @@ export function ThreadIndexView(props: Props) {
             type="reset"
             onClick={handlers.handleReset}
           >
-            <XMarkIcon />
+            <CancelIcon />
           </Button>
         )}
         <Button

@@ -1,4 +1,3 @@
-import { ExclamationTriangleIcon } from "@heroicons/react/24/solid";
 import { PropsWithChildren } from "react";
 
 import {
@@ -12,6 +11,7 @@ import {
 import { deriveError } from "@/utils/error";
 
 import { Spinner } from "../ui/Spinner";
+import { WarningIcon } from "../ui/icons/Warning";
 import { LinkButton } from "../ui/link-button";
 
 type Props = {
@@ -32,7 +32,7 @@ export function Unready({ error }: Props) {
   return (
     <HStack maxW="xs" alignItems="center" color="fg.subtle">
       <Box w="5" flexShrink="0">
-        <ExclamationTriangleIcon />
+        <WarningIcon />
       </Box>
       <p id="error__message">{message}</p>
     </HStack>
@@ -55,7 +55,7 @@ export function UnreadyBanner({ error, children }: PropsWithChildren<Props>) {
       <CardBox maxW="xs">
         <LStack>
           <HStack id="error__heading" gap="2" alignItems="center">
-            <ExclamationTriangleIcon width={24} height={24} />
+            <WarningIcon />
             <styled.h1 fontSize="md" fontWeight="bold" my="0">
               Something went wrong
             </styled.h1>
