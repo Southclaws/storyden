@@ -1,21 +1,20 @@
-import { BellIcon } from "@heroicons/react/24/outline";
-
 import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { NotificationIcon } from "@/components/ui/icons/Notification";
 import { Box } from "@/styled-system/jsx";
 
-import { AnchorProps, MenuItem } from "../Anchors/Anchor";
+import { AnchorProps, MenuItem } from "../site/Navigation/Anchors/Anchor";
 
 export const NotificationsID = "notifications";
 export const NotificationsRoute = "/notifications";
 export const NotificationsLabel = "Notifications";
-export const NotificationsIcon = <BellIcon />;
+export const NotificationsIcon = <NotificationIcon />;
 
 type Props = {
   unread?: boolean;
 };
 
-export function NotificationAction({
+export function NotificationsTrigger({
   hideLabel,
   unread,
   ...props
@@ -41,16 +40,5 @@ export function NotificationAction({
         />
       )}
     </IconButton>
-  );
-}
-
-export function NotificationsMenuItem() {
-  return (
-    <MenuItem
-      id={NotificationsID}
-      route={NotificationsRoute}
-      label={NotificationsLabel}
-      icon={NotificationsIcon}
-    />
   );
 }

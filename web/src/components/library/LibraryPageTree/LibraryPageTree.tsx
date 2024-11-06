@@ -8,7 +8,7 @@ import Link from "next/link";
 import { forwardRef, useState } from "react";
 
 import { NodeWithChildren, Visibility } from "@/api/openapi-schema";
-import { CreatePageAction } from "@/components/site/Navigation/Actions/CreatePage";
+import { CreatePageAction } from "@/components/library/CreatePage";
 import { NavigationHeader } from "@/components/site/Navigation/ContentNavigationList/NavigationHeader";
 import { visibilityColour } from "@/lib/library/visibilityColours";
 import { css, cx } from "@/styled-system/css";

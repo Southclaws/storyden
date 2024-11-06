@@ -1,10 +1,9 @@
-import { InfoIcon } from "lucide-react";
 import { PropsWithChildren } from "react";
 
+import { IconButton } from "@/components/ui/icon-button";
+import { InfoIcon } from "@/components/ui/icons/Info";
 import * as Popover from "@/components/ui/popover";
 import { LStack } from "@/styled-system/jsx";
-
-import { IconButton } from "../ui/icon-button";
 
 type Props = {
   title: string;

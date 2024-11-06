@@ -11,7 +11,7 @@ import { LinkButton } from "@/components/ui/link-button";
 import { LibraryPath, joinLibraryPath } from "@/screens/library/library-path";
 import { Box, HStack } from "@/styled-system/jsx";
 
-import { CreatePageAction } from "../site/Navigation/Actions/CreatePage";
+import { CreatePageAction } from "./CreatePage";
 
 type Props = {
   libraryPath: LibraryPath;

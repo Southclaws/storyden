@@ -5,7 +5,7 @@ import { Thread } from "src/api/openapi-schema";
 import { Anchor } from "src/components/site/Anchor";
 
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
-import { ProfilePill } from "@/components/site/ProfilePill/ProfilePill";
+import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { Button } from "@/components/ui/button";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 import { CardBox } from "@/styled-system/patterns";
@@ -39,8 +39,8 @@ export function ReplyBox(props: Thread) {
       >
         <HStack justifyContent="space-between">
           <HStack gap="1">
-            Reply to{" "}
-            <ProfilePill profileReference={props.author} showAvatar={false} />
+            <styled.span textWrap="nowrap">Reply to</styled.span>
+            <MemberIdent profile={props.author} name="handle" avatar="hidden" />
           </HStack>
 
           <Button type="submit" size="xs" disabled={isLoading || isEmpty}>

@@ -1,5 +1,4 @@
-import { PlusIcon } from "lucide-react";
-
+import { CreateIcon } from "@/components/ui/icons/Create";
 import { LinkButtonStyleProps } from "@/components/ui/link-button";
 
 import { Anchor, AnchorProps, MenuItem } from "./Anchor";
@@ -7,7 +6,7 @@ import { Anchor, AnchorProps, MenuItem } from "./Anchor";
 export const ComposeID = "compose";
 export const ComposeRoute = "/new";
 export const ComposeLabel = "Post";
-export const ComposeIcon = <PlusIcon />;
+export const ComposeIcon = <CreateIcon />;
 
 export function ComposeAnchor(props: AnchorProps & LinkButtonStyleProps) {
   return (

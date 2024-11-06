@@ -1,8 +1,7 @@
-import { PlusIcon } from "@heroicons/react/24/outline";
-
 import { handle } from "@/api/client";
 import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { CreateIcon } from "@/components/ui/icons/Create";
 import { Item } from "@/components/ui/menu";
 import { useLibraryMutation } from "@/lib/library/library";
 
@@ -13,7 +12,7 @@ type Props = ButtonProps & {
 
 export const CreatePageID = "create-page";
 export const CreatePageLabel = "Create";
-export const CreatePageIcon = <PlusIcon />;
+export const CreatePageIcon = <CreateIcon />;
 
 export function CreatePageAction({ parentSlug, hideLabel, ...props }: Props) {
   const { createNode, revalidate } = useLibraryMutation();
