@@ -1,4 +1,3 @@
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Fragment } from "react";
 
 import {
@@ -7,6 +6,7 @@ import {
   ThreadReference,
 } from "src/api/openapi-schema";
 
+import { BreadcrumbIcon } from "@/components/ui/icons/Breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 
@@ -64,7 +64,7 @@ export function Breadcrumbs({ thread }: Props) {
         return (
           <Fragment key={c.key}>
             <Box flexShrink="0">
-              <ChevronRightIcon width="1rem" />
+              <BreadcrumbIcon />
             </Box>
 
             <BreadcrumbButton breadcrumb={c} />

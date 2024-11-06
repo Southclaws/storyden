@@ -1,15 +1,13 @@
 "use client";
 
-import { TrashIcon } from "@heroicons/react/24/outline";
-import { XIcon } from "lucide-react";
-
 import { Button, ButtonProps } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { CancelIcon } from "@/components/ui/icons/Cancel";
+import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { menuItemColorPalette } from "@/styled-system/patterns";
 import { button } from "@/styled-system/recipes";
-
-import { IconButton } from "../ui/icon-button";
 
 import { useConfirmation } from "./useConfirmation";
 
@@ -49,7 +47,7 @@ export function DeleteWithConfirmationButton({ onDelete, ...props }: Props) {
           title="Cancel delete"
           onClick={handleCancelAction}
         >
-          <XIcon />
+          <CancelIcon />
         </IconButton>
       </HStack>
     );
@@ -64,7 +62,7 @@ export function DeleteWithConfirmationButton({ onDelete, ...props }: Props) {
       onClick={handleConfirmAction}
     >
       <HStack gap="1">
-        <TrashIcon width="1.4em" /> Delete
+        <DeleteIcon /> Delete
       </HStack>
     </Button>
   );
