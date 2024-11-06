@@ -1,5 +1,4 @@
-import { CircleUserRoundIcon } from "lucide-react";
-
+import { ProfileIcon } from "@/components/ui/icons/Profile";
 import { LinkButtonStyleProps } from "@/components/ui/link-button";
 
 import { Anchor, MenuItem } from "./Anchor";
@@ -7,7 +6,6 @@ import { Anchor, MenuItem } from "./Anchor";
 export const ProfileID = "profile";
 export const ProfileRoute = (handle: string) => `/m/${handle}`;
 export const ProfileLabel = "Profile";
-export const ProfileIcon = <CircleUserRoundIcon />;
 
 export function ProfileAnchor({
   handle,
@@ -18,7 +16,7 @@ export function ProfileAnchor({
       id={ProfileID}
       route={ProfileRoute(handle)}
       label={ProfileLabel}
-      icon={ProfileIcon}
+      icon={<ProfileIcon />}
       {...props}
     />
   );
@@ -30,7 +28,7 @@ export function ProfileMenuItem({ handle }: { handle: string }) {
       id={ProfileID}
       route={ProfileRoute(handle)}
       label={ProfileLabel}
-      icon={ProfileIcon}
+      icon={<ProfileIcon />}
     />
   );
 }

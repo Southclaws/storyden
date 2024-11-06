@@ -1,10 +1,10 @@
-import { BoxesIcon } from "lucide-react";
-
 import { Collection } from "@/api/openapi-schema";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/rich-card";
 import { HStack, WStack } from "@/styled-system/jsx";
+
+import { CollectionIcon } from "../ui/icons/Collection";
 
 import { CollectionMenu } from "./CollectionMenu/CollectionMenu";
 
@@ -47,7 +47,7 @@ function CollectionItems(props: Props) {
   const itemsLabel = props.collection.item_count === 1 ? "item" : "items";
   return (
     <Badge size="sm">
-      <BoxesIcon width="1.4rem" />{" "}
+      <CollectionIcon />{" "}
       <span>
         {props.collection.item_count} {itemsLabel}
       </span>

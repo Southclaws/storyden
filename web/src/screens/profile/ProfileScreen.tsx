@@ -1,6 +1,5 @@
 "use client";
 
-import { HeartIcon } from "@heroicons/react/24/outline";
 import { formatDistanceToNow } from "date-fns";
 
 import { Unready } from "src/components/site/Unready";
@@ -14,6 +13,7 @@ import { EditAction } from "@/components/site/Action/Edit";
 import { MoreAction } from "@/components/site/Action/More";
 import { SaveAction } from "@/components/site/Action/Save";
 import { DotSeparator } from "@/components/site/Dot";
+import { LikeIcon } from "@/components/ui/icons/Like";
 import { Input } from "@/components/ui/input";
 import {
   Box,
@@ -128,7 +128,7 @@ export function ProfileScreen(props: Props) {
               textWrap="nowrap"
             >
               <Box flexShrink="0">
-                <HeartIcon width="1rem" />
+                <LikeIcon w="4" />
               </Box>
               <span>{profile.like_score} likes</span>
             </HStack>

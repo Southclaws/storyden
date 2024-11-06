@@ -47,7 +47,9 @@ export function MemberOptionsMenu({
 
   return (
     <Menu.Root onSelect={handleSelect}>
-      <Menu.Trigger cursor="pointer">{children}</Menu.Trigger>
+      <Menu.Trigger maxW="full" cursor="pointer">
+        {children}
+      </Menu.Trigger>
 
       <Portal>
         <Menu.Positioner>

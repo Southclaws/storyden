@@ -1,7 +1,6 @@
-import { ImageMinusIcon } from "lucide-react";
-
 import { AssetUploadAction } from "@/components/asset/AssetUploadAction";
 import { Button } from "@/components/ui/button";
+import { MediaRemoveIcon } from "@/components/ui/icons/Media";
 
 import {
   Props,
@@ -24,7 +23,7 @@ export function LibraryPageCoverImageControl(props: Props) {
           variant="outline"
           onClick={handleRemoveCoverImage}
         >
-          <ImageMinusIcon />
+          <MediaRemoveIcon />
           remove cover
         </Button>
       )}

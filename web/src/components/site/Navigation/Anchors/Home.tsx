@@ -1,5 +1,4 @@
-import { HomeIcon as HomeHeroIcon } from "@heroicons/react/24/outline";
-
+import { HomeIcon } from "@/components/ui/icons/Home";
 import { LinkButtonStyleProps } from "@/components/ui/link-button";
 
 import { Anchor, AnchorProps, MenuItem } from "./Anchor";
@@ -7,7 +6,6 @@ import { Anchor, AnchorProps, MenuItem } from "./Anchor";
 export const HomeID = "home";
 export const HomeRoute = "/";
 export const HomeLabel = "Home";
-export const HomeIcon = <HomeHeroIcon />;
 
 export function HomeAnchor(props: AnchorProps & LinkButtonStyleProps) {
   return (
@@ -15,7 +13,7 @@ export function HomeAnchor(props: AnchorProps & LinkButtonStyleProps) {
       id={HomeID}
       route={HomeRoute}
       label={HomeLabel}
-      icon={HomeIcon}
+      icon={<HomeIcon />}
       {...props}
     />
   );
@@ -23,6 +21,11 @@ export function HomeAnchor(props: AnchorProps & LinkButtonStyleProps) {
 
 export function HomeMenuItem() {
   return (
-    <MenuItem id={HomeID} route={HomeRoute} label={HomeLabel} icon={HomeIcon} />
+    <MenuItem
+      id={HomeID}
+      route={HomeRoute}
+      label={HomeLabel}
+      icon={<HomeIcon />}
+    />
   );
 }

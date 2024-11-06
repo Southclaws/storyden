@@ -1,5 +1,3 @@
-import { ChatBubbleLeftIcon as ChatBubbleLeftIconOutline } from "@heroicons/react/24/outline";
-import { ChatBubbleLeftIcon as ChatBubbleLeftIconSolid } from "@heroicons/react/24/solid";
 import Link from "next/link";
 
 import { ThreadReference } from "src/api/openapi-schema";
@@ -10,6 +8,11 @@ import { CollectionMenu } from "src/components/content/CollectionMenu/Collection
 import { Card } from "@/components/ui/rich-card";
 import { HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
+
+import {
+  DiscussionIcon,
+  DiscussionParticipatingIcon,
+} from "../ui/icons/Discussion";
 
 import { FeedItemMenu } from "./FeedItemMenu/FeedItemMenu";
 
@@ -61,9 +64,9 @@ export function ThreadItem({ thread }: Props) {
             <Link href={permalink} title={replyStatusLabel}>
               <styled.span color="fg.subtle" display="flex" gap="1">
                 {hasReplied ? (
-                  <ChatBubbleLeftIconSolid width="1rem" />
+                  <DiscussionParticipatingIcon width="4" />
                 ) : (
-                  <ChatBubbleLeftIconOutline width="1rem" />
+                  <DiscussionIcon width="4" />
                 )}
                 {replyCount}
               </styled.span>

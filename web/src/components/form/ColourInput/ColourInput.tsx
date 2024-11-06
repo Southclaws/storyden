@@ -1,9 +1,8 @@
 import { CSSProperties, Ref, forwardRef } from "react";
 import { Control, Controller } from "react-hook-form";
 
-import { DragHandleIcon } from "src/components/graphics/DragHandleIcon";
-
 import { FormControl } from "@/components/ui/form/FormControl";
+import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { styled } from "@/styled-system/jsx";
 
 import { C, L, Props, useColourInput } from "./useColourInput";
@@ -87,7 +86,7 @@ export function ColourInput(props: Props) {
               width: "var(--thumb-size)",
             }}
           >
-            <DragHandleIcon />
+            <DragHandleIcon color="fg.muted" />
           </styled.div>
         </styled.output>
       </styled.div>

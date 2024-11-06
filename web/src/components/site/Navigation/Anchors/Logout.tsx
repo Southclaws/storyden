@@ -1,5 +1,4 @@
-import { LogoutIcon as LogoutGraphic } from "src/components/graphics/LogoutIcon";
-
+import { LogoutIcon } from "@/components/ui/icons/Logout";
 import { LinkButtonStyleProps } from "@/components/ui/link-button";
 import { Item } from "@/components/ui/menu";
 import { button } from "@/styled-system/recipes";
@@ -9,7 +8,6 @@ import { AnchorProps, MenuItem } from "./Anchor";
 export const LogoutID = "logout";
 export const LogoutRoute = "/logout";
 export const LogoutLabel = "Logout";
-export const LogoutIcon = <LogoutGraphic />;
 
 type Props = AnchorProps & LinkButtonStyleProps;
 
@@ -20,7 +18,7 @@ export function LogoutAnchor({ hideLabel, ...props }: Props) {
       href={LogoutRoute}
       title={LogoutLabel}
     >
-      {LogoutIcon}
+      {<LogoutIcon />}
       {!hideLabel && (
         <>
           &nbsp;<span>{LogoutLabel}</span>
@@ -34,7 +32,7 @@ export function LogoutMenuItem({ hideLabel }: AnchorProps) {
   return (
     <a href={LogoutRoute}>
       <Item value={LogoutID}>
-        {LogoutIcon}
+        {<LogoutIcon />}
         {!hideLabel && (
           <>
             &nbsp;<span>{LogoutLabel}</span>

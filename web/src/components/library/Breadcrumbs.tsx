@@ -1,4 +1,3 @@
-import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { last } from "lodash";
 import { uniq } from "lodash/fp";
 import { FormEventHandler, ForwardedRef, Fragment, forwardRef } from "react";
@@ -11,7 +10,9 @@ import { LinkButton } from "@/components/ui/link-button";
 import { LibraryPath, joinLibraryPath } from "@/screens/library/library-path";
 import { Box, HStack } from "@/styled-system/jsx";
 
-import { CreatePageAction } from "../site/Navigation/Actions/CreatePage";
+import { BreadcrumbIcon } from "../ui/icons/Breadcrumb";
+
+import { CreatePageAction } from "./CreatePage";
 
 type Props = {
   libraryPath: LibraryPath;
@@ -67,7 +68,7 @@ export const Breadcrumbs_ = (
         return (
           <Fragment key={p}>
             <Box flexShrink="0">
-              <ChevronRightIcon width="1rem" />
+              <BreadcrumbIcon />
             </Box>
             <LinkButton
               size="xs"
@@ -101,7 +102,7 @@ export const Breadcrumbs_ = (
       {session && create == "show" && (
         <>
           <Box flexShrink="0">
-            <ChevronRightIcon width="1rem" />
+            <BreadcrumbIcon />
           </Box>
           <CreatePageAction parentSlug={current} />
         </>
@@ -109,7 +110,7 @@ export const Breadcrumbs_ = (
       {isEditing && (
         <>
           <Box flexShrink="0">
-            <ChevronRightIcon width="1rem" />
+            <BreadcrumbIcon />
           </Box>
           <Input
             ref={ref}
