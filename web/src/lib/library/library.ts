@@ -261,8 +261,9 @@ export function useLibraryMutation(node?: Node) {
       const newNodes = data.nodes.map((node) => {
         if (node.slug === slug) {
           if (
-            node.parent?.visibility !== Visibility.published &&
-            visibility === Visibility.published
+            node.parent &&
+            visibility === Visibility.published &&
+            node.parent.visibility !== Visibility.published
           ) {
             toast.warning(
               "Page is staged for publishing but has not been published yet because this page's parent is not published. When the parent is published, this page be visible on the site.",
