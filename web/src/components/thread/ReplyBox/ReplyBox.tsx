@@ -1,4 +1,3 @@
-import { ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 import { Controller, ControllerProps } from "react-hook-form";
 
 import { Thread } from "src/api/openapi-schema";
@@ -7,6 +6,7 @@ import { Anchor } from "src/components/site/Anchor";
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { Button } from "@/components/ui/button";
+import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 import { CardBox } from "@/styled-system/patterns";
 
@@ -95,7 +95,7 @@ function LoginToReply() {
       bgColor="blackAlpha.50"
       justifyContent="center"
     >
-      <ChatBubbleLeftRightIcon width="1.5em" />
+      <DiscussionIcon />
 
       <p>
         Please <Anchor href="/register">sign up or log in</Anchor> to reply

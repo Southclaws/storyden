@@ -1,8 +1,7 @@
 "use client";
 
-import { FingerPrintIcon } from "@heroicons/react/24/outline";
-
 import { Button } from "@/components/ui/button";
+import { BiometricIcon } from "@/components/ui/icons/Biometric";
 import { Input } from "@/components/ui/input";
 import { Flex, styled } from "@/styled-system/jsx";
 
@@ -62,7 +61,7 @@ export function RegisterForm(props: Props) {
             >
               <styled.span display="flex" gap="1" alignItems="center" px="4">
                 device
-                <FingerPrintIcon />
+                <BiometricIcon />
               </styled.span>
             </Button>
           </>

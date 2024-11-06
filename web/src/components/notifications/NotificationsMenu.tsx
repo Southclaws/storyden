@@ -1,15 +1,15 @@
 import { Portal } from "@ark-ui/react";
-import { ArchiveBoxIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
+import { MemberAvatar } from "@/components/member/MemberBadge/MemberAvatar";
+import { Button } from "@/components/ui/button";
+import { ArchiveIcon } from "@/components/ui/icons/Archive";
+import { SettingsIcon } from "@/components/ui/icons/Settings";
+import { LinkButton } from "@/components/ui/link-button";
 import * as Menu from "@/components/ui/menu";
-import { Center, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { Center, LStack, WStack, styled } from "@/styled-system/jsx";
 import { hstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
-
-import { MemberAvatar } from "../member/MemberBadge/MemberAvatar";
-import { Button } from "../ui/button";
-import { LinkButton } from "../ui/link-button";
 
 import { NotificationsTrigger } from "./NotificationsTrigger";
 import { NotificationItem } from "./item";
@@ -105,7 +105,7 @@ export function NotificationsMenu(props: Props) {
                           handlers.handleMarkAs(notification.id, "read")
                         }
                       >
-                        <ArchiveBoxIcon />
+                        <ArchiveIcon />
                       </Button>
                     </WStack>
                   </Menu.Item>
@@ -124,5 +124,5 @@ export function NotificationAvatar(props: { notification: NotificationItem }) {
     return <MemberAvatar profile={props.notification.source} size="sm" />;
   }
 
-  return <Cog6ToothIcon width="1rem" />;
+  return <SettingsIcon />;
 }

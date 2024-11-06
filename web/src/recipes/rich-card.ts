@@ -117,6 +117,10 @@ export const richCard = defineSlotRecipe({
           gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
         },
 
+        container: {
+          width: "full",
+        },
+
         // -
         // Container slots.
         // -

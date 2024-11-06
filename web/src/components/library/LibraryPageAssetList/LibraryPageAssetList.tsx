@@ -1,4 +1,3 @@
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import { ImagePlusIcon } from "lucide-react";
 import { parseAsBoolean, useQueryState } from "nuqs";
 
@@ -8,6 +7,7 @@ import { AssetThumbnail } from "@/components/asset/AssetThumbnail";
 import { AssetUploadAction } from "@/components/asset/AssetUploadAction";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { useLibraryMutation } from "@/lib/library/library";
 import { Box, HStack } from "@/styled-system/jsx";
 
@@ -97,7 +97,7 @@ export function LibraryPageAssetList(props: Props) {
                 title="Remove media from page"
                 onClick={() => handleRemove(a)}
               >
-                <XMarkIcon />
+                <DeleteIcon />
               </IconButton>
             )}
           </Box>
