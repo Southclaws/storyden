@@ -1,9 +1,11 @@
 import { Portal } from "@ark-ui/react";
 import { format } from "date-fns/format";
-import { LinkIcon, ShareIcon, TrashIcon } from "lucide-react";
 
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { MoreAction } from "@/components/site/Action/More";
+import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { LinkIcon } from "@/components/ui/icons/Link";
+import { ShareIcon } from "@/components/ui/icons/Share";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
 import { menuItemColorPalette } from "@/styled-system/patterns";
@@ -39,14 +41,14 @@ export function FeedItemMenu(props: Props) {
 
               <Menu.Item value="copy-link">
                 <HStack gap="1">
-                  <LinkIcon width="1.4em" /> Copy link
+                  <LinkIcon /> Copy link
                 </HStack>
               </Menu.Item>
 
               {isSharingEnabled && (
                 <Menu.Item value="share">
                   <HStack gap="1">
-                    <ShareIcon width="1.4em" /> Share
+                    <ShareIcon /> Share
                   </HStack>
                 </Menu.Item>
               )}
@@ -81,7 +83,7 @@ export function FeedItemMenu(props: Props) {
                     closeOnSelect={false}
                   >
                     <HStack gap="1">
-                      <TrashIcon width="1.4em" /> Delete
+                      <DeleteIcon /> Delete
                     </HStack>
                   </Menu.Item>
                 ))}

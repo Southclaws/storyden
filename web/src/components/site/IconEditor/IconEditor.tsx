@@ -1,13 +1,10 @@
-import { ArrowLeft } from "lucide-react";
-import { borderRadius } from "polished";
 import { CSSProperties } from "react";
 import AvatarEditor from "react-avatar-editor";
 
 import { avatarSize } from "@/components/member/MemberBadge/MemberAvatar";
 import { Button } from "@/components/ui/button";
-import { css } from "@/styled-system/css";
-import { Box, Flex, HStack, LStack, VStack } from "@/styled-system/jsx";
-import { styled } from "@/styled-system/jsx";
+import { ArrowLeftIcon } from "@/components/ui/icons/Arrow";
+import { Box, Flex, HStack, LStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
 import { Props, useIconEditor } from "./useIconEditor";
@@ -50,7 +47,7 @@ export function IconEditor(props: Props) {
             position={position}
             onPositionChange={onPositionChange}
           />
-          <ArrowLeft width="1rem" />
+          <ArrowLeftIcon width="4" />
           <p>How it&apos;ll look on posts</p>
         </HStack>
       )}
