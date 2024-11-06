@@ -1,5 +1,6 @@
 "use client";
 
+import { Portal } from "@ark-ui/react";
 import { ChevronRightIcon, MinusCircleIcon } from "@heroicons/react/24/outline";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import chroma from "chroma-js";
@@ -33,27 +34,29 @@ export function MemberRoleMenu(props: Props) {
         <ChevronRightIcon />
       </Menu.TriggerItem>
 
-      <Menu.Positioner>
-        <Menu.Content>
-          {roles.map((r) => {
-            const colour = chroma(r.colour);
+      <Portal>
+        <Menu.Positioner>
+          <Menu.Content>
+            {roles.map((r) => {
+              const colour = chroma(r.colour);
 
-            const bgColour = colour.brighten(2).desaturate(1).css();
+              const bgColour = colour.brighten(2).desaturate(1).css();
 
-            return (
-              <Menu.Item key={r.id} value={r.id} gap="2">
-                {r.selected ? (
-                  <CheckCircleIcon width="1rem" fill={bgColour} />
-                ) : (
-                  <MinusCircleIcon width="1rem" />
-                )}
+              return (
+                <Menu.Item key={r.id} value={r.id} gap="2">
+                  {r.selected ? (
+                    <CheckCircleIcon width="1rem" fill={bgColour} />
+                  ) : (
+                    <MinusCircleIcon width="1rem" />
+                  )}
 
-                <RoleBadge role={r} />
-              </Menu.Item>
-            );
-          })}
-        </Menu.Content>
-      </Menu.Positioner>
+                  <RoleBadge role={r} />
+                </Menu.Item>
+              );
+            })}
+          </Menu.Content>
+        </Menu.Positioner>
+      </Portal>
     </Menu.Root>
   );
 }
