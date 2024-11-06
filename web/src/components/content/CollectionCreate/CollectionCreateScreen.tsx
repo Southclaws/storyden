@@ -5,7 +5,7 @@ import { FormControl } from "@/components/ui/form/FormControl";
 import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
 import { Input } from "@/components/ui/input";
-import { HStack, VStack, styled } from "@/styled-system/jsx";
+import { VStack, WStack, styled } from "@/styled-system/jsx";
 
 import { Props, useCollectionCreate } from "./useCollectionCreate";
 
@@ -40,7 +40,7 @@ export function CollectionCreateScreen(props: Props) {
           </FormHelperText>
         </FormControl>
 
-        <HStack w="full" justify="space-between">
+        <WStack>
           <Button
             w="full"
             type="button"
@@ -52,7 +52,7 @@ export function CollectionCreateScreen(props: Props) {
           <Button w="full" type="submit">
             Create
           </Button>
-        </HStack>
+        </WStack>
       </styled.form>
     </VStack>
   );

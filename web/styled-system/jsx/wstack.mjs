@@ -1,13 +1,13 @@
 import { createElement, forwardRef } from 'react'
 
 import { splitProps } from '../helpers.mjs';
-import { getLstackStyle } from '../patterns/lstack.mjs';
+import { getWstackStyle } from '../patterns/wstack.mjs';
 import { styled } from './factory.mjs';
 
-export const LStack = /* @__PURE__ */ forwardRef(function LStack(props, ref) {
+export const WStack = /* @__PURE__ */ forwardRef(function WStack(props, ref) {
   const [patternProps, restProps] = splitProps(props, [])
 
-const styleProps = getLstackStyle(patternProps)
+const styleProps = getWstackStyle(patternProps)
 const mergedProps = { ref, ...styleProps, ...restProps }
 
 return createElement(styled.div, mergedProps)

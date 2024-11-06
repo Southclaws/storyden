@@ -6,7 +6,7 @@ import { ThreadItemList } from "@/components/feed/ThreadItemList";
 import { CardGrid } from "@/components/ui/rich-card";
 import * as Tabs from "@/components/ui/tabs";
 import { HStack, VStack } from "@/styled-system/jsx";
-import { LStack } from "@/styled-system/patterns";
+import { lstack } from "@/styled-system/patterns";
 
 import { Props, useProfileContent } from "./useProfileContent";
 
@@ -32,7 +32,7 @@ export function ProfileContent(props: Props) {
           <ThreadItemList threads={threads} />
         </Tabs.Content>
 
-        <Tabs.Content className={LStack()} value="collections">
+        <Tabs.Content className={lstack()} value="collections">
           {isSelf && props.session && (
             <HStack w="full" justify="end">
               <CollectionCreateTrigger session={props.session} />

@@ -4,7 +4,7 @@ import { ContentComposer } from "src/components/content/ContentComposer/ContentC
 
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { SaveAction } from "@/components/site/Action/Save";
-import { CardBox, HStack, styled } from "@/styled-system/jsx";
+import { CardBox, HStack, WStack, styled } from "@/styled-system/jsx";
 
 import { Byline } from "../../content/Byline";
 import { ReactList } from "../ReactList/ReactList";
@@ -25,7 +25,7 @@ export function Reply(props: Props) {
         gap="2"
         onSubmit={handlers.handleSave}
       >
-        <HStack w="full" justify="space-between">
+        <WStack>
           <Byline
             href={`#${reply.id}`}
             author={reply.author}
@@ -54,7 +54,7 @@ export function Reply(props: Props) {
               onEdit={handlers.handleSetEditing}
             />
           )}
-        </HStack>
+        </WStack>
 
         <ReplyBodyInput
           control={form.control}

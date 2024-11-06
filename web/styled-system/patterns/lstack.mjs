@@ -1,7 +1,7 @@
 import { getPatternStyles, patternFns } from '../helpers.mjs';
 import { css } from '../css/index.mjs';
 
-const LStackConfig = {
+const lstackConfig = {
 transform() {
   return {
     display: "flex",
@@ -12,10 +12,10 @@ transform() {
   };
 }}
 
-export const getLStackStyle = (styles = {}) => {
-  const _styles = getPatternStyles(LStackConfig, styles)
-  return LStackConfig.transform(_styles, patternFns)
+export const getLstackStyle = (styles = {}) => {
+  const _styles = getPatternStyles(lstackConfig, styles)
+  return lstackConfig.transform(_styles, patternFns)
 }
 
-export const LStack = (styles) => css(getLStackStyle(styles))
-LStack.raw = getLStackStyle
+export const lstack = (styles) => css(getLstackStyle(styles))
+lstack.raw = getLstackStyle

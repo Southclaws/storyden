@@ -18,7 +18,7 @@ import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Form } from "@/screens/library/LibraryPageScreen/useLibraryPageScreen";
-import { HStack, LStack } from "@/styled-system/jsx";
+import { HStack, LStack, WStack } from "@/styled-system/jsx";
 
 import { LinkCard } from "../links/LinkCard";
 
@@ -95,7 +95,7 @@ export function LibraryPageImportFromURL(props: Props) {
 
         return (
           <LStack gap="0">
-            <HStack w="full" justify="space-between">
+            <WStack>
               <Input
                 w="full"
                 size="sm"
@@ -121,7 +121,7 @@ export function LibraryPageImportFromURL(props: Props) {
                   Import
                 </Button>
               </HStack>
-            </HStack>
+            </WStack>
             <FormErrorText>{form.fieldState.error?.message}</FormErrorText>
             {match(link)
               .with(null, () => null)

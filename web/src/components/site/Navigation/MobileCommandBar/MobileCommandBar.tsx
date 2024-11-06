@@ -5,7 +5,7 @@ import { Presence } from "@ark-ui/react";
 import { ProfilePill } from "src/components/site/ProfilePill/ProfilePill";
 import { Toolpill } from "src/components/site/Toolpill/Toolpill";
 
-import { HStack } from "@/styled-system/jsx";
+import { HStack, WStack } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 
 import { CloseAction } from "../../Action/Close";
@@ -31,7 +31,7 @@ export function MobileCommandBar() {
         present={isExpanded}
         className={vstack({ w: "full", gap: "2" })}
       >
-        <HStack w="full" justify="space-between">
+        <WStack>
           {account ? (
             <>
               <HStack>
@@ -53,7 +53,7 @@ export function MobileCommandBar() {
           ) : (
             <LoginAnchor />
           )}
-        </HStack>
+        </WStack>
 
         <ContentNavigationList />
       </Presence>

@@ -11,7 +11,7 @@ import { useSession } from "@/auth";
 import { CategoryMenu } from "@/components/category/CategoryMenu/CategoryMenu";
 import { Unready } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
-import { HStack, LStack, styled } from "@/styled-system/jsx";
+import { LStack, WStack, styled } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
 
 import { ThreadFeedScreen } from "../feed/ThreadFeedScreen";
@@ -86,11 +86,11 @@ export function CategoryScreen(props: Props) {
   return (
     <LStack>
       <LStack gap="1">
-        <HStack w="full" justify="space-between" alignItems="start">
+        <WStack alignItems="start">
           <Heading>{category.name}</Heading>
 
           <CategoryMenu category={category} />
-        </HStack>
+        </WStack>
 
         <styled.p color="fg.muted">{category.description}</styled.p>
       </LStack>

@@ -9,8 +9,8 @@ import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { css } from "@/styled-system/css";
-import { Divider, HStack, LStack } from "@/styled-system/jsx";
-import { LStack as lstack } from "@/styled-system/patterns";
+import { Divider, HStack, LStack, WStack } from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
 
 import { EditAction } from "../Action/Edit";
 import { SaveAction } from "../Action/Save";
@@ -34,7 +34,7 @@ export function SiteContextPane(props: Props) {
       className={lstack({ gap: "1" })}
       onSubmit={handlers.handleSaveSettings}
     >
-      <HStack w="full" justify="space-between" alignItems="start">
+      <WStack alignItems="start">
         {isEditingSettings ? (
           <FormControl>
             <Input placeholder="Site title..." {...form.register("title")} />
@@ -61,7 +61,7 @@ export function SiteContextPane(props: Props) {
               : undefined
           }
         />
-      </HStack>
+      </WStack>
 
       {isEditingSettings ? (
         <FormControl>
@@ -106,7 +106,7 @@ export function SiteContextPane(props: Props) {
 
           <Divider />
 
-          <HStack w="full" justify="space-between">
+          <WStack>
             {isEditingSettings ? (
               <SaveAction type="submit">Save</SaveAction>
             ) : (
@@ -115,7 +115,7 @@ export function SiteContextPane(props: Props) {
               </EditAction>
             )}
             {isAdmin && <AdminAnchor />}
-          </HStack>
+          </WStack>
         </LStack>
       )}
     </form>

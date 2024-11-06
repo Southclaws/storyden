@@ -1,18 +1,10 @@
-import {
-  CheckboxCheckedChangeDetails,
-  ListCollection,
-  createListCollection,
-} from "@ark-ui/react";
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
-import { useState } from "react";
+import { CheckboxCheckedChangeDetails } from "@ark-ui/react";
+import { CheckIcon } from "lucide-react";
 import { Controller, ControllerProps, FieldValues } from "react-hook-form";
 
 import * as Checkbox from "@/components/ui/checkbox";
 import { Box, CardBox } from "@/styled-system/jsx";
-import { LStack, hstack } from "@/styled-system/patterns";
-
-import { IconButton } from "../icon-button";
-import { Input } from "../input";
+import { hstack, lstack } from "@/styled-system/patterns";
 
 type CollectionItem = {
   label: string;
@@ -39,7 +31,7 @@ export function CardGroupSelect<T extends FieldValues>({
 
         return (
           <Checkbox.Group
-            className={LStack()}
+            className={lstack()}
             defaultValue={defaultValue}
             onValueChange={console.log}
           >

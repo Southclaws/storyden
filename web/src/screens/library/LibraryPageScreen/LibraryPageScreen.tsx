@@ -19,7 +19,7 @@ import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
 import { css } from "@/styled-system/css";
-import { Box, HStack, LStack, styled } from "@/styled-system/jsx";
+import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import "react-advanced-cropper/dist/style.css";
 
@@ -80,7 +80,7 @@ export function LibraryPage(props: Props) {
     >
       <FormProvider {...form}>
         <LStack h="full">
-          <HStack w="full" justify="space-between" alignItems="start">
+          <WStack alignItems="start">
             <Breadcrumbs
               libraryPath={libraryPath}
               visibility={node.visibility}
@@ -105,7 +105,7 @@ export function LibraryPage(props: Props) {
                 <LibraryPageMenu node={node} />
               </HStack>
             )}
-          </HStack>
+          </WStack>
 
           {editing && (
             <HStack w="full" justify="end">
@@ -179,7 +179,7 @@ export function LibraryPage(props: Props) {
 
           <LStack gap="2">
             <LStack minW="0">
-              <HStack w="full" justify="space-between" alignItems="end">
+              <WStack alignItems="end">
                 {editing ? (
                   <TitleInput />
                 ) : (
@@ -187,7 +187,7 @@ export function LibraryPage(props: Props) {
                     {node.name || "(untitled)"}
                   </Heading>
                 )}
-              </HStack>
+              </WStack>
             </LStack>
           </LStack>
 

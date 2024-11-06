@@ -5,7 +5,7 @@ import { FormControl } from "@/components/ui/form/FormControl";
 import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
 import { Input } from "@/components/ui/input";
-import { HStack, VStack, styled } from "@/styled-system/jsx";
+import { VStack, WStack, styled } from "@/styled-system/jsx";
 
 import { useCategoryCreate } from "./useCategoryCreate";
 
@@ -40,14 +40,14 @@ export function CategoryCreateScreen(props: UseDisclosureProps) {
           <FormHelperText>Describe your category</FormHelperText>
         </FormControl>
 
-        <HStack w="full" justify="space-between">
+        <WStack>
           <Button w="full" type="submit" onClick={props.onClose}>
             Cancel
           </Button>
           <Button w="full" type="submit">
             Create
           </Button>
-        </HStack>
+        </WStack>
       </styled.form>
     </VStack>
   );

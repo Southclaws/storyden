@@ -4,7 +4,7 @@ import { Unready } from "src/components/site/Unready";
 
 import { useThreadList } from "@/api/openapi-client/threads";
 import { ThreadListParams, ThreadListResult } from "@/api/openapi-schema";
-import { EmptyState } from "@/components/feed/EmptyState";
+import { FeedEmptyState } from "@/components/feed/FeedEmptyState";
 import { ThreadItemList } from "@/components/feed/ThreadItemList";
 
 export type Props = {
@@ -21,7 +21,7 @@ export function ThreadFeedScreen({ params, initialData }: Props) {
   }
 
   if (data.threads.length === 0) {
-    return <EmptyState />;
+    return <FeedEmptyState />;
   }
 
   return <ThreadItemList threads={data.threads} />;

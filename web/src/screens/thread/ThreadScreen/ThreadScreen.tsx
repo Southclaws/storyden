@@ -20,7 +20,7 @@ import { TagListField, ThreadTagList } from "@/components/thread/ThreadTagList";
 import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Heading } from "@/components/ui/heading";
 import { HeadingInput } from "@/components/ui/heading-input";
-import { HStack, LStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { Form, Props, useThreadScreen } from "./useThreadScreen";
 
@@ -44,7 +44,7 @@ export function ThreadScreen(props: Props) {
         width="full"
         onSubmit={handlers.handleSave}
       >
-        <HStack w="full" justify="space-between" alignItems="start">
+        <WStack alignItems="start">
           <Breadcrumbs thread={thread} />
 
           <HStack>
@@ -64,7 +64,7 @@ export function ThreadScreen(props: Props) {
 
             <ThreadMenu thread={thread} />
           </HStack>
-        </HStack>
+        </WStack>
 
         <Byline
           href={`#${thread.id}`}

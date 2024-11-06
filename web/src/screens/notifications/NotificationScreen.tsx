@@ -10,7 +10,7 @@ import { NotificationCardList } from "@/components/notifications/NotificationCar
 import { useNotifications } from "@/components/notifications/useNotifications";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Switch } from "@/components/ui/switch";
-import { HStack, LStack, styled } from "@/styled-system/jsx";
+import { LStack, WStack, styled } from "@/styled-system/jsx";
 
 type Props = {
   initialData: NotificationListResult;
@@ -70,7 +70,7 @@ export function NotificationScreen(props: Props) {
 
   return (
     <LStack>
-      <HStack w="full" justify="space-between">
+      <WStack>
         <LStack>
           <styled.h1 fontWeight="bold">Notifications</styled.h1>
 
@@ -82,7 +82,7 @@ export function NotificationScreen(props: Props) {
             Archived
           </Switch>
         </LStack>
-      </HStack>
+      </WStack>
 
       <NotificationCardList
         notifications={notifications}

@@ -7,7 +7,7 @@ import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPag
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Timestamp } from "@/components/site/Timestamp";
 import { Card, CardRows } from "@/components/ui/rich-card";
-import { HStack } from "@/styled-system/jsx";
+import { HStack, WStack } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
 export function QueueNodeList({ nodes }: { nodes: NodeWithChildren[] }) {
@@ -39,7 +39,7 @@ export function QueueNodeListItem({ node }: { node: NodeWithChildren }) {
       title={node.name}
       text={node.description}
       controls={
-        <HStack w="full" justify="space-between">
+        <WStack>
           <HStack gap="2">
             <MemberBadge profile={node.owner} size="sm" />
 
@@ -53,7 +53,7 @@ export function QueueNodeListItem({ node }: { node: NodeWithChildren }) {
           </HStack>
 
           <LibraryPageMenu node={node} />
-        </HStack>
+        </WStack>
       }
     />
   );

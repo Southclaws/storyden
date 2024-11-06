@@ -1,8 +1,8 @@
 import { SVGProps } from "react";
 
-import styles from "./Sidebar.module.css";
-
 import { cx } from "@/styled-system/css";
+
+import styles from "./Sidebar.module.css";
 
 type Props = {
   open: boolean;
