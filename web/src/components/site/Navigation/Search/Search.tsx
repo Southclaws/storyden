@@ -1,9 +1,8 @@
 "use client";
 
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
-import { XMarkIcon } from "@heroicons/react/24/solid";
-
 import { Button } from "@/components/ui/button";
+import { CancelIcon } from "@/components/ui/icons/Cancel";
+import { SearchIcon } from "@/components/ui/icons/Search";
 import { Input } from "@/components/ui/input";
 import { styled } from "@/styled-system/jsx";
 
@@ -45,7 +44,7 @@ export function Search(props: Props) {
           type="reset"
           onClick={handlers.handleReset}
         >
-          <XMarkIcon />
+          <CancelIcon />
         </Button>
       )}
       <Button
@@ -58,7 +57,7 @@ export function Search(props: Props) {
         type="submit"
         width="min"
       >
-        <MagnifyingGlassIcon />
+        <SearchIcon />
       </Button>
     </styled.form>
   );

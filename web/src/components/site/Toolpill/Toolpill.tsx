@@ -34,7 +34,7 @@ export function Toolpill({
           id="toolpill-content-container"
           ref={ref}
           className={Floating()}
-          p="1"
+          p="2"
           gap="2"
           flexDirection="column"
           borderRadius="xl"

@@ -1,7 +1,7 @@
-import { CloudArrowUpIcon } from "@heroicons/react/24/outline";
 import { PropsWithChildren } from "react";
 
 import { Button, ButtonProps } from "@/components/ui/button";
+import { SaveIcon } from "@/components/ui/icons/Save";
 
 export function SaveAction({
   children,
@@ -9,7 +9,7 @@ export function SaveAction({
 }: PropsWithChildren<ButtonProps>) {
   return (
     <Button variant="subtle" size="xs" {...props}>
-      <CloudArrowUpIcon width="1.4em" /> {children}
+      <SaveIcon /> {children}
     </Button>
   );
 }

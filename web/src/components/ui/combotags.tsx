@@ -1,10 +1,12 @@
 import { createListCollection, useTagsInput } from "@ark-ui/react";
-import { XIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import * as Combobox from "@/components/ui/combobox";
 import { IconButton } from "@/components/ui/icon-button";
 import * as TagsInput from "@/components/ui/tags-input";
+
+import { CancelIcon } from "./icons/Cancel";
+import { DeleteSmallIcon } from "./icons/Delete";
 
 export type Props = {
   initialValue?: string[];
@@ -96,7 +98,7 @@ export function Combotags(props: Props) {
                       <TagsInput.ItemText>{value}</TagsInput.ItemText>
                       <TagsInput.ItemDeleteTrigger asChild>
                         <IconButton variant="link" size="xs">
-                          <XIcon />
+                          <DeleteSmallIcon />
                         </IconButton>
                       </TagsInput.ItemDeleteTrigger>
                     </TagsInput.ItemPreview>

@@ -1,9 +1,9 @@
-import { FolderPlusIcon } from "@heroicons/react/24/outline";
 import { PropsWithChildren } from "react";
 
 import { useDisclosure } from "src/utils/useDisclosure";
 
 import { Button } from "@/components/ui/button";
+import { CreateFolderIcon } from "@/components/ui/icons/CreateFolder";
 import { ButtonVariantProps } from "@/styled-system/recipes";
 
 import { CollectionCreateModal } from "./CollectionCreateModal";
@@ -30,7 +30,7 @@ export function CollectionCreateTrigger(
           {...props}
           onClick={onOpen}
         >
-          <FolderPlusIcon width="1.4rem" /> {props.label ?? "Collection"}
+          <CreateFolderIcon /> {props.label ?? "Collection"}
         </Button>
       )}
       <CollectionCreateModal isOpen={isOpen} onClose={onClose} {...props} />

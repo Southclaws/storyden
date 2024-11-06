@@ -2,12 +2,12 @@ import { Portal } from "@ark-ui/react";
 import { EmojiClickData, EmojiStyle } from "emoji-picker-react";
 import { motion } from "framer-motion";
 import { throttle } from "lodash";
-import { SmilePlusIcon } from "lucide-react";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { ReactionAddIcon } from "@/components/ui/icons/Reaction";
 import * as Popover from "@/components/ui/popover";
 import { css } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
@@ -202,7 +202,7 @@ function ReactionPickerTrigger(props: ReactionPickerTriggerProps) {
           borderRadius="md"
           color="fg.muted"
         >
-          <SmilePlusIcon />
+          <ReactionAddIcon />
         </IconButton>
       </Popover.Trigger>
 

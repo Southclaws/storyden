@@ -1,5 +1,4 @@
-import { BookOpenIcon } from "@heroicons/react/24/outline";
-
+import { LibraryIcon } from "@/components/ui/icons/Library";
 import { LinkButtonStyleProps } from "@/components/ui/link-button";
 
 import { Anchor, AnchorProps, MenuItem } from "./Anchor";
@@ -7,7 +6,6 @@ import { Anchor, AnchorProps, MenuItem } from "./Anchor";
 export const LibraryID = "library";
 export const LibraryRoute = "/l";
 export const LibraryLabel = "Library";
-export const LibraryIcon = <BookOpenIcon />;
 
 export function LibraryAnchor(props: AnchorProps & LinkButtonStyleProps) {
   return (
@@ -15,7 +13,7 @@ export function LibraryAnchor(props: AnchorProps & LinkButtonStyleProps) {
       id={LibraryID}
       route={LibraryRoute}
       label={LibraryLabel}
-      icon={LibraryIcon}
+      icon={<LibraryIcon />}
       {...props}
     />
   );
@@ -27,7 +25,7 @@ export function LibraryMenuItem() {
       id={LibraryID}
       route={LibraryRoute}
       label={LibraryLabel}
-      icon={LibraryIcon}
+      icon={<LibraryIcon />}
     />
   );
 }

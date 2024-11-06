@@ -3,8 +3,8 @@
 import { LibraryPageTree } from "@/components/library/LibraryPageTree/LibraryPageTree";
 import { LStack } from "@/styled-system/jsx";
 
+import { CreatePageAction } from "../../../library/CreatePage";
 import { Unready } from "../../Unready";
-import { CreatePageAction } from "../Actions/CreatePage";
 import { NavigationHeader } from "../ContentNavigationList/NavigationHeader";
 
 import { Props, useLibraryNavigationTree } from "./useLibraryNavigationTree";

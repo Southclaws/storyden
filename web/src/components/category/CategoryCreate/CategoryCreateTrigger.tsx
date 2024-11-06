@@ -1,9 +1,8 @@
-import { PlusIcon } from "@heroicons/react/24/outline";
-
 import { useDisclosure } from "src/utils/useDisclosure";
 
 import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { CreateIcon } from "@/components/ui/icons/Create";
 import { Item } from "@/components/ui/menu";
 
 import { CategoryCreateModal } from "./CategoryCreateModal";
@@ -15,7 +14,7 @@ type Props = ButtonProps & {
 
 export const CreateCategoryID = "create-category";
 export const CreateCategoryLabel = "Create";
-export const CreateCategoryIcon = <PlusIcon />;
+export const CreateCategoryIcon = <CreateIcon />;
 
 export function CategoryCreateTrigger({
   parentSlug,

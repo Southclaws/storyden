@@ -1,5 +1,4 @@
-import { CrownIcon } from "src/components/graphics/CrownIcon";
-
+import { AdminIcon } from "@/components/ui/icons/Admin";
 import { LinkButtonStyleProps } from "@/components/ui/link-button";
 
 import { Anchor, AnchorProps, MenuItem } from "./Anchor";
@@ -7,7 +6,6 @@ import { Anchor, AnchorProps, MenuItem } from "./Anchor";
 export const AdminID = "admin";
 export const AdminRoute = "/admin";
 export const AdminLabel = "Admin";
-export const AdminIcon = <CrownIcon />;
 
 type Props = AnchorProps & LinkButtonStyleProps;
 
@@ -17,7 +15,7 @@ export function AdminAnchor(props: Props) {
       id={AdminID}
       route={AdminRoute}
       label={AdminLabel}
-      icon={AdminIcon}
+      icon={<AdminIcon />}
       {...props}
     />
   );
@@ -29,7 +27,7 @@ export function AdminMenuItem() {
       id={AdminID}
       route={AdminRoute}
       label={AdminLabel}
-      icon={AdminIcon}
+      icon={<AdminIcon />}
     />
   );
 }

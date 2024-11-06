@@ -1,10 +1,11 @@
 import { CheckboxCheckedChangeDetails } from "@ark-ui/react";
-import { CheckIcon } from "lucide-react";
 import { Controller, ControllerProps, FieldValues } from "react-hook-form";
 
 import * as Checkbox from "@/components/ui/checkbox";
 import { Box, CardBox } from "@/styled-system/jsx";
 import { hstack, lstack } from "@/styled-system/patterns";
+
+import { CheckIcon } from "../icons/Check";
 
 type CollectionItem = {
   label: string;
@@ -30,11 +31,7 @@ export function CardGroupSelect<T extends FieldValues>({
         const defaultValue = formState.defaultValues![props.name];
 
         return (
-          <Checkbox.Group
-            className={lstack()}
-            defaultValue={defaultValue}
-            onValueChange={console.log}
-          >
+          <Checkbox.Group className={lstack()} defaultValue={defaultValue}>
             {items.map((item) => {
               function handleChange({ checked }: CheckboxCheckedChangeDetails) {
                 const current = field.value;

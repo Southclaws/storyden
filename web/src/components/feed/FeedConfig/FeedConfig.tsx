@@ -6,7 +6,6 @@ import {
   createListCollection,
 } from "@ark-ui/react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { Controller, ControllerProps, useForm } from "react-hook-form";
@@ -22,6 +21,10 @@ import {
   EditingSchema,
 } from "@/components/site/SiteContextPane/useSiteContextPane";
 import { Unready } from "@/components/site/Unready";
+import { CheckIcon } from "@/components/ui/icons/Check";
+import { DiscussionIcon } from "@/components/ui/icons/Discussion";
+import { LibraryIcon } from "@/components/ui/icons/Library";
+import { SelectIcon } from "@/components/ui/icons/Select";
 import * as Select from "@/components/ui/select";
 import {
   FeedLayoutConfigSchema,
@@ -30,7 +33,7 @@ import {
 import { useSettingsMutation } from "@/lib/settings/mutation";
 import { Settings } from "@/lib/settings/settings";
 import { useSettings } from "@/lib/settings/settings-client";
-import { HStack } from "@/styled-system/jsx";
+import { HStack, styled } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
 
 import { refreshFeed } from "../../../lib/feed/refresh";
@@ -124,10 +127,12 @@ const sources = [
   {
     label: "Threads",
     value: "threads" as const,
+    icon: <DiscussionIcon width="4" />,
   },
   {
     label: "Library",
     value: "library" as const,
+    icon: <LibraryIcon width="4" />,
   },
 ];
 
@@ -167,15 +172,6 @@ export function FeedConfig(props: Props) {
   );
 }
 
-function getFeedSourceName(metadata: Settings["metadata"]) {
-  switch (metadata.feed.source.type) {
-    case "threads":
-      return "Feed";
-    case "library":
-      return "Library";
-  }
-}
-
 function SelectField<T = any>({
   collection,
   defaultValue,
@@ -201,20 +197,25 @@ function SelectField<T = any>({
             size="xs"
             defaultValue={[defaultValue]}
             collection={collection}
-            positioning={{ sameWidth: true }}
+            positioning={{ sameWidth: false }}
             onValueChange={handleChange}
           >
             <Select.Control>
               <Select.Trigger>
                 <Select.ValueText placeholder="Select a Source" />
-                <ChevronsUpDownIcon />
+                <SelectIcon />
               </Select.Trigger>
             </Select.Control>
             <Select.Positioner>
               <Select.Content>
                 {sources.map((item) => (
                   <Select.Item key={item.value} item={item}>
-                    <Select.ItemText>{item.label}</Select.ItemText>
+                    <Select.ItemText mr="2">
+                      <HStack gap="1">
+                        <styled.span w="4">{item.icon}</styled.span>
+                        <styled.span>{item.label}</styled.span>
+                      </HStack>
+                    </Select.ItemText>
                     <Select.ItemIndicator>
                       <CheckIcon />
                     </Select.ItemIndicator>

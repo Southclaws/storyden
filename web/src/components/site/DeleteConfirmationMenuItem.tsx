@@ -1,8 +1,7 @@
 "use client";
 
-import { TrashIcon } from "@heroicons/react/24/outline";
-
 import { CancelAction } from "@/components/site/Action/Cancel";
+import { DeleteIcon } from "@/components/ui/icons/Delete";
 import * as Menu from "@/components/ui/menu";
 import { HStack } from "@/styled-system/jsx";
 import { menuItemColorPalette } from "@/styled-system/patterns";
@@ -45,7 +44,7 @@ export function DeleteWithConfirmationMenuItem(props: Props) {
       onClick={handleConfirmAction}
     >
       <HStack gap="1">
-        <TrashIcon width="1.4em" /> Delete
+        <DeleteIcon /> Delete
       </HStack>
     </Menu.Item>
   );

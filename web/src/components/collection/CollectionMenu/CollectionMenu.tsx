@@ -1,17 +1,15 @@
 "use client";
 
 import { Portal } from "@ark-ui/react";
-import { LinkIcon, PencilIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { ShareIcon } from "@heroicons/react/24/solid";
 import { format } from "date-fns/format";
 
 import { MoreAction } from "src/components/site/Action/More";
 
-import { CancelAction } from "@/components/site/Action/Cancel";
 import { DeleteWithConfirmationMenuItem } from "@/components/site/DeleteConfirmationMenuItem";
+import { LinkIcon } from "@/components/ui/icons/Link";
+import { ShareIcon } from "@/components/ui/icons/Share";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
-import { menuItemColorPalette } from "@/styled-system/patterns";
 
 import { Props, useCollectionMenu } from "./useCollectionMenu";
 
@@ -47,14 +45,14 @@ export function CollectionMenu(props: Props) {
 
               <Menu.Item value="copy-link" onClick={handlers.handleCopyLink}>
                 <HStack gap="1">
-                  <LinkIcon width="1.4em" /> Copy link
+                  <LinkIcon /> Copy link
                 </HStack>
               </Menu.Item>
 
               {isSharingEnabled && (
                 <Menu.Item value="share" onClick={handlers.handleShare}>
                   <HStack gap="1">
-                    <ShareIcon width="1.4em" /> Share
+                    <ShareIcon /> Share
                   </HStack>
                 </Menu.Item>
               )}
