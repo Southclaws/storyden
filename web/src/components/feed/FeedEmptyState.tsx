@@ -3,7 +3,7 @@ import { ThreadStaircase } from "src/components/graphics/ThreadStaircase";
 import { VStack } from "@/styled-system/jsx";
 import { styled } from "@/styled-system/jsx";
 
-export function EmptyState() {
+export function FeedEmptyState() {
   return (
     <VStack height="full" justify="center" pb="32">
       <ThreadStaircase width="100%" />

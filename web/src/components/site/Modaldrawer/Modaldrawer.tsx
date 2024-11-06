@@ -4,7 +4,7 @@ import { Drawer } from "vaul";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 
 import { Heading } from "@/components/ui/heading";
-import { Box, HStack, VStack } from "@/styled-system/jsx";
+import { Box, HStack, VStack, WStack } from "@/styled-system/jsx";
 
 import { CloseAction } from "../Action/Close";
 
@@ -41,12 +41,12 @@ export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
               boxShadow="lg"
               p={{ base: "4", md: "3" }}
             >
-              <HStack w="full" justify="space-between" alignItems="start">
+              <WStack alignItems="start">
                 <Drawer.Title asChild>
                   <Heading size="md">{props.title}</Heading>
                 </Drawer.Title>
                 <CloseAction onClick={props.onClose} />
-              </HStack>
+              </WStack>
 
               <Box h="full" w="full" pb="3" overflowY="scroll">
                 {children}

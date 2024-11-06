@@ -8,7 +8,7 @@ import { CardGroupSelect } from "@/components/ui/form/CardGroupSelect";
 import { Input } from "@/components/ui/input";
 import { PermissionList } from "@/lib/permission/permission";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
-import { LStack as lstack } from "@/styled-system/patterns";
+import { lstack } from "@/styled-system/patterns";
 
 import { Props, useRoleEditScreen } from "./useRoleEdit";
 

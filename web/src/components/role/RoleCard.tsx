@@ -1,7 +1,7 @@
 import { Role } from "@/api/openapi-schema";
 import { Heading } from "@/components/ui/heading";
 import { css } from "@/styled-system/css";
-import { CardBox, HStack } from "@/styled-system/jsx";
+import { CardBox, WStack } from "@/styled-system/jsx";
 
 import { PermissionSummary } from "./PermissionList";
 import { RoleEditModalTrigger } from "./RoleEdit/RoleEditModal";
@@ -26,11 +26,11 @@ export function RoleCard({ role, editable }: Props) {
         borderLeftStyle: "solid",
       }}
     >
-      <HStack w="full" justify="space-between">
+      <WStack>
         <Heading>{role.name}</Heading>
 
         {editable && <RoleEditModalTrigger role={role} />}
-      </HStack>
+      </WStack>
 
       <PermissionSummary permissions={role.permissions} />
     </CardBox>

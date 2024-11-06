@@ -8,7 +8,7 @@ import { InfoTip } from "@/components/site/InfoTip";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import { CardGrid } from "@/components/ui/rich-card";
-import { HStack, LStack } from "@/styled-system/jsx";
+import { LStack, WStack } from "@/styled-system/jsx";
 import { hasPermission } from "@/utils/permissions";
 
 type Props = {
@@ -28,11 +28,11 @@ export function RoleScreen(props: Props) {
 
   return (
     <LStack>
-      <HStack w="full" justify="space-between">
+      <WStack>
         <Heading>Roles</Heading>
 
         {canEdit && <RoleCreateModalTrigger />}
-      </HStack>
+      </WStack>
 
       <p>
         Roles provide granular permission control and profile customisation for

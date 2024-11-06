@@ -3,7 +3,7 @@ import { ArchiveBoxIcon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 import * as Menu from "@/components/ui/menu";
-import { Center, HStack, LStack, styled } from "@/styled-system/jsx";
+import { Center, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { hstack } from "@/styled-system/patterns";
 import { deriveError } from "@/utils/error";
 
@@ -45,7 +45,7 @@ export function NotificationsMenu(props: Props) {
             <Menu.ItemGroup id="heading">
               <Menu.ItemGroupLabel display="flex" gap="2" alignItems="center">
                 <LStack fontSize="sm">
-                  <HStack w="full" justify="space-between">
+                  <WStack>
                     <styled.p color="fg.muted">
                       Notifications ({unreads})
                     </styled.p>
@@ -57,7 +57,7 @@ export function NotificationsMenu(props: Props) {
                     >
                       see all
                     </LinkButton>
-                  </HStack>
+                  </WStack>
                 </LStack>
               </Menu.ItemGroupLabel>
 
@@ -75,7 +75,7 @@ export function NotificationsMenu(props: Props) {
                     height="auto"
                     py="1"
                   >
-                    <HStack w="full" justify="space-between">
+                    <WStack>
                       <Link
                         className={hstack({
                           w: "full",
@@ -107,7 +107,7 @@ export function NotificationsMenu(props: Props) {
                       >
                         <ArchiveBoxIcon />
                       </Button>
-                    </HStack>
+                    </WStack>
                   </Menu.Item>
                 ))
               )}

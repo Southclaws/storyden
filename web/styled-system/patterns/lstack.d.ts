@@ -5,16 +5,16 @@ import type { SystemProperties } from '../types/style-props';
 import type { DistributiveOmit } from '../types/system-types';
 import type { Tokens } from '../tokens/index';
 
-export interface LStackProperties {
+export interface LstackProperties {
    
 }
 
 
-interface LStackStyles extends LStackProperties, DistributiveOmit<SystemStyleObject, keyof LStackProperties > {}
+interface LstackStyles extends LstackProperties, DistributiveOmit<SystemStyleObject, keyof LstackProperties > {}
 
-interface LStackPatternFn {
-  (styles?: LStackStyles): string
-  raw: (styles?: LStackStyles) => SystemStyleObject
+interface LstackPatternFn {
+  (styles?: LstackStyles): string
+  raw: (styles?: LstackStyles) => SystemStyleObject
 }
 
 /**
@@ -22,4 +22,4 @@ interface LStackPatternFn {
 
 
  */
-export declare const LStack: LStackPatternFn;
+export declare const lstack: LstackPatternFn;

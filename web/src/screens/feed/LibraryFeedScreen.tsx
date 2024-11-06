@@ -4,8 +4,9 @@ import { Unready } from "src/components/site/Unready";
 
 import { useNodeList } from "@/api/openapi-client/nodes";
 import { NodeListResult } from "@/api/openapi-schema";
-import { EmptyState } from "@/components/feed/EmptyState";
+
 import { NodeCardGrid } from "@/components/library/NodeCardList";
+import { EmptyState } from "@/components/site/EmptyState";
 
 export type Props = {
   initialData?: NodeListResult;

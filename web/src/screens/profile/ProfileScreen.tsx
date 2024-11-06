@@ -23,7 +23,7 @@ import {
   LStack,
   styled,
 } from "@/styled-system/jsx";
-import { LStack as lstack } from "@/styled-system/patterns";
+import { lstack } from "@/styled-system/patterns";
 
 import { Form, Props, useProfileScreen } from "./useProfileScreen";
 

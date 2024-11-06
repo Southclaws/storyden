@@ -4,7 +4,7 @@ import { Collection } from "@/api/openapi-schema";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/rich-card";
-import { HStack } from "@/styled-system/jsx";
+import { HStack, WStack } from "@/styled-system/jsx";
 
 import { CollectionMenu } from "./CollectionMenu/CollectionMenu";
 
@@ -25,7 +25,7 @@ export function CollectionCard({ collection, hideOwner }: Props) {
       title={collection.name}
       text={collection.description}
       controls={
-        <HStack w="full" justify="space-between">
+        <WStack>
           <HStack>
             {hideOwner ? null : (
               <MemberBadge profile={collection.owner} size="sm" name="handle" />
@@ -37,7 +37,7 @@ export function CollectionCard({ collection, hideOwner }: Props) {
           <HStack>
             <CollectionMenu collection={collection} />
           </HStack>
-        </HStack>
+        </WStack>
       }
     />
   );

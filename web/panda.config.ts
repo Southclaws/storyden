@@ -163,8 +163,9 @@ export default defineConfig({
 
   patterns: {
     extend: {
-      LStack: {
+      lstack: {
         description: "A VStack with full width aligned left.",
+        jsxName: "LStack",
         transform() {
           return {
             display: "flex",
@@ -172,6 +173,19 @@ export default defineConfig({
             flexDirection: "column",
             width: "full",
             alignItems: "start",
+          };
+        },
+      },
+      wstack: {
+        description: "A HStack with full width and spaced children.",
+        jsxName: "WStack",
+        transform() {
+          return {
+            display: "flex",
+            flexDirection: "row",
+            gap: "3",
+            width: "full",
+            justifyContent: "space-between",
           };
         },
       },

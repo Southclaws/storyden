@@ -4,7 +4,7 @@ import { Category } from "@/api/openapi-schema";
 import { Heading } from "@/components/ui/heading";
 import { CardGrid } from "@/components/ui/rich-card";
 import { categoryColourCSS } from "@/lib/category/colours";
-import { CardBox, HStack, LStack, styled } from "@/styled-system/jsx";
+import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
 
 import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
@@ -17,11 +17,11 @@ export type Props = {
 export function CategoryCardList({ categories }: Props) {
   return (
     <LStack>
-      <HStack w="full" justify="space-between">
+      <WStack>
         <Heading>Discussion categories</Heading>
 
         <CategoryCreateTrigger />
-      </HStack>
+      </WStack>
 
       <CardGrid>
         {categories.map((c) => (
@@ -46,13 +46,13 @@ export function CategoryCard(props: Category) {
       justifyContent="space-between"
     >
       <LStack>
-        <HStack w="full" justify="space-between" alignItems="start">
+        <WStack alignItems="start">
           <Link className={linkOverlay()} href={`/d/${props.slug}`}>
             <Heading>{props.name}</Heading>
           </Link>
 
           <CategoryMenu category={props} />
-        </HStack>
+        </WStack>
 
         <styled.p color="fg.muted">{props.description}</styled.p>
       </LStack>

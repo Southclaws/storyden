@@ -1,19 +1,20 @@
-'use client'
+"use client";
 
-import { Clipboard } from '@ark-ui/react/clipboard'
-import type { ComponentProps } from 'react'
-import { styled } from 'styled-system/jsx'
-import { clipboard } from 'styled-system/recipes'
-import { createStyleContext } from '@/utils/create-style-context'
+import { Clipboard } from "@ark-ui/react/clipboard";
+import type { ComponentProps } from "react";
+import { styled } from "styled-system/jsx";
+import { clipboard } from "styled-system/recipes";
 
-const { withProvider, withContext } = createStyleContext(clipboard)
+import { createStyleContext } from "@/utils/create-style-context";
 
-export const Root = withProvider(styled(Clipboard.Root), 'root')
-export const Control = withContext(styled(Clipboard.Control), 'control')
-export const Indicator = withContext(styled(Clipboard.Indicator), 'indicator')
-export const Input = withContext(styled(Clipboard.Input), 'input')
-export const Label = withContext(styled(Clipboard.Label), 'label')
-export const Trigger = withContext(styled(Clipboard.Trigger), 'trigger')
+const { withProvider, withContext } = createStyleContext(clipboard);
+
+export const Root = withProvider(styled(Clipboard.Root), "root");
+export const Control = withContext(styled(Clipboard.Control), "control");
+export const Indicator = withContext(styled(Clipboard.Indicator), "indicator");
+export const Input = withContext(styled(Clipboard.Input), "input");
+export const Label = withContext(styled(Clipboard.Label), "label");
+export const Trigger = withContext(styled(Clipboard.Trigger), "trigger");
 
 export interface RootProps extends ComponentProps<typeof Root> {}
 export interface ControlProps extends ComponentProps<typeof Control> {}

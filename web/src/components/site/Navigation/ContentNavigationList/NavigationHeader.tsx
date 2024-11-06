@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PropsWithChildren } from "react";
 
 import { css, cx } from "@/styled-system/css";
-import { HStack, styled } from "@/styled-system/jsx";
+import { HStack, WStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
 type Props = {
@@ -23,7 +23,7 @@ export function NavigationHeader({
   controls,
 }: PropsWithChildren<Props>) {
   return (
-    <HStack w="full" justify="space-between">
+    <WStack>
       <Link className={linkStyles} href={href}>
         <styled.h1 fontSize="xs" fontWeight="medium" color="fg.subtle">
           {children}
@@ -31,6 +31,6 @@ export function NavigationHeader({
       </Link>
 
       {controls}
-    </HStack>
+    </WStack>
   );
 }
