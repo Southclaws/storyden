@@ -2,8 +2,9 @@
 
 import { CategoryListOKResponse, NodeListResult } from "@/api/openapi-schema";
 import { CategoryList } from "@/components/category/CategoryList/CategoryList";
-import { Divider, HStack, LStack, styled } from "@/styled-system/jsx";
+import { Divider, LStack, WStack, styled } from "@/styled-system/jsx";
 
+import { CollectionsAnchor } from "../Anchors/Collections";
 import { MembersAnchor } from "../Anchors/Members";
 import { RolesAnchor } from "../Anchors/Roles";
 import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
@@ -26,9 +27,8 @@ export function ContentNavigationList(props: Props) {
       width="full"
       alignItems="start"
       justifyContent="space-between"
-      overflowY="scroll"
     >
-      <LStack gap="1">
+      <LStack gap="1" overflowY="scroll" mr="-scrollGutter">
         <CategoryList initialCategoryList={props.initialCategoryList} />
         <LibraryNavigationTree
           initialNodeList={props.initialNodeList}
@@ -40,11 +40,12 @@ export function ContentNavigationList(props: Props) {
       </LStack>
 
       <LStack gap="1">
+        <CollectionsAnchor />
         <Divider />
-        <HStack>
+        <WStack>
           <MembersAnchor />
           <RolesAnchor />
-        </HStack>
+        </WStack>
       </LStack>
     </styled.nav>
   );

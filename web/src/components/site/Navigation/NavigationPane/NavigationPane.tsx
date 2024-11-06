@@ -22,7 +22,7 @@ export async function NavigationPane() {
         borderRadius="md"
         className={Floating()}
       >
-        <Box id="desktop-nav-box" w="full" height="full" p="2" pr="0">
+        <Box id="desktop-nav-box" w="full" height="full" p="2">
           <ContentNavigationList
             initialNodeList={initialNodeList}
             initialCategoryList={initialCategoryList}

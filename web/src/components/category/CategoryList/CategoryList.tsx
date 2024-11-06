@@ -44,6 +44,7 @@ export function CategoryList(props: Props) {
         Discussion
       </NavigationHeader>
       <styled.ul
+        flexShrink="0"
         overflow="hidden"
         margin="0"
         display="flex"
