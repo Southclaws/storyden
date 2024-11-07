@@ -10,6 +10,8 @@ import { AssetLightbox } from "./AssetLightbox";
 
 type Props = {
   asset: Asset;
+  set?: Asset[];
+  setIndex?: number;
   width?: number;
   height?: number;
 };
@@ -21,7 +23,13 @@ const thumbnailStyles = css({
   overflowClipMargin: "unset",
 });
 
-export function AssetThumbnail({ asset, width = 80, height = 80 }: Props) {
+export function AssetThumbnail({
+  asset,
+  set,
+  setIndex,
+  width = 80,
+  height = 80,
+}: Props) {
   const [view, setView] = useQueryState<string | null>("view", {
     defaultValue: null,
     clearOnDefault: true,
@@ -46,6 +54,7 @@ export function AssetThumbnail({ asset, width = 80, height = 80 }: Props) {
       borderRadius="md"
       overflow="hidden"
       grayscale="0.8"
+      cursor="pointer"
       filter={lightbox ? "auto" : undefined}
     >
       <Image
@@ -57,7 +66,13 @@ export function AssetThumbnail({ asset, width = 80, height = 80 }: Props) {
         onClick={handleOpen}
       />
 
-      <AssetLightbox asset={asset} present={lightbox} onClose={handleClose} />
+      <AssetLightbox
+        asset={asset}
+        set={set}
+        setIndex={setIndex}
+        present={lightbox}
+        onClose={handleClose}
+      />
     </Box>
   );
 }
