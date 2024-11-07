@@ -7,8 +7,6 @@ import { hasPermission } from "@/utils/permissions";
 
 export type Props = {
   initialNodeList?: NodeListResult;
-  label: string;
-  href: string;
   currentNode: string | undefined;
   visibility: Visibility[];
 };
