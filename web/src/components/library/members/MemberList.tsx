@@ -3,6 +3,7 @@ import { Empty } from "src/components/site/Empty";
 
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { RoleBadgeList } from "@/components/role/RoleBadge/RoleBadgeList";
+import { EmptyState } from "@/components/site/EmptyState";
 import { Timestamp } from "@/components/site/Timestamp";
 import * as Table from "@/components/ui/table";
 import { LStack, styled } from "@/styled-system/jsx";
@@ -13,7 +14,7 @@ type Props = {
 
 export function MemberList({ profiles }: Props) {
   if (profiles.length === 0) {
-    return <Empty>no members were found</Empty>;
+    return <EmptyState>no members were found</EmptyState>;
   }
 
   return (
