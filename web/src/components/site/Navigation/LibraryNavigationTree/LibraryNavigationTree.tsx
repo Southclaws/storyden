@@ -1,10 +1,12 @@
 "use client";
 
+import { CreatePageAction } from "@/components/library/CreatePage";
 import { LibraryPageTree } from "@/components/library/LibraryPageTree/LibraryPageTree";
-import { LStack } from "@/styled-system/jsx";
+import { Unready } from "@/components/site/Unready";
+import { LibraryIcon } from "@/components/ui/icons/Library";
+import { HStack, LStack } from "@/styled-system/jsx";
 
-import { CreatePageAction } from "../../../library/CreatePage";
-import { Unready } from "../../Unready";
+import { LibraryLabel, LibraryRoute } from "../Anchors/Library";
 import { NavigationHeader } from "../ContentNavigationList/NavigationHeader";
 
 import { Props, useLibraryNavigationTree } from "./useLibraryNavigationTree";
@@ -16,23 +18,26 @@ export function LibraryNavigationTree(props: Props) {
     return <Unready error={error} />;
   }
 
-  const { label, href, currentNode } = props;
+  const { currentNode } = props;
 
   return (
     <LStack gap="1">
       <NavigationHeader
-        href={href}
+        href={LibraryRoute}
         controls={
           canManageLibrary && <CreatePageAction variant="ghost" hideLabel />
         }
       >
-        {label}
+        <HStack gap="1">
+          <LibraryIcon />
+          {LibraryLabel}
+        </HStack>
       </NavigationHeader>
 
       <LibraryPageTree
         currentNode={currentNode}
         data={{
-          label: label,
+          label: LibraryLabel,
           children: data.nodes,
         }}
       />

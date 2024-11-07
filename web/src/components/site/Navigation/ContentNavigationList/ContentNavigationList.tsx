@@ -39,8 +39,6 @@ export function ContentNavigationList(props: Props) {
         <CategoryList initialCategoryList={props.initialCategoryList} />
         <LibraryNavigationTree
           initialNodeList={props.initialNodeList}
-          label="Library"
-          href="/l"
           currentNode={nodeSlug}
           visibility={["draft", "review", "unlisted", "published"]}
         />

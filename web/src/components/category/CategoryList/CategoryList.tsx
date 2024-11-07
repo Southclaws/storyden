@@ -10,7 +10,8 @@ import { Category } from "src/api/openapi-schema";
 import { Unready } from "src/components/site/Unready";
 
 import { NavigationHeader } from "@/components/site/Navigation/ContentNavigationList/NavigationHeader";
-import { styled } from "@/styled-system/jsx";
+import { DiscussionIcon } from "@/components/ui/icons/Discussion";
+import { HStack, styled } from "@/styled-system/jsx";
 
 import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
 
@@ -41,7 +42,10 @@ export function CategoryList(props: Props) {
         href="/d"
         controls={canManageCategories && <CategoryCreateTrigger hideLabel />}
       >
-        Discussion
+        <HStack gap="1">
+          <DiscussionIcon />
+          Discussion
+        </HStack>
       </NavigationHeader>
       <styled.ul
         flexShrink="0"
