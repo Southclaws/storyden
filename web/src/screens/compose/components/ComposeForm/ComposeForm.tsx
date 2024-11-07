@@ -31,9 +31,9 @@ export function ComposeForm(props: Props) {
           </HStack>
 
           <HStack
-            display={{ base: "none", md: "flex" }}
             flexGrow="1"
             flexShrink="0"
+            flexWrap="nowrap"
             maxWidth="min"
             flexDir={{ base: "column-reverse", md: "row" }}
             gap="2"
