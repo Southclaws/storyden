@@ -72,7 +72,7 @@ export function LibraryPageAssetList(props: Props) {
       scrollSnapStrictness="mandatory"
     >
       <HStack w="full" h="20" maxW="full">
-        {assets.map((a) => (
+        {assets.map((a, i) => (
           // Sizing for next/image is measured in px, size tokens are basically
           // 4X, so size token 20 used above is equal to 80px, so we pass 80 here.
           <Box
@@ -81,7 +81,13 @@ export function LibraryPageAssetList(props: Props) {
             scrollSnapAlign="start"
             scrollSnapStop="always"
           >
-            <AssetThumbnail asset={a} width={80} height={80} />
+            <AssetThumbnail
+              asset={a}
+              set={assets}
+              setIndex={i}
+              width={80}
+              height={80}
+            />
             {editing && (
               <IconButton
                 type="button"

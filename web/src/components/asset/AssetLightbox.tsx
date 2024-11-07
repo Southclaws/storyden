@@ -1,14 +1,21 @@
 import { Portal, Presence, UsePresenceProps } from "@ark-ui/react";
 import { useClickAway } from "@uidotdev/usehooks";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import { useQueryState } from "nuqs";
 
 import { Asset } from "@/api/openapi-schema";
 import { css, cx } from "@/styled-system/css";
-import { Box, Center } from "@/styled-system/jsx";
+import { Box, Center, HStack } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
+
+import { IconButton } from "../ui/icon-button";
+import { ArrowLeftIcon, ArrowRightIcon } from "../ui/icons/Arrow";
 
 type Props = UsePresenceProps & {
   asset: Asset;
+  set?: Asset[];
+  setIndex?: number;
   onClose: () => void;
 };
 
@@ -40,6 +47,7 @@ const backdropImageStyles = css({
 
 const lightboxStyles = css({
   margin: "auto",
+  padding: "4",
 });
 
 const imageStyles = css({
@@ -52,13 +60,46 @@ const imageStyles = css({
     "0px 0px 40px var(--colors-black-a2), 0px 0px 1px var(--colors-gray-a7)",
 });
 
-export function AssetLightbox({ asset, onClose, ...presenceProps }: Props) {
+export function AssetLightbox({
+  asset,
+  set,
+  setIndex,
+  onClose,
+  ...presenceProps
+}: Props) {
   const url = getAssetURL(asset.path)!;
 
+  const [view, setView] = useQueryState<string | null>("view", {
+    defaultValue: null,
+    clearOnDefault: true,
+    parse: (value) => (value === "" ? null : value),
+  });
   const ref = useClickAway<HTMLImageElement>(handleClose);
 
   function handleClose() {
     onClose();
+  }
+
+  function handlePrevious() {
+    if (set === undefined || setIndex === undefined) return;
+
+    const nextIndex = setIndex - 1 < 0 ? set.length - 1 : setIndex - 1;
+    const next = set[nextIndex];
+
+    if (next) {
+      setView(next.id);
+    }
+  }
+
+  function handleNext() {
+    if (set === undefined || setIndex === undefined) return;
+
+    const nextIndex = setIndex + 1 === set.length ? 0 : setIndex + 1;
+    const next = set[nextIndex];
+
+    if (next) {
+      setView(next.id);
+    }
   }
 
   // NOTE: Presence doesn't work for some reason. Possibly bug in Ark UI.
@@ -75,14 +116,27 @@ export function AssetLightbox({ asset, onClose, ...presenceProps }: Props) {
           </Box>
 
           <Center className={cx(overlayStyles, lightboxStyles)}>
-            <Image
-              ref={ref}
-              className={imageStyles}
-              src={url}
-              width={2000}
-              height={2000}
-              alt=""
-            />
+            <HStack ref={ref}>
+              <Box position="fixed" left="8">
+                <IconButton variant="subtle" size="sm" onClick={handlePrevious}>
+                  <ArrowLeftIcon />
+                </IconButton>
+              </Box>
+
+              <Box position="fixed" right="8">
+                <IconButton variant="subtle" size="sm" onClick={handleNext}>
+                  <ArrowRightIcon />
+                </IconButton>
+              </Box>
+
+              <Image
+                className={imageStyles}
+                src={url}
+                width={2000}
+                height={2000}
+                alt=""
+              />
+            </HStack>
           </Center>
 
           {/* <Image src={url} alt={asset.filename} width="1920" height="1080" /> */}
