@@ -1,26 +1,18 @@
 "use client";
 
-import { Presence } from "@ark-ui/react";
-
-import { Toolpill } from "src/components/site/Toolpill/Toolpill";
-
-import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
+import { CommandDock } from "@/components/site/CommandDock/CommandDock";
 import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { MenuIcon } from "@/components/ui/icons/Menu";
-import { HStack, WStack } from "@/styled-system/jsx";
-import { vstack } from "@/styled-system/patterns";
+import { SiteIcon } from "@/components/ui/icons/Site";
+import { WStack } from "@/styled-system/jsx";
 
 import { CloseAction } from "../../Action/Close";
 import { AccountMenu } from "../AccountMenu/AccountMenu";
-import { AdminAnchor } from "../Anchors/Admin";
 import { ComposeAnchor } from "../Anchors/Compose";
-import { DraftsAnchor } from "../Anchors/Drafts";
 import { HomeAnchor } from "../Anchors/Home";
 import { LibraryAnchor } from "../Anchors/Library";
 import { LoginAnchor } from "../Anchors/Login";
-import { LogoutAnchor } from "../Anchors/Logout";
-import { SettingsAnchor } from "../Anchors/Settings";
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
 import { Search } from "../Search/Search";
 
@@ -28,75 +20,41 @@ import { useMobileCommandBar } from "./useMobileCommandBar";
 
 export function MobileCommandBar() {
   const { isExpanded, onExpand, onClose, account } = useMobileCommandBar();
+
   return (
-    <Toolpill onClickOutside={onClose}>
-      <Presence
-        present={isExpanded}
-        className={vstack({ w: "full", gap: "2" })}
-      >
-        <WStack>
-          {account ? (
-            <>
-              <HStack>
-                <HomeAnchor hideLabel />
-                <DraftsAnchor hideLabel />
-                <LogoutAnchor hideLabel size="xs" />
-              </HStack>
-              <HStack>
-                {account.admin && (
-                  <>
-                    <AdminAnchor hideLabel />
-                    {/* TODO: Move public drafts for admin review to /queue */}
-                    {/* <QueueAction /> */}
-                  </>
-                )}
-                <SettingsAnchor hideLabel />
-              </HStack>
-            </>
-          ) : (
-            <LoginAnchor />
-          )}
-        </WStack>
-
-        <ContentNavigationList />
-      </Presence>
-
-      {account ? (
-        <WStack alignItems="center">
-          {isExpanded ? (
-            <>
+    <CommandDock
+      isOpen={isExpanded}
+      onClickOutside={onClose}
+      render={() => {
+        return <ContentNavigationList />;
+      }}
+    >
+      <WStack alignItems="center">
+        {isExpanded ? (
+          <>
+            {account ? (
               <AccountMenu account={account} size="sm" />
-              <Search />
-              <CloseAction onClick={onClose} size="sm" />
-            </>
-          ) : (
-            <>
+            ) : (
+              <SiteIcon borderRadius="full" w="6" />
+            )}
+            <Search />
+            <CloseAction onClick={onClose} size="sm" />
+          </>
+        ) : (
+          <>
+            {account ? (
               <AccountMenu account={account} size="sm" />
-              <HomeAnchor hideLabel size="sm" />
-              <ComposeAnchor hideLabel size="sm" />
-              <LibraryAnchor hideLabel size="sm" />
-              <ExpandTrigger onClick={onExpand} />
-            </>
-          )}
-        </WStack>
-      ) : (
-        <WStack alignItems="center">
-          {isExpanded ? (
-            <>
-              <HomeAnchor hideLabel size="sm" />
-              <Search />
-              <CloseAction onClick={onClose} size="sm" />
-            </>
-          ) : (
-            <>
-              <HomeAnchor hideLabel />
-              <LoginAnchor />
-              <ExpandTrigger onClick={onExpand} />
-            </>
-          )}
-        </WStack>
-      )}
-    </Toolpill>
+            ) : (
+              <SiteIcon borderRadius="full" w="6" />
+            )}
+            <HomeAnchor hideLabel />
+            {account ? <ComposeAnchor hideLabel size="sm" /> : <LoginAnchor />}
+            <LibraryAnchor hideLabel size="sm" />
+            <ExpandTrigger onClick={onExpand} />
+          </>
+        )}
+      </WStack>
+    </CommandDock>
   );
 }
 

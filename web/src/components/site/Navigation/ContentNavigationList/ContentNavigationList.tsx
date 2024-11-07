@@ -25,10 +25,17 @@ export function ContentNavigationList(props: Props) {
       gap="4"
       height="full"
       width="full"
+      minH="0"
       alignItems="start"
       justifyContent="space-between"
     >
-      <LStack gap="1" overflowY="scroll" mr="-scrollGutter">
+      <LStack
+        gap="1"
+        overflowY="scroll"
+        style={{
+          scrollbarWidth: "none",
+        }}
+      >
         <CategoryList initialCategoryList={props.initialCategoryList} />
         <LibraryNavigationTree
           initialNodeList={props.initialNodeList}
