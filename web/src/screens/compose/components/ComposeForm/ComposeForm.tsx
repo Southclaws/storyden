@@ -2,7 +2,7 @@ import { FormProvider } from "react-hook-form";
 
 import { TagListField } from "@/components/thread/ThreadTagList";
 import { Button } from "@/components/ui/button";
-import { HStack, styled } from "@/styled-system/jsx";
+import { HStack, WStack, styled } from "@/styled-system/jsx";
 
 import { BodyInput } from "../BodyInput/BodyInput";
 import { CategorySelect } from "../CategorySelect/CategorySelect";
@@ -25,27 +25,24 @@ export function ComposeForm(props: Props) {
       onSubmit={onPublish}
     >
       <FormProvider {...formContext}>
-        <HStack width="full" justifyContent="space-between" alignItems="start">
+        <WStack>
           <HStack width="full">
-            <TitleInput />
+            <CategorySelect />
+            <TagListField
+              name="tags"
+              control={formContext.control}
+              initialTags={props.initialDraft?.tags}
+            />
           </HStack>
 
-          <HStack
-            flexGrow="1"
-            flexShrink="0"
-            flexWrap="nowrap"
-            maxWidth="min"
-            flexDir={{ base: "column-reverse", md: "row" }}
-            gap="2"
-            alignItems="end"
-          >
+          <HStack>
             <Button
               variant="ghost"
               size="xs"
               disabled={!formContext.formState.isValid}
               onClick={onSave}
             >
-              Save
+              Save draft
             </Button>
 
             <Button
@@ -58,15 +55,12 @@ export function ComposeForm(props: Props) {
               Post
             </Button>
           </HStack>
-        </HStack>
+        </WStack>
 
-        <HStack width="full">
-          <CategorySelect />
-          <TagListField
-            name="tags"
-            control={formContext.control}
-            initialTags={props.initialDraft?.tags}
-          />
+        <HStack width="full" justifyContent="space-between" alignItems="start">
+          <HStack width="full">
+            <TitleInput />
+          </HStack>
         </HStack>
 
         <BodyInput onAssetUpload={onAssetUpload} />
