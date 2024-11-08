@@ -21,6 +21,7 @@ export const richCard = defineSlotRecipe({
   base: {
     container: {
       containerType: "inline-size",
+      width: "full",
     },
     root: {
       "--card-border-radius": "radii.lg",
