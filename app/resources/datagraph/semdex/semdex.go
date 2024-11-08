@@ -7,6 +7,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 )
 
 type Indexer interface {
@@ -23,6 +24,10 @@ type RefSearcher interface {
 
 type Recommender interface {
 	Recommend(ctx context.Context, object datagraph.Item) (datagraph.ItemList, error)
+}
+
+type Tagger interface {
+	SuggestTags(ctx context.Context, content datagraph.Content, available tag_ref.Names) (tag_ref.Names, error)
 }
 
 type RefRecommender interface {
@@ -46,6 +51,7 @@ type RefSemdexer interface {
 	Indexer
 	RefSearcher
 	RefRecommender
+	Tagger
 	Retriever
 	RelevanceScorer
 	Summariser
@@ -55,6 +61,7 @@ type Semdexer interface {
 	Indexer
 	Searcher
 	Recommender
+	Tagger
 	Retriever
 	RelevanceScorer
 	Summariser
@@ -73,6 +80,10 @@ func (o *OnlySearcher) Index(ctx context.Context, object datagraph.Item) error {
 }
 
 func (o *OnlySearcher) Recommend(ctx context.Context, object datagraph.Item) (datagraph.ItemList, error) {
+	return nil, nil
+}
+
+func (o *OnlySearcher) SuggestTags(ctx context.Context, content datagraph.Content, available tag_ref.Names) (tag_ref.Names, error) {
 	return nil, nil
 }
 

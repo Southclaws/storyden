@@ -2,6 +2,7 @@ package tag_querier
 
 import (
 	"context"
+	"sort"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -46,7 +47,9 @@ func (q *Querier) List(ctx context.Context) (tag_ref.Tags, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	tags := dt.Map(r, tag_ref.Map(counts))
+	tags := tag_ref.Tags(dt.Map(r, tag_ref.Map(counts)))
+
+	sort.Sort(tags)
 
 	return tags, nil
 }

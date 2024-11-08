@@ -27,6 +27,7 @@ import type {
   NodeRemoveChildOKResponse,
   NodeUpdateBody,
   NodeUpdateOKResponse,
+  NodeUpdateParams,
   NotFoundResponse,
   UnauthorisedResponse,
   VisibilityUpdateBody,
@@ -189,21 +190,26 @@ export const useNodeGet = <
 export const nodeUpdate = (
   nodeSlug: string,
   nodeUpdateBody: NodeUpdateBody,
+  params?: NodeUpdateParams,
 ) => {
   return fetcher<NodeUpdateOKResponse>({
     url: `/nodes/${nodeSlug}`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: nodeUpdateBody,
+    params,
   });
 };
 
-export const getNodeUpdateMutationFetcher = (nodeSlug: string) => {
+export const getNodeUpdateMutationFetcher = (
+  nodeSlug: string,
+  params?: NodeUpdateParams,
+) => {
   return (
     _: string,
     { arg }: { arg: NodeUpdateBody },
   ): Promise<NodeUpdateOKResponse> => {
-    return nodeUpdate(nodeSlug, arg);
+    return nodeUpdate(nodeSlug, arg, params);
   };
 };
 export const getNodeUpdateMutationKey = (nodeSlug: string) =>
@@ -224,6 +230,7 @@ export const useNodeUpdate = <
     | InternalServerErrorResponse,
 >(
   nodeSlug: string,
+  params?: NodeUpdateParams,
   options?: {
     swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof nodeUpdate>>,
@@ -237,7 +244,7 @@ export const useNodeUpdate = <
   const { swr: swrOptions } = options ?? {};
 
   const swrKey = swrOptions?.swrKey ?? getNodeUpdateMutationKey(nodeSlug);
-  const swrFn = getNodeUpdateMutationFetcher(nodeSlug);
+  const swrFn = getNodeUpdateMutationFetcher(nodeSlug, params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
