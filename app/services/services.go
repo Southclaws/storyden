@@ -30,6 +30,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex/index_job"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer"
 	"github.com/Southclaws/storyden/app/services/semdex/summarise_job"
+	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 )
@@ -62,5 +63,6 @@ func Build() fx.Option {
 		fx.Provide(avatar_gen.New),
 		fx.Provide(node_read.New, node_mutate.New, nodetree.New, node_visibility.New),
 		fx.Provide(following.New),
+		fx.Provide(instance_info.New),
 	)
 }
