@@ -2931,7 +2931,13 @@ components:
     Info:
       description: Basic public information about the Storyden installation.
       type: object
-      required: [title, description, content, accent_colour, onboarding_status]
+      required:
+        - title,
+        - description,
+        - content,
+        - accent_colour,
+        - capabilities,
+        - onboarding_status,
       properties:
         title:
           type: string
@@ -2943,6 +2949,8 @@ components:
           type: string
         onboarding_status:
           $ref: "#/components/schemas/OnboardingStatus"
+        capabilities:
+          $ref: "#/components/schemas/InstanceCapabilityList"
         metadata:
           $ref: "#/components/schemas/Metadata"
 
@@ -2957,6 +2965,15 @@ components:
         - requires_more_accounts
         - requires_first_post
         - complete
+
+    InstanceCapability:
+      type: string
+      enum:
+        - semdex
+
+    InstanceCapabilityList:
+      type: array
+      items: { $ref: "#/components/schemas/InstanceCapability" }
 
     ContentKind:
       type: string
