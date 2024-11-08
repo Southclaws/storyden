@@ -37,6 +37,12 @@ type Config struct {
 
 	QueueType string `envconfig:"QUEUE_TYPE" default:"internal"`
 	AmqpURL   string `envconfig:"AMQP_URL"   default:"amqp://guest:guest@localhost:5672/"`
+
+	SemdexEnabled     bool   `envconfig:"SEMDEX_ENABLED" default:"false"`
+	WeaviateURL       string `envconfig:"WEAVIATE_URL"`
+	WeaviateToken     string `envconfig:"WEAVIATE_API_TOKEN"`
+	WeaviateClassName string `envconfig:"WEAVIATE_CLASS_NAME"`
+	OpenAIKey         string `envconfig:"OPENAI_API_KEY"`
 }
 
 func Build() fx.Option {
