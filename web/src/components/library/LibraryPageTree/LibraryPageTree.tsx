@@ -5,11 +5,13 @@ import {
 } from "@ark-ui/react/tree-view";
 import { keyBy } from "lodash";
 import Link from "next/link";
-import { forwardRef, useState } from "react";
+import { JSX, forwardRef, useState } from "react";
 
 import { NodeWithChildren, Visibility } from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
 import { NavigationHeader } from "@/components/site/Navigation/ContentNavigationList/NavigationHeader";
+import { DraftIcon } from "@/components/ui/icons/Draft";
+import { ReviewIcon, UnlistedIcon } from "@/components/ui/icons/Visibility";
 import { visibilityColour } from "@/lib/library/visibilityColours";
 import { css, cx } from "@/styled-system/css";
 import { HStack, splitCssProps } from "@/styled-system/jsx";
@@ -43,6 +45,13 @@ const visibilityLabels: Record<Visibility, string> = {
   [Visibility.review]: "In review",
   [Visibility.draft]: "Drafts",
   [Visibility.unlisted]: "Unlisted",
+};
+
+const visibilityIcons: Record<Visibility, JSX.Element> = {
+  [Visibility.published]: <></>,
+  [Visibility.review]: <ReviewIcon />,
+  [Visibility.draft]: <DraftIcon />,
+  [Visibility.unlisted]: <UnlistedIcon />,
 };
 
 export const LibraryPageTree = forwardRef<HTMLDivElement, TreeViewProps>(
@@ -87,6 +96,7 @@ export const LibraryPageTree = forwardRef<HTMLDivElement, TreeViewProps>(
       const isRoot = Boolean(rootNodeMap[child.id]);
 
       const dividerLabel = visibilityLabels[child.visibility];
+      const dividerIcon = visibilityIcons[child.visibility];
 
       // We only show dividers on the root list, as this is the only list that's
       // sorted by visibility.
@@ -102,7 +112,12 @@ export const LibraryPageTree = forwardRef<HTMLDivElement, TreeViewProps>(
         >
           {showDivider && (
             <HStack mb="1">
-              <NavigationHeader href="/drafts">{dividerLabel}</NavigationHeader>
+              <NavigationHeader href="/drafts">
+                <HStack>
+                  {dividerIcon}
+                  {dividerLabel}
+                </HStack>
+              </NavigationHeader>
             </HStack>
           )}
 
