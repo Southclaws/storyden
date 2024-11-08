@@ -6,7 +6,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/onboarding"
 	"github.com/Southclaws/storyden/internal/config"
@@ -22,7 +21,6 @@ func New(
 	config config.Config,
 	settings *settings.SettingsRepository,
 	onboarding onboarding.Service,
-	semdex semdex.Semdexer,
 ) *Provider {
 	return &Provider{
 		config:     config,
