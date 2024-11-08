@@ -2932,12 +2932,12 @@ components:
       description: Basic public information about the Storyden installation.
       type: object
       required:
-        - title,
-        - description,
-        - content,
-        - accent_colour,
-        - capabilities,
-        - onboarding_status,
+        - title
+        - description
+        - content
+        - accent_colour
+        - capabilities
+        - onboarding_status
       properties:
         title:
           type: string
