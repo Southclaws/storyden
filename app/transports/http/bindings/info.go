@@ -3,42 +3,35 @@ package bindings
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
-	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/icon"
-	"github.com/Southclaws/storyden/app/services/onboarding"
+	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Info struct {
-	sr *settings.SettingsRepository
-	os onboarding.Service
-	is icon.Service
+	systemInfo *instance_info.Provider
+	is         icon.Service
 }
 
-func NewInfo(sr *settings.SettingsRepository, os onboarding.Service, is icon.Service) Info {
+func NewInfo(systemInfo *instance_info.Provider, is icon.Service) Info {
 	return Info{
-		sr: sr,
-		os: os,
-		is: is,
+		systemInfo: systemInfo,
+		is:         is,
 	}
 }
 
 func (i Info) GetInfo(ctx context.Context, request openapi.GetInfoRequestObject) (openapi.GetInfoResponseObject, error) {
-	settings, err := i.sr.Get(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	status, err := i.os.GetOnboardingStatus(ctx)
+	info, err := i.systemInfo.Get(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.GetInfo200JSONResponse{
-		GetInfoOKJSONResponse: openapi.GetInfoOKJSONResponse(serialiseInfo(settings, *status)),
+		GetInfoOKJSONResponse: openapi.GetInfoOKJSONResponse(serialiseInfo(info)),
 	}, nil
 }
 
@@ -66,13 +59,20 @@ func (i Info) IconUpload(ctx context.Context, request openapi.IconUploadRequestO
 	return openapi.IconUpload200Response{}, nil
 }
 
-func serialiseInfo(s *settings.Settings, status onboarding.Status) openapi.Info {
+func serialiseInfo(info *instance_info.Info) openapi.Info {
 	return openapi.Info{
-		Title:            s.Title.OrZero(),
-		Description:      s.Description.OrZero(),
-		Content:          s.Content.OrZero().HTML(),
-		AccentColour:     s.AccentColour.OrZero(),
-		OnboardingStatus: openapi.OnboardingStatus(status.String()),
-		Metadata:         (*openapi.Metadata)(s.Metadata.Ptr()),
+		Title:            info.Settings.Title.OrZero(),
+		Description:      info.Settings.Description.OrZero(),
+		Content:          info.Settings.Content.OrZero().HTML(),
+		AccentColour:     info.Settings.AccentColour.OrZero(),
+		OnboardingStatus: openapi.OnboardingStatus(info.OnboardingStatus.String()),
+		Capabilities:     serialiseCapabilitiesList(info.Capabilities),
+		Metadata:         (*openapi.Metadata)(info.Settings.Metadata.Ptr()),
 	}
+}
+
+func serialiseCapabilitiesList(cs instance_info.Capabilities) openapi.InstanceCapabilityList {
+	return dt.Map(cs, func(c instance_info.Capability) openapi.InstanceCapability {
+		return openapi.InstanceCapability(c.String())
+	})
 }

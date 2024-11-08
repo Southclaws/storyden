@@ -7,20 +7,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { InstanceCapabilityList } from "./instanceCapabilityList";
-import type { Metadata } from "./metadata";
-import type { OnboardingStatus } from "./onboardingStatus";
-import type { PostContent } from "./postContent";
+import type { InstanceCapability } from "./instanceCapability";
 
-/**
- * Basic public information about the Storyden installation.
- */
-export interface Info {
-  accent_colour: string;
-  capabilities: InstanceCapabilityList;
-  content: PostContent;
-  description: string;
-  metadata?: Metadata;
-  onboarding_status: OnboardingStatus;
-  title: string;
-}
+export type InstanceCapabilityList = InstanceCapability[];
