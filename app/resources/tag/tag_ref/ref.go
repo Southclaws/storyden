@@ -45,6 +45,10 @@ type Tag struct {
 
 type Tags []*Tag
 
+func (a Tags) Len() int           { return len(a) }
+func (a Tags) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a Tags) Less(i, j int) bool { return a[i].ItemCount > a[j].ItemCount }
+
 func (t Tags) Names() []Name {
 	return dt.Map(t, func(t *Tag) Name {
 		return t.Name
