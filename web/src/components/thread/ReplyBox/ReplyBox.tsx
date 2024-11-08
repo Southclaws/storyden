@@ -95,7 +95,7 @@ function LoginToReply() {
       bgColor="blackAlpha.50"
       justifyContent="center"
     >
-      <DiscussionIcon />
+      <DiscussionIcon width="4" />
 
       <p>
         Please <Anchor href="/register">sign up or log in</Anchor> to reply
