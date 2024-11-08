@@ -15,6 +15,7 @@ export const DefaultSettings = {
   content: "",
   accent_colour: FALLBACK_COLOUR,
   onboarding_status: "complete",
+  capabilities: [],
   metadata: DefaultFrontendConfig,
 } satisfies Settings;
 
