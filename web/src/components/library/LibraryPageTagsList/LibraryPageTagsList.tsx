@@ -2,11 +2,13 @@ import { useRef, useState } from "react";
 
 import { handle } from "@/api/client";
 import { tagList } from "@/api/openapi-client/tags";
-import { Node, TagNameList } from "@/api/openapi-schema";
+import { InstanceCapability, Node, TagNameList } from "@/api/openapi-schema";
 import { IntelligenceAction } from "@/components/site/Action/Intelligence";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { Combotags, CombotagsHandle } from "@/components/ui/combotags";
 import { useLibraryMutation } from "@/lib/library/library";
+import { useCapability } from "@/lib/settings/capabilities";
+import { useSettings } from "@/lib/settings/settings-client";
 import { HStack } from "@/styled-system/jsx";
 
 export type Props = {
@@ -15,6 +17,8 @@ export type Props = {
 };
 
 export function LibraryPageTagsList(props: Props) {
+  const isSuggestEnabled = useCapability(InstanceCapability.semdex);
+
   const { updateNode, suggestTags, revalidate } = useLibraryMutation(
     props.node,
   );
@@ -77,13 +81,15 @@ export function LibraryPageTagsList(props: Props) {
           onQuery={handleQuery}
           onChange={handleChange}
         />
-        <IntelligenceAction
-          title="Suggest tags for this page"
-          onClick={handleSuggestTags}
-          variant="subtle"
-          h="full"
-          loading={loadingTags}
-        />
+        {isSuggestEnabled && (
+          <IntelligenceAction
+            title="Suggest tags for this page"
+            onClick={handleSuggestTags}
+            variant="subtle"
+            h="full"
+            loading={loadingTags}
+          />
+        )}
       </HStack>
     );
   }
