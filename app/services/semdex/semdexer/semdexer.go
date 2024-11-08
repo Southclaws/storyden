@@ -8,18 +8,19 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/refhydrate"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/simplesearch"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/weaviate_semdexer"
+	"github.com/Southclaws/storyden/internal/config"
 	weaviate_infra "github.com/Southclaws/storyden/internal/infrastructure/weaviate"
 )
 
 func newSemdexer(
+	cfg config.Config,
 	wc *weaviate.Client,
 	simpleSearcher *simplesearch.ParallelSearcher,
 
 	weaviateClassName weaviate_infra.WeaviateClassName,
 	hydrator *refhydrate.Hydrator,
 ) semdex.Semdexer {
-	// TODO: Switch this based on config (semdex_provider) not a nil check.
-	if wc == nil {
+	if !cfg.SemdexEnabled {
 		return &semdex.OnlySearcher{Searcher: simpleSearcher}
 	}
 

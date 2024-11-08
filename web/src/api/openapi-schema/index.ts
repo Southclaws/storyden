@@ -172,6 +172,8 @@ export * from "./getInfoOKResponse";
 export * from "./hasCollected";
 export * from "./identifier";
 export * from "./info";
+export * from "./instanceCapability";
+export * from "./instanceCapabilityList";
 export * from "./internalServerErrorResponse";
 export * from "./invitation";
 export * from "./invitationCreateBody";

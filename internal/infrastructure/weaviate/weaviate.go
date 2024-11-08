@@ -7,11 +7,12 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/kelseyhightower/envconfig"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/auth"
 	"github.com/weaviate/weaviate/entities/models"
 	"go.uber.org/fx"
+
+	"github.com/Southclaws/storyden/internal/config"
 )
 
 type WeaviateClassName string
@@ -20,29 +21,16 @@ func (w WeaviateClassName) String() string {
 	return string(w)
 }
 
-type Configuration struct {
-	Enabled   bool   `envconfig:"WEAVIATE_ENABLED"`
-	URL       string `envconfig:"WEAVIATE_URL"`
-	Token     string `envconfig:"WEAVIATE_API_TOKEN"`
-	ClassName string `envconfig:"WEAVIATE_CLASS_NAME"`
-	OpenAIKey string `envconfig:"OPENAI_API_KEY"`
-}
-
 func Build() fx.Option {
 	return fx.Provide(newWeaviateClient)
 }
 
-func newWeaviateClient(lc fx.Lifecycle) (*weaviate.Client, WeaviateClassName, error) {
-	cfg := Configuration{}
-	if err := envconfig.Process("", &cfg); err != nil {
-		return nil, "", fault.Wrap(err)
-	}
-
-	if !cfg.Enabled {
+func newWeaviateClient(lc fx.Lifecycle, cfg config.Config) (*weaviate.Client, WeaviateClassName, error) {
+	if !cfg.SemdexEnabled {
 		return nil, "", nil
 	}
 
-	u, err := url.Parse(cfg.URL)
+	u, err := url.Parse(cfg.WeaviateURL)
 	if err != nil {
 		return nil, "", fault.Wrap(err)
 	}
@@ -50,7 +38,7 @@ func newWeaviateClient(lc fx.Lifecycle) (*weaviate.Client, WeaviateClassName, er
 	wc := weaviate.Config{
 		Host:       u.Host,
 		Scheme:     u.Scheme,
-		AuthConfig: auth.ApiKey{Value: cfg.Token},
+		AuthConfig: auth.ApiKey{Value: cfg.WeaviateToken},
 		Headers:    map[string]string{"X-OpenAI-Api-Key": cfg.OpenAIKey},
 	}
 
@@ -112,11 +100,11 @@ func newWeaviateClient(lc fx.Lifecycle) (*weaviate.Client, WeaviateClassName, er
 		},
 	}
 
-	if cfg.ClassName == "text2vec-openai" && cfg.OpenAIKey == "" {
+	if cfg.WeaviateClassName == "text2vec-openai" && cfg.OpenAIKey == "" {
 		return nil, "", fault.New("OpenAI API key is required for text2vec-openai class")
 	}
 
-	class, ok := classMap[cfg.ClassName]
+	class, ok := classMap[cfg.WeaviateClassName]
 	if !ok {
 		return nil, "", fault.New("invalid class name")
 	}
@@ -158,7 +146,7 @@ func newWeaviateClient(lc fx.Lifecycle) (*weaviate.Client, WeaviateClassName, er
 				return err
 			}
 
-			same := compareClassConfig(cfg.ClassName, *current, class)
+			same := compareClassConfig(cfg.WeaviateClassName, *current, class)
 			if !same {
 				err = client.Schema().
 					ClassDeleter().
