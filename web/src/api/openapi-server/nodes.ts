@@ -20,6 +20,7 @@ import type {
   NodeRemoveChildOKResponse,
   NodeUpdateBody,
   NodeUpdateOKResponse,
+  NodeUpdateParams,
   VisibilityUpdateBody,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -111,20 +112,37 @@ export type nodeUpdateResponse = {
   status: number;
 };
 
-export const getNodeUpdateUrl = (nodeSlug: string) => {
-  return `/nodes/${nodeSlug}`;
+export const getNodeUpdateUrl = (
+  nodeSlug: string,
+  params?: NodeUpdateParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value === null) {
+      normalizedParams.append(key, "null");
+    } else if (value !== undefined) {
+      normalizedParams.append(key, value.toString());
+    }
+  });
+
+  return `/nodes/${nodeSlug}?${normalizedParams.toString()}`;
 };
 
 export const nodeUpdate = async (
   nodeSlug: string,
   nodeUpdateBody: NodeUpdateBody,
+  params?: NodeUpdateParams,
   options?: RequestInit,
 ): Promise<nodeUpdateResponse> => {
-  return fetcher<Promise<nodeUpdateResponse>>(getNodeUpdateUrl(nodeSlug), {
-    ...options,
-    method: "PATCH",
-    body: JSON.stringify(nodeUpdateBody),
-  });
+  return fetcher<Promise<nodeUpdateResponse>>(
+    getNodeUpdateUrl(nodeSlug, params),
+    {
+      ...options,
+      method: "PATCH",
+      body: JSON.stringify(nodeUpdateBody),
+    },
+  );
 };
 
 /**

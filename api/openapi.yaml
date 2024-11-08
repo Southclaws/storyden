@@ -1528,7 +1528,9 @@ paths:
       operationId: NodeUpdate
       description: Update a node.
       tags: [nodes]
-      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      parameters:
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/TagFillRuleQueryParam"
       requestBody: { $ref: "#/components/requestBodies/NodeUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -2076,6 +2078,17 @@ components:
       required: false
       schema:
         $ref: "#/components/schemas/Identifier"
+
+    TagFillRuleQueryParam:
+      description: |
+        Use the content extracted from the child resource to determine a set of
+        tags (existing or new) to either write directly into the resource or to
+        return as part of the response in order to prompt for confirmation.
+      name: tag_fill_rule
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/TagFillRule"
 
     NodeSlugParam:
       description: Unique node Slug.
@@ -2982,6 +2995,19 @@ components:
     ContentKinds:
       type: array
       items: { $ref: "#/components/schemas/ContentKind" }
+
+    TagFillRule:
+      description: |
+        A tag fill-rule defines a strategy for automatically generating a set of
+        tags for a datagraph item using semantic/LLM features. Using `query` as
+        a rule will not modify the resource but return the tags as part of the
+        response for the frontend implementation to present to the user as a set
+        of suggestions. Using `replace` as a rule will automatically update the
+        tags of the affected resource with those sourced by the semdex LLM.
+      type: string
+      enum:
+        - query
+        - replace
 
     ContentFillRule:
       type: string
@@ -4225,6 +4251,11 @@ components:
       properties:
         tags: { $ref: "#/components/schemas/TagReferenceList" }
 
+    TagSuggestions:
+      type: object
+      properties:
+        tag_suggestions: { $ref: "#/components/schemas/TagNameList" }
+
     #
     # 8888888b.                   888
     # 888   Y88b                  888
@@ -4769,6 +4800,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
         - $ref: "#/components/schemas/NodeCommonProps"
+        - $ref: "#/components/schemas/TagSuggestions"
 
     NodeWithChildren:
       description: |

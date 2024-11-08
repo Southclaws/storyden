@@ -117,7 +117,7 @@ func TestNodeTags(t *testing.T) {
 			a.False(f(t3))
 
 			newTags := []string{t1, t2, t3}
-			create2, err := cl.NodeUpdateWithResponse(root, create1.JSON200.Slug, openapi.NodeMutableProps{
+			create2, err := cl.NodeUpdateWithResponse(root, create1.JSON200.Slug, nil, openapi.NodeMutableProps{
 				Tags: &newTags,
 			}, adminSession)
 			tests.Ok(t, err, create2)
@@ -149,7 +149,7 @@ func TestNodeTags(t *testing.T) {
 			tests.Ok(t, err, create1)
 
 			newTags := []string{t1, t2}
-			create2, err := cl.NodeUpdateWithResponse(root, create1.JSON200.Slug, openapi.NodeMutableProps{
+			create2, err := cl.NodeUpdateWithResponse(root, create1.JSON200.Slug, nil, openapi.NodeMutableProps{
 				Tags: &newTags,
 			}, adminSession)
 			tests.Ok(t, err, create2)

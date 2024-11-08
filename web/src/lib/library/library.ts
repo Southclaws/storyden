@@ -128,6 +128,7 @@ export function useLibraryMutation(node?: Node) {
       tags: [],
       visibility: "draft",
       recomentations: [],
+      tag_suggestions: [],
     };
 
     const mutator: MutatorCallback<NodeListOKResponse> = (data) => {
@@ -229,6 +230,16 @@ export function useLibraryMutation(node?: Node) {
     }
 
     return slugChanged;
+  };
+
+  const suggestTags = async (slug: string) => {
+    const { tag_suggestions } = await nodeUpdate(
+      slug,
+      {},
+      { tag_fill_rule: "query" },
+    );
+
+    return tag_suggestions;
   };
 
   const removeNodeCoverImage = async (slug: string) => {
@@ -374,6 +385,7 @@ export function useLibraryMutation(node?: Node) {
   return {
     createNode,
     updateNode,
+    suggestTags,
     removeNodeCoverImage,
     updateNodeVisibility,
     addAsset,

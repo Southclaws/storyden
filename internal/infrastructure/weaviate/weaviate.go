@@ -96,6 +96,9 @@ func newWeaviateClient(lc fx.Lifecycle, cfg config.Config) (*weaviate.Client, We
 					"dimensions": "3072",
 					"type":       "text",
 				},
+				"generative-openai": map[string]any{
+					"model": "gpt-4",
+				},
 			},
 		},
 	}
@@ -178,6 +181,10 @@ func compareClassConfig(cn string, a, b models.Class) bool {
 	}
 
 	if a.Vectorizer != b.Vectorizer {
+		return false
+	}
+
+	if !reflect.DeepEqual(a.ModuleConfig, b.ModuleConfig) {
 		return false
 	}
 

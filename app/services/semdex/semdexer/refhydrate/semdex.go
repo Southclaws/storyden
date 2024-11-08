@@ -9,6 +9,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 )
 
 var _ semdex.Semdexer = &HydratedSemdexer{}
@@ -40,6 +41,10 @@ func (h *HydratedSemdexer) Recommend(ctx context.Context, object datagraph.Item)
 	}
 
 	return h.Hydrator.Hydrate(ctx, rs...)
+}
+
+func (h *HydratedSemdexer) SuggestTags(ctx context.Context, content datagraph.Content, available tag_ref.Names) (tag_ref.Names, error) {
+	return h.RefSemdex.SuggestTags(ctx, content, available)
 }
 
 func (h *HydratedSemdexer) GetAll(ctx context.Context) (datagraph.RefList, error) {

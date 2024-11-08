@@ -1,5 +1,12 @@
 import { createListCollection, useTagsInput } from "@ark-ui/react";
-import { useEffect, useRef, useState } from "react";
+import { uniq } from "lodash";
+import {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 
 import * as Combobox from "@/components/ui/combobox";
 import { IconButton } from "@/components/ui/icon-button";
@@ -14,11 +21,15 @@ export type Props = {
   onChange: (values: string[]) => Promise<void>;
 };
 
+export type CombotagsHandle = {
+  append: (tags: string[]) => void;
+};
+
 // Combotags provides a mix of a tags input and a combobox where the tags input
 // field is used to filter the combobox results. The combobox results are then
 // used to add new tags to the tags input. It also allows just hitting enter or
 // comma to add a custom tag value to the tags list for creating new tags.
-export function Combotags(props: Props) {
+export const Combotags = forwardRef<CombotagsHandle, Props>((props, ref) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<string[]>([]);
   const [isComboboxOpen, setIsComboboxOpen] = useState(false);
@@ -39,6 +50,17 @@ export function Combotags(props: Props) {
   useEffect(() => {
     tagsInputRef.current = tagsInput;
   }, [tagsInput]);
+
+  useImperativeHandle<CombotagsHandle, CombotagsHandle>(ref, () => {
+    function append(tags: string[]) {
+      const newValue = uniq([...tagsInputRef.current.value, ...tags]);
+      tagsInputRef.current.setValue(newValue);
+    }
+
+    return {
+      append,
+    };
+  });
 
   // Used for positioning the combobox by computing the height of the input.
   const inputControlRef = useRef<HTMLDivElement>(null);
@@ -148,4 +170,6 @@ export function Combotags(props: Props) {
       </TagsInput.RootProvider>
     </>
   );
-}
+});
+
+Combotags.displayName = "Combotags";

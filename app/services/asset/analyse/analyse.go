@@ -20,7 +20,7 @@ type Analyser struct {
 	assetQuerier *asset_querier.Querier
 	downloader   *asset_download.Downloader
 	nodereader   *node_querier.Querier
-	nodewriter   node_mutate.Manager
+	nodewriter   *node_mutate.Manager
 	pdfextractor *pdf.Extractor
 }
 
@@ -28,7 +28,7 @@ func New(
 	assetQuerier *asset_querier.Querier,
 	downloader *asset_download.Downloader,
 	nodereader *node_querier.Querier,
-	nodewriter node_mutate.Manager,
+	nodewriter *node_mutate.Manager,
 	pdfextractor *pdf.Extractor,
 ) *Analyser {
 	return &Analyser{
