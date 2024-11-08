@@ -31,7 +31,7 @@ import (
 
 type Nodes struct {
 	accountQuery *account_querier.Querier
-	nodeMutator  node_mutate.Manager
+	nodeMutator  *node_mutate.Manager
 	nodeReader   *node_read.HydratedQuerier
 	nv           *node_visibility.Controller
 	ntree        nodetree.Graph
@@ -40,7 +40,7 @@ type Nodes struct {
 
 func NewNodes(
 	accountQuery *account_querier.Querier,
-	nodeMutator node_mutate.Manager,
+	nodeMutator *node_mutate.Manager,
 	nodeReader *node_read.HydratedQuerier,
 	nv *node_visibility.Controller,
 	ntree nodetree.Graph,
@@ -224,6 +224,17 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 
 	primaryImage := deletable.NewMap(request.Body.PrimaryImageAssetId, deserialiseAssetID)
 
+	opts := []node_mutate.Option{}
+
+	tagFillRuleParam, err := opt.MapErr(opt.NewPtr(request.Params.TagFillRule), deserialiseTagFillRule)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if tfr, ok := tagFillRuleParam.Get(); ok {
+		opts = append(opts, node_mutate.WithTagFillRule(tfr))
+	}
+
 	node, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
 		Name:         opt.NewPtr(request.Body.Name),
 		Slug:         slug,
@@ -235,13 +246,13 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
 		Tags:         tags,
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
-	})
+	}, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.NodeUpdate200JSONResponse{
-		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseNode(node)),
+		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseUpdatedNode(node)),
 	}, nil
 }
 
@@ -295,7 +306,7 @@ func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRe
 	}
 
 	return openapi.NodeAddAsset200JSONResponse{
-		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseNode(node)),
+		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseUpdatedNode(node)),
 	}, nil
 }
 
@@ -310,7 +321,7 @@ func (c *Nodes) NodeRemoveAsset(ctx context.Context, request openapi.NodeRemoveA
 	}
 
 	return openapi.NodeRemoveAsset200JSONResponse{
-		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseNode(node)),
+		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseUpdatedNode(node)),
 	}, nil
 }
 
@@ -334,6 +345,17 @@ func (c *Nodes) NodeRemoveNode(ctx context.Context, request openapi.NodeRemoveNo
 	return openapi.NodeRemoveNode200JSONResponse{
 		NodeRemoveChildOKJSONResponse: openapi.NodeRemoveChildOKJSONResponse(serialiseNode(node)),
 	}, nil
+}
+
+func serialiseUpdatedNode(in *node_mutate.Updated) openapi.Node {
+	n := serialiseNode(&in.Node)
+
+	if ts, ok := in.TagSuggestions.Get(); ok {
+		s := ts.Strings()
+		n.TagSuggestions = &s
+	}
+
+	return n
 }
 
 func serialiseNode(in *library.Node) openapi.Node {

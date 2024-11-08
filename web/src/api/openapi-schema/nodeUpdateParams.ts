@@ -7,15 +7,14 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { CommonProperties } from "./commonProperties";
-import type { NodeCommonProps } from "./nodeCommonProps";
-import type { TagSuggestions } from "./tagSuggestions";
+import type { TagFillRuleQueryParamParameter } from "./tagFillRuleQueryParamParameter";
 
-/**
- * A node is a text document with children and assets. It serves as an
-abstraction for grouping structured data objects. It can represent
-things such as brands, manufacturers, authors, directors, etc. Nodes
-can be referenced in content posts and they also have their own content.
+export type NodeUpdateParams = {
+  /**
+ * Use the content extracted from the child resource to determine a set of
+tags (existing or new) to either write directly into the resource or to
+return as part of the response in order to prompt for confirmation.
 
  */
-export type Node = CommonProperties & NodeCommonProps & TagSuggestions;
+  tag_fill_rule?: TagFillRuleQueryParamParameter;
+};

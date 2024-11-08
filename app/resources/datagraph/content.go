@@ -114,6 +114,10 @@ func (r Content) References() RefList {
 	return r.sdrs
 }
 
+func (r Content) IsEmpty() bool {
+	return r.html == nil || r.plain == "" || r.short == ""
+}
+
 type options struct {
 	baseURL string
 }
