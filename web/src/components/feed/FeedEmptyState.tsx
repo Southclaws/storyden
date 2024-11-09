@@ -5,7 +5,7 @@ import { styled } from "@/styled-system/jsx";
 
 export function FeedEmptyState() {
   return (
-    <VStack height="full" justify="center" pb="32">
+    <VStack w="full" height="full" justify="center" pb="32">
       <ThreadStaircase width="100%" />
       <styled.p textAlign="center" fontStyle="italic" color="gray.5">
         *tumbleweed*&nbsp;there&nbsp;are&nbsp;no&nbsp;posts...
