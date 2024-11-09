@@ -3,7 +3,6 @@ package settings
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -14,6 +13,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/utils/errutil"
 )
 
 // StorydenPrimarySettingsKey is the key used to store the primary settings data
@@ -181,7 +181,7 @@ func (d *SettingsRepository) recache(ctx context.Context) {
 
 	settings, err := d.get(ctx)
 	if err != nil {
-		if errors.Is(err, context.Canceled) {
+		if errutil.IsIgnored(err) {
 			return
 		}
 
