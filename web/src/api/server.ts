@@ -15,7 +15,11 @@ type Result<T> = {
 };
 
 export const fetcher = async <T>(url: string, opts: Options): Promise<T> => {
-  const req = buildRequest({ url, method: opts.method as any });
+  const req = buildRequest({
+    url,
+    method: opts.method as any,
+    revalidate: 100,
+  });
 
   req.headers.set("Cookie", await getCookieHeader());
 

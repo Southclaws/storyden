@@ -10,6 +10,7 @@ export type Options = {
   data?: unknown;
   responseType?: string;
   cookie?: string;
+  revalidate?: number;
 };
 
 export class RequestError extends Error {
@@ -27,6 +28,7 @@ export function buildRequest({
   headers,
   params,
   data,
+  revalidate,
 }: Options): Request {
   const address = `${API_ADDRESS}/api${url}${cleanQuery(params)}`;
   const _method = method.toUpperCase();
@@ -37,7 +39,10 @@ export function buildRequest({
     credentials: "include",
     headers,
     body: buildPayload(data),
-    cache: "force-cache",
+    next: {
+      tags: ["api"],
+      revalidate,
+    },
   });
 }
 
