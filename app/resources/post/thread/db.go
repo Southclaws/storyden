@@ -152,7 +152,7 @@ const repliesCountManyQuery = `select
   count(a.id) replied  -- has this account replied
 from
   posts p
-  inner join posts r on r.root_post_id = p.id and p.deleted_at is null
+  inner join posts r on r.root_post_id = p.id and r.deleted_at is null
   left join accounts a on a.id = p.account_posts and a.id = $1
 group by p.id
 `
