@@ -2,6 +2,7 @@ package config
 
 import (
 	"net/url"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
@@ -15,6 +16,9 @@ type Config struct {
 	Production  bool          `envconfig:"PRODUCTION"   default:"false"`
 	LogLevel    zapcore.Level `envconfig:"LOG_LEVEL"    default:"info"`
 	RunFrontend string        `envconfig:"RUN_FRONTEND" default:""`
+
+	DevChaosSlowMode time.Duration `envconfig:"DEV_CHAOS_SLOW_MODE"` // Simulates slow requests
+	DevChaosFailRate float64       `envconfig:"DEV_CHAOS_FAIL_RATE"` // Simulates failed requests
 
 	DatabaseURL        string  `envconfig:"DATABASE_URL"           default:"sqlite://data/data.db?_pragma=foreign_keys(1)"`
 	ListenAddr         string  `envconfig:"LISTEN_ADDR"            default:"0.0.0.0:8000"`
