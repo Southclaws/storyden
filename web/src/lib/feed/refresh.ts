@@ -1,7 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function refreshFeed() {
-  revalidatePath("/");
+  revalidatePath("/", "layout");
+  revalidateTag("api");
 }
