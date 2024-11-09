@@ -1,3 +1,5 @@
+"use client";
+
 import { JSX, PropsWithChildren } from "react";
 
 import { useSession } from "@/auth";
