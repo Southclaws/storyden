@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/middleware/useragent"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
+	"github.com/Southclaws/storyden/internal/infrastructure/httpserver/chaos"
 )
 
 const MaxRequestSizeBytes = 10 * 1024 * 1024
@@ -39,6 +40,7 @@ func MountOpenAPI(
 			cj.WithAuth,
 			limiter.WithRateLimiter(cfg),
 			limiter.WithRequestSizeLimiter(MaxRequestSizeBytes),
+			chaos.WithChaos(cfg),
 		)
 
 		// Mounting the Echo router must happen after all Echo's middleware and
