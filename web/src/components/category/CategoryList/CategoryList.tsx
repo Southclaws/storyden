@@ -9,6 +9,7 @@ import { useId } from "react";
 import { Category } from "src/api/openapi-schema";
 import { Unready } from "src/components/site/Unready";
 
+import { DiscussionRoute } from "@/components/site/Navigation/Anchors/Discussion";
 import { NavigationHeader } from "@/components/site/Navigation/ContentNavigationList/NavigationHeader";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { HStack, styled } from "@/styled-system/jsx";
@@ -39,7 +40,7 @@ export function CategoryList(props: Props) {
       onDragEnd={handleDragEnd}
     >
       <NavigationHeader
-        href="/d"
+        href={DiscussionRoute}
         controls={canManageCategories && <CategoryCreateTrigger hideLabel />}
       >
         <HStack gap="1">

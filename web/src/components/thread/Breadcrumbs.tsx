@@ -10,6 +10,8 @@ import { BreadcrumbIcon } from "@/components/ui/icons/Breadcrumb";
 import { LinkButton } from "@/components/ui/link-button";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 
+import { DiscussionRoute } from "../site/Navigation/Anchors/Discussion";
+
 type Props = {
   thread?: Thread;
 };
@@ -56,7 +58,7 @@ export function Breadcrumbs({ thread }: Props) {
         variant="subtle"
         flexShrink="0"
         minW="min"
-        href="/l"
+        href={DiscussionRoute}
       >
         Discussion
       </LinkButton>
