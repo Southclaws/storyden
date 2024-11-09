@@ -1,16 +1,10 @@
-import { ThreadStaircase } from "src/components/graphics/ThreadStaircase";
-
-import { VStack } from "@/styled-system/jsx";
-import { styled } from "@/styled-system/jsx";
+import { EmptyState } from "../site/EmptyState";
+import { EmptyThreadsIcon } from "../ui/icons/Empty";
 
 export function FeedEmptyState() {
   return (
-    <VStack w="full" height="full" justify="center" pb="32">
-      <ThreadStaircase width="100%" />
-      <styled.p textAlign="center" fontStyle="italic" color="gray.5">
-        *tumbleweed*&nbsp;there&nbsp;are&nbsp;no&nbsp;posts...
-        you&nbsp;could&nbsp;be&nbsp;the&nbsp;first!
-      </styled.p>
-    </VStack>
+    <EmptyState w="full" icon={<EmptyThreadsIcon />}>
+      <p>*tumbleweed*&nbsp;there&nbsp;are&nbsp;no&nbsp;posts...</p>
+    </EmptyState>
   );
 }
