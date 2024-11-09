@@ -30,135 +30,120 @@ func TestNodeTags(t *testing.T) {
 		cj *session.Jar,
 		aw *account_writer.Writer,
 	) {
-		t.Run("create_with_new_tags", func(t *testing.T) {
-			t.Parallel()
-
-			a := assert.New(t)
-			r := require.New(t)
-
+		lc.Append(fx.StartHook(func() {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			adminSession := e2e.WithSession(adminCtx, cj)
 
-			t1 := xid.New().String()
-			t2 := xid.New().String()
-			t3 := xid.New().String()
+			t.Run("create_with_new_tags", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
 
-			tags := []string{t1, t2, t3}
-			create, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
-				Name: un("n1"),
-				Tags: &tags,
-			}, adminSession)
-			tests.Ok(t, err, create)
-			r.NotEmpty(create.JSON200.Tags)
-			f := find(create.JSON200.Tags)
-			a.True(f(t1))
-			a.True(f(t2))
-			a.True(f(t3))
-		})
+				t1 := xid.New().String()
+				t2 := xid.New().String()
+				t3 := xid.New().String()
 
-		t.Run("create_with_existing_tags", func(t *testing.T) {
-			t.Parallel()
+				tags := []string{t1, t2, t3}
+				create, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					Name: un("n1"),
+					Tags: &tags,
+				}, adminSession)
+				tests.Ok(t, err, create)
+				r.NotEmpty(create.JSON200.Tags)
+				f := find(create.JSON200.Tags)
+				a.True(f(t1))
+				a.True(f(t2))
+				a.True(f(t3))
+			})
 
-			a := assert.New(t)
-			r := require.New(t)
+			t.Run("create_with_existing_tags", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
 
-			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			adminSession := e2e.WithSession(adminCtx, cj)
+				t1 := xid.New().String()
+				t2 := xid.New().String()
+				t3 := xid.New().String()
 
-			t1 := xid.New().String()
-			t2 := xid.New().String()
-			t3 := xid.New().String()
+				n1tags := []string{t1, t2, t3}
+				create1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					Name: un("n1"),
+					Tags: &n1tags,
+				}, adminSession)
+				tests.Ok(t, err, create1)
 
-			n1tags := []string{t1, t2, t3}
-			create1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
-				Name: un("n1"),
-				Tags: &n1tags,
-			}, adminSession)
-			tests.Ok(t, err, create1)
+				t4 := xid.New().String()
+				n2tags := []string{t2, t3, t4}
+				create2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					Name: un("n1"),
+					Tags: &n2tags,
+				}, adminSession)
+				tests.Ok(t, err, create2)
+				r.NotEmpty(create2.JSON200.Tags)
+				f := find(create2.JSON200.Tags)
+				a.False(f(t1))
+				a.True(f(t2))
+				a.True(f(t3))
+				a.True(f(t4))
+			})
 
-			t4 := xid.New().String()
-			n2tags := []string{t2, t3, t4}
-			create2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
-				Name: un("n1"),
-				Tags: &n2tags,
-			}, adminSession)
-			tests.Ok(t, err, create2)
-			r.NotEmpty(create2.JSON200.Tags)
-			f := find(create2.JSON200.Tags)
-			a.False(f(t1))
-			a.True(f(t2))
-			a.True(f(t3))
-			a.True(f(t4))
-		})
+			t.Run("update_tags", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
 
-		t.Run("update_tags", func(t *testing.T) {
-			t.Parallel()
+				t1 := xid.New().String()
+				t2 := xid.New().String()
+				t3 := xid.New().String()
 
-			a := assert.New(t)
-			r := require.New(t)
+				tags := []string{t1, t2}
+				create1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					Name: un("n1"),
+					Tags: &tags,
+				}, adminSession)
+				tests.Ok(t, err, create1)
+				r.NotEmpty(create1.JSON200.Tags)
+				f := find(create1.JSON200.Tags)
+				a.True(f(t1))
+				a.True(f(t2))
+				a.False(f(t3))
 
-			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			adminSession := e2e.WithSession(adminCtx, cj)
+				newTags := []string{t1, t2, t3}
+				create2, err := cl.NodeUpdateWithResponse(root, create1.JSON200.Slug, nil, openapi.NodeMutableProps{
+					Tags: &newTags,
+				}, adminSession)
+				tests.Ok(t, err, create2)
+				r.NotEmpty(create2.JSON200.Tags)
+				f = find(create2.JSON200.Tags)
+				a.True(f(t1))
+				a.True(f(t2))
+				a.True(f(t3))
+			})
 
-			t1 := xid.New().String()
-			t2 := xid.New().String()
-			t3 := xid.New().String()
+			t.Run("remove_tags", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
 
-			tags := []string{t1, t2}
-			create1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
-				Name: un("n1"),
-				Tags: &tags,
-			}, adminSession)
-			tests.Ok(t, err, create1)
-			r.NotEmpty(create1.JSON200.Tags)
-			f := find(create1.JSON200.Tags)
-			a.True(f(t1))
-			a.True(f(t2))
-			a.False(f(t3))
+				t1 := xid.New().String()
+				t2 := xid.New().String()
+				t3 := xid.New().String()
 
-			newTags := []string{t1, t2, t3}
-			create2, err := cl.NodeUpdateWithResponse(root, create1.JSON200.Slug, nil, openapi.NodeMutableProps{
-				Tags: &newTags,
-			}, adminSession)
-			tests.Ok(t, err, create2)
-			r.NotEmpty(create2.JSON200.Tags)
-			f = find(create2.JSON200.Tags)
-			a.True(f(t1))
-			a.True(f(t2))
-			a.True(f(t3))
-		})
+				tags := []string{t1, t2, t3}
+				create1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					Name: un("n1"),
+					Tags: &tags,
+				}, adminSession)
+				tests.Ok(t, err, create1)
 
-		t.Run("remove_tags", func(t *testing.T) {
-			t.Parallel()
-
-			a := assert.New(t)
-			r := require.New(t)
-
-			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			adminSession := e2e.WithSession(adminCtx, cj)
-
-			t1 := xid.New().String()
-			t2 := xid.New().String()
-			t3 := xid.New().String()
-
-			tags := []string{t1, t2, t3}
-			create1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
-				Name: un("n1"),
-				Tags: &tags,
-			}, adminSession)
-			tests.Ok(t, err, create1)
-
-			newTags := []string{t1, t2}
-			create2, err := cl.NodeUpdateWithResponse(root, create1.JSON200.Slug, nil, openapi.NodeMutableProps{
-				Tags: &newTags,
-			}, adminSession)
-			tests.Ok(t, err, create2)
-			r.NotEmpty(create2.JSON200.Tags)
-			f := find(create2.JSON200.Tags)
-			a.True(f(t1))
-			a.True(f(t2))
-			a.False(f(t3))
-		})
+				newTags := []string{t1, t2}
+				create2, err := cl.NodeUpdateWithResponse(root, create1.JSON200.Slug, nil, openapi.NodeMutableProps{
+					Tags: &newTags,
+				}, adminSession)
+				tests.Ok(t, err, create2)
+				r.NotEmpty(create2.JSON200.Tags)
+				f := find(create2.JSON200.Tags)
+				a.True(f(t1))
+				a.True(f(t2))
+				a.False(f(t3))
+			})
+		}))
 	}))
 }
 
