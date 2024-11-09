@@ -37,15 +37,15 @@ func TestRoles(t *testing.T) {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			adminSession := e2e.WithSession(adminCtx, cj)
 
-			name := "test-role-" + xid.New().String()
-			colour := "red"
-			permissions := openapi.PermissionList{openapi.MANAGECATEGORIES}
-
-			role, err := cl.RoleCreateWithResponse(adminCtx, openapi.RoleCreateJSONRequestBody{Name: name, Colour: colour, Permissions: permissions}, adminSession)
-			tests.Ok(t, err, role)
-
 			t.Run("role_assignment", func(t *testing.T) {
 				t.Parallel()
+
+				name := "test-role-" + xid.New().String()
+				colour := "red"
+				permissions := openapi.PermissionList{openapi.MANAGECATEGORIES}
+
+				role, err := cl.RoleCreateWithResponse(adminCtx, openapi.RoleCreateJSONRequestBody{Name: name, Colour: colour, Permissions: permissions}, adminSession)
+				tests.Ok(t, err, role)
 
 				guestCtx, guest1 := e2e.WithAccount(root, aw, seed.Account_004_Loki)
 				guest1Session := e2e.WithSession(guestCtx, cj)
@@ -88,6 +88,13 @@ func TestRoles(t *testing.T) {
 
 			t.Run("role_edit", func(t *testing.T) {
 				t.Parallel()
+
+				name := "test-role-" + xid.New().String()
+				colour := "red"
+				permissions := openapi.PermissionList{openapi.MANAGECATEGORIES}
+
+				role, err := cl.RoleCreateWithResponse(adminCtx, openapi.RoleCreateJSONRequestBody{Name: name, Colour: colour, Permissions: permissions}, adminSession)
+				tests.Ok(t, err, role)
 
 				guestCtx, guest1 := e2e.WithAccount(root, aw, seed.Account_004_Loki)
 				guest1Session := e2e.WithSession(guestCtx, cj)

@@ -7,8 +7,10 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"dario.cat/mergo"
+	"github.com/gosimple/slug"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources"
@@ -18,16 +20,14 @@ import (
 	"github.com/Southclaws/storyden/internal/utils"
 )
 
-// Test provides a full app setup for testing service behaviour. It returns a
-// context cancellation function for immediate shutdown once all test functions
-// have finished. Usage is a simple call and defer:
+// Test provides a full app setup for testing end to end behaviour. Example:
 //
 //	func TestMyThing(t *testing.T) {
-//	    defer integration.Test(t, nil, fx.Invoke(func(test dependencies...) {
+//	    integration.Test(t, nil, fx.Invoke(func(test dependencies...) {
 //	        r := require.New(t)
 //	        a := assert.New(t)
 //
-//	        your behavioural test code...
+//	        // your e2e test code...
 //
 //	    }))
 //	}
@@ -39,13 +39,29 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		AuthenticatedRPM:   1000,
 	}
 
-	if url := os.Getenv("DATABASE_URL"); url != "" {
-		if isMaybeProdDB(url) {
+	if dbURL := os.Getenv("DATABASE_URL"); dbURL != "" {
+		if isMaybeProdDB(dbURL) {
 			panic("maybe accidental prod DATABASE_URL in integration tests!")
 		}
-		defaultConfig.DatabaseURL = url
+		defaultConfig.DatabaseURL = dbURL
 	} else {
-		defaultConfig.DatabaseURL = "sqlite://data.db?_pragma=foreign_keys(1)&_pragma=busy_timeout(10000)&_pragma=journal_mode(WAL)"
+		// Generate a unique database per test, avoids SQLite write contention.
+		testDatabaseName := slug.Make(time.Now().Format(time.RFC3339) + t.Name())
+
+		opts := url.Values{"_pragma": []string{
+			"foreign_keys(1)",
+			"busy_timeout(10000)",
+			"journal_mode(WAL)",
+			"synchronous(NORMAL)",
+			"cache_size(1000000000)",
+			"temp_store(MEMORY)",
+		}}.Encode()
+
+		defaultConfig.DatabaseURL = fmt.Sprintf(
+			"sqlite://data/%s.db?%s",
+			testDatabaseName,
+			opts,
+		)
 	}
 
 	ctx, cf := context.WithCancel(context.Background())

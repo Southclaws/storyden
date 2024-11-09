@@ -43,8 +43,6 @@ func TestNodesVisibilityRules_Draft(t *testing.T) {
 			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 
 			t.Run("draft_child_succeeds", func(t *testing.T) {
-				t.Parallel()
-
 				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 
@@ -54,8 +52,6 @@ func TestNodesVisibilityRules_Draft(t *testing.T) {
 			})
 
 			t.Run("unlisted_child_fails", func(t *testing.T) {
-				t.Parallel()
-
 				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
 
@@ -65,8 +61,6 @@ func TestNodesVisibilityRules_Draft(t *testing.T) {
 			})
 
 			t.Run("review_child_fails", func(t *testing.T) {
-				t.Parallel()
-
 				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
 
@@ -76,8 +70,6 @@ func TestNodesVisibilityRules_Draft(t *testing.T) {
 			})
 
 			t.Run("published_child_fails", func(t *testing.T) {
-				t.Parallel()
-
 				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
 
@@ -112,8 +104,6 @@ func TestNodesVisibilityRules_Unlisted(t *testing.T) {
 			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 
 			t.Run("draft_child_fails", func(t *testing.T) {
-				t.Parallel()
-
 				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
 
@@ -123,8 +113,6 @@ func TestNodesVisibilityRules_Unlisted(t *testing.T) {
 			})
 
 			t.Run("unlisted_child_succeeds", func(t *testing.T) {
-				t.Parallel()
-
 				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 
@@ -134,8 +122,6 @@ func TestNodesVisibilityRules_Unlisted(t *testing.T) {
 			})
 
 			t.Run("review_child_fails", func(t *testing.T) {
-				t.Parallel()
-
 				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
 
@@ -145,8 +131,6 @@ func TestNodesVisibilityRules_Unlisted(t *testing.T) {
 			})
 
 			t.Run("published_child_fails", func(t *testing.T) {
-				t.Parallel()
-
 				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
 
@@ -181,8 +165,6 @@ func TestNodesVisibilityRules_Review(t *testing.T) {
 			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 
 			t.Run("draft_child_succeeds", func(t *testing.T) {
-				t.Parallel()
-
 				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 
@@ -192,8 +174,6 @@ func TestNodesVisibilityRules_Review(t *testing.T) {
 			})
 
 			t.Run("unlisted_child_fails", func(t *testing.T) {
-				t.Parallel()
-
 				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
 
@@ -203,8 +183,6 @@ func TestNodesVisibilityRules_Review(t *testing.T) {
 			})
 
 			t.Run("review_child_succeeds", func(t *testing.T) {
-				t.Parallel()
-
 				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 
@@ -214,8 +192,6 @@ func TestNodesVisibilityRules_Review(t *testing.T) {
 			})
 
 			t.Run("published_child_fails", func(t *testing.T) {
-				t.Parallel()
-
 				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
 
@@ -250,8 +226,6 @@ func TestNodesVisibilityRules_Published(t *testing.T) {
 			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 
 			t.Run("draft_child_succeeds", func(t *testing.T) {
-				t.Parallel()
-
 				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 
@@ -261,8 +235,6 @@ func TestNodesVisibilityRules_Published(t *testing.T) {
 			})
 
 			t.Run("unlisted_child_fails", func(t *testing.T) {
-				t.Parallel()
-
 				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
 
@@ -272,8 +244,6 @@ func TestNodesVisibilityRules_Published(t *testing.T) {
 			})
 
 			t.Run("review_child_succeeds", func(t *testing.T) {
-				t.Parallel()
-
 				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 
@@ -283,8 +253,6 @@ func TestNodesVisibilityRules_Published(t *testing.T) {
 			})
 
 			t.Run("published_child_succeeds", func(t *testing.T) {
-				t.Parallel()
-
 				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
 				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
 
