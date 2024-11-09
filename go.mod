@@ -32,7 +32,6 @@ require (
 	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/Southclaws/opt v0.6.1
 	github.com/ThreeDotsLabs/watermill v1.3.7
-	github.com/ThreeDotsLabs/watermill-amqp/v2 v2.1.3
 	github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.0
 	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
 	github.com/cixtor/readability v1.0.0
