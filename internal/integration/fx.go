@@ -54,6 +54,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 			"journal_mode(WAL)",
 			"synchronous(NORMAL)",
 			"cache_size(1000000000)",
+			"temp_store(MEMORY)",
 		}}.Encode()
 
 		defaultConfig.DatabaseURL = fmt.Sprintf(
