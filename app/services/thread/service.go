@@ -88,7 +88,7 @@ type service struct {
 	tagWriter    *tag_writer.Writer
 	fetcher      *fetcher.Fetcher
 	recommender  semdex.Recommender
-	indexQueue   pubsub.Topic[mq.IndexPost]
+	indexQueue   pubsub.Topic[mq.IndexThread]
 	mentioner    *mentioner.Mentioner
 	cpm          *content_policy.Manager
 }
@@ -101,7 +101,7 @@ func New(
 	tagWriter *tag_writer.Writer,
 	fetcher *fetcher.Fetcher,
 	recommender semdex.Recommender,
-	indexQueue pubsub.Topic[mq.IndexPost],
+	indexQueue pubsub.Topic[mq.IndexThread],
 	mentioner *mentioner.Mentioner,
 	cpm *content_policy.Manager,
 ) Service {

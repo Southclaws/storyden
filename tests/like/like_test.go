@@ -86,8 +86,10 @@ func TestLikeThreads(t *testing.T) {
 			tests.Ok(t, err, profilelikeget)
 			r.Equal(profilelikeget.JSON200.Results, 1)
 			r.Equal(profilelikeget.JSON200.Results, len(profilelikeget.JSON200.Likes))
-			a.Equal(thread1create.JSON200.Id, profilelikeget.JSON200.Likes[0].Item.Id)
-			a.Equal(thread1create.JSON200.Slug, profilelikeget.JSON200.Likes[0].Item.Slug)
+			itemPost, err := profilelikeget.JSON200.Likes[0].Item.AsDatagraphItemPost()
+			r.NoError(err)
+			a.Equal(thread1create.JSON200.Id, itemPost.Ref.Id)
+			a.Equal(thread1create.JSON200.Slug, itemPost.Ref.Slug)
 
 			// Assert thread list includes all like statuses
 			threadlist1, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{Categories: &[]string{cat1create.JSON200.Slug}}, user1Session)
@@ -197,8 +199,10 @@ func TestLikeReplies(t *testing.T) {
 			tests.Ok(t, err, profilelikeget)
 			r.Equal(profilelikeget.JSON200.Results, 1)
 			r.Equal(profilelikeget.JSON200.Results, len(profilelikeget.JSON200.Likes))
-			a.Equal(reply1.JSON200.Id, profilelikeget.JSON200.Likes[0].Item.Id)
-			a.Equal(thread1create.JSON200.Slug, profilelikeget.JSON200.Likes[0].Item.Slug)
+			itemPost, err := profilelikeget.JSON200.Likes[0].Item.AsDatagraphItemPost()
+			r.NoError(err)
+			a.Equal(reply1.JSON200.Id, itemPost.Ref.Id)
+			a.Equal(thread1create.JSON200.Slug, itemPost.Ref.Slug)
 		}))
 	}))
 }

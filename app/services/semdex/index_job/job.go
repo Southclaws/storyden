@@ -16,7 +16,8 @@ func runIndexConsumer(
 	l *zap.Logger,
 
 	qnode pubsub.Topic[mq.IndexNode],
-	qpost pubsub.Topic[mq.IndexPost],
+	qthread pubsub.Topic[mq.IndexThread],
+	qreply pubsub.Topic[mq.IndexReply],
 	qprofile pubsub.Topic[mq.IndexProfile],
 
 	ic *indexerConsumer,
@@ -27,7 +28,12 @@ func runIndexConsumer(
 			panic(err)
 		}
 
-		postChan, err := qpost.Subscribe(ctx)
+		threadChan, err := qthread.Subscribe(ctx)
+		if err != nil {
+			panic(err)
+		}
+
+		replyChan, err := qreply.Subscribe(ctx)
 		if err != nil {
 			panic(err)
 		}
@@ -50,8 +56,20 @@ func runIndexConsumer(
 		}()
 
 		go func() {
-			for msg := range postChan {
-				if err := ic.indexPost(ctx, msg.Payload.ID); err != nil {
+			for msg := range threadChan {
+				if err := ic.indexThread(ctx, msg.Payload.ID); err != nil {
+					l.Error("failed to index post", zap.Error(err))
+					msg.Nack()
+					continue
+				}
+
+				msg.Ack()
+			}
+		}()
+
+		go func() {
+			for msg := range replyChan {
+				if err := ic.indexReply(ctx, msg.Payload.ID); err != nil {
 					l.Error("failed to index post", zap.Error(err))
 					msg.Nack()
 					continue

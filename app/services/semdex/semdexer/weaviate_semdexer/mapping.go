@@ -1,11 +1,44 @@
 package weaviate_semdexer
 
 import (
+	"encoding/json"
+	"strconv"
+
 	"github.com/Southclaws/fault"
 	"github.com/rs/xid"
+	"github.com/weaviate/weaviate/entities/models"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
+
+type WeaviateObject struct {
+	DatagraphID   string             `json:"datagraph_id"`
+	DatagraphType string             `json:"datagraph_type"`
+	Name          string             `json:"name"`
+	Content       string             `json:"content"`
+	Additional    WeaviateAdditional `json:"_additional"`
+}
+
+type WeaviateAdditional struct {
+	Distance float64 `json:"distance"`
+	Summary  []struct {
+		Property string `json:"property"`
+		Result   string `json:"result"`
+	} `json:"summary"`
+	Generate struct {
+		SingleResult string `json:"singleResult"`
+		Error        string `json:"error"`
+	} `json:"generate"`
+	Score        string `json:"score"`
+	ExplainScore string `json:"explainScore"`
+}
+
+type WeaviateContent map[string][]WeaviateObject
+
+type WeaviateResponse struct {
+	Get     WeaviateContent
+	Explore WeaviateContent
+}
 
 func mapToNodeReference(v WeaviateObject) (*datagraph.Ref, error) {
 	id, err := xid.FromString(v.DatagraphID)
@@ -18,9 +51,44 @@ func mapToNodeReference(v WeaviateObject) (*datagraph.Ref, error) {
 		return nil, fault.Wrap(err)
 	}
 
+	var relevance float64
+	if v.Additional.Distance > 0 {
+		// Distances are inverse to "scores" (complexionary or relevance)
+		relevance = min(max(1-v.Additional.Distance, 0), 1)
+	} else {
+		relevance, err = strconv.ParseFloat(v.Additional.Score, 64)
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
+	}
+
 	return &datagraph.Ref{
 		ID:        id,
 		Kind:      dk,
-		Relevance: min(max(1-v.Additional.Distance, 0), 1),
+		Relevance: relevance,
 	}, nil
+}
+
+func mapResponseObjects(raw map[string]models.JSONObject) (*WeaviateResponse, error) {
+	j, err := json.Marshal(raw)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	parsed := WeaviateResponse{}
+	err = json.Unmarshal(j, &parsed)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	return &parsed, nil
+}
+
+func (s *weaviateRefIndex) getFirstResult(wr *WeaviateResponse) (*WeaviateObject, error) {
+	objects := wr.Get[s.cn.String()]
+	if len(objects) != 1 {
+		return nil, fault.Newf("expected exactly one result, got %d", len(objects))
+	}
+
+	return &objects[0], nil
 }

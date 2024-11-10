@@ -7,10 +7,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { CollectionItemAllOf } from "./collectionItemAllOf";
 import type { CollectionItemMetadata } from "./collectionItemMetadata";
 import type { CommonProperties } from "./commonProperties";
-import type { DatagraphItem } from "./datagraphItem";
 
 export type CollectionItem = CommonProperties &
-  DatagraphItem &
-  CollectionItemMetadata;
+  CollectionItemMetadata &
+  CollectionItemAllOf;

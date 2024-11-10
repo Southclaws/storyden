@@ -1,6 +1,19 @@
-import { DatagraphItem, DatagraphItemKind } from "@/api/openapi-schema";
-import { HStack } from "@/styled-system/jsx";
+import chroma from "chroma-js";
 
+import {
+  DatagraphItem,
+  DatagraphItemKind,
+  DatagraphItemNode,
+  DatagraphItemPost,
+  DatagraphItemProfile,
+  DatagraphItemReply,
+  DatagraphItemThread,
+} from "@/api/openapi-schema";
+import { WStack } from "@/styled-system/jsx";
+import { ColorPalette } from "@/styled-system/tokens";
+import { getAssetURL } from "@/utils/asset";
+
+import { MemberBadge } from "../member/MemberBadge/MemberBadge";
 import { Badge } from "../ui/badge";
 import { Card } from "../ui/rich-card";
 
@@ -9,21 +22,93 @@ type Props = {
 };
 
 export function DatagraphItemCard({ item }: Props) {
-  const url = buildPermalink(item);
+  switch (item.kind) {
+    case DatagraphItemKind.post:
+      return <DatagraphItemPostGenericCard item={item} />;
+
+    case DatagraphItemKind.thread:
+      return <DatagraphItemPostGenericCard item={item} />;
+
+    case DatagraphItemKind.reply:
+      return <DatagraphItemPostGenericCard item={item} />;
+
+    case DatagraphItemKind.node:
+      return <DatagraphItemNodeCard item={item} />;
+
+    // case DatagraphItemKind.collection:
+    //   return null;
+
+    case DatagraphItemKind.profile:
+      return <DatagraphItemProfileCard item={item} />;
+
+    // case DatagraphItemKind.event:
+    //   return null;
+  }
+}
+
+function DatagraphItemPostGenericCard({
+  item,
+}: {
+  item: DatagraphItemPost | DatagraphItemThread | DatagraphItemReply;
+}) {
+  const { ref } = item;
+  const url = `/t/${ref.slug}`;
 
   return (
     <Card
-      id={item.id}
+      id={ref.id}
       url={url}
-      title={item.name}
-      text={item.description}
+      title={ref.title || "(untitled post)"}
+      text={ref.description}
       controls={
-        <HStack>
-          {/* TODO: We need more info for datagraph items on the API. */}
-          {/* <MemberBadge profile={item.owner} /> */}
+        <WStack>
+          <MemberBadge profile={ref.author} size="sm" name="full-horizontal" />
 
           <DatagraphItemBadge item={item} />
-        </HStack>
+        </WStack>
+      }
+    />
+  );
+}
+
+function DatagraphItemNodeCard({ item }: { item: DatagraphItemNode }) {
+  const { ref } = item;
+  const url = `/l/${ref.slug}`;
+
+  return (
+    <Card
+      id={ref.id}
+      url={url}
+      title={ref.name}
+      text={ref.description}
+      image={getAssetURL(ref.primary_image?.path)}
+      controls={
+        <WStack>
+          <MemberBadge profile={ref.owner} size="sm" name="full-horizontal" />
+
+          <DatagraphItemBadge item={item} />
+        </WStack>
+      }
+    />
+  );
+}
+
+function DatagraphItemProfileCard({ item }: { item: DatagraphItemProfile }) {
+  const { ref } = item;
+  const url = `/m/${ref.handle}`;
+
+  return (
+    <Card
+      id={ref.id}
+      url={url}
+      title={ref.name}
+      text={ref.bio}
+      controls={
+        <WStack>
+          <MemberBadge profile={ref} size="sm" name="full-horizontal" />
+
+          <DatagraphItemBadge item={item} />
+        </WStack>
       }
     />
   );
@@ -31,27 +116,76 @@ export function DatagraphItemCard({ item }: Props) {
 
 export function DatagraphItemBadge({ item }: Props) {
   const label = getDatagraphKindLabel(item.kind);
-  return <Badge>{label}</Badge>;
+  const colour = getDatagraphKindColour(item.kind);
+
+  const cssVars = badgeColourCSS(colour);
+
+  return (
+    <Badge
+      style={cssVars}
+      backgroundColor="var(--colors-color-palette-bg)"
+      borderColor="var(--colors-color-palette-bo)"
+      color="var(--colors-color-palette-fg)"
+    >
+      {label}
+    </Badge>
+  );
 }
 
-function buildPermalink(d: DatagraphItem): string {
-  switch (d.kind) {
-    case "post":
-      return `/t/${d.slug}`;
-    case "profile":
-      return `/t/${d.slug}`;
-    case "node":
-      return `/l/${d.slug}`;
-  }
+export function badgeColourCSS(c: string) {
+  const { bg, bo, fg } = badgeColours(c);
+
+  return {
+    "--colors-color-palette-fg": fg,
+    "--colors-color-palette-bo": bo,
+    "--colors-color-palette-bg": bg,
+  } as React.CSSProperties;
+}
+
+export function badgeColours(c: string) {
+  const colour = chroma(c);
+
+  const bg = colour.luminance(0.8).css();
+  const bo = colour.luminance(0.6).saturate(1.3).css();
+  const fg = colour.darken(1.5).saturate(2).css();
+
+  return { bg, bo, fg };
 }
 
 function getDatagraphKindLabel(kind: DatagraphItemKind): string {
   switch (kind) {
-    case "post":
+    case DatagraphItemKind.post:
       return "Post";
-    case "profile":
-      return "Profile";
-    case "node":
+    case DatagraphItemKind.thread:
+      return "Thread";
+    case DatagraphItemKind.reply:
+      return "Reply";
+    case DatagraphItemKind.node:
       return "Library";
+    case DatagraphItemKind.collection:
+      return "Collection";
+    case DatagraphItemKind.profile:
+      return "Profile";
+    case DatagraphItemKind.event:
+      return "Event";
+  }
+}
+
+function getDatagraphKindColour(kind: DatagraphItemKind): ColorPalette {
+  switch (kind) {
+    case DatagraphItemKind.post:
+      return "pink";
+    case DatagraphItemKind.thread:
+      return "pink";
+    case DatagraphItemKind.reply:
+      return "pink";
+    case DatagraphItemKind.node:
+      return "green";
+    case DatagraphItemKind.collection:
+      return "blue";
+    case DatagraphItemKind.profile:
+      return "red";
+    case DatagraphItemKind.event:
+      return "amber";
   }
 }
