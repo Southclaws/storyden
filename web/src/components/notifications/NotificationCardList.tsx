@@ -3,6 +3,7 @@ import { NotificationStatus } from "@/api/openapi-schema";
 import { ArchiveIcon } from "@/components/ui/icons/Archive";
 import { InboxIcon } from "@/components/ui/icons/Inbox";
 import { Card, CardRows } from "@/components/ui/rich-card";
+import { getCommonProperties } from "@/lib/datagraph/item";
 import { Center, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { timestamp } from "@/utils/date";
 
@@ -29,8 +30,10 @@ export function NotificationCardList({ notifications, onMove }: Props) {
   return (
     <CardRows>
       {notifications.map((n) => {
-        const title = n.item?.description
-          ? `${n.description} "${n.item?.description}"`
+        const properties = n.item && getCommonProperties(n.item);
+
+        const title = properties?.description
+          ? `${n.description} "${properties?.description}"`
           : n.description;
 
         return (

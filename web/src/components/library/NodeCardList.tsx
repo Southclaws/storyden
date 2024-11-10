@@ -15,13 +15,7 @@ export function NodeCardRows({ libraryPath, nodes, context }: Props) {
   return (
     <CardRows>
       {nodes.map((c) => (
-        <NodeCard
-          key={c.id}
-          shape="row"
-          context={context}
-          libraryPath={libraryPath}
-          node={c}
-        />
+        <NodeCard key={c.id} shape="row" libraryPath={libraryPath} node={c} />
       ))}
     </CardRows>
   );
@@ -34,7 +28,6 @@ export function NodeCardGrid({ libraryPath, nodes, context }: Props) {
         <NodeCard
           key={c.id}
           shape="responsive"
-          context={context}
           libraryPath={libraryPath}
           node={c}
         />
