@@ -2,17 +2,16 @@ package weaviate_semdexer
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/rs/xid"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/filters"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
-	"github.com/weaviate/weaviate/entities/models"
+
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
 func (w *weaviateRefIndex) ScoreRelevance(ctx context.Context, object datagraph.Item, ids ...xid.ID) (map[xid.ID]float64, error) {
@@ -72,28 +71,4 @@ func (w *weaviateRefIndex) ScoreRelevance(ctx context.Context, object datagraph.
 	}, map[xid.ID]float64{})
 
 	return out, nil
-}
-
-func mapResponseObjects(raw map[string]models.JSONObject) (*WeaviateResponse, error) {
-	j, err := json.Marshal(raw)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	parsed := WeaviateResponse{}
-	err = json.Unmarshal(j, &parsed)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	return &parsed, nil
-}
-
-func (s *weaviateRefIndex) getFirstResult(wr *WeaviateResponse) (*WeaviateObject, error) {
-	objects := wr.Get[s.cn.String()]
-	if len(objects) != 1 {
-		return nil, fault.Newf("expected exactly one result, got %d", len(objects))
-	}
-
-	return &objects[0], nil
 }

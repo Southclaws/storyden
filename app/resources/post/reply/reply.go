@@ -27,6 +27,7 @@ type Reply struct {
 	RootThreadMark  string
 	RootThreadTitle string
 	RootAuthor      profile.Public
+	Slug            string // The root slug with the post ID as a #fragment
 	ReplyTo         opt.Optional[post.ID]
 }
 
@@ -39,6 +40,8 @@ func (r *Reply) GetName() string {
 
 	return fmt.Sprintf("reply to: %s", r.RootThreadTitle)
 }
+
+func (r *Reply) GetKind() datagraph.Kind { return datagraph.KindReply }
 
 func (r *Reply) GetSlug() string {
 	if xid.ID(r.RootPostID).IsZero() {
@@ -118,6 +121,8 @@ func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Reply, error) {
 			rootThreadMark := opt.NewPtr(m.Edges.Root).OrZero().Slug
 			rootThreadTitle := opt.NewPtr(m.Edges.Root).OrZero().Title
 
+			slug := fmt.Sprintf("%s#%s", rootThreadMark, m.ID)
+
 			rootAuthor, err := profile.ProfileFromModel(m.Edges.Root.Edges.Author)
 			if err != nil {
 				return nil, fault.Wrap(err)
@@ -127,6 +132,7 @@ func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Reply, error) {
 			reply.RootThreadMark = rootThreadMark
 			reply.RootThreadTitle = rootThreadTitle
 			reply.RootAuthor = *rootAuthor
+			reply.Slug = slug
 		}
 
 		return reply, nil

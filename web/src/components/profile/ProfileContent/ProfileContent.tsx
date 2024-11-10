@@ -2,7 +2,7 @@ import { Unready } from "src/components/site/Unready";
 
 import { CollectionCard } from "@/components/collection/CollectionCard";
 import { CollectionCreateTrigger } from "@/components/content/CollectionCreate/CollectionCreateTrigger";
-import { ThreadItemList } from "@/components/feed/ThreadItemList";
+import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";
 import { CardGrid } from "@/components/ui/rich-card";
 import * as Tabs from "@/components/ui/tabs";
 import { HStack, VStack } from "@/styled-system/jsx";
@@ -29,7 +29,7 @@ export function ProfileContent(props: Props) {
         </Tabs.List>
 
         <Tabs.Content value="threads">
-          <ThreadItemList threads={threads} />
+          <ThreadReferenceList threads={threads} />
         </Tabs.Content>
 
         <Tabs.Content className={lstack()} value="collections">

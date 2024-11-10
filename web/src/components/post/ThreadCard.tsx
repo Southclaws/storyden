@@ -9,18 +9,17 @@ import { Card } from "@/components/ui/rich-card";
 import { HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
+import { FeedItemMenu } from "../feed/FeedItemMenu/FeedItemMenu";
 import {
   DiscussionIcon,
   DiscussionParticipatingIcon,
 } from "../ui/icons/Discussion";
 
-import { FeedItemMenu } from "./FeedItemMenu/FeedItemMenu";
-
 type Props = {
   thread: ThreadReference;
 };
 
-export function ThreadItem({ thread }: Props) {
+export function ThreadReferenceCard({ thread }: Props) {
   const session = useSession();
   const permalink = `/t/${thread.slug}`;
 

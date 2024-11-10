@@ -12,24 +12,30 @@ func matchThreadToItem(t *testing.T, thread *openapi.Thread, item openapi.Collec
 	t.Helper()
 	a := assert.New(t)
 
-	a.Equal(openapi.DatagraphItemKindPost, item.Kind)
-	a.Equal(thread.Id, item.Id)
-	// a.Equal(thread.CreatedAt, item.CreatedAt) // TODO
-	a.Equal(thread.Title, item.Name)
-	a.Contains(thread.Slug, item.Slug)
-	a.Equal(thread.Description, item.Description)
-	a.Equal(thread.Author, item.Owner)
+	itemPost, err := item.Item.AsDatagraphItemPost()
+	a.NoError(err)
+
+	a.Equal(openapi.DatagraphItemKindPost, itemPost.Kind)
+	a.Equal(thread.Id, itemPost.Ref.Id)
+	a.Equal(thread.CreatedAt, itemPost.Ref.CreatedAt)
+	a.Equal(thread.Title, itemPost.Ref.Title)
+	a.Contains(thread.Slug, itemPost.Ref.Slug)
+	a.Equal(thread.Description, itemPost.Ref.Description)
+	a.Equal(thread.Author, itemPost.Ref.Author)
 }
 
 func matchNodeToItem(t *testing.T, node *openapi.Node, item openapi.CollectionItem) {
 	t.Helper()
 	a := assert.New(t)
 
-	a.Equal(openapi.DatagraphItemKindNode, item.Kind)
-	a.Equal(node.Id, item.Id)
-	// a.Equal(node.CreatedAt, item.CreatedAt) // TODO
-	a.Equal(node.Name, item.Name)
-	a.Contains(node.Slug, item.Slug)
-	a.Equal(node.Description, *item.Description)
-	a.Equal(node.Owner, item.Owner)
+	itemNode, err := item.Item.AsDatagraphItemNode()
+	a.NoError(err)
+
+	a.Equal(openapi.DatagraphItemKindNode, itemNode.Kind)
+	a.Equal(node.Id, itemNode.Ref.Id)
+	a.Equal(node.CreatedAt, itemNode.Ref.CreatedAt)
+	a.Equal(node.Name, itemNode.Ref.Name)
+	a.Contains(node.Slug, itemNode.Ref.Slug)
+	a.Equal(node.Description, itemNode.Ref.Description)
+	a.Equal(node.Owner, itemNode.Ref.Owner)
 }

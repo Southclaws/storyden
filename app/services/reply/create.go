@@ -36,7 +36,7 @@ func (s *service) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create reply post in thread"))
 	}
 
-	if err := s.indexQueue.Publish(ctx, mq.IndexPost{
+	if err := s.indexQueue.Publish(ctx, mq.IndexReply{
 		ID: p.ID,
 	}); err != nil {
 		s.l.Error("failed to publish index post message", zap.Error(err))

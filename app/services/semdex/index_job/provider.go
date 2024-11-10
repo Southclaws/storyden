@@ -12,7 +12,8 @@ func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			queue.New[mq.IndexNode],
-			queue.New[mq.IndexPost],
+			queue.New[mq.IndexThread],
+			queue.New[mq.IndexReply],
 			queue.New[mq.IndexProfile],
 		),
 

@@ -14,6 +14,10 @@ export type DatagraphItemKind =
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const DatagraphItemKind = {
   post: "post",
+  thread: "thread",
+  reply: "reply",
   node: "node",
+  collection: "collection",
   profile: "profile",
+  event: "event",
 } as const;

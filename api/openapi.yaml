@@ -4732,8 +4732,10 @@ components:
     CollectionItem:
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - $ref: "#/components/schemas/DatagraphItem"
         - $ref: "#/components/schemas/CollectionItemMetadata"
+        - required: [item]
+          properties:
+            item: { $ref: "#/components/schemas/DatagraphItem" }
 
     CollectionItemMetadata:
       type: object
@@ -5009,22 +5011,59 @@ components:
 
     DatagraphItem:
       type: object
-      required: [kind, id, name, slug, assets]
+      discriminator:
+        propertyName: kind
+        mapping:
+          post: "#/components/schemas/DatagraphItemPost"
+          thread: "#/components/schemas/DatagraphItemThread"
+          reply: "#/components/schemas/DatagraphItemReply"
+          node: "#/components/schemas/DatagraphItemNode"
+          profile: "#/components/schemas/DatagraphItemProfile"
+      oneOf:
+        - $ref: "#/components/schemas/DatagraphItemPost"
+        - $ref: "#/components/schemas/DatagraphItemThread"
+        - $ref: "#/components/schemas/DatagraphItemReply"
+        - $ref: "#/components/schemas/DatagraphItemNode"
+        - $ref: "#/components/schemas/DatagraphItemProfile"
+
+    DatagraphItemPost:
+      type: object
+      required: [kind, ref]
       properties:
         kind: { $ref: "#/components/schemas/DatagraphItemKind" }
-        id: { $ref: "#/components/schemas/Identifier" }
-        name:
-          type: string
-        slug:
-          type: string
-        description:
-          type: string
-        assets: { $ref: "#/components/schemas/AssetList" }
-        meta: { $ref: "#/components/schemas/Metadata" }
+        ref: { $ref: "#/components/schemas/Post" }
+
+    DatagraphItemThread:
+      type: object
+      required: [kind, ref]
+      properties:
+        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
+        ref: { $ref: "#/components/schemas/Thread" }
+
+    DatagraphItemReply:
+      type: object
+      required: [kind, ref]
+      properties:
+        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
+        ref: { $ref: "#/components/schemas/Reply" }
+
+    DatagraphItemNode:
+      type: object
+      required: [kind, ref]
+      properties:
+        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
+        ref: { $ref: "#/components/schemas/Node" }
+
+    DatagraphItemProfile:
+      type: object
+      required: [kind, ref]
+      properties:
+        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
+        ref: { $ref: "#/components/schemas/PublicProfile" }
 
     DatagraphItemKind:
       type: string
-      enum: [post, node, profile]
+      enum: [post, thread, reply, node, collection, profile, event]
 
     DatagraphRecommendations:
       required: [recomentations]
