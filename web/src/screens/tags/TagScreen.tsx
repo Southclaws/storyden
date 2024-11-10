@@ -2,7 +2,7 @@
 
 import { useTagGet } from "@/api/openapi-client/tags";
 import { Tag, TagName } from "@/api/openapi-schema";
-import { DatagraphResultItem } from "@/components/search/DatagraphSearchResults";
+import { DatagraphItemCard } from "@/components/datagraph/DatagraphItemCard";
 import { Unready } from "@/components/site/Unready";
 import { TagBadge } from "@/components/tag/TagBadge";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
@@ -46,7 +46,7 @@ export function TagScreen(props: Props) {
       </LStack>
 
       {tag.items.map((item) => (
-        <DatagraphResultItem key={item.id} {...item} />
+        <DatagraphItemCard key={item.ref.id} item={item} />
       ))}
     </LStack>
   );

@@ -10,6 +10,7 @@ import {
   NotificationListResult,
   NotificationStatus,
 } from "@/api/openapi-schema";
+import { getCommonProperties } from "@/lib/datagraph/item";
 
 import { NotificationItem } from "./item";
 
@@ -101,13 +102,14 @@ function mapToItem(n: Notification): NotificationItem {
 }
 
 function getNotificationContent(n: Notification) {
+  const p = n.item && getCommonProperties(n.item);
   switch (n.event) {
     case "thread_reply":
-      return { description: "replied to your post", url: `/t/${n.item?.slug}` };
+      return { description: "replied to your post", url: `/t/${p?.slug}` };
     case "post_like":
-      return { description: "liked your post", url: `/t/${n.item?.slug}` };
+      return { description: "liked your post", url: `/t/${p?.slug}` };
     case "profile_mention":
-      return { description: "mentioned you", url: `/t/${n.item?.slug}` };
+      return { description: "mentioned you", url: `/t/${p?.slug}` };
     case "follow":
       return { description: "followed you", url: `/m/${n.source?.handle}` };
   }

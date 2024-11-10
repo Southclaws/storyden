@@ -7,15 +7,11 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { DatagraphItemNode } from "./datagraphItemNode";
-import type { DatagraphItemPost } from "./datagraphItemPost";
-import type { DatagraphItemProfile } from "./datagraphItemProfile";
-import type { DatagraphItemReply } from "./datagraphItemReply";
-import type { DatagraphItemThread } from "./datagraphItemThread";
 
-export type DatagraphItem =
-  | DatagraphItemPost
-  | DatagraphItemThread
-  | DatagraphItemReply
-  | DatagraphItemNode
-  | DatagraphItemProfile;
+export type DatagraphItemProfileKind =
+  (typeof DatagraphItemProfileKind)[keyof typeof DatagraphItemProfileKind];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const DatagraphItemProfileKind = {
+  profile: "profile",
+} as const;

@@ -66,7 +66,7 @@ export function CollectionScreen({ session, initialCollection }: Props) {
 
       <CardGrid>
         {collection.items.map((i) => (
-          <DatagraphItemCard key={i.id} item={i} />
+          <DatagraphItemCard key={i.id} item={i.item} />
         ))}
       </CardGrid>
     </VStack>

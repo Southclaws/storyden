@@ -6,10 +6,13 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/asset"
 )
 
 var ErrInvalidReferenceScheme = fault.New("invalid reference scheme")
+
+type OptAsset = opt.Optional[asset.Asset]
 
 type (
 	Identifiable interface{ GetID() xid.ID }             // Has a unique ID
@@ -21,6 +24,7 @@ type (
 	WithAssets   interface{ GetAssets() []*asset.Asset } // Has media assets
 	WithCreated  interface{ GetCreated() time.Time }     // Has a creation timestamp
 	WithUpdated  interface{ GetUpdated() time.Time }     // Has an update timestamp
+	WithCover    interface{ GetCover() OptAsset }        // Has a cover image
 )
 
 // Addressable describes a type that can be uniquely identified via either an ID

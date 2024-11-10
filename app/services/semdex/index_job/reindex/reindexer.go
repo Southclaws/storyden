@@ -27,7 +27,8 @@ type reindexer struct {
 	ec *ent.Client
 
 	qnode    pubsub.Topic[mq.IndexNode]
-	qpost    pubsub.Topic[mq.IndexPost]
+	qthread  pubsub.Topic[mq.IndexThread]
+	qreply   pubsub.Topic[mq.IndexReply]
 	qprofile pubsub.Topic[mq.IndexProfile]
 
 	indexer   semdex.Indexer
@@ -40,7 +41,8 @@ func newReindexer(
 	ec *ent.Client,
 
 	qnode pubsub.Topic[mq.IndexNode],
-	qpost pubsub.Topic[mq.IndexPost],
+	qthread pubsub.Topic[mq.IndexThread],
+	qreply pubsub.Topic[mq.IndexReply],
 	qprofile pubsub.Topic[mq.IndexProfile],
 
 	indexer semdex.Indexer,
@@ -60,7 +62,8 @@ func newReindexer(
 		ec: ec,
 
 		qnode:    qnode,
-		qpost:    qpost,
+		qthread:  qthread,
+		qreply:   qreply,
 		qprofile: qprofile,
 
 		indexer:   indexer,
@@ -74,11 +77,16 @@ func (r *reindexer) reindexAll(ctx context.Context) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	posts := dt.Filter(indexed, func(i *datagraph.Ref) bool { return i.Kind == datagraph.KindPost })
+	threads := dt.Filter(indexed, func(i *datagraph.Ref) bool { return i.Kind == datagraph.KindThread })
+	replies := dt.Filter(indexed, func(i *datagraph.Ref) bool { return i.Kind == datagraph.KindReply })
 	nodes := dt.Filter(indexed, func(i *datagraph.Ref) bool { return i.Kind == datagraph.KindNode })
 	profiles := dt.Filter(indexed, func(i *datagraph.Ref) bool { return i.Kind == datagraph.KindProfile })
 
-	if err := r.reindexPosts(ctx, posts); err != nil {
+	if err := r.reindexThreads(ctx, threads); err != nil {
+		return err
+	}
+
+	if err := r.reindexReplies(ctx, replies); err != nil {
 		return err
 	}
 
@@ -121,8 +129,8 @@ func (r *reindexer) reindexNodes(ctx context.Context, indexed []*datagraph.Ref) 
 	return nil
 }
 
-func (r *reindexer) reindexPosts(ctx context.Context, indexed []*datagraph.Ref) error {
-	posts, err := r.ec.Post.Query().Select(entpost.FieldID).All(ctx)
+func (r *reindexer) reindexThreads(ctx context.Context, indexed []*datagraph.Ref) error {
+	posts, err := r.ec.Post.Query().Select(entpost.FieldID).Where(entpost.RootPostIDIsNil()).All(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -132,17 +140,45 @@ func (r *reindexer) reindexPosts(ctx context.Context, indexed []*datagraph.Ref) 
 
 	intersection := lo.Without(postIDs, indexedIDs...)
 
-	r.l.Debug("reindexing all unindexed posts",
+	r.l.Debug("reindexing all unindexed threads",
 		zap.Int("all_posts", len(posts)),
 		zap.Int("indexed_posts", len(indexed)),
 		zap.Int("unindexed_posts", len(intersection)),
 	)
 
-	messages := dt.Map(intersection, func(id xid.ID) mq.IndexPost {
-		return mq.IndexPost{ID: post.ID(id)}
+	messages := dt.Map(intersection, func(id xid.ID) mq.IndexThread {
+		return mq.IndexThread{ID: post.ID(id)}
 	})
 
-	if err := r.qpost.Publish(ctx, messages...); err != nil {
+	if err := r.qthread.Publish(ctx, messages...); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (r *reindexer) reindexReplies(ctx context.Context, indexed []*datagraph.Ref) error {
+	posts, err := r.ec.Post.Query().Select(entpost.FieldID).Where(entpost.RootPostIDNotNil()).All(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	indexedIDs := dt.Map(indexed, func(i *datagraph.Ref) xid.ID { return i.ID })
+	postIDs := dt.Map(posts, func(p *ent.Post) xid.ID { return p.ID })
+
+	intersection := lo.Without(postIDs, indexedIDs...)
+
+	r.l.Debug("reindexing all unindexed replies",
+		zap.Int("all_posts", len(posts)),
+		zap.Int("indexed_posts", len(indexed)),
+		zap.Int("unindexed_posts", len(intersection)),
+	)
+
+	messages := dt.Map(intersection, func(id xid.ID) mq.IndexReply {
+		return mq.IndexReply{ID: post.ID(id)}
+	})
+
+	if err := r.qreply.Publish(ctx, messages...); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 

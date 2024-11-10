@@ -74,7 +74,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.indexQueue.Publish(ctx, mq.IndexPost{
+	if err := s.indexQueue.Publish(ctx, mq.IndexThread{
 		ID: thr.ID,
 	}); err != nil {
 		s.l.Error("failed to publish index post message", zap.Error(err))

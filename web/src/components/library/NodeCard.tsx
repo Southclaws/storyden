@@ -14,10 +14,9 @@ export type NodeCardContext = "library" | "generic";
 export type Props = {
   node: Node;
   libraryPath: LibraryPath;
-  context: NodeCardContext;
 } & RichCardVariantProps;
 
-export function NodeCard({ node, libraryPath, context, ...rest }: Props) {
+export function NodeCard({ node, libraryPath, ...rest }: Props) {
   const slug = joinLibraryPath(libraryPath, node.slug);
   const url = `/l/${slug}`;
   const image = getAssetURL(node.primary_image?.path);

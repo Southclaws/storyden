@@ -67,7 +67,7 @@ func (s *service) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))
 	}
 
-	if err := s.indexQueue.Publish(ctx, mq.IndexPost{
+	if err := s.indexQueue.Publish(ctx, mq.IndexThread{
 		ID: thr.ID,
 	}); err != nil {
 		s.l.Error("failed to publish index post message", zap.Error(err))
