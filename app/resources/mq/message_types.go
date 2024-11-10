@@ -19,7 +19,11 @@ type IndexNode struct {
 	ID library.NodeID
 }
 
-type IndexPost struct {
+type IndexThread struct {
+	ID post.ID
+}
+
+type IndexReply struct {
 	ID post.ID
 }
 

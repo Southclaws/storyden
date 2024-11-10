@@ -11,39 +11,16 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
-type WeaviateAdditional struct {
-	Distance float64 `json:"distance"`
-	Summary  []struct {
-		Property string `json:"property"`
-		Result   string `json:"result"`
-	} `json:"summary"`
-	Generate struct {
-		SingleResult string `json:"singleResult"`
-		Error        string `json:"error"`
-	} `json:"generate"`
-}
-
-type WeaviateObject struct {
-	DatagraphID   string             `json:"datagraph_id"`
-	DatagraphType string             `json:"datagraph_type"`
-	Name          string             `json:"name"`
-	Content       string             `json:"content"`
-	Additional    WeaviateAdditional `json:"_additional"`
-}
-
-type WeaviateContent map[string][]WeaviateObject
-
-type WeaviateResponse struct {
-	Get     WeaviateContent
-	Explore WeaviateContent
-}
-
 func (s *weaviateRefIndex) Search(ctx context.Context, q string) (datagraph.RefList, error) {
 	fields := []graphql.Field{
 		{Name: "datagraph_id"},
 		{Name: "datagraph_type"},
 		{Name: "name"},
 		{Name: "content"},
+		{Name: "_additional", Fields: []graphql.Field{
+			{Name: "score"},
+			{Name: "explainScore"},
+		}},
 	}
 
 	arg := s.wc.GraphQL().
@@ -56,6 +33,7 @@ func (s *weaviateRefIndex) Search(ctx context.Context, q string) (datagraph.RefL
 		WithClassName(s.cn.String()).
 		WithFields(fields...).
 		WithHybrid(arg).
+		WithAutocut(2).
 		WithLimit(30).
 		Do(context.Background()))
 	if err != nil {

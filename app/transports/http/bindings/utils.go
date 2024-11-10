@@ -135,7 +135,7 @@ func serialiseReply(p *reply.Reply) openapi.Reply {
 		UpdatedAt: p.UpdatedAt,
 		DeletedAt: p.DeletedAt.Ptr(),
 		RootId:    p.RootPostID.String(),
-		RootSlug:  p.RootThreadMark,
+		RootSlug:  p.Slug,
 		Body:      p.Content.HTML(),
 		Author:    serialiseProfileReference(p.Author),
 		Likes:     serialiseLikeStatus(&p.Likes),
@@ -146,17 +146,22 @@ func serialiseReply(p *reply.Reply) openapi.Reply {
 }
 
 func serialisePost(p *post.Post) openapi.Post {
+	description := p.Content.Short()
 	return openapi.Post{
-		Id:        openapi.Identifier(xid.ID(p.ID).String()),
-		CreatedAt: p.CreatedAt,
-		UpdatedAt: p.UpdatedAt,
-		DeletedAt: p.DeletedAt.Ptr(),
-		Body:      p.Content.HTML(),
-		Author:    serialiseProfileReference(p.Author),
-		Likes:     serialiseLikeStatus(&p.Likes),
-		Reacts:    dt.Map(p.Reacts, serialiseReact),
-		Meta:      (*openapi.Metadata)(&p.Meta),
-		Assets:    dt.Map(p.Assets, serialiseAssetPtr),
+		Id:          openapi.Identifier(xid.ID(p.ID).String()),
+		CreatedAt:   p.CreatedAt,
+		DeletedAt:   p.DeletedAt.Ptr(),
+		UpdatedAt:   p.UpdatedAt,
+		Title:       p.Title,
+		Description: &description,
+		Slug:        p.Slug,
+		Body:        p.Content.HTML(),
+		Author:      serialiseProfileReference(p.Author),
+		Assets:      dt.Map(p.Assets, serialiseAssetPtr),
+		Collections: openapi.CollectionStatus{},
+		Likes:       serialiseLikeStatus(&p.Likes),
+		Reacts:      dt.Map(p.Reacts, serialiseReact),
+		Meta:        (*openapi.Metadata)(&p.Meta),
 	}
 }
 

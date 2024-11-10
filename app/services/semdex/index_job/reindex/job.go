@@ -17,7 +17,8 @@ func runReindexer(
 	l *zap.Logger,
 
 	qnode pubsub.Topic[mq.IndexNode],
-	qpost pubsub.Topic[mq.IndexPost],
+	qthread pubsub.Topic[mq.IndexThread],
+	qreply pubsub.Topic[mq.IndexReply],
 	re *reindexer,
 ) {
 	if re == nil {

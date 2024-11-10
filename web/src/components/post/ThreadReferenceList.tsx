@@ -2,17 +2,17 @@ import { ThreadReference } from "src/api/openapi-schema";
 
 import { styled } from "@/styled-system/jsx";
 
-import { ThreadItem } from "./ThreadItem";
+import { ThreadReferenceCard } from "./ThreadCard";
 
 type Props = {
   threads: ThreadReference[];
 };
 
-export function ThreadItemList(props: Props) {
+export function ThreadReferenceList(props: Props) {
   return (
     <styled.ol width="full" display="flex" flexDirection="column" gap="3">
       {props.threads.map((t) => (
-        <ThreadItem key={t.id} thread={t} />
+        <ThreadReferenceCard key={t.id} thread={t} />
       ))}
     </styled.ol>
   );

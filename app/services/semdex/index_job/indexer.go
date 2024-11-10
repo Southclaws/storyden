@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -22,13 +23,15 @@ import (
 type indexerConsumer struct {
 	l *zap.Logger
 
+	threadRepo   thread.Repository
 	replyRepo    reply.Repository
 	nodeQuerier  *node_querier.Querier
 	accountQuery *account_querier.Querier
 
 	qnode    pubsub.Topic[mq.IndexNode]
 	qnodesum pubsub.Topic[mq.SummariseNode]
-	qpost    pubsub.Topic[mq.IndexPost]
+	qthread  pubsub.Topic[mq.IndexThread]
+	qreply   pubsub.Topic[mq.IndexReply]
 
 	indexer   semdex.Indexer
 	retriever semdex.Retriever
@@ -37,13 +40,15 @@ type indexerConsumer struct {
 func newIndexConsumer(
 	l *zap.Logger,
 
+	threadRepo thread.Repository,
 	replyRepo reply.Repository,
 	nodeQuerier *node_querier.Querier,
 	accountQuery *account_querier.Querier,
 
 	qnode pubsub.Topic[mq.IndexNode],
 	qnodesum pubsub.Topic[mq.SummariseNode],
-	qpost pubsub.Topic[mq.IndexPost],
+	qthread pubsub.Topic[mq.IndexThread],
+	qreply pubsub.Topic[mq.IndexReply],
 	qprofile pubsub.Topic[mq.IndexProfile],
 
 	indexer semdex.Indexer,
@@ -51,18 +56,29 @@ func newIndexConsumer(
 ) *indexerConsumer {
 	return &indexerConsumer{
 		l:            l,
+		threadRepo:   threadRepo,
 		replyRepo:    replyRepo,
 		nodeQuerier:  nodeQuerier,
 		accountQuery: accountQuery,
 		qnode:        qnode,
 		qnodesum:     qnodesum,
-		qpost:        qpost,
+		qthread:      qthread,
+		qreply:       qreply,
 		indexer:      indexer,
 		retriever:    retriever,
 	}
 }
 
-func (i *indexerConsumer) indexPost(ctx context.Context, id post.ID) error {
+func (i *indexerConsumer) indexThread(ctx context.Context, id post.ID) error {
+	p, err := i.threadRepo.Get(ctx, id, nil)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return i.indexer.Index(ctx, p)
+}
+
+func (i *indexerConsumer) indexReply(ctx context.Context, id post.ID) error {
 	p, err := i.replyRepo.Get(ctx, id)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))

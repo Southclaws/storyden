@@ -2,8 +2,8 @@
 
 import { Unready } from "src/components/site/Unready";
 
-import { ThreadItemList } from "@/components/feed/ThreadItemList";
 import { NodeCardRows } from "@/components/library/NodeCardList";
+import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";
 import { Heading } from "@/components/ui/heading";
 import { VStack } from "@/styled-system/jsx";
 
@@ -24,7 +24,7 @@ export function DraftListScreen(props: Props) {
       <Heading>Your drafts</Heading>
 
       <Heading color="fg.subtle">Threads</Heading>
-      <ThreadItemList threads={threads} />
+      <ThreadReferenceList threads={threads} />
 
       <Heading color="fg.subtle">Library</Heading>
       <NodeCardRows libraryPath={libraryPath} context="generic" nodes={nodes} />

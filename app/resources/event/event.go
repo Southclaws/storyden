@@ -20,7 +20,7 @@ type Event struct {
 }
 
 func (e *Event) GetID() xid.ID                 { return xid.ID(e.ID) }
-func (e *Event) GetKind() datagraph.Kind       { return datagraph.KindPost }
+func (e *Event) GetKind() datagraph.Kind       { return datagraph.KindEvent }
 func (e *Event) GetName() string               { return e.Name }
 func (e *Event) GetSlug() string               { return e.Slug }
 func (e *Event) GetContent() datagraph.Content { return e.Thread.Content }

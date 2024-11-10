@@ -57,7 +57,7 @@ type service struct {
 	accountQuery *account_querier.Querier
 	post_repo    reply.Repository
 	fetcher      *fetcher.Fetcher
-	indexQueue   pubsub.Topic[mq.IndexPost]
+	indexQueue   pubsub.Topic[mq.IndexReply]
 	notifier     *notify.Notifier
 	cpm          *content_policy.Manager
 }
@@ -68,7 +68,7 @@ func New(
 	accountQuery *account_querier.Querier,
 	post_repo reply.Repository,
 	fetcher *fetcher.Fetcher,
-	indexQueue pubsub.Topic[mq.IndexPost],
+	indexQueue pubsub.Topic[mq.IndexReply],
 	notifier *notify.Notifier,
 	cpm *content_policy.Manager,
 ) Service {

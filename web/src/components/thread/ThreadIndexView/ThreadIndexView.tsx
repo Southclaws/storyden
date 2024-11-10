@@ -1,7 +1,7 @@
 import { PaginationControls } from "src/components/site/PaginationControls/PaginationControls";
 import { Unready } from "src/components/site/Unready";
 
-import { ThreadItemList } from "@/components/feed/ThreadItemList";
+import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";
 import { Button } from "@/components/ui/button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
@@ -62,7 +62,7 @@ export function ThreadIndexView(props: Props) {
         pageSize={data.threads.page_size}
       />
 
-      <ThreadItemList threads={data.threads.threads} />
+      <ThreadReferenceList threads={data.threads.threads} />
     </VStack>
   );
 }

@@ -39,11 +39,12 @@ type Thread struct {
 
 func (*Thread) GetResourceName() string { return "thread" }
 
-func (t *Thread) GetName() string       { return t.Title }
-func (t *Thread) GetSlug() string       { return t.Slug }
-func (t *Thread) GetDesc() string       { return t.Short }
-func (t *Thread) GetCreated() time.Time { return t.CreatedAt }
-func (t *Thread) GetUpdated() time.Time { return t.UpdatedAt }
+func (t *Thread) GetKind() datagraph.Kind { return datagraph.KindThread }
+func (t *Thread) GetName() string         { return t.Title }
+func (t *Thread) GetSlug() string         { return t.Slug }
+func (t *Thread) GetDesc() string         { return t.Short }
+func (t *Thread) GetCreated() time.Time   { return t.CreatedAt }
+func (t *Thread) GetUpdated() time.Time   { return t.UpdatedAt }
 
 func FromModel(ls post.PostLikesMap, cs collection_item_status.CollectionStatusMap, rs post.PostRepliesMap) func(m *ent.Post) (*Thread, error) {
 	return func(m *ent.Post) (*Thread, error) {

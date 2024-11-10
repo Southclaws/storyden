@@ -202,22 +202,16 @@ func serialiseCollectionWithItems(in *collection.CollectionWithItems) openapi.Co
 
 func serialiseCollectionItem(in *collection.CollectionItem) openapi.CollectionItem {
 	score := opt.PtrMap(in.RelevanceScore, func(s float64) float32 { return float32(s) })
-	meta := in.Item.GetProps()
 
 	return openapi.CollectionItem{
 		Id:             in.Item.GetID().String(),
-		AddedAt:        in.Added,
 		CreatedAt:      in.Item.GetCreated(),
 		UpdatedAt:      in.Item.GetUpdated(),
-		MembershipType: openapi.CollectionItemMembershipType(in.MembershipType.String()),
 		Owner:          serialiseProfileReference(in.Author), // Invalid, wrong owner
-		Kind:           serialiseDatagraphKind(in.Item.GetKind()),
-		Name:           in.Item.GetName(),
-		Slug:           in.Item.GetSlug(),
-		Description:    opt.New(in.Item.GetDesc()).Ptr(),
+		AddedAt:        in.Added,
+		MembershipType: openapi.CollectionItemMembershipType(in.MembershipType.String()),
 		RelevanceScore: score,
-		Meta:           (*openapi.Metadata)(&meta),
-		Assets:         dt.Map(in.Item.GetAssets(), serialiseAssetPtr),
+		Item:           serialiseDatagraphItem(in.Item),
 	}
 }
 
