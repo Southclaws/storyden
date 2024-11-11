@@ -19,7 +19,15 @@ type IndexNode struct {
 	ID library.NodeID
 }
 
+type DeleteNode struct {
+	ID library.NodeID
+}
+
 type IndexThread struct {
+	ID post.ID
+}
+
+type DeleteThread struct {
 	ID post.ID
 }
 
@@ -29,10 +37,6 @@ type IndexReply struct {
 
 type IndexProfile struct {
 	ID account.AccountID
-}
-
-type SummariseNode struct {
-	ID library.NodeID
 }
 
 type AnalyseAsset struct {

@@ -14,6 +14,10 @@ type Indexer interface {
 	Index(ctx context.Context, object datagraph.Item) error
 }
 
+type Deleter interface {
+	Delete(ctx context.Context, object xid.ID) error
+}
+
 type Searcher interface {
 	Search(ctx context.Context, query string) (datagraph.ItemList, error)
 }
@@ -43,12 +47,13 @@ type Summariser interface {
 }
 
 type Retriever interface {
-	GetAll(ctx context.Context) (datagraph.RefList, error)
+	GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error)
 	// GetVectorFor(ctx context.Context, idx ...xid.ID) ([]float64, error)
 }
 
 type RefSemdexer interface {
 	Indexer
+	Deleter
 	RefSearcher
 	RefRecommender
 	Tagger
@@ -59,6 +64,7 @@ type RefSemdexer interface {
 
 type Semdexer interface {
 	Indexer
+	Deleter
 	Searcher
 	Recommender
 	Tagger

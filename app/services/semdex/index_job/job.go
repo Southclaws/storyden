@@ -23,16 +23,6 @@ func runIndexConsumer(
 	ic *indexerConsumer,
 ) {
 	lc.Append(fx.StartHook(func(_ context.Context) error {
-		nodeChan, err := qnode.Subscribe(ctx)
-		if err != nil {
-			panic(err)
-		}
-
-		threadChan, err := qthread.Subscribe(ctx)
-		if err != nil {
-			panic(err)
-		}
-
 		replyChan, err := qreply.Subscribe(ctx)
 		if err != nil {
 			panic(err)
@@ -42,30 +32,6 @@ func runIndexConsumer(
 		if err != nil {
 			panic(err)
 		}
-
-		go func() {
-			for msg := range nodeChan {
-				if err := ic.indexNode(ctx, msg.Payload.ID); err != nil {
-					l.Error("failed to index node", zap.Error(err))
-					msg.Nack()
-					continue
-				}
-
-				msg.Ack()
-			}
-		}()
-
-		go func() {
-			for msg := range threadChan {
-				if err := ic.indexThread(ctx, msg.Payload.ID); err != nil {
-					l.Error("failed to index post", zap.Error(err))
-					msg.Nack()
-					continue
-				}
-
-				msg.Ack()
-			}
-		}()
 
 		go func() {
 			for msg := range replyChan {

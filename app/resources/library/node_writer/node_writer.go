@@ -2,6 +2,7 @@ package node_writer
 
 import (
 	"context"
+	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -36,6 +37,12 @@ type Option func(*ent.NodeMutation)
 func WithID(id library.NodeID) Option {
 	return func(c *ent.NodeMutation) {
 		c.SetID(xid.ID(id))
+	}
+}
+
+func WithIndexed() Option {
+	return func(nm *ent.NodeMutation) {
+		nm.SetIndexedAt(time.Now())
 	}
 }
 

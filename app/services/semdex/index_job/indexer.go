@@ -10,7 +10,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
-	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -28,10 +27,9 @@ type indexerConsumer struct {
 	nodeQuerier  *node_querier.Querier
 	accountQuery *account_querier.Querier
 
-	qnode    pubsub.Topic[mq.IndexNode]
-	qnodesum pubsub.Topic[mq.SummariseNode]
-	qthread  pubsub.Topic[mq.IndexThread]
-	qreply   pubsub.Topic[mq.IndexReply]
+	qnode   pubsub.Topic[mq.IndexNode]
+	qthread pubsub.Topic[mq.IndexThread]
+	qreply  pubsub.Topic[mq.IndexReply]
 
 	indexer   semdex.Indexer
 	retriever semdex.Retriever
@@ -46,7 +44,6 @@ func newIndexConsumer(
 	accountQuery *account_querier.Querier,
 
 	qnode pubsub.Topic[mq.IndexNode],
-	qnodesum pubsub.Topic[mq.SummariseNode],
 	qthread pubsub.Topic[mq.IndexThread],
 	qreply pubsub.Topic[mq.IndexReply],
 	qprofile pubsub.Topic[mq.IndexProfile],
@@ -61,21 +58,12 @@ func newIndexConsumer(
 		nodeQuerier:  nodeQuerier,
 		accountQuery: accountQuery,
 		qnode:        qnode,
-		qnodesum:     qnodesum,
-		qthread:      qthread,
-		qreply:       qreply,
-		indexer:      indexer,
-		retriever:    retriever,
-	}
-}
 
-func (i *indexerConsumer) indexThread(ctx context.Context, id post.ID) error {
-	p, err := i.threadRepo.Get(ctx, id, nil)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
+		qthread:   qthread,
+		qreply:    qreply,
+		indexer:   indexer,
+		retriever: retriever,
 	}
-
-	return i.indexer.Index(ctx, p)
 }
 
 func (i *indexerConsumer) indexReply(ctx context.Context, id post.ID) error {
@@ -85,25 +73,6 @@ func (i *indexerConsumer) indexReply(ctx context.Context, id post.ID) error {
 	}
 
 	return i.indexer.Index(ctx, p)
-}
-
-func (i *indexerConsumer) indexNode(ctx context.Context, id library.NodeID) error {
-	n, err := i.nodeQuerier.Probe(ctx, id)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	err = i.indexer.Index(ctx, n)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	err = i.qnodesum.Publish(ctx, mq.SummariseNode{ID: library.NodeID(n.Mark.ID())})
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return nil
 }
 
 func (i *indexerConsumer) indexProfile(ctx context.Context, id account.AccountID) error {

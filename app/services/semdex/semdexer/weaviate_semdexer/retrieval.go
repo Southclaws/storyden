@@ -4,45 +4,43 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/rs/xid"
+	"github.com/weaviate/weaviate-go-client/v4/weaviate/filters"
 	"github.com/weaviate/weaviate/entities/models"
+
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
-func (o *weaviateRefIndex) GetAll(ctx context.Context) (datagraph.RefList, error) {
-	objects, err := o.wc.Data().
-		ObjectsGetter().
-		//
-		// NOTE: Currently this effectively limits indexing to 10k datagraph
-		// nodes. Including posts, nodes, profiles, etc. This needs to be fixed
-		// to use paging so that all items are returned. But tbh, long term it's
-		// probably best to re-think how re-indexing works for large instances.
-		//
-		WithLimit(10000).
+func (o *weaviateRefIndex) GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error) {
+	stringIDs := dt.Map(ids, func(x xid.ID) string { return x.String() })
+
+	objects, err := o.wc.
+		GraphQL().
+		Get().
 		WithClassName(o.cn.String()).
+		WithWhere(
+			filters.Where().
+				WithPath([]string{"id"}).
+				WithOperator(filters.ContainsAny).
+				WithValueString(stringIDs...),
+		).
+		WithLimit(int(limit)).
 		Do(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	invalid := []*models.Object{}
-	refs := []*datagraph.Ref{}
-
-	for _, m := range objects {
-		o, err := mapWeaviateObject(m)
-		if err != nil {
-			invalid = append(invalid, m)
-			continue
-		}
-
-		refs = append(refs, o)
+	data, err := mapResponseObjects(objects.Data)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	for _, m := range invalid {
-		if err := o.wc.Data().Deleter().WithID(m.ID.String()).Do(ctx); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
+	refs, err := dt.MapErr(data.Get[string(o.cn)], mapToNodeReference)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return datagraph.RefList(refs), nil

@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
@@ -74,10 +75,18 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.indexQueue.Publish(ctx, mq.IndexThread{
-		ID: thr.ID,
-	}); err != nil {
-		s.l.Error("failed to publish index post message", zap.Error(err))
+	if thr.Visibility == visibility.VisibilityPublished {
+		if err := s.indexQueue.Publish(ctx, mq.IndexThread{
+			ID: thr.ID,
+		}); err != nil {
+			s.l.Error("failed to publish index post message", zap.Error(err))
+		}
+	} else {
+		if err := s.deleteQueue.Publish(ctx, mq.DeleteThread{
+			ID: thr.ID,
+		}); err != nil {
+			s.l.Error("failed to publish index post message", zap.Error(err))
+		}
 	}
 
 	return thr, nil

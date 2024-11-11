@@ -33,6 +33,7 @@ func Build() fx.Option {
 			newSemdexer,
 			fx.As(new(semdex.Semdexer)),
 			fx.As(new(semdex.Indexer)),
+			fx.As(new(semdex.Deleter)),
 			fx.As(new(semdex.Searcher)),
 			fx.As(new(semdex.Recommender)),
 			fx.As(new(semdex.Tagger)),

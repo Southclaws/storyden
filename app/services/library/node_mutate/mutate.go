@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -60,6 +61,7 @@ func (p Partial) Opts() (opts []node_writer.Option) {
 }
 
 type Manager struct {
+	logger            *zap.Logger
 	accountQuery      *account_querier.Querier
 	nodeQuerier       *node_querier.Querier
 	nodeWriter        *node_writer.Writer
@@ -68,10 +70,12 @@ type Manager struct {
 	nc                node_children.Repository
 	fetcher           *fetcher.Fetcher
 	indexQueue        pubsub.Topic[mq.IndexNode]
+	deleteQueue       pubsub.Topic[mq.DeleteNode]
 	assetAnalyseQueue pubsub.Topic[mq.AnalyseAsset]
 }
 
 func New(
+	logger *zap.Logger,
 	accountQuery *account_querier.Querier,
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
@@ -80,9 +84,11 @@ func New(
 	nc node_children.Repository,
 	fetcher *fetcher.Fetcher,
 	indexQueue pubsub.Topic[mq.IndexNode],
+	deleteQueue pubsub.Topic[mq.DeleteNode],
 	assetAnalyseQueue pubsub.Topic[mq.AnalyseAsset],
 ) *Manager {
 	return &Manager{
+		logger:            logger,
 		accountQuery:      accountQuery,
 		nodeQuerier:       nodeQuerier,
 		nodeWriter:        nodeWriter,
@@ -91,6 +97,7 @@ func New(
 		nc:                nc,
 		fetcher:           fetcher,
 		indexQueue:        indexQueue,
+		deleteQueue:       deleteQueue,
 		assetAnalyseQueue: assetAnalyseQueue,
 	}
 }
