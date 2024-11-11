@@ -61,6 +61,7 @@ func (d *database) Create(
 
 	create := d.db.Post.Create()
 	mutate := create.Mutation()
+	mutate.SetUpdatedAt(time.Now())
 
 	for _, fn := range opts {
 		fn(mutate)
@@ -119,6 +120,11 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 
 	for _, fn := range opts {
 		fn(mutate)
+	}
+
+	// Only set the updated_at field if not changing the indexed_at field.
+	if _, set := mutate.IndexedAt(); !set {
+		mutate.SetUpdatedAt(time.Now())
 	}
 
 	err := update.Exec(ctx)

@@ -46,6 +46,14 @@ func (UpdatedAt) Fields() []ent.Field {
 	}
 }
 
+type UpdatedAtManual struct{ mixin.Schema }
+
+func (UpdatedAtManual) Fields() []ent.Field {
+	return []ent.Field{
+		field.Time("updated_at"),
+	}
+}
+
 type DeletedAt struct{ mixin.Schema }
 
 func (DeletedAt) Fields() []ent.Field {
