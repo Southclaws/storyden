@@ -20,6 +20,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldIndexedAt holds the string denoting the indexed_at field in the database.
+	FieldIndexedAt = "indexed_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldSlug holds the string denoting the slug field in the database.
@@ -89,6 +91,7 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldIndexedAt,
 	FieldName,
 	FieldSlug,
 	FieldDescription,
@@ -183,6 +186,11 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByIndexedAt orders the results by the indexed_at field.
+func ByIndexedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIndexedAt, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.

@@ -12,7 +12,7 @@ type Collection struct {
 }
 
 func (Collection) Mixin() []ent.Mixin {
-	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}}
+	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}, IndexedAt{}}
 }
 
 func (Collection) Fields() []ent.Field {

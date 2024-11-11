@@ -74,6 +74,26 @@ func (au *AccountUpdate) ClearDeletedAt() *AccountUpdate {
 	return au
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (au *AccountUpdate) SetIndexedAt(t time.Time) *AccountUpdate {
+	au.mutation.SetIndexedAt(t)
+	return au
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (au *AccountUpdate) SetNillableIndexedAt(t *time.Time) *AccountUpdate {
+	if t != nil {
+		au.SetIndexedAt(*t)
+	}
+	return au
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (au *AccountUpdate) ClearIndexedAt() *AccountUpdate {
+	au.mutation.ClearIndexedAt()
+	return au
+}
+
 // SetHandle sets the "handle" field.
 func (au *AccountUpdate) SetHandle(s string) *AccountUpdate {
 	au.mutation.SetHandle(s)
@@ -927,6 +947,12 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if au.mutation.DeletedAtCleared() {
 		_spec.ClearField(account.FieldDeletedAt, field.TypeTime)
+	}
+	if value, ok := au.mutation.IndexedAt(); ok {
+		_spec.SetField(account.FieldIndexedAt, field.TypeTime, value)
+	}
+	if au.mutation.IndexedAtCleared() {
+		_spec.ClearField(account.FieldIndexedAt, field.TypeTime)
 	}
 	if value, ok := au.mutation.Handle(); ok {
 		_spec.SetField(account.FieldHandle, field.TypeString, value)
@@ -1868,6 +1894,26 @@ func (auo *AccountUpdateOne) ClearDeletedAt() *AccountUpdateOne {
 	return auo
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (auo *AccountUpdateOne) SetIndexedAt(t time.Time) *AccountUpdateOne {
+	auo.mutation.SetIndexedAt(t)
+	return auo
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableIndexedAt(t *time.Time) *AccountUpdateOne {
+	if t != nil {
+		auo.SetIndexedAt(*t)
+	}
+	return auo
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (auo *AccountUpdateOne) ClearIndexedAt() *AccountUpdateOne {
+	auo.mutation.ClearIndexedAt()
+	return auo
+}
+
 // SetHandle sets the "handle" field.
 func (auo *AccountUpdateOne) SetHandle(s string) *AccountUpdateOne {
 	auo.mutation.SetHandle(s)
@@ -2751,6 +2797,12 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	}
 	if auo.mutation.DeletedAtCleared() {
 		_spec.ClearField(account.FieldDeletedAt, field.TypeTime)
+	}
+	if value, ok := auo.mutation.IndexedAt(); ok {
+		_spec.SetField(account.FieldIndexedAt, field.TypeTime, value)
+	}
+	if auo.mutation.IndexedAtCleared() {
+		_spec.ClearField(account.FieldIndexedAt, field.TypeTime)
 	}
 	if value, ok := auo.mutation.Handle(); ok {
 		_spec.SetField(account.FieldHandle, field.TypeString, value)

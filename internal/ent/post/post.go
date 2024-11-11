@@ -22,6 +22,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
+	// FieldIndexedAt holds the string denoting the indexed_at field in the database.
+	FieldIndexedAt = "indexed_at"
 	// FieldFirst holds the string denoting the first field in the database.
 	FieldFirst = "first"
 	// FieldTitle holds the string denoting the title field in the database.
@@ -171,6 +173,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldDeletedAt,
+	FieldIndexedAt,
 	FieldFirst,
 	FieldTitle,
 	FieldSlug,
@@ -285,6 +288,11 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByDeletedAt orders the results by the deleted_at field.
 func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+}
+
+// ByIndexedAt orders the results by the indexed_at field.
+func ByIndexedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIndexedAt, opts...).ToFunc()
 }
 
 // ByFirst orders the results by the first field.

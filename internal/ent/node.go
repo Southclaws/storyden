@@ -28,6 +28,8 @@ type Node struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	// IndexedAt holds the value of the "indexed_at" field.
+	IndexedAt *time.Time `json:"indexed_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Slug holds the value of the "slug" field.
@@ -190,7 +192,7 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case node.FieldName, node.FieldSlug, node.FieldDescription, node.FieldContent, node.FieldVisibility:
 			values[i] = new(sql.NullString)
-		case node.FieldCreatedAt, node.FieldUpdatedAt, node.FieldDeletedAt:
+		case node.FieldCreatedAt, node.FieldUpdatedAt, node.FieldDeletedAt, node.FieldIndexedAt:
 			values[i] = new(sql.NullTime)
 		case node.FieldID, node.FieldParentNodeID, node.FieldAccountID, node.FieldLinkID:
 			values[i] = new(xid.ID)
@@ -233,6 +235,13 @@ func (n *Node) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				n.DeletedAt = new(time.Time)
 				*n.DeletedAt = value.Time
+			}
+		case node.FieldIndexedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field indexed_at", values[i])
+			} else if value.Valid {
+				n.IndexedAt = new(time.Time)
+				*n.IndexedAt = value.Time
 			}
 		case node.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -393,6 +402,11 @@ func (n *Node) String() string {
 	builder.WriteString(", ")
 	if v := n.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := n.IndexedAt; v != nil {
+		builder.WriteString("indexed_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")

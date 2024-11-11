@@ -40,6 +40,26 @@ func (cu *CollectionUpdate) SetUpdatedAt(t time.Time) *CollectionUpdate {
 	return cu
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (cu *CollectionUpdate) SetIndexedAt(t time.Time) *CollectionUpdate {
+	cu.mutation.SetIndexedAt(t)
+	return cu
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (cu *CollectionUpdate) SetNillableIndexedAt(t *time.Time) *CollectionUpdate {
+	if t != nil {
+		cu.SetIndexedAt(*t)
+	}
+	return cu
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (cu *CollectionUpdate) ClearIndexedAt() *CollectionUpdate {
+	cu.mutation.ClearIndexedAt()
+	return cu
+}
+
 // SetName sets the "name" field.
 func (cu *CollectionUpdate) SetName(s string) *CollectionUpdate {
 	cu.mutation.SetName(s)
@@ -316,6 +336,12 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.UpdatedAt(); ok {
 		_spec.SetField(collection.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := cu.mutation.IndexedAt(); ok {
+		_spec.SetField(collection.FieldIndexedAt, field.TypeTime, value)
+	}
+	if cu.mutation.IndexedAtCleared() {
+		_spec.ClearField(collection.FieldIndexedAt, field.TypeTime)
+	}
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.SetField(collection.FieldName, field.TypeString, value)
 	}
@@ -528,6 +554,26 @@ type CollectionUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (cuo *CollectionUpdateOne) SetUpdatedAt(t time.Time) *CollectionUpdateOne {
 	cuo.mutation.SetUpdatedAt(t)
+	return cuo
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (cuo *CollectionUpdateOne) SetIndexedAt(t time.Time) *CollectionUpdateOne {
+	cuo.mutation.SetIndexedAt(t)
+	return cuo
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (cuo *CollectionUpdateOne) SetNillableIndexedAt(t *time.Time) *CollectionUpdateOne {
+	if t != nil {
+		cuo.SetIndexedAt(*t)
+	}
+	return cuo
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (cuo *CollectionUpdateOne) ClearIndexedAt() *CollectionUpdateOne {
+	cuo.mutation.ClearIndexedAt()
 	return cuo
 }
 
@@ -836,6 +882,12 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 	}
 	if value, ok := cuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(collection.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := cuo.mutation.IndexedAt(); ok {
+		_spec.SetField(collection.FieldIndexedAt, field.TypeTime, value)
+	}
+	if cuo.mutation.IndexedAtCleared() {
+		_spec.ClearField(collection.FieldIndexedAt, field.TypeTime)
 	}
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.SetField(collection.FieldName, field.TypeString, value)

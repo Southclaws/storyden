@@ -71,6 +71,11 @@ func DeletedAt(v time.Time) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldDeletedAt, v))
 }
 
+// IndexedAt applies equality check predicate on the "indexed_at" field. It's identical to IndexedAtEQ.
+func IndexedAt(v time.Time) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldIndexedAt, v))
+}
+
 // Handle applies equality check predicate on the "handle" field. It's identical to HandleEQ.
 func Handle(v string) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldHandle, v))
@@ -224,6 +229,56 @@ func DeletedAtIsNil() predicate.Account {
 // DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
 func DeletedAtNotNil() predicate.Account {
 	return predicate.Account(sql.FieldNotNull(FieldDeletedAt))
+}
+
+// IndexedAtEQ applies the EQ predicate on the "indexed_at" field.
+func IndexedAtEQ(v time.Time) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldIndexedAt, v))
+}
+
+// IndexedAtNEQ applies the NEQ predicate on the "indexed_at" field.
+func IndexedAtNEQ(v time.Time) predicate.Account {
+	return predicate.Account(sql.FieldNEQ(FieldIndexedAt, v))
+}
+
+// IndexedAtIn applies the In predicate on the "indexed_at" field.
+func IndexedAtIn(vs ...time.Time) predicate.Account {
+	return predicate.Account(sql.FieldIn(FieldIndexedAt, vs...))
+}
+
+// IndexedAtNotIn applies the NotIn predicate on the "indexed_at" field.
+func IndexedAtNotIn(vs ...time.Time) predicate.Account {
+	return predicate.Account(sql.FieldNotIn(FieldIndexedAt, vs...))
+}
+
+// IndexedAtGT applies the GT predicate on the "indexed_at" field.
+func IndexedAtGT(v time.Time) predicate.Account {
+	return predicate.Account(sql.FieldGT(FieldIndexedAt, v))
+}
+
+// IndexedAtGTE applies the GTE predicate on the "indexed_at" field.
+func IndexedAtGTE(v time.Time) predicate.Account {
+	return predicate.Account(sql.FieldGTE(FieldIndexedAt, v))
+}
+
+// IndexedAtLT applies the LT predicate on the "indexed_at" field.
+func IndexedAtLT(v time.Time) predicate.Account {
+	return predicate.Account(sql.FieldLT(FieldIndexedAt, v))
+}
+
+// IndexedAtLTE applies the LTE predicate on the "indexed_at" field.
+func IndexedAtLTE(v time.Time) predicate.Account {
+	return predicate.Account(sql.FieldLTE(FieldIndexedAt, v))
+}
+
+// IndexedAtIsNil applies the IsNil predicate on the "indexed_at" field.
+func IndexedAtIsNil() predicate.Account {
+	return predicate.Account(sql.FieldIsNull(FieldIndexedAt))
+}
+
+// IndexedAtNotNil applies the NotNil predicate on the "indexed_at" field.
+func IndexedAtNotNil() predicate.Account {
+	return predicate.Account(sql.FieldNotNull(FieldIndexedAt))
 }
 
 // HandleEQ applies the EQ predicate on the "handle" field.

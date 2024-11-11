@@ -55,3 +55,13 @@ func (DeletedAt) Fields() []ent.Field {
 			Nillable(),
 	}
 }
+
+type IndexedAt struct{ mixin.Schema }
+
+func (IndexedAt) Fields() []ent.Field {
+	return []ent.Field{
+		field.Time("indexed_at").
+			Optional().
+			Nillable(),
+	}
+}

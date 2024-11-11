@@ -71,6 +71,11 @@ func DeletedAt(v time.Time) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldDeletedAt, v))
 }
 
+// IndexedAt applies equality check predicate on the "indexed_at" field. It's identical to IndexedAtEQ.
+func IndexedAt(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldIndexedAt, v))
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldName, v))
@@ -239,6 +244,56 @@ func DeletedAtIsNil() predicate.Node {
 // DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
 func DeletedAtNotNil() predicate.Node {
 	return predicate.Node(sql.FieldNotNull(FieldDeletedAt))
+}
+
+// IndexedAtEQ applies the EQ predicate on the "indexed_at" field.
+func IndexedAtEQ(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldIndexedAt, v))
+}
+
+// IndexedAtNEQ applies the NEQ predicate on the "indexed_at" field.
+func IndexedAtNEQ(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldNEQ(FieldIndexedAt, v))
+}
+
+// IndexedAtIn applies the In predicate on the "indexed_at" field.
+func IndexedAtIn(vs ...time.Time) predicate.Node {
+	return predicate.Node(sql.FieldIn(FieldIndexedAt, vs...))
+}
+
+// IndexedAtNotIn applies the NotIn predicate on the "indexed_at" field.
+func IndexedAtNotIn(vs ...time.Time) predicate.Node {
+	return predicate.Node(sql.FieldNotIn(FieldIndexedAt, vs...))
+}
+
+// IndexedAtGT applies the GT predicate on the "indexed_at" field.
+func IndexedAtGT(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldGT(FieldIndexedAt, v))
+}
+
+// IndexedAtGTE applies the GTE predicate on the "indexed_at" field.
+func IndexedAtGTE(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldGTE(FieldIndexedAt, v))
+}
+
+// IndexedAtLT applies the LT predicate on the "indexed_at" field.
+func IndexedAtLT(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldLT(FieldIndexedAt, v))
+}
+
+// IndexedAtLTE applies the LTE predicate on the "indexed_at" field.
+func IndexedAtLTE(v time.Time) predicate.Node {
+	return predicate.Node(sql.FieldLTE(FieldIndexedAt, v))
+}
+
+// IndexedAtIsNil applies the IsNil predicate on the "indexed_at" field.
+func IndexedAtIsNil() predicate.Node {
+	return predicate.Node(sql.FieldIsNull(FieldIndexedAt))
+}
+
+// IndexedAtNotNil applies the NotNil predicate on the "indexed_at" field.
+func IndexedAtNotNil() predicate.Node {
+	return predicate.Node(sql.FieldNotNull(FieldIndexedAt))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
