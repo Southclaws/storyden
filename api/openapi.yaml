@@ -1700,6 +1700,7 @@ paths:
       tags: [datagraph]
       parameters:
         - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/DatagraphKindQuery"
         - $ref: "#/components/parameters/PaginationQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1995,6 +1996,16 @@ components:
       schema:
         type: string
         minLength: 0
+
+    DatagraphKindQuery:
+      description: Datagraph item kind query.
+      name: kind
+      in: query
+      required: false
+      allowEmptyValue: true
+      schema:
+        type: array
+        items: { $ref: "#/components/schemas/DatagraphItemKind" }
 
     PaginationQuery:
       description: Pagination query parameters.

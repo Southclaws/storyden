@@ -9,11 +9,11 @@ import (
 	"github.com/rs/xid"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/services/account/session"
+	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
 type HydratedQuerier struct {

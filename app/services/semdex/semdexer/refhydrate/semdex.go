@@ -8,8 +8,10 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
+	"github.com/Southclaws/storyden/app/services/search/searcher"
+	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
 var _ semdex.Semdexer = &HydratedSemdexer{}
@@ -29,13 +31,20 @@ func (h *HydratedSemdexer) Delete(ctx context.Context, id xid.ID) error {
 	return h.RefSemdex.Delete(ctx, id)
 }
 
-func (h *HydratedSemdexer) Search(ctx context.Context, query string) (datagraph.ItemList, error) {
-	rs, err := h.RefSemdex.Search(ctx, query)
+func (h *HydratedSemdexer) Search(ctx context.Context, query string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
+	rs, err := h.RefSemdex.Search(ctx, query, p, opts)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return h.Hydrator.Hydrate(ctx, rs...)
+	hydrated, err := h.Hydrator.Hydrate(ctx, rs.Items...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	results := pagination.ConvertPageResult[*datagraph.Ref, datagraph.Item](*rs, hydrated)
+
+	return &results, nil
 }
 
 func (h *HydratedSemdexer) Recommend(ctx context.Context, object datagraph.Item) (datagraph.ItemList, error) {
