@@ -38,6 +38,7 @@ type Account struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt opt.Optional[time.Time]
+	IndexedAt opt.Optional[time.Time]
 
 	InvitedByID *xid.ID
 	InvitedBy   opt.Optional[Account]

@@ -71,6 +71,7 @@ func NodeFromModel(c *ent.Node) (*Node, error) {
 		Mark:         NewMark(c.ID, c.Slug),
 		CreatedAt:    c.CreatedAt,
 		UpdatedAt:    c.UpdatedAt,
+		IndexedAt:    opt.NewPtr(c.IndexedAt),
 		Name:         c.Name,
 		Assets:       assets,
 		WebLink:      link,

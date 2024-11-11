@@ -45,6 +45,7 @@ type Post struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt opt.Optional[time.Time]
+	IndexedAt opt.Optional[time.Time]
 }
 
 func (p *Post) GetID() xid.ID                 { return xid.ID(p.ID) }
@@ -111,5 +112,6 @@ func Map(in *ent.Post) (*Post, error) {
 		CreatedAt: in.CreatedAt,
 		UpdatedAt: in.UpdatedAt,
 		DeletedAt: opt.NewPtr(in.DeletedAt),
+		IndexedAt: opt.NewPtr(in.IndexedAt),
 	}, nil
 }

@@ -35,6 +35,7 @@ type Node struct {
 	Mark      Mark
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	IndexedAt opt.Optional[time.Time]
 
 	Name           string
 	Assets         []*asset.Asset
