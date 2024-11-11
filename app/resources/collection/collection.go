@@ -17,6 +17,7 @@ type Collection struct {
 	Mark      Mark
 	CreatedAt time.Time
 	UpdatedAt time.Time
+	IndexedAt opt.Optional[time.Time]
 
 	Name        string
 	Owner       profile.Public
@@ -68,6 +69,7 @@ func Map(queriedItems []xid.ID) func(c *ent.Collection) (*Collection, error) {
 			Mark:           NewMark(c.ID, c.Slug),
 			CreatedAt:      c.CreatedAt,
 			UpdatedAt:      c.UpdatedAt,
+			IndexedAt:      opt.NewPtr(c.IndexedAt),
 			Owner:          *pro,
 			Name:           c.Name,
 			Description:    opt.NewPtr(c.Description),

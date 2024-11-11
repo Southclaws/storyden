@@ -25,6 +25,7 @@ type Event struct {
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    opt.Optional[time.Time]
+	IndexedAt    opt.Optional[time.Time]
 	Name         string
 	Slug         string
 	Description  opt.Optional[string]
@@ -76,6 +77,7 @@ func Map(in *ent.Event) (*Event, error) {
 		CreatedAt:    in.CreatedAt,
 		UpdatedAt:    in.UpdatedAt,
 		DeletedAt:    opt.NewPtr(in.DeletedAt),
+		IndexedAt:    opt.NewPtr(in.IndexedAt),
 		Name:         in.Name,
 		Slug:         in.Slug,
 		Description:  opt.NewPtr(in.Description),

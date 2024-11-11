@@ -83,6 +83,7 @@ func MapAccount(a *ent.Account) (*Account, error) {
 		CreatedAt: a.CreatedAt,
 		UpdatedAt: a.UpdatedAt,
 		DeletedAt: opt.NewPtr(a.DeletedAt),
+		IndexedAt: opt.NewPtr(a.IndexedAt),
 	}, nil
 }
 
