@@ -83,6 +83,20 @@ func (ac *AccountCreate) SetNillableDeletedAt(t *time.Time) *AccountCreate {
 	return ac
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (ac *AccountCreate) SetIndexedAt(t time.Time) *AccountCreate {
+	ac.mutation.SetIndexedAt(t)
+	return ac
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (ac *AccountCreate) SetNillableIndexedAt(t *time.Time) *AccountCreate {
+	if t != nil {
+		ac.SetIndexedAt(*t)
+	}
+	return ac
+}
+
 // SetHandle sets the "handle" field.
 func (ac *AccountCreate) SetHandle(s string) *AccountCreate {
 	ac.mutation.SetHandle(s)
@@ -571,6 +585,10 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		_spec.SetField(account.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
+	if value, ok := ac.mutation.IndexedAt(); ok {
+		_spec.SetField(account.FieldIndexedAt, field.TypeTime, value)
+		_node.IndexedAt = &value
+	}
 	if value, ok := ac.mutation.Handle(); ok {
 		_spec.SetField(account.FieldHandle, field.TypeString, value)
 		_node.Handle = value
@@ -989,6 +1007,24 @@ func (u *AccountUpsert) ClearDeletedAt() *AccountUpsert {
 	return u
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (u *AccountUpsert) SetIndexedAt(v time.Time) *AccountUpsert {
+	u.Set(account.FieldIndexedAt, v)
+	return u
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateIndexedAt() *AccountUpsert {
+	u.SetExcluded(account.FieldIndexedAt)
+	return u
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *AccountUpsert) ClearIndexedAt() *AccountUpsert {
+	u.SetNull(account.FieldIndexedAt)
+	return u
+}
+
 // SetHandle sets the "handle" field.
 func (u *AccountUpsert) SetHandle(v string) *AccountUpsert {
 	u.Set(account.FieldHandle, v)
@@ -1180,6 +1216,27 @@ func (u *AccountUpsertOne) UpdateDeletedAt() *AccountUpsertOne {
 func (u *AccountUpsertOne) ClearDeletedAt() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearDeletedAt()
+	})
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (u *AccountUpsertOne) SetIndexedAt(v time.Time) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetIndexedAt(v)
+	})
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateIndexedAt() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateIndexedAt()
+	})
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *AccountUpsertOne) ClearIndexedAt() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearIndexedAt()
 	})
 }
 
@@ -1559,6 +1616,27 @@ func (u *AccountUpsertBulk) UpdateDeletedAt() *AccountUpsertBulk {
 func (u *AccountUpsertBulk) ClearDeletedAt() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearDeletedAt()
+	})
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (u *AccountUpsertBulk) SetIndexedAt(v time.Time) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetIndexedAt(v)
+	})
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateIndexedAt() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateIndexedAt()
+	})
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *AccountUpsertBulk) ClearIndexedAt() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.ClearIndexedAt()
 	})
 }
 

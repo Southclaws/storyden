@@ -56,6 +56,20 @@ func (cc *CollectionCreate) SetNillableUpdatedAt(t *time.Time) *CollectionCreate
 	return cc
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (cc *CollectionCreate) SetIndexedAt(t time.Time) *CollectionCreate {
+	cc.mutation.SetIndexedAt(t)
+	return cc
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (cc *CollectionCreate) SetNillableIndexedAt(t *time.Time) *CollectionCreate {
+	if t != nil {
+		cc.SetIndexedAt(*t)
+	}
+	return cc
+}
+
 // SetName sets the "name" field.
 func (cc *CollectionCreate) SetName(s string) *CollectionCreate {
 	cc.mutation.SetName(s)
@@ -316,6 +330,10 @@ func (cc *CollectionCreate) createSpec() (*Collection, *sqlgraph.CreateSpec) {
 		_spec.SetField(collection.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
+	if value, ok := cc.mutation.IndexedAt(); ok {
+		_spec.SetField(collection.FieldIndexedAt, field.TypeTime, value)
+		_node.IndexedAt = &value
+	}
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.SetField(collection.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -470,6 +488,24 @@ func (u *CollectionUpsert) UpdateUpdatedAt() *CollectionUpsert {
 	return u
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (u *CollectionUpsert) SetIndexedAt(v time.Time) *CollectionUpsert {
+	u.Set(collection.FieldIndexedAt, v)
+	return u
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *CollectionUpsert) UpdateIndexedAt() *CollectionUpsert {
+	u.SetExcluded(collection.FieldIndexedAt)
+	return u
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *CollectionUpsert) ClearIndexedAt() *CollectionUpsert {
+	u.SetNull(collection.FieldIndexedAt)
+	return u
+}
+
 // SetName sets the "name" field.
 func (u *CollectionUpsert) SetName(v string) *CollectionUpsert {
 	u.Set(collection.FieldName, v)
@@ -604,6 +640,27 @@ func (u *CollectionUpsertOne) SetUpdatedAt(v time.Time) *CollectionUpsertOne {
 func (u *CollectionUpsertOne) UpdateUpdatedAt() *CollectionUpsertOne {
 	return u.Update(func(s *CollectionUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (u *CollectionUpsertOne) SetIndexedAt(v time.Time) *CollectionUpsertOne {
+	return u.Update(func(s *CollectionUpsert) {
+		s.SetIndexedAt(v)
+	})
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *CollectionUpsertOne) UpdateIndexedAt() *CollectionUpsertOne {
+	return u.Update(func(s *CollectionUpsert) {
+		s.UpdateIndexedAt()
+	})
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *CollectionUpsertOne) ClearIndexedAt() *CollectionUpsertOne {
+	return u.Update(func(s *CollectionUpsert) {
+		s.ClearIndexedAt()
 	})
 }
 
@@ -920,6 +977,27 @@ func (u *CollectionUpsertBulk) SetUpdatedAt(v time.Time) *CollectionUpsertBulk {
 func (u *CollectionUpsertBulk) UpdateUpdatedAt() *CollectionUpsertBulk {
 	return u.Update(func(s *CollectionUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (u *CollectionUpsertBulk) SetIndexedAt(v time.Time) *CollectionUpsertBulk {
+	return u.Update(func(s *CollectionUpsert) {
+		s.SetIndexedAt(v)
+	})
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *CollectionUpsertBulk) UpdateIndexedAt() *CollectionUpsertBulk {
+	return u.Update(func(s *CollectionUpsert) {
+		s.UpdateIndexedAt()
+	})
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *CollectionUpsertBulk) ClearIndexedAt() *CollectionUpsertBulk {
+	return u.Update(func(s *CollectionUpsert) {
+		s.ClearIndexedAt()
 	})
 }
 

@@ -59,6 +59,26 @@ func (eu *EventUpdate) ClearDeletedAt() *EventUpdate {
 	return eu
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (eu *EventUpdate) SetIndexedAt(t time.Time) *EventUpdate {
+	eu.mutation.SetIndexedAt(t)
+	return eu
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (eu *EventUpdate) SetNillableIndexedAt(t *time.Time) *EventUpdate {
+	if t != nil {
+		eu.SetIndexedAt(*t)
+	}
+	return eu
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (eu *EventUpdate) ClearIndexedAt() *EventUpdate {
+	eu.mutation.ClearIndexedAt()
+	return eu
+}
+
 // SetName sets the "name" field.
 func (eu *EventUpdate) SetName(s string) *EventUpdate {
 	eu.mutation.SetName(s)
@@ -495,6 +515,12 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if eu.mutation.DeletedAtCleared() {
 		_spec.ClearField(event.FieldDeletedAt, field.TypeTime)
 	}
+	if value, ok := eu.mutation.IndexedAt(); ok {
+		_spec.SetField(event.FieldIndexedAt, field.TypeTime, value)
+	}
+	if eu.mutation.IndexedAtCleared() {
+		_spec.ClearField(event.FieldIndexedAt, field.TypeTime)
+	}
 	if value, ok := eu.mutation.Name(); ok {
 		_spec.SetField(event.FieldName, field.TypeString, value)
 	}
@@ -724,6 +750,26 @@ func (euo *EventUpdateOne) SetNillableDeletedAt(t *time.Time) *EventUpdateOne {
 // ClearDeletedAt clears the value of the "deleted_at" field.
 func (euo *EventUpdateOne) ClearDeletedAt() *EventUpdateOne {
 	euo.mutation.ClearDeletedAt()
+	return euo
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (euo *EventUpdateOne) SetIndexedAt(t time.Time) *EventUpdateOne {
+	euo.mutation.SetIndexedAt(t)
+	return euo
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (euo *EventUpdateOne) SetNillableIndexedAt(t *time.Time) *EventUpdateOne {
+	if t != nil {
+		euo.SetIndexedAt(*t)
+	}
+	return euo
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (euo *EventUpdateOne) ClearIndexedAt() *EventUpdateOne {
+	euo.mutation.ClearIndexedAt()
 	return euo
 }
 
@@ -1192,6 +1238,12 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 	}
 	if euo.mutation.DeletedAtCleared() {
 		_spec.ClearField(event.FieldDeletedAt, field.TypeTime)
+	}
+	if value, ok := euo.mutation.IndexedAt(); ok {
+		_spec.SetField(event.FieldIndexedAt, field.TypeTime, value)
+	}
+	if euo.mutation.IndexedAtCleared() {
+		_spec.ClearField(event.FieldIndexedAt, field.TypeTime)
 	}
 	if value, ok := euo.mutation.Name(); ok {
 		_spec.SetField(event.FieldName, field.TypeString, value)

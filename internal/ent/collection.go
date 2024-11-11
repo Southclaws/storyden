@@ -24,6 +24,8 @@ type Collection struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// IndexedAt holds the value of the "indexed_at" field.
+	IndexedAt *time.Time `json:"indexed_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Slug holds the value of the "slug" field.
@@ -127,7 +129,7 @@ func (*Collection) scanValues(columns []string) ([]any, error) {
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case collection.FieldName, collection.FieldSlug, collection.FieldDescription, collection.FieldVisibility:
 			values[i] = new(sql.NullString)
-		case collection.FieldCreatedAt, collection.FieldUpdatedAt:
+		case collection.FieldCreatedAt, collection.FieldUpdatedAt, collection.FieldIndexedAt:
 			values[i] = new(sql.NullTime)
 		case collection.FieldID:
 			values[i] = new(xid.ID)
@@ -165,6 +167,13 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				c.UpdatedAt = value.Time
+			}
+		case collection.FieldIndexedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field indexed_at", values[i])
+			} else if value.Valid {
+				c.IndexedAt = new(time.Time)
+				*c.IndexedAt = value.Time
 			}
 		case collection.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -276,6 +285,11 @@ func (c *Collection) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := c.IndexedAt; v != nil {
+		builder.WriteString("indexed_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)

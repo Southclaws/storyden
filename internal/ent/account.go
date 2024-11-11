@@ -27,6 +27,8 @@ type Account struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	// IndexedAt holds the value of the "indexed_at" field.
+	IndexedAt *time.Time `json:"indexed_at,omitempty"`
 	// Handle holds the value of the "handle" field.
 	Handle string `json:"handle,omitempty"`
 	// Name holds the value of the "name" field.
@@ -278,7 +280,7 @@ func (*Account) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case account.FieldHandle, account.FieldName, account.FieldBio:
 			values[i] = new(sql.NullString)
-		case account.FieldCreatedAt, account.FieldUpdatedAt, account.FieldDeletedAt:
+		case account.FieldCreatedAt, account.FieldUpdatedAt, account.FieldDeletedAt, account.FieldIndexedAt:
 			values[i] = new(sql.NullTime)
 		case account.FieldID:
 			values[i] = new(xid.ID)
@@ -321,6 +323,13 @@ func (a *Account) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.DeletedAt = new(time.Time)
 				*a.DeletedAt = value.Time
+			}
+		case account.FieldIndexedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field indexed_at", values[i])
+			} else if value.Valid {
+				a.IndexedAt = new(time.Time)
+				*a.IndexedAt = value.Time
 			}
 		case account.FieldHandle:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -508,6 +517,11 @@ func (a *Account) String() string {
 	builder.WriteString(", ")
 	if v := a.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := a.IndexedAt; v != nil {
+		builder.WriteString("indexed_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")

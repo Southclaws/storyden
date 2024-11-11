@@ -66,6 +66,26 @@ func (pu *PostUpdate) ClearDeletedAt() *PostUpdate {
 	return pu
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (pu *PostUpdate) SetIndexedAt(t time.Time) *PostUpdate {
+	pu.mutation.SetIndexedAt(t)
+	return pu
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableIndexedAt(t *time.Time) *PostUpdate {
+	if t != nil {
+		pu.SetIndexedAt(*t)
+	}
+	return pu
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (pu *PostUpdate) ClearIndexedAt() *PostUpdate {
+	pu.mutation.ClearIndexedAt()
+	return pu
+}
+
 // SetFirst sets the "first" field.
 func (pu *PostUpdate) SetFirst(b bool) *PostUpdate {
 	pu.mutation.SetFirst(b)
@@ -798,6 +818,12 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if pu.mutation.DeletedAtCleared() {
 		_spec.ClearField(post.FieldDeletedAt, field.TypeTime)
 	}
+	if value, ok := pu.mutation.IndexedAt(); ok {
+		_spec.SetField(post.FieldIndexedAt, field.TypeTime, value)
+	}
+	if pu.mutation.IndexedAtCleared() {
+		_spec.ClearField(post.FieldIndexedAt, field.TypeTime)
+	}
 	if value, ok := pu.mutation.First(); ok {
 		_spec.SetField(post.FieldFirst, field.TypeBool, value)
 	}
@@ -1471,6 +1497,26 @@ func (puo *PostUpdateOne) SetNillableDeletedAt(t *time.Time) *PostUpdateOne {
 // ClearDeletedAt clears the value of the "deleted_at" field.
 func (puo *PostUpdateOne) ClearDeletedAt() *PostUpdateOne {
 	puo.mutation.ClearDeletedAt()
+	return puo
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (puo *PostUpdateOne) SetIndexedAt(t time.Time) *PostUpdateOne {
+	puo.mutation.SetIndexedAt(t)
+	return puo
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableIndexedAt(t *time.Time) *PostUpdateOne {
+	if t != nil {
+		puo.SetIndexedAt(*t)
+	}
+	return puo
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (puo *PostUpdateOne) ClearIndexedAt() *PostUpdateOne {
+	puo.mutation.ClearIndexedAt()
 	return puo
 }
 
@@ -2235,6 +2281,12 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if puo.mutation.DeletedAtCleared() {
 		_spec.ClearField(post.FieldDeletedAt, field.TypeTime)
+	}
+	if value, ok := puo.mutation.IndexedAt(); ok {
+		_spec.SetField(post.FieldIndexedAt, field.TypeTime, value)
+	}
+	if puo.mutation.IndexedAtCleared() {
+		_spec.ClearField(post.FieldIndexedAt, field.TypeTime)
 	}
 	if value, ok := puo.mutation.First(); ok {
 		_spec.SetField(post.FieldFirst, field.TypeBool, value)

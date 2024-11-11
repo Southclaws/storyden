@@ -71,6 +71,20 @@ func (nc *NodeCreate) SetNillableDeletedAt(t *time.Time) *NodeCreate {
 	return nc
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (nc *NodeCreate) SetIndexedAt(t time.Time) *NodeCreate {
+	nc.mutation.SetIndexedAt(t)
+	return nc
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (nc *NodeCreate) SetNillableIndexedAt(t *time.Time) *NodeCreate {
+	if t != nil {
+		nc.SetIndexedAt(*t)
+	}
+	return nc
+}
+
 // SetName sets the "name" field.
 func (nc *NodeCreate) SetName(s string) *NodeCreate {
 	nc.mutation.SetName(s)
@@ -456,6 +470,10 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		_spec.SetField(node.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
+	if value, ok := nc.mutation.IndexedAt(); ok {
+		_spec.SetField(node.FieldIndexedAt, field.TypeTime, value)
+		_node.IndexedAt = &value
+	}
 	if value, ok := nc.mutation.Name(); ok {
 		_spec.SetField(node.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -714,6 +732,24 @@ func (u *NodeUpsert) ClearDeletedAt() *NodeUpsert {
 	return u
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (u *NodeUpsert) SetIndexedAt(v time.Time) *NodeUpsert {
+	u.Set(node.FieldIndexedAt, v)
+	return u
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateIndexedAt() *NodeUpsert {
+	u.SetExcluded(node.FieldIndexedAt)
+	return u
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *NodeUpsert) ClearIndexedAt() *NodeUpsert {
+	u.SetNull(node.FieldIndexedAt)
+	return u
+}
+
 // SetName sets the "name" field.
 func (u *NodeUpsert) SetName(v string) *NodeUpsert {
 	u.Set(node.FieldName, v)
@@ -953,6 +989,27 @@ func (u *NodeUpsertOne) UpdateDeletedAt() *NodeUpsertOne {
 func (u *NodeUpsertOne) ClearDeletedAt() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.ClearDeletedAt()
+	})
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (u *NodeUpsertOne) SetIndexedAt(v time.Time) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetIndexedAt(v)
+	})
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateIndexedAt() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateIndexedAt()
+	})
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *NodeUpsertOne) ClearIndexedAt() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearIndexedAt()
 	})
 }
 
@@ -1388,6 +1445,27 @@ func (u *NodeUpsertBulk) UpdateDeletedAt() *NodeUpsertBulk {
 func (u *NodeUpsertBulk) ClearDeletedAt() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.ClearDeletedAt()
+	})
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (u *NodeUpsertBulk) SetIndexedAt(v time.Time) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetIndexedAt(v)
+	})
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateIndexedAt() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateIndexedAt()
+	})
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *NodeUpsertBulk) ClearIndexedAt() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearIndexedAt()
 	})
 }
 

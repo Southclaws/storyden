@@ -82,6 +82,7 @@ type AccountMutation struct {
 	created_at                     *time.Time
 	updated_at                     *time.Time
 	deleted_at                     *time.Time
+	indexed_at                     *time.Time
 	handle                         *string
 	name                           *string
 	bio                            *string
@@ -374,6 +375,55 @@ func (m *AccountMutation) DeletedAtCleared() bool {
 func (m *AccountMutation) ResetDeletedAt() {
 	m.deleted_at = nil
 	delete(m.clearedFields, account.FieldDeletedAt)
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (m *AccountMutation) SetIndexedAt(t time.Time) {
+	m.indexed_at = &t
+}
+
+// IndexedAt returns the value of the "indexed_at" field in the mutation.
+func (m *AccountMutation) IndexedAt() (r time.Time, exists bool) {
+	v := m.indexed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIndexedAt returns the old "indexed_at" field's value of the Account entity.
+// If the Account object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMutation) OldIndexedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIndexedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIndexedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIndexedAt: %w", err)
+	}
+	return oldValue.IndexedAt, nil
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (m *AccountMutation) ClearIndexedAt() {
+	m.indexed_at = nil
+	m.clearedFields[account.FieldIndexedAt] = struct{}{}
+}
+
+// IndexedAtCleared returns if the "indexed_at" field was cleared in this mutation.
+func (m *AccountMutation) IndexedAtCleared() bool {
+	_, ok := m.clearedFields[account.FieldIndexedAt]
+	return ok
+}
+
+// ResetIndexedAt resets all changes to the "indexed_at" field.
+func (m *AccountMutation) ResetIndexedAt() {
+	m.indexed_at = nil
+	delete(m.clearedFields, account.FieldIndexedAt)
 }
 
 // SetHandle sets the "handle" field.
@@ -1729,7 +1779,7 @@ func (m *AccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AccountMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, account.FieldCreatedAt)
 	}
@@ -1738,6 +1788,9 @@ func (m *AccountMutation) Fields() []string {
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, account.FieldDeletedAt)
+	}
+	if m.indexed_at != nil {
+		fields = append(fields, account.FieldIndexedAt)
 	}
 	if m.handle != nil {
 		fields = append(fields, account.FieldHandle)
@@ -1774,6 +1827,8 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case account.FieldDeletedAt:
 		return m.DeletedAt()
+	case account.FieldIndexedAt:
+		return m.IndexedAt()
 	case account.FieldHandle:
 		return m.Handle()
 	case account.FieldName:
@@ -1803,6 +1858,8 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldUpdatedAt(ctx)
 	case account.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
+	case account.FieldIndexedAt:
+		return m.OldIndexedAt(ctx)
 	case account.FieldHandle:
 		return m.OldHandle(ctx)
 	case account.FieldName:
@@ -1846,6 +1903,13 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeletedAt(v)
+		return nil
+	case account.FieldIndexedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIndexedAt(v)
 		return nil
 	case account.FieldHandle:
 		v, ok := value.(string)
@@ -1929,6 +1993,9 @@ func (m *AccountMutation) ClearedFields() []string {
 	if m.FieldCleared(account.FieldDeletedAt) {
 		fields = append(fields, account.FieldDeletedAt)
 	}
+	if m.FieldCleared(account.FieldIndexedAt) {
+		fields = append(fields, account.FieldIndexedAt)
+	}
 	if m.FieldCleared(account.FieldBio) {
 		fields = append(fields, account.FieldBio)
 	}
@@ -1958,6 +2025,9 @@ func (m *AccountMutation) ClearField(name string) error {
 	case account.FieldDeletedAt:
 		m.ClearDeletedAt()
 		return nil
+	case account.FieldIndexedAt:
+		m.ClearIndexedAt()
+		return nil
 	case account.FieldBio:
 		m.ClearBio()
 		return nil
@@ -1986,6 +2056,9 @@ func (m *AccountMutation) ResetField(name string) error {
 		return nil
 	case account.FieldDeletedAt:
 		m.ResetDeletedAt()
+		return nil
+	case account.FieldIndexedAt:
+		m.ResetIndexedAt()
 		return nil
 	case account.FieldHandle:
 		m.ResetHandle()
@@ -6786,6 +6859,7 @@ type CollectionMutation struct {
 	id                 *xid.ID
 	created_at         *time.Time
 	updated_at         *time.Time
+	indexed_at         *time.Time
 	name               *string
 	slug               *string
 	description        *string
@@ -6980,6 +7054,55 @@ func (m *CollectionMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *CollectionMutation) ResetUpdatedAt() {
 	m.updated_at = nil
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (m *CollectionMutation) SetIndexedAt(t time.Time) {
+	m.indexed_at = &t
+}
+
+// IndexedAt returns the value of the "indexed_at" field in the mutation.
+func (m *CollectionMutation) IndexedAt() (r time.Time, exists bool) {
+	v := m.indexed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIndexedAt returns the old "indexed_at" field's value of the Collection entity.
+// If the Collection object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CollectionMutation) OldIndexedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIndexedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIndexedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIndexedAt: %w", err)
+	}
+	return oldValue.IndexedAt, nil
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (m *CollectionMutation) ClearIndexedAt() {
+	m.indexed_at = nil
+	m.clearedFields[collection.FieldIndexedAt] = struct{}{}
+}
+
+// IndexedAtCleared returns if the "indexed_at" field was cleared in this mutation.
+func (m *CollectionMutation) IndexedAtCleared() bool {
+	_, ok := m.clearedFields[collection.FieldIndexedAt]
+	return ok
+}
+
+// ResetIndexedAt resets all changes to the "indexed_at" field.
+func (m *CollectionMutation) ResetIndexedAt() {
+	m.indexed_at = nil
+	delete(m.clearedFields, collection.FieldIndexedAt)
 }
 
 // SetName sets the "name" field.
@@ -7409,12 +7532,15 @@ func (m *CollectionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CollectionMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, collection.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, collection.FieldUpdatedAt)
+	}
+	if m.indexed_at != nil {
+		fields = append(fields, collection.FieldIndexedAt)
 	}
 	if m.name != nil {
 		fields = append(fields, collection.FieldName)
@@ -7443,6 +7569,8 @@ func (m *CollectionMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case collection.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case collection.FieldIndexedAt:
+		return m.IndexedAt()
 	case collection.FieldName:
 		return m.Name()
 	case collection.FieldSlug:
@@ -7466,6 +7594,8 @@ func (m *CollectionMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldCreatedAt(ctx)
 	case collection.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case collection.FieldIndexedAt:
+		return m.OldIndexedAt(ctx)
 	case collection.FieldName:
 		return m.OldName(ctx)
 	case collection.FieldSlug:
@@ -7498,6 +7628,13 @@ func (m *CollectionMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case collection.FieldIndexedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIndexedAt(v)
 		return nil
 	case collection.FieldName:
 		v, ok := value.(string)
@@ -7564,6 +7701,9 @@ func (m *CollectionMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *CollectionMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(collection.FieldIndexedAt) {
+		fields = append(fields, collection.FieldIndexedAt)
+	}
 	if m.FieldCleared(collection.FieldDescription) {
 		fields = append(fields, collection.FieldDescription)
 	}
@@ -7584,6 +7724,9 @@ func (m *CollectionMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *CollectionMutation) ClearField(name string) error {
 	switch name {
+	case collection.FieldIndexedAt:
+		m.ClearIndexedAt()
+		return nil
 	case collection.FieldDescription:
 		m.ClearDescription()
 		return nil
@@ -7603,6 +7746,9 @@ func (m *CollectionMutation) ResetField(name string) error {
 		return nil
 	case collection.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case collection.FieldIndexedAt:
+		m.ResetIndexedAt()
 		return nil
 	case collection.FieldName:
 		m.ResetName()
@@ -9432,6 +9578,7 @@ type EventMutation struct {
 	created_at            *time.Time
 	updated_at            *time.Time
 	deleted_at            *time.Time
+	indexed_at            *time.Time
 	name                  *string
 	slug                  *string
 	description           *string
@@ -9686,6 +9833,55 @@ func (m *EventMutation) DeletedAtCleared() bool {
 func (m *EventMutation) ResetDeletedAt() {
 	m.deleted_at = nil
 	delete(m.clearedFields, event.FieldDeletedAt)
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (m *EventMutation) SetIndexedAt(t time.Time) {
+	m.indexed_at = &t
+}
+
+// IndexedAt returns the value of the "indexed_at" field in the mutation.
+func (m *EventMutation) IndexedAt() (r time.Time, exists bool) {
+	v := m.indexed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIndexedAt returns the old "indexed_at" field's value of the Event entity.
+// If the Event object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EventMutation) OldIndexedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIndexedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIndexedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIndexedAt: %w", err)
+	}
+	return oldValue.IndexedAt, nil
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (m *EventMutation) ClearIndexedAt() {
+	m.indexed_at = nil
+	m.clearedFields[event.FieldIndexedAt] = struct{}{}
+}
+
+// IndexedAtCleared returns if the "indexed_at" field was cleared in this mutation.
+func (m *EventMutation) IndexedAtCleared() bool {
+	_, ok := m.clearedFields[event.FieldIndexedAt]
+	return ok
+}
+
+// ResetIndexedAt resets all changes to the "indexed_at" field.
+func (m *EventMutation) ResetIndexedAt() {
+	m.indexed_at = nil
+	delete(m.clearedFields, event.FieldIndexedAt)
 }
 
 // SetName sets the "name" field.
@@ -10574,7 +10770,7 @@ func (m *EventMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EventMutation) Fields() []string {
-	fields := make([]string, 0, 18)
+	fields := make([]string, 0, 19)
 	if m.created_at != nil {
 		fields = append(fields, event.FieldCreatedAt)
 	}
@@ -10583,6 +10779,9 @@ func (m *EventMutation) Fields() []string {
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, event.FieldDeletedAt)
+	}
+	if m.indexed_at != nil {
+		fields = append(fields, event.FieldIndexedAt)
 	}
 	if m.name != nil {
 		fields = append(fields, event.FieldName)
@@ -10643,6 +10842,8 @@ func (m *EventMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case event.FieldDeletedAt:
 		return m.DeletedAt()
+	case event.FieldIndexedAt:
+		return m.IndexedAt()
 	case event.FieldName:
 		return m.Name()
 	case event.FieldSlug:
@@ -10688,6 +10889,8 @@ func (m *EventMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldUpdatedAt(ctx)
 	case event.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
+	case event.FieldIndexedAt:
+		return m.OldIndexedAt(ctx)
 	case event.FieldName:
 		return m.OldName(ctx)
 	case event.FieldSlug:
@@ -10747,6 +10950,13 @@ func (m *EventMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeletedAt(v)
+		return nil
+	case event.FieldIndexedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIndexedAt(v)
 		return nil
 	case event.FieldName:
 		v, ok := value.(string)
@@ -10925,6 +11135,9 @@ func (m *EventMutation) ClearedFields() []string {
 	if m.FieldCleared(event.FieldDeletedAt) {
 		fields = append(fields, event.FieldDeletedAt)
 	}
+	if m.FieldCleared(event.FieldIndexedAt) {
+		fields = append(fields, event.FieldIndexedAt)
+	}
 	if m.FieldCleared(event.FieldDescription) {
 		fields = append(fields, event.FieldDescription)
 	}
@@ -10969,6 +11182,9 @@ func (m *EventMutation) ClearField(name string) error {
 	case event.FieldDeletedAt:
 		m.ClearDeletedAt()
 		return nil
+	case event.FieldIndexedAt:
+		m.ClearIndexedAt()
+		return nil
 	case event.FieldDescription:
 		m.ClearDescription()
 		return nil
@@ -11012,6 +11228,9 @@ func (m *EventMutation) ResetField(name string) error {
 		return nil
 	case event.FieldDeletedAt:
 		m.ResetDeletedAt()
+		return nil
+	case event.FieldIndexedAt:
+		m.ResetIndexedAt()
 		return nil
 	case event.FieldName:
 		m.ResetName()
@@ -14954,6 +15173,7 @@ type NodeMutation struct {
 	created_at           *time.Time
 	updated_at           *time.Time
 	deleted_at           *time.Time
+	indexed_at           *time.Time
 	name                 *string
 	slug                 *string
 	description          *string
@@ -15212,6 +15432,55 @@ func (m *NodeMutation) DeletedAtCleared() bool {
 func (m *NodeMutation) ResetDeletedAt() {
 	m.deleted_at = nil
 	delete(m.clearedFields, node.FieldDeletedAt)
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (m *NodeMutation) SetIndexedAt(t time.Time) {
+	m.indexed_at = &t
+}
+
+// IndexedAt returns the value of the "indexed_at" field in the mutation.
+func (m *NodeMutation) IndexedAt() (r time.Time, exists bool) {
+	v := m.indexed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIndexedAt returns the old "indexed_at" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldIndexedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIndexedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIndexedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIndexedAt: %w", err)
+	}
+	return oldValue.IndexedAt, nil
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (m *NodeMutation) ClearIndexedAt() {
+	m.indexed_at = nil
+	m.clearedFields[node.FieldIndexedAt] = struct{}{}
+}
+
+// IndexedAtCleared returns if the "indexed_at" field was cleared in this mutation.
+func (m *NodeMutation) IndexedAtCleared() bool {
+	_, ok := m.clearedFields[node.FieldIndexedAt]
+	return ok
+}
+
+// ResetIndexedAt resets all changes to the "indexed_at" field.
+func (m *NodeMutation) ResetIndexedAt() {
+	m.indexed_at = nil
+	delete(m.clearedFields, node.FieldIndexedAt)
 }
 
 // SetName sets the "name" field.
@@ -16103,7 +16372,7 @@ func (m *NodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NodeMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, node.FieldCreatedAt)
 	}
@@ -16112,6 +16381,9 @@ func (m *NodeMutation) Fields() []string {
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, node.FieldDeletedAt)
+	}
+	if m.indexed_at != nil {
+		fields = append(fields, node.FieldIndexedAt)
 	}
 	if m.name != nil {
 		fields = append(fields, node.FieldName)
@@ -16157,6 +16429,8 @@ func (m *NodeMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case node.FieldDeletedAt:
 		return m.DeletedAt()
+	case node.FieldIndexedAt:
+		return m.IndexedAt()
 	case node.FieldName:
 		return m.Name()
 	case node.FieldSlug:
@@ -16192,6 +16466,8 @@ func (m *NodeMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUpdatedAt(ctx)
 	case node.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
+	case node.FieldIndexedAt:
+		return m.OldIndexedAt(ctx)
 	case node.FieldName:
 		return m.OldName(ctx)
 	case node.FieldSlug:
@@ -16241,6 +16517,13 @@ func (m *NodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeletedAt(v)
+		return nil
+	case node.FieldIndexedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIndexedAt(v)
 		return nil
 	case node.FieldName:
 		v, ok := value.(string)
@@ -16345,6 +16628,9 @@ func (m *NodeMutation) ClearedFields() []string {
 	if m.FieldCleared(node.FieldDeletedAt) {
 		fields = append(fields, node.FieldDeletedAt)
 	}
+	if m.FieldCleared(node.FieldIndexedAt) {
+		fields = append(fields, node.FieldIndexedAt)
+	}
 	if m.FieldCleared(node.FieldDescription) {
 		fields = append(fields, node.FieldDescription)
 	}
@@ -16380,6 +16666,9 @@ func (m *NodeMutation) ClearField(name string) error {
 	case node.FieldDeletedAt:
 		m.ClearDeletedAt()
 		return nil
+	case node.FieldIndexedAt:
+		m.ClearIndexedAt()
+		return nil
 	case node.FieldDescription:
 		m.ClearDescription()
 		return nil
@@ -16414,6 +16703,9 @@ func (m *NodeMutation) ResetField(name string) error {
 		return nil
 	case node.FieldDeletedAt:
 		m.ResetDeletedAt()
+		return nil
+	case node.FieldIndexedAt:
+		m.ResetIndexedAt()
 		return nil
 	case node.FieldName:
 		m.ResetName()
@@ -17633,6 +17925,7 @@ type PostMutation struct {
 	created_at           *time.Time
 	updated_at           *time.Time
 	deleted_at           *time.Time
+	indexed_at           *time.Time
 	first                *bool
 	title                *string
 	slug                 *string
@@ -17910,6 +18203,55 @@ func (m *PostMutation) DeletedAtCleared() bool {
 func (m *PostMutation) ResetDeletedAt() {
 	m.deleted_at = nil
 	delete(m.clearedFields, post.FieldDeletedAt)
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (m *PostMutation) SetIndexedAt(t time.Time) {
+	m.indexed_at = &t
+}
+
+// IndexedAt returns the value of the "indexed_at" field in the mutation.
+func (m *PostMutation) IndexedAt() (r time.Time, exists bool) {
+	v := m.indexed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIndexedAt returns the old "indexed_at" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldIndexedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIndexedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIndexedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIndexedAt: %w", err)
+	}
+	return oldValue.IndexedAt, nil
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (m *PostMutation) ClearIndexedAt() {
+	m.indexed_at = nil
+	m.clearedFields[post.FieldIndexedAt] = struct{}{}
+}
+
+// IndexedAtCleared returns if the "indexed_at" field was cleared in this mutation.
+func (m *PostMutation) IndexedAtCleared() bool {
+	_, ok := m.clearedFields[post.FieldIndexedAt]
+	return ok
+}
+
+// ResetIndexedAt resets all changes to the "indexed_at" field.
+func (m *PostMutation) ResetIndexedAt() {
+	m.indexed_at = nil
+	delete(m.clearedFields, post.FieldIndexedAt)
 }
 
 // SetFirst sets the "first" field.
@@ -19182,7 +19524,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 16)
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
@@ -19191,6 +19533,9 @@ func (m *PostMutation) Fields() []string {
 	}
 	if m.deleted_at != nil {
 		fields = append(fields, post.FieldDeletedAt)
+	}
+	if m.indexed_at != nil {
+		fields = append(fields, post.FieldIndexedAt)
 	}
 	if m.first != nil {
 		fields = append(fields, post.FieldFirst)
@@ -19242,6 +19587,8 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case post.FieldDeletedAt:
 		return m.DeletedAt()
+	case post.FieldIndexedAt:
+		return m.IndexedAt()
 	case post.FieldFirst:
 		return m.First()
 	case post.FieldTitle:
@@ -19281,6 +19628,8 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUpdatedAt(ctx)
 	case post.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
+	case post.FieldIndexedAt:
+		return m.OldIndexedAt(ctx)
 	case post.FieldFirst:
 		return m.OldFirst(ctx)
 	case post.FieldTitle:
@@ -19334,6 +19683,13 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeletedAt(v)
+		return nil
+	case post.FieldIndexedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIndexedAt(v)
 		return nil
 	case post.FieldFirst:
 		v, ok := value.(bool)
@@ -19452,6 +19808,9 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldDeletedAt) {
 		fields = append(fields, post.FieldDeletedAt)
 	}
+	if m.FieldCleared(post.FieldIndexedAt) {
+		fields = append(fields, post.FieldIndexedAt)
+	}
 	if m.FieldCleared(post.FieldTitle) {
 		fields = append(fields, post.FieldTitle)
 	}
@@ -19490,6 +19849,9 @@ func (m *PostMutation) ClearField(name string) error {
 	case post.FieldDeletedAt:
 		m.ClearDeletedAt()
 		return nil
+	case post.FieldIndexedAt:
+		m.ClearIndexedAt()
+		return nil
 	case post.FieldTitle:
 		m.ClearTitle()
 		return nil
@@ -19527,6 +19889,9 @@ func (m *PostMutation) ResetField(name string) error {
 		return nil
 	case post.FieldDeletedAt:
 		m.ResetDeletedAt()
+		return nil
+	case post.FieldIndexedAt:
+		m.ResetIndexedAt()
 		return nil
 	case post.FieldFirst:
 		m.ResetFirst()

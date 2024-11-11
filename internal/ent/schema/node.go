@@ -13,7 +13,7 @@ type Node struct {
 }
 
 func (Node) Mixin() []ent.Mixin {
-	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}, DeletedAt{}}
+	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}, DeletedAt{}, IndexedAt{}}
 }
 
 func (Node) Fields() []ent.Field {

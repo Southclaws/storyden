@@ -61,6 +61,26 @@ func (nu *NodeUpdate) ClearDeletedAt() *NodeUpdate {
 	return nu
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (nu *NodeUpdate) SetIndexedAt(t time.Time) *NodeUpdate {
+	nu.mutation.SetIndexedAt(t)
+	return nu
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (nu *NodeUpdate) SetNillableIndexedAt(t *time.Time) *NodeUpdate {
+	if t != nil {
+		nu.SetIndexedAt(*t)
+	}
+	return nu
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (nu *NodeUpdate) ClearIndexedAt() *NodeUpdate {
+	nu.mutation.ClearIndexedAt()
+	return nu
+}
+
 // SetName sets the "name" field.
 func (nu *NodeUpdate) SetName(s string) *NodeUpdate {
 	nu.mutation.SetName(s)
@@ -568,6 +588,12 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nu.mutation.DeletedAtCleared() {
 		_spec.ClearField(node.FieldDeletedAt, field.TypeTime)
 	}
+	if value, ok := nu.mutation.IndexedAt(); ok {
+		_spec.SetField(node.FieldIndexedAt, field.TypeTime, value)
+	}
+	if nu.mutation.IndexedAtCleared() {
+		_spec.ClearField(node.FieldIndexedAt, field.TypeTime)
+	}
 	if value, ok := nu.mutation.Name(); ok {
 		_spec.SetField(node.FieldName, field.TypeString, value)
 	}
@@ -993,6 +1019,26 @@ func (nuo *NodeUpdateOne) SetNillableDeletedAt(t *time.Time) *NodeUpdateOne {
 // ClearDeletedAt clears the value of the "deleted_at" field.
 func (nuo *NodeUpdateOne) ClearDeletedAt() *NodeUpdateOne {
 	nuo.mutation.ClearDeletedAt()
+	return nuo
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (nuo *NodeUpdateOne) SetIndexedAt(t time.Time) *NodeUpdateOne {
+	nuo.mutation.SetIndexedAt(t)
+	return nuo
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (nuo *NodeUpdateOne) SetNillableIndexedAt(t *time.Time) *NodeUpdateOne {
+	if t != nil {
+		nuo.SetIndexedAt(*t)
+	}
+	return nuo
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (nuo *NodeUpdateOne) ClearIndexedAt() *NodeUpdateOne {
+	nuo.mutation.ClearIndexedAt()
 	return nuo
 }
 
@@ -1532,6 +1578,12 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	}
 	if nuo.mutation.DeletedAtCleared() {
 		_spec.ClearField(node.FieldDeletedAt, field.TypeTime)
+	}
+	if value, ok := nuo.mutation.IndexedAt(); ok {
+		_spec.SetField(node.FieldIndexedAt, field.TypeTime, value)
+	}
+	if nuo.mutation.IndexedAtCleared() {
+		_spec.ClearField(node.FieldIndexedAt, field.TypeTime)
 	}
 	if value, ok := nuo.mutation.Name(); ok {
 		_spec.SetField(node.FieldName, field.TypeString, value)

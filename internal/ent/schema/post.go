@@ -13,7 +13,7 @@ type Post struct {
 }
 
 func (Post) Mixin() []ent.Mixin {
-	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}, DeletedAt{}}
+	return []ent.Mixin{Identifier{}, CreatedAt{}, UpdatedAt{}, DeletedAt{}, IndexedAt{}}
 }
 
 func (Post) Fields() []ent.Field {

@@ -76,6 +76,20 @@ func (pc *PostCreate) SetNillableDeletedAt(t *time.Time) *PostCreate {
 	return pc
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (pc *PostCreate) SetIndexedAt(t time.Time) *PostCreate {
+	pc.mutation.SetIndexedAt(t)
+	return pc
+}
+
+// SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
+func (pc *PostCreate) SetNillableIndexedAt(t *time.Time) *PostCreate {
+	if t != nil {
+		pc.SetIndexedAt(*t)
+	}
+	return pc
+}
+
 // SetFirst sets the "first" field.
 func (pc *PostCreate) SetFirst(b bool) *PostCreate {
 	pc.mutation.SetFirst(b)
@@ -576,6 +590,10 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_spec.SetField(post.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
+	if value, ok := pc.mutation.IndexedAt(); ok {
+		_spec.SetField(post.FieldIndexedAt, field.TypeTime, value)
+		_node.IndexedAt = &value
+	}
 	if value, ok := pc.mutation.First(); ok {
 		_spec.SetField(post.FieldFirst, field.TypeBool, value)
 		_node.First = value
@@ -935,6 +953,24 @@ func (u *PostUpsert) ClearDeletedAt() *PostUpsert {
 	return u
 }
 
+// SetIndexedAt sets the "indexed_at" field.
+func (u *PostUpsert) SetIndexedAt(v time.Time) *PostUpsert {
+	u.Set(post.FieldIndexedAt, v)
+	return u
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *PostUpsert) UpdateIndexedAt() *PostUpsert {
+	u.SetExcluded(post.FieldIndexedAt)
+	return u
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *PostUpsert) ClearIndexedAt() *PostUpsert {
+	u.SetNull(post.FieldIndexedAt)
+	return u
+}
+
 // SetFirst sets the "first" field.
 func (u *PostUpsert) SetFirst(v bool) *PostUpsert {
 	u.Set(post.FieldFirst, v)
@@ -1204,6 +1240,27 @@ func (u *PostUpsertOne) UpdateDeletedAt() *PostUpsertOne {
 func (u *PostUpsertOne) ClearDeletedAt() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearDeletedAt()
+	})
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (u *PostUpsertOne) SetIndexedAt(v time.Time) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetIndexedAt(v)
+	})
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateIndexedAt() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateIndexedAt()
+	})
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *PostUpsertOne) ClearIndexedAt() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearIndexedAt()
 	})
 }
 
@@ -1674,6 +1731,27 @@ func (u *PostUpsertBulk) UpdateDeletedAt() *PostUpsertBulk {
 func (u *PostUpsertBulk) ClearDeletedAt() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.ClearDeletedAt()
+	})
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (u *PostUpsertBulk) SetIndexedAt(v time.Time) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetIndexedAt(v)
+	})
+}
+
+// UpdateIndexedAt sets the "indexed_at" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateIndexedAt() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateIndexedAt()
+	})
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (u *PostUpsertBulk) ClearIndexedAt() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearIndexedAt()
 	})
 }
 

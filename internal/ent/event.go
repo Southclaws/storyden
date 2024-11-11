@@ -27,6 +27,8 @@ type Event struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// DeletedAt holds the value of the "deleted_at" field.
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
+	// IndexedAt holds the value of the "indexed_at" field.
+	IndexedAt *time.Time `json:"indexed_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Slug holds the value of the "slug" field.
@@ -122,7 +124,7 @@ func (*Event) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case event.FieldName, event.FieldSlug, event.FieldDescription, event.FieldParticipationPolicy, event.FieldVisibility, event.FieldLocationType, event.FieldLocationName, event.FieldLocationAddress, event.FieldLocationURL:
 			values[i] = new(sql.NullString)
-		case event.FieldCreatedAt, event.FieldUpdatedAt, event.FieldDeletedAt, event.FieldStartTime, event.FieldEndTime:
+		case event.FieldCreatedAt, event.FieldUpdatedAt, event.FieldDeletedAt, event.FieldIndexedAt, event.FieldStartTime, event.FieldEndTime:
 			values[i] = new(sql.NullTime)
 		case event.FieldID:
 			values[i] = new(xid.ID)
@@ -169,6 +171,13 @@ func (e *Event) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.DeletedAt = new(time.Time)
 				*e.DeletedAt = value.Time
+			}
+		case event.FieldIndexedAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field indexed_at", values[i])
+			} else if value.Valid {
+				e.IndexedAt = new(time.Time)
+				*e.IndexedAt = value.Time
 			}
 		case event.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -343,6 +352,11 @@ func (e *Event) String() string {
 	builder.WriteString(", ")
 	if v := e.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := e.IndexedAt; v != nil {
+		builder.WriteString("indexed_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
