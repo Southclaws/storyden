@@ -72,3 +72,32 @@ type Semdexer interface {
 	RelevanceScorer
 	Summariser
 }
+
+type Disabled struct{}
+
+func (*Disabled) Index(ctx context.Context, object datagraph.Item) error { return nil }
+func (*Disabled) Delete(ctx context.Context, object xid.ID) error        { return nil }
+
+func (*Disabled) Search(ctx context.Context, query string) (datagraph.ItemList, error) {
+	return nil, nil
+}
+
+func (*Disabled) Recommend(ctx context.Context, object datagraph.Item) (datagraph.ItemList, error) {
+	return nil, nil
+}
+
+func (*Disabled) SuggestTags(ctx context.Context, content datagraph.Content, available tag_ref.Names) (tag_ref.Names, error) {
+	return nil, nil
+}
+
+func (*Disabled) ScoreRelevance(ctx context.Context, object datagraph.Item, idx ...xid.ID) (map[xid.ID]float64, error) {
+	return nil, nil
+}
+
+func (*Disabled) Summarise(ctx context.Context, object datagraph.Item) (string, error) {
+	return "", nil
+}
+
+func (*Disabled) GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error) {
+	return nil, nil
+}

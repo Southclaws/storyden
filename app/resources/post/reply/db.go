@@ -46,6 +46,7 @@ func (d *database) Create(
 
 	q := d.db.Post.
 		Create().
+		SetUpdatedAt(time.Now()).
 		SetFirst(false).
 		SetRootID(xid.ID(parentID)).
 		SetAuthorID(xid.ID(authorID))
@@ -115,6 +116,11 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Rep
 
 	for _, fn := range opts {
 		fn(mutate)
+	}
+
+	// Only set the updated_at field if not changing the indexed_at field.
+	if _, set := mutate.IndexedAt(); !set {
+		mutate.SetUpdatedAt(time.Now())
 	}
 
 	err := update.Exec(ctx)

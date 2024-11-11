@@ -20,7 +20,7 @@ func newSemdexer(
 	hydrator *refhydrate.Hydrator,
 ) semdex.Semdexer {
 	if !cfg.SemdexEnabled {
-		return nil
+		return &semdex.Disabled{}
 	}
 
 	return weaviate_semdexer.New(wc, weaviateClassName, hydrator)
