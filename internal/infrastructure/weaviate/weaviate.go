@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/mitchellh/mapstructure"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/auth"
 	"github.com/weaviate/weaviate/entities/models"
@@ -24,6 +25,14 @@ func (w WeaviateClassName) String() string {
 func Build() fx.Option {
 	return fx.Provide(newWeaviateClient)
 }
+
+type ModuleConfig struct {
+	Model      string `mapstructure:"model"`
+	Type       string `mapstructure:"type"`
+	Dimensions string `mapstructure:"dimensions"`
+}
+
+type ModuleConfigMap map[string]ModuleConfig
 
 func newWeaviateClient(lc fx.Lifecycle, cfg config.Config) (*weaviate.Client, WeaviateClassName, error) {
 	if !cfg.SemdexEnabled {
@@ -90,14 +99,14 @@ func newWeaviateClient(lc fx.Lifecycle, cfg config.Config) (*weaviate.Client, We
 					DataType: []string{"text"},
 				},
 			},
-			ModuleConfig: map[string]any{
-				"text2vec-openai": map[string]any{
-					"model":      "text-embedding-3-large",
-					"dimensions": "3072",
-					"type":       "text",
+			ModuleConfig: map[string]ModuleConfig{
+				"text2vec-openai": {
+					Model:      "text-embedding-3-large",
+					Dimensions: "3072",
+					Type:       "text",
 				},
-				"generative-openai": map[string]any{
-					"model": "gpt-4",
+				"generative-openai": {
+					Model: "gpt-4",
 				},
 			},
 		},
@@ -184,7 +193,7 @@ func compareClassConfig(cn string, a, b models.Class) bool {
 		return false
 	}
 
-	if !reflect.DeepEqual(a.ModuleConfig, b.ModuleConfig) {
+	if !compareModuleConfig(a.ModuleConfig, b.ModuleConfig) {
 		return false
 	}
 
@@ -199,6 +208,22 @@ func compareClassConfig(cn string, a, b models.Class) bool {
 	}
 
 	return true
+}
+
+func compareModuleConfig(a, b any) bool {
+	var aa ModuleConfigMap
+	err := mapstructure.Decode(a, &aa)
+	if err != nil {
+		panic(err)
+	}
+
+	var bb ModuleConfigMap
+	err = mapstructure.Decode(b, &bb)
+	if err != nil {
+		panic(err)
+	}
+
+	return reflect.DeepEqual(aa, bb)
 }
 
 func comparePropertyConfig(cn string, a, b *models.Property) bool {
