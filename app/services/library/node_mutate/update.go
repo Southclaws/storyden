@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -16,8 +17,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	library_service "github.com/Southclaws/storyden/app/services/library"
+	"github.com/Southclaws/storyden/app/services/library/node_auth"
 )
 
 type Option func(*updateOptions)
@@ -58,7 +60,7 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial, op
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := library_service.AuthoriseNodeMutation(ctx, acc, n); err != nil {
+	if err := node_auth.AuthoriseNodeMutation(ctx, acc, n); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -156,8 +158,18 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial, op
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: library.NodeID(n.Mark.ID())}); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+	if n.Visibility == visibility.VisibilityPublished {
+		if err := s.indexQueue.Publish(ctx, mq.IndexNode{
+			ID: library.NodeID(n.Mark.ID()),
+		}); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+	} else {
+		if err := s.deleteQueue.Publish(ctx, mq.DeleteNode{
+			ID: library.NodeID(n.GetID()),
+		}); err != nil {
+			s.logger.Error("failed to publish index post message", zap.Error(err))
+		}
 	}
 
 	s.fetcher.HydrateContentURLs(ctx, n)

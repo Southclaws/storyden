@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	library_service "github.com/Southclaws/storyden/app/services/library"
+	"github.com/Southclaws/storyden/app/services/library/node_auth"
 )
 
 var (
@@ -74,7 +74,7 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := library_service.AuthoriseNodeParentChildMutation(ctx, acc, cnode, pnode); err != nil {
+	if err := node_auth.AuthoriseNodeParentChildMutation(ctx, acc, cnode, pnode); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -127,7 +127,7 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := library_service.AuthoriseNodeParentChildMutation(ctx, acc, cnode, pnode); err != nil {
+	if err := node_auth.AuthoriseNodeParentChildMutation(ctx, acc, cnode, pnode); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

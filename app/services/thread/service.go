@@ -25,6 +25,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/mention/mentioner"
 	"github.com/Southclaws/storyden/app/services/moderation/content_policy"
+	"github.com/Southclaws/storyden/app/services/thread/thread_semdex"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -77,7 +78,10 @@ func (p Partial) Opts() (opts []thread.Option) {
 }
 
 func Build() fx.Option {
-	return fx.Provide(New)
+	return fx.Options(
+		fx.Provide(New),
+		thread_semdex.Build(),
+	)
 }
 
 type service struct {
@@ -89,6 +93,7 @@ type service struct {
 	fetcher      *fetcher.Fetcher
 	recommender  semdex.Recommender
 	indexQueue   pubsub.Topic[mq.IndexThread]
+	deleteQueue  pubsub.Topic[mq.DeleteThread]
 	mentioner    *mentioner.Mentioner
 	cpm          *content_policy.Manager
 }
@@ -102,6 +107,7 @@ func New(
 	fetcher *fetcher.Fetcher,
 	recommender semdex.Recommender,
 	indexQueue pubsub.Topic[mq.IndexThread],
+	deleteQueue pubsub.Topic[mq.DeleteThread],
 	mentioner *mentioner.Mentioner,
 	cpm *content_policy.Manager,
 ) Service {
@@ -114,6 +120,7 @@ func New(
 		fetcher:      fetcher,
 		recommender:  recommender,
 		indexQueue:   indexQueue,
+		deleteQueue:  deleteQueue,
 		mentioner:    mentioner,
 		cpm:          cpm,
 	}

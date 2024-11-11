@@ -25,6 +25,10 @@ func (h *HydratedSemdexer) Index(ctx context.Context, object datagraph.Item) err
 	return h.RefSemdex.Index(ctx, object)
 }
 
+func (h *HydratedSemdexer) Delete(ctx context.Context, id xid.ID) error {
+	return h.RefSemdex.Delete(ctx, id)
+}
+
 func (h *HydratedSemdexer) Search(ctx context.Context, query string) (datagraph.ItemList, error) {
 	rs, err := h.RefSemdex.Search(ctx, query)
 	if err != nil {
@@ -47,8 +51,8 @@ func (h *HydratedSemdexer) SuggestTags(ctx context.Context, content datagraph.Co
 	return h.RefSemdex.SuggestTags(ctx, content, available)
 }
 
-func (h *HydratedSemdexer) GetAll(ctx context.Context) (datagraph.RefList, error) {
-	return h.RefSemdex.GetAll(ctx)
+func (h *HydratedSemdexer) GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error) {
+	return h.RefSemdex.GetMany(ctx, limit, ids...)
 }
 
 func (h *HydratedSemdexer) ScoreRelevance(ctx context.Context, object datagraph.Item, idx ...xid.ID) (map[xid.ID]float64, error) {

@@ -82,8 +82,10 @@ func (s *Manager) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: library.NodeID(n.Mark.ID())}); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+	if p.Visibility.OrZero() == visibility.VisibilityPublished {
+		if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: library.NodeID(n.Mark.ID())}); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	s.fetcher.HydrateContentURLs(ctx, n)

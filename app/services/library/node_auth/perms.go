@@ -1,4 +1,4 @@
-package library
+package node_auth
 
 import (
 	"context"
