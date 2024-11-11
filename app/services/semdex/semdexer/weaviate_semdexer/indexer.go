@@ -22,18 +22,13 @@ func (s *weaviateRefIndex) Index(ctx context.Context, object datagraph.Item) err
 
 	wid := GetWeaviateID(object.GetID())
 
-	// Don't bother indexing if the content is too short.
-	if len(content) < 30 {
-		return nil
-	}
-
-	_, err := s.wc.Data().ObjectsGetter().
+	result, err := s.wc.Data().ObjectsGetter().
 		WithClassName(s.cn.String()).
 		WithID(wid).
 		Do(ctx)
 
 	we := &weaviate_errors.WeaviateClientError{}
-	nonExistent := errors.As(err, &we) && we.StatusCode == 404
+	nonExistent := (errors.As(err, &we) && we.StatusCode == 404) || len(result) == 0
 
 	if err != nil && !nonExistent {
 		return fault.Wrap(err, fctx.With(ctx))
@@ -48,6 +43,15 @@ func (s *weaviateRefIndex) Index(ctx context.Context, object datagraph.Item) err
 	}
 
 	if !nonExistent {
+		existing := result[0]
+
+		existingProps := existing.Properties.(map[string]any)
+
+		isSame := compareIndexedContentProperties(existingProps, props)
+		if isSame {
+			return nil
+		}
+
 		err = s.wc.Data().Updater().
 			WithClassName(s.cn.String()).
 			WithID(wid).
@@ -73,6 +77,20 @@ func (s *weaviateRefIndex) Index(ctx context.Context, object datagraph.Item) err
 	}
 
 	return nil
+}
+
+func compareIndexedContentProperties(a, b map[string]any) bool {
+	if a["name"] != b["name"] {
+		return false
+	}
+	if a["description"] != b["description"] {
+		return false
+	}
+	if a["content"] != b["content"] {
+		return false
+	}
+
+	return true
 }
 
 func GetWeaviateID(id xid.ID) string {
