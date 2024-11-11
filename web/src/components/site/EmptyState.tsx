@@ -12,12 +12,14 @@ type Props = {
   icon?: JSX.Element;
   unauthenticatedLabel?: string;
   authenticatedLabel?: string;
+  hideContributionLabel?: boolean;
 };
 
 export function EmptyState({
   icon,
   unauthenticatedLabel,
   authenticatedLabel,
+  hideContributionLabel,
   children,
   ...props
 }: PropsWithChildren<Props & VstackProps>) {
@@ -33,7 +35,7 @@ export function EmptyState({
 
       <VStack gap="1" textAlign="center" fontStyle="italic">
         {children || <p>There&apos;s no content here.</p>}
-        <p>{contributionLabel}</p>
+        {!hideContributionLabel && <p>{contributionLabel}</p>}
       </VStack>
     </Center>
   );
