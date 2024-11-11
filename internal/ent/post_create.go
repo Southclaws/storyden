@@ -54,14 +54,6 @@ func (pc *PostCreate) SetUpdatedAt(t time.Time) *PostCreate {
 	return pc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (pc *PostCreate) SetNillableUpdatedAt(t *time.Time) *PostCreate {
-	if t != nil {
-		pc.SetUpdatedAt(*t)
-	}
-	return pc
-}
-
 // SetDeletedAt sets the "deleted_at" field.
 func (pc *PostCreate) SetDeletedAt(t time.Time) *PostCreate {
 	pc.mutation.SetDeletedAt(t)
@@ -487,10 +479,6 @@ func (pc *PostCreate) defaults() {
 	if _, ok := pc.mutation.CreatedAt(); !ok {
 		v := post.DefaultCreatedAt()
 		pc.mutation.SetCreatedAt(v)
-	}
-	if _, ok := pc.mutation.UpdatedAt(); !ok {
-		v := post.DefaultUpdatedAt()
-		pc.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := pc.mutation.Pinned(); !ok {
 		v := post.DefaultPinned

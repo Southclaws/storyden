@@ -66,6 +66,12 @@ func WithID(id post.ID) Option {
 	}
 }
 
+func WithIndexed() Option {
+	return func(m *ent.PostMutation) {
+		m.SetIndexedAt(time.Now())
+	}
+}
+
 func WithTitle(v string) Option {
 	return func(pm *ent.PostMutation) {
 		pm.SetTitle(v)

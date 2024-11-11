@@ -763,20 +763,12 @@ func init() {
 	_ = postMixinFields0
 	postMixinFields1 := postMixin[1].Fields()
 	_ = postMixinFields1
-	postMixinFields2 := postMixin[2].Fields()
-	_ = postMixinFields2
 	postFields := schema.Post{}.Fields()
 	_ = postFields
 	// postDescCreatedAt is the schema descriptor for created_at field.
 	postDescCreatedAt := postMixinFields1[0].Descriptor()
 	// post.DefaultCreatedAt holds the default value on creation for the created_at field.
 	post.DefaultCreatedAt = postDescCreatedAt.Default.(func() time.Time)
-	// postDescUpdatedAt is the schema descriptor for updated_at field.
-	postDescUpdatedAt := postMixinFields2[0].Descriptor()
-	// post.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	post.DefaultUpdatedAt = postDescUpdatedAt.Default.(func() time.Time)
-	// post.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	post.UpdateDefaultUpdatedAt = postDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// postDescPinned is the schema descriptor for pinned field.
 	postDescPinned := postFields[3].Descriptor()
 	// post.DefaultPinned holds the default value on creation for the pinned field.
