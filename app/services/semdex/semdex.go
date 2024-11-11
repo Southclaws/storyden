@@ -7,7 +7,9 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
+	"github.com/Southclaws/storyden/app/services/search/searcher"
 )
 
 type Indexer interface {
@@ -19,11 +21,11 @@ type Deleter interface {
 }
 
 type Searcher interface {
-	Search(ctx context.Context, query string) (datagraph.ItemList, error)
+	Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error)
 }
 
 type RefSearcher interface {
-	Search(ctx context.Context, query string) (datagraph.RefList, error)
+	Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[*datagraph.Ref], error)
 }
 
 type Recommender interface {
@@ -75,10 +77,12 @@ type Semdexer interface {
 
 type Disabled struct{}
 
+var _ Semdexer = &Disabled{}
+
 func (*Disabled) Index(ctx context.Context, object datagraph.Item) error { return nil }
 func (*Disabled) Delete(ctx context.Context, object xid.ID) error        { return nil }
 
-func (*Disabled) Search(ctx context.Context, query string) (datagraph.ItemList, error) {
+func (*Disabled) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
 	return nil, nil
 }
 

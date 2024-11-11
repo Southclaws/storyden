@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -14,40 +15,63 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/profile"
-	"github.com/Southclaws/storyden/app/services/search"
+	"github.com/Southclaws/storyden/app/services/search/searcher"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Datagraph struct {
-	searcher search.Searcher
+	searcher searcher.Searcher
 }
 
 func NewDatagraph(
-	searcher search.Searcher,
+	searcher searcher.Searcher,
 ) Datagraph {
 	return Datagraph{
 		searcher: searcher,
 	}
 }
 
+const datagraphSearchPageSize = 50
+
 func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.DatagraphSearchRequestObject) (openapi.DatagraphSearchResponseObject, error) {
 	if request.Params.Q == nil {
 		return nil, fault.New("missing query")
 	}
 
-	r, err := d.searcher.Search(ctx, *request.Params.Q)
+	pp := deserialisePageParams(request.Params.Page, datagraphSearchPageSize)
+
+	kindFilter, err := opt.MapErr(opt.NewPtr(request.Params.Kind), deserialiseDatagraphKindList)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	items := dt.Map(r, serialiseDatagraphItem)
+	opts := searcher.Options{
+		Kinds: kindFilter,
+	}
+
+	r, err := d.searcher.Search(ctx, *request.Params.Q, pp, opts)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return openapi.DatagraphSearch200JSONResponse{
 		DatagraphSearchOKJSONResponse: openapi.DatagraphSearchOKJSONResponse{
-			// TODO: pagination
-			Items: items,
+			CurrentPage: r.CurrentPage,
+			Items:       dt.Map(r.Items, serialiseDatagraphItem),
+			NextPage:    r.NextPage.Ptr(),
+			PageSize:    r.Size,
+			Results:     r.Results,
+			TotalPages:  r.TotalPages,
 		},
 	}, nil
+}
+
+func deserialiseDatagraphKindList(ks []openapi.DatagraphItemKind) ([]datagraph.Kind, error) {
+	return dt.MapErr(ks, deserialiseDatagraphKind)
+}
+
+func deserialiseDatagraphKind(v openapi.DatagraphItemKind) (datagraph.Kind, error) {
+	return datagraph.NewKind(string(v))
 }
 
 func serialiseDatagraphItem(v datagraph.Item) openapi.DatagraphItem {
