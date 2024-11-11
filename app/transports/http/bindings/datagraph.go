@@ -9,24 +9,24 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/services/search"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Datagraph struct {
-	ds semdex.Searcher
+	searcher search.Searcher
 }
 
 func NewDatagraph(
-	ds semdex.Searcher,
+	searcher search.Searcher,
 ) Datagraph {
 	return Datagraph{
-		ds: ds,
+		searcher: searcher,
 	}
 }
 
@@ -35,7 +35,7 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 		return nil, fault.New("missing query")
 	}
 
-	r, err := d.ds.Search(ctx, *request.Params.Q)
+	r, err := d.searcher.Search(ctx, *request.Params.Q)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

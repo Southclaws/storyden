@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
+	"github.com/Southclaws/storyden/app/services/search/simplesearch"
 )
 
 type Service interface {
@@ -25,7 +26,10 @@ type Query struct {
 }
 
 func Build() fx.Option {
-	return fx.Provide(New)
+	return fx.Options(
+		fx.Provide(New),
+		fx.Provide(simplesearch.NewParallelSearcher, NewSearcher),
+	)
 }
 
 type service struct {

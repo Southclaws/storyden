@@ -6,7 +6,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/refhydrate"
-	"github.com/Southclaws/storyden/app/services/semdex/semdexer/simplesearch"
+
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/weaviate_semdexer"
 	"github.com/Southclaws/storyden/internal/config"
 	weaviate_infra "github.com/Southclaws/storyden/internal/infrastructure/weaviate"
@@ -15,13 +15,12 @@ import (
 func newSemdexer(
 	cfg config.Config,
 	wc *weaviate.Client,
-	simpleSearcher *simplesearch.ParallelSearcher,
 
 	weaviateClassName weaviate_infra.WeaviateClassName,
 	hydrator *refhydrate.Hydrator,
 ) semdex.Semdexer {
 	if !cfg.SemdexEnabled {
-		return &semdex.OnlySearcher{Searcher: simpleSearcher}
+		return nil
 	}
 
 	return weaviate_semdexer.New(wc, weaviateClassName, hydrator)
@@ -30,7 +29,6 @@ func newSemdexer(
 func Build() fx.Option {
 	return fx.Provide(
 		refhydrate.New,
-		simplesearch.NewParallelSearcher,
 		fx.Annotate(
 			newSemdexer,
 			fx.As(new(semdex.Semdexer)),
