@@ -85,7 +85,7 @@ func TestSemdexWeaviate(t *testing.T) {
 			query := "outage"
 
 			search1, err := cl.DatagraphSearchWithResponse(ctx, &openapi.DatagraphSearchParams{
-				Q: &query,
+				Q: query,
 			}, e2e.WithSession(ctx, cj))
 			r.NoError(err)
 			r.Equal(http.StatusOK, search1.StatusCode())
