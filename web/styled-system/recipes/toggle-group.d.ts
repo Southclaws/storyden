@@ -10,7 +10,7 @@ variant: "outline" | "ghost"
 /**
  * @default "md"
  */
-size: "sm" | "md" | "lg"
+size: "xs" | "sm" | "md" | "lg"
 }
 
 type ToggleGroupVariantMap = {
@@ -23,7 +23,7 @@ export type ToggleGroupVariantProps = {
 
 export interface ToggleGroupRecipe {
   __type: ToggleGroupVariantProps
-  (props?: ToggleGroupVariantProps): Pretty<Record<"root" | "item" | "root" | "item", string>>
+  (props?: ToggleGroupVariantProps): Pretty<Record<"root" | "item" | "root" | "item" | "root" | "item", string>>
   raw: (props?: ToggleGroupVariantProps) => ToggleGroupVariantProps
   variantMap: ToggleGroupVariantMap
   variantKeys: Array<keyof ToggleGroupVariant>
