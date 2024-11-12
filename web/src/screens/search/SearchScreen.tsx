@@ -4,7 +4,10 @@ import { DatagraphSearchResults } from "src/components/search/DatagraphSearchRes
 import { UnreadyBanner } from "src/components/site/Unready";
 
 import { useDatagraphSearch } from "@/api/openapi-client/datagraph";
-import { DatagraphSearchOKResponse } from "@/api/openapi-schema";
+import {
+  DatagraphItemKind,
+  DatagraphSearchOKResponse,
+} from "@/api/openapi-schema";
 import { Search } from "@/components/search/Search/Search";
 import { useSearchQueryState } from "@/components/search/Search/useSearch";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
@@ -13,6 +16,7 @@ import { VStack } from "@/styled-system/jsx";
 type Props = {
   query: string;
   page: number;
+  kind: DatagraphItemKind[];
   initialResults: DatagraphSearchOKResponse;
 };
 
@@ -23,6 +27,7 @@ export function SearchScreen(props: Props) {
     {
       q: query,
       page: props.page.toString(),
+      kind: props.kind,
     },
     {
       swr: {
