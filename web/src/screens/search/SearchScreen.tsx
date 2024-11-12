@@ -71,7 +71,6 @@ export function SearchScreen(props: Props) {
           borderColor="border.default"
           type="submit"
           width="min"
-          disabled={query ? false : true}
           loading={isLoading}
         >
           <SearchIcon />
@@ -113,7 +112,9 @@ export function SearchScreen(props: Props) {
       ) : error ? (
         <UnreadyBanner error={error} />
       ) : (
-        <EmptyState>No search results.</EmptyState>
+        <EmptyState hideContributionLabel>
+          {query ? "No search results." : "Go forth, seek far and wide."}
+        </EmptyState>
       )}
     </styled.form>
   );

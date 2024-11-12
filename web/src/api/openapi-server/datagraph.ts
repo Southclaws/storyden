@@ -21,7 +21,7 @@ export type datagraphSearchResponse = {
   status: number;
 };
 
-export const getDatagraphSearchUrl = (params?: DatagraphSearchParams) => {
+export const getDatagraphSearchUrl = (params: DatagraphSearchParams) => {
   const normalizedParams = new URLSearchParams();
 
   Object.entries(params || {}).forEach(([key, value]) => {
@@ -45,7 +45,7 @@ export const getDatagraphSearchUrl = (params?: DatagraphSearchParams) => {
 };
 
 export const datagraphSearch = async (
-  params?: DatagraphSearchParams,
+  params: DatagraphSearchParams,
   options?: RequestInit,
 ): Promise<datagraphSearchResponse> => {
   return fetcher<Promise<datagraphSearchResponse>>(

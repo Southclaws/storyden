@@ -1699,7 +1699,7 @@ paths:
       description: Query and search content.
       tags: [datagraph]
       parameters:
-        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/RequiredSearchQuery"
         - $ref: "#/components/parameters/DatagraphKindQuery"
         - $ref: "#/components/parameters/PaginationQuery"
       responses:
@@ -1992,6 +1992,16 @@ components:
       name: q
       in: query
       required: false
+      allowEmptyValue: true
+      schema:
+        type: string
+        minLength: 0
+
+    RequiredSearchQuery:
+      description: Search query string.
+      name: q
+      in: query
+      required: true
       allowEmptyValue: true
       schema:
         type: string

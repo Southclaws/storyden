@@ -37,7 +37,6 @@ export default async function Page(props: Props) {
 
     const params = QuerySchema.parse(searchParams);
 
-    // TODO: Don't run this query if query is empty
     const { data } = params.q
       ? await datagraphSearch({
           q: params.q,
