@@ -88,7 +88,7 @@ func (*Disabled) Delete(ctx context.Context, object xid.ID) error {
 }
 
 func (*Disabled) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
-	return nil, nil
+	panic("semdex disabled: searcher switch bug")
 }
 
 func (*Disabled) Recommend(ctx context.Context, object datagraph.Item) (datagraph.ItemList, error) {
