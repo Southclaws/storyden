@@ -29,7 +29,6 @@ func NewParallelSearcher(
 ) *ParallelSearcher {
 	return &ParallelSearcher{
 		searchers: map[datagraph.Kind]searcher.SingleKindSearcher{
-			datagraph.KindPost:   &postSearcher{post_searcher},
 			datagraph.KindThread: &postSearcher{post_searcher},
 			datagraph.KindNode:   &nodeSearcher{node_searcher},
 		},
