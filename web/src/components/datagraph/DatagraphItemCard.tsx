@@ -9,11 +9,12 @@ import {
   DatagraphItemReply,
   DatagraphItemThread,
 } from "@/api/openapi-schema";
-import { WStack } from "@/styled-system/jsx";
+import { HStack, WStack } from "@/styled-system/jsx";
 import { ColorPalette } from "@/styled-system/tokens";
 import { getAssetURL } from "@/utils/asset";
 
 import { MemberBadge } from "../member/MemberBadge/MemberBadge";
+import { Timestamp } from "../site/Timestamp";
 import { Badge } from "../ui/badge";
 import { Card } from "../ui/rich-card";
 
@@ -62,7 +63,14 @@ function DatagraphItemPostGenericCard({
       text={ref.description}
       controls={
         <WStack>
-          <MemberBadge profile={ref.author} size="sm" name="full-horizontal" />
+          <HStack gap="1" minWidth="0" color="fg.subtle">
+            <MemberBadge
+              profile={ref.author}
+              size="sm"
+              name="full-horizontal"
+            />
+            <Timestamp created={ref.createdAt} />
+          </HStack>
 
           <DatagraphItemBadge item={item} />
         </WStack>
@@ -84,7 +92,10 @@ function DatagraphItemNodeCard({ item }: { item: DatagraphItemNode }) {
       image={getAssetURL(ref.primary_image?.path)}
       controls={
         <WStack>
-          <MemberBadge profile={ref.owner} size="sm" name="full-horizontal" />
+          <HStack gap="1" minWidth="0" color="fg.subtle">
+            <MemberBadge profile={ref.owner} size="sm" name="full-horizontal" />
+            <Timestamp created={ref.createdAt} />
+          </HStack>
 
           <DatagraphItemBadge item={item} />
         </WStack>
@@ -105,7 +116,10 @@ function DatagraphItemProfileCard({ item }: { item: DatagraphItemProfile }) {
       text={ref.bio}
       controls={
         <WStack>
-          <MemberBadge profile={ref} size="sm" name="full-horizontal" />
+          <HStack gap="1" minWidth="0" color="fg.subtle">
+            <MemberBadge profile={ref} size="sm" name="full-horizontal" />
+            <Timestamp created={ref.createdAt} />
+          </HStack>
 
           <DatagraphItemBadge item={item} />
         </WStack>
