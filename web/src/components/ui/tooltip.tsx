@@ -1,41 +1,47 @@
+"use client";
+
 import type { Assign } from "@ark-ui/react";
 import { Tooltip } from "@ark-ui/react/tooltip";
 
 import { type TooltipVariantProps, tooltip } from "@/styled-system/recipes";
-import type { JsxStyleProps } from "@/styled-system/types";
+import type { ComponentProps, HTMLStyledProps } from "@/styled-system/types";
 import { createStyleContext } from "@/utils/create-style-context";
 
 const { withRootProvider, withContext } = createStyleContext(tooltip);
 
-export interface RootProps extends Tooltip.RootProps, TooltipVariantProps {}
-export const Root = withRootProvider<RootProps>(Tooltip.Root);
+export type RootProviderProps = ComponentProps<typeof RootProvider>;
+export const RootProvider = withRootProvider<
+  Assign<Tooltip.RootProviderProps, TooltipVariantProps>
+>(Tooltip.RootProvider);
+
+export type RootProps = ComponentProps<typeof Root>;
+export const Root = withRootProvider<
+  Assign<Tooltip.RootProps, TooltipVariantProps>
+>(Tooltip.Root);
 
 export const Arrow = withContext<
   HTMLDivElement,
-  Assign<JsxStyleProps, Tooltip.ArrowProps>
+  Assign<HTMLStyledProps<"div">, Tooltip.ArrowBaseProps>
 >(Tooltip.Arrow, "arrow");
 
 export const ArrowTip = withContext<
   HTMLDivElement,
-  Assign<JsxStyleProps, Tooltip.ArrowTipProps>
+  Assign<HTMLStyledProps<"div">, Tooltip.ArrowTipBaseProps>
 >(Tooltip.ArrowTip, "arrowTip");
 
 export const Content = withContext<
   HTMLDivElement,
-  Assign<JsxStyleProps, Tooltip.ContentProps>
+  Assign<HTMLStyledProps<"div">, Tooltip.ContentBaseProps>
 >(Tooltip.Content, "content");
 
 export const Positioner = withContext<
   HTMLDivElement,
-  Assign<JsxStyleProps, Tooltip.PositionerProps>
+  Assign<HTMLStyledProps<"div">, Tooltip.PositionerBaseProps>
 >(Tooltip.Positioner, "positioner");
 
 export const Trigger = withContext<
   HTMLButtonElement,
-  Assign<JsxStyleProps, Tooltip.TriggerProps>
+  Assign<HTMLStyledProps<"button">, Tooltip.TriggerBaseProps>
 >(Tooltip.Trigger, "trigger");
 
-export {
-  TooltipContext as Context,
-  type TooltipContextProps as ContextProps,
-} from "@ark-ui/react/tooltip";
+export { TooltipContext as Context } from "@ark-ui/react/tooltip";

@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { EmptyState } from "src/components/site/EmptyState";
 import { SearchScreen } from "src/screens/search/SearchScreen";
 
 import { datagraphSearch } from "@/api/openapi-server/datagraph";
@@ -10,6 +9,8 @@ import { DatagraphKindSchema } from "@/lib/datagraph/schema";
 type Props = {
   searchParams: Promise<Query>;
 };
+
+export const dynamic = "force-dynamic";
 
 const QuerySchema = z.object({
   q: z.string().optional(),
@@ -36,25 +37,22 @@ export default async function Page(props: Props) {
 
     const params = QuerySchema.parse(searchParams);
 
-    if (!params.q) {
-      return (
-        <EmptyState>
-          <p>Search anything.</p>
-        </EmptyState>
-      );
-    }
-
-    const { data } = await datagraphSearch({
-      q: params.q,
-      page: params.page?.toString(),
-      kind: params.kind,
-    });
+    // TODO: Don't run this query if query is empty
+    const { data } = params.q
+      ? await datagraphSearch({
+          q: params.q,
+          page: params.page?.toString(),
+          kind: params.kind,
+        })
+      : {
+          data: undefined,
+        };
 
     return (
       <SearchScreen
-        query={params.q}
-        page={params.page ?? 1}
-        kind={params.kind ?? []}
+        initialQuery={params.q ?? ""}
+        initialPage={params.page ?? 1}
+        initialKind={params.kind ?? []}
         initialResults={data}
       />
     );
