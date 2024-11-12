@@ -1,5 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { usePathname, useRouter } from "next/navigation";
+import { parseAsString, useQueryState } from "nuqs";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -10,11 +12,19 @@ export type Form = z.infer<typeof FormSchema>;
 
 export type Props = {
   query?: string;
+  isLoading?: boolean;
 };
 
 export function useSearch(props: Props) {
-  const router = useRouter();
-  const pathname = usePathname();
+  const [query, setQuery] = useSearchQueryState();
+
+  // NOTE: This is done via a useEffect because we don't want this to be present
+  // on a server-render, only for client side search interactions.
+  const [isLoading, setLoading] = useState(false);
+  useEffect(() => {
+    setLoading(props.isLoading ?? false);
+  }, [props.isLoading]);
+
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
@@ -25,24 +35,31 @@ export function useSearch(props: Props) {
   const { q } = form.watch();
 
   const handleSearch = form.handleSubmit((data) => {
-    router.push(`/search?q=${data.q}`);
+    setQuery(data.q);
   });
 
   const handleReset = async () => {
     form.reset();
-    if (pathname === "/search") {
-      router.push("/search");
-    }
+    setQuery(null);
   };
 
   return {
     form,
     data: {
       q,
+      isLoading,
     },
     handlers: {
       handleSearch,
       handleReset,
     },
   };
+}
+
+export function useSearchQueryState() {
+  return useQueryState("q", {
+    ...parseAsString,
+    defaultValue: "",
+    clearOnDefault: true,
+  });
 }

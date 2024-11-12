@@ -56,6 +56,7 @@ export function Search(props: Props) {
         borderColor="border.default"
         type="submit"
         width="min"
+        loading={data.isLoading}
       >
         <SearchIcon />
       </Button>

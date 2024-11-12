@@ -10,13 +10,14 @@ import (
 	"github.com/jmoiron/sqlx"
 
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
 )
 
 type Search interface {
-	Search(ctx context.Context, opts ...Option) ([]*library.Node, error)
+	Search(ctx context.Context, params pagination.Parameters, opts ...Option) (*pagination.Result[*library.Node], error)
 }
 
 type query struct {
@@ -50,7 +51,12 @@ func New(db *ent.Client, raw *sqlx.DB) Search {
 	}
 }
 
-func (s *service) Search(ctx context.Context, opts ...Option) ([]*library.Node, error) {
+func (s *service) Search(ctx context.Context, params pagination.Parameters, opts ...Option) (*pagination.Result[*library.Node], error) {
+	total, err := s.db.Node.Query().Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	q := &query{}
 
 	for _, fn := range opts {
@@ -72,7 +78,9 @@ func (s *service) Search(ctx context.Context, opts ...Option) ([]*library.Node, 
 		}).
 		WithPrimaryImage().
 		WithAssets().
-		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
+		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc())).
+		Limit(params.Limit()).
+		Offset(params.Offset())
 
 	r, err := query.All(ctx)
 	if err != nil {
@@ -84,5 +92,7 @@ func (s *service) Search(ctx context.Context, opts ...Option) ([]*library.Node, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return nodes, nil
+	result := pagination.NewPageResult(params, total, nodes)
+
+	return &result, nil
 }

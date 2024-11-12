@@ -7,6 +7,7 @@ import { MenuIcon } from "@/components/ui/icons/Menu";
 import { SiteIcon } from "@/components/ui/icons/Site";
 import { WStack } from "@/styled-system/jsx";
 
+import { Search } from "../../../search/Search/Search";
 import { CloseAction } from "../../Action/Close";
 import { AccountMenu } from "../AccountMenu/AccountMenu";
 import { ComposeAnchor } from "../Anchors/Compose";
@@ -14,7 +15,6 @@ import { HomeAnchor } from "../Anchors/Home";
 import { LibraryAnchor } from "../Anchors/Library";
 import { LoginAnchor } from "../Anchors/Login";
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
-import { Search } from "../Search/Search";
 
 import { useMobileCommandBar } from "./useMobileCommandBar";
 

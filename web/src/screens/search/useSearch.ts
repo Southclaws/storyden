@@ -4,7 +4,7 @@ import {
   DatagraphSearchResult,
 } from "src/api/openapi-schema";
 
-export function useSearch(
+export function useSearchScreen(
   params?: DatagraphSearchParams,
   initialResults?: DatagraphSearchResult,
 ) {

@@ -4,7 +4,7 @@ import (
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph/semdex"
+	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/refhydrate"
 
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/weaviate_semdexer"
