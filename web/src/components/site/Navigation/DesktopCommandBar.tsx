@@ -4,12 +4,13 @@ import { cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { Floating } from "@/styled-system/patterns";
 
+import { Search } from "../../search/Search/Search";
+
 import styles from "./navigation.module.css";
 
 import { MemberActions } from "./MemberActions";
 import { SidebarToggle } from "./NavigationPane/SidebarToggle";
 import { getServerSidebarState } from "./NavigationPane/server";
-import { Search } from "./Search/Search";
 import { Title } from "./Title";
 
 export async function DesktopCommandBar() {

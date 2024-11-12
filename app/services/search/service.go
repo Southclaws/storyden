@@ -3,8 +3,6 @@ package search
 import (
 	"context"
 
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -51,23 +49,7 @@ func New(
 	}
 }
 
+// TODO: Remove this entire endpoint
 func (s *service) Search(ctx context.Context, q Query) ([]*post.Post, error) {
-	filters := []post_search.Filter{}
-
-	q.Body.Call(func(v string) {
-		filters = append(filters, post_search.WithKeywords(v))
-	})
-	q.Author.Call(func(v string) {
-		filters = append(filters, post_search.WithAuthorHandle(v))
-	})
-	q.Kinds.Call(func(v []post_search.Kind) {
-		filters = append(filters, post_search.WithKinds(v...))
-	})
-
-	posts, err := s.post_search_repo.Search(ctx, filters...)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return posts, nil
+	return nil, nil
 }

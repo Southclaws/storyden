@@ -140,6 +140,7 @@ export * from "./datagraphItemReply";
 export * from "./datagraphItemReplyKind";
 export * from "./datagraphItemThread";
 export * from "./datagraphItemThreadKind";
+export * from "./datagraphKindQueryParameter";
 export * from "./datagraphRecommendations";
 export * from "./datagraphSearchOKResponse";
 export * from "./datagraphSearchParams";

@@ -56,6 +56,12 @@ type Item interface {
 	WithProps
 }
 
+type ByCreatedDesc []Item
+
+func (a ByCreatedDesc) Len() int           { return len(a) }
+func (a ByCreatedDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ByCreatedDesc) Less(i, j int) bool { return a[i].GetCreated().After(a[j].GetCreated()) }
+
 // ItemRef describes a type which knows its ID and kind, but nothing else.
 type ItemRef interface {
 	Identifiable

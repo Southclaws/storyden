@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"net/url"
+	"strconv"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -12,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
@@ -286,4 +288,18 @@ func serialiseOptionalFloat(in opt.Optional[float64]) *float32 {
 
 func seraliseOptionalURL(in opt.Optional[url.URL]) *string {
 	return opt.PtrMap(in, func(s url.URL) string { return s.String() })
+}
+
+// NOTE: Page query parameters are string types due to a bug in oapi-codegen.
+func deserialisePageParams(p *string, pageSize uint) pagination.Parameters {
+	pageNumber := opt.NewPtrMap(p, func(s string) uint {
+		v, err := strconv.ParseUint(s, 10, 32)
+		if err != nil {
+			return 1
+		}
+
+		return max(1, uint(v))
+	}).Or(1)
+
+	return pagination.NewPageParams(pageNumber, pageSize)
 }

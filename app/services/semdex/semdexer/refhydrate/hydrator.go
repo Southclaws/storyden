@@ -51,7 +51,7 @@ func (a sortedByRelevance) Len() int           { return len(a) }
 func (a sortedByRelevance) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a sortedByRelevance) Less(i, j int) bool { return a[i].r > a[j].r }
 
-func (h *Hydrator) Hydrate(ctx context.Context, refs ...*datagraph.Ref) ([]datagraph.Item, error) {
+func (h *Hydrator) Hydrate(ctx context.Context, refs ...*datagraph.Ref) (datagraph.ItemList, error) {
 	parts := lo.GroupBy(refs, func(r *datagraph.Ref) datagraph.Kind { return r.Kind })
 
 	// TODO: Use "GetMany" funcs so this is optimised at DB level.
