@@ -144,6 +144,36 @@ func TestNewPageResultOffByOnes(t *testing.T) {
 		a.False(r.NextPage.Ok())
 		a.Len(r.Items, 10)
 	})
+
+	t.Run("edge_case_page_zero", func(t *testing.T) {
+		p := NewPageParams(0, pageSize)
+
+		rows := lo.Slice(database, p.Offset(), p.Offset()+p.Limit())
+
+		r := NewPageResult(p, tableSize, rows)
+
+		a.Equal(pageSize, r.Size)
+		a.Equal(10, r.Results)
+		a.Equal(10, r.TotalPages)
+		a.Equal(1, r.CurrentPage)
+		a.Equal(2, r.NextPage.OrZero())
+		a.Len(r.Items, 10)
+	})
+
+	t.Run("edge_case_page_size_zero", func(t *testing.T) {
+		p := NewPageParams(0, 0)
+
+		rows := lo.Slice(database, p.Offset(), p.Offset()+p.Limit())
+
+		r := NewPageResult(p, tableSize, rows)
+
+		a.Equal(1, r.Size)
+		a.Equal(1, r.Results)
+		a.Equal(100, r.TotalPages)
+		a.Equal(1, r.CurrentPage)
+		a.Equal(2, r.NextPage.OrZero())
+		a.Len(r.Items, 1)
+	})
 }
 
 func TestConvertPageResult(t *testing.T) {

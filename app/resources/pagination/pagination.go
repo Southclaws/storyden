@@ -35,6 +35,10 @@ func NewPageParams(oneIndexedPageNumber uint, pageSize uint) Parameters {
 		oneIndexedPageNumber = 1
 	}
 
+	if pageSize == 0 {
+		pageSize = 1
+	}
+
 	return Parameters{
 		page: Page(oneIndexedPageNumber),
 		size: Size(pageSize),
