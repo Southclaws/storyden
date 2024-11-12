@@ -2,10 +2,13 @@ package simplesearch
 
 import (
 	"context"
+	"sort"
 	"sync"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 	"github.com/samber/lo"
 	"golang.org/x/sync/errgroup"
 
@@ -16,12 +19,8 @@ import (
 	"github.com/Southclaws/storyden/app/services/search/searcher"
 )
 
-type Basic interface {
-	Search(ctx context.Context, query string) (datagraph.ItemList, error)
-}
-
 type ParallelSearcher struct {
-	searchers map[datagraph.Kind]Basic
+	searchers map[datagraph.Kind]searcher.SingleKindSearcher
 }
 
 func NewParallelSearcher(
@@ -29,7 +28,7 @@ func NewParallelSearcher(
 	node_searcher node_search.Search,
 ) *ParallelSearcher {
 	return &ParallelSearcher{
-		searchers: map[datagraph.Kind]Basic{
+		searchers: map[datagraph.Kind]searcher.SingleKindSearcher{
 			datagraph.KindPost: &postSearcher{post_searcher},
 			datagraph.KindNode: &nodeSearcher{node_searcher},
 		},
@@ -38,11 +37,11 @@ func NewParallelSearcher(
 
 func (s *ParallelSearcher) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
 	mx := sync.Mutex{}
-	results := datagraph.ItemList{}
+	results := []*pagination.Result[datagraph.Item]{}
 
 	eg, ctx := errgroup.WithContext(ctx)
 
-	var searchers []Basic
+	var searchers []searcher.SingleKindSearcher
 
 	if kinds, ok := opts.Kinds.Get(); ok {
 		for _, k := range kinds {
@@ -54,16 +53,20 @@ func (s *ParallelSearcher) Search(ctx context.Context, q string, p pagination.Pa
 		searchers = lo.Values(s.searchers)
 	}
 
+	// Earch searcher receives a smaller page size
+	subsearchPageSize := uint(p.Size() / len(searchers))
+	subsearchParams := pagination.NewPageParams(uint(p.PageOneIndexed()), subsearchPageSize)
+
 	for _, v := range searchers {
 		v := v
 		eg.Go(func() error {
-			r, err := v.Search(ctx, q)
+			r, err := v.Search(ctx, q, subsearchParams)
 			if err != nil {
 				return err
 			}
 
 			mx.Lock()
-			results = append(results, r...)
+			results = append(results, r)
 			mx.Unlock()
 
 			return nil
@@ -74,10 +77,32 @@ func (s *ParallelSearcher) Search(ctx context.Context, q string, p pagination.Pa
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// TODO: Fix
-	total := len(results)
+	result := dt.Reduce(results, func(acc *pagination.Result[datagraph.Item], prev *pagination.Result[datagraph.Item]) *pagination.Result[datagraph.Item] {
+		nextPage := acc.NextPage
+		if !nextPage.Ok() {
+			nextPage = prev.NextPage
+		}
 
-	result := pagination.NewPageResult(p, total, results)
+		totalPages := max(acc.TotalPages, prev.TotalPages)
 
-	return &result, nil
+		return &pagination.Result[datagraph.Item]{
+			Size:        p.Size(),
+			Results:     acc.Results + prev.Results,
+			TotalPages:  totalPages,
+			CurrentPage: p.PageOneIndexed(),
+			NextPage:    nextPage,
+			Items:       append(acc.Items, prev.Items...),
+		}
+	}, &pagination.Result[datagraph.Item]{
+		Size:        0,
+		Results:     0,
+		TotalPages:  0,
+		CurrentPage: 0,
+		NextPage:    opt.NewEmpty[int](),
+		Items:       []datagraph.Item{},
+	})
+
+	sort.Sort(datagraph.ByCreatedDesc(result.Items))
+
+	return result, nil
 }

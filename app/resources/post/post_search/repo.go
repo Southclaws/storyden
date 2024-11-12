@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/dt"
 
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/account"
@@ -24,7 +25,7 @@ const (
 type Filter func(*ent.PostQuery)
 
 type Repository interface {
-	Search(ctx context.Context, opts ...Filter) ([]*post.Post, error)
+	Search(ctx context.Context, params pagination.Parameters, filters ...Filter) (*pagination.Result[*post.Post], error)
 	GetMany(ctx context.Context, id ...post.ID) ([]*post.Post, error)
 }
 

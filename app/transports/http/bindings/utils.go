@@ -295,7 +295,7 @@ func deserialisePageParams(p *string, pageSize uint) pagination.Parameters {
 	pageNumber := opt.NewPtrMap(p, func(s string) uint {
 		v, err := strconv.ParseUint(s, 10, 32)
 		if err != nil {
-			return 0
+			return 1
 		}
 
 		return max(1, uint(v))
