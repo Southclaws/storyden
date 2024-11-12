@@ -8,7 +8,7 @@ import { DatagraphSearchOKResponse } from "@/api/openapi-schema";
 import { Search } from "@/components/search/Search/Search";
 import { useSearchQueryState } from "@/components/search/Search/useSearch";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
-import { LStack } from "@/styled-system/jsx";
+import { VStack } from "@/styled-system/jsx";
 
 type Props = {
   query: string;
@@ -36,7 +36,7 @@ export function SearchScreen(props: Props) {
   }
 
   return (
-    <LStack>
+    <VStack>
       <Search query={props.query} isLoading={isLoading} />
 
       <PaginationControls
@@ -48,6 +48,6 @@ export function SearchScreen(props: Props) {
       />
 
       <DatagraphSearchResults result={data} />
-    </LStack>
+    </VStack>
   );
 }
