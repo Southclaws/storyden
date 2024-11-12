@@ -53,6 +53,10 @@ func (p Parameters) PageZeroIndexed() int {
 	return int(p.page - 1)
 }
 
+func (p Parameters) Size() int {
+	return int(p.size)
+}
+
 // Limit returns a query limit clause value. The actual limit is +1 because we
 // want to determine if there are more results by checking if the returned rows
 // are above the page size, this would mean there's another page available.

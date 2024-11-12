@@ -15,3 +15,7 @@ type Options struct {
 type Searcher interface {
 	Search(ctx context.Context, q string, p pagination.Parameters, opts Options) (*pagination.Result[datagraph.Item], error)
 }
+
+type SingleKindSearcher interface {
+	Search(ctx context.Context, query string, p pagination.Parameters) (*pagination.Result[datagraph.Item], error)
+}

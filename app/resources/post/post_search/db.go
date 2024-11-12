@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
@@ -22,9 +23,14 @@ func New(db *ent.Client) Repository {
 	return &database{db}
 }
 
-func (d *database) Search(ctx context.Context, filters ...Filter) ([]*post.Post, error) {
+func (d *database) Search(ctx context.Context, params pagination.Parameters, filters ...Filter) (*pagination.Result[*post.Post], error) {
+	total, err := d.db.Post.Query().Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 	if len(filters) == 0 {
-		return []*post.Post{}, nil
+		result := pagination.NewPageResult(params, total, []*post.Post{})
+		return &result, nil
 	}
 
 	q := d.db.Post.
@@ -39,23 +45,27 @@ func (d *database) Search(ctx context.Context, filters ...Filter) ([]*post.Post,
 		}).
 		WithTags().
 		WithRoot().
-		Order(ent.Asc(ent_post.FieldCreatedAt))
+		Order(ent.Asc(ent_post.FieldCreatedAt)).
+		Limit(params.Limit()).
+		Offset(params.Offset())
 
 	for _, fn := range filters {
 		fn(q)
 	}
 
-	result, err := q.All(ctx)
+	r, err := q.All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	posts, err := dt.MapErr(result, post.Map)
+	posts, err := dt.MapErr(r, post.Map)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return posts, nil
+	result := pagination.NewPageResult(params, total, posts)
+
+	return &result, nil
 }
 
 func (d *database) GetMany(ctx context.Context, ids ...post.ID) ([]*post.Post, error) {
