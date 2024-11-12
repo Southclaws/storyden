@@ -29,8 +29,9 @@ func NewParallelSearcher(
 ) *ParallelSearcher {
 	return &ParallelSearcher{
 		searchers: map[datagraph.Kind]searcher.SingleKindSearcher{
-			datagraph.KindPost: &postSearcher{post_searcher},
-			datagraph.KindNode: &nodeSearcher{node_searcher},
+			datagraph.KindPost:   &postSearcher{post_searcher},
+			datagraph.KindThread: &postSearcher{post_searcher},
+			datagraph.KindNode:   &nodeSearcher{node_searcher},
 		},
 	}
 }
@@ -51,6 +52,11 @@ func (s *ParallelSearcher) Search(ctx context.Context, q string, p pagination.Pa
 		}
 	} else {
 		searchers = lo.Values(s.searchers)
+	}
+
+	if len(searchers) == 0 {
+		results := pagination.NewPageResult(p, 0, []datagraph.Item{})
+		return &results, nil
 	}
 
 	// Earch searcher receives a smaller page size
