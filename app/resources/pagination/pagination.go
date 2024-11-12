@@ -82,8 +82,9 @@ func NewPageResult[T any](p Parameters, total int, r []T) Result[T] {
 
 	// A bit of a hack for Weaviate due to paging with vector searches being a
 	// bit unpredictable. This happens when Autocut is used and total is wrong.
-	if results < int(p.size) {
+	if p.page == 1 && !moreResults && total > int(p.size) {
 		totalPages = 1
+		nextPage = opt.NewEmpty[int]()
 	}
 
 	return Result[T]{
