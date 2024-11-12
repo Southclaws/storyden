@@ -4,10 +4,9 @@ import { cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { Floating } from "@/styled-system/patterns";
 
-import { Search } from "../../search/Search/Search";
-
 import styles from "./navigation.module.css";
 
+import { SearchAnchor } from "./Anchors/Search";
 import { MemberActions } from "./MemberActions";
 import { SidebarToggle } from "./NavigationPane/SidebarToggle";
 import { getServerSidebarState } from "./NavigationPane/server";
@@ -29,7 +28,7 @@ export async function DesktopCommandBar() {
     >
       <HStack className={styles["topbar-left"]}>
         <SidebarToggle initialValue={initialSidebarState} />
-        <Search />
+        <SearchAnchor />
       </HStack>
 
       <HStack className={styles["topbar-middle"]} justify="space-around">

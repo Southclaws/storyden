@@ -355,6 +355,7 @@ export * from "./replyInitialProps";
 export * from "./replyList";
 export * from "./replyProps";
 export * from "./replyStatus";
+export * from "./requiredSearchQueryParameter";
 export * from "./residentKeyRequirement";
 export * from "./role";
 export * from "./roleCreateBody";

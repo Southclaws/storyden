@@ -34,10 +34,6 @@ func NewDatagraph(
 const datagraphSearchPageSize = 50
 
 func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.DatagraphSearchRequestObject) (openapi.DatagraphSearchResponseObject, error) {
-	if request.Params.Q == nil {
-		return nil, fault.New("missing query")
-	}
-
 	pp := deserialisePageParams(request.Params.Page, datagraphSearchPageSize)
 
 	kindFilter, err := opt.MapErr(opt.NewPtr(request.Params.Kind), deserialiseDatagraphKindList)
@@ -49,7 +45,7 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 		Kinds: kindFilter,
 	}
 
-	r, err := d.searcher.Search(ctx, *request.Params.Q, pp, opts)
+	r, err := d.searcher.Search(ctx, request.Params.Q, pp, opts)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
