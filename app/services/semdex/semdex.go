@@ -80,33 +80,33 @@ type Disabled struct{}
 var _ Semdexer = &Disabled{}
 
 func (*Disabled) Index(ctx context.Context, object datagraph.Item) error {
-	panic("semdex disabled")
+	return nil
 }
 
 func (*Disabled) Delete(ctx context.Context, object xid.ID) error {
-	panic("semdex disabled")
+	return nil
 }
 
 func (*Disabled) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
-	panic("semdex disabled: use searcher.Searcher")
+	return nil, nil
 }
 
 func (*Disabled) Recommend(ctx context.Context, object datagraph.Item) (datagraph.ItemList, error) {
-	panic("semdex disabled")
+	return nil, nil
 }
 
 func (*Disabled) SuggestTags(ctx context.Context, content datagraph.Content, available tag_ref.Names) (tag_ref.Names, error) {
-	panic("semdex disabled")
+	return nil, nil
 }
 
 func (*Disabled) ScoreRelevance(ctx context.Context, object datagraph.Item, idx ...xid.ID) (map[xid.ID]float64, error) {
-	panic("semdex disabled")
+	return nil, nil
 }
 
 func (*Disabled) Summarise(ctx context.Context, object datagraph.Item) (string, error) {
-	panic("semdex disabled")
+	return "", nil
 }
 
 func (*Disabled) GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error) {
-	panic("semdex disabled")
+	return nil, nil
 }
