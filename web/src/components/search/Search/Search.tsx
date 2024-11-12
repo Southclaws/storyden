@@ -14,7 +14,7 @@ export function Search(props: Props) {
     <styled.form
       display="flex"
       w="full"
-      onSubmit={handlers.handleSearch}
+      // onSubmit={handlers.handleSearch}
       action="/search"
     >
       <Input

@@ -65,6 +65,7 @@ export function useSearchScreen(props: Props) {
     },
     {
       swr: {
+        enabled: !!query,
         fallbackData: props.initialResults,
       },
     },
