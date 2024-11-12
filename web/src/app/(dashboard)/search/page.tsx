@@ -5,6 +5,7 @@ import { SearchScreen } from "src/screens/search/SearchScreen";
 
 import { datagraphSearch } from "@/api/openapi-server/datagraph";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { DatagraphKindSchema } from "@/lib/datagraph/schema";
 
 type Props = {
   searchParams: Promise<Query>;
@@ -15,6 +16,15 @@ const QuerySchema = z.object({
   page: z
     .string()
     .transform((v) => parseInt(v, 10))
+    .optional(),
+  kind: z
+    .preprocess((arg: unknown) => {
+      if (typeof arg === "string") {
+        return [arg];
+      }
+
+      return arg;
+    }, z.array(DatagraphKindSchema))
     .optional(),
 });
 
@@ -34,12 +44,17 @@ export default async function Page(props: Props) {
       );
     }
 
-    const { data } = await datagraphSearch({ q: params.q });
+    const { data } = await datagraphSearch({
+      q: params.q,
+      page: params.page?.toString(),
+      kind: params.kind,
+    });
 
     return (
       <SearchScreen
         query={params.q}
         page={params.page ?? 1}
+        kind={params.kind ?? []}
         initialResults={data}
       />
     );
