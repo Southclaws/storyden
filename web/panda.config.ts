@@ -21,6 +21,8 @@ import { richCard } from "@/recipes/rich-card";
 import { select } from "@/recipes/select";
 import { table } from "@/recipes/table";
 import { tagsInput } from "@/recipes/tags-input";
+import { toggleGroup } from "@/recipes/toggle-group";
+import { tooltip } from "@/recipes/tooltip";
 import { treeView } from "@/recipes/tree-view";
 import { typographyHeading } from "@/recipes/typography-heading";
 
@@ -295,6 +297,8 @@ export default defineConfig({
         table: table,
         tagsInput: tagsInput,
         treeView: treeView,
+        toggleGroup: toggleGroup,
+        tooltip: tooltip,
       },
       semanticTokens,
       tokens: defineTokens({
