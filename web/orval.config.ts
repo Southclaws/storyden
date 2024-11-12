@@ -2,7 +2,7 @@ import { defineConfig } from "orval";
 
 const input = {
   target: "../api/openapi.yaml",
-  validation: true,
+  validation: false,
 };
 
 const common = {
