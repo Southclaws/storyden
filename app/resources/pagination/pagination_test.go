@@ -105,6 +105,47 @@ func TestNewPageResult(t *testing.T) {
 	})
 }
 
+func TestNewPageResultOffByOnes(t *testing.T) {
+	a := assert.New(t)
+
+	const pageSize = 10
+	tableSize := 100
+
+	// a rudimentary fake database of integers
+	// we use lo.Slice to simulate a limit+offset sql query
+	database := lo.Range(tableSize)
+
+	t.Run("page_1", func(t *testing.T) {
+		p := NewPageParams(1, pageSize)
+
+		rows := lo.Slice(database, p.Offset(), p.Offset()+p.Limit())
+
+		r := NewPageResult(p, tableSize, rows)
+
+		a.Equal(pageSize, r.Size)
+		a.Equal(10, r.Results)
+		a.Equal(10, r.TotalPages)
+		a.Equal(1, r.CurrentPage)
+		a.Equal(2, r.NextPage.OrZero())
+		a.Len(r.Items, 10)
+	})
+
+	t.Run("page_10", func(t *testing.T) {
+		p := NewPageParams(10, pageSize)
+
+		rows := lo.Slice(database, p.Offset(), p.Offset()+p.Limit())
+
+		r := NewPageResult(p, tableSize, rows)
+
+		a.Equal(pageSize, r.Size)
+		a.Equal(10, r.Results)
+		a.Equal(10, r.TotalPages)
+		a.Equal(10, r.CurrentPage)
+		a.False(r.NextPage.Ok())
+		a.Len(r.Items, 10)
+	})
+}
+
 func TestConvertPageResult(t *testing.T) {
 	a := assert.New(t)
 

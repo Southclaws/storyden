@@ -66,7 +66,7 @@ func (p Parameters) Offset() int {
 func NewPageResult[T any](p Parameters, total int, r []T) Result[T] {
 	totalPages := int(math.Ceil(float64(total) / float64(p.size)))
 
-	moreResults := len(r) >= int(p.size)
+	moreResults := len(r) > int(p.size)
 	nextPage := opt.NewSafe(int(p.page+1), moreResults)
 
 	var trimmed []T
