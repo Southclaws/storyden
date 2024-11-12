@@ -2003,6 +2003,7 @@ components:
       in: query
       required: false
       allowEmptyValue: true
+      explode: true
       schema:
         type: array
         items: { $ref: "#/components/schemas/DatagraphItemKind" }
@@ -2169,6 +2170,7 @@ components:
         the necessary permission to view in-review items.
       required: false
       in: query
+      explode: true
       schema:
         type: array
         items: { $ref: "#/components/schemas/Visibility" }
