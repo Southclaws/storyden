@@ -91,7 +91,10 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 		Offset(params.Offset())
 
 	// Only search published nodes.
-	query.Where(node.VisibilityEQ(node.VisibilityPublished))
+	query.Where(
+		node.VisibilityEQ(node.VisibilityPublished),
+		node.DeletedAtIsNil(),
+	)
 
 	r, err := query.All(ctx)
 	if err != nil {
