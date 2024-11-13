@@ -17,6 +17,9 @@ export const FeedSourceConfigSchema = z.union([
   z.object({
     type: z.literal("library"),
   }),
+  z.object({
+    type: z.literal("categories"),
+  }),
 ]);
 export type FeedSourceConfig = z.infer<typeof FeedSourceConfigSchema>;
 

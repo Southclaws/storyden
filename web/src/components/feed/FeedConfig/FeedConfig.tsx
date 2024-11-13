@@ -21,6 +21,7 @@ import {
   EditingSchema,
 } from "@/components/site/SiteContextPane/useSiteContextPane";
 import { Unready } from "@/components/site/Unready";
+import { CategoryIcon } from "@/components/ui/icons/Category";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { LibraryIcon } from "@/components/ui/icons/Library";
@@ -133,6 +134,11 @@ const sources = [
     label: "Library",
     value: "library" as const,
     icon: <LibraryIcon width="4" />,
+  },
+  {
+    label: "Categories",
+    value: "categories" as const,
+    icon: <CategoryIcon width="4" />,
   },
 ];
 
