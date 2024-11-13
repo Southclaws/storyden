@@ -117,7 +117,7 @@ func serialiseLink(in *link.Link) openapi.Link {
 		Title:          in.Title.Ptr(),
 		Description:    in.Description.Ptr(),
 		FaviconImage:   opt.Map(in.FaviconImage, serialiseAsset).Ptr(),
-		PrimaryImage:   &openapi.Asset{},
+		PrimaryImage:   opt.Map(in.PrimaryImage, serialiseAsset).Ptr(),
 		Assets:         dt.Map(in.Assets, serialiseAssetPtr),
 		Nodes:          dt.Map(in.Nodes, serialiseNode),
 		Posts:          dt.Map(in.Posts, serialisePostRef),

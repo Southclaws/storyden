@@ -55,6 +55,8 @@ func (d *LinkQuerier) Get(ctx context.Context, slug string) (*link.Link, error) 
 	query := d.db.Link.Query().
 		Where(link_ent.SlugEqualFold(slug)).
 		WithAssets().
+		WithPrimaryImage().
+		WithFaviconImage().
 		WithPosts(func(pq *ent.PostQuery) {
 			pq.WithAuthor(func(aq *ent.AccountQuery) {
 				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
@@ -98,6 +100,8 @@ func (d *LinkQuerier) Search(ctx context.Context, page int, size int, filters ..
 	}
 
 	query := d.db.Link.Query().
+		WithPrimaryImage().
+		WithFaviconImage().
 		Limit(size + 1).
 		Offset(page * size).
 		Order(ent.Desc(link_ent.FieldCreatedAt))
