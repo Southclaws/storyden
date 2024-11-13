@@ -1,4 +1,6 @@
-import { LinkIndexScreen } from "src/screens/library/links/LinkIndexScreen/LinkIndexScreen";
+import { linkList } from "@/api/openapi-server/links";
+import { UnreadyBanner } from "@/components/site/Unready";
+import { LinkIndexScreen } from "@/screens/library/links/LinkIndexScreen";
 
 type Props = {
   searchParams: Promise<{
@@ -8,10 +10,22 @@ type Props = {
 };
 
 export default async function Page(props: Props) {
-  return (
-    <LinkIndexScreen
-      query={(await props.searchParams).q}
-      page={(await props.searchParams).page}
-    />
-  );
+  try {
+    const searchParams = await props.searchParams;
+
+    const { data } = await linkList({
+      q: searchParams.q,
+      page: searchParams.page?.toString(),
+    });
+
+    return (
+      <LinkIndexScreen
+        initialResult={data}
+        query={searchParams.q}
+        page={searchParams.page}
+      />
+    );
+  } catch (e) {
+    return <UnreadyBanner error={e} />;
+  }
 }
