@@ -33,17 +33,18 @@ const dir = "testdata"
 func TestSemdexWeaviate(t *testing.T) {
 	t.Parallel()
 
-	if os.Getenv("WEAVIATE_ENABLED") != "true" {
-		return
-	}
-
 	integration.Test(t, &config.Config{}, e2e.Setup(), fx.Invoke(func(
-		lc fx.Lifecycle,
 		ctx context.Context,
+		lc fx.Lifecycle,
+		cfg config.Config,
 		cl *openapi.ClientWithResponses,
 		cj *session.Jar,
 		aw *account_writer.Writer,
 	) {
+		if !cfg.SemdexEnabled {
+			return
+		}
+
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
 			a := assert.New(t)

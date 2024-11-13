@@ -53,6 +53,9 @@ func (d *database) Search(ctx context.Context, params pagination.Parameters, fil
 		fn(q)
 	}
 
+	// Only search published posts.
+	q.Where(ent_post.VisibilityEQ(ent_post.VisibilityPublished))
+
 	r, err := q.All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

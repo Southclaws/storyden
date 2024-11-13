@@ -21,15 +21,22 @@ type Search interface {
 }
 
 type query struct {
-	qs         string
-	visibility []visibility.Visibility
+	nameContains    string
+	contentContains string
+	visibility      []visibility.Visibility
 }
 
 type Option func(*query)
 
 func WithNameContains(s string) Option {
 	return func(q *query) {
-		q.qs = s
+		q.nameContains = s
+	}
+}
+
+func WithContentContains(s string) Option {
+	return func(q *query) {
+		q.contentContains = s
 	}
 }
 
@@ -65,8 +72,10 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 
 	query := s.db.Node.Query().
 		Where(
-			node.NameContainsFold(q.qs),
-			// TODO: more query/filter params
+			node.Or(
+				node.NameContainsFold(q.nameContains),
+				node.ContentContainsFold(q.contentContains),
+			),
 		).
 		WithOwner(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
@@ -77,10 +86,12 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 			})
 		}).
 		WithPrimaryImage().
-		WithAssets().
 		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc())).
 		Limit(params.Limit()).
 		Offset(params.Offset())
+
+	// Only search published nodes.
+	query.Where(node.VisibilityEQ(node.VisibilityPublished))
 
 	r, err := query.All(ctx)
 	if err != nil {

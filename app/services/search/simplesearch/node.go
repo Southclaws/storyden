@@ -18,7 +18,7 @@ type nodeSearcher struct {
 }
 
 func (s *nodeSearcher) Search(ctx context.Context, query string, p pagination.Parameters) (*pagination.Result[datagraph.Item], error) {
-	rs, err := s.node_search.Search(ctx, p, node_search.WithNameContains(query))
+	rs, err := s.node_search.Search(ctx, p, node_search.WithNameContains(query), node_search.WithContentContains(query))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
