@@ -1,5 +1,6 @@
 import { LinkListResult } from "src/api/openapi-schema";
-import { Empty } from "src/components/site/Empty";
+
+import { EmptyState } from "@/components/site/EmptyState";
 
 import { LinkCardRows } from "../LinkCardList";
 
@@ -10,7 +11,7 @@ type Props = {
 
 export function LinkResultList({ links, show }: Props) {
   if (links.links.length === 0) {
-    return <Empty>no links were found</Empty>;
+    return <EmptyState hideContributionLabel>No links were found.</EmptyState>;
   }
 
   const shown = show ? links.links.slice(0, show) : links.links;

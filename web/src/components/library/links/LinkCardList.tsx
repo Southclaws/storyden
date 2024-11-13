@@ -1,7 +1,6 @@
 import { LinkReference } from "src/api/openapi-schema";
 
 import { CardGrid, CardRows } from "@/components/ui/rich-card";
-import { RichCardVariantProps } from "@/styled-system/recipes";
 
 import { LinkCard } from "./LinkCard";
 
