@@ -97,6 +97,7 @@ export function ThreadMenu(props: Props) {
                       value="delete"
                       w="full"
                       closeOnSelect={false}
+                      onClick={handlers.handleConfirmDelete}
                     >
                       Are you sure?
                     </Menu.Item>
