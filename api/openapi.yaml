@@ -1169,34 +1169,6 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { description: OK }
 
-  /posts/search:
-    get:
-      operationId: PostSearch
-      description: Search through posts using various queries and filters.
-      tags: [posts]
-      security: []
-      parameters:
-        - name: body
-          description: A text query to search for in post content.
-          required: false
-          in: query
-          schema: { type: string }
-        - name: author
-          description: Show only results created by this account.
-          required: false
-          in: query
-          schema: { $ref: "#/components/schemas/AccountHandle" }
-        - name: kind
-          description: Posts, threads or both.
-          required: false
-          in: query
-          schema: { $ref: "#/components/schemas/ContentKinds" }
-      responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/PostSearchOK" }
-
   /posts/{post_id}/reacts:
     put:
       operationId: PostReactAdd

@@ -11,7 +11,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	reply_service "github.com/Southclaws/storyden/app/services/reply"
-	"github.com/Southclaws/storyden/app/services/search"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -19,18 +18,15 @@ import (
 type Replies struct {
 	reply_svc       reply_service.Service
 	thread_mark_svc thread_mark.Service
-	search_svc      search.Service
 }
 
 func NewReplies(
 	reply_svc reply_service.Service,
 	thread_mark_svc thread_mark.Service,
-	search_svc search.Service,
 ) Replies {
 	return Replies{
 		reply_svc:       reply_svc,
 		thread_mark_svc: thread_mark_svc,
-		search_svc:      search_svc,
 	}
 }
 

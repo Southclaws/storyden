@@ -70,7 +70,6 @@ type OperationPermissions interface {
 	ReplyCreate() (bool, *rbac.Permission)
 	PostUpdate() (bool, *rbac.Permission)
 	PostDelete() (bool, *rbac.Permission)
-	PostSearch() (bool, *rbac.Permission)
 	PostReactAdd() (bool, *rbac.Permission)
 	PostReactRemove() (bool, *rbac.Permission)
 	AssetUpload() (bool, *rbac.Permission)
@@ -247,8 +246,6 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.PostUpdate()
 	case "PostDelete":
 		return optable.PostDelete()
-	case "PostSearch":
-		return optable.PostSearch()
 	case "PostReactAdd":
 		return optable.PostReactAdd()
 	case "PostReactRemove":

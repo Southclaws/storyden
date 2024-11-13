@@ -10,8 +10,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   PostReactAddBody,
   PostReactAddOKResponse,
-  PostSearchOKResponse,
-  PostSearchParams,
   PostUpdateBody,
   PostUpdateOKResponse,
 } from "../openapi-schema";
@@ -61,38 +59,6 @@ export const postDelete = async (
   return fetcher<Promise<postDeleteResponse>>(getPostDeleteUrl(postId), {
     ...options,
     method: "DELETE",
-  });
-};
-
-/**
- * Search through posts using various queries and filters.
- */
-export type postSearchResponse = {
-  data: PostSearchOKResponse;
-  status: number;
-};
-
-export const getPostSearchUrl = (params?: PostSearchParams) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
-    }
-  });
-
-  return normalizedParams.size
-    ? `/posts/search?${normalizedParams.toString()}`
-    : `/posts/search`;
-};
-
-export const postSearch = async (
-  params?: PostSearchParams,
-  options?: RequestInit,
-): Promise<postSearchResponse> => {
-  return fetcher<Promise<postSearchResponse>>(getPostSearchUrl(params), {
-    ...options,
-    method: "GET",
   });
 };
 
