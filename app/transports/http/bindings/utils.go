@@ -16,7 +16,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
-	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/profile"
@@ -183,23 +182,6 @@ func serialisePostRef(p *post.Post) openapi.PostReference {
 
 func deserialisePostID(s string) post.ID {
 	return post.ID(openapi.ParseID(s))
-}
-
-func deserialiseContentKinds(in openapi.ContentKinds) ([]post_search.Kind, error) {
-	out, err := dt.MapErr(in, deserialiseContentKind)
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-	return out, nil
-}
-
-func deserialiseContentKind(in openapi.ContentKind) (post_search.Kind, error) {
-	out, err := post_search.NewKind(string(in))
-	if err != nil {
-		return post_search.Kind{}, fault.Wrap(err)
-	}
-
-	return out, nil
 }
 
 func serialiseProfileReference(a profile.Public) openapi.ProfileReference {

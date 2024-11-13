@@ -300,7 +300,6 @@ export * from "./postReference";
 export * from "./postReferenceList";
 export * from "./postReferenceProps";
 export * from "./postSearchOKResponse";
-export * from "./postSearchParams";
 export * from "./postSearchResults";
 export * from "./postUpdateBody";
 export * from "./postUpdateOKResponse";

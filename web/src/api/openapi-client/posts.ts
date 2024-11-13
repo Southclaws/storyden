@@ -7,8 +7,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import useSwr from "swr";
-import type { Arguments, Key, SWRConfiguration } from "swr";
+import type { Arguments, Key } from "swr";
 import useSWRMutation from "swr/mutation";
 import type { SWRMutationConfiguration } from "swr/mutation";
 
@@ -18,8 +17,6 @@ import type {
   NotFoundResponse,
   PostReactAddBody,
   PostReactAddOKResponse,
-  PostSearchOKResponse,
-  PostSearchParams,
   PostUpdateBody,
   PostUpdateOKResponse,
   UnauthorisedResponse,
@@ -131,60 +128,6 @@ export const usePostDelete = <
   const swrFn = getPostDeleteMutationFetcher(postId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
-
-  return {
-    swrKey,
-    ...query,
-  };
-};
-/**
- * Search through posts using various queries and filters.
- */
-export const postSearch = (params?: PostSearchParams) => {
-  return fetcher<PostSearchOKResponse>({
-    url: `/posts/search`,
-    method: "GET",
-    params,
-  });
-};
-
-export const getPostSearchKey = (params?: PostSearchParams) =>
-  [`/posts/search`, ...(params ? [params] : [])] as const;
-
-export type PostSearchQueryResult = NonNullable<
-  Awaited<ReturnType<typeof postSearch>>
->;
-export type PostSearchQueryError =
-  | UnauthorisedResponse
-  | NotFoundResponse
-  | InternalServerErrorResponse;
-
-export const usePostSearch = <
-  TError =
-    | UnauthorisedResponse
-    | NotFoundResponse
-    | InternalServerErrorResponse,
->(
-  params?: PostSearchParams,
-  options?: {
-    swr?: SWRConfiguration<Awaited<ReturnType<typeof postSearch>>, TError> & {
-      swrKey?: Key;
-      enabled?: boolean;
-    };
-  },
-) => {
-  const { swr: swrOptions } = options ?? {};
-
-  const isEnabled = swrOptions?.enabled !== false;
-  const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getPostSearchKey(params) : null));
-  const swrFn = () => postSearch(params);
-
-  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
-    swrKey,
-    swrFn,
-    swrOptions,
-  );
 
   return {
     swrKey,
