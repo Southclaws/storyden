@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { memo } from "react";
 
 import { ThreadReference } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
@@ -19,7 +20,7 @@ type Props = {
   thread: ThreadReference;
 };
 
-export function ThreadReferenceCard({ thread }: Props) {
+export const ThreadReferenceCard = memo(({ thread }: Props) => {
   const session = useSession();
   const permalink = `/t/${thread.slug}`;
 
@@ -75,4 +76,6 @@ export function ThreadReferenceCard({ thread }: Props) {
       />
     </Card>
   );
-}
+});
+
+ThreadReferenceCard.displayName = "ThreadReferenceCard";
