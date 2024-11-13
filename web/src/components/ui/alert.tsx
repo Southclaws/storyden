@@ -1,22 +1,36 @@
 "use client";
 
+import type { Assign, PolymorphicProps } from "@ark-ui/react";
 import { ark } from "@ark-ui/react/factory";
-import type { ComponentProps } from "react";
-import { styled } from "styled-system/jsx";
-import { alert } from "styled-system/recipes";
 
+import { alert } from "@/styled-system/recipes";
+import type { ComponentProps, HTMLStyledProps } from "@/styled-system/types";
 import { createStyleContext } from "@/utils/create-style-context";
 
 const { withProvider, withContext } = createStyleContext(alert);
 
-export const Root = withProvider(styled(ark.div), "root");
-export const Content = withContext(styled(ark.div), "content");
-export const Description = withContext(styled(ark.div), "description");
-export const Icon = withContext(styled(ark.svg), "icon");
-export const Title = withContext(styled(ark.h5), "title");
+export type RootProps = ComponentProps<typeof Root>;
+export const Root = withProvider<
+  HTMLDivElement,
+  Assign<HTMLStyledProps<"div">, PolymorphicProps>
+>(ark.div, "root");
 
-export interface RootProps extends ComponentProps<typeof Root> {}
-export interface ContentProps extends ComponentProps<typeof Content> {}
-export interface DescriptionProps extends ComponentProps<typeof Description> {}
-export interface IconProps extends ComponentProps<typeof Icon> {}
-export interface TitleProps extends ComponentProps<typeof Title> {}
+export const Content = withContext<
+  HTMLDivElement,
+  Assign<HTMLStyledProps<"div">, PolymorphicProps>
+>(ark.div, "content");
+
+export const Description = withContext<
+  HTMLDivElement,
+  Assign<HTMLStyledProps<"div">, PolymorphicProps>
+>(ark.div, "description");
+
+export const Icon = withContext<
+  HTMLOrSVGElement,
+  Assign<HTMLStyledProps<"svg">, PolymorphicProps>
+>(ark.svg, "icon");
+
+export const Title = withContext<
+  HTMLHeadingElement,
+  Assign<HTMLStyledProps<"h5">, PolymorphicProps>
+>(ark.h5, "title");

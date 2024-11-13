@@ -35,7 +35,8 @@ export function useThreadMenu({ thread }: Props) {
 
   const isSharingEnabled = useShare();
   const isEditingEnabled = canEditPost(thread, account);
-  const isDeletingEnabled = canDeletePost(thread, account);
+  const isDeletingEnabled =
+    canDeletePost(thread, account) && thread.deletedAt === undefined;
 
   const permalink = getPermalinkForThread(thread.slug);
 

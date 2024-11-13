@@ -13,6 +13,7 @@ import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { Breadcrumbs } from "@/components/thread/Breadcrumbs";
 import { ReplyBox } from "@/components/thread/ReplyBox/ReplyBox";
 import { ReplyList } from "@/components/thread/ReplyList/ReplyList";
+import { ThreadDeletedAlert } from "@/components/thread/ThreadDeletedAlert";
 import { ThreadMenu } from "@/components/thread/ThreadMenu/ThreadMenu";
 import { TagListField } from "@/components/thread/ThreadTagList";
 import { FormErrorText } from "@/components/ui/FormErrorText";
@@ -67,6 +68,10 @@ export function ThreadScreen(props: Props) {
             <ThreadMenu thread={thread} />
           </HStack>
         </WStack>
+
+        {thread.deletedAt !== undefined && (
+          <ThreadDeletedAlert thread={thread} />
+        )}
 
         <Byline
           href={`#${thread.id}`}

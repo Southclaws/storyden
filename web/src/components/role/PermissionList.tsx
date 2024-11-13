@@ -1,10 +1,10 @@
 import { PermissionList } from "@/api/openapi-schema";
 import * as Popover from "@/components/ui/popover";
-import { PermissionDetails } from "@/lib/permission/permission";
 import { Box, LStack } from "@/styled-system/jsx";
 
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
+
+import { PermissionBadge } from "./PermissionBadge";
 
 type Props = {
   permissions: PermissionList;
@@ -39,7 +39,7 @@ export function PermissionSummary({ permissions }: Props) {
             <LStack overflowY="scroll">
               {permissions.length > 0 ? (
                 permissions.map((p) => (
-                  <Badge key={p}>{PermissionDetails[p].name}</Badge>
+                  <PermissionBadge key={p} permission={p} />
                 ))
               ) : (
                 <Box pl="4">

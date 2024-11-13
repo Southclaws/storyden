@@ -6,12 +6,17 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
+
+var ErrNoPermission = fault.New("unauthenticated user cannot view unpublished threads", ftag.With(ftag.PermissionDenied))
 
 func (s *service) Get(
 	ctx context.Context,
@@ -22,6 +27,28 @@ func (s *service) Get(
 	thr, err := s.thread_repo.Get(ctx, threadID, session)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get thread"))
+	}
+
+	if thr.Visibility != visibility.VisibilityPublished {
+		accountID, ok := session.Get()
+		if !ok {
+			return nil, fault.Wrap(ErrNoPermission, fctx.With(ctx))
+		}
+
+		acc, err := s.accountQuery.GetByID(ctx, accountID)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if err := acc.Roles.Permissions().Authorise(ctx, func() error {
+			if thr.Author.ID == accountID {
+				return nil
+			}
+
+			return ErrNoPermission
+		}, rbac.PermissionManagePosts); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	recommendations, err := s.recommender.Recommend(ctx, thr)
