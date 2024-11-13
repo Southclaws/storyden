@@ -12,6 +12,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_node "github.com/Southclaws/storyden/internal/ent/node"
+	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	ent_tag "github.com/Southclaws/storyden/internal/ent/tag"
 )
 
@@ -25,12 +27,14 @@ func New(db *ent.Client, raw *sqlx.DB) *Querier {
 }
 
 const tagItemsCountManyQuery = `select
-  t.id tag_id,                              -- tag ID
-  count(tp.tag_id) + count(tn.tag_id) items -- number of items,
+  t.id tag_id,                    -- tag ID
+  count(p.id) + count(n.id) items -- number of items,
 from
   tags t
   left join tag_posts tp on tp.tag_id = t.id
+  left join posts p on p.id = tp.post_id and p.visibility = 'published' and p.deleted_at is null
   left join tag_nodes tn on tn.tag_id = t.id
+  left join nodes n on n.id = tn.node_id and n.visibility = 'published' and n.deleted_at is null
 group by
   t.id
 `
@@ -80,12 +84,20 @@ func (q *Querier) Get(ctx context.Context, name tag_ref.Name) (*tag.Tag, error) 
 		Where(ent_tag.Name(name.String())).
 		WithAccounts().
 		WithPosts(func(pq *ent.PostQuery) {
+			pq.Where(
+				ent_post.VisibilityEQ(ent_post.VisibilityPublished),
+				ent_post.DeletedAtIsNil(),
+			)
 			pq.WithCategory()
 			pq.WithAuthor(func(aq *ent.AccountQuery) {
 				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 			})
 		}).
 		WithNodes(func(nq *ent.NodeQuery) {
+			nq.Where(
+				ent_node.VisibilityEQ(ent_node.VisibilityPublished),
+				ent_node.DeletedAtIsNil(),
+			)
 			nq.WithOwner(func(aq *ent.AccountQuery) {
 				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 			})
