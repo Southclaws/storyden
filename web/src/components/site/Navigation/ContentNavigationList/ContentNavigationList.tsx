@@ -5,6 +5,7 @@ import { CategoryList } from "@/components/category/CategoryList/CategoryList";
 import { Divider, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { CollectionsAnchor } from "../Anchors/Collections";
+import { LinksAnchor } from "../Anchors/Link";
 import { MembersAnchor } from "../Anchors/Members";
 import { RolesAnchor } from "../Anchors/Roles";
 import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
@@ -46,11 +47,8 @@ export function ContentNavigationList(props: Props) {
 
       <LStack gap="1">
         <CollectionsAnchor />
-        <Divider />
-        <WStack>
-          <MembersAnchor />
-          <RolesAnchor />
-        </WStack>
+        <LinksAnchor />
+        <MembersAnchor />
       </LStack>
     </styled.nav>
   );

@@ -3,8 +3,9 @@
 import { Unready } from "src/components/site/Unready";
 
 import { MemberList } from "@/components/library/members/MemberList";
+import { RolesAnchor } from "@/components/site/Navigation/Anchors/Roles";
 import { PaginatedSearch } from "@/components/site/PaginatedSearch/PaginatedSearch";
-import { VStack } from "@/styled-system/jsx";
+import { VStack, WStack } from "@/styled-system/jsx";
 
 import { Props, useMemberIndexScreen } from "./useMemberIndexScreen";
 
@@ -23,6 +24,10 @@ export function MemberIndexScreen(props: Props) {
         totalPages={data.total_pages}
         pageSize={data.page_size}
       />
+
+      <WStack>
+        <RolesAnchor variant="subtle" />
+      </WStack>
 
       <MemberList profiles={data.profiles} />
     </VStack>
