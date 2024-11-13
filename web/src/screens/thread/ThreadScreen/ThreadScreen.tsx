@@ -65,7 +65,7 @@ export function ThreadScreen(props: Props) {
               </>
             )}
 
-            <ThreadMenu thread={thread} />
+            <ThreadMenu thread={thread} editingEnabled movingEnabled />
           </HStack>
         </WStack>
 

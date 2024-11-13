@@ -9,7 +9,7 @@ import {
   postUpdate,
 } from "@/api/openapi-client/posts";
 import { replyCreate } from "@/api/openapi-client/replies";
-import { getThreadGetKey } from "@/api/openapi-client/threads";
+import { getThreadGetKey, threadUpdate } from "@/api/openapi-client/threads";
 import {
   Identifier,
   PostMutableProps,
@@ -18,10 +18,11 @@ import {
   ReplyInitialProps,
   Thread,
   ThreadGetResponse,
+  ThreadReference,
 } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 
-export function useThreadMutations(thread: Thread) {
+export function useThreadMutations(thread: ThreadReference) {
   const sessionInitial = useSession();
   const sessionRef = useRef(sessionInitial);
   useEffect(() => {
@@ -182,6 +183,25 @@ export function useThreadMutations(thread: Thread) {
     await postReactRemove(replyID, reactID);
   };
 
+  const updateCategory = async (categoryID: Identifier) => {
+    const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
+      if (!data) return;
+
+      const newData = {
+        ...data,
+        category_id: categoryID,
+      };
+
+      return newData;
+    };
+
+    await mutate(key, mutator, {
+      revalidate: false,
+    });
+
+    await threadUpdate(thread.slug, { category: categoryID });
+  };
+
   const revalidate = async (after?: number) => {
     setTimeout(() => {
       mutate(key);
@@ -194,6 +214,7 @@ export function useThreadMutations(thread: Thread) {
     deleteReply,
     reactionAdd,
     reactionRemove,
+    updateCategory,
     revalidate,
   };
 }

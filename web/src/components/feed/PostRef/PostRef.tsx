@@ -5,8 +5,6 @@ import { CollectionMenu } from "@/components/content/CollectionMenu/CollectionMe
 import { Card } from "@/components/ui/rich-card";
 import { HStack } from "@/styled-system/jsx";
 
-import { FeedItemMenu } from "../FeedItemMenu/FeedItemMenu";
-
 type Props = {
   item: PostReference;
 };
@@ -27,7 +25,6 @@ export function PostRef({ item }: Props) {
         session && (
           <HStack>
             <CollectionMenu account={session} thread={item} />
-            <FeedItemMenu thread={item} />
           </HStack>
         )
       }

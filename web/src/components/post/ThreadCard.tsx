@@ -9,7 +9,7 @@ import { Card } from "@/components/ui/rich-card";
 import { HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
-import { FeedItemMenu } from "../feed/FeedItemMenu/FeedItemMenu";
+import { ThreadMenu } from "../thread/ThreadMenu/ThreadMenu";
 import {
   DiscussionIcon,
   DiscussionParticipatingIcon,
@@ -48,7 +48,7 @@ export function ThreadReferenceCard({ thread }: Props) {
         session && (
           <HStack>
             <CollectionMenu account={session} thread={thread} />
-            <FeedItemMenu thread={thread} />
+            <ThreadMenu thread={thread} />
           </HStack>
         )
       }

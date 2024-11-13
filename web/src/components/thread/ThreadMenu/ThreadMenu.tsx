@@ -5,6 +5,8 @@ import { format } from "date-fns/format";
 
 import { MoreAction } from "src/components/site/Action/More";
 
+import { CategoryMoveMenu } from "@/components/category/CategoryMoveMenu/CategoryMoveMenu";
+import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { EditIcon } from "@/components/ui/icons/Edit";
@@ -20,6 +22,7 @@ export function ThreadMenu(props: Props) {
   const {
     isSharingEnabled,
     isEditingEnabled,
+    isMovingEnabled,
     isDeletingEnabled,
     isConfirmingDelete,
     handlers,
@@ -49,6 +52,12 @@ export function ThreadMenu(props: Props) {
               >
                 <styled.span>{`Post by ${thread.author.name}`}</styled.span>
 
+                <MemberBadge
+                  profile={thread.author}
+                  size="sm"
+                  name="full-vertical"
+                />
+
                 <styled.time fontWeight="normal">
                   {format(new Date(thread.createdAt), "yyyy-MM-dd")}
                 </styled.time>
@@ -77,6 +86,8 @@ export function ThreadMenu(props: Props) {
                   </HStack>
                 </Menu.Item>
               )}
+
+              {isMovingEnabled && <CategoryMoveMenu thread={thread} />}
 
               {isDeletingEnabled &&
                 (isConfirmingDelete ? (
