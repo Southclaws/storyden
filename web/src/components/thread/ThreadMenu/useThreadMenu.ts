@@ -4,7 +4,7 @@ import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 
-import { Thread } from "src/api/openapi-schema";
+import { ThreadReference } from "src/api/openapi-schema";
 
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";
@@ -16,10 +16,16 @@ import { useShare } from "@/utils/client";
 import { getPermalinkForThread } from "../utils";
 
 export type Props = {
-  thread: Thread;
+  thread: ThreadReference;
+  editingEnabled?: boolean;
+  movingEnabled?: boolean;
 };
 
-export function useThreadMenu({ thread }: Props) {
+export function useThreadMenu({
+  thread,
+  editingEnabled,
+  movingEnabled,
+}: Props) {
   const router = useRouter();
   const account = useSession();
   const [_, setEditing] = useQueryState("edit", parseAsBoolean);
@@ -34,7 +40,8 @@ export function useThreadMenu({ thread }: Props) {
   } = useConfirmation(handleDelete);
 
   const isSharingEnabled = useShare();
-  const isEditingEnabled = canEditPost(thread, account);
+  const isEditingEnabled = canEditPost(thread, account) && editingEnabled;
+  const isMovingEnabled = canEditPost(thread, account) && movingEnabled;
   const isDeletingEnabled =
     canDeletePost(thread, account) && thread.deletedAt === undefined;
 
@@ -71,6 +78,7 @@ export function useThreadMenu({ thread }: Props) {
   return {
     isSharingEnabled,
     isEditingEnabled,
+    isMovingEnabled,
     isDeletingEnabled,
     isConfirmingDelete,
     handlers: {

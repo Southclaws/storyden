@@ -7,26 +7,35 @@ import { Badge, BadgeProps } from "../ui/badge";
 
 type Props = {
   category: Category;
+  asLink?: boolean;
 };
 
-export function CategoryBadge({ category, ...props }: Props & BadgeProps) {
+export function CategoryBadge({
+  category,
+  asLink = true,
+  ...props
+}: Props & BadgeProps) {
   const cssProps = categoryColourCSS(category.colour);
 
   const path = `/d/${category.slug}`;
 
-  return (
-    <Link href={path}>
-      <Badge
-        size="sm"
-        style={cssProps}
-        bgColor="colorPalette"
-        borderColor="colorPalette.muted"
-        color="colorPalette.text"
-        // as any: expression produces a union that is too complex... (???)
-        {...(props as any)}
-      >
-        {category.name}
-      </Badge>
-    </Link>
+  const children = (
+    <Badge
+      size="sm"
+      style={cssProps}
+      bgColor="colorPalette"
+      borderColor="colorPalette.muted"
+      color="colorPalette.text"
+      // as any: expression produces a union that is too complex... (???)
+      {...(props as any)}
+    >
+      {category.name}
+    </Badge>
   );
+
+  if (asLink) {
+    return <Link href={path}>{children}</Link>;
+  }
+
+  return children;
 }
