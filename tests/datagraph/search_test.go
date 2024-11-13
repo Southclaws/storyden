@@ -70,13 +70,13 @@ func TestSearchMultipleKinds(t *testing.T) {
 			}, session2)
 			tests.Ok(t, err, t2)
 			n1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
-				Name:       "node 1",
+				Name:       "node 1" + uuid.NewString(),
 				Content:    &hot,
 				Visibility: &published,
 			}, adminSession)
 			tests.Ok(t, err, n1)
 			n2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
-				Name:       "node 2",
+				Name:       "node 2" + uuid.NewString(),
 				Content:    &cold,
 				Visibility: &draft,
 			}, session2)
@@ -238,13 +238,13 @@ func TestSearchVisibilityRules(t *testing.T) {
 			}, session2)
 			tests.Ok(t, err, t2)
 			n1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
-				Name:       "node 1",
+				Name:       "node 1" + uuid.NewString(),
 				Content:    &hot,
 				Visibility: &published,
 			}, adminSession)
 			tests.Ok(t, err, n1)
 			n2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
-				Name:       "node 2",
+				Name:       "node 2" + uuid.NewString(),
 				Content:    &cold,
 				Visibility: &draft,
 			}, session2)
