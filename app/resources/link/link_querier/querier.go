@@ -64,7 +64,11 @@ func (d *LinkQuerier) Get(ctx context.Context, slug string) (*link.Link, error) 
 			pq.WithCategory()
 			pq.WithRoot()
 		}).
-		WithNodes()
+		WithNodes(func(nq *ent.NodeQuery) {
+			nq.WithOwner(func(aq *ent.AccountQuery) {
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+			})
+		})
 
 	r, err := query.First(ctx)
 	if err != nil {
