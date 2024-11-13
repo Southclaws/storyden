@@ -18,7 +18,7 @@ export const fetcher = async <T>(url: string, opts: Options): Promise<T> => {
   const req = buildRequest({
     url,
     method: opts.method as any,
-    revalidate: 100,
+    revalidate: 5,
   });
 
   req.headers.set("Cookie", await getCookieHeader());
