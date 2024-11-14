@@ -2,10 +2,8 @@ import { SWRResponse } from "swr";
 
 import { useAccountAuthProviderList } from "src/api/openapi-client/accounts";
 import { APIError, AccountAuthMethods } from "src/api/openapi-schema";
-import {
-  groupAuthMethods,
-  groupAuthProviders,
-} from "src/components/settings/utils";
+
+import { groupAuthMethods, groupAuthProviders } from "@/lib/auth/utils";
 
 export function useAuthMethodSettings() {
   const response: SWRResponse<AccountAuthMethods, APIError> =

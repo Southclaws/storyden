@@ -5,9 +5,9 @@ import { BiometricIcon } from "@/components/ui/icons/Biometric";
 import { Input } from "@/components/ui/input";
 import { Flex, styled } from "@/styled-system/jsx";
 
-import { Props, useRegisterForm } from "./useRegisterForm";
+import { Props, useRegisterHandleForm } from "./useRegisterHandleForm";
 
-export function RegisterForm(props: Props) {
+export function RegisterHandleForm(props: Props) {
   const {
     form: {
       register,
@@ -16,7 +16,7 @@ export function RegisterForm(props: Props) {
       handleWebauthn,
       errors,
     },
-  } = useRegisterForm();
+  } = useRegisterHandleForm();
 
   return (
     <styled.form

@@ -1,15 +1,15 @@
 import "server-only";
 
 import { AuthProvider } from "src/api/openapi-schema";
-import { groupAuthProviders } from "src/components/settings/utils";
 
 import { authProviderList } from "@/api/openapi-server/auth";
+import { groupAuthProviders } from "@/lib/auth/utils";
 
 interface Providers {
   password: boolean;
   phone: boolean;
   webauthn: boolean;
-  providers: AuthProvider[];
+  oauth: AuthProvider[];
 }
 
 /**

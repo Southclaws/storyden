@@ -1,13 +1,12 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { BiometricIcon } from "@/components/ui/icons/Biometric";
 import { Input } from "@/components/ui/input";
 import { Flex, styled } from "@/styled-system/jsx";
 
-import { Props, useLoginForm } from "./useLoginForm";
+import { useLoginHandleForm } from "./useLoginHandleForm";
 
-export function LoginForm(props: Props) {
+export function LoginHandleForm() {
   const {
     form: {
       register,
@@ -16,7 +15,7 @@ export function LoginForm(props: Props) {
       handleWebauthn,
       errors,
     },
-  } = useLoginForm();
+  } = useLoginHandleForm();
 
   return (
     <styled.form
@@ -48,24 +47,6 @@ export function LoginForm(props: Props) {
           autoComplete="current-password"
           {...register("token")}
         />
-        {props.webauthn && isWebauthnEnabled && (
-          <>
-            <styled.span>or</styled.span>
-
-            <Button
-              w="full"
-              variant="ghost"
-              size="sm"
-              type="button"
-              onClick={handleWebauthn}
-            >
-              <styled.span display="flex" gap="1" alignItems="center" px="4">
-                device
-                <BiometricIcon />
-              </styled.span>
-            </Button>
-          </>
-        )}
       </Flex>
       <styled.p color="fg.error" fontSize="sm">
         {errors.token?.message}

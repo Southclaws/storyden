@@ -19,7 +19,7 @@ export function groupAuthProviders(providers: AuthProviderList) {
     password: Boolean(password),
     phone: Boolean(phone),
     webauthn: Boolean(webauthn),
-    providers: oauth,
+    oauth,
   };
 }
 

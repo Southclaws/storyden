@@ -17,3 +17,8 @@ export const PasswordSchema = z
 export const ExistingPasswordSchema = z
   .string()
   .min(1, "Please enter your current password.");
+
+export const UsernameOrEmailSchema = z.union([
+  UsernameSchema,
+  z.string().email("Please enter a valid email."),
+]);
