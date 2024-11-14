@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/kelseyhightower/envconfig"
 
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/internal/config"
 )
 
@@ -22,20 +23,25 @@ type Configuration struct {
 // LoadProvider attempts to load a configuration for an OAuth2 provider from
 // environment variables. The way this works is, if the parse fails then the
 // provider is considered disabled and an empty configuration is returned.
-func LoadProvider(name string) (Configuration, error) {
+func LoadProvider(svc authentication.Service) (*Configuration, error) {
+	name := svc.String()
+
 	enabled := struct{ Enabled bool }{}
 	if envconfig.Process(strings.ToUpper(name), &enabled); !enabled.Enabled {
-		return Configuration{}, nil
+		return nil, nil
 	}
 
 	pc := Configuration{}
 	if err := envconfig.Process(strings.ToUpper(name), &pc); err != nil {
-		return Configuration{}, fault.Wrap(err, fmsg.With(fmt.Sprintf("oauth provider '%s' is enabled but configuration failed to load", name)))
+		return nil, fault.Wrap(err, fmsg.With(fmt.Sprintf("oauth provider '%s' is enabled but configuration failed to load", name)))
 	}
 
-	return pc, nil
+	return &pc, nil
 }
 
-func Redirect(cfg config.Config, name string) string {
+// TODO: Let the frontend construct this URL via some kind of template.
+func Redirect(cfg config.Config, svc authentication.Service) string {
+	name := svc.String()
+
 	return fmt.Sprintf("%s/auth/%s/callback", cfg.PublicWebAddress.String(), name)
 }

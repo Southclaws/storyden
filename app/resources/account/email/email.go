@@ -41,6 +41,9 @@ func (r *EmailRepo) Add(ctx context.Context,
 
 	result, err := create.Save(ctx)
 	if err != nil {
+		if ent.IsConstraintError(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
+		}
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

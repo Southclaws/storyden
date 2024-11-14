@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -30,6 +31,10 @@ type Settings struct {
 	// Public is intended to be used to configure public access to the API. If
 	// set to false any request to the API will require a verified user account.
 	Public opt.Optional[bool]
+
+	// The authentication mode is used to control which authentication methods
+	// are exposed to members during the frontend registration and login flows.
+	AuthenticationMode opt.Optional[authentication.Mode]
 
 	// Metadata is an arbitrary object which can be used by frontends/clients to
 	// store vendor-specific configuration to control the client implementation.

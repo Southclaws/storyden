@@ -28,10 +28,7 @@ var (
 	ErrAccountExists          = fault.New("requester already has an account")
 )
 
-const (
-	id   = "webauthn"
-	name = "WebAuthn"
-)
+var provider = authentication.ServicePhone
 
 type Provider struct {
 	auth_repo    authentication.Repository
@@ -56,9 +53,12 @@ func New(
 	}, nil
 }
 
-func (p *Provider) Enabled() bool { return true }
-func (p *Provider) ID() string    { return id }
-func (p *Provider) Name() string  { return name }
+func (p *Provider) Provides() authentication.Service { return provider }
+
+func (p *Provider) Enabled(ctx context.Context) (bool, error) {
+	// TODO: Provide a way to enable/disable Passkey (WebAuthn) authentication.
+	return true, nil
+}
 
 func (b *Provider) Link(_ string) (string, error) {
 	return "", nil
@@ -69,7 +69,7 @@ func (p *Provider) Login(ctx context.Context, handle, pubkey string) (*account.A
 }
 
 func (p *Provider) register(ctx context.Context, handle string, credential *webauthn.Credential, inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
-	acc, exists, err := p.accountQuery.LookupByHandle(ctx, handle)
+	_, exists, err := p.accountQuery.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -88,7 +88,7 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 	opts := []account_writer.Option{}
 	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
 
-	acc, err = p.reg.Create(ctx, handle, opts...)
+	acc, err := p.reg.Create(ctx, handle, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -100,7 +100,7 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 
 	_, err = p.auth_repo.Create(ctx,
 		acc.ID,
-		id,
+		provider,
 		base64.RawURLEncoding.EncodeToString(credential.ID),
 		string(encoded),
 		nil,
@@ -126,7 +126,7 @@ func (p *Provider) add(ctx context.Context, accountID account.AccountID, credent
 
 	_, err = p.auth_repo.Create(ctx,
 		acc.ID,
-		id,
+		provider,
 		base64.RawURLEncoding.EncodeToString(credential.ID),
 		string(encoded),
 		nil,

@@ -3,6 +3,7 @@ package services
 import (
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/services/account/account_auth"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
 	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/asset"
@@ -62,5 +63,6 @@ func Build() fx.Option {
 		fx.Provide(following.New),
 		fx.Provide(autotagger.New),
 		fx.Provide(instance_info.New),
+		fx.Provide(account_auth.New),
 	)
 }

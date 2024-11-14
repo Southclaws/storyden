@@ -16,10 +16,12 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/register"
 )
 
 var (
+	ErrHandleLoginDisabled  = errors.New("cannot register while in non-handle authentication mode")
 	ErrAccountAlreadyExists = errors.New("account already exists")
 	ErrPasswordMismatch     = errors.New("password mismatch")
 	ErrNoPassword           = errors.New("password not enabled")
@@ -28,26 +30,36 @@ var (
 	ErrNotFound             = errors.New("account not found")
 )
 
-const (
-	id   = "password"
-	name = "Password"
+var (
+	requiredMode = authentication.ModeHandle
+	provider     = authentication.ServicePassword
 )
 
 type Provider struct {
+	settings     *settings.SettingsRepository
 	auth         authentication.Repository
 	accountQuery *account_querier.Querier
 	register     *register.Registrar
 }
 
-func New(auth authentication.Repository, accountQuery *account_querier.Querier, register *register.Registrar) *Provider {
-	return &Provider{auth, accountQuery, register}
+func New(settings *settings.SettingsRepository, auth authentication.Repository, accountQuery *account_querier.Querier, register *register.Registrar) *Provider {
+	return &Provider{
+		settings:     settings,
+		auth:         auth,
+		accountQuery: accountQuery,
+		register:     register,
+	}
 }
 
-func (p *Provider) Enabled() bool { return true } // TODO: Allow disabling.
-func (p *Provider) ID() string    { return id }
-func (p *Provider) Name() string  { return name }
+func (p *Provider) Provides() authentication.Service { return provider }
 
-func (b *Provider) Register(ctx context.Context, identifier string, password string, inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
+func (p *Provider) Enabled(ctx context.Context) (bool, error) {
+	// Handle+password registration and login is always enabled.
+
+	return true, nil
+}
+
+func (p *Provider) Register(ctx context.Context, identifier string, password string, inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
 	if len(password) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,
 			fctx.With(ctx),
@@ -55,7 +67,16 @@ func (b *Provider) Register(ctx context.Context, identifier string, password str
 			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
 	}
 
-	_, exists, err := b.accountQuery.LookupByHandle(ctx, identifier)
+	settings, err := p.settings.Get(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if settings.AuthenticationMode.Or(authentication.ModeHandle) != requiredMode {
+		return nil, fault.Wrap(ErrHandleLoginDisabled, fctx.With(ctx), fmsg.With("failed to get account"))
+	}
+
+	_, exists, err := p.accountQuery.LookupByHandle(ctx, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
@@ -70,21 +91,16 @@ func (b *Provider) Register(ctx context.Context, identifier string, password str
 	opts := []account_writer.Option{}
 	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
 
-	account, err := b.register.Create(ctx, identifier, opts...)
+	account, err := p.register.Create(ctx, identifier, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}
 
-	if err := b.addPasswordAuth(ctx, account.ID, password); err != nil {
+	if err := p.addPasswordAuth(ctx, account.ID, password); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return account, nil
-}
-
-func (b *Provider) Link(_ string) (string, error) {
-	// Password provider does not use external links.
-	return "", nil
 }
 
 func (b *Provider) Login(ctx context.Context, identifier string, password string) (*account.Account, error) {
@@ -107,7 +123,7 @@ func (b *Provider) Login(ctx context.Context, identifier string, password string
 			fmsg.WithDesc("not found", "No account was found with the provided handle."))
 	}
 
-	a, exists, err := b.auth.LookupByHandle(ctx, id, identifier)
+	a, exists, err := b.auth.LookupByHandle(ctx, provider, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -151,7 +167,7 @@ func (b *Provider) Create(ctx context.Context, aid account.AccountID, password s
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
 
-	_, exists, err := b.auth.LookupByHandle(ctx, id, acc.Handle)
+	_, exists, err := b.auth.LookupByHandle(ctx, provider, acc.Handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -183,7 +199,7 @@ func (b *Provider) Update(ctx context.Context, aid account.AccountID, oldpasswor
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
 
-	auth, exists, err := b.auth.LookupByHandle(ctx, id, a.Handle)
+	auth, exists, err := b.auth.LookupByHandle(ctx, provider, a.Handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -230,7 +246,7 @@ func (b *Provider) addPasswordAuth(ctx context.Context, accountID account.Accoun
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
 	}
 
-	_, err = b.auth.Create(ctx, accountID, id, xid.New().String(), string(hashed), nil)
+	_, err = b.auth.Create(ctx, accountID, provider, xid.New().String(), string(hashed), nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}
