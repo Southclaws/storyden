@@ -29,10 +29,7 @@ var (
 	ErrMissingToken = fault.New("no access token in response")
 )
 
-const (
-	id   = "google"
-	name = "Google"
-)
+var provider = authentication.ServiceOAuthGoogle
 
 type Provider struct {
 	auth_repo  authentication.Repository
@@ -41,7 +38,7 @@ type Provider struct {
 
 	ed       endec.EncrypterDecrypter
 	callback string
-	config   all.Configuration
+	config   *all.Configuration
 	oac      oauth2.Config
 }
 
@@ -52,12 +49,16 @@ func New(
 	avatar_svc avatar.Service,
 	ed endec.EncrypterDecrypter,
 ) (*Provider, error) {
-	config, err := all.LoadProvider(id)
+	config, err := all.LoadProvider(provider)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	callback := all.Redirect(cfg, id)
+	if config == nil {
+		return nil, nil
+	}
+
+	callback := all.Redirect(cfg, provider)
 
 	oac := oauth2.Config{
 		ClientID:     config.ClientID,
@@ -82,9 +83,11 @@ func New(
 	}, nil
 }
 
-func (p *Provider) Enabled() bool { return p.config.Enabled }
-func (p *Provider) Name() string  { return name }
-func (p *Provider) ID() string    { return id }
+func (p *Provider) Provides() authentication.Service { return provider }
+
+func (p *Provider) Enabled(ctx context.Context) (bool, error) {
+	return p.config != nil, nil
+}
 
 func (p *Provider) Link(redirectPath string) (string, error) {
 	state, err := p.ed.Encrypt(map[string]any{
@@ -130,7 +133,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 	// TODO: Everything below this can be made generic for all OAuth providers.
 
 	acc, err := p.getOrCreateAccount(ctx,
-		id,
+		provider,
 		strings.ToLower(u.Id),
 		token.AccessToken,
 		handle,

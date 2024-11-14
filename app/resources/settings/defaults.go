@@ -2,6 +2,7 @@ package settings
 
 import (
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
@@ -22,8 +23,9 @@ const DefaultColour = "hsl(157, 65%, 44%)"
 var defaultContent, _ = datagraph.NewRichText(DefaultContent)
 
 var DefaultSettings = Settings{
-	Title:        opt.New(DefaultTitle),
-	Description:  opt.New(DefaultDescription),
-	Content:      opt.New(defaultContent),
-	AccentColour: opt.New(DefaultColour),
+	Title:              opt.New(DefaultTitle),
+	Description:        opt.New(DefaultDescription),
+	Content:            opt.New(defaultContent),
+	AccentColour:       opt.New(DefaultColour),
+	AuthenticationMode: opt.New(authentication.ModeHandle),
 }

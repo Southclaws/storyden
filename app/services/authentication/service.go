@@ -1,12 +1,17 @@
 package authentication
 
 import (
+	"context"
+
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
 	"github.com/samber/lo"
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_only"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_password"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
@@ -18,22 +23,16 @@ import (
 )
 
 type Manager struct {
-	providers map[string]Provider
+	settings  *settings.SettingsRepository
+	providers map[authentication.Service]Provider
 }
 
 var ErrInvalidProvider = fault.New("invalid provider")
 
-// Adding a new OAuth2 provider?
-//
-// 1. Add the constructor to the `fx.Provide` call in the builder.
-// 2. Add the instance to `allProviders` in the Manager constructor.
-//
-// See lines annotated with (1) and (2) below...
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			// (1)
-			// All auth providers are initialised, those that fail are disabled.
+			// All authentication provider services.
 			password.New,
 			email_password.New,
 			email_only.New,
@@ -50,20 +49,18 @@ func Build() fx.Option {
 
 func New(
 	l *zap.Logger,
+	settings *settings.SettingsRepository,
 
 	pw *password.Provider,
 	ep *email_password.Provider,
 	eo *email_only.Provider,
 	wa *webauthn.Provider,
 	gg *google.Provider,
-	gh *github.GitHubProvider,
-	li *linkedin.LinkedInProvider,
+	gh *github.Provider,
+	li *linkedin.Provider,
 	pp *phone.Provider,
 ) *Manager {
-	allProviders := []Provider{
-		// (2)
-		// All OAuth2 providers are statically added to this list regardless of
-		// whether they are enabled or not. Disabled providers are filtered out.
+	providers := []Provider{
 		pw,
 		ep,
 		eo,
@@ -74,28 +71,37 @@ func New(
 		pp,
 	}
 
-	// Filter out disabled providers.
-	enabledProviders := lo.Filter(allProviders, func(p Provider, _ int) bool {
-		return p.Enabled()
-	})
-
 	l.Debug("initialised auth providers",
-		zap.Strings("all_providers", dt.Map(allProviders, name)),
-		zap.Strings("enabled_providers", dt.Map(enabledProviders, name)),
+		zap.Strings("providers", dt.Map(providers, name)),
 	)
 
 	return &Manager{
-		providers: lo.KeyBy(enabledProviders, func(p Provider) string {
-			return p.ID()
+		settings: settings,
+		providers: lo.KeyBy(providers, func(p Provider) authentication.Service {
+			return p.Provides()
 		}),
 	}
 }
 
-func (oa *Manager) Providers() []Provider {
-	return lo.Values(oa.providers)
+func (oa *Manager) GetProviderList(ctx context.Context) ([]Provider, error) {
+	providerList := lo.Values(oa.providers)
+
+	filtered, err := dt.FilterErr(providerList, func(p Provider) (bool, error) {
+		enabled, err := p.Enabled(ctx)
+		if err != nil {
+			return false, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		return enabled, nil
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return filtered, nil
 }
 
-func (oa *Manager) Provider(id string) (Provider, error) {
+func (oa *Manager) Provider(id authentication.Service) (Provider, error) {
 	p, ok := oa.providers[id]
 	if !ok {
 		return nil, fault.Wrap(ErrInvalidProvider)
@@ -104,4 +110,4 @@ func (oa *Manager) Provider(id string) (Provider, error) {
 	return p, nil
 }
 
-func name(p Provider) string { return p.ID() }
+func name(p Provider) string { return p.Provides().String() }

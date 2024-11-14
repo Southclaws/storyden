@@ -77,7 +77,7 @@ func SeedAccount(ctx context.Context, r *account_writer.Writer, auth authenticat
 	// TODO: email+password auth provider.
 	// email := acc.Handle + "@storyd.en"
 
-	if _, err = auth.Create(ctx, acc.ID, authentication.Service("password"), xid.New().String(), SeedPassword, nil); err != nil {
+	if _, err = auth.Create(ctx, acc.ID, authentication.ServicePassword, xid.New().String(), SeedPassword, nil); err != nil {
 		panic(err)
 	}
 }
@@ -93,7 +93,7 @@ func SeedAccountUnique(ctx context.Context, r *account_writer.Writer, auth authe
 		panic(err)
 	}
 
-	if _, err = auth.Create(ctx, acc.ID, authentication.Service("password"), xid.New().String(), SeedPassword, nil); err != nil {
+	if _, err = auth.Create(ctx, acc.ID, authentication.ServicePassword, xid.New().String(), SeedPassword, nil); err != nil {
 		panic(err)
 	}
 }

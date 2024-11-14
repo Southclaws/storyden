@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/internal/otp"
@@ -32,12 +33,13 @@ var (
 	ErrNotFound             = errors.New("account not found")
 )
 
-const (
-	id   = "email_password"
-	name = "Email and Password"
+var (
+	requiredMode = authentication.ModeEmail
+	provider     = authentication.ServicePassword
 )
 
 type Provider struct {
+	settings     *settings.SettingsRepository
 	auth         authentication.Repository
 	accountQuery *account_querier.Querier
 	er           email.EmailRepo
@@ -48,18 +50,33 @@ type Provider struct {
 }
 
 func New(
+	settings *settings.SettingsRepository,
 	auth authentication.Repository,
 	accountQuery *account_querier.Querier,
 	er email.EmailRepo,
 	register *register.Registrar,
 	sender email_verify.Verifier,
 ) *Provider {
-	return &Provider{auth, accountQuery, er, register, sender}
+	return &Provider{
+		settings:     settings,
+		auth:         auth,
+		accountQuery: accountQuery,
+		er:           er,
+		register:     register,
+		sender:       sender,
+	}
 }
 
-func (p *Provider) Enabled() bool { return true } // TODO: Allow disabling.
-func (p *Provider) ID() string    { return id }
-func (p *Provider) Name() string  { return name }
+func (p *Provider) Provides() authentication.Service { return provider }
+
+func (p *Provider) Enabled(ctx context.Context) (bool, error) {
+	settings, err := p.settings.Get(ctx)
+	if err != nil {
+		return false, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return settings.AuthenticationMode.Or(authentication.ModeHandle) == requiredMode, nil
+}
 
 func (b *Provider) Register(ctx context.Context, email mail.Address, password string, handle opt.Optional[string], inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
 	if len(password) < 8 {
@@ -133,7 +150,7 @@ func (b *Provider) Login(ctx context.Context, email string, password string) (*a
 	}
 
 	// Get the auth record for this email address
-	a, exists, err := b.auth.LookupByHandle(ctx, id, acc.Handle)
+	a, exists, err := b.auth.LookupByHandle(ctx, provider, acc.Handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -185,7 +202,7 @@ func (b *Provider) addEmailPasswordAuth(ctx context.Context, accountID account.A
 	// use the token field for the password hash.
 	identifier := xid.New().String()
 
-	authRecord, err := b.auth.Create(ctx, accountID, id, identifier, string(hashed), nil)
+	authRecord, err := b.auth.Create(ctx, accountID, provider, identifier, string(hashed), nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}

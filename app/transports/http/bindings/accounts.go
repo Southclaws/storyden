@@ -31,7 +31,7 @@ type Accounts struct {
 	authManager   *authentication.Manager
 	accountQuery  *account_querier.Querier
 	accountUpdate account_update.Updater
-	accountAuth   account_auth.Manager
+	accountAuth   *account_auth.Manager
 	roleAssign    *role_assign.Assignment
 	roleBadge     *role_badge.Writer
 }
@@ -41,7 +41,7 @@ func NewAccounts(
 	authManager *authentication.Manager,
 	accountQuery *account_querier.Querier,
 	accountUpdate account_update.Updater,
-	accountAuth account_auth.Manager,
+	accountAuth *account_auth.Manager,
 	roleAssign *role_assign.Assignment,
 	roleBadge *role_badge.Writer,
 ) Accounts {
@@ -127,12 +127,17 @@ func (i *Accounts) AccountAuthProviderList(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	providers, err := i.authManager.GetProviderList(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	authmethods, err := i.accountAuth.GetAuthMethods(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	available, err := dt.MapErr(i.authManager.Providers(), serialiseAuthProvider)
+	available, err := dt.MapErr(providers, serialiseAuthProvider)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -166,12 +171,17 @@ func (i *Accounts) AccountAuthMethodDelete(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	providers, err := i.authManager.GetProviderList(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	authmethods, err := i.accountAuth.GetAuthMethods(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	available, err := dt.MapErr(i.authManager.Providers(), serialiseAuthProvider)
+	available, err := dt.MapErr(providers, serialiseAuthProvider)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

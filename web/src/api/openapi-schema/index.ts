@@ -57,6 +57,7 @@ export * from "./authEmailPasswordSignupParams";
 export * from "./authEmailSignupParams";
 export * from "./authEmailVerifyBody";
 export * from "./authEmailVerifyProps";
+export * from "./authMode";
 export * from "./authPair";
 export * from "./authPasswordBody";
 export * from "./authPasswordCreateBody";

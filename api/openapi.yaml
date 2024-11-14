@@ -2471,9 +2471,10 @@ components:
         application/json:
           schema:
             type: object
-            required: [providers]
+            required: [providers, mode]
             properties:
               providers: { $ref: "#/components/schemas/AuthProviderList" }
+              mode: { $ref: "#/components/schemas/AuthMode" }
 
     WebAuthnRequestCredentialOK:
       description: OK
@@ -3346,6 +3347,13 @@ components:
       type: array
       items:
         $ref: "#/components/schemas/AuthProvider"
+
+    AuthMode:
+      type: string
+      enum:
+        - handle
+        - email
+        - phone
 
     AuthProvider:
       type: object

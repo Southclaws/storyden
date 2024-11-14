@@ -36,7 +36,7 @@ func (d *database) Create(ctx context.Context,
 	mutate := create.Mutation()
 
 	mutate.SetAccountID(xid.ID(id))
-	mutate.SetService(string(service))
+	mutate.SetService(service.String())
 	mutate.SetIdentifier(identifier)
 	mutate.SetToken(token)
 	mutate.SetMetadata(metadata)
@@ -77,7 +77,7 @@ func (d *database) LookupByIdentifier(ctx context.Context, service Service, iden
 		Query().
 		Where(
 			authentication.IdentifierEQ(identifier),
-			authentication.ServiceEQ(string(service)),
+			authentication.ServiceEQ(service.String()),
 		).
 		WithAccount(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
@@ -103,7 +103,7 @@ func (d *database) LookupByHandle(ctx context.Context, service Service, handle s
 	r, err := d.db.Authentication.
 		Query().
 		Where(
-			authentication.ServiceEQ(string(service)),
+			authentication.ServiceEQ(service.String()),
 			authentication.HasAccountWith(model_account.Handle(handle)),
 		).
 		WithAccount(func(aq *ent.AccountQuery) {
@@ -209,7 +209,7 @@ func (d *database) Delete(ctx context.Context, accountID account.AccountID, iden
 				model_account.ID(xid.ID(accountID)),
 			),
 			authentication.IdentifierEQ(identifier),
-			authentication.ServiceEQ(string(service)),
+			authentication.ServiceEQ(service.String()),
 		).Exec(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {

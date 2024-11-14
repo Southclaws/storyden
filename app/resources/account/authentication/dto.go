@@ -13,8 +13,6 @@ import (
 
 type ID = xid.ID
 
-type Service string
-
 type Authentication struct {
 	ID         ID
 	Created    time.Time
@@ -37,11 +35,16 @@ func FromModel(m *ent.Authentication) (*Authentication, error) {
 		return nil, fault.Wrap(err)
 	}
 
+	service, err := NewService(m.Service)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Authentication{
 		ID:         ID(m.ID),
 		Created:    m.CreatedAt,
 		Account:    *acc,
-		Service:    Service(m.Service),
+		Service:    service,
 		Identifier: m.Identifier,
 		Token:      m.Token,
 		Name:       opt.NewPtr(m.Name),

@@ -13,36 +13,35 @@ import (
 	"github.com/Southclaws/storyden/internal/config"
 )
 
-const (
-	id   = "github"
-	name = "GitHub"
-)
+var provider = authentication.ServiceOAuthGitHub
 
-type GitHubProvider struct {
+type Provider struct {
 	auth_repo authentication.Repository
 
 	callback string
-	config   all.Configuration
+	config   *all.Configuration
 }
 
-func New(cfg config.Config, auth_repo authentication.Repository) (*GitHubProvider, error) {
-	config, err := all.LoadProvider(id)
+func New(cfg config.Config, auth_repo authentication.Repository) (*Provider, error) {
+	config, err := all.LoadProvider(provider)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	return &GitHubProvider{
+	return &Provider{
 		auth_repo: auth_repo,
 		config:    config,
-		callback:  all.Redirect(cfg, id),
+		callback:  all.Redirect(cfg, provider),
 	}, nil
 }
 
-func (p *GitHubProvider) Enabled() bool { return p.config.Enabled }
-func (p *GitHubProvider) ID() string    { return id }
-func (p *GitHubProvider) Name() string  { return name }
+func (p *Provider) Provides() authentication.Service { return provider }
 
-func (p *GitHubProvider) Link(_ string) (string, error) {
+func (p *Provider) Enabled(ctx context.Context) (bool, error) {
+	return p.config != nil, nil
+}
+
+func (p *Provider) Link(_ string) (string, error) {
 	c := oauth2.Config{
 		ClientID:     p.config.ClientID,
 		ClientSecret: p.config.ClientSecret,
@@ -54,6 +53,6 @@ func (p *GitHubProvider) Link(_ string) (string, error) {
 	return c.AuthCodeURL("", oauth2.AccessTypeOffline), nil
 }
 
-func (p *GitHubProvider) Login(ctx context.Context, state, code string) (*account.Account, error) {
+func (p *Provider) Login(ctx context.Context, state, code string) (*account.Account, error) {
 	return nil, nil
 }

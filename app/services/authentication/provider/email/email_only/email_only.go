@@ -17,20 +17,21 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
-
 	"github.com/Southclaws/storyden/internal/otp"
 )
 
 var ErrAccountAlreadyExists = errors.New("account already exists")
 
-const (
-	id   = "email_only"
-	name = "Email"
+var (
+	requiredMode = authentication.ModeEmail
+	provider     = authentication.ServiceEmailOnly
 )
 
 type Provider struct {
+	settings *settings.SettingsRepository
 	auth     authentication.Repository
 	register *register.Registrar
 	er       email.EmailRepo
@@ -40,18 +41,32 @@ type Provider struct {
 }
 
 func New(
+	settings *settings.SettingsRepository,
 	auth authentication.Repository,
 
 	register *register.Registrar,
 	er email.EmailRepo,
 	sender email_verify.Verifier,
 ) *Provider {
-	return &Provider{auth, register, er, sender}
+	return &Provider{
+		settings: settings,
+		auth:     auth,
+		register: register,
+		er:       er,
+		sender:   sender,
+	}
 }
 
-func (p *Provider) Enabled() bool { return true } // TODO: Allow disabling.
-func (p *Provider) ID() string    { return id }
-func (p *Provider) Name() string  { return name }
+func (p *Provider) Provides() authentication.Service { return provider }
+
+func (p *Provider) Enabled(ctx context.Context) (bool, error) {
+	settings, err := p.settings.Get(ctx)
+	if err != nil {
+		return false, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return settings.AuthenticationMode.Or(authentication.ModeHandle) == requiredMode, nil
+}
 
 func (b *Provider) Register(ctx context.Context, email mail.Address, handle opt.Optional[string], inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
 	_, exists, err := b.er.LookupAccount(ctx, email)
@@ -112,7 +127,7 @@ func (b *Provider) addEmailAuth(ctx context.Context, accountID account.AccountID
 	identifier := xid.New().String()
 	token := xid.New().String()
 
-	authRecord, err := b.auth.Create(ctx, accountID, id, identifier, token, nil)
+	authRecord, err := b.auth.Create(ctx, accountID, provider, identifier, token, nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}
