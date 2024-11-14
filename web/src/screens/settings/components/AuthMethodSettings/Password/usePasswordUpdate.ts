@@ -8,11 +8,9 @@ import * as z from "zod";
 import { useAccountGet } from "src/api/openapi-client/accounts";
 import { authPasswordUpdate } from "src/api/openapi-client/auth";
 import { APIError } from "src/api/openapi-schema";
-import {
-  ExistingPasswordSchema,
-  PasswordSchema,
-} from "src/screens/auth/schemas";
 import { deriveError } from "src/utils/error";
+
+import { ExistingPasswordSchema, PasswordSchema } from "@/lib/auth/schemas";
 
 const FormSchema = z.object({
   old: ExistingPasswordSchema,

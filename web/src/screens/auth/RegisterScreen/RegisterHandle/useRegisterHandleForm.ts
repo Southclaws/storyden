@@ -5,14 +5,13 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 
-import { useAccountGet } from "src/api/openapi-client/accounts";
-import { authPasswordSignup } from "src/api/openapi-client/auth";
-import { APIError } from "src/api/openapi-schema";
-import { passkeyRegister } from "src/components/auth/webauthn/utils";
-import { deriveError } from "src/utils/error";
-
-import { PasswordSchema, UsernameSchema } from "../schemas";
-import { isWebauthnAvailable } from "../utils";
+import { useAccountGet } from "@/api/openapi-client/accounts";
+import { authPasswordSignup } from "@/api/openapi-client/auth";
+import { APIError } from "@/api/openapi-schema";
+import { passkeyRegister } from "@/components/auth/webauthn/utils";
+import { PasswordSchema, UsernameSchema } from "@/lib/auth/schemas";
+import { isWebauthnAvailable } from "@/lib/auth/webauthn";
+import { deriveError } from "@/utils/error";
 
 export type Props = {
   webauthn: boolean;
@@ -31,7 +30,7 @@ const FormPasswordSchema = z.object({
 });
 type Form = z.infer<typeof FormSchema>;
 
-export function useRegisterForm() {
+export function useRegisterHandleForm() {
   const {
     register,
     handleSubmit,
