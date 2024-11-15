@@ -20,6 +20,7 @@ import { popover } from "@/recipes/popover";
 import { richCard } from "@/recipes/rich-card";
 import { select } from "@/recipes/select";
 import { table } from "@/recipes/table";
+import { tabs } from "@/recipes/tabs";
 import { tagsInput } from "@/recipes/tags-input";
 import { toggleGroup } from "@/recipes/toggle-group";
 import { tooltip } from "@/recipes/tooltip";
@@ -296,6 +297,7 @@ export default defineConfig({
         popover: popover,
         table: table,
         tagsInput: tagsInput,
+        tabs: tabs,
         treeView: treeView,
         toggleGroup: toggleGroup,
         tooltip: tooltip,
