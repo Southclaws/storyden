@@ -22,8 +22,8 @@ export default async function Layout({ children }: PropsWithChildren) {
             <Image
               className={css({ width: "24" })}
               src={getIconURL("512x512")}
-              width="512"
-              height="512"
+              width={512}
+              height={512}
               alt={`The ${siteName} logo`}
             />
 
