@@ -105,6 +105,20 @@ func (au *AuthenticationUpdate) ClearMetadata() *AuthenticationUpdate {
 	return au
 }
 
+// SetAccountAuthentication sets the "account_authentication" field.
+func (au *AuthenticationUpdate) SetAccountAuthentication(x xid.ID) *AuthenticationUpdate {
+	au.mutation.SetAccountAuthentication(x)
+	return au
+}
+
+// SetNillableAccountAuthentication sets the "account_authentication" field if the given value is not nil.
+func (au *AuthenticationUpdate) SetNillableAccountAuthentication(x *xid.ID) *AuthenticationUpdate {
+	if x != nil {
+		au.SetAccountAuthentication(*x)
+	}
+	return au
+}
+
 // SetAccountID sets the "account" edge to the Account entity by ID.
 func (au *AuthenticationUpdate) SetAccountID(id xid.ID) *AuthenticationUpdate {
 	au.mutation.SetAccountID(id)
@@ -414,6 +428,20 @@ func (auo *AuthenticationUpdateOne) SetMetadata(m map[string]interface{}) *Authe
 // ClearMetadata clears the value of the "metadata" field.
 func (auo *AuthenticationUpdateOne) ClearMetadata() *AuthenticationUpdateOne {
 	auo.mutation.ClearMetadata()
+	return auo
+}
+
+// SetAccountAuthentication sets the "account_authentication" field.
+func (auo *AuthenticationUpdateOne) SetAccountAuthentication(x xid.ID) *AuthenticationUpdateOne {
+	auo.mutation.SetAccountAuthentication(x)
+	return auo
+}
+
+// SetNillableAccountAuthentication sets the "account_authentication" field if the given value is not nil.
+func (auo *AuthenticationUpdateOne) SetNillableAccountAuthentication(x *xid.ID) *AuthenticationUpdateOne {
+	if x != nil {
+		auo.SetAccountAuthentication(*x)
+	}
 	return auo
 }
 

@@ -27,6 +27,8 @@ const (
 	FieldName = "name"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
+	// FieldAccountAuthentication holds the string denoting the account_authentication field in the database.
+	FieldAccountAuthentication = "account_authentication"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
 	EdgeAccount = "account"
 	// EdgeEmailAddress holds the string denoting the email_address edge name in mutations.
@@ -58,23 +60,13 @@ var Columns = []string{
 	FieldToken,
 	FieldName,
 	FieldMetadata,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "authentications"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"account_authentication",
+	FieldAccountAuthentication,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -125,6 +117,11 @@ func ByToken(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByAccountAuthentication orders the results by the account_authentication field.
+func ByAccountAuthentication(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAccountAuthentication, opts...).ToFunc()
 }
 
 // ByAccountField orders the results by account field.

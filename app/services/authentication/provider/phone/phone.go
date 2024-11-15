@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/register"
+	"github.com/Southclaws/storyden/app/services/authentication/provider"
 	"github.com/Southclaws/storyden/internal/infrastructure/sms"
 	"github.com/Southclaws/storyden/internal/otp"
 )
@@ -31,7 +32,7 @@ var (
 
 var (
 	requiredMode = authentication.ModePhone
-	provider     = authentication.ServicePhone
+	service      = authentication.ServicePhone
 )
 
 const template = `Your unique one-time login code is: %s`
@@ -61,7 +62,7 @@ func New(
 	}
 }
 
-func (p *Provider) Provides() authentication.Service { return provider }
+func (p *Provider) Provides() authentication.Service { return service }
 
 func (p *Provider) Enabled(ctx context.Context) (bool, error) {
 	settings, err := p.settings.Get(ctx)
@@ -73,6 +74,9 @@ func (p *Provider) Enabled(ctx context.Context) (bool, error) {
 }
 
 func (p *Provider) Register(ctx context.Context, handle string, phone string, inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
+	if err := provider.CheckMode(ctx, p.settings, requiredMode); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 	//
 	// STEP 1.
 	//
@@ -82,7 +86,7 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string, in
 	// phone login system so if there's an account already, we start auth again.
 	//
 
-	authrecord, exists, err := p.auth.LookupByIdentifier(ctx, provider, phone)
+	authrecord, exists, err := p.auth.LookupByIdentifier(ctx, service, phone)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
@@ -120,9 +124,9 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string, in
 		// and start fresh with the new request.
 		// NOTE: This could result in a DoS for the account holder...
 		if _, exists = lo.Find(auths, func(a *authentication.Authentication) bool {
-			return a.Service == provider
+			return a.Service == service
 		}); exists {
-			_, err = p.auth.Delete(ctx, acc.ID, phone, provider)
+			_, err = p.auth.Delete(ctx, acc.ID, phone, service)
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
@@ -161,7 +165,7 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string, in
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to generate code"))
 	}
 
-	_, err = p.auth.Create(ctx, acc.ID, provider, phone, code, nil)
+	_, err = p.auth.Create(ctx, acc.ID, service, phone, code, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}
@@ -204,7 +208,7 @@ func (p *Provider) Login(ctx context.Context, handle string, onetimecode string)
 	}
 
 	phoneauth, exists := lo.Find(auths, func(a *authentication.Authentication) bool {
-		return a.Service == provider
+		return a.Service == service
 	})
 	if !exists {
 		return nil, fault.Wrap(errNoPhoneAuth)

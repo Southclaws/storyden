@@ -1,4 +1,4 @@
-package auth_test
+package email_password_test
 
 import (
 	"context"
@@ -11,18 +11,22 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
+	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/tests"
 )
 
-func TestEmailOnlyAuth(t *testing.T) {
+func TestEmailPasswordAuth(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
@@ -30,21 +34,33 @@ func TestEmailOnlyAuth(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session1.Jar,
+		set *settings.SettingsRepository,
 		accountQuery *account_querier.Querier,
 		mail mailer.Sender,
 	) {
 		inbox := mail.(*mailer.Mock)
 
 		lc.Append(fx.StartHook(func() {
-			t.Run("verify_success", func(t *testing.T) {
+			utils.Must(set.Set(root, settings.Settings{
+				AuthenticationMode: opt.New(authentication.ModeEmail),
+			}))
+
+			t.Run("register_success", func(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
 				address := xid.New().String() + "@storyden.org"
+				handle := xid.New().String()
+				password := "password"
 
 				// Sign up with email
-				signup, err := cl.AuthEmailSignupWithResponse(root, nil, openapi.AuthEmailSignupJSONRequestBody{Email: address})
+				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Handle: &handle, Password: password})
 				tests.Ok(t, err, signup)
+
+				// Sign in with email
+				signin, err := cl.AuthEmailPasswordSigninWithResponse(root, openapi.AuthEmailPasswordSigninJSONRequestBody{Email: address, Password: password})
+				tests.Ok(t, err, signin)
+				a.NotEmpty(signin.HTTPResponse.Header.Get("Set-Cookie"))
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
 				ctx1 := session.WithAccountID(root, accountID)
@@ -58,6 +74,23 @@ func TestEmailOnlyAuth(t *testing.T) {
 				a.Equal(address, (unverified.JSON200.EmailAddresses)[0].EmailAddress)
 				a.True(unverified.JSON200.EmailAddresses[0].IsAuth)
 				a.False(unverified.JSON200.EmailAddresses[0].Verified)
+			})
+
+			t.Run("register_verify_success", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				address := xid.New().String() + "@storyden.org"
+				handle := xid.New().String()
+				password := "password"
+
+				// Sign up with email
+				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Handle: &handle, Password: password})
+				tests.Ok(t, err, signup)
+
+				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
+				ctx1 := session.WithAccountID(root, accountID)
+				session := e2e.WithSession(ctx1, cj)
 
 				// Get code from email, verify account
 				verification := inbox.GetLast()
@@ -75,52 +108,37 @@ func TestEmailOnlyAuth(t *testing.T) {
 				a.True(verified.JSON200.EmailAddresses[0].IsAuth)
 				a.True(verified.JSON200.EmailAddresses[0].Verified)
 			})
+		}))
+	}))
+}
 
-			t.Run("verify_resend", func(t *testing.T) {
-				// r := require.New(t)
-				a := assert.New(t)
+func TestEmailPasswordAuthFailsInHandleMode(t *testing.T) {
+	t.Parallel()
 
-				address := xid.New().String() + "@storyden.org"
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		cj *session1.Jar,
+		set *settings.SettingsRepository,
+		accountQuery *account_querier.Querier,
+	) {
+		lc.Append(fx.StartHook(func() {
+			utils.Must(set.Set(root, settings.Settings{
+				AuthenticationMode: opt.New(authentication.ModeHandle),
+			}))
 
-				// Sign up with email
-				signup, err := cl.AuthEmailSignupWithResponse(root, nil, openapi.AuthEmailSignupJSONRequestBody{Email: address})
-				tests.Ok(t, err, signup)
+			address := xid.New().String() + "@storyden.org"
+			handle := xid.New().String()
+			password := "password"
 
-				// Sign up with email, again, resulting in a 202 Accepted and no cookie session
-				signup2, err := cl.AuthEmailSignupWithResponse(root, nil, openapi.AuthEmailSignupJSONRequestBody{Email: address})
-				tests.Status(t, err, signup2, http.StatusUnprocessableEntity)
-
-				a.Empty(signup2.HTTPResponse.Header.Get("Set-Cookie"))
+			// Sign up with username + password
+			signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{
+				Email:    address,
+				Handle:   &handle,
+				Password: password,
 			})
-
-			t.Run("verify_wrong_code", func(t *testing.T) {
-				r := require.New(t)
-				a := assert.New(t)
-
-				address := xid.New().String() + "@storyden.org"
-
-				// Sign up with email
-				signup, err := cl.AuthEmailSignupWithResponse(root, nil, openapi.AuthEmailSignupJSONRequestBody{Email: address})
-				tests.Ok(t, err, signup)
-
-				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
-				ctx1 := session.WithAccountID(root, accountID)
-				session := e2e.WithSession(ctx1, cj)
-
-				// Get own account, currently unverified
-				unverified, err := cl.AccountGetWithResponse(root, session)
-				tests.Ok(t, err, unverified)
-				r.Equal(openapi.AccountVerifiedStatusNone, unverified.JSON200.VerifiedStatus)
-
-				incorrectCode := "999999" // one day, this test will fail...
-				verify, err := cl.AuthEmailVerifyWithResponse(root, openapi.AuthEmailVerifyJSONRequestBody{Email: address, Code: incorrectCode}, session)
-				tests.Status(t, err, verify, http.StatusForbidden)
-
-				// Get own account, still not verified
-				verified, err := cl.AccountGetWithResponse(root, session)
-				tests.Ok(t, err, verified)
-				a.Equal(openapi.AccountVerifiedStatusNone, verified.JSON200.VerifiedStatus)
-			})
+			tests.Status(t, err, signup, http.StatusBadRequest)
 		}))
 	}))
 }

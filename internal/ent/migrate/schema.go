@@ -177,9 +177,9 @@ var (
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "authentication_service_identifier",
+				Name:    "authentication_service_identifier_account_authentication",
 				Unique:  true,
-				Columns: []*schema.Column{AuthenticationsColumns[2], AuthenticationsColumns[3]},
+				Columns: []*schema.Column{AuthenticationsColumns[2], AuthenticationsColumns[3], AuthenticationsColumns[7]},
 			},
 		},
 	}

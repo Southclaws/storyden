@@ -3,6 +3,7 @@ package e2e
 import (
 	"context"
 	"net/http"
+	"testing"
 
 	"github.com/rs/xid"
 
@@ -41,6 +42,19 @@ func WithSession(ctx context.Context, cj *session1.Jar) openapi.RequestEditorFn 
 
 	return func(ctx context.Context, req *http.Request) error {
 		req.AddCookie(cj.Create(accountID.String()))
+		return nil
+	}
+}
+
+func WithSessionFromHeader(t *testing.T, ctx context.Context, header http.Header) openapi.RequestEditorFn {
+	cookieHeader := header.Get("Set-Cookie")
+	cookie, err := http.ParseSetCookie(cookieHeader)
+	if err != nil {
+		t.Error("failed to parse cookies from header", err)
+	}
+
+	return func(ctx context.Context, req *http.Request) error {
+		req.AddCookie(cookie)
 		return nil
 	}
 }

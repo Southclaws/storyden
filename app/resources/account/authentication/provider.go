@@ -5,9 +5,9 @@ package authentication
 type serviceEnum string
 
 const (
-	servicePassword  serviceEnum = "password"   // Username + password (default)
-	serviceEmailOnly serviceEnum = "email_only" // Email + verification code
-	servicePhone     serviceEnum = "phone"      // Phone number + verification code
+	servicePassword serviceEnum = "password" // User/email + password
+	serviceEmail    serviceEnum = "email"    // Email + verification code
+	servicePhone    serviceEnum = "phone"    // Phone number + verification code
 
 	// OAuth services
 	serviceOAuthGoogle   serviceEnum = "oauth_google"   // Google
