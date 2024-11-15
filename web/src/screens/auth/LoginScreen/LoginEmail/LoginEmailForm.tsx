@@ -30,7 +30,9 @@ export function LoginEmailForm() {
           required
           {...form.register("identifier")}
         />
-        <FormErrorText>{form.formState.errors["email"]?.message}</FormErrorText>
+        <FormErrorText>
+          {form.formState.errors["identifier"]?.message}
+        </FormErrorText>
       </FormControl>
 
       <FormControl>
