@@ -9,10 +9,13 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/seed"
+	"github.com/Southclaws/storyden/app/resources/settings"
 	authSession "github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -30,6 +33,7 @@ func TestAccountInvitations(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session.Jar,
+		set *settings.SettingsRepository,
 		aw *account_writer.Writer,
 		accountQuery *account_querier.Querier,
 	) {
@@ -52,7 +56,6 @@ func TestAccountInvitations(t *testing.T) {
 			invitationID := invResponse.JSON200.Id
 
 			t.Run("accept_invite_with_password", func(t *testing.T) {
-				t.Parallel()
 				r := require.New(t)
 				a := assert.New(t)
 
@@ -75,7 +78,10 @@ func TestAccountInvitations(t *testing.T) {
 			})
 
 			t.Run("accept_invite_with_email_password", func(t *testing.T) {
-				t.Parallel()
+				utils.Must(set.Set(root, settings.Settings{
+					AuthenticationMode: opt.New(authentication.ModeEmail),
+				}))
+
 				r := require.New(t)
 				a := assert.New(t)
 
