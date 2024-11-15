@@ -39,7 +39,6 @@ type Provider struct {
 	ed       endec.EncrypterDecrypter
 	callback string
 	config   *all.Configuration
-	oac      oauth2.Config
 }
 
 func New(
@@ -54,22 +53,7 @@ func New(
 		return nil, fault.Wrap(err)
 	}
 
-	if config == nil {
-		return nil, nil
-	}
-
 	callback := all.Redirect(cfg, provider)
-
-	oac := oauth2.Config{
-		ClientID:     config.ClientID,
-		ClientSecret: config.ClientSecret,
-		Endpoint:     google.Endpoint,
-		RedirectURL:  callback,
-		Scopes: []string{
-			"https://www.googleapis.com/auth/userinfo.email",
-			"https://www.googleapis.com/auth/userinfo.profile",
-		},
-	}
 
 	return &Provider{
 		auth_repo:  auth_repo,
@@ -79,7 +63,6 @@ func New(
 		ed:       ed,
 		config:   config,
 		callback: callback,
-		oac:      oac,
 	}, nil
 }
 
@@ -97,7 +80,18 @@ func (p *Provider) Link(redirectPath string) (string, error) {
 		return "", fault.Wrap(err)
 	}
 
-	return p.oac.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
+	oac := oauth2.Config{
+		ClientID:     p.config.ClientID,
+		ClientSecret: p.config.ClientSecret,
+		Endpoint:     google.Endpoint,
+		RedirectURL:  p.callback,
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile",
+		},
+	}
+
+	return oac.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
 }
 
 func (p *Provider) Login(ctx context.Context, state, code string) (*account.Account, error) {
@@ -110,7 +104,18 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 	}
 	// TODO: Process claims for redirect etc.
 
-	token, err := p.oac.Exchange(ctx, code, oauth2.AccessTypeOffline)
+	oac := oauth2.Config{
+		ClientID:     p.config.ClientID,
+		ClientSecret: p.config.ClientSecret,
+		Endpoint:     google.Endpoint,
+		RedirectURL:  p.callback,
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile",
+		},
+	}
+
+	token, err := oac.Exchange(ctx, code, oauth2.AccessTypeOffline)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
