@@ -2,7 +2,6 @@ package email_password_test
 
 import (
 	"context"
-	"net/http"
 	"regexp"
 	"testing"
 
@@ -11,18 +10,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
-	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/tests"
 )
 
@@ -34,17 +29,12 @@ func TestEmailPasswordAuth(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session1.Jar,
-		set *settings.SettingsRepository,
 		accountQuery *account_querier.Querier,
 		mail mailer.Sender,
 	) {
 		inbox := mail.(*mailer.Mock)
 
 		lc.Append(fx.StartHook(func() {
-			utils.Must(set.Set(root, settings.Settings{
-				AuthenticationMode: opt.New(authentication.ModeEmail),
-			}))
-
 			t.Run("register_success", func(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
@@ -108,37 +98,6 @@ func TestEmailPasswordAuth(t *testing.T) {
 				a.True(verified.JSON200.EmailAddresses[0].IsAuth)
 				a.True(verified.JSON200.EmailAddresses[0].Verified)
 			})
-		}))
-	}))
-}
-
-func TestEmailPasswordAuthFailsInHandleMode(t *testing.T) {
-	t.Parallel()
-
-	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
-		lc fx.Lifecycle,
-		root context.Context,
-		cl *openapi.ClientWithResponses,
-		cj *session1.Jar,
-		set *settings.SettingsRepository,
-		accountQuery *account_querier.Querier,
-	) {
-		lc.Append(fx.StartHook(func() {
-			utils.Must(set.Set(root, settings.Settings{
-				AuthenticationMode: opt.New(authentication.ModeHandle),
-			}))
-
-			address := xid.New().String() + "@storyden.org"
-			handle := xid.New().String()
-			password := "password"
-
-			// Sign up with username + password
-			signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{
-				Email:    address,
-				Handle:   &handle,
-				Password: password,
-			})
-			tests.Status(t, err, signup, http.StatusBadRequest)
 		}))
 	}))
 }

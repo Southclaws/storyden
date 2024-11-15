@@ -13,6 +13,7 @@ import (
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -41,6 +42,7 @@ var (
 )
 
 type Provider struct {
+	logger       *zap.Logger
 	settings     *settings.SettingsRepository
 	auth         authentication.Repository
 	accountQuery *account_querier.Querier
@@ -52,6 +54,7 @@ type Provider struct {
 }
 
 func New(
+	logger *zap.Logger,
 	settings *settings.SettingsRepository,
 	auth authentication.Repository,
 	accountQuery *account_querier.Querier,
@@ -60,6 +63,7 @@ func New(
 	sender email_verify.Verifier,
 ) *Provider {
 	return &Provider{
+		logger:       logger,
 		settings:     settings,
 		auth:         auth,
 		accountQuery: accountQuery,
@@ -81,7 +85,7 @@ func (p *Provider) Enabled(ctx context.Context) (bool, error) {
 }
 
 func (p *Provider) Register(ctx context.Context, email mail.Address, password string, handle opt.Optional[string], inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
-	if err := provider.CheckMode(ctx, p.settings, requiredMode); err != nil {
+	if err := provider.CheckMode(ctx, p.logger, p.settings, requiredMode); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

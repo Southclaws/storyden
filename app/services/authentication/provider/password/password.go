@@ -11,6 +11,7 @@ import (
 	"github.com/alexedwards/argon2id"
 	"github.com/pkg/errors"
 	"github.com/rs/xid"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -37,14 +38,22 @@ var (
 )
 
 type Provider struct {
+	logger       *zap.Logger
 	settings     *settings.SettingsRepository
 	auth         authentication.Repository
 	accountQuery *account_querier.Querier
 	register     *register.Registrar
 }
 
-func New(settings *settings.SettingsRepository, auth authentication.Repository, accountQuery *account_querier.Querier, register *register.Registrar) *Provider {
+func New(
+	logger *zap.Logger,
+	settings *settings.SettingsRepository,
+	auth authentication.Repository,
+	accountQuery *account_querier.Querier,
+	register *register.Registrar,
+) *Provider {
 	return &Provider{
+		logger:       logger,
 		settings:     settings,
 		auth:         auth,
 		accountQuery: accountQuery,
@@ -68,7 +77,7 @@ func (p *Provider) Register(ctx context.Context, identifier string, password str
 			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
 	}
 
-	if err := provider.CheckMode(ctx, p.settings, requiredMode); err != nil {
+	if err := provider.CheckMode(ctx, p.logger, p.settings, requiredMode); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
