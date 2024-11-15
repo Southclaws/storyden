@@ -12,8 +12,8 @@ import {
   Box,
   CardBox,
   HStack,
-  LStack,
   Stack,
+  WStack,
   styled,
 } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -34,7 +34,10 @@ export function BrandSettingsForm(props: Props) {
 
   return (
     <CardBox className={lstack()}>
-      <Heading size="md">Brand settings</Heading>
+      <WStack>
+        <Heading size="md">Brand settings</Heading>
+        <Button type="submit">Save</Button>
+      </WStack>
 
       <styled.form
         width="full"
@@ -111,36 +114,6 @@ export function BrandSettingsForm(props: Props) {
                 {...register("accentColour")}
               />
             </Box>
-
-            {/* This is a colour profile tester tool... not well designed so it's omitted */}
-
-            {/* <VStack
-              width="full"
-              backgroundColor="gray.50"
-              p={2}
-              borderRadius={8}
-            >
-              <Text>
-                Use the slider to adjust the contrast of your colour scheme. (
-                {contrast})
-              </Text>
-
-              <Slider
-                aria-label="slider-ex-1"
-                defaultValue={contrast}
-                value={contrast}
-                step={0.01}
-                max={2}
-                onChange={onContrastChange}
-              >
-                <SliderTrack>
-                  <SliderFilledTrack />
-                </SliderTrack>
-                <SliderThumb />
-              </Slider>
-
-              <ColourPreview />
-            </VStack> */}
           </HStack>
 
           <FormHelperText>
@@ -150,9 +123,9 @@ export function BrandSettingsForm(props: Props) {
           </FormHelperText>
         </FormControl>
 
-        <HStack justify="end">
+        <WStack justifyContent="end">
           <Button type="submit">Save</Button>
-        </HStack>
+        </WStack>
       </styled.form>
     </CardBox>
   );
