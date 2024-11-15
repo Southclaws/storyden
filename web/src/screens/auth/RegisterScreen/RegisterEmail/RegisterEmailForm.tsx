@@ -22,7 +22,7 @@ export function RegisterEmailForm() {
     >
       <FormControl>
         <Input
-          type="text"
+          type="email"
           w="full"
           size="sm"
           textAlign="center"
