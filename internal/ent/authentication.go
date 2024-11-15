@@ -32,11 +32,12 @@ type Authentication struct {
 	Name *string `json:"name,omitempty"`
 	// Any necessary metadata specific to the authentication method.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	// AccountAuthentication holds the value of the "account_authentication" field.
+	AccountAuthentication xid.ID `json:"account_authentication,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AuthenticationQuery when eager-loading is set.
-	Edges                  AuthenticationEdges `json:"edges"`
-	account_authentication *xid.ID
-	selectValues           sql.SelectValues
+	Edges        AuthenticationEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // AuthenticationEdges holds the relations/edges for other nodes in the graph.
@@ -81,10 +82,8 @@ func (*Authentication) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case authentication.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case authentication.FieldID:
+		case authentication.FieldID, authentication.FieldAccountAuthentication:
 			values[i] = new(xid.ID)
-		case authentication.ForeignKeys[0]: // account_authentication
-			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -145,12 +144,11 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
-		case authentication.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
+		case authentication.FieldAccountAuthentication:
+			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_authentication", values[i])
-			} else if value.Valid {
-				a.account_authentication = new(xid.ID)
-				*a.account_authentication = *value.S.(*xid.ID)
+			} else if value != nil {
+				a.AccountAuthentication = *value
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
@@ -216,6 +214,9 @@ func (a *Authentication) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", a.Metadata))
+	builder.WriteString(", ")
+	builder.WriteString("account_authentication=")
+	builder.WriteString(fmt.Sprintf("%v", a.AccountAuthentication))
 	builder.WriteByte(')')
 	return builder.String()
 }

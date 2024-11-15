@@ -22,20 +22,22 @@ import (
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
+	"github.com/Southclaws/storyden/app/services/authentication/provider"
 	"github.com/Southclaws/storyden/internal/otp"
 )
 
 var (
-	ErrAccountAlreadyExists = errors.New("account already exists")
-	ErrPasswordMismatch     = errors.New("password mismatch")
-	ErrNoPassword           = errors.New("password not enabled")
-	ErrPasswordTooShort     = errors.New("password too short")
-	ErrNotFound             = errors.New("account not found")
+	ErrEmailRegistrationDisabled = errors.New("cannot register while in non-email authentication mode")
+	ErrAccountAlreadyExists      = errors.New("account already exists")
+	ErrPasswordMismatch          = errors.New("password mismatch")
+	ErrNoPassword                = errors.New("password not enabled")
+	ErrPasswordTooShort          = errors.New("password too short")
+	ErrNotFound                  = errors.New("account not found")
 )
 
 var (
 	requiredMode = authentication.ModeEmail
-	provider     = authentication.ServicePassword
+	service      = authentication.ServicePassword
 )
 
 type Provider struct {
@@ -67,7 +69,7 @@ func New(
 	}
 }
 
-func (p *Provider) Provides() authentication.Service { return provider }
+func (p *Provider) Provides() authentication.Service { return service }
 
 func (p *Provider) Enabled(ctx context.Context) (bool, error) {
 	settings, err := p.settings.Get(ctx)
@@ -78,7 +80,11 @@ func (p *Provider) Enabled(ctx context.Context) (bool, error) {
 	return settings.AuthenticationMode.Or(authentication.ModeHandle) == requiredMode, nil
 }
 
-func (b *Provider) Register(ctx context.Context, email mail.Address, password string, handle opt.Optional[string], inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
+func (p *Provider) Register(ctx context.Context, email mail.Address, password string, handle opt.Optional[string], inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
+	if err := provider.CheckMode(ctx, p.settings, requiredMode); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	if len(password) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,
 			fctx.With(ctx),
@@ -88,7 +94,7 @@ func (b *Provider) Register(ctx context.Context, email mail.Address, password st
 
 	identifier := handle.Or(petname.Generate(2, "-"))
 
-	_, exists, err := b.accountQuery.LookupByHandle(ctx, identifier)
+	_, exists, err := p.accountQuery.LookupByHandle(ctx, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
@@ -103,24 +109,24 @@ func (b *Provider) Register(ctx context.Context, email mail.Address, password st
 	opts := []account_writer.Option{}
 	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
 
-	account, err := b.register.Create(ctx, identifier, opts...)
+	account, err := p.register.Create(ctx, identifier, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}
 
-	if err := b.addEmailPasswordAuth(ctx, account.ID, email, password); err != nil {
+	if err := p.addEmailPasswordAuth(ctx, account.ID, email, password); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return account, nil
 }
 
-func (b *Provider) Link(_ string) (string, error) {
+func (p *Provider) Link(_ string) (string, error) {
 	// Password provider does not use external links.
 	return "", nil
 }
 
-func (b *Provider) Login(ctx context.Context, email string, password string) (*account.Account, error) {
+func (p *Provider) Login(ctx context.Context, email string, password string) (*account.Account, error) {
 	if len(password) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,
 			fctx.With(ctx),
@@ -133,7 +139,7 @@ func (b *Provider) Login(ctx context.Context, email string, password string) (*a
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, exists, err := b.er.LookupAccount(ctx, *emailAddress)
+	acc, exists, err := p.er.LookupAccount(ctx, *emailAddress)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
@@ -150,7 +156,7 @@ func (b *Provider) Login(ctx context.Context, email string, password string) (*a
 	}
 
 	// Get the auth record for this email address
-	a, exists, err := b.auth.LookupByHandle(ctx, provider, acc.Handle)
+	a, exists, err := p.auth.LookupByHandle(ctx, service, acc.Handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -177,17 +183,17 @@ func (b *Provider) Login(ctx context.Context, email string, password string) (*a
 	return &a.Account, nil
 }
 
-func (b *Provider) Create(ctx context.Context, aid account.AccountID, email mail.Address, password string) (*account.Account, error) {
+func (p *Provider) Create(ctx context.Context, aid account.AccountID, email mail.Address, password string) (*account.Account, error) {
 	// TODO: Add an email-password auth record for an existing account.
 	return nil, nil
 }
 
-func (b *Provider) Update(ctx context.Context, aid account.AccountID, email mail.Address, oldpassword, newpassword string) (*account.Account, error) {
+func (p *Provider) Update(ctx context.Context, aid account.AccountID, email mail.Address, oldpassword, newpassword string) (*account.Account, error) {
 	// TODO: Update password for an email-password auth type.
 	return nil, nil
 }
 
-func (b *Provider) addEmailPasswordAuth(ctx context.Context, accountID account.AccountID, email mail.Address, password string) error {
+func (p *Provider) addEmailPasswordAuth(ctx context.Context, accountID account.AccountID, email mail.Address, password string) error {
 	code, err := otp.Generate()
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
@@ -198,16 +204,14 @@ func (b *Provider) addEmailPasswordAuth(ctx context.Context, accountID account.A
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
 	}
 
-	// Email auth records do not hold identifiers. However the auth record does
-	// use the token field for the password hash.
-	identifier := xid.New().String()
+	identifier := "email"
 
-	authRecord, err := b.auth.Create(ctx, accountID, provider, identifier, string(hashed), nil)
+	authRecord, err := p.auth.Create(ctx, accountID, service, identifier, string(hashed), nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}
 
-	err = b.sender.BeginEmailVerification(ctx, accountID, email, code, opt.New(authRecord.ID))
+	err = p.sender.BeginEmailVerification(ctx, accountID, email, code, opt.New(authRecord.ID))
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

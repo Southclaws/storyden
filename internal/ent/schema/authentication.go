@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/rs/xid"
 )
 
 type Authentication struct {
@@ -37,6 +38,8 @@ func (Authentication) Fields() []ent.Field {
 		field.JSON("metadata", map[string]interface{}{}).
 			Optional().
 			Comment("Any necessary metadata specific to the authentication method."),
+
+		field.String("account_authentication").GoType(xid.ID{}),
 	}
 }
 
@@ -44,6 +47,7 @@ func (Authentication) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("account", Account.Type).
 			Ref("authentication").
+			Field("account_authentication").
 			Required().
 			Unique(),
 
@@ -54,7 +58,7 @@ func (Authentication) Edges() []ent.Edge {
 func (Authentication) Indexes() []ent.Index {
 	return []ent.Index{
 		// a given identifier should be unique within the context of a service.
-		index.Fields("service", "identifier").
+		index.Fields("service", "identifier", "account_authentication").
 			Unique(),
 	}
 }

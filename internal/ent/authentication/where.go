@@ -81,6 +81,11 @@ func Name(v string) predicate.Authentication {
 	return predicate.Authentication(sql.FieldEQ(FieldName, v))
 }
 
+// AccountAuthentication applies equality check predicate on the "account_authentication" field. It's identical to AccountAuthenticationEQ.
+func AccountAuthentication(v xid.ID) predicate.Authentication {
+	return predicate.Authentication(sql.FieldEQ(FieldAccountAuthentication, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Authentication {
 	return predicate.Authentication(sql.FieldEQ(FieldCreatedAt, v))
@@ -399,6 +404,76 @@ func MetadataIsNil() predicate.Authentication {
 // MetadataNotNil applies the NotNil predicate on the "metadata" field.
 func MetadataNotNil() predicate.Authentication {
 	return predicate.Authentication(sql.FieldNotNull(FieldMetadata))
+}
+
+// AccountAuthenticationEQ applies the EQ predicate on the "account_authentication" field.
+func AccountAuthenticationEQ(v xid.ID) predicate.Authentication {
+	return predicate.Authentication(sql.FieldEQ(FieldAccountAuthentication, v))
+}
+
+// AccountAuthenticationNEQ applies the NEQ predicate on the "account_authentication" field.
+func AccountAuthenticationNEQ(v xid.ID) predicate.Authentication {
+	return predicate.Authentication(sql.FieldNEQ(FieldAccountAuthentication, v))
+}
+
+// AccountAuthenticationIn applies the In predicate on the "account_authentication" field.
+func AccountAuthenticationIn(vs ...xid.ID) predicate.Authentication {
+	return predicate.Authentication(sql.FieldIn(FieldAccountAuthentication, vs...))
+}
+
+// AccountAuthenticationNotIn applies the NotIn predicate on the "account_authentication" field.
+func AccountAuthenticationNotIn(vs ...xid.ID) predicate.Authentication {
+	return predicate.Authentication(sql.FieldNotIn(FieldAccountAuthentication, vs...))
+}
+
+// AccountAuthenticationGT applies the GT predicate on the "account_authentication" field.
+func AccountAuthenticationGT(v xid.ID) predicate.Authentication {
+	return predicate.Authentication(sql.FieldGT(FieldAccountAuthentication, v))
+}
+
+// AccountAuthenticationGTE applies the GTE predicate on the "account_authentication" field.
+func AccountAuthenticationGTE(v xid.ID) predicate.Authentication {
+	return predicate.Authentication(sql.FieldGTE(FieldAccountAuthentication, v))
+}
+
+// AccountAuthenticationLT applies the LT predicate on the "account_authentication" field.
+func AccountAuthenticationLT(v xid.ID) predicate.Authentication {
+	return predicate.Authentication(sql.FieldLT(FieldAccountAuthentication, v))
+}
+
+// AccountAuthenticationLTE applies the LTE predicate on the "account_authentication" field.
+func AccountAuthenticationLTE(v xid.ID) predicate.Authentication {
+	return predicate.Authentication(sql.FieldLTE(FieldAccountAuthentication, v))
+}
+
+// AccountAuthenticationContains applies the Contains predicate on the "account_authentication" field.
+func AccountAuthenticationContains(v xid.ID) predicate.Authentication {
+	vc := v.String()
+	return predicate.Authentication(sql.FieldContains(FieldAccountAuthentication, vc))
+}
+
+// AccountAuthenticationHasPrefix applies the HasPrefix predicate on the "account_authentication" field.
+func AccountAuthenticationHasPrefix(v xid.ID) predicate.Authentication {
+	vc := v.String()
+	return predicate.Authentication(sql.FieldHasPrefix(FieldAccountAuthentication, vc))
+}
+
+// AccountAuthenticationHasSuffix applies the HasSuffix predicate on the "account_authentication" field.
+func AccountAuthenticationHasSuffix(v xid.ID) predicate.Authentication {
+	vc := v.String()
+	return predicate.Authentication(sql.FieldHasSuffix(FieldAccountAuthentication, vc))
+}
+
+// AccountAuthenticationEqualFold applies the EqualFold predicate on the "account_authentication" field.
+func AccountAuthenticationEqualFold(v xid.ID) predicate.Authentication {
+	vc := v.String()
+	return predicate.Authentication(sql.FieldEqualFold(FieldAccountAuthentication, vc))
+}
+
+// AccountAuthenticationContainsFold applies the ContainsFold predicate on the "account_authentication" field.
+func AccountAuthenticationContainsFold(v xid.ID) predicate.Authentication {
+	vc := v.String()
+	return predicate.Authentication(sql.FieldContainsFold(FieldAccountAuthentication, vc))
 }
 
 // HasAccount applies the HasEdge predicate on the "account" edge.

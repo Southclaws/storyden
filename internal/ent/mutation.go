@@ -5510,6 +5510,42 @@ func (m *AuthenticationMutation) ResetMetadata() {
 	delete(m.clearedFields, authentication.FieldMetadata)
 }
 
+// SetAccountAuthentication sets the "account_authentication" field.
+func (m *AuthenticationMutation) SetAccountAuthentication(x xid.ID) {
+	m.account = &x
+}
+
+// AccountAuthentication returns the value of the "account_authentication" field in the mutation.
+func (m *AuthenticationMutation) AccountAuthentication() (r xid.ID, exists bool) {
+	v := m.account
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountAuthentication returns the old "account_authentication" field's value of the Authentication entity.
+// If the Authentication object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AuthenticationMutation) OldAccountAuthentication(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountAuthentication is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountAuthentication requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountAuthentication: %w", err)
+	}
+	return oldValue.AccountAuthentication, nil
+}
+
+// ResetAccountAuthentication resets all changes to the "account_authentication" field.
+func (m *AuthenticationMutation) ResetAccountAuthentication() {
+	m.account = nil
+}
+
 // SetAccountID sets the "account" edge to the Account entity by id.
 func (m *AuthenticationMutation) SetAccountID(id xid.ID) {
 	m.account = &id
@@ -5518,6 +5554,7 @@ func (m *AuthenticationMutation) SetAccountID(id xid.ID) {
 // ClearAccount clears the "account" edge to the Account entity.
 func (m *AuthenticationMutation) ClearAccount() {
 	m.clearedaccount = true
+	m.clearedFields[authentication.FieldAccountAuthentication] = struct{}{}
 }
 
 // AccountCleared reports if the "account" edge to the Account entity was cleared.
@@ -5637,7 +5674,7 @@ func (m *AuthenticationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AuthenticationMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, authentication.FieldCreatedAt)
 	}
@@ -5655,6 +5692,9 @@ func (m *AuthenticationMutation) Fields() []string {
 	}
 	if m.metadata != nil {
 		fields = append(fields, authentication.FieldMetadata)
+	}
+	if m.account != nil {
+		fields = append(fields, authentication.FieldAccountAuthentication)
 	}
 	return fields
 }
@@ -5676,6 +5716,8 @@ func (m *AuthenticationMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case authentication.FieldMetadata:
 		return m.Metadata()
+	case authentication.FieldAccountAuthentication:
+		return m.AccountAuthentication()
 	}
 	return nil, false
 }
@@ -5697,6 +5739,8 @@ func (m *AuthenticationMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldName(ctx)
 	case authentication.FieldMetadata:
 		return m.OldMetadata(ctx)
+	case authentication.FieldAccountAuthentication:
+		return m.OldAccountAuthentication(ctx)
 	}
 	return nil, fmt.Errorf("unknown Authentication field %s", name)
 }
@@ -5747,6 +5791,13 @@ func (m *AuthenticationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMetadata(v)
+		return nil
+	case authentication.FieldAccountAuthentication:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountAuthentication(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Authentication field %s", name)
@@ -5829,6 +5880,9 @@ func (m *AuthenticationMutation) ResetField(name string) error {
 		return nil
 	case authentication.FieldMetadata:
 		m.ResetMetadata()
+		return nil
+	case authentication.FieldAccountAuthentication:
+		m.ResetAccountAuthentication()
 		return nil
 	}
 	return fmt.Errorf("unknown Authentication field %s", name)

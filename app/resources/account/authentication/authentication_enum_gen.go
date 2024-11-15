@@ -82,7 +82,7 @@ type Service struct {
 
 var (
 	ServicePassword      = Service{servicePassword}
-	ServiceEmailOnly     = Service{serviceEmailOnly}
+	ServiceEmail         = Service{serviceEmail}
 	ServicePhone         = Service{servicePhone}
 	ServiceOAuthGoogle   = Service{serviceOAuthGoogle}
 	ServiceOAuthGitHub   = Service{serviceOAuthGitHub}
@@ -98,8 +98,8 @@ func (r Service) Format(f fmt.State, verb rune) {
 	case 'v':
 		switch r {
 		case ServicePassword:
-			fmt.Fprint(f, "Username + password (default)")
-		case ServiceEmailOnly:
+			fmt.Fprint(f, "User/email + password")
+		case ServiceEmail:
 			fmt.Fprint(f, "Email + verification code")
 		case ServicePhone:
 			fmt.Fprint(f, "Phone number + verification code")
@@ -145,8 +145,8 @@ func NewService(__iNpUt__ string) (Service, error) {
 	switch __iNpUt__ {
 	case string(servicePassword):
 		return ServicePassword, nil
-	case string(serviceEmailOnly):
-		return ServiceEmailOnly, nil
+	case string(serviceEmail):
+		return ServiceEmail, nil
 	case string(servicePhone):
 		return ServicePhone, nil
 	case string(serviceOAuthGoogle):

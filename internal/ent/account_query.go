@@ -1609,7 +1609,9 @@ func (aq *AccountQuery) loadAuthentication(ctx context.Context, query *Authentic
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(authentication.FieldAccountAuthentication)
+	}
 	query.Where(predicate.Authentication(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(account.AuthenticationColumn), fks...))
 	}))
@@ -1618,13 +1620,10 @@ func (aq *AccountQuery) loadAuthentication(ctx context.Context, query *Authentic
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.account_authentication
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "account_authentication" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.AccountAuthentication
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "account_authentication" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "account_authentication" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

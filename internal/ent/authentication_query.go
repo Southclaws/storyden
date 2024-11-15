@@ -28,7 +28,6 @@ type AuthenticationQuery struct {
 	predicates       []predicate.Authentication
 	withAccount      *AccountQuery
 	withEmailAddress *EmailQuery
-	withFKs          bool
 	modifiers        []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -410,19 +409,12 @@ func (aq *AuthenticationQuery) prepareQuery(ctx context.Context) error {
 func (aq *AuthenticationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Authentication, error) {
 	var (
 		nodes       = []*Authentication{}
-		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
 		loadedTypes = [2]bool{
 			aq.withAccount != nil,
 			aq.withEmailAddress != nil,
 		}
 	)
-	if aq.withAccount != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, authentication.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Authentication).scanValues(nil, columns)
 	}
@@ -464,10 +456,7 @@ func (aq *AuthenticationQuery) loadAccount(ctx context.Context, query *AccountQu
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Authentication)
 	for i := range nodes {
-		if nodes[i].account_authentication == nil {
-			continue
-		}
-		fk := *nodes[i].account_authentication
+		fk := nodes[i].AccountAuthentication
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -553,6 +542,9 @@ func (aq *AuthenticationQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != authentication.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if aq.withAccount != nil {
+			_spec.Node.AddColumnOnce(authentication.FieldAccountAuthentication)
 		}
 	}
 	if ps := aq.predicates; len(ps) > 0 {
