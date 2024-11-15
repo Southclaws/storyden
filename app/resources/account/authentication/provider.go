@@ -8,6 +8,7 @@ const (
 	servicePassword serviceEnum = "password" // User/email + password
 	serviceEmail    serviceEnum = "email"    // Email + verification code
 	servicePhone    serviceEnum = "phone"    // Phone number + verification code
+	serviceWebAuthn serviceEnum = "webauthn" // WebAuthn/Passkey
 
 	// OAuth services
 	serviceOAuthGoogle   serviceEnum = "oauth_google"   // Google

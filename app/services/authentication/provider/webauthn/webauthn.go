@@ -28,7 +28,7 @@ var (
 	ErrAccountExists          = fault.New("requester already has an account")
 )
 
-var provider = authentication.ServicePhone
+var provider = authentication.ServiceWebAuthn
 
 type Provider struct {
 	auth_repo    authentication.Repository
