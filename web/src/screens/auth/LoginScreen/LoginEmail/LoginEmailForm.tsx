@@ -42,7 +42,7 @@ export function LoginEmailForm() {
           size="sm"
           textAlign="center"
           placeholder="password"
-          autoComplete="new-password"
+          autoComplete="current-password"
           {...form.register("password")}
         />
 
