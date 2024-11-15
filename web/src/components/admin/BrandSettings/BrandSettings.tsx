@@ -1,6 +1,4 @@
-import { useGetInfo } from "src/api/openapi-client/misc";
 import { ColourField } from "src/components/form/ColourInput/ColourInput";
-import { Unready } from "src/components/site/Unready";
 
 import { ContentFormField } from "@/components/content/ContentComposer/ContentField";
 import { FormErrorText } from "@/components/ui/FormErrorText";
@@ -10,14 +8,20 @@ import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
-import { Box, CardBox, HStack, Stack, styled } from "@/styled-system/jsx";
-
-import { SettingsSection } from "../SettingsSection/SettingsSection";
+import {
+  Box,
+  CardBox,
+  HStack,
+  LStack,
+  Stack,
+  styled,
+} from "@/styled-system/jsx";
+import { lstack } from "@/styled-system/patterns";
 
 import { IconEditor } from "./IconEditor/IconEditor";
 import { Props, useBrandSettings } from "./useBrandSettings";
 
-function BrandSettingsForm(props: Props) {
+export function BrandSettingsForm(props: Props) {
   const {
     register,
     control,
@@ -29,7 +33,7 @@ function BrandSettingsForm(props: Props) {
   } = useBrandSettings(props);
 
   return (
-    <SettingsSection>
+    <CardBox className={lstack()}>
       <Heading size="md">Brand settings</Heading>
 
       <styled.form
@@ -85,7 +89,7 @@ function BrandSettingsForm(props: Props) {
               control={control}
               name="content"
               // NOTE: Does not update if sidebar is changed. Doesn't matter...
-              initialValue={props.content}
+              initialValue={props.settings.content}
               placeholder="About your community..."
             />
             <FormErrorText>{formState.errors.content?.message}</FormErrorText>
@@ -101,7 +105,7 @@ function BrandSettingsForm(props: Props) {
           <HStack>
             <Box>
               <ColourField
-                defaultValue={props.accent_colour}
+                defaultValue={props.settings.accent_colour}
                 control={control}
                 onUpdate={onColourChangePreview}
                 {...register("accentColour")}
@@ -150,13 +154,6 @@ function BrandSettingsForm(props: Props) {
           <Button type="submit">Save</Button>
         </HStack>
       </styled.form>
-    </SettingsSection>
+    </CardBox>
   );
-}
-
-export function BrandSettings() {
-  const { data, error } = useGetInfo();
-  if (!data) return <Unready error={error} />;
-
-  return <BrandSettingsForm {...data} />;
 }

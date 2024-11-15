@@ -4,14 +4,16 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { iconUpload } from "src/api/openapi-client/misc";
-import { Info } from "src/api/openapi-schema";
 import { getColourVariants } from "src/utils/colour";
 
 import { handle } from "@/api/client";
 import { useSettingsMutation } from "@/lib/settings/mutation";
+import { Settings } from "@/lib/settings/settings";
 import { getIconURL } from "@/utils/icon";
 
-export type Props = Info;
+export type Props = {
+  settings: Settings;
+};
 
 export const FormSchema = z.object({
   title: z.string(),
@@ -21,15 +23,15 @@ export const FormSchema = z.object({
 });
 export type Form = z.infer<typeof FormSchema>;
 
-export function useBrandSettings(props: Props) {
-  const { revalidate, updateSettings } = useSettingsMutation(props);
+export function useBrandSettings({ settings }: Props) {
+  const { revalidate, updateSettings } = useSettingsMutation(settings);
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      title: props.title,
-      description: props.description,
-      content: props.content,
-      accentColour: props.accent_colour,
+      title: settings.title,
+      description: settings.description,
+      content: settings.content,
+      accentColour: settings.accent_colour,
     },
   });
   const [currentIcon, setCurrentIcon] = useState<File | undefined>(undefined);
