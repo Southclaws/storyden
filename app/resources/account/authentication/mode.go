@@ -4,6 +4,13 @@ package authentication
 
 type modeEnum string
 
+// The Authentication Mode value behaves as a suggestion to clients for the
+// recommended/preferred methods of authentication. It is not a strict rule and
+// clients may authenticate using any available method. The main reason for this
+// is to avoid global switch state for the instance which makes certain things
+// more complex to achieve and test. Clients should respect the authentication
+// mode value when displaying a registration flow to the user for registering.
+//
 // Handle is the default and enables simple username+password signup and login
 // flows. This mode is very rudimentary and will make use-cases such as sending
 // marketing emails, newsletters and even certain anti-spam measures impossible.

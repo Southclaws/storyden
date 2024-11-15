@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -38,6 +39,7 @@ var (
 const template = `Your unique one-time login code is: %s`
 
 type Provider struct {
+	logger   *zap.Logger
 	settings *settings.SettingsRepository
 	auth     authentication.Repository
 	account  *account_querier.Querier
@@ -47,6 +49,7 @@ type Provider struct {
 }
 
 func New(
+	logger *zap.Logger,
 	settings *settings.SettingsRepository,
 	auth authentication.Repository,
 	account *account_querier.Querier,
@@ -54,6 +57,7 @@ func New(
 	sms sms.Sender,
 ) *Provider {
 	return &Provider{
+		logger:   logger,
 		settings: settings,
 		auth:     auth,
 		account:  account,
@@ -74,7 +78,7 @@ func (p *Provider) Enabled(ctx context.Context) (bool, error) {
 }
 
 func (p *Provider) Register(ctx context.Context, handle string, phone string, inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
-	if err := provider.CheckMode(ctx, p.settings, requiredMode); err != nil {
+	if err := provider.CheckMode(ctx, p.logger, p.settings, requiredMode); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	//

@@ -11,18 +11,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
-	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/tests"
 )
 
@@ -34,17 +30,12 @@ func TestEmailOnlyAuth(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session1.Jar,
-		set *settings.SettingsRepository,
 		accountQuery *account_querier.Querier,
 		mail mailer.Sender,
 	) {
 		inbox := mail.(*mailer.Mock)
 
 		lc.Append(fx.StartHook(func() {
-			utils.Must(set.Set(root, settings.Settings{
-				AuthenticationMode: opt.New(authentication.ModeEmail),
-			}))
-
 			t.Run("verify_success", func(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)

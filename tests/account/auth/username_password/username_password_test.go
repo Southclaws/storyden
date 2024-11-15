@@ -10,17 +10,13 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
-	"github.com/Southclaws/storyden/internal/utils"
 	"github.com/Southclaws/storyden/tests"
 )
 
@@ -32,14 +28,9 @@ func TestUsernamePasswordAuth(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session1.Jar,
-		set *settings.SettingsRepository,
 		accountQuery *account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
-			utils.Must(set.Set(root, settings.Settings{
-				AuthenticationMode: opt.New(authentication.ModeHandle),
-			}))
-
 			t.Run("register_success", func(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
@@ -84,7 +75,7 @@ func TestUsernamePasswordAuth(t *testing.T) {
 	}))
 }
 
-func TestUsernamePasswordAuthFailsInEmailMode(t *testing.T) {
+func TestUsernamePasswordAuthMultiMethod(t *testing.T) {
 	t.Parallel()
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
@@ -92,52 +83,36 @@ func TestUsernamePasswordAuthFailsInEmailMode(t *testing.T) {
 		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session1.Jar,
-		set *settings.SettingsRepository,
 		accountQuery *account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
-			utils.Must(set.Set(root, settings.Settings{
-				AuthenticationMode: opt.New(authentication.ModeEmail),
-			}))
+			r := require.New(t)
 
-			t.Run("register_with_username_only_fails", func(t *testing.T) {
-				handle := xid.New().String()
-				password := "password"
+			email := xid.New().String() + "@storyden.org"
+			handle := xid.New().String()
+			password := "password"
 
-				// Sign up with username + password
-				signup, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPasswordSignupJSONRequestBody{Identifier: handle, Token: password})
-				tests.Status(t, err, signup, http.StatusBadRequest)
+			// Sign up with username + password
+			signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{
+				Email:    email,
+				Handle:   &handle,
+				Password: password,
 			})
+			tests.Ok(t, err, signup)
 
-			t.Run("register_with_email_login_with_username_success", func(t *testing.T) {
-				r := require.New(t)
-
-				email := xid.New().String() + "@storyden.org"
-				handle := xid.New().String()
-				password := "password"
-
-				// Sign up with username + password
-				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{
-					Email:    email,
-					Handle:   &handle,
-					Password: password,
-				})
-				tests.Ok(t, err, signup)
-
-				// Sign in using just a username
-				signin, err := cl.AuthPasswordSigninWithResponse(root, openapi.AuthPasswordSigninJSONRequestBody{
-					Identifier: handle,
-					Token:      password,
-				})
-				tests.Ok(t, err, signin)
-				session := e2e.WithSessionFromHeader(t, root, signin.HTTPResponse.Header)
-
-				// Get own account
-				get, err := cl.AccountGetWithResponse(root, session)
-				tests.Ok(t, err, get)
-				r.Equal(openapi.AccountVerifiedStatusNone, get.JSON200.VerifiedStatus)
-				r.Len(get.JSON200.EmailAddresses, 1)
+			// Sign in using just a username
+			signin, err := cl.AuthPasswordSigninWithResponse(root, openapi.AuthPasswordSigninJSONRequestBody{
+				Identifier: handle,
+				Token:      password,
 			})
+			tests.Ok(t, err, signin)
+			session := e2e.WithSessionFromHeader(t, root, signin.HTTPResponse.Header)
+
+			// Get own account
+			get, err := cl.AccountGetWithResponse(root, session)
+			tests.Ok(t, err, get)
+			r.Equal(openapi.AccountVerifiedStatusNone, get.JSON200.VerifiedStatus)
+			r.Len(get.JSON200.EmailAddresses, 1)
 		}))
 	}))
 }
