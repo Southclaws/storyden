@@ -84,6 +84,7 @@ var (
 	ServicePassword      = Service{servicePassword}
 	ServiceEmail         = Service{serviceEmail}
 	ServicePhone         = Service{servicePhone}
+	ServiceWebAuthn      = Service{serviceWebAuthn}
 	ServiceOAuthGoogle   = Service{serviceOAuthGoogle}
 	ServiceOAuthGitHub   = Service{serviceOAuthGitHub}
 	ServiceOAuthLinkedin = Service{serviceOAuthLinkedin}
@@ -103,6 +104,8 @@ func (r Service) Format(f fmt.State, verb rune) {
 			fmt.Fprint(f, "Email + verification code")
 		case ServicePhone:
 			fmt.Fprint(f, "Phone number + verification code")
+		case ServiceWebAuthn:
+			fmt.Fprint(f, "WebAuthn/Passkey")
 		case ServiceOAuthGoogle:
 			fmt.Fprint(f, "Google")
 		case ServiceOAuthGitHub:
@@ -149,6 +152,8 @@ func NewService(__iNpUt__ string) (Service, error) {
 		return ServiceEmail, nil
 	case string(servicePhone):
 		return ServicePhone, nil
+	case string(serviceWebAuthn):
+		return ServiceWebAuthn, nil
 	case string(serviceOAuthGoogle):
 		return ServiceOAuthGoogle, nil
 	case string(serviceOAuthGitHub):
