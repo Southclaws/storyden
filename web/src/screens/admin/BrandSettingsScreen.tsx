@@ -1,3 +1,5 @@
+"use client";
+
 import { UnreadyBanner } from "@/components/site/Unready";
 import { useSettings } from "@/lib/settings/settings-client";
 

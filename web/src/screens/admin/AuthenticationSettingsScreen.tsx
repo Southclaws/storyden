@@ -1,3 +1,5 @@
+"use client";
+
 import { AuthenticationSettingsForm } from "@/components/admin/AuthenticationSettings/AuthenticationSettingsForm";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { useSettings } from "@/lib/settings/settings-client";
