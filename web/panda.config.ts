@@ -17,6 +17,7 @@ import { headingInput } from "@/recipes/heading-input";
 import { input } from "@/recipes/input";
 import { menu } from "@/recipes/menu";
 import { popover } from "@/recipes/popover";
+import { radioGroup } from "@/recipes/radio-group";
 import { richCard } from "@/recipes/rich-card";
 import { select } from "@/recipes/select";
 import { table } from "@/recipes/table";
@@ -298,6 +299,7 @@ export default defineConfig({
         table: table,
         tagsInput: tagsInput,
         tabs: tabs,
+        radioGroup: radioGroup,
         treeView: treeView,
         toggleGroup: toggleGroup,
         tooltip: tooltip,

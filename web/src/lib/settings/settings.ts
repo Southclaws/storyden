@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { Info } from "@/api/openapi-schema";
+import { AuthMode, Info } from "@/api/openapi-schema";
 import { FALLBACK_COLOUR } from "@/utils/colour";
 
 import { DefaultFeedConfig, FeedConfigSchema } from "./feed";
@@ -15,6 +15,7 @@ export const DefaultSettings = {
   content: "",
   accent_colour: FALLBACK_COLOUR,
   onboarding_status: "complete",
+  authentication_mode: AuthMode.handle,
   capabilities: [],
   metadata: DefaultFrontendConfig,
 } satisfies Settings;
