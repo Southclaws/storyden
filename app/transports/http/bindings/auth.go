@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
@@ -97,4 +98,12 @@ func serialiseAuthProvider(p auth_svc.Provider) (openapi.AuthProvider, error) {
 	return openapi.AuthProvider{
 		Provider: p.Provides().String(),
 	}, nil
+}
+
+func deserialiseAuthMode(in openapi.AuthMode) (authentication.Mode, error) {
+	mode, err := authentication.NewMode(string(in))
+	if err != nil {
+		return authentication.Mode{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+	}
+	return mode, nil
 }

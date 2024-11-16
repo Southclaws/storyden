@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
@@ -48,12 +49,18 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	authMode, err := opt.MapErr(opt.NewPtr(request.Body.AuthenticationMode), deserialiseAuthMode)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	settings, err := a.sr.Set(ctx, settings.Settings{
-		Title:        opt.NewPtr(request.Body.Title),
-		Description:  opt.NewPtr(request.Body.Description),
-		Content:      content,
-		AccentColour: opt.NewPtr(request.Body.AccentColour),
-		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Metadata)),
+		Title:              opt.NewPtr(request.Body.Title),
+		Description:        opt.NewPtr(request.Body.Description),
+		Content:            content,
+		AccentColour:       opt.NewPtr(request.Body.AccentColour),
+		AuthenticationMode: authMode,
+		Metadata:           opt.NewPtr((*map[string]any)(request.Body.Metadata)),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -126,10 +133,11 @@ func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.Admin
 
 func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 	return openapi.AdminSettingsProps{
-		AccentColour: in.AccentColour.OrZero(),
-		Description:  in.Description.OrZero(),
-		Content:      in.Content.OrZero().HTML(),
-		Title:        in.Title.OrZero(),
-		Metadata:     (*openapi.Metadata)(in.Metadata.Ptr()),
+		AccentColour:       in.AccentColour.OrZero(),
+		Description:        in.Description.OrZero(),
+		Content:            in.Content.OrZero().HTML(),
+		Title:              in.Title.OrZero(),
+		AuthenticationMode: openapi.AuthMode(in.AuthenticationMode.Or(authentication.ModeHandle).String()),
+		Metadata:           (*openapi.Metadata)(in.Metadata.Ptr()),
 	}
 }

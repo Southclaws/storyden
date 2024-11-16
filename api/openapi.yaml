@@ -2945,6 +2945,7 @@ components:
         - description
         - content
         - accent_colour
+        - authentication_mode
         - capabilities
         - onboarding_status
       properties:
@@ -2958,6 +2959,8 @@ components:
           type: string
         onboarding_status:
           $ref: "#/components/schemas/OnboardingStatus"
+        authentication_mode:
+          $ref: "#/components/schemas/AuthMode"
         capabilities:
           $ref: "#/components/schemas/InstanceCapabilityList"
         metadata:
@@ -3177,7 +3180,12 @@ components:
     AdminSettingsProps:
       description: Storyden installation and administration settings.
       type: object
-      required: [title, description, content, accent_colour]
+      required:
+        - title
+        - description
+        - content
+        - accent_colour
+        - authentication_mode
       properties:
         title:
           type: string
@@ -3187,6 +3195,8 @@ components:
           $ref: "#/components/schemas/PostContent"
         accent_colour:
           type: string
+        authentication_mode:
+          $ref: "#/components/schemas/AuthMode"
         metadata:
           $ref: "#/components/schemas/Metadata"
 
@@ -3201,6 +3211,8 @@ components:
           $ref: "#/components/schemas/PostContent"
         accent_colour:
           type: string
+        authentication_mode:
+          $ref: "#/components/schemas/AuthMode"
         metadata:
           description: |
             The settings metadata may be used by frontends to store arbitrary
