@@ -12,8 +12,9 @@ type Capability struct {
 }
 
 var (
-	CapabilityNone   = Capability{capabilityNone}
-	CapabilitySemdex = Capability{capabilitySemdex}
+	CapabilitySemdex      = Capability{capabilitySemdex}
+	CapabilityEmailClient = Capability{capabilityEmailClient}
+	CapabilitySMSClient   = Capability{capabilitySMSClient}
 )
 
 func (r Capability) Format(f fmt.State, verb rune) {
@@ -53,10 +54,12 @@ func (r *Capability) Scan(__iNpUt__ any) error {
 }
 func NewCapability(__iNpUt__ string) (Capability, error) {
 	switch __iNpUt__ {
-	case string(capabilityNone):
-		return CapabilityNone, nil
 	case string(capabilitySemdex):
 		return CapabilitySemdex, nil
+	case string(capabilityEmailClient):
+		return CapabilityEmailClient, nil
+	case string(capabilitySMSClient):
+		return CapabilitySMSClient, nil
 	default:
 		return Capability{}, fmt.Errorf("invalid value for type 'Capability': '%s'", __iNpUt__)
 	}

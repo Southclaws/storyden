@@ -52,6 +52,12 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 		caps = append(caps, CapabilitySemdex)
 	}
 
+	if p.config.EmailProvider != "" {
+		caps = append(caps, CapabilityEmailClient)
+	}
+
+	// TODO: SMS client check
+
 	return &Info{
 		Settings:         settings,
 		OnboardingStatus: status,

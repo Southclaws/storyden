@@ -125,8 +125,6 @@ export * from "./collectionWithItemsAllOf";
 export * from "./commonProperties";
 export * from "./commonPropertiesMisc";
 export * from "./contentFillRule";
-export * from "./contentKind";
-export * from "./contentKinds";
 export * from "./credentialRequestOptions";
 export * from "./datagraphItem";
 export * from "./datagraphItemKind";

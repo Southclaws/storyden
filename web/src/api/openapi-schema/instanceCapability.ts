@@ -14,4 +14,6 @@ export type InstanceCapability =
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const InstanceCapability = {
   semdex: "semdex",
+  email_client: "email_client",
+  sms_client: "sms_client",
 } as const;
