@@ -2982,18 +2982,12 @@ components:
       type: string
       enum:
         - semdex
+        - email_client
+        - sms_client
 
     InstanceCapabilityList:
       type: array
       items: { $ref: "#/components/schemas/InstanceCapability" }
-
-    ContentKind:
-      type: string
-      enum: [post, thread]
-
-    ContentKinds:
-      type: array
-      items: { $ref: "#/components/schemas/ContentKind" }
 
     TagFillRule:
       description: |

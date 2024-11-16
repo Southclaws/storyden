@@ -5,8 +5,9 @@ package instance_info
 type capabilityEnum string
 
 const (
-	capabilityNone   capabilityEnum = `none`
-	capabilitySemdex capabilityEnum = `semdex`
+	capabilitySemdex      capabilityEnum = `semdex`
+	capabilityEmailClient capabilityEnum = `email_client`
+	capabilitySMSClient   capabilityEnum = `sms_client`
 )
 
 type Capabilities []Capability
