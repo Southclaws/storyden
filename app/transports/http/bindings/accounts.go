@@ -379,11 +379,14 @@ func serialiseAuthMethod(in *account_auth.AuthMethod) (openapi.AccountAuthMethod
 		return openapi.AccountAuthMethod{}, fault.Wrap(err)
 	}
 
+	email := opt.Map(in.Instance.Email, serialiseEmailAddress)
+
 	return openapi.AccountAuthMethod{
 		Id:         in.Instance.ID.String(),
 		CreatedAt:  in.Instance.Created,
 		Name:       in.Instance.Name.Or("Unknown"),
 		Identifier: in.Instance.Identifier,
 		Provider:   p,
+		Email:      email.Ptr(),
 	}, nil
 }

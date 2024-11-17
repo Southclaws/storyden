@@ -85,6 +85,7 @@ func (d *database) LookupByIdentifier(ctx context.Context, service Service, iden
 		WithAccount(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
+		WithEmailAddress().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -113,6 +114,7 @@ func (d *database) LookupByTokenType(ctx context.Context, accountID account.Acco
 		WithAccount(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
+		WithEmailAddress().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -139,6 +141,7 @@ func (d *database) LookupByEmail(ctx context.Context, emailAddress mail.Address)
 		WithAccount(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
+		WithEmailAddress().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -163,6 +166,7 @@ func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]
 		WithAccount(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
+		WithEmailAddress().
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))

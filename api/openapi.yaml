@@ -3363,7 +3363,7 @@ components:
 
     AuthProvider:
       type: object
-      required: [provider, name, link]
+      required: [provider, name]
       properties:
         provider:
           description: The slug name of the provider.
@@ -3815,6 +3815,8 @@ components:
           description: The external identifier (third party ID or device ID)
           type: string
         provider: { $ref: "#/components/schemas/AuthProvider" }
+        # If the auth method uses email, this is the email record associated.
+        email: { $ref: "#/components/schemas/AccountEmailAddress" }
 
     AccountVerifiedStatus:
       type: string
