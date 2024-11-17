@@ -11,7 +11,7 @@ import (
 )
 
 func (i *Authentication) AuthPasswordSignin(ctx context.Context, request openapi.AuthPasswordSigninRequestObject) (openapi.AuthPasswordSigninResponseObject, error) {
-	u, err := i.p.Login(ctx, request.Body.Identifier, request.Body.Token)
+	u, err := i.passwordAuthProvider.LoginWithHandle(ctx, request.Body.Identifier, request.Body.Token)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -32,7 +32,7 @@ func (i *Authentication) AuthPasswordSignup(ctx context.Context, request openapi
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	u, err := i.p.Register(ctx, request.Body.Identifier, request.Body.Token, invitedBy)
+	u, err := i.passwordAuthProvider.RegisterWithHandle(ctx, request.Body.Identifier, request.Body.Token, invitedBy)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -53,7 +53,7 @@ func (i *Authentication) AuthPasswordCreate(ctx context.Context, request openapi
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	u, err := i.p.Create(ctx, id, request.Body.Password)
+	u, err := i.passwordAuthProvider.AddPassword(ctx, id, request.Body.Password)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -74,7 +74,7 @@ func (i *Authentication) AuthPasswordUpdate(ctx context.Context, request openapi
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	u, err := i.p.Update(ctx, id, request.Body.Old, request.Body.New)
+	u, err := i.passwordAuthProvider.UpdatePassword(ctx, id, request.Body.Old, request.Body.New)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

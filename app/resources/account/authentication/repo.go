@@ -2,6 +2,7 @@ package authentication
 
 import (
 	"context"
+	"net/mail"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -24,6 +25,9 @@ type Repository interface {
 
 	// Gets an auth method for a specific account based on a token type and identifier.
 	LookupByTokenType(ctx context.Context, accountID account.AccountID, tokenType TokenType, identifier string) (*Authentication, bool, error)
+
+	// Gets an auth method for a specific account based on an email record.
+	LookupByEmail(ctx context.Context, email mail.Address) (*Authentication, bool, error)
 
 	// Gets all auth methods that a account has.
 	GetAuthMethods(ctx context.Context, userID account.AccountID) ([]*Authentication, error)

@@ -32,8 +32,7 @@ func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			// All authentication provider services.
-			password.NewEmailPasswordProvider,
-			password.NewUsernamePasswordProvider,
+			password.New,
 			email_only.New,
 			webauthn.New,
 			google.New,
@@ -50,8 +49,7 @@ func New(
 	l *zap.Logger,
 	settings *settings.SettingsRepository,
 
-	pw *password.UsernamePasswordProvider,
-	ep *password.EmailPasswordProvider,
+	pw *password.Provider,
 	eo *email_only.Provider,
 	wa *webauthn.Provider,
 	gg *google.Provider,
@@ -61,7 +59,6 @@ func New(
 ) *Manager {
 	providers := []Provider{
 		pw,
-		ep,
 		eo,
 		wa,
 		gg,

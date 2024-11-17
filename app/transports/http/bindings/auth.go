@@ -16,36 +16,41 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/email_only"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
-	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
-	"github.com/Southclaws/storyden/internal/config"
 )
 
 type Authentication struct {
-	settings     *settings.SettingsRepository
-	p            *password.UsernamePasswordProvider
-	ep           *email_only.Provider
-	epp          *password.EmailPasswordProvider
-	cj           *session1.Jar
-	accountQuery *account_querier.Querier
-	er           email.EmailRepo
-	am           *auth_svc.Manager
-	ev           email_verify.Verifier
+	cj                            *session.Jar
+	settings                      *settings.SettingsRepository
+	passwordAuthProvider          *password.Provider
+	emailVerificationAuthProvider *email_only.Provider
+	accountQuery                  *account_querier.Querier
+	emailRepo                     email.EmailRepo
+	authManager                   *auth_svc.Manager
+	emailVerifier                 email_verify.Verifier
 }
 
 func NewAuthentication(
+	cj *session.Jar,
 	settings *settings.SettingsRepository,
-	cfg config.Config,
-	p *password.UsernamePasswordProvider,
-	ep *email_only.Provider,
-	epp *password.EmailPasswordProvider,
+	passwordAuthProvider *password.Provider,
+	emailVerificationAuthProvider *email_only.Provider,
 	accountQuery *account_querier.Querier,
-	er email.EmailRepo,
-	sm *session1.Jar,
-	am *auth_svc.Manager,
-	ev email_verify.Verifier,
+	emailRepo email.EmailRepo,
+	authManager *auth_svc.Manager,
+	emailVerifier email_verify.Verifier,
 ) Authentication {
-	return Authentication{settings, p, ep, epp, sm, accountQuery, er, am, ev}
+	return Authentication{
+		cj:                            cj,
+		settings:                      settings,
+		passwordAuthProvider:          passwordAuthProvider,
+		emailVerificationAuthProvider: emailVerificationAuthProvider,
+		accountQuery:                  accountQuery,
+		emailRepo:                     emailRepo,
+		authManager:                   authManager,
+		emailVerifier:                 emailVerifier,
+	}
 }
 
 func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.AuthProviderListRequestObject) (openapi.AuthProviderListResponseObject, error) {
@@ -54,7 +59,7 @@ func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.A
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	providers, err := o.am.GetProviderList(ctx)
+	providers, err := o.authManager.GetProviderList(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

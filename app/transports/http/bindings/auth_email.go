@@ -27,7 +27,7 @@ func (i *Authentication) AuthEmailSignup(ctx context.Context, request openapi.Au
 
 	handle := opt.NewPtr(request.Body.Handle)
 
-	acc, err := i.ep.Register(ctx, *address, handle, invitedBy)
+	acc, err := i.emailVerificationAuthProvider.Register(ctx, *address, handle, invitedBy)
 	if err != nil {
 		// SPEC: If the email exists, return a 422 response with no session.
 		if errors.Is(err, email_only.ErrAccountAlreadyExists) {
