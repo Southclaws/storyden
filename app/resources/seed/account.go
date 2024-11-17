@@ -80,8 +80,8 @@ func SeedAccount(ctx context.Context, r *account_writer.Writer, auth authenticat
 	if _, err = auth.Create(
 		ctx,
 		acc.ID,
-		authentication.ServiceUsernamePassword,
-		authentication.TokenTypePassword,
+		authentication.ServicePassword,
+		authentication.TokenTypePasswordHash,
 		"password",
 		SeedPassword,
 		nil,
@@ -104,8 +104,8 @@ func SeedAccountUnique(ctx context.Context, r *account_writer.Writer, auth authe
 	if _, err = auth.Create(
 		ctx,
 		acc.ID,
-		authentication.ServiceUsernamePassword,
-		authentication.TokenTypePassword,
+		authentication.ServicePassword,
+		authentication.TokenTypePasswordHash,
 		"password",
 		SeedPassword,
 		nil,

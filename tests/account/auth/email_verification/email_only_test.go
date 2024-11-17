@@ -1,4 +1,4 @@
-package email_password_test
+package email_verification_test
 
 import (
 	"context"

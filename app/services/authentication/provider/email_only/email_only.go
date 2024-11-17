@@ -10,7 +10,6 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	petname "github.com/dustinkirkland/golang-petname"
-	"github.com/pkg/errors"
 	"github.com/rs/xid"
 	"go.uber.org/zap"
 
@@ -26,16 +25,11 @@ import (
 )
 
 var (
-	ErrEmailRegistrationDisabled = errors.New("cannot register while in non-email authentication mode")
-	ErrAccountAlreadyExists      = errors.New("account already exists")
+	ErrEmailRegistrationDisabled = fault.New("cannot register while in non-email authentication mode")
+	ErrAccountAlreadyExists      = fault.New("account already exists")
+	ErrEmailNotFound             = fault.New("email address not found")
+	ErrAccountMismatch           = fault.New("account mismatch")
 )
-
-// Email auth records do not hold tokens. There's no password hash and the
-// verification code is held in the email resource. We use a constant label
-// for the identifier in order to ensure there's only ever a single "email"
-// based authentication type (there's a unique constraint between identifier
-// and token type, in this case token type is none and identifier is const.)
-const authRecordIdentifier = "email"
 
 var (
 	requiredMode = authentication.ModeEmail
@@ -127,6 +121,30 @@ func (p *Provider) Register(ctx context.Context, email mail.Address, handle opt.
 	return account, nil
 }
 
+func (p *Provider) Login(ctx context.Context, email mail.Address) error {
+	if err := provider.CheckMode(ctx, p.logger, p.settings, requiredMode); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, exists, err := p.auth.LookupByEmail(ctx, email)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if !exists {
+		return fault.Wrap(ErrEmailNotFound,
+			fctx.With(ctx),
+			ftag.With(ftag.NotFound),
+			fmsg.WithDesc("not found", "The specified email address is not associated with an account."))
+	}
+
+	err = p.sender.ResendVerification(ctx, email)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
 func (p *Provider) addEmailAuth(ctx context.Context, accountID account.AccountID, email mail.Address) error {
 	code, err := otp.Generate()
 	if err != nil {
@@ -135,9 +153,10 @@ func (p *Provider) addEmailAuth(ctx context.Context, accountID account.AccountID
 
 	// Email verification authentication does not use any form of token, however
 	// there needs to be some value set so generate a random ID for each record.
+	identifier := ""
 	token := xid.New().String()
 
-	authRecord, err := p.auth.Create(ctx, accountID, service, authentication.TokenTypeNone, authRecordIdentifier, token, nil)
+	authRecord, err := p.auth.Create(ctx, accountID, service, authentication.TokenTypeNone, identifier, token, nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}

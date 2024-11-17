@@ -12,73 +12,21 @@ import (
 	"github.com/alexedwards/argon2id"
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/rs/xid"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
-	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/resources/account/email"
-	"github.com/Southclaws/storyden/app/resources/settings"
-	"github.com/Southclaws/storyden/app/services/account/register"
-	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
-	"github.com/Southclaws/storyden/app/services/authentication/provider"
-	"github.com/Southclaws/storyden/internal/otp"
 )
 
-type EmailPasswordProvider struct {
-	logger       *zap.Logger
-	settings     *settings.SettingsRepository
-	auth         authentication.Repository
-	accountQuery *account_querier.Querier
-	er           email.EmailRepo
-	register     *register.Registrar
-
-	// TODO: Replace with an MQ message and sender job.
-	sender email_verify.Verifier
-}
-
-var (
-	emaiRequiredMode = authentication.ModeEmail
-	emailService     = authentication.ServiceEmailPassword
-)
-
-func NewEmailPasswordProvider(
-	logger *zap.Logger,
-	settings *settings.SettingsRepository,
-	auth authentication.Repository,
-	accountQuery *account_querier.Querier,
-	er email.EmailRepo,
-	register *register.Registrar,
-	sender email_verify.Verifier,
-) *EmailPasswordProvider {
-	return &EmailPasswordProvider{
-		logger:       logger,
-		settings:     settings,
-		auth:         auth,
-		accountQuery: accountQuery,
-		er:           er,
-		register:     register,
-		sender:       sender,
-	}
-}
-
-func (p *EmailPasswordProvider) Service() authentication.Service { return emailService }
-func (p *EmailPasswordProvider) Token() authentication.TokenType { return tokenType }
-
-func (p *EmailPasswordProvider) Enabled(ctx context.Context) (bool, error) {
-	settings, err := p.settings.Get(ctx)
+func (p *Provider) RegisterWithEmail(ctx context.Context, email mail.Address, password string, handle opt.Optional[string], inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
+	enabled, err := p.isEmailAvailable(ctx)
 	if err != nil {
-		return false, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return settings.AuthenticationMode.Or(authentication.ModeHandle) == emaiRequiredMode, nil
-}
-
-func (p *EmailPasswordProvider) Register(ctx context.Context, email mail.Address, password string, handle opt.Optional[string], inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
-	if err := provider.CheckMode(ctx, p.logger, p.settings, emaiRequiredMode); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+	if !enabled {
+		return nil, ErrEmailRegistrationDisabled
+	}
+
+	// TODO: Check if email capability is enabled
 
 	if len(password) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,
@@ -109,19 +57,22 @@ func (p *EmailPasswordProvider) Register(ctx context.Context, email mail.Address
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}
 
-	if err := p.addEmailPasswordAuth(ctx, account.ID, email, password); err != nil {
+	if err := p.addPasswordAuthWithEmail(ctx, account.ID, email, password); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return account, nil
 }
 
-func (p *EmailPasswordProvider) Link(_ string) (string, error) {
-	// Password provider does not use external links.
-	return "", nil
-}
+func (p *Provider) LoginWithEmail(ctx context.Context, emailAddress mail.Address, password string) (*account.Account, error) {
+	enabled, err := p.isEmailAvailable(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !enabled {
+		return nil, ErrEmailRegistrationDisabled
+	}
 
-func (p *EmailPasswordProvider) Login(ctx context.Context, email string, password string) (*account.Account, error) {
 	if len(password) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,
 			fctx.With(ctx),
@@ -129,12 +80,7 @@ func (p *EmailPasswordProvider) Login(ctx context.Context, email string, passwor
 			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
 	}
 
-	emailAddress, err := mail.ParseAddress(email)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	acc, exists, err := p.er.LookupAccount(ctx, *emailAddress)
+	acc, exists, err := p.er.LookupAccount(ctx, emailAddress)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
@@ -151,7 +97,7 @@ func (p *EmailPasswordProvider) Login(ctx context.Context, email string, passwor
 	}
 
 	// Get the auth record for this account, it must be a password-based method.
-	a, exists, err := p.auth.LookupByTokenType(ctx, acc.ID, authentication.TokenTypePassword, authRecordIdentifier)
+	a, exists, err := p.auth.LookupByEmail(ctx, emailAddress)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -176,28 +122,4 @@ func (p *EmailPasswordProvider) Login(ctx context.Context, email string, passwor
 	}
 
 	return &a.Account, nil
-}
-
-func (p *EmailPasswordProvider) addEmailPasswordAuth(ctx context.Context, accountID account.AccountID, email mail.Address, password string) error {
-	code, err := otp.Generate()
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	hashed, err := argon2id.CreateHash(password, argon2id.DefaultParams)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
-	}
-
-	authRecord, err := p.auth.Create(ctx, accountID, emailService, authentication.TokenTypePassword, authRecordIdentifier, string(hashed), nil)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
-	}
-
-	err = p.sender.BeginEmailVerification(ctx, accountID, email, code, opt.New(authRecord.ID))
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return nil
 }

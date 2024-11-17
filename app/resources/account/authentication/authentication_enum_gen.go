@@ -81,14 +81,13 @@ type Service struct {
 }
 
 var (
-	ServiceUsernamePassword = Service{serviceUsernamePassword}
-	ServiceEmailPassword    = Service{serviceEmailPassword}
-	ServiceEmailVerify      = Service{serviceEmailVerify}
-	ServicePhoneVerify      = Service{servicePhoneVerify}
-	ServiceWebAuthn         = Service{serviceWebAuthn}
-	ServiceOAuthGoogle      = Service{serviceOAuthGoogle}
-	ServiceOAuthGitHub      = Service{serviceOAuthGitHub}
-	ServiceOAuthLinkedin    = Service{serviceOAuthLinkedin}
+	ServicePassword      = Service{servicePassword}
+	ServiceEmailVerify   = Service{serviceEmailVerify}
+	ServicePhoneVerify   = Service{servicePhoneVerify}
+	ServiceWebAuthn      = Service{serviceWebAuthn}
+	ServiceOAuthGoogle   = Service{serviceOAuthGoogle}
+	ServiceOAuthGitHub   = Service{serviceOAuthGitHub}
+	ServiceOAuthLinkedin = Service{serviceOAuthLinkedin}
 )
 
 func (r Service) Format(f fmt.State, verb rune) {
@@ -99,10 +98,8 @@ func (r Service) Format(f fmt.State, verb rune) {
 		fmt.Fprintf(f, "%q", r.String())
 	case 'v':
 		switch r {
-		case ServiceUsernamePassword:
-			fmt.Fprint(f, "User/email + password")
-		case ServiceEmailPassword:
-			fmt.Fprint(f, "Email + password")
+		case ServicePassword:
+			fmt.Fprint(f, "Password + either username or email")
 		case ServiceEmailVerify:
 			fmt.Fprint(f, "Email + verification code")
 		case ServicePhoneVerify:
@@ -149,10 +146,8 @@ func (r *Service) Scan(__iNpUt__ any) error {
 }
 func NewService(__iNpUt__ string) (Service, error) {
 	switch __iNpUt__ {
-	case string(serviceUsernamePassword):
-		return ServiceUsernamePassword, nil
-	case string(serviceEmailPassword):
-		return ServiceEmailPassword, nil
+	case string(servicePassword):
+		return ServicePassword, nil
 	case string(serviceEmailVerify):
 		return ServiceEmailVerify, nil
 	case string(servicePhoneVerify):
@@ -175,10 +170,10 @@ type TokenType struct {
 }
 
 var (
-	TokenTypeNone     = TokenType{tokenTypeNone}
-	TokenTypePassword = TokenType{tokenTypePassword}
-	TokenTypeWebAuthn = TokenType{tokenTypeWebAuthn}
-	TokenTypeOAuth    = TokenType{tokenTypeOAuth}
+	TokenTypeNone         = TokenType{tokenTypeNone}
+	TokenTypePasswordHash = TokenType{tokenTypePasswordHash}
+	TokenTypeWebAuthn     = TokenType{tokenTypeWebAuthn}
+	TokenTypeOAuth        = TokenType{tokenTypeOAuth}
 )
 
 func (r TokenType) Format(f fmt.State, verb rune) {
@@ -191,7 +186,7 @@ func (r TokenType) Format(f fmt.State, verb rune) {
 		switch r {
 		case TokenTypeNone:
 			fmt.Fprint(f, "Authenticated by other means")
-		case TokenTypePassword:
+		case TokenTypePasswordHash:
 			fmt.Fprint(f, "argon2 hashed password")
 		case TokenTypeWebAuthn:
 			fmt.Fprint(f, "WebAuthn token")
@@ -233,8 +228,8 @@ func NewTokenType(__iNpUt__ string) (TokenType, error) {
 	switch __iNpUt__ {
 	case string(tokenTypeNone):
 		return TokenTypeNone, nil
-	case string(tokenTypePassword):
-		return TokenTypePassword, nil
+	case string(tokenTypePasswordHash):
+		return TokenTypePasswordHash, nil
 	case string(tokenTypeWebAuthn):
 		return TokenTypeWebAuthn, nil
 	case string(tokenTypeOAuth):

@@ -2,7 +2,6 @@ package mailer
 
 import (
 	"context"
-	"fmt"
 	"net/mail"
 
 	"go.uber.org/fx"
@@ -31,12 +30,15 @@ func Build() fx.Option {
 func newMailer(l *zap.Logger, cfg config.Config) (Sender, error) {
 	switch cfg.EmailProvider {
 	case "sendgrid":
+		l.Info("initialising sendgrid mailer")
 		return newSendgridMailer(l)
 
-	case "":
+	case "mock":
+		l.Info("initialising mock mailer")
 		return &Mock{}, nil
 
 	default:
-		panic(fmt.Sprintf("unknown email provider: %s", cfg.EmailProvider))
+		l.Info("initialising with no mailer")
+		return nil, nil
 	}
 }

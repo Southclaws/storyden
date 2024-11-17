@@ -18,7 +18,7 @@ func (o *Authentication) OAuthProviderCallback(ctx context.Context, request open
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	provider, err := o.am.Provider(service)
+	provider, err := o.authManager.Provider(service)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

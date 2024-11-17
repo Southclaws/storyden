@@ -25,7 +25,7 @@ func (i *Authentication) AuthEmailPasswordSignup(ctx context.Context, request op
 
 	handle := opt.NewPtr(request.Body.Handle)
 
-	acc, err := i.epp.Register(ctx, *address, request.Body.Password, handle, invitedBy)
+	acc, err := i.passwordAuthProvider.RegisterWithEmail(ctx, *address, request.Body.Password, handle, invitedBy)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -41,7 +41,12 @@ func (i *Authentication) AuthEmailPasswordSignup(ctx context.Context, request op
 }
 
 func (i *Authentication) AuthEmailPasswordSignin(ctx context.Context, request openapi.AuthEmailPasswordSigninRequestObject) (openapi.AuthEmailPasswordSigninResponseObject, error) {
-	u, err := i.epp.Login(ctx, request.Body.Email, request.Body.Password)
+	address, err := mail.ParseAddress(request.Body.Email)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	u, err := i.passwordAuthProvider.LoginWithEmail(ctx, *address, request.Body.Password)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

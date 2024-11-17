@@ -11,3 +11,12 @@ const (
 )
 
 type Capabilities []Capability
+
+func (c Capabilities) Has(capability Capability) bool {
+	for _, cap := range c {
+		if cap == capability {
+			return true
+		}
+	}
+	return false
+}

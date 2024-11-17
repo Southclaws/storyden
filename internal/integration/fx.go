@@ -37,6 +37,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		PublicWebAddress:   *utils.Must(url.Parse("http://localhost")),
 		UnauthenticatedRPM: 1000,
 		AuthenticatedRPM:   1000,
+		EmailProvider:      "mock",
 	}
 
 	if dbURL := os.Getenv("DATABASE_URL"); dbURL != "" {
