@@ -43,18 +43,22 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 		DeletedAt:      acc.DeletedAt.Ptr(),
 		Admin:          acc.Admin,
 		VerifiedStatus: openapi.AccountVerifiedStatus(acc.VerifiedStatus.String()),
-		EmailAddresses: dt.Map(acc.EmailAddresses, serialiseEmailAddress),
+		EmailAddresses: dt.Map(acc.EmailAddresses, serialiseEmailAddressPtr),
 		Roles:          serialiseHeldRoleList(acc.Roles),
 		InvitedBy:      invitedBy.Ptr(),
 	}
 }
 
-func serialiseEmailAddress(in *account.EmailAddress) openapi.AccountEmailAddress {
+func serialiseEmailAddress(in account.EmailAddress) openapi.AccountEmailAddress {
 	return openapi.AccountEmailAddress{
 		EmailAddress: in.Email.Address,
 		IsAuth:       in.IsAuth,
 		Verified:     in.Verified,
 	}
+}
+
+func serialiseEmailAddressPtr(in *account.EmailAddress) openapi.AccountEmailAddress {
+	return serialiseEmailAddress(*in)
 }
 
 func serialiseExternalLinks(in []account.ExternalLink) openapi.ProfileExternalLinkList {

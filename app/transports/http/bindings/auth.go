@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -95,12 +96,14 @@ func serialiseAuthProvider(p auth_svc.Provider) (openapi.AuthProvider, error) {
 		}
 		return openapi.AuthProvider{
 			Provider: p.Service().String(),
-			Link:     link,
+			Name:     fmt.Sprintf("%v", p.Service()),
+			Link:     &link,
 		}, nil
 	}
 
 	return openapi.AuthProvider{
 		Provider: p.Service().String(),
+		Name:     fmt.Sprintf("%v", p.Service()),
 	}, nil
 }
 
