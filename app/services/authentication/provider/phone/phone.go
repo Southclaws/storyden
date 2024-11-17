@@ -33,7 +33,8 @@ var (
 
 var (
 	requiredMode = authentication.ModePhone
-	service      = authentication.ServicePhone
+	service      = authentication.ServicePhoneVerify
+	tokenType    = authentication.TokenTypeNone
 )
 
 const template = `Your unique one-time login code is: %s`
@@ -66,7 +67,8 @@ func New(
 	}
 }
 
-func (p *Provider) Provides() authentication.Service { return service }
+func (p *Provider) Service() authentication.Service { return service }
+func (p *Provider) Token() authentication.TokenType { return tokenType }
 
 func (p *Provider) Enabled(ctx context.Context) (bool, error) {
 	settings, err := p.settings.Get(ctx)
@@ -169,7 +171,7 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string, in
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to generate code"))
 	}
 
-	_, err = p.auth.Create(ctx, acc.ID, service, phone, code, nil)
+	_, err = p.auth.Create(ctx, acc.ID, service, authentication.TokenTypeNone, phone, code, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}

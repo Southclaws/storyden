@@ -1,4 +1,4 @@
-package email_password
+package password
 
 import (
 	"context"
@@ -11,7 +11,6 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/alexedwards/argon2id"
 	petname "github.com/dustinkirkland/golang-petname"
-	"github.com/pkg/errors"
 	"github.com/rs/xid"
 	"go.uber.org/zap"
 
@@ -27,21 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/otp"
 )
 
-var (
-	ErrEmailRegistrationDisabled = errors.New("cannot register while in non-email authentication mode")
-	ErrAccountAlreadyExists      = errors.New("account already exists")
-	ErrPasswordMismatch          = errors.New("password mismatch")
-	ErrNoPassword                = errors.New("password not enabled")
-	ErrPasswordTooShort          = errors.New("password too short")
-	ErrNotFound                  = errors.New("account not found")
-)
-
-var (
-	requiredMode = authentication.ModeEmail
-	service      = authentication.ServicePassword
-)
-
-type Provider struct {
+type EmailPasswordProvider struct {
 	logger       *zap.Logger
 	settings     *settings.SettingsRepository
 	auth         authentication.Repository
@@ -53,7 +38,12 @@ type Provider struct {
 	sender email_verify.Verifier
 }
 
-func New(
+var (
+	emaiRequiredMode = authentication.ModeEmail
+	emailService     = authentication.ServiceEmailPassword
+)
+
+func NewEmailPasswordProvider(
 	logger *zap.Logger,
 	settings *settings.SettingsRepository,
 	auth authentication.Repository,
@@ -61,8 +51,8 @@ func New(
 	er email.EmailRepo,
 	register *register.Registrar,
 	sender email_verify.Verifier,
-) *Provider {
-	return &Provider{
+) *EmailPasswordProvider {
+	return &EmailPasswordProvider{
 		logger:       logger,
 		settings:     settings,
 		auth:         auth,
@@ -73,19 +63,20 @@ func New(
 	}
 }
 
-func (p *Provider) Provides() authentication.Service { return service }
+func (p *EmailPasswordProvider) Service() authentication.Service { return emailService }
+func (p *EmailPasswordProvider) Token() authentication.TokenType { return tokenType }
 
-func (p *Provider) Enabled(ctx context.Context) (bool, error) {
+func (p *EmailPasswordProvider) Enabled(ctx context.Context) (bool, error) {
 	settings, err := p.settings.Get(ctx)
 	if err != nil {
 		return false, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return settings.AuthenticationMode.Or(authentication.ModeHandle) == requiredMode, nil
+	return settings.AuthenticationMode.Or(authentication.ModeHandle) == emaiRequiredMode, nil
 }
 
-func (p *Provider) Register(ctx context.Context, email mail.Address, password string, handle opt.Optional[string], inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
-	if err := provider.CheckMode(ctx, p.logger, p.settings, requiredMode); err != nil {
+func (p *EmailPasswordProvider) Register(ctx context.Context, email mail.Address, password string, handle opt.Optional[string], inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
+	if err := provider.CheckMode(ctx, p.logger, p.settings, emaiRequiredMode); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -125,12 +116,12 @@ func (p *Provider) Register(ctx context.Context, email mail.Address, password st
 	return account, nil
 }
 
-func (p *Provider) Link(_ string) (string, error) {
+func (p *EmailPasswordProvider) Link(_ string) (string, error) {
 	// Password provider does not use external links.
 	return "", nil
 }
 
-func (p *Provider) Login(ctx context.Context, email string, password string) (*account.Account, error) {
+func (p *EmailPasswordProvider) Login(ctx context.Context, email string, password string) (*account.Account, error) {
 	if len(password) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,
 			fctx.With(ctx),
@@ -159,8 +150,8 @@ func (p *Provider) Login(ctx context.Context, email string, password string) (*a
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// Get the auth record for this email address
-	a, exists, err := p.auth.LookupByHandle(ctx, service, acc.Handle)
+	// Get the auth record for this account, it must be a password-based method.
+	a, exists, err := p.auth.LookupByTokenType(ctx, acc.ID, authentication.TokenTypePassword, authRecordIdentifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -187,17 +178,7 @@ func (p *Provider) Login(ctx context.Context, email string, password string) (*a
 	return &a.Account, nil
 }
 
-func (p *Provider) Create(ctx context.Context, aid account.AccountID, email mail.Address, password string) (*account.Account, error) {
-	// TODO: Add an email-password auth record for an existing account.
-	return nil, nil
-}
-
-func (p *Provider) Update(ctx context.Context, aid account.AccountID, email mail.Address, oldpassword, newpassword string) (*account.Account, error) {
-	// TODO: Update password for an email-password auth type.
-	return nil, nil
-}
-
-func (p *Provider) addEmailPasswordAuth(ctx context.Context, accountID account.AccountID, email mail.Address, password string) error {
+func (p *EmailPasswordProvider) addEmailPasswordAuth(ctx context.Context, accountID account.AccountID, email mail.Address, password string) error {
 	code, err := otp.Generate()
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
@@ -208,9 +189,7 @@ func (p *Provider) addEmailPasswordAuth(ctx context.Context, accountID account.A
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
 	}
 
-	identifier := "email"
-
-	authRecord, err := p.auth.Create(ctx, accountID, service, identifier, string(hashed), nil)
+	authRecord, err := p.auth.Create(ctx, accountID, emailService, authentication.TokenTypePassword, authRecordIdentifier, string(hashed), nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}

@@ -14,8 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/settings"
 	auth_svc "github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
-	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_only"
-	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_password"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/email_only"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -24,9 +23,9 @@ import (
 
 type Authentication struct {
 	settings     *settings.SettingsRepository
-	p            *password.Provider
+	p            *password.UsernamePasswordProvider
 	ep           *email_only.Provider
-	epp          *email_password.Provider
+	epp          *password.EmailPasswordProvider
 	cj           *session1.Jar
 	accountQuery *account_querier.Querier
 	er           email.EmailRepo
@@ -37,9 +36,9 @@ type Authentication struct {
 func NewAuthentication(
 	settings *settings.SettingsRepository,
 	cfg config.Config,
-	p *password.Provider,
+	p *password.UsernamePasswordProvider,
 	ep *email_only.Provider,
-	epp *email_password.Provider,
+	epp *password.EmailPasswordProvider,
 	accountQuery *account_querier.Querier,
 	er email.EmailRepo,
 	sm *session1.Jar,
@@ -90,13 +89,13 @@ func serialiseAuthProvider(p auth_svc.Provider) (openapi.AuthProvider, error) {
 			return openapi.AuthProvider{}, fault.Wrap(err)
 		}
 		return openapi.AuthProvider{
-			Provider: p.Provides().String(),
+			Provider: p.Service().String(),
 			Link:     link,
 		}, nil
 	}
 
 	return openapi.AuthProvider{
-		Provider: p.Provides().String(),
+		Provider: p.Service().String(),
 	}, nil
 }
 

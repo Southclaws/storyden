@@ -28,7 +28,10 @@ var (
 	ErrAccountExists          = fault.New("requester already has an account")
 )
 
-var provider = authentication.ServiceWebAuthn
+var (
+	service   = authentication.ServiceWebAuthn
+	tokenType = authentication.TokenTypeWebAuthn
+)
 
 type Provider struct {
 	auth_repo    authentication.Repository
@@ -53,7 +56,8 @@ func New(
 	}, nil
 }
 
-func (p *Provider) Provides() authentication.Service { return provider }
+func (p *Provider) Service() authentication.Service { return service }
+func (p *Provider) Token() authentication.TokenType { return tokenType }
 
 func (p *Provider) Enabled(ctx context.Context) (bool, error) {
 	// TODO: Provide a way to enable/disable Passkey (WebAuthn) authentication.
@@ -100,7 +104,8 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 
 	_, err = p.auth_repo.Create(ctx,
 		acc.ID,
-		provider,
+		service,
+		authentication.TokenTypeWebAuthn,
 		base64.RawURLEncoding.EncodeToString(credential.ID),
 		string(encoded),
 		nil,
@@ -126,7 +131,8 @@ func (p *Provider) add(ctx context.Context, accountID account.AccountID, credent
 
 	_, err = p.auth_repo.Create(ctx,
 		acc.ID,
-		provider,
+		service,
+		authentication.TokenTypeWebAuthn,
 		base64.RawURLEncoding.EncodeToString(credential.ID),
 		string(encoded),
 		nil,

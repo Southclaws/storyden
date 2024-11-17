@@ -19,6 +19,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldService holds the string denoting the service field in the database.
 	FieldService = "service"
+	// FieldTokenType holds the string denoting the token_type field in the database.
+	FieldTokenType = "token_type"
 	// FieldIdentifier holds the string denoting the identifier field in the database.
 	FieldIdentifier = "identifier"
 	// FieldToken holds the string denoting the token field in the database.
@@ -29,6 +31,8 @@ const (
 	FieldMetadata = "metadata"
 	// FieldAccountAuthentication holds the string denoting the account_authentication field in the database.
 	FieldAccountAuthentication = "account_authentication"
+	// FieldEmailAddressRecordID holds the string denoting the email_address_record_id field in the database.
+	FieldEmailAddressRecordID = "email_address_record_id"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
 	EdgeAccount = "account"
 	// EdgeEmailAddress holds the string denoting the email_address edge name in mutations.
@@ -43,12 +47,12 @@ const (
 	// AccountColumn is the table column denoting the account relation/edge.
 	AccountColumn = "account_authentication"
 	// EmailAddressTable is the table that holds the email_address relation/edge.
-	EmailAddressTable = "emails"
+	EmailAddressTable = "authentications"
 	// EmailAddressInverseTable is the table name for the Email entity.
 	// It exists in this package in order to avoid circular dependency with the "email" package.
 	EmailAddressInverseTable = "emails"
 	// EmailAddressColumn is the table column denoting the email_address relation/edge.
-	EmailAddressColumn = "authentication_record_id"
+	EmailAddressColumn = "email_address_record_id"
 )
 
 // Columns holds all SQL columns for authentication fields.
@@ -56,11 +60,13 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldService,
+	FieldTokenType,
 	FieldIdentifier,
 	FieldToken,
 	FieldName,
 	FieldMetadata,
 	FieldAccountAuthentication,
+	FieldEmailAddressRecordID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -78,8 +84,12 @@ var (
 	DefaultCreatedAt func() time.Time
 	// ServiceValidator is a validator for the "service" field. It is called by the builders before save.
 	ServiceValidator func(string) error
+	// TokenTypeValidator is a validator for the "token_type" field. It is called by the builders before save.
+	TokenTypeValidator func(string) error
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	TokenValidator func(string) error
+	// EmailAddressRecordIDValidator is a validator for the "email_address_record_id" field. It is called by the builders before save.
+	EmailAddressRecordIDValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -104,6 +114,11 @@ func ByService(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldService, opts...).ToFunc()
 }
 
+// ByTokenType orders the results by the token_type field.
+func ByTokenType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTokenType, opts...).ToFunc()
+}
+
 // ByIdentifier orders the results by the identifier field.
 func ByIdentifier(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIdentifier, opts...).ToFunc()
@@ -124,6 +139,11 @@ func ByAccountAuthentication(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAccountAuthentication, opts...).ToFunc()
 }
 
+// ByEmailAddressRecordID orders the results by the email_address_record_id field.
+func ByEmailAddressRecordID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEmailAddressRecordID, opts...).ToFunc()
+}
+
 // ByAccountField orders the results by account field.
 func ByAccountField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -131,17 +151,10 @@ func ByAccountField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByEmailAddressCount orders the results by email_address count.
-func ByEmailAddressCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEmailAddressField orders the results by email_address field.
+func ByEmailAddressField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEmailAddressStep(), opts...)
-	}
-}
-
-// ByEmailAddress orders the results by email_address terms.
-func ByEmailAddress(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEmailAddressStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEmailAddressStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newAccountStep() *sqlgraph.Step {
@@ -155,6 +168,6 @@ func newEmailAddressStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EmailAddressInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EmailAddressTable, EmailAddressColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, EmailAddressTable, EmailAddressColumn),
 	)
 }

@@ -13,7 +13,10 @@ import (
 	"github.com/Southclaws/storyden/internal/config"
 )
 
-var provider = authentication.ServiceOAuthGitHub
+var (
+	service   = authentication.ServiceOAuthGitHub
+	tokenType = authentication.TokenTypeOAuth
+)
 
 type Provider struct {
 	auth_repo authentication.Repository
@@ -23,7 +26,7 @@ type Provider struct {
 }
 
 func New(cfg config.Config, auth_repo authentication.Repository) (*Provider, error) {
-	config, err := all.LoadProvider(provider)
+	config, err := all.LoadProvider(service)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -31,11 +34,12 @@ func New(cfg config.Config, auth_repo authentication.Repository) (*Provider, err
 	return &Provider{
 		auth_repo: auth_repo,
 		config:    config,
-		callback:  all.Redirect(cfg, provider),
+		callback:  all.Redirect(cfg, service),
 	}, nil
 }
 
-func (p *Provider) Provides() authentication.Service { return provider }
+func (p *Provider) Service() authentication.Service { return service }
+func (p *Provider) Token() authentication.TokenType { return tokenType }
 
 func (p *Provider) Enabled(ctx context.Context) (bool, error) {
 	return p.config != nil, nil

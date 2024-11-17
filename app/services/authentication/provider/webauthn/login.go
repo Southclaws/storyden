@@ -38,7 +38,7 @@ func (p *Provider) BeginLogin(ctx context.Context, handle string) (*protocol.Cre
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	ams = dt.Filter(ams, func(a *authentication.Authentication) bool { return a.Service == provider })
+	ams = dt.Filter(ams, func(a *authentication.Authentication) bool { return a.Service == service })
 	if len(ams) == 0 {
 		return nil, nil, fault.Wrap(ErrNoAuthRecord,
 			fctx.With(ctx),
@@ -94,7 +94,7 @@ func (p *Provider) FinishLogin(ctx context.Context,
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	ams = dt.Filter(ams, func(a *authentication.Authentication) bool { return a.Service == provider })
+	ams = dt.Filter(ams, func(a *authentication.Authentication) bool { return a.Service == service })
 	if len(ams) == 0 {
 		return nil, nil, fault.Wrap(ErrNoAuthRecord,
 			fctx.With(ctx),

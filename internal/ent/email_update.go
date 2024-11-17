@@ -51,26 +51,6 @@ func (eu *EmailUpdate) ClearAccountID() *EmailUpdate {
 	return eu
 }
 
-// SetAuthenticationRecordID sets the "authentication_record_id" field.
-func (eu *EmailUpdate) SetAuthenticationRecordID(x xid.ID) *EmailUpdate {
-	eu.mutation.SetAuthenticationRecordID(x)
-	return eu
-}
-
-// SetNillableAuthenticationRecordID sets the "authentication_record_id" field if the given value is not nil.
-func (eu *EmailUpdate) SetNillableAuthenticationRecordID(x *xid.ID) *EmailUpdate {
-	if x != nil {
-		eu.SetAuthenticationRecordID(*x)
-	}
-	return eu
-}
-
-// ClearAuthenticationRecordID clears the value of the "authentication_record_id" field.
-func (eu *EmailUpdate) ClearAuthenticationRecordID() *EmailUpdate {
-	eu.mutation.ClearAuthenticationRecordID()
-	return eu
-}
-
 // SetVerificationCode sets the "verification_code" field.
 func (eu *EmailUpdate) SetVerificationCode(s string) *EmailUpdate {
 	eu.mutation.SetVerificationCode(s)
@@ -104,23 +84,23 @@ func (eu *EmailUpdate) SetAccount(a *Account) *EmailUpdate {
 	return eu.SetAccountID(a.ID)
 }
 
-// SetAuthenticationID sets the "authentication" edge to the Authentication entity by ID.
-func (eu *EmailUpdate) SetAuthenticationID(id xid.ID) *EmailUpdate {
-	eu.mutation.SetAuthenticationID(id)
+// SetAuthenticationRecordID sets the "authentication_record" edge to the Authentication entity by ID.
+func (eu *EmailUpdate) SetAuthenticationRecordID(id xid.ID) *EmailUpdate {
+	eu.mutation.SetAuthenticationRecordID(id)
 	return eu
 }
 
-// SetNillableAuthenticationID sets the "authentication" edge to the Authentication entity by ID if the given value is not nil.
-func (eu *EmailUpdate) SetNillableAuthenticationID(id *xid.ID) *EmailUpdate {
+// SetNillableAuthenticationRecordID sets the "authentication_record" edge to the Authentication entity by ID if the given value is not nil.
+func (eu *EmailUpdate) SetNillableAuthenticationRecordID(id *xid.ID) *EmailUpdate {
 	if id != nil {
-		eu = eu.SetAuthenticationID(*id)
+		eu = eu.SetAuthenticationRecordID(*id)
 	}
 	return eu
 }
 
-// SetAuthentication sets the "authentication" edge to the Authentication entity.
-func (eu *EmailUpdate) SetAuthentication(a *Authentication) *EmailUpdate {
-	return eu.SetAuthenticationID(a.ID)
+// SetAuthenticationRecord sets the "authentication_record" edge to the Authentication entity.
+func (eu *EmailUpdate) SetAuthenticationRecord(a *Authentication) *EmailUpdate {
+	return eu.SetAuthenticationRecordID(a.ID)
 }
 
 // Mutation returns the EmailMutation object of the builder.
@@ -134,9 +114,9 @@ func (eu *EmailUpdate) ClearAccount() *EmailUpdate {
 	return eu
 }
 
-// ClearAuthentication clears the "authentication" edge to the Authentication entity.
-func (eu *EmailUpdate) ClearAuthentication() *EmailUpdate {
-	eu.mutation.ClearAuthentication()
+// ClearAuthenticationRecord clears the "authentication_record" edge to the Authentication entity.
+func (eu *EmailUpdate) ClearAuthenticationRecord() *EmailUpdate {
+	eu.mutation.ClearAuthenticationRecord()
 	return eu
 }
 
@@ -230,12 +210,12 @@ func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eu.mutation.AuthenticationCleared() {
+	if eu.mutation.AuthenticationRecordCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   email.AuthenticationTable,
-			Columns: []string{email.AuthenticationColumn},
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   email.AuthenticationRecordTable,
+			Columns: []string{email.AuthenticationRecordColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
@@ -243,12 +223,12 @@ func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.AuthenticationIDs(); len(nodes) > 0 {
+	if nodes := eu.mutation.AuthenticationRecordIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   email.AuthenticationTable,
-			Columns: []string{email.AuthenticationColumn},
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   email.AuthenticationRecordTable,
+			Columns: []string{email.AuthenticationRecordColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
@@ -301,26 +281,6 @@ func (euo *EmailUpdateOne) ClearAccountID() *EmailUpdateOne {
 	return euo
 }
 
-// SetAuthenticationRecordID sets the "authentication_record_id" field.
-func (euo *EmailUpdateOne) SetAuthenticationRecordID(x xid.ID) *EmailUpdateOne {
-	euo.mutation.SetAuthenticationRecordID(x)
-	return euo
-}
-
-// SetNillableAuthenticationRecordID sets the "authentication_record_id" field if the given value is not nil.
-func (euo *EmailUpdateOne) SetNillableAuthenticationRecordID(x *xid.ID) *EmailUpdateOne {
-	if x != nil {
-		euo.SetAuthenticationRecordID(*x)
-	}
-	return euo
-}
-
-// ClearAuthenticationRecordID clears the value of the "authentication_record_id" field.
-func (euo *EmailUpdateOne) ClearAuthenticationRecordID() *EmailUpdateOne {
-	euo.mutation.ClearAuthenticationRecordID()
-	return euo
-}
-
 // SetVerificationCode sets the "verification_code" field.
 func (euo *EmailUpdateOne) SetVerificationCode(s string) *EmailUpdateOne {
 	euo.mutation.SetVerificationCode(s)
@@ -354,23 +314,23 @@ func (euo *EmailUpdateOne) SetAccount(a *Account) *EmailUpdateOne {
 	return euo.SetAccountID(a.ID)
 }
 
-// SetAuthenticationID sets the "authentication" edge to the Authentication entity by ID.
-func (euo *EmailUpdateOne) SetAuthenticationID(id xid.ID) *EmailUpdateOne {
-	euo.mutation.SetAuthenticationID(id)
+// SetAuthenticationRecordID sets the "authentication_record" edge to the Authentication entity by ID.
+func (euo *EmailUpdateOne) SetAuthenticationRecordID(id xid.ID) *EmailUpdateOne {
+	euo.mutation.SetAuthenticationRecordID(id)
 	return euo
 }
 
-// SetNillableAuthenticationID sets the "authentication" edge to the Authentication entity by ID if the given value is not nil.
-func (euo *EmailUpdateOne) SetNillableAuthenticationID(id *xid.ID) *EmailUpdateOne {
+// SetNillableAuthenticationRecordID sets the "authentication_record" edge to the Authentication entity by ID if the given value is not nil.
+func (euo *EmailUpdateOne) SetNillableAuthenticationRecordID(id *xid.ID) *EmailUpdateOne {
 	if id != nil {
-		euo = euo.SetAuthenticationID(*id)
+		euo = euo.SetAuthenticationRecordID(*id)
 	}
 	return euo
 }
 
-// SetAuthentication sets the "authentication" edge to the Authentication entity.
-func (euo *EmailUpdateOne) SetAuthentication(a *Authentication) *EmailUpdateOne {
-	return euo.SetAuthenticationID(a.ID)
+// SetAuthenticationRecord sets the "authentication_record" edge to the Authentication entity.
+func (euo *EmailUpdateOne) SetAuthenticationRecord(a *Authentication) *EmailUpdateOne {
+	return euo.SetAuthenticationRecordID(a.ID)
 }
 
 // Mutation returns the EmailMutation object of the builder.
@@ -384,9 +344,9 @@ func (euo *EmailUpdateOne) ClearAccount() *EmailUpdateOne {
 	return euo
 }
 
-// ClearAuthentication clears the "authentication" edge to the Authentication entity.
-func (euo *EmailUpdateOne) ClearAuthentication() *EmailUpdateOne {
-	euo.mutation.ClearAuthentication()
+// ClearAuthenticationRecord clears the "authentication_record" edge to the Authentication entity.
+func (euo *EmailUpdateOne) ClearAuthenticationRecord() *EmailUpdateOne {
+	euo.mutation.ClearAuthenticationRecord()
 	return euo
 }
 
@@ -510,12 +470,12 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if euo.mutation.AuthenticationCleared() {
+	if euo.mutation.AuthenticationRecordCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   email.AuthenticationTable,
-			Columns: []string{email.AuthenticationColumn},
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   email.AuthenticationRecordTable,
+			Columns: []string{email.AuthenticationRecordColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
@@ -523,12 +483,12 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.AuthenticationIDs(); len(nodes) > 0 {
+	if nodes := euo.mutation.AuthenticationRecordIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   email.AuthenticationTable,
-			Columns: []string{email.AuthenticationColumn},
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   email.AuthenticationRecordTable,
+			Columns: []string{email.AuthenticationRecordColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),

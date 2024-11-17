@@ -21,8 +21,10 @@ func CheckMode(ctx context.Context, l *zap.Logger, settings *settings.SettingsRe
 	}
 
 	if set.AuthenticationMode.Or(authentication.ModeHandle) != requiredMode {
-		l.Warn("authentication occurred with a different mode to the preferred mode", zap.Error(
-			fault.Wrap(ErrIncorrectMode, fctx.With(ctx))))
+		l.Warn("authentication occurred with a different mode to the preferred mode",
+			zap.String("preferred_mode", requiredMode.String()),
+			zap.String("actual_mode", set.AuthenticationMode.String()),
+			zap.Error(fault.Wrap(ErrIncorrectMode, fctx.With(ctx))))
 	}
 
 	return nil

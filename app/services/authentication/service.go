@@ -12,8 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/settings"
-	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_only"
-	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_password"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/email_only"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/google"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/linkedin"
@@ -33,8 +32,8 @@ func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			// All authentication provider services.
-			password.New,
-			email_password.New,
+			password.NewEmailPasswordProvider,
+			password.NewUsernamePasswordProvider,
 			email_only.New,
 			webauthn.New,
 			google.New,
@@ -51,8 +50,8 @@ func New(
 	l *zap.Logger,
 	settings *settings.SettingsRepository,
 
-	pw *password.Provider,
-	ep *email_password.Provider,
+	pw *password.UsernamePasswordProvider,
+	ep *password.EmailPasswordProvider,
 	eo *email_only.Provider,
 	wa *webauthn.Provider,
 	gg *google.Provider,
@@ -78,7 +77,7 @@ func New(
 	return &Manager{
 		settings: settings,
 		providers: lo.KeyBy(providers, func(p Provider) authentication.Service {
-			return p.Provides()
+			return p.Service()
 		}),
 	}
 }
@@ -110,4 +109,6 @@ func (oa *Manager) Provider(id authentication.Service) (Provider, error) {
 	return p, nil
 }
 
-func name(p Provider) string { return p.Provides().String() }
+func service(p Provider) authentication.Service { return p.Service() }
+
+func name(p Provider) string { return p.Service().String() }

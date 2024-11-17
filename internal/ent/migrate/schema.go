@@ -156,11 +156,13 @@ var (
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
 		{Name: "service", Type: field.TypeString},
+		{Name: "token_type", Type: field.TypeString},
 		{Name: "identifier", Type: field.TypeString},
 		{Name: "token", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_authentication", Type: field.TypeString, Size: 20},
+		{Name: "email_address_record_id", Type: field.TypeString, Unique: true, Nullable: true, Size: 20},
 	}
 	// AuthenticationsTable holds the schema information for the "authentications" table.
 	AuthenticationsTable = &schema.Table{
@@ -170,16 +172,27 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "authentications_accounts_authentication",
-				Columns:    []*schema.Column{AuthenticationsColumns[7]},
+				Columns:    []*schema.Column{AuthenticationsColumns[8]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "authentications_emails_authentication_record",
+				Columns:    []*schema.Column{AuthenticationsColumns[9]},
+				RefColumns: []*schema.Column{EmailsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 		Indexes: []*schema.Index{
 			{
 				Name:    "authentication_service_identifier_account_authentication",
 				Unique:  true,
-				Columns: []*schema.Column{AuthenticationsColumns[2], AuthenticationsColumns[3], AuthenticationsColumns[7]},
+				Columns: []*schema.Column{AuthenticationsColumns[2], AuthenticationsColumns[4], AuthenticationsColumns[8]},
+			},
+			{
+				Name:    "authentication_token_type_identifier_account_authentication",
+				Unique:  true,
+				Columns: []*schema.Column{AuthenticationsColumns[3], AuthenticationsColumns[4], AuthenticationsColumns[8]},
 			},
 		},
 	}
@@ -311,7 +324,6 @@ var (
 		{Name: "verification_code", Type: field.TypeString, Size: 6},
 		{Name: "verified", Type: field.TypeBool, Default: "false"},
 		{Name: "account_id", Type: field.TypeString, Nullable: true, Size: 20},
-		{Name: "authentication_record_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// EmailsTable holds the schema information for the "emails" table.
 	EmailsTable = &schema.Table{
@@ -324,12 +336,6 @@ var (
 				Columns:    []*schema.Column{EmailsColumns[5]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "emails_authentications_email_address",
-				Columns:    []*schema.Column{EmailsColumns[6]},
-				RefColumns: []*schema.Column{AuthenticationsColumns[0]},
-				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -1012,6 +1018,7 @@ func init() {
 	AssetsTable.ForeignKeys[0].RefTable = AccountsTable
 	AssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
+	AuthenticationsTable.ForeignKeys[1].RefTable = EmailsTable
 	CollectionsTable.ForeignKeys[0].RefTable = AccountsTable
 	CollectionsTable.ForeignKeys[1].RefTable = AssetsTable
 	CollectionNodesTable.ForeignKeys[0].RefTable = CollectionsTable
@@ -1019,7 +1026,6 @@ func init() {
 	CollectionPostsTable.ForeignKeys[0].RefTable = CollectionsTable
 	CollectionPostsTable.ForeignKeys[1].RefTable = PostsTable
 	EmailsTable.ForeignKeys[0].RefTable = AccountsTable
-	EmailsTable.ForeignKeys[1].RefTable = AuthenticationsTable
 	EventsTable.ForeignKeys[0].RefTable = AssetsTable
 	EventsTable.ForeignKeys[1].RefTable = PostsTable
 	EventParticipantsTable.ForeignKeys[0].RefTable = AccountsTable
