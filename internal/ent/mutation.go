@@ -5149,6 +5149,7 @@ type AuthenticationMutation struct {
 	id                   *xid.ID
 	created_at           *time.Time
 	service              *string
+	token_type           *string
 	identifier           *string
 	token                *string
 	name                 *string
@@ -5156,8 +5157,7 @@ type AuthenticationMutation struct {
 	clearedFields        map[string]struct{}
 	account              *xid.ID
 	clearedaccount       bool
-	email_address        map[xid.ID]struct{}
-	removedemail_address map[xid.ID]struct{}
+	email_address        *xid.ID
 	clearedemail_address bool
 	done                 bool
 	oldValue             func(context.Context) (*Authentication, error)
@@ -5338,6 +5338,42 @@ func (m *AuthenticationMutation) OldService(ctx context.Context) (v string, err 
 // ResetService resets all changes to the "service" field.
 func (m *AuthenticationMutation) ResetService() {
 	m.service = nil
+}
+
+// SetTokenType sets the "token_type" field.
+func (m *AuthenticationMutation) SetTokenType(s string) {
+	m.token_type = &s
+}
+
+// TokenType returns the value of the "token_type" field in the mutation.
+func (m *AuthenticationMutation) TokenType() (r string, exists bool) {
+	v := m.token_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTokenType returns the old "token_type" field's value of the Authentication entity.
+// If the Authentication object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AuthenticationMutation) OldTokenType(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTokenType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTokenType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTokenType: %w", err)
+	}
+	return oldValue.TokenType, nil
+}
+
+// ResetTokenType resets all changes to the "token_type" field.
+func (m *AuthenticationMutation) ResetTokenType() {
+	m.token_type = nil
 }
 
 // SetIdentifier sets the "identifier" field.
@@ -5546,6 +5582,55 @@ func (m *AuthenticationMutation) ResetAccountAuthentication() {
 	m.account = nil
 }
 
+// SetEmailAddressRecordID sets the "email_address_record_id" field.
+func (m *AuthenticationMutation) SetEmailAddressRecordID(x xid.ID) {
+	m.email_address = &x
+}
+
+// EmailAddressRecordID returns the value of the "email_address_record_id" field in the mutation.
+func (m *AuthenticationMutation) EmailAddressRecordID() (r xid.ID, exists bool) {
+	v := m.email_address
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmailAddressRecordID returns the old "email_address_record_id" field's value of the Authentication entity.
+// If the Authentication object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AuthenticationMutation) OldEmailAddressRecordID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmailAddressRecordID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmailAddressRecordID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmailAddressRecordID: %w", err)
+	}
+	return oldValue.EmailAddressRecordID, nil
+}
+
+// ClearEmailAddressRecordID clears the value of the "email_address_record_id" field.
+func (m *AuthenticationMutation) ClearEmailAddressRecordID() {
+	m.email_address = nil
+	m.clearedFields[authentication.FieldEmailAddressRecordID] = struct{}{}
+}
+
+// EmailAddressRecordIDCleared returns if the "email_address_record_id" field was cleared in this mutation.
+func (m *AuthenticationMutation) EmailAddressRecordIDCleared() bool {
+	_, ok := m.clearedFields[authentication.FieldEmailAddressRecordID]
+	return ok
+}
+
+// ResetEmailAddressRecordID resets all changes to the "email_address_record_id" field.
+func (m *AuthenticationMutation) ResetEmailAddressRecordID() {
+	m.email_address = nil
+	delete(m.clearedFields, authentication.FieldEmailAddressRecordID)
+}
+
 // SetAccountID sets the "account" edge to the Account entity by id.
 func (m *AuthenticationMutation) SetAccountID(id xid.ID) {
 	m.account = &id
@@ -5586,49 +5671,36 @@ func (m *AuthenticationMutation) ResetAccount() {
 	m.clearedaccount = false
 }
 
-// AddEmailAddresIDs adds the "email_address" edge to the Email entity by ids.
-func (m *AuthenticationMutation) AddEmailAddresIDs(ids ...xid.ID) {
-	if m.email_address == nil {
-		m.email_address = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		m.email_address[ids[i]] = struct{}{}
-	}
+// SetEmailAddressID sets the "email_address" edge to the Email entity by id.
+func (m *AuthenticationMutation) SetEmailAddressID(id xid.ID) {
+	m.email_address = &id
 }
 
 // ClearEmailAddress clears the "email_address" edge to the Email entity.
 func (m *AuthenticationMutation) ClearEmailAddress() {
 	m.clearedemail_address = true
+	m.clearedFields[authentication.FieldEmailAddressRecordID] = struct{}{}
 }
 
 // EmailAddressCleared reports if the "email_address" edge to the Email entity was cleared.
 func (m *AuthenticationMutation) EmailAddressCleared() bool {
-	return m.clearedemail_address
+	return m.EmailAddressRecordIDCleared() || m.clearedemail_address
 }
 
-// RemoveEmailAddresIDs removes the "email_address" edge to the Email entity by IDs.
-func (m *AuthenticationMutation) RemoveEmailAddresIDs(ids ...xid.ID) {
-	if m.removedemail_address == nil {
-		m.removedemail_address = make(map[xid.ID]struct{})
-	}
-	for i := range ids {
-		delete(m.email_address, ids[i])
-		m.removedemail_address[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedEmailAddress returns the removed IDs of the "email_address" edge to the Email entity.
-func (m *AuthenticationMutation) RemovedEmailAddressIDs() (ids []xid.ID) {
-	for id := range m.removedemail_address {
-		ids = append(ids, id)
+// EmailAddressID returns the "email_address" edge ID in the mutation.
+func (m *AuthenticationMutation) EmailAddressID() (id xid.ID, exists bool) {
+	if m.email_address != nil {
+		return *m.email_address, true
 	}
 	return
 }
 
 // EmailAddressIDs returns the "email_address" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// EmailAddressID instead. It exists only for internal usage by the builders.
 func (m *AuthenticationMutation) EmailAddressIDs() (ids []xid.ID) {
-	for id := range m.email_address {
-		ids = append(ids, id)
+	if id := m.email_address; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -5637,7 +5709,6 @@ func (m *AuthenticationMutation) EmailAddressIDs() (ids []xid.ID) {
 func (m *AuthenticationMutation) ResetEmailAddress() {
 	m.email_address = nil
 	m.clearedemail_address = false
-	m.removedemail_address = nil
 }
 
 // Where appends a list predicates to the AuthenticationMutation builder.
@@ -5674,12 +5745,15 @@ func (m *AuthenticationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AuthenticationMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, authentication.FieldCreatedAt)
 	}
 	if m.service != nil {
 		fields = append(fields, authentication.FieldService)
+	}
+	if m.token_type != nil {
+		fields = append(fields, authentication.FieldTokenType)
 	}
 	if m.identifier != nil {
 		fields = append(fields, authentication.FieldIdentifier)
@@ -5696,6 +5770,9 @@ func (m *AuthenticationMutation) Fields() []string {
 	if m.account != nil {
 		fields = append(fields, authentication.FieldAccountAuthentication)
 	}
+	if m.email_address != nil {
+		fields = append(fields, authentication.FieldEmailAddressRecordID)
+	}
 	return fields
 }
 
@@ -5708,6 +5785,8 @@ func (m *AuthenticationMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case authentication.FieldService:
 		return m.Service()
+	case authentication.FieldTokenType:
+		return m.TokenType()
 	case authentication.FieldIdentifier:
 		return m.Identifier()
 	case authentication.FieldToken:
@@ -5718,6 +5797,8 @@ func (m *AuthenticationMutation) Field(name string) (ent.Value, bool) {
 		return m.Metadata()
 	case authentication.FieldAccountAuthentication:
 		return m.AccountAuthentication()
+	case authentication.FieldEmailAddressRecordID:
+		return m.EmailAddressRecordID()
 	}
 	return nil, false
 }
@@ -5731,6 +5812,8 @@ func (m *AuthenticationMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldCreatedAt(ctx)
 	case authentication.FieldService:
 		return m.OldService(ctx)
+	case authentication.FieldTokenType:
+		return m.OldTokenType(ctx)
 	case authentication.FieldIdentifier:
 		return m.OldIdentifier(ctx)
 	case authentication.FieldToken:
@@ -5741,6 +5824,8 @@ func (m *AuthenticationMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldMetadata(ctx)
 	case authentication.FieldAccountAuthentication:
 		return m.OldAccountAuthentication(ctx)
+	case authentication.FieldEmailAddressRecordID:
+		return m.OldEmailAddressRecordID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Authentication field %s", name)
 }
@@ -5763,6 +5848,13 @@ func (m *AuthenticationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetService(v)
+		return nil
+	case authentication.FieldTokenType:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTokenType(v)
 		return nil
 	case authentication.FieldIdentifier:
 		v, ok := value.(string)
@@ -5798,6 +5890,13 @@ func (m *AuthenticationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAccountAuthentication(v)
+		return nil
+	case authentication.FieldEmailAddressRecordID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEmailAddressRecordID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Authentication field %s", name)
@@ -5835,6 +5934,9 @@ func (m *AuthenticationMutation) ClearedFields() []string {
 	if m.FieldCleared(authentication.FieldMetadata) {
 		fields = append(fields, authentication.FieldMetadata)
 	}
+	if m.FieldCleared(authentication.FieldEmailAddressRecordID) {
+		fields = append(fields, authentication.FieldEmailAddressRecordID)
+	}
 	return fields
 }
 
@@ -5855,6 +5957,9 @@ func (m *AuthenticationMutation) ClearField(name string) error {
 	case authentication.FieldMetadata:
 		m.ClearMetadata()
 		return nil
+	case authentication.FieldEmailAddressRecordID:
+		m.ClearEmailAddressRecordID()
+		return nil
 	}
 	return fmt.Errorf("unknown Authentication nullable field %s", name)
 }
@@ -5868,6 +5973,9 @@ func (m *AuthenticationMutation) ResetField(name string) error {
 		return nil
 	case authentication.FieldService:
 		m.ResetService()
+		return nil
+	case authentication.FieldTokenType:
+		m.ResetTokenType()
 		return nil
 	case authentication.FieldIdentifier:
 		m.ResetIdentifier()
@@ -5883,6 +5991,9 @@ func (m *AuthenticationMutation) ResetField(name string) error {
 		return nil
 	case authentication.FieldAccountAuthentication:
 		m.ResetAccountAuthentication()
+		return nil
+	case authentication.FieldEmailAddressRecordID:
+		m.ResetEmailAddressRecordID()
 		return nil
 	}
 	return fmt.Errorf("unknown Authentication field %s", name)
@@ -5909,11 +6020,9 @@ func (m *AuthenticationMutation) AddedIDs(name string) []ent.Value {
 			return []ent.Value{*id}
 		}
 	case authentication.EdgeEmailAddress:
-		ids := make([]ent.Value, 0, len(m.email_address))
-		for id := range m.email_address {
-			ids = append(ids, id)
+		if id := m.email_address; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -5921,23 +6030,12 @@ func (m *AuthenticationMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AuthenticationMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
-	if m.removedemail_address != nil {
-		edges = append(edges, authentication.EdgeEmailAddress)
-	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *AuthenticationMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case authentication.EdgeEmailAddress:
-		ids := make([]ent.Value, 0, len(m.removedemail_address))
-		for id := range m.removedemail_address {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
@@ -5971,6 +6069,9 @@ func (m *AuthenticationMutation) ClearEdge(name string) error {
 	switch name {
 	case authentication.EdgeAccount:
 		m.ClearAccount()
+		return nil
+	case authentication.EdgeEmailAddress:
+		m.ClearEmailAddress()
 		return nil
 	}
 	return fmt.Errorf("unknown Authentication unique edge %s", name)
@@ -8870,21 +8971,21 @@ func (m *CollectionPostMutation) ResetEdge(name string) error {
 // EmailMutation represents an operation that mutates the Email nodes in the graph.
 type EmailMutation struct {
 	config
-	op                    Op
-	typ                   string
-	id                    *xid.ID
-	created_at            *time.Time
-	email_address         *string
-	verification_code     *string
-	verified              *bool
-	clearedFields         map[string]struct{}
-	account               *xid.ID
-	clearedaccount        bool
-	authentication        *xid.ID
-	clearedauthentication bool
-	done                  bool
-	oldValue              func(context.Context) (*Email, error)
-	predicates            []predicate.Email
+	op                           Op
+	typ                          string
+	id                           *xid.ID
+	created_at                   *time.Time
+	email_address                *string
+	verification_code            *string
+	verified                     *bool
+	clearedFields                map[string]struct{}
+	account                      *xid.ID
+	clearedaccount               bool
+	authentication_record        *xid.ID
+	clearedauthentication_record bool
+	done                         bool
+	oldValue                     func(context.Context) (*Email, error)
+	predicates                   []predicate.Email
 }
 
 var _ ent.Mutation = (*EmailMutation)(nil)
@@ -9076,55 +9177,6 @@ func (m *EmailMutation) ResetAccountID() {
 	delete(m.clearedFields, email.FieldAccountID)
 }
 
-// SetAuthenticationRecordID sets the "authentication_record_id" field.
-func (m *EmailMutation) SetAuthenticationRecordID(x xid.ID) {
-	m.authentication = &x
-}
-
-// AuthenticationRecordID returns the value of the "authentication_record_id" field in the mutation.
-func (m *EmailMutation) AuthenticationRecordID() (r xid.ID, exists bool) {
-	v := m.authentication
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAuthenticationRecordID returns the old "authentication_record_id" field's value of the Email entity.
-// If the Email object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EmailMutation) OldAuthenticationRecordID(ctx context.Context) (v *xid.ID, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAuthenticationRecordID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAuthenticationRecordID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAuthenticationRecordID: %w", err)
-	}
-	return oldValue.AuthenticationRecordID, nil
-}
-
-// ClearAuthenticationRecordID clears the value of the "authentication_record_id" field.
-func (m *EmailMutation) ClearAuthenticationRecordID() {
-	m.authentication = nil
-	m.clearedFields[email.FieldAuthenticationRecordID] = struct{}{}
-}
-
-// AuthenticationRecordIDCleared returns if the "authentication_record_id" field was cleared in this mutation.
-func (m *EmailMutation) AuthenticationRecordIDCleared() bool {
-	_, ok := m.clearedFields[email.FieldAuthenticationRecordID]
-	return ok
-}
-
-// ResetAuthenticationRecordID resets all changes to the "authentication_record_id" field.
-func (m *EmailMutation) ResetAuthenticationRecordID() {
-	m.authentication = nil
-	delete(m.clearedFields, email.FieldAuthenticationRecordID)
-}
-
 // SetEmailAddress sets the "email_address" field.
 func (m *EmailMutation) SetEmailAddress(s string) {
 	m.email_address = &s
@@ -9260,44 +9312,43 @@ func (m *EmailMutation) ResetAccount() {
 	m.clearedaccount = false
 }
 
-// SetAuthenticationID sets the "authentication" edge to the Authentication entity by id.
-func (m *EmailMutation) SetAuthenticationID(id xid.ID) {
-	m.authentication = &id
+// SetAuthenticationRecordID sets the "authentication_record" edge to the Authentication entity by id.
+func (m *EmailMutation) SetAuthenticationRecordID(id xid.ID) {
+	m.authentication_record = &id
 }
 
-// ClearAuthentication clears the "authentication" edge to the Authentication entity.
-func (m *EmailMutation) ClearAuthentication() {
-	m.clearedauthentication = true
-	m.clearedFields[email.FieldAuthenticationRecordID] = struct{}{}
+// ClearAuthenticationRecord clears the "authentication_record" edge to the Authentication entity.
+func (m *EmailMutation) ClearAuthenticationRecord() {
+	m.clearedauthentication_record = true
 }
 
-// AuthenticationCleared reports if the "authentication" edge to the Authentication entity was cleared.
-func (m *EmailMutation) AuthenticationCleared() bool {
-	return m.AuthenticationRecordIDCleared() || m.clearedauthentication
+// AuthenticationRecordCleared reports if the "authentication_record" edge to the Authentication entity was cleared.
+func (m *EmailMutation) AuthenticationRecordCleared() bool {
+	return m.clearedauthentication_record
 }
 
-// AuthenticationID returns the "authentication" edge ID in the mutation.
-func (m *EmailMutation) AuthenticationID() (id xid.ID, exists bool) {
-	if m.authentication != nil {
-		return *m.authentication, true
+// AuthenticationRecordID returns the "authentication_record" edge ID in the mutation.
+func (m *EmailMutation) AuthenticationRecordID() (id xid.ID, exists bool) {
+	if m.authentication_record != nil {
+		return *m.authentication_record, true
 	}
 	return
 }
 
-// AuthenticationIDs returns the "authentication" edge IDs in the mutation.
+// AuthenticationRecordIDs returns the "authentication_record" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// AuthenticationID instead. It exists only for internal usage by the builders.
-func (m *EmailMutation) AuthenticationIDs() (ids []xid.ID) {
-	if id := m.authentication; id != nil {
+// AuthenticationRecordID instead. It exists only for internal usage by the builders.
+func (m *EmailMutation) AuthenticationRecordIDs() (ids []xid.ID) {
+	if id := m.authentication_record; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetAuthentication resets all changes to the "authentication" edge.
-func (m *EmailMutation) ResetAuthentication() {
-	m.authentication = nil
-	m.clearedauthentication = false
+// ResetAuthenticationRecord resets all changes to the "authentication_record" edge.
+func (m *EmailMutation) ResetAuthenticationRecord() {
+	m.authentication_record = nil
+	m.clearedauthentication_record = false
 }
 
 // Where appends a list predicates to the EmailMutation builder.
@@ -9334,15 +9385,12 @@ func (m *EmailMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EmailMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 5)
 	if m.created_at != nil {
 		fields = append(fields, email.FieldCreatedAt)
 	}
 	if m.account != nil {
 		fields = append(fields, email.FieldAccountID)
-	}
-	if m.authentication != nil {
-		fields = append(fields, email.FieldAuthenticationRecordID)
 	}
 	if m.email_address != nil {
 		fields = append(fields, email.FieldEmailAddress)
@@ -9365,8 +9413,6 @@ func (m *EmailMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case email.FieldAccountID:
 		return m.AccountID()
-	case email.FieldAuthenticationRecordID:
-		return m.AuthenticationRecordID()
 	case email.FieldEmailAddress:
 		return m.EmailAddress()
 	case email.FieldVerificationCode:
@@ -9386,8 +9432,6 @@ func (m *EmailMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldCreatedAt(ctx)
 	case email.FieldAccountID:
 		return m.OldAccountID(ctx)
-	case email.FieldAuthenticationRecordID:
-		return m.OldAuthenticationRecordID(ctx)
 	case email.FieldEmailAddress:
 		return m.OldEmailAddress(ctx)
 	case email.FieldVerificationCode:
@@ -9416,13 +9460,6 @@ func (m *EmailMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAccountID(v)
-		return nil
-	case email.FieldAuthenticationRecordID:
-		v, ok := value.(xid.ID)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAuthenticationRecordID(v)
 		return nil
 	case email.FieldEmailAddress:
 		v, ok := value.(string)
@@ -9478,9 +9515,6 @@ func (m *EmailMutation) ClearedFields() []string {
 	if m.FieldCleared(email.FieldAccountID) {
 		fields = append(fields, email.FieldAccountID)
 	}
-	if m.FieldCleared(email.FieldAuthenticationRecordID) {
-		fields = append(fields, email.FieldAuthenticationRecordID)
-	}
 	return fields
 }
 
@@ -9498,9 +9532,6 @@ func (m *EmailMutation) ClearField(name string) error {
 	case email.FieldAccountID:
 		m.ClearAccountID()
 		return nil
-	case email.FieldAuthenticationRecordID:
-		m.ClearAuthenticationRecordID()
-		return nil
 	}
 	return fmt.Errorf("unknown Email nullable field %s", name)
 }
@@ -9514,9 +9545,6 @@ func (m *EmailMutation) ResetField(name string) error {
 		return nil
 	case email.FieldAccountID:
 		m.ResetAccountID()
-		return nil
-	case email.FieldAuthenticationRecordID:
-		m.ResetAuthenticationRecordID()
 		return nil
 	case email.FieldEmailAddress:
 		m.ResetEmailAddress()
@@ -9537,8 +9565,8 @@ func (m *EmailMutation) AddedEdges() []string {
 	if m.account != nil {
 		edges = append(edges, email.EdgeAccount)
 	}
-	if m.authentication != nil {
-		edges = append(edges, email.EdgeAuthentication)
+	if m.authentication_record != nil {
+		edges = append(edges, email.EdgeAuthenticationRecord)
 	}
 	return edges
 }
@@ -9551,8 +9579,8 @@ func (m *EmailMutation) AddedIDs(name string) []ent.Value {
 		if id := m.account; id != nil {
 			return []ent.Value{*id}
 		}
-	case email.EdgeAuthentication:
-		if id := m.authentication; id != nil {
+	case email.EdgeAuthenticationRecord:
+		if id := m.authentication_record; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -9577,8 +9605,8 @@ func (m *EmailMutation) ClearedEdges() []string {
 	if m.clearedaccount {
 		edges = append(edges, email.EdgeAccount)
 	}
-	if m.clearedauthentication {
-		edges = append(edges, email.EdgeAuthentication)
+	if m.clearedauthentication_record {
+		edges = append(edges, email.EdgeAuthenticationRecord)
 	}
 	return edges
 }
@@ -9589,8 +9617,8 @@ func (m *EmailMutation) EdgeCleared(name string) bool {
 	switch name {
 	case email.EdgeAccount:
 		return m.clearedaccount
-	case email.EdgeAuthentication:
-		return m.clearedauthentication
+	case email.EdgeAuthenticationRecord:
+		return m.clearedauthentication_record
 	}
 	return false
 }
@@ -9602,8 +9630,8 @@ func (m *EmailMutation) ClearEdge(name string) error {
 	case email.EdgeAccount:
 		m.ClearAccount()
 		return nil
-	case email.EdgeAuthentication:
-		m.ClearAuthentication()
+	case email.EdgeAuthenticationRecord:
+		m.ClearAuthenticationRecord()
 		return nil
 	}
 	return fmt.Errorf("unknown Email unique edge %s", name)
@@ -9616,8 +9644,8 @@ func (m *EmailMutation) ResetEdge(name string) error {
 	case email.EdgeAccount:
 		m.ResetAccount()
 		return nil
-	case email.EdgeAuthentication:
-		m.ResetAuthentication()
+	case email.EdgeAuthenticationRecord:
+		m.ResetAuthenticationRecord()
 		return nil
 	}
 	return fmt.Errorf("unknown Email edge %s", name)

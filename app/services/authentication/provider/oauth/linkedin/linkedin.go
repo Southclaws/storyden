@@ -27,7 +27,10 @@ var (
 	ErrMissingToken = fault.New("no access token in response")
 )
 
-var provider = authentication.ServiceOAuthLinkedin
+var (
+	service   = authentication.ServiceOAuthLinkedin
+	tokenType = authentication.TokenTypeOAuth
+)
 
 type Provider struct {
 	auth_repo  authentication.Repository
@@ -39,7 +42,7 @@ type Provider struct {
 }
 
 func New(cfg config.Config, auth_repo authentication.Repository, register *register.Registrar, avatar_svc avatar.Service) (*Provider, error) {
-	config, err := all.LoadProvider(provider)
+	config, err := all.LoadProvider(service)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -49,11 +52,12 @@ func New(cfg config.Config, auth_repo authentication.Repository, register *regis
 		register:   register,
 		avatar_svc: avatar_svc,
 		config:     config,
-		callback:   all.Redirect(cfg, provider),
+		callback:   all.Redirect(cfg, service),
 	}, nil
 }
 
-func (p *Provider) Provides() authentication.Service { return provider }
+func (p *Provider) Service() authentication.Service { return service }
+func (p *Provider) Token() authentication.TokenType { return tokenType }
 
 func (p *Provider) Enabled(ctx context.Context) (bool, error) {
 	return p.config != nil, nil
@@ -161,7 +165,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 
 	// TODO: Everything below this can be made generic for all OAuth providers.
 
-	acc, err := p.getOrCreateAccount(ctx, provider, profile.ID, auth.AccessToken, handle, name)
+	acc, err := p.getOrCreateAccount(ctx, service, profile.ID, auth.AccessToken, handle, name)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -174,8 +178,8 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 	return acc, nil
 }
 
-func (p *Provider) getOrCreateAccount(ctx context.Context, provider authentication.Service, identifier, token, handle, name string) (*account.Account, error) {
-	authmethod, exists, err := p.auth_repo.LookupByIdentifier(ctx, provider, identifier)
+func (p *Provider) getOrCreateAccount(ctx context.Context, service authentication.Service, identifier, token, handle, name string) (*account.Account, error) {
+	authmethod, exists, err := p.auth_repo.LookupByIdentifier(ctx, service, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to lookup existing account"), fctx.With(ctx))
 	}
@@ -190,7 +194,7 @@ func (p *Provider) getOrCreateAccount(ctx context.Context, provider authenticati
 		return nil, fault.Wrap(err, fmsg.With("failed to create new account"), fctx.With(ctx))
 	}
 
-	_, err = p.auth_repo.Create(ctx, acc.ID, provider, identifier, token, nil)
+	_, err = p.auth_repo.Create(ctx, acc.ID, service, authentication.TokenTypeOAuth, identifier, token, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for account"), fctx.With(ctx))
 	}

@@ -45,6 +45,20 @@ func (au *AuthenticationUpdate) SetNillableService(s *string) *AuthenticationUpd
 	return au
 }
 
+// SetTokenType sets the "token_type" field.
+func (au *AuthenticationUpdate) SetTokenType(s string) *AuthenticationUpdate {
+	au.mutation.SetTokenType(s)
+	return au
+}
+
+// SetNillableTokenType sets the "token_type" field if the given value is not nil.
+func (au *AuthenticationUpdate) SetNillableTokenType(s *string) *AuthenticationUpdate {
+	if s != nil {
+		au.SetTokenType(*s)
+	}
+	return au
+}
+
 // SetIdentifier sets the "identifier" field.
 func (au *AuthenticationUpdate) SetIdentifier(s string) *AuthenticationUpdate {
 	au.mutation.SetIdentifier(s)
@@ -119,6 +133,26 @@ func (au *AuthenticationUpdate) SetNillableAccountAuthentication(x *xid.ID) *Aut
 	return au
 }
 
+// SetEmailAddressRecordID sets the "email_address_record_id" field.
+func (au *AuthenticationUpdate) SetEmailAddressRecordID(x xid.ID) *AuthenticationUpdate {
+	au.mutation.SetEmailAddressRecordID(x)
+	return au
+}
+
+// SetNillableEmailAddressRecordID sets the "email_address_record_id" field if the given value is not nil.
+func (au *AuthenticationUpdate) SetNillableEmailAddressRecordID(x *xid.ID) *AuthenticationUpdate {
+	if x != nil {
+		au.SetEmailAddressRecordID(*x)
+	}
+	return au
+}
+
+// ClearEmailAddressRecordID clears the value of the "email_address_record_id" field.
+func (au *AuthenticationUpdate) ClearEmailAddressRecordID() *AuthenticationUpdate {
+	au.mutation.ClearEmailAddressRecordID()
+	return au
+}
+
 // SetAccountID sets the "account" edge to the Account entity by ID.
 func (au *AuthenticationUpdate) SetAccountID(id xid.ID) *AuthenticationUpdate {
 	au.mutation.SetAccountID(id)
@@ -130,19 +164,23 @@ func (au *AuthenticationUpdate) SetAccount(a *Account) *AuthenticationUpdate {
 	return au.SetAccountID(a.ID)
 }
 
-// AddEmailAddresIDs adds the "email_address" edge to the Email entity by IDs.
-func (au *AuthenticationUpdate) AddEmailAddresIDs(ids ...xid.ID) *AuthenticationUpdate {
-	au.mutation.AddEmailAddresIDs(ids...)
+// SetEmailAddressID sets the "email_address" edge to the Email entity by ID.
+func (au *AuthenticationUpdate) SetEmailAddressID(id xid.ID) *AuthenticationUpdate {
+	au.mutation.SetEmailAddressID(id)
 	return au
 }
 
-// AddEmailAddress adds the "email_address" edges to the Email entity.
-func (au *AuthenticationUpdate) AddEmailAddress(e ...*Email) *AuthenticationUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEmailAddressID sets the "email_address" edge to the Email entity by ID if the given value is not nil.
+func (au *AuthenticationUpdate) SetNillableEmailAddressID(id *xid.ID) *AuthenticationUpdate {
+	if id != nil {
+		au = au.SetEmailAddressID(*id)
 	}
-	return au.AddEmailAddresIDs(ids...)
+	return au
+}
+
+// SetEmailAddress sets the "email_address" edge to the Email entity.
+func (au *AuthenticationUpdate) SetEmailAddress(e *Email) *AuthenticationUpdate {
+	return au.SetEmailAddressID(e.ID)
 }
 
 // Mutation returns the AuthenticationMutation object of the builder.
@@ -156,25 +194,10 @@ func (au *AuthenticationUpdate) ClearAccount() *AuthenticationUpdate {
 	return au
 }
 
-// ClearEmailAddress clears all "email_address" edges to the Email entity.
+// ClearEmailAddress clears the "email_address" edge to the Email entity.
 func (au *AuthenticationUpdate) ClearEmailAddress() *AuthenticationUpdate {
 	au.mutation.ClearEmailAddress()
 	return au
-}
-
-// RemoveEmailAddresIDs removes the "email_address" edge to Email entities by IDs.
-func (au *AuthenticationUpdate) RemoveEmailAddresIDs(ids ...xid.ID) *AuthenticationUpdate {
-	au.mutation.RemoveEmailAddresIDs(ids...)
-	return au
-}
-
-// RemoveEmailAddress removes "email_address" edges to Email entities.
-func (au *AuthenticationUpdate) RemoveEmailAddress(e ...*Email) *AuthenticationUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return au.RemoveEmailAddresIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -211,9 +234,19 @@ func (au *AuthenticationUpdate) check() error {
 			return &ValidationError{Name: "service", err: fmt.Errorf(`ent: validator failed for field "Authentication.service": %w`, err)}
 		}
 	}
+	if v, ok := au.mutation.TokenType(); ok {
+		if err := authentication.TokenTypeValidator(v); err != nil {
+			return &ValidationError{Name: "token_type", err: fmt.Errorf(`ent: validator failed for field "Authentication.token_type": %w`, err)}
+		}
+	}
 	if v, ok := au.mutation.Token(); ok {
 		if err := authentication.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "Authentication.token": %w`, err)}
+		}
+	}
+	if v, ok := au.mutation.EmailAddressRecordID(); ok {
+		if err := authentication.EmailAddressRecordIDValidator(v.String()); err != nil {
+			return &ValidationError{Name: "email_address_record_id", err: fmt.Errorf(`ent: validator failed for field "Authentication.email_address_record_id": %w`, err)}
 		}
 	}
 	if au.mutation.AccountCleared() && len(au.mutation.AccountIDs()) > 0 {
@@ -242,6 +275,9 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if value, ok := au.mutation.Service(); ok {
 		_spec.SetField(authentication.FieldService, field.TypeString, value)
+	}
+	if value, ok := au.mutation.TokenType(); ok {
+		_spec.SetField(authentication.FieldTokenType, field.TypeString, value)
 	}
 	if value, ok := au.mutation.Identifier(); ok {
 		_spec.SetField(authentication.FieldIdentifier, field.TypeString, value)
@@ -292,37 +328,21 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if au.mutation.EmailAddressCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   authentication.EmailAddressTable,
 			Columns: []string{authentication.EmailAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.RemovedEmailAddressIDs(); len(nodes) > 0 && !au.mutation.EmailAddressCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   authentication.EmailAddressTable,
-			Columns: []string{authentication.EmailAddressColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := au.mutation.EmailAddressIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   authentication.EmailAddressTable,
 			Columns: []string{authentication.EmailAddressColumn},
 			Bidi:    false,
@@ -367,6 +387,20 @@ func (auo *AuthenticationUpdateOne) SetService(s string) *AuthenticationUpdateOn
 func (auo *AuthenticationUpdateOne) SetNillableService(s *string) *AuthenticationUpdateOne {
 	if s != nil {
 		auo.SetService(*s)
+	}
+	return auo
+}
+
+// SetTokenType sets the "token_type" field.
+func (auo *AuthenticationUpdateOne) SetTokenType(s string) *AuthenticationUpdateOne {
+	auo.mutation.SetTokenType(s)
+	return auo
+}
+
+// SetNillableTokenType sets the "token_type" field if the given value is not nil.
+func (auo *AuthenticationUpdateOne) SetNillableTokenType(s *string) *AuthenticationUpdateOne {
+	if s != nil {
+		auo.SetTokenType(*s)
 	}
 	return auo
 }
@@ -445,6 +479,26 @@ func (auo *AuthenticationUpdateOne) SetNillableAccountAuthentication(x *xid.ID) 
 	return auo
 }
 
+// SetEmailAddressRecordID sets the "email_address_record_id" field.
+func (auo *AuthenticationUpdateOne) SetEmailAddressRecordID(x xid.ID) *AuthenticationUpdateOne {
+	auo.mutation.SetEmailAddressRecordID(x)
+	return auo
+}
+
+// SetNillableEmailAddressRecordID sets the "email_address_record_id" field if the given value is not nil.
+func (auo *AuthenticationUpdateOne) SetNillableEmailAddressRecordID(x *xid.ID) *AuthenticationUpdateOne {
+	if x != nil {
+		auo.SetEmailAddressRecordID(*x)
+	}
+	return auo
+}
+
+// ClearEmailAddressRecordID clears the value of the "email_address_record_id" field.
+func (auo *AuthenticationUpdateOne) ClearEmailAddressRecordID() *AuthenticationUpdateOne {
+	auo.mutation.ClearEmailAddressRecordID()
+	return auo
+}
+
 // SetAccountID sets the "account" edge to the Account entity by ID.
 func (auo *AuthenticationUpdateOne) SetAccountID(id xid.ID) *AuthenticationUpdateOne {
 	auo.mutation.SetAccountID(id)
@@ -456,19 +510,23 @@ func (auo *AuthenticationUpdateOne) SetAccount(a *Account) *AuthenticationUpdate
 	return auo.SetAccountID(a.ID)
 }
 
-// AddEmailAddresIDs adds the "email_address" edge to the Email entity by IDs.
-func (auo *AuthenticationUpdateOne) AddEmailAddresIDs(ids ...xid.ID) *AuthenticationUpdateOne {
-	auo.mutation.AddEmailAddresIDs(ids...)
+// SetEmailAddressID sets the "email_address" edge to the Email entity by ID.
+func (auo *AuthenticationUpdateOne) SetEmailAddressID(id xid.ID) *AuthenticationUpdateOne {
+	auo.mutation.SetEmailAddressID(id)
 	return auo
 }
 
-// AddEmailAddress adds the "email_address" edges to the Email entity.
-func (auo *AuthenticationUpdateOne) AddEmailAddress(e ...*Email) *AuthenticationUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEmailAddressID sets the "email_address" edge to the Email entity by ID if the given value is not nil.
+func (auo *AuthenticationUpdateOne) SetNillableEmailAddressID(id *xid.ID) *AuthenticationUpdateOne {
+	if id != nil {
+		auo = auo.SetEmailAddressID(*id)
 	}
-	return auo.AddEmailAddresIDs(ids...)
+	return auo
+}
+
+// SetEmailAddress sets the "email_address" edge to the Email entity.
+func (auo *AuthenticationUpdateOne) SetEmailAddress(e *Email) *AuthenticationUpdateOne {
+	return auo.SetEmailAddressID(e.ID)
 }
 
 // Mutation returns the AuthenticationMutation object of the builder.
@@ -482,25 +540,10 @@ func (auo *AuthenticationUpdateOne) ClearAccount() *AuthenticationUpdateOne {
 	return auo
 }
 
-// ClearEmailAddress clears all "email_address" edges to the Email entity.
+// ClearEmailAddress clears the "email_address" edge to the Email entity.
 func (auo *AuthenticationUpdateOne) ClearEmailAddress() *AuthenticationUpdateOne {
 	auo.mutation.ClearEmailAddress()
 	return auo
-}
-
-// RemoveEmailAddresIDs removes the "email_address" edge to Email entities by IDs.
-func (auo *AuthenticationUpdateOne) RemoveEmailAddresIDs(ids ...xid.ID) *AuthenticationUpdateOne {
-	auo.mutation.RemoveEmailAddresIDs(ids...)
-	return auo
-}
-
-// RemoveEmailAddress removes "email_address" edges to Email entities.
-func (auo *AuthenticationUpdateOne) RemoveEmailAddress(e ...*Email) *AuthenticationUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return auo.RemoveEmailAddresIDs(ids...)
 }
 
 // Where appends a list predicates to the AuthenticationUpdate builder.
@@ -550,9 +593,19 @@ func (auo *AuthenticationUpdateOne) check() error {
 			return &ValidationError{Name: "service", err: fmt.Errorf(`ent: validator failed for field "Authentication.service": %w`, err)}
 		}
 	}
+	if v, ok := auo.mutation.TokenType(); ok {
+		if err := authentication.TokenTypeValidator(v); err != nil {
+			return &ValidationError{Name: "token_type", err: fmt.Errorf(`ent: validator failed for field "Authentication.token_type": %w`, err)}
+		}
+	}
 	if v, ok := auo.mutation.Token(); ok {
 		if err := authentication.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "Authentication.token": %w`, err)}
+		}
+	}
+	if v, ok := auo.mutation.EmailAddressRecordID(); ok {
+		if err := authentication.EmailAddressRecordIDValidator(v.String()); err != nil {
+			return &ValidationError{Name: "email_address_record_id", err: fmt.Errorf(`ent: validator failed for field "Authentication.email_address_record_id": %w`, err)}
 		}
 	}
 	if auo.mutation.AccountCleared() && len(auo.mutation.AccountIDs()) > 0 {
@@ -598,6 +651,9 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 	}
 	if value, ok := auo.mutation.Service(); ok {
 		_spec.SetField(authentication.FieldService, field.TypeString, value)
+	}
+	if value, ok := auo.mutation.TokenType(); ok {
+		_spec.SetField(authentication.FieldTokenType, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.Identifier(); ok {
 		_spec.SetField(authentication.FieldIdentifier, field.TypeString, value)
@@ -648,37 +704,21 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 	}
 	if auo.mutation.EmailAddressCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   authentication.EmailAddressTable,
 			Columns: []string{authentication.EmailAddressColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.RemovedEmailAddressIDs(); len(nodes) > 0 && !auo.mutation.EmailAddressCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   authentication.EmailAddressTable,
-			Columns: []string{authentication.EmailAddressColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := auo.mutation.EmailAddressIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   authentication.EmailAddressTable,
 			Columns: []string{authentication.EmailAddressColumn},
 			Bidi:    false,

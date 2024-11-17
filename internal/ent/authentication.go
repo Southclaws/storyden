@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
+	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/rs/xid"
 )
 
@@ -24,7 +25,9 @@ type Authentication struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// The authentication service name, such as GitHub, Twitter, Discord, etc. Or, 'password' for password auth and 'api_token' for token auth
 	Service string `json:"service,omitempty"`
-	// The identifier, usually a user/account ID on some OAuth service or API token name. If it's a password, this is blank.
+	// The type of secret/token used by the service to secure the authentication record.
+	TokenType string `json:"token_type,omitempty"`
+	// The identifier, usually a user/account ID on some OAuth service or API token name.
 	Identifier string `json:"identifier,omitempty"`
 	// The actual authentication token/password/key/etc. If OAuth, it'll be the access_token value, if it's a password, a hash and if it's an api_token type then the API token string.
 	Token string `json:"-"`
@@ -34,6 +37,8 @@ type Authentication struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// AccountAuthentication holds the value of the "account_authentication" field.
 	AccountAuthentication xid.ID `json:"account_authentication,omitempty"`
+	// EmailAddressRecordID holds the value of the "email_address_record_id" field.
+	EmailAddressRecordID *xid.ID `json:"email_address_record_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AuthenticationQuery when eager-loading is set.
 	Edges        AuthenticationEdges `json:"edges"`
@@ -45,7 +50,7 @@ type AuthenticationEdges struct {
 	// Account holds the value of the account edge.
 	Account *Account `json:"account,omitempty"`
 	// EmailAddress holds the value of the email_address edge.
-	EmailAddress []*Email `json:"email_address,omitempty"`
+	EmailAddress *Email `json:"email_address,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -63,10 +68,12 @@ func (e AuthenticationEdges) AccountOrErr() (*Account, error) {
 }
 
 // EmailAddressOrErr returns the EmailAddress value or an error if the edge
-// was not loaded in eager-loading.
-func (e AuthenticationEdges) EmailAddressOrErr() ([]*Email, error) {
-	if e.loadedTypes[1] {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AuthenticationEdges) EmailAddressOrErr() (*Email, error) {
+	if e.EmailAddress != nil {
 		return e.EmailAddress, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: email.Label}
 	}
 	return nil, &NotLoadedError{edge: "email_address"}
 }
@@ -76,9 +83,11 @@ func (*Authentication) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case authentication.FieldEmailAddressRecordID:
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case authentication.FieldMetadata:
 			values[i] = new([]byte)
-		case authentication.FieldService, authentication.FieldIdentifier, authentication.FieldToken, authentication.FieldName:
+		case authentication.FieldService, authentication.FieldTokenType, authentication.FieldIdentifier, authentication.FieldToken, authentication.FieldName:
 			values[i] = new(sql.NullString)
 		case authentication.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -117,6 +126,12 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.Service = value.String
 			}
+		case authentication.FieldTokenType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field token_type", values[i])
+			} else if value.Valid {
+				a.TokenType = value.String
+			}
 		case authentication.FieldIdentifier:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field identifier", values[i])
@@ -149,6 +164,13 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field account_authentication", values[i])
 			} else if value != nil {
 				a.AccountAuthentication = *value
+			}
+		case authentication.FieldEmailAddressRecordID:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field email_address_record_id", values[i])
+			} else if value.Valid {
+				a.EmailAddressRecordID = new(xid.ID)
+				*a.EmailAddressRecordID = *value.S.(*xid.ID)
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
@@ -202,6 +224,9 @@ func (a *Authentication) String() string {
 	builder.WriteString("service=")
 	builder.WriteString(a.Service)
 	builder.WriteString(", ")
+	builder.WriteString("token_type=")
+	builder.WriteString(a.TokenType)
+	builder.WriteString(", ")
 	builder.WriteString("identifier=")
 	builder.WriteString(a.Identifier)
 	builder.WriteString(", ")
@@ -217,6 +242,11 @@ func (a *Authentication) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("account_authentication=")
 	builder.WriteString(fmt.Sprintf("%v", a.AccountAuthentication))
+	builder.WriteString(", ")
+	if v := a.EmailAddressRecordID; v != nil {
+		builder.WriteString("email_address_record_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

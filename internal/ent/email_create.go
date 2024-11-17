@@ -54,20 +54,6 @@ func (ec *EmailCreate) SetNillableAccountID(x *xid.ID) *EmailCreate {
 	return ec
 }
 
-// SetAuthenticationRecordID sets the "authentication_record_id" field.
-func (ec *EmailCreate) SetAuthenticationRecordID(x xid.ID) *EmailCreate {
-	ec.mutation.SetAuthenticationRecordID(x)
-	return ec
-}
-
-// SetNillableAuthenticationRecordID sets the "authentication_record_id" field if the given value is not nil.
-func (ec *EmailCreate) SetNillableAuthenticationRecordID(x *xid.ID) *EmailCreate {
-	if x != nil {
-		ec.SetAuthenticationRecordID(*x)
-	}
-	return ec
-}
-
 // SetEmailAddress sets the "email_address" field.
 func (ec *EmailCreate) SetEmailAddress(s string) *EmailCreate {
 	ec.mutation.SetEmailAddress(s)
@@ -113,23 +99,23 @@ func (ec *EmailCreate) SetAccount(a *Account) *EmailCreate {
 	return ec.SetAccountID(a.ID)
 }
 
-// SetAuthenticationID sets the "authentication" edge to the Authentication entity by ID.
-func (ec *EmailCreate) SetAuthenticationID(id xid.ID) *EmailCreate {
-	ec.mutation.SetAuthenticationID(id)
+// SetAuthenticationRecordID sets the "authentication_record" edge to the Authentication entity by ID.
+func (ec *EmailCreate) SetAuthenticationRecordID(id xid.ID) *EmailCreate {
+	ec.mutation.SetAuthenticationRecordID(id)
 	return ec
 }
 
-// SetNillableAuthenticationID sets the "authentication" edge to the Authentication entity by ID if the given value is not nil.
-func (ec *EmailCreate) SetNillableAuthenticationID(id *xid.ID) *EmailCreate {
+// SetNillableAuthenticationRecordID sets the "authentication_record" edge to the Authentication entity by ID if the given value is not nil.
+func (ec *EmailCreate) SetNillableAuthenticationRecordID(id *xid.ID) *EmailCreate {
 	if id != nil {
-		ec = ec.SetAuthenticationID(*id)
+		ec = ec.SetAuthenticationRecordID(*id)
 	}
 	return ec
 }
 
-// SetAuthentication sets the "authentication" edge to the Authentication entity.
-func (ec *EmailCreate) SetAuthentication(a *Authentication) *EmailCreate {
-	return ec.SetAuthenticationID(a.ID)
+// SetAuthenticationRecord sets the "authentication_record" edge to the Authentication entity.
+func (ec *EmailCreate) SetAuthenticationRecord(a *Authentication) *EmailCreate {
+	return ec.SetAuthenticationRecordID(a.ID)
 }
 
 // Mutation returns the EmailMutation object of the builder.
@@ -279,12 +265,12 @@ func (ec *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 		_node.AccountID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.AuthenticationIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.AuthenticationRecordIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   email.AuthenticationTable,
-			Columns: []string{email.AuthenticationColumn},
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   email.AuthenticationRecordTable,
+			Columns: []string{email.AuthenticationRecordColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
@@ -293,7 +279,6 @@ func (ec *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.AuthenticationRecordID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -363,24 +348,6 @@ func (u *EmailUpsert) UpdateAccountID() *EmailUpsert {
 // ClearAccountID clears the value of the "account_id" field.
 func (u *EmailUpsert) ClearAccountID() *EmailUpsert {
 	u.SetNull(email.FieldAccountID)
-	return u
-}
-
-// SetAuthenticationRecordID sets the "authentication_record_id" field.
-func (u *EmailUpsert) SetAuthenticationRecordID(v xid.ID) *EmailUpsert {
-	u.Set(email.FieldAuthenticationRecordID, v)
-	return u
-}
-
-// UpdateAuthenticationRecordID sets the "authentication_record_id" field to the value that was provided on create.
-func (u *EmailUpsert) UpdateAuthenticationRecordID() *EmailUpsert {
-	u.SetExcluded(email.FieldAuthenticationRecordID)
-	return u
-}
-
-// ClearAuthenticationRecordID clears the value of the "authentication_record_id" field.
-func (u *EmailUpsert) ClearAuthenticationRecordID() *EmailUpsert {
-	u.SetNull(email.FieldAuthenticationRecordID)
 	return u
 }
 
@@ -480,27 +447,6 @@ func (u *EmailUpsertOne) UpdateAccountID() *EmailUpsertOne {
 func (u *EmailUpsertOne) ClearAccountID() *EmailUpsertOne {
 	return u.Update(func(s *EmailUpsert) {
 		s.ClearAccountID()
-	})
-}
-
-// SetAuthenticationRecordID sets the "authentication_record_id" field.
-func (u *EmailUpsertOne) SetAuthenticationRecordID(v xid.ID) *EmailUpsertOne {
-	return u.Update(func(s *EmailUpsert) {
-		s.SetAuthenticationRecordID(v)
-	})
-}
-
-// UpdateAuthenticationRecordID sets the "authentication_record_id" field to the value that was provided on create.
-func (u *EmailUpsertOne) UpdateAuthenticationRecordID() *EmailUpsertOne {
-	return u.Update(func(s *EmailUpsert) {
-		s.UpdateAuthenticationRecordID()
-	})
-}
-
-// ClearAuthenticationRecordID clears the value of the "authentication_record_id" field.
-func (u *EmailUpsertOne) ClearAuthenticationRecordID() *EmailUpsertOne {
-	return u.Update(func(s *EmailUpsert) {
-		s.ClearAuthenticationRecordID()
 	})
 }
 
@@ -771,27 +717,6 @@ func (u *EmailUpsertBulk) UpdateAccountID() *EmailUpsertBulk {
 func (u *EmailUpsertBulk) ClearAccountID() *EmailUpsertBulk {
 	return u.Update(func(s *EmailUpsert) {
 		s.ClearAccountID()
-	})
-}
-
-// SetAuthenticationRecordID sets the "authentication_record_id" field.
-func (u *EmailUpsertBulk) SetAuthenticationRecordID(v xid.ID) *EmailUpsertBulk {
-	return u.Update(func(s *EmailUpsert) {
-		s.SetAuthenticationRecordID(v)
-	})
-}
-
-// UpdateAuthenticationRecordID sets the "authentication_record_id" field to the value that was provided on create.
-func (u *EmailUpsertBulk) UpdateAuthenticationRecordID() *EmailUpsertBulk {
-	return u.Update(func(s *EmailUpsert) {
-		s.UpdateAuthenticationRecordID()
-	})
-}
-
-// ClearAuthenticationRecordID clears the value of the "authentication_record_id" field.
-func (u *EmailUpsertBulk) ClearAuthenticationRecordID() *EmailUpsertBulk {
-	return u.Update(func(s *EmailUpsert) {
-		s.ClearAuthenticationRecordID()
 	})
 }
 

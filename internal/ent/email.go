@@ -24,8 +24,6 @@ type Email struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// If set, this email is associated with an account, otherwise can be used for newsletter subscriptions etc.
 	AccountID *xid.ID `json:"account_id,omitempty"`
-	// If set, this this email is used for authentication
-	AuthenticationRecordID *xid.ID `json:"authentication_record_id,omitempty"`
 	// EmailAddress holds the value of the "email_address" field.
 	EmailAddress string `json:"email_address,omitempty"`
 	// A six digit code that is sent to the email address to verify ownership
@@ -42,8 +40,8 @@ type Email struct {
 type EmailEdges struct {
 	// Account holds the value of the account edge.
 	Account *Account `json:"account,omitempty"`
-	// Authentication holds the value of the authentication edge.
-	Authentication *Authentication `json:"authentication,omitempty"`
+	// AuthenticationRecord holds the value of the authentication_record edge.
+	AuthenticationRecord *Authentication `json:"authentication_record,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -60,15 +58,15 @@ func (e EmailEdges) AccountOrErr() (*Account, error) {
 	return nil, &NotLoadedError{edge: "account"}
 }
 
-// AuthenticationOrErr returns the Authentication value or an error if the edge
+// AuthenticationRecordOrErr returns the AuthenticationRecord value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e EmailEdges) AuthenticationOrErr() (*Authentication, error) {
-	if e.Authentication != nil {
-		return e.Authentication, nil
+func (e EmailEdges) AuthenticationRecordOrErr() (*Authentication, error) {
+	if e.AuthenticationRecord != nil {
+		return e.AuthenticationRecord, nil
 	} else if e.loadedTypes[1] {
 		return nil, &NotFoundError{label: authentication.Label}
 	}
-	return nil, &NotLoadedError{edge: "authentication"}
+	return nil, &NotLoadedError{edge: "authentication_record"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -76,7 +74,7 @@ func (*Email) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case email.FieldAccountID, email.FieldAuthenticationRecordID:
+		case email.FieldAccountID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case email.FieldVerified:
 			values[i] = new(sql.NullBool)
@@ -120,13 +118,6 @@ func (e *Email) assignValues(columns []string, values []any) error {
 				e.AccountID = new(xid.ID)
 				*e.AccountID = *value.S.(*xid.ID)
 			}
-		case email.FieldAuthenticationRecordID:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field authentication_record_id", values[i])
-			} else if value.Valid {
-				e.AuthenticationRecordID = new(xid.ID)
-				*e.AuthenticationRecordID = *value.S.(*xid.ID)
-			}
 		case email.FieldEmailAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email_address", values[i])
@@ -163,9 +154,9 @@ func (e *Email) QueryAccount() *AccountQuery {
 	return NewEmailClient(e.config).QueryAccount(e)
 }
 
-// QueryAuthentication queries the "authentication" edge of the Email entity.
-func (e *Email) QueryAuthentication() *AuthenticationQuery {
-	return NewEmailClient(e.config).QueryAuthentication(e)
+// QueryAuthenticationRecord queries the "authentication_record" edge of the Email entity.
+func (e *Email) QueryAuthenticationRecord() *AuthenticationQuery {
+	return NewEmailClient(e.config).QueryAuthenticationRecord(e)
 }
 
 // Update returns a builder for updating this Email.
@@ -196,11 +187,6 @@ func (e *Email) String() string {
 	builder.WriteString(", ")
 	if v := e.AccountID; v != nil {
 		builder.WriteString("account_id=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
-	builder.WriteString(", ")
-	if v := e.AuthenticationRecordID; v != nil {
-		builder.WriteString("authentication_record_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")

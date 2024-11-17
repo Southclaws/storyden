@@ -42,7 +42,7 @@ func (m *Manager) GetAuthMethods(ctx context.Context, id account.AccountID) ([]*
 
 	mapping := lo.FromEntries(dt.Map(ps, func(p authentication_service.Provider) lo.Entry[authentication.Service, authentication_service.Provider] {
 		return lo.Entry[authentication.Service, authentication_service.Provider]{
-			Key:   p.Provides(),
+			Key:   p.Service(),
 			Value: p,
 		}
 	}))
@@ -52,14 +52,24 @@ func (m *Manager) GetAuthMethods(ctx context.Context, id account.AccountID) ([]*
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return dt.Map(active, func(a *authentication.Authentication) *AuthMethod {
-		p := mapping[a.Service]
+	// We have two lists here, the list of all currently enabled auth providers
+	// and a list of methods that the account has used. If an instance admin has
+	// disabled certain providers, we should not show those in the list of auth
+	// methods used by the account. So they are filtered out during mapping.
 
-		return &AuthMethod{
-			Instance: *a,
-			Provider: p,
+	authMethods := dt.Reduce(active, func(acc []*AuthMethod, a *authentication.Authentication) []*AuthMethod {
+		p, enabled := mapping[a.Service]
+		if enabled {
+			acc = append(acc, &AuthMethod{
+				Instance: *a,
+				Provider: p,
+			})
 		}
-	}), nil
+
+		return acc
+	}, []*AuthMethod{})
+
+	return authMethods, nil
 }
 
 func (m *Manager) DeleteAuthMethod(ctx context.Context, id account.AccountID, aid authentication_repo.ID) error {

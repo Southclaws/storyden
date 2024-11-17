@@ -19,8 +19,6 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
-	// FieldAuthenticationRecordID holds the string denoting the authentication_record_id field in the database.
-	FieldAuthenticationRecordID = "authentication_record_id"
 	// FieldEmailAddress holds the string denoting the email_address field in the database.
 	FieldEmailAddress = "email_address"
 	// FieldVerificationCode holds the string denoting the verification_code field in the database.
@@ -29,8 +27,8 @@ const (
 	FieldVerified = "verified"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
 	EdgeAccount = "account"
-	// EdgeAuthentication holds the string denoting the authentication edge name in mutations.
-	EdgeAuthentication = "authentication"
+	// EdgeAuthenticationRecord holds the string denoting the authentication_record edge name in mutations.
+	EdgeAuthenticationRecord = "authentication_record"
 	// Table holds the table name of the email in the database.
 	Table = "emails"
 	// AccountTable is the table that holds the account relation/edge.
@@ -40,13 +38,13 @@ const (
 	AccountInverseTable = "accounts"
 	// AccountColumn is the table column denoting the account relation/edge.
 	AccountColumn = "account_id"
-	// AuthenticationTable is the table that holds the authentication relation/edge.
-	AuthenticationTable = "emails"
-	// AuthenticationInverseTable is the table name for the Authentication entity.
+	// AuthenticationRecordTable is the table that holds the authentication_record relation/edge.
+	AuthenticationRecordTable = "authentications"
+	// AuthenticationRecordInverseTable is the table name for the Authentication entity.
 	// It exists in this package in order to avoid circular dependency with the "authentication" package.
-	AuthenticationInverseTable = "authentications"
-	// AuthenticationColumn is the table column denoting the authentication relation/edge.
-	AuthenticationColumn = "authentication_record_id"
+	AuthenticationRecordInverseTable = "authentications"
+	// AuthenticationRecordColumn is the table column denoting the authentication_record relation/edge.
+	AuthenticationRecordColumn = "email_address_record_id"
 )
 
 // Columns holds all SQL columns for email fields.
@@ -54,7 +52,6 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldAccountID,
-	FieldAuthenticationRecordID,
 	FieldEmailAddress,
 	FieldVerificationCode,
 	FieldVerified,
@@ -103,11 +100,6 @@ func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAccountID, opts...).ToFunc()
 }
 
-// ByAuthenticationRecordID orders the results by the authentication_record_id field.
-func ByAuthenticationRecordID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAuthenticationRecordID, opts...).ToFunc()
-}
-
 // ByEmailAddress orders the results by the email_address field.
 func ByEmailAddress(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEmailAddress, opts...).ToFunc()
@@ -130,10 +122,10 @@ func ByAccountField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByAuthenticationField orders the results by authentication field.
-func ByAuthenticationField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByAuthenticationRecordField orders the results by authentication_record field.
+func ByAuthenticationRecordField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAuthenticationStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newAuthenticationRecordStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newAccountStep() *sqlgraph.Step {
@@ -143,10 +135,10 @@ func newAccountStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, AccountTable, AccountColumn),
 	)
 }
-func newAuthenticationStep() *sqlgraph.Step {
+func newAuthenticationRecordStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AuthenticationInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, AuthenticationTable, AuthenticationColumn),
+		sqlgraph.To(AuthenticationRecordInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, AuthenticationRecordTable, AuthenticationRecordColumn),
 	)
 }

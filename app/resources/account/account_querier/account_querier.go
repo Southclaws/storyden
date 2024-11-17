@@ -26,7 +26,7 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 		Query().
 		Where(account_ent.ID(xid.ID(id))).
 		WithTags().
-		WithEmails().
+		WithEmails(func(eq *ent.EmailQuery) { eq.WithAuthenticationRecord() }).
 		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		WithInvitedBy(func(iq *ent.InvitationQuery) {
 			iq.WithCreator(func(aq *ent.AccountQuery) {

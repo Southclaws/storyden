@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -101,7 +100,7 @@ func (aq *AuthenticationQuery) QueryEmailAddress() *EmailQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(authentication.Table, authentication.FieldID, selector),
 			sqlgraph.To(email.Table, email.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, authentication.EmailAddressTable, authentication.EmailAddressColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, authentication.EmailAddressTable, authentication.EmailAddressColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -443,9 +442,8 @@ func (aq *AuthenticationQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 		}
 	}
 	if query := aq.withEmailAddress; query != nil {
-		if err := aq.loadEmailAddress(ctx, query, nodes,
-			func(n *Authentication) { n.Edges.EmailAddress = []*Email{} },
-			func(n *Authentication, e *Email) { n.Edges.EmailAddress = append(n.Edges.EmailAddress, e) }); err != nil {
+		if err := aq.loadEmailAddress(ctx, query, nodes, nil,
+			func(n *Authentication, e *Email) { n.Edges.EmailAddress = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -482,35 +480,34 @@ func (aq *AuthenticationQuery) loadAccount(ctx context.Context, query *AccountQu
 	return nil
 }
 func (aq *AuthenticationQuery) loadEmailAddress(ctx context.Context, query *EmailQuery, nodes []*Authentication, init func(*Authentication), assign func(*Authentication, *Email)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[xid.ID]*Authentication)
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Authentication)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].EmailAddressRecordID == nil {
+			continue
 		}
+		fk := *nodes[i].EmailAddressRecordID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(email.FieldAuthenticationRecordID)
+	if len(ids) == 0 {
+		return nil
 	}
-	query.Where(predicate.Email(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(authentication.EmailAddressColumn), fks...))
-	}))
+	query.Where(email.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.AuthenticationRecordID
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "authentication_record_id" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "authentication_record_id" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "email_address_record_id" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
@@ -545,6 +542,9 @@ func (aq *AuthenticationQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if aq.withAccount != nil {
 			_spec.Node.AddColumnOnce(authentication.FieldAccountAuthentication)
+		}
+		if aq.withEmailAddress != nil {
+			_spec.Node.AddColumnOnce(authentication.FieldEmailAddressRecordID)
 		}
 	}
 	if ps := aq.predicates; len(ps) > 0 {

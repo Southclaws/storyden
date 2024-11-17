@@ -107,6 +107,6 @@ func MapEmail(in *ent.Email) *EmailAddress {
 	return &EmailAddress{
 		Email:    *addr,
 		Verified: in.Verified,
-		IsAuth:   in.AuthenticationRecordID != nil,
+		IsAuth:   in.Edges.AuthenticationRecord != nil,
 	}
 }

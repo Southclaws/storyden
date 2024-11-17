@@ -12,6 +12,7 @@ type Repository interface {
 	Create(ctx context.Context,
 		userID account.AccountID,
 		service Service,
+		tokenType TokenType,
 		identifier string,
 		token string,
 		metadata map[string]any,
@@ -21,8 +22,8 @@ type Repository interface {
 	// Gets an auth method based on a service's external account ID.
 	LookupByIdentifier(ctx context.Context, service Service, identifier string) (*Authentication, bool, error)
 
-	// Gets an auth method based on a service and the account's handle.
-	LookupByHandle(ctx context.Context, service Service, handle string) (*Authentication, bool, error)
+	// Gets an auth method for a specific account based on a token type and identifier.
+	LookupByTokenType(ctx context.Context, accountID account.AccountID, tokenType TokenType, identifier string) (*Authentication, bool, error)
 
 	// Gets all auth methods that a account has.
 	GetAuthMethods(ctx context.Context, userID account.AccountID) ([]*Authentication, error)

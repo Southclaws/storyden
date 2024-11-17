@@ -46,6 +46,12 @@ func (ac *AuthenticationCreate) SetService(s string) *AuthenticationCreate {
 	return ac
 }
 
+// SetTokenType sets the "token_type" field.
+func (ac *AuthenticationCreate) SetTokenType(s string) *AuthenticationCreate {
+	ac.mutation.SetTokenType(s)
+	return ac
+}
+
 // SetIdentifier sets the "identifier" field.
 func (ac *AuthenticationCreate) SetIdentifier(s string) *AuthenticationCreate {
 	ac.mutation.SetIdentifier(s)
@@ -84,6 +90,20 @@ func (ac *AuthenticationCreate) SetAccountAuthentication(x xid.ID) *Authenticati
 	return ac
 }
 
+// SetEmailAddressRecordID sets the "email_address_record_id" field.
+func (ac *AuthenticationCreate) SetEmailAddressRecordID(x xid.ID) *AuthenticationCreate {
+	ac.mutation.SetEmailAddressRecordID(x)
+	return ac
+}
+
+// SetNillableEmailAddressRecordID sets the "email_address_record_id" field if the given value is not nil.
+func (ac *AuthenticationCreate) SetNillableEmailAddressRecordID(x *xid.ID) *AuthenticationCreate {
+	if x != nil {
+		ac.SetEmailAddressRecordID(*x)
+	}
+	return ac
+}
+
 // SetID sets the "id" field.
 func (ac *AuthenticationCreate) SetID(x xid.ID) *AuthenticationCreate {
 	ac.mutation.SetID(x)
@@ -109,19 +129,23 @@ func (ac *AuthenticationCreate) SetAccount(a *Account) *AuthenticationCreate {
 	return ac.SetAccountID(a.ID)
 }
 
-// AddEmailAddresIDs adds the "email_address" edge to the Email entity by IDs.
-func (ac *AuthenticationCreate) AddEmailAddresIDs(ids ...xid.ID) *AuthenticationCreate {
-	ac.mutation.AddEmailAddresIDs(ids...)
+// SetEmailAddressID sets the "email_address" edge to the Email entity by ID.
+func (ac *AuthenticationCreate) SetEmailAddressID(id xid.ID) *AuthenticationCreate {
+	ac.mutation.SetEmailAddressID(id)
 	return ac
 }
 
-// AddEmailAddress adds the "email_address" edges to the Email entity.
-func (ac *AuthenticationCreate) AddEmailAddress(e ...*Email) *AuthenticationCreate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEmailAddressID sets the "email_address" edge to the Email entity by ID if the given value is not nil.
+func (ac *AuthenticationCreate) SetNillableEmailAddressID(id *xid.ID) *AuthenticationCreate {
+	if id != nil {
+		ac = ac.SetEmailAddressID(*id)
 	}
-	return ac.AddEmailAddresIDs(ids...)
+	return ac
+}
+
+// SetEmailAddress sets the "email_address" edge to the Email entity.
+func (ac *AuthenticationCreate) SetEmailAddress(e *Email) *AuthenticationCreate {
+	return ac.SetEmailAddressID(e.ID)
 }
 
 // Mutation returns the AuthenticationMutation object of the builder.
@@ -182,6 +206,14 @@ func (ac *AuthenticationCreate) check() error {
 			return &ValidationError{Name: "service", err: fmt.Errorf(`ent: validator failed for field "Authentication.service": %w`, err)}
 		}
 	}
+	if _, ok := ac.mutation.TokenType(); !ok {
+		return &ValidationError{Name: "token_type", err: errors.New(`ent: missing required field "Authentication.token_type"`)}
+	}
+	if v, ok := ac.mutation.TokenType(); ok {
+		if err := authentication.TokenTypeValidator(v); err != nil {
+			return &ValidationError{Name: "token_type", err: fmt.Errorf(`ent: validator failed for field "Authentication.token_type": %w`, err)}
+		}
+	}
 	if _, ok := ac.mutation.Identifier(); !ok {
 		return &ValidationError{Name: "identifier", err: errors.New(`ent: missing required field "Authentication.identifier"`)}
 	}
@@ -195,6 +227,11 @@ func (ac *AuthenticationCreate) check() error {
 	}
 	if _, ok := ac.mutation.AccountAuthentication(); !ok {
 		return &ValidationError{Name: "account_authentication", err: errors.New(`ent: missing required field "Authentication.account_authentication"`)}
+	}
+	if v, ok := ac.mutation.EmailAddressRecordID(); ok {
+		if err := authentication.EmailAddressRecordIDValidator(v.String()); err != nil {
+			return &ValidationError{Name: "email_address_record_id", err: fmt.Errorf(`ent: validator failed for field "Authentication.email_address_record_id": %w`, err)}
+		}
 	}
 	if v, ok := ac.mutation.ID(); ok {
 		if err := authentication.IDValidator(v.String()); err != nil {
@@ -248,6 +285,10 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		_spec.SetField(authentication.FieldService, field.TypeString, value)
 		_node.Service = value
 	}
+	if value, ok := ac.mutation.TokenType(); ok {
+		_spec.SetField(authentication.FieldTokenType, field.TypeString, value)
+		_node.TokenType = value
+	}
 	if value, ok := ac.mutation.Identifier(); ok {
 		_spec.SetField(authentication.FieldIdentifier, field.TypeString, value)
 		_node.Identifier = value
@@ -283,8 +324,8 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 	}
 	if nodes := ac.mutation.EmailAddressIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   authentication.EmailAddressTable,
 			Columns: []string{authentication.EmailAddressColumn},
 			Bidi:    false,
@@ -295,6 +336,7 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.EmailAddressRecordID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -358,6 +400,18 @@ func (u *AuthenticationUpsert) SetService(v string) *AuthenticationUpsert {
 // UpdateService sets the "service" field to the value that was provided on create.
 func (u *AuthenticationUpsert) UpdateService() *AuthenticationUpsert {
 	u.SetExcluded(authentication.FieldService)
+	return u
+}
+
+// SetTokenType sets the "token_type" field.
+func (u *AuthenticationUpsert) SetTokenType(v string) *AuthenticationUpsert {
+	u.Set(authentication.FieldTokenType, v)
+	return u
+}
+
+// UpdateTokenType sets the "token_type" field to the value that was provided on create.
+func (u *AuthenticationUpsert) UpdateTokenType() *AuthenticationUpsert {
+	u.SetExcluded(authentication.FieldTokenType)
 	return u
 }
 
@@ -433,6 +487,24 @@ func (u *AuthenticationUpsert) UpdateAccountAuthentication() *AuthenticationUpse
 	return u
 }
 
+// SetEmailAddressRecordID sets the "email_address_record_id" field.
+func (u *AuthenticationUpsert) SetEmailAddressRecordID(v xid.ID) *AuthenticationUpsert {
+	u.Set(authentication.FieldEmailAddressRecordID, v)
+	return u
+}
+
+// UpdateEmailAddressRecordID sets the "email_address_record_id" field to the value that was provided on create.
+func (u *AuthenticationUpsert) UpdateEmailAddressRecordID() *AuthenticationUpsert {
+	u.SetExcluded(authentication.FieldEmailAddressRecordID)
+	return u
+}
+
+// ClearEmailAddressRecordID clears the value of the "email_address_record_id" field.
+func (u *AuthenticationUpsert) ClearEmailAddressRecordID() *AuthenticationUpsert {
+	u.SetNull(authentication.FieldEmailAddressRecordID)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -495,6 +567,20 @@ func (u *AuthenticationUpsertOne) SetService(v string) *AuthenticationUpsertOne 
 func (u *AuthenticationUpsertOne) UpdateService() *AuthenticationUpsertOne {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.UpdateService()
+	})
+}
+
+// SetTokenType sets the "token_type" field.
+func (u *AuthenticationUpsertOne) SetTokenType(v string) *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetTokenType(v)
+	})
+}
+
+// UpdateTokenType sets the "token_type" field to the value that was provided on create.
+func (u *AuthenticationUpsertOne) UpdateTokenType() *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateTokenType()
 	})
 }
 
@@ -579,6 +665,27 @@ func (u *AuthenticationUpsertOne) SetAccountAuthentication(v xid.ID) *Authentica
 func (u *AuthenticationUpsertOne) UpdateAccountAuthentication() *AuthenticationUpsertOne {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.UpdateAccountAuthentication()
+	})
+}
+
+// SetEmailAddressRecordID sets the "email_address_record_id" field.
+func (u *AuthenticationUpsertOne) SetEmailAddressRecordID(v xid.ID) *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetEmailAddressRecordID(v)
+	})
+}
+
+// UpdateEmailAddressRecordID sets the "email_address_record_id" field to the value that was provided on create.
+func (u *AuthenticationUpsertOne) UpdateEmailAddressRecordID() *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateEmailAddressRecordID()
+	})
+}
+
+// ClearEmailAddressRecordID clears the value of the "email_address_record_id" field.
+func (u *AuthenticationUpsertOne) ClearEmailAddressRecordID() *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.ClearEmailAddressRecordID()
 	})
 }
 
@@ -814,6 +921,20 @@ func (u *AuthenticationUpsertBulk) UpdateService() *AuthenticationUpsertBulk {
 	})
 }
 
+// SetTokenType sets the "token_type" field.
+func (u *AuthenticationUpsertBulk) SetTokenType(v string) *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetTokenType(v)
+	})
+}
+
+// UpdateTokenType sets the "token_type" field to the value that was provided on create.
+func (u *AuthenticationUpsertBulk) UpdateTokenType() *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateTokenType()
+	})
+}
+
 // SetIdentifier sets the "identifier" field.
 func (u *AuthenticationUpsertBulk) SetIdentifier(v string) *AuthenticationUpsertBulk {
 	return u.Update(func(s *AuthenticationUpsert) {
@@ -895,6 +1016,27 @@ func (u *AuthenticationUpsertBulk) SetAccountAuthentication(v xid.ID) *Authentic
 func (u *AuthenticationUpsertBulk) UpdateAccountAuthentication() *AuthenticationUpsertBulk {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.UpdateAccountAuthentication()
+	})
+}
+
+// SetEmailAddressRecordID sets the "email_address_record_id" field.
+func (u *AuthenticationUpsertBulk) SetEmailAddressRecordID(v xid.ID) *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetEmailAddressRecordID(v)
+	})
+}
+
+// UpdateEmailAddressRecordID sets the "email_address_record_id" field to the value that was provided on create.
+func (u *AuthenticationUpsertBulk) UpdateEmailAddressRecordID() *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateEmailAddressRecordID()
+	})
+}
+
+// ClearEmailAddressRecordID clears the value of the "email_address_record_id" field.
+func (u *AuthenticationUpsertBulk) ClearEmailAddressRecordID() *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.ClearEmailAddressRecordID()
 	})
 }
 

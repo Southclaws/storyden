@@ -30,9 +30,17 @@ var (
 	ErrAccountAlreadyExists      = errors.New("account already exists")
 )
 
+// Email auth records do not hold tokens. There's no password hash and the
+// verification code is held in the email resource. We use a constant label
+// for the identifier in order to ensure there's only ever a single "email"
+// based authentication type (there's a unique constraint between identifier
+// and token type, in this case token type is none and identifier is const.)
+const authRecordIdentifier = "email"
+
 var (
 	requiredMode = authentication.ModeEmail
-	service      = authentication.ServiceEmail
+	service      = authentication.ServiceEmailVerify
+	tokenType    = authentication.TokenTypeNone
 )
 
 type Provider struct {
@@ -65,7 +73,8 @@ func New(
 	}
 }
 
-func (p *Provider) Provides() authentication.Service { return service }
+func (p *Provider) Service() authentication.Service { return service }
+func (p *Provider) Token() authentication.TokenType { return tokenType }
 
 func (p *Provider) Enabled(ctx context.Context) (bool, error) {
 	settings, err := p.settings.Get(ctx)
@@ -118,28 +127,17 @@ func (p *Provider) Register(ctx context.Context, email mail.Address, handle opt.
 	return account, nil
 }
 
-func (p *Provider) Link(_ string) (string, error) {
-	// Password provider does not use external links.
-	return "", nil
-}
-
-func (p *Provider) Login(ctx context.Context, accountID string, code string) (*account.Account, error) {
-	// NOTE: There's no login method for this, it uses the email.Verify method.
-	return nil, nil
-}
-
 func (p *Provider) addEmailAuth(ctx context.Context, accountID account.AccountID, email mail.Address) error {
 	code, err := otp.Generate()
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// Email auth records do not hold tokens or identifiers. There's no password
-	// hash and the verification code is held in the email resource.
-	identifier := "email_only"
+	// Email verification authentication does not use any form of token, however
+	// there needs to be some value set so generate a random ID for each record.
 	token := xid.New().String()
 
-	authRecord, err := p.auth.Create(ctx, accountID, service, identifier, token, nil)
+	authRecord, err := p.auth.Create(ctx, accountID, service, authentication.TokenTypeNone, authRecordIdentifier, token, nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}

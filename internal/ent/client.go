@@ -1534,7 +1534,7 @@ func (c *AuthenticationClient) QueryEmailAddress(a *Authentication) *EmailQuery 
 		step := sqlgraph.NewStep(
 			sqlgraph.From(authentication.Table, authentication.FieldID, id),
 			sqlgraph.To(email.Table, email.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, authentication.EmailAddressTable, authentication.EmailAddressColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, authentication.EmailAddressTable, authentication.EmailAddressColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -2301,15 +2301,15 @@ func (c *EmailClient) QueryAccount(e *Email) *AccountQuery {
 	return query
 }
 
-// QueryAuthentication queries the authentication edge of a Email.
-func (c *EmailClient) QueryAuthentication(e *Email) *AuthenticationQuery {
+// QueryAuthenticationRecord queries the authentication_record edge of a Email.
+func (c *EmailClient) QueryAuthenticationRecord(e *Email) *AuthenticationQuery {
 	query := (&AuthenticationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(email.Table, email.FieldID, id),
 			sqlgraph.To(authentication.Table, authentication.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, email.AuthenticationTable, email.AuthenticationColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, email.AuthenticationRecordTable, email.AuthenticationRecordColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil

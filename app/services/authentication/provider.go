@@ -12,10 +12,13 @@ type Provider interface {
 	// Enabled tells the auth method manager whether this method is enabled.
 	Enabled(ctx context.Context) (bool, error)
 
-	// Provides returns the unique identifier for the service. This is used for
+	// Service returns the unique identifier for the service. This is used for
 	// the repository layer to record which auth methods a member has used. It
 	// may also be used by clients to show a user-friendly label for the method.
-	Provides() authentication.Service
+	Service() authentication.Service
+
+	// Token returns the type of token/secret that this provider uses.
+	Token() authentication.TokenType
 }
 
 type OAuthProvider interface {

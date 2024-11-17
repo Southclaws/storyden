@@ -10,7 +10,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_only"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/email_only"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 

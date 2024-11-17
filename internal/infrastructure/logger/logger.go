@@ -26,6 +26,8 @@ func newLogger(cfg config.Config) (*zap.Logger, error) {
 		zapconfig = zap.NewDevelopmentConfig()
 	}
 
+	zapconfig.DisableStacktrace = true
+
 	zapconfig.Level.SetLevel(cfg.LogLevel)
 	zapconfig.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
 
