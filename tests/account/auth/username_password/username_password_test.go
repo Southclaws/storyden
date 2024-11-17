@@ -130,6 +130,17 @@ func TestUsernamePasswordAuth(t *testing.T) {
 				tests.Ok(t, err, signout)
 				a.Contains(signout.HTTPResponse.Header.Get("Set-Cookie"), "storyden-session=;")
 			})
+
+			t.Run("register_fail_invalid_password", func(t *testing.T) {
+				handle := xid.New().String()
+
+				signup, err := cl.AuthPasswordSignupWithResponse(root, nil,
+					openapi.AuthPasswordSignupJSONRequestBody{
+						Identifier: handle,
+						Token:      "weak", // too short password
+					})
+				tests.Status(t, err, signup, http.StatusBadRequest)
+			})
 		}))
 	}))
 }
