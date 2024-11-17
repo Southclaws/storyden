@@ -38,7 +38,12 @@ export function OAuth({ active, available }: Props) {
       <styled.ul display="flex" flexDir="column" gap="2" w="full">
         {available.map((v) => (
           <styled.li key={v.provider}>
-            <LinkButton href={v.link} variant="subtle">
+            <LinkButton
+              href={
+                v.link! /* OAuth2 methods always have a link property set */
+              }
+              variant="subtle"
+            >
               {v.name}
             </LinkButton>
           </styled.li>

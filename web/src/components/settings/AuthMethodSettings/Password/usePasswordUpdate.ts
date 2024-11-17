@@ -10,6 +10,7 @@ import { authPasswordUpdate } from "src/api/openapi-client/auth";
 import { APIError } from "src/api/openapi-schema";
 import { deriveError } from "src/utils/error";
 
+import { handle } from "@/api/client";
 import { ExistingPasswordSchema, PasswordSchema } from "@/lib/auth/schemas";
 
 const FormSchema = z.object({
@@ -19,37 +20,34 @@ const FormSchema = z.object({
 type Form = z.infer<typeof FormSchema>;
 
 export function usePasswordUpdate() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    setError,
-  } = useForm<Form>({
+  const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
   });
   const { mutate } = useAccountGet();
-  const [success, setSuccess] = useState(false);
 
-  async function handlePasswordChange(payload: Form) {
-    await authPasswordUpdate(payload)
-      .then(() => {
-        mutate();
-        setSuccess(true);
-      })
-      .catch((e: APIError) => setError("root", { message: deriveError(e) }));
-  }
-
-  function handleCloseNotification() {
-    setSuccess(false);
-  }
+  const handlePasswordChange = form.handleSubmit(async (payload: Form) => {
+    await handle(
+      async () => {
+        await authPasswordUpdate(payload);
+        await mutate();
+      },
+      {
+        errorToast: false,
+        async cleanup() {
+          await mutate();
+        },
+        async onError(error: unknown) {
+          form.setError("old", {
+            type: "manual",
+            message: deriveError(error),
+          });
+        },
+      },
+    );
+  });
 
   return {
-    form: {
-      register,
-      handlePasswordChange: handleSubmit(handlePasswordChange),
-      errors,
-    },
-    success,
-    handleCloseNotification,
+    form,
+    handlePasswordChange,
   };
 }
