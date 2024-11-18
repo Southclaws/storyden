@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/register"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/password/password_reset"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/internal/otp"
 )
@@ -43,6 +44,7 @@ type Provider struct {
 	accountQuery *account_querier.Querier
 	er           *email.Repository
 	register     *register.Registrar
+	resetter     *password_reset.EmailResetter
 
 	// TODO: Replace with an MQ message and sender job.
 	sender *email_verify.Verifier
@@ -58,6 +60,7 @@ func New(
 	accountQuery *account_querier.Querier,
 	er *email.Repository,
 	register *register.Registrar,
+	resetter *password_reset.EmailResetter,
 	sender *email_verify.Verifier,
 ) *Provider {
 	return &Provider{
@@ -68,6 +71,7 @@ func New(
 		accountQuery: accountQuery,
 		er:           er,
 		register:     register,
+		resetter:     resetter,
 		sender:       sender,
 	}
 }
@@ -159,6 +163,36 @@ func (b *Provider) UpdatePassword(ctx context.Context, aid account.AccountID, ol
 	}
 
 	auth, err = b.auth.Update(ctx, auth.ID, authentication.WithToken(hashed))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return &auth.Account, nil
+}
+
+func (p *Provider) ResetPassword(ctx context.Context, token string, newpassword string) (*account.Account, error) {
+	accountID, err := p.resetter.Verify(ctx, token)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	auth, exists, err := p.auth.LookupByTokenType(ctx, accountID, tokenType, accountID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	if !exists {
+		return nil, fault.Wrap(ErrNoPassword,
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc("no password", "The specified account does not use password authentication. Please try a different method."))
+	}
+
+	hashed, err := argon2id.CreateHash(newpassword, argon2id.DefaultParams)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create secure password hash"))
+	}
+
+	auth, err = p.auth.Update(ctx, auth.ID, authentication.WithToken(hashed))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

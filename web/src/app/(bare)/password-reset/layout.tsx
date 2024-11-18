@@ -9,8 +9,8 @@ export default async function Layout({ children }: PropsWithChildren) {
       {children}
 
       <HStack>
-        <LinkButton size="xs" variant="ghost" href="/password-reset">
-          Forgot password
+        <LinkButton size="xs" variant="ghost" href="/login">
+          Login
         </LinkButton>
 
         <LinkButton size="xs" variant="subtle" href="/register">

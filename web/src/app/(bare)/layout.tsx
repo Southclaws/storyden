@@ -3,9 +3,11 @@ import { PropsWithChildren } from "react";
 
 import { Fullpage } from "src/layouts/Fullpage";
 
+import { BackAction } from "@/components/site/Action/Back";
+import { HomeAnchor } from "@/components/site/Navigation/Anchors/Home";
 import { getSettings } from "@/lib/settings/settings-server";
 import { css } from "@/styled-system/css";
-import { CardBox, VStack, styled } from "@/styled-system/jsx";
+import { CardBox, VStack, WStack, styled } from "@/styled-system/jsx";
 import { vstack } from "@/styled-system/patterns";
 import { getIconURL } from "@/utils/icon";
 
@@ -18,6 +20,11 @@ export default async function Layout({ children }: PropsWithChildren) {
     <Fullpage>
       <VStack minH="dvh" py="24">
         <CardBox className={vstack()} maxW="sm" gap="4" p="4">
+          <WStack>
+            <BackAction />
+
+            <HomeAnchor hideLabel />
+          </WStack>
           <VStack>
             <Image
               className={css({ width: "24" })}

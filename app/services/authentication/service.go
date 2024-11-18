@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/google"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/linkedin"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/password/password_reset"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/phone"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/webauthn"
 )
@@ -42,6 +43,7 @@ func Build() fx.Option {
 			phone.New,
 		),
 		fx.Provide(email_verify.New),
+		fx.Provide(password_reset.NewTokenProvider, password_reset.NewEmailResetter),
 		fx.Provide(New),
 	)
 }

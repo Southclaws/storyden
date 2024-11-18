@@ -346,7 +346,6 @@ paths:
         Given the requesting account does not have a password authentication,
         add a password authentication method to it with the given password.
       tags: [auth]
-      security: []
       requestBody: { $ref: "#/components/requestBodies/AuthPasswordCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -359,8 +358,22 @@ paths:
         Given the requesting account has a password authentication, update the
         password on file.
       tags: [auth]
-      security: []
       requestBody: { $ref: "#/components/requestBodies/AuthPasswordUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
+  /auth/password/reset:
+    post:
+      operationId: AuthPasswordReset
+      description: |
+        Complete a password-reset flow using a token that was provided to the
+        member via a reset request operation such as `AuthEmailPasswordReset`.
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/AuthPasswordReset" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -392,6 +405,20 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
+  /auth/email-password/reset:
+    post:
+      operationId: AuthPasswordResetRequestEmail
+      description: |
+        Request password reset email to be sent to the specified email address.
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/AuthEmailPasswordReset" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
 
   /auth/email/signup:
     post:
@@ -2263,6 +2290,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AuthEmailPasswordInitialProps" }
 
+    AuthEmailPasswordReset:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthEmailPasswordReset" }
+
     AuthEmail:
       content:
         application/json:
@@ -2282,6 +2314,11 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/AuthPasswordMutableProps" }
+
+    AuthPasswordReset:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthPasswordResetProps" }
 
     OAuthProviderCallback:
       content:
@@ -3438,6 +3475,26 @@ components:
         handle:
           $ref: "#/components/schemas/AccountHandle"
 
+    AuthEmailPasswordReset:
+      type: object
+      required: [email, token_url]
+      properties:
+        email: { $ref: "#/components/schemas/EmailAddress" }
+        token_url:
+          type: object
+          required: [url, query]
+          properties:
+            url:
+              description: |
+                The URL to include in the password reset email. This URL's host
+                must match the configured Storyden instance's web address value.
+              type: string
+            query:
+              description: |
+                The query parameters to store the reset token in. This is a
+                frontend client specific value.
+              type: string
+
     AuthEmailInitialProps:
       type: object
       required: [email]
@@ -3473,6 +3530,16 @@ components:
       properties:
         old:
           example: "password123"
+          type: string
+        new:
+          example: "password456"
+          type: string
+
+    AuthPasswordResetProps:
+      type: object
+      required: [token, new]
+      properties:
+        token:
           type: string
         new:
           example: "password456"

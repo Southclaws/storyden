@@ -10,11 +10,13 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   AuthEmailBody,
   AuthEmailPasswordBody,
+  AuthEmailPasswordResetBody,
   AuthEmailPasswordSignupParams,
   AuthEmailSignupParams,
   AuthEmailVerifyBody,
   AuthPasswordBody,
   AuthPasswordCreateBody,
+  AuthPasswordResetBody,
   AuthPasswordSignupParams,
   AuthPasswordUpdateBody,
   AuthProviderListOKResponse,
@@ -179,6 +181,35 @@ export const authPasswordUpdate = async (
 };
 
 /**
+ * Complete a password-reset flow using a token that was provided to the
+member via a reset request operation such as `AuthEmailPasswordReset`.
+
+ */
+export type authPasswordResetResponse = {
+  data: AuthSuccessOKResponse;
+  status: number;
+};
+
+export const getAuthPasswordResetUrl = () => {
+  return `/auth/password/reset`;
+};
+
+export const authPasswordReset = async (
+  authPasswordResetBody: AuthPasswordResetBody,
+  options?: RequestInit,
+): Promise<authPasswordResetResponse> => {
+  return fetcher<Promise<authPasswordResetResponse>>(
+    getAuthPasswordResetUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(authPasswordResetBody),
+    },
+  );
+};
+
+/**
  * Register a new account with a email and password.
  */
 export type authEmailPasswordSignupResponse = {
@@ -241,6 +272,34 @@ export const authEmailPasswordSignin = async (
       method: "POST",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(authEmailPasswordBody),
+    },
+  );
+};
+
+/**
+ * Request password reset email to be sent to the specified email address.
+
+ */
+export type authPasswordResetRequestEmailResponse = {
+  data: void;
+  status: number;
+};
+
+export const getAuthPasswordResetRequestEmailUrl = () => {
+  return `/auth/email-password/reset`;
+};
+
+export const authPasswordResetRequestEmail = async (
+  authEmailPasswordResetBody: AuthEmailPasswordResetBody,
+  options?: RequestInit,
+): Promise<authPasswordResetRequestEmailResponse> => {
+  return fetcher<Promise<authPasswordResetRequestEmailResponse>>(
+    getAuthPasswordResetRequestEmailUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(authEmailPasswordResetBody),
     },
   );
 };
