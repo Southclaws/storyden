@@ -9,7 +9,7 @@ type Props = {
   }>;
 };
 
-export const QuerySchema = z.object({
+const QuerySchema = z.object({
   token: z.string(),
 });
 
