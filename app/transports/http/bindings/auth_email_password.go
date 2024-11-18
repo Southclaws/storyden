@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
+	"github.com/Southclaws/storyden/app/services/authentication/provider/password/password_reset"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
@@ -59,4 +60,23 @@ func (i *Authentication) AuthEmailPasswordSignin(ctx context.Context, request op
 			},
 		},
 	}, nil
+}
+
+func (i *Authentication) AuthPasswordResetRequestEmail(ctx context.Context, request openapi.AuthPasswordResetRequestEmailRequestObject) (openapi.AuthPasswordResetRequestEmailResponseObject, error) {
+	address, err := mail.ParseAddress(request.Body.Email)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	lt, err := password_reset.NewLinkTemplate(request.Body.TokenUrl.Url, request.Body.TokenUrl.Query)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	err = i.passwordAuthProvider.RequestReset(ctx, *address, *lt)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AuthPasswordResetRequestEmail200Response{}, nil
 }

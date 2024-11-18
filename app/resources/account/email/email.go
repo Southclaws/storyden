@@ -36,17 +36,22 @@ func (r *Repository) Add(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if exists && existing.AccountID != nil {
-		return nil, fault.New("email address already claimed", fctx.With(ctx), ftag.With(ftag.AlreadyExists))
-	}
-
-	// Exists already, but not claimed, update to new owner.
 	if exists {
-		updated, err := r.db.Email.UpdateOne(existing).
+		// Already been claimed, by a different account
+		if existing.AccountID != nil && *existing.AccountID != xid.ID(accountID) {
+			return nil, fault.New("email address already claimed", fctx.With(ctx), ftag.With(ftag.AlreadyExists))
+		}
+
+		// Already claimed by this account, update the record
+		update := r.db.Email.UpdateOne(existing).
 			Where(email_ent.EmailAddress(email.Address)).
-			SetAccountID(xid.ID(accountID)).
-			SetVerificationCode(code).
-			Save(ctx)
+			SetVerificationCode(code)
+
+		if existing.AccountID == nil {
+			update.SetAccountID(xid.ID(accountID))
+		}
+
+		updated, err := update.Save(ctx)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}

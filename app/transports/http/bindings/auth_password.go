@@ -88,3 +88,19 @@ func (i *Authentication) AuthPasswordUpdate(ctx context.Context, request openapi
 		},
 	}, nil
 }
+
+func (i *Authentication) AuthPasswordReset(ctx context.Context, request openapi.AuthPasswordResetRequestObject) (openapi.AuthPasswordResetResponseObject, error) {
+	u, err := i.passwordAuthProvider.ResetPassword(ctx, request.Body.Token, request.Body.New)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AuthPasswordReset200JSONResponse{
+		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
+			Body: openapi.AuthSuccessOK{Id: u.ID.String()},
+			Headers: openapi.AuthSuccessOKResponseHeaders{
+				SetCookie: i.cj.Create(u.ID.String()).String(),
+			},
+		},
+	}, nil
+}

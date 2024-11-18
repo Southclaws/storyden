@@ -14,6 +14,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/password/password_reset"
 )
 
 func (p *Provider) RegisterWithEmail(ctx context.Context, email mail.Address, password string, handle opt.Optional[string], inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
@@ -129,4 +130,29 @@ func (p *Provider) LoginWithEmail(ctx context.Context, emailAddress mail.Address
 	}
 
 	return &a.Account, nil
+}
+
+func (p *Provider) RequestReset(ctx context.Context, emailAddress mail.Address, lt password_reset.LinkTemplate) error {
+	enabled, err := p.isEmailAvailable(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if !enabled {
+		return ErrEmailRegistrationDisabled
+	}
+
+	acc, exists, err := p.er.LookupAccount(ctx, emailAddress)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if !exists {
+		return fault.Wrap(ErrNotFound, fctx.With(ctx), fmsg.With("failed to get account"))
+	}
+
+	err = p.resetter.SendPasswordReset(ctx, acc.ID, emailAddress, lt)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
 }
