@@ -7,11 +7,12 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { EmailAddress } from "./emailAddress";
+import type { Identifier } from "./identifier";
 
 export interface AccountEmailAddress {
-  email_address: string;
-  /** Is the email used for authenticating to the platform? */
-  is_auth: boolean;
+  email_address: EmailAddress;
+  id: Identifier;
   /** Is the email address verified to be owned by the account? */
   verified: boolean;
 }

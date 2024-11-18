@@ -1,17 +1,65 @@
 "use client";
 
-import { Heading } from "@/components/ui/heading";
-import { VStack } from "@/styled-system/jsx";
+import { TabsValueChangeDetails } from "@ark-ui/react";
+import { useQueryState } from "nuqs";
+import { useEffect } from "react";
 
-import { AuthMethodSettings } from "./components/AuthMethodSettings/AuthMethodSettings";
-import { IdentitySettings } from "./components/IdentitySettings/IdentitySettings";
+import * as Tabs from "@/components/ui/tabs";
+import { Settings } from "@/lib/settings/settings";
 
-export function SettingsScreen() {
+import { MemberAuthenticationSettingsScreen } from "./MemberAuthenticationSettingsScreen";
+import { MemberEmailSettingsScreen } from "./MemberEmailSettingsScreen";
+
+const DEFAULT_TAB = "authentication";
+
+type Props = {
+  initialSettings: Settings;
+};
+
+export function SettingsScreen({ initialSettings }: Props) {
+  const [tab, setTab] = useQueryState("tab", {
+    defaultValue: DEFAULT_TAB,
+  });
+
+  // NOTE: A hack because for some reason, the tab component renders twice and
+  // the associated hook gets lost and results in `ready` always being false,
+  // despite the useSettings hook returning the correct data. Not sure if this
+  // is a Next.js bug, a React bug or a Ark, Park or something else bug...
+  useEffect(() => {
+    if (!tab) {
+      setTab(DEFAULT_TAB);
+    }
+  }, [tab, setTab]);
+
+  function handleTabChange({ value }: TabsValueChangeDetails) {
+    setTab(value);
+  }
+
+  const emailEnabled = initialSettings.capabilities.includes("email_client");
+
   return (
-    <VStack alignItems="start" gap="4">
-      <Heading size="lg">Settings</Heading>
+    <Tabs.Root
+      width="full"
+      variant="enclosed"
+      defaultValue={DEFAULT_TAB}
+      value={tab}
+      onValueChange={handleTabChange}
+    >
+      <Tabs.List>
+        <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
+        {emailEnabled && <Tabs.Trigger value="email">Email</Tabs.Trigger>}
+        <Tabs.Indicator />
+      </Tabs.List>
 
-      <AuthMethodSettings />
-    </VStack>
+      <Tabs.Content value="authentication">
+        <MemberAuthenticationSettingsScreen />
+      </Tabs.Content>
+
+      {emailEnabled && (
+        <Tabs.Content value="email">
+          <MemberEmailSettingsScreen />
+        </Tabs.Content>
+      )}
+    </Tabs.Root>
   );
 }

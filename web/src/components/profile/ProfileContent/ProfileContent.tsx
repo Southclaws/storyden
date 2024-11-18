@@ -21,7 +21,7 @@ export function ProfileContent(props: Props) {
 
   return (
     <VStack alignItems="start" w="full">
-      <Tabs.Root width="full" variant="line" defaultValue="threads">
+      <Tabs.Root width="full" variant="enclosed" defaultValue="threads">
         <Tabs.List>
           <Tabs.Trigger value="threads">Threads</Tabs.Trigger>
           <Tabs.Trigger value="collections">Collections</Tabs.Trigger>

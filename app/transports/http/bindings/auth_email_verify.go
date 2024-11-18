@@ -17,7 +17,7 @@ func (i *Authentication) AuthEmailVerify(ctx context.Context, request openapi.Au
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	acc, err := i.ev.Verify(ctx, *email, request.Body.Code)
+	acc, err := i.emailVerifier.Verify(ctx, *email, request.Body.Code)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

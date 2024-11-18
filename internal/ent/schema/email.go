@@ -26,12 +26,6 @@ func (Email) Fields() []ent.Field {
 			GoType(xid.ID{}).
 			Comment("If set, this email is associated with an account, otherwise can be used for newsletter subscriptions etc."),
 
-		field.String("authentication_record_id").
-			Optional().
-			Nillable().
-			GoType(xid.ID{}).
-			Comment("If set, this this email is used for authentication"),
-
 		field.String("email_address").
 			NotEmpty().
 			Immutable().
@@ -58,11 +52,6 @@ func (Email) Edges() []ent.Edge {
 		edge.From("account", Account.Type).
 			Ref("emails").
 			Field("account_id").
-			Unique(),
-
-		edge.From("authentication", Authentication.Type).
-			Ref("email_address").
-			Field("authentication_record_id").
 			Unique(),
 	}
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/services/icon"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -61,13 +62,14 @@ func (i Info) IconUpload(ctx context.Context, request openapi.IconUploadRequestO
 
 func serialiseInfo(info *instance_info.Info) openapi.Info {
 	return openapi.Info{
-		Title:            info.Settings.Title.OrZero(),
-		Description:      info.Settings.Description.OrZero(),
-		Content:          info.Settings.Content.OrZero().HTML(),
-		AccentColour:     info.Settings.AccentColour.OrZero(),
-		OnboardingStatus: openapi.OnboardingStatus(info.OnboardingStatus.String()),
-		Capabilities:     serialiseCapabilitiesList(info.Capabilities),
-		Metadata:         (*openapi.Metadata)(info.Settings.Metadata.Ptr()),
+		Title:              info.Settings.Title.OrZero(),
+		Description:        info.Settings.Description.OrZero(),
+		Content:            info.Settings.Content.OrZero().HTML(),
+		AccentColour:       info.Settings.AccentColour.OrZero(),
+		OnboardingStatus:   openapi.OnboardingStatus(info.OnboardingStatus.String()),
+		AuthenticationMode: openapi.AuthMode(info.Settings.AuthenticationMode.Or(authentication.ModeHandle).String()),
+		Capabilities:       serialiseCapabilitiesList(info.Capabilities),
+		Metadata:           (*openapi.Metadata)(info.Settings.Metadata.Ptr()),
 	}
 }
 

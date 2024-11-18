@@ -1526,22 +1526,6 @@ func (c *AuthenticationClient) QueryAccount(a *Authentication) *AccountQuery {
 	return query
 }
 
-// QueryEmailAddress queries the email_address edge of a Authentication.
-func (c *AuthenticationClient) QueryEmailAddress(a *Authentication) *EmailQuery {
-	query := (&EmailClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := a.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(authentication.Table, authentication.FieldID, id),
-			sqlgraph.To(email.Table, email.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, authentication.EmailAddressTable, authentication.EmailAddressColumn),
-		)
-		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *AuthenticationClient) Hooks() []Hook {
 	return c.hooks.Authentication
@@ -2294,22 +2278,6 @@ func (c *EmailClient) QueryAccount(e *Email) *AccountQuery {
 			sqlgraph.From(email.Table, email.FieldID, id),
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, email.AccountTable, email.AccountColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryAuthentication queries the authentication edge of a Email.
-func (c *EmailClient) QueryAuthentication(e *Email) *AuthenticationQuery {
-	query := (&AuthenticationClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(email.Table, email.FieldID, id),
-			sqlgraph.To(authentication.Table, authentication.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, email.AuthenticationTable, email.AuthenticationColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil

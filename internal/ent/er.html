@@ -48,10 +48,12 @@ erDiagram
         xidDOTID id
         timeDOTTime created_at
         string service
+        string token_type
         string identifier
         string token
         string name
         mapLBRACKstringRBRACKinterface {} metadata
+        xidDOTID account_authentication
     }
     Category {
         xidDOTID id
@@ -92,7 +94,6 @@ erDiagram
         xidDOTID id
         timeDOTTime created_at
         xidDOTID account_id
-        xidDOTID authentication_record_id
         string email_address
         string verification_code
         bool verified
@@ -251,7 +252,6 @@ erDiagram
     	AccountRoles }o--o| Role : "role"
     	Asset |o--o{ Asset : "assets/parent"
     	Asset |o--o{ Event : "event/primary_image"
-    	Authentication |o--o{ Email : "email_address/authentication"
     	Category |o--o{ Post : "posts/category"
     	Collection }o--o| Asset : "cover_image"
     	Collection }o--o{ Post : "posts/collections"

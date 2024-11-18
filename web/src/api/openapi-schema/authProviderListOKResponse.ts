@@ -7,8 +7,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { AuthMode } from "./authMode";
 import type { AuthProviderList } from "./authProviderList";
 
 export type AuthProviderListOKResponse = {
+  mode: AuthMode;
   providers: AuthProviderList;
 };

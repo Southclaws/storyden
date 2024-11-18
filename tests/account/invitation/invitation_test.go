@@ -52,7 +52,6 @@ func TestAccountInvitations(t *testing.T) {
 			invitationID := invResponse.JSON200.Id
 
 			t.Run("accept_invite_with_password", func(t *testing.T) {
-				t.Parallel()
 				r := require.New(t)
 				a := assert.New(t)
 
@@ -75,7 +74,6 @@ func TestAccountInvitations(t *testing.T) {
 			})
 
 			t.Run("accept_invite_with_email_password", func(t *testing.T) {
-				t.Parallel()
 				r := require.New(t)
 				a := assert.New(t)
 

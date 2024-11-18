@@ -5,6 +5,8 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
+	petname "github.com/dustinkirkland/golang-petname"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
@@ -26,7 +28,7 @@ func New(
 	}
 }
 
-func (s *Registrar) Create(ctx context.Context, handle string, opts ...account_writer.Option) (*account.Account, error) {
+func (s *Registrar) Create(ctx context.Context, handle opt.Optional[string], opts ...account_writer.Option) (*account.Account, error) {
 	status, err := s.onboarding.GetOnboardingStatus(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -37,7 +39,10 @@ func (s *Registrar) Create(ctx context.Context, handle string, opts ...account_w
 		opts = append(opts, account_writer.WithAdmin(true))
 	}
 
-	acc, err := s.writer.Create(ctx, handle, opts...)
+	// If no handle was given, generate one using adjective-animal.
+	handleOrGenerated := handle.Or(petname.Generate(2, "-"))
+
+	acc, err := s.writer.Create(ctx, handleOrGenerated, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

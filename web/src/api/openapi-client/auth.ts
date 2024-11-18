@@ -16,11 +16,13 @@ import { fetcher } from "../client";
 import type {
   AuthEmailBody,
   AuthEmailPasswordBody,
+  AuthEmailPasswordResetBody,
   AuthEmailPasswordSignupParams,
   AuthEmailSignupParams,
   AuthEmailVerifyBody,
   AuthPasswordBody,
   AuthPasswordCreateBody,
+  AuthPasswordResetBody,
   AuthPasswordSignupParams,
   AuthPasswordUpdateBody,
   AuthProviderListOKResponse,
@@ -328,6 +330,67 @@ export const useAuthPasswordUpdate = <
   };
 };
 /**
+ * Complete a password-reset flow using a token that was provided to the
+member via a reset request operation such as `AuthEmailPasswordReset`.
+
+ */
+export const authPasswordReset = (
+  authPasswordResetBody: AuthPasswordResetBody,
+) => {
+  return fetcher<AuthSuccessOKResponse>({
+    url: `/auth/password/reset`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: authPasswordResetBody,
+  });
+};
+
+export const getAuthPasswordResetMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: AuthPasswordResetBody },
+  ): Promise<AuthSuccessOKResponse> => {
+    return authPasswordReset(arg);
+  };
+};
+export const getAuthPasswordResetMutationKey = () =>
+  [`/auth/password/reset`] as const;
+
+export type AuthPasswordResetMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authPasswordReset>>
+>;
+export type AuthPasswordResetMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAuthPasswordReset = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof authPasswordReset>>,
+    TError,
+    Key,
+    AuthPasswordResetBody,
+    Awaited<ReturnType<typeof authPasswordReset>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAuthPasswordResetMutationKey();
+  const swrFn = getAuthPasswordResetMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
  * Register a new account with a email and password.
  */
 export const authEmailPasswordSignup = (
@@ -442,6 +505,67 @@ export const useAuthEmailPasswordSignin = <
 
   const swrKey = swrOptions?.swrKey ?? getAuthEmailPasswordSigninMutationKey();
   const swrFn = getAuthEmailPasswordSigninMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Request password reset email to be sent to the specified email address.
+
+ */
+export const authPasswordResetRequestEmail = (
+  authEmailPasswordResetBody: AuthEmailPasswordResetBody,
+) => {
+  return fetcher<void>({
+    url: `/auth/email-password/reset`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: authEmailPasswordResetBody,
+  });
+};
+
+export const getAuthPasswordResetRequestEmailMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: AuthEmailPasswordResetBody },
+  ): Promise<void> => {
+    return authPasswordResetRequestEmail(arg);
+  };
+};
+export const getAuthPasswordResetRequestEmailMutationKey = () =>
+  [`/auth/email-password/reset`] as const;
+
+export type AuthPasswordResetRequestEmailMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authPasswordResetRequestEmail>>
+>;
+export type AuthPasswordResetRequestEmailMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAuthPasswordResetRequestEmail = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof authPasswordResetRequestEmail>>,
+    TError,
+    Key,
+    AuthEmailPasswordResetBody,
+    Awaited<ReturnType<typeof authPasswordResetRequestEmail>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAuthPasswordResetRequestEmailMutationKey();
+  const swrFn = getAuthPasswordResetRequestEmailMutationFetcher();
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

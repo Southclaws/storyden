@@ -14,7 +14,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
-	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/rs/xid"
 )
 
@@ -43,6 +42,12 @@ func (ac *AuthenticationCreate) SetNillableCreatedAt(t *time.Time) *Authenticati
 // SetService sets the "service" field.
 func (ac *AuthenticationCreate) SetService(s string) *AuthenticationCreate {
 	ac.mutation.SetService(s)
+	return ac
+}
+
+// SetTokenType sets the "token_type" field.
+func (ac *AuthenticationCreate) SetTokenType(s string) *AuthenticationCreate {
+	ac.mutation.SetTokenType(s)
 	return ac
 }
 
@@ -78,6 +83,12 @@ func (ac *AuthenticationCreate) SetMetadata(m map[string]interface{}) *Authentic
 	return ac
 }
 
+// SetAccountAuthentication sets the "account_authentication" field.
+func (ac *AuthenticationCreate) SetAccountAuthentication(x xid.ID) *AuthenticationCreate {
+	ac.mutation.SetAccountAuthentication(x)
+	return ac
+}
+
 // SetID sets the "id" field.
 func (ac *AuthenticationCreate) SetID(x xid.ID) *AuthenticationCreate {
 	ac.mutation.SetID(x)
@@ -101,21 +112,6 @@ func (ac *AuthenticationCreate) SetAccountID(id xid.ID) *AuthenticationCreate {
 // SetAccount sets the "account" edge to the Account entity.
 func (ac *AuthenticationCreate) SetAccount(a *Account) *AuthenticationCreate {
 	return ac.SetAccountID(a.ID)
-}
-
-// AddEmailAddresIDs adds the "email_address" edge to the Email entity by IDs.
-func (ac *AuthenticationCreate) AddEmailAddresIDs(ids ...xid.ID) *AuthenticationCreate {
-	ac.mutation.AddEmailAddresIDs(ids...)
-	return ac
-}
-
-// AddEmailAddress adds the "email_address" edges to the Email entity.
-func (ac *AuthenticationCreate) AddEmailAddress(e ...*Email) *AuthenticationCreate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return ac.AddEmailAddresIDs(ids...)
 }
 
 // Mutation returns the AuthenticationMutation object of the builder.
@@ -176,6 +172,14 @@ func (ac *AuthenticationCreate) check() error {
 			return &ValidationError{Name: "service", err: fmt.Errorf(`ent: validator failed for field "Authentication.service": %w`, err)}
 		}
 	}
+	if _, ok := ac.mutation.TokenType(); !ok {
+		return &ValidationError{Name: "token_type", err: errors.New(`ent: missing required field "Authentication.token_type"`)}
+	}
+	if v, ok := ac.mutation.TokenType(); ok {
+		if err := authentication.TokenTypeValidator(v); err != nil {
+			return &ValidationError{Name: "token_type", err: fmt.Errorf(`ent: validator failed for field "Authentication.token_type": %w`, err)}
+		}
+	}
 	if _, ok := ac.mutation.Identifier(); !ok {
 		return &ValidationError{Name: "identifier", err: errors.New(`ent: missing required field "Authentication.identifier"`)}
 	}
@@ -186,6 +190,9 @@ func (ac *AuthenticationCreate) check() error {
 		if err := authentication.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "Authentication.token": %w`, err)}
 		}
+	}
+	if _, ok := ac.mutation.AccountAuthentication(); !ok {
+		return &ValidationError{Name: "account_authentication", err: errors.New(`ent: missing required field "Authentication.account_authentication"`)}
 	}
 	if v, ok := ac.mutation.ID(); ok {
 		if err := authentication.IDValidator(v.String()); err != nil {
@@ -239,6 +246,10 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		_spec.SetField(authentication.FieldService, field.TypeString, value)
 		_node.Service = value
 	}
+	if value, ok := ac.mutation.TokenType(); ok {
+		_spec.SetField(authentication.FieldTokenType, field.TypeString, value)
+		_node.TokenType = value
+	}
 	if value, ok := ac.mutation.Identifier(); ok {
 		_spec.SetField(authentication.FieldIdentifier, field.TypeString, value)
 		_node.Identifier = value
@@ -269,23 +280,7 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.account_authentication = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ac.mutation.EmailAddressIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   authentication.EmailAddressTable,
-			Columns: []string{authentication.EmailAddressColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(email.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
+		_node.AccountAuthentication = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -352,6 +347,18 @@ func (u *AuthenticationUpsert) UpdateService() *AuthenticationUpsert {
 	return u
 }
 
+// SetTokenType sets the "token_type" field.
+func (u *AuthenticationUpsert) SetTokenType(v string) *AuthenticationUpsert {
+	u.Set(authentication.FieldTokenType, v)
+	return u
+}
+
+// UpdateTokenType sets the "token_type" field to the value that was provided on create.
+func (u *AuthenticationUpsert) UpdateTokenType() *AuthenticationUpsert {
+	u.SetExcluded(authentication.FieldTokenType)
+	return u
+}
+
 // SetIdentifier sets the "identifier" field.
 func (u *AuthenticationUpsert) SetIdentifier(v string) *AuthenticationUpsert {
 	u.Set(authentication.FieldIdentifier, v)
@@ -409,6 +416,18 @@ func (u *AuthenticationUpsert) UpdateMetadata() *AuthenticationUpsert {
 // ClearMetadata clears the value of the "metadata" field.
 func (u *AuthenticationUpsert) ClearMetadata() *AuthenticationUpsert {
 	u.SetNull(authentication.FieldMetadata)
+	return u
+}
+
+// SetAccountAuthentication sets the "account_authentication" field.
+func (u *AuthenticationUpsert) SetAccountAuthentication(v xid.ID) *AuthenticationUpsert {
+	u.Set(authentication.FieldAccountAuthentication, v)
+	return u
+}
+
+// UpdateAccountAuthentication sets the "account_authentication" field to the value that was provided on create.
+func (u *AuthenticationUpsert) UpdateAccountAuthentication() *AuthenticationUpsert {
+	u.SetExcluded(authentication.FieldAccountAuthentication)
 	return u
 }
 
@@ -474,6 +493,20 @@ func (u *AuthenticationUpsertOne) SetService(v string) *AuthenticationUpsertOne 
 func (u *AuthenticationUpsertOne) UpdateService() *AuthenticationUpsertOne {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.UpdateService()
+	})
+}
+
+// SetTokenType sets the "token_type" field.
+func (u *AuthenticationUpsertOne) SetTokenType(v string) *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetTokenType(v)
+	})
+}
+
+// UpdateTokenType sets the "token_type" field to the value that was provided on create.
+func (u *AuthenticationUpsertOne) UpdateTokenType() *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateTokenType()
 	})
 }
 
@@ -544,6 +577,20 @@ func (u *AuthenticationUpsertOne) UpdateMetadata() *AuthenticationUpsertOne {
 func (u *AuthenticationUpsertOne) ClearMetadata() *AuthenticationUpsertOne {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.ClearMetadata()
+	})
+}
+
+// SetAccountAuthentication sets the "account_authentication" field.
+func (u *AuthenticationUpsertOne) SetAccountAuthentication(v xid.ID) *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetAccountAuthentication(v)
+	})
+}
+
+// UpdateAccountAuthentication sets the "account_authentication" field to the value that was provided on create.
+func (u *AuthenticationUpsertOne) UpdateAccountAuthentication() *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateAccountAuthentication()
 	})
 }
 
@@ -779,6 +826,20 @@ func (u *AuthenticationUpsertBulk) UpdateService() *AuthenticationUpsertBulk {
 	})
 }
 
+// SetTokenType sets the "token_type" field.
+func (u *AuthenticationUpsertBulk) SetTokenType(v string) *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetTokenType(v)
+	})
+}
+
+// UpdateTokenType sets the "token_type" field to the value that was provided on create.
+func (u *AuthenticationUpsertBulk) UpdateTokenType() *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateTokenType()
+	})
+}
+
 // SetIdentifier sets the "identifier" field.
 func (u *AuthenticationUpsertBulk) SetIdentifier(v string) *AuthenticationUpsertBulk {
 	return u.Update(func(s *AuthenticationUpsert) {
@@ -846,6 +907,20 @@ func (u *AuthenticationUpsertBulk) UpdateMetadata() *AuthenticationUpsertBulk {
 func (u *AuthenticationUpsertBulk) ClearMetadata() *AuthenticationUpsertBulk {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.ClearMetadata()
+	})
+}
+
+// SetAccountAuthentication sets the "account_authentication" field.
+func (u *AuthenticationUpsertBulk) SetAccountAuthentication(v xid.ID) *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetAccountAuthentication(v)
+	})
+}
+
+// UpdateAccountAuthentication sets the "account_authentication" field to the value that was provided on create.
+func (u *AuthenticationUpsertBulk) UpdateAccountAuthentication() *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateAccountAuthentication()
 	})
 }
 

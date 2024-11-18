@@ -105,8 +105,8 @@ func MapEmail(in *ent.Email) *EmailAddress {
 	// TODO: use mail.Address instead of string in ent schema
 
 	return &EmailAddress{
+		ID:       in.ID,
 		Email:    *addr,
 		Verified: in.Verified,
-		IsAuth:   in.AuthenticationRecordID != nil,
 	}
 }

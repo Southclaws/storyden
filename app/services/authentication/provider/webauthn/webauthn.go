@@ -28,9 +28,9 @@ var (
 	ErrAccountExists          = fault.New("requester already has an account")
 )
 
-const (
-	id   = "webauthn"
-	name = "WebAuthn"
+var (
+	service   = authentication.ServiceWebAuthn
+	tokenType = authentication.TokenTypeWebAuthn
 )
 
 type Provider struct {
@@ -56,9 +56,13 @@ func New(
 	}, nil
 }
 
-func (p *Provider) Enabled() bool { return true }
-func (p *Provider) ID() string    { return id }
-func (p *Provider) Name() string  { return name }
+func (p *Provider) Service() authentication.Service { return service }
+func (p *Provider) Token() authentication.TokenType { return tokenType }
+
+func (p *Provider) Enabled(ctx context.Context) (bool, error) {
+	// TODO: Provide a way to enable/disable Passkey (WebAuthn) authentication.
+	return true, nil
+}
 
 func (b *Provider) Link(_ string) (string, error) {
 	return "", nil
@@ -69,7 +73,7 @@ func (p *Provider) Login(ctx context.Context, handle, pubkey string) (*account.A
 }
 
 func (p *Provider) register(ctx context.Context, handle string, credential *webauthn.Credential, inviteCode opt.Optional[xid.ID]) (*account.Account, error) {
-	acc, exists, err := p.accountQuery.LookupByHandle(ctx, handle)
+	_, exists, err := p.accountQuery.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -88,7 +92,7 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 	opts := []account_writer.Option{}
 	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
 
-	acc, err = p.reg.Create(ctx, handle, opts...)
+	acc, err := p.reg.Create(ctx, opt.New(handle), opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -100,7 +104,8 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 
 	_, err = p.auth_repo.Create(ctx,
 		acc.ID,
-		id,
+		service,
+		authentication.TokenTypeWebAuthn,
 		base64.RawURLEncoding.EncodeToString(credential.ID),
 		string(encoded),
 		nil,
@@ -126,7 +131,8 @@ func (p *Provider) add(ctx context.Context, accountID account.AccountID, credent
 
 	_, err = p.auth_repo.Create(ctx,
 		acc.ID,
-		id,
+		service,
+		authentication.TokenTypeWebAuthn,
 		base64.RawURLEncoding.EncodeToString(credential.ID),
 		string(encoded),
 		nil,

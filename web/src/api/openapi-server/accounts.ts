@@ -9,6 +9,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type {
   AccountAuthProviderListOKResponse,
+  AccountEmailAddBody,
+  AccountEmailUpdateOKResponse,
   AccountGetAvatarResponse,
   AccountGetOKResponse,
   AccountSetAvatarBody,
@@ -108,6 +110,55 @@ export const accountAuthMethodDelete = async (
 ): Promise<accountAuthMethodDeleteResponse> => {
   return fetcher<Promise<accountAuthMethodDeleteResponse>>(
     getAccountAuthMethodDeleteUrl(authMethodId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+/**
+ * Add an email address to the authenticated account.
+ */
+export type accountEmailAddResponse = {
+  data: AccountEmailUpdateOKResponse;
+  status: number;
+};
+
+export const getAccountEmailAddUrl = () => {
+  return `/accounts/self/emails`;
+};
+
+export const accountEmailAdd = async (
+  accountEmailAddBody: AccountEmailAddBody,
+  options?: RequestInit,
+): Promise<accountEmailAddResponse> => {
+  return fetcher<Promise<accountEmailAddResponse>>(getAccountEmailAddUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(accountEmailAddBody),
+  });
+};
+
+/**
+ * Remove an email address from the authenticated account.
+ */
+export type accountEmailRemoveResponse = {
+  data: void;
+  status: number;
+};
+
+export const getAccountEmailRemoveUrl = (emailAddressId: string) => {
+  return `/accounts/self/emails/${emailAddressId}`;
+};
+
+export const accountEmailRemove = async (
+  emailAddressId: string,
+  options?: RequestInit,
+): Promise<accountEmailRemoveResponse> => {
+  return fetcher<Promise<accountEmailRemoveResponse>>(
+    getAccountEmailRemoveUrl(emailAddressId),
     {
       ...options,
       method: "DELETE",

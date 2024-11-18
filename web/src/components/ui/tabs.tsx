@@ -1,38 +1,47 @@
+"use client";
+
 import type { Assign } from "@ark-ui/react";
 import { Tabs } from "@ark-ui/react/tabs";
 
 import { type TabsVariantProps, tabs } from "@/styled-system/recipes";
-import type { JsxStyleProps } from "@/styled-system/types";
+import type { ComponentProps, HTMLStyledProps } from "@/styled-system/types";
 import { createStyleContext } from "@/utils/create-style-context";
 
 const { withProvider, withContext } = createStyleContext(tabs);
 
-export interface RootProps
-  extends Assign<JsxStyleProps, Tabs.RootProps>,
-    TabsVariantProps {}
-export const Root = withProvider<HTMLDivElement, RootProps>(Tabs.Root, "root");
+export type RootProviderProps = ComponentProps<typeof RootProvider>;
+export const RootProvider = withProvider<
+  HTMLDivElement,
+  Assign<
+    Assign<HTMLStyledProps<"div">, Tabs.RootProviderBaseProps>,
+    TabsVariantProps
+  >
+>(Tabs.RootProvider, "root");
+
+export type RootProps = ComponentProps<typeof Root>;
+export const Root = withProvider<
+  HTMLDivElement,
+  Assign<Assign<HTMLStyledProps<"div">, Tabs.RootBaseProps>, TabsVariantProps>
+>(Tabs.Root, "root");
 
 export const Content = withContext<
   HTMLDivElement,
-  Assign<JsxStyleProps, Tabs.ContentProps>
+  Assign<HTMLStyledProps<"div">, Tabs.ContentBaseProps>
 >(Tabs.Content, "content");
 
 export const Indicator = withContext<
   HTMLDivElement,
-  Assign<JsxStyleProps, Tabs.IndicatorProps>
+  Assign<HTMLStyledProps<"div">, Tabs.IndicatorBaseProps>
 >(Tabs.Indicator, "indicator");
 
 export const List = withContext<
   HTMLDivElement,
-  Assign<JsxStyleProps, Tabs.ListProps>
+  Assign<HTMLStyledProps<"div">, Tabs.ListBaseProps>
 >(Tabs.List, "list");
 
 export const Trigger = withContext<
   HTMLButtonElement,
-  Assign<JsxStyleProps, Tabs.TriggerProps>
+  Assign<HTMLStyledProps<"button">, Tabs.TriggerBaseProps>
 >(Tabs.Trigger, "trigger");
 
-export {
-  TabsContext as Context,
-  type TabsContextProps as ContextProps,
-} from "@ark-ui/react/tabs";
+export { TabsContext as Context } from "@ark-ui/react/tabs";
