@@ -36,7 +36,12 @@ export function NotificationsMenu(props: Props) {
   return (
     <Menu.Root closeOnSelect={false}>
       <Menu.Trigger cursor="pointer" position="relative" asChild>
-        <NotificationsTrigger hideLabel size="md" variant="ghost" unread />
+        <NotificationsTrigger
+          hideLabel
+          size="md"
+          variant="ghost"
+          unread={!isEmpty}
+        />
       </Menu.Trigger>
 
       <Portal>
