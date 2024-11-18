@@ -5,12 +5,18 @@ import { useQueryState } from "nuqs";
 import { useEffect } from "react";
 
 import * as Tabs from "@/components/ui/tabs";
+import { Settings } from "@/lib/settings/settings";
 
 import { MemberAuthenticationSettingsScreen } from "./MemberAuthenticationSettingsScreen";
+import { MemberEmailSettingsScreen } from "./MemberEmailSettingsScreen";
 
 const DEFAULT_TAB = "authentication";
 
-export function SettingsScreen() {
+type Props = {
+  initialSettings: Settings;
+};
+
+export function SettingsScreen({ initialSettings }: Props) {
   const [tab, setTab] = useQueryState("tab", {
     defaultValue: DEFAULT_TAB,
   });
@@ -29,6 +35,8 @@ export function SettingsScreen() {
     setTab(value);
   }
 
+  const emailEnabled = initialSettings.capabilities.includes("email_client");
+
   return (
     <Tabs.Root
       width="full"
@@ -39,12 +47,19 @@ export function SettingsScreen() {
     >
       <Tabs.List>
         <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
+        {emailEnabled && <Tabs.Trigger value="email">Email</Tabs.Trigger>}
         <Tabs.Indicator />
       </Tabs.List>
 
       <Tabs.Content value="authentication">
         <MemberAuthenticationSettingsScreen />
       </Tabs.Content>
+
+      {emailEnabled && (
+        <Tabs.Content value="email">
+          <MemberEmailSettingsScreen />
+        </Tabs.Content>
+      )}
     </Tabs.Root>
   );
 }
