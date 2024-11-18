@@ -4,7 +4,7 @@ import { Account } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { AddIcon } from "@/components/ui/icons/Add";
-import { CardBox, LStack, WStack } from "@/styled-system/jsx";
+import { CardBox, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { EmailCard } from "./EmailCard";
@@ -48,7 +48,7 @@ export function EmailSettings(props: Props) {
   return (
     <CardBox className={lstack()} gap="4">
       <LStack>
-        <Heading size="md">Email address</Heading>
+        <Heading size="md">Email settings</Heading>
         <p>
           Manage your email addresses here. You can add multiple email addresses
           and use them to log in to your account. Emails are also used for
@@ -68,9 +68,13 @@ export function EmailSettings(props: Props) {
           </Button>
         </WStack>
 
-        {data.emails.map((email) => (
-          <EmailCard key={email.id} email={email} />
-        ))}
+        {data.emails.length === 0 ? (
+          <styled.p color="fg.muted">
+            You do not have any email addresses associated with your account.
+          </styled.p>
+        ) : (
+          data.emails.map((email) => <EmailCard key={email.id} email={email} />)
+        )}
 
         {data.adding && (
           <EmailCreateForm
