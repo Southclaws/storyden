@@ -12,6 +12,8 @@ processes    = []
   PUBLIC_API_ADDRESS = "https://api.makeroom.club"
   PUBLIC_WEB_ADDRESS = "https://makeroom.club"
 
+  EMAIL_PROVIDER = "sendgrid"
+
   # S3 credentials are specified via Fly secrets.
   ASSET_STORAGE_TYPE = "s3"
 
