@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/settings"
+	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/email_only"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/google"
@@ -40,7 +41,7 @@ func Build() fx.Option {
 			linkedin.New,
 			phone.New,
 		),
-
+		fx.Provide(email_verify.New),
 		fx.Provide(New),
 	)
 }

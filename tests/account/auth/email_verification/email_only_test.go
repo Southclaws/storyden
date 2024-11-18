@@ -56,7 +56,6 @@ func TestEmailOnlyAuth(t *testing.T) {
 				r.Equal(openapi.AccountVerifiedStatusNone, unverified.JSON200.VerifiedStatus)
 				r.Len(unverified.JSON200.EmailAddresses, 1)
 				a.Equal(address, (unverified.JSON200.EmailAddresses)[0].EmailAddress)
-				a.True(unverified.JSON200.EmailAddresses[0].IsAuth)
 				a.False(unverified.JSON200.EmailAddresses[0].Verified)
 
 				// Get code from email, verify account
@@ -72,7 +71,6 @@ func TestEmailOnlyAuth(t *testing.T) {
 				a.Equal(openapi.AccountVerifiedStatusVerifiedEmail, verified.JSON200.VerifiedStatus)
 				r.NotNil(verified.JSON200.EmailAddresses)
 				a.Equal(address, verified.JSON200.EmailAddresses[0].EmailAddress)
-				a.True(verified.JSON200.EmailAddresses[0].IsAuth)
 				a.True(verified.JSON200.EmailAddresses[0].Verified)
 			})
 

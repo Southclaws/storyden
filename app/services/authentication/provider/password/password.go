@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/Southclaws/opt"
 	"github.com/alexedwards/argon2id"
 	"go.uber.org/zap"
 
@@ -42,11 +41,11 @@ type Provider struct {
 	system       *instance_info.Provider
 	auth         authentication.Repository
 	accountQuery *account_querier.Querier
-	er           email.EmailRepo
+	er           *email.Repository
 	register     *register.Registrar
 
 	// TODO: Replace with an MQ message and sender job.
-	sender email_verify.Verifier
+	sender *email_verify.Verifier
 }
 
 var service = authentication.ServicePassword
@@ -57,9 +56,9 @@ func New(
 	system *instance_info.Provider,
 	auth authentication.Repository,
 	accountQuery *account_querier.Querier,
-	er email.EmailRepo,
+	er *email.Repository,
 	register *register.Registrar,
-	sender email_verify.Verifier,
+	sender *email_verify.Verifier,
 ) *Provider {
 	return &Provider{
 		logger:       logger,
@@ -191,19 +190,19 @@ func (b *Provider) addPasswordAuth(ctx context.Context, accountID account.Accoun
 }
 
 func (p *Provider) addPasswordAuthWithEmail(ctx context.Context, accountID account.AccountID, email mail.Address, password string) error {
-	authRecord, err := p.addPasswordAuth(ctx, accountID, password)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
-	}
-
 	code, err := otp.Generate()
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = p.sender.BeginEmailVerification(ctx, accountID, email, code, opt.New(authRecord.ID))
+	_, err = p.sender.BeginEmailVerification(ctx, accountID, email, code)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, err = p.addPasswordAuth(ctx, accountID, password)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}
 
 	return nil

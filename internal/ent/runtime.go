@@ -211,10 +211,6 @@ func init() {
 	authenticationDescToken := authenticationFields[3].Descriptor()
 	// authentication.TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	authentication.TokenValidator = authenticationDescToken.Validators[0].(func(string) error)
-	// authenticationDescEmailAddressRecordID is the schema descriptor for email_address_record_id field.
-	authenticationDescEmailAddressRecordID := authenticationFields[7].Descriptor()
-	// authentication.EmailAddressRecordIDValidator is a validator for the "email_address_record_id" field. It is called by the builders before save.
-	authentication.EmailAddressRecordIDValidator = authenticationDescEmailAddressRecordID.Validators[0].(func(string) error)
 	// authenticationDescID is the schema descriptor for id field.
 	authenticationDescID := authenticationMixinFields0[0].Descriptor()
 	// authentication.DefaultID holds the default value on creation for the id field.

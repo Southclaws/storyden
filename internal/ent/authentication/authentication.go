@@ -31,12 +31,8 @@ const (
 	FieldMetadata = "metadata"
 	// FieldAccountAuthentication holds the string denoting the account_authentication field in the database.
 	FieldAccountAuthentication = "account_authentication"
-	// FieldEmailAddressRecordID holds the string denoting the email_address_record_id field in the database.
-	FieldEmailAddressRecordID = "email_address_record_id"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
 	EdgeAccount = "account"
-	// EdgeEmailAddress holds the string denoting the email_address edge name in mutations.
-	EdgeEmailAddress = "email_address"
 	// Table holds the table name of the authentication in the database.
 	Table = "authentications"
 	// AccountTable is the table that holds the account relation/edge.
@@ -46,13 +42,6 @@ const (
 	AccountInverseTable = "accounts"
 	// AccountColumn is the table column denoting the account relation/edge.
 	AccountColumn = "account_authentication"
-	// EmailAddressTable is the table that holds the email_address relation/edge.
-	EmailAddressTable = "authentications"
-	// EmailAddressInverseTable is the table name for the Email entity.
-	// It exists in this package in order to avoid circular dependency with the "email" package.
-	EmailAddressInverseTable = "emails"
-	// EmailAddressColumn is the table column denoting the email_address relation/edge.
-	EmailAddressColumn = "email_address_record_id"
 )
 
 // Columns holds all SQL columns for authentication fields.
@@ -66,7 +55,6 @@ var Columns = []string{
 	FieldName,
 	FieldMetadata,
 	FieldAccountAuthentication,
-	FieldEmailAddressRecordID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -88,8 +76,6 @@ var (
 	TokenTypeValidator func(string) error
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	TokenValidator func(string) error
-	// EmailAddressRecordIDValidator is a validator for the "email_address_record_id" field. It is called by the builders before save.
-	EmailAddressRecordIDValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -139,22 +125,10 @@ func ByAccountAuthentication(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAccountAuthentication, opts...).ToFunc()
 }
 
-// ByEmailAddressRecordID orders the results by the email_address_record_id field.
-func ByEmailAddressRecordID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEmailAddressRecordID, opts...).ToFunc()
-}
-
 // ByAccountField orders the results by account field.
 func ByAccountField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newAccountStep(), sql.OrderByField(field, opts...))
-	}
-}
-
-// ByEmailAddressField orders the results by email_address field.
-func ByEmailAddressField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEmailAddressStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newAccountStep() *sqlgraph.Step {
@@ -162,12 +136,5 @@ func newAccountStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AccountInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, AccountTable, AccountColumn),
-	)
-}
-func newEmailAddressStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EmailAddressInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, true, EmailAddressTable, EmailAddressColumn),
 	)
 }

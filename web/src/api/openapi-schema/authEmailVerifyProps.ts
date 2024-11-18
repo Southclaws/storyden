@@ -7,11 +7,12 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { EmailAddress } from "./emailAddress";
 
 export interface AuthEmailVerifyProps {
   code: string;
   /** The email address to be verified, only necessary for when submitting
 a verification without a session cookie present.
  */
-  email: string;
+  email: EmailAddress;
 }

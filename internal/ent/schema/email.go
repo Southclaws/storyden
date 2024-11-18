@@ -53,8 +53,5 @@ func (Email) Edges() []ent.Edge {
 			Ref("emails").
 			Field("account_id").
 			Unique(),
-
-		edge.To("authentication_record", Authentication.Type).
-			Unique(),
 	}
 }

@@ -632,6 +632,30 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AccountAuthProviderListOK" }
 
+  /accounts/self/emails:
+    post:
+      operationId: AccountEmailAdd
+      description: Add an email address to the authenticated account.
+      tags: [accounts]
+      requestBody: { $ref: "#/components/requestBodies/AccountEmailAdd" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AccountEmailUpdateOK" }
+
+  /accounts/self/emails/{email_address_id}:
+    delete:
+      operationId: AccountEmailRemove
+      description: Remove an email address from the authenticated account.
+      tags: [accounts]
+      parameters: [{ $ref: "#/components/parameters/EmailAddressIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
+
   /accounts/self/avatar:
     post:
       operationId: AccountSetAvatar
@@ -1886,6 +1910,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    EmailAddressIDParam:
+      description: An email address ID associated with the requesting account.
+      name: email_address_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     InvitationIDParam:
       description: Unique invitation ID.
       name: invitation_id
@@ -2281,6 +2313,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AccountMutableProps" }
 
+    AccountEmailAdd:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AccountEmailInitialProps" }
+
     AccountSetAvatar:
       content:
         application/octet-stream:
@@ -2512,6 +2549,13 @@ components:
           schema:
             $ref: "#/components/schemas/Account"
 
+    AccountEmailUpdateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccountEmailAddress"
+
     AccountAuthProviderListOK:
       description: OK
       content:
@@ -2664,13 +2708,6 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Post"
-
-    PostSearchOK:
-      description: Thread post updated successfully.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/PostSearchResults"
 
     PostReactAddOK:
       description: Post reaction added.
@@ -3129,6 +3166,11 @@ components:
       description: The rich-text bio for an account's public profile.
       example: <body><p>hi, my name is</p><p>southclaws</p></body>
 
+    EmailAddress:
+      description: A valid email address.
+      type: string
+      example: "hello@storyden.org"
+
     ProfileReference:
       type: object
       description: A minimal reference to an account.
@@ -3390,9 +3432,7 @@ components:
       type: object
       required: [email, password]
       properties:
-        email:
-          example: "hello@storyden.org"
-          type: string
+        email: { $ref: "#/components/schemas/EmailAddress" }
         password:
           type: string
         handle:
@@ -3402,9 +3442,7 @@ components:
       type: object
       required: [email]
       properties:
-        email:
-          example: "hello@storyden.org"
-          type: string
+        email: { $ref: "#/components/schemas/EmailAddress" }
         handle:
           $ref: "#/components/schemas/AccountHandle"
 
@@ -3416,7 +3454,7 @@ components:
           description: |
             The email address to be verified, only necessary for when submitting
             a verification without a session cookie present.
-          type: string
+          $ref: "#/components/schemas/EmailAddress"
         code:
           example: "728562"
           type: string
@@ -3815,8 +3853,6 @@ components:
           description: The external identifier (third party ID or device ID)
           type: string
         provider: { $ref: "#/components/schemas/AuthProvider" }
-        # If the auth method uses email, this is the email record associated.
-        email: { $ref: "#/components/schemas/AccountEmailAddress" }
 
     AccountVerifiedStatus:
       type: string
@@ -3831,16 +3867,19 @@ components:
 
     AccountEmailAddress:
       type: object
-      required: [email_address, verified, is_auth]
+      required: [id, email_address, verified]
       properties:
-        email_address:
-          type: string
+        id: { $ref: "#/components/schemas/Identifier" }
+        email_address: { $ref: "#/components/schemas/EmailAddress" }
         verified:
           description: Is the email address verified to be owned by the account?
           type: boolean
-        is_auth:
-          description: Is the email used for authenticating to the platform?
-          type: boolean
+
+    AccountEmailInitialProps:
+      type: object
+      required: [email_address]
+      properties:
+        email_address: { $ref: "#/components/schemas/EmailAddress" }
 
     #
     # 8888888                   d8b 888             888    d8b
@@ -4332,17 +4371,6 @@ components:
         body: { $ref: "#/components/schemas/PostContent" }
         meta: { $ref: "#/components/schemas/Metadata" }
         url: { $ref: "#/components/schemas/URL" }
-
-    PostSearchResults:
-      type: object
-      required: [count, results]
-      properties:
-        count:
-          type: number
-        results:
-          type: array
-          items:
-            $ref: "#/components/schemas/Post"
 
     PostDescription:
       type: string

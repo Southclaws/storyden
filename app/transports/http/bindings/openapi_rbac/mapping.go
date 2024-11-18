@@ -146,6 +146,14 @@ func (m *Mapping) AccountAuthMethodDelete() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) AccountEmailAdd() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) AccountEmailRemove() (bool, *rbac.Permission) {
+	return true, nil
+}
+
 func (m *Mapping) AccountSetAvatar() (bool, *rbac.Permission) {
 	return true, nil
 }

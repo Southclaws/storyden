@@ -51,8 +51,8 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 
 func serialiseEmailAddress(in account.EmailAddress) openapi.AccountEmailAddress {
 	return openapi.AccountEmailAddress{
+		Id:           in.ID.String(),
 		EmailAddress: in.Email.Address,
-		IsAuth:       in.IsAuth,
 		Verified:     in.Verified,
 	}
 }

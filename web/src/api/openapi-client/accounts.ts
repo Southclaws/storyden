@@ -15,6 +15,8 @@ import type { SWRMutationConfiguration } from "swr/mutation";
 import { fetcher } from "../client";
 import type {
   AccountAuthProviderListOKResponse,
+  AccountEmailAddBody,
+  AccountEmailUpdateOKResponse,
   AccountGetAvatarResponse,
   AccountGetOKResponse,
   AccountSetAvatarBody,
@@ -228,6 +230,121 @@ export const useAccountAuthMethodDelete = <
   const swrKey =
     swrOptions?.swrKey ?? getAccountAuthMethodDeleteMutationKey(authMethodId);
   const swrFn = getAccountAuthMethodDeleteMutationFetcher(authMethodId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Add an email address to the authenticated account.
+ */
+export const accountEmailAdd = (accountEmailAddBody: AccountEmailAddBody) => {
+  return fetcher<AccountEmailUpdateOKResponse>({
+    url: `/accounts/self/emails`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: accountEmailAddBody,
+  });
+};
+
+export const getAccountEmailAddMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: AccountEmailAddBody },
+  ): Promise<AccountEmailUpdateOKResponse> => {
+    return accountEmailAdd(arg);
+  };
+};
+export const getAccountEmailAddMutationKey = () =>
+  [`/accounts/self/emails`] as const;
+
+export type AccountEmailAddMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountEmailAdd>>
+>;
+export type AccountEmailAddMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useAccountEmailAdd = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof accountEmailAdd>>,
+    TError,
+    Key,
+    AccountEmailAddBody,
+    Awaited<ReturnType<typeof accountEmailAdd>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAccountEmailAddMutationKey();
+  const swrFn = getAccountEmailAddMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Remove an email address from the authenticated account.
+ */
+export const accountEmailRemove = (emailAddressId: string) => {
+  return fetcher<void>({
+    url: `/accounts/self/emails/${emailAddressId}`,
+    method: "DELETE",
+  });
+};
+
+export const getAccountEmailRemoveMutationFetcher = (
+  emailAddressId: string,
+) => {
+  return (_: Key, __: { arg: Arguments }): Promise<void> => {
+    return accountEmailRemove(emailAddressId);
+  };
+};
+export const getAccountEmailRemoveMutationKey = (emailAddressId: string) =>
+  [`/accounts/self/emails/${emailAddressId}`] as const;
+
+export type AccountEmailRemoveMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accountEmailRemove>>
+>;
+export type AccountEmailRemoveMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useAccountEmailRemove = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(
+  emailAddressId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accountEmailRemove>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof accountEmailRemove>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAccountEmailRemoveMutationKey(emailAddressId);
+  const swrFn = getAccountEmailRemoveMutationFetcher(emailAddressId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

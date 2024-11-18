@@ -8,13 +8,9 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/Southclaws/opt"
 	"github.com/matcornic/hermes/v2"
-	"github.com/rs/xid"
-	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
 	"github.com/Southclaws/storyden/app/resources/mailtemplate"
 	"github.com/Southclaws/storyden/app/resources/settings"
@@ -27,13 +23,24 @@ var (
 )
 
 type Verifier struct {
-	fx.In
+	emailRepo *email.Repository
+	sender    mailer.Sender
+	template  *mailtemplate.Builder
+	settings  *settings.SettingsRepository
+}
 
-	AuthRepo  authentication.Repository
-	EmailRepo email.EmailRepo
-	Sender    mailer.Sender
-	Template  *mailtemplate.Builder
-	Settings  *settings.SettingsRepository
+func New(
+	emailRepo *email.Repository,
+	sender mailer.Sender,
+	template *mailtemplate.Builder,
+	settings *settings.SettingsRepository,
+) *Verifier {
+	return &Verifier{
+		emailRepo: emailRepo,
+		sender:    sender,
+		template:  template,
+		settings:  settings,
+	}
 }
 
 // BeginEmailVerification adds an email record for the specified account, sets
@@ -45,18 +52,17 @@ func (s *Verifier) BeginEmailVerification(
 	accountID account.AccountID,
 	address mail.Address,
 	code string,
-	authRecordID opt.Optional[xid.ID],
-) error {
-	_, err := s.EmailRepo.Add(ctx, accountID, address, code, authRecordID)
+) (*account.EmailAddress, error) {
+	ae, err := s.emailRepo.Add(ctx, accountID, address, code)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return s.sendVerification(ctx, address, code)
+	return ae, s.sendVerification(ctx, address, code)
 }
 
 func (s *Verifier) sendVerification(ctx context.Context, address mail.Address, code string) error {
-	set, err := s.Settings.Get(ctx)
+	set, err := s.settings.Get(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -65,7 +71,7 @@ func (s *Verifier) sendVerification(ctx context.Context, address mail.Address, c
 	instanceTitle := set.Title.Or(settings.DefaultTitle)
 	welcome := fmt.Sprintf("Welcome to %s!", instanceTitle)
 
-	template, err := s.Template.Build(ctx, recipientName, []string{welcome}, []hermes.Action{
+	template, err := s.template.Build(ctx, recipientName, []string{welcome}, []hermes.Action{
 		{
 			Instructions: "Please use the following code to verify your account:",
 			InviteCode:   code,
@@ -75,11 +81,11 @@ func (s *Verifier) sendVerification(ctx context.Context, address mail.Address, c
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return s.Sender.Send(ctx, address, recipientName, welcome, template.HTML, template.Plain)
+	return s.sender.Send(ctx, address, recipientName, welcome, template.HTML, template.Plain)
 }
 
 func (s *Verifier) ResendVerification(ctx context.Context, address mail.Address) error {
-	code, err := s.EmailRepo.GetCode(ctx, address)
+	code, err := s.emailRepo.GetCode(ctx, address)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -88,7 +94,7 @@ func (s *Verifier) ResendVerification(ctx context.Context, address mail.Address)
 }
 
 func (s *Verifier) Verify(ctx context.Context, emailAddress mail.Address, code string) (*account.Account, error) {
-	acc, exists, err := s.EmailRepo.LookupCode(ctx, emailAddress, code)
+	acc, exists, err := s.emailRepo.LookupCode(ctx, emailAddress, code)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -100,7 +106,7 @@ func (s *Verifier) Verify(ctx context.Context, emailAddress mail.Address, code s
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = s.EmailRepo.Verify(ctx, acc.ID, emailAddress)
+	err = s.emailRepo.Verify(ctx, acc.ID, emailAddress)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
