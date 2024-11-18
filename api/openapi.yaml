@@ -346,7 +346,6 @@ paths:
         Given the requesting account does not have a password authentication,
         add a password authentication method to it with the given password.
       tags: [auth]
-      security: []
       requestBody: { $ref: "#/components/requestBodies/AuthPasswordCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -359,8 +358,22 @@ paths:
         Given the requesting account has a password authentication, update the
         password on file.
       tags: [auth]
-      security: []
       requestBody: { $ref: "#/components/requestBodies/AuthPasswordUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
+  /auth/password/reset:
+    post:
+      operationId: AuthPasswordReset
+      description: |
+        Complete a password-reset flow using a token that was provided to the
+        member via a reset request operation such as `AuthEmailPasswordReset`.
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/AuthPasswordReset" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -392,6 +405,20 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
+
+  /auth/email-password/reset:
+    post:
+      operationId: AuthPasswordResetRequestEmail
+      description: |
+        Request password reset email to be sent to the specified email address.
+      tags: [auth]
+      security: []
+      requestBody: { $ref: "#/components/requestBodies/AuthEmailPasswordReset" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
 
   /auth/email/signup:
     post:
@@ -631,6 +658,30 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AccountAuthProviderListOK" }
+
+  /accounts/self/emails:
+    post:
+      operationId: AccountEmailAdd
+      description: Add an email address to the authenticated account.
+      tags: [accounts]
+      requestBody: { $ref: "#/components/requestBodies/AccountEmailAdd" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/AccountEmailUpdateOK" }
+
+  /accounts/self/emails/{email_address_id}:
+    delete:
+      operationId: AccountEmailRemove
+      description: Remove an email address from the authenticated account.
+      tags: [accounts]
+      parameters: [{ $ref: "#/components/parameters/EmailAddressIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { description: OK }
 
   /accounts/self/avatar:
     post:
@@ -1886,6 +1937,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    EmailAddressIDParam:
+      description: An email address ID associated with the requesting account.
+      name: email_address_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     InvitationIDParam:
       description: Unique invitation ID.
       name: invitation_id
@@ -2231,6 +2290,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/AuthEmailPasswordInitialProps" }
 
+    AuthEmailPasswordReset:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthEmailPasswordReset" }
+
     AuthEmail:
       content:
         application/json:
@@ -2250,6 +2314,11 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/AuthPasswordMutableProps" }
+
+    AuthPasswordReset:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AuthPasswordResetProps" }
 
     OAuthProviderCallback:
       content:
@@ -2280,6 +2349,11 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/AccountMutableProps" }
+
+    AccountEmailAdd:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AccountEmailInitialProps" }
 
     AccountSetAvatar:
       content:
@@ -2471,9 +2545,10 @@ components:
         application/json:
           schema:
             type: object
-            required: [providers]
+            required: [providers, mode]
             properties:
               providers: { $ref: "#/components/schemas/AuthProviderList" }
+              mode: { $ref: "#/components/schemas/AuthMode" }
 
     WebAuthnRequestCredentialOK:
       description: OK
@@ -2510,6 +2585,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Account"
+
+    AccountEmailUpdateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccountEmailAddress"
 
     AccountAuthProviderListOK:
       description: OK
@@ -2663,13 +2745,6 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Post"
-
-    PostSearchOK:
-      description: Thread post updated successfully.
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/PostSearchResults"
 
     PostReactAddOK:
       description: Post reaction added.
@@ -2944,6 +3019,7 @@ components:
         - description
         - content
         - accent_colour
+        - authentication_mode
         - capabilities
         - onboarding_status
       properties:
@@ -2957,6 +3033,8 @@ components:
           type: string
         onboarding_status:
           $ref: "#/components/schemas/OnboardingStatus"
+        authentication_mode:
+          $ref: "#/components/schemas/AuthMode"
         capabilities:
           $ref: "#/components/schemas/InstanceCapabilityList"
         metadata:
@@ -2978,18 +3056,12 @@ components:
       type: string
       enum:
         - semdex
+        - email_client
+        - sms_client
 
     InstanceCapabilityList:
       type: array
       items: { $ref: "#/components/schemas/InstanceCapability" }
-
-    ContentKind:
-      type: string
-      enum: [post, thread]
-
-    ContentKinds:
-      type: array
-      items: { $ref: "#/components/schemas/ContentKind" }
 
     TagFillRule:
       description: |
@@ -3131,6 +3203,11 @@ components:
       description: The rich-text bio for an account's public profile.
       example: <body><p>hi, my name is</p><p>southclaws</p></body>
 
+    EmailAddress:
+      description: A valid email address.
+      type: string
+      example: "hello@storyden.org"
+
     ProfileReference:
       type: object
       description: A minimal reference to an account.
@@ -3176,7 +3253,12 @@ components:
     AdminSettingsProps:
       description: Storyden installation and administration settings.
       type: object
-      required: [title, description, content, accent_colour]
+      required:
+        - title
+        - description
+        - content
+        - accent_colour
+        - authentication_mode
       properties:
         title:
           type: string
@@ -3186,6 +3268,8 @@ components:
           $ref: "#/components/schemas/PostContent"
         accent_colour:
           type: string
+        authentication_mode:
+          $ref: "#/components/schemas/AuthMode"
         metadata:
           $ref: "#/components/schemas/Metadata"
 
@@ -3200,6 +3284,8 @@ components:
           $ref: "#/components/schemas/PostContent"
         accent_colour:
           type: string
+        authentication_mode:
+          $ref: "#/components/schemas/AuthMode"
         metadata:
           description: |
             The settings metadata may be used by frontends to store arbitrary
@@ -3347,9 +3433,16 @@ components:
       items:
         $ref: "#/components/schemas/AuthProvider"
 
+    AuthMode:
+      type: string
+      enum:
+        - handle
+        - email
+        - phone
+
     AuthProvider:
       type: object
-      required: [provider, name, link]
+      required: [provider, name]
       properties:
         provider:
           description: The slug name of the provider.
@@ -3376,21 +3469,37 @@ components:
       type: object
       required: [email, password]
       properties:
-        email:
-          example: "hello@storyden.org"
-          type: string
+        email: { $ref: "#/components/schemas/EmailAddress" }
         password:
           type: string
         handle:
           $ref: "#/components/schemas/AccountHandle"
 
+    AuthEmailPasswordReset:
+      type: object
+      required: [email, token_url]
+      properties:
+        email: { $ref: "#/components/schemas/EmailAddress" }
+        token_url:
+          type: object
+          required: [url, query]
+          properties:
+            url:
+              description: |
+                The URL to include in the password reset email. This URL's host
+                must match the configured Storyden instance's web address value.
+              type: string
+            query:
+              description: |
+                The query parameters to store the reset token in. This is a
+                frontend client specific value.
+              type: string
+
     AuthEmailInitialProps:
       type: object
       required: [email]
       properties:
-        email:
-          example: "hello@storyden.org"
-          type: string
+        email: { $ref: "#/components/schemas/EmailAddress" }
         handle:
           $ref: "#/components/schemas/AccountHandle"
 
@@ -3402,7 +3511,7 @@ components:
           description: |
             The email address to be verified, only necessary for when submitting
             a verification without a session cookie present.
-          type: string
+          $ref: "#/components/schemas/EmailAddress"
         code:
           example: "728562"
           type: string
@@ -3421,6 +3530,16 @@ components:
       properties:
         old:
           example: "password123"
+          type: string
+        new:
+          example: "password456"
+          type: string
+
+    AuthPasswordResetProps:
+      type: object
+      required: [token, new]
+      properties:
+        token:
           type: string
         new:
           example: "password456"
@@ -3815,16 +3934,19 @@ components:
 
     AccountEmailAddress:
       type: object
-      required: [email_address, verified, is_auth]
+      required: [id, email_address, verified]
       properties:
-        email_address:
-          type: string
+        id: { $ref: "#/components/schemas/Identifier" }
+        email_address: { $ref: "#/components/schemas/EmailAddress" }
         verified:
           description: Is the email address verified to be owned by the account?
           type: boolean
-        is_auth:
-          description: Is the email used for authenticating to the platform?
-          type: boolean
+
+    AccountEmailInitialProps:
+      type: object
+      required: [email_address]
+      properties:
+        email_address: { $ref: "#/components/schemas/EmailAddress" }
 
     #
     # 8888888                   d8b 888             888    d8b
@@ -4316,17 +4438,6 @@ components:
         body: { $ref: "#/components/schemas/PostContent" }
         meta: { $ref: "#/components/schemas/Metadata" }
         url: { $ref: "#/components/schemas/URL" }
-
-    PostSearchResults:
-      type: object
-      required: [count, results]
-      properties:
-        count:
-          type: number
-        results:
-          type: array
-          items:
-            $ref: "#/components/schemas/Post"
 
     PostDescription:
       type: string

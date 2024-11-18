@@ -78,11 +78,19 @@ func (m *Mapping) AuthPasswordUpdate() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) AuthPasswordReset() (bool, *rbac.Permission) {
+	return false, nil // Public
+}
+
 func (m *Mapping) AuthEmailPasswordSignup() (bool, *rbac.Permission) {
 	return false, nil // Public
 }
 
 func (m *Mapping) AuthEmailPasswordSignin() (bool, *rbac.Permission) {
+	return false, nil // Public
+}
+
+func (m *Mapping) AuthPasswordResetRequestEmail() (bool, *rbac.Permission) {
 	return false, nil // Public
 }
 
@@ -143,6 +151,14 @@ func (m *Mapping) AccountAuthProviderList() (bool, *rbac.Permission) {
 }
 
 func (m *Mapping) AccountAuthMethodDelete() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) AccountEmailAdd() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) AccountEmailRemove() (bool, *rbac.Permission) {
 	return true, nil
 }
 

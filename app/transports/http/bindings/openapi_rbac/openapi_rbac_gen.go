@@ -21,8 +21,10 @@ type OperationPermissions interface {
 	AuthPasswordSignin() (bool, *rbac.Permission)
 	AuthPasswordCreate() (bool, *rbac.Permission)
 	AuthPasswordUpdate() (bool, *rbac.Permission)
+	AuthPasswordReset() (bool, *rbac.Permission)
 	AuthEmailPasswordSignup() (bool, *rbac.Permission)
 	AuthEmailPasswordSignin() (bool, *rbac.Permission)
+	AuthPasswordResetRequestEmail() (bool, *rbac.Permission)
 	AuthEmailSignup() (bool, *rbac.Permission)
 	AuthEmailSignin() (bool, *rbac.Permission)
 	AuthEmailVerify() (bool, *rbac.Permission)
@@ -38,6 +40,8 @@ type OperationPermissions interface {
 	AccountUpdate() (bool, *rbac.Permission)
 	AccountAuthProviderList() (bool, *rbac.Permission)
 	AccountAuthMethodDelete() (bool, *rbac.Permission)
+	AccountEmailAdd() (bool, *rbac.Permission)
+	AccountEmailRemove() (bool, *rbac.Permission)
 	AccountSetAvatar() (bool, *rbac.Permission)
 	AccountGetAvatar() (bool, *rbac.Permission)
 	AccountAddRole() (bool, *rbac.Permission)
@@ -148,10 +152,14 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AuthPasswordCreate()
 	case "AuthPasswordUpdate":
 		return optable.AuthPasswordUpdate()
+	case "AuthPasswordReset":
+		return optable.AuthPasswordReset()
 	case "AuthEmailPasswordSignup":
 		return optable.AuthEmailPasswordSignup()
 	case "AuthEmailPasswordSignin":
 		return optable.AuthEmailPasswordSignin()
+	case "AuthPasswordResetRequestEmail":
+		return optable.AuthPasswordResetRequestEmail()
 	case "AuthEmailSignup":
 		return optable.AuthEmailSignup()
 	case "AuthEmailSignin":
@@ -182,6 +190,10 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AccountAuthProviderList()
 	case "AccountAuthMethodDelete":
 		return optable.AccountAuthMethodDelete()
+	case "AccountEmailAdd":
+		return optable.AccountEmailAdd()
+	case "AccountEmailRemove":
+		return optable.AccountEmailRemove()
 	case "AccountSetAvatar":
 		return optable.AccountSetAvatar()
 	case "AccountGetAvatar":

@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/account/account_auth"
+	"github.com/Southclaws/storyden/app/services/account/account_email"
 	"github.com/Southclaws/storyden/app/services/account/account_update"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -31,7 +32,8 @@ type Accounts struct {
 	authManager   *authentication.Manager
 	accountQuery  *account_querier.Querier
 	accountUpdate account_update.Updater
-	accountAuth   account_auth.Manager
+	accountAuth   *account_auth.Manager
+	accountEmail  *account_email.Manager
 	roleAssign    *role_assign.Assignment
 	roleBadge     *role_badge.Writer
 }
@@ -41,7 +43,8 @@ func NewAccounts(
 	authManager *authentication.Manager,
 	accountQuery *account_querier.Querier,
 	accountUpdate account_update.Updater,
-	accountAuth account_auth.Manager,
+	accountAuth *account_auth.Manager,
+	accountEmail *account_email.Manager,
 	roleAssign *role_assign.Assignment,
 	roleBadge *role_badge.Writer,
 ) Accounts {
@@ -51,6 +54,7 @@ func NewAccounts(
 		accountQuery:  accountQuery,
 		accountUpdate: accountUpdate,
 		accountAuth:   accountAuth,
+		accountEmail:  accountEmail,
 		roleAssign:    roleAssign,
 		roleBadge:     roleBadge,
 	}
@@ -127,12 +131,17 @@ func (i *Accounts) AccountAuthProviderList(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	providers, err := i.authManager.GetProviderList(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	authmethods, err := i.accountAuth.GetAuthMethods(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	available, err := dt.MapErr(i.authManager.Providers(), serialiseAuthProvider)
+	available, err := dt.MapErr(providers, serialiseAuthProvider)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -166,12 +175,17 @@ func (i *Accounts) AccountAuthMethodDelete(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	providers, err := i.authManager.GetProviderList(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	authmethods, err := i.accountAuth.GetAuthMethods(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	available, err := dt.MapErr(i.authManager.Providers(), serialiseAuthProvider)
+	available, err := dt.MapErr(providers, serialiseAuthProvider)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

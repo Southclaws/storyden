@@ -27,40 +27,43 @@ var (
 	ErrMissingToken = fault.New("no access token in response")
 )
 
-const (
-	id   = "linkedin"
-	name = "LinkedIn"
+var (
+	service   = authentication.ServiceOAuthLinkedin
+	tokenType = authentication.TokenTypeOAuth
 )
 
-type LinkedInProvider struct {
+type Provider struct {
 	auth_repo  authentication.Repository
 	register   *register.Registrar
 	avatar_svc avatar.Service
 
 	callback string
-	config   all.Configuration
+	config   *all.Configuration
 }
 
-func New(cfg config.Config, auth_repo authentication.Repository, register *register.Registrar, avatar_svc avatar.Service) (*LinkedInProvider, error) {
-	config, err := all.LoadProvider(id)
+func New(cfg config.Config, auth_repo authentication.Repository, register *register.Registrar, avatar_svc avatar.Service) (*Provider, error) {
+	config, err := all.LoadProvider(service)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	return &LinkedInProvider{
+	return &Provider{
 		auth_repo:  auth_repo,
 		register:   register,
 		avatar_svc: avatar_svc,
 		config:     config,
-		callback:   all.Redirect(cfg, id),
+		callback:   all.Redirect(cfg, service),
 	}, nil
 }
 
-func (p *LinkedInProvider) Enabled() bool { return p.config.Enabled }
-func (p *LinkedInProvider) ID() string    { return id }
-func (p *LinkedInProvider) Name() string  { return name }
+func (p *Provider) Service() authentication.Service { return service }
+func (p *Provider) Token() authentication.TokenType { return tokenType }
 
-func (p *LinkedInProvider) Link(_ string) (string, error) {
+func (p *Provider) Enabled(ctx context.Context) (bool, error) {
+	return p.config != nil, nil
+}
+
+func (p *Provider) Link(_ string) (string, error) {
 	c := oauth2.Config{
 		ClientID:     p.config.ClientID,
 		ClientSecret: p.config.ClientSecret,
@@ -75,7 +78,7 @@ func (p *LinkedInProvider) Link(_ string) (string, error) {
 	return c.AuthCodeURL("state", oauth2.AccessTypeOffline), nil
 }
 
-func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*account.Account, error) {
+func (p *Provider) Login(ctx context.Context, state, code string) (*account.Account, error) {
 	// TODO: Use `state` properly to secure the flow.
 	ctx = fctx.WithMeta(ctx,
 		"state", state,
@@ -162,7 +165,7 @@ func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*acco
 
 	// TODO: Everything below this can be made generic for all OAuth providers.
 
-	acc, err := p.getOrCreateAccount(ctx, "linkedin", profile.ID, auth.AccessToken, handle, name)
+	acc, err := p.getOrCreateAccount(ctx, service, profile.ID, auth.AccessToken, handle, name)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -175,8 +178,8 @@ func (p *LinkedInProvider) Login(ctx context.Context, state, code string) (*acco
 	return acc, nil
 }
 
-func (p *LinkedInProvider) getOrCreateAccount(ctx context.Context, provider authentication.Service, identifier, token, handle, name string) (*account.Account, error) {
-	authmethod, exists, err := p.auth_repo.LookupByIdentifier(ctx, provider, identifier)
+func (p *Provider) getOrCreateAccount(ctx context.Context, service authentication.Service, identifier, token, handle, name string) (*account.Account, error) {
+	authmethod, exists, err := p.auth_repo.LookupByIdentifier(ctx, service, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to lookup existing account"), fctx.With(ctx))
 	}
@@ -185,13 +188,13 @@ func (p *LinkedInProvider) getOrCreateAccount(ctx context.Context, provider auth
 		return &authmethod.Account, nil
 	}
 
-	acc, err := p.register.Create(ctx, handle,
+	acc, err := p.register.Create(ctx, opt.New(handle),
 		account_writer.WithName(name))
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to create new account"), fctx.With(ctx))
 	}
 
-	_, err = p.auth_repo.Create(ctx, acc.ID, provider, identifier, token, nil)
+	_, err = p.auth_repo.Create(ctx, acc.ID, service, authentication.TokenTypeOAuth, identifier, token, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for account"), fctx.With(ctx))
 	}
@@ -199,7 +202,7 @@ func (p *LinkedInProvider) getOrCreateAccount(ctx context.Context, provider auth
 	return acc, nil
 }
 
-func (p *LinkedInProvider) setAvatar(ctx context.Context, rest *resty.Client, acc *account.Account, avatarURL opt.Optional[string]) error {
+func (p *Provider) setAvatar(ctx context.Context, rest *resty.Client, acc *account.Account, avatarURL opt.Optional[string]) error {
 	url, ok := avatarURL.Get()
 	if !ok {
 		return nil

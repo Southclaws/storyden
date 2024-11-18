@@ -1,9 +1,14 @@
 import { LoginScreen } from "src/screens/auth/LoginScreen/LoginScreen";
 
+import { UnreadyBanner } from "@/components/site/Unready";
 import { getSettings } from "@/lib/settings/settings-server";
 
 export default function Page() {
-  return <LoginScreen />;
+  try {
+    return <LoginScreen />;
+  } catch (error) {
+    return <UnreadyBanner error={error} />;
+  }
 }
 
 export async function generateMetadata() {

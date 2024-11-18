@@ -10,7 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
 export interface AuthProvider {
   /** The hyperlink to render for the user. */
-  link: string;
+  link?: string;
   /** The human-readable name of the provider. */
   name: string;
   /** The slug name of the provider. */

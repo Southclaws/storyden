@@ -8,9 +8,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type { AccountHandle } from "./accountHandle";
+import type { EmailAddress } from "./emailAddress";
 
 export interface AuthEmailPasswordInitialProps {
-  email: string;
+  email: EmailAddress;
   handle?: AccountHandle;
   password: string;
 }

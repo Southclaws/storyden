@@ -24,7 +24,9 @@ type Authentication struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// The authentication service name, such as GitHub, Twitter, Discord, etc. Or, 'password' for password auth and 'api_token' for token auth
 	Service string `json:"service,omitempty"`
-	// The identifier, usually a user/account ID on some OAuth service or API token name. If it's a password, this is blank.
+	// The type of secret/token used by the service to secure the authentication record.
+	TokenType string `json:"token_type,omitempty"`
+	// The identifier, usually a user/account ID on some OAuth service or API token name.
 	Identifier string `json:"identifier,omitempty"`
 	// The actual authentication token/password/key/etc. If OAuth, it'll be the access_token value, if it's a password, a hash and if it's an api_token type then the API token string.
 	Token string `json:"-"`
@@ -32,22 +34,21 @@ type Authentication struct {
 	Name *string `json:"name,omitempty"`
 	// Any necessary metadata specific to the authentication method.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
+	// AccountAuthentication holds the value of the "account_authentication" field.
+	AccountAuthentication xid.ID `json:"account_authentication,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AuthenticationQuery when eager-loading is set.
-	Edges                  AuthenticationEdges `json:"edges"`
-	account_authentication *xid.ID
-	selectValues           sql.SelectValues
+	Edges        AuthenticationEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // AuthenticationEdges holds the relations/edges for other nodes in the graph.
 type AuthenticationEdges struct {
 	// Account holds the value of the account edge.
 	Account *Account `json:"account,omitempty"`
-	// EmailAddress holds the value of the email_address edge.
-	EmailAddress []*Email `json:"email_address,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 }
 
 // AccountOrErr returns the Account value or an error if the edge
@@ -61,15 +62,6 @@ func (e AuthenticationEdges) AccountOrErr() (*Account, error) {
 	return nil, &NotLoadedError{edge: "account"}
 }
 
-// EmailAddressOrErr returns the EmailAddress value or an error if the edge
-// was not loaded in eager-loading.
-func (e AuthenticationEdges) EmailAddressOrErr() ([]*Email, error) {
-	if e.loadedTypes[1] {
-		return e.EmailAddress, nil
-	}
-	return nil, &NotLoadedError{edge: "email_address"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Authentication) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -77,14 +69,12 @@ func (*Authentication) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case authentication.FieldMetadata:
 			values[i] = new([]byte)
-		case authentication.FieldService, authentication.FieldIdentifier, authentication.FieldToken, authentication.FieldName:
+		case authentication.FieldService, authentication.FieldTokenType, authentication.FieldIdentifier, authentication.FieldToken, authentication.FieldName:
 			values[i] = new(sql.NullString)
 		case authentication.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case authentication.FieldID:
+		case authentication.FieldID, authentication.FieldAccountAuthentication:
 			values[i] = new(xid.ID)
-		case authentication.ForeignKeys[0]: // account_authentication
-			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -118,6 +108,12 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.Service = value.String
 			}
+		case authentication.FieldTokenType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field token_type", values[i])
+			} else if value.Valid {
+				a.TokenType = value.String
+			}
 		case authentication.FieldIdentifier:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field identifier", values[i])
@@ -145,12 +141,11 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
-		case authentication.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
+		case authentication.FieldAccountAuthentication:
+			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_authentication", values[i])
-			} else if value.Valid {
-				a.account_authentication = new(xid.ID)
-				*a.account_authentication = *value.S.(*xid.ID)
+			} else if value != nil {
+				a.AccountAuthentication = *value
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
@@ -168,11 +163,6 @@ func (a *Authentication) Value(name string) (ent.Value, error) {
 // QueryAccount queries the "account" edge of the Authentication entity.
 func (a *Authentication) QueryAccount() *AccountQuery {
 	return NewAuthenticationClient(a.config).QueryAccount(a)
-}
-
-// QueryEmailAddress queries the "email_address" edge of the Authentication entity.
-func (a *Authentication) QueryEmailAddress() *EmailQuery {
-	return NewAuthenticationClient(a.config).QueryEmailAddress(a)
 }
 
 // Update returns a builder for updating this Authentication.
@@ -204,6 +194,9 @@ func (a *Authentication) String() string {
 	builder.WriteString("service=")
 	builder.WriteString(a.Service)
 	builder.WriteString(", ")
+	builder.WriteString("token_type=")
+	builder.WriteString(a.TokenType)
+	builder.WriteString(", ")
 	builder.WriteString("identifier=")
 	builder.WriteString(a.Identifier)
 	builder.WriteString(", ")
@@ -216,6 +209,9 @@ func (a *Authentication) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", a.Metadata))
+	builder.WriteString(", ")
+	builder.WriteString("account_authentication=")
+	builder.WriteString(fmt.Sprintf("%v", a.AccountAuthentication))
 	builder.WriteByte(')')
 	return builder.String()
 }

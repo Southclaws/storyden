@@ -4,25 +4,24 @@ import (
 	"context"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/authentication"
 )
 
 // Provider describes a type that can be used to authenticate people.
-//
-// Link simply returns a URL to start the authentication process.
-//
-// Login is called by the callback and handles the code/token exchange and
-// returns a User object to the caller to be encoded into a cookie.
 type Provider interface {
-	// Enabled tells the OAuth component if the provider is enabled. Providers
-	// can be enabled and disabled at initialisation time based on the presence
-	// of environment variable configuration for each provider.
-	Enabled() bool
+	// Enabled tells the auth method manager whether this method is enabled.
+	Enabled(ctx context.Context) (bool, error)
 
-	// Provider general information. This could be a struct but it's simpler as
-	// part of the interface for now, despite bloating the interface a bit.
-	Name() string
-	ID() string
+	// Service returns the unique identifier for the service. This is used for
+	// the repository layer to record which auth methods a member has used. It
+	// may also be used by clients to show a user-friendly label for the method.
+	Service() authentication.Service
 
+	// Token returns the type of token/secret that this provider uses.
+	Token() authentication.TokenType
+}
+
+type OAuthProvider interface {
 	// Link will, for providers that support it, provide a URL to a third-party
 	// authenticator. OAuth providers use this to start the authentication flow.
 	Link(redirect string) (string, error)

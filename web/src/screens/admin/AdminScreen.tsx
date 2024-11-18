@@ -1,25 +1,58 @@
 "use client";
 
-import { Unready, UnreadyBanner } from "src/components/site/Unready";
+import { TabsValueChangeDetails } from "@ark-ui/react";
+import { useQueryState } from "nuqs";
+import { useEffect } from "react";
 
-import { Heading } from "@/components/ui/heading";
-import { VStack } from "@/styled-system/jsx";
+import * as Tabs from "@/components/ui/tabs";
 
-import { BrandSettings } from "./components/BrandSettings/BrandSettings";
-import { useAdminScreen } from "./useAdminScreen";
+import { AuthenticationSettingsScreen } from "./AuthenticationSettingsScreen";
+import { BrandSettingsScreen } from "./BrandSettingsScreen";
+
+const DEFAULT_TAB = "brand";
 
 export function AdminScreen() {
-  const { data, error } = useAdminScreen();
-  if (!data) return <Unready error={error} />;
+  const [tab, setTab] = useQueryState("tab", {
+    defaultValue: DEFAULT_TAB,
+  });
 
-  if (!data.admin)
-    return <UnreadyBanner error="Not authorised to view this page" />;
+  // NOTE: A hack because for some reason, the tab component renders twice and
+  // the associated hook gets lost and results in `ready` always being false,
+  // despite the useSettings hook returning the correct data. Not sure if this
+  // is a Next.js bug, a React bug or a Ark, Park or something else bug...
+  useEffect(() => {
+    if (!tab) {
+      setTab(DEFAULT_TAB);
+    }
+  }, [tab, setTab]);
+
+  function handleTabChange({ value }: TabsValueChangeDetails) {
+    setTab(value);
+  }
 
   return (
-    <VStack alignItems="start" gap="4">
-      <Heading size="lg">Administration</Heading>
+    <Tabs.Root
+      width="full"
+      variant="enclosed"
+      // variant="line"
+      // variant="outline"
+      defaultValue={DEFAULT_TAB}
+      value={tab}
+      onValueChange={handleTabChange}
+    >
+      <Tabs.List>
+        <Tabs.Trigger value="brand">Brand</Tabs.Trigger>
+        <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
+        <Tabs.Indicator />
+      </Tabs.List>
 
-      <BrandSettings />
-    </VStack>
+      <Tabs.Content value="brand">
+        <BrandSettingsScreen />
+      </Tabs.Content>
+
+      <Tabs.Content value="authentication">
+        <AuthenticationSettingsScreen />
+      </Tabs.Content>
+    </Tabs.Root>
   );
 }

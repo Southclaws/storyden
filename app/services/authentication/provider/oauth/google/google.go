@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	ga "google.golang.org/api/oauth2/v2"
@@ -29,9 +30,9 @@ var (
 	ErrMissingToken = fault.New("no access token in response")
 )
 
-const (
-	id   = "google"
-	name = "Google"
+var (
+	service   = authentication.ServiceOAuthGoogle
+	tokenType = authentication.TokenTypeOAuth
 )
 
 type Provider struct {
@@ -41,8 +42,7 @@ type Provider struct {
 
 	ed       endec.EncrypterDecrypter
 	callback string
-	config   all.Configuration
-	oac      oauth2.Config
+	config   *all.Configuration
 }
 
 func New(
@@ -52,23 +52,12 @@ func New(
 	avatar_svc avatar.Service,
 	ed endec.EncrypterDecrypter,
 ) (*Provider, error) {
-	config, err := all.LoadProvider(id)
+	config, err := all.LoadProvider(service)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	callback := all.Redirect(cfg, id)
-
-	oac := oauth2.Config{
-		ClientID:     config.ClientID,
-		ClientSecret: config.ClientSecret,
-		Endpoint:     google.Endpoint,
-		RedirectURL:  callback,
-		Scopes: []string{
-			"https://www.googleapis.com/auth/userinfo.email",
-			"https://www.googleapis.com/auth/userinfo.profile",
-		},
-	}
+	callback := all.Redirect(cfg, service)
 
 	return &Provider{
 		auth_repo:  auth_repo,
@@ -78,13 +67,15 @@ func New(
 		ed:       ed,
 		config:   config,
 		callback: callback,
-		oac:      oac,
 	}, nil
 }
 
-func (p *Provider) Enabled() bool { return p.config.Enabled }
-func (p *Provider) Name() string  { return name }
-func (p *Provider) ID() string    { return id }
+func (p *Provider) Service() authentication.Service { return service }
+func (p *Provider) Token() authentication.TokenType { return tokenType }
+
+func (p *Provider) Enabled(ctx context.Context) (bool, error) {
+	return p.config != nil, nil
+}
 
 func (p *Provider) Link(redirectPath string) (string, error) {
 	state, err := p.ed.Encrypt(map[string]any{
@@ -94,7 +85,18 @@ func (p *Provider) Link(redirectPath string) (string, error) {
 		return "", fault.Wrap(err)
 	}
 
-	return p.oac.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
+	oac := oauth2.Config{
+		ClientID:     p.config.ClientID,
+		ClientSecret: p.config.ClientSecret,
+		Endpoint:     google.Endpoint,
+		RedirectURL:  p.callback,
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile",
+		},
+	}
+
+	return oac.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
 }
 
 func (p *Provider) Login(ctx context.Context, state, code string) (*account.Account, error) {
@@ -107,7 +109,18 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 	}
 	// TODO: Process claims for redirect etc.
 
-	token, err := p.oac.Exchange(ctx, code, oauth2.AccessTypeOffline)
+	oac := oauth2.Config{
+		ClientID:     p.config.ClientID,
+		ClientSecret: p.config.ClientSecret,
+		Endpoint:     google.Endpoint,
+		RedirectURL:  p.callback,
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile",
+		},
+	}
+
+	token, err := oac.Exchange(ctx, code, oauth2.AccessTypeOffline)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -130,7 +143,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 	// TODO: Everything below this can be made generic for all OAuth providers.
 
 	acc, err := p.getOrCreateAccount(ctx,
-		id,
+		service,
 		strings.ToLower(u.Id),
 		token.AccessToken,
 		handle,
@@ -143,8 +156,8 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 	return acc, nil
 }
 
-func (p *Provider) getOrCreateAccount(ctx context.Context, provider authentication.Service, identifier, token, handle, name string) (*account.Account, error) {
-	authmethod, exists, err := p.auth_repo.LookupByIdentifier(ctx, provider, identifier)
+func (p *Provider) getOrCreateAccount(ctx context.Context, service authentication.Service, identifier, token, handle, name string) (*account.Account, error) {
+	authmethod, exists, err := p.auth_repo.LookupByIdentifier(ctx, service, identifier)
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to lookup existing account"), fctx.With(ctx))
 	}
@@ -153,13 +166,13 @@ func (p *Provider) getOrCreateAccount(ctx context.Context, provider authenticati
 		return &authmethod.Account, nil
 	}
 
-	acc, err := p.register.Create(ctx, handle,
+	acc, err := p.register.Create(ctx, opt.New(handle),
 		account_writer.WithName(name))
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to create new account"), fctx.With(ctx))
 	}
 
-	_, err = p.auth_repo.Create(ctx, acc.ID, provider, identifier, token, nil)
+	_, err = p.auth_repo.Create(ctx, acc.ID, service, authentication.TokenTypeOAuth, identifier, token, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for account"), fctx.With(ctx))
 	}

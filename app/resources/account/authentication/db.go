@@ -3,7 +3,6 @@ package authentication
 import (
 	"context"
 
-	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -27,6 +26,7 @@ func New(db *ent.Client) Repository {
 func (d *database) Create(ctx context.Context,
 	id account.AccountID,
 	service Service,
+	tokenType TokenType,
 	identifier string,
 	token string,
 	metadata map[string]any,
@@ -36,7 +36,8 @@ func (d *database) Create(ctx context.Context,
 	mutate := create.Mutation()
 
 	mutate.SetAccountID(xid.ID(id))
-	mutate.SetService(string(service))
+	mutate.SetService(service.String())
+	mutate.SetTokenType(tokenType.String())
 	mutate.SetIdentifier(identifier)
 	mutate.SetToken(token)
 	mutate.SetMetadata(metadata)
@@ -77,7 +78,7 @@ func (d *database) LookupByIdentifier(ctx context.Context, service Service, iden
 		Query().
 		Where(
 			authentication.IdentifierEQ(identifier),
-			authentication.ServiceEQ(string(service)),
+			authentication.ServiceEQ(service.String()),
 		).
 		WithAccount(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
@@ -99,20 +100,18 @@ func (d *database) LookupByIdentifier(ctx context.Context, service Service, iden
 	return auth, true, nil
 }
 
-func (d *database) LookupByHandle(ctx context.Context, service Service, handle string) (*Authentication, bool, error) {
+func (d *database) LookupByTokenType(ctx context.Context, accountID account.AccountID, tokenType TokenType, identifier string) (*Authentication, bool, error) {
 	r, err := d.db.Authentication.
 		Query().
 		Where(
-			authentication.ServiceEQ(string(service)),
-			authentication.HasAccountWith(model_account.Handle(handle)),
+			authentication.AccountAuthenticationEQ(xid.ID(accountID)),
+			authentication.TokenTypeEQ(tokenType.String()),
+			authentication.IdentifierEQ(identifier),
 		).
 		WithAccount(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
-		Order(authentication.ByCreatedAt(sql.OrderDesc())).
-		// NOTE: We pick the latest here and don't handle multiple providers of
-		// the same type very well (it's quite an edge case...)
-		First(ctx)
+		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			return nil, false, nil
@@ -209,7 +208,7 @@ func (d *database) Delete(ctx context.Context, accountID account.AccountID, iden
 				model_account.ID(xid.ID(accountID)),
 			),
 			authentication.IdentifierEQ(identifier),
-			authentication.ServiceEQ(string(service)),
+			authentication.ServiceEQ(service.String()),
 		).Exec(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {

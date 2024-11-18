@@ -10,7 +10,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/services/authentication/provider/email/email_only"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/email_only"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
@@ -27,7 +27,7 @@ func (i *Authentication) AuthEmailSignup(ctx context.Context, request openapi.Au
 
 	handle := opt.NewPtr(request.Body.Handle)
 
-	acc, err := i.ep.Register(ctx, *address, handle, invitedBy)
+	acc, err := i.emailVerificationAuthProvider.Register(ctx, *address, handle, invitedBy)
 	if err != nil {
 		// SPEC: If the email exists, return a 422 response with no session.
 		if errors.Is(err, email_only.ErrAccountAlreadyExists) {
@@ -48,6 +48,17 @@ func (i *Authentication) AuthEmailSignup(ctx context.Context, request openapi.Au
 }
 
 func (i *Authentication) AuthEmailSignin(ctx context.Context, request openapi.AuthEmailSigninRequestObject) (openapi.AuthEmailSigninResponseObject, error) {
-	// i.ep.Login(ctx, request.Body.Email)
-	return nil, nil
+	address, err := mail.ParseAddress(request.Body.Email)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	err = i.emailVerificationAuthProvider.Login(ctx, *address)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AuthEmailSignin200JSONResponse{
+		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{},
+	}, nil
 }
