@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/rs/xid"
 )
@@ -40,11 +39,9 @@ type Email struct {
 type EmailEdges struct {
 	// Account holds the value of the account edge.
 	Account *Account `json:"account,omitempty"`
-	// AuthenticationRecord holds the value of the authentication_record edge.
-	AuthenticationRecord *Authentication `json:"authentication_record,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 }
 
 // AccountOrErr returns the Account value or an error if the edge
@@ -56,17 +53,6 @@ func (e EmailEdges) AccountOrErr() (*Account, error) {
 		return nil, &NotFoundError{label: account.Label}
 	}
 	return nil, &NotLoadedError{edge: "account"}
-}
-
-// AuthenticationRecordOrErr returns the AuthenticationRecord value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e EmailEdges) AuthenticationRecordOrErr() (*Authentication, error) {
-	if e.AuthenticationRecord != nil {
-		return e.AuthenticationRecord, nil
-	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: authentication.Label}
-	}
-	return nil, &NotLoadedError{edge: "authentication_record"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -152,11 +138,6 @@ func (e *Email) Value(name string) (ent.Value, error) {
 // QueryAccount queries the "account" edge of the Email entity.
 func (e *Email) QueryAccount() *AccountQuery {
 	return NewEmailClient(e.config).QueryAccount(e)
-}
-
-// QueryAuthenticationRecord queries the "authentication_record" edge of the Email entity.
-func (e *Email) QueryAuthenticationRecord() *AuthenticationQuery {
-	return NewEmailClient(e.config).QueryAuthenticationRecord(e)
 }
 
 // Update returns a builder for updating this Email.

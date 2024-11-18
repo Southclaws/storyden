@@ -44,7 +44,7 @@ func (p *Provider) RegisterWithHandle(ctx context.Context, handle string, passwo
 	opts := []account_writer.Option{}
 	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
 
-	account, err := p.register.Create(ctx, handle, opts...)
+	account, err := p.register.Create(ctx, opt.New(handle), opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}

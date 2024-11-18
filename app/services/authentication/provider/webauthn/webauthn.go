@@ -92,7 +92,7 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 	opts := []account_writer.Option{}
 	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
 
-	acc, err := p.reg.Create(ctx, handle, opts...)
+	acc, err := p.reg.Create(ctx, opt.New(handle), opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

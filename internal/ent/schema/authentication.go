@@ -44,12 +44,6 @@ func (Authentication) Fields() []ent.Field {
 			Comment("Any necessary metadata specific to the authentication method."),
 
 		field.String("account_authentication").GoType(xid.ID{}),
-
-		field.String("email_address_record_id").
-			GoType(xid.ID{}).
-			Optional().
-			Nillable().
-			NotEmpty(),
 	}
 }
 
@@ -59,12 +53,6 @@ func (Authentication) Edges() []ent.Edge {
 			Ref("authentication").
 			Field("account_authentication").
 			Required().
-			Unique(),
-
-		// Only one auth method may be linked to an email address.
-		edge.From("email_address", Email.Type).
-			Field("email_address_record_id").
-			Ref("authentication_record").
 			Unique(),
 	}
 }

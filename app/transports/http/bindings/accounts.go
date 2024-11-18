@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/account/account_auth"
+	"github.com/Southclaws/storyden/app/services/account/account_email"
 	"github.com/Southclaws/storyden/app/services/account/account_update"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -32,6 +33,7 @@ type Accounts struct {
 	accountQuery  *account_querier.Querier
 	accountUpdate account_update.Updater
 	accountAuth   *account_auth.Manager
+	accountEmail  *account_email.Manager
 	roleAssign    *role_assign.Assignment
 	roleBadge     *role_badge.Writer
 }
@@ -42,6 +44,7 @@ func NewAccounts(
 	accountQuery *account_querier.Querier,
 	accountUpdate account_update.Updater,
 	accountAuth *account_auth.Manager,
+	accountEmail *account_email.Manager,
 	roleAssign *role_assign.Assignment,
 	roleBadge *role_badge.Writer,
 ) Accounts {
@@ -51,6 +54,7 @@ func NewAccounts(
 		accountQuery:  accountQuery,
 		accountUpdate: accountUpdate,
 		accountAuth:   accountAuth,
+		accountEmail:  accountEmail,
 		roleAssign:    roleAssign,
 		roleBadge:     roleBadge,
 	}
@@ -379,14 +383,11 @@ func serialiseAuthMethod(in *account_auth.AuthMethod) (openapi.AccountAuthMethod
 		return openapi.AccountAuthMethod{}, fault.Wrap(err)
 	}
 
-	email := opt.Map(in.Instance.Email, serialiseEmailAddress)
-
 	return openapi.AccountAuthMethod{
 		Id:         in.Instance.ID.String(),
 		CreatedAt:  in.Instance.Created,
 		Name:       in.Instance.Name.Or("Unknown"),
 		Identifier: in.Instance.Identifier,
 		Provider:   p,
-		Email:      email.Ptr(),
 	}, nil
 }

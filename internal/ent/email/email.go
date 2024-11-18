@@ -27,8 +27,6 @@ const (
 	FieldVerified = "verified"
 	// EdgeAccount holds the string denoting the account edge name in mutations.
 	EdgeAccount = "account"
-	// EdgeAuthenticationRecord holds the string denoting the authentication_record edge name in mutations.
-	EdgeAuthenticationRecord = "authentication_record"
 	// Table holds the table name of the email in the database.
 	Table = "emails"
 	// AccountTable is the table that holds the account relation/edge.
@@ -38,13 +36,6 @@ const (
 	AccountInverseTable = "accounts"
 	// AccountColumn is the table column denoting the account relation/edge.
 	AccountColumn = "account_id"
-	// AuthenticationRecordTable is the table that holds the authentication_record relation/edge.
-	AuthenticationRecordTable = "authentications"
-	// AuthenticationRecordInverseTable is the table name for the Authentication entity.
-	// It exists in this package in order to avoid circular dependency with the "authentication" package.
-	AuthenticationRecordInverseTable = "authentications"
-	// AuthenticationRecordColumn is the table column denoting the authentication_record relation/edge.
-	AuthenticationRecordColumn = "email_address_record_id"
 )
 
 // Columns holds all SQL columns for email fields.
@@ -121,24 +112,10 @@ func ByAccountField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAccountStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByAuthenticationRecordField orders the results by authentication_record field.
-func ByAuthenticationRecordField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAuthenticationRecordStep(), sql.OrderByField(field, opts...))
-	}
-}
 func newAccountStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AccountInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, AccountTable, AccountColumn),
-	)
-}
-func newAuthenticationRecordStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AuthenticationRecordInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, AuthenticationRecordTable, AuthenticationRecordColumn),
 	)
 }

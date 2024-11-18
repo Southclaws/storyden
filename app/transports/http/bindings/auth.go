@@ -27,9 +27,9 @@ type Authentication struct {
 	passwordAuthProvider          *password.Provider
 	emailVerificationAuthProvider *email_only.Provider
 	accountQuery                  *account_querier.Querier
-	emailRepo                     email.EmailRepo
+	emailRepo                     *email.Repository
 	authManager                   *auth_svc.Manager
-	emailVerifier                 email_verify.Verifier
+	emailVerifier                 *email_verify.Verifier
 }
 
 func NewAuthentication(
@@ -38,9 +38,9 @@ func NewAuthentication(
 	passwordAuthProvider *password.Provider,
 	emailVerificationAuthProvider *email_only.Provider,
 	accountQuery *account_querier.Querier,
-	emailRepo email.EmailRepo,
+	emailRepo *email.Repository,
 	authManager *auth_svc.Manager,
-	emailVerifier email_verify.Verifier,
+	emailVerifier *email_verify.Verifier,
 ) Authentication {
 	return Authentication{
 		cj:                            cj,

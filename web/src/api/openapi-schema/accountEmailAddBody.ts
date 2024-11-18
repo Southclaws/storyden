@@ -7,9 +7,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { Post } from "./post";
+import type { AccountEmailInitialProps } from "./accountEmailInitialProps";
 
-export interface PostSearchResults {
-  count: number;
-  results: Post[];
-}
+export type AccountEmailAddBody = AccountEmailInitialProps;

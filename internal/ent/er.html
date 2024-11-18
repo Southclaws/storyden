@@ -54,7 +54,6 @@ erDiagram
         string name
         mapLBRACKstringRBRACKinterface {} metadata
         xidDOTID account_authentication
-        xidDOTID email_address_record_id
     }
     Category {
         xidDOTID id
@@ -261,7 +260,6 @@ erDiagram
     	CollectionNode }o--o| Node : "node"
     	CollectionPost }o--o| Collection : "collection"
     	CollectionPost }o--o| Post : "post"
-    	Email |o--o| Authentication : "authentication_record/email_address"
     	Event |o--o{ EventParticipant : "participants/event"
     	Invitation |o--o{ Account : "invited/invited_by"
     	Link |o--o{ Post : "posts/link"

@@ -188,7 +188,7 @@ func (p *Provider) getOrCreateAccount(ctx context.Context, service authenticatio
 		return &authmethod.Account, nil
 	}
 
-	acc, err := p.register.Create(ctx, handle,
+	acc, err := p.register.Create(ctx, opt.New(handle),
 		account_writer.WithName(name))
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to create new account"), fctx.With(ctx))

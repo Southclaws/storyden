@@ -38,6 +38,8 @@ type OperationPermissions interface {
 	AccountUpdate() (bool, *rbac.Permission)
 	AccountAuthProviderList() (bool, *rbac.Permission)
 	AccountAuthMethodDelete() (bool, *rbac.Permission)
+	AccountEmailAdd() (bool, *rbac.Permission)
+	AccountEmailRemove() (bool, *rbac.Permission)
 	AccountSetAvatar() (bool, *rbac.Permission)
 	AccountGetAvatar() (bool, *rbac.Permission)
 	AccountAddRole() (bool, *rbac.Permission)
@@ -182,6 +184,10 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AccountAuthProviderList()
 	case "AccountAuthMethodDelete":
 		return optable.AccountAuthMethodDelete()
+	case "AccountEmailAdd":
+		return optable.AccountEmailAdd()
+	case "AccountEmailRemove":
+		return optable.AccountEmailRemove()
 	case "AccountSetAvatar":
 		return optable.AccountSetAvatar()
 	case "AccountGetAvatar":

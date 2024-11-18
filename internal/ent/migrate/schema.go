@@ -162,7 +162,6 @@ var (
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_authentication", Type: field.TypeString, Size: 20},
-		{Name: "email_address_record_id", Type: field.TypeString, Unique: true, Nullable: true, Size: 20},
 	}
 	// AuthenticationsTable holds the schema information for the "authentications" table.
 	AuthenticationsTable = &schema.Table{
@@ -175,12 +174,6 @@ var (
 				Columns:    []*schema.Column{AuthenticationsColumns[8]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "authentications_emails_authentication_record",
-				Columns:    []*schema.Column{AuthenticationsColumns[9]},
-				RefColumns: []*schema.Column{EmailsColumns[0]},
-				OnDelete:   schema.SetNull,
 			},
 		},
 		Indexes: []*schema.Index{
@@ -1018,7 +1011,6 @@ func init() {
 	AssetsTable.ForeignKeys[0].RefTable = AccountsTable
 	AssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
-	AuthenticationsTable.ForeignKeys[1].RefTable = EmailsTable
 	CollectionsTable.ForeignKeys[0].RefTable = AccountsTable
 	CollectionsTable.ForeignKeys[1].RefTable = AssetsTable
 	CollectionNodesTable.ForeignKeys[0].RefTable = CollectionsTable

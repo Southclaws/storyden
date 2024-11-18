@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
-	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
 )
@@ -21,13 +20,12 @@ import (
 // AuthenticationQuery is the builder for querying Authentication entities.
 type AuthenticationQuery struct {
 	config
-	ctx              *QueryContext
-	order            []authentication.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.Authentication
-	withAccount      *AccountQuery
-	withEmailAddress *EmailQuery
-	modifiers        []func(*sql.Selector)
+	ctx         *QueryContext
+	order       []authentication.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.Authentication
+	withAccount *AccountQuery
+	modifiers   []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -79,28 +77,6 @@ func (aq *AuthenticationQuery) QueryAccount() *AccountQuery {
 			sqlgraph.From(authentication.Table, authentication.FieldID, selector),
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, authentication.AccountTable, authentication.AccountColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryEmailAddress chains the current query on the "email_address" edge.
-func (aq *AuthenticationQuery) QueryEmailAddress() *EmailQuery {
-	query := (&EmailClient{config: aq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := aq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(authentication.Table, authentication.FieldID, selector),
-			sqlgraph.To(email.Table, email.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, authentication.EmailAddressTable, authentication.EmailAddressColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -295,13 +271,12 @@ func (aq *AuthenticationQuery) Clone() *AuthenticationQuery {
 		return nil
 	}
 	return &AuthenticationQuery{
-		config:           aq.config,
-		ctx:              aq.ctx.Clone(),
-		order:            append([]authentication.OrderOption{}, aq.order...),
-		inters:           append([]Interceptor{}, aq.inters...),
-		predicates:       append([]predicate.Authentication{}, aq.predicates...),
-		withAccount:      aq.withAccount.Clone(),
-		withEmailAddress: aq.withEmailAddress.Clone(),
+		config:      aq.config,
+		ctx:         aq.ctx.Clone(),
+		order:       append([]authentication.OrderOption{}, aq.order...),
+		inters:      append([]Interceptor{}, aq.inters...),
+		predicates:  append([]predicate.Authentication{}, aq.predicates...),
+		withAccount: aq.withAccount.Clone(),
 		// clone intermediate query.
 		sql:       aq.sql.Clone(),
 		path:      aq.path,
@@ -317,17 +292,6 @@ func (aq *AuthenticationQuery) WithAccount(opts ...func(*AccountQuery)) *Authent
 		opt(query)
 	}
 	aq.withAccount = query
-	return aq
-}
-
-// WithEmailAddress tells the query-builder to eager-load the nodes that are connected to
-// the "email_address" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AuthenticationQuery) WithEmailAddress(opts ...func(*EmailQuery)) *AuthenticationQuery {
-	query := (&EmailClient{config: aq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	aq.withEmailAddress = query
 	return aq
 }
 
@@ -409,9 +373,8 @@ func (aq *AuthenticationQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 	var (
 		nodes       = []*Authentication{}
 		_spec       = aq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [1]bool{
 			aq.withAccount != nil,
-			aq.withEmailAddress != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -441,12 +404,6 @@ func (aq *AuthenticationQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 			return nil, err
 		}
 	}
-	if query := aq.withEmailAddress; query != nil {
-		if err := aq.loadEmailAddress(ctx, query, nodes, nil,
-			func(n *Authentication, e *Email) { n.Edges.EmailAddress = e }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
 }
 
@@ -472,38 +429,6 @@ func (aq *AuthenticationQuery) loadAccount(ctx context.Context, query *AccountQu
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "account_authentication" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (aq *AuthenticationQuery) loadEmailAddress(ctx context.Context, query *EmailQuery, nodes []*Authentication, init func(*Authentication), assign func(*Authentication, *Email)) error {
-	ids := make([]xid.ID, 0, len(nodes))
-	nodeids := make(map[xid.ID][]*Authentication)
-	for i := range nodes {
-		if nodes[i].EmailAddressRecordID == nil {
-			continue
-		}
-		fk := *nodes[i].EmailAddressRecordID
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(email.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "email_address_record_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -542,9 +467,6 @@ func (aq *AuthenticationQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if aq.withAccount != nil {
 			_spec.Node.AddColumnOnce(authentication.FieldAccountAuthentication)
-		}
-		if aq.withEmailAddress != nil {
-			_spec.Node.AddColumnOnce(authentication.FieldEmailAddressRecordID)
 		}
 	}
 	if ps := aq.predicates; len(ps) > 0 {

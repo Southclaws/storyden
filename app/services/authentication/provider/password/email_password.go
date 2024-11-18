@@ -10,7 +10,6 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/alexedwards/argon2id"
-	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -26,8 +25,6 @@ func (p *Provider) RegisterWithEmail(ctx context.Context, email mail.Address, pa
 		return nil, ErrEmailRegistrationDisabled
 	}
 
-	// TODO: Check if email capability is enabled
-
 	if len(password) < 8 {
 		return nil, fault.Wrap(ErrPasswordTooShort,
 			fctx.With(ctx),
@@ -35,24 +32,35 @@ func (p *Provider) RegisterWithEmail(ctx context.Context, email mail.Address, pa
 			fmsg.WithDesc("too short", "Password must be at least 8 characters."))
 	}
 
-	identifier := handle.Or(petname.Generate(2, "-"))
+	if h, ok := handle.Get(); ok {
+		_, exists, err := p.accountQuery.LookupByHandle(ctx, h)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
+		}
 
-	_, exists, err := p.accountQuery.LookupByHandle(ctx, identifier)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
+		if exists {
+			return nil, fault.Wrap(ErrAccountAlreadyExists,
+				fctx.With(ctx),
+				ftag.With(ftag.AlreadyExists),
+				fmsg.WithDesc("exists", "The specified handle has already been registered."))
+		}
 	}
 
+	_, exists, err := p.er.LookupAccount(ctx, email)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 	if exists {
 		return nil, fault.Wrap(ErrAccountAlreadyExists,
 			fctx.With(ctx),
 			ftag.With(ftag.AlreadyExists),
-			fmsg.WithDesc("exists", "The specified handle has already been registered."))
+			fmsg.WithDesc("exists", "The specified email has already been registered."))
 	}
 
 	opts := []account_writer.Option{}
 	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
 
-	account, err := p.register.Create(ctx, identifier, opts...)
+	account, err := p.register.Create(ctx, handle, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}
@@ -84,7 +92,6 @@ func (p *Provider) LoginWithEmail(ctx context.Context, emailAddress mail.Address
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get account"))
 	}
-
 	if !exists {
 		return nil, fault.Wrap(ErrNotFound,
 			fctx.With(ctx),
@@ -97,11 +104,11 @@ func (p *Provider) LoginWithEmail(ctx context.Context, emailAddress mail.Address
 	}
 
 	// Get the auth record for this account, it must be a password-based method.
-	a, exists, err := p.auth.LookupByEmail(ctx, emailAddress)
+	// Email based auth records use the account ID as the method's identifier.
+	a, exists, err := p.auth.LookupByTokenType(ctx, acc.ID, tokenType, acc.ID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
 	if !exists {
 		return nil, fault.Wrap(ErrNoPassword,
 			fctx.With(ctx),

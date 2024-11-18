@@ -7,9 +7,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { PostSearchResults } from "./postSearchResults";
 
 /**
- * Thread post updated successfully.
+ * A valid email address.
  */
-export type PostSearchOKResponse = PostSearchResults;
+export type EmailAddress = string;

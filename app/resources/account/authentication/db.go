@@ -2,7 +2,6 @@ package authentication
 
 import (
 	"context"
-	"net/mail"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -14,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 	model_account "github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/authentication"
-	"github.com/Southclaws/storyden/internal/ent/email"
 )
 
 type database struct {
@@ -85,7 +83,6 @@ func (d *database) LookupByIdentifier(ctx context.Context, service Service, iden
 		WithAccount(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
-		WithEmailAddress().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -114,34 +111,6 @@ func (d *database) LookupByTokenType(ctx context.Context, accountID account.Acco
 		WithAccount(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
-		WithEmailAddress().
-		Only(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, false, nil
-		}
-
-		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
-	}
-
-	auth, err := FromModel(r)
-	if err != nil {
-		return nil, false, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return auth, true, nil
-}
-
-func (d *database) LookupByEmail(ctx context.Context, emailAddress mail.Address) (*Authentication, bool, error) {
-	r, err := d.db.Authentication.
-		Query().
-		Where(
-			authentication.HasEmailAddressWith(email.EmailAddressEQ(emailAddress.Address)),
-		).
-		WithAccount(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
-		WithEmailAddress().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -166,7 +135,6 @@ func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]
 		WithAccount(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
-		WithEmailAddress().
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))

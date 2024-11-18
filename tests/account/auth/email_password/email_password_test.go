@@ -2,6 +2,7 @@ package email_password_test
 
 import (
 	"context"
+	"net/http"
 	"regexp"
 	"testing"
 
@@ -62,7 +63,6 @@ func TestEmailPasswordAuth(t *testing.T) {
 				r.Equal(openapi.AccountVerifiedStatusNone, unverified.JSON200.VerifiedStatus)
 				r.Len(unverified.JSON200.EmailAddresses, 1)
 				a.Equal(address, (unverified.JSON200.EmailAddresses)[0].EmailAddress)
-				a.True(unverified.JSON200.EmailAddresses[0].IsAuth)
 				a.False(unverified.JSON200.EmailAddresses[0].Verified)
 			})
 
@@ -95,8 +95,20 @@ func TestEmailPasswordAuth(t *testing.T) {
 				a.Equal(openapi.AccountVerifiedStatusVerifiedEmail, verified.JSON200.VerifiedStatus)
 				r.NotNil(verified.JSON200.EmailAddresses)
 				a.Equal(address, verified.JSON200.EmailAddresses[0].EmailAddress)
-				a.True(verified.JSON200.EmailAddresses[0].IsAuth)
 				a.True(verified.JSON200.EmailAddresses[0].Verified)
+			})
+
+			t.Run("email_already_taken", func(t *testing.T) {
+				address := xid.New().String() + "@storyden.org"
+				password := "password"
+
+				// Sign up with email
+				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Password: password})
+				tests.Ok(t, err, signup)
+
+				// Sign up with email
+				signup2, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Password: password})
+				tests.Status(t, err, signup2, http.StatusConflict)
 			})
 		}))
 	}))

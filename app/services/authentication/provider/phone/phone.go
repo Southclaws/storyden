@@ -147,7 +147,7 @@ func (p *Provider) Register(ctx context.Context, handle string, phone string, in
 		opts := []account_writer.Option{}
 		inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
 
-		acc, err = p.register.Create(ctx, handle, opts...)
+		acc, err = p.register.Create(ctx, opt.New(handle), opts...)
 		if err != nil {
 			if ftag.Get(err) == ftag.AlreadyExists {
 				return nil, fault.Wrap(err,

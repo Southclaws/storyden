@@ -91,11 +91,6 @@ func AccountAuthentication(v xid.ID) predicate.Authentication {
 	return predicate.Authentication(sql.FieldEQ(FieldAccountAuthentication, v))
 }
 
-// EmailAddressRecordID applies equality check predicate on the "email_address_record_id" field. It's identical to EmailAddressRecordIDEQ.
-func EmailAddressRecordID(v xid.ID) predicate.Authentication {
-	return predicate.Authentication(sql.FieldEQ(FieldEmailAddressRecordID, v))
-}
-
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Authentication {
 	return predicate.Authentication(sql.FieldEQ(FieldCreatedAt, v))
@@ -551,86 +546,6 @@ func AccountAuthenticationContainsFold(v xid.ID) predicate.Authentication {
 	return predicate.Authentication(sql.FieldContainsFold(FieldAccountAuthentication, vc))
 }
 
-// EmailAddressRecordIDEQ applies the EQ predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDEQ(v xid.ID) predicate.Authentication {
-	return predicate.Authentication(sql.FieldEQ(FieldEmailAddressRecordID, v))
-}
-
-// EmailAddressRecordIDNEQ applies the NEQ predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDNEQ(v xid.ID) predicate.Authentication {
-	return predicate.Authentication(sql.FieldNEQ(FieldEmailAddressRecordID, v))
-}
-
-// EmailAddressRecordIDIn applies the In predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDIn(vs ...xid.ID) predicate.Authentication {
-	return predicate.Authentication(sql.FieldIn(FieldEmailAddressRecordID, vs...))
-}
-
-// EmailAddressRecordIDNotIn applies the NotIn predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDNotIn(vs ...xid.ID) predicate.Authentication {
-	return predicate.Authentication(sql.FieldNotIn(FieldEmailAddressRecordID, vs...))
-}
-
-// EmailAddressRecordIDGT applies the GT predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDGT(v xid.ID) predicate.Authentication {
-	return predicate.Authentication(sql.FieldGT(FieldEmailAddressRecordID, v))
-}
-
-// EmailAddressRecordIDGTE applies the GTE predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDGTE(v xid.ID) predicate.Authentication {
-	return predicate.Authentication(sql.FieldGTE(FieldEmailAddressRecordID, v))
-}
-
-// EmailAddressRecordIDLT applies the LT predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDLT(v xid.ID) predicate.Authentication {
-	return predicate.Authentication(sql.FieldLT(FieldEmailAddressRecordID, v))
-}
-
-// EmailAddressRecordIDLTE applies the LTE predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDLTE(v xid.ID) predicate.Authentication {
-	return predicate.Authentication(sql.FieldLTE(FieldEmailAddressRecordID, v))
-}
-
-// EmailAddressRecordIDContains applies the Contains predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDContains(v xid.ID) predicate.Authentication {
-	vc := v.String()
-	return predicate.Authentication(sql.FieldContains(FieldEmailAddressRecordID, vc))
-}
-
-// EmailAddressRecordIDHasPrefix applies the HasPrefix predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDHasPrefix(v xid.ID) predicate.Authentication {
-	vc := v.String()
-	return predicate.Authentication(sql.FieldHasPrefix(FieldEmailAddressRecordID, vc))
-}
-
-// EmailAddressRecordIDHasSuffix applies the HasSuffix predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDHasSuffix(v xid.ID) predicate.Authentication {
-	vc := v.String()
-	return predicate.Authentication(sql.FieldHasSuffix(FieldEmailAddressRecordID, vc))
-}
-
-// EmailAddressRecordIDIsNil applies the IsNil predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDIsNil() predicate.Authentication {
-	return predicate.Authentication(sql.FieldIsNull(FieldEmailAddressRecordID))
-}
-
-// EmailAddressRecordIDNotNil applies the NotNil predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDNotNil() predicate.Authentication {
-	return predicate.Authentication(sql.FieldNotNull(FieldEmailAddressRecordID))
-}
-
-// EmailAddressRecordIDEqualFold applies the EqualFold predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDEqualFold(v xid.ID) predicate.Authentication {
-	vc := v.String()
-	return predicate.Authentication(sql.FieldEqualFold(FieldEmailAddressRecordID, vc))
-}
-
-// EmailAddressRecordIDContainsFold applies the ContainsFold predicate on the "email_address_record_id" field.
-func EmailAddressRecordIDContainsFold(v xid.ID) predicate.Authentication {
-	vc := v.String()
-	return predicate.Authentication(sql.FieldContainsFold(FieldEmailAddressRecordID, vc))
-}
-
 // HasAccount applies the HasEdge predicate on the "account" edge.
 func HasAccount() predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
@@ -646,29 +561,6 @@ func HasAccount() predicate.Authentication {
 func HasAccountWith(preds ...predicate.Account) predicate.Authentication {
 	return predicate.Authentication(func(s *sql.Selector) {
 		step := newAccountStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasEmailAddress applies the HasEdge predicate on the "email_address" edge.
-func HasEmailAddress() predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, EmailAddressTable, EmailAddressColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasEmailAddressWith applies the HasEdge predicate on the "email_address" edge with a given conditions (other predicates).
-func HasEmailAddressWith(preds ...predicate.Email) predicate.Authentication {
-	return predicate.Authentication(func(s *sql.Selector) {
-		step := newEmailAddressStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

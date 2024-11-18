@@ -7,7 +7,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { AccountEmailAddress } from "./accountEmailAddress";
 import type { AuthProvider } from "./authProvider";
 
 /**
@@ -19,7 +18,6 @@ authentication methods so they can edit or remove it.
 export interface AccountAuthMethod {
   /** When this auth method was registered to the account. */
   created_at: string;
-  email?: AccountEmailAddress;
   /** The internal unique ID this method has. */
   id: string;
   /** The external identifier (third party ID or device ID) */

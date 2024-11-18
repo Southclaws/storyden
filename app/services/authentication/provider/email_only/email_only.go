@@ -9,11 +9,11 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/rs/xid"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
@@ -38,32 +38,34 @@ var (
 )
 
 type Provider struct {
-	logger   *zap.Logger
-	settings *settings.SettingsRepository
-	auth     authentication.Repository
-	register *register.Registrar
-	er       email.EmailRepo
+	logger       *zap.Logger
+	settings     *settings.SettingsRepository
+	accountQuery *account_querier.Querier
+	auth         authentication.Repository
+	register     *register.Registrar
+	er           *email.Repository
 
 	// TODO: Replace with an MQ message and sender job.
-	sender email_verify.Verifier
+	sender *email_verify.Verifier
 }
 
 func New(
 	logger *zap.Logger,
 	settings *settings.SettingsRepository,
+	accountQuery *account_querier.Querier,
 	auth authentication.Repository,
-
 	register *register.Registrar,
-	er email.EmailRepo,
-	sender email_verify.Verifier,
+	er *email.Repository,
+	sender *email_verify.Verifier,
 ) *Provider {
 	return &Provider{
-		logger:   logger,
-		settings: settings,
-		auth:     auth,
-		register: register,
-		er:       er,
-		sender:   sender,
+		logger:       logger,
+		settings:     settings,
+		accountQuery: accountQuery,
+		auth:         auth,
+		register:     register,
+		er:           er,
+		sender:       sender,
 	}
 }
 
@@ -84,6 +86,20 @@ func (p *Provider) Register(ctx context.Context, email mail.Address, handle opt.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if h, ok := handle.Get(); ok {
+		_, exists, err := p.accountQuery.LookupByHandle(ctx, h)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if exists {
+			return nil, fault.Wrap(ErrAccountAlreadyExists,
+				fctx.With(ctx),
+				ftag.With(ftag.AlreadyExists),
+				fmsg.WithDesc("exists", "The specified handle has already been registered."))
+		}
+	}
+
 	_, exists, err := p.er.LookupAccount(ctx, email)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -102,14 +118,10 @@ func (p *Provider) Register(ctx context.Context, email mail.Address, handle opt.
 			fmsg.WithDesc("exists", "The specified email address has already been registered."))
 	}
 
-	// For direct email registration, we generate a random handle for the new
-	// account which is a simple placeholder that the owner can overwrite later.
-	identifier := handle.Or(petname.Generate(2, "-"))
-
 	opts := []account_writer.Option{}
 	inviteCode.Call(func(id xid.ID) { opts = append(opts, account_writer.WithInvitedBy(id)) })
 
-	account, err := p.register.Create(ctx, identifier, opts...)
+	account, err := p.register.Create(ctx, handle, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account"))
 	}
@@ -126,7 +138,18 @@ func (p *Provider) Login(ctx context.Context, email mail.Address) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, exists, err := p.auth.LookupByEmail(ctx, email)
+	acc, exists, err := p.er.LookupAccount(ctx, email)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	if !exists {
+		return fault.Wrap(ErrEmailNotFound,
+			fctx.With(ctx),
+			ftag.With(ftag.NotFound),
+			fmsg.WithDesc("not found", "The specified email address is not associated with an account."))
+	}
+
+	_, exists, err = p.auth.LookupByTokenType(ctx, acc.ID, tokenType, acc.ID.String())
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -153,15 +176,14 @@ func (p *Provider) addEmailAuth(ctx context.Context, accountID account.AccountID
 
 	// Email verification authentication does not use any form of token, however
 	// there needs to be some value set so generate a random ID for each record.
-	identifier := ""
 	token := xid.New().String()
 
-	authRecord, err := p.auth.Create(ctx, accountID, service, authentication.TokenTypeNone, identifier, token, nil)
+	_, err = p.auth.Create(ctx, accountID, service, authentication.TokenTypeNone, accountID.String(), token, nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create account authentication instance"))
 	}
 
-	err = p.sender.BeginEmailVerification(ctx, accountID, email, code, opt.New(authRecord.ID))
+	_, err = p.sender.BeginEmailVerification(ctx, accountID, email, code)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

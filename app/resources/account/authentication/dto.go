@@ -22,7 +22,6 @@ type Authentication struct {
 	Identifier string
 	Token      string
 	Name       opt.Optional[string]
-	Email      opt.Optional[account.EmailAddress]
 	Metadata   interface{}
 }
 
@@ -47,11 +46,6 @@ func FromModel(m *ent.Authentication) (*Authentication, error) {
 		return nil, err
 	}
 
-	emailEdge := opt.NewPtr(m.Edges.EmailAddress)
-	email := opt.Map(emailEdge, func(em ent.Email) account.EmailAddress {
-		return *account.MapEmail(&em)
-	})
-
 	return &Authentication{
 		ID:         ID(m.ID),
 		Created:    m.CreatedAt,
@@ -61,7 +55,6 @@ func FromModel(m *ent.Authentication) (*Authentication, error) {
 		Identifier: m.Identifier,
 		Token:      m.Token,
 		Name:       opt.NewPtr(m.Name),
-		Email:      email,
 		Metadata:   m.Metadata,
 	}, nil
 }

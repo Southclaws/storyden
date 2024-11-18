@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/account"
-	"github.com/Southclaws/storyden/internal/ent/authentication"
 	"github.com/Southclaws/storyden/internal/ent/email"
 	"github.com/rs/xid"
 )
@@ -97,25 +96,6 @@ func (ec *EmailCreate) SetNillableID(x *xid.ID) *EmailCreate {
 // SetAccount sets the "account" edge to the Account entity.
 func (ec *EmailCreate) SetAccount(a *Account) *EmailCreate {
 	return ec.SetAccountID(a.ID)
-}
-
-// SetAuthenticationRecordID sets the "authentication_record" edge to the Authentication entity by ID.
-func (ec *EmailCreate) SetAuthenticationRecordID(id xid.ID) *EmailCreate {
-	ec.mutation.SetAuthenticationRecordID(id)
-	return ec
-}
-
-// SetNillableAuthenticationRecordID sets the "authentication_record" edge to the Authentication entity by ID if the given value is not nil.
-func (ec *EmailCreate) SetNillableAuthenticationRecordID(id *xid.ID) *EmailCreate {
-	if id != nil {
-		ec = ec.SetAuthenticationRecordID(*id)
-	}
-	return ec
-}
-
-// SetAuthenticationRecord sets the "authentication_record" edge to the Authentication entity.
-func (ec *EmailCreate) SetAuthenticationRecord(a *Authentication) *EmailCreate {
-	return ec.SetAuthenticationRecordID(a.ID)
 }
 
 // Mutation returns the EmailMutation object of the builder.
@@ -263,22 +243,6 @@ func (ec *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.AccountID = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ec.mutation.AuthenticationRecordIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   email.AuthenticationRecordTable,
-			Columns: []string{email.AuthenticationRecordColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
