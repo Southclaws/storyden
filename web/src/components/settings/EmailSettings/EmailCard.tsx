@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useSWRConfig } from "swr";
 
 import { handle } from "@/api/client";
@@ -48,7 +49,7 @@ export function EmailCard({ email }: Props) {
       <WStack alignItems="center">
         <HStack>
           <Heading size="sm">{email.email_address}</Heading>
-          {email.verified && (
+          {email.verified ? (
             <Badge
               borderColor="green.6"
               backgroundColor="green.5"
@@ -56,6 +57,12 @@ export function EmailCard({ email }: Props) {
             >
               Verified
             </Badge>
+          ) : (
+            <Link href="/auth/verify/email?returnURL=/settings">
+              <Badge borderColor="red.6" backgroundColor="red.5" color="red.11">
+                Verify this email
+              </Badge>
+            </Link>
           )}
         </HStack>
 
