@@ -36,12 +36,12 @@ func (c *RedisCache) Get(ctx context.Context, key string) (string, error) {
 	return str, err
 }
 
-func (c *RedisCache) Set(ctx context.Context, key string, value string) error {
+func (c *RedisCache) Set(ctx context.Context, key string, value string, ttl time.Duration) error {
 	cmd := c.client.B().
 		Set().
 		Key(key).
 		Value(value).
-		ExSeconds(int64(c.options.Expiration.Seconds())).
+		Ex(ttl).
 		Build()
 
 	err := c.client.Do(ctx, cmd).Error()

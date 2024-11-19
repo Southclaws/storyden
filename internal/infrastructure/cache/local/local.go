@@ -40,9 +40,11 @@ func (c *LocalCache) Get(ctx context.Context, key string) (string, error) {
 	return v.Value.(string), nil
 }
 
-func (c *LocalCache) Set(ctx context.Context, key string, value string) error {
+func (c *LocalCache) Set(ctx context.Context, key string, value string, ttl time.Duration) error {
+	e := time.Now().Add(ttl)
 	c.local.Store(key, Entry{
-		Value: value,
+		Value:  value,
+		Expiry: &e,
 	})
 	return nil
 }
