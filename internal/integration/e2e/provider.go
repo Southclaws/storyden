@@ -12,7 +12,7 @@ import (
 
 	http_transport "github.com/Southclaws/storyden/app/transports/http"
 	"github.com/Southclaws/storyden/app/transports/http/bindings"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session"
+	"github.com/Southclaws/storyden/app/transports/http/middleware"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
@@ -53,7 +53,7 @@ func Setup() fx.Option {
 		//
 		fx.Provide(httpserver.NewRouter, newHttpTestServer, newClient),
 
-		fx.Provide(session.New),
+		middleware.Build(),
 
 		bindings.Build(),
 

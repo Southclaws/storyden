@@ -33,11 +33,12 @@ import (
 //	}
 func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 	defaultConfig := config.Config{
-		PublicAPIAddress:   *utils.Must(url.Parse("http://localhost")),
-		PublicWebAddress:   *utils.Must(url.Parse("http://localhost")),
-		UnauthenticatedRPM: 1000,
-		AuthenticatedRPM:   1000,
-		EmailProvider:      "mock",
+		PublicAPIAddress: *utils.Must(url.Parse("http://localhost")),
+		PublicWebAddress: *utils.Must(url.Parse("http://localhost")),
+		RateLimit:        1000,
+		RateLimitPeriod:  time.Hour,
+		RateLimitExpire:  time.Minute,
+		EmailProvider:    "mock",
 	}
 
 	if dbURL := os.Getenv("DATABASE_URL"); dbURL != "" {
