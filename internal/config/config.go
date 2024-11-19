@@ -41,8 +41,8 @@ type Config struct {
 	S3AccessKey           string `envconfig:"S3_ACCESS_KEY"`
 	S3SecretKey           string `envconfig:"S3_SECRET_KEY"`
 
-	CacheProvider string `envconfig:"CACHE_PROVIDER" default:""`
-	RedisHost     string `envconfig:"REDIS_HOST"     default:""`
+	CacheProvider string  `envconfig:"CACHE_PROVIDER" default:""`
+	RedisURL      url.URL `envconfig:"REDIS_URL"      default:""`
 
 	QueueType string `envconfig:"QUEUE_TYPE" default:"internal"`
 	AmqpURL   string `envconfig:"AMQP_URL"   default:"amqp://guest:guest@localhost:5672/"`

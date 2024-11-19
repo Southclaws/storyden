@@ -33,8 +33,14 @@ func Build() fx.Option {
 				return local.New(), nil
 
 			case "redis":
+				password, _ := cfg.RedisURL.User.Password()
+
 				client, err := rueidis.NewClient(rueidis.ClientOption{
-					InitAddress: []string{cfg.RedisHost},
+					InitAddress:      []string{cfg.RedisURL.Host},
+					Username:         cfg.RedisURL.User.Username(),
+					Password:         password,
+					DisableCache:     true,
+					ConnWriteTimeout: 5 * time.Second,
 				})
 				if err != nil {
 					return nil, fault.Wrap(err, fmsg.With("failed to connect to redis"))
