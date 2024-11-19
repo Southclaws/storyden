@@ -36,7 +36,7 @@ func New(
 	return &Middleware{
 		logger: logger,
 		rl:     rl,
-		kf:     fromIP("X-Forwarded-For", "X-Real-IP", "Origin"),
+		kf:     fromIP("CF-Connecting-IP", "X-Real-IP", "True-Client-IP"),
 	}
 }
 
