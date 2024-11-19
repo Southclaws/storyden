@@ -10,6 +10,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-default}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-default}
 
+  redis:
+    image: redis:8.0-M02-alpine
+    ports:
+      - "6379:6379"
+
   minio:
     image: quay.io/minio/minio
     command: server /data --console-address ":9001"

@@ -31,6 +31,7 @@ func MountOpenAPI(
 
 	// Middleware providers
 	cj *session.Jar,
+	rl *limiter.Middleware,
 ) {
 	lc.Append(fx.StartHook(func() {
 		applied := httpserver.Apply(router,
@@ -38,7 +39,7 @@ func MountOpenAPI(
 			reqlog.WithLogger(logger),
 			useragent.UserAgentContext,
 			cj.WithAuth,
-			limiter.WithRateLimiter(cfg),
+			rl.WithRateLimit,
 			limiter.WithRequestSizeLimiter(MaxRequestSizeBytes),
 			chaos.WithChaos(cfg),
 		)

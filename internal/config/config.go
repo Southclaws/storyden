@@ -20,13 +20,15 @@ type Config struct {
 	DevChaosSlowMode time.Duration `envconfig:"DEV_CHAOS_SLOW_MODE"` // Simulates slow requests
 	DevChaosFailRate float64       `envconfig:"DEV_CHAOS_FAIL_RATE"` // Simulates failed requests
 
-	DatabaseURL        string  `envconfig:"DATABASE_URL"           default:"sqlite://data/data.db?_pragma=foreign_keys(1)"`
-	ListenAddr         string  `envconfig:"LISTEN_ADDR"            default:"0.0.0.0:8000"`
-	SessionKey         string  `envconfig:"SESSION_KEY"            default:"0000000000000000"`
-	PublicWebAddress   url.URL `envconfig:"PUBLIC_WEB_ADDRESS"     default:"http://localhost:3000"`
-	PublicAPIAddress   url.URL `envconfig:"PUBLIC_API_ADDRESS"     default:"http://localhost:8000"`
-	UnauthenticatedRPM int     `envconfig:"RPM_UNAUTHENTICATED"    default:"100"`
-	AuthenticatedRPM   int     `envconfig:"RPM_AUTHENTICATED"      default:"1000"`
+	DatabaseURL      string  `envconfig:"DATABASE_URL"           default:"sqlite://data/data.db?_pragma=foreign_keys(1)"`
+	ListenAddr       string  `envconfig:"LISTEN_ADDR"            default:"0.0.0.0:8000"`
+	SessionKey       string  `envconfig:"SESSION_KEY"            default:"0000000000000000"`
+	PublicWebAddress url.URL `envconfig:"PUBLIC_WEB_ADDRESS"     default:"http://localhost:3000"`
+	PublicAPIAddress url.URL `envconfig:"PUBLIC_API_ADDRESS"     default:"http://localhost:8000"`
+
+	RateLimit       int           `envconfig:"RATE_LIMIT"        default:"1000"`
+	RateLimitPeriod time.Duration `envconfig:"RATE_LIMIT_PERIOD" default:"1h"`
+	RateLimitExpire time.Duration `envconfig:"RATE_LIMIT_EXPIRE" default:"1m"`
 
 	EmailProvider string `envconfig:"EMAIL_PROVIDER"         default:""`
 
@@ -38,6 +40,9 @@ type Config struct {
 	S3Region              string `envconfig:"S3_REGION"`
 	S3AccessKey           string `envconfig:"S3_ACCESS_KEY"`
 	S3SecretKey           string `envconfig:"S3_SECRET_KEY"`
+
+	CacheProvider string `envconfig:"CACHE_PROVIDER" default:""`
+	RedisHost     string `envconfig:"REDIS_HOST"     default:""`
 
 	QueueType string `envconfig:"QUEUE_TYPE" default:"internal"`
 	AmqpURL   string `envconfig:"AMQP_URL"   default:"amqp://guest:guest@localhost:5672/"`
