@@ -10,7 +10,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/transports/http/bindings"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session"
+	"github.com/Southclaws/storyden/app/transports/http/middleware"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 )
 
@@ -20,8 +20,8 @@ func Build() fx.Option {
 		// up, starts the server on the fx OnStart lifecycle event.
 		httpserver.Build(),
 
-		// Provide the cookie session manager.
-		fx.Provide(session.New),
+		// Build all middleware dependencies.
+		middleware.Build(),
 
 		// Binds all the generated spec code for services to the *http.ServeMux.
 		bindings.Build(),

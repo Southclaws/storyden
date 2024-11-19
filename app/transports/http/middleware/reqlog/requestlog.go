@@ -3,6 +3,7 @@ package reqlog
 import (
 	"fmt"
 	"net/http"
+	"runtime/debug"
 	"time"
 
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
@@ -50,9 +51,11 @@ func WithLogger(logger *zap.Logger) func(http.Handler) http.Handler {
 						}
 					}(recovery)
 
+					trace := debug.Stack()
+
 					errorlog := title + ": " + err.Error()
 
-					log.Error(errorlog, zap.Error(err))
+					log.Error(errorlog, zap.Error(err), zap.String("trace", string(trace)))
 
 					w.WriteHeader(http.StatusInternalServerError)
 					return

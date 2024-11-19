@@ -31,6 +31,7 @@ require github.com/Southclaws/fault v0.8.1
 require (
 	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/Southclaws/opt v0.6.1
+	github.com/Southclaws/swirl v1.0.0
 	github.com/ThreeDotsLabs/watermill v1.4.1
 	github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.0
 	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
@@ -59,10 +60,10 @@ require (
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/pb33f/libopenapi v0.18.6
 	github.com/puzpuzpuz/xsync/v3 v3.4.0
+	github.com/redis/rueidis v1.0.49
 	github.com/rs/cors v1.11.1
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	github.com/twilio/twilio-go v1.23.5
-	github.com/ulule/limiter/v3 v3.11.2
 	github.com/weaviate/weaviate v1.27.2
 	github.com/weaviate/weaviate-go-client/v4 v4.16.0
 	golang.org/x/sync v0.9.0
