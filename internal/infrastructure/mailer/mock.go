@@ -22,11 +22,7 @@ type Mock struct {
 
 func (m *Mock) Send(
 	ctx context.Context,
-	address mail.Address,
-	name string,
-	subject string,
-	html string,
-	plain string,
+	msg Message,
 ) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
@@ -34,18 +30,18 @@ func (m *Mock) Send(
 	fmt.Printf(`Mock email sent to: %s <%s> '%s'
 %s
 `,
-		name,
-		address.String(),
-		subject,
-		plain,
+		msg.Name,
+		msg.Address.String(),
+		msg.Subject,
+		msg.Content.Plain,
 	)
 
 	m.sent = append(m.sent, MockEmail{
-		Address: address,
-		Name:    name,
-		Subject: subject,
-		Html:    html,
-		Plain:   plain,
+		Address: msg.Address,
+		Name:    msg.Name,
+		Subject: msg.Subject,
+		Html:    msg.Content.HTML,
+		Plain:   msg.Content.Plain,
 	})
 
 	return nil

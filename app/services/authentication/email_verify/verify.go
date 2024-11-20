@@ -12,9 +12,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/email"
-	"github.com/Southclaws/storyden/app/resources/mailtemplate"
 	"github.com/Southclaws/storyden/app/resources/settings"
-	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
+	"github.com/Southclaws/storyden/app/services/comms/mailqueue"
 )
 
 var (
@@ -24,21 +23,18 @@ var (
 
 type Verifier struct {
 	emailRepo *email.Repository
-	sender    mailer.Sender
-	template  *mailtemplate.Builder
+	mailqueue *mailqueue.Queuer
 	settings  *settings.SettingsRepository
 }
 
 func New(
 	emailRepo *email.Repository,
-	sender mailer.Sender,
-	template *mailtemplate.Builder,
+	mailqueue *mailqueue.Queuer,
 	settings *settings.SettingsRepository,
 ) *Verifier {
 	return &Verifier{
 		emailRepo: emailRepo,
-		sender:    sender,
-		template:  template,
+		mailqueue: mailqueue,
 		settings:  settings,
 	}
 }
@@ -71,17 +67,12 @@ func (s *Verifier) sendVerification(ctx context.Context, address mail.Address, c
 	instanceTitle := set.Title.Or(settings.DefaultTitle)
 	welcome := fmt.Sprintf("Welcome to %s!", instanceTitle)
 
-	template, err := s.template.Build(ctx, recipientName, []string{welcome}, []hermes.Action{
+	return s.mailqueue.Queue(ctx, address, recipientName, welcome, []string{welcome}, []hermes.Action{
 		{
 			Instructions: "Please use the following code to verify your account:",
 			InviteCode:   code,
 		},
 	})
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return s.sender.Send(ctx, address, recipientName, welcome, template.HTML, template.Plain)
 }
 
 func (s *Verifier) ResendVerification(ctx context.Context, address mail.Address) error {

@@ -10,12 +10,10 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 )
 
-type Rendered struct {
-	HTML  string
-	Plain string
-}
+type Action = hermes.Action
 
 type Builder struct {
 	instanceURL url.URL
@@ -33,7 +31,7 @@ func New(
 	}, nil
 }
 
-func (b *Builder) Build(ctx context.Context, name string, intros []string, actions []hermes.Action) (*Rendered, error) {
+func (b *Builder) Build(ctx context.Context, name string, intros []string, actions []hermes.Action) (*mailer.Content, error) {
 	s, err := b.settings.Get(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -70,5 +68,5 @@ func (b *Builder) Build(ctx context.Context, name string, intros []string, actio
 		return nil, fault.Wrap(err)
 	}
 
-	return &Rendered{html, plain}, nil
+	return mailer.NewContent(html, plain)
 }

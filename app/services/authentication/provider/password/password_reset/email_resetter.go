@@ -12,8 +12,9 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/resources/mailtemplate"
 	"github.com/Southclaws/storyden/app/resources/settings"
+	"github.com/Southclaws/storyden/app/services/comms/mailqueue"
+	"github.com/Southclaws/storyden/app/services/comms/mailtemplate"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 )
 
@@ -26,7 +27,7 @@ type EmailResetter struct {
 	tokenProvider *TokenProvider
 	authRepo      authentication.Repository
 	sender        mailer.Sender
-	template      *mailtemplate.Builder
+	mailqueue     *mailqueue.Queuer
 	settings      *settings.SettingsRepository
 }
 
@@ -34,14 +35,14 @@ func NewEmailResetter(
 	tokenProvider *TokenProvider,
 	authRepo authentication.Repository,
 	sender mailer.Sender,
-	template *mailtemplate.Builder,
+	mailqueue *mailqueue.Queuer,
 	settings *settings.SettingsRepository,
 ) *EmailResetter {
 	return &EmailResetter{
 		tokenProvider: tokenProvider,
 		authRepo:      authRepo,
 		sender:        sender,
-		template:      template,
+		mailqueue:     mailqueue,
 		settings:      settings,
 	}
 }
@@ -72,7 +73,7 @@ func (s *EmailResetter) sendResetEmail(ctx context.Context, address mail.Address
 	instanceTitle := set.Title.Or(settings.DefaultTitle)
 	welcome := fmt.Sprintf("Reset your password on %s!", instanceTitle)
 
-	template, err := s.template.Build(ctx, recipientName, []string{welcome}, []hermes.Action{
+	return s.mailqueue.Queue(ctx, address, recipientName, welcome, []string{welcome}, []mailtemplate.Action{
 		{
 			Instructions: "Click the link below to reset your password.",
 			Button: hermes.Button{
@@ -81,11 +82,6 @@ func (s *EmailResetter) sendResetEmail(ctx context.Context, address mail.Address
 			},
 		},
 	})
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return s.sender.Send(ctx, address, recipientName, welcome, template.HTML, template.Plain)
 }
 
 func (s *EmailResetter) Verify(ctx context.Context, token string) (account.AccountID, error) {

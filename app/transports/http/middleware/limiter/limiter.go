@@ -6,7 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/Southclaws/swirl"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
@@ -22,7 +21,7 @@ const (
 
 type Middleware struct {
 	logger *zap.Logger
-	rl     *swirl.Limiter
+	rl     rate.Limiter
 	kf     KeyFunc
 }
 
@@ -53,7 +52,7 @@ func (m *Middleware) WithRateLimit(next http.Handler) http.Handler {
 		// TODO: Generate costs per-operation from OpenAPI spec
 		cost := 1
 
-		status, exceeded, err := m.rl.Increment(ctx, key, cost)
+		status, allowed, err := m.rl.Increment(ctx, key, cost)
 		if err != nil {
 			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
@@ -67,7 +66,7 @@ func (m *Middleware) WithRateLimit(next http.Handler) http.Handler {
 		w.Header().Set(RateLimitRemaining, strconv.FormatUint(uint64(remaining), 10))
 		w.Header().Set(RateLimitReset, resetTime)
 
-		if exceeded {
+		if !allowed {
 			w.Header().Set(RetryAfter, resetTime)
 			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
 			return

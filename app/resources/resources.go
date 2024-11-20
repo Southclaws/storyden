@@ -33,7 +33,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/like/like_writer"
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
-	"github.com/Southclaws/storyden/app/resources/mailtemplate"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
@@ -89,7 +88,6 @@ func Build() fx.Option {
 			profile_search.New,
 			follow_writer.New,
 			follow_querier.New,
-			mailtemplate.New,
 			event_querier.New,
 			event_writer.New,
 			participant_querier.New,
