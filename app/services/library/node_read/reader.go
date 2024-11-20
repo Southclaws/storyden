@@ -12,20 +12,20 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/profile"
-	"github.com/Southclaws/storyden/app/services/account/session"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
 type HydratedQuerier struct {
 	logger     *zap.Logger
-	session    session.SessionProvider
+	session    *session.Provider
 	nodereader *node_querier.Querier
 	scorer     semdex.RelevanceScorer
 }
 
 func New(
 	logger *zap.Logger,
-	session session.SessionProvider,
+	session *session.Provider,
 	nodereader *node_querier.Querier,
 	scorer semdex.RelevanceScorer,
 ) *HydratedQuerier {
@@ -38,7 +38,7 @@ func New(
 }
 
 func (q *HydratedQuerier) GetBySlug(ctx context.Context, qk library.QueryKey) (*library.Node, error) {
-	session := q.session.AccountOpt(ctx)
+	session := q.session.AccountMaybe(ctx)
 
 	opts := []node_querier.Option{}
 

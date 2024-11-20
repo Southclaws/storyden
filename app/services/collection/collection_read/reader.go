@@ -20,7 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
-	"github.com/Southclaws/storyden/app/services/account/session"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
@@ -28,14 +28,14 @@ type Hydrator struct {
 	logger  *zap.Logger
 	querier *collection_querier.Querier
 	semdex  semdex.RelevanceScorer
-	session session.SessionProvider
+	session *session.Provider
 }
 
 func New(
 	logger *zap.Logger,
 	querier *collection_querier.Querier,
 	semdex semdex.RelevanceScorer,
-	session session.SessionProvider,
+	session *session.Provider,
 ) *Hydrator {
 	return &Hydrator{
 		logger:  logger,
@@ -46,7 +46,7 @@ func New(
 }
 
 func (r *Hydrator) GetCollection(ctx context.Context, qk collection.QueryKey) (*collection.CollectionWithItems, error) {
-	session := r.session.AccountOpt(ctx)
+	session := r.session.AccountMaybe(ctx)
 	acc := session.OrZero()
 
 	col, err := r.querier.Get(ctx, qk)

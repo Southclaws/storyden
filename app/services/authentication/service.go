@@ -21,6 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password/password_reset"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/phone"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/webauthn"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 type Manager struct {
@@ -44,7 +45,7 @@ func Build() fx.Option {
 		),
 		fx.Provide(email_verify.New),
 		fx.Provide(password_reset.NewTokenProvider, password_reset.NewEmailResetter),
-		fx.Provide(New),
+		fx.Provide(New, session.New),
 	)
 }
 
