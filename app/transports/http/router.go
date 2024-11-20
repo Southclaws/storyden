@@ -10,7 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/middleware/limiter"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/reqlog"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/useragent"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
@@ -30,7 +30,7 @@ func MountOpenAPI(
 	router *echo.Echo,
 
 	// Middleware providers
-	cj *session.Jar,
+	cj *session_cookie.Jar,
 	rl *limiter.Middleware,
 ) {
 	lc.Append(fx.StartHook(func() {

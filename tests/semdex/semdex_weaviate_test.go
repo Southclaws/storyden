@@ -18,7 +18,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -38,7 +38,7 @@ func TestSemdexWeaviate(t *testing.T) {
 		lc fx.Lifecycle,
 		cfg config.Config,
 		cl *openapi.ClientWithResponses,
-		cj *session.Jar,
+		cj *session_cookie.Jar,
 		aw *account_writer.Writer,
 	) {
 		if !cfg.SemdexEnabled {

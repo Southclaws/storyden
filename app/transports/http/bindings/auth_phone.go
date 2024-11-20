@@ -7,16 +7,16 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/services/authentication/provider/phone"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type PhoneAuth struct {
 	pp *phone.Provider
-	cj *session.Jar
+	cj *session_cookie.Jar
 }
 
-func NewPhoneAuth(pp *phone.Provider, cj *session.Jar) PhoneAuth {
+func NewPhoneAuth(pp *phone.Provider, cj *session_cookie.Jar) PhoneAuth {
 	return PhoneAuth{pp, cj}
 }
 
