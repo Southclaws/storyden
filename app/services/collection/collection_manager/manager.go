@@ -12,18 +12,18 @@ import (
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_writer"
-	"github.com/Southclaws/storyden/app/services/account/session"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/collection/collection_auth"
 )
 
 type Manager struct {
-	session    session.SessionProvider
+	session    *session.Provider
 	colQuerier *collection_querier.Querier
 	colWriter  *collection_writer.Writer
 }
 
 func New(
-	session session.SessionProvider,
+	session *session.Provider,
 	colQuerier *collection_querier.Querier,
 	colWriter *collection_writer.Writer,
 ) *Manager {
