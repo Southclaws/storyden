@@ -3,7 +3,6 @@ package mailer
 import (
 	"context"
 	"net/http"
-	netmail "net/mail"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -50,20 +49,16 @@ func newSendgridMailer(l *zap.Logger) (*SendGrid, error) {
 
 func (m *SendGrid) Send(
 	ctx context.Context,
-	address netmail.Address,
-	name string,
-	subject string,
-	html string,
-	plain string,
+	msg Message,
 ) error {
 	from := mail.NewEmail(m.fromName, m.fromAddress)
-	to := mail.NewEmail(name, address.Address)
-	message := mail.NewSingleEmail(from, subject, to, plain, html)
+	to := mail.NewEmail(msg.Name, msg.Address.Address)
+	message := mail.NewSingleEmail(from, msg.Subject, to, msg.Content.Plain, msg.Content.HTML)
 
 	m.l.Info("sending live email",
 		zap.String("email", to.Address),
 		zap.String("name", to.Name),
-		zap.String("subject", subject),
+		zap.String("subject", msg.Subject),
 	)
 
 	res, err := m.client.SendWithContext(ctx, message)

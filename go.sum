@@ -37,8 +37,8 @@ github.com/Southclaws/fault v0.8.1 h1:mgqqdC6kUBQ6ExMALZ0nNaDfNJD5h2+wq3se5mAyX+
 github.com/Southclaws/fault v0.8.1/go.mod h1:VUVkAWutC59SL16s6FTqf3I6I2z77RmnaW5XRz4bLOE=
 github.com/Southclaws/opt v0.6.1 h1:Hi6fQZOuZHrDXO7CbV2dsjkAxJvgFUerw91REo06yQE=
 github.com/Southclaws/opt v0.6.1/go.mod h1:zGjXSHmM4ScFX3TLkCr8TdVvd4KAcZq0mwWtzqoqwwQ=
-github.com/Southclaws/swirl v1.0.0 h1:SCBxKI1a7a8HArJndHmyhmbB/fLVBYxPg/yb5lhiWxk=
-github.com/Southclaws/swirl v1.0.0/go.mod h1:g+5GElHV4itp5HKktH8tiDhNxEUU6TW1uAnxrPzexyI=
+github.com/Southclaws/swirl v1.0.1 h1:xQdYBQ2VURjRNYq7MkjWIRDe9tpEKLJGG0AMnEAkAdo=
+github.com/Southclaws/swirl v1.0.1/go.mod h1:g+5GElHV4itp5HKktH8tiDhNxEUU6TW1uAnxrPzexyI=
 github.com/ThreeDotsLabs/watermill v1.4.1 h1:gjP6yZH+otMPjV0KsV07pl9TeMm9UQV/gqiuiuG5Drs=
 github.com/ThreeDotsLabs/watermill v1.4.1/go.mod h1:lBnrLbxOjeMRgcJbv+UiZr8Ylz8RkJ4m6i/VN/Nk+to=
 github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.0 h1:r5idq2qkd3M345iv3C3zAX+lFlEu7iW8QESNnuuv4eY=

@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/event/event_ref"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 )
 
 type IndexNode struct {
@@ -55,6 +56,10 @@ type LikePost struct {
 
 type UnlikePost struct {
 	PostID post.ID
+}
+
+type Email struct {
+	Message mailer.Message
 }
 
 type Notification struct {

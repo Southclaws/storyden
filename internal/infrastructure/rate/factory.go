@@ -24,6 +24,6 @@ func (f *LimiterFactory) NewLimiter(
 	limit int,
 	period time.Duration,
 	expiry time.Duration,
-) *swirl.Limiter {
-	return swirl.New(f.store, limit, period, expiry)
+) Limiter {
+	return wrap(swirl.New(f.store, limit, period, expiry))
 }

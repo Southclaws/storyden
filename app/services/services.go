@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
 	"github.com/Southclaws/storyden/app/services/category"
 	"github.com/Southclaws/storyden/app/services/collection"
+	"github.com/Southclaws/storyden/app/services/comms"
 	"github.com/Southclaws/storyden/app/services/event"
 	"github.com/Southclaws/storyden/app/services/icon"
 	"github.com/Southclaws/storyden/app/services/library"
@@ -52,7 +53,7 @@ func Build() fx.Option {
 		thread_mark.Build(),
 		collection.Build(),
 		library.Build(),
-
+		comms.Build(),
 		link.Build(),
 		notify_job.Build(),
 		mention_job.Build(),

@@ -2,7 +2,6 @@ package mailer
 
 import (
 	"context"
-	"net/mail"
 
 	"go.uber.org/fx"
 	"go.uber.org/zap"
@@ -11,14 +10,7 @@ import (
 )
 
 type Sender interface {
-	Send(
-		ctx context.Context,
-		address mail.Address,
-		name string,
-		subject string,
-		html string,
-		plain string,
-	) error
+	Send(ctx context.Context, msg Message) error
 }
 
 func Build() fx.Option {

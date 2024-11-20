@@ -31,7 +31,7 @@ require github.com/Southclaws/fault v0.8.1
 require (
 	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/Southclaws/opt v0.6.1
-	github.com/Southclaws/swirl v1.0.0
+	github.com/Southclaws/swirl v1.0.1
 	github.com/ThreeDotsLabs/watermill v1.4.1
 	github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.0
 	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
