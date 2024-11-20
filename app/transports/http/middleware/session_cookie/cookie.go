@@ -1,7 +1,7 @@
 // Package session provides session handling primitives and middleware for the
 // API. Sessions work by encrypting an account's ID inside a cookie value. This
 // is read via a middleware and dropped into the request context for later use.
-package session
+package session_cookie
 
 import (
 	"context"
