@@ -6,10 +6,13 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -17,10 +20,11 @@ import (
 
 type Querier struct {
 	db *ent.Client
+	aq *account_querier.Querier
 }
 
-func New(db *ent.Client) *Querier {
-	return &Querier{db}
+func New(db *ent.Client, aq *account_querier.Querier) *Querier {
+	return &Querier{db, aq}
 }
 
 type options struct {
@@ -49,6 +53,39 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		opt(o)
 	}
 
+	requestingAccount, err := q.getRequestingAccount(ctx, o)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	applyVisibilityRulesPredicate := func(nq *ent.NodeQuery) {
+		if !o.visibilityRules {
+			return
+		}
+
+		// Apply visibility rules:
+		// - published nodes are visible to everyone
+		// - non-published nodes are not visible to anyone except the owner
+		if acc, ok := requestingAccount.Get(); ok {
+
+			canViewInReview := acc.Roles.Permissions().HasAny(rbac.PermissionAdministrator, rbac.PermissionManageLibrary)
+
+			if canViewInReview {
+				nq.Where(node.Or(
+					node.AccountID(xid.ID(*o.requestingAccount)),
+					node.VisibilityIn(node.VisibilityPublished, node.VisibilityReview),
+				))
+			} else {
+				nq.Where(node.Or(
+					node.AccountID(xid.ID(*o.requestingAccount)),
+					node.VisibilityEQ(node.VisibilityPublished),
+				))
+			}
+		} else {
+			nq.Where(node.VisibilityEQ(node.VisibilityPublished))
+		}
+	}
+
 	query.
 		WithOwner(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
@@ -69,31 +106,10 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		}).
 		WithTags()
 
-	if o.visibilityRules {
-		if o.requestingAccount == nil {
-			query.Where(node.VisibilityEQ(node.VisibilityPublished))
-		} else {
-			query.Where(node.Or(
-				node.AccountID(xid.ID(*o.requestingAccount)),
-				node.VisibilityEQ(node.VisibilityPublished),
-			))
-		}
-	}
+	applyVisibilityRulesPredicate(query)
 
 	query.WithNodes(func(cq *ent.NodeQuery) {
-		if o.visibilityRules {
-			// Apply visibility rules:
-			// - published nodes are visible to everyone
-			// - non-published nodes are not visible to anyone except the owner
-			if o.requestingAccount == nil {
-				cq.Where(node.VisibilityEQ(node.VisibilityPublished))
-			} else {
-				cq.Where(node.Or(
-					node.AccountID(xid.ID(*o.requestingAccount)),
-					node.VisibilityEQ(node.VisibilityPublished),
-				))
-			}
-		}
+		applyVisibilityRulesPredicate(cq)
 
 		cq.
 			WithAssets().
@@ -137,4 +153,20 @@ func (q *Querier) Probe(ctx context.Context, id library.NodeID) (*library.Node, 
 	}
 
 	return r, nil
+}
+
+func (q *Querier) getRequestingAccount(ctx context.Context, o *options) (opt.Optional[account.Account], error) {
+	if !o.visibilityRules {
+		return nil, nil
+	}
+	if o.requestingAccount == nil {
+		return nil, nil
+	}
+
+	acc, err := q.aq.GetByID(ctx, *o.requestingAccount)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return opt.New(*acc), nil
 }

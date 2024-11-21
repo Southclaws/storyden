@@ -210,6 +210,9 @@ func TestNodesVisibility(t *testing.T) {
 				a.NotContains(ids, node2.JSON200.Id)
 				a.Contains(ids, node3.JSON200.Id, "in review so is now visible to admins")
 				a.NotContains(ids, node4.JSON200.Id, "")
+
+				get3 := tests.AssertRequest(cl.NodeGetWithResponse(root, node3.JSON200.Slug, adminSession))(t, http.StatusOK)
+				a.Equal(openapi.Review, get3.JSON200.Visibility)
 			})
 
 			t.Run("author_submmits_unlisted", func(t *testing.T) {
