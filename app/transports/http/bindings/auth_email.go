@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/mail"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -15,7 +16,7 @@ import (
 )
 
 func (i *Authentication) AuthEmailSignup(ctx context.Context, request openapi.AuthEmailSignupRequestObject) (openapi.AuthEmailSignupResponseObject, error) {
-	address, err := mail.ParseAddress(request.Body.Email)
+	address, err := mail.ParseAddress(strings.ToLower(request.Body.Email))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -48,7 +49,7 @@ func (i *Authentication) AuthEmailSignup(ctx context.Context, request openapi.Au
 }
 
 func (i *Authentication) AuthEmailSignin(ctx context.Context, request openapi.AuthEmailSigninRequestObject) (openapi.AuthEmailSigninResponseObject, error) {
-	address, err := mail.ParseAddress(request.Body.Email)
+	address, err := mail.ParseAddress(strings.ToLower(request.Body.Email))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}

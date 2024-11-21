@@ -3,13 +3,15 @@ package bindings
 import (
 	"context"
 	"net/mail"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/rs/xid"
+
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
-	"github.com/rs/xid"
 )
 
 func (h *Accounts) AccountEmailAdd(ctx context.Context, request openapi.AccountEmailAddRequestObject) (openapi.AccountEmailAddResponseObject, error) {
@@ -18,7 +20,7 @@ func (h *Accounts) AccountEmailAdd(ctx context.Context, request openapi.AccountE
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	emailAddress, err := mail.ParseAddress(request.Body.EmailAddress)
+	emailAddress, err := mail.ParseAddress(strings.ToLower(request.Body.EmailAddress))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}

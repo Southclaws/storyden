@@ -80,7 +80,12 @@ export function PasswordResetVerifyScreen(props: Props) {
         <FormErrorText>{form.formState.errors["new"]?.message}</FormErrorText>
       </FormControl>
 
-      <Button type="submit" size="sm" w="full">
+      <Button
+        type="submit"
+        size="sm"
+        w="full"
+        loading={form.formState.isSubmitting}
+      >
         Reset
       </Button>
 

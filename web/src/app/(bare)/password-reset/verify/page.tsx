@@ -10,22 +10,20 @@ type Props = {
 };
 
 const QuerySchema = z.object({
-  token: z.string(),
+  token: z.string().optional(),
 });
 
 export default async function Page(props: Props) {
   try {
     const searchParams = await props.searchParams;
 
-    const parsed = QuerySchema.safeParse(searchParams);
+    const parsed = QuerySchema.parse(searchParams);
 
-    if (!parsed.success) {
-      throw new Error(
-        "Missing password reset token, please try resetting your password again.",
-      );
+    const { token } = parsed;
+
+    if (!token) {
+      return <p>Please check your email for a verification link.</p>;
     }
-
-    const { token } = parsed.data;
 
     return <PasswordResetVerifyScreen token={token} />;
   } catch (error) {

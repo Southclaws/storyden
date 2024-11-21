@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 	"net/mail"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -14,7 +15,7 @@ import (
 )
 
 func (i *Authentication) AuthEmailPasswordSignup(ctx context.Context, request openapi.AuthEmailPasswordSignupRequestObject) (openapi.AuthEmailPasswordSignupResponseObject, error) {
-	address, err := mail.ParseAddress(request.Body.Email)
+	address, err := mail.ParseAddress(strings.ToLower(request.Body.Email))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -42,7 +43,7 @@ func (i *Authentication) AuthEmailPasswordSignup(ctx context.Context, request op
 }
 
 func (i *Authentication) AuthEmailPasswordSignin(ctx context.Context, request openapi.AuthEmailPasswordSigninRequestObject) (openapi.AuthEmailPasswordSigninResponseObject, error) {
-	address, err := mail.ParseAddress(request.Body.Email)
+	address, err := mail.ParseAddress(strings.ToLower(request.Body.Email))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -63,7 +64,7 @@ func (i *Authentication) AuthEmailPasswordSignin(ctx context.Context, request op
 }
 
 func (i *Authentication) AuthPasswordResetRequestEmail(ctx context.Context, request openapi.AuthPasswordResetRequestEmailRequestObject) (openapi.AuthPasswordResetRequestEmailResponseObject, error) {
-	address, err := mail.ParseAddress(request.Body.Email)
+	address, err := mail.ParseAddress(strings.ToLower(request.Body.Email))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
