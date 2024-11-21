@@ -24,17 +24,14 @@ func New(db *ent.Client) Repository {
 }
 
 func (d *database) Search(ctx context.Context, params pagination.Parameters, filters ...Filter) (*pagination.Result[*post.Post], error) {
-	total, err := d.db.Post.Query().Count(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-	if len(filters) == 0 {
-		result := pagination.NewPageResult(params, total, []*post.Post{})
-		return &result, nil
-	}
+	predicate := ent_post.And(
+		ent_post.VisibilityEQ(ent_post.VisibilityPublished),
+		ent_post.DeletedAtIsNil(),
+	)
 
 	q := d.db.Post.
 		Query().
+		Where(predicate).
 		WithAuthor(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
@@ -49,15 +46,17 @@ func (d *database) Search(ctx context.Context, params pagination.Parameters, fil
 		Limit(params.Limit()).
 		Offset(params.Offset())
 
+	countQuery := d.db.Post.Query().Where(predicate)
+
 	for _, fn := range filters {
 		fn(q)
+		fn(countQuery)
 	}
 
-	// Only search published posts.
-	q.Where(
-		ent_post.VisibilityEQ(ent_post.VisibilityPublished),
-		ent_post.DeletedAtIsNil(),
-	)
+	total, err := countQuery.Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	r, err := q.All(ctx)
 	if err != nil {

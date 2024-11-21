@@ -59,24 +59,28 @@ func New(db *ent.Client, raw *sqlx.DB) Search {
 }
 
 func (s *service) Search(ctx context.Context, params pagination.Parameters, opts ...Option) (*pagination.Result[*library.Node], error) {
-	total, err := s.db.Node.Query().Count(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	q := &query{}
 
 	for _, fn := range opts {
 		fn(q)
 	}
 
+	predicate := node.And(
+		node.Or(
+			node.NameContainsFold(q.nameContains),
+			node.ContentContainsFold(q.contentContains),
+		),
+		node.VisibilityEQ(node.VisibilityPublished),
+		node.DeletedAtIsNil(),
+	)
+
+	total, err := s.db.Node.Query().Where(predicate).Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	query := s.db.Node.Query().
-		Where(
-			node.Or(
-				node.NameContainsFold(q.nameContains),
-				node.ContentContainsFold(q.contentContains),
-			),
-		).
+		Where(predicate).
 		WithOwner(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
@@ -89,12 +93,6 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc())).
 		Limit(params.Limit()).
 		Offset(params.Offset())
-
-	// Only search published nodes.
-	query.Where(
-		node.VisibilityEQ(node.VisibilityPublished),
-		node.DeletedAtIsNil(),
-	)
 
 	r, err := query.All(ctx)
 	if err != nil {
