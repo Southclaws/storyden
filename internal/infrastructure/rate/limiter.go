@@ -30,11 +30,7 @@ func (l *swirlLimiter) Increment(ctx context.Context, key string, incr int) (*sw
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if !allowed {
-		return nil, false, fault.Wrap(status, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
-	}
-
-	return status, true, nil
+	return status, allowed, nil
 }
 
 func (l *swirlLimiter) Check(ctx context.Context, key string, cost int) error {
