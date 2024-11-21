@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/rs/xid"
@@ -64,6 +65,29 @@ func TestEmailPasswordAuth(t *testing.T) {
 				r.Len(unverified.JSON200.EmailAddresses, 1)
 				a.Equal(address, (unverified.JSON200.EmailAddresses)[0].EmailAddress)
 				a.False(unverified.JSON200.EmailAddresses[0].Verified)
+			})
+
+			t.Run("register_normalise_case_success", func(t *testing.T) {
+				a := assert.New(t)
+
+				address := xid.New().String() + "UPPERCASE@storyden.org"
+				handle := xid.New().String()
+				password := "password"
+
+				// Sign up with email
+				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: address, Handle: &handle, Password: password})
+				tests.Ok(t, err, signup)
+
+				// Sign in with email, as originally written, with uppercase
+				signin, err := cl.AuthEmailPasswordSigninWithResponse(root, openapi.AuthEmailPasswordSigninJSONRequestBody{Email: address, Password: password})
+				tests.Ok(t, err, signin)
+				a.NotEmpty(signin.HTTPResponse.Header.Get("Set-Cookie"))
+
+				// Sign in with email, as all lowercase
+				lowercase := strings.ToLower(address)
+				signin2, err := cl.AuthEmailPasswordSigninWithResponse(root, openapi.AuthEmailPasswordSigninJSONRequestBody{Email: lowercase, Password: password})
+				tests.Ok(t, err, signin2)
+				a.NotEmpty(signin2.HTTPResponse.Header.Get("Set-Cookie"))
 			})
 
 			t.Run("register_verify_success", func(t *testing.T) {

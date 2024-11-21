@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 	"net/mail"
+	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -12,7 +13,7 @@ import (
 )
 
 func (i *Authentication) AuthEmailVerify(ctx context.Context, request openapi.AuthEmailVerifyRequestObject) (openapi.AuthEmailVerifyResponseObject, error) {
-	email, err := mail.ParseAddress(request.Body.Email)
+	email, err := mail.ParseAddress(strings.ToLower(request.Body.Email))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
