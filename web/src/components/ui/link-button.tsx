@@ -30,7 +30,12 @@ export function LinkButton({
   const target = isExternal ? "_blank" : undefined;
 
   return (
-    <NextLink className={cn} href={href} target={target}>
+    <NextLink
+      className={cn}
+      href={href}
+      target={target}
+      onClick={props.onClick}
+    >
       <styled.span
         display="flex"
         // Supports overflowing children and text ellipsis
