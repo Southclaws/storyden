@@ -4,6 +4,7 @@ import (
 	"context"
 	"regexp"
 	"testing"
+	"time"
 
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
@@ -42,6 +43,9 @@ func TestPasswordReset(t *testing.T) {
 				signup, err := cl.AuthEmailPasswordSignupWithResponse(root, nil, openapi.AuthEmailPasswordSignupJSONRequestBody{Email: email, Password: password})
 				tests.Ok(t, err, signup)
 
+				// HACK: because I haven't set up proper queue tooling for tests
+				time.Sleep(time.Millisecond * 100)
+
 				// oh no! I forgot my password :( let's reset it
 				request, err := cl.AuthPasswordResetRequestEmailWithResponse(root, openapi.AuthEmailPasswordReset{
 					Email: email,
@@ -54,6 +58,9 @@ func TestPasswordReset(t *testing.T) {
 					},
 				})
 				tests.Ok(t, err, request)
+
+				// HACK: because I haven't set up proper queue tooling for tests
+				time.Sleep(time.Millisecond * 100)
 
 				resetEmail := inbox.GetLast()
 				token := regexp.MustCompile(`\?token=(.+)`).FindStringSubmatch(resetEmail.Plain)[1]
