@@ -3,14 +3,15 @@ package category
 import (
 	"context"
 
-	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/gosimple/slug"
+	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
+	"github.com/samber/lo"
 	"go.uber.org/multierr"
 
 	"github.com/Southclaws/storyden/internal/ent"
@@ -20,11 +21,12 @@ import (
 )
 
 type database struct {
-	db *ent.Client
+	db  *ent.Client
+	raw *sqlx.DB
 }
 
-func New(db *ent.Client) Repository {
-	return &database{db}
+func New(db *ent.Client, raw *sqlx.DB) Repository {
+	return &database{db, raw}
 }
 
 func (d *database) CreateCategory(ctx context.Context, name, desc, colour string, sort int, admin bool, opts ...Option) (*Category, error) {
@@ -51,15 +53,41 @@ func (d *database) CreateCategory(ctx context.Context, name, desc, colour string
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
 		}
 
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	c, err := d.db.Category.Get(ctx, id)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return FromModel(c), nil
+}
+
+const postsCountManyQuery = `select
+  c.id        cat_id, -- category id
+  count(p.id) threads -- thread count
+from
+  categories c
+  inner join posts p on p.category_id = c.id
+    and p.deleted_at is null
+    and p.visibility = 'published'
+group by
+  c.id
+`
+
+type CategoryThreadsResult struct {
+	CategoryID xid.ID `db:"cat_id"`
+	PostCount  int    `db:"threads"`
+}
+
+type (
+	CategoryThreadsResults []CategoryThreadsResult
+	CategoryThreadsMap     map[xid.ID]CategoryThreadsResult
+)
+
+func (p CategoryThreadsResults) Map() CategoryThreadsMap {
+	return lo.KeyBy(p, func(x CategoryThreadsResult) xid.ID { return x.CategoryID })
 }
 
 func (d *database) GetCategories(ctx context.Context, admin bool) ([]*Category, error) {
@@ -77,6 +105,7 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]*Category, 
 				Where(
 					post.FirstEQ(true),
 					post.DeletedAtIsNil(),
+					post.VisibilityEQ(post.VisibilityPublished),
 				).
 				WithAuthor(func(aq *ent.AccountQuery) {
 					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
@@ -87,49 +116,23 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]*Category, 
 		Order(ent.Asc(category.FieldSort)).
 		All(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if len(categories) == 0 {
 		return []*Category{}, nil
 	}
 
-	// NOTE:
-	// Lazy two queries because Ent doesn't yet support Count aggregations.
-	// I could write the above query as raw SQL too but... screw that. Joins are
-	// super annoying to get nested data out of because SQL is awful. So for now
-	// there are two separate queries and the data is joined below. Besides,
-	// there won't be many categories anyway so it's not going to affect
-	// performance much.
-	type CategoryPostCount struct {
-		ID    xid.ID `json:"id"`
-		Posts int    `json:"posts"`
-	}
-
-	var categoryPostsList []CategoryPostCount
-
-	err = d.db.Category.Query().Modify(func(s *sql.Selector) {
-		s.
-			Select(
-				sql.As(s.C("id"), "id"),
-				sql.As(sql.Count("*"), "posts"),
-			).
-			Join(sql.Table(post.Table).As("p")).On(s.C(post.FieldID), "category_id").
-			GroupBy(s.C("id")).
-			OrderBy(sql.Desc("posts"))
-	}).Scan(ctx, &categoryPostsList)
+	var replies CategoryThreadsResults
+	err = d.raw.SelectContext(ctx, &replies, postsCountManyQuery)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	categoryPosts := make(map[xid.ID]int)
-	for _, c := range categoryPostsList {
-		categoryPosts[c.ID] = c.Posts
-	}
+	categoryPosts := replies.Map()
 
 	return dt.Map(categories, func(in *ent.Category) *Category {
 		category := FromModel(in)
-		category.PostCount = categoryPosts[in.ID]
+		category.PostCount = categoryPosts[in.ID].PostCount
 		return category
 	}), nil
 }
@@ -185,7 +188,7 @@ func (d *database) UpdateCategory(ctx context.Context, id CategoryID, opts ...Op
 
 	c, err := update.Save(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return FromModel(c), nil
@@ -194,14 +197,16 @@ func (d *database) UpdateCategory(ctx context.Context, id CategoryID, opts ...Op
 func (d *database) DeleteCategory(ctx context.Context, id CategoryID, moveto CategoryID) (*Category, error) {
 	tx, err := d.db.Tx(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	defer tx.Rollback()
+	defer func() {
+		err = tx.Rollback()
+	}()
 
 	c, err := tx.Category.Get(ctx, xid.ID(id))
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	_, err = tx.Post.Update().
@@ -209,15 +214,17 @@ func (d *database) DeleteCategory(ctx context.Context, id CategoryID, moveto Cat
 		SetCategoryID(xid.ID(moveto)).
 		Save(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	err = tx.Category.DeleteOneID(xid.ID(id)).Exec(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to perform move+delete transaction"))
