@@ -10,31 +10,35 @@ import { VStack } from "@/styled-system/jsx";
 import { CategoryIndexScreen } from "../category/CategoryIndexScreen";
 
 import { LibraryFeedScreen } from "./LibraryFeedScreen";
-import { ThreadFeedScreen } from "./ThreadFeedScreen";
+import { ThreadFeedScreen } from "./ThreadFeedScreen/ThreadFeedScreen";
 
-export type Props = {
+export type PageProps = {
+  page: number;
+};
+
+export type Props = PageProps & {
   initialSession?: Account;
   initialSettings: Settings;
 };
 
-export function FeedScreen({ initialSession, initialSettings }: Props) {
+export function FeedScreen({ page, initialSession, initialSettings }: Props) {
   return (
     <VStack>
       <FeedConfig
         initialSession={initialSession}
         initialSettings={initialSettings}
       />
-      <FeedScreenContent initialSettings={initialSettings} />
+      <FeedScreenContent page={page} initialSettings={initialSettings} />
     </VStack>
   );
 }
 
-async function FeedScreenContent({ initialSettings }: Props) {
+async function FeedScreenContent({ page, initialSettings }: Props) {
   const feedConfig = initialSettings.metadata.feed;
 
   switch (feedConfig.source.type) {
     case "threads":
-      return <ThreadFeedScreenContent />;
+      return <ThreadFeedScreenContent page={page} />;
 
     case "library":
       return <LibraryFeedScreenContent />;
@@ -44,10 +48,15 @@ async function FeedScreenContent({ initialSettings }: Props) {
   }
 }
 
-async function ThreadFeedScreenContent() {
+async function ThreadFeedScreenContent({ page }: PageProps) {
   try {
-    const threads = await threadList();
-    return <ThreadFeedScreen initialData={threads.data} />;
+    const threads = await threadList({
+      page: page.toString(),
+    });
+
+    return (
+      <ThreadFeedScreen initialPage={page} initialPageData={[threads.data]} />
+    );
   } catch (e) {
     return <UnreadyBanner error={e} />;
   }
