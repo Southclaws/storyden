@@ -9,7 +9,7 @@ import { cva } from "@/styled-system/css";
 import { HStack, LStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
-import { Props, useCategoryScreen } from "./CategoryScreen";
+import { Props, useCategoryScreen } from "./useCategoryScreen";
 
 const valueStyles = cva({
   base: {},

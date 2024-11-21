@@ -1,81 +1,19 @@
 "use client";
 
-import { useCategoryList } from "@/api/openapi-client/categories";
-import { useThreadList } from "@/api/openapi-client/threads";
-import {
-  CategoryListOKResponse,
-  Permission,
-  ThreadListOKResponse,
-} from "@/api/openapi-schema";
-import { useSession } from "@/auth";
 import { CategoryMenu } from "@/components/category/CategoryMenu/CategoryMenu";
 import { Unready } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
-import { hasPermission } from "@/utils/permissions";
 
-import { ThreadFeedScreen } from "../feed/ThreadFeedScreen";
+import { ThreadFeedScreen } from "../feed/ThreadFeedScreen/ThreadFeedScreen";
 
-export type Props = {
-  initialCategoryList: CategoryListOKResponse;
-  initialThreadList: ThreadListOKResponse;
-  slug: string;
-};
+import { Props, useCategoryScreen } from "./useCategoryScreen";
 
-export function useCategoryScreen({
-  initialCategoryList,
-  initialThreadList,
-  slug,
-}: Props) {
-  const session = useSession();
+type ScreenProps = {
+  initialPage: number;
+} & Props;
 
-  const { data: categoryListData, error: categoryListError } = useCategoryList({
-    swr: { fallbackData: initialCategoryList },
-  });
-
-  const { data: threadListData, error: threadListError } = useThreadList(
-    { categories: [slug] },
-    {
-      swr: { fallbackData: initialThreadList },
-    },
-  );
-
-  if (!categoryListData) {
-    return {
-      ready: false as const,
-      error: categoryListError,
-    };
-  }
-  if (!threadListData) {
-    return {
-      ready: false as const,
-      error: threadListError,
-    };
-  }
-
-  const category = categoryListData.categories.find((c) => c.slug === slug);
-  if (!category) {
-    return {
-      ready: false as const,
-      error: new Error("Category not found"),
-    };
-  }
-
-  const canEditCategory = hasPermission(session, Permission.MANAGE_CATEGORIES);
-
-  const threads = threadListData;
-
-  return {
-    ready: true as const,
-    data: {
-      canEditCategory,
-      category,
-      threads,
-    },
-  };
-}
-
-export function CategoryScreen(props: Props) {
+export function CategoryScreen(props: ScreenProps) {
   const { ready, data, error } = useCategoryScreen(props);
   if (!ready) {
     return <Unready error={error} />;
@@ -96,10 +34,9 @@ export function CategoryScreen(props: Props) {
       </LStack>
 
       <ThreadFeedScreen
-        params={{
-          categories: [props.slug],
-        }}
-        initialData={threads}
+        initialPage={props.initialPage}
+        initialPageData={[threads]}
+        category={category}
       />
     </LStack>
   );
