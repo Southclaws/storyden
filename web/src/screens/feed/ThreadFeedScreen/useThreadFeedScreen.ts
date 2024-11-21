@@ -117,9 +117,19 @@ export function useThreadFeedScreen(props: Props) {
       return;
     }
 
-    const scrolledToEnd =
-      window.innerHeight + document.documentElement.scrollTop ===
-      document.documentElement.offsetHeight;
+    const threshold = 1.5;
+
+    const scrollPosition =
+      window.innerHeight + document.documentElement.scrollTop;
+    const endPosition = document.documentElement.offsetHeight;
+    const scrolledToEnd = scrollPosition >= endPosition - threshold;
+
+    console.log("scrollPosition", {
+      scrollPosition,
+      endPosition,
+      threshold,
+      scrolledToEnd,
+    });
 
     if (!scrolledToEnd) {
       return;
@@ -156,7 +166,7 @@ export function useThreadFeedScreen(props: Props) {
   useEffect(() => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [handleScroll, isLoading, morePagesAvailable]);
+  }, [handleScroll]);
 
   if (!data) {
     return {
