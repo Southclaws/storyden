@@ -98,7 +98,7 @@ export function SearchScreen(props: Props) {
         />
       </HStack>
 
-      {results && results?.items.length > 0 ? (
+      {results ? (
         <>
           <PaginationControls
             path="/search"
@@ -107,14 +107,21 @@ export function SearchScreen(props: Props) {
             totalPages={results.total_pages}
             pageSize={results.page_size}
           />
-          <DatagraphSearchResults result={results} />
+
+          {results?.items.length > 0 ? (
+            <DatagraphSearchResults result={results} />
+          ) : (
+            <EmptyState hideContributionLabel>
+              {query
+                ? page > results.total_pages
+                  ? "You've gone past the last page! Nothing to see here."
+                  : "No search results."
+                : "Go forth, seek far and wide."}
+            </EmptyState>
+          )}
         </>
-      ) : error ? (
-        <UnreadyBanner error={error} />
       ) : (
-        <EmptyState hideContributionLabel>
-          {query ? "No search results." : "Go forth, seek far and wide."}
-        </EmptyState>
+        <UnreadyBanner error={error} />
       )}
     </styled.form>
   );
