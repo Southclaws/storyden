@@ -1,4 +1,5 @@
 import { range } from "lodash";
+import { MouseEvent } from "react";
 
 import { LinkButton } from "@/components/ui/link-button";
 import { HStack, styled } from "@/styled-system/jsx";
@@ -59,6 +60,14 @@ export function PaginationControls({
 
   const targetPages = getPages();
 
+  const clickHandler =
+    (page: number) => (event: MouseEvent<HTMLAnchorElement>) => {
+      if (onClick) {
+        event.preventDefault();
+        onClick(page);
+      }
+    };
+
   return (
     <HStack w="min" p="1">
       {needStartJump && (
@@ -70,7 +79,7 @@ export function PaginationControls({
               ...params,
               page: "1",
             }).toString()}`}
-            onClick={() => onClick?.(1)}
+            onClick={clickHandler(1)}
           >
             {1}
           </LinkButton>
@@ -92,7 +101,7 @@ export function PaginationControls({
             size="xs"
             key={v}
             href={`${path}?${withPage.toString()}`}
-            onClick={() => onClick?.(v)}
+            onClick={clickHandler(v)}
           >
             {pageName}
           </LinkButton>
@@ -109,7 +118,7 @@ export function PaginationControls({
               ...params,
               page: lastPage.toString(),
             }).toString()}`}
-            onClick={() => onClick?.(lastPage)}
+            onClick={clickHandler(lastPage)}
           >
             {lastPage}
           </LinkButton>

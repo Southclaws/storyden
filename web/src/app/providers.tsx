@@ -16,7 +16,7 @@ export function Providers({ children }: PropsWithChildren) {
       <SWRConfig
         value={{
           keepPreviousData: true,
-          provider: provider,
+          // provider: provider,
         }}
       >
         <Toaster />
