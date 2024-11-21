@@ -25,7 +25,7 @@ export default async function Page({ searchParams }: Props) {
     const session = await getServerSession();
     const settings = await getSettings();
 
-    const { page } = await searchParams;
+    const { page } = QuerySchema.parse(await searchParams);
 
     return (
       <FeedScreen
