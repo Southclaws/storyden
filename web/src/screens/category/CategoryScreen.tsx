@@ -19,7 +19,7 @@ export function CategoryScreen(props: ScreenProps) {
     return <Unready error={error} />;
   }
 
-  const { category, threads } = data;
+  const { category } = data;
 
   return (
     <LStack>
@@ -35,7 +35,7 @@ export function CategoryScreen(props: ScreenProps) {
 
       <ThreadFeedScreen
         initialPage={props.initialPage}
-        initialPageData={[threads]}
+        initialPageData={[props.initialThreadList]}
         category={category}
       />
     </LStack>
