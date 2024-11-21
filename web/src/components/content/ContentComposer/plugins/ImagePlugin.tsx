@@ -78,7 +78,7 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
               }
 
               event.preventDefault();
-              handleFiles(images);
+              handleFiles?.(images);
             },
 
             paste(view, event) {
@@ -100,7 +100,7 @@ export const ImageExtended = Image.extend<ImageOptions & Options>({
               }
 
               event.preventDefault();
-              handleFiles(images);
+              handleFiles?.(images);
             },
           },
         },
