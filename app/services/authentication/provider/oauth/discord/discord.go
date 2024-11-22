@@ -1,4 +1,4 @@
-package google
+package discord
 
 import (
 	"context"
@@ -11,12 +11,8 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
-	petname "github.com/dustinkirkland/golang-petname"
-	"github.com/gosimple/slug"
+	"github.com/bwmarrin/discordgo"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
-	ga "google.golang.org/api/oauth2/v2"
-	"google.golang.org/api/option"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
@@ -27,13 +23,13 @@ import (
 )
 
 var (
-	ErrAccessToken  = fault.New("failed to get access token")
-	ErrMissingToken = fault.New("no access token in response")
-)
-
-var (
-	service   = authentication.ServiceOAuthGoogle
+	service   = authentication.ServiceOAuthDiscord
 	tokenType = authentication.TokenTypeOAuth
+	endpoint  = oauth2.Endpoint{
+		AuthURL:   "https://discord.com/oauth2/authorize",
+		TokenURL:  "https://discord.com/api/oauth2/token",
+		AuthStyle: oauth2.AuthStyleInParams,
+	}
 )
 
 type Provider struct {
@@ -54,13 +50,11 @@ func New(
 		return nil, fault.Wrap(err)
 	}
 
-	callback := all.Redirect(cfg, service)
-
 	return &Provider{
 		register: register,
 		ed:       ed,
 		config:   config,
-		callback: callback,
+		callback: all.Redirect(cfg, service),
 	}, nil
 }
 
@@ -79,11 +73,11 @@ func (p *Provider) oauthConfig() *oauth2.Config {
 	return &oauth2.Config{
 		ClientID:     p.config.ClientID,
 		ClientSecret: p.config.ClientSecret,
-		Endpoint:     google.Endpoint,
+		Endpoint:     endpoint,
 		RedirectURL:  p.callback,
 		Scopes: []string{
-			"https://www.googleapis.com/auth/userinfo.email",
-			"https://www.googleapis.com/auth/userinfo.profile",
+			"identify",
+			"email",
 		},
 	}
 }
@@ -121,39 +115,33 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		)
 	}
 
-	gs, err := ga.NewService(ctx, option.WithTokenSource(oauth2.StaticTokenSource(token)))
+	client, err := discordgo.New(fmt.Sprintf("Bearer %s", token.AccessToken))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	u, err := ga.NewUserinfoV2MeService(gs).Get().Do()
+	u, err := client.User("@me", discordgo.WithContext(ctx))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	handle := slug.Make(fmt.Sprintf("%s %s", u.GivenName, petname.Generate(2, "-")))
-
-	name := fmt.Sprint(u.GivenName, " ", u.FamilyName)
+	handle := strings.ToLower(u.Username)
+	name := u.GlobalName
 
 	email, err := mail.ParseAddress(u.Email)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	authName := fmt.Sprintf("Google (%s)", email.Address)
+	authName := fmt.Sprintf("Discord (@%s)", handle)
 
-	acc, err := p.register.GetOrCreateViaEmail(ctx,
+	return p.register.GetOrCreateViaEmail(ctx,
 		service,
 		authName,
-		strings.ToLower(u.Id),
+		u.ID,
 		token.AccessToken,
 		handle,
 		name,
 		*email,
 	)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return acc, nil
 }
