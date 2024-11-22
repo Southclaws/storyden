@@ -15,9 +15,13 @@ type Result<T> = {
 };
 
 export const fetcher = async <T>(url: string, opts: Options): Promise<T> => {
+  const headers = Object.fromEntries(new Headers(opts.headers).entries());
+
   const req = buildRequest({
     url,
+    headers,
     method: opts.method as any,
+    data: opts.body,
     revalidate: 5,
   });
 
