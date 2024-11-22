@@ -1670,6 +1670,9 @@ paths:
 
         When a link is submitted, it is first "cleaned" to remove any fragments.
       tags: [links]
+      parameters:
+        - $ref: "#/components/parameters/NodeContentFillRuleQuery"
+        - $ref: "#/components/parameters/NodeContentFillTargetQuery"
       requestBody: { $ref: "#/components/requestBodies/LinkCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -3079,6 +3082,7 @@ components:
     ContentFillRule:
       type: string
       enum:
+        - create
         - replace
         # NOTE: Prepend and append are not implemented yet.
         # - prepend

@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
 	"go.uber.org/zap"
 
@@ -19,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
+	"github.com/Southclaws/storyden/app/services/library/node_fill"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -31,6 +33,7 @@ type Fetcher struct {
 	lq       *link_querier.LinkQuerier
 	lr       *link_writer.LinkWriter
 	sc       scrape.Scraper
+	nodeFill *node_fill.Filler
 	queue    pubsub.Topic[mq.ScrapeLink]
 }
 
@@ -40,6 +43,7 @@ func New(
 	lq *link_querier.LinkQuerier,
 	lr *link_writer.LinkWriter,
 	sc scrape.Scraper,
+	nodeFill *node_fill.Filler,
 	queue pubsub.Topic[mq.ScrapeLink],
 ) *Fetcher {
 	return &Fetcher{
@@ -48,11 +52,16 @@ func New(
 		lq:       lq,
 		lr:       lr,
 		sc:       sc,
+		nodeFill: nodeFill,
 		queue:    queue,
 	}
 }
 
-func (s *Fetcher) Fetch(ctx context.Context, u url.URL) (*link_ref.LinkRef, error) {
+type Options struct {
+	ContentFill opt.Optional[asset.ContentFillCommand]
+}
+
+func (s *Fetcher) Fetch(ctx context.Context, u url.URL, opts Options) (*link_ref.LinkRef, error) {
 	if u.String() == "" {
 		return nil, fault.Wrap(errEmptyLink, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -71,7 +80,18 @@ func (s *Fetcher) Fetch(ctx context.Context, u url.URL) (*link_ref.LinkRef, erro
 		return r.Links[0], nil
 	}
 
-	return s.ScrapeAndStore(ctx, u)
+	lr, wc, err := s.ScrapeAndStore(ctx, u)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if cfr, ok := opts.ContentFill.Get(); ok {
+		if err := s.nodeFill.FillContentFromLink(ctx, lr, wc, cfr); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
+	return lr, nil
 }
 
 // HydrateContentURLs takes all the URLs mentioned in the content of an item and
@@ -108,10 +128,10 @@ func (s *Fetcher) QueueForItem(ctx context.Context, u url.URL, item datagraph.It
 	return nil
 }
 
-func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.LinkRef, error) {
+func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.LinkRef, *scrape.WebContent, error) {
 	wc, err := s.sc.Scrape(ctx, u)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	opts := []link_writer.Option{}
@@ -136,10 +156,10 @@ func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.Link
 
 	ln, err := s.lr.Store(ctx, u.String(), wc.Title, wc.Description, opts...)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return ln, nil
+	return ln, wc, nil
 }
 
 func (s *Fetcher) CopyAsset(ctx context.Context, url string) (*asset.Asset, error) {

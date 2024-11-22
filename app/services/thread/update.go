@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/rs/xid"
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 
@@ -18,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/link/fetcher"
 )
 
 func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial) (*thread.Thread, error) {
@@ -68,6 +70,13 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 
 		opts = append(opts, thread.WithTagsAdd(addIDs...))
 		opts = append(opts, thread.WithTagsRemove(removeIDs...))
+	}
+
+	if u, ok := partial.URL.Get(); ok {
+		ln, err := s.fetcher.Fetch(ctx, u, fetcher.Options{})
+		if err == nil {
+			opts = append(opts, thread.WithLink(xid.ID(ln.ID)))
+		}
 	}
 
 	thr, err = s.thread_repo.Update(ctx, threadID, opts...)

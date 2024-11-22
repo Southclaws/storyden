@@ -10,7 +10,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
 	"github.com/Southclaws/storyden/app/services/semdex"
+	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -46,6 +48,9 @@ type semdexer struct {
 	indexer     semdex.Indexer
 	deleter     semdex.Deleter
 	retriever   semdex.Retriever
+	summariser  semdex.Summariser
+	tagger      *autotagger.Tagger
+	tagWriter   *tag_writer.Writer
 }
 
 func newSemdexer(
@@ -62,6 +67,9 @@ func newSemdexer(
 	indexer semdex.Indexer,
 	deleter semdex.Deleter,
 	retriever semdex.Retriever,
+	summariser semdex.Summariser,
+	tagger *autotagger.Tagger,
+	tagWriter *tag_writer.Writer,
 ) {
 	if !cfg.SemdexEnabled {
 		return
@@ -77,6 +85,9 @@ func newSemdexer(
 		indexer:     indexer,
 		deleter:     deleter,
 		retriever:   retriever,
+		summariser:  summariser,
+		tagger:      tagger,
+		tagWriter:   tagWriter,
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
@@ -98,7 +109,7 @@ func newSemdexer(
 
 		go func() {
 			for msg := range sub {
-				if err := re.index(ctx, msg.Payload.ID); err != nil {
+				if err := re.index(ctx, msg.Payload.ID, msg.Payload.SummariseContent, msg.Payload.AutoTag); err != nil {
 					l.Error("failed to index node", zap.Error(err))
 				}
 
