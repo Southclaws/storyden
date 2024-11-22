@@ -7,13 +7,15 @@ import {
   AuthProviderList,
 } from "src/api/openapi-schema";
 
+import { filterWithLink } from "./oauth";
+
 const groupProviders = keyBy<AuthProvider>("provider");
 
 export function groupAuthProviders(providers: AuthProviderList) {
   // pull out password and phone, if present, the rest are OAuth2 providers.
   const { password, phone, webauthn, ...rest } = groupProviders(providers);
 
-  const oauth = values(rest).filter((v) => v.link);
+  const oauth = filterWithLink(values(rest));
 
   return {
     password: Boolean(password),

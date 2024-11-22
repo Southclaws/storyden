@@ -1,20 +1,8 @@
-import { filter } from "lodash/fp";
-
-import { AuthProvider } from "src/api/openapi-schema";
-
 import { LinkButton } from "@/components/ui/link-button";
 import { Text } from "@/components/ui/text";
+import { OAuthProvider, filterWithLink } from "@/lib/auth/oauth";
 import { getProviders } from "@/lib/auth/providers";
 import { Divider, VStack, WStack, styled } from "@/styled-system/jsx";
-
-const hasLink = (provider: AuthProvider): provider is WithLink => {
-  return provider.link !== undefined;
-};
-
-const filterWithLink = (list: AuthProvider[]): WithLink[] =>
-  filter(hasLink)(list);
-
-type WithLink = AuthProvider & { link: string };
 
 export async function OAuthProviderList() {
   const { oauth: all } = await getProviders();
@@ -46,7 +34,7 @@ export async function OAuthProviderList() {
       >
         {oauth.map((v) => (
           <styled.li w="full" key={v.provider}>
-            <OAuthProvider provider={v} />
+            <OAuthProviderLink provider={v} />
           </styled.li>
         ))}
       </styled.ul>
@@ -54,7 +42,7 @@ export async function OAuthProviderList() {
   );
 }
 
-function OAuthProvider({ provider }: { provider: WithLink }) {
+function OAuthProviderLink({ provider }: { provider: OAuthProvider }) {
   return (
     <LinkButton size="sm" variant="outline" w="full" href={provider.link}>
       {provider.name}

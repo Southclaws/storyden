@@ -1,3 +1,5 @@
+import { find } from "lodash";
+
 import { useAccountAuthProviderList } from "src/api/openapi-client/accounts";
 
 import { groupAuthMethods, groupAuthProviders } from "@/lib/auth/utils";
@@ -22,7 +24,12 @@ export function useAuthMethodSettings() {
     methods,
   } = groupAuthMethods(active);
 
-  const sorted = oauth.sort((a, b) => a.name.localeCompare(b.name));
+  // Remove any OAuth providers that are already active
+  const availableOAuth = oauth.filter((v) => {
+    return !find(methods, (m) => m.provider.provider === v.provider);
+  });
+
+  const sorted = availableOAuth.sort((a, b) => a.name.localeCompare(b.name));
 
   return {
     ready: true as const,

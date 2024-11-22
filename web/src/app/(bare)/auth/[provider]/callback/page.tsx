@@ -36,8 +36,6 @@ export default function Page(props: Props) {
           return;
         }
 
-        console.log("params", params, "searchParams", searchParams);
-
         const { id } = await oAuthProviderCallback(
           params.provider,
           searchParams,
