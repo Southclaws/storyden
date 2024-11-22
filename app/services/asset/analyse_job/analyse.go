@@ -5,23 +5,26 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/services/asset/analyse"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 )
 
 type analyseConsumer struct {
-	queue    pubsub.Topic[mq.AnalyseAsset]
-	analyser *analyse.Analyser
+	analyser   *analyse.Analyser
+	uploader   *asset_upload.Uploader
+	nodeWriter *node_writer.Writer
 }
 
 func newAnalyseConsumer(
-	queue pubsub.Topic[mq.AnalyseAsset],
 	analyser *analyse.Analyser,
+	uploader *asset_upload.Uploader,
+	nodeWriter *node_writer.Writer,
 ) *analyseConsumer {
 	return &analyseConsumer{
-		queue:    queue,
-		analyser: analyser,
+		analyser:   analyser,
+		uploader:   uploader,
+		nodeWriter: nodeWriter,
 	}
 }
 

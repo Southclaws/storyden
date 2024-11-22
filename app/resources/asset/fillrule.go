@@ -7,10 +7,10 @@ import "github.com/rs/xid"
 type contentFillRuleEnum string
 
 const (
-	contentFillRuleEnumNone contentFillRuleEnum = "none"
-	contentFillRulePrepend  contentFillRuleEnum = "prepend"
-	contentFillRuleAppend   contentFillRuleEnum = "append"
-	contentFillRuleReplace  contentFillRuleEnum = "replace"
+	contentFillRuleCreate  contentFillRuleEnum = "create"
+	contentFillRulePrepend contentFillRuleEnum = "prepend"
+	contentFillRuleAppend  contentFillRuleEnum = "append"
+	contentFillRuleReplace contentFillRuleEnum = "replace"
 )
 
 type ContentFillCommand struct {

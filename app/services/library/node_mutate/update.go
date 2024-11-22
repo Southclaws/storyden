@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_auth"
+	"github.com/Southclaws/storyden/app/services/link/fetcher"
 )
 
 type Option func(*updateOptions)
@@ -97,7 +98,7 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial, op
 	}
 
 	if u, ok := p.URL.Get(); ok {
-		ln, err := s.fetcher.Fetch(ctx, u)
+		ln, err := s.fetcher.Fetch(ctx, u, fetcher.Options{})
 		if err == nil {
 			opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
 		}

@@ -53,6 +53,7 @@ type Content struct {
 	short string
 	plain string
 	links []string
+	media []string
 	sdrs  RefList
 }
 
@@ -110,6 +111,10 @@ func (r Content) Links() []string {
 	return r.links
 }
 
+func (r Content) Media() []string {
+	return r.media
+}
+
 func (r Content) References() RefList {
 	return r.sdrs
 }
@@ -123,16 +128,33 @@ type options struct {
 }
 type option func(*options)
 
+func WithBaseURL(url string) option {
+	return func(o *options) {
+		o.baseURL = url
+	}
+}
+
 // NewRichText will pull out any meaningful structured information from markdown
 // document this includes a summary of the text and all link URLs for hydrating.
 func NewRichText(raw string) (Content, error) {
 	return NewRichTextFromReader(strings.NewReader(raw))
 }
 
+// NewRichText will pull out any meaningful structured information from markdown
+// document this includes a summary of the text and all link URLs for hydrating.
+func NewRichTextWithOptions(raw string, opts ...option) (Content, error) {
+	return NewRichTextFromReader(strings.NewReader(raw), opts...)
+}
+
 func NewRichTextFromReader(r io.Reader, opts ...option) (Content, error) {
 	o := options{baseURL: "ignore:"}
 	for _, opt := range opts {
 		opt(&o)
+	}
+
+	baseURL, err := url.Parse(o.baseURL)
+	if err != nil {
+		return Content{}, fault.Wrap(err)
 	}
 
 	buf, err := io.ReadAll(r)
@@ -154,20 +176,22 @@ func NewRichTextFromReader(r io.Reader, opts ...option) (Content, error) {
 
 	short := getSummary(result)
 
-	bodyTree, links, refs := extractReferences(htmlTree)
+	bodyTree, links, media, refs := extractReferences(htmlTree, baseURL)
 
 	return Content{
 		html:  bodyTree,
 		short: short,
 		plain: result.TextContent,
 		links: links,
+		media: media,
 		sdrs:  refs,
 	}, nil
 }
 
-func extractReferences(htmlTree *html.Node) (*html.Node, []string, RefList) {
+func extractReferences(htmlTree *html.Node, baseURL *url.URL) (*html.Node, []string, []string, RefList) {
 	bodyTree := &html.Node{}
 	links := []string{}
+	media := []string{}
 	sdrs := []url.URL{}
 
 	if htmlTree.DataAtom == atom.Body {
@@ -177,9 +201,9 @@ func extractReferences(htmlTree *html.Node) (*html.Node, []string, RefList) {
 	var walk func(n *html.Node)
 	walk = func(n *html.Node) {
 		if n.Parent != nil {
-			switch n.Parent.DataAtom {
+			switch n.DataAtom {
 			case atom.A:
-				href, hasHref := lo.Find(n.Parent.Attr, func(a html.Attribute) bool {
+				href, hasHref := lo.Find(n.Attr, func(a html.Attribute) bool {
 					return strings.ToLower(a.Key) == "href"
 				})
 
@@ -188,6 +212,25 @@ func extractReferences(htmlTree *html.Node) (*html.Node, []string, RefList) {
 						switch parsed.Scheme {
 						case "http", "https":
 							links = append(links, parsed.String())
+						case RefScheme:
+							sdrs = append(sdrs, *parsed)
+						}
+					}
+				}
+
+			case atom.Img:
+				src, hasSrc := lo.Find(n.Attr, func(a html.Attribute) bool {
+					return strings.ToLower(a.Key) == "src"
+				})
+
+				if hasSrc {
+					if parsed, err := url.Parse(src.Val); err == nil {
+						switch parsed.Scheme {
+						case "":
+							abs := baseURL.ResolveReference(parsed).String()
+							media = append(media, abs)
+						case "http", "https":
+							media = append(media, parsed.String())
 						case RefScheme:
 							sdrs = append(sdrs, *parsed)
 						}
@@ -217,7 +260,7 @@ func extractReferences(htmlTree *html.Node) (*html.Node, []string, RefList) {
 		refs = append(refs, r)
 	}
 
-	return bodyTree, links, refs
+	return bodyTree, links, media, refs
 }
 
 func getSummary(article readability.Article) string {

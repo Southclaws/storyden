@@ -13,5 +13,6 @@ export type ContentFillRule =
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ContentFillRule = {
+  create: "create",
   replace: "replace",
 } as const;

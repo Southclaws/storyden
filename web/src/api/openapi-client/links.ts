@@ -17,6 +17,7 @@ import type {
   InternalServerErrorResponse,
   LinkCreateBody,
   LinkCreateOKResponse,
+  LinkCreateParams,
   LinkGetOKResponse,
   LinkListOKResponse,
   LinkListParams,
@@ -37,24 +38,29 @@ metadata will be updated with the new metadata and the URL is unchanged.
 When a link is submitted, it is first "cleaned" to remove any fragments.
 
  */
-export const linkCreate = (linkCreateBody: LinkCreateBody) => {
+export const linkCreate = (
+  linkCreateBody: LinkCreateBody,
+  params?: LinkCreateParams,
+) => {
   return fetcher<LinkCreateOKResponse>({
     url: `/links`,
     method: "POST",
     headers: { "Content-Type": "application/json" },
     data: linkCreateBody,
+    params,
   });
 };
 
-export const getLinkCreateMutationFetcher = () => {
+export const getLinkCreateMutationFetcher = (params?: LinkCreateParams) => {
   return (
     _: Key,
     { arg }: { arg: LinkCreateBody },
   ): Promise<LinkCreateOKResponse> => {
-    return linkCreate(arg);
+    return linkCreate(arg, params);
   };
 };
-export const getLinkCreateMutationKey = () => [`/links`] as const;
+export const getLinkCreateMutationKey = (params?: LinkCreateParams) =>
+  [`/links`, ...(params ? [params] : [])] as const;
 
 export type LinkCreateMutationResult = NonNullable<
   Awaited<ReturnType<typeof linkCreate>>
@@ -65,19 +71,22 @@ export type LinkCreateMutationError =
 
 export const useLinkCreate = <
   TError = UnauthorisedResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRMutationConfiguration<
-    Awaited<ReturnType<typeof linkCreate>>,
-    TError,
-    Key,
-    LinkCreateBody,
-    Awaited<ReturnType<typeof linkCreate>>
-  > & { swrKey?: string };
-}) => {
+>(
+  params?: LinkCreateParams,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof linkCreate>>,
+      TError,
+      Key,
+      LinkCreateBody,
+      Awaited<ReturnType<typeof linkCreate>>
+    > & { swrKey?: string };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
-  const swrKey = swrOptions?.swrKey ?? getLinkCreateMutationKey();
-  const swrFn = getLinkCreateMutationFetcher();
+  const swrKey = swrOptions?.swrKey ?? getLinkCreateMutationKey(params);
+  const swrFn = getLinkCreateMutationFetcher(params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

@@ -1,0 +1,45 @@
+package analyse_job
+
+import (
+	"context"
+	"net/http"
+
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
+	"github.com/gosimple/slug"
+
+	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_writer"
+	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
+)
+
+func (c *analyseConsumer) downloadAsset(ctx context.Context, src string, fillrule opt.Optional[asset.ContentFillCommand]) error {
+	resp, err := http.Get(src)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		ctx = fctx.WithMeta(ctx, "status", resp.Status)
+		return fault.Wrap(fault.New("failed to get asset"), fctx.With(ctx))
+	}
+
+	// TODO: Better naming???
+	name := slug.Make(src)
+
+	a, err := c.uploader.Upload(ctx, resp.Body, resp.ContentLength, asset.NewFilename(name), asset_upload.Options{})
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if fr, ok := fillrule.Get(); ok {
+		_, err = c.nodeWriter.Update(ctx, library.NewID(fr.TargetNodeID), node_writer.WithAssets([]asset.AssetID{a.ID}))
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
+	return nil
+}
