@@ -1,11 +1,15 @@
-import { redirect } from "next/navigation";
+"use client";
 
-import { oAuthProviderCallback } from "src/api/openapi-server/auth";
-import { UnreadyBanner } from "src/components/site/Unready";
+import { useRouter } from "next/navigation";
+import { use, useEffect, useState } from "react";
 
+import { oAuthProviderCallback } from "src/api/openapi-client/auth";
+import { Unready } from "src/components/site/Unready";
+
+import { handle } from "@/api/client";
 import { OAuthCallback } from "@/api/openapi-schema";
-import { LinkButton } from "@/components/ui/link-button";
-import { HStack, VStack } from "@/styled-system/jsx";
+
+export const dynamic = "force-dynamic";
 
 export type Props = {
   params: Promise<{
@@ -14,28 +18,41 @@ export type Props = {
   searchParams: Promise<OAuthCallback>;
 };
 
-export default async function Page(props: Props) {
-  try {
-    const { provider } = await props.params;
-    const query = await props.searchParams;
-    const { data } = await oAuthProviderCallback(provider, query);
+export default function Page(props: Props) {
+  const router = useRouter();
+  const [error, setError] = useState<unknown | null>(null);
 
-    const { id } = data;
+  const params = use(props.params);
+  const searchParams = use(props.searchParams);
 
-    redirect(`/?id=${id}`);
-  } catch (e) {
-    return (
-      <VStack w="full" height="dvh" justify="center" p="10">
-        <UnreadyBanner error={e} />
-        <HStack>
-          <LinkButton href="/register" variant="outline">
-            Back to register
-          </LinkButton>
-          <LinkButton href="/login" variant="outline">
-            Back to login
-          </LinkButton>
-        </HStack>
-      </VStack>
+  useEffect(() => {
+    handle(
+      async () => {
+        if (error != null) {
+          return;
+        }
+
+        if (params.provider === undefined || searchParams === undefined) {
+          return;
+        }
+
+        console.log("params", params, "searchParams", searchParams);
+
+        const { id } = await oAuthProviderCallback(
+          params.provider,
+          searchParams,
+        );
+
+        router.push(`/?id=${id}`);
+      },
+      {
+        errorToast: false,
+        onError: async (e) => {
+          setError(e);
+        },
+      },
     );
-  }
+  }, [router, error, params, searchParams]);
+
+  return <Unready error={error} />;
 }
