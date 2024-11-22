@@ -118,12 +118,17 @@ func (s *Registrar) GetOrCreateViaEmail(
 	}
 
 	isVerified := func() bool {
+		if !emailExists {
+			return false
+		}
+
 		current, found := lo.Find(emailOwner.EmailAddresses, func(e *account.EmailAddress) bool {
 			return e.Email.Address == email.Address
 		})
 		if !found {
 			return false
 		}
+
 		return current.Verified
 	}()
 
