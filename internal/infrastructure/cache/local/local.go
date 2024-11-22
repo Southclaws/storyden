@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/dgraph-io/ristretto/v2"
+	"github.com/shirou/gopsutil/v4/mem"
 )
 
 var errNotFound = fmt.Errorf("not found")
@@ -24,9 +25,18 @@ func init() {
 }
 
 func New() (*LocalCache, error) {
+	vm, err := mem.VirtualMemory()
+	if err != nil {
+		return nil, err
+	}
+
+	// cache size is 25% of available memory
+	// is this a good idea? who knows...
+	maxCost := int64(vm.Available / 4)
+
 	cache, err := ristretto.NewCache(&ristretto.Config[string, []byte]{
 		NumCounters:            1e7,
-		MaxCost:                128 * 1024 * 1024, // storyden runs in smol places! only do 128mb cache size
+		MaxCost:                maxCost,
 		BufferItems:            64,
 		TtlTickerDurationInSec: 30,
 	})
