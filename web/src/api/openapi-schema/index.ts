@@ -221,6 +221,7 @@ export * from "./likeStatus";
 export * from "./link";
 export * from "./linkCreateBody";
 export * from "./linkCreateOKResponse";
+export * from "./linkCreateParams";
 export * from "./linkDescription";
 export * from "./linkDomain";
 export * from "./linkGetOKResponse";

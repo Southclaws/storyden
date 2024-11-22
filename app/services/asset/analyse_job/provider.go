@@ -11,6 +11,7 @@ func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(
 			queue.New[mq.AnalyseAsset],
+			queue.New[mq.DownloadAsset],
 		),
 
 		fx.Provide(newAnalyseConsumer),

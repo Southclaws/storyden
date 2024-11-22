@@ -56,7 +56,7 @@ func (s *webScraper) postprocess(ctx context.Context, addr url.URL, r io.Reader)
 		Description: description(t),
 		Text:        text,
 		Favicon:     withBaseURL(favicon(doc)),
-		Image:       t["og:image"],
+		Image:       withBaseURL(t["og:image"]),
 		Content:     rc,
 	}
 

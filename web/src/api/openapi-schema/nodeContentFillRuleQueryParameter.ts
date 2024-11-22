@@ -13,5 +13,6 @@ export type NodeContentFillRuleQueryParameter =
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const NodeContentFillRuleQueryParameter = {
+  create: "create",
   replace: "replace",
 } as const;

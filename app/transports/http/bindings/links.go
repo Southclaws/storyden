@@ -44,7 +44,14 @@ func (i *Links) LinkCreate(ctx context.Context, request openapi.LinkCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	link, err := i.fetcher.Fetch(ctx, *u)
+	cfr, err := getContentFillRuleCommand(request.Params.ContentFillRule, request.Params.NodeContentFillTarget)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	link, err := i.fetcher.Fetch(ctx, *u, fetcher.Options{
+		ContentFill: cfr,
+	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

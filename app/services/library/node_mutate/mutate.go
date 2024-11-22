@@ -29,19 +29,20 @@ import (
 )
 
 type Partial struct {
-	Name         opt.Optional[string]
-	Slug         opt.Optional[mark.Slug]
-	URL          opt.Optional[url.URL]
-	PrimaryImage deletable.Value[asset.AssetID]
-	Content      opt.Optional[datagraph.Content]
-	Parent       opt.Optional[library.QueryKey]
-	Tags         opt.Optional[tag_ref.Names]
-	Visibility   opt.Optional[visibility.Visibility]
-	Metadata     opt.Optional[map[string]any]
-	AssetsAdd    opt.Optional[[]asset.AssetID]
-	AssetsRemove opt.Optional[[]asset.AssetID]
-	AssetSources opt.Optional[[]string]
-	ContentFill  opt.Optional[asset.ContentFillCommand]
+	Name             opt.Optional[string]
+	Slug             opt.Optional[mark.Slug]
+	URL              opt.Optional[url.URL]
+	PrimaryImage     deletable.Value[asset.AssetID]
+	Content          opt.Optional[datagraph.Content]
+	Parent           opt.Optional[library.QueryKey]
+	Tags             opt.Optional[tag_ref.Names]
+	Visibility       opt.Optional[visibility.Visibility]
+	Metadata         opt.Optional[map[string]any]
+	AssetsAdd        opt.Optional[[]asset.AssetID]
+	AssetsRemove     opt.Optional[[]asset.AssetID]
+	AssetSources     opt.Optional[[]string]
+	ContentFill      opt.Optional[asset.ContentFillCommand]
+	ContentSummarise opt.Optional[bool]
 }
 
 func (p Partial) Opts() (opts []node_writer.Option) {

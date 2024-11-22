@@ -37,7 +37,7 @@ func newScrapeConsumer(
 }
 
 func (s *scrapeConsumer) scrapeLink(ctx context.Context, u url.URL, item opt.Optional[datagraph.Ref]) error {
-	ln, err := s.fetcher.ScrapeAndStore(ctx, u)
+	ln, _, err := s.fetcher.ScrapeAndStore(ctx, u)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

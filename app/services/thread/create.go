@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/link/fetcher"
 )
 
 func (s *service) Create(ctx context.Context,
@@ -40,7 +41,7 @@ func (s *service) Create(ctx context.Context,
 	)
 
 	if u, ok := partial.URL.Get(); ok {
-		ln, err := s.fetcher.Fetch(ctx, u)
+		ln, err := s.fetcher.Fetch(ctx, u, fetcher.Options{})
 		if err == nil {
 			opts = append(opts, thread.WithLink(xid.ID(ln.ID)))
 		}
