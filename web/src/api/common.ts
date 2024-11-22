@@ -77,6 +77,10 @@ export const buildPayload = (data: unknown) => {
     return data;
   }
 
+  if (typeof data === "string") {
+    return data;
+  }
+
   return JSON.stringify(data);
 };
 
