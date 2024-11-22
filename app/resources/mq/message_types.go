@@ -17,7 +17,9 @@ import (
 )
 
 type IndexNode struct {
-	ID library.NodeID
+	ID               library.NodeID
+	SummariseContent bool
+	AutoTag          bool
 }
 
 type DeleteNode struct {
@@ -38,6 +40,11 @@ type IndexReply struct {
 
 type IndexProfile struct {
 	ID account.AccountID
+}
+
+type DownloadAsset struct {
+	URL             string
+	ContentFillRule opt.Optional[asset.ContentFillCommand]
 }
 
 type AnalyseAsset struct {

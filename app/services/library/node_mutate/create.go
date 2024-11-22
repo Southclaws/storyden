@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
+	"github.com/Southclaws/storyden/app/services/link/fetcher"
 )
 
 func (s *Manager) Create(ctx context.Context,
@@ -60,7 +61,7 @@ func (s *Manager) Create(ctx context.Context,
 	nodeSlug := p.Slug.Or(mark.NewSlugFromName(name))
 
 	if u, ok := p.URL.Get(); ok {
-		ln, err := s.fetcher.Fetch(ctx, u)
+		ln, err := s.fetcher.Fetch(ctx, u, fetcher.Options{})
 		if err == nil {
 			opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
 		}

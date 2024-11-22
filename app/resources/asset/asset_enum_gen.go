@@ -12,10 +12,10 @@ type ContentFillRule struct {
 }
 
 var (
-	ContentFillRuleEnumNone = ContentFillRule{contentFillRuleEnumNone}
-	ContentFillRulePrepend  = ContentFillRule{contentFillRulePrepend}
-	ContentFillRuleAppend   = ContentFillRule{contentFillRuleAppend}
-	ContentFillRuleReplace  = ContentFillRule{contentFillRuleReplace}
+	ContentFillRuleCreate  = ContentFillRule{contentFillRuleCreate}
+	ContentFillRulePrepend = ContentFillRule{contentFillRulePrepend}
+	ContentFillRuleAppend  = ContentFillRule{contentFillRuleAppend}
+	ContentFillRuleReplace = ContentFillRule{contentFillRuleReplace}
 )
 
 func (r ContentFillRule) Format(f fmt.State, verb rune) {
@@ -55,8 +55,8 @@ func (r *ContentFillRule) Scan(__iNpUt__ any) error {
 }
 func NewContentFillRule(__iNpUt__ string) (ContentFillRule, error) {
 	switch __iNpUt__ {
-	case string(contentFillRuleEnumNone):
-		return ContentFillRuleEnumNone, nil
+	case string(contentFillRuleCreate):
+		return ContentFillRuleCreate, nil
 	case string(contentFillRulePrepend):
 		return ContentFillRulePrepend, nil
 	case string(contentFillRuleAppend):
