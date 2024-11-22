@@ -81,13 +81,13 @@ type Service struct {
 }
 
 var (
-	ServicePassword      = Service{servicePassword}
-	ServiceEmailVerify   = Service{serviceEmailVerify}
-	ServicePhoneVerify   = Service{servicePhoneVerify}
-	ServiceWebAuthn      = Service{serviceWebAuthn}
-	ServiceOAuthGoogle   = Service{serviceOAuthGoogle}
-	ServiceOAuthGitHub   = Service{serviceOAuthGitHub}
-	ServiceOAuthLinkedin = Service{serviceOAuthLinkedin}
+	ServicePassword     = Service{servicePassword}
+	ServiceEmailVerify  = Service{serviceEmailVerify}
+	ServicePhoneVerify  = Service{servicePhoneVerify}
+	ServiceWebAuthn     = Service{serviceWebAuthn}
+	ServiceOAuthGoogle  = Service{serviceOAuthGoogle}
+	ServiceOAuthGitHub  = Service{serviceOAuthGitHub}
+	ServiceOAuthDiscord = Service{serviceOAuthDiscord}
 )
 
 func (r Service) Format(f fmt.State, verb rune) {
@@ -110,8 +110,8 @@ func (r Service) Format(f fmt.State, verb rune) {
 			fmt.Fprint(f, "Google")
 		case ServiceOAuthGitHub:
 			fmt.Fprint(f, "GitHub")
-		case ServiceOAuthLinkedin:
-			fmt.Fprint(f, "LinkedIn")
+		case ServiceOAuthDiscord:
+			fmt.Fprint(f, "Discord")
 		default:
 			fmt.Fprint(f, "")
 		}
@@ -158,8 +158,8 @@ func NewService(__iNpUt__ string) (Service, error) {
 		return ServiceOAuthGoogle, nil
 	case string(serviceOAuthGitHub):
 		return ServiceOAuthGitHub, nil
-	case string(serviceOAuthLinkedin):
-		return ServiceOAuthLinkedin, nil
+	case string(serviceOAuthDiscord):
+		return ServiceOAuthDiscord, nil
 	default:
 		return Service{}, fmt.Errorf("invalid value for type 'Service': '%s'", __iNpUt__)
 	}
