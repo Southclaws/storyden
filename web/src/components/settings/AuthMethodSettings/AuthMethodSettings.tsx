@@ -32,9 +32,10 @@ export function AuthMethodSettings() {
 
       {available.webauthn && <Devices active={active.webauthn} />}
 
-      {available.oauth.length > 0 && (
-        <OAuth active={active.methods} available={available.oauth} />
-      )}
+      {available.oauth.length > 0 ||
+        (active.methods.length > 0 && (
+          <OAuth active={active.methods} available={available.oauth} />
+        ))}
     </CardBox>
   );
 }
