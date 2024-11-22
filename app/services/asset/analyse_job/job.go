@@ -23,7 +23,7 @@ func runAnalyseConsumer(
 	lc.Append(fx.StartHook(func(_ context.Context) error {
 		analyseChan, err := analyseQueue.Subscribe(ctx)
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		go func() {
@@ -31,7 +31,7 @@ func runAnalyseConsumer(
 				nctx := session.GetSessionFromMessage(ctx, msg)
 
 				if err := consumer.analyseAsset(nctx, msg.Payload.AssetID, msg.Payload.ContentFillRule); err != nil {
-					l.Error("failed to index node", zap.Error(err))
+					l.Error("failed to analyse asset", zap.Error(err))
 				}
 
 				msg.Ack()
@@ -40,7 +40,7 @@ func runAnalyseConsumer(
 
 		downloadChan, err := downloadQueue.Subscribe(ctx)
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		go func() {
@@ -48,7 +48,7 @@ func runAnalyseConsumer(
 				nctx := session.GetSessionFromMessage(ctx, msg)
 
 				if err := consumer.downloadAsset(nctx, msg.Payload.URL, msg.Payload.ContentFillRule); err != nil {
-					l.Error("failed to index node", zap.Error(err))
+					l.Error("failed to download asset", zap.Error(err))
 				}
 
 				msg.Ack()

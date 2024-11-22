@@ -3,6 +3,7 @@ package analyse_job
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -16,10 +17,20 @@ import (
 )
 
 func (c *analyseConsumer) downloadAsset(ctx context.Context, src string, fillrule opt.Optional[asset.ContentFillCommand]) error {
-	resp, err := http.Get(src)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, src, nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
+
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+	}
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
 		ctx = fctx.WithMeta(ctx, "status", resp.Status)
