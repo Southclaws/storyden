@@ -30,7 +30,8 @@ func Build() fx.Option {
 		fx.Provide(func(cfg config.Config) (Store, error) {
 			switch cfg.CacheProvider {
 			case "":
-				return local.New(), nil
+				c, err := local.New()
+				return c, err
 
 			case "redis":
 				password, _ := cfg.RedisURL.User.Password()
