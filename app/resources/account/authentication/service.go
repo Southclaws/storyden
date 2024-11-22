@@ -11,9 +11,9 @@ const (
 	serviceWebAuthn    serviceEnum = "webauthn"     // WebAuthn/Passkey
 
 	// OAuth services
-	serviceOAuthGoogle   serviceEnum = "oauth_google"   // Google
-	serviceOAuthGitHub   serviceEnum = "oauth_github"   // GitHub
-	serviceOAuthLinkedin serviceEnum = "oauth_linkedin" // LinkedIn
+	serviceOAuthGoogle  serviceEnum = "oauth_google"  // Google
+	serviceOAuthGitHub  serviceEnum = "oauth_github"  // GitHub
+	serviceOAuthDiscord serviceEnum = "oauth_discord" // Discord
 )
 
 type tokenTypeEnum string
