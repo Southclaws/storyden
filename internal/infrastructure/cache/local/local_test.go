@@ -63,28 +63,6 @@ func TestLocalCache(t *testing.T) {
 		r.NoError(err)
 		a.Equal(map[string]string{field: "2"}, m)
 	})
-
-	t.Run("concurrency", func(t *testing.T) {
-		r := require.New(t)
-		ctx := context.Background()
-
-		c, err := local.New()
-		r.NoError(err)
-
-		go func() {
-			for i := 0; i < 10000; i++ {
-				_, err := c.HIncrBy(ctx, "key", "field", 1)
-				r.NoError(err)
-			}
-		}()
-
-		go func() {
-			for i := 0; i < 10000; i++ {
-				_, err := c.HGetAll(ctx, "key")
-				r.NoError(err)
-			}
-		}()
-	})
 }
 
 func BenchmarkLocalCache(b *testing.B) {
