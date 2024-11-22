@@ -310,7 +310,7 @@ func (s *Registrar) GetOrCreateViaHandle(
 			return &sessionAccount, nil
 		}
 
-		return s.CreateWithHandle(ctx, service, identifier, authName, token, name, handle)
+		return s.CreateWithHandle(ctx, service, authName, identifier, token, name, handle)
 
 	default:
 		// switch block covers all cases.
