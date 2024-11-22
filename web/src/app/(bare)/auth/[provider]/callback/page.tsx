@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { oAuthProviderCallback } from "src/api/openapi-client/auth";
 import { Unready } from "src/components/site/Unready";
@@ -22,12 +22,12 @@ export default function Page(props: Props) {
   const router = useRouter();
   const [error, setError] = useState<unknown | null>(null);
 
-  const params = use(props.params);
-  const searchParams = use(props.searchParams);
-
   useEffect(() => {
     handle(
       async () => {
+        const params = await props.params;
+        const searchParams = await props.searchParams;
+
         if (error != null) {
           return;
         }
@@ -50,7 +50,7 @@ export default function Page(props: Props) {
         },
       },
     );
-  }, [router, error, params, searchParams]);
+  }, [router, error, props]);
 
   return <Unready error={error} />;
 }
