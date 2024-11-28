@@ -19,7 +19,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/rs/xid v1.6.0
 	github.com/samber/lo v1.47.0
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 	go.uber.org/dig v1.18.0
 	go.uber.org/fx v1.23.0
 	go.uber.org/zap v1.27.0
@@ -35,14 +35,17 @@ require (
 	github.com/ThreeDotsLabs/watermill v1.4.1
 	github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.0
 	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
+	github.com/bwmarrin/discordgo v0.28.1
 	github.com/cixtor/readability v1.0.0
 	github.com/dave/jennifer v1.7.1
 	github.com/dboslee/lru v0.0.1
+	github.com/dgraph-io/ristretto/v2 v2.0.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/dustinkirkland/golang-petname v0.0.0-20240428194347-eebcea082ee0
 	github.com/gabriel-vasile/mimetype v1.4.7
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/google/go-github/v66 v66.0.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/jmoiron/sqlx v1.4.0
@@ -63,11 +66,12 @@ require (
 	github.com/redis/rueidis v1.0.49
 	github.com/rs/cors v1.11.1
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
+	github.com/shirou/gopsutil/v4 v4.24.10
 	github.com/twilio/twilio-go v1.23.6
-	github.com/weaviate/weaviate v1.27.5
+	github.com/weaviate/weaviate v1.27.6
 	github.com/weaviate/weaviate-go-client/v4 v4.16.1
 	golang.org/x/sync v0.9.0
-	google.golang.org/api v0.208.0
+	google.golang.org/api v0.209.0
 )
 
 require (
@@ -83,10 +87,8 @@ require (
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
-	github.com/bwmarrin/discordgo v0.28.1 // indirect
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/dgraph-io/ristretto/v2 v2.0.0 // indirect
 	github.com/dprotaso/go-yit v0.0.0-20240618133044-5a0af90af097 // indirect
 	github.com/ebitengine/purego v0.8.1 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
@@ -105,7 +107,6 @@ require (
 	github.com/goccy/go-json v0.10.3 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/mock v1.6.0 // indirect
-	github.com/google/go-github/v66 v66.0.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/go-tpm v0.9.1 // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
@@ -135,7 +136,6 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
-	github.com/shirou/gopsutil/v4 v4.24.10 // indirect
 	github.com/speakeasy-api/openapi-overlay v0.9.0 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/tetratelabs/wazero v1.8.1 // indirect
@@ -169,7 +169,7 @@ require (
 	github.com/klauspost/compress v1.17.11 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.8 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.80
+	github.com/minio/minio-go/v7 v7.0.81
 )
 
 require (
@@ -182,7 +182,7 @@ require (
 	github.com/go-openapi/inflect v0.21.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/swag v0.23.0 // indirect
-	github.com/go-resty/resty/v2 v2.16.1
+	github.com/go-resty/resty/v2 v2.16.2
 	github.com/go-webauthn/webauthn v0.11.2
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/go-cmp v0.6.0 // indirect
