@@ -46,6 +46,7 @@ require (
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/go-github/v66 v66.0.0
+	github.com/google/go-github/v67 v67.0.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/jmoiron/sqlx v1.4.0
