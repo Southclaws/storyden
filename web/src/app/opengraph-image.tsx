@@ -20,7 +20,7 @@ export default async function Image() {
   const iconURL = getIconURL("512x512");
   const backgroundImageURL = getBannerURL();
 
-  const { title, description, accent_colour } = settings;
+  const { title, accent_colour } = settings;
 
   return new ImageResponse(
     (
@@ -57,17 +57,32 @@ export default async function Image() {
             flexDirection: "column",
             width: "100%",
             padding: "2rem",
-            backgroundColor: "hsla(180deg, 10%, 10%, 0.58)",
             color: "white",
           }}
         >
           <div
             style={{
               display: "flex",
+              justifyContent: "space-between",
               alignItems: "center",
               gap: "2rem",
+
+              background: "hsla(180deg, 10%, 10%, 58%)",
+              borderRadius: "12px",
+              padding: "1rem",
             }}
           >
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                fontSize: "4rem",
+                fontWeight: 600,
+              }}
+            >
+              <span>{title}</span>
+            </div>
+
             <img
               src={iconURL}
               width="100"
@@ -78,31 +93,6 @@ export default async function Image() {
                 borderRadius: "12px",
               }}
             />
-
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <div
-                style={{
-                  fontSize: "4rem",
-                  fontWeight: 600,
-                }}
-              >
-                {title}
-              </div>
-
-              <div
-                style={{
-                  fontSize: "2rem",
-                  fontWeight: 300,
-                }}
-              >
-                {description}
-              </div>
-            </div>
           </div>
         </div>
       </div>

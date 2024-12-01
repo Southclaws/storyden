@@ -54,7 +54,7 @@ export default async function Image({ params }: Props) {
         <div
           style={{
             position: "absolute",
-            bottom: 0,
+            top: 0,
             display: "flex",
             flexDirection: "column",
             padding: "2rem",
