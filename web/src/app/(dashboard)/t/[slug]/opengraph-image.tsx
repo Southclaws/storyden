@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 
 import { threadGet } from "@/api/openapi-server/threads";
+import { interBold, interRegular } from "@/app/fonts/og";
 import { getSettings } from "@/lib/settings/settings-server";
 import { getAssetURL } from "@/utils/asset";
 
@@ -19,7 +20,7 @@ export default async function Image({ params }: Props) {
 
   const { accent_colour } = await getSettings();
 
-  const image = data.assets[0];
+  const image = data.link?.primary_image ?? data.assets[0];
 
   return new ImageResponse(
     (
@@ -83,6 +84,20 @@ export default async function Image({ params }: Props) {
     ),
     {
       ...size,
+      fonts: [
+        {
+          name: "Inter",
+          data: await interRegular(),
+          style: "normal",
+          weight: 400,
+        },
+        {
+          name: "Inter",
+          data: await interBold(),
+          style: "normal",
+          weight: 800,
+        },
+      ],
       emoji: "fluent",
     },
   );
