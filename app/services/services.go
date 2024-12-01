@@ -11,11 +11,11 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
+	"github.com/Southclaws/storyden/app/services/branding"
 	"github.com/Southclaws/storyden/app/services/category"
 	"github.com/Southclaws/storyden/app/services/collection"
 	"github.com/Southclaws/storyden/app/services/comms"
 	"github.com/Southclaws/storyden/app/services/event"
-	"github.com/Southclaws/storyden/app/services/icon"
 	"github.com/Southclaws/storyden/app/services/library"
 	"github.com/Southclaws/storyden/app/services/like/post_liker"
 	"github.com/Southclaws/storyden/app/services/link"
@@ -38,7 +38,7 @@ import (
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(register.New),
-		icon.Build(),
+		branding.Build(),
 		onboarding.Build(),
 		account_suspension.Build(),
 		authentication.Build(),

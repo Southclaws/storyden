@@ -168,7 +168,26 @@ paths:
       description: Upload and process the installation's logo image.
       tags: [misc]
       requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
-      parameters: [$ref: "#/components/parameters/ContentLength"]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200":
+          description: OK
+
+  /info/banner:
+    get:
+      operationId: BannerGet
+      description: Get the banner image.
+      security: []
+      tags: [misc]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/AssetGetOK" }
+    post:
+      operationId: BannerUpload
+      description: Upload and process the installation's banner image.
+      tags: [misc]
+      requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "401": { $ref: "#/components/responses/Unauthorised" }

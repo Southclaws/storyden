@@ -3516,12 +3516,6 @@ type EventListParams struct {
 	Page *PaginationQuery `form:"page,omitempty" json:"page,omitempty"`
 }
 
-// IconUploadParams defines parameters for IconUpload.
-type IconUploadParams struct {
-	// ContentLength Body content length in bytes.
-	ContentLength ContentLength `json:"Content-Length"`
-}
-
 // IconGetParamsIconSize defines parameters for IconGet.
 type IconGetParamsIconSize string
 
@@ -4375,8 +4369,14 @@ type ClientInterface interface {
 	// GetInfo request
 	GetInfo(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// BannerGet request
+	BannerGet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// BannerUploadWithBody request with any body
+	BannerUploadWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// IconUploadWithBody request with any body
-	IconUploadWithBody(ctx context.Context, params *IconUploadParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	IconUploadWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// IconGet request
 	IconGet(ctx context.Context, iconSize IconGetParamsIconSize, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -5584,8 +5584,32 @@ func (c *Client) GetInfo(ctx context.Context, reqEditors ...RequestEditorFn) (*h
 	return c.Client.Do(req)
 }
 
-func (c *Client) IconUploadWithBody(ctx context.Context, params *IconUploadParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewIconUploadRequestWithBody(c.Server, params, contentType, body)
+func (c *Client) BannerGet(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewBannerGetRequest(c.Server)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) BannerUploadWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewBannerUploadRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) IconUploadWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewIconUploadRequestWithBody(c.Server, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -8879,8 +8903,64 @@ func NewGetInfoRequest(server string) (*http.Request, error) {
 	return req, nil
 }
 
+// NewBannerGetRequest generates requests for BannerGet
+func NewBannerGetRequest(server string) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/info/banner")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewBannerUploadRequestWithBody generates requests for BannerUpload with any type of body
+func NewBannerUploadRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/info/banner")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewIconUploadRequestWithBody generates requests for IconUpload with any type of body
-func NewIconUploadRequestWithBody(server string, params *IconUploadParams, contentType string, body io.Reader) (*http.Request, error) {
+func NewIconUploadRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -8904,19 +8984,6 @@ func NewIconUploadRequestWithBody(server string, params *IconUploadParams, conte
 	}
 
 	req.Header.Add("Content-Type", contentType)
-
-	if params != nil {
-
-		var headerParam0 string
-
-		headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Content-Length", runtime.ParamLocationHeader, params.ContentLength)
-		if err != nil {
-			return nil, err
-		}
-
-		req.Header.Set("Content-Length", headerParam0)
-
-	}
 
 	return req, nil
 }
@@ -11524,8 +11591,14 @@ type ClientWithResponsesInterface interface {
 	// GetInfoWithResponse request
 	GetInfoWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*GetInfoResponse, error)
 
+	// BannerGetWithResponse request
+	BannerGetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*BannerGetResponse, error)
+
+	// BannerUploadWithBodyWithResponse request with any body
+	BannerUploadWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*BannerUploadResponse, error)
+
 	// IconUploadWithBodyWithResponse request with any body
-	IconUploadWithBodyWithResponse(ctx context.Context, params *IconUploadParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IconUploadResponse, error)
+	IconUploadWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IconUploadResponse, error)
 
 	// IconGetWithResponse request
 	IconGetWithResponse(ctx context.Context, iconSize IconGetParamsIconSize, reqEditors ...RequestEditorFn) (*IconGetResponse, error)
@@ -13042,6 +13115,50 @@ func (r GetInfoResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetInfoResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type BannerGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r BannerGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r BannerGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type BannerUploadResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSONDefault  *InternalServerError
+}
+
+// Status returns HTTPResponse.Status
+func (r BannerUploadResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r BannerUploadResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -14932,9 +15049,27 @@ func (c *ClientWithResponses) GetInfoWithResponse(ctx context.Context, reqEditor
 	return ParseGetInfoResponse(rsp)
 }
 
+// BannerGetWithResponse request returning *BannerGetResponse
+func (c *ClientWithResponses) BannerGetWithResponse(ctx context.Context, reqEditors ...RequestEditorFn) (*BannerGetResponse, error) {
+	rsp, err := c.BannerGet(ctx, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseBannerGetResponse(rsp)
+}
+
+// BannerUploadWithBodyWithResponse request with arbitrary body returning *BannerUploadResponse
+func (c *ClientWithResponses) BannerUploadWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*BannerUploadResponse, error) {
+	rsp, err := c.BannerUploadWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseBannerUploadResponse(rsp)
+}
+
 // IconUploadWithBodyWithResponse request with arbitrary body returning *IconUploadResponse
-func (c *ClientWithResponses) IconUploadWithBodyWithResponse(ctx context.Context, params *IconUploadParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IconUploadResponse, error) {
-	rsp, err := c.IconUploadWithBody(ctx, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) IconUploadWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*IconUploadResponse, error) {
+	rsp, err := c.IconUploadWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -17363,6 +17498,58 @@ func ParseGetInfoResponse(rsp *http.Response) (*GetInfoResponse, error) {
 	return response, nil
 }
 
+// ParseBannerGetResponse parses an HTTP response from a BannerGetWithResponse call
+func ParseBannerGetResponse(rsp *http.Response) (*BannerGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &BannerGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseBannerUploadResponse parses an HTTP response from a BannerUploadWithResponse call
+func ParseBannerUploadResponse(rsp *http.Response) (*BannerUploadResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &BannerUploadResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest InternalServerError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
 // ParseIconUploadResponse parses an HTTP response from a IconUploadWithResponse call
 func ParseIconUploadResponse(rsp *http.Response) (*IconUploadResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -19102,8 +19289,14 @@ type ServerInterface interface {
 	// (GET /info)
 	GetInfo(ctx echo.Context) error
 
+	// (GET /info/banner)
+	BannerGet(ctx echo.Context) error
+
+	// (POST /info/banner)
+	BannerUpload(ctx echo.Context) error
+
 	// (POST /info/icon)
-	IconUpload(ctx echo.Context, params IconUploadParams) error
+	IconUpload(ctx echo.Context) error
 
 	// (GET /info/icon/{icon_size})
 	IconGet(ctx echo.Context, iconSize IconGetParamsIconSize) error
@@ -20299,36 +20492,34 @@ func (w *ServerInterfaceWrapper) GetInfo(ctx echo.Context) error {
 	return err
 }
 
+// BannerGet converts echo context to params.
+func (w *ServerInterfaceWrapper) BannerGet(ctx echo.Context) error {
+	var err error
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.BannerGet(ctx)
+	return err
+}
+
+// BannerUpload converts echo context to params.
+func (w *ServerInterfaceWrapper) BannerUpload(ctx echo.Context) error {
+	var err error
+
+	ctx.Set(BrowserScopes, []string{})
+
+	// Invoke the callback with all the unmarshaled arguments
+	err = w.Handler.BannerUpload(ctx)
+	return err
+}
+
 // IconUpload converts echo context to params.
 func (w *ServerInterfaceWrapper) IconUpload(ctx echo.Context) error {
 	var err error
 
 	ctx.Set(BrowserScopes, []string{})
 
-	// Parameter object where we will unmarshal all parameters from the context
-	var params IconUploadParams
-
-	headers := ctx.Request().Header
-	// ------------- Required header parameter "Content-Length" -------------
-	if valueList, found := headers[http.CanonicalHeaderKey("Content-Length")]; found {
-		var ContentLength ContentLength
-		n := len(valueList)
-		if n != 1 {
-			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Expected one value for Content-Length, got %d", n))
-		}
-
-		err = runtime.BindStyledParameterWithOptions("simple", "Content-Length", valueList[0], &ContentLength, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true})
-		if err != nil {
-			return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Invalid format for parameter Content-Length: %s", err))
-		}
-
-		params.ContentLength = ContentLength
-	} else {
-		return echo.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("Header parameter Content-Length is required, but not found"))
-	}
-
 	// Invoke the callback with all the unmarshaled arguments
-	err = w.Handler.IconUpload(ctx, params)
+	err = w.Handler.IconUpload(ctx)
 	return err
 }
 
@@ -21444,6 +21635,8 @@ func RegisterHandlersWithBaseURL(router EchoRouter, si ServerInterface, baseURL 
 	router.DELETE(baseURL+"/events/:event_mark/participants/:account_id", wrapper.EventParticipantRemove)
 	router.PUT(baseURL+"/events/:event_mark/participants/:account_id", wrapper.EventParticipantUpdate)
 	router.GET(baseURL+"/info", wrapper.GetInfo)
+	router.GET(baseURL+"/info/banner", wrapper.BannerGet)
+	router.POST(baseURL+"/info/banner", wrapper.BannerUpload)
 	router.POST(baseURL+"/info/icon", wrapper.IconUpload)
 	router.GET(baseURL+"/info/icon/:icon_size", wrapper.IconGet)
 	router.GET(baseURL+"/invitations", wrapper.InvitationList)
@@ -24134,9 +24327,78 @@ func (response GetInfodefaultJSONResponse) VisitGetInfoResponse(w http.ResponseW
 	return json.NewEncoder(w).Encode(response.Body)
 }
 
+type BannerGetRequestObject struct {
+}
+
+type BannerGetResponseObject interface {
+	VisitBannerGetResponse(w http.ResponseWriter) error
+}
+
+type BannerGet200AsteriskResponse struct{ AssetGetOKAsteriskResponse }
+
+func (response BannerGet200AsteriskResponse) VisitBannerGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", response.ContentType)
+	if response.ContentLength != 0 {
+		w.Header().Set("Content-Length", fmt.Sprint(response.ContentLength))
+	}
+	w.WriteHeader(200)
+
+	if closer, ok := response.Body.(io.ReadCloser); ok {
+		defer closer.Close()
+	}
+	_, err := io.Copy(w, response.Body)
+	return err
+}
+
+type BannerGetdefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response BannerGetdefaultJSONResponse) VisitBannerGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
+type BannerUploadRequestObject struct {
+	Body io.Reader
+}
+
+type BannerUploadResponseObject interface {
+	VisitBannerUploadResponse(w http.ResponseWriter) error
+}
+
+type BannerUpload200Response struct {
+}
+
+func (response BannerUpload200Response) VisitBannerUploadResponse(w http.ResponseWriter) error {
+	w.WriteHeader(200)
+	return nil
+}
+
+type BannerUpload401Response = UnauthorisedResponse
+
+func (response BannerUpload401Response) VisitBannerUploadResponse(w http.ResponseWriter) error {
+	w.WriteHeader(401)
+	return nil
+}
+
+type BannerUploaddefaultJSONResponse struct {
+	Body       APIError
+	StatusCode int
+}
+
+func (response BannerUploaddefaultJSONResponse) VisitBannerUploadResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	return json.NewEncoder(w).Encode(response.Body)
+}
+
 type IconUploadRequestObject struct {
-	Params IconUploadParams
-	Body   io.Reader
+	Body io.Reader
 }
 
 type IconUploadResponseObject interface {
@@ -26368,6 +26630,12 @@ type StrictServerInterface interface {
 	// (GET /info)
 	GetInfo(ctx context.Context, request GetInfoRequestObject) (GetInfoResponseObject, error)
 
+	// (GET /info/banner)
+	BannerGet(ctx context.Context, request BannerGetRequestObject) (BannerGetResponseObject, error)
+
+	// (POST /info/banner)
+	BannerUpload(ctx context.Context, request BannerUploadRequestObject) (BannerUploadResponseObject, error)
+
 	// (POST /info/icon)
 	IconUpload(ctx context.Context, request IconUploadRequestObject) (IconUploadResponseObject, error)
 
@@ -28138,11 +28406,57 @@ func (sh *strictHandler) GetInfo(ctx echo.Context) error {
 	return nil
 }
 
-// IconUpload operation middleware
-func (sh *strictHandler) IconUpload(ctx echo.Context, params IconUploadParams) error {
-	var request IconUploadRequestObject
+// BannerGet operation middleware
+func (sh *strictHandler) BannerGet(ctx echo.Context) error {
+	var request BannerGetRequestObject
 
-	request.Params = params
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.BannerGet(ctx.Request().Context(), request.(BannerGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "BannerGet")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(BannerGetResponseObject); ok {
+		return validResponse.VisitBannerGetResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// BannerUpload operation middleware
+func (sh *strictHandler) BannerUpload(ctx echo.Context) error {
+	var request BannerUploadRequestObject
+
+	request.Body = ctx.Request().Body
+
+	handler := func(ctx echo.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.BannerUpload(ctx.Request().Context(), request.(BannerUploadRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "BannerUpload")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		return err
+	} else if validResponse, ok := response.(BannerUploadResponseObject); ok {
+		return validResponse.VisitBannerUploadResponse(ctx.Response())
+	} else if response != nil {
+		return fmt.Errorf("unexpected response type: %T", response)
+	}
+	return nil
+}
+
+// IconUpload operation middleware
+func (sh *strictHandler) IconUpload(ctx echo.Context) error {
+	var request IconUploadRequestObject
 
 	request.Body = ctx.Request().Body
 
@@ -29773,65 +30087,66 @@ var swaggerSpec = []string{
 	"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",
-	"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",
-	"YLGjJQIA",
+	"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",
+	"AA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

@@ -8,6 +8,8 @@ type OperationPermissions interface {
 	GetInfo() (bool, *rbac.Permission)
 	IconGet() (bool, *rbac.Permission)
 	IconUpload() (bool, *rbac.Permission)
+	BannerGet() (bool, *rbac.Permission)
+	BannerUpload() (bool, *rbac.Permission)
 	AdminSettingsUpdate() (bool, *rbac.Permission)
 	AdminAccountBanCreate() (bool, *rbac.Permission)
 	AdminAccountBanRemove() (bool, *rbac.Permission)
@@ -126,6 +128,10 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.IconGet()
 	case "IconUpload":
 		return optable.IconUpload()
+	case "BannerGet":
+		return optable.BannerGet()
+	case "BannerUpload":
+		return optable.BannerUpload()
 	case "AdminSettingsUpdate":
 		return optable.AdminSettingsUpdate()
 	case "AdminAccountBanCreate":

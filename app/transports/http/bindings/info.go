@@ -8,7 +8,8 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
-	"github.com/Southclaws/storyden/app/services/icon"
+	"github.com/Southclaws/storyden/app/services/branding/banner"
+	"github.com/Southclaws/storyden/app/services/branding/icon"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -16,12 +17,14 @@ import (
 type Info struct {
 	systemInfo *instance_info.Provider
 	is         icon.Service
+	os         banner.Service
 }
 
-func NewInfo(systemInfo *instance_info.Provider, is icon.Service) Info {
+func NewInfo(systemInfo *instance_info.Provider, is icon.Service, os banner.Service) Info {
 	return Info{
 		systemInfo: systemInfo,
 		is:         is,
+		os:         os,
 	}
 }
 
@@ -58,6 +61,30 @@ func (i Info) IconUpload(ctx context.Context, request openapi.IconUploadRequestO
 	}
 
 	return openapi.IconUpload200Response{}, nil
+}
+
+func (i Info) BannerGet(ctx context.Context, request openapi.BannerGetRequestObject) (openapi.BannerGetResponseObject, error) {
+	a, r, err := i.os.Get(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.BannerGet200AsteriskResponse{
+		AssetGetOKAsteriskResponse: openapi.AssetGetOKAsteriskResponse{
+			Body:          r,
+			ContentType:   a.MIME.String(),
+			ContentLength: int64(a.Size),
+		},
+	}, nil
+}
+
+func (i Info) BannerUpload(ctx context.Context, request openapi.BannerUploadRequestObject) (openapi.BannerUploadResponseObject, error) {
+	err := i.os.Upload(ctx, request.Body)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.BannerUpload200Response{}, nil
 }
 
 func serialiseInfo(info *instance_info.Info) openapi.Info {

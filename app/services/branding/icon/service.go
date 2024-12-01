@@ -17,7 +17,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/disintegration/imaging"
-	"go.uber.org/fx"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -60,10 +59,6 @@ var errBadFormat = fault.Wrap(fault.New("bad format"), ftag.With(ftag.InvalidArg
 type Service interface {
 	Upload(ctx context.Context, r io.Reader) error
 	Get(ctx context.Context, size string) (*asset.Asset, io.Reader, error)
-}
-
-func Build() fx.Option {
-	return fx.Provide(New)
 }
 
 type service struct {
