@@ -44,6 +44,10 @@ conic-gradient(
 `;
 
 const semanticTokens = defineSemanticTokens({
+  fonts: {
+    body: { value: "{fonts.inter}" },
+    heading: { value: "{fonts.interDisplay}" },
+  },
   blurs: {
     frosted: { value: "10px" },
   },
@@ -330,6 +334,11 @@ export default defineConfig({
           "2xl": { value: "1rem" },
           "3xl": { value: "1.5rem" },
           full: { value: "9999px" },
+        },
+
+        fonts: {
+          inter: { value: "var(--font-inter)" },
+          interDisplay: { value: "var(--font-inter-display)" },
         },
 
         // NOTE: Font sizes are specified in global.css in order to make use of
