@@ -26,6 +26,14 @@ func (m *Mapping) IconUpload() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageSettings
 }
 
+func (m *Mapping) BannerGet() (bool, *rbac.Permission) {
+	return false, nil // Public
+}
+
+func (m *Mapping) BannerUpload() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageSettings
+}
+
 func (m *Mapping) AdminSettingsUpdate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageSettings
 }

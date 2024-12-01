@@ -245,3 +245,90 @@ export const useIconUpload = <
     ...query,
   };
 };
+/**
+ * Get the banner image.
+ */
+export const bannerGet = () => {
+  return fetcher<AssetGetOKResponse>({ url: `/info/banner`, method: "GET" });
+};
+
+export const getBannerGetKey = () => [`/info/banner`] as const;
+
+export type BannerGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof bannerGet>>
+>;
+export type BannerGetQueryError = InternalServerErrorResponse;
+
+export const useBannerGet = <TError = InternalServerErrorResponse>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof bannerGet>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getBannerGetKey() : null));
+  const swrFn = () => bannerGet();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Upload and process the installation's banner image.
+ */
+export const bannerUpload = (assetUploadBody: AssetUploadBody) => {
+  return fetcher<void>({
+    url: `/info/banner`,
+    method: "POST",
+    headers: { "Content-Type": "application/octet-stream" },
+    data: assetUploadBody,
+  });
+};
+
+export const getBannerUploadMutationFetcher = () => {
+  return (_: Key, { arg }: { arg: AssetUploadBody }): Promise<void> => {
+    return bannerUpload(arg);
+  };
+};
+export const getBannerUploadMutationKey = () => [`/info/banner`] as const;
+
+export type BannerUploadMutationResult = NonNullable<
+  Awaited<ReturnType<typeof bannerUpload>>
+>;
+export type BannerUploadMutationError =
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useBannerUpload = <
+  TError = UnauthorisedResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof bannerUpload>>,
+    TError,
+    Key,
+    AssetUploadBody,
+    Awaited<ReturnType<typeof bannerUpload>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getBannerUploadMutationKey();
+  const swrFn = getBannerUploadMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};

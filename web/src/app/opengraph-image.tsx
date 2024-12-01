@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
 
 import { interBold, interRegular } from "@/app/fonts/og";
 import { getSettings } from "@/lib/settings/settings-server";
-import { getIconURL } from "@/utils/icon";
+import { getBannerURL, getIconURL } from "@/utils/icon";
 
 export const size = {
   width: 1200,
@@ -18,7 +18,7 @@ export const contentType = "image/png";
 export default async function Image() {
   const settings = await getSettings();
   const iconURL = getIconURL("512x512");
-  const backgroundImageURL = "https://www.storyden.org/social-1280-640.png"; // TODO: Replace with actual background image from settings
+  const backgroundImageURL = getBannerURL();
 
   const { title, description, accent_colour } = settings;
 
@@ -51,7 +51,7 @@ export default async function Image() {
         <div
           style={{
             position: "absolute",
-            bottom: 0,
+            top: 0,
             left: 0,
             display: "flex",
             flexDirection: "column",

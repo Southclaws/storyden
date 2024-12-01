@@ -1,6 +1,8 @@
 import AvatarEditor from "react-avatar-editor";
 
 import { Button } from "@/components/ui/button";
+import { MediaAddIcon } from "@/components/ui/icons/Media";
+import { SaveIcon } from "@/components/ui/icons/Save";
 import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
@@ -14,6 +16,37 @@ export function IconEditor(props: Props) {
 
   return (
     <VStack alignItems="start" w="min">
+      <>
+        <styled.input
+          id="file-input"
+          display="none"
+          width="min"
+          type="file"
+          bgColor="gray.2"
+          borderRadius="md"
+          border="none"
+          onChange={onFileChange}
+        />
+        <HStack w="full">
+          <styled.label
+            htmlFor="file-input"
+            w="full"
+            className={button({ size: "xs", variant: "outline" })}
+          >
+            <MediaAddIcon /> Upload icon
+          </styled.label>
+          <Button
+            size="xs"
+            variant="solid"
+            w="full"
+            onClick={onSave}
+            disabled={saving}
+          >
+            <SaveIcon /> Save icon
+          </Button>
+        </HStack>
+      </>
+
       <HStack>
         <Box borderRadius="lg" overflow="hidden">
           <AvatarEditor
@@ -72,30 +105,6 @@ export function IconEditor(props: Props) {
           </Box>
         </VStack>
       </HStack>
-      <>
-        <styled.input
-          id="file-input"
-          display="none"
-          width="min"
-          type="file"
-          bgColor="gray.2"
-          borderRadius="md"
-          border="none"
-          onChange={onFileChange}
-        />
-        <HStack w="full">
-          <styled.label
-            htmlFor="file-input"
-            w="full"
-            className={button({ variant: "ghost" })}
-          >
-            Edit icon
-          </styled.label>
-          <Button variant="subtle" w="full" onClick={onSave} disabled={saving}>
-            Save icon
-          </Button>
-        </HStack>
-      </>
     </VStack>
   );
 }
