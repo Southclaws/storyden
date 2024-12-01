@@ -18,6 +18,7 @@ import {
 } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
+import { BannerEditor } from "./BannerEditor/BannerEditor";
 import { IconEditor } from "./IconEditor/IconEditor";
 import { Props, useBrandSettings } from "./useBrandSettings";
 
@@ -54,27 +55,36 @@ export function BrandSettingsForm(props: Props) {
             lg: "row",
           }}
         >
-          <FormControl display="flex" flexDirection="column">
+          <FormControl>
             <FormLabel>Community name</FormLabel>
             <Input {...register("title")} />
             <FormHelperText>
               The name of your community. This appears in the sidebar, Google
               indexing and tab titles.
             </FormHelperText>
-
-            <FormHelperText>
-              Your icon will be automatically resized and optimised for various
-              devices. It is used for the website favicon and a PWA app icon for
-              iOS and Android devices.
-            </FormHelperText>
-          </FormControl>
-
-          <FormControl display="flex" flexDirection="column">
-            <FormLabel>Icon</FormLabel>
-
-            <IconEditor initialValue={currentIcon} onSave={onSaveIcon} />
           </FormControl>
         </Stack>
+
+        <FormControl display="flex" flexDirection="column">
+          <FormLabel>Icon</FormLabel>
+
+          <IconEditor initialValue={currentIcon} onSave={onSaveIcon} />
+
+          <FormHelperText>
+            Your icon will be automatically resized and optimised for various
+            devices. It is used for the website favicon and a PWA app icon for
+            iOS and Android devices.
+          </FormHelperText>
+        </FormControl>
+
+        <FormControl display="flex" flexDirection="column">
+          <FormLabel>Banner</FormLabel>
+
+          <BannerEditor />
+          <FormHelperText>
+            Your banner will be used for link previews on other platforms.
+          </FormHelperText>
+        </FormControl>
 
         <FormControl>
           <FormLabel>Description</FormLabel>

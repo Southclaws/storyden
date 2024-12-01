@@ -134,3 +134,51 @@ export const iconUpload = async (
     body: JSON.stringify(assetUploadBody),
   });
 };
+
+/**
+ * Get the banner image.
+ */
+export type bannerGetResponse = {
+  data: AssetGetOKResponse;
+  status: number;
+};
+
+export const getBannerGetUrl = () => {
+  return `/info/banner`;
+};
+
+export const bannerGet = async (
+  options?: RequestInit,
+): Promise<bannerGetResponse> => {
+  return fetcher<Promise<bannerGetResponse>>(getBannerGetUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+/**
+ * Upload and process the installation's banner image.
+ */
+export type bannerUploadResponse = {
+  data: void;
+  status: number;
+};
+
+export const getBannerUploadUrl = () => {
+  return `/info/banner`;
+};
+
+export const bannerUpload = async (
+  assetUploadBody: AssetUploadBody,
+  options?: RequestInit,
+): Promise<bannerUploadResponse> => {
+  return fetcher<Promise<bannerUploadResponse>>(getBannerUploadUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/octet-stream",
+      ...options?.headers,
+    },
+    body: JSON.stringify(assetUploadBody),
+  });
+};
