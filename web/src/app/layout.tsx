@@ -3,6 +3,7 @@ import { PropsWithChildren } from "react";
 
 import { getColourAsHex } from "src/utils/colour";
 
+import { inter, interDisplay } from "@/app/fonts";
 import { WEB_ADDRESS } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";
 import { getIconURL } from "@/utils/icon";
@@ -15,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${interDisplay.variable}`}>
       <head>
         {/*
             NOTE: This stylesheet is fully server-side rendered but it's not

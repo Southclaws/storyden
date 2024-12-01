@@ -15,7 +15,7 @@ export type Props = BadgeProps & {
 
 // tags are always lowercase, which means most ascenders and descenders are
 // slightly mis-aligned to the optical center of the badge.
-const OPTICAL_ALIGNMENT_ADJUSTMENT = 1.5;
+const OPTICAL_ALIGNMENT_ADJUSTMENT = 0.5;
 
 const badgeStyles = css({
   bgColor: "colorPalette",
