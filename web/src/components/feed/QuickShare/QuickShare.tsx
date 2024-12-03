@@ -6,6 +6,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/button";
 import { ComposeField } from "@/components/ui/form/ComposeField";
 import { FormErrorText } from "@/components/ui/form/FormErrorText";
+import { CreateIcon } from "@/components/ui/icons/Create";
 import { Card } from "@/components/ui/rich-card";
 import { CardBox, Flex, HStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
@@ -61,10 +62,12 @@ export function QuickShare(props: Props) {
 
           <Button
             type="submit"
-            variant="outline"
+            size="sm"
+            variant="subtle"
             loading={form.formState.isSubmitting}
           >
-            Post
+            <CreateIcon />
+            Share
           </Button>
         </Flex>
 
