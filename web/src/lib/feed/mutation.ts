@@ -1,11 +1,24 @@
+import { uniqueId } from "lodash/fp";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
-import { SWRInfiniteKeyLoader } from "swr/infinite";
+import { SWRInfiniteKeyLoader, unstable_serialize } from "swr/infinite";
 
 import { cleanQuery } from "@/api/common";
-import { getThreadListKey, threadDelete } from "@/api/openapi-client/threads";
-import { Identifier, ThreadListOKResponse } from "@/api/openapi-schema";
+import {
+  getThreadListKey,
+  threadCreate,
+  threadDelete,
+} from "@/api/openapi-client/threads";
+import {
+  Account,
+  Identifier,
+  LinkReference,
+  ThreadInitialProps,
+  ThreadListOKResponse,
+  ThreadListParams,
+  ThreadReference,
+} from "@/api/openapi-schema";
 
-type QueryParams = Record<string, string | undefined>;
+type QueryParams = Record<string, string | string[] | undefined>;
 
 export const getThreadListPageKey =
   (parameters?: QueryParams): SWRInfiniteKeyLoader<ThreadListOKResponse> =>
@@ -26,32 +39,112 @@ export const getThreadListPageKey =
     return key;
   };
 
-export function useFeedMutations() {
+export function useFeedMutations(session?: Account, params?: ThreadListParams) {
   const { mutate } = useSWRConfig();
 
-  const threadQueryMutationKey = getThreadListKey()[0];
+  const pageKeyParams = {
+    ...(params ? { categories: params.categories } : {}),
+    ...(params?.page ? { page: params.page } : {}),
+  } as ThreadListParams;
 
-  function keyFilterFn(key: Arguments) {
-    return Array.isArray(key) && key[0].startsWith(threadQueryMutationKey);
-  }
+  const threadQueryMutationKey = unstable_serialize(
+    getThreadListPageKey(pageKeyParams),
+  );
 
   async function revalidate() {
-    await mutate(keyFilterFn);
+    await mutate(threadQueryMutationKey);
   }
 
-  async function deleteThread(id: Identifier) {
-    const mutator: MutatorCallback<ThreadListOKResponse> = (data) => {
-      if (!data || !data.threads) return;
+  async function createThread(
+    initial: ThreadInitialProps,
+    preHydratedLink?: LinkReference,
+  ) {
+    const mutator: MutatorCallback<ThreadListOKResponse[]> = (data) => {
+      if (!data) return;
+      if (!session) return;
 
-      const newData = {
-        ...data,
-        threads: data.threads.filter((t) => t.id !== id),
-      };
+      const description =
+        new DOMParser()
+          .parseFromString(initial.body, "text/html")
+          .querySelector("body")?.textContent ?? "";
+
+      const newThread = {
+        ...initial,
+        category: {
+          id: initial.category,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          slug: "",
+          admin: false,
+          colour: "colour",
+          description: "",
+          name: "name",
+          sort: 0,
+        },
+        id: uniqueId("optimistic_thread_id_"),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        slug: uniqueId("optimistic_thread_slug_"),
+        author: session,
+        description,
+        body: initial.body,
+        body_links: [],
+        assets: [],
+        collections: {
+          has_collected: false,
+          in_collections: 0,
+        },
+        likes: { likes: 0, liked: false },
+        reacts: [],
+        pinned: false,
+        reply_status: { replies: 0, replied: 0 },
+        tags: [],
+        link: preHydratedLink,
+      } satisfies ThreadReference;
+
+      const newData = data.reduce((acc, page) => {
+        // Append the new thread to the first page
+        // NOTE: This assumes ordering is most recent first.
+        if (page.current_page === 1) {
+          acc.push({
+            ...page,
+            threads: [newThread, ...page.threads],
+          });
+        } else {
+          acc.push(page);
+        }
+
+        return acc;
+      }, [] as ThreadListOKResponse[]);
 
       return newData;
     };
 
-    await mutate(keyFilterFn, mutator, {
+    await mutate(threadQueryMutationKey, mutator, {
+      revalidate: false,
+    });
+
+    return await threadCreate(initial);
+  }
+
+  async function deleteThread(id: Identifier) {
+    const mutator: MutatorCallback<ThreadListOKResponse[]> = (data) => {
+      if (!data) return;
+
+      const newData = data.reduce((acc, page) => {
+        // Scan every page, remove the deleted post.
+        acc.push({
+          ...page,
+          threads: page.threads.filter((t) => t.id !== id),
+        });
+
+        return acc;
+      }, [] as ThreadListOKResponse[]);
+
+      return newData;
+    };
+
+    await mutate(threadQueryMutationKey, mutator, {
       revalidate: false,
     });
 
@@ -59,6 +152,7 @@ export function useFeedMutations() {
   }
 
   return {
+    createThread,
     deleteThread,
     revalidate,
   };
