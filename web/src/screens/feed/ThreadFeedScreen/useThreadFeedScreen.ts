@@ -7,6 +7,7 @@ import useSWRInfinite from "swr/infinite";
 import { fetcher } from "@/api/client";
 import {
   APIError,
+  Account,
   Category,
   ThreadListOKResponse,
   ThreadListResult,
@@ -14,6 +15,7 @@ import {
 import { getThreadListPageKey } from "@/lib/feed/mutation";
 
 export type Props = {
+  initialSession?: Account;
   initialPage: number;
   initialPageData?: ThreadListResult[];
   category?: Category;
@@ -123,13 +125,6 @@ export function useThreadFeedScreen(props: Props) {
       window.innerHeight + document.documentElement.scrollTop;
     const endPosition = document.documentElement.offsetHeight;
     const scrolledToEnd = scrollPosition >= endPosition - threshold;
-
-    console.log("scrollPosition", {
-      scrollPosition,
-      endPosition,
-      threshold,
-      scrolledToEnd,
-    });
 
     if (!scrolledToEnd) {
       return;
