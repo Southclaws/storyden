@@ -124,7 +124,7 @@ export const button = defineRecipe({
       subtle: {
         colorPalette: "gray",
         background: "colorPalette.4/80",
-        color: "fg.muted",
+        color: "fg.default",
         backdropBlur: "sm",
         backdropFilter: "auto",
         _hover: {

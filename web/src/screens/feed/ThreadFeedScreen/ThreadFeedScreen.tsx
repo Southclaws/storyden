@@ -6,12 +6,14 @@ import { PropsWithChildren, useEffect } from "react";
 
 import { Unready } from "src/components/site/Unready";
 
+import { useSession } from "@/auth";
 import { FeedEmptyState } from "@/components/feed/FeedEmptyState";
+import { QuickShare } from "@/components/feed/QuickShare/QuickShare";
 import { ThreadReferenceCard } from "@/components/post/ThreadCard";
 import { PaginationBubble } from "@/components/site/PaginationBubble/PaginationBubble";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
-import { VStack } from "@/styled-system/jsx";
+import { LStack, VStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import {
@@ -20,7 +22,26 @@ import {
   useThreadFeedScreen,
 } from "./useThreadFeedScreen";
 
-export function ThreadFeedScreen(props: Props) {
+export function ThreadFeedScreen({
+  initialSession,
+  initialPage,
+  initialPageData,
+  category,
+}: Props) {
+  const session = useSession(initialSession);
+  return (
+    <LStack>
+      <QuickShare initialSession={session} initialCategory={category} />
+      <ThreadFeed
+        initialPage={initialPage}
+        initialPageData={initialPageData}
+        category={category}
+      />
+    </LStack>
+  );
+}
+
+export function ThreadFeed(props: Props) {
   const { ready, error, isValidating, morePagesAvailable, data, handlers } =
     useThreadFeedScreen(props);
   if (!ready) {

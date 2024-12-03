@@ -13,11 +13,11 @@ import { LibraryFeedScreen } from "./LibraryFeedScreen";
 import { ThreadFeedScreen } from "./ThreadFeedScreen/ThreadFeedScreen";
 
 export type PageProps = {
+  initialSession?: Account;
   page: number;
 };
 
 export type Props = PageProps & {
-  initialSession?: Account;
   initialSettings: Settings;
 };
 
@@ -28,17 +28,27 @@ export function FeedScreen({ page, initialSession, initialSettings }: Props) {
         initialSession={initialSession}
         initialSettings={initialSettings}
       />
-      <FeedScreenContent page={page} initialSettings={initialSettings} />
+      <FeedScreenContent
+        initialSession={initialSession}
+        initialSettings={initialSettings}
+        page={page}
+      />
     </VStack>
   );
 }
 
-async function FeedScreenContent({ page, initialSettings }: Props) {
+async function FeedScreenContent({
+  initialSession,
+  page,
+  initialSettings,
+}: Props) {
   const feedConfig = initialSettings.metadata.feed;
 
   switch (feedConfig.source.type) {
     case "threads":
-      return <ThreadFeedScreenContent page={page} />;
+      return (
+        <ThreadFeedScreenContent initialSession={initialSession} page={page} />
+      );
 
     case "library":
       return <LibraryFeedScreenContent />;
@@ -48,14 +58,18 @@ async function FeedScreenContent({ page, initialSettings }: Props) {
   }
 }
 
-async function ThreadFeedScreenContent({ page }: PageProps) {
+async function ThreadFeedScreenContent({ initialSession, page }: PageProps) {
   try {
     const threads = await threadList({
       page: page.toString(),
     });
 
     return (
-      <ThreadFeedScreen initialPage={page} initialPageData={[threads.data]} />
+      <ThreadFeedScreen
+        initialSession={initialSession}
+        initialPage={page}
+        initialPageData={[threads.data]}
+      />
     );
   } catch (e) {
     return <UnreadyBanner error={e} />;
