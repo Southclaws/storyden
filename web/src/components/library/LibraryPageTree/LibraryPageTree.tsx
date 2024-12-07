@@ -5,7 +5,7 @@ import {
 } from "@ark-ui/react/tree-view";
 import { keyBy } from "lodash";
 import Link from "next/link";
-import { JSX, forwardRef, useState } from "react";
+import { JSX, forwardRef } from "react";
 
 import { NodeWithChildren, Visibility } from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
@@ -179,14 +179,7 @@ type BranchProps = {
 };
 
 function TreeBranch({ styles, child, isHighlighted, isRoot }: BranchProps) {
-  // NOTE: We need some state here to track open/close of the menu because CSS
-  // isn't quite enough to track this nicely. The reason for this is that when
-  // the mouse moves away from the branch control, the container that holds the
-  // menu trigger moves to display: none; and the menu closes unexpectedly.
-  const [menuOpen, setOpen] = useState(false);
-
   const isPublished = child.visibility === Visibility.published;
-  const visibilityLabel = child.visibility;
 
   const label = isPublished ? child.name : `${child.name}`;
 
@@ -224,22 +217,17 @@ function TreeBranch({ styles, child, isHighlighted, isRoot }: BranchProps) {
       </ArkTreeView.BranchText>
 
       <HStack
-        display={{
-          base: menuOpen ? "flex" : "none",
-          _groupHover: "flex",
-          _active: "flex",
+        className="library-page-tree__menu"
+        opacity={{
+          base: "0",
+          _groupHover: "full",
         }}
         gap="1"
         minW="min"
         flexShrink="0"
-        onClick={() => setOpen(true)}
       >
         <CreatePageAction variant="ghost" hideLabel parentSlug={child.slug} />
-        <LibraryPageMenu
-          variant="ghost"
-          onClose={() => setOpen(false)}
-          node={child}
-        />
+        <LibraryPageMenu variant="ghost" node={child} />
       </HStack>
     </ArkTreeView.BranchControl>
   );
