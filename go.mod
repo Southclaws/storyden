@@ -70,7 +70,7 @@ require (
 	github.com/twilio/twilio-go v1.23.6
 	github.com/weaviate/weaviate v1.27.6
 	github.com/weaviate/weaviate-go-client/v4 v4.16.1
-	golang.org/x/sync v0.9.0
+	golang.org/x/sync v0.10.0
 	google.golang.org/api v0.209.0
 )
 
@@ -208,11 +208,11 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zclconf/go-cty v1.15.0 // indirect
 	go.uber.org/multierr v1.11.0
-	golang.org/x/crypto v0.29.0
+	golang.org/x/crypto v0.31.0
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.31.0
-	golang.org/x/sys v0.27.0 // indirect
-	golang.org/x/text v0.20.0
+	golang.org/x/sys v0.28.0 // indirect
+	golang.org/x/text v0.21.0
 	golang.org/x/time v0.8.0 // indirect
 	google.golang.org/protobuf v1.35.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
