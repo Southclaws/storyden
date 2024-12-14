@@ -12,7 +12,7 @@ import (
 )
 
 var SummarisePrompt = template.Must(template.New("").Parse(`
-Write a short few paragraphs that are somewhat engaging but remaining relatively neutral in tone in the style of a wikipedia introduction about "{{ .Name }}". Focus on providing unique insights and interesting details while keeping the tone conversational and approachable. Imagine this will be read by someone browsing a directory or knowledgebase.
+Write a short few paragraphs that are somewhat engaging but remaining relatively neutral in tone in the style of a wikipedia introduction based on the specified content. Focus on providing unique insights and interesting details while keeping the tone conversational and approachable. Imagine this will be read by someone browsing a directory or knowledgebase.
 
 Be aware that the input to this may include broken HTML and other artifacts from the web and due to the nature of web scraping, there may be parts that do not make sense.
 
@@ -29,11 +29,10 @@ Content:
 {{ .Content }}
 `))
 
-func (g *generator) Summarise(ctx context.Context, object datagraph.Item) (string, error) {
+func (g *generator) Summarise(ctx context.Context, content datagraph.Content) (string, error) {
 	template := strings.Builder{}
 	err := SummarisePrompt.Execute(&template, map[string]any{
-		"Name":    object.GetName(),
-		"Content": object.GetContent().Plaintext(),
+		"Content": content.Plaintext(),
 	})
 	if err != nil {
 		return "", fault.Wrap(err, fctx.With(ctx))
