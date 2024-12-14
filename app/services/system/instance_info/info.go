@@ -60,7 +60,7 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 
 	caps := Capabilities{}
 
-	if p.config.SemdexEnabled {
+	if p.config.SemdexProvider != "" {
 		caps = append(caps, CapabilitySemdex)
 	}
 

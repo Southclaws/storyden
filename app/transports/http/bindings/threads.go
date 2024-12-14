@@ -81,9 +81,10 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		status,
 		meta,
 		thread_service.Partial{
-			Content: opt.New(richContent),
-			URL:     url,
-			Tags:    tags,
+			Content:    opt.New(richContent),
+			URL:        url,
+			Tags:       tags,
+			Visibility: opt.New(status),
 		},
 	)
 	if err != nil {

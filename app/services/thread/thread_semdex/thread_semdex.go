@@ -62,7 +62,7 @@ func newSemdexer(
 	deleter semdex.Deleter,
 	retriever semdex.Retriever,
 ) {
-	if !cfg.SemdexEnabled {
+	if cfg.SemdexProvider == "" {
 		return
 	}
 
@@ -77,17 +77,6 @@ func newSemdexer(
 		deleter:       deleter,
 		retriever:     retriever,
 	}
-
-	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		err := re.reindex(hctx, DefaultReindexThreshold, DefaultReindexChunk)
-		if err != nil {
-			return err
-		}
-
-		go re.schedule(ctx, DefaultReindexSchedule, DefaultReindexThreshold, DefaultReindexChunk)
-
-		return nil
-	}))
 
 	lc.Append(fx.StartHook(func(_ context.Context) error {
 		sub, err := indexQueue.Subscribe(ctx)
@@ -123,6 +112,17 @@ func newSemdexer(
 				msg.Ack()
 			}
 		}()
+
+		return nil
+	}))
+
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		err := re.reindex(hctx, DefaultReindexThreshold, DefaultReindexChunk)
+		if err != nil {
+			return err
+		}
+
+		go re.schedule(ctx, DefaultReindexSchedule, DefaultReindexThreshold, DefaultReindexChunk)
 
 		return nil
 	}))

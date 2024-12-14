@@ -35,7 +35,7 @@ type ModuleConfig struct {
 type ModuleConfigMap map[string]ModuleConfig
 
 func newWeaviateClient(lc fx.Lifecycle, cfg config.Config) (*weaviate.Client, WeaviateClassName, error) {
-	if !cfg.SemdexEnabled {
+	if cfg.SemdexProvider != "weaviate" {
 		return nil, "", nil
 	}
 

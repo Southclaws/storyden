@@ -14,11 +14,13 @@ func New(
 	simpleSearcher *simplesearch.ParallelSearcher,
 	semdexSearcher semdex.Searcher,
 ) searcher.Searcher {
-	if cfg.SemdexEnabled {
+	switch cfg.SemdexProvider {
+	case "chromem", "weaviate":
 		return semdexSearcher
-	}
 
-	return simpleSearcher
+	default:
+		return simpleSearcher
+	}
 }
 
 func Build() fx.Option {
