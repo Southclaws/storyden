@@ -4,6 +4,7 @@ package infrastructure
 import (
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/internal/infrastructure/ai"
 	"github.com/Southclaws/storyden/internal/infrastructure/cache"
 	"github.com/Southclaws/storyden/internal/infrastructure/db"
 	"github.com/Southclaws/storyden/internal/infrastructure/endec/jwt"
@@ -33,6 +34,7 @@ func Build() fx.Option {
 		object.Build(),
 		frontend.Build(),
 		weaviate.Build(),
+		fx.Provide(ai.New),
 		jwt.Build(),
 		queue.Build(),
 		fx.Provide(pdf.New),

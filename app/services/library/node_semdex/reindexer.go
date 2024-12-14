@@ -53,7 +53,7 @@ func (r *semdexer) reindex(ctx context.Context, reindexThreshold time.Duration, 
 	keepIDs := dt.Map(keep, func(p *ent.Node) xid.ID { return p.ID })
 	discardIDs := dt.Map(discard, func(p *ent.Node) xid.ID { return p.ID })
 
-	indexed, err := r.retriever.GetMany(ctx, uint(reindexChunk), keepIDs...)
+	indexed, err := r.semdexQuerier.GetMany(ctx, uint(reindexChunk), keepIDs...)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

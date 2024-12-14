@@ -60,6 +60,10 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 
 	caps := Capabilities{}
 
+	if p.config.LanguageModelProvider != "" {
+		caps = append(caps, CapabilityGenAI)
+	}
+
 	if p.config.SemdexProvider != "" {
 		caps = append(caps, CapabilitySemdex)
 	}

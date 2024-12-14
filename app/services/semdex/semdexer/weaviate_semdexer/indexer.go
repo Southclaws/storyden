@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
-func (s *weaviateRefIndex) Index(ctx context.Context, object datagraph.Item) error {
+func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Item) error {
 	rich := object.GetContent()
 	sid := object.GetID()
 
