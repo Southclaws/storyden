@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
-func (o *weaviateRefIndex) GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error) {
+func (o *weaviateSemdexer) GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error) {
 	stringIDs := dt.Map(ids, func(x xid.ID) string { return x.String() })
 
 	objects, err := o.wc.

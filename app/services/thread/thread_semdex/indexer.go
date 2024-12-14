@@ -17,7 +17,7 @@ func (i *semdexer) indexThread(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = i.indexer.Index(ctx, p)
+	err = i.semdexMutator.Index(ctx, p)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -31,7 +31,7 @@ func (i *semdexer) indexThread(ctx context.Context, id post.ID) error {
 }
 
 func (i *semdexer) deindexThread(ctx context.Context, id post.ID) error {
-	err := i.deleter.Delete(ctx, xid.ID(id))
+	err := i.semdexMutator.Delete(ctx, xid.ID(id))
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

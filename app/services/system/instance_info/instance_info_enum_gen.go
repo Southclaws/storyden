@@ -12,6 +12,7 @@ type Capability struct {
 }
 
 var (
+	CapabilityGenAI       = Capability{capabilityGenAI}
 	CapabilitySemdex      = Capability{capabilitySemdex}
 	CapabilityEmailClient = Capability{capabilityEmailClient}
 	CapabilitySMSClient   = Capability{capabilitySMSClient}
@@ -54,6 +55,8 @@ func (r *Capability) Scan(__iNpUt__ any) error {
 }
 func NewCapability(__iNpUt__ string) (Capability, error) {
 	switch __iNpUt__ {
+	case string(capabilityGenAI):
+		return CapabilityGenAI, nil
 	case string(capabilitySemdex):
 		return CapabilitySemdex, nil
 	case string(capabilityEmailClient):

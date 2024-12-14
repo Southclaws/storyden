@@ -31,8 +31,7 @@ type indexerConsumer struct {
 	qthread pubsub.Topic[mq.IndexThread]
 	qreply  pubsub.Topic[mq.IndexReply]
 
-	indexer   semdex.Indexer
-	retriever semdex.Retriever
+	indexer semdex.Mutator
 }
 
 func newIndexConsumer(
@@ -48,8 +47,7 @@ func newIndexConsumer(
 	qreply pubsub.Topic[mq.IndexReply],
 	qprofile pubsub.Topic[mq.IndexProfile],
 
-	indexer semdex.Indexer,
-	retriever semdex.Retriever,
+	indexer semdex.Mutator,
 ) *indexerConsumer {
 	return &indexerConsumer{
 		l:            l,
@@ -59,10 +57,9 @@ func newIndexConsumer(
 		accountQuery: accountQuery,
 		qnode:        qnode,
 
-		qthread:   qthread,
-		qreply:    qreply,
-		indexer:   indexer,
-		retriever: retriever,
+		qthread: qthread,
+		qreply:  qreply,
+		indexer: indexer,
 	}
 }
 

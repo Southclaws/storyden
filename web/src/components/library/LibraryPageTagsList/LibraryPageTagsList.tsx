@@ -17,7 +17,7 @@ export type Props = {
 };
 
 export function LibraryPageTagsList(props: Props) {
-  const isSuggestEnabled = useCapability(InstanceCapability.semdex);
+  const isSuggestEnabled = useCapability(InstanceCapability.gen_ai);
 
   const { updateNode, suggestTags, revalidate } = useLibraryMutation(
     props.node,

@@ -3077,6 +3077,7 @@ components:
     InstanceCapability:
       type: string
       enum:
+        - gen_ai
         - semdex
         - email_client
         - sms_client

@@ -20,6 +20,7 @@ import (
 	collection_items "github.com/Southclaws/storyden/app/resources/collection/collection_item"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_writer"
+	"github.com/Southclaws/storyden/app/resources/datagraph/hydrate"
 	"github.com/Southclaws/storyden/app/resources/event/event_querier"
 	"github.com/Southclaws/storyden/app/resources/event/event_writer"
 	"github.com/Southclaws/storyden/app/resources/event/participation/participant_querier"
@@ -92,6 +93,7 @@ func Build() fx.Option {
 			event_writer.New,
 			participant_querier.New,
 			participant_writer.New,
+			hydrate.New,
 		),
 	)
 }

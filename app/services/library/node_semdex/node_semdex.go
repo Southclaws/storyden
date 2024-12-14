@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
+	"github.com/Southclaws/storyden/app/services/generative"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 	"github.com/Southclaws/storyden/internal/config"
@@ -39,18 +40,17 @@ var (
 )
 
 type semdexer struct {
-	logger      *zap.Logger
-	db          *ent.Client
-	nodeQuerier *node_querier.Querier
-	nodeWriter  *node_writer.Writer
-	indexQueue  pubsub.Topic[mq.IndexNode]
-	deleteQueue pubsub.Topic[mq.DeleteNode]
-	indexer     semdex.Indexer
-	deleter     semdex.Deleter
-	retriever   semdex.Retriever
-	summariser  semdex.Summariser
-	tagger      *autotagger.Tagger
-	tagWriter   *tag_writer.Writer
+	logger        *zap.Logger
+	db            *ent.Client
+	nodeQuerier   *node_querier.Querier
+	nodeWriter    *node_writer.Writer
+	indexQueue    pubsub.Topic[mq.IndexNode]
+	deleteQueue   pubsub.Topic[mq.DeleteNode]
+	semdexMutator semdex.Mutator
+	semdexQuerier semdex.Querier
+	summariser    generative.Summariser
+	tagger        *autotagger.Tagger
+	tagWriter     *tag_writer.Writer
 }
 
 func newSemdexer(
@@ -64,10 +64,9 @@ func newSemdexer(
 	nodeWriter *node_writer.Writer,
 	indexQueue pubsub.Topic[mq.IndexNode],
 	deleteQueue pubsub.Topic[mq.DeleteNode],
-	indexer semdex.Indexer,
-	deleter semdex.Deleter,
-	retriever semdex.Retriever,
-	summariser semdex.Summariser,
+	semdexMutator semdex.Mutator,
+	semdexQuerier semdex.Querier,
+	summariser generative.Summariser,
 	tagger *autotagger.Tagger,
 	tagWriter *tag_writer.Writer,
 ) {
@@ -76,18 +75,17 @@ func newSemdexer(
 	}
 
 	re := semdexer{
-		logger:      l,
-		db:          db,
-		nodeQuerier: nodeQuerier,
-		nodeWriter:  nodeWriter,
-		indexQueue:  indexQueue,
-		deleteQueue: deleteQueue,
-		indexer:     indexer,
-		deleter:     deleter,
-		retriever:   retriever,
-		summariser:  summariser,
-		tagger:      tagger,
-		tagWriter:   tagWriter,
+		logger:        l,
+		db:            db,
+		nodeQuerier:   nodeQuerier,
+		nodeWriter:    nodeWriter,
+		indexQueue:    indexQueue,
+		deleteQueue:   deleteQueue,
+		semdexMutator: semdexMutator,
+		semdexQuerier: semdexQuerier,
+		summariser:    summariser,
+		tagger:        tagger,
+		tagWriter:     tagWriter,
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
