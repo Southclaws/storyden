@@ -47,11 +47,13 @@ type Config struct {
 	QueueType string `envconfig:"QUEUE_TYPE" default:"internal"`
 	AmqpURL   string `envconfig:"AMQP_URL"   default:"amqp://guest:guest@localhost:5672/"`
 
+	LanguageModelProvider string `envconfig:"LANGUAGE_MODEL_PROVIDER"`
+	OpenAIKey             string `envconfig:"OPENAI_API_KEY"`
+
 	SemdexProvider    string `envconfig:"SEMDEX_PROVIDER" default:""`
 	WeaviateURL       string `envconfig:"WEAVIATE_URL"`
 	WeaviateToken     string `envconfig:"WEAVIATE_API_TOKEN"`
 	WeaviateClassName string `envconfig:"WEAVIATE_CLASS_NAME"`
-	OpenAIKey         string `envconfig:"OPENAI_API_KEY"`
 
 	SemdexLocalPath string `envconfig:"SEMDEX_LOCAL_PATH" default:"data/semdex"`
 }

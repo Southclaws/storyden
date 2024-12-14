@@ -14,7 +14,21 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
-func (w *weaviateRefIndex) Recommend(ctx context.Context, object datagraph.Item) (datagraph.RefList, error) {
+func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Item) (datagraph.ItemList, error) {
+	refs, err := w.RecommendRefs(ctx, object)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	items, err := w.hydrator.Hydrate(ctx, refs...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return items, nil
+}
+
+func (w *weaviateSemdexer) RecommendRefs(ctx context.Context, object datagraph.Item) (datagraph.RefList, error) {
 	wid := GetWeaviateID(object.GetID())
 
 	result, err := w.wc.Data().ObjectsGetter().

@@ -84,7 +84,7 @@ func mapResponseObjects(raw map[string]models.JSONObject) (*WeaviateResponse, er
 	return &parsed, nil
 }
 
-func (s *weaviateRefIndex) getFirstResult(wr *WeaviateResponse) (*WeaviateObject, error) {
+func (s *weaviateSemdexer) getFirstResult(wr *WeaviateResponse) (*WeaviateObject, error) {
 	objects := wr.Get[s.cn.String()]
 	if len(objects) != 1 {
 		return nil, fault.Newf("expected exactly one result, got %d", len(objects))

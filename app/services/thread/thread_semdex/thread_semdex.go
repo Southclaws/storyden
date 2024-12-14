@@ -42,9 +42,8 @@ type semdexer struct {
 	threadWriter  thread.Repository
 	indexQueue    pubsub.Topic[mq.IndexThread]
 	deleteQueue   pubsub.Topic[mq.DeleteThread]
-	indexer       semdex.Indexer
-	deleter       semdex.Deleter
-	retriever     semdex.Retriever
+	semdexMutator semdex.Mutator
+	semdexQuerier semdex.Querier
 }
 
 func newSemdexer(
@@ -58,9 +57,8 @@ func newSemdexer(
 	threadWriter thread.Repository,
 	indexQueue pubsub.Topic[mq.IndexThread],
 	deleteQueue pubsub.Topic[mq.DeleteThread],
-	indexer semdex.Indexer,
-	deleter semdex.Deleter,
-	retriever semdex.Retriever,
+	semdexMutator semdex.Mutator,
+	semdexQuerier semdex.Querier,
 ) {
 	if cfg.SemdexProvider == "" {
 		return
@@ -73,9 +71,8 @@ func newSemdexer(
 		threadWriter:  threadQuerier,
 		indexQueue:    indexQueue,
 		deleteQueue:   deleteQueue,
-		indexer:       indexer,
-		deleter:       deleter,
-		retriever:     retriever,
+		semdexMutator: semdexMutator,
+		semdexQuerier: semdexQuerier,
 	}
 
 	lc.Append(fx.StartHook(func(_ context.Context) error {

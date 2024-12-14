@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
-func (w *weaviateRefIndex) ScoreRelevance(ctx context.Context, object datagraph.Item, ids ...xid.ID) (map[xid.ID]float64, error) {
+func (w *weaviateSemdexer) ScoreRelevance(ctx context.Context, object datagraph.Item, ids ...xid.ID) (map[xid.ID]float64, error) {
 	if len(ids) == 0 {
 		return map[xid.ID]float64{}, nil
 	}

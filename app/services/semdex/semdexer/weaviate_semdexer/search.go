@@ -15,7 +15,22 @@ import (
 	"github.com/Southclaws/storyden/app/services/search/searcher"
 )
 
-func (s *weaviateRefIndex) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[*datagraph.Ref], error) {
+func (s *weaviateSemdexer) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
+	refs, err := s.SearchRefs(ctx, q, p, opts)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	items, err := s.hydrator.Hydrate(ctx, refs.Items...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	result := pagination.NewPageResult(p, refs.Results, items)
+	return &result, nil
+}
+
+func (s *weaviateSemdexer) SearchRefs(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[*datagraph.Ref], error) {
 	fields := []graphql.Field{
 		{Name: "datagraph_id"},
 		{Name: "datagraph_type"},
@@ -95,7 +110,7 @@ func (s *weaviateRefIndex) Search(ctx context.Context, q string, p pagination.Pa
 	return &pagedResult, nil
 }
 
-func (s *weaviateRefIndex) countObjects(ctx context.Context, countQuery graphql.AggregateBuilder) (int, error) {
+func (s *weaviateSemdexer) countObjects(ctx context.Context, countQuery graphql.AggregateBuilder) (int, error) {
 	r, err := mergeErrors(countQuery.Do(ctx))
 	if err != nil {
 		return 0, fault.Wrap(err, fctx.With(ctx))

@@ -13,6 +13,7 @@ export type InstanceCapability =
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const InstanceCapability = {
+  gen_ai: "gen_ai",
   semdex: "semdex",
   email_client: "email_client",
   sms_client: "sms_client",
