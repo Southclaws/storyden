@@ -5,6 +5,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/services/semdex"
+	"github.com/Southclaws/storyden/app/services/semdex/semdexer/chromem_semdexer"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/refhydrate"
 
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/weaviate_semdexer"
@@ -18,12 +19,17 @@ func newSemdexer(
 
 	weaviateClassName weaviate_infra.WeaviateClassName,
 	hydrator *refhydrate.Hydrator,
-) semdex.Semdexer {
-	if !cfg.SemdexEnabled {
-		return &semdex.Disabled{}
-	}
+) (semdex.Semdexer, error) {
+	switch cfg.SemdexProvider {
+	case "chromem":
+		return chromem_semdexer.New(cfg, hydrator)
 
-	return weaviate_semdexer.New(wc, weaviateClassName, hydrator)
+	case "weaviate":
+		return weaviate_semdexer.New(wc, weaviateClassName, hydrator), nil
+
+	default:
+		return &semdex.Disabled{}, nil
+	}
 }
 
 func Build() fx.Option {

@@ -41,7 +41,7 @@ func TestSemdexWeaviate(t *testing.T) {
 		cj *session_cookie.Jar,
 		aw *account_writer.Writer,
 	) {
-		if !cfg.SemdexEnabled {
+		if cfg.SemdexProvider == "" {
 			return
 		}
 

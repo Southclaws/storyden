@@ -71,7 +71,7 @@ func newSemdexer(
 	tagger *autotagger.Tagger,
 	tagWriter *tag_writer.Writer,
 ) {
-	if !cfg.SemdexEnabled {
+	if cfg.SemdexProvider == "" {
 		return
 	}
 
