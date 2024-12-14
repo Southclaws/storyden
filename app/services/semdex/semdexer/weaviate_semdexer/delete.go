@@ -8,7 +8,7 @@ import (
 	"github.com/rs/xid"
 )
 
-func (w *weaviateRefIndex) Delete(ctx context.Context, id xid.ID) error {
+func (w *weaviateSemdexer) Delete(ctx context.Context, id xid.ID) error {
 	wid := GetWeaviateID(id)
 
 	err := w.wc.Data().Deleter().

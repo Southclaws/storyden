@@ -1,9 +1,9 @@
-package weaviate_semdexer
+package generative
 
 import (
 	"context"
+	"html/template"
 	"strings"
-	"text/template"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -11,10 +11,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/samber/lo"
-	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
 )
 
-var SuggestTagsPrompt = template.Must(template.New("").Parse(`Analyze the provided content of \"{name}\" and generate relevant tags. Tags are either single words or multiple words separated only by a hyphen, no spaces.
+var SuggestTagsPrompt = template.Must(template.New("").Parse(`Analyze the provided content and generate up to three relevant tags. Tags are either single words or multiple words separated only by a hyphen, no spaces.
 
 It's very important that only tags that are relevant to the content are returned, any tags of low confidence MUST be omitted. Do not generate tags that are too vague or tags that are too specific and cannot easily be used in other contexts for other types of content. Generally avoid tags that are singular and not plural that too closely match phrases or words in the content.
 
@@ -30,7 +29,7 @@ Content:
 {{ .Content }}
 `))
 
-func (s *weaviateRefIndex) SuggestTags(ctx context.Context, content datagraph.Content, available tag_ref.Names) (tag_ref.Names, error) {
+func (g *generator) SuggestTags(ctx context.Context, content datagraph.Content, available tag_ref.Names) (tag_ref.Names, error) {
 	// cap the available tags at 50, we don't to blow out the prompt size limit.
 	sliced := lo.Splice(available, 50)
 
@@ -43,31 +42,12 @@ func (s *weaviateRefIndex) SuggestTags(ctx context.Context, content datagraph.Co
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	prompt := strings.ReplaceAll(template.String(), "\n", `\n`)
-
-	gs := graphql.NewGenerativeSearch().SingleResult(prompt)
-
-	r, err := mergeErrors(s.wc.GraphQL().
-		Get().
-		WithClassName(s.cn.String()).
-		WithLimit(1).
-		WithGenerativeSearch(gs).
-		Do(ctx))
+	result, err := g.prompter.Prompt(ctx, template.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	wr, err := mapResponseObjects(r.Data)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	object, err := s.getFirstResult(wr)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	strings := strings.Split(object.Additional.Generate.SingleResult, ", ")
+	strings := strings.Split(result.Answer, ", ")
 
 	tags := dt.Map(strings, func(s string) tag_ref.Name {
 		return tag_ref.NewName(s)

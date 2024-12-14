@@ -1,8 +1,5 @@
-// Package refhydrate provides a Semdexer implementation which wraps an instance
-// of a RefSemdexer which will provide references for read-path methods instead
-// of fully hydrated Storyden objects (Post, Node, etc.) The Semdexer provided
-// by this package hydrates those references by looking them up in the database.
-package refhydrate
+// Package hydrate provides a generic datagraph item lookup conversion.
+package hydrate
 
 import (
 	"context"

@@ -12,19 +12,20 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/datagraph/hydrate"
 	"github.com/Southclaws/storyden/app/resources/pagination"
-	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
-	"github.com/Southclaws/storyden/app/services/semdex/semdexer/refhydrate"
+	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
 )
 
 type chromemRefIndex struct {
-	db *chromem.DB
-	c  *chromem.Collection
+	db       *chromem.DB
+	c        *chromem.Collection
+	hydrator *hydrate.Hydrator
 }
 
-func New(cfg config.Config, rh *refhydrate.Hydrator) (*refhydrate.HydratedSemdexer, error) {
+func New(cfg config.Config, rh *hydrate.Hydrator) (semdex.Semdexer, error) {
 	db, err := chromem.NewPersistentDB(cfg.SemdexLocalPath, false)
 	if err != nil {
 		return nil, err
@@ -41,9 +42,10 @@ func New(cfg config.Config, rh *refhydrate.Hydrator) (*refhydrate.HydratedSemdex
 		return nil, err
 	}
 
-	return &refhydrate.HydratedSemdexer{
-		RefSemdex: &chromemRefIndex{db: db, c: collection},
-		Hydrator:  rh,
+	return &chromemRefIndex{
+		db:       db,
+		c:        collection,
+		hydrator: rh,
 	}, nil
 }
 
@@ -61,7 +63,38 @@ func (c *chromemRefIndex) Delete(ctx context.Context, object xid.ID) error {
 	return c.c.Delete(ctx, nil, nil, object.String())
 }
 
-func (c *chromemRefIndex) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[*datagraph.Ref], error) {
+func (c *chromemRefIndex) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
+	nr := min(c.c.Count(), p.Size())
+	if nr == 0 {
+		res := pagination.NewPageResult[datagraph.Item](p, 0, nil)
+		return &res, nil
+	}
+
+	rs, err := c.c.Query(ctx, q, nr, nil, nil)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	filtered := lo.Filter(rs, func(r chromem.Result, _ int) bool {
+		return r.Similarity > 0.2
+	})
+
+	list, err := mapResults(filtered)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	hyd, err := c.hydrator.Hydrate(ctx, list...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	results := pagination.NewPageResult(p, len(rs), hyd)
+
+	return &results, nil
+}
+
+func (c *chromemRefIndex) SearchRefs(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[*datagraph.Ref], error) {
 	nr := min(c.c.Count(), p.Size())
 	if nr == 0 {
 		res := pagination.NewPageResult[*datagraph.Ref](p, 0, nil)
@@ -87,11 +120,7 @@ func (c *chromemRefIndex) Search(ctx context.Context, q string, p pagination.Par
 	return &results, nil
 }
 
-func (c *chromemRefIndex) SuggestTags(ctx context.Context, content datagraph.Content, available tag_ref.Names) (tag_ref.Names, error) {
-	return nil, nil
-}
-
-func (c *chromemRefIndex) Recommend(ctx context.Context, object datagraph.Item) (datagraph.RefList, error) {
+func (c *chromemRefIndex) RecommendRefs(ctx context.Context, object datagraph.Item) (datagraph.RefList, error) {
 	doc, err := c.c.GetByID(ctx, object.GetID().String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -110,6 +139,32 @@ func (c *chromemRefIndex) Recommend(ctx context.Context, object datagraph.Item) 
 	}
 
 	return list, nil
+}
+
+func (c *chromemRefIndex) Recommend(ctx context.Context, object datagraph.Item) (datagraph.ItemList, error) {
+	doc, err := c.c.GetByID(ctx, object.GetID().String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	nr := min(c.c.Count(), 10)
+
+	rs, err := c.c.QueryEmbedding(ctx, doc.Embedding, nr, nil, nil)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	list, err := mapResults(rs)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	items, err := c.hydrator.Hydrate(ctx, list...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return items, nil
 }
 
 func (c *chromemRefIndex) ScoreRelevance(ctx context.Context, object datagraph.Item, ids ...xid.ID) (map[xid.ID]float64, error) {
@@ -147,10 +202,6 @@ func (c *chromemRefIndex) ScoreRelevance(ctx context.Context, object datagraph.I
 	}, map[xid.ID]float64{})
 
 	return result, nil
-}
-
-func (c *chromemRefIndex) Summarise(ctx context.Context, object datagraph.Item) (string, error) {
-	return "", nil
 }
 
 func mapResults(rs []chromem.Result) (datagraph.RefList, error) {

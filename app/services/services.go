@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/collection"
 	"github.com/Southclaws/storyden/app/services/comms"
 	"github.com/Southclaws/storyden/app/services/event"
+	"github.com/Southclaws/storyden/app/services/generative"
 	"github.com/Southclaws/storyden/app/services/library"
 	"github.com/Southclaws/storyden/app/services/like/post_liker"
 	"github.com/Southclaws/storyden/app/services/link"
@@ -57,6 +58,7 @@ func Build() fx.Option {
 		link.Build(),
 		notify_job.Build(),
 		mention_job.Build(),
+		generative.Build(),
 		semdexer.Build(),
 		index_job.Build(),
 		event.Build(),
