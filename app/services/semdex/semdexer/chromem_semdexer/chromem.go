@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/search/searcher"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/infrastructure/ai"
 )
 
 type chromemRefIndex struct {
@@ -25,17 +26,17 @@ type chromemRefIndex struct {
 	hydrator *hydrate.Hydrator
 }
 
-func New(cfg config.Config, rh *hydrate.Hydrator) (semdex.Semdexer, error) {
+func New(cfg config.Config, rh *hydrate.Hydrator, aip ai.Prompter) (semdex.Semdexer, error) {
 	db, err := chromem.NewPersistentDB(cfg.SemdexLocalPath, false)
 	if err != nil {
 		return nil, err
 	}
 
-	if cfg.OpenAIKey == "" {
-		return nil, fault.New("OpenAI API key is required for embedded semdexer")
+	if _, ok := aip.(*ai.Disabled); ok {
+		return nil, fault.New("a language model provider must be enabled for the embedded semdexer to be enabled")
 	}
 
-	ef := chromem.NewEmbeddingFuncOpenAI(cfg.OpenAIKey, chromem.EmbeddingModelOpenAI3Large)
+	ef := aip.EmbeddingFunc()
 
 	collection, err := db.GetOrCreateCollection("semdex", nil, ef)
 	if err != nil {

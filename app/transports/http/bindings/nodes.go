@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -197,7 +198,7 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 }
 
 func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateRequestObject) (openapi.NodeUpdateResponseObject, error) {
-	richContent, err := opt.MapErr(opt.NewPtr(request.Body.Content), datagraph.NewRichText)
+	content, err := opt.MapErr(opt.NewPtr(request.Body.Content), datagraph.NewRichText)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
@@ -213,40 +214,40 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	tags := opt.Map(opt.NewPtr(request.Body.Tags), func(tags []string) tag_ref.Names {
-		return dt.Map(tags, deserialiseTagName)
-	})
-
 	slug, err := deserialiseInputSlug(request.Body.Slug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	primaryImage := deletable.NewMap(request.Body.PrimaryImageAssetId, deserialiseAssetID)
-
-	opts := []node_mutate.Option{}
 
 	tagFillRuleParam, err := opt.MapErr(opt.NewPtr(request.Params.TagFillRule), deserialiseTagFillRule)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if tfr, ok := tagFillRuleParam.Get(); ok {
-		opts = append(opts, node_mutate.WithTagFillRule(tfr))
-	}
+	tags := opt.Map(opt.NewPtr(request.Body.Tags), func(tags []string) tag_ref.Names {
+		return dt.Map(tags, deserialiseTagName)
+	})
 
-	node, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
+	primaryImage := deletable.NewMap(request.Body.PrimaryImageAssetId, deserialiseAssetID)
+
+	partial := node_mutate.Partial{
 		Name:         opt.NewPtr(request.Body.Name),
 		Slug:         slug,
 		AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 		AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
 		URL:          url,
-		Content:      richContent,
+		Content:      content,
 		PrimaryImage: primaryImage,
 		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
 		Tags:         tags,
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
-	}, opts...)
+	}
+
+	if tfr, ok := tagFillRuleParam.Get(); ok {
+		partial.TagFill = opt.New(tag.TagFillCommand{FillRule: tfr})
+	}
+
+	node, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), partial)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

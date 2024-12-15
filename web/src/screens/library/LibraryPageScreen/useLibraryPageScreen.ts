@@ -19,6 +19,7 @@ import { useSession } from "src/auth";
 
 import { handle } from "@/api/client";
 import { assetUpload } from "@/api/openapi-client/assets";
+import { linkCreate } from "@/api/openapi-client/links";
 import { useLibraryMutation } from "@/lib/library/library";
 import {
   CoverImage,
@@ -223,13 +224,12 @@ export function useLibraryPageScreen({ node }: Props) {
 
         form.setValue("content", link.description);
 
-        await updateNode(
-          node.slug,
+        await linkCreate(
+          { url: link.url },
           {
-            content: link.description,
-            primary_image_asset_id: link.primary_image?.id,
+            content_fill_rule: "replace",
+            node_content_fill_target: node.id,
           },
-          coverConfig,
         );
       },
       {

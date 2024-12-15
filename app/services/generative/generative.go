@@ -15,7 +15,7 @@ type Tagger interface {
 }
 
 type Summariser interface {
-	Summarise(ctx context.Context, object datagraph.Item) (string, error)
+	Summarise(ctx context.Context, content datagraph.Content) (string, error)
 }
 
 var (
