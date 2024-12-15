@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/chromem_semdexer"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/weaviate_semdexer"
 	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/infrastructure/ai"
 	weaviate_infra "github.com/Southclaws/storyden/internal/infrastructure/weaviate"
 )
 
@@ -19,6 +20,7 @@ func newSemdexer(
 
 	weaviateClassName weaviate_infra.WeaviateClassName,
 	hydrator *hydrate.Hydrator,
+	prompter ai.Prompter,
 ) (semdex.Semdexer, error) {
 	if cfg.SemdexProvider != "" && cfg.LanguageModelProvider == "" {
 		return nil, fault.New("semdex requires a language model provider to be enabled")
@@ -26,11 +28,9 @@ func newSemdexer(
 
 	switch cfg.SemdexProvider {
 	case "chromem":
-
-		return chromem_semdexer.New(cfg, hydrator)
+		return chromem_semdexer.New(cfg, hydrator, prompter)
 
 	case "weaviate":
-
 		return weaviate_semdexer.New(wc, weaviateClassName, hydrator), nil
 
 	default:
