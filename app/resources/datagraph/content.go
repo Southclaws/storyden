@@ -301,3 +301,125 @@ func getSummary(article readability.Article) string {
 
 	return short
 }
+
+// rough upper bound sentence size for most languages.
+const roughMaxSentenceSize = 350
+
+func (c Content) Split() []string {
+	r := []html.Node{}
+
+	// first, walk the tree for the top-most block-content nodes.
+	var walk func(n *html.Node)
+	walk = func(n *html.Node) {
+		if n.Type == html.ElementNode {
+			switch n.DataAtom {
+			case
+				atom.H1,
+				atom.H2,
+				atom.H3,
+				atom.H4,
+				atom.H5,
+				atom.H6,
+				atom.Blockquote,
+				atom.Pre,
+				atom.P:
+				r = append(r, *n)
+				// once split, exit out of this branch
+				return
+			}
+		}
+
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			walk(c)
+		}
+	}
+	walk(c.html)
+
+	// now, iterate these top level nodes and split any that are "too big"
+	chunks := chunksFromNodes(r, roughMaxSentenceSize)
+
+	return chunks
+}
+
+func chunksFromNodes(ns []html.Node, max int) []string {
+	chunks := []string{}
+
+	for _, n := range ns {
+		t := textfromnode(&n)
+		if len(t) > max {
+			// TODO: Split logic
+			chunks = append(chunks, splitearly(t, max)...)
+		} else {
+			chunks = append(chunks, t)
+		}
+	}
+
+	return chunks
+}
+
+func splitearly(in string, max int) []string {
+	var chunks []string
+	var split func(s string)
+	split = func(s string) {
+		upper := min(len(s), max) - 1
+		if upper == -1 {
+			// reached end of input stream
+			return
+		}
+
+		lower := upper / 2
+		boundary := upper
+		fallback := -1
+	outer:
+		for ; boundary > lower; boundary-- {
+			c := s[boundary]
+			switch c {
+			// very rudimentary sentence boundaries (latin only at the moment)
+			case '.', ';', '!', '?':
+				break outer
+			// worst case: no boundaries found, use the closest space
+			case ' ':
+				if fallback == -1 {
+					fallback = boundary
+				}
+			}
+		}
+
+		if boundary <= lower {
+			if fallback > -1 {
+				// worst case: no sent boundaries, split at fallback position.
+				boundary = fallback
+			} else {
+				// worst case: no fallback either (the input string was a solid
+				// block of text with no spaces or sentence boundaries.)
+				boundary = upper
+			}
+		}
+
+		left := strings.TrimSpace(s[:boundary])
+		right := strings.TrimSpace(s[boundary+1:])
+		chunks = append(chunks, left)
+
+		if len(right) > 0 {
+			split(right)
+		}
+	}
+	split(in)
+
+	return chunks
+}
+
+func textfromnode(n *html.Node) string {
+	var collect func(*html.Node, *strings.Builder)
+	collect = func(cc *html.Node, buf *strings.Builder) {
+		if cc.Type == html.TextNode {
+			buf.WriteString(cc.Data)
+		}
+		for c := cc.FirstChild; c != nil; c = c.NextSibling {
+			collect(c, buf)
+		}
+	}
+	buf := &strings.Builder{}
+	collect(n, buf)
+	return buf.String()
+}
