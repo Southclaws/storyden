@@ -148,6 +148,20 @@ func TestSplit(t *testing.T) {
 	a.Len(ps, 5)
 }
 
+func TestSplitMinimal(t *testing.T) {
+	r := require.New(t)
+	a := assert.New(t)
+
+	c, err := NewRichText(`I&#39;ve tried everything, but for some reason it seems impossible to find datasets that includes a simple list of the councils in England sorted by their group, and a list of covid cases also sorted by councils.  I&#39;m not British so it may be a lack of knowledge of how their government sites work. 
+
+Anyone know a place to find these?`)
+	r.NoError(err)
+	r.NotNil(r)
+
+	ps := c.Split()
+	a.Len(ps, 1)
+}
+
 func TestSplitLong(t *testing.T) {
 	r := require.New(t)
 	a := assert.New(t)
