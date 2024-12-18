@@ -329,6 +329,15 @@ func (c Content) Split() []string {
 			}
 		}
 
+		if n.Type == html.TextNode {
+			// if the text node is empty, skip it.
+			if strings.TrimSpace(n.Data) == "" {
+				return
+			}
+
+			r = append(r, *n)
+		}
+
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
 			walk(c)
 		}
