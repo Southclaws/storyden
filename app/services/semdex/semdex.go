@@ -24,7 +24,6 @@ type Mutator interface {
 type Querier interface {
 	Searcher
 	Recommender
-	RelevanceScorer
 
 	GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error)
 }
@@ -37,8 +36,4 @@ type Searcher interface {
 type Recommender interface {
 	Recommend(ctx context.Context, object datagraph.Item) (datagraph.ItemList, error)
 	RecommendRefs(ctx context.Context, object datagraph.Item) (datagraph.RefList, error)
-}
-
-type RelevanceScorer interface {
-	ScoreRelevance(ctx context.Context, object datagraph.Item, idx ...xid.ID) (map[xid.ID]float64, error)
 }
