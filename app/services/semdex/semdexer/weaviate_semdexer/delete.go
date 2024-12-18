@@ -6,15 +6,20 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
+	"github.com/weaviate/weaviate-go-client/v4/weaviate/filters"
 )
 
 func (w *weaviateSemdexer) Delete(ctx context.Context, id xid.ID) error {
-	wid := GetWeaviateID(id)
+	delete := w.wc.Batch().
+		ObjectsBatchDeleter().
+		WithWhere(
+			filters.Where().
+				WithPath([]string{"datagraph_id"}).
+				WithOperator(filters.Equal).
+				WithValueString(id.String()),
+		)
 
-	err := w.wc.Data().Deleter().
-		WithClassName(string(w.cn)).
-		WithID(wid).
-		Do(ctx)
+	_, err := delete.Do(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
