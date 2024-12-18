@@ -6,46 +6,49 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/google/uuid"
-	"github.com/k3a/html2text"
 	"github.com/rs/xid"
 	weaviate_errors "github.com/weaviate/weaviate-go-client/v4/weaviate/fault"
+	"github.com/weaviate/weaviate/entities/models"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
 func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Item) error {
-	rich := object.GetContent()
-	sid := object.GetID()
+	chunks := object.GetContent().Split()
 
-	content := html2text.HTML2Text(rich.HTML())
+	if len(chunks) == 0 {
+		return fault.New("no text chunks to index", fctx.With(ctx))
+	}
 
-	wid := GetWeaviateID(object.GetID())
+	for _, chunk := range chunks {
+		err := s.indexChunk(ctx, object, chunk)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+	}
 
-	result, err := s.wc.Data().ObjectsGetter().
-		WithClassName(s.cn.String()).
-		WithID(wid).
-		Do(ctx)
+	return nil
+}
 
-	we := &weaviate_errors.WeaviateClientError{}
-	nonExistent := (errors.As(err, &we) && we.StatusCode == 404) || len(result) == 0
+func (s *weaviateSemdexer) indexChunk(ctx context.Context, object datagraph.Item, chunk string) error {
+	objectID := object.GetID()
+	chunkID := generateChunkID(objectID, chunk).String()
 
-	if err != nil && !nonExistent {
+	current, exists, err := s.existsByContent(ctx, objectID, chunk)
+	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	props := map[string]any{
-		"datagraph_id":   sid.String(),
+		"datagraph_id":   objectID.String(),
 		"datagraph_type": object.GetKind(),
 		"name":           object.GetName(),
 		"description":    object.GetDesc(),
-		"content":        content[:min(1000, len(content))],
+		"content":        chunk,
 	}
 
-	if !nonExistent {
-		existing := result[0]
-
-		existingProps := existing.Properties.(map[string]any)
+	if exists {
+		existingProps := current.Properties.(map[string]any)
 
 		isSame := compareIndexedContentProperties(existingProps, props)
 		if isSame {
@@ -54,13 +57,13 @@ func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Item) err
 
 		err = s.wc.Data().Updater().
 			WithClassName(s.cn.String()).
-			WithID(wid).
+			WithID(chunkID).
 			WithProperties(props).
 			Do(ctx)
 	} else {
 		_, err = s.wc.Data().Creator().
 			WithClassName(s.cn.String()).
-			WithID(wid).
+			WithID(chunkID).
 			WithProperties(props).
 			Do(ctx)
 	}
@@ -79,6 +82,31 @@ func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Item) err
 	return nil
 }
 
+func (s *weaviateSemdexer) existsByContent(ctx context.Context, objectID xid.ID, chunk string) (*models.Object, bool, error) {
+	chunkID := generateChunkID(objectID, chunk)
+
+	result, err := s.wc.Data().ObjectsGetter().
+		WithClassName(s.cn.String()).
+		WithID(chunkID.String()).
+		Do(ctx)
+
+	we := &weaviate_errors.WeaviateClientError{}
+	if errors.As(err, &we) {
+		if we.StatusCode == 404 {
+			return nil, false, nil
+		}
+	}
+	if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if len(result) == 0 {
+		return nil, false, nil
+	}
+
+	return result[0], true, nil
+}
+
 func compareIndexedContentProperties(a, b map[string]any) bool {
 	if a["name"] != b["name"] {
 		return false
@@ -91,8 +119,4 @@ func compareIndexedContentProperties(a, b map[string]any) bool {
 	}
 
 	return true
-}
-
-func GetWeaviateID(id xid.ID) string {
-	return uuid.NewSHA1(uuid.NameSpaceOID, id.Bytes()).String()
 }

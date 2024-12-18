@@ -2,9 +2,12 @@ package weaviate_semdexer
 
 import (
 	"encoding/json"
+	"hash/fnv"
 	"strconv"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
+	"github.com/google/uuid"
 	"github.com/rs/xid"
 	"github.com/weaviate/weaviate/entities/models"
 
@@ -55,7 +58,7 @@ func mapToNodeReference(v WeaviateObject) (*datagraph.Ref, error) {
 	if v.Additional.Distance > 0 {
 		// Distances are inverse to "scores" (complexionary or relevance)
 		relevance = min(max(1-v.Additional.Distance, 0), 1)
-	} else {
+	} else if v.Additional.Score != "" {
 		relevance, err = strconv.ParseFloat(v.Additional.Score, 64)
 		if err != nil {
 			return nil, fault.Wrap(err)
@@ -91,4 +94,34 @@ func (s *weaviateSemdexer) getFirstResult(wr *WeaviateResponse) (*WeaviateObject
 	}
 
 	return &objects[0], nil
+}
+
+func generateChunkID(id xid.ID, chunk string) uuid.UUID {
+	// We don't currently support sharing chunks across content nodes, so append
+	// the object's ID to the chunk's hash, to ensure it's unique to the object.
+	payload := []byte(append(id.Bytes(), chunk...))
+
+	return uuid.NewHash(fnv.New128(), uuid.NameSpaceOID, payload, 4)
+}
+
+func chunkIDsFor(id xid.ID) func(chunk string) uuid.UUID {
+	return func(chunk string) uuid.UUID {
+		// We don't currently support sharing chunks across content nodes, so append
+		// the object's ID to the chunk's hash, to ensure it's unique to the object.
+		payload := []byte(append(id.Bytes(), chunk...))
+
+		return uuid.NewHash(fnv.New128(), uuid.NameSpaceOID, payload, 4)
+	}
+}
+
+func chunkIDsForItem(object datagraph.Item) []uuid.UUID {
+	return dt.Map(object.GetContent().Split(), chunkIDsFor(object.GetID()))
+}
+
+func objectIDsToStrings(ids []xid.ID) []string {
+	strs := make([]string, len(ids))
+	for i, id := range ids {
+		strs[i] = id.String()
+	}
+	return strs
 }
