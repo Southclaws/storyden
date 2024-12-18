@@ -7,6 +7,8 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/mitchellh/mapstructure"
+	"github.com/rs/xid"
+	"github.com/samber/lo"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/filters"
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/graphql"
 
@@ -105,7 +107,9 @@ func (s *weaviateSemdexer) SearchRefs(ctx context.Context, q string, p paginatio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pagedResult := pagination.NewPageResult(p, total, results)
+	deduped := dedupeChunks(results)
+
+	pagedResult := pagination.NewPageResult(p, total, deduped)
 
 	return &pagedResult, nil
 }
@@ -115,16 +119,6 @@ func (s *weaviateSemdexer) countObjects(ctx context.Context, countQuery graphql.
 	if err != nil {
 		return 0, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	// "Aggregate": {
-	//   "ContentOpenAI": [
-	//     {
-	//       "datagraph_id": {
-	//         "count": 24563
-	//       }
-	//     }
-	//   ]
-	// }
 
 	type AggregateResponse struct {
 		Aggregate map[ /* class name */ string][]struct {
@@ -148,4 +142,33 @@ func (s *weaviateSemdexer) countObjects(ctx context.Context, countQuery graphql.
 	count := classes[0].Field.Count
 
 	return count, nil
+}
+
+func dedupeChunks(results []*datagraph.Ref) []*datagraph.Ref {
+	groupedByID := lo.GroupBy(results, func(r *datagraph.Ref) xid.ID { return r.ID })
+
+	// for each grouped result, compute the average score and flatten
+	// the list of results into a single result per ID
+	// this is a naive approach to deduplication
+
+	list := lo.Values(groupedByID)
+
+	deduped := dt.Reduce(list, func(acc []*datagraph.Ref, curr []*datagraph.Ref) []*datagraph.Ref {
+		first := curr[0]
+		score := 0.0
+
+		for _, r := range curr {
+			score += r.Relevance
+		}
+
+		next := &datagraph.Ref{
+			ID:        first.ID,
+			Kind:      first.Kind,
+			Relevance: score / float64(len(curr)),
+		}
+
+		return append(acc, next)
+	}, []*datagraph.Ref{})
+
+	return deduped
 }
