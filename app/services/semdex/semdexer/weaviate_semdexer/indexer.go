@@ -3,6 +3,8 @@ package weaviate_semdexer
 import (
 	"context"
 	"errors"
+	"runtime"
+	"sync"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -20,10 +22,37 @@ func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Item) err
 		return fault.New("no text chunks to index", fctx.With(ctx))
 	}
 
-	for _, chunk := range chunks {
-		err := s.indexChunk(ctx, object, chunk)
+	numWorkers := runtime.NumCPU()
+	chunkQueue := make(chan string, len(chunks))
+	errChan := make(chan error, len(chunks))
+
+	var wg sync.WaitGroup
+
+	for i := 0; i < numWorkers; i++ {
+		wg.Add(1)
+		go func(workerID int) {
+			defer wg.Done()
+			for chunk := range chunkQueue {
+				if err := s.indexChunk(ctx, object, chunk); err != nil {
+					errChan <- fault.Wrap(err, fctx.With(ctx))
+				}
+			}
+		}(i)
+	}
+
+	go func() {
+		for _, chunk := range chunks {
+			chunkQueue <- chunk
+		}
+		close(chunkQueue)
+	}()
+
+	wg.Wait()
+	close(errChan)
+
+	for err := range errChan {
 		if err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
+			return err
 		}
 	}
 
