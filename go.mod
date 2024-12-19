@@ -61,7 +61,9 @@ require (
 	github.com/oapi-codegen/nullable v1.1.0
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
+	github.com/openai/openai-go v0.1.0-alpha.39
 	github.com/pb33f/libopenapi v0.18.7
+	github.com/philippgille/chromem-go v0.7.0
 	github.com/puzpuzpuz/xsync/v3 v3.4.0
 	github.com/redis/rueidis v1.0.49
 	github.com/rs/cors v1.11.1
@@ -130,9 +132,7 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/oklog/ulid v1.3.1 // indirect
 	github.com/olekukonko/tablewriter v0.0.5 // indirect
-	github.com/openai/openai-go v0.1.0-alpha.39 // indirect
 	github.com/perimeterx/marshmallow v1.1.5 // indirect
-	github.com/philippgille/chromem-go v0.7.0 // indirect
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
@@ -215,7 +215,7 @@ require (
 	go.uber.org/multierr v1.11.0
 	golang.org/x/crypto v0.31.0
 	golang.org/x/mod v0.21.0 // indirect
-	golang.org/x/net v0.31.0
+	golang.org/x/net v0.33.0
 	golang.org/x/sys v0.28.0 // indirect
 	golang.org/x/text v0.21.0
 	golang.org/x/time v0.8.0 // indirect
