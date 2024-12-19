@@ -11,7 +11,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
-	"github.com/Southclaws/storyden/app/services/generative"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/library/node_mutate"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 	"github.com/Southclaws/storyden/internal/config"
@@ -25,6 +26,7 @@ func Build() fx.Option {
 		fx.Provide(
 			queue.New[mq.IndexNode],
 			queue.New[mq.DeleteNode],
+			queue.New[mq.AutoFillNode],
 		),
 		fx.Invoke(newSemdexer),
 	)
@@ -40,17 +42,22 @@ var (
 )
 
 type semdexer struct {
-	logger        *zap.Logger
-	db            *ent.Client
-	nodeQuerier   *node_querier.Querier
-	nodeWriter    *node_writer.Writer
+	logger *zap.Logger
+	db     *ent.Client
+
+	nodeQuerier *node_querier.Querier
+	nodeWriter  *node_writer.Writer
+	nodeUpdater *node_mutate.Manager
+
 	indexQueue    pubsub.Topic[mq.IndexNode]
 	deleteQueue   pubsub.Topic[mq.DeleteNode]
+	autoFillQueue pubsub.Topic[mq.AutoFillNode]
+
 	semdexMutator semdex.Mutator
 	semdexQuerier semdex.Querier
-	summariser    generative.Summariser
-	tagger        *autotagger.Tagger
-	tagWriter     *tag_writer.Writer
+
+	tagger    *autotagger.Tagger
+	tagWriter *tag_writer.Writer
 }
 
 func newSemdexer(
@@ -62,11 +69,13 @@ func newSemdexer(
 	db *ent.Client,
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
+	nodeUpdater *node_mutate.Manager,
 	indexQueue pubsub.Topic[mq.IndexNode],
 	deleteQueue pubsub.Topic[mq.DeleteNode],
+	autoFillQueue pubsub.Topic[mq.AutoFillNode],
 	semdexMutator semdex.Mutator,
 	semdexQuerier semdex.Querier,
-	summariser generative.Summariser,
+
 	tagger *autotagger.Tagger,
 	tagWriter *tag_writer.Writer,
 ) {
@@ -79,13 +88,14 @@ func newSemdexer(
 		db:            db,
 		nodeQuerier:   nodeQuerier,
 		nodeWriter:    nodeWriter,
+		nodeUpdater:   nodeUpdater,
 		indexQueue:    indexQueue,
 		deleteQueue:   deleteQueue,
 		semdexMutator: semdexMutator,
 		semdexQuerier: semdexQuerier,
-		summariser:    summariser,
-		tagger:        tagger,
-		tagWriter:     tagWriter,
+
+		tagger:    tagger,
+		tagWriter: tagWriter,
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
@@ -107,7 +117,7 @@ func newSemdexer(
 
 		go func() {
 			for msg := range sub {
-				if err := re.index(ctx, msg.Payload.ID, msg.Payload.SummariseContent, msg.Payload.AutoTag); err != nil {
+				if err := re.index(ctx, msg.Payload.ID); err != nil {
 					l.Error("failed to index node", zap.Error(err))
 				}
 
@@ -128,6 +138,27 @@ func newSemdexer(
 			for msg := range sub {
 				if err := re.deindex(ctx, msg.Payload.ID); err != nil {
 					l.Error("failed to index node", zap.Error(err))
+				}
+
+				msg.Ack()
+			}
+		}()
+
+		return nil
+	}))
+
+	lc.Append(fx.StartHook(func(_ context.Context) error {
+		sub, err := autoFillQueue.Subscribe(ctx)
+		if err != nil {
+			return err
+		}
+
+		go func() {
+			for msg := range sub {
+				ctx = session.GetSessionFromMessage(ctx, msg)
+
+				if err := re.autofill(ctx, msg.Payload.ID, msg.Payload.SummariseContent, msg.Payload.AutoTag); err != nil {
+					l.Error("failed to autofill node", zap.Error(err))
 				}
 
 				msg.Ack()

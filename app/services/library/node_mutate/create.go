@@ -3,22 +3,17 @@ package node_mutate
 import (
 	"context"
 
-	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/rs/xid"
+	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/library"
-	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/rbac"
-	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
-	"github.com/Southclaws/storyden/app/services/link/fetcher"
 )
 
 func (s *Manager) Create(ctx context.Context,
@@ -42,41 +37,13 @@ func (s *Manager) Create(ctx context.Context,
 		}
 	}
 
-	opts, err := s.applyOpts(ctx, p)
+	pre, err := s.preMutation(ctx, p, opt.NewEmpty[library.Node]())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	if v, ok := p.AssetSources.Get(); ok {
-		for _, source := range v {
-			a, err := s.fetcher.CopyAsset(ctx, source)
-			if err != nil {
-				return nil, fault.Wrap(err, fctx.With(ctx))
-			}
-
-			opts = append(opts, node_writer.WithAssets([]asset.AssetID{a.ID}))
-		}
-	}
+	opts := pre.opts
 
 	nodeSlug := p.Slug.Or(mark.NewSlugFromName(name))
-
-	if u, ok := p.URL.Get(); ok {
-		ln, err := s.fetcher.Fetch(ctx, u, fetcher.Options{})
-		if err == nil {
-			opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
-		}
-	}
-
-	if tags, ok := p.Tags.Get(); ok {
-		newTags, err := s.tagWriter.Add(ctx, tags...)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		tagIDs := dt.Map(newTags, func(t *tag_ref.Tag) tag_ref.ID { return t.ID })
-
-		opts = append(opts, node_writer.WithTagsAdd(tagIDs...))
-	}
 
 	n, err := s.nodeWriter.Create(ctx, owner, name, nodeSlug, opts...)
 	if err != nil {
