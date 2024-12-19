@@ -55,7 +55,11 @@ func (f *Filler) FillContentFromLink(ctx context.Context, link *link_ref.LinkRef
 
 	switch cfr.FillRule {
 	case asset.ContentFillRuleCreate:
-		slug, _ := mark.NewSlug(slug.Make(wc.Title + "-" + xid.New().String()))
+		title := wc.Title
+		if title == "" {
+			title = "Untitled"
+		}
+		slug, _ := mark.NewSlug(slug.Make(title + "-" + xid.New().String()))
 
 		opts := []node_writer.Option{
 			node_writer.WithParent(library.NodeID(cfr.TargetNodeID)),
@@ -89,7 +93,7 @@ func (f *Filler) FillContentFromLink(ctx context.Context, link *link_ref.LinkRef
 
 		err = f.autoFillQueue.Publish(ctx, mq.AutoFillNode{
 			ID:               library.NodeID(n.Mark.ID()),
-			SummariseContent: true,
+			SummariseContent: false,
 			AutoTag:          true,
 		})
 		if err != nil {
