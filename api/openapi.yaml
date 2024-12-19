@@ -1753,6 +1753,19 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/DatagraphSearchOK" }
 
+  /datagraph/qna:
+    get:
+      operationId: DatagraphAsk
+      description: Ask questions about the community's content.
+      tags: [datagraph]
+      parameters:
+        - $ref: "#/components/parameters/RequiredSearchQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/DatagraphAskOK" }
+
   #
   #                                     888
   #                                     888
@@ -2942,6 +2955,13 @@ components:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/DatagraphSearchResult" }
+
+    DatagraphAskOK:
+      description: Search results.
+      content:
+        text/plain:
+          schema:
+            type: string
 
     EventListOK:
       description: Event list.

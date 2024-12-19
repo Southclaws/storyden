@@ -6,6 +6,7 @@ import { Floating } from "@/styled-system/patterns";
 
 import styles from "./navigation.module.css";
 
+import { AskAnchor } from "./Anchors/Ask";
 import { SearchAnchor } from "./Anchors/Search";
 import { MemberActions } from "./MemberActions";
 import { SidebarToggle } from "./NavigationPane/SidebarToggle";
@@ -29,6 +30,7 @@ export async function DesktopCommandBar() {
       <HStack className={styles["topbar-left"]}>
         <SidebarToggle initialValue={initialSidebarState} />
         <SearchAnchor />
+        <AskAnchor />
       </HStack>
 
       <HStack className={styles["topbar-middle"]} justify="space-around">

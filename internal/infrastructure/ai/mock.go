@@ -23,6 +23,10 @@ func (o *Mock) Prompt(ctx context.Context, input string) (*Result, error) {
 	}, nil
 }
 
+func (o *Mock) PromptStream(ctx context.Context, input string) (chan string, chan error) {
+	return nil, nil
+}
+
 const mockEmbeddingSize = 3072
 
 func (o *Mock) EmbeddingFunc() func(ctx context.Context, text string) ([]float32, error) {

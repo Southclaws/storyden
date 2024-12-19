@@ -12,6 +12,7 @@ type Result struct {
 
 type Prompter interface {
 	Prompt(ctx context.Context, input string) (*Result, error)
+	PromptStream(ctx context.Context, input string) (chan string, chan error)
 	EmbeddingFunc() func(ctx context.Context, text string) ([]float32, error)
 }
 
@@ -31,6 +32,10 @@ func New(cfg config.Config) (Prompter, error) {
 type Disabled struct{}
 
 func (d *Disabled) Prompt(ctx context.Context, input string) (*Result, error) {
+	return nil, nil
+}
+
+func (d *Disabled) PromptStream(ctx context.Context, input string) (chan string, chan error) {
 	return nil, nil
 }
 

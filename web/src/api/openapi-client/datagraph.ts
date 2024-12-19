@@ -12,6 +12,8 @@ import type { Key, SWRConfiguration } from "swr";
 
 import { fetcher } from "../client";
 import type {
+  DatagraphAskOKResponse,
+  DatagraphAskParams,
   DatagraphSearchOKResponse,
   DatagraphSearchParams,
   InternalServerErrorResponse,
@@ -62,6 +64,61 @@ export const useDatagraphSearch = <
     swrOptions?.swrKey ??
     (() => (isEnabled ? getDatagraphSearchKey(params) : null));
   const swrFn = () => datagraphSearch(params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Ask questions about the community's content.
+ */
+export const datagraphAsk = (params: DatagraphAskParams) => {
+  return fetcher<DatagraphAskOKResponse>({
+    url: `/datagraph/qna`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getDatagraphAskKey = (params: DatagraphAskParams) =>
+  [`/datagraph/qna`, ...(params ? [params] : [])] as const;
+
+export type DatagraphAskQueryResult = NonNullable<
+  Awaited<ReturnType<typeof datagraphAsk>>
+>;
+export type DatagraphAskQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useDatagraphAsk = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  params: DatagraphAskParams,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof datagraphAsk>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getDatagraphAskKey(params) : null));
+  const swrFn = () => datagraphAsk(params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
