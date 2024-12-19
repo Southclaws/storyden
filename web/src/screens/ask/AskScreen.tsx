@@ -1,5 +1,6 @@
 "use client";
 
+import { values } from "lodash";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
@@ -35,20 +36,18 @@ export function AskScreen() {
   const [question, setQuestion] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [sources, setSources] = useState<Set<DatagraphRef>>(
-    new Set<DatagraphRef>(),
-  );
+  const [sources, setSources] = useState<Record<string, DatagraphRef>>({});
 
   useEffect(() => {
     // Helper to extract SDR references from content
-    const extractSources = (text: string): Set<DatagraphRef> => {
+    const extractSources = (text: string): Record<string, DatagraphRef> => {
       const sdrRegex = /sdr:(\w+)\/([\w-]+)/g;
-      const refs = new Set<DatagraphRef>();
+      const refs = {};
 
       text.replace(sdrRegex, (_, kind, id) => {
         if (id.length === 20) {
           const kp = getRouteForKind(kind);
-          refs.add({ id, kp: kp, href: `${WEB_ADDRESS}/${kp}/${id}` });
+          refs[id] = { id, kp: kp, href: `${WEB_ADDRESS}/${kp}/${id}` };
         }
         return "";
       });
@@ -56,7 +55,9 @@ export function AskScreen() {
       return refs;
     };
 
-    setSources(extractSources(content));
+    const newSources = extractSources(content);
+
+    setSources((current) => ({ ...current, ...newSources }));
   }, [content]);
 
   // Helper to replace SDR URLs with frontend links
@@ -140,6 +141,8 @@ export function AskScreen() {
     ul: ({ children }) => <ul className={lstack({ gap: "2" })}>{children}</ul>,
   };
 
+  const sourceList = values(sources);
+
   return (
     <LStack>
       <styled.form
@@ -169,10 +172,10 @@ export function AskScreen() {
           {replaceSdrUrls(content)}
         </ReactMarkdown>
 
-        {sources.size > 0 && (
+        {sourceList.length > 0 && (
           <LStack>
             <Heading>Sources from the community</Heading>
-            {sources.entries().map(([_, source]) => (
+            {sourceList.map((source) => (
               <SourceCard
                 key={source.id}
                 href={source.href}
