@@ -2,6 +2,7 @@ package weaviate_semdexer
 
 import (
 	"context"
+	"sort"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -107,7 +108,9 @@ func (s *weaviateSemdexer) SearchRefs(ctx context.Context, q string, p paginatio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	deduped := dedupeChunks(results)
+	filtered := filterChunks(results)
+
+	deduped := dedupeChunks(filtered)
 
 	pagedResult := pagination.NewPageResult(p, total, deduped)
 
@@ -144,6 +147,14 @@ func (s *weaviateSemdexer) countObjects(ctx context.Context, countQuery graphql.
 	return count, nil
 }
 
+func filterChunks(results []*datagraph.Ref) []*datagraph.Ref {
+	filtered := dt.Filter(results, func(r *datagraph.Ref) bool {
+		return r.Relevance > 0.5
+	})
+
+	return filtered
+}
+
 func dedupeChunks(results []*datagraph.Ref) []*datagraph.Ref {
 	groupedByID := lo.GroupBy(results, func(r *datagraph.Ref) xid.ID { return r.ID })
 
@@ -169,6 +180,8 @@ func dedupeChunks(results []*datagraph.Ref) []*datagraph.Ref {
 
 		return append(acc, next)
 	}, []*datagraph.Ref{})
+
+	sort.Sort(datagraph.RefList(deduped))
 
 	return deduped
 }
