@@ -23,6 +23,7 @@ type Mutator interface {
 
 type Querier interface {
 	Searcher
+	Asker
 	Recommender
 
 	GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error)
@@ -31,6 +32,10 @@ type Querier interface {
 type Searcher interface {
 	Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error)
 	SearchRefs(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[*datagraph.Ref], error)
+}
+
+type Asker interface {
+	Ask(ctx context.Context, q string) (chan string, chan error)
 }
 
 type Recommender interface {

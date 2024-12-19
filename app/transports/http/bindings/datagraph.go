@@ -2,11 +2,13 @@ package bindings
 
 import (
 	"context"
+	"net/http"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -16,18 +18,88 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
+	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Datagraph struct {
 	searcher searcher.Searcher
+	asker    semdex.Asker
 }
 
 func NewDatagraph(
 	searcher searcher.Searcher,
+	asker semdex.Asker,
+	router *echo.Echo,
 ) Datagraph {
-	return Datagraph{
+	d := Datagraph{
 		searcher: searcher,
+		asker:    asker,
+	}
+
+	// The generated OpenAPI code does not expose the underlying ResponseWriter
+	// which we need for streaming Q&A responses for that ✨chatgpt✨ effect.
+	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			path := c.Path()
+			if path == "/api/datagraph/qna" {
+				ctx := c.Request().Context()
+
+				query := c.QueryParam("q")
+
+				r, errSignal := d.asker.Ask(ctx, query)
+
+				w := c.Response().Writer
+
+				w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+
+				// if fails to cast, do nothing, flusher nil, just guard clause.
+				flusher, ok := w.(http.Flusher)
+				if !ok {
+					if innerWriter := unwrapWriter(w); innerWriter != nil {
+						flusher, _ = innerWriter.(http.Flusher)
+					}
+				}
+
+				for {
+					select {
+					case <-ctx.Done():
+						return ctx.Err()
+
+					case chunk, ok := <-r:
+						if !ok {
+							return nil
+						}
+
+						if _, err := w.Write([]byte(chunk)); err != nil {
+							return err
+						}
+
+						if flusher != nil {
+							flusher.Flush()
+						}
+
+					case err := <-errSignal:
+						if err != nil {
+							return err
+						}
+					}
+				}
+			}
+
+			return next(c)
+		}
+	})
+
+	return d
+}
+
+func unwrapWriter(w http.ResponseWriter) http.ResponseWriter {
+	switch v := w.(type) {
+	case interface{ Unwrap() http.ResponseWriter }:
+		return v.Unwrap()
+	default:
+		return nil
 	}
 }
 
@@ -60,6 +132,11 @@ func (d Datagraph) DatagraphSearch(ctx context.Context, request openapi.Datagrap
 			TotalPages:  r.TotalPages,
 		},
 	}, nil
+}
+
+func (d Datagraph) DatagraphAsk(ctx context.Context, request openapi.DatagraphAskRequestObject) (openapi.DatagraphAskResponseObject, error) {
+	// NOTE: Unused stub, see middleware above.
+	return nil, nil
 }
 
 func deserialiseDatagraphKindList(ks []openapi.DatagraphItemKind) ([]datagraph.Kind, error) {
