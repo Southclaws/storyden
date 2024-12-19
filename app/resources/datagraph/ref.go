@@ -29,6 +29,10 @@ func (r *Ref) GetKind() Kind {
 
 type RefList []*Ref
 
+func (a RefList) Len() int           { return len(a) }
+func (a RefList) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a RefList) Less(i, j int) bool { return a[i].Relevance > a[j].Relevance }
+
 func NewRef(i Item) *Ref {
 	return &Ref{
 		ID:   i.GetID(),
