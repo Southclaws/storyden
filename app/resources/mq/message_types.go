@@ -17,6 +17,10 @@ import (
 )
 
 type IndexNode struct {
+	ID library.NodeID
+}
+
+type AutoFillNode struct {
 	ID               library.NodeID
 	SummariseContent bool
 	AutoTag          bool
