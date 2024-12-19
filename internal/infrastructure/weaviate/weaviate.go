@@ -101,7 +101,7 @@ func newWeaviateClient(lc fx.Lifecycle, cfg config.Config) (*weaviate.Client, We
 			},
 			ModuleConfig: map[string]ModuleConfig{
 				"text2vec-openai": {
-					Model:      "text-embedding-3-large",
+					Model:      "text-embedding-3-small",
 					Dimensions: "3072",
 					Type:       "text",
 				},

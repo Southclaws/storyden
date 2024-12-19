@@ -29,12 +29,18 @@ func (w *weaviateSemdexer) Recommend(ctx context.Context, object datagraph.Item)
 }
 
 func (w *weaviateSemdexer) RecommendRefs(ctx context.Context, object datagraph.Item) (datagraph.RefList, error) {
-	wid := GetWeaviateID(object.GetID())
+	chunkIDs := chunkIDsForItem(object)
+	if len(chunkIDs) == 0 {
+		return nil, nil
+	}
 
+	wid := chunkIDs[0]
+
+	// NOTE: Janky, needs to be rewritten for multi-vector averaging
 	result, err := w.wc.Data().ObjectsGetter().
 		WithClassName(w.cn.String()).
 		WithVector().
-		WithID(wid).
+		WithID(wid.String()).
 		Do(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -46,7 +52,7 @@ func (w *weaviateSemdexer) RecommendRefs(ctx context.Context, object datagraph.I
 
 	withNearVector := w.wc.GraphQL().NearVectorArgBuilder().
 		WithVector(wobj.Vector).
-		WithCertainty(0.5)
+		WithCertainty(0.7)
 
 	fields := []graphql.Field{
 		{Name: "datagraph_id"},
