@@ -82,7 +82,7 @@ func SeedAccount(ctx context.Context, r *account_writer.Writer, auth authenticat
 		acc.ID,
 		authentication.ServicePassword,
 		authentication.TokenTypePasswordHash,
-		"password",
+		acc.ID.String(),
 		SeedPassword,
 		nil,
 	); err != nil {
