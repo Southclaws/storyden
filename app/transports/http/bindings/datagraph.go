@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
 	"github.com/Southclaws/storyden/app/services/semdex"
+	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
@@ -28,6 +29,7 @@ type Datagraph struct {
 }
 
 func NewDatagraph(
+	info *instance_info.Provider,
 	searcher searcher.Searcher,
 	asker semdex.Asker,
 	router *echo.Echo,
@@ -37,12 +39,23 @@ func NewDatagraph(
 		asker:    asker,
 	}
 
+	ii, err := info.Get(context.Background())
+	if err != nil {
+		panic(err)
+	}
+
+	isEnabled := ii.Capabilities.Has(instance_info.CapabilitySemdex)
+
 	// The generated OpenAPI code does not expose the underlying ResponseWriter
 	// which we need for streaming Q&A responses for that ✨chatgpt✨ effect.
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
 			path := c.Path()
 			if path == "/api/datagraph/qna" {
+				if !isEnabled {
+					return echo.NewHTTPError(http.StatusNotImplemented, "Semdex is not enabled")
+				}
+
 				ctx := c.Request().Context()
 
 				query := c.QueryParam("q")
