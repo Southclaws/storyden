@@ -3,6 +3,9 @@ package ai
 import (
 	"context"
 	"math"
+	"time"
+
+	"golang.org/x/exp/rand"
 )
 
 type Mock struct{}
@@ -24,7 +27,31 @@ func (o *Mock) Prompt(ctx context.Context, input string) (*Result, error) {
 }
 
 func (o *Mock) PromptStream(ctx context.Context, input string) (chan string, chan error) {
-	return nil, nil
+	ch := make(chan string)
+	errCh := make(chan error)
+
+	go func() {
+		defer close(ch)
+		defer close(errCh)
+
+		// Simulating incremental streaming
+		parts := []string{
+			"An answer for:",
+			input,
+		}
+
+		for _, part := range parts {
+			select {
+			case <-ctx.Done():
+				errCh <- ctx.Err()
+				return
+			case ch <- part:
+				time.Sleep(time.Millisecond * (10 + time.Duration(rand.Intn(100))))
+			}
+		}
+	}()
+
+	return ch, errCh
 }
 
 const mockEmbeddingSize = 3072
