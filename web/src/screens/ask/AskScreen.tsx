@@ -9,22 +9,19 @@ import { useNodeGet } from "@/api/openapi-client/nodes";
 import { useThreadGet } from "@/api/openapi-client/threads";
 import { DatagraphItemKind } from "@/api/openapi-schema";
 import {
-  DatagraphItemBadge,
-  DatagraphItemCard,
   DatagraphItemNodeCard,
   DatagraphItemPostGenericCard,
 } from "@/components/datagraph/DatagraphItemCard";
-import { Unready } from "@/components/site/Unready";
+import { UnreadyBanner } from "@/components/site/Unready";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { Input } from "@/components/ui/input";
 import { API_ADDRESS, WEB_ADDRESS } from "@/config";
-import { DatagraphKindSchema } from "@/lib/datagraph/schema";
+import { useCapability } from "@/lib/settings/capabilities";
 import { css } from "@/styled-system/css";
-import { Box, CardBox, LStack, styled } from "@/styled-system/jsx";
+import { Box, LStack, styled } from "@/styled-system/jsx";
 import { hstack, lstack } from "@/styled-system/patterns";
-import { deriveError } from "@/utils/error";
 
 type DatagraphRef = {
   id: string;
@@ -37,6 +34,7 @@ export function AskScreen() {
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sources, setSources] = useState<Record<string, DatagraphRef>>({});
+  const isEnabled = useCapability("semdex");
 
   useEffect(() => {
     // Helper to extract SDR references from content
@@ -142,6 +140,12 @@ export function AskScreen() {
   };
 
   const sourceList = values(sources);
+
+  if (!isEnabled) {
+    return (
+      <UnreadyBanner error="Ask mode is not enabled for this installation." />
+    );
+  }
 
   return (
     <LStack>
