@@ -121,6 +121,10 @@ func (c *chromemRefIndex) SearchRefs(ctx context.Context, q string, p pagination
 	return &results, nil
 }
 
+func (c *chromemRefIndex) Ask(ctx context.Context, q string) (chan string, chan error) {
+	return nil, nil
+}
+
 func (c *chromemRefIndex) RecommendRefs(ctx context.Context, object datagraph.Item) (datagraph.RefList, error) {
 	doc, err := c.c.GetByID(ctx, object.GetID().String())
 	if err != nil {

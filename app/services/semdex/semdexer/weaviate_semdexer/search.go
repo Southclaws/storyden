@@ -34,6 +34,26 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string, p pagination.Pa
 }
 
 func (s *weaviateSemdexer) SearchRefs(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[*datagraph.Ref], error) {
+	objects, err := s.SearchChunks(ctx, q, p, opts)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	results, err := dt.MapErr(objects, mapToNodeReference)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	filtered := filterChunks(results)
+
+	deduped := dedupeChunks(filtered)
+
+	pagedResult := pagination.NewPageResult(p, len(results), deduped)
+
+	return &pagedResult, nil
+}
+
+func (s *weaviateSemdexer) SearchChunks(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) ([]WeaviateObject, error) {
 	fields := []graphql.Field{
 		{Name: "datagraph_id"},
 		{Name: "datagraph_type"},
@@ -83,11 +103,6 @@ func (s *weaviateSemdexer) SearchRefs(ctx context.Context, q string, p paginatio
 		countQuery.WithWhere(filter)
 	}
 
-	total, err := s.countObjects(ctx, *countQuery)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	result, err := mergeErrors(query.Do(context.Background()))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -103,20 +118,10 @@ func (s *weaviateSemdexer) SearchRefs(ctx context.Context, q string, p paginatio
 		return nil, fault.New("weaviate response did not contain expected class data")
 	}
 
-	results, err := dt.MapErr(classData, mapToNodeReference)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	filtered := filterChunks(results)
-
-	deduped := dedupeChunks(filtered)
-
-	pagedResult := pagination.NewPageResult(p, total, deduped)
-
-	return &pagedResult, nil
+	return classData, nil
 }
 
+// TODO: GroupBy on the datagraph_id
 func (s *weaviateSemdexer) countObjects(ctx context.Context, countQuery graphql.AggregateBuilder) (int, error) {
 	r, err := mergeErrors(countQuery.Do(ctx))
 	if err != nil {

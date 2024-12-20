@@ -47,7 +47,7 @@ export function DatagraphItemCard({ item }: Props) {
   }
 }
 
-function DatagraphItemPostGenericCard({
+export function DatagraphItemPostGenericCard({
   item,
 }: {
   item: DatagraphItemPost | DatagraphItemThread | DatagraphItemReply;
@@ -72,14 +72,14 @@ function DatagraphItemPostGenericCard({
             <Timestamp created={ref.createdAt} />
           </HStack>
 
-          <DatagraphItemBadge item={item} />
+          <DatagraphItemBadge kind={item.kind} />
         </WStack>
       }
     />
   );
 }
 
-function DatagraphItemNodeCard({ item }: { item: DatagraphItemNode }) {
+export function DatagraphItemNodeCard({ item }: { item: DatagraphItemNode }) {
   const { ref } = item;
   const url = `/l/${ref.slug}`;
 
@@ -97,14 +97,18 @@ function DatagraphItemNodeCard({ item }: { item: DatagraphItemNode }) {
             <Timestamp created={ref.createdAt} />
           </HStack>
 
-          <DatagraphItemBadge item={item} />
+          <DatagraphItemBadge kind={item.kind} />
         </WStack>
       }
     />
   );
 }
 
-function DatagraphItemProfileCard({ item }: { item: DatagraphItemProfile }) {
+export function DatagraphItemProfileCard({
+  item,
+}: {
+  item: DatagraphItemProfile;
+}) {
   const { ref } = item;
   const url = `/m/${ref.handle}`;
 
@@ -121,16 +125,16 @@ function DatagraphItemProfileCard({ item }: { item: DatagraphItemProfile }) {
             <Timestamp created={ref.createdAt} />
           </HStack>
 
-          <DatagraphItemBadge item={item} />
+          <DatagraphItemBadge kind={item.kind} />
         </WStack>
       }
     />
   );
 }
 
-export function DatagraphItemBadge({ item }: Props) {
-  const label = getDatagraphKindLabel(item.kind);
-  const colour = getDatagraphKindColour(item.kind);
+export function DatagraphItemBadge({ kind }: { kind: DatagraphItemKind }) {
+  const label = getDatagraphKindLabel(kind);
+  const colour = getDatagraphKindColour(kind);
 
   const cssVars = badgeColourCSS(colour);
 
