@@ -31,7 +31,7 @@ func newSemdexer(
 		return chromem_semdexer.New(cfg, hydrator, prompter)
 
 	case "weaviate":
-		return weaviate_semdexer.New(wc, weaviateClassName, hydrator), nil
+		return weaviate_semdexer.New(wc, weaviateClassName, prompter, hydrator), nil
 
 	default:
 		return &semdex.Disabled{}, nil
@@ -47,6 +47,7 @@ func Build() fx.Option {
 			fx.As(new(semdex.Mutator)),
 			fx.As(new(semdex.Recommender)),
 			fx.As(new(semdex.Searcher)),
+			fx.As(new(semdex.Asker)),
 		),
 	)
 }

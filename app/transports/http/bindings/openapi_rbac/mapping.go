@@ -426,6 +426,10 @@ func (m *Mapping) DatagraphSearch() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) DatagraphAsk() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionReadPublishedThreads
+}
+
 func (m *Mapping) EventList() (bool, *rbac.Permission) {
 	return false, nil
 }

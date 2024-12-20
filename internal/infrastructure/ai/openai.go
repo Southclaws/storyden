@@ -43,6 +43,48 @@ func (o *OpenAI) Prompt(ctx context.Context, input string) (*Result, error) {
 	}, nil
 }
 
+func (o *OpenAI) PromptStream(ctx context.Context, input string) (chan string, chan error) {
+	ch := make(chan string)
+	errCh := make(chan error)
+
+	go func() {
+		defer close(ch)
+		defer close(errCh)
+
+		stream := o.client.Chat.Completions.NewStreaming(ctx, openai.ChatCompletionNewParams{
+			Model: openai.F(openai.ChatModelChatgpt4oLatest),
+			Messages: openai.F([]openai.ChatCompletionMessageParamUnion{
+				openai.UserMessage(input),
+			}),
+		})
+
+		for {
+			select {
+			case <-ctx.Done():
+				errCh <- ctx.Err()
+				return
+			default:
+			}
+
+			if !stream.Next() {
+				break
+			}
+
+			chunk := stream.Current()
+
+			if len(chunk.Choices) > 0 {
+				ch <- chunk.Choices[0].Delta.Content
+			}
+		}
+
+		if err := stream.Err(); err != nil {
+			errCh <- err
+		}
+	}()
+
+	return ch, errCh
+}
+
 func (o *OpenAI) EmbeddingFunc() func(ctx context.Context, text string) ([]float32, error) {
 	return o.ef
 }

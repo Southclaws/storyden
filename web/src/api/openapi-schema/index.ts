@@ -134,6 +134,8 @@ export * from "./commonProperties";
 export * from "./commonPropertiesMisc";
 export * from "./contentFillRule";
 export * from "./credentialRequestOptions";
+export * from "./datagraphAskOKResponse";
+export * from "./datagraphAskParams";
 export * from "./datagraphItem";
 export * from "./datagraphItemKind";
 export * from "./datagraphItemList";
