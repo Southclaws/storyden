@@ -7,6 +7,9 @@ import {
   KeyboardEvent,
   forwardRef,
   useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
 } from "react";
 import {
   type HeadingInputVariantProps,
@@ -33,8 +36,25 @@ function HeadingInputWithRef(
   props: HeadingInputProps,
   ref: ForwardedRef<HTMLSpanElement>,
 ) {
-  const { onValueChange, defaultValue, ...rest } = props;
+  const { onValueChange, defaultValue, value, ...rest } = props;
   const [recipeProps, componentProps] = headingInput.splitVariantProps(rest);
+  const internalRef = useRef<HTMLSpanElement>(null);
+
+  useImperativeHandle(ref, () => internalRef.current as any);
+
+  useEffect(() => {
+    if (internalRef.current && value !== undefined) {
+      if (internalRef.current.textContent !== value) {
+        internalRef.current.textContent = value.toString();
+      }
+    }
+  }, [value]);
+
+  useEffect(() => {
+    if (internalRef.current && defaultValue) {
+      internalRef.current.textContent = defaultValue.toString();
+    }
+  }, [defaultValue]);
 
   const [headingProps] = typographyHeading.splitVariantProps(rest);
 
@@ -66,7 +86,7 @@ function HeadingInputWithRef(
   return (
     <styled.span
       {...(componentProps as any)}
-      ref={ref}
+      ref={internalRef}
       className={cx(
         headingInput({ ...recipeProps }),
         typographyHeading({ ...headingProps }),

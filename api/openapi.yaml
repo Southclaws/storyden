@@ -1572,6 +1572,7 @@ paths:
       tags: [nodes]
       parameters:
         - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/TitleFillRuleQueryParam"
         - $ref: "#/components/parameters/TagFillRuleQueryParam"
       requestBody: { $ref: "#/components/requestBodies/NodeUpdate" }
       responses:
@@ -2166,6 +2167,15 @@ components:
       required: false
       schema:
         $ref: "#/components/schemas/Identifier"
+
+    TitleFillRuleQueryParam:
+      description: |
+        Use the content extracted from the child resource to suggest a title.
+      name: title_fill_rule
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/TitleFillRule"
 
     TagFillRuleQueryParam:
       description: |
@@ -3106,6 +3116,15 @@ components:
       type: array
       items: { $ref: "#/components/schemas/InstanceCapability" }
 
+    TitleFillRule:
+      description: |
+        A title fill rule defines a strategy for automatically generating a 
+        title for a piece of content using semantic/LLM features.
+      type: string
+      enum:
+        - query
+        - replace
+
     TagFillRule:
       description: |
         A tag fill-rule defines a strategy for automatically generating a set of
@@ -3268,6 +3287,13 @@ components:
       type: string
       description: The title of a thread.
       example: Hello world!
+
+    TitleSuggestion:
+      type: object
+      description: A suggested title for a thread.
+      required: [title]
+      properties:
+        title_suggestion: { $ref: "#/components/schemas/ThreadTitle" }
 
     PostContent:
       description: |
@@ -4952,6 +4978,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
         - $ref: "#/components/schemas/NodeCommonProps"
+        - $ref: "#/components/schemas/TitleSuggestion"
         - $ref: "#/components/schemas/TagSuggestions"
 
     NodeWithChildren:

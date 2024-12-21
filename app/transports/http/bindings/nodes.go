@@ -219,6 +219,11 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	titleFillRuleParam, err := opt.MapErr(opt.NewPtr(request.Params.TitleFillRule), deserialiseTitleFillRule)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	tagFillRuleParam, err := opt.MapErr(opt.NewPtr(request.Params.TagFillRule), deserialiseTagFillRule)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -241,6 +246,10 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
 		Tags:         tags,
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
+	}
+
+	if tfr, ok := titleFillRuleParam.Get(); ok {
+		partial.TitleFill = opt.New(datagraph.TitleFillCommand{FillRule: tfr})
 	}
 
 	if tfr, ok := tagFillRuleParam.Get(); ok {
@@ -351,6 +360,10 @@ func (c *Nodes) NodeRemoveNode(ctx context.Context, request openapi.NodeRemoveNo
 func serialiseUpdatedNode(in *node_mutate.Updated) openapi.Node {
 	n := serialiseNode(&in.Node)
 
+	if ts, ok := in.TitleSuggestion.Get(); ok {
+		n.TitleSuggestion = &ts
+	}
+
 	if ts, ok := in.TagSuggestions.Get(); ok {
 		s := ts.Strings()
 		n.TagSuggestions = &s
@@ -433,4 +446,8 @@ func deserialiseInputSlug(in *string) (opt.Optional[mark.Slug], error) {
 	}
 
 	return opt.New(*slug), nil
+}
+
+func deserialiseTitleFillRule(in openapi.TitleFillRule) (datagraph.TitleFillRule, error) {
+	return datagraph.NewTitleFillRule(string(in))
 }

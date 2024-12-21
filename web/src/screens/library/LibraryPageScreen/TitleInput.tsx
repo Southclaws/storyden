@@ -6,7 +6,12 @@ import { HeadingInput } from "@/components/ui/heading-input";
 
 import { Form } from "./useLibraryPageScreen";
 
-export function TitleInput() {
+type Props = {
+  imperativeValue?: string;
+  onResetImperativeValue?: () => void;
+};
+
+export function TitleInput({ imperativeValue, onResetImperativeValue }: Props) {
   const { control, formState } = useFormContext<Form>();
 
   const fieldError = formState.errors?.["name"];
@@ -15,15 +20,21 @@ export function TitleInput() {
     <FormControl>
       <Controller
         render={({ field: { onChange, ...field }, formState }) => {
+          function handleChangeAndReset(event: any) {
+            onChange(event);
+            onResetImperativeValue?.();
+          }
+
           return (
             <HeadingInput
               id="name-input"
               size={"2xl" as any}
               fontWeight="bold"
               placeholder="Name..."
-              onValueChange={onChange}
+              onValueChange={handleChangeAndReset}
               defaultValue={formState.defaultValues?.["name"]}
               {...field}
+              value={imperativeValue ?? field.value}
             />
           );
         }}

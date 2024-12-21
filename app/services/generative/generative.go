@@ -10,6 +10,10 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/ai"
 )
 
+type Titler interface {
+	SuggestTitle(ctx context.Context, content datagraph.Content) ([]string, error)
+}
+
 type Tagger interface {
 	SuggestTags(ctx context.Context, content datagraph.Content, available tag_ref.Names) (tag_ref.Names, error)
 }
@@ -19,6 +23,7 @@ type Summariser interface {
 }
 
 var (
+	_ Titler     = &generator{}
 	_ Tagger     = &generator{}
 	_ Summariser = &generator{}
 )
@@ -35,6 +40,7 @@ func Build() fx.Option {
 	return fx.Provide(
 		fx.Annotate(
 			newGenerator,
+			fx.As(new(Titler)),
 			fx.As(new(Tagger)),
 			fx.As(new(Summariser)),
 		),
