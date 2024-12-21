@@ -76,3 +76,58 @@ func NewKind(__iNpUt__ string) (Kind, error) {
 		return Kind{}, fmt.Errorf("invalid value for type 'Kind': '%s'", __iNpUt__)
 	}
 }
+
+type TitleFillRule struct {
+	v titleFillRuleEnum
+}
+
+var (
+	TitleFillRuleQuery   = TitleFillRule{titleFillRuleQuery}
+	TitleFillRuleReplace = TitleFillRule{titleFillRuleReplace}
+)
+
+func (r TitleFillRule) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, r.v)
+	case 'q':
+		fmt.Fprintf(f, "%q", r.String())
+	default:
+		fmt.Fprint(f, r.v)
+	}
+}
+func (r TitleFillRule) String() string {
+	return string(r.v)
+}
+func (r TitleFillRule) MarshalText() ([]byte, error) {
+	return []byte(r.v), nil
+}
+func (r *TitleFillRule) UnmarshalText(__iNpUt__ []byte) error {
+	s, err := NewTitleFillRule(string(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func (r TitleFillRule) Value() (driver.Value, error) {
+	return r.v, nil
+}
+func (r *TitleFillRule) Scan(__iNpUt__ any) error {
+	s, err := NewTitleFillRule(fmt.Sprint(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func NewTitleFillRule(__iNpUt__ string) (TitleFillRule, error) {
+	switch __iNpUt__ {
+	case string(titleFillRuleQuery):
+		return TitleFillRuleQuery, nil
+	case string(titleFillRuleReplace):
+		return TitleFillRuleReplace, nil
+	default:
+		return TitleFillRule{}, fmt.Errorf("invalid value for type 'TitleFillRule': '%s'", __iNpUt__)
+	}
+}

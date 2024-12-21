@@ -242,6 +242,16 @@ export function useLibraryMutation(node?: Node) {
     return tag_suggestions;
   };
 
+  const suggestTitle = async (slug: string) => {
+    const { title_suggestion } = await nodeUpdate(
+      slug,
+      {},
+      { title_fill_rule: "query" },
+    );
+
+    return title_suggestion;
+  };
+
   const removeNodeCoverImage = async (slug: string) => {
     const nodeKey = getNodeGetKey(slug);
     const nodeKeyFn = (key: Arguments) => {
@@ -385,6 +395,7 @@ export function useLibraryMutation(node?: Node) {
   return {
     createNode,
     updateNode,
+    suggestTitle,
     suggestTags,
     removeNodeCoverImage,
     updateNodeVisibility,

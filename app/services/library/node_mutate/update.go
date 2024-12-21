@@ -18,7 +18,8 @@ import (
 
 type Updated struct {
 	library.Node
-	TagSuggestions opt.Optional[tag_ref.Names]
+	TitleSuggestion opt.Optional[string]
+	TagSuggestions  opt.Optional[tag_ref.Names]
 }
 
 func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*Updated, error) {
@@ -69,8 +70,9 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 	s.fetcher.HydrateContentURLs(ctx, n)
 
 	u := Updated{
-		Node:           *n,
-		TagSuggestions: pre.tags,
+		Node:            *n,
+		TagSuggestions:  pre.tags,
+		TitleSuggestion: pre.title,
 	}
 
 	return &u, nil

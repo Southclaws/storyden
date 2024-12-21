@@ -8,8 +8,14 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type { TagFillRuleQueryParamParameter } from "./tagFillRuleQueryParamParameter";
+import type { TitleFillRuleQueryParamParameter } from "./titleFillRuleQueryParamParameter";
 
 export type NodeUpdateParams = {
+  /**
+ * Use the content extracted from the child resource to suggest a title.
+
+ */
+  title_fill_rule?: TitleFillRuleQueryParamParameter;
   /**
  * Use the content extracted from the child resource to determine a set of
 tags (existing or new) to either write directly into the resource or to
