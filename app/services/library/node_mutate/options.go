@@ -30,7 +30,8 @@ type preMutationResult struct {
 	// returns tag suggestions which can be opted out of being applied directly.
 	// This may change in future but it would require breaking public API change
 	// and it works pretty well at the moment as an API design, so not critical.
-	tags opt.Optional[tag_ref.Names]
+	tags  opt.Optional[tag_ref.Names]
+	title opt.Optional[string]
 }
 
 // preMutation constructs node_writer options for a create or partial update.
@@ -100,9 +101,25 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 	// the new content if specified in the partial, or the current node content.
 	content := p.Content.Or(current.OrZero().Content.OrZero())
 
+	var titleSuggestion opt.Optional[string]
+	if tf, ok := p.TitleFill.Get(); ok {
+		title, err := s.buildTitleSuggestionOpts(ctx, content)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if suggested, ok := title.Get(); ok {
+			if tf.FillRule == datagraph.TitleFillRuleReplace {
+				opts = append(opts, node_writer.WithName(suggested))
+			} else {
+				titleSuggestion = title
+			}
+		}
+	}
+
 	var tags opt.Optional[tag_ref.Names]
 	if tfr, ok := p.TagFill.Get(); ok {
-		suggested, err := s.buildTagSuggestionOpts(ctx, content, tfr.FillRule)
+		suggested, err := s.buildTagSuggestionOpts(ctx, content)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
@@ -143,8 +160,9 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 	}
 
 	return &preMutationResult{
-		opts: opts,
-		tags: tags,
+		opts:  opts,
+		tags:  tags,
+		title: titleSuggestion,
 	}, nil
 }
 
@@ -204,13 +222,31 @@ func (s *Manager) createDeleteTagsForExistingNode(ctx context.Context, n *librar
 	return opts, nil
 }
 
-func (s *Manager) buildTagSuggestionOpts(ctx context.Context, content datagraph.Content, tfr tag.TagFillRule) (tag_ref.Names, error) {
+func (s *Manager) buildTitleSuggestionOpts(ctx context.Context, content datagraph.Content) (opt.Optional[string], error) {
+	// Only bother if there's any actual content to work with!
+	if content.IsEmpty() {
+		return opt.NewEmpty[string](), nil
+	}
+
+	titles, err := s.titler.SuggestTitle(ctx, content)
+	if err != nil {
+		return opt.NewEmpty[string](), fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if len(titles) == 0 {
+		return opt.NewEmpty[string](), nil
+	}
+
+	return opt.New(titles[0]), nil
+}
+
+func (s *Manager) buildTagSuggestionOpts(ctx context.Context, content datagraph.Content) (tag_ref.Names, error) {
 	// Only bother if there's any actual content to work with!
 	if content.IsEmpty() {
 		return nil, nil
 	}
 
-	gathered, err := s.tagger.Gather(ctx, tfr, content)
+	gathered, err := s.tagger.Gather(ctx, content)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

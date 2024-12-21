@@ -15,6 +15,7 @@ import { LibraryPageCoverImageControl } from "@/components/library/LibraryPageCo
 import { LibraryPageImportFromURL } from "@/components/library/LibraryPageImportFromURL/LibraryPageImportFromURL";
 import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
 import { LibraryPageTagsList } from "@/components/library/LibraryPageTagsList/LibraryPageTagsList";
+import { IntelligenceAction } from "@/components/site/Action/Intelligence";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
@@ -53,19 +54,22 @@ export function LibraryPage(props: Props) {
     handlers: {
       handleSubmit,
       handleEditMode,
-      handleVisibilityChange,
-      handleDelete,
+      handleSuggestTitle,
+      handleResetGeneratedTitle,
       handleAssetUpload,
       handleImportFromLink,
     },
     libraryPath,
     editing,
     node,
+    generatedTitle,
     cropperRef,
     primaryAssetURL,
     primaryAssetEditingURL,
     initialCoverCoordinates,
     isAllowedToEdit,
+    isTitleSuggestEnabled,
+    isLoadingSuggestTitle,
   } = useLibraryPageScreen(props);
 
   return (
@@ -181,7 +185,21 @@ export function LibraryPage(props: Props) {
             <LStack minW="0">
               <WStack alignItems="end">
                 {editing ? (
-                  <TitleInput />
+                  <>
+                    <TitleInput
+                      imperativeValue={generatedTitle}
+                      onResetImperativeValue={handleResetGeneratedTitle}
+                    />
+                    {isTitleSuggestEnabled && (
+                      <IntelligenceAction
+                        title="Suggest tags for this page"
+                        onClick={handleSuggestTitle}
+                        variant="subtle"
+                        h="full"
+                        loading={isLoadingSuggestTitle}
+                      />
+                    )}
+                  </>
                 ) : (
                   <Heading fontSize="heading.2" fontWeight="bold">
                     {node.name || "(untitled)"}

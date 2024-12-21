@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import slugify from "@sindresorhus/slugify";
 import { parseAsBoolean, useQueryState } from "nuqs";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FixedCropperRef } from "react-advanced-cropper";
 import { useForm } from "react-hook-form";
 import { match } from "ts-pattern";
@@ -10,6 +10,7 @@ import { z } from "zod";
 import { nodeAddAsset, nodeRemoveAsset } from "src/api/openapi-client/nodes";
 import {
   Asset,
+  InstanceCapability,
   LinkReference,
   NodeWithChildren,
   Permission,
@@ -26,6 +27,7 @@ import {
   CoverImageSchema,
   parseNodeMetadata,
 } from "@/lib/library/metadata";
+import { useCapability } from "@/lib/settings/capabilities";
 import { getAssetURL } from "@/utils/asset";
 import { hasPermissionOr } from "@/utils/permissions";
 
@@ -68,8 +70,14 @@ export function useLibraryPageScreen({ node }: Props) {
   });
   const libraryPath = useLibraryPath();
   const account = useSession();
-  const { revalidate, updateNode, updateNodeVisibility, deleteNode } =
-    useLibraryMutation(node);
+  const {
+    revalidate,
+    updateNode,
+    updateNodeVisibility,
+    suggestTitle,
+    deleteNode,
+  } = useLibraryMutation(node);
+  const isTitleSuggestEnabled = useCapability(InstanceCapability.gen_ai);
 
   const cropperRef = useRef<FixedCropperRef>(null);
 
@@ -109,6 +117,35 @@ export function useLibraryPageScreen({ node }: Props) {
       form.setValue("slug", autoSlug);
     }
   }, [form, name]);
+
+  // Title suggestion logic
+  const [generatedTitle, setGeneratedTitle] = useState<string | undefined>(
+    undefined,
+  );
+  const [isLoadingSuggestTitle, setLoadingSuggestTitle] = useState(false);
+
+  function handleResetGeneratedTitle() {
+    setGeneratedTitle(undefined);
+  }
+
+  async function handleSuggestTitle() {
+    await handle(
+      async () => {
+        setLoadingSuggestTitle(true);
+
+        const title = await suggestTitle(node.id);
+        if (!title) {
+          throw new Error("No title could be suggested for this content.");
+        }
+
+        form.setValue("name", title);
+        setGeneratedTitle(title);
+      },
+      {
+        cleanup: async () => setLoadingSuggestTitle(false),
+      },
+    );
+  }
 
   // This URL is used for the crop editor, it will always be the original image
   // depending on whether the current primary image has any new versions set.
@@ -322,8 +359,8 @@ export function useLibraryPageScreen({ node }: Props) {
     handlers: {
       handleEditMode,
       handleSubmit,
-      handleVisibilityChange,
-      handleDelete,
+      handleSuggestTitle,
+      handleResetGeneratedTitle,
       handleAssetUpload,
       handleAssetRemove,
       handleImportFromLink,
@@ -331,6 +368,7 @@ export function useLibraryPageScreen({ node }: Props) {
     libraryPath,
     editing,
     node,
+    generatedTitle,
     cropperRef,
     primaryAssetURL,
     primaryAssetEditingURL,
@@ -338,5 +376,7 @@ export function useLibraryPageScreen({ node }: Props) {
     isAllowedToEdit,
     isSaving: form.formState.isSubmitting,
     isAllowedToDelete,
+    isTitleSuggestEnabled,
+    isLoadingSuggestTitle,
   };
 }

@@ -39,6 +39,7 @@ type Partial struct {
 	AssetsAdd        opt.Optional[[]asset.AssetID]
 	AssetsRemove     opt.Optional[[]asset.AssetID]
 	AssetSources     opt.Optional[[]string]
+	TitleFill        opt.Optional[datagraph.TitleFillCommand]
 	TagFill          opt.Optional[tag.TagFillCommand]
 	ContentFill      opt.Optional[asset.ContentFillCommand]
 	ContentSummarise opt.Optional[bool]
@@ -50,6 +51,7 @@ type Manager struct {
 	nodeQuerier       *node_querier.Querier
 	nodeWriter        *node_writer.Writer
 	tagWriter         *tag_writer.Writer
+	titler            generative.Titler
 	tagger            *autotagger.Tagger
 	nc                node_children.Repository
 	fetcher           *fetcher.Fetcher
@@ -65,6 +67,7 @@ func New(
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	tagWriter *tag_writer.Writer,
+	titler generative.Titler,
 	tagger *autotagger.Tagger,
 	nc node_children.Repository,
 	fetcher *fetcher.Fetcher,
@@ -79,6 +82,7 @@ func New(
 		nodeQuerier:       nodeQuerier,
 		nodeWriter:        nodeWriter,
 		tagWriter:         tagWriter,
+		titler:            titler,
 		tagger:            tagger,
 		nc:                nc,
 		fetcher:           fetcher,
