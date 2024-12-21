@@ -39,17 +39,16 @@ func NewDatagraph(
 		asker:    asker,
 	}
 
-	ii, err := info.Get(context.Background())
-	if err != nil {
-		panic(err)
-	}
-
-	isEnabled := ii.Capabilities.Has(instance_info.CapabilitySemdex)
-
 	// The generated OpenAPI code does not expose the underlying ResponseWriter
 	// which we need for streaming Q&A responses for that ✨chatgpt✨ effect.
 	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+			ii, err := info.Get(context.Background())
+			if err != nil {
+				return fault.Wrap(err, fctx.With(c.Request().Context()))
+			}
+			isEnabled := ii.Capabilities.Has(instance_info.CapabilitySemdex)
+
 			path := c.Path()
 			if path == "/api/datagraph/qna" {
 				if !isEnabled {
