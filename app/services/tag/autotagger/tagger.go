@@ -7,7 +7,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_querier"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/services/generative"
@@ -28,7 +27,7 @@ func New(
 	}
 }
 
-func (t *Tagger) Gather(ctx context.Context, tfr tag.TagFillRule, content datagraph.Content) (tag_ref.Names, error) {
+func (t *Tagger) Gather(ctx context.Context, content datagraph.Content) (tag_ref.Names, error) {
 	available, err := t.querier.List(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
