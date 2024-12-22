@@ -4,7 +4,6 @@ import { PropsWithChildren } from "react";
 import { getColourAsHex } from "src/utils/colour";
 
 import { inter, interDisplay } from "@/app/fonts";
-import { WEB_ADDRESS } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";
 import { getIconURL } from "@/utils/icon";
 
@@ -14,10 +13,27 @@ import { Providers } from "./providers";
 
 export const dynamic = "force-dynamic";
 
+const API_ADDRESS =
+  global.process.env["NEXT_PUBLIC_API_ADDRESS"] ?? "http://localhost:8000";
+const WEB_ADDRESS =
+  global.process.env["NEXT_PUBLIC_WEB_ADDRESS"] ?? "http://localhost:3000";
+
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" className={`${inter.variable} ${interDisplay.variable}`}>
       <head>
+        {/*
+          NOTE: Because the browser side does not support dynamic environment
+          variables (obviously, it's a browser script) we hack around Next.js'
+          build-time variables by providing a direct reference to these inside
+          the window object. This allows us to set the API/frontend addresses
+          without rebuilding the entire app.
+        */}
+        <script>{`
+          window.__storyden__ = {"API_ADDRESS":"${API_ADDRESS}", "WEB_ADDRESS":"${WEB_ADDRESS}", "source": "script"};
+          console.log("set up window config", window.__storyden__);
+        `}</script>
+
         {/*
             NOTE: This stylesheet is fully server-side rendered but it's not
             static because it uses data from the API to be generated. But we
