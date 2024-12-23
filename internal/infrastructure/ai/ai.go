@@ -21,6 +21,9 @@ func New(cfg config.Config) (Prompter, error) {
 	case "openai":
 		return newOpenAI(cfg)
 
+	case "perplexity":
+		return newPerplexity(cfg)
+
 	case "mock":
 		return newMock()
 
