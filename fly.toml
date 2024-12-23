@@ -10,9 +10,10 @@ kill_timeout = 5
   PUBLIC_API_ADDRESS = "https://api.makeroom.club"
   PUBLIC_WEB_ADDRESS = "https://makeroom.club"
 
-  CACHE_PROVIDER  = "redis"
-  EMAIL_PROVIDER  = "sendgrid"
-  SEMDEX_PROVIDER = "chromem"
+  CACHE_PROVIDER          = "redis"
+  EMAIL_PROVIDER          = "sendgrid"
+  LANGUAGE_MODEL_PROVIDER = "openai"
+  SEMDEX_PROVIDER         = "chromem"
 
   ASSET_STORAGE_TYPE = "s3"
 
