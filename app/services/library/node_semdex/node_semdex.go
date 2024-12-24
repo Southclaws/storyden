@@ -157,7 +157,7 @@ func newSemdexer(
 			for msg := range sub {
 				ctx = session.GetSessionFromMessage(ctx, msg)
 
-				if err := re.autofill(ctx, msg.Payload.ID, msg.Payload.SummariseContent, msg.Payload.AutoTag); err != nil {
+				if err := re.autofill(ctx, msg.Payload.ID, msg.Payload.AutoTitle, msg.Payload.AutoTag); err != nil {
 					l.Error("failed to autofill node", zap.Error(err))
 				}
 

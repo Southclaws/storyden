@@ -7,6 +7,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { FillSourceQueryParameter } from "./fillSourceQueryParameter";
+import type { NodeContentFillRuleQueryParameter } from "./nodeContentFillRuleQueryParameter";
 import type { TagFillRuleQueryParamParameter } from "./tagFillRuleQueryParamParameter";
 import type { TitleFillRuleQueryParamParameter } from "./titleFillRuleQueryParamParameter";
 
@@ -23,4 +25,20 @@ return as part of the response in order to prompt for confirmation.
 
  */
   tag_fill_rule?: TagFillRuleQueryParamParameter;
+  /**
+ * Use the content extracted from the child resource to modify the target
+resource. This can be used to populate a node from a asset or link. For
+example, if you wanted to create a node that held the contents of a PDF
+file, you can upload the file with a target node and a fill rule set.
+
+ */
+  content_fill_rule?: NodeContentFillRuleQueryParameter;
+  /**
+ * When NodeContentFillRuleQuery is used, this option must be set in order
+to specify the source of the content-fill command. This allows you to
+fill a page with either a summary of the content (existing or new) or
+from the URL by scraping the content.
+
+ */
+  fill_source?: FillSourceQueryParameter;
 };

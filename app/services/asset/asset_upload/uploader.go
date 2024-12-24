@@ -77,7 +77,12 @@ func (s *Uploader) Upload(ctx context.Context, or io.Reader, size int64, name as
 	}
 
 	if cfr, ok := opts.ContentFill.Get(); ok {
-		nodeID := library.QueryKey{mark.NewQueryKeyID(cfr.TargetNodeID)}
+		targetNode, ok := cfr.TargetNodeID.Get()
+		if !ok {
+			return nil, fault.New("target node ID not set", fctx.With(ctx))
+		}
+
+		nodeID := library.QueryKey{mark.NewQueryKeyID(targetNode)}
 
 		_, err := s.nodewriter.Update(ctx, nodeID, node_writer.WithAssets([]asset.AssetID{a.ID}))
 		if err != nil {

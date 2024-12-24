@@ -15,11 +15,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
-	"github.com/Southclaws/storyden/app/services/link/fetcher"
 )
 
 type preMutationResult struct {
@@ -30,8 +28,9 @@ type preMutationResult struct {
 	// returns tag suggestions which can be opted out of being applied directly.
 	// This may change in future but it would require breaking public API change
 	// and it works pretty well at the moment as an API design, so not critical.
-	tags  opt.Optional[tag_ref.Names]
-	title opt.Optional[string]
+	tags    opt.Optional[tag_ref.Names]
+	title   opt.Optional[string]
+	content opt.Optional[datagraph.Content]
 }
 
 // preMutation constructs node_writer options for a create or partial update.
@@ -73,35 +72,60 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 		opts = append(opts, o...)
 	}
 
-	// If assets have been added to the node and there's a content fill rule,
-	// queue the assets for extraction for the node's content etc.
-	assetsAdd, assetsAddSet := p.AssetsAdd.Get()
-	if assetsAddSet && p.ContentFill.Ok() {
-		if err := s.assetAnalyseQueue.Publish(ctx, dt.Map(assetsAdd, func(a asset.AssetID) mq.AnalyseAsset {
-			return mq.AnalyseAsset{
-				AssetID:         a,
-				ContentFillRule: p.ContentFill,
-			}
-		})...); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-	}
+	// -
+	// Generative Fill Rules
+	// -
 
-	// If there's a URL being applied, fetch its contents.
-	if u, ok := p.URL.Get(); ok {
-		ln, err := s.fetcher.Fetch(ctx, u, fetcher.Options{})
-		if err == nil {
-			opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
-		}
-	}
-
+	//
 	// The content to use during pre-mutation tasks such as tag suggestion, auto
 	// title generation and content summarisation. If it's a new node, this will
 	// be the content submitted for the new node, if it's an update, either pick
 	// the new content if specified in the partial, or the current node content.
+	//
+	// The first fill rule to run is summarisation, which generates a summary of
+	// the content either from a URL or from the current or new content. This
+	// mutates the current context content to be the summary thus resulting in
+	// title or tag generation to be run on the summary result not the original.
+	//
+
 	content := p.Content.Or(current.OrZero().Content.OrZero())
 
+	var contentSuggestion opt.Optional[datagraph.Content]
 	var titleSuggestion opt.Optional[string]
+	var tagSuggestions opt.Optional[tag_ref.Names]
+	var tagsToWrite opt.Optional[tag_ref.Names]
+
+	// If there's a URL being applied, fetch it and if it returns new content,
+	// set that as the content to be used for fill rules.
+	if u, ok := p.URL.Get(); ok {
+		ln, wc, err := s.fetcher.ScrapeAndStore(ctx, u)
+		if err == nil {
+			opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
+
+			// If the request intends to run fill-rules on URL content, set it.
+			if fs, ok := p.FillSource.Get(); ok && fs == asset.FillSourceURL {
+				content = wc.Content
+				titleSuggestion = opt.New(wc.Title)
+			}
+		}
+	}
+
+	if cfr, ok := p.ContentFill.Get(); ok {
+		suggested, err := s.buildSummaryOpts(ctx, content)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		switch cfr.FillRule {
+		case asset.ContentFillRuleQuery:
+			content = *suggested
+			contentSuggestion = opt.New(*suggested)
+
+		case asset.ContentFillRuleReplace:
+			opts = append(opts, node_writer.WithContent(*suggested))
+		}
+	}
+
 	if tf, ok := p.TitleFill.Get(); ok {
 		title, err := s.buildTitleSuggestionOpts(ctx, content)
 		if err != nil {
@@ -117,23 +141,33 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 		}
 	}
 
-	var tags opt.Optional[tag_ref.Names]
 	if tfr, ok := p.TagFill.Get(); ok {
 		suggested, err := s.buildTagSuggestionOpts(ctx, content)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		if tfr.FillRule == tag.TagFillRuleReplace {
-			tags = opt.New(suggested)
-		} else {
-			tags = p.Tags
+		switch tfr.FillRule {
+		case tag.TagFillRuleQuery:
+			tagSuggestions = opt.New(suggested)
+
+		case tag.TagFillRuleReplace:
+			tagsToWrite = opt.New(suggested)
 		}
 	} else {
-		tags = p.Tags
+		// If not running a generative fill command use the partial update tags.
+		tagsToWrite = p.Tags
 	}
 
-	if t, ok := tags.Get(); ok {
+	// -
+	// Saving tags
+	//
+	// Happens after any generative options due to how tag-fill rules may yield
+	// new tags that need to be saved before being applied to the node. But even
+	// if there's no tag-fill rule set this is applied to any tags in the patch.
+	// -
+
+	if t, ok := tagsToWrite.Get(); ok {
 		n, ok := current.Get()
 		if ok {
 			tagOpts, err := s.createDeleteTagsForExistingNode(ctx, &n, t)
@@ -150,19 +184,11 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 		}
 	}
 
-	if p.ContentSummarise.OrZero() {
-		opt, err := s.buildSummaryOpts(ctx, content)
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-
-		opts = append(opts, opt)
-	}
-
 	return &preMutationResult{
-		opts:  opts,
-		tags:  tags,
-		title: titleSuggestion,
+		opts:    opts,
+		tags:    tagSuggestions,
+		title:   titleSuggestion,
+		content: contentSuggestion,
 	}, nil
 }
 
@@ -254,7 +280,7 @@ func (s *Manager) buildTagSuggestionOpts(ctx context.Context, content datagraph.
 	return gathered, nil
 }
 
-func (s *Manager) buildSummaryOpts(ctx context.Context, content datagraph.Content) (node_writer.Option, error) {
+func (s *Manager) buildSummaryOpts(ctx context.Context, content datagraph.Content) (*datagraph.Content, error) {
 	summary, err := s.summariser.Summarise(ctx, content)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -265,5 +291,5 @@ func (s *Manager) buildSummaryOpts(ctx context.Context, content datagraph.Conten
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return node_writer.WithContent(newContent), nil
+	return &newContent, nil
 }

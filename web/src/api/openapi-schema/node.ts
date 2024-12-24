@@ -8,6 +8,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type { CommonProperties } from "./commonProperties";
+import type { ContentSuggestion } from "./contentSuggestion";
 import type { NodeCommonProps } from "./nodeCommonProps";
 import type { TagSuggestions } from "./tagSuggestions";
 import type { TitleSuggestion } from "./titleSuggestion";
@@ -22,4 +23,5 @@ can be referenced in content posts and they also have their own content.
 export type Node = CommonProperties &
   NodeCommonProps &
   TitleSuggestion &
-  TagSuggestions;
+  TagSuggestions &
+  ContentSuggestion;
