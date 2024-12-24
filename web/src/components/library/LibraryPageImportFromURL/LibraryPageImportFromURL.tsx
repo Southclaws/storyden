@@ -29,6 +29,7 @@ type Props = Omit<ControllerProps<Form>, "render"> & {
 
 function useLibraryPageImportFromURL({ node, onImport }: Props) {
   const [link, setLink] = useState<LinkReference | null | undefined>(null);
+  const [isImporting, setIsImporting] = useState(false);
 
   async function handleURL(s: string) {
     if (s === "") {
@@ -59,12 +60,15 @@ function useLibraryPageImportFromURL({ node, onImport }: Props) {
       return;
     }
 
+    setIsImporting(true);
     await onImport(link);
+    setIsImporting(false);
   }
 
   return {
     data: {
       link,
+      isImporting,
     },
     handlers: {
       handleURL,
@@ -76,7 +80,7 @@ function useLibraryPageImportFromURL({ node, onImport }: Props) {
 export function LibraryPageImportFromURL(props: Props) {
   const { data, handlers } = useLibraryPageImportFromURL(props);
 
-  const { link } = data;
+  const { link, isImporting } = data;
 
   return (
     <Controller<Form>
@@ -116,6 +120,7 @@ export function LibraryPageImportFromURL(props: Props) {
                   size="xs"
                   variant="subtle"
                   disabled={!link}
+                  loading={isImporting}
                   onClick={handlers.handleImport}
                 >
                   Import

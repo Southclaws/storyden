@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/opt"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -18,8 +19,9 @@ import (
 
 type Updated struct {
 	library.Node
-	TitleSuggestion opt.Optional[string]
-	TagSuggestions  opt.Optional[tag_ref.Names]
+	TitleSuggestion   opt.Optional[string]
+	TagSuggestions    opt.Optional[tag_ref.Names]
+	ContentSuggestion opt.Optional[datagraph.Content]
 }
 
 func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*Updated, error) {
@@ -70,9 +72,10 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 	s.fetcher.HydrateContentURLs(ctx, n)
 
 	u := Updated{
-		Node:            *n,
-		TagSuggestions:  pre.tags,
-		TitleSuggestion: pre.title,
+		Node:              *n,
+		TagSuggestions:    pre.tags,
+		TitleSuggestion:   pre.title,
+		ContentSuggestion: pre.content,
 	}
 
 	return &u, nil

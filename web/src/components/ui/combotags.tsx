@@ -17,6 +17,7 @@ import { DeleteSmallIcon } from "./icons/Delete";
 
 export type Props = {
   initialValue?: string[];
+  value?: string[];
   onQuery: (query: string) => Promise<string[]>;
   onChange: (values: string[]) => Promise<void>;
 };
@@ -38,6 +39,7 @@ export const Combotags = forwardRef<CombotagsHandle, Props>((props, ref) => {
   // use the context provider here for easier control of the tags input values.
   const tagsInput = useTagsInput({
     defaultValue: props.initialValue,
+    value: props.value ?? props.initialValue,
     inputValue: searchQuery,
     addOnPaste: true,
     onInputValueChange: handleInputValueChange,

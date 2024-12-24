@@ -12,6 +12,7 @@ type ContentFillRule struct {
 }
 
 var (
+	ContentFillRuleQuery   = ContentFillRule{contentFillRuleQuery}
 	ContentFillRuleCreate  = ContentFillRule{contentFillRuleCreate}
 	ContentFillRulePrepend = ContentFillRule{contentFillRulePrepend}
 	ContentFillRuleAppend  = ContentFillRule{contentFillRuleAppend}
@@ -55,6 +56,8 @@ func (r *ContentFillRule) Scan(__iNpUt__ any) error {
 }
 func NewContentFillRule(__iNpUt__ string) (ContentFillRule, error) {
 	switch __iNpUt__ {
+	case string(contentFillRuleQuery):
+		return ContentFillRuleQuery, nil
 	case string(contentFillRuleCreate):
 		return ContentFillRuleCreate, nil
 	case string(contentFillRulePrepend):
@@ -65,5 +68,60 @@ func NewContentFillRule(__iNpUt__ string) (ContentFillRule, error) {
 		return ContentFillRuleReplace, nil
 	default:
 		return ContentFillRule{}, fmt.Errorf("invalid value for type 'ContentFillRule': '%s'", __iNpUt__)
+	}
+}
+
+type FillSource struct {
+	v fillSourceEnum
+}
+
+var (
+	FillSourceURL     = FillSource{fillSourceURL}
+	FillSourceContent = FillSource{fillSourceContent}
+)
+
+func (r FillSource) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, r.v)
+	case 'q':
+		fmt.Fprintf(f, "%q", r.String())
+	default:
+		fmt.Fprint(f, r.v)
+	}
+}
+func (r FillSource) String() string {
+	return string(r.v)
+}
+func (r FillSource) MarshalText() ([]byte, error) {
+	return []byte(r.v), nil
+}
+func (r *FillSource) UnmarshalText(__iNpUt__ []byte) error {
+	s, err := NewFillSource(string(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func (r FillSource) Value() (driver.Value, error) {
+	return r.v, nil
+}
+func (r *FillSource) Scan(__iNpUt__ any) error {
+	s, err := NewFillSource(fmt.Sprint(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func NewFillSource(__iNpUt__ string) (FillSource, error) {
+	switch __iNpUt__ {
+	case string(fillSourceURL):
+		return FillSourceURL, nil
+	case string(fillSourceContent):
+		return FillSourceContent, nil
+	default:
+		return FillSource{}, fmt.Errorf("invalid value for type 'FillSource': '%s'", __iNpUt__)
 	}
 }

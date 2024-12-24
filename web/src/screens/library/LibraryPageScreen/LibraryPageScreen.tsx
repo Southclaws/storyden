@@ -17,6 +17,7 @@ import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPag
 import { LibraryPageTagsList } from "@/components/library/LibraryPageTagsList/LibraryPageTagsList";
 import { IntelligenceAction } from "@/components/site/Action/Intelligence";
 import { UnreadyBanner } from "@/components/site/Unready";
+import { Button } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
 import { LinkButton } from "@/components/ui/link-button";
 import { css } from "@/styled-system/css";
@@ -29,6 +30,7 @@ import { TitleInput } from "./TitleInput";
 import {
   CROP_STENCIL_HEIGHT,
   CROP_STENCIL_WIDTH,
+  Form,
   Props,
   useLibraryPageScreen,
 } from "./useLibraryPageScreen";
@@ -62,6 +64,7 @@ export function LibraryPage(props: Props) {
     libraryPath,
     editing,
     node,
+    generatedContent,
     generatedTitle,
     cropperRef,
     primaryAssetURL,
@@ -192,7 +195,7 @@ export function LibraryPage(props: Props) {
                     />
                     {isTitleSuggestEnabled && (
                       <IntelligenceAction
-                        title="Suggest tags for this page"
+                        title="Suggest a title for this page"
                         onClick={handleSuggestTitle}
                         variant="subtle"
                         h="full"
@@ -209,7 +212,12 @@ export function LibraryPage(props: Props) {
             </LStack>
           </LStack>
 
-          <LibraryPageTagsList editing={editing} node={node} />
+          <LibraryPageTagsList<Form>
+            control={form.control}
+            name="tags"
+            editing={editing}
+            node={node}
+          />
 
           <LStack gap="2">
             <HStack w="full">
@@ -238,6 +246,7 @@ export function LibraryPage(props: Props) {
             initialValue={
               node.content ?? form.formState.defaultValues?.["content"]
             }
+            value={generatedContent}
           />
         </LStack>
       </FormProvider>

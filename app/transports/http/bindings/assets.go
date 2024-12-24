@@ -87,7 +87,7 @@ func getContentFillRuleCommand(contentFillRuleParam *openapi.ContentFillRule, co
 		}
 
 		return opt.New(asset.ContentFillCommand{
-			TargetNodeID: nodeID,
+			TargetNodeID: opt.New(nodeID),
 			FillRule:     rule,
 		}), nil
 	}

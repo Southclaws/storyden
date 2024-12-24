@@ -252,6 +252,33 @@ export function useLibraryMutation(node?: Node) {
     return title_suggestion;
   };
 
+  const suggestSummary = async (slug: string) => {
+    const { title_suggestion } = await nodeUpdate(
+      slug,
+      {},
+      { content_fill_rule: "query" },
+    );
+
+    return title_suggestion;
+  };
+
+  const importFromLink = async (slug: string, url: string) => {
+    const { title_suggestion, tag_suggestions, content_suggestion } =
+      await nodeUpdate(
+        slug,
+        { url },
+        {
+          // generate all these fields from the provided URL:
+          fill_source: "url",
+          // title_fill_rule: "query",
+          tag_fill_rule: "query",
+          content_fill_rule: "query",
+        },
+      );
+
+    return { title_suggestion, tag_suggestions, content_suggestion };
+  };
+
   const removeNodeCoverImage = async (slug: string) => {
     const nodeKey = getNodeGetKey(slug);
     const nodeKeyFn = (key: Arguments) => {
@@ -396,7 +423,9 @@ export function useLibraryMutation(node?: Node) {
     createNode,
     updateNode,
     suggestTitle,
+    suggestSummary,
     suggestTags,
+    importFromLink,
     removeNodeCoverImage,
     updateNodeVisibility,
     addAsset,

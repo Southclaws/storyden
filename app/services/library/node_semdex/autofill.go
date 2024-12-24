@@ -8,18 +8,19 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
 )
 
-func (i *semdexer) autofill(ctx context.Context, id library.NodeID, summarise bool, autotag bool) error {
+func (i *semdexer) autofill(ctx context.Context, id library.NodeID, autotitle bool, autotag bool) error {
 	qk := library.NewID(xid.ID(id))
 
 	p := node_mutate.Partial{}
 
-	if summarise {
-		p.ContentSummarise = opt.New(true)
+	if autotitle {
+		p.TitleFill = opt.New(datagraph.TitleFillCommand{FillRule: datagraph.TitleFillRuleReplace})
 	}
 
 	if autotag {
