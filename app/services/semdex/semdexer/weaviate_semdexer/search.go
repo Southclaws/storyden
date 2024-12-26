@@ -2,6 +2,8 @@ package weaviate_semdexer
 
 import (
 	"context"
+	"fmt"
+	"net/url"
 	"sort"
 
 	"github.com/Southclaws/dt"
@@ -16,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
+	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
 func (s *weaviateSemdexer) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
@@ -34,7 +37,7 @@ func (s *weaviateSemdexer) Search(ctx context.Context, q string, p pagination.Pa
 }
 
 func (s *weaviateSemdexer) SearchRefs(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[*datagraph.Ref], error) {
-	objects, err := s.SearchChunks(ctx, q, p, opts)
+	objects, err := s.searchObjects(ctx, q, p, opts)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -53,7 +56,16 @@ func (s *weaviateSemdexer) SearchRefs(ctx context.Context, q string, p paginatio
 	return &pagedResult, nil
 }
 
-func (s *weaviateSemdexer) SearchChunks(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) ([]WeaviateObject, error) {
+func (s *weaviateSemdexer) SearchChunks(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) ([]*semdex.Chunk, error) {
+	classData, err := s.searchObjects(ctx, q, p, opts)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return mapObjectsToChunks(classData)
+}
+
+func (s *weaviateSemdexer) searchObjects(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) ([]WeaviateObject, error) {
 	fields := []graphql.Field{
 		{Name: "datagraph_id"},
 		{Name: "datagraph_type"},
@@ -189,4 +201,32 @@ func dedupeChunks(results []*datagraph.Ref) []*datagraph.Ref {
 	sort.Sort(datagraph.RefList(deduped))
 
 	return deduped
+}
+
+func mapObjectToChunk(o WeaviateObject) (*semdex.Chunk, error) {
+	id, err := xid.FromString(o.DatagraphID)
+	if err != nil {
+		return nil, err
+	}
+
+	kind, err := datagraph.NewKind(o.DatagraphType)
+	if err != nil {
+		return nil, err
+	}
+
+	sdr, err := url.Parse(fmt.Sprintf("%s:%s/%s", datagraph.RefScheme, kind, id.String()))
+	if err != nil {
+		return nil, err
+	}
+
+	return &semdex.Chunk{
+		ID:      id,
+		Kind:    kind,
+		URL:     *sdr,
+		Content: o.Content,
+	}, nil
+}
+
+func mapObjectsToChunks(objects []WeaviateObject) ([]*semdex.Chunk, error) {
+	return dt.MapErr(objects, mapObjectToChunk)
 }

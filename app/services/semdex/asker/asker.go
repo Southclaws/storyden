@@ -1,57 +1,35 @@
-package weaviate_semdexer
+package asker
 
 import (
 	"context"
-	"fmt"
 	"html/template"
-	"net/url"
 	"strings"
 
-	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/rs/xid"
+	"github.com/Southclaws/fault/ftag"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
+	"github.com/Southclaws/storyden/app/services/semdex"
+	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/infrastructure/ai"
 )
 
-type Source struct {
-	ID      xid.ID
-	Kind    datagraph.Kind
-	URL     url.URL
-	Content string
+type Asker struct {
+	searcher semdex.Searcher
+	prompter ai.Prompter
 }
 
-// const fakeSDR = "https://sdr-dummy-domain.com/"
-
-func mapObjectToSource(o WeaviateObject) (*Source, error) {
-	id, err := xid.FromString(o.DatagraphID)
-	if err != nil {
-		return nil, err
+func New(cfg config.Config, searcher semdex.Searcher, prompter ai.Prompter) (*Asker, error) {
+	if cfg.SemdexProvider != "" && cfg.LanguageModelProvider == "" {
+		return nil, fault.New("semdex requires a language model provider to be enabled")
 	}
 
-	kind, err := datagraph.NewKind(o.DatagraphType)
-	if err != nil {
-		return nil, err
-	}
-
-	fakeSDR, err := url.Parse(fmt.Sprintf("%s:%s/%s", datagraph.RefScheme, kind, id.String()))
-	if err != nil {
-		return nil, err
-	}
-
-	return &Source{
-		ID:      id,
-		Kind:    kind,
-		URL:     *fakeSDR,
-		Content: o.Content,
+	return &Asker{
+		searcher: searcher,
+		prompter: prompter,
 	}, nil
-}
-
-func mapObjectsToSources(objects []WeaviateObject) ([]*Source, error) {
-	return dt.MapErr(objects, mapObjectToSource)
 }
 
 var AnswerPrompt = template.Must(template.New("").Parse(`
@@ -78,28 +56,27 @@ References:
 
 const maxContextForRAG = 10
 
-func (s *weaviateSemdexer) Ask(ctx context.Context, q string) (chan string, chan error) {
-	objects, err := s.SearchChunks(ctx, q, pagination.NewPageParams(1, 200), searcher.Options{})
+func (a *Asker) Ask(ctx context.Context, q string) (chan string, chan error) {
+	chunks, err := a.searcher.SearchChunks(ctx, q, pagination.NewPageParams(1, 200), searcher.Options{})
 	if err != nil {
 		ech := make(chan error, 1)
 		ech <- fault.Wrap(err, fctx.With(ctx))
 		return nil, ech
 	}
 
-	if len(objects) > maxContextForRAG {
-		objects = objects[:maxContextForRAG]
+	if len(chunks) == 0 {
+		ech := make(chan error, 1)
+		ech <- fault.New("no context found for question", fctx.With(ctx), ftag.With(ftag.NotFound))
+		return nil, ech
 	}
 
-	sources, err := mapObjectsToSources(objects)
-	if err != nil {
-		ech := make(chan error, 1)
-		ech <- fault.Wrap(err, fctx.With(ctx))
-		return nil, ech
+	if len(chunks) > maxContextForRAG {
+		chunks = chunks[:maxContextForRAG]
 	}
 
 	t := strings.Builder{}
 	err = AnswerPrompt.Execute(&t, map[string]any{
-		"Context":  sources,
+		"Context":  chunks,
 		"Question": q,
 	})
 	if err != nil {
@@ -108,7 +85,7 @@ func (s *weaviateSemdexer) Ask(ctx context.Context, q string) (chan string, chan
 		return nil, ech
 	}
 
-	chch, ech := s.ai.PromptStream(ctx, t.String())
+	chch, ech := a.prompter.PromptStream(ctx, t.String())
 
 	return chch, ech
 }

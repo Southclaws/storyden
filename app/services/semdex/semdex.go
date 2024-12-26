@@ -3,6 +3,7 @@ package semdex
 
 import (
 	"context"
+	"net/url"
 
 	"github.com/rs/xid"
 
@@ -23,15 +24,22 @@ type Mutator interface {
 
 type Querier interface {
 	Searcher
-	Asker
 	Recommender
 
 	GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error)
 }
 
+type Chunk struct {
+	ID      xid.ID
+	Kind    datagraph.Kind
+	URL     url.URL
+	Content string
+}
+
 type Searcher interface {
 	Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error)
 	SearchRefs(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[*datagraph.Ref], error)
+	SearchChunks(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) ([]*Chunk, error)
 }
 
 type Asker interface {
