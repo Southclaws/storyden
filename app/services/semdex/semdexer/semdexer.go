@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/storyden/app/resources/datagraph/hydrate"
 	"github.com/Southclaws/storyden/app/services/semdex"
+	"github.com/Southclaws/storyden/app/services/semdex/asker"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/chromem_semdexer"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/weaviate_semdexer"
 	"github.com/Southclaws/storyden/internal/config"
@@ -31,7 +32,7 @@ func newSemdexer(
 		return chromem_semdexer.New(cfg, hydrator, prompter)
 
 	case "weaviate":
-		return weaviate_semdexer.New(wc, weaviateClassName, prompter, hydrator), nil
+		return weaviate_semdexer.New(wc, weaviateClassName, hydrator), nil
 
 	default:
 		return &semdex.Disabled{}, nil
@@ -39,15 +40,22 @@ func newSemdexer(
 }
 
 func Build() fx.Option {
-	return fx.Provide(
-		fx.Annotate(
-			newSemdexer,
-			fx.As(new(semdex.Semdexer)),
-			fx.As(new(semdex.Querier)),
-			fx.As(new(semdex.Mutator)),
-			fx.As(new(semdex.Recommender)),
-			fx.As(new(semdex.Searcher)),
-			fx.As(new(semdex.Asker)),
+	return fx.Options(
+		fx.Provide(
+			fx.Annotate(
+				asker.New,
+				fx.As(new(semdex.Asker)),
+			),
+		),
+		fx.Provide(
+			fx.Annotate(
+				newSemdexer,
+				fx.As(new(semdex.Semdexer)),
+				fx.As(new(semdex.Querier)),
+				fx.As(new(semdex.Mutator)),
+				fx.As(new(semdex.Recommender)),
+				fx.As(new(semdex.Searcher)),
+			),
 		),
 	)
 }
