@@ -2,7 +2,9 @@ package chromem_semdexer
 
 import (
 	"context"
+	"fmt"
 	"math"
+	"net/url"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -121,8 +123,27 @@ func (c *chromemRefIndex) SearchRefs(ctx context.Context, q string, p pagination
 	return &results, nil
 }
 
-func (c *chromemRefIndex) Ask(ctx context.Context, q string) (chan string, chan error) {
-	return nil, nil
+func (c *chromemRefIndex) SearchChunks(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) ([]*semdex.Chunk, error) {
+	nr := min(c.c.Count(), p.Size())
+	if nr == 0 {
+		return []*semdex.Chunk{}, nil
+	}
+
+	rs, err := c.c.Query(ctx, q, nr, nil, nil)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	filtered := lo.Filter(rs, func(r chromem.Result, _ int) bool {
+		return r.Similarity > 0.2
+	})
+
+	list, err := mapChunks(filtered)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return list, nil
 }
 
 func (c *chromemRefIndex) RecommendRefs(ctx context.Context, object datagraph.Item) (datagraph.RefList, error) {
@@ -207,6 +228,39 @@ func (c *chromemRefIndex) ScoreRelevance(ctx context.Context, object datagraph.I
 	}, map[xid.ID]float64{})
 
 	return result, nil
+}
+
+func mapChunks(rs []chromem.Result) ([]*semdex.Chunk, error) {
+	return dt.MapErr(rs, mapChunk)
+}
+
+func mapChunk(r chromem.Result) (*semdex.Chunk, error) {
+	id, err := xid.FromString(r.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	dk, ok := r.Metadata["datagraph_kind"]
+	if !ok {
+		return nil, fault.New("missing datagraph_kind metadata")
+	}
+
+	k, err := datagraph.NewKind(dk)
+	if err != nil {
+		return nil, err
+	}
+
+	sdr, err := url.Parse(fmt.Sprintf("%s:%s/%s", datagraph.RefScheme, k, id.String()))
+	if err != nil {
+		return nil, err
+	}
+
+	return &semdex.Chunk{
+		ID:      id,
+		Kind:    k,
+		URL:     *sdr,
+		Content: r.Content,
+	}, nil
 }
 
 func mapResults(rs []chromem.Result) (datagraph.RefList, error) {
