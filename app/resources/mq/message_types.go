@@ -21,9 +21,9 @@ type IndexNode struct {
 }
 
 type AutoFillNode struct {
-	ID               library.NodeID
-	SummariseContent bool
-	AutoTag          bool
+	ID        library.NodeID
+	AutoTitle bool
+	AutoTag   bool
 }
 
 type DeleteNode struct {

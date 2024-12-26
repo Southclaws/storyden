@@ -46,6 +46,7 @@ const CoverImageFormSchema = z.union([
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name."),
   slug: z.string().optional(),
+  tags: z.string().array().optional(),
   link: z.preprocess((v) => {
     if (typeof v === "string" && v === "") {
       return undefined;
@@ -75,6 +76,8 @@ export function useLibraryPageScreen({ node }: Props) {
     updateNode,
     updateNodeVisibility,
     suggestTitle,
+    suggestSummary,
+    importFromLink,
     deleteNode,
   } = useLibraryMutation(node);
   const isTitleSuggestEnabled = useCapability(InstanceCapability.gen_ai);
@@ -97,6 +100,7 @@ export function useLibraryPageScreen({ node }: Props) {
     () => ({
       name: node.name,
       slug: node.slug,
+      tags: node.tags.map((t) => t.name),
       link: node.link?.url,
       description: node.description,
       content: node.content,
@@ -109,7 +113,7 @@ export function useLibraryPageScreen({ node }: Props) {
     defaultValues: defaults,
   });
 
-  const { name } = form.watch();
+  const { name, content } = form.watch();
 
   useEffect(() => {
     if (!form.getFieldState("slug").isDirty) {
@@ -117,6 +121,23 @@ export function useLibraryPageScreen({ node }: Props) {
       form.setValue("slug", autoSlug);
     }
   }, [form, name]);
+
+  // Summary suggestion logic
+  const [generatedContent, setGeneratedContent] = useState<string | undefined>(
+    undefined,
+  );
+
+  function handleResetGeneratedContent() {
+    setGeneratedContent(undefined);
+  }
+
+  useEffect(() => {
+    if (content && generatedContent) {
+      // if the content field changes, and it was previously using a controlled
+      // value, reset this controlled value to move it back to uncontrolled.
+      setGeneratedContent(undefined);
+    }
+  }, [form, content, generatedContent]);
 
   // Title suggestion logic
   const [generatedTitle, setGeneratedTitle] = useState<string | undefined>(
@@ -248,26 +269,17 @@ export function useLibraryPageScreen({ node }: Props) {
   async function handleImportFromLink(link: LinkReference) {
     await handle(
       async () => {
-        const coverConfig = link.primary_image
-          ? {
-              asset: link.primary_image,
-              config: {
-                top: 0,
-                left: 0,
-              },
-              isReplacement: true,
-            }
-          : undefined;
+        const { title_suggestion, tag_suggestions, content_suggestion } =
+          await importFromLink(node.slug, link.url);
 
-        form.setValue("content", link.description);
+        setGeneratedTitle(title_suggestion);
+        setGeneratedContent(content_suggestion);
 
-        await linkCreate(
-          { url: link.url },
-          {
-            content_fill_rule: "replace",
-            node_content_fill_target: node.id,
-          },
-        );
+        if (title_suggestion) {
+          form.setValue("name", title_suggestion);
+        }
+        form.setValue("tags", tag_suggestions);
+        form.setValue("content", content_suggestion);
       },
       {
         cleanup: async () => await revalidate(),
@@ -360,6 +372,7 @@ export function useLibraryPageScreen({ node }: Props) {
       handleEditMode,
       handleSubmit,
       handleSuggestTitle,
+      handleResetGeneratedContent,
       handleResetGeneratedTitle,
       handleAssetUpload,
       handleAssetRemove,
@@ -368,6 +381,7 @@ export function useLibraryPageScreen({ node }: Props) {
     libraryPath,
     editing,
     node,
+    generatedContent,
     generatedTitle,
     cropperRef,
     primaryAssetURL,

@@ -22,7 +22,7 @@ Be aware that the input to this may include broken HTML and other artifacts from
 - Do not describe the appearance of the input (e.g., broken HTML or artifacts). Instead, infer the main idea or purpose and expand on it creatively.
 - If key parts of the content are missing or ambiguous, use creativity to fill gaps while maintaining relevance to the topic.
 
-Output Format: Provide the output as a correctly formatted HTML document, you are free to use basic HTML formatting tags for emphasis, lists and headings. However, do not include the content title as a <h1> tag at the top. Start with a paragraph block immediately.
+Output Format: Provide the output as a correctly formatted HTML document, but do not include any markdown tags around the output, you are free to use basic HTML formatting tags for emphasis, lists and headings. However, do not include the content title as a <h1> tag at the top. Start with a paragraph block immediately.
 
 Content:
 

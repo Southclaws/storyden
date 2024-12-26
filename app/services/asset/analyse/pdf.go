@@ -26,7 +26,12 @@ func (a *Analyser) analysePDF(ctx context.Context, buf []byte, fillrule opt.Opti
 		return nil // no fill rule, nothing to do
 	}
 
-	node, err := a.nodereader.Probe(ctx, library.NodeID(rule.TargetNodeID))
+	targetNode, ok := rule.TargetNodeID.Get()
+	if !ok {
+		return fault.New("target node ID not set", fctx.With(ctx))
+	}
+
+	node, err := a.nodereader.Probe(ctx, library.NodeID(targetNode))
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
