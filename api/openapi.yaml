@@ -1574,6 +1574,8 @@ paths:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/TitleFillRuleQueryParam"
         - $ref: "#/components/parameters/TagFillRuleQueryParam"
+        - $ref: "#/components/parameters/NodeContentFillRuleQuery"
+        - $ref: "#/components/parameters/FillSourceQuery"
       requestBody: { $ref: "#/components/requestBodies/NodeUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -2217,6 +2219,18 @@ components:
       required: false
       schema:
         $ref: "#/components/schemas/ContentFillRule"
+
+    FillSourceQuery:
+      description: |
+        When NodeContentFillRuleQuery is used, this option must be set in order
+        to specify the source of the content-fill command. This allows you to
+        fill a page with either a summary of the content (existing or new) or
+        from the URL by scraping the content.
+      name: fill_source
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/FillSource"
 
     NodeContentFillTargetQuery:
       description: |
@@ -3116,6 +3130,22 @@ components:
       type: array
       items: { $ref: "#/components/schemas/InstanceCapability" }
 
+    FillSource:
+      description: |
+        Where to yield fill results from. When set to `url` the link
+        will be fetched first and the content will be used to fill the target.
+        When set to `content` the content of the resource will be used. If used
+        on a patch request, fill rules will use any parameters in the patch over
+        existing current data in the resource. Otherwise it'll use the resource.
+
+        Data filling occurs in a specific order: summary, title and tags. This
+        means that if you set a content fill rule to summarise content, then the
+        output of that summarisation is used to generate the title and tags.
+      type: string
+      enum:
+        - url
+        - content
+
     TitleFillRule:
       description: |
         A title fill rule defines a strategy for automatically generating a 
@@ -3139,9 +3169,20 @@ components:
         - replace
 
     ContentFillRule:
+      description: |
+        A content fill rule defines a strategy for automatically generating the
+        body content of a resource using semantic/LLM features. Using `query` as
+        a rule will not modify the resource but return the content as part of a
+        response for the frontend implementation to present to the user as a
+        suggestion. Using `replace` as a rule will automatically update the
+        content of the affected resource with that sourced by the semdex LLM.
       type: string
       enum:
+        # Don't modify the underlying resource, instead return proposed content.
+        - query
+        # Create a new resource with the proposed content. Currently only links.
         - create
+        # Perform a write operation without prompting the client for review.
         - replace
         # NOTE: Prepend and append are not implemented yet.
         # - prepend
@@ -3291,9 +3332,14 @@ components:
     TitleSuggestion:
       type: object
       description: A suggested title for a thread.
-      required: [title]
       properties:
         title_suggestion: { $ref: "#/components/schemas/ThreadTitle" }
+
+    ContentSuggestion:
+      type: object
+      description: A suggested body content.
+      properties:
+        content_suggestion: { $ref: "#/components/schemas/PostContent" }
 
     PostContent:
       description: |
@@ -4980,6 +5026,7 @@ components:
         - $ref: "#/components/schemas/NodeCommonProps"
         - $ref: "#/components/schemas/TitleSuggestion"
         - $ref: "#/components/schemas/TagSuggestions"
+        - $ref: "#/components/schemas/ContentSuggestion"
 
     NodeWithChildren:
       description: |

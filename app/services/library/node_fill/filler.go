@@ -62,11 +62,14 @@ func (f *Filler) FillContentFromLink(ctx context.Context, link *link_ref.LinkRef
 		slug, _ := mark.NewSlug(slug.Make(title + "-" + xid.New().String()))
 
 		opts := []node_writer.Option{
-			node_writer.WithParent(library.NodeID(cfr.TargetNodeID)),
 			node_writer.WithLink(link.ID),
 			node_writer.WithContent(wc.Content),
 			node_writer.WithDescription(wc.Description),
 			node_writer.WithVisibility(vis),
+		}
+
+		if v, ok := cfr.TargetNodeID.Get(); ok {
+			opts = append(opts, node_writer.WithParent(library.NodeID(v)))
 		}
 
 		if v, ok := link.PrimaryImage.Get(); ok {
@@ -82,7 +85,7 @@ func (f *Filler) FillContentFromLink(ctx context.Context, link *link_ref.LinkRef
 			return mq.DownloadAsset{
 				URL: u,
 				ContentFillRule: opt.New(asset.ContentFillCommand{
-					TargetNodeID: n.GetID(),
+					TargetNodeID: opt.New(n.GetID()),
 					FillRule:     asset.ContentFillRuleAppend,
 				}),
 			}
@@ -92,9 +95,8 @@ func (f *Filler) FillContentFromLink(ctx context.Context, link *link_ref.LinkRef
 		}
 
 		err = f.autoFillQueue.Publish(ctx, mq.AutoFillNode{
-			ID:               library.NodeID(n.Mark.ID()),
-			SummariseContent: false,
-			AutoTag:          true,
+			ID:      library.NodeID(n.Mark.ID()),
+			AutoTag: true,
 		})
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
@@ -109,10 +111,14 @@ func (f *Filler) FillContentFromLink(ctx context.Context, link *link_ref.LinkRef
 		}
 
 	case asset.ContentFillRuleReplace:
+		targetNode, ok := cfr.TargetNodeID.Get()
+		if !ok {
+			return fault.New("target node ID not set", fctx.With(ctx))
+		}
+
 		err = f.autoFillQueue.Publish(ctx, mq.AutoFillNode{
-			ID:               library.NodeID(library.NodeID(cfr.TargetNodeID)),
-			SummariseContent: true,
-			AutoTag:          true,
+			ID:      library.NodeID(library.NodeID(targetNode)),
+			AutoTag: true,
 		})
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))

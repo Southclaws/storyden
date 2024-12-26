@@ -46,7 +46,12 @@ func (c *analyseConsumer) downloadAsset(ctx context.Context, src string, fillrul
 	}
 
 	if fr, ok := fillrule.Get(); ok {
-		_, err = c.nodeWriter.Update(ctx, library.NewID(fr.TargetNodeID), node_writer.WithAssets([]asset.AssetID{a.ID}))
+		targetNodeID, targetSet := fr.TargetNodeID.Get()
+		if !targetSet {
+			return fault.New("target node ID not set", fctx.With(ctx))
+		}
+
+		_, err = c.nodeWriter.Update(ctx, library.NewID(targetNodeID), node_writer.WithAssets([]asset.AssetID{a.ID}))
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}

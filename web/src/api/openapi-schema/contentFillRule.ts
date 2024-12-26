@@ -8,11 +8,21 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 
+/**
+ * A content fill rule defines a strategy for automatically generating the
+body content of a resource using semantic/LLM features. Using `query` as
+a rule will not modify the resource but return the content as part of a
+response for the frontend implementation to present to the user as a
+suggestion. Using `replace` as a rule will automatically update the
+content of the affected resource with that sourced by the semdex LLM.
+
+ */
 export type ContentFillRule =
   (typeof ContentFillRule)[keyof typeof ContentFillRule];
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare
 export const ContentFillRule = {
+  query: "query",
   create: "create",
   replace: "replace",
 } as const;

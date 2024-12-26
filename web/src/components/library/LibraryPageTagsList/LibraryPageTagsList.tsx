@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { Controller, ControllerProps, FieldValues } from "react-hook-form";
 
 import { handle } from "@/api/client";
 import { tagList } from "@/api/openapi-client/tags";
@@ -8,35 +9,24 @@ import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { Combotags, CombotagsHandle } from "@/components/ui/combotags";
 import { useLibraryMutation } from "@/lib/library/library";
 import { useCapability } from "@/lib/settings/capabilities";
-import { useSettings } from "@/lib/settings/settings-client";
 import { HStack } from "@/styled-system/jsx";
 
-export type Props = {
+export type Props<T extends FieldValues> = Omit<
+  ControllerProps<T>,
+  "render"
+> & {
   editing: boolean;
   node: Node;
 };
 
-export function LibraryPageTagsList(props: Props) {
+export function useLibraryPageTagsList<T extends FieldValues>(props: Props<T>) {
   const isSuggestEnabled = useCapability(InstanceCapability.gen_ai);
 
-  const { updateNode, suggestTags, revalidate } = useLibraryMutation(
-    props.node,
-  );
+  const { suggestTags } = useLibraryMutation(props.node);
   const ref = useRef<CombotagsHandle>(null);
   const [loadingTags, setLoadingTags] = useState(false);
 
   const currentTags = props.node.tags.map((t) => t.name);
-
-  async function handleChange(values: string[]) {
-    await handle(
-      async () => {
-        await updateNode(props.node.slug, { tags: values });
-      },
-      {
-        cleanup: async () => await revalidate(),
-      },
-    );
-  }
 
   async function handleQuery(q: string): Promise<TagNameList> {
     const tags =
@@ -72,25 +62,58 @@ export function LibraryPageTagsList(props: Props) {
     );
   }
 
+  return {
+    ref,
+    currentTags,
+    isSuggestEnabled,
+    loadingTags,
+    handleQuery,
+    handleSuggestTags,
+  };
+}
+
+export function LibraryPageTagsList<T extends FieldValues>(props: Props<T>) {
+  const {
+    ref,
+    currentTags,
+    isSuggestEnabled,
+    loadingTags,
+    handleQuery,
+    handleSuggestTags,
+  } = useLibraryPageTagsList(props);
+
   if (props.editing) {
     return (
-      <HStack w="full" gap="1" alignItems="start">
-        <Combotags
-          ref={ref}
-          initialValue={currentTags}
-          onQuery={handleQuery}
-          onChange={handleChange}
-        />
-        {isSuggestEnabled && (
-          <IntelligenceAction
-            title="Suggest tags for this page"
-            onClick={handleSuggestTags}
-            variant="subtle"
-            h="full"
-            loading={loadingTags}
-          />
-        )}
-      </HStack>
+      <Controller
+        name={props.name}
+        control={props.control}
+        render={({ field }) => {
+          async function handleChange(values: string[]) {
+            field.onChange(values);
+          }
+
+          return (
+            <HStack w="full" gap="1" alignItems="start">
+              <Combotags
+                ref={ref}
+                initialValue={currentTags}
+                onQuery={handleQuery}
+                onChange={handleChange}
+                value={field.value}
+              />
+              {isSuggestEnabled && (
+                <IntelligenceAction
+                  title="Suggest tags for this page"
+                  onClick={handleSuggestTags}
+                  variant="subtle"
+                  h="full"
+                  loading={loadingTags}
+                />
+              )}
+            </HStack>
+          );
+        }}
+      />
     );
   }
 

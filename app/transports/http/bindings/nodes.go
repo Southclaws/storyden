@@ -229,6 +229,16 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	fillSource, err := opt.MapErr(opt.NewPtr(request.Params.FillSource), deserialiseFillSource)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	contentFillCmd, err := getContentFillRuleSourceCommand(request.Params.ContentFillRule, request.Params.FillSource)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
 	tags := opt.Map(opt.NewPtr(request.Body.Tags), func(tags []string) tag_ref.Names {
 		return dt.Map(tags, deserialiseTagName)
 	})
@@ -246,6 +256,8 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
 		Tags:         tags,
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
+		FillSource:   fillSource,
+		ContentFill:  contentFillCmd,
 	}
 
 	if tfr, ok := titleFillRuleParam.Get(); ok {
@@ -369,6 +381,11 @@ func serialiseUpdatedNode(in *node_mutate.Updated) openapi.Node {
 		n.TagSuggestions = &s
 	}
 
+	if cs, ok := in.ContentSuggestion.Get(); ok {
+		html := cs.HTML()
+		n.ContentSuggestion = &html
+	}
+
 	return n
 }
 
@@ -450,4 +467,37 @@ func deserialiseInputSlug(in *string) (opt.Optional[mark.Slug], error) {
 
 func deserialiseTitleFillRule(in openapi.TitleFillRule) (datagraph.TitleFillRule, error) {
 	return datagraph.NewTitleFillRule(string(in))
+}
+
+func deserialiseContentFillRule(in openapi.ContentFillRule) (asset.ContentFillRule, error) {
+	return asset.NewContentFillRule(string(in))
+}
+
+func deserialiseFillSource(in openapi.FillSource) (asset.FillSource, error) {
+	return asset.NewFillSource(string(in))
+}
+
+func getContentFillRuleSourceCommand(contentFillRuleParam *openapi.ContentFillRule, contentFillSourceParam *openapi.FillSourceQuery) (opt.Optional[asset.ContentFillCommand], error) {
+	if contentFillRuleParam != nil {
+		if contentFillSourceParam == nil {
+			return nil, fault.New("node_content_fill_target is required when content_fill_rule is specified")
+		}
+
+		rule, err := asset.NewContentFillRule((string)(*contentFillRuleParam))
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
+
+		sourceType, err := asset.NewFillSource((string)(*contentFillSourceParam))
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
+
+		return opt.New(asset.ContentFillCommand{
+			SourceType: opt.New(sourceType),
+			FillRule:   rule,
+		}), nil
+	}
+
+	return opt.NewEmpty[asset.ContentFillCommand](), nil
 }
