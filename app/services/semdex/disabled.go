@@ -30,6 +30,10 @@ func (*Disabled) SearchRefs(ctx context.Context, q string, p pagination.Paramete
 	panic("semdex disabled: searcher switch bug")
 }
 
+func (*Disabled) SearchChunks(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) ([]*Chunk, error) {
+	return nil, nil
+}
+
 func (*Disabled) Ask(ctx context.Context, q string) (chan string, chan error) {
 	return nil, nil
 }

@@ -5,13 +5,18 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 
+import { handle } from "@/api/client";
 import { useNodeGet } from "@/api/openapi-client/nodes";
 import { useThreadGet } from "@/api/openapi-client/threads";
-import { DatagraphItemKind } from "@/api/openapi-schema";
+import { Account, DatagraphItemKind } from "@/api/openapi-schema";
 import {
   DatagraphItemNodeCard,
   DatagraphItemPostGenericCard,
 } from "@/components/datagraph/DatagraphItemCard";
+import {
+  LoginAnchor,
+  RegisterAnchor,
+} from "@/components/site/Navigation/Anchors/Login";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Spinner } from "@/components/ui/Spinner";
 import { Button } from "@/components/ui/button";
@@ -20,8 +25,9 @@ import { Input } from "@/components/ui/input";
 import { API_ADDRESS, WEB_ADDRESS } from "@/config";
 import { useCapability } from "@/lib/settings/capabilities";
 import { css } from "@/styled-system/css";
-import { Box, LStack, styled } from "@/styled-system/jsx";
+import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { hstack, lstack } from "@/styled-system/patterns";
+import { deriveError } from "@/utils/error";
 
 type DatagraphRef = {
   id: string;
@@ -29,7 +35,26 @@ type DatagraphRef = {
   href: string;
 };
 
-export function AskScreen() {
+type Props = {
+  session?: Account;
+};
+
+export function AskScreen({ session }: Props) {
+  if (!session) {
+    return (
+      <UnreadyBanner error="You must be logged in to use the knowledgebase Ask tool.">
+        <WStack>
+          <RegisterAnchor />
+          <LoginAnchor />
+        </WStack>
+      </UnreadyBanner>
+    );
+  }
+
+  return <Ask />;
+}
+
+export function Ask() {
   const [question, setQuestion] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -76,39 +101,50 @@ export function AskScreen() {
     setContent("");
     setIsLoading(true);
 
-    try {
-      const response = await fetch(
-        `${API_ADDRESS}/api/datagraph/qna?q=${encodeURIComponent(question)}`,
-        {
-          method: "GET",
-          mode: "cors",
-          credentials: "include",
+    await handle(
+      async () => {
+        const response = await fetch(
+          `${API_ADDRESS}/api/datagraph/qna?q=${encodeURIComponent(question)}`,
+          {
+            method: "GET",
+            mode: "cors",
+            credentials: "include",
+          },
+        );
+
+        if (response.status === 404) {
+          throw new Error("No answer could be found for this question.");
+        }
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.statusText}`);
+        }
+
+        if (!response.body) {
+          throw new Error(`Error: response is empty`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder("utf-8");
+        let done = false;
+
+        while (!done) {
+          const { value, done: readerDone } = await reader.read();
+          done = readerDone;
+          const chunk = decoder.decode(value, { stream: true });
+          setContent((prev) => prev + chunk);
+        }
+      },
+      {
+        errorToast: false,
+        async onError(e) {
+          setContent(deriveError(e));
         },
-      );
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.statusText}`);
-      }
-
-      if (!response.body) {
-        throw new Error(`Error: response is empty`);
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let done = false;
-
-      while (!done) {
-        const { value, done: readerDone } = await reader.read();
-        done = readerDone;
-        const chunk = decoder.decode(value, { stream: true });
-        setContent((prev) => prev + chunk);
-      }
-    } catch (error) {
-      console.error("Streaming error:", error);
-    } finally {
-      setIsLoading(false);
-    }
+        async cleanup() {
+          setIsLoading(false);
+        },
+      },
+    );
   };
 
   const components = {
