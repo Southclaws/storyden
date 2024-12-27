@@ -76,7 +76,8 @@ ENV HOSTNAME "0.0.0.0"
 
 VOLUME [ "/data" ]
 
-# Instruct the Go process to run the Next.js server too.
+# Instruct the API process to run the Next.js server and proxy requests to it.
 ENV RUN_FRONTEND "server.js"
+ENV PROXY_FRONTEND_ADDRESS "http://localhost:3000"
 
 ENTRYPOINT ["./backend"]

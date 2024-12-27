@@ -8,21 +8,29 @@ import (
 	"github.com/mileusna/useragent"
 )
 
+type Middleware struct{}
+
+func New() *Middleware {
+	return &Middleware{}
+}
+
 type uaKey struct{}
 
-// UserAgentContext stores in the request context the user agent info.
-func UserAgentContext(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
+// WithUserAgentContext stores in the request context the user agent info.
+func (m *Middleware) WithUserAgentContext() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
 
-		ua := useragent.Parse(r.Header.Get("User-Agent"))
+			ua := useragent.Parse(r.Header.Get("User-Agent"))
 
-		newctx := context.WithValue(ctx, uaKey{}, ua)
+			newctx := context.WithValue(ctx, uaKey{}, ua)
 
-		r = r.WithContext(newctx)
+			r = r.WithContext(newctx)
 
-		next.ServeHTTP(w, r)
-	})
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
 func GetDeviceName(ctx context.Context) string {

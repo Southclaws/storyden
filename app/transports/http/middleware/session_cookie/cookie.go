@@ -121,12 +121,14 @@ func (j *Jar) WithSession(r *http.Request) context.Context {
 }
 
 // WithAuth simply pulls out the session from the cookie and propagates it.
-func (j *Jar) WithAuth(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := j.WithSession(r)
+func (j *Jar) WithAuth() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := j.WithSession(r)
 
-		next.ServeHTTP(w, r.WithContext(ctx))
-	})
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
+	}
 }
 
 func (j *Jar) GetCookieName() string {
