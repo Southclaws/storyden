@@ -7,6 +7,8 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/transports/http/middleware/chaos"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/frontend"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/limiter"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/reqlog"
@@ -14,10 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/middleware/useragent"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
-	"github.com/Southclaws/storyden/internal/infrastructure/httpserver/chaos"
 )
-
-const MaxRequestSizeBytes = 10 * 1024 * 1024
 
 // Invoked by fx at runtime to mount the Echo router onto the http multiplexer.
 // This is where all global middleware (not OpenAPI specific) is applied.
@@ -30,18 +29,24 @@ func MountOpenAPI(
 	router *echo.Echo,
 
 	// Middleware providers
+	co *origin.Middleware,
+	lo *reqlog.Middleware,
+	fe *frontend.Provider,
+	ua *useragent.Middleware,
 	cj *session_cookie.Jar,
 	rl *limiter.Middleware,
+	cm *chaos.Middleware,
 ) {
 	lc.Append(fx.StartHook(func() {
 		applied := httpserver.Apply(router,
-			origin.WithCORS(cfg),
-			reqlog.WithLogger(logger),
-			useragent.UserAgentContext,
-			cj.WithAuth,
-			rl.WithRateLimit,
-			limiter.WithRequestSizeLimiter(MaxRequestSizeBytes),
-			chaos.WithChaos(cfg),
+			co.WithCORS(),
+			lo.WithLogger(),
+			fe.WithFrontendProxy(),
+			ua.WithUserAgentContext(),
+			cj.WithAuth(),
+			rl.WithRequestSizeLimiter(),
+			rl.WithRateLimit(),
+			cm.WithChaos(),
 		)
 
 		// Mounting the Echo router must happen after all Echo's middleware and

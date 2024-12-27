@@ -13,16 +13,18 @@ import (
 )
 
 const (
-	RateLimitLimit     = "X-RateLimit-Limit"
-	RateLimitRemaining = "X-RateLimit-Remaining"
-	RateLimitReset     = "X-RateLimit-Reset"
-	RetryAfter         = "Retry-After"
+	RateLimitLimit      = "X-RateLimit-Limit"
+	RateLimitRemaining  = "X-RateLimit-Remaining"
+	RateLimitReset      = "X-RateLimit-Reset"
+	RetryAfter          = "Retry-After"
+	MaxRequestSizeBytes = 10 * 1024 * 1024
 )
 
 type Middleware struct {
-	logger *zap.Logger
-	rl     rate.Limiter
-	kf     KeyFunc
+	logger    *zap.Logger
+	rl        rate.Limiter
+	kf        KeyFunc
+	sizeLimit int64
 }
 
 func New(
@@ -33,47 +35,50 @@ func New(
 	rl := f.NewLimiter(cfg.RateLimit, cfg.RateLimitPeriod, cfg.RateLimitExpire)
 
 	return &Middleware{
-		logger: logger,
-		rl:     rl,
-		kf:     fromIP("CF-Connecting-IP", "X-Real-IP", "True-Client-IP"),
+		logger:    logger,
+		rl:        rl,
+		kf:        fromIP("CF-Connecting-IP", "X-Real-IP", "True-Client-IP"),
+		sizeLimit: MaxRequestSizeBytes, // TODO: cfg.MaxRequestSize
 	}
 }
 
-func (m *Middleware) WithRateLimit(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := r.Context()
+func (m *Middleware) WithRateLimit() func(next http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
 
-		key, err := m.kf(r)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
+			key, err := m.kf(r)
+			if err != nil {
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
+			}
 
-		// TODO: Generate costs per-operation from OpenAPI spec
-		cost := 1
+			// TODO: Generate costs per-operation from OpenAPI spec
+			cost := 1
 
-		status, allowed, err := m.rl.Increment(ctx, key, cost)
-		if err != nil {
-			http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
+			status, allowed, err := m.rl.Increment(ctx, key, cost)
+			if err != nil {
+				http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
+			}
 
-		limit := status.Limit
-		remaining := status.Remaining
-		resetTime := status.Reset.UTC().Format(time.RFC1123)
+			limit := status.Limit
+			remaining := status.Remaining
+			resetTime := status.Reset.UTC().Format(time.RFC1123)
 
-		w.Header().Set(RateLimitLimit, strconv.FormatUint(uint64(limit), 10))
-		w.Header().Set(RateLimitRemaining, strconv.FormatUint(uint64(remaining), 10))
-		w.Header().Set(RateLimitReset, resetTime)
+			w.Header().Set(RateLimitLimit, strconv.FormatUint(uint64(limit), 10))
+			w.Header().Set(RateLimitRemaining, strconv.FormatUint(uint64(remaining), 10))
+			w.Header().Set(RateLimitReset, resetTime)
 
-		if !allowed {
-			w.Header().Set(RetryAfter, resetTime)
-			http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
-			return
-		}
+			if !allowed {
+				w.Header().Set(RetryAfter, resetTime)
+				http.Error(w, http.StatusText(http.StatusTooManyRequests), http.StatusTooManyRequests)
+				return
+			}
 
-		next.ServeHTTP(w, r)
-	})
+			next.ServeHTTP(w, r)
+		})
+	}
 }
 
 type KeyFunc func(r *http.Request) (string, error)
@@ -94,10 +99,10 @@ func fromIP(headers ...string) KeyFunc {
 	}
 }
 
-func WithRequestSizeLimiter(bytes int64) func(http.Handler) http.Handler {
+func (m *Middleware) WithRequestSizeLimiter() func(http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			r.Body = http.MaxBytesReader(w, r.Body, bytes)
+			r.Body = http.MaxBytesReader(w, r.Body, m.sizeLimit)
 			h.ServeHTTP(w, r)
 		})
 	}

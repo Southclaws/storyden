@@ -9,7 +9,15 @@ import (
 	"github.com/Southclaws/storyden/internal/config"
 )
 
-func WithCORS(cfg config.Config) func(next http.Handler) http.Handler {
+type Middleware struct {
+	cfg config.Config
+}
+
+func New(cfg config.Config) *Middleware {
+	return &Middleware{cfg: cfg}
+}
+
+func (m *Middleware) WithCORS() func(next http.Handler) http.Handler {
 	allowedMethods := []string{
 		"GET",
 		"POST",
