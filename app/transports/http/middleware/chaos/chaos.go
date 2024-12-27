@@ -9,27 +9,36 @@ import (
 	"github.com/Southclaws/storyden/internal/config"
 )
 
-func WithChaos(cfg config.Config) func(http.Handler) http.Handler {
-	failRate := cfg.DevChaosFailRate
-	slowMode := cfg.DevChaosSlowMode
+type Middleware struct {
+	enabled  bool
+	failRate float64
+	slowMode time.Duration
+}
 
-	disabled := failRate == 0 && slowMode == 0
+func New(cfg config.Config) *Middleware {
+	return &Middleware{
+		enabled:  cfg.DevChaosFailRate > 0 || cfg.DevChaosSlowMode == 0,
+		failRate: cfg.DevChaosFailRate,
+		slowMode: cfg.DevChaosSlowMode,
+	}
+}
 
-	if disabled {
+func (m *Middleware) WithChaos() func(http.Handler) http.Handler {
+	if !m.enabled {
 		return func(h http.Handler) http.Handler { return h }
 	}
 
 	return func(h http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			if slowMode > 0 {
-				wait := time.Duration(rand.Intn(int(slowMode)))
+			if m.slowMode > 0 {
+				wait := time.Duration(rand.Intn(int(m.slowMode)))
 				fmt.Println("[DEV_CHAOS_SLOW_MODE] waiting", wait)
 				time.Sleep(wait)
 			}
 
-			if failRate > 0 {
+			if m.failRate > 0 {
 				chance := rand.Float64()
-				if chance < failRate {
+				if chance < m.failRate {
 					fmt.Println("[DEV_CHAOS_FAIL_RATE] crashing")
 					w.WriteHeader(http.StatusInternalServerError)
 					return
