@@ -71,6 +71,11 @@ func (s *localStorer) Read(ctx context.Context, path string) (io.Reader, int64, 
 func (s *localStorer) Write(ctx context.Context, path string, r io.Reader, size int64) error {
 	fullpath := filepath.Join(s.path, path)
 
+	dir := filepath.Dir(fullpath)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
 	f, err := os.OpenFile(fullpath,
 		os.O_CREATE|os.O_WRONLY,
 		0o755,
