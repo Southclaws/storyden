@@ -1,23 +1,12 @@
-/** @type {import('next').NextConfig} */
-
 const isStandalone = process.env.NEXT_BUILD_STANDALONE === "true";
 
-const API_ADDRESS =
-  process.env["NEXT_PUBLIC_API_ADDRESS"] ?? "http://localhost:8000";
-
-const apiURL = new URL(API_ADDRESS);
-
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   output: isStandalone ? "standalone" : undefined,
   reactStrictMode: true,
   images: {
-    remotePatterns: [
-      {
-        protocol: apiURL.protocol.replace(":", ""),
-        hostname: apiURL.hostname,
-        port: apiURL.port,
-      },
-    ],
+    loader: "custom",
+    loaderFile: "./src/lib/asset/loader.js",
   },
 };
 
