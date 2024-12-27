@@ -16,7 +16,7 @@ type Config struct {
 	Production    bool          `envconfig:"PRODUCTION"   default:"false"`
 	LogLevel      zapcore.Level `envconfig:"LOG_LEVEL"    default:"info"`
 	RunFrontend   string        `envconfig:"RUN_FRONTEND" default:""`           // Path to server.js for running frontend process
-	FrontendProxy *url.URL      `envconfig:"PROXY_FRONTEND_ADDRESS" default:""` // Proxy non-/api requests to this address
+	FrontendProxy url.URL       `envconfig:"PROXY_FRONTEND_ADDRESS" default:""` // Proxy non-/api requests to this address
 
 	DevChaosSlowMode time.Duration `envconfig:"DEV_CHAOS_SLOW_MODE"` // Simulates slow requests
 	DevChaosFailRate float64       `envconfig:"DEV_CHAOS_FAIL_RATE"` // Simulates failed requests

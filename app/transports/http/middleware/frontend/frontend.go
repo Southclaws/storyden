@@ -22,7 +22,7 @@ func New(
 	mux *http.ServeMux,
 	cj *session_cookie.Jar,
 ) *Provider {
-	if cfg.FrontendProxy == nil {
+	if cfg.FrontendProxy.String() == "" {
 		return &Provider{}
 	}
 
@@ -32,7 +32,7 @@ func New(
 		}
 	}
 
-	proxy := httputil.NewSingleHostReverseProxy(cfg.FrontendProxy)
+	proxy := httputil.NewSingleHostReverseProxy(&cfg.FrontendProxy)
 
 	return &Provider{
 		handler: handler(proxy),
