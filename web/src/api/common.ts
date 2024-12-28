@@ -1,6 +1,6 @@
 import { filter, flow, reduce, toPairs } from "lodash/fp";
 
-import { API_ADDRESS } from "@/config";
+import { getAPIAddress } from "@/config";
 
 export type Options = {
   url: string;
@@ -30,7 +30,8 @@ export function buildRequest({
   data,
   revalidate,
 }: Options): Request {
-  const address = `${API_ADDRESS}/api${url}${cleanQuery(params)}`;
+  const apiAddress = getAPIAddress();
+  const address = `${apiAddress}/api${url}${cleanQuery(params)}`;
   const _method = method.toUpperCase();
 
   return new Request(address, {

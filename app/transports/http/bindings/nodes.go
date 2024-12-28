@@ -133,6 +133,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	// TODO: Clean this mess up.
 	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (account.Account, error) {
 		a, err := c.accountQuery.GetByID(ctx, aid)
 		if err != nil {
@@ -142,7 +143,11 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 		return *a, nil
 	})
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		if ftag.Get(err) == ftag.NotFound {
+			acc = opt.NewEmpty[account.Account]()
+		} else {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	var cs []*library.Node
