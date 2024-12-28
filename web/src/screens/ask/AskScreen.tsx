@@ -124,6 +124,8 @@ export function Ask() {
           throw new Error(`Error: response is empty`);
         }
 
+        setSources({});
+
         const reader = response.body.getReader();
         const decoder = new TextDecoder("utf-8");
         let done = false;
