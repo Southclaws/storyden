@@ -7,6 +7,7 @@ const nextConfig = {
   images: {
     loader: "custom",
     loaderFile: "./src/lib/asset/loader.js",
+    unoptimized: true,
   },
 };
 
