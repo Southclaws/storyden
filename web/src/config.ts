@@ -18,9 +18,13 @@ function isomorphicEnvironment(): Config {
   } else {
     const config = {
       API_ADDRESS:
-        global.process.env["NEXT_PUBLIC_API_ADDRESS"] ?? DEFAULT_API_ADDRESS,
+        global.process.env["NEXT_PUBLIC_API_ADDRESS"] ??
+        global.process.env["PUBLIC_API_ADDRESS"] ??
+        DEFAULT_API_ADDRESS,
       WEB_ADDRESS:
-        global.process.env["NEXT_PUBLIC_WEB_ADDRESS"] ?? DEFAULT_WEB_ADDRESS,
+        global.process.env["NEXT_PUBLIC_WEB_ADDRESS"] ??
+        global.process.env["PUBLIC_WEB_ADDRESS"] ??
+        DEFAULT_WEB_ADDRESS,
       source: "server" as const,
     };
     console.log("loaded server config", config);
