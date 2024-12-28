@@ -4,6 +4,7 @@ import { PropsWithChildren } from "react";
 import { getColourAsHex } from "src/utils/colour";
 
 import { inter, interDisplay } from "@/app/fonts";
+import { serverEnvironment } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";
 import { getIconURL } from "@/utils/icon";
 
@@ -13,10 +14,7 @@ import { Providers } from "./providers";
 
 export const dynamic = "force-dynamic";
 
-const API_ADDRESS =
-  global.process.env["NEXT_PUBLIC_API_ADDRESS"] ?? "http://localhost:8000";
-const WEB_ADDRESS =
-  global.process.env["NEXT_PUBLIC_WEB_ADDRESS"] ?? "http://localhost:3000";
+const { API_ADDRESS, WEB_ADDRESS } = serverEnvironment();
 
 export default async function RootLayout({ children }: PropsWithChildren) {
   return (

@@ -80,4 +80,15 @@ VOLUME [ "/data" ]
 ENV RUN_FRONTEND "server.js"
 ENV PROXY_FRONTEND_ADDRESS "http://localhost:3000"
 
+# The fullstack image uses the backend as a proxy for the frontend, this means
+# that the address for both are the same. Change via -e if deployed publicly.
+ENV PUBLIC_API_ADDRESS="http://localhost:8000"
+ENV PUBLIC_WEB_ADDRESS="http://localhost:8000"
+
+# You won't need to change this ever, if you do then this image is not for you.
+# This tells the Next.js server to make local HTTP requests directly to the API
+# server instead of going via some external network and through the API proxy.
+# This setting is pretty much only used when both services run side by side.
+ENV SSR_API_ADDRESS="http://localhost:8000"
+
 ENTRYPOINT ["./backend"]
