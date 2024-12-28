@@ -121,7 +121,7 @@ export function SearchScreen(props: Props) {
           )}
         </>
       ) : (
-        <UnreadyBanner error={error} />
+        isLoading && <UnreadyBanner error={error} />
       )}
     </styled.form>
   );
