@@ -63,6 +63,9 @@ type Notification func(*sql.Selector)
 // Post is the predicate function for post builders.
 type Post func(*sql.Selector)
 
+// Question is the predicate function for question builders.
+type Question func(*sql.Selector)
+
 // React is the predicate function for react builders.
 type React func(*sql.Selector)
 
