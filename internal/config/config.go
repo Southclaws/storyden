@@ -51,10 +51,20 @@ type Config struct {
 	LanguageModelProvider string `envconfig:"LANGUAGE_MODEL_PROVIDER"`
 	OpenAIKey             string `envconfig:"OPENAI_API_KEY"`
 
-	SemdexProvider    string `envconfig:"SEMDEX_PROVIDER" default:""`
+	// chromem (local), weaviate, pinecone
+	SemdexProvider string `envconfig:"SEMDEX_PROVIDER" default:""`
+
+	// Weaviate
 	WeaviateURL       string `envconfig:"WEAVIATE_URL"`
 	WeaviateToken     string `envconfig:"WEAVIATE_API_TOKEN"`
 	WeaviateClassName string `envconfig:"WEAVIATE_CLASS_NAME"`
+
+	// Pinecone
+	PineconeAPIKey     string `envconfig:"PINECONE_API_KEY"`
+	PineconeIndex      string `envconfig:"PINECONE_INDEX"`
+	PineconeDimentions int32  `envconfig:"PINECONE_DIMENSIONS"`
+	PineconeCloud      string `envconfig:"PINECONE_CLOUD"`
+	PineconeRegion     string `envconfig:"PINECONE_REGION"`
 
 	SemdexLocalPath string `envconfig:"SEMDEX_LOCAL_PATH" default:"data/semdex"`
 }
