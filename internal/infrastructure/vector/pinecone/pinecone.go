@@ -36,6 +36,10 @@ func Build() fx.Option {
 }
 
 func newPinecone(cfg config.Config) (*Client, error) {
+	if cfg.SemdexProvider != "pinecone" {
+		return nil, nil
+	}
+
 	c, err := pinecone.NewClient(pinecone.NewClientParams{
 		ApiKey: cfg.PineconeAPIKey,
 	})
