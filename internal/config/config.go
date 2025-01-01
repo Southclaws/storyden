@@ -62,7 +62,7 @@ type Config struct {
 	// Pinecone
 	PineconeAPIKey     string `envconfig:"PINECONE_API_KEY"`
 	PineconeIndex      string `envconfig:"PINECONE_INDEX"`
-	PineconeDimentions int32  `envconfig:"PINECONE_DIMENSIONS"`
+	PineconeDimensions int32  `envconfig:"PINECONE_DIMENSIONS"`
 	PineconeCloud      string `envconfig:"PINECONE_CLOUD"`
 	PineconeRegion     string `envconfig:"PINECONE_REGION"`
 

@@ -49,7 +49,7 @@ func newPinecone(cfg config.Config) (*Client, error) {
 
 	return &Client{
 		Client: c,
-		size:   cfg.PineconeDimentions,
+		size:   cfg.PineconeDimensions,
 		cloud:  pinecone.Cloud(cfg.PineconeCloud),
 		region: cfg.PineconeRegion,
 	}, nil
