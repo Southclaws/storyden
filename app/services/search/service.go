@@ -15,7 +15,7 @@ func New(
 	semdexSearcher semdex.Searcher,
 ) searcher.Searcher {
 	switch cfg.SemdexProvider {
-	case "chromem", "weaviate":
+	case "chromem", "weaviate", "pinecone":
 		return semdexSearcher
 
 	default:

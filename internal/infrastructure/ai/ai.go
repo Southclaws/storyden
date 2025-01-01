@@ -10,6 +10,8 @@ type Result struct {
 	Answer string
 }
 
+type Embedder func(ctx context.Context, text string) ([]float32, error)
+
 type Prompter interface {
 	Prompt(ctx context.Context, input string) (*Result, error)
 	PromptStream(ctx context.Context, input string) (chan string, chan error)
