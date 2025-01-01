@@ -1,6 +1,8 @@
 package semdexer
 
 import (
+	"context"
+
 	"github.com/weaviate/weaviate-go-client/v4/weaviate"
 	"go.uber.org/fx"
 
@@ -9,15 +11,19 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/semdex/asker"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/chromem_semdexer"
+	"github.com/Southclaws/storyden/app/services/semdex/semdexer/pinecone_semdexer"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer/weaviate_semdexer"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/ai"
+	"github.com/Southclaws/storyden/internal/infrastructure/vector/pinecone"
 	weaviate_infra "github.com/Southclaws/storyden/internal/infrastructure/weaviate"
 )
 
 func newSemdexer(
+	ctx context.Context,
 	cfg config.Config,
 	wc *weaviate.Client,
+	pc *pinecone.Client,
 
 	weaviateClassName weaviate_infra.WeaviateClassName,
 	hydrator *hydrate.Hydrator,
@@ -33,6 +39,9 @@ func newSemdexer(
 
 	case "weaviate":
 		return weaviate_semdexer.New(wc, weaviateClassName, hydrator), nil
+
+	case "pinecone":
+		return pinecone_semdexer.New(ctx, cfg, pc, hydrator, prompter)
 
 	default:
 		return &semdex.Disabled{}, nil

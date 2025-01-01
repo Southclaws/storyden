@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/queue"
 	"github.com/Southclaws/storyden/internal/infrastructure/rate"
 	"github.com/Southclaws/storyden/internal/infrastructure/sms"
+	"github.com/Southclaws/storyden/internal/infrastructure/vector/pinecone"
 	"github.com/Southclaws/storyden/internal/infrastructure/weaviate"
 	"github.com/Southclaws/storyden/internal/infrastructure/webauthn"
 )
@@ -34,6 +35,7 @@ func Build() fx.Option {
 		object.Build(),
 		frontend.Build(),
 		weaviate.Build(),
+		pinecone.Build(),
 		fx.Provide(ai.New),
 		jwt.Build(),
 		queue.Build(),
