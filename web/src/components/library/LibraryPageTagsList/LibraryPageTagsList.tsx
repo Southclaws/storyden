@@ -99,7 +99,6 @@ export function LibraryPageTagsList<T extends FieldValues>(props: Props<T>) {
                 initialValue={currentTags}
                 onQuery={handleQuery}
                 onChange={handleChange}
-                value={field.value}
               />
               {isSuggestEnabled && (
                 <IntelligenceAction
