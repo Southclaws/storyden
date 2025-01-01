@@ -13,7 +13,11 @@ kill_timeout = 5
   CACHE_PROVIDER          = "redis"
   EMAIL_PROVIDER          = "sendgrid"
   LANGUAGE_MODEL_PROVIDER = "openai"
-  SEMDEX_PROVIDER         = "chromem"
+  PINECONE_CLOUD          = "aws"
+  PINECONE_DIMENSIONS     = "3072"
+  PINECONE_INDEX          = "makeroom"
+  PINECONE_REGION         = "us-east-1"
+  SEMDEX_PROVIDER         = "pinecone"
 
   ASSET_STORAGE_TYPE = "s3"
 
