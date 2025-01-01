@@ -16,7 +16,7 @@ export type Props = {
 export const FormSchema = z.object({
   title: z.string().min(1, "Please enter a title."),
   body: z.string().min(1),
-  tags: z.array(z.string()),
+  tags: z.array(z.string()).optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
