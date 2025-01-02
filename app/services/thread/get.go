@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -21,10 +22,11 @@ var ErrNoPermission = fault.New("unauthenticated user cannot view unpublished th
 func (s *service) Get(
 	ctx context.Context,
 	threadID post.ID,
+	pageParams pagination.Parameters,
 ) (*thread.Thread, error) {
 	session := session.GetOptAccountID(ctx)
 
-	thr, err := s.thread_repo.Get(ctx, threadID, session)
+	thr, err := s.thread_repo.Get(ctx, threadID, pageParams, session)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get thread"))
 	}

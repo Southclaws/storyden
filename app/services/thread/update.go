@@ -13,6 +13,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -39,7 +40,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	thr, err := s.thread_repo.Get(ctx, threadID, nil)
+	thr, err := s.thread_repo.Get(ctx, threadID, pagination.Parameters{}, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

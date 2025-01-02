@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -55,6 +56,7 @@ type Service interface {
 	Get(
 		ctx context.Context,
 		threadID post.ID,
+		pageParams pagination.Parameters,
 	) (*thread.Thread, error)
 }
 

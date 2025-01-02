@@ -21,7 +21,7 @@ export function ReplyList({ thread }: Props) {
       flexDir="column"
       width="full"
     >
-      {thread.replies.map((reply, i) => {
+      {thread.replies.replies.map((reply, i) => {
         const previous = thread.replies[i - 1];
         const start = previous ? new Date(previous.createdAt) : undefined;
         const end = new Date(reply.createdAt);

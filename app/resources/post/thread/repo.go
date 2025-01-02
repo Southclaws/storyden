@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -53,7 +54,7 @@ type Repository interface {
 
 	// GetPostCounts(ctx context.Context) (map[string]int, error)
 
-	Get(ctx context.Context, threadID post.ID, accountID opt.Optional[account.AccountID]) (*Thread, error)
+	Get(ctx context.Context, threadID post.ID, pageParams pagination.Parameters, accountID opt.Optional[account.AccountID]) (*Thread, error)
 
 	Delete(ctx context.Context, id post.ID) error
 }

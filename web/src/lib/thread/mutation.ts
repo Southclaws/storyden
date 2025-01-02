@@ -58,7 +58,10 @@ export function useThreadMutations(thread: ThreadReference) {
 
       const newData: Thread = {
         ...data,
-        replies: [...data.replies, newReply],
+        replies: {
+          ...data.replies,
+          replies: [...data.replies.replies, newReply],
+        },
       };
 
       return newData;
@@ -77,9 +80,12 @@ export function useThreadMutations(thread: ThreadReference) {
 
       const newData = {
         ...data,
-        replies: data.replies.map((reply) =>
-          reply.id === id ? { ...reply, ...updated } : reply,
-        ),
+        replies: {
+          ...data.replies,
+          replies: data.replies.replies.map((reply) =>
+            reply.id === id ? { ...reply, ...updated } : reply,
+          ),
+        },
       };
 
       return newData;
@@ -98,7 +104,10 @@ export function useThreadMutations(thread: ThreadReference) {
 
       const newData: ThreadGetResponse = {
         ...data,
-        replies: data.replies.filter((reply) => reply.id !== id),
+        replies: {
+          ...data.replies,
+          replies: data.replies.replies.filter((reply) => reply.id !== id),
+        },
       };
 
       return newData;
@@ -120,24 +129,27 @@ export function useThreadMutations(thread: ThreadReference) {
 
       const newData = {
         ...data,
-        replies: data.replies.map((reply) => {
-          if (reply.id !== replyID) {
-            return reply;
-          }
+        replies: {
+          ...data.replies,
+          replies: data.replies.replies.map((reply) => {
+            if (reply.id !== replyID) {
+              return reply;
+            }
 
-          const newReact = {
-            id: uniqueId("optimistic_reply_update_"),
-            emoji,
-            author: session,
-          } satisfies React;
+            const newReact = {
+              id: uniqueId("optimistic_reply_update_"),
+              emoji,
+              author: session,
+            } satisfies React;
 
-          const reacts = [...reply.reacts, newReact];
+            const reacts = [...reply.reacts, newReact];
 
-          return {
-            ...reply,
-            reacts,
-          };
-        }),
+            return {
+              ...reply,
+              reacts,
+            };
+          }),
+        },
       };
 
       return newData;
@@ -159,18 +171,21 @@ export function useThreadMutations(thread: ThreadReference) {
 
       const newData = {
         ...data,
-        replies: data.replies.map((reply) => {
-          if (reply.id !== replyID) {
-            return reply;
-          }
+        replies: {
+          ...data.replies,
+          replies: data.replies.replies.map((reply) => {
+            if (reply.id !== replyID) {
+              return reply;
+            }
 
-          const reacts = reply.reacts.filter((react) => react.id !== reactID);
+            const reacts = reply.reacts.filter((react) => react.id !== reactID);
 
-          return {
-            ...reply,
-            reacts,
-          };
-        }),
+            return {
+              ...reply,
+              reacts,
+            };
+          }),
+        },
       };
 
       return newData;

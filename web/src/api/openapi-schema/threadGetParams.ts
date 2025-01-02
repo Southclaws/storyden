@@ -7,8 +7,11 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { PaginatedReplyList } from "./paginatedReplyList";
+import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
-export type ThreadAllOf = {
-  replies: PaginatedReplyList;
+export type ThreadGetParams = {
+  /**
+   * Pagination query parameters.
+   */
+  page?: PaginationQueryParameter;
 };
