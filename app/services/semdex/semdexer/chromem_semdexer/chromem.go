@@ -52,18 +52,28 @@ func New(cfg config.Config, rh *hydrate.Hydrator, aip ai.Prompter) (semdex.Semde
 	}, nil
 }
 
-func (c *chromemRefIndex) Index(ctx context.Context, object datagraph.Item) error {
-	return c.c.AddDocument(ctx, chromem.Document{
+func (c *chromemRefIndex) Index(ctx context.Context, object datagraph.Item) (int, error) {
+	err := c.c.AddDocument(ctx, chromem.Document{
 		ID:      object.GetID().String(),
 		Content: object.GetContent().Plaintext(),
 		Metadata: map[string]string{
 			"datagraph_kind": object.GetKind().String(),
 		},
 	})
+	if err != nil {
+		return 0, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return 1, nil
 }
 
-func (c *chromemRefIndex) Delete(ctx context.Context, object xid.ID) error {
-	return c.c.Delete(ctx, nil, nil, object.String())
+func (c *chromemRefIndex) Delete(ctx context.Context, object xid.ID) (int, error) {
+	err := c.c.Delete(ctx, nil, nil, object.String())
+	if err != nil {
+		return 0, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return 1, nil
 }
 
 func (c *chromemRefIndex) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {

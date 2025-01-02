@@ -69,7 +69,8 @@ func (i *indexerConsumer) indexReply(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return i.indexer.Index(ctx, p)
+	_, err = i.indexer.Index(ctx, p)
+	return err
 }
 
 func (i *indexerConsumer) indexProfile(ctx context.Context, id account.AccountID) error {
@@ -78,5 +79,6 @@ func (i *indexerConsumer) indexProfile(ctx context.Context, id account.AccountID
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return i.indexer.Index(ctx, profile.ProfileFromAccount(p))
+	_, err = i.indexer.Index(ctx, profile.ProfileFromAccount(p))
+	return err
 }

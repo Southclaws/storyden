@@ -15,11 +15,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
-func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Item) error {
+func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Item) (int, error) {
 	chunks := object.GetContent().Split()
 
 	if len(chunks) == 0 {
-		return fault.New("no text chunks to index", fctx.With(ctx))
+		return 0, fault.New("no text chunks to index", fctx.With(ctx))
 	}
 
 	numWorkers := runtime.NumCPU()
@@ -52,11 +52,11 @@ func (s *weaviateSemdexer) Index(ctx context.Context, object datagraph.Item) err
 
 	for err := range errChan {
 		if err != nil {
-			return err
+			return 0, err
 		}
 	}
 
-	return nil
+	return len(chunks), nil
 }
 
 func (s *weaviateSemdexer) indexChunk(ctx context.Context, object datagraph.Item, chunk string) error {

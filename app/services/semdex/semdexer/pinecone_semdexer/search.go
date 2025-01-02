@@ -89,7 +89,7 @@ func (s *pineconeSemdexer) searchObjects(ctx context.Context, q string, p pagina
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return mapObjects(response.Matches)
+	return mapScoredVectors(response.Matches)
 }
 
 func filterChunks(results []*datagraph.Ref) []*datagraph.Ref {

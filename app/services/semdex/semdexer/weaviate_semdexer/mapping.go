@@ -87,15 +87,6 @@ func mapResponseObjects(raw map[string]models.JSONObject) (*WeaviateResponse, er
 	return &parsed, nil
 }
 
-func (s *weaviateSemdexer) getFirstResult(wr *WeaviateResponse) (*WeaviateObject, error) {
-	objects := wr.Get[s.cn.String()]
-	if len(objects) != 1 {
-		return nil, fault.Newf("expected exactly one result, got %d", len(objects))
-	}
-
-	return &objects[0], nil
-}
-
 func generateChunkID(id xid.ID, chunk string) uuid.UUID {
 	// We don't currently support sharing chunks across content nodes, so append
 	// the object's ID to the chunk's hash, to ensure it's unique to the object.
@@ -116,12 +107,4 @@ func chunkIDsFor(id xid.ID) func(chunk string) uuid.UUID {
 
 func chunkIDsForItem(object datagraph.Item) []uuid.UUID {
 	return dt.Map(object.GetContent().Split(), chunkIDsFor(object.GetID()))
-}
-
-func objectIDsToStrings(ids []xid.ID) []string {
-	strs := make([]string, len(ids))
-	for i, id := range ids {
-		strs[i] = id.String()
-	}
-	return strs
 }
