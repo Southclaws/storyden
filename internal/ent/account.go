@@ -67,6 +67,8 @@ type AccountEdges struct {
 	InvitedBy *Invitation `json:"invited_by,omitempty"`
 	// Posts holds the value of the posts edge.
 	Posts []*Post `json:"posts,omitempty"`
+	// Questions holds the value of the questions edge.
+	Questions []*Question `json:"questions,omitempty"`
 	// Reacts holds the value of the reacts edge.
 	Reacts []*React `json:"reacts,omitempty"`
 	// Likes holds the value of the likes edge.
@@ -91,7 +93,7 @@ type AccountEdges struct {
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [19]bool
+	loadedTypes [20]bool
 }
 
 // EmailsOrErr returns the Emails value or an error if the edge
@@ -168,10 +170,19 @@ func (e AccountEdges) PostsOrErr() ([]*Post, error) {
 	return nil, &NotLoadedError{edge: "posts"}
 }
 
+// QuestionsOrErr returns the Questions value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) QuestionsOrErr() ([]*Question, error) {
+	if e.loadedTypes[8] {
+		return e.Questions, nil
+	}
+	return nil, &NotLoadedError{edge: "questions"}
+}
+
 // ReactsOrErr returns the Reacts value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) ReactsOrErr() ([]*React, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[9] {
 		return e.Reacts, nil
 	}
 	return nil, &NotLoadedError{edge: "reacts"}
@@ -180,7 +191,7 @@ func (e AccountEdges) ReactsOrErr() ([]*React, error) {
 // LikesOrErr returns the Likes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) LikesOrErr() ([]*LikePost, error) {
-	if e.loadedTypes[9] {
+	if e.loadedTypes[10] {
 		return e.Likes, nil
 	}
 	return nil, &NotLoadedError{edge: "likes"}
@@ -189,7 +200,7 @@ func (e AccountEdges) LikesOrErr() ([]*LikePost, error) {
 // MentionsOrErr returns the Mentions value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) MentionsOrErr() ([]*MentionProfile, error) {
-	if e.loadedTypes[10] {
+	if e.loadedTypes[11] {
 		return e.Mentions, nil
 	}
 	return nil, &NotLoadedError{edge: "mentions"}
@@ -198,7 +209,7 @@ func (e AccountEdges) MentionsOrErr() ([]*MentionProfile, error) {
 // RolesOrErr returns the Roles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) RolesOrErr() ([]*Role, error) {
-	if e.loadedTypes[11] {
+	if e.loadedTypes[12] {
 		return e.Roles, nil
 	}
 	return nil, &NotLoadedError{edge: "roles"}
@@ -207,7 +218,7 @@ func (e AccountEdges) RolesOrErr() ([]*Role, error) {
 // AuthenticationOrErr returns the Authentication value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AuthenticationOrErr() ([]*Authentication, error) {
-	if e.loadedTypes[12] {
+	if e.loadedTypes[13] {
 		return e.Authentication, nil
 	}
 	return nil, &NotLoadedError{edge: "authentication"}
@@ -216,7 +227,7 @@ func (e AccountEdges) AuthenticationOrErr() ([]*Authentication, error) {
 // TagsOrErr returns the Tags value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) TagsOrErr() ([]*Tag, error) {
-	if e.loadedTypes[13] {
+	if e.loadedTypes[14] {
 		return e.Tags, nil
 	}
 	return nil, &NotLoadedError{edge: "tags"}
@@ -225,7 +236,7 @@ func (e AccountEdges) TagsOrErr() ([]*Tag, error) {
 // CollectionsOrErr returns the Collections value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) CollectionsOrErr() ([]*Collection, error) {
-	if e.loadedTypes[14] {
+	if e.loadedTypes[15] {
 		return e.Collections, nil
 	}
 	return nil, &NotLoadedError{edge: "collections"}
@@ -234,7 +245,7 @@ func (e AccountEdges) CollectionsOrErr() ([]*Collection, error) {
 // NodesOrErr returns the Nodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) NodesOrErr() ([]*Node, error) {
-	if e.loadedTypes[15] {
+	if e.loadedTypes[16] {
 		return e.Nodes, nil
 	}
 	return nil, &NotLoadedError{edge: "nodes"}
@@ -243,7 +254,7 @@ func (e AccountEdges) NodesOrErr() ([]*Node, error) {
 // AssetsOrErr returns the Assets value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AssetsOrErr() ([]*Asset, error) {
-	if e.loadedTypes[16] {
+	if e.loadedTypes[17] {
 		return e.Assets, nil
 	}
 	return nil, &NotLoadedError{edge: "assets"}
@@ -252,7 +263,7 @@ func (e AccountEdges) AssetsOrErr() ([]*Asset, error) {
 // EventsOrErr returns the Events value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) EventsOrErr() ([]*EventParticipant, error) {
-	if e.loadedTypes[17] {
+	if e.loadedTypes[18] {
 		return e.Events, nil
 	}
 	return nil, &NotLoadedError{edge: "events"}
@@ -261,7 +272,7 @@ func (e AccountEdges) EventsOrErr() ([]*EventParticipant, error) {
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[18] {
+	if e.loadedTypes[19] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -429,6 +440,11 @@ func (a *Account) QueryInvitedBy() *InvitationQuery {
 // QueryPosts queries the "posts" edge of the Account entity.
 func (a *Account) QueryPosts() *PostQuery {
 	return NewAccountClient(a.config).QueryPosts(a)
+}
+
+// QueryQuestions queries the "questions" edge of the Account entity.
+func (a *Account) QueryQuestions() *QuestionQuery {
+	return NewAccountClient(a.config).QueryQuestions(a)
 }
 
 // QueryReacts queries the "reacts" edge of the Account entity.

@@ -691,6 +691,31 @@ var (
 			},
 		},
 	}
+	// QuestionsColumns holds the columns for the "questions" table.
+	QuestionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "indexed_at", Type: field.TypeTime, Nullable: true},
+		{Name: "slug", Type: field.TypeString, Unique: true},
+		{Name: "query", Type: field.TypeString},
+		{Name: "result", Type: field.TypeString},
+		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+	}
+	// QuestionsTable holds the schema information for the "questions" table.
+	QuestionsTable = &schema.Table{
+		Name:       "questions",
+		Columns:    QuestionsColumns,
+		PrimaryKey: []*schema.Column{QuestionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "questions_accounts_questions",
+				Columns:    []*schema.Column{QuestionsColumns[7]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// ReactsColumns holds the columns for the "reacts" table.
 	ReactsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -987,6 +1012,7 @@ var (
 		NodesTable,
 		NotificationsTable,
 		PostsTable,
+		QuestionsTable,
 		ReactsTable,
 		RolesTable,
 		SettingsTable,
@@ -1040,6 +1066,7 @@ func init() {
 	PostsTable.ForeignKeys[2].RefTable = LinksTable
 	PostsTable.ForeignKeys[3].RefTable = PostsTable
 	PostsTable.ForeignKeys[4].RefTable = PostsTable
+	QuestionsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable

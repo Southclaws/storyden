@@ -4,12 +4,19 @@ import (
 	"context"
 	"html/template"
 	"strings"
+	"time"
 
+	htmltomarkdown "github.com/JohannesKaufmann/html-to-markdown/v2"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
+	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
+	"github.com/Southclaws/storyden/app/resources/question"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
@@ -17,18 +24,22 @@ import (
 )
 
 type Asker struct {
-	searcher semdex.Searcher
-	prompter ai.Prompter
+	logger    *zap.Logger
+	searcher  semdex.Searcher
+	prompter  ai.Prompter
+	questions *question.Repository
 }
 
-func New(cfg config.Config, searcher semdex.Searcher, prompter ai.Prompter) (*Asker, error) {
+func New(cfg config.Config, logger *zap.Logger, searcher semdex.Searcher, prompter ai.Prompter, questions *question.Repository) (*Asker, error) {
 	if cfg.SemdexProvider != "" && cfg.LanguageModelProvider == "" {
 		return nil, fault.New("semdex requires a language model provider to be enabled")
 	}
 
 	return &Asker{
-		searcher: searcher,
-		prompter: prompter,
+		logger:    logger,
+		searcher:  searcher,
+		prompter:  prompter,
+		questions: questions,
 	}, nil
 }
 
@@ -56,18 +67,97 @@ References:
 
 const maxContextForRAG = 10
 
-func (a *Asker) Ask(ctx context.Context, q string) (chan string, chan error) {
+func (a *Asker) Ask(ctx context.Context, q string) (func(yield func(string, error) bool), error) {
+	cached, err := a.questions.GetByQuerySlug(ctx, q)
+	if err == nil {
+		return a.cachedResult(ctx, cached)
+	}
+
+	return a.livePrompt(ctx, q)
+}
+
+func (a *Asker) cachedResult(ctx context.Context, q *question.Question) (func(yield func(string, error) bool), error) {
+	md, err := htmltomarkdown.ConvertNode(q.Result.HTMLTree())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	chunks := strings.SplitAfter(string(md), " ")
+
+	return func(yield func(string, error) bool) {
+		for _, ch := range chunks {
+			select {
+			case <-ctx.Done():
+				return
+
+			default:
+				if !yield(ch, nil) {
+					return
+				}
+			}
+			time.Sleep(time.Millisecond * 10)
+		}
+	}, nil
+}
+
+func (a *Asker) livePrompt(ctx context.Context, q string) (func(yield func(string, error) bool), error) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	t, err := a.buildPrompt(ctx, q)
+	if err != nil {
+		return nil, err
+	}
+
+	chch, ech := a.prompter.PromptStream(ctx, t.String())
+
+	return func(yield func(string, error) bool) {
+		acc := []string{}
+
+		cleanup := func() {
+			err := a.cacheResult(ctx, accountID, q, acc)
+			if err != nil {
+				a.logger.Error("failed to cache result", zap.Error(err))
+			}
+		}
+
+		for {
+			select {
+			case <-ctx.Done():
+				return
+
+			case chunk, ok := <-chch:
+				if !ok {
+					cleanup()
+					return
+				}
+
+				acc = append(acc, chunk)
+				if !yield(chunk, nil) {
+					cleanup()
+					return
+				}
+
+			case err := <-ech:
+				if err != nil {
+					yield("", err)
+					return
+				}
+			}
+		}
+	}, nil
+}
+
+func (a *Asker) buildPrompt(ctx context.Context, q string) (*strings.Builder, error) {
 	chunks, err := a.searcher.SearchChunks(ctx, q, pagination.NewPageParams(1, 200), searcher.Options{})
 	if err != nil {
-		ech := make(chan error, 1)
-		ech <- fault.Wrap(err, fctx.With(ctx))
-		return nil, ech
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	if len(chunks) == 0 {
-		ech := make(chan error, 1)
-		ech <- fault.New("no context found for question", fctx.With(ctx), ftag.With(ftag.NotFound))
-		return nil, ech
+		return nil, fault.New("no context found for question", fctx.With(ctx), ftag.With(ftag.NotFound))
 	}
 
 	if len(chunks) > maxContextForRAG {
@@ -80,12 +170,24 @@ func (a *Asker) Ask(ctx context.Context, q string) (chan string, chan error) {
 		"Question": q,
 	})
 	if err != nil {
-		ech := make(chan error, 1)
-		ech <- fault.Wrap(err, fctx.With(ctx))
-		return nil, ech
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	chch, ech := a.prompter.PromptStream(ctx, t.String())
+	return &t, nil
+}
 
-	return chch, ech
+func (a *Asker) cacheResult(ctx context.Context, accountID account.AccountID, q string, chunks []string) error {
+	result := strings.Join(chunks, "")
+
+	acc, err := datagraph.NewRichTextFromMarkdown(result)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, err = a.questions.Store(ctx, accountID, q, acc)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
 }
