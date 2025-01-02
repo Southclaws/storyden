@@ -100,16 +100,20 @@ func (s *pineconeSemdexer) buildIndexOps(ctx context.Context, object datagraph.I
 
 	vecids := dt.Map(indexedChunk.VectorIds, func(id *string) string { return *id })
 
-	indexedChunkTable, err := s.index.FetchVectors(ctx, vecids)
-	if err != nil {
-		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	indexedChunkTable := map[string]*pinecone.Vector{}
+	if len(vecids) > 0 {
+		resp, err := s.index.FetchVectors(ctx, vecids)
+		if err != nil {
+			return nil, nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		indexedChunkTable = resp.Vectors
 	}
 
 	pool := pond.NewResultPool[*pinecone.Vector](min(runtime.NumCPU(), len(chunkIDs)))
 	group := pool.NewGroupContext(ctx)
 
 	for id, chunk := range inputChunkTable {
-		_, exists := indexedChunkTable.Vectors[id]
+		_, exists := indexedChunkTable[id]
 		if exists {
 			continue
 		}
@@ -146,7 +150,7 @@ func (s *pineconeSemdexer) buildIndexOps(ctx context.Context, object datagraph.I
 	// build a list of vectors to delete by yielding items that are indexed but
 	// not present in the input object chunk table.
 	deletes := []string{}
-	for id := range indexedChunkTable.Vectors {
+	for id := range indexedChunkTable {
 		_, exists := inputChunkTable[id]
 		if exists {
 			continue
