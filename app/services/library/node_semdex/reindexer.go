@@ -11,7 +11,6 @@ import (
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -53,15 +52,8 @@ func (r *semdexer) reindex(ctx context.Context, reindexThreshold time.Duration, 
 	keepIDs := dt.Map(keep, func(p *ent.Node) xid.ID { return p.ID })
 	discardIDs := dt.Map(discard, func(p *ent.Node) xid.ID { return p.ID })
 
-	indexed, err := r.semdexQuerier.GetMany(ctx, uint(reindexChunk), keepIDs...)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	indexedIDs := dt.Map(indexed, func(p *datagraph.Ref) xid.ID { return p.ID })
-
-	updated := diff(keepIDs, indexedIDs)
-	deleted := lo.Intersect(indexedIDs, discardIDs)
+	updated := keepIDs
+	deleted := discardIDs
 
 	r.logger.Debug("reindexing nodes",
 		zap.Int("all", len(nodes)),

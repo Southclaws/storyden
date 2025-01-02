@@ -56,8 +56,8 @@ func (o Objects) ToRefs() datagraph.RefList {
 	return refs
 }
 
-func mapObject(v *pinecone.ScoredVector) (*Object, error) {
-	meta := v.Vector.Metadata.AsMap()
+func mapVector(v *pinecone.Vector) (*Object, error) {
+	meta := v.Metadata.AsMap()
 
 	idRaw, ok := meta["datagraph_id"]
 	if !ok {
@@ -109,14 +109,28 @@ func mapObject(v *pinecone.ScoredVector) (*Object, error) {
 	}
 
 	return &Object{
-		ID:        id,
-		Kind:      dk,
-		Relevance: float64((v.Score + 1) / 2),
-		URL:       *sdr,
-		Content:   content,
+		ID:      id,
+		Kind:    dk,
+		URL:     *sdr,
+		Content: content,
 	}, nil
 }
 
-func mapObjects(objects []*pinecone.ScoredVector) (Objects, error) {
-	return dt.MapErr(objects, mapObject)
+func mapVectors(objects []*pinecone.Vector) (Objects, error) {
+	return dt.MapErr(objects, mapVector)
+}
+
+func mapScoredVector(v *pinecone.ScoredVector) (*Object, error) {
+	obj, err := mapVector(v.Vector)
+	if err != nil {
+		return nil, err
+	}
+
+	obj.Relevance = float64((v.Score + 1) / 2)
+
+	return obj, nil
+}
+
+func mapScoredVectors(objects []*pinecone.ScoredVector) (Objects, error) {
+	return dt.MapErr(objects, mapScoredVector)
 }

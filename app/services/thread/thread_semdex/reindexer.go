@@ -11,7 +11,6 @@ import (
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -28,44 +27,12 @@ func (r *semdexer) schedule(ctx context.Context, schedule time.Duration, reindex
 }
 
 func (r *semdexer) reindex(ctx context.Context, reindexThreshold time.Duration, reindexChunk int) error {
-	threads, err := r.db.Post.Query().
-		Select(
-			ent_post.FieldID,
-			ent_post.FieldVisibility,
-			ent_post.FieldDeletedAt,
-		).
-		Where(
-			ent_post.Or(
-				ent_post.IndexedAtIsNil(),
-				ent_post.IndexedAtLT(time.Now().Add(-reindexThreshold)),
-			),
-			ent_post.RootPostIDIsNil(),
-		).
-		Limit(reindexChunk).
-		All(ctx)
+	updated, deleted, err := r.gatherTargets(ctx, reindexThreshold, reindexChunk)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
-
-	keep, discard := lo.FilterReject(threads, func(p *ent.Post, _ int) bool {
-		return p.Visibility == ent_post.VisibilityPublished && p.DeletedAt == nil
-	})
-
-	keepIDs := dt.Map(keep, func(p *ent.Post) xid.ID { return p.ID })
-	discardIDs := dt.Map(discard, func(p *ent.Post) xid.ID { return p.ID })
-
-	indexed, err := r.semdexQuerier.GetMany(ctx, uint(reindexChunk), keepIDs...)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	indexedIDs := dt.Map(indexed, func(p *datagraph.Ref) xid.ID { return p.ID })
-
-	updated := diff(keepIDs, indexedIDs)
-	deleted := lo.Intersect(indexedIDs, discardIDs)
 
 	r.logger.Debug("reindexing threads",
-		zap.Int("all", len(threads)),
 		zap.Int("updated", len(updated)),
 		zap.Int("deleted", len(deleted)),
 	)
@@ -88,7 +55,38 @@ func (r *semdexer) reindex(ctx context.Context, reindexThreshold time.Duration, 
 	return nil
 }
 
-func diff(targets []xid.ID, indexed []xid.ID) []xid.ID {
-	_, ids := lo.Difference(indexed, targets)
-	return ids
+func (r *semdexer) gatherTargets(ctx context.Context, reindexThreshold time.Duration, reindexChunk int) ([]xid.ID, []xid.ID, error) {
+	threads, err := r.db.Post.Query().
+		Select(
+			ent_post.FieldID,
+			ent_post.FieldVisibility,
+			ent_post.FieldDeletedAt,
+		).
+		Where(
+			ent_post.Or(
+				ent_post.IndexedAtIsNil(),
+				ent_post.IndexedAtLT(time.Now().Add(-reindexThreshold)),
+			),
+		).
+		Order(ent.Desc(ent_post.FieldCreatedAt)).
+		Limit(reindexChunk).
+		All(ctx)
+	if err != nil {
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	keepIDs, discardIDs := r.partition(threads)
+
+	return keepIDs, discardIDs, nil
+}
+
+func (r *semdexer) partition(threads []*ent.Post) ([]xid.ID, []xid.ID) {
+	keep, discard := lo.FilterReject(threads, func(p *ent.Post, _ int) bool {
+		return p.Visibility == ent_post.VisibilityPublished && p.DeletedAt == nil
+	})
+
+	keepIDs := dt.Map(keep, func(p *ent.Post) xid.ID { return p.ID })
+	discardIDs := dt.Map(discard, func(p *ent.Post) xid.ID { return p.ID })
+
+	return keepIDs, discardIDs
 }

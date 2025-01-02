@@ -29,6 +29,8 @@ type MetadataFilter = pinecone.MetadataFilter
 
 type QueryByVectorValuesRequest = pinecone.QueryByVectorValuesRequest
 
+type ListVectorsRequest = pinecone.ListVectorsRequest
+
 type ScoredVector = pinecone.ScoredVector
 
 func Build() fx.Option {

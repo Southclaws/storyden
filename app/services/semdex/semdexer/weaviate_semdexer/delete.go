@@ -9,7 +9,7 @@ import (
 	"github.com/weaviate/weaviate-go-client/v4/weaviate/filters"
 )
 
-func (w *weaviateSemdexer) Delete(ctx context.Context, id xid.ID) error {
+func (w *weaviateSemdexer) Delete(ctx context.Context, id xid.ID) (int, error) {
 	delete := w.wc.Batch().
 		ObjectsBatchDeleter().
 		WithWhere(
@@ -19,10 +19,10 @@ func (w *weaviateSemdexer) Delete(ctx context.Context, id xid.ID) error {
 				WithValueString(id.String()),
 		)
 
-	_, err := delete.Do(ctx)
+	r, err := delete.Do(ctx)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
+		return 0, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return nil
+	return int(r.Results.Successful), nil
 }
