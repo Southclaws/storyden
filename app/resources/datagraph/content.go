@@ -370,6 +370,11 @@ func splitearly(in string, max int) []string {
 	var chunks []string
 	var split func(s string)
 	split = func(s string) {
+		if len(s) <= max {
+			chunks = append(chunks, strings.TrimSpace(s))
+			return
+		}
+
 		upper := min(len(s), max) - 1
 		if upper == -1 {
 			// reached end of input stream
