@@ -9,6 +9,7 @@ import { Byline } from "@/components/content/Byline";
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { SaveAction } from "@/components/site/Action/Save";
+import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
 import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { Breadcrumbs } from "@/components/thread/Breadcrumbs";
 import { ReplyBox } from "@/components/thread/ReplyBox/ReplyBox";
@@ -23,7 +24,7 @@ import {
   DiscussionIcon,
   DiscussionParticipatingIcon,
 } from "@/components/ui/icons/Discussion";
-import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 
 import { Form, Props, useThreadScreen } from "./useThreadScreen";
 
@@ -112,7 +113,27 @@ export function ThreadScreen(props: Props) {
 
       <ThreadReplyStatus {...thread} />
 
-      <ReplyList thread={thread} />
+      <VStack w="full">
+        {data.thread.replies.total_pages > 1 && (
+          <PaginationControls
+            path={`/t/${thread.slug}`}
+            currentPage={data.thread.replies.current_page ?? 1}
+            totalPages={data.thread.replies.total_pages}
+            pageSize={data.thread.replies.page_size}
+          />
+        )}
+
+        <ReplyList thread={thread} />
+
+        {data.thread.replies.total_pages > 1 && (
+          <PaginationControls
+            path={`/t/${thread.slug}`}
+            currentPage={data.thread.replies.current_page ?? 1}
+            totalPages={data.thread.replies.total_pages}
+            pageSize={data.thread.replies.page_size}
+          />
+        )}
+      </VStack>
 
       <ReplyBox {...thread} />
     </LStack>

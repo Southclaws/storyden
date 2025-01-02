@@ -7,8 +7,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { PaginatedReplyList } from "./paginatedReplyList";
+import type { PaginatedReplyListAllOf } from "./paginatedReplyListAllOf";
+import type { PaginatedResult } from "./paginatedResult";
 
-export type ThreadAllOf = {
-  replies: PaginatedReplyList;
-};
+export type PaginatedReplyList = PaginatedResult & PaginatedReplyListAllOf;

@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 import { threadGet } from "@/api/openapi-server/threads";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { getSettings } from "@/lib/settings/settings-server";
@@ -7,15 +9,28 @@ export type Props = {
   params: Promise<{
     slug: string;
   }>;
+  searchParams: Promise<Query>;
 };
+
+const QuerySchema = z.object({
+  page: z
+    .string()
+    .transform((v) => parseInt(v, 10))
+    .optional(),
+});
+
+type Query = z.infer<typeof QuerySchema>;
 
 export default async function Page(props: Props) {
   const { slug } = await props.params;
+  const searchParams = await props.searchParams;
+
+  const { page } = QuerySchema.parse(searchParams);
 
   try {
     const { data } = await threadGet(slug);
 
-    return <ThreadScreen slug={slug} thread={data} />;
+    return <ThreadScreen initialPage={page} slug={slug} thread={data} />;
   } catch (e) {
     return <UnreadyBanner error={e} />;
   }

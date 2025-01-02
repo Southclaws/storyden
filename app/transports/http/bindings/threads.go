@@ -211,7 +211,9 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	thread, err := i.thread_svc.Get(ctx, postID)
+	pp := deserialisePageParams(request.Params.Page, 50)
+
+	thread, err := i.thread_svc.Get(ctx, postID, pp)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

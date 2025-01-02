@@ -18,6 +18,7 @@ import type {
   NotFoundResponse,
   ThreadCreateBody,
   ThreadCreateOKResponse,
+  ThreadGetParams,
   ThreadGetResponse,
   ThreadListOKResponse,
   ThreadListParams,
@@ -142,15 +143,16 @@ created as well as a list of the posts within the thread.
 
  * @summary Get information about a thread and the posts within the thread.
  */
-export const threadGet = (threadMark: string) => {
+export const threadGet = (threadMark: string, params?: ThreadGetParams) => {
   return fetcher<ThreadGetResponse>({
     url: `/threads/${threadMark}`,
     method: "GET",
+    params,
   });
 };
 
-export const getThreadGetKey = (threadMark: string) =>
-  [`/threads/${threadMark}`] as const;
+export const getThreadGetKey = (threadMark: string, params?: ThreadGetParams) =>
+  [`/threads/${threadMark}`, ...(params ? [params] : [])] as const;
 
 export type ThreadGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof threadGet>>
@@ -170,6 +172,7 @@ export const useThreadGet = <
     | InternalServerErrorResponse,
 >(
   threadMark: string,
+  params?: ThreadGetParams,
   options?: {
     swr?: SWRConfiguration<Awaited<ReturnType<typeof threadGet>>, TError> & {
       swrKey?: Key;
@@ -182,8 +185,8 @@ export const useThreadGet = <
   const isEnabled = swrOptions?.enabled !== false && !!threadMark;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getThreadGetKey(threadMark) : null));
-  const swrFn = () => threadGet(threadMark);
+    (() => (isEnabled ? getThreadGetKey(threadMark, params) : null));
+  const swrFn = () => threadGet(threadMark, params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
