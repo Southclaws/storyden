@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -28,7 +29,7 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 	}
 
 	// TODO: Minimal reader interface for thread.
-	thr, err := s.thread_repo.Get(ctx, id, nil)
+	thr, err := s.thread_repo.Get(ctx, id, pagination.Parameters{}, nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

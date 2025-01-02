@@ -19,8 +19,10 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/collection"
@@ -284,6 +286,19 @@ func (d *database) List(
 	}, nil
 }
 
+const repliesCountQuery = `select
+  p.id        post_id, -- post ID
+  count(r.id) replies, -- number of replies,
+  count(a.id) replied  -- has this account replied
+from
+  posts p
+  inner join posts r on r.root_post_id = p.id and r.deleted_at is null
+  left join accounts a on a.id = r.account_posts and a.id = $2
+where
+  p.id = $1 or p.root_post_id = $1
+group by p.id
+`
+
 const likesCountQuery = `select
   p.id        post_id, -- the post (thread or reply) ID
   count(*)    likes,   -- number of likes
@@ -312,9 +327,15 @@ where
 group by p.id
 `
 
-func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Optional[account.AccountID]) (*Thread, error) {
+func (d *database) Get(ctx context.Context, threadID post.ID, pageParams pagination.Parameters, accountID opt.Optional[account.AccountID]) (*Thread, error) {
+	var replyStats post.PostRepliesResults
+	err := d.raw.SelectContext(ctx, &replyStats, repliesCountQuery, threadID.String(), accountID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	var likes post.PostLikesResults
-	err := d.raw.SelectContext(ctx, &likes, likesCountQuery, threadID.String(), accountID.String())
+	err = d.raw.SelectContext(ctx, &likes, likesCountQuery, threadID.String(), accountID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -354,6 +375,8 @@ func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Opti
 					lq.WithFaviconImage().WithPrimaryImage()
 					lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 				}).
+				Limit(pageParams.Limit()).
+				Offset(pageParams.Offset()).
 				Order(ent.Asc(ent_post.FieldCreatedAt))
 		}).
 		WithAuthor(func(aq *ent.AccountQuery) {
@@ -382,26 +405,23 @@ func (d *database) Get(ctx context.Context, threadID post.ID, accountID opt.Opti
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	replies := post.PostRepliesMap{
-		xid.ID(threadID): post.PostRepliesResult{
-			PostID: xid.ID(threadID),
-			Count:  len(r.Edges.Posts),
-			Replied: opt.Map(accountID, func(a account.AccountID) (replied int) {
-				for _, p := range r.Edges.Posts {
-					if p.Edges.Author.ID == xid.ID(a) {
-						replied++
-					}
-				}
-				return
-			}).OrZero(),
-		},
+	replies, err := dt.MapErr(r.Edges.Posts, reply.FromModel(likes.Map()))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	mapper := FromModel(likes.Map(), collections.Map(), replies)
+	replyStatsMap := replyStats.Map()
+	totalReplies := replyStatsMap[r.ID].Count
+
+	repliesPage := pagination.NewPageResult(pageParams, totalReplies, replies)
+
+	mapper := FromModel(likes.Map(), collections.Map(), replyStatsMap)
 	p, err := mapper(r)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	p.Replies = repliesPage
 
 	return p, nil
 }

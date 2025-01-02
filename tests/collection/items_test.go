@@ -166,7 +166,7 @@ func TestCollectionItems(t *testing.T) {
 				a.True(fromList.Collections.HasCollected)
 				a.Equal(1, fromList.Collections.InCollections)
 
-				ownerget, err := cl.ThreadGetWithResponse(root, thr.JSON200.Id, session1)
+				ownerget, err := cl.ThreadGetWithResponse(root, thr.JSON200.Id, nil, session1)
 				tests.Ok(t, err, ownerget)
 				a.True(ownerget.JSON200.Collections.HasCollected)
 				a.Equal(1, ownerget.JSON200.Collections.InCollections)
@@ -180,7 +180,7 @@ func TestCollectionItems(t *testing.T) {
 				a.False(fromList.Collections.HasCollected)
 				a.Equal(1, fromList.Collections.InCollections)
 
-				randoget, err := cl.ThreadGetWithResponse(root, thr.JSON200.Id, session2)
+				randoget, err := cl.ThreadGetWithResponse(root, thr.JSON200.Id, nil, session2)
 				tests.Ok(t, err, randoget)
 				a.False(randoget.JSON200.Collections.HasCollected)
 				a.Equal(1, randoget.JSON200.Collections.InCollections)
@@ -194,7 +194,7 @@ func TestCollectionItems(t *testing.T) {
 				a.False(fromList.Collections.HasCollected)
 				a.Equal(1, fromList.Collections.InCollections)
 
-				guestget, err := cl.ThreadGetWithResponse(root, thr.JSON200.Id)
+				guestget, err := cl.ThreadGetWithResponse(root, thr.JSON200.Id, nil)
 				tests.Ok(t, err, guestget)
 				a.False(guestget.JSON200.Collections.HasCollected)
 				a.Equal(1, guestget.JSON200.Collections.InCollections)

@@ -118,11 +118,22 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		ReplyStatus:    serialiseReplyStatus(t.ReplyStatus),
 		Reacts:         dt.Map(t.Reacts, serialiseReact),
 		Recomentations: dt.Map(t.Related, serialiseDatagraphItem),
-		Replies:        dt.Map(t.Replies, serialiseReply),
+		Replies:        serialiseThreadRepliesPaginatedList(t.Replies),
 		Slug:           t.Slug,
 		Tags:           serialiseTagReferenceList(t.Tags),
 		Title:          t.Title,
 		UpdatedAt:      t.UpdatedAt,
+	}
+}
+
+func serialiseThreadRepliesPaginatedList(in pagination.Result[*reply.Reply]) openapi.PaginatedReplyList {
+	return openapi.PaginatedReplyList{
+		CurrentPage: in.CurrentPage,
+		NextPage:    in.NextPage.Ptr(),
+		PageSize:    in.Size,
+		Results:     in.Results,
+		Replies:     dt.Map(in.Items, serialiseReply),
+		TotalPages:  in.TotalPages,
 	}
 }
 

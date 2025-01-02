@@ -66,17 +66,17 @@ func TestLikeThreads(t *testing.T) {
 			a.Equal(user2Acc.Handle, likepostget.JSON200.Likes[1].Owner.Handle)
 
 			// Assert LikeStatus is correct
-			tget1, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, user1Session)
+			tget1, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, nil, user1Session)
 			tests.Ok(t, err, tget1)
 			a.Equal(2, tget1.JSON200.Likes.Likes)
 			a.True(tget1.JSON200.Likes.Liked)
 
-			tget2, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, user2Session)
+			tget2, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, nil, user2Session)
 			tests.Ok(t, err, tget2)
 			a.Equal(2, tget2.JSON200.Likes.Likes)
 			a.True(tget2.JSON200.Likes.Liked)
 
-			tget3, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, adminSession)
+			tget3, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, nil, adminSession)
 			tests.Ok(t, err, tget3)
 			a.Equal(2, tget3.JSON200.Likes.Likes)
 			a.False(tget3.JSON200.Likes.Liked)
@@ -171,28 +171,28 @@ func TestLikeReplies(t *testing.T) {
 			// admin user did not like the reply
 
 			// get the thread as user1
-			tget1, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, user1Session)
+			tget1, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, nil, user1Session)
 			tests.Ok(t, err, tget1)
 			a.Equal(0, tget1.JSON200.Likes.Likes, "the thread has 0 likes")
 			a.False(tget1.JSON200.Likes.Liked, "user1 did not like the thread")
-			a.Equal(2, tget1.JSON200.Replies[0].Likes.Likes, "the reply has 2 likes from user1+2")
-			a.True(tget1.JSON200.Replies[0].Likes.Liked, "user1 liked the reply")
+			a.Equal(2, tget1.JSON200.Replies.Replies[0].Likes.Likes, "the reply has 2 likes from user1+2")
+			a.True(tget1.JSON200.Replies.Replies[0].Likes.Liked, "user1 liked the reply")
 
 			// get the thread as user2
-			tget2, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, user2Session)
+			tget2, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, nil, user2Session)
 			tests.Ok(t, err, tget2)
 			a.Equal(0, tget2.JSON200.Likes.Likes, "the thread has 0 likes")
 			a.False(tget2.JSON200.Likes.Liked, "user2 did not like the thread")
-			a.Equal(2, tget2.JSON200.Replies[0].Likes.Likes, "the reply has 1 likes from user1+2")
-			a.True(tget2.JSON200.Replies[0].Likes.Liked, "user2 liked the reply")
+			a.Equal(2, tget2.JSON200.Replies.Replies[0].Likes.Likes, "the reply has 1 likes from user1+2")
+			a.True(tget2.JSON200.Replies.Replies[0].Likes.Liked, "user2 liked the reply")
 
 			// get the thread as admin
-			tget3, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, adminSession)
+			tget3, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, nil, adminSession)
 			tests.Ok(t, err, tget3)
 			a.Equal(0, tget3.JSON200.Likes.Likes, "the thread has 0 likes")
 			a.False(tget3.JSON200.Likes.Liked, "admin user did not like the thread")
-			a.Equal(2, tget3.JSON200.Replies[0].Likes.Likes, "the reply has 2 likes from user1+2")
-			a.False(tget3.JSON200.Replies[0].Likes.Liked, "admin user did not like the reply")
+			a.Equal(2, tget3.JSON200.Replies.Replies[0].Likes.Likes, "the reply has 2 likes from user1+2")
+			a.False(tget3.JSON200.Replies.Replies[0].Likes.Liked, "admin user did not like the reply")
 
 			// Assert profile likes contains reply
 			profilelikeget, err := cl.LikeProfileGetWithResponse(root, user1Acc.Handle, &openapi.LikeProfileGetParams{}, user2Session)

@@ -10,6 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   ThreadCreateBody,
   ThreadCreateOKResponse,
+  ThreadGetParams,
   ThreadGetResponse,
   ThreadListOKResponse,
   ThreadListParams,
@@ -94,18 +95,35 @@ export type threadGetResponse = {
   status: number;
 };
 
-export const getThreadGetUrl = (threadMark: string) => {
-  return `/threads/${threadMark}`;
+export const getThreadGetUrl = (
+  threadMark: string,
+  params?: ThreadGetParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/threads/${threadMark}?${normalizedParams.toString()}`
+    : `/threads/${threadMark}`;
 };
 
 export const threadGet = async (
   threadMark: string,
+  params?: ThreadGetParams,
   options?: RequestInit,
 ): Promise<threadGetResponse> => {
-  return fetcher<Promise<threadGetResponse>>(getThreadGetUrl(threadMark), {
-    ...options,
-    method: "GET",
-  });
+  return fetcher<Promise<threadGetResponse>>(
+    getThreadGetUrl(threadMark, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
 };
 
 /**

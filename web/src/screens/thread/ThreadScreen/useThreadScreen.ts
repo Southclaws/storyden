@@ -9,6 +9,7 @@ import { threadUpdate, useThreadGet } from "@/api/openapi-client/threads";
 import { ThreadGetResponse } from "@/api/openapi-schema";
 
 export type Props = {
+  initialPage?: number;
   slug: string;
   thread: ThreadGetResponse;
 };
@@ -20,7 +21,7 @@ export const FormSchema = z.object({
 });
 export type Form = z.infer<typeof FormSchema>;
 
-export function useThreadScreen({ slug, thread }: Props) {
+export function useThreadScreen({ initialPage, slug, thread }: Props) {
   const [editing, setEditing] = useQueryState("edit", {
     ...parseAsBoolean,
     defaultValue: false,
@@ -38,11 +39,17 @@ export function useThreadScreen({ slug, thread }: Props) {
     },
   });
 
-  const { data, error, mutate } = useThreadGet(slug, {
-    swr: {
-      fallbackData: thread,
+  const { data, error, mutate } = useThreadGet(
+    slug,
+    {
+      page: initialPage?.toString(),
     },
-  });
+    {
+      swr: {
+        fallbackData: thread,
+      },
+    },
+  );
 
   if (!data) {
     return {

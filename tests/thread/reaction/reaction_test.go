@@ -54,7 +54,7 @@ func TestReactions(t *testing.T) {
 				a.Equal("👻", react1create.JSON200.Emoji)
 				a.Equal(acc2.ID.String(), react1create.JSON200.Author.Id)
 
-				thread1get, err := cl.ThreadGetWithResponse(root, threadID, session1)
+				thread1get, err := cl.ThreadGetWithResponse(root, threadID, nil, session1)
 				tests.Ok(t, err, thread1get)
 				r.Len(thread1get.JSON200.Reacts, 1)
 				r.Equal("👻", thread1get.JSON200.Reacts[0].Emoji)
@@ -75,7 +75,7 @@ func TestReactions(t *testing.T) {
 				react1delete, err := cl.PostReactRemoveWithResponse(root, threadID, react1create.JSON200.Id, session2)
 				tests.Ok(t, err, react1delete)
 
-				thread1get, err := cl.ThreadGetWithResponse(root, threadID, session1)
+				thread1get, err := cl.ThreadGetWithResponse(root, threadID, nil, session1)
 				tests.Ok(t, err, thread1get)
 				r.Len(thread1get.JSON200.Reacts, 0)
 			})
@@ -93,11 +93,11 @@ func TestReactions(t *testing.T) {
 				a.Equal("👻", react1create.JSON200.Emoji)
 				a.Equal(acc2.ID.String(), react1create.JSON200.Author.Id)
 
-				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, session1)
+				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, nil, session1)
 				tests.Ok(t, err, thread1get)
 				r.Len(thread1get.JSON200.Reacts, 0)
-				r.Len(thread1get.JSON200.Replies, 1)
-				reply := thread1get.JSON200.Replies[0]
+				r.Len(thread1get.JSON200.Replies.Replies, 1)
+				reply := thread1get.JSON200.Replies.Replies[0]
 				r.Len(reply.Reacts, 1)
 				r.Equal("👻", reply.Reacts[0].Emoji)
 				r.Equal(acc2.ID.String(), reply.Reacts[0].Author.Id)
@@ -118,11 +118,11 @@ func TestReactions(t *testing.T) {
 				react1delete, err := cl.PostReactRemoveWithResponse(root, reply1create.JSON200.Id, react1create.JSON200.Id, session2)
 				tests.Ok(t, err, react1delete)
 
-				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, session1)
+				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Id, nil, session1)
 				tests.Ok(t, err, thread1get)
 				r.Len(thread1get.JSON200.Reacts, 0)
-				r.Len(thread1get.JSON200.Replies, 1)
-				reply := thread1get.JSON200.Replies[0]
+				r.Len(thread1get.JSON200.Replies.Replies, 1)
+				reply := thread1get.JSON200.Replies.Replies[0]
 				r.Len(reply.Reacts, 0)
 			})
 
@@ -141,7 +141,7 @@ func TestReactions(t *testing.T) {
 				r4, err := cl.PostReactAddWithResponse(root, threadID, openapi.PostReactAddJSONRequestBody{Emoji: "🥶"}, session2)
 				tests.Ok(t, err, r4)
 
-				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug)
+				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil)
 				tests.Ok(t, err, thread1get)
 
 				r.Len(thread1get.JSON200.Reacts, 2, "2 reacts because 👻 is ignored after the first react, reactions are unique by (post, account, emoji) constraint")

@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -74,7 +75,7 @@ func (h *Hydrator) Hydrate(ctx context.Context, refs ...*datagraph.Ref) (datagra
 
 			case datagraph.KindThread:
 				items, err = dt.MapErr(v, func(r *datagraph.Ref) (withRelevance, error) {
-					i, err := h.threads.Get(ctx, post.ID(r.ID), nil)
+					i, err := h.threads.Get(ctx, post.ID(r.ID), pagination.Parameters{}, nil)
 					return withRelevance{Item: i, r: r.Relevance}, err
 				})
 
