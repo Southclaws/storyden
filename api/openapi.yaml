@@ -1147,7 +1147,9 @@ paths:
         created as well as a list of the posts within the thread.
       security: []
       tags: [threads]
-      parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
+      parameters:
+        - $ref: "#/components/parameters/ThreadMarkParam"
+        - $ref: "#/components/parameters/PaginationQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -4577,7 +4579,7 @@ components:
         - type: object
           required: [replies]
           properties:
-            replies: { $ref: "#/components/schemas/ReplyList" }
+            replies: { $ref: "#/components/schemas/PaginatedReplyList" }
 
     ThreadInitialProps:
       type: object
@@ -4685,6 +4687,14 @@ components:
         - { $ref: "#/components/schemas/PostReferenceProps" }
         - { $ref: "#/components/schemas/PostProps" }
         - { $ref: "#/components/schemas/ReplyProps" }
+
+    PaginatedReplyList:
+      allOf:
+        - $ref: "#/components/schemas/PaginatedResult"
+        - type: object
+          required: [replies]
+          properties:
+            replies: { $ref: "#/components/schemas/ReplyList" }
 
     ReplyList:
       type: array

@@ -73,7 +73,7 @@ func TestThreads(t *testing.T) {
 				a.Equal("this is a thread", *thread1create.JSON200.Description)
 				a.Equal(false, thread1create.JSON200.Pinned)
 				a.Equal(cat1create.JSON200.Name, thread1create.JSON200.Category.Name)
-				a.Len(thread1create.JSON200.Replies, 0, "a newly created thread has zero replies")
+				a.Len(thread1create.JSON200.Replies.Replies, 0, "a newly created thread has zero replies")
 				a.Len(thread1create.JSON200.Reacts, 0)
 				a.Equal(thread1create.JSON200.ReplyStatus.Replies, 0)
 				a.Equal(thread1create.JSON200.ReplyStatus.Replied, 0)
@@ -93,16 +93,16 @@ func TestThreads(t *testing.T) {
 				tests.Ok(t, err, reply1create)
 				a.Equal(acc2.ID.String(), reply1create.JSON200.Author.Id)
 
-				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug)
+				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil)
 				tests.Ok(t, err, thread1get)
 
-				r.Len(thread1get.JSON200.Replies, 1)
-				replyids := dt.Map(thread1get.JSON200.Replies, func(p openapi.Reply) string { return p.Id })
+				r.Len(thread1get.JSON200.Replies.Replies, 1)
+				replyids := dt.Map(thread1get.JSON200.Replies.Replies, func(p openapi.Reply) string { return p.Id })
 				a.Contains(replyids, reply1create.JSON200.Id)
 				a.Equal(thread1get.JSON200.ReplyStatus.Replies, 1)
 				a.Equal(thread1get.JSON200.ReplyStatus.Replied, 0)
 
-				thread2get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, session2)
+				thread2get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil, session2)
 				tests.Ok(t, err, thread2get)
 				a.Equal(thread2get.JSON200.ReplyStatus.Replies, 1)
 				a.Equal(thread2get.JSON200.ReplyStatus.Replied, 1, "ctx2 replied")
@@ -132,7 +132,7 @@ func TestThreads(t *testing.T) {
 				r1del, err := cl.PostDeleteWithResponse(root, r1.JSON200.Id, session2)
 				tests.Ok(t, err, r1del)
 
-				t1get, err := cl.ThreadGetWithResponse(root, t1.JSON200.Slug)
+				t1get, err := cl.ThreadGetWithResponse(root, t1.JSON200.Slug, nil)
 				tests.Ok(t, err, t1get)
 				a.Equal(2, t1get.JSON200.ReplyStatus.Replies)
 
@@ -183,7 +183,7 @@ func TestThreads(t *testing.T) {
 
 				// Get the thread just created, ensure link is present.
 
-				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, session)
+				thread1get, err := cl.ThreadGetWithResponse(root, thread1create.JSON200.Slug, nil, session)
 				tests.Ok(t, err, thread1get)
 				r.NotNil(thread1get.JSON200.Link)
 				a.Equal(url, thread1get.JSON200.Link.Url)

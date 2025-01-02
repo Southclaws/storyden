@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
@@ -30,7 +31,7 @@ type Thread struct {
 	Pinned bool
 
 	ReplyStatus post.ReplyStatus
-	Replies     []*reply.Reply
+	Replies     pagination.Result[*reply.Reply]
 	Category    category.Category
 	Visibility  visibility.Visibility
 	Tags        tag_ref.Tags
@@ -61,11 +62,6 @@ func FromModel(ls post.PostLikesMap, cs collection_item_status.CollectionStatusM
 		category := category.FromModel(categoryEdge)
 
 		pro, err := profile.ProfileFromModel(authorEdge)
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-
-		replies, err := dt.MapErr(m.Edges.Posts, reply.FromModel(ls))
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}
@@ -110,7 +106,6 @@ func FromModel(ls post.PostLikesMap, cs collection_item_status.CollectionStatusM
 			Pinned: m.Pinned,
 
 			ReplyStatus: rs.Status(m.ID),
-			Replies:     replies,
 			Category:    *category,
 			Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
 			Tags:        tags,
