@@ -19,14 +19,16 @@ func (i *semdexer) index(ctx context.Context, id library.NodeID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = i.semdexMutator.Index(ctx, node)
+	updates, err := i.semdexMutator.Index(ctx, node)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = i.nodeWriter.Update(ctx, qk, node_writer.WithIndexed())
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
+	if updates > 0 {
+		_, err = i.nodeWriter.Update(ctx, qk, node_writer.WithIndexed())
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	return nil
@@ -35,7 +37,7 @@ func (i *semdexer) index(ctx context.Context, id library.NodeID) error {
 func (i *semdexer) deindex(ctx context.Context, id library.NodeID) error {
 	qk := library.NewID(xid.ID(id))
 
-	err := i.semdexMutator.Delete(ctx, xid.ID(id))
+	_, err := i.semdexMutator.Delete(ctx, xid.ID(id))
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

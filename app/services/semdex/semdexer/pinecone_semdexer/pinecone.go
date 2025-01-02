@@ -2,6 +2,7 @@ package pinecone_semdexer
 
 import (
 	"context"
+	"fmt"
 	"hash/fnv"
 
 	"github.com/Southclaws/dt"
@@ -44,17 +45,20 @@ func New(ctx context.Context, cfg config.Config, pc *pinecone.Client, rh *hydrat
 	}, nil
 }
 
-func generateChunkID(id xid.ID, chunk string) uuid.UUID {
+func generateChunkID(id xid.ID, chunk string) string {
 	// We don't currently support sharing chunks across content nodes, so append
 	// the object's ID to the chunk's hash, to ensure it's unique to the object.
-	payload := []byte(append(id.Bytes(), chunk...))
 
-	return uuid.NewHash(fnv.New128(), uuid.NameSpaceOID, payload, 4)
+	hash := uuid.NewHash(fnv.New128(), uuid.NameSpaceOID, []byte(chunk), 4)
+
+	prefix := id.String()
+
+	return fmt.Sprintf("%s/%s", prefix, hash)
 }
 
 func chunkIDsFor(id xid.ID) func(chunk string) string {
 	return func(chunk string) string {
-		return generateChunkID(id, chunk).String()
+		return generateChunkID(id, chunk)
 	}
 }
 
@@ -62,6 +66,19 @@ func chunkIDsForItem(object datagraph.Item) []string {
 	return dt.Map(object.GetContent().Split(), chunkIDsFor(object.GetID()))
 }
 
-func (c *pineconeSemdexer) GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error) {
-	return nil, nil
+type chunk struct {
+	id      string
+	content string
+}
+
+func chunksFor(object datagraph.Item) []chunk {
+	id := object.GetID()
+	chunks := object.GetContent().Split()
+
+	return dt.Map(chunks, func(c string) chunk {
+		return chunk{
+			id:      generateChunkID(id, c),
+			content: c,
+		}
+	})
 }

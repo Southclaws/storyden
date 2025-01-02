@@ -17,21 +17,23 @@ func (i *semdexer) indexThread(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = i.semdexMutator.Index(ctx, p)
+	updates, err := i.semdexMutator.Index(ctx, p)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = i.threadWriter.Update(ctx, id, thread.WithIndexed())
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
+	if updates > 0 {
+		_, err = i.threadWriter.Update(ctx, id, thread.WithIndexed())
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	return nil
 }
 
 func (i *semdexer) deindexThread(ctx context.Context, id post.ID) error {
-	err := i.semdexMutator.Delete(ctx, xid.ID(id))
+	_, err := i.semdexMutator.Delete(ctx, xid.ID(id))
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

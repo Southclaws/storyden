@@ -18,15 +18,13 @@ type Semdexer interface {
 }
 
 type Mutator interface {
-	Index(ctx context.Context, object datagraph.Item) error
-	Delete(ctx context.Context, object xid.ID) error
+	Index(ctx context.Context, object datagraph.Item) (int, error)
+	Delete(ctx context.Context, object xid.ID) (int, error)
 }
 
 type Querier interface {
 	Searcher
 	Recommender
-
-	GetMany(ctx context.Context, limit uint, ids ...xid.ID) (datagraph.RefList, error)
 }
 
 type Chunk struct {
