@@ -191,5 +191,28 @@ func TestSplitLong(t *testing.T) {
 	a.Equal("So clearly the next best option is to have the decision be made by a more intelligent group of people. Who better than Rabbis? They have studied all their lives, are genetically more likely to have a very high IQ, have shown immense dedication, work ethic, and pure intentions (aside from pricking the penis of male converts, not sure why they do", ps[11])
 	a.Equal("that). It's common for them to engage in debates and intellectual discussions with each other, and they are chosen by G-d as His favored people to lead the way forward for humanity.Imagine a society where they are able to choose amongst themselves. Personally I think it would be amazing", ps[12])
 	a.Equal("The person they choose doesn't even have to be a Rabbi or Jewish at all, it could be some random kid. But we need to all trust in their judgment because it is the best one available to us. To keep things fresh it's probably best to rotate different Rabbis every year, maybe have one year be Conservative, the next one be Reform, etc", ps[13])
-	a.Equal("just for the variety and to give them a break. Many of them are senior citizens, we don't want them getting exhausted or accelerating neurological issues they might have", ps[14])
+	a.Equal("just for the variety and to give them a break. Many of them are senior citizens, we don't want them getting exhausted or accelerating neurological issues they might have.", ps[14])
+}
+
+func TestSplitLong2(t *testing.T) {
+	r := require.New(t)
+	a := assert.New(t)
+
+	c, err := NewRichText(`<body>Hello friends,
+
+I need help. I am currently using Europeam Values Study data set (2017) and i did crosstab for two variables - country code and political party support.
+
+The problem is that i have been given all the countries and all the political parties.
+
+I would like to sort varibles in a way that i see only a specific country and the support for the political parties only in that country.
+
+Thank you im advance</body>
+`)
+	r.NoError(err)
+	r.NotNil(r)
+
+	ps := c.Split()
+	r.Len(ps, 2)
+	a.Equal("Hello friends,\n\nI need help. I am currently using Europeam Values Study data set (2017) and i did crosstab for two variables - country code and political party support.\n\nThe problem is that i have been given all the countries and all the political parties", ps[0])
+	a.Equal("I would like to sort varibles in a way that i see only a specific country and the support for the political parties only in that country.\n\nThank you im advance", ps[1])
 }
