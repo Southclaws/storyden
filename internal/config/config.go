@@ -50,6 +50,7 @@ type Config struct {
 
 	LanguageModelProvider string `envconfig:"LANGUAGE_MODEL_PROVIDER"`
 	OpenAIKey             string `envconfig:"OPENAI_API_KEY"`
+	PerplexityAPIKey      string `envconfig:"PERPLEXITY_API_KEY"`
 
 	// chromem (local), weaviate, pinecone
 	SemdexProvider string `envconfig:"SEMDEX_PROVIDER" default:""`
