@@ -14,12 +14,12 @@ type Disabled struct{}
 
 var _ Semdexer = &Disabled{}
 
-func (*Disabled) Index(ctx context.Context, object datagraph.Item) error {
-	return nil
+func (*Disabled) Index(ctx context.Context, object datagraph.Item) (int, error) {
+	return 0, nil
 }
 
-func (*Disabled) Delete(ctx context.Context, object xid.ID) error {
-	return nil
+func (*Disabled) Delete(ctx context.Context, object xid.ID) (int, error) {
+	return 0, nil
 }
 
 func (*Disabled) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {

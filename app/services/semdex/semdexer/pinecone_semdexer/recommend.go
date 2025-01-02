@@ -53,7 +53,7 @@ func (s *pineconeSemdexer) RecommendRefs(ctx context.Context, object datagraph.I
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	objects, err := mapObjects(result.Matches)
+	objects, err := mapScoredVectors(result.Matches)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

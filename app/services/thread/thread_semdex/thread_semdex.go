@@ -30,7 +30,7 @@ func Build() fx.Option {
 // with duplicate messages since there's no checksum mechanism built currently.
 // TODO: Make these parameters configurable by the SD instance administrator.
 var (
-	DefaultReindexSchedule  = time.Hour * 21 // how frequently do we reindex
+	DefaultReindexSchedule  = time.Hour      // how frequently do we reindex
 	DefaultReindexThreshold = time.Hour * 24 // ignore indexed_at after this
 	DefaultReindexChunk     = 100            // size of query per reindex
 )
@@ -103,7 +103,7 @@ func newSemdexer(
 		go func() {
 			for msg := range sub {
 				if err := re.deindexThread(ctx, msg.Payload.ID); err != nil {
-					l.Error("failed to index post", zap.Error(err))
+					l.Error("failed to deindex post", zap.Error(err))
 				}
 
 				msg.Ack()
