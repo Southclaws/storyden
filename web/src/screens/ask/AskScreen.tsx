@@ -9,6 +9,7 @@ import { handle } from "@/api/client";
 import { useNodeGet } from "@/api/openapi-client/nodes";
 import { useThreadGet } from "@/api/openapi-client/threads";
 import { Account, DatagraphItemKind } from "@/api/openapi-schema";
+import { CreateThreadFromResultModalTrigger } from "@/components/ask/CreateThreadFromResultModal/CreateThreadFromResultModal";
 import {
   DatagraphItemNodeCard,
   DatagraphItemPostGenericCard,
@@ -185,6 +186,8 @@ export function Ask() {
     );
   }
 
+  const isFinishedWithResult = isLoading === false && content.length > 0;
+
   return (
     <LStack>
       <styled.form
@@ -213,6 +216,28 @@ export function Ask() {
         <ReactMarkdown className="typography" components={components}>
           {replaceSdrUrls(content)}
         </ReactMarkdown>
+
+        {isFinishedWithResult && (
+          <WStack>
+            {/* <Button
+              type="button"
+              size="xs"
+              variant="outline" onClick={handleShare}
+            >
+              Share
+            </Button> */}
+
+            <HStack>
+              {/* <Button type="button" size="xs" variant="outline">
+                Create in library
+              </Button> */}
+              <CreateThreadFromResultModalTrigger
+                contentMarkdown={replaceSdrUrls(content)}
+                sources={sourceList}
+              />
+            </HStack>
+          </WStack>
+        )}
 
         {sourceList.length > 0 && (
           <LStack>

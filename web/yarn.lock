@@ -8170,6 +8170,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"marked@npm:^15.0.4":
+  version: 15.0.4
+  resolution: "marked@npm:15.0.4"
+  bin:
+    marked: bin/marked.js
+  checksum: 10c0/e2bfd9178e5242cc814aaf8020f3c2e954c047652c498dac0732f4b711d5e3ab80dbc54b964799d80470d6c515a24905e554c4a40f87b05dedc26e4e36cfdfdb
+  languageName: node
+  linkType: hard
+
 "mdast-util-from-markdown@npm:^2.0.0":
   version: 2.0.2
   resolution: "mdast-util-from-markdown@npm:2.0.2"
@@ -11392,6 +11401,7 @@ __metadata:
     js-cookie: "npm:^3.0.5"
     lodash: "npm:^4.17.21"
     lucide-react: "npm:^0.451.0"
+    marked: "npm:^15.0.4"
     mime-db: "npm:^1.53.0"
     next: "npm:15.0.0"
     nuqs: "npm:^1.20.0"
