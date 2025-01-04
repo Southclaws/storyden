@@ -116,6 +116,11 @@ func Short(v string) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldShort, v))
 }
 
+// AccountPosts applies equality check predicate on the "account_posts" field. It's identical to AccountPostsEQ.
+func AccountPosts(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldAccountPosts, v))
+}
+
 // CategoryID applies equality check predicate on the "category_id" field. It's identical to CategoryIDEQ.
 func CategoryID(v xid.ID) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldCategoryID, v))
@@ -794,6 +799,76 @@ func VisibilityIn(vs ...Visibility) predicate.Post {
 // VisibilityNotIn applies the NotIn predicate on the "visibility" field.
 func VisibilityNotIn(vs ...Visibility) predicate.Post {
 	return predicate.Post(sql.FieldNotIn(FieldVisibility, vs...))
+}
+
+// AccountPostsEQ applies the EQ predicate on the "account_posts" field.
+func AccountPostsEQ(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldAccountPosts, v))
+}
+
+// AccountPostsNEQ applies the NEQ predicate on the "account_posts" field.
+func AccountPostsNEQ(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldNEQ(FieldAccountPosts, v))
+}
+
+// AccountPostsIn applies the In predicate on the "account_posts" field.
+func AccountPostsIn(vs ...xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldIn(FieldAccountPosts, vs...))
+}
+
+// AccountPostsNotIn applies the NotIn predicate on the "account_posts" field.
+func AccountPostsNotIn(vs ...xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldNotIn(FieldAccountPosts, vs...))
+}
+
+// AccountPostsGT applies the GT predicate on the "account_posts" field.
+func AccountPostsGT(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldGT(FieldAccountPosts, v))
+}
+
+// AccountPostsGTE applies the GTE predicate on the "account_posts" field.
+func AccountPostsGTE(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldGTE(FieldAccountPosts, v))
+}
+
+// AccountPostsLT applies the LT predicate on the "account_posts" field.
+func AccountPostsLT(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldLT(FieldAccountPosts, v))
+}
+
+// AccountPostsLTE applies the LTE predicate on the "account_posts" field.
+func AccountPostsLTE(v xid.ID) predicate.Post {
+	return predicate.Post(sql.FieldLTE(FieldAccountPosts, v))
+}
+
+// AccountPostsContains applies the Contains predicate on the "account_posts" field.
+func AccountPostsContains(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(sql.FieldContains(FieldAccountPosts, vc))
+}
+
+// AccountPostsHasPrefix applies the HasPrefix predicate on the "account_posts" field.
+func AccountPostsHasPrefix(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(sql.FieldHasPrefix(FieldAccountPosts, vc))
+}
+
+// AccountPostsHasSuffix applies the HasSuffix predicate on the "account_posts" field.
+func AccountPostsHasSuffix(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(sql.FieldHasSuffix(FieldAccountPosts, vc))
+}
+
+// AccountPostsEqualFold applies the EqualFold predicate on the "account_posts" field.
+func AccountPostsEqualFold(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(sql.FieldEqualFold(FieldAccountPosts, vc))
+}
+
+// AccountPostsContainsFold applies the ContainsFold predicate on the "account_posts" field.
+func AccountPostsContainsFold(v xid.ID) predicate.Post {
+	vc := v.String()
+	return predicate.Post(sql.FieldContainsFold(FieldAccountPosts, vc))
 }
 
 // CategoryIDEQ applies the EQ predicate on the "category_id" field.

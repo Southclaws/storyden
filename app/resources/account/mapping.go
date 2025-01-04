@@ -16,10 +16,7 @@ import (
 )
 
 func MapAccount(a *ent.Account) (*Account, error) {
-	rolesEdge, err := a.Edges.AccountRolesOrErr()
-	if err != nil {
-		return nil, err
-	}
+	rolesEdge := a.Edges.AccountRoles
 
 	auths := dt.Map(a.Edges.Authentication, func(a *ent.Authentication) string {
 		return a.Service

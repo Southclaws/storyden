@@ -44,6 +44,8 @@ const (
 	FieldMetadata = "metadata"
 	// FieldVisibility holds the string denoting the visibility field in the database.
 	FieldVisibility = "visibility"
+	// FieldAccountPosts holds the string denoting the account_posts field in the database.
+	FieldAccountPosts = "account_posts"
 	// FieldCategoryID holds the string denoting the category_id field in the database.
 	FieldCategoryID = "category_id"
 	// FieldLinkID holds the string denoting the link_id field in the database.
@@ -184,14 +186,9 @@ var Columns = []string{
 	FieldShort,
 	FieldMetadata,
 	FieldVisibility,
+	FieldAccountPosts,
 	FieldCategoryID,
 	FieldLinkID,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "posts"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"account_posts",
 }
 
 var (
@@ -213,11 +210,6 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -334,6 +326,11 @@ func ByShort(opts ...sql.OrderTermOption) OrderOption {
 // ByVisibility orders the results by the visibility field.
 func ByVisibility(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldVisibility, opts...).ToFunc()
+}
+
+// ByAccountPosts orders the results by the account_posts field.
+func ByAccountPosts(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAccountPosts, opts...).ToFunc()
 }
 
 // ByCategoryID orders the results by the category_id field.

@@ -6,7 +6,9 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -47,24 +49,68 @@ func (t *Thread) GetDesc() string         { return t.Short }
 func (t *Thread) GetCreated() time.Time   { return t.CreatedAt }
 func (t *Thread) GetUpdated() time.Time   { return t.UpdatedAt }
 
-func FromModel(ls post.PostLikesMap, cs collection_item_status.CollectionStatusMap, rs post.PostRepliesMap) func(m *ent.Post) (*Thread, error) {
+func Map(m *ent.Post) (*Thread, error) {
+	categoryEdge, err := m.Edges.CategoryOrErr()
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+	category := category.FromModel(categoryEdge)
+
+	link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
+		return *link_ref.Map(&in)
+	})
+
+	content, err := datagraph.NewRichText(m.Body)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	pro, err := profile.ProfileFromModel(m.Edges.Author)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	tags := dt.Map(m.Edges.Tags, tag_ref.Map(nil))
+
+	return &Thread{
+		Post: post.Post{
+			ID: post.ID(m.ID),
+
+			Content: content,
+			Author:  *pro,
+			Assets:  dt.Map(m.Edges.Assets, asset.Map),
+			WebLink: link,
+			Meta:    m.Metadata,
+
+			CreatedAt: m.CreatedAt,
+			UpdatedAt: m.UpdatedAt,
+			DeletedAt: opt.NewPtr(m.DeletedAt),
+		},
+
+		Title:  m.Title,
+		Slug:   m.Slug,
+		Short:  m.Short,
+		Pinned: m.Pinned,
+
+		Category:   *category,
+		Visibility: visibility.NewVisibilityFromEnt(m.Visibility),
+		Tags:       tags,
+	}, nil
+}
+
+func Mapper(
+	am account.Lookup,
+	ls post.PostLikesMap,
+	cs collection_item_status.CollectionStatusMap,
+	rs post.PostRepliesMap,
+	rl reaction.Lookup,
+) func(m *ent.Post) (*Thread, error) {
 	return func(m *ent.Post) (*Thread, error) {
 		categoryEdge, err := m.Edges.CategoryOrErr()
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}
-
-		authorEdge, err := m.Edges.AuthorOrErr()
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-
 		category := category.FromModel(categoryEdge)
-
-		pro, err := profile.ProfileFromModel(authorEdge)
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
 
 		link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
 			return *link_ref.Map(&in)
@@ -75,12 +121,18 @@ func FromModel(ls post.PostLikesMap, cs collection_item_status.CollectionStatusM
 			return nil, fault.Wrap(err)
 		}
 
-		reacts, err := reaction.MapList(m.Edges.Reacts)
-		if err != nil {
-			return nil, err
+		var pro *profile.Public
+		authorEdge := am[m.AccountPosts]
+		if authorEdge != nil {
+			pro = profile.ProfileFromAccount(authorEdge)
+		} else {
+			pro, err = profile.ProfileFromModel(m.Edges.Author)
+			if err != nil {
+				return nil, fault.Wrap(err)
+			}
 		}
 
-		tags := dt.Map(m.Edges.Tags, tag_ref.Map(nil))
+		reacts := rl[xid.ID(m.ID)]
 
 		return &Thread{
 			Post: post.Post{
@@ -91,7 +143,6 @@ func FromModel(ls post.PostLikesMap, cs collection_item_status.CollectionStatusM
 				Likes:       ls.Status(m.ID),
 				Collections: cs.Status(m.ID),
 				Reacts:      reacts,
-				Assets:      dt.Map(m.Edges.Assets, asset.Map),
 				WebLink:     link,
 				Meta:        m.Metadata,
 
@@ -108,7 +159,6 @@ func FromModel(ls post.PostLikesMap, cs collection_item_status.CollectionStatusM
 			ReplyStatus: rs.Status(m.ID),
 			Category:    *category,
 			Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
-			Tags:        tags,
 		}, nil
 	}
 }
