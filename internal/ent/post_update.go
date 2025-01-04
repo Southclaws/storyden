@@ -256,6 +256,20 @@ func (pu *PostUpdate) SetNillableVisibility(po *post.Visibility) *PostUpdate {
 	return pu
 }
 
+// SetAccountPosts sets the "account_posts" field.
+func (pu *PostUpdate) SetAccountPosts(x xid.ID) *PostUpdate {
+	pu.mutation.SetAccountPosts(x)
+	return pu
+}
+
+// SetNillableAccountPosts sets the "account_posts" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableAccountPosts(x *xid.ID) *PostUpdate {
+	if x != nil {
+		pu.SetAccountPosts(*x)
+	}
+	return pu
+}
+
 // SetCategoryID sets the "category_id" field.
 func (pu *PostUpdate) SetCategoryID(x xid.ID) *PostUpdate {
 	pu.mutation.SetCategoryID(x)
@@ -1685,6 +1699,20 @@ func (puo *PostUpdateOne) SetVisibility(po post.Visibility) *PostUpdateOne {
 func (puo *PostUpdateOne) SetNillableVisibility(po *post.Visibility) *PostUpdateOne {
 	if po != nil {
 		puo.SetVisibility(*po)
+	}
+	return puo
+}
+
+// SetAccountPosts sets the "account_posts" field.
+func (puo *PostUpdateOne) SetAccountPosts(x xid.ID) *PostUpdateOne {
+	puo.mutation.SetAccountPosts(x)
+	return puo
+}
+
+// SetNillableAccountPosts sets the "account_posts" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableAccountPosts(x *xid.ID) *PostUpdateOne {
+	if x != nil {
+		puo.SetAccountPosts(*x)
 	}
 	return puo
 }

@@ -2,7 +2,6 @@ package tag
 
 import (
 	"github.com/Southclaws/dt"
-
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -33,7 +32,7 @@ func Map(in *ent.Tag) (*Tag, error) {
 
 	tag.ItemCount = len(postsEdge) + len(nodesEdge)
 
-	posts, err := dt.MapErr(postsEdge, thread.FromModel(nil, nil, nil))
+	posts, err := dt.MapErr(postsEdge, thread.Map)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +51,7 @@ func Map(in *ent.Tag) (*Tag, error) {
 	}
 
 	return &Tag{
-		Tag:   *tag,
-		Items: items,
+		Tag: *tag,
+		// Items: items,
 	}, nil
 }

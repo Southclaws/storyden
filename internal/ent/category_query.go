@@ -419,7 +419,6 @@ func (cq *CategoryQuery) loadPosts(ctx context.Context, query *PostQuery, nodes 
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(post.FieldCategoryID)
 	}

@@ -13,32 +13,44 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/alitto/pond/v2"
 	"github.com/gosimple/slug"
 	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
+	"github.com/samber/lo"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/ent/asset"
+	ent_account "github.com/Southclaws/storyden/internal/ent/account"
+	ent_asset "github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
-	"github.com/Southclaws/storyden/internal/ent/react"
-	"github.com/Southclaws/storyden/internal/ent/tag"
+	ent_react "github.com/Southclaws/storyden/internal/ent/react"
+	ent_tag "github.com/Southclaws/storyden/internal/ent/tag"
 )
 
 type database struct {
-	db  *ent.Client
-	raw *sqlx.DB
+	logger *zap.Logger
+	db     *ent.Client
+	raw    *sqlx.DB
 }
 
-func New(db *ent.Client, raw *sqlx.DB) Repository {
-	return &database{db, raw}
+func New(logger *zap.Logger, db *ent.Client, raw *sqlx.DB) Repository {
+	return &database{
+		logger: logger,
+		db:     db,
+		raw:    raw,
+	}
 }
 
 func (d *database) Create(
@@ -113,7 +125,7 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(nil, nil, nil)(p)
+	return Map(p)
 }
 
 func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thread, error) {
@@ -151,7 +163,7 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(nil, nil, nil)(p)
+	return Map(p)
 }
 
 const repliesCountManyQuery = `select
@@ -217,7 +229,7 @@ func (d *database) List(
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
 		WithAssets(func(aq *ent.AssetQuery) {
-			aq.Order(asset.ByUpdatedAt(), asset.ByCreatedAt())
+			aq.Order(ent_asset.ByUpdatedAt(), ent_asset.ByCreatedAt())
 		}).
 		WithCollections(func(cq *ent.CollectionQuery) {
 			cq.WithOwner(func(aq *ent.AccountQuery) {
@@ -270,7 +282,7 @@ func (d *database) List(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	mapper := FromModel(likes.Map(), collections.Map(), replies.Map())
+	mapper := Mapper(nil, likes.Map(), collections.Map(), replies.Map(), nil)
 	threads, err := dt.MapErr(result, mapper)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -328,100 +340,210 @@ group by p.id
 `
 
 func (d *database) Get(ctx context.Context, threadID post.ID, pageParams pagination.Parameters, accountID opt.Optional[account.AccountID]) (*Thread, error) {
-	var replyStats post.PostRepliesResults
-	err := d.raw.SelectContext(ctx, &replyStats, repliesCountQuery, threadID.String(), accountID.String())
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+	pool1 := pond.NewGroup()
+	logger := d.logger.With(
+		zap.String("thread_id", threadID.String()),
+		zap.String("account_id", accountID.String()),
+	)
+
+	logduration := func(m string) func() {
+		start := time.Now()
+		return func() {
+			logger.Debug(m, zap.Duration("duration", time.Since(start)))
+		}
 	}
 
-	var likes post.PostLikesResults
-	err = d.raw.SelectContext(ctx, &likes, likesCountQuery, threadID.String(), accountID.String())
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+	var replyStatsMap post.PostRepliesMap
+	pool1.SubmitErr(func() error {
+		defer logduration("reply status")()
 
-	var collections collection_item_status.CollectionStatusResults
-	err = d.raw.SelectContext(ctx, &collections, collectionsCountQuery, threadID.String(), accountID.String())
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+		var replyStats post.PostRepliesResults
+		err := d.raw.SelectContext(ctx, &replyStats, repliesCountQuery, threadID.String(), accountID.String())
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+		replyStatsMap = replyStats.Map()
+		return nil
+	})
 
-	r, err := d.db.Post.
-		Query().
-		Where(
-			ent_post.First(true),
-			ent_post.ID(xid.ID(threadID)),
-		).
-		WithPosts(func(pq *ent.PostQuery) {
-			pq.
-				Where(
-					ent_post.DeletedAtIsNil(),
-				).
-				WithReplyTo(func(pq *ent.PostQuery) {
-					pq.WithAuthor(func(aq *ent.AccountQuery) {
-						aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-					})
-				}).
-				WithReacts(func(rq *ent.ReactQuery) {
-					rq.WithAccount(func(aq *ent.AccountQuery) {
-						aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-					}).Order(react.ByCreatedAt())
-				}).
-				WithAuthor(func(aq *ent.AccountQuery) {
-					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-				}).
-				WithAssets().
-				WithLink(func(lq *ent.LinkQuery) {
-					lq.WithFaviconImage().WithPrimaryImage()
-					lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
-				}).
-				Limit(pageParams.Limit()).
-				Offset(pageParams.Offset()).
-				Order(ent.Asc(ent_post.FieldCreatedAt))
-		}).
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
-		WithCategory().
-		WithTags(func(tq *ent.TagQuery) {
-			tq.Order(tag.ByCreatedAt())
-		}).
-		WithReacts(func(rq *ent.ReactQuery) {
-			rq.WithAccount(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			}).Order(react.ByCreatedAt())
-		}).
-		WithAssets().
-		WithLink(func(lq *ent.LinkQuery) {
-			lq.WithFaviconImage().WithPrimaryImage()
-			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
-		}).
-		Only(ctx)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+	var likesMap post.PostLikesMap
+	pool1.SubmitErr(func() error {
+		defer logduration("likes status")()
+
+		var likes post.PostLikesResults
+		err := d.raw.SelectContext(ctx, &likes, likesCountQuery, threadID.String(), accountID.String())
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
 		}
 
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
-	}
+		likesMap = likes.Map()
 
-	replies, err := dt.MapErr(r.Edges.Posts, reply.FromModel(likes.Map()))
+		return nil
+	})
+
+	var collectionsMap collection_item_status.CollectionStatusMap
+	pool1.SubmitErr(func() error {
+		defer logduration("collection status")()
+
+		var collections collection_item_status.CollectionStatusResults
+		err := d.raw.SelectContext(ctx, &collections, collectionsCountQuery, threadID.String(), accountID.String())
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		collectionsMap = collections.Map()
+
+		return nil
+	})
+
+	var tags tag_ref.Tags
+	pool1.SubmitErr(func() error {
+		defer logduration("thread tags")()
+
+		tagsResult, err := d.db.Tag.Query().Where(ent_tag.HasPostsWith(ent_post.ID(xid.ID(threadID)))).All(ctx)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		tags = dt.Map(tagsResult, tag_ref.Map(nil))
+
+		return nil
+	})
+
+	var assets []*asset.Asset
+	pool1.SubmitErr(func() error {
+		defer logduration("thread assets")()
+
+		r, err := d.db.Asset.Query().Where(ent_asset.HasPostsWith(ent_post.ID(xid.ID(threadID)))).All(ctx)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		assets = dt.Map(r, asset.Map)
+
+		return nil
+	})
+
+	var repliesResult []*ent.Post
+	pool1.SubmitErr(func() error {
+		defer logduration("thread replies")()
+
+		r, err := d.db.Post.Query().
+			Where(
+				ent_post.DeletedAtIsNil(),
+				ent_post.First(false),
+				ent_post.RootPostID(xid.ID(threadID)),
+			).
+			Limit(pageParams.Limit()).
+			Offset(pageParams.Offset()).
+			Order(ent.Asc(ent_post.FieldCreatedAt)).
+			All(ctx)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		repliesResult = r
+
+		return nil
+	})
+
+	var threadResult *ent.Post
+	pool1.SubmitErr(func() error {
+		defer logduration("thread root")()
+
+		r, err := d.db.Post.Query().
+			Where(
+				ent_post.DeletedAtIsNil(),
+				ent_post.First(true),
+				ent_post.ID(xid.ID(threadID)),
+			).
+			WithCategory().
+			WithLink(func(lq *ent.LinkQuery) {
+				lq.WithFaviconImage().WithPrimaryImage()
+			}).
+			Only(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+			}
+
+			return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		}
+
+		threadResult = r
+
+		return nil
+	})
+
+	// Wait for first stage to complete.
+	err := pool1.Wait()
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	replyStatsMap := replyStats.Map()
-	totalReplies := replyStatsMap[r.ID].Count
+	allPosts := append(repliesResult, threadResult)
+	postIDs := dt.Map(allPosts, func(p *ent.Post) xid.ID { return p.ID })
 
+	accountIDs := dt.Map(allPosts, func(p *ent.Post) xid.ID { return p.AccountPosts })
+
+	// Fetch dependent edges.
+
+	reactResult, err := d.db.React.Query().
+		Where(ent_react.PostIDIn(postIDs...)).
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	// React lookup contributes to the account query.
+	reacters := dt.Map(reactResult, func(r *ent.React) xid.ID { return r.AccountID })
+	accountIDs = append(accountIDs, reacters...)
+
+	accountIDs = lo.Uniq(accountIDs)
+
+	// Lookup all accounts relevant to this thread.
+	var accountLookup account.Lookup
+	accountEdges, err := d.db.Account.Query().
+		Where(ent_account.IDIn(accountIDs...)).
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	accounts, err := dt.MapErr(accountEdges, account.MapAccount)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	accountLookup = account.Accounts(accounts).Map()
+
+	// Join all data together
+
+	reacts, err := dt.MapErr(reactResult, reaction.Mapper(accountLookup))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	reactLookup := reaction.Reacts(reacts).Map()
+
+	replyMapper := reply.Mapper(accountLookup, likesMap, reactLookup)
+	threadMapper := Mapper(accountLookup, likesMap, collectionsMap, replyStatsMap, reactLookup)
+
+	replies, err := dt.MapErr(repliesResult, replyMapper)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	p, err := threadMapper(threadResult)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	totalReplies := replyStatsMap[threadResult.ID].Count
 	repliesPage := pagination.NewPageResult(pageParams, totalReplies, replies)
 
-	mapper := FromModel(likes.Map(), collections.Map(), replyStatsMap)
-	p, err := mapper(r)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	p.Replies = repliesPage
+	p.Tags = tags
+	p.Assets = assets
 
 	return p, nil
 }

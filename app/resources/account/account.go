@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
+	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -43,6 +44,14 @@ type Account struct {
 	InvitedByID *xid.ID
 	InvitedBy   opt.Optional[Account]
 }
+
+type Accounts []*Account
+
+func (a Accounts) Map() Lookup {
+	return lo.KeyBy(a, func(a *Account) xid.ID { return xid.ID(a.ID) })
+}
+
+type Lookup map[xid.ID]*Account
 
 type ExternalLink struct {
 	Text string

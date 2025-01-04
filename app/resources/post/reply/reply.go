@@ -7,9 +7,9 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/opt"
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/rs/xid"
@@ -66,17 +66,49 @@ func replyTo(m *ent.Post) opt.Optional[post.ID] {
 func (r *Reply) GetCreated() time.Time { return r.CreatedAt }
 func (r *Reply) GetUpdated() time.Time { return r.UpdatedAt }
 
-func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Reply, error) {
-	return func(m *ent.Post) (*Reply, error) {
-		authorEdge, err := m.Edges.AuthorOrErr()
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
+func Map(m *ent.Post) (*Reply, error) {
+	authorEdge, err := m.Edges.AuthorOrErr()
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
 
-		pro, err := profile.ProfileFromModel(authorEdge)
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
+	pro, err := profile.ProfileFromModel(authorEdge)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	content, err := datagraph.NewRichText(m.Body)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	replyTo := replyTo(m)
+
+	return &Reply{
+		Post: post.Post{
+			ID: post.ID(m.ID),
+
+			Content: content,
+			Author:  *pro,
+			Assets:  dt.Map(m.Edges.Assets, asset.Map),
+			Meta:    m.Metadata,
+
+			CreatedAt: m.CreatedAt,
+			UpdatedAt: m.UpdatedAt,
+			DeletedAt: opt.NewPtr(m.DeletedAt),
+		},
+		ReplyTo: replyTo,
+	}, nil
+}
+
+func Mapper(
+	am account.Lookup,
+	ls post.PostLikesMap,
+	rl reaction.Lookup,
+) func(m *ent.Post) (*Reply, error) {
+	return func(m *ent.Post) (*Reply, error) {
+		authorEdge := am[m.AccountPosts]
+		pro := profile.ProfileFromAccount(authorEdge)
 
 		content, err := datagraph.NewRichText(m.Body)
 		if err != nil {
@@ -85,14 +117,7 @@ func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Reply, error) {
 
 		replyTo := replyTo(m)
 
-		link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
-			return *link_ref.Map(&in)
-		})
-
-		reacts, err := reaction.MapList(m.Edges.Reacts)
-		if err != nil {
-			return nil, err
-		}
+		reacts := rl[xid.ID(m.ID)]
 
 		reply := &Reply{
 			Post: post.Post{
@@ -104,10 +129,9 @@ func FromModel(ls post.PostLikesMap) func(m *ent.Post) (*Reply, error) {
 				Collections: collection_item_status.Status{
 					// NOTE: Members cannot yet add replies to collections.
 				},
-				Reacts:  reacts,
-				Assets:  dt.Map(m.Edges.Assets, asset.Map),
-				WebLink: link,
-				Meta:    m.Metadata,
+				Reacts: reacts,
+				Assets: dt.Map(m.Edges.Assets, asset.Map),
+				Meta:   m.Metadata,
 
 				CreatedAt: m.CreatedAt,
 				UpdatedAt: m.UpdatedAt,
