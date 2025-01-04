@@ -18570,6 +18570,42 @@ func (m *PostMutation) ResetVisibility() {
 	m.visibility = nil
 }
 
+// SetAccountPosts sets the "account_posts" field.
+func (m *PostMutation) SetAccountPosts(x xid.ID) {
+	m.author = &x
+}
+
+// AccountPosts returns the value of the "account_posts" field in the mutation.
+func (m *PostMutation) AccountPosts() (r xid.ID, exists bool) {
+	v := m.author
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountPosts returns the old "account_posts" field's value of the Post entity.
+// If the Post object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostMutation) OldAccountPosts(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountPosts is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountPosts requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountPosts: %w", err)
+	}
+	return oldValue.AccountPosts, nil
+}
+
+// ResetAccountPosts resets all changes to the "account_posts" field.
+func (m *PostMutation) ResetAccountPosts() {
+	m.author = nil
+}
+
 // SetCategoryID sets the "category_id" field.
 func (m *PostMutation) SetCategoryID(x xid.ID) {
 	m.category = &x
@@ -18676,6 +18712,7 @@ func (m *PostMutation) SetAuthorID(id xid.ID) {
 // ClearAuthor clears the "author" edge to the Account entity.
 func (m *PostMutation) ClearAuthor() {
 	m.clearedauthor = true
+	m.clearedFields[post.FieldAccountPosts] = struct{}{}
 }
 
 // AuthorCleared reports if the "author" edge to the Account entity was cleared.
@@ -19415,7 +19452,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 17)
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
@@ -19457,6 +19494,9 @@ func (m *PostMutation) Fields() []string {
 	}
 	if m.visibility != nil {
 		fields = append(fields, post.FieldVisibility)
+	}
+	if m.author != nil {
+		fields = append(fields, post.FieldAccountPosts)
 	}
 	if m.category != nil {
 		fields = append(fields, post.FieldCategoryID)
@@ -19500,6 +19540,8 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.Metadata()
 	case post.FieldVisibility:
 		return m.Visibility()
+	case post.FieldAccountPosts:
+		return m.AccountPosts()
 	case post.FieldCategoryID:
 		return m.CategoryID()
 	case post.FieldLinkID:
@@ -19541,6 +19583,8 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldMetadata(ctx)
 	case post.FieldVisibility:
 		return m.OldVisibility(ctx)
+	case post.FieldAccountPosts:
+		return m.OldAccountPosts(ctx)
 	case post.FieldCategoryID:
 		return m.OldCategoryID(ctx)
 	case post.FieldLinkID:
@@ -19651,6 +19695,13 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetVisibility(v)
+		return nil
+	case post.FieldAccountPosts:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountPosts(v)
 		return nil
 	case post.FieldCategoryID:
 		v, ok := value.(xid.ID)
@@ -19813,6 +19864,9 @@ func (m *PostMutation) ResetField(name string) error {
 		return nil
 	case post.FieldVisibility:
 		m.ResetVisibility()
+		return nil
+	case post.FieldAccountPosts:
+		m.ResetAccountPosts()
 		return nil
 	case post.FieldCategoryID:
 		m.ResetCategoryID()

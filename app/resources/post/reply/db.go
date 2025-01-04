@@ -84,7 +84,7 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(nil)(p)
+	return Map(p)
 }
 
 func (d *database) Get(ctx context.Context, id post.ID) (*Reply, error) {
@@ -107,7 +107,7 @@ func (d *database) Get(ctx context.Context, id post.ID) (*Reply, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(nil /* TODO */)(p)
+	return Map(p)
 }
 
 func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Reply, error) {
@@ -145,7 +145,7 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Rep
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	return FromModel(nil)(p)
+	return Map(p)
 }
 
 func (d *database) Delete(ctx context.Context, id post.ID) error {

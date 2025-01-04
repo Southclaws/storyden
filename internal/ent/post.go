@@ -50,15 +50,16 @@ type Post struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Visibility holds the value of the "visibility" field.
 	Visibility post.Visibility `json:"visibility,omitempty"`
+	// AccountPosts holds the value of the "account_posts" field.
+	AccountPosts xid.ID `json:"account_posts,omitempty"`
 	// CategoryID holds the value of the "category_id" field.
 	CategoryID xid.ID `json:"category_id,omitempty"`
 	// LinkID holds the value of the "link_id" field.
 	LinkID xid.ID `json:"link_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PostQuery when eager-loading is set.
-	Edges         PostEdges `json:"edges"`
-	account_posts *xid.ID
-	selectValues  sql.SelectValues
+	Edges        PostEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // PostEdges holds the relations/edges for other nodes in the graph.
@@ -256,10 +257,8 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt, post.FieldIndexedAt:
 			values[i] = new(sql.NullTime)
-		case post.FieldID, post.FieldRootPostID, post.FieldReplyToPostID, post.FieldCategoryID, post.FieldLinkID:
+		case post.FieldID, post.FieldRootPostID, post.FieldReplyToPostID, post.FieldAccountPosts, post.FieldCategoryID, post.FieldLinkID:
 			values[i] = new(xid.ID)
-		case post.ForeignKeys[0]: // account_posts
-			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -369,6 +368,12 @@ func (po *Post) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				po.Visibility = post.Visibility(value.String)
 			}
+		case post.FieldAccountPosts:
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field account_posts", values[i])
+			} else if value != nil {
+				po.AccountPosts = *value
+			}
 		case post.FieldCategoryID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field category_id", values[i])
@@ -380,13 +385,6 @@ func (po *Post) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field link_id", values[i])
 			} else if value != nil {
 				po.LinkID = *value
-			}
-		case post.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field account_posts", values[i])
-			} else if value.Valid {
-				po.account_posts = new(xid.ID)
-				*po.account_posts = *value.S.(*xid.ID)
 			}
 		default:
 			po.selectValues.Set(columns[i], values[i])
@@ -544,6 +542,9 @@ func (po *Post) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("visibility=")
 	builder.WriteString(fmt.Sprintf("%v", po.Visibility))
+	builder.WriteString(", ")
+	builder.WriteString("account_posts=")
+	builder.WriteString(fmt.Sprintf("%v", po.AccountPosts))
 	builder.WriteString(", ")
 	builder.WriteString("category_id=")
 	builder.WriteString(fmt.Sprintf("%v", po.CategoryID))
