@@ -48,10 +48,7 @@ func (p *Public) GetCreated() time.Time         { return p.Created }
 func (p *Public) GetUpdated() time.Time         { return p.Created }
 
 func ProfileFromModel(a *ent.Account) (*Public, error) {
-	rolesEdge, err := a.Edges.AccountRolesOrErr()
-	if err != nil {
-		return nil, err
-	}
+	rolesEdge := a.Edges.AccountRoles
 
 	roles, err := held.MapList(rolesEdge, a.Admin)
 	if err != nil {

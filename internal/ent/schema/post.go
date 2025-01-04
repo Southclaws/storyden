@@ -38,6 +38,7 @@ func (Post) Fields() []ent.Field {
 		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
 
 		// Edges
+		field.String("account_posts").GoType(xid.ID{}),
 		field.String("category_id").GoType(xid.ID{}).Optional(),
 		field.String("link_id").GoType(xid.ID{}).Optional(),
 	}
@@ -47,6 +48,7 @@ func (Post) Fields() []ent.Field {
 func (Post) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("author", Account.Type).
+			Field("account_posts").
 			Ref("posts").
 			Unique().
 			Required(),

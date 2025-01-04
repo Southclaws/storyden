@@ -19,6 +19,7 @@ import (
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -57,7 +58,7 @@ func newSQL(cfg config.Config) (*sql.DB, *sqlx.DB, error) {
 // to write too much test-specific code for DB stuff. We should use enttest tbh.
 var schemaLock = sync.Mutex{}
 
-func newEntClient(lc fx.Lifecycle, cfg config.Config, db *sql.DB) (*ent.Client, error) {
+func newEntClient(lc fx.Lifecycle, logger *zap.Logger, cfg config.Config, db *sql.DB) (*ent.Client, error) {
 	wctx, cancel := context.WithCancel(context.Background())
 
 	client, err := connect(wctx, cfg, db)
@@ -65,6 +66,50 @@ func newEntClient(lc fx.Lifecycle, cfg config.Config, db *sql.DB) (*ent.Client, 
 		cancel()
 		return nil, err
 	}
+
+	// client.Use(func(next ent.Mutator) ent.Mutator {
+	// 	return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	// 		start := time.Now()
+	// 		defer func() {
+	// 			logger.Debug(m.Op().String(),
+	// 				zap.String("type", m.Type()),
+	// 				zap.Duration("duration", time.Since(start)),
+	// 			)
+	// 		}()
+	// 		return next.Mutate(ctx, m)
+	// 	})
+	// })
+
+	// client.Intercept(ent.InterceptFunc(func(next ent.Querier) ent.Querier {
+	// 	return ent.QuerierFunc(func(ctx context.Context, query ent.Query) (ent.Value, error) {
+	// 		qc := entgo.QueryFromContext(ctx)
+	// 		spanName := fmt.Sprintf("ent %s %s", qc.Op, qc.Type)
+
+	// 		start := time.Now()
+	// 		id := xid.New()
+	// 		t := reflect.ValueOf(query)
+
+	// 		defer func() {
+	// 			logger.Debug("END   "+spanName,
+	// 				zap.String("id", id.String()),
+	// 				zap.String("type", t.Elem().String()),
+	// 				zap.Duration("duration", time.Since(start)),
+	// 			)
+	// 		}()
+
+	// 		logger.Debug("BEGIN "+spanName,
+	// 			zap.String("id", id.String()),
+	// 			zap.String("type", t.Elem().String()),
+	// 		)
+
+	// 		v, err := next.Query(ctx, query)
+	// 		if err != nil {
+	// 			return nil, fault.Wrap(err, fctx.With(ctx))
+	// 		}
+
+	// 		return v, nil
+	// 	})
+	// }))
 
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {

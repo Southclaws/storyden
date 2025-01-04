@@ -190,6 +190,12 @@ func (pc *PostCreate) SetNillableVisibility(po *post.Visibility) *PostCreate {
 	return pc
 }
 
+// SetAccountPosts sets the "account_posts" field.
+func (pc *PostCreate) SetAccountPosts(x xid.ID) *PostCreate {
+	pc.mutation.SetAccountPosts(x)
+	return pc
+}
+
 // SetCategoryID sets the "category_id" field.
 func (pc *PostCreate) SetCategoryID(x xid.ID) *PostCreate {
 	pc.mutation.SetCategoryID(x)
@@ -522,6 +528,9 @@ func (pc *PostCreate) check() error {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Post.visibility": %w`, err)}
 		}
 	}
+	if _, ok := pc.mutation.AccountPosts(); !ok {
+		return &ValidationError{Name: "account_posts", err: errors.New(`ent: missing required field "Post.account_posts"`)}
+	}
 	if v, ok := pc.mutation.ID(); ok {
 		if err := post.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Post.id": %w`, err)}
@@ -628,7 +637,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.account_posts = &nodes[0]
+		_node.AccountPosts = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.CategoryIDs(); len(nodes) > 0 {
@@ -1109,6 +1118,18 @@ func (u *PostUpsert) UpdateVisibility() *PostUpsert {
 	return u
 }
 
+// SetAccountPosts sets the "account_posts" field.
+func (u *PostUpsert) SetAccountPosts(v xid.ID) *PostUpsert {
+	u.Set(post.FieldAccountPosts, v)
+	return u
+}
+
+// UpdateAccountPosts sets the "account_posts" field to the value that was provided on create.
+func (u *PostUpsert) UpdateAccountPosts() *PostUpsert {
+	u.SetExcluded(post.FieldAccountPosts)
+	return u
+}
+
 // SetCategoryID sets the "category_id" field.
 func (u *PostUpsert) SetCategoryID(v xid.ID) *PostUpsert {
 	u.Set(post.FieldCategoryID, v)
@@ -1424,6 +1445,20 @@ func (u *PostUpsertOne) SetVisibility(v post.Visibility) *PostUpsertOne {
 func (u *PostUpsertOne) UpdateVisibility() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateVisibility()
+	})
+}
+
+// SetAccountPosts sets the "account_posts" field.
+func (u *PostUpsertOne) SetAccountPosts(v xid.ID) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetAccountPosts(v)
+	})
+}
+
+// UpdateAccountPosts sets the "account_posts" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateAccountPosts() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateAccountPosts()
 	})
 }
 
@@ -1915,6 +1950,20 @@ func (u *PostUpsertBulk) SetVisibility(v post.Visibility) *PostUpsertBulk {
 func (u *PostUpsertBulk) UpdateVisibility() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateVisibility()
+	})
+}
+
+// SetAccountPosts sets the "account_posts" field.
+func (u *PostUpsertBulk) SetAccountPosts(v xid.ID) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetAccountPosts(v)
+	})
+}
+
+// UpdateAccountPosts sets the "account_posts" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateAccountPosts() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateAccountPosts()
 	})
 }
 

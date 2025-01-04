@@ -49,7 +49,6 @@ type PostQuery struct {
 	withLink         *LinkQuery
 	withContentLinks *LinkQuery
 	withEvent        *EventQuery
-	withFKs          bool
 	modifiers        []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -873,7 +872,6 @@ func (pq *PostQuery) prepareQuery(ctx context.Context) error {
 func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, error) {
 	var (
 		nodes       = []*Post{}
-		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
 		loadedTypes = [15]bool{
 			pq.withAuthor != nil,
@@ -893,12 +891,6 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 			pq.withEvent != nil,
 		}
 	)
-	if pq.withAuthor != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, post.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Post).scanValues(nil, columns)
 	}
@@ -1027,10 +1019,7 @@ func (pq *PostQuery) loadAuthor(ctx context.Context, query *AccountQuery, nodes 
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Post)
 	for i := range nodes {
-		if nodes[i].account_posts == nil {
-			continue
-		}
-		fk := *nodes[i].account_posts
+		fk := nodes[i].AccountPosts
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -1184,7 +1173,6 @@ func (pq *PostQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*P
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(post.FieldRootPostID)
 	}
@@ -1244,7 +1232,6 @@ func (pq *PostQuery) loadReplies(ctx context.Context, query *PostQuery, nodes []
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(post.FieldReplyToPostID)
 	}
@@ -1626,6 +1613,9 @@ func (pq *PostQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != post.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if pq.withAuthor != nil {
+			_spec.Node.AddColumnOnce(post.FieldAccountPosts)
 		}
 		if pq.withCategory != nil {
 			_spec.Node.AddColumnOnce(post.FieldCategoryID)

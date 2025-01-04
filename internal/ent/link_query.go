@@ -677,7 +677,6 @@ func (lq *LinkQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*L
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(post.FieldLinkID)
 	}
