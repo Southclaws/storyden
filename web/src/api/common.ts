@@ -40,6 +40,7 @@ export function buildRequest({
     credentials: "include",
     headers,
     body: buildPayload(data),
+    cache: "force-cache",
     next: {
       tags: ["api"],
       revalidate,
