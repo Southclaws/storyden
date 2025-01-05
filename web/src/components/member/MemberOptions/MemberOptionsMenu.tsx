@@ -17,6 +17,7 @@ import { MemberSuspensionTrigger } from "../MemberSuspension/MemberSuspensionTri
 
 export type Props = {
   profile: ProfileReference;
+  asChild?: boolean;
 };
 
 export function MemberOptionsMenu({
@@ -47,7 +48,7 @@ export function MemberOptionsMenu({
 
   return (
     <Menu.Root onSelect={handleSelect}>
-      <Menu.Trigger maxW="full" cursor="pointer">
+      <Menu.Trigger maxW="full" cursor="pointer" asChild={props.asChild}>
         {children}
       </Menu.Trigger>
 
