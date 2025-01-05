@@ -34,15 +34,17 @@ export function buildRequest({
   const address = `${apiAddress}/api${url}${cleanQuery(params)}`;
   const _method = method.toUpperCase();
 
+  const tags = url.split("/");
+
   return new Request(address, {
     method: _method,
     mode: "cors",
     credentials: "include",
     headers,
     body: buildPayload(data),
-    cache: "force-cache",
+    cache: "default",
     next: {
-      tags: ["api"],
+      tags,
       revalidate,
     },
   });
