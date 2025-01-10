@@ -161,12 +161,12 @@ export function CardGrid(props: CardGroupProps) {
       <Grid
         w="full"
         gridTemplateColumns={{
-          _containerSmall: "1",
-          _containerMedium: "2",
-          _containerLarge: "3",
-          base: "1",
-          sm: "2",
-          "2xl": "3",
+          _containerSmall: "1fr",
+          _containerMedium: "1fr 1fr",
+          _containerLarge: "1fr 1fr 1fr",
+          base: "1fr",
+          sm: "1fr 1fr",
+          "2xl": "1fr 1fr 1fr",
         }}
       >
         {props.children
