@@ -2,8 +2,13 @@
 
 import { values } from "lodash";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
+import React, {
+  AnchorHTMLAttributes,
+  ClassAttributes,
+  useEffect,
+  useState,
+} from "react";
+import ReactMarkdown, { Components } from "react-markdown";
 
 import { handle } from "@/api/client";
 import { useNodeGet } from "@/api/openapi-client/nodes";
@@ -149,8 +154,12 @@ export function Ask() {
     );
   };
 
-  const components = {
-    a: ({ href, children }) => {
+  const components: Components = {
+    a: ({ href, children }: AnchorHTMLAttributes<HTMLAnchorElement>) => {
+      if (href === undefined) {
+        return <a href={href}>{children}</a>;
+      }
+
       try {
         const [kind, id] = sourceDataFromURL(href);
         if (!kind || !id) {
