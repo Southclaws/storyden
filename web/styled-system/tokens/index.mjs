@@ -679,6 +679,10 @@ const tokens = {
     "value": "var(--font-inter)",
     "variable": "var(--fonts-inter)"
   },
+  "fonts.interDisplay": {
+    "value": "var(--font-inter-display)",
+    "variable": "var(--fonts-inter-display)"
+  },
   "fontSizes.2xs": {
     "value": "0.5rem",
     "variable": "var(--font-sizes-2xs)"
@@ -7327,9 +7331,13 @@ const tokens = {
     "value": "var(--radii-xl)",
     "variable": "var(--radii-l3)"
   },
-  "fonts.ui": {
+  "fonts.body": {
     "value": "var(--fonts-inter)",
-    "variable": "var(--fonts-ui)"
+    "variable": "var(--fonts-body)"
+  },
+  "fonts.heading": {
+    "value": "var(--fonts-inter-display)",
+    "variable": "var(--fonts-heading)"
   },
   "blurs.frosted": {
     "value": "10px",

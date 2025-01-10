@@ -2793,7 +2793,7 @@ gridAutoRows?: ConditionalValue<WithEscapeHatch<UtilityValues["gridAutoRows"] | 
    *
    * @see https://developer.mozilla.org/docs/Web/CSS/grid-column
    */
-gridColumn?: ConditionalValue<WithEscapeHatch<UtilityValues["gridColumn"] | CssVars>>
+gridColumn?: ConditionalValue<WithEscapeHatch<CssProperties["gridColumn"]>>
  /**
    * The **`grid-column-end`** CSS property specifies a grid item's end position within the grid column by contributing a line, a span, or nothing (automatic) to its grid placement, thereby specifying the block-end edge of its grid area.
    *
@@ -2835,7 +2835,7 @@ gridColumnStart?: ConditionalValue<WithEscapeHatch<CssProperties["gridColumnStar
    *
    * @see https://developer.mozilla.org/docs/Web/CSS/grid-row
    */
-gridRow?: ConditionalValue<WithEscapeHatch<UtilityValues["gridRow"] | CssVars>>
+gridRow?: ConditionalValue<WithEscapeHatch<CssProperties["gridRow"]>>
  /**
    * The **`grid-row-end`** CSS property specifies a grid item's end position within the grid row by contributing a line, a span, or nothing (automatic) to its grid placement, thereby specifying the inline-end edge of its grid area.
    *
@@ -2904,7 +2904,7 @@ gridTemplateAreas?: ConditionalValue<WithEscapeHatch<CssProperties["gridTemplate
    *
    * @see https://developer.mozilla.org/docs/Web/CSS/grid-template-columns
    */
-gridTemplateColumns?: ConditionalValue<WithEscapeHatch<UtilityValues["gridTemplateColumns"] | CssVars>>
+gridTemplateColumns?: ConditionalValue<WithEscapeHatch<CssProperties["gridTemplateColumns"]>>
  /**
    * The **`grid-template-rows`** CSS property defines the line names and track sizing functions of the grid rows.
    *
@@ -2918,7 +2918,7 @@ gridTemplateColumns?: ConditionalValue<WithEscapeHatch<UtilityValues["gridTempla
    *
    * @see https://developer.mozilla.org/docs/Web/CSS/grid-template-rows
    */
-gridTemplateRows?: ConditionalValue<WithEscapeHatch<UtilityValues["gridTemplateRows"] | CssVars>>
+gridTemplateRows?: ConditionalValue<WithEscapeHatch<CssProperties["gridTemplateRows"]>>
  /**
    * The **`hanging-punctuation`** CSS property specifies whether a punctuation mark should hang at the start or end of a line of text. Hanging punctuation may be placed outside the line box.
    *
@@ -4840,7 +4840,7 @@ scrollbarColor?: ConditionalValue<WithEscapeHatch<UtilityValues["scrollbarColor"
    *
    * @see https://developer.mozilla.org/docs/Web/CSS/scrollbar-gutter
    */
-scrollbarGutter?: ConditionalValue<WithEscapeHatch<UtilityValues["scrollbarGutter"] | CssVars>>
+scrollbarGutter?: ConditionalValue<WithEscapeHatch<CssProperties["scrollbarGutter"]>>
  /**
    * The **`scrollbar-width`** property allows the author to set the maximum thickness of an element's scrollbars when they are shown.
    *
