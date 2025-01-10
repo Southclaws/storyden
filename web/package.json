@@ -88,6 +88,9 @@
     "typescript": "^5.7.2"
   },
   "packageManager": "yarn@4.5.0",
+  "engines": {
+    "node": "22.13.0"
+  },
   "resolutions": {
     "@types/react": "npm:types-react@19.0.0-rc.1"
   }
