@@ -10,7 +10,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"go.uber.org/zap"
 
-	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/question"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -69,11 +68,6 @@ func (a *cachedAsker) cachedResult(ctx context.Context, q *question.Question) (f
 }
 
 func (a *cachedAsker) livePrompt(ctx context.Context, q string) (func(yield func(string, error) bool), error) {
-	accountID, err := session.GetAccountID(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
 	iter, err := a.asker.Ask(ctx, q)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -83,7 +77,7 @@ func (a *cachedAsker) livePrompt(ctx context.Context, q string) (func(yield func
 		acc := []string{}
 
 		defer func() {
-			err := a.cacheResult(ctx, accountID, q, acc)
+			err := a.cacheResult(ctx, q, acc)
 			if err != nil {
 				a.logger.Error("failed to cache result", zap.Error(err))
 			}
@@ -103,7 +97,9 @@ func (a *cachedAsker) livePrompt(ctx context.Context, q string) (func(yield func
 	}, nil
 }
 
-func (a *cachedAsker) cacheResult(ctx context.Context, accountID account.AccountID, q string, chunks []string) error {
+func (a *cachedAsker) cacheResult(ctx context.Context, q string, chunks []string) error {
+	accountID := session.GetOptAccountID(ctx)
+
 	result := strings.Join(chunks, "")
 
 	acc, err := datagraph.NewRichTextFromMarkdown(result)
@@ -111,7 +107,7 @@ func (a *cachedAsker) cacheResult(ctx context.Context, accountID account.Account
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = a.questions.Store(ctx, accountID, q, acc)
+	_, err = a.questions.Store(ctx, q, acc, accountID)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

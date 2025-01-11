@@ -700,7 +700,7 @@ var (
 		{Name: "query", Type: field.TypeString},
 		{Name: "result", Type: field.TypeString},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
-		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "account_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// QuestionsTable holds the schema information for the "questions" table.
 	QuestionsTable = &schema.Table{
@@ -712,7 +712,7 @@ var (
 				Symbol:     "questions_accounts_questions",
 				Columns:    []*schema.Column{QuestionsColumns[7]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
