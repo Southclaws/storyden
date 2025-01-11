@@ -43,14 +43,8 @@ func (o *OpenAI) Prompt(ctx context.Context, input string) (*Result, error) {
 	}, nil
 }
 
-func (o *OpenAI) PromptStream(ctx context.Context, input string) (chan string, chan error) {
-	ch := make(chan string)
-	errCh := make(chan error)
-
-	go func() {
-		defer close(ch)
-		defer close(errCh)
-
+func (o *OpenAI) PromptStream(ctx context.Context, input string) (func(yield func(string, error) bool), error) {
+	iter := func(yield func(string, error) bool) {
 		stream := o.client.Chat.Completions.NewStreaming(ctx, openai.ChatCompletionNewParams{
 			Model: openai.F(openai.ChatModelChatgpt4oLatest),
 			Messages: openai.F([]openai.ChatCompletionMessageParamUnion{
@@ -61,7 +55,6 @@ func (o *OpenAI) PromptStream(ctx context.Context, input string) (chan string, c
 		for {
 			select {
 			case <-ctx.Done():
-				errCh <- ctx.Err()
 				return
 			default:
 			}
@@ -73,16 +66,19 @@ func (o *OpenAI) PromptStream(ctx context.Context, input string) (chan string, c
 			chunk := stream.Current()
 
 			if len(chunk.Choices) > 0 {
-				ch <- chunk.Choices[0].Delta.Content
+				if !yield(chunk.Choices[0].Delta.Content, nil) {
+					return
+				}
 			}
 		}
 
 		if err := stream.Err(); err != nil {
-			errCh <- err
+			yield("", fault.Wrap(err, fctx.With(ctx)))
+			return
 		}
-	}()
+	}
 
-	return ch, errCh
+	return iter, nil
 }
 
 func (o *OpenAI) EmbeddingFunc() func(ctx context.Context, text string) ([]float32, error) {

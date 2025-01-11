@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"regexp"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -29,6 +30,8 @@ const (
 	Llama_3_1_70bInstruct          = "llama-3.1-70b-instruct"
 )
 
+var citationMarkerRegex = regexp.MustCompile(`\[\d+\]`)
+
 type Perplexity struct {
 	endpoint    string
 	apiKey      string
@@ -50,18 +53,11 @@ func newPerplexityAsker(cfg config.Config, searcher semdex.Searcher) (*Perplexit
 	return s, nil
 }
 
-func (a *Perplexity) Ask(ctx context.Context, q string) (chan string, chan error) {
-	outch := make(chan string)
-	errch := make(chan error)
-
+func (a *Perplexity) Ask(ctx context.Context, q string) (func(yield func(string, error) bool), error) {
 	t, err := buildContextPrompt(ctx, a.searcher, q)
 	if err != nil {
-		ech := make(chan error, 1)
-		ech <- fault.Wrap(err, fctx.With(ctx))
-		return nil, ech
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	fmt.Println(t)
 
 	resp, err := func() (*http.Response, error) {
 		reqBody := CompletionRequest{
@@ -91,56 +87,56 @@ func (a *Perplexity) Ask(ctx context.Context, q string) (chan string, chan error
 		return resp, nil
 	}()
 	if err != nil {
-		errch <- err
-		return outch, errch
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	dec := ssestream.NewDecoder(resp)
 
-	go func() {
+	iter := func(yield func(string, error) bool) {
 		defer resp.Body.Close()
-		defer close(outch)
-		defer close(errch)
 
 		for dec.Next() {
 			event := dec.Event()
 			var cr CompletionResponse
 
 			if err := json.Unmarshal(event.Data, &cr); err != nil {
-				errch <- fmt.Errorf("failed to unmarshal SSE event: %w", err)
+				yield("", fmt.Errorf("failed to unmarshal SSE event: %w", err))
 				return
 			}
 
 			if len(cr.Choices) == 0 {
-				errch <- fmt.Errorf("no choices in response")
+				yield("", fmt.Errorf("no choices in response"))
 				return
 			}
 
 			if len(cr.Citations) == 0 {
 				fmt.Println(string(event.Data))
-				errch <- fmt.Errorf("no citations in response")
+				yield("", fmt.Errorf("no citations in response"))
 				return
 			}
 
 			choice := cr.Choices[0]
 
-			outch <- choice.Delta.Content
+			chunk := choice.Delta.Content
+
+			// replace [1]/[2]/etc citation markers with empty string
+			cleaned := citationMarkerRegex.ReplaceAllString(chunk, "")
+
+			if !yield(cleaned, nil) {
+				return
+			}
 
 			if choice.FinishReason == "stop" {
-				break
+				return
 			}
 		}
 
 		if dec.Err() != nil {
-			errch <- fmt.Errorf("failed to read SSE stream: %w", dec.Err())
+			yield("", fmt.Errorf("failed to read SSE stream: %w", dec.Err()))
 		}
-	}()
+	}
 
-	return outch, errch
-}
-
-func replaceCitations(message string, citations []string) string {
-	return message
+	return iter, nil
 }
 
 type Message struct {

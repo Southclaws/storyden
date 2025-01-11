@@ -29,6 +29,7 @@ require (
 require github.com/Southclaws/fault v0.8.1
 
 require (
+	github.com/JohannesKaufmann/html-to-markdown/v2 v2.2.2
 	github.com/PuerkitoBio/goquery v1.10.0
 	github.com/Southclaws/opt v0.6.1
 	github.com/Southclaws/swirl v1.0.1
@@ -68,6 +69,7 @@ require (
 	github.com/puzpuzpuz/xsync/v3 v3.4.0
 	github.com/redis/rueidis v1.0.49
 	github.com/rs/cors v1.11.1
+	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	github.com/shirou/gopsutil/v4 v4.24.10
 	github.com/twilio/twilio-go v1.23.6
@@ -82,10 +84,11 @@ require (
 	cloud.google.com/go/auth v0.10.2 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.5 // indirect
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
+	github.com/JohannesKaufmann/dom v0.2.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
-	github.com/andybalholm/cascadia v1.3.2 // indirect
+	github.com/andybalholm/cascadia v1.3.3 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
@@ -138,7 +141,6 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20210106213030-5aafc221ea8c // indirect
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
-	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/speakeasy-api/openapi-overlay v0.9.0 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect

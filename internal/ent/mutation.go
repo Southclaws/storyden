@@ -31,6 +31,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
+	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/schema"
@@ -67,6 +68,7 @@ const (
 	TypeNode             = "Node"
 	TypeNotification     = "Notification"
 	TypePost             = "Post"
+	TypeQuestion         = "Question"
 	TypeReact            = "React"
 	TypeRole             = "Role"
 	TypeSetting          = "Setting"
@@ -114,6 +116,9 @@ type AccountMutation struct {
 	posts                          map[xid.ID]struct{}
 	removedposts                   map[xid.ID]struct{}
 	clearedposts                   bool
+	questions                      map[xid.ID]struct{}
+	removedquestions               map[xid.ID]struct{}
+	clearedquestions               bool
 	reacts                         map[xid.ID]struct{}
 	removedreacts                  map[xid.ID]struct{}
 	clearedreacts                  bool
@@ -1151,6 +1156,60 @@ func (m *AccountMutation) ResetPosts() {
 	m.removedposts = nil
 }
 
+// AddQuestionIDs adds the "questions" edge to the Question entity by ids.
+func (m *AccountMutation) AddQuestionIDs(ids ...xid.ID) {
+	if m.questions == nil {
+		m.questions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.questions[ids[i]] = struct{}{}
+	}
+}
+
+// ClearQuestions clears the "questions" edge to the Question entity.
+func (m *AccountMutation) ClearQuestions() {
+	m.clearedquestions = true
+}
+
+// QuestionsCleared reports if the "questions" edge to the Question entity was cleared.
+func (m *AccountMutation) QuestionsCleared() bool {
+	return m.clearedquestions
+}
+
+// RemoveQuestionIDs removes the "questions" edge to the Question entity by IDs.
+func (m *AccountMutation) RemoveQuestionIDs(ids ...xid.ID) {
+	if m.removedquestions == nil {
+		m.removedquestions = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.questions, ids[i])
+		m.removedquestions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedQuestions returns the removed IDs of the "questions" edge to the Question entity.
+func (m *AccountMutation) RemovedQuestionsIDs() (ids []xid.ID) {
+	for id := range m.removedquestions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// QuestionsIDs returns the "questions" edge IDs in the mutation.
+func (m *AccountMutation) QuestionsIDs() (ids []xid.ID) {
+	for id := range m.questions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetQuestions resets all changes to the "questions" edge.
+func (m *AccountMutation) ResetQuestions() {
+	m.questions = nil
+	m.clearedquestions = false
+	m.removedquestions = nil
+}
+
 // AddReactIDs adds the "reacts" edge to the React entity by ids.
 func (m *AccountMutation) AddReactIDs(ids ...xid.ID) {
 	if m.reacts == nil {
@@ -2087,7 +2146,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 19)
+	edges := make([]string, 0, 20)
 	if m.emails != nil {
 		edges = append(edges, account.EdgeEmails)
 	}
@@ -2111,6 +2170,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.posts != nil {
 		edges = append(edges, account.EdgePosts)
+	}
+	if m.questions != nil {
+		edges = append(edges, account.EdgeQuestions)
 	}
 	if m.reacts != nil {
 		edges = append(edges, account.EdgeReacts)
@@ -2198,6 +2260,12 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeQuestions:
+		ids := make([]ent.Value, 0, len(m.questions))
+		for id := range m.questions {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeReacts:
 		ids := make([]ent.Value, 0, len(m.reacts))
 		for id := range m.reacts {
@@ -2270,7 +2338,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 19)
+	edges := make([]string, 0, 20)
 	if m.removedemails != nil {
 		edges = append(edges, account.EdgeEmails)
 	}
@@ -2291,6 +2359,9 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedposts != nil {
 		edges = append(edges, account.EdgePosts)
+	}
+	if m.removedquestions != nil {
+		edges = append(edges, account.EdgeQuestions)
 	}
 	if m.removedreacts != nil {
 		edges = append(edges, account.EdgeReacts)
@@ -2374,6 +2445,12 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgeQuestions:
+		ids := make([]ent.Value, 0, len(m.removedquestions))
+		for id := range m.removedquestions {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeReacts:
 		ids := make([]ent.Value, 0, len(m.removedreacts))
 		for id := range m.removedreacts {
@@ -2446,7 +2523,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 19)
+	edges := make([]string, 0, 20)
 	if m.clearedemails {
 		edges = append(edges, account.EdgeEmails)
 	}
@@ -2470,6 +2547,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	}
 	if m.clearedposts {
 		edges = append(edges, account.EdgePosts)
+	}
+	if m.clearedquestions {
+		edges = append(edges, account.EdgeQuestions)
 	}
 	if m.clearedreacts {
 		edges = append(edges, account.EdgeReacts)
@@ -2527,6 +2607,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedinvited_by
 	case account.EdgePosts:
 		return m.clearedposts
+	case account.EdgeQuestions:
+		return m.clearedquestions
 	case account.EdgeReacts:
 		return m.clearedreacts
 	case account.EdgeLikes:
@@ -2591,6 +2673,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgePosts:
 		m.ResetPosts()
+		return nil
+	case account.EdgeQuestions:
+		m.ResetQuestions()
 		return nil
 	case account.EdgeReacts:
 		m.ResetReacts()
@@ -20284,6 +20369,770 @@ func (m *PostMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Post edge %s", name)
+}
+
+// QuestionMutation represents an operation that mutates the Question nodes in the graph.
+type QuestionMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *xid.ID
+	created_at    *time.Time
+	indexed_at    *time.Time
+	slug          *string
+	query         *string
+	result        *string
+	metadata      *map[string]interface{}
+	clearedFields map[string]struct{}
+	author        *xid.ID
+	clearedauthor bool
+	done          bool
+	oldValue      func(context.Context) (*Question, error)
+	predicates    []predicate.Question
+}
+
+var _ ent.Mutation = (*QuestionMutation)(nil)
+
+// questionOption allows management of the mutation configuration using functional options.
+type questionOption func(*QuestionMutation)
+
+// newQuestionMutation creates new mutation for the Question entity.
+func newQuestionMutation(c config, op Op, opts ...questionOption) *QuestionMutation {
+	m := &QuestionMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeQuestion,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withQuestionID sets the ID field of the mutation.
+func withQuestionID(id xid.ID) questionOption {
+	return func(m *QuestionMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Question
+		)
+		m.oldValue = func(ctx context.Context) (*Question, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Question.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withQuestion sets the old Question of the mutation.
+func withQuestion(node *Question) questionOption {
+	return func(m *QuestionMutation) {
+		m.oldValue = func(context.Context) (*Question, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m QuestionMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m QuestionMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Question entities.
+func (m *QuestionMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *QuestionMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *QuestionMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Question.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *QuestionMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *QuestionMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Question entity.
+// If the Question object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *QuestionMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *QuestionMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetIndexedAt sets the "indexed_at" field.
+func (m *QuestionMutation) SetIndexedAt(t time.Time) {
+	m.indexed_at = &t
+}
+
+// IndexedAt returns the value of the "indexed_at" field in the mutation.
+func (m *QuestionMutation) IndexedAt() (r time.Time, exists bool) {
+	v := m.indexed_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIndexedAt returns the old "indexed_at" field's value of the Question entity.
+// If the Question object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *QuestionMutation) OldIndexedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIndexedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIndexedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIndexedAt: %w", err)
+	}
+	return oldValue.IndexedAt, nil
+}
+
+// ClearIndexedAt clears the value of the "indexed_at" field.
+func (m *QuestionMutation) ClearIndexedAt() {
+	m.indexed_at = nil
+	m.clearedFields[question.FieldIndexedAt] = struct{}{}
+}
+
+// IndexedAtCleared returns if the "indexed_at" field was cleared in this mutation.
+func (m *QuestionMutation) IndexedAtCleared() bool {
+	_, ok := m.clearedFields[question.FieldIndexedAt]
+	return ok
+}
+
+// ResetIndexedAt resets all changes to the "indexed_at" field.
+func (m *QuestionMutation) ResetIndexedAt() {
+	m.indexed_at = nil
+	delete(m.clearedFields, question.FieldIndexedAt)
+}
+
+// SetSlug sets the "slug" field.
+func (m *QuestionMutation) SetSlug(s string) {
+	m.slug = &s
+}
+
+// Slug returns the value of the "slug" field in the mutation.
+func (m *QuestionMutation) Slug() (r string, exists bool) {
+	v := m.slug
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSlug returns the old "slug" field's value of the Question entity.
+// If the Question object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *QuestionMutation) OldSlug(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSlug is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSlug requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSlug: %w", err)
+	}
+	return oldValue.Slug, nil
+}
+
+// ResetSlug resets all changes to the "slug" field.
+func (m *QuestionMutation) ResetSlug() {
+	m.slug = nil
+}
+
+// SetQuery sets the "query" field.
+func (m *QuestionMutation) SetQuery(s string) {
+	m.query = &s
+}
+
+// Query returns the value of the "query" field in the mutation.
+func (m *QuestionMutation) Query() (r string, exists bool) {
+	v := m.query
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldQuery returns the old "query" field's value of the Question entity.
+// If the Question object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *QuestionMutation) OldQuery(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldQuery is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldQuery requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldQuery: %w", err)
+	}
+	return oldValue.Query, nil
+}
+
+// ResetQuery resets all changes to the "query" field.
+func (m *QuestionMutation) ResetQuery() {
+	m.query = nil
+}
+
+// SetResult sets the "result" field.
+func (m *QuestionMutation) SetResult(s string) {
+	m.result = &s
+}
+
+// Result returns the value of the "result" field in the mutation.
+func (m *QuestionMutation) Result() (r string, exists bool) {
+	v := m.result
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResult returns the old "result" field's value of the Question entity.
+// If the Question object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *QuestionMutation) OldResult(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResult is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResult requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResult: %w", err)
+	}
+	return oldValue.Result, nil
+}
+
+// ResetResult resets all changes to the "result" field.
+func (m *QuestionMutation) ResetResult() {
+	m.result = nil
+}
+
+// SetMetadata sets the "metadata" field.
+func (m *QuestionMutation) SetMetadata(value map[string]interface{}) {
+	m.metadata = &value
+}
+
+// Metadata returns the value of the "metadata" field in the mutation.
+func (m *QuestionMutation) Metadata() (r map[string]interface{}, exists bool) {
+	v := m.metadata
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMetadata returns the old "metadata" field's value of the Question entity.
+// If the Question object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *QuestionMutation) OldMetadata(ctx context.Context) (v map[string]interface{}, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMetadata is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMetadata requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMetadata: %w", err)
+	}
+	return oldValue.Metadata, nil
+}
+
+// ClearMetadata clears the value of the "metadata" field.
+func (m *QuestionMutation) ClearMetadata() {
+	m.metadata = nil
+	m.clearedFields[question.FieldMetadata] = struct{}{}
+}
+
+// MetadataCleared returns if the "metadata" field was cleared in this mutation.
+func (m *QuestionMutation) MetadataCleared() bool {
+	_, ok := m.clearedFields[question.FieldMetadata]
+	return ok
+}
+
+// ResetMetadata resets all changes to the "metadata" field.
+func (m *QuestionMutation) ResetMetadata() {
+	m.metadata = nil
+	delete(m.clearedFields, question.FieldMetadata)
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *QuestionMutation) SetAccountID(x xid.ID) {
+	m.author = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *QuestionMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.author
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the Question entity.
+// If the Question object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *QuestionMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *QuestionMutation) ResetAccountID() {
+	m.author = nil
+}
+
+// SetAuthorID sets the "author" edge to the Account entity by id.
+func (m *QuestionMutation) SetAuthorID(id xid.ID) {
+	m.author = &id
+}
+
+// ClearAuthor clears the "author" edge to the Account entity.
+func (m *QuestionMutation) ClearAuthor() {
+	m.clearedauthor = true
+	m.clearedFields[question.FieldAccountID] = struct{}{}
+}
+
+// AuthorCleared reports if the "author" edge to the Account entity was cleared.
+func (m *QuestionMutation) AuthorCleared() bool {
+	return m.clearedauthor
+}
+
+// AuthorID returns the "author" edge ID in the mutation.
+func (m *QuestionMutation) AuthorID() (id xid.ID, exists bool) {
+	if m.author != nil {
+		return *m.author, true
+	}
+	return
+}
+
+// AuthorIDs returns the "author" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AuthorID instead. It exists only for internal usage by the builders.
+func (m *QuestionMutation) AuthorIDs() (ids []xid.ID) {
+	if id := m.author; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAuthor resets all changes to the "author" edge.
+func (m *QuestionMutation) ResetAuthor() {
+	m.author = nil
+	m.clearedauthor = false
+}
+
+// Where appends a list predicates to the QuestionMutation builder.
+func (m *QuestionMutation) Where(ps ...predicate.Question) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the QuestionMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *QuestionMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Question, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *QuestionMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *QuestionMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Question).
+func (m *QuestionMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *QuestionMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, question.FieldCreatedAt)
+	}
+	if m.indexed_at != nil {
+		fields = append(fields, question.FieldIndexedAt)
+	}
+	if m.slug != nil {
+		fields = append(fields, question.FieldSlug)
+	}
+	if m.query != nil {
+		fields = append(fields, question.FieldQuery)
+	}
+	if m.result != nil {
+		fields = append(fields, question.FieldResult)
+	}
+	if m.metadata != nil {
+		fields = append(fields, question.FieldMetadata)
+	}
+	if m.author != nil {
+		fields = append(fields, question.FieldAccountID)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *QuestionMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case question.FieldCreatedAt:
+		return m.CreatedAt()
+	case question.FieldIndexedAt:
+		return m.IndexedAt()
+	case question.FieldSlug:
+		return m.Slug()
+	case question.FieldQuery:
+		return m.Query()
+	case question.FieldResult:
+		return m.Result()
+	case question.FieldMetadata:
+		return m.Metadata()
+	case question.FieldAccountID:
+		return m.AccountID()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *QuestionMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case question.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case question.FieldIndexedAt:
+		return m.OldIndexedAt(ctx)
+	case question.FieldSlug:
+		return m.OldSlug(ctx)
+	case question.FieldQuery:
+		return m.OldQuery(ctx)
+	case question.FieldResult:
+		return m.OldResult(ctx)
+	case question.FieldMetadata:
+		return m.OldMetadata(ctx)
+	case question.FieldAccountID:
+		return m.OldAccountID(ctx)
+	}
+	return nil, fmt.Errorf("unknown Question field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *QuestionMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case question.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case question.FieldIndexedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIndexedAt(v)
+		return nil
+	case question.FieldSlug:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSlug(v)
+		return nil
+	case question.FieldQuery:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetQuery(v)
+		return nil
+	case question.FieldResult:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResult(v)
+		return nil
+	case question.FieldMetadata:
+		v, ok := value.(map[string]interface{})
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMetadata(v)
+		return nil
+	case question.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Question field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *QuestionMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *QuestionMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *QuestionMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Question numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *QuestionMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(question.FieldIndexedAt) {
+		fields = append(fields, question.FieldIndexedAt)
+	}
+	if m.FieldCleared(question.FieldMetadata) {
+		fields = append(fields, question.FieldMetadata)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *QuestionMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *QuestionMutation) ClearField(name string) error {
+	switch name {
+	case question.FieldIndexedAt:
+		m.ClearIndexedAt()
+		return nil
+	case question.FieldMetadata:
+		m.ClearMetadata()
+		return nil
+	}
+	return fmt.Errorf("unknown Question nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *QuestionMutation) ResetField(name string) error {
+	switch name {
+	case question.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case question.FieldIndexedAt:
+		m.ResetIndexedAt()
+		return nil
+	case question.FieldSlug:
+		m.ResetSlug()
+		return nil
+	case question.FieldQuery:
+		m.ResetQuery()
+		return nil
+	case question.FieldResult:
+		m.ResetResult()
+		return nil
+	case question.FieldMetadata:
+		m.ResetMetadata()
+		return nil
+	case question.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	}
+	return fmt.Errorf("unknown Question field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *QuestionMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.author != nil {
+		edges = append(edges, question.EdgeAuthor)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *QuestionMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case question.EdgeAuthor:
+		if id := m.author; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *QuestionMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *QuestionMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *QuestionMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedauthor {
+		edges = append(edges, question.EdgeAuthor)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *QuestionMutation) EdgeCleared(name string) bool {
+	switch name {
+	case question.EdgeAuthor:
+		return m.clearedauthor
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *QuestionMutation) ClearEdge(name string) error {
+	switch name {
+	case question.EdgeAuthor:
+		m.ClearAuthor()
+		return nil
+	}
+	return fmt.Errorf("unknown Question unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *QuestionMutation) ResetEdge(name string) error {
+	switch name {
+	case question.EdgeAuthor:
+		m.ResetAuthor()
+		return nil
+	}
+	return fmt.Errorf("unknown Question edge %s", name)
 }
 
 // ReactMutation represents an operation that mutates the React nodes in the graph.

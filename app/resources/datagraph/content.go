@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/cixtor/readability"
 	"github.com/microcosm-cc/bluemonday"
+	"github.com/russross/blackfriday/v2"
 	"github.com/samber/lo"
 	"go.uber.org/zap"
 	"golang.org/x/net/html"
@@ -144,6 +145,14 @@ func NewRichText(raw string) (Content, error) {
 // document this includes a summary of the text and all link URLs for hydrating.
 func NewRichTextWithOptions(raw string, opts ...option) (Content, error) {
 	return NewRichTextFromReader(strings.NewReader(raw), opts...)
+}
+
+func NewRichTextFromMarkdown(md string) (Content, error) {
+	html := blackfriday.Run([]byte(md), blackfriday.WithExtensions(
+		blackfriday.NoEmptyLineBeforeBlock,
+	))
+
+	return NewRichTextFromReader(strings.NewReader(string(html)))
 }
 
 func NewRichTextFromReader(r io.Reader, opts ...option) (Content, error) {
