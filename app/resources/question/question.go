@@ -1,10 +1,12 @@
 package question
 
 import (
+	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
+
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/rs/xid"
 )
 
 type Question struct {
@@ -12,21 +14,24 @@ type Question struct {
 	Slug   string
 	Query  string
 	Result datagraph.Content
-	Author account.Account
+	Author opt.Optional[account.Account]
 }
 
 func Map(in *ent.Question) (*Question, error) {
-	authorEdge, err := in.Edges.AuthorOrErr()
-	if err != nil {
-		return nil, err
-	}
+	authorEdge := opt.NewPtr(in.Edges.Author)
 
 	result, err := datagraph.NewRichText(in.Result)
 	if err != nil {
 		return nil, err
 	}
 
-	author, err := account.MapAccount(authorEdge)
+	author, err := opt.MapErr(authorEdge, func(a ent.Account) (account.Account, error) {
+		acc, err := account.MapAccount(&a)
+		if err != nil {
+			return account.Account{}, err
+		}
+		return *acc, nil
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -36,6 +41,6 @@ func Map(in *ent.Question) (*Question, error) {
 		Slug:   in.Slug,
 		Query:  in.Query,
 		Result: result,
-		Author: *author,
+		Author: author,
 	}, nil
 }
