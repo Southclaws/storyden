@@ -59,7 +59,10 @@ func NewDatagraph(
 
 				query := c.QueryParam("q")
 
-				r, errSignal := d.asker.Ask(ctx, query)
+				iter, err := d.asker.Ask(ctx, query)
+				if err != nil {
+					return fault.Wrap(err, fctx.With(ctx))
+				}
 
 				w := c.Response().Writer
 
@@ -73,28 +76,17 @@ func NewDatagraph(
 					}
 				}
 
-				for {
-					select {
-					case <-ctx.Done():
-						return ctx.Err()
+				for chunk, err := range iter {
+					if err != nil {
+						return err
+					}
 
-					case chunk, ok := <-r:
-						if !ok {
-							return nil
-						}
+					if _, err := w.Write([]byte(chunk)); err != nil {
+						return err
+					}
 
-						if _, err := w.Write([]byte(chunk)); err != nil {
-							return err
-						}
-
-						if flusher != nil {
-							flusher.Flush()
-						}
-
-					case err := <-errSignal:
-						if err != nil {
-							return err
-						}
+					if flusher != nil {
+						flusher.Flush()
 					}
 				}
 			}

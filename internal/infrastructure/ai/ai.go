@@ -14,7 +14,7 @@ type Embedder func(ctx context.Context, text string) ([]float32, error)
 
 type Prompter interface {
 	Prompt(ctx context.Context, input string) (*Result, error)
-	PromptStream(ctx context.Context, input string) (chan string, chan error)
+	PromptStream(ctx context.Context, input string) (func(yield func(string, error) bool), error)
 	EmbeddingFunc() func(ctx context.Context, text string) ([]float32, error)
 }
 
@@ -37,7 +37,7 @@ func (d *Disabled) Prompt(ctx context.Context, input string) (*Result, error) {
 	return nil, nil
 }
 
-func (d *Disabled) PromptStream(ctx context.Context, input string) (chan string, chan error) {
+func (d *Disabled) PromptStream(ctx context.Context, input string) (func(yield func(string, error) bool), error) {
 	return nil, nil
 }
 

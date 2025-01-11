@@ -63,6 +63,7 @@ func (Account) Edges() []ent.Edge {
 			Unique(),
 
 		edge.To("posts", Post.Type),
+		edge.To("questions", Question.Type),
 
 		edge.To("reacts", React.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),

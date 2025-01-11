@@ -207,6 +207,16 @@ erDiagram
         xidDOTID category_id
         xidDOTID link_id
     }
+    Question {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime indexed_at
+        string slug
+        string query
+        string result
+        mapLBRACKstringRBRACKinterface {} metadata
+        xidDOTID account_id
+    }
     React {
         xidDOTID id
         timeDOTTime created_at
@@ -240,6 +250,7 @@ erDiagram
     	Account |o--o{ AccountFollow : "followed_by/following"
     	Account |o--o{ Invitation : "invitations/creator"
     	Account |o--o{ Post : "posts/author"
+    	Account |o--o{ Question : "questions/author"
     	Account |o--o{ React : "reacts/account"
     	Account |o--o{ LikePost : "likes/account"
     	Account |o--o{ MentionProfile : "mentions/account"
