@@ -51,8 +51,15 @@ type Config struct {
 	LanguageModelProvider string `envconfig:"LANGUAGE_MODEL_PROVIDER"`
 	OpenAIKey             string `envconfig:"OPENAI_API_KEY"`
 
+	// default (whatever LanguageModelProvider is) or perplexity
+	AskerProvider    string `envconfig:"ASKER_PROVIDER" default:""`
+	PerplexityAPIKey string `envconfig:"PERPLEXITY_API_KEY"`
+
 	// chromem (local), weaviate, pinecone
 	SemdexProvider string `envconfig:"SEMDEX_PROVIDER" default:""`
+
+	// Chromem
+	SemdexLocalPath string `envconfig:"SEMDEX_LOCAL_PATH" default:"data/semdex"`
 
 	// Weaviate
 	WeaviateURL       string `envconfig:"WEAVIATE_URL"`
@@ -65,8 +72,6 @@ type Config struct {
 	PineconeDimensions int32  `envconfig:"PINECONE_DIMENSIONS"`
 	PineconeCloud      string `envconfig:"PINECONE_CLOUD"`
 	PineconeRegion     string `envconfig:"PINECONE_REGION"`
-
-	SemdexLocalPath string `envconfig:"SEMDEX_LOCAL_PATH" default:"data/semdex"`
 }
 
 func Build() fx.Option {
