@@ -1150,11 +1150,14 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ThreadMarkParam"
         - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/If-None-Match"
+        - $ref: "#/components/parameters/If-Modified-Since"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ThreadGet" }
+        "304": { description: cached }
     patch:
       operationId: ThreadUpdate
       description: Publish changes to a thread.
@@ -1910,6 +1913,21 @@ components:
   #
 
   parameters:
+    "If-None-Match":
+      description: If-None-Match cache control header.
+      name: If-None-Match
+      in: header
+      required: false
+      schema:
+        type: string
+    "If-Modified-Since":
+      description: If-Modified-Since cache control header.
+      name: If-Modified-Since
+      in: header
+      required: false
+      schema:
+        type: string
+
     IconSize:
       description: Icon sizes.
       example: "512x512"
@@ -2789,6 +2807,10 @@ components:
 
     ThreadGet:
       description: The information about a thread and its posts.
+      headers:
+        Cache-Control: { $ref: "#/components/headers/Cache-Control" }
+        Last-Modified: { $ref: "#/components/headers/Last-Modified" }
+        ETag: { $ref: "#/components/headers/ETag" }
       content:
         application/json:
           schema: { $ref: "#/components/schemas/Thread" }
@@ -3023,6 +3045,18 @@ components:
   # Y88b  d88P Y88b  d88P 888    888 888        888   "   888  d8888888888 Y88b  d88P
   #  "Y8888P"   "Y8888P"  888    888 8888888888 888       888 d88P     888  "Y8888P"
   #
+
+  headers:
+    Cache-Control:
+      schema:
+        type: string
+    Last-Modified:
+      schema:
+        type: string
+        format: RFC1123
+    ETag:
+      schema:
+        type: string
 
   schemas:
     #
