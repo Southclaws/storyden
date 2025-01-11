@@ -35,7 +35,7 @@ export function CategoryScreen(props: ScreenProps) {
 
       <ThreadFeedScreen
         initialPage={props.initialPage}
-        initialPageData={[props.initialThreadList]}
+        initialPageData={props.initialThreadList}
         category={category}
       />
     </LStack>

@@ -68,7 +68,7 @@ async function ThreadFeedScreenContent({ initialSession, page }: PageProps) {
       <ThreadFeedScreen
         initialSession={initialSession}
         initialPage={page}
-        initialPageData={[threads.data]}
+        initialPageData={threads.data}
       />
     );
   } catch (e) {
