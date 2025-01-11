@@ -20768,9 +20768,22 @@ func (m *QuestionMutation) OldAccountID(ctx context.Context) (v xid.ID, err erro
 	return oldValue.AccountID, nil
 }
 
+// ClearAccountID clears the value of the "account_id" field.
+func (m *QuestionMutation) ClearAccountID() {
+	m.author = nil
+	m.clearedFields[question.FieldAccountID] = struct{}{}
+}
+
+// AccountIDCleared returns if the "account_id" field was cleared in this mutation.
+func (m *QuestionMutation) AccountIDCleared() bool {
+	_, ok := m.clearedFields[question.FieldAccountID]
+	return ok
+}
+
 // ResetAccountID resets all changes to the "account_id" field.
 func (m *QuestionMutation) ResetAccountID() {
 	m.author = nil
+	delete(m.clearedFields, question.FieldAccountID)
 }
 
 // SetAuthorID sets the "author" edge to the Account entity by id.
@@ -20786,7 +20799,7 @@ func (m *QuestionMutation) ClearAuthor() {
 
 // AuthorCleared reports if the "author" edge to the Account entity was cleared.
 func (m *QuestionMutation) AuthorCleared() bool {
-	return m.clearedauthor
+	return m.AccountIDCleared() || m.clearedauthor
 }
 
 // AuthorID returns the "author" edge ID in the mutation.
@@ -21008,6 +21021,9 @@ func (m *QuestionMutation) ClearedFields() []string {
 	if m.FieldCleared(question.FieldMetadata) {
 		fields = append(fields, question.FieldMetadata)
 	}
+	if m.FieldCleared(question.FieldAccountID) {
+		fields = append(fields, question.FieldAccountID)
+	}
 	return fields
 }
 
@@ -21027,6 +21043,9 @@ func (m *QuestionMutation) ClearField(name string) error {
 		return nil
 	case question.FieldMetadata:
 		m.ClearMetadata()
+		return nil
+	case question.FieldAccountID:
+		m.ClearAccountID()
 		return nil
 	}
 	return fmt.Errorf("unknown Question nullable field %s", name)

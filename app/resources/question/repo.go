@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -21,7 +22,7 @@ func New(db *ent.Client) *Repository {
 	return &Repository{db: db}
 }
 
-func (r *Repository) Store(ctx context.Context, accountID account.AccountID, query string, result datagraph.Content) (*Question, error) {
+func (r *Repository) Store(ctx context.Context, query string, result datagraph.Content, accountID opt.Optional[account.AccountID]) (*Question, error) {
 	create := r.db.Question.Create()
 	mutate := create.Mutation()
 
@@ -30,7 +31,10 @@ func (r *Repository) Store(ctx context.Context, accountID account.AccountID, que
 	mutate.SetSlug(slug)
 	mutate.SetQuery(query)
 	mutate.SetResult(result.HTML())
-	mutate.SetAccountID(xid.ID(accountID))
+
+	accountID.Call(func(id account.AccountID) {
+		mutate.SetAccountID(xid.ID(id))
+	})
 
 	create.OnConflictColumns("slug").UpdateNewValues()
 

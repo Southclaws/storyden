@@ -83,6 +83,14 @@ func (qc *QuestionCreate) SetAccountID(x xid.ID) *QuestionCreate {
 	return qc
 }
 
+// SetNillableAccountID sets the "account_id" field if the given value is not nil.
+func (qc *QuestionCreate) SetNillableAccountID(x *xid.ID) *QuestionCreate {
+	if x != nil {
+		qc.SetAccountID(*x)
+	}
+	return qc
+}
+
 // SetID sets the "id" field.
 func (qc *QuestionCreate) SetID(x xid.ID) *QuestionCreate {
 	qc.mutation.SetID(x)
@@ -100,6 +108,14 @@ func (qc *QuestionCreate) SetNillableID(x *xid.ID) *QuestionCreate {
 // SetAuthorID sets the "author" edge to the Account entity by ID.
 func (qc *QuestionCreate) SetAuthorID(id xid.ID) *QuestionCreate {
 	qc.mutation.SetAuthorID(id)
+	return qc
+}
+
+// SetNillableAuthorID sets the "author" edge to the Account entity by ID if the given value is not nil.
+func (qc *QuestionCreate) SetNillableAuthorID(id *xid.ID) *QuestionCreate {
+	if id != nil {
+		qc = qc.SetAuthorID(*id)
+	}
 	return qc
 }
 
@@ -167,16 +183,10 @@ func (qc *QuestionCreate) check() error {
 	if _, ok := qc.mutation.Result(); !ok {
 		return &ValidationError{Name: "result", err: errors.New(`ent: missing required field "Question.result"`)}
 	}
-	if _, ok := qc.mutation.AccountID(); !ok {
-		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "Question.account_id"`)}
-	}
 	if v, ok := qc.mutation.ID(); ok {
 		if err := question.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Question.id": %w`, err)}
 		}
-	}
-	if len(qc.mutation.AuthorIDs()) == 0 {
-		return &ValidationError{Name: "author", err: errors.New(`ent: missing required edge "Question.author"`)}
 	}
 	return nil
 }
@@ -391,6 +401,12 @@ func (u *QuestionUpsert) UpdateAccountID() *QuestionUpsert {
 	return u
 }
 
+// ClearAccountID clears the value of the "account_id" field.
+func (u *QuestionUpsert) ClearAccountID() *QuestionUpsert {
+	u.SetNull(question.FieldAccountID)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
 // Using this option is equivalent to using:
 //
@@ -537,6 +553,13 @@ func (u *QuestionUpsertOne) SetAccountID(v xid.ID) *QuestionUpsertOne {
 func (u *QuestionUpsertOne) UpdateAccountID() *QuestionUpsertOne {
 	return u.Update(func(s *QuestionUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// ClearAccountID clears the value of the "account_id" field.
+func (u *QuestionUpsertOne) ClearAccountID() *QuestionUpsertOne {
+	return u.Update(func(s *QuestionUpsert) {
+		s.ClearAccountID()
 	})
 }
 
@@ -853,6 +876,13 @@ func (u *QuestionUpsertBulk) SetAccountID(v xid.ID) *QuestionUpsertBulk {
 func (u *QuestionUpsertBulk) UpdateAccountID() *QuestionUpsertBulk {
 	return u.Update(func(s *QuestionUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// ClearAccountID clears the value of the "account_id" field.
+func (u *QuestionUpsertBulk) ClearAccountID() *QuestionUpsertBulk {
+	return u.Update(func(s *QuestionUpsert) {
+		s.ClearAccountID()
 	})
 }
 

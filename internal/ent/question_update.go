@@ -119,9 +119,23 @@ func (qu *QuestionUpdate) SetNillableAccountID(x *xid.ID) *QuestionUpdate {
 	return qu
 }
 
+// ClearAccountID clears the value of the "account_id" field.
+func (qu *QuestionUpdate) ClearAccountID() *QuestionUpdate {
+	qu.mutation.ClearAccountID()
+	return qu
+}
+
 // SetAuthorID sets the "author" edge to the Account entity by ID.
 func (qu *QuestionUpdate) SetAuthorID(id xid.ID) *QuestionUpdate {
 	qu.mutation.SetAuthorID(id)
+	return qu
+}
+
+// SetNillableAuthorID sets the "author" edge to the Account entity by ID if the given value is not nil.
+func (qu *QuestionUpdate) SetNillableAuthorID(id *xid.ID) *QuestionUpdate {
+	if id != nil {
+		qu = qu.SetAuthorID(*id)
+	}
 	return qu
 }
 
@@ -168,14 +182,6 @@ func (qu *QuestionUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (qu *QuestionUpdate) check() error {
-	if qu.mutation.AuthorCleared() && len(qu.mutation.AuthorIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Question.author"`)
-	}
-	return nil
-}
-
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (qu *QuestionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *QuestionUpdate {
 	qu.modifiers = append(qu.modifiers, modifiers...)
@@ -183,9 +189,6 @@ func (qu *QuestionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *Quest
 }
 
 func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := qu.check(); err != nil {
-		return n, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(question.Table, question.Columns, sqlgraph.NewFieldSpec(question.FieldID, field.TypeString))
 	if ps := qu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -354,9 +357,23 @@ func (quo *QuestionUpdateOne) SetNillableAccountID(x *xid.ID) *QuestionUpdateOne
 	return quo
 }
 
+// ClearAccountID clears the value of the "account_id" field.
+func (quo *QuestionUpdateOne) ClearAccountID() *QuestionUpdateOne {
+	quo.mutation.ClearAccountID()
+	return quo
+}
+
 // SetAuthorID sets the "author" edge to the Account entity by ID.
 func (quo *QuestionUpdateOne) SetAuthorID(id xid.ID) *QuestionUpdateOne {
 	quo.mutation.SetAuthorID(id)
+	return quo
+}
+
+// SetNillableAuthorID sets the "author" edge to the Account entity by ID if the given value is not nil.
+func (quo *QuestionUpdateOne) SetNillableAuthorID(id *xid.ID) *QuestionUpdateOne {
+	if id != nil {
+		quo = quo.SetAuthorID(*id)
+	}
 	return quo
 }
 
@@ -416,14 +433,6 @@ func (quo *QuestionUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (quo *QuestionUpdateOne) check() error {
-	if quo.mutation.AuthorCleared() && len(quo.mutation.AuthorIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Question.author"`)
-	}
-	return nil
-}
-
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (quo *QuestionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *QuestionUpdateOne {
 	quo.modifiers = append(quo.modifiers, modifiers...)
@@ -431,9 +440,6 @@ func (quo *QuestionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *Q
 }
 
 func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err error) {
-	if err := quo.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(question.Table, question.Columns, sqlgraph.NewFieldSpec(question.FieldID, field.TypeString))
 	id, ok := quo.mutation.ID()
 	if !ok {
