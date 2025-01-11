@@ -439,6 +439,16 @@ func AccountIDHasSuffix(v xid.ID) predicate.Question {
 	return predicate.Question(sql.FieldHasSuffix(FieldAccountID, vc))
 }
 
+// AccountIDIsNil applies the IsNil predicate on the "account_id" field.
+func AccountIDIsNil() predicate.Question {
+	return predicate.Question(sql.FieldIsNull(FieldAccountID))
+}
+
+// AccountIDNotNil applies the NotNil predicate on the "account_id" field.
+func AccountIDNotNil() predicate.Question {
+	return predicate.Question(sql.FieldNotNull(FieldAccountID))
+}
+
 // AccountIDEqualFold applies the EqualFold predicate on the "account_id" field.
 func AccountIDEqualFold(v xid.ID) predicate.Question {
 	vc := v.String()

@@ -23,7 +23,7 @@ func (Question) Fields() []ent.Field {
 
 		field.JSON("metadata", map[string]any{}).Optional(),
 
-		field.String("account_id").GoType(xid.ID{}),
+		field.String("account_id").GoType(xid.ID{}).Optional(),
 	}
 }
 
@@ -32,7 +32,6 @@ func (Question) Edges() []ent.Edge {
 		edge.From("author", Account.Type).
 			Field("account_id").
 			Ref("questions").
-			Unique().
-			Required(),
+			Unique(),
 	}
 }
