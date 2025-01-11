@@ -8,15 +8,36 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/pagination"
+	"github.com/Southclaws/storyden/app/resources/question"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/ai"
 )
 
-func New(cfg config.Config, searcher semdex.Searcher, prompter ai.Prompter) (semdex.Asker, error) {
+func New(
+	cfg config.Config,
+	logger *zap.Logger,
+	searcher semdex.Searcher,
+	prompter ai.Prompter,
+	questions *question.Repository,
+) (semdex.Asker, error) {
+	asker, err := newAsker(cfg, searcher, prompter)
+	if err != nil {
+		return nil, err
+	}
+
+	return newCachedAsker(
+		logger,
+		asker,
+		questions,
+	)
+}
+
+func newAsker(cfg config.Config, searcher semdex.Searcher, prompter ai.Prompter) (semdex.Asker, error) {
 	if cfg.SemdexProvider != "" && cfg.LanguageModelProvider == "" {
 		return nil, fault.New("semdex requires a language model provider to be enabled")
 	}
@@ -32,7 +53,6 @@ func New(cfg config.Config, searcher semdex.Searcher, prompter ai.Prompter) (sem
 		return newPerplexityAsker(cfg, searcher)
 
 	default:
-
 		return &defaultAsker{
 			searcher: searcher,
 			prompter: prompter,

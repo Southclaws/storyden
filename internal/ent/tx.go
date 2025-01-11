@@ -52,6 +52,8 @@ type Tx struct {
 	Notification *NotificationClient
 	// Post is the client for interacting with the Post builders.
 	Post *PostClient
+	// Question is the client for interacting with the Question builders.
+	Question *QuestionClient
 	// React is the client for interacting with the React builders.
 	React *ReactClient
 	// Role is the client for interacting with the Role builders.
@@ -210,6 +212,7 @@ func (tx *Tx) init() {
 	tx.Node = NewNodeClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)
 	tx.Post = NewPostClient(tx.config)
+	tx.Question = NewQuestionClient(tx.config)
 	tx.React = NewReactClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.Setting = NewSettingClient(tx.config)

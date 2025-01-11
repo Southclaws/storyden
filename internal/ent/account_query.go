@@ -27,6 +27,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
+	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/tag"
@@ -48,6 +49,7 @@ type AccountQuery struct {
 	withInvitations            *InvitationQuery
 	withInvitedBy              *InvitationQuery
 	withPosts                  *PostQuery
+	withQuestions              *QuestionQuery
 	withReacts                 *ReactQuery
 	withLikes                  *LikePostQuery
 	withMentions               *MentionProfileQuery
@@ -265,6 +267,28 @@ func (aq *AccountQuery) QueryPosts() *PostQuery {
 			sqlgraph.From(account.Table, account.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.PostsTable, account.PostsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryQuestions chains the current query on the "questions" edge.
+func (aq *AccountQuery) QueryQuestions() *QuestionQuery {
+	query := (&QuestionClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(question.Table, question.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.QuestionsTable, account.QuestionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -714,6 +738,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		withInvitations:            aq.withInvitations.Clone(),
 		withInvitedBy:              aq.withInvitedBy.Clone(),
 		withPosts:                  aq.withPosts.Clone(),
+		withQuestions:              aq.withQuestions.Clone(),
 		withReacts:                 aq.withReacts.Clone(),
 		withLikes:                  aq.withLikes.Clone(),
 		withMentions:               aq.withMentions.Clone(),
@@ -817,6 +842,17 @@ func (aq *AccountQuery) WithPosts(opts ...func(*PostQuery)) *AccountQuery {
 		opt(query)
 	}
 	aq.withPosts = query
+	return aq
+}
+
+// WithQuestions tells the query-builder to eager-load the nodes that are connected to
+// the "questions" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithQuestions(opts ...func(*QuestionQuery)) *AccountQuery {
+	query := (&QuestionClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withQuestions = query
 	return aq
 }
 
@@ -1019,7 +1055,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [19]bool{
+		loadedTypes = [20]bool{
 			aq.withEmails != nil,
 			aq.withNotifications != nil,
 			aq.withTriggeredNotifications != nil,
@@ -1028,6 +1064,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			aq.withInvitations != nil,
 			aq.withInvitedBy != nil,
 			aq.withPosts != nil,
+			aq.withQuestions != nil,
 			aq.withReacts != nil,
 			aq.withLikes != nil,
 			aq.withMentions != nil,
@@ -1116,6 +1153,13 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := aq.loadPosts(ctx, query, nodes,
 			func(n *Account) { n.Edges.Posts = []*Post{} },
 			func(n *Account, e *Post) { n.Edges.Posts = append(n.Edges.Posts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withQuestions; query != nil {
+		if err := aq.loadQuestions(ctx, query, nodes,
+			func(n *Account) { n.Edges.Questions = []*Question{} },
+			func(n *Account, e *Question) { n.Edges.Questions = append(n.Edges.Questions, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1442,6 +1486,36 @@ func (aq *AccountQuery) loadPosts(ctx context.Context, query *PostQuery, nodes [
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "account_posts" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AccountQuery) loadQuestions(ctx context.Context, query *QuestionQuery, nodes []*Account, init func(*Account), assign func(*Account, *Question)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(question.FieldAccountID)
+	}
+	query.Where(predicate.Question(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.QuestionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

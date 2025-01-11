@@ -41,7 +41,7 @@ type Searcher interface {
 }
 
 type Asker interface {
-	Ask(ctx context.Context, q string) (chan string, chan error)
+	Ask(ctx context.Context, q string) (func(yield func(string, error) bool), error)
 }
 
 type Recommender interface {

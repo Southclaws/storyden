@@ -31,6 +31,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/setting"
@@ -114,6 +115,7 @@ func checkColumn(table, column string) error {
 			node.Table:             node.ValidColumn,
 			notification.Table:     notification.ValidColumn,
 			post.Table:             post.ValidColumn,
+			question.Table:         question.ValidColumn,
 			react.Table:            react.ValidColumn,
 			role.Table:             role.ValidColumn,
 			setting.Table:          setting.ValidColumn,

@@ -24,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/schema"
@@ -784,6 +785,37 @@ func init() {
 	// post.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	post.IDValidator = func() func(string) error {
 		validators := postDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	questionMixin := schema.Question{}.Mixin()
+	questionMixinFields0 := questionMixin[0].Fields()
+	_ = questionMixinFields0
+	questionMixinFields1 := questionMixin[1].Fields()
+	_ = questionMixinFields1
+	questionFields := schema.Question{}.Fields()
+	_ = questionFields
+	// questionDescCreatedAt is the schema descriptor for created_at field.
+	questionDescCreatedAt := questionMixinFields1[0].Descriptor()
+	// question.DefaultCreatedAt holds the default value on creation for the created_at field.
+	question.DefaultCreatedAt = questionDescCreatedAt.Default.(func() time.Time)
+	// questionDescID is the schema descriptor for id field.
+	questionDescID := questionMixinFields0[0].Descriptor()
+	// question.DefaultID holds the default value on creation for the id field.
+	question.DefaultID = questionDescID.Default.(func() xid.ID)
+	// question.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	question.IDValidator = func() func(string) error {
+		validators := questionDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
