@@ -51,10 +51,7 @@ func newSemdexer(
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			fx.Annotate(
-				asker.New,
-				fx.As(new(semdex.Asker)),
-			),
+			asker.New,
 		),
 		fx.Provide(
 			fx.Annotate(
