@@ -16,15 +16,16 @@ type defaultAsker struct {
 	prompter ai.Prompter
 }
 
-func (a *defaultAsker) Ask(ctx context.Context, q string) (chan string, chan error) {
+func (a *defaultAsker) Ask(ctx context.Context, q string) (func(yield func(string, error) bool), error) {
 	t, err := buildContextPrompt(ctx, a.searcher, q)
 	if err != nil {
-		ech := make(chan error, 1)
-		ech <- fault.Wrap(err, fctx.With(ctx))
-		return nil, ech
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	chch, ech := a.prompter.PromptStream(ctx, t)
+	iter, err := a.prompter.PromptStream(ctx, t)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
-	return chch, ech
+	return iter, nil
 }

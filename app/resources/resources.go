@@ -43,6 +43,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_writer"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
+	"github.com/Southclaws/storyden/app/resources/question"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_querier"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
@@ -94,6 +95,7 @@ func Build() fx.Option {
 			participant_querier.New,
 			participant_writer.New,
 			hydrate.New,
+			question.New,
 		),
 	)
 }

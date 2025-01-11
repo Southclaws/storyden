@@ -26,32 +26,26 @@ func (o *Mock) Prompt(ctx context.Context, input string) (*Result, error) {
 	}, nil
 }
 
-func (o *Mock) PromptStream(ctx context.Context, input string) (chan string, chan error) {
-	ch := make(chan string)
-	errCh := make(chan error)
+func (o *Mock) PromptStream(ctx context.Context, input string) (func(yield func(string, error) bool), error) {
+	// Simulating incremental streaming
+	parts := []string{
+		"An answer for:",
+		input,
+	}
 
-	go func() {
-		defer close(ch)
-		defer close(errCh)
-
-		// Simulating incremental streaming
-		parts := []string{
-			"An answer for:",
-			input,
-		}
-
+	iter := func(yield func(string, error) bool) {
 		for _, part := range parts {
 			select {
 			case <-ctx.Done():
-				errCh <- ctx.Err()
 				return
-			case ch <- part:
+			default:
+				yield(part, nil)
 				time.Sleep(time.Millisecond * (10 + time.Duration(rand.Intn(100))))
 			}
 		}
-	}()
+	}
 
-	return ch, errCh
+	return iter, nil
 }
 
 const mockEmbeddingSize = 3072
