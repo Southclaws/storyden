@@ -12,6 +12,7 @@ import (
 func (w *weaviateSemdexer) Delete(ctx context.Context, id xid.ID) (int, error) {
 	delete := w.wc.Batch().
 		ObjectsBatchDeleter().
+		WithClassName(w.cn.String()).
 		WithWhere(
 			filters.Where().
 				WithPath([]string{"datagraph_id"}).
