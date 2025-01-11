@@ -11,6 +11,7 @@ export type Options = {
   responseType?: string;
   cookie?: string;
   revalidate?: number;
+  cache?: RequestCache;
 };
 
 export class RequestError extends Error {
@@ -29,6 +30,7 @@ export function buildRequest({
   params,
   data,
   revalidate,
+  cache,
 }: Options): Request {
   const apiAddress = getAPIAddress();
   const address = `${apiAddress}/api${url}${cleanQuery(params)}`;
@@ -42,7 +44,7 @@ export function buildRequest({
     credentials: "include",
     headers,
     body: buildPayload(data),
-    cache: "default",
+    cache,
     next: {
       tags,
       revalidate,
