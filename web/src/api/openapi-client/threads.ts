@@ -158,6 +158,7 @@ export type ThreadGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof threadGet>>
 >;
 export type ThreadGetQueryError =
+  | void
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
@@ -167,6 +168,7 @@ export type ThreadGetQueryError =
  */
 export const useThreadGet = <
   TError =
+    | void
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,

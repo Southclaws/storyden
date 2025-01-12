@@ -5,7 +5,18 @@ import { deriveError } from "@/utils/error";
 import { Options, buildRequest, buildResult } from "./common";
 
 export const fetcher = async <T>(opts: Options): Promise<T> => {
-  const response = await fetch(buildRequest(opts));
+  const request = buildRequest({
+    ...opts,
+    // We use the browser default cache behaviour for the client side requests.
+    // There's no revalidation set on the client as we're already using SWR for
+    // that. The default cache behaviour will however make use of browser HTTP
+    // Conditional Requests and ETag headers which some endpoints in Storyden
+    // provide. This results in a mostly fast experience but it's slowed down a
+    // bit by the server side behaviour (see server.ts comment for more info.)
+    cache: "default",
+  });
+
+  const response = await fetch(request);
 
   return buildResult<T>(response);
 };

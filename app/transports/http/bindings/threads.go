@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -13,10 +14,12 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	thread_service "github.com/Southclaws/storyden/app/services/thread"
@@ -25,17 +28,19 @@ import (
 )
 
 type Threads struct {
+	thread_cache    *thread_cache.Cache
 	thread_svc      thread_service.Service
 	thread_mark_svc thread_mark.Service
 	accountQuery    *account_querier.Querier
 }
 
 func NewThreads(
+	thread_cache *thread_cache.Cache,
 	thread_svc thread_service.Service,
 	thread_mark_svc thread_mark.Service,
 	accountQuery *account_querier.Querier,
 ) Threads {
-	return Threads{thread_svc, thread_mark_svc, accountQuery}
+	return Threads{thread_cache, thread_svc, thread_mark_svc, accountQuery}
 }
 
 func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreateRequestObject) (openapi.ThreadCreateResponseObject, error) {
@@ -211,6 +216,15 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	notModified, err := i.thread_cache.IsNotModified(ctx, cachecontrol.NewQuery(request.Params.IfNoneMatch, request.Params.IfModifiedSince), xid.ID(postID))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if notModified {
+		return openapi.ThreadGet304Response{}, nil
+	}
+
 	pp := deserialisePageParams(request.Params.Page, 50)
 
 	thread, err := i.thread_svc.Get(ctx, postID, pp)
@@ -219,7 +233,13 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 	}
 
 	return openapi.ThreadGet200JSONResponse{
-		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse(serialiseThread(thread)),
+		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse{
+			Body: serialiseThread(thread),
+			Headers: openapi.ThreadGetResponseHeaders{
+				CacheControl: "max-age=1",
+				LastModified: thread.UpdatedAt.Format(time.RFC1123),
+			},
+		},
 	}, nil
 }
 
