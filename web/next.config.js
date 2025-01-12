@@ -9,6 +9,9 @@ const nextConfig = {
     loaderFile: "./src/lib/asset/loader.js",
     unoptimized: true,
   },
+  experimental: {
+    ppr: "incremental",
+  },
 };
 
 module.exports = nextConfig;
