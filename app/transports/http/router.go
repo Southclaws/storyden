@@ -9,11 +9,11 @@ import (
 
 	"github.com/Southclaws/storyden/app/transports/http/middleware/chaos"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/frontend"
+	"github.com/Southclaws/storyden/app/transports/http/middleware/headers"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/limiter"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/reqlog"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/useragent"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 )
@@ -32,7 +32,7 @@ func MountOpenAPI(
 	co *origin.Middleware,
 	lo *reqlog.Middleware,
 	fe *frontend.Provider,
-	ua *useragent.Middleware,
+	ri *headers.Middleware,
 	cj *session_cookie.Jar,
 	rl *limiter.Middleware,
 	cm *chaos.Middleware,
@@ -42,7 +42,7 @@ func MountOpenAPI(
 			co.WithCORS(),
 			lo.WithLogger(),
 			fe.WithFrontendProxy(),
-			ua.WithUserAgentContext(),
+			ri.WithHeaderContext(),
 			cj.WithAuth(),
 			rl.WithRequestSizeLimiter(),
 			rl.WithRateLimit(),

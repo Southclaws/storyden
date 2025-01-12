@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 	"net/url"
+	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -17,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/account/account_auth"
 	"github.com/Southclaws/storyden/app/services/account/account_email"
@@ -24,10 +26,12 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/avatar"
+	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Accounts struct {
+	profile_cache *profile_cache.Cache
 	avatarService avatar.Service
 	authManager   *authentication.Manager
 	accountQuery  *account_querier.Querier
@@ -39,6 +43,7 @@ type Accounts struct {
 }
 
 func NewAccounts(
+	profile_cache *profile_cache.Cache,
 	avatarService avatar.Service,
 	authManager *authentication.Manager,
 	accountQuery *account_querier.Querier,
@@ -49,6 +54,7 @@ func NewAccounts(
 	roleBadge *role_badge.Writer,
 ) Accounts {
 	return Accounts{
+		profile_cache: profile_cache,
 		avatarService: avatarService,
 		authManager:   authManager,
 		accountQuery:  accountQuery,
@@ -71,13 +77,23 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if i.profile_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(accountID)) {
+		return openapi.AccountGet304Response{}, nil
+	}
+
 	acc, err := i.accountQuery.GetByID(ctx, accountID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AccountGet200JSONResponse{
-		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse(serialiseAccount(acc)),
+		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse{
+			Body: serialiseAccount(acc),
+			Headers: openapi.AccountGetOKResponseHeaders{
+				CacheControl: "public, max-age=1",
+				LastModified: acc.UpdatedAt.Format(time.RFC1123),
+			},
+		},
 	}, nil
 }
 
@@ -218,6 +234,9 @@ func (i *Accounts) AccountGetAvatar(ctx context.Context, request openapi.Account
 		AccountGetAvatarImagepngResponse: openapi.AccountGetAvatarImagepngResponse{
 			Body:          r,
 			ContentLength: size,
+			Headers: openapi.AccountGetAvatarResponseHeaders{
+				CacheControl: "public, max-age=3600",
+			},
 		},
 	}, nil
 }

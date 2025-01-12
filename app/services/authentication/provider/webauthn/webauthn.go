@@ -18,7 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/services/account/register"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/useragent"
+	"github.com/Southclaws/storyden/app/services/reqinfo"
 )
 
 var (
@@ -109,7 +109,7 @@ func (p *Provider) register(ctx context.Context, handle string, credential *weba
 		base64.RawURLEncoding.EncodeToString(credential.ID),
 		string(encoded),
 		nil,
-		authentication.WithName(useragent.GetDeviceName(ctx)),
+		authentication.WithName(reqinfo.GetDeviceName(ctx)),
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -136,7 +136,7 @@ func (p *Provider) add(ctx context.Context, accountID account.AccountID, credent
 		base64.RawURLEncoding.EncodeToString(credential.ID),
 		string(encoded),
 		nil,
-		authentication.WithName(useragent.GetDeviceName(ctx)),
+		authentication.WithName(reqinfo.GetDeviceName(ctx)),
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
