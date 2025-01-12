@@ -20,6 +20,7 @@ import (
 type Public struct {
 	ID      account.AccountID
 	Created time.Time
+	Updated time.Time
 	Deleted opt.Optional[time.Time]
 
 	Handle        string
@@ -45,7 +46,7 @@ func (p *Public) GetContent() datagraph.Content { return p.Bio }
 func (p *Public) GetProps() map[string]any      { return p.Metadata }
 func (p *Public) GetAssets() []*asset.Asset     { return []*asset.Asset{} }
 func (p *Public) GetCreated() time.Time         { return p.Created }
-func (p *Public) GetUpdated() time.Time         { return p.Created }
+func (p *Public) GetUpdated() time.Time         { return p.Updated }
 
 func ProfileFromModel(a *ent.Account) (*Public, error) {
 	rolesEdge := a.Edges.AccountRoles
@@ -84,6 +85,7 @@ func ProfileFromModel(a *ent.Account) (*Public, error) {
 	return &Public{
 		ID:        account.AccountID(a.ID),
 		Created:   a.CreatedAt,
+		Updated:   a.UpdatedAt,
 		Deleted:   opt.NewPtr(a.DeletedAt),
 		Handle:    a.Handle,
 		Name:      a.Name,
@@ -99,6 +101,7 @@ func ProfileFromAccount(a *account.Account) *Public {
 	return &Public{
 		ID:            a.ID,
 		Created:       a.CreatedAt,
+		Updated:       a.UpdatedAt,
 		Deleted:       a.DeletedAt,
 		Handle:        a.Handle,
 		Name:          a.Name,

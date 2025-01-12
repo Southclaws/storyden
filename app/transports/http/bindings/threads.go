@@ -14,7 +14,6 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 
@@ -22,6 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/reqinfo"
 	thread_service "github.com/Southclaws/storyden/app/services/thread"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -216,12 +216,7 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	notModified, err := i.thread_cache.IsNotModified(ctx, cachecontrol.NewQuery(request.Params.IfNoneMatch, request.Params.IfModifiedSince), xid.ID(postID))
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if notModified {
+	if i.thread_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(postID)) {
 		return openapi.ThreadGet304Response{}, nil
 	}
 

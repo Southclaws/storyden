@@ -1,4 +1,4 @@
-package thread_cache
+package profile_cache
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/account"
 )
 
 type Cache struct {
@@ -21,7 +21,7 @@ func New(db *ent.Client) *Cache {
 }
 
 func (c *Cache) IsNotModified(ctx context.Context, cq cachecontrol.Query, id xid.ID) bool {
-	r, err := c.db.Post.Query().Select(post.FieldUpdatedAt).Where(post.ID(id)).Only(ctx)
+	r, err := c.db.Account.Query().Select(account.FieldUpdatedAt).Where(account.ID(id)).Only(ctx)
 	if err != nil {
 		return false
 	}
