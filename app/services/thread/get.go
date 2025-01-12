@@ -7,7 +7,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -53,12 +52,12 @@ func (s *service) Get(
 		}
 	}
 
-	recommendations, err := s.recommender.Recommend(ctx, thr)
-	if err != nil {
-		s.l.Warn("failed to aggregate recommendations", zap.Error(err))
-	} else {
-		thr.Related = append(thr.Related, recommendations...)
-	}
+	// recommendations, err := s.recommender.Recommend(ctx, thr)
+	// if err != nil {
+	// 	s.l.Warn("failed to aggregate recommendations", zap.Error(err))
+	// } else {
+	// 	thr.Related = append(thr.Related, recommendations...)
+	// }
 
 	return thr, nil
 }
