@@ -98,12 +98,14 @@ export type ProfileGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof profileGet>>
 >;
 export type ProfileGetQueryError =
+  | void
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
 export const useProfileGet = <
   TError =
+    | void
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,
@@ -344,12 +346,14 @@ export type ProfileFollowingGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof profileFollowingGet>>
 >;
 export type ProfileFollowingGetQueryError =
+  | void
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
 export const useProfileFollowingGet = <
   TError =
+    | void
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,

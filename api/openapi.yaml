@@ -39,6 +39,12 @@ servers:
 security:
   - browser: []
 
+x-types:
+  cache_response_headers: &cache_response_headers
+    Cache-Control: { $ref: "#/components/headers/Cache-Control" }
+    Last-Modified: { $ref: "#/components/headers/Last-Modified" }
+    ETag: { $ref: "#/components/headers/ETag" }
+
 tags:
   - name: misc
     description: General metadata for the instance and uncategorised routes.
@@ -636,6 +642,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountGetOK" }
+        "304": { description: cached }
 
     patch:
       operationId: AccountUpdate
@@ -942,6 +949,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ProfileGetOK" }
+        "304": { description: cached }
 
   /profiles/{account_handle}/followers:
     get:
@@ -992,6 +1000,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ProfileFollowingGetOK" }
+        "304": { description: cached }
 
   #
   #                   888                                      d8b
@@ -1150,8 +1159,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ThreadMarkParam"
         - $ref: "#/components/parameters/PaginationQuery"
-        - $ref: "#/components/parameters/If-None-Match"
-        - $ref: "#/components/parameters/If-Modified-Since"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1913,21 +1920,6 @@ components:
   #
 
   parameters:
-    "If-None-Match":
-      description: If-None-Match cache control header.
-      name: If-None-Match
-      in: header
-      required: false
-      schema:
-        type: string
-    "If-Modified-Since":
-      description: If-Modified-Since cache control header.
-      name: If-Modified-Since
-      in: header
-      required: false
-      schema:
-        type: string
-
     IconSize:
       description: Icon sizes.
       example: "512x512"
@@ -2653,6 +2645,7 @@ components:
 
     AccountGetOK:
       description: OK
+      headers: { <<: *cache_response_headers }
       content:
         application/json:
           schema:
@@ -2681,6 +2674,7 @@ components:
 
     AccountGetAvatar:
       description: OK
+      headers: { <<: *cache_response_headers }
       content:
         image/png:
           schema:
@@ -2731,6 +2725,7 @@ components:
 
     ProfileGetOK:
       description: OK
+      headers: { <<: *cache_response_headers }
       content:
         application/json:
           schema:
@@ -2807,10 +2802,7 @@ components:
 
     ThreadGet:
       description: The information about a thread and its posts.
-      headers:
-        Cache-Control: { $ref: "#/components/headers/Cache-Control" }
-        Last-Modified: { $ref: "#/components/headers/Last-Modified" }
-        ETag: { $ref: "#/components/headers/ETag" }
+      headers: { <<: *cache_response_headers }
       content:
         application/json:
           schema: { $ref: "#/components/schemas/Thread" }
@@ -2845,6 +2837,7 @@ components:
 
     AssetGetOK:
       description: The new URL of an uploaded file.
+      headers: { <<: *cache_response_headers }
       content:
         "*/*":
           schema:

@@ -50,6 +50,9 @@ func (i Info) IconGet(ctx context.Context, request openapi.IconGetRequestObject)
 			Body:          r,
 			ContentType:   a.MIME.String(),
 			ContentLength: int64(a.Size),
+			Headers: openapi.AssetGetOKResponseHeaders{
+				CacheControl: "public, max-age=31536000",
+			},
 		},
 	}, nil
 }
@@ -74,6 +77,9 @@ func (i Info) BannerGet(ctx context.Context, request openapi.BannerGetRequestObj
 			Body:          r,
 			ContentType:   a.MIME.String(),
 			ContentLength: int64(a.Size),
+			Headers: openapi.AssetGetOKResponseHeaders{
+				CacheControl: "public, max-age=3600",
+			},
 		},
 	}, nil
 }

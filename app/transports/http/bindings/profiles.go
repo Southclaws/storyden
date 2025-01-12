@@ -10,13 +10,16 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/profile/following"
+	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 )
@@ -24,6 +27,7 @@ import (
 type Profiles struct {
 	apiAddress    url.URL
 	accountQuery  *account_querier.Querier
+	profile_cache *profile_cache.Cache
 	ps            profile_search.Repository
 	followQuerier *follow_querier.Querier
 	followManager *following.FollowManager
@@ -32,6 +36,7 @@ type Profiles struct {
 func NewProfiles(
 	cfg config.Config,
 	accountQuery *account_querier.Querier,
+	profile_cache *profile_cache.Cache,
 	ps profile_search.Repository,
 	followQuerier *follow_querier.Querier,
 	followManager *following.FollowManager,
@@ -39,6 +44,7 @@ func NewProfiles(
 	return Profiles{
 		apiAddress:    cfg.PublicWebAddress,
 		accountQuery:  accountQuery,
+		profile_cache: profile_cache,
 		ps:            ps,
 		followQuerier: followQuerier,
 		followManager: followManager,
@@ -94,6 +100,10 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if p.profile_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(id)) {
+		return openapi.ProfileGet304Response{}, nil
+	}
+
 	acc, err := p.accountQuery.GetByID(ctx, id)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -102,7 +112,13 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 	pro := profile.ProfileFromAccount(acc)
 
 	return openapi.ProfileGet200JSONResponse{
-		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse(serialiseProfile(pro)),
+		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
+			Body: serialiseProfile(pro),
+			Headers: openapi.ProfileGetOKResponseHeaders{
+				CacheControl: "public, max-age=1",
+				LastModified: pro.Updated.Format(time.RFC1123),
+			},
+		},
 	}, nil
 }
 

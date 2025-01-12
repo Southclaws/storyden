@@ -41,12 +41,14 @@ export type AccountGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof accountGet>>
 >;
 export type AccountGetQueryError =
+  | void
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
 export const useAccountGet = <
   TError =
+    | void
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,
