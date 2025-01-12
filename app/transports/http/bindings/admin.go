@@ -97,7 +97,9 @@ func (i *Admin) AdminAccountBanCreate(ctx context.Context, request openapi.Admin
 	}
 
 	return openapi.AdminAccountBanCreate200JSONResponse{
-		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse(serialiseAccount(acc)),
+		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse{
+			Body: serialiseAccount(acc),
+		},
 	}, nil
 }
 
@@ -127,7 +129,9 @@ func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.Admin
 	}
 
 	return openapi.AdminAccountBanRemove200JSONResponse{
-		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse(serialiseAccount(acc)),
+		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse{
+			Body: serialiseAccount(acc),
+		},
 	}, nil
 }
 
