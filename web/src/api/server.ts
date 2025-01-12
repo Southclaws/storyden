@@ -22,7 +22,22 @@ export const fetcher = async <T>(url: string, opts: Options): Promise<T> => {
     headers,
     method: opts.method as any,
     data: opts.body,
-    revalidate: 5,
+    // Server side requests are cached a little more aggressively than client
+    // side hydration requests. The downside of this is a user may see a flash
+    // of stale data as the server render loads which will be replaced by the
+    // client side hydration by SWR. However, the second call will most likely
+    // be a 304 if it has been loaded before by the same user already. So, in a
+    // best case, we get a single database read, worst case we get two. The
+    // revalidation period is set to one minute in order to cut down on the
+    // flashes of stale data. However, in reality this doesn't really gain much
+    // as a user landing for the first time will still trigger two DB reads,
+    // and a user returning is quite likely someone who has interacted with a
+    // piece of content and thus will result in a new read at least once. So,
+    // it's not the most efficient approach (ignoring server-side data cache)
+    // but it's the best of a not-so-great situation. This should improve a lot
+    // if Next.js adds support for HTTP Conditional Requests and ETag headers.
+    revalidate: 60,
+    cache: "force-cache",
   });
 
   req.headers.set("Cookie", await getCookieHeader());
