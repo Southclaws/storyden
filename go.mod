@@ -45,6 +45,8 @@ require (
 	github.com/disintegration/imaging v1.6.2
 	github.com/dustinkirkland/golang-petname v0.0.0-20240428194347-eebcea082ee0
 	github.com/gabriel-vasile/mimetype v1.4.7
+	github.com/getsentry/sentry-go v0.31.1
+	github.com/getsentry/sentry-go/otel v0.31.1
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/go-github/v66 v66.0.0
@@ -75,6 +77,10 @@ require (
 	github.com/twilio/twilio-go v1.23.6
 	github.com/weaviate/weaviate v1.27.6
 	github.com/weaviate/weaviate-go-client/v4 v4.16.1
+	go.opentelemetry.io/otel v1.33.0
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.33.0
+	go.opentelemetry.io/otel/sdk v1.33.0
+	go.opentelemetry.io/otel/trace v1.33.0
 	golang.org/x/exp v0.0.0-20240909161429-701f63a606c0
 	golang.org/x/sync v0.10.0
 	google.golang.org/api v0.209.0
@@ -95,6 +101,7 @@ require (
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
+	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/dprotaso/go-yit v0.0.0-20240618133044-5a0af90af097 // indirect
 	github.com/ebitengine/purego v0.8.1 // indirect
@@ -121,6 +128,7 @@ require (
 	github.com/googleapis/gax-go/v2 v2.14.0 // indirect
 	github.com/gorilla/css v1.0.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.24.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/huandu/xstrings v1.5.0 // indirect
@@ -159,10 +167,11 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	go.mongodb.org/mongo-driver v1.17.0 // indirect
 	go.opencensus.io v0.24.0 // indirect
+	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.55.0 // indirect
-	go.opentelemetry.io/otel v1.31.0 // indirect
-	go.opentelemetry.io/otel/metric v1.31.0 // indirect
-	go.opentelemetry.io/otel/trace v1.31.0 // indirect
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.33.0 // indirect
+	go.opentelemetry.io/otel/metric v1.33.0 // indirect
+	go.opentelemetry.io/proto/otlp v1.4.0 // indirect
 	golang.org/x/image v0.20.0 // indirect
 	golang.org/x/tools v0.25.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241230172942-26aa7a208def // indirect

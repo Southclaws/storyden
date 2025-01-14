@@ -31,6 +31,11 @@ type Config struct {
 	RateLimitPeriod time.Duration `envconfig:"RATE_LIMIT_PERIOD" default:"1h"`
 	RateLimitExpire time.Duration `envconfig:"RATE_LIMIT_EXPIRE" default:"1m"`
 
+	// logger (default) or sentry
+	OTELProvider string  `envconfig:"OTEL_PROVIDER"               default:""`
+	OTELEndpoint url.URL `envconfig:"OTEL_EXPORTER_OTLP_ENDPOINT" default:""`
+	SentryDSN    string  `envconfig:"SENTRY_DSN"                  default:""` // required when OTLPProvider = sentry
+
 	EmailProvider string `envconfig:"EMAIL_PROVIDER"         default:""`
 
 	AssetStorageType      string `envconfig:"ASSET_STORAGE_TYPE"`
