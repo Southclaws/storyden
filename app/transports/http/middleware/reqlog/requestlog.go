@@ -7,16 +7,17 @@ import (
 	"time"
 
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
-	"go.uber.org/zap"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
 
 type Middleware struct {
-	logger *zap.Logger
+	ins spanner.Instrumentation
 }
 
-func New(logger *zap.Logger) *Middleware {
+func New(ins spanner.Builder) *Middleware {
 	return &Middleware{
-		logger: logger,
+		ins: ins.Build(),
 	}
 }
 
@@ -46,14 +47,20 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 
 			wr := &withStatus{ResponseWriter: w}
 
+			ctx, span := m.ins.InstrumentNamed(r.Context(), title,
+				kv.String("http.request.header.origin", origin),
+				kv.String("client.address", r.RemoteAddr),
+				kv.String("http.request.method", r.Method),
+				kv.String("http.route", r.URL.Path),
+				kv.String("url.query", r.URL.Query().Encode()),
+				kv.Int("http.request.body.size", int(r.ContentLength)),
+			)
+			defer span.End()
+
 			defer func() {
-				log := m.logger.With(
-					zap.Duration("duration", time.Since(start)),
-					zap.String("query", r.URL.Query().Encode()),
-					zap.Int64("body", r.ContentLength),
-					zap.String("ip", r.RemoteAddr),
-					zap.String("origin", origin),
-					zap.Int("status", wr.statusCode),
+				span.Annotate(
+					kv.Duration("duration", time.Since(start)),
+					kv.Int("http.response.status_code", wr.statusCode),
 				)
 
 				if recovery := recover(); recovery != nil {
@@ -69,16 +76,14 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 
 					errorlog := title + ": " + err.Error()
 
-					log.Error(errorlog, zap.Error(err), zap.String("trace", string(trace)))
+					_ = span.Wrap(err, errorlog, kv.String("trace", string(trace)))
 
 					w.WriteHeader(http.StatusInternalServerError)
 					return
 				}
-
-				log.Info(title)
 			}()
 
-			next.ServeHTTP(wr, r)
+			next.ServeHTTP(wr, r.WithContext(ctx))
 		})
 	}
 }

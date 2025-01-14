@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/endec/jwt"
 	"github.com/Southclaws/storyden/internal/infrastructure/endec/securecookie"
 	"github.com/Southclaws/storyden/internal/infrastructure/frontend"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation"
 	"github.com/Southclaws/storyden/internal/infrastructure/logger"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
@@ -25,6 +26,7 @@ import (
 func Build() fx.Option {
 	return fx.Options(
 		logger.Build(),
+		instrumentation.Build(),
 		db.Build(),
 		cache.Build(),
 		fx.Provide(rate.NewFactory),

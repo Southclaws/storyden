@@ -10,19 +10,23 @@ import (
 	"strings"
 	"sync"
 
+	entgo "entgo.io/ent"
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	_ "github.com/glebarez/go-sqlite"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/tracing"
 )
 
 func Build() fx.Option {
@@ -58,7 +62,7 @@ func newSQL(cfg config.Config) (*sql.DB, *sqlx.DB, error) {
 // to write too much test-specific code for DB stuff. We should use enttest tbh.
 var schemaLock = sync.Mutex{}
 
-func newEntClient(lc fx.Lifecycle, logger *zap.Logger, cfg config.Config, db *sql.DB) (*ent.Client, error) {
+func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sql.DB) (*ent.Client, error) {
 	wctx, cancel := context.WithCancel(context.Background())
 
 	client, err := connect(wctx, cfg, db)
@@ -67,18 +71,44 @@ func newEntClient(lc fx.Lifecycle, logger *zap.Logger, cfg config.Config, db *sq
 		return nil, err
 	}
 
-	// client.Use(func(next ent.Mutator) ent.Mutator {
-	// 	return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	// 		start := time.Now()
-	// 		defer func() {
-	// 			logger.Debug(m.Op().String(),
-	// 				zap.String("type", m.Type()),
-	// 				zap.Duration("duration", time.Since(start)),
-	// 			)
-	// 		}()
-	// 		return next.Mutate(ctx, m)
-	// 	})
-	// })
+	tr := tf.Build(lc, "ent")
+
+	client.Intercept(ent.InterceptFunc(func(next ent.Querier) ent.Querier {
+		return ent.QuerierFunc(func(ctx context.Context, query ent.Query) (ent.Value, error) {
+			qc := entgo.QueryFromContext(ctx)
+			spanName := fmt.Sprintf("ent/%s/%s", qc.Op, qc.Type)
+
+			ctx, span := tr.Start(ctx, spanName, trace.WithAttributes(
+				attribute.String("type", qc.Type),
+				attribute.String("op", qc.Op),
+				attribute.Bool("unique", opt.NewPtr(qc.Unique).OrZero()),
+				attribute.Int("limit", opt.NewPtr(qc.Limit).OrZero()),
+				attribute.Int("offset", opt.NewPtr(qc.Offset).OrZero()),
+				attribute.StringSlice("fields", qc.Fields),
+			))
+			defer span.End()
+
+			return next.Query(ctx, query)
+		})
+	}))
+
+	client.Use(func(next ent.Mutator) ent.Mutator {
+		return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+			spanName := fmt.Sprintf("ent/%s/%s", m.Op(), m.Type())
+
+			ctx, span := tr.Start(ctx, spanName, trace.WithAttributes(
+				attribute.String("type", m.Type()),
+				attribute.String("op", m.Op().String()),
+				attribute.StringSlice("fields", m.Fields()),
+				attribute.StringSlice("added_edges", m.AddedEdges()),
+				attribute.StringSlice("added_fields", m.AddedFields()),
+				attribute.StringSlice("removed_edges", m.RemovedEdges()),
+			))
+			defer span.End()
+
+			return next.Mutate(ctx, m)
+		})
+	})
 
 	// client.Intercept(ent.InterceptFunc(func(next ent.Querier) ent.Querier {
 	// 	return ent.QuerierFunc(func(ctx context.Context, query ent.Query) (ent.Value, error) {
