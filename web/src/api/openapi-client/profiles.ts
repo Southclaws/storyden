@@ -16,6 +16,7 @@ import { fetcher } from "../client";
 import type {
   InternalServerErrorResponse,
   NotFoundResponse,
+  NotModifiedResponse,
   ProfileFollowersGetOKResponse,
   ProfileFollowersGetParams,
   ProfileFollowingGetOKResponse,
@@ -98,14 +99,14 @@ export type ProfileGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof profileGet>>
 >;
 export type ProfileGetQueryError =
-  | void
+  | NotModifiedResponse
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
 export const useProfileGet = <
   TError =
-    | void
+    | NotModifiedResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,
@@ -346,14 +347,14 @@ export type ProfileFollowingGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof profileFollowingGet>>
 >;
 export type ProfileFollowingGetQueryError =
-  | void
+  | NotModifiedResponse
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
 export const useProfileFollowingGet = <
   TError =
-    | void
+    | NotModifiedResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,

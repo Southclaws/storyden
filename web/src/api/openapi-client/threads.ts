@@ -16,6 +16,7 @@ import { fetcher } from "../client";
 import type {
   InternalServerErrorResponse,
   NotFoundResponse,
+  NotModifiedResponse,
   ThreadCreateBody,
   ThreadCreateOKResponse,
   ThreadGetParams,
@@ -158,7 +159,7 @@ export type ThreadGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof threadGet>>
 >;
 export type ThreadGetQueryError =
-  | void
+  | NotModifiedResponse
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
@@ -168,7 +169,7 @@ export type ThreadGetQueryError =
  */
 export const useThreadGet = <
   TError =
-    | void
+    | NotModifiedResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,

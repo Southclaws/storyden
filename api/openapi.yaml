@@ -642,7 +642,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountGetOK" }
-        "304": { description: cached }
+        "304": { $ref: "#/components/responses/NotModified" }
 
     patch:
       operationId: AccountUpdate
@@ -949,7 +949,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ProfileGetOK" }
-        "304": { description: cached }
+        "304": { $ref: "#/components/responses/NotModified" }
 
   /profiles/{account_handle}/followers:
     get:
@@ -1000,7 +1000,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ProfileFollowingGetOK" }
-        "304": { description: cached }
+        "304": { $ref: "#/components/responses/NotModified" }
 
   #
   #                   888                                      d8b
@@ -1164,7 +1164,7 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/ThreadGet" }
-        "304": { description: cached }
+        "304": { $ref: "#/components/responses/NotModified" }
     patch:
       operationId: ThreadUpdate
       description: Publish changes to a thread.
@@ -2551,6 +2551,9 @@ components:
   #
 
   responses:
+    NotModified:
+      description: Not modified
+      headers: { <<: *cache_response_headers }
     BadRequest:
       description: Bad request
     NotFound:

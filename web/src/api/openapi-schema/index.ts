@@ -275,6 +275,7 @@ export * from "./nodeUpdateParams";
 export * from "./nodeWithChildren";
 export * from "./nodeWithChildrenAllOf";
 export * from "./notFoundResponse";
+export * from "./notModifiedResponse";
 export * from "./notification";
 export * from "./notificationCount";
 export * from "./notificationEvent";

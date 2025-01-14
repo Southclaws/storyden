@@ -217,7 +217,11 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 	}
 
 	if i.thread_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(postID)) {
-		return openapi.ThreadGet304Response{}, nil
+		return openapi.ThreadGet304Response{
+			Headers: openapi.NotModifiedResponseHeaders{
+				CacheControl: "public, max-age=60, stale-while-revalidate=120",
+			},
+		}, nil
 	}
 
 	pp := deserialisePageParams(request.Params.Page, 50)
