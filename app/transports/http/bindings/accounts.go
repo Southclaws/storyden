@@ -78,7 +78,11 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 	}
 
 	if i.profile_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(accountID)) {
-		return openapi.AccountGet304Response{}, nil
+		return openapi.AccountGet304Response{
+			Headers: openapi.NotModifiedResponseHeaders{
+				CacheControl: "public, max-age=60, stale-while-revalidate=120",
+			},
+		}, nil
 	}
 
 	acc, err := i.accountQuery.GetByID(ctx, accountID)

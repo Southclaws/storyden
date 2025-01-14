@@ -25,6 +25,7 @@ import type {
   BadRequestResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
+  NotModifiedResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
@@ -41,14 +42,14 @@ export type AccountGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof accountGet>>
 >;
 export type AccountGetQueryError =
-  | void
+  | NotModifiedResponse
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
 export const useAccountGet = <
   TError =
-    | void
+    | NotModifiedResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,
