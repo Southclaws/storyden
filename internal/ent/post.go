@@ -94,9 +94,11 @@ type PostEdges struct {
 	ContentLinks []*Link `json:"content_links,omitempty"`
 	// Event holds the value of the event edge.
 	Event []*Event `json:"event,omitempty"`
+	// PostTags holds the value of the post_tags edge.
+	PostTags []*TagPost `json:"post_tags,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [15]bool
+	loadedTypes [16]bool
 }
 
 // AuthorOrErr returns the Author value or an error if the edge
@@ -242,6 +244,15 @@ func (e PostEdges) EventOrErr() ([]*Event, error) {
 		return e.Event, nil
 	}
 	return nil, &NotLoadedError{edge: "event"}
+}
+
+// PostTagsOrErr returns the PostTags value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) PostTagsOrErr() ([]*TagPost, error) {
+	if e.loadedTypes[15] {
+		return e.PostTags, nil
+	}
+	return nil, &NotLoadedError{edge: "post_tags"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -472,6 +483,11 @@ func (po *Post) QueryContentLinks() *LinkQuery {
 // QueryEvent queries the "event" edge of the Post entity.
 func (po *Post) QueryEvent() *EventQuery {
 	return NewPostClient(po.config).QueryEvent(po)
+}
+
+// QueryPostTags queries the "post_tags" edge of the Post entity.
+func (po *Post) QueryPostTags() *TagPostQuery {
+	return NewPostClient(po.config).QueryPostTags(po)
 }
 
 // Update returns a builder for updating this Post.

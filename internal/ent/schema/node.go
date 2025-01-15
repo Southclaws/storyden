@@ -58,6 +58,7 @@ func (Node) Edges() []ent.Edge {
 		edge.To("assets", Asset.Type),
 
 		edge.From("tags", Tag.Type).
+			Through("node_tags", TagNode.Type).
 			Ref("nodes"),
 
 		edge.From("link", Link.Type).

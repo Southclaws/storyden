@@ -791,6 +791,82 @@ var (
 		Columns:    TagsColumns,
 		PrimaryKey: []*schema.Column{TagsColumns[0]},
 	}
+	// TagNodesColumns holds the columns for the "tag_nodes" table.
+	TagNodesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "tag_id", Type: field.TypeString, Size: 20},
+		{Name: "node_id", Type: field.TypeString, Size: 20},
+	}
+	// TagNodesTable holds the schema information for the "tag_nodes" table.
+	TagNodesTable = &schema.Table{
+		Name:       "tag_nodes",
+		Columns:    TagNodesColumns,
+		PrimaryKey: []*schema.Column{TagNodesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "tag_nodes_tags_tag",
+				Columns:    []*schema.Column{TagNodesColumns[1]},
+				RefColumns: []*schema.Column{TagsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "tag_nodes_nodes_node",
+				Columns:    []*schema.Column{TagNodesColumns[2]},
+				RefColumns: []*schema.Column{NodesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "tagnode_node_id",
+				Unique:  false,
+				Columns: []*schema.Column{TagNodesColumns[2]},
+			},
+			{
+				Name:    "tagnode_tag_id_node_id",
+				Unique:  true,
+				Columns: []*schema.Column{TagNodesColumns[1], TagNodesColumns[2]},
+			},
+		},
+	}
+	// TagPostsColumns holds the columns for the "tag_posts" table.
+	TagPostsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "tag_id", Type: field.TypeString, Size: 20},
+		{Name: "post_id", Type: field.TypeString, Size: 20},
+	}
+	// TagPostsTable holds the schema information for the "tag_posts" table.
+	TagPostsTable = &schema.Table{
+		Name:       "tag_posts",
+		Columns:    TagPostsColumns,
+		PrimaryKey: []*schema.Column{TagPostsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "tag_posts_tags_tag",
+				Columns:    []*schema.Column{TagPostsColumns[1]},
+				RefColumns: []*schema.Column{TagsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "tag_posts_posts_post",
+				Columns:    []*schema.Column{TagPostsColumns[2]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "tagpost_post_id",
+				Unique:  false,
+				Columns: []*schema.Column{TagPostsColumns[2]},
+			},
+			{
+				Name:    "tagpost_tag_id_post_id",
+				Unique:  true,
+				Columns: []*schema.Column{TagPostsColumns[1], TagPostsColumns[2]},
+			},
+		},
+	}
 	// AccountTagsColumns holds the columns for the "account_tags" table.
 	AccountTagsColumns = []*schema.Column{
 		{Name: "account_id", Type: field.TypeString, Size: 20},
@@ -941,56 +1017,6 @@ var (
 			},
 		},
 	}
-	// TagPostsColumns holds the columns for the "tag_posts" table.
-	TagPostsColumns = []*schema.Column{
-		{Name: "tag_id", Type: field.TypeString, Size: 20},
-		{Name: "post_id", Type: field.TypeString, Size: 20},
-	}
-	// TagPostsTable holds the schema information for the "tag_posts" table.
-	TagPostsTable = &schema.Table{
-		Name:       "tag_posts",
-		Columns:    TagPostsColumns,
-		PrimaryKey: []*schema.Column{TagPostsColumns[0], TagPostsColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "tag_posts_tag_id",
-				Columns:    []*schema.Column{TagPostsColumns[0]},
-				RefColumns: []*schema.Column{TagsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "tag_posts_post_id",
-				Columns:    []*schema.Column{TagPostsColumns[1]},
-				RefColumns: []*schema.Column{PostsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// TagNodesColumns holds the columns for the "tag_nodes" table.
-	TagNodesColumns = []*schema.Column{
-		{Name: "tag_id", Type: field.TypeString, Size: 20},
-		{Name: "node_id", Type: field.TypeString, Size: 20},
-	}
-	// TagNodesTable holds the schema information for the "tag_nodes" table.
-	TagNodesTable = &schema.Table{
-		Name:       "tag_nodes",
-		Columns:    TagNodesColumns,
-		PrimaryKey: []*schema.Column{TagNodesColumns[0], TagNodesColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "tag_nodes_tag_id",
-				Columns:    []*schema.Column{TagNodesColumns[0]},
-				RefColumns: []*schema.Column{TagsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "tag_nodes_node_id",
-				Columns:    []*schema.Column{TagNodesColumns[1]},
-				RefColumns: []*schema.Column{NodesColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AccountsTable,
@@ -1017,14 +1043,14 @@ var (
 		RolesTable,
 		SettingsTable,
 		TagsTable,
+		TagNodesTable,
+		TagPostsTable,
 		AccountTagsTable,
 		LinkPostContentReferencesTable,
 		LinkNodeContentReferencesTable,
 		LinkAssetsTable,
 		NodeAssetsTable,
 		PostAssetsTable,
-		TagPostsTable,
-		TagNodesTable,
 	}
 )
 
@@ -1069,6 +1095,10 @@ func init() {
 	QuestionsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
+	TagNodesTable.ForeignKeys[0].RefTable = TagsTable
+	TagNodesTable.ForeignKeys[1].RefTable = NodesTable
+	TagPostsTable.ForeignKeys[0].RefTable = TagsTable
+	TagPostsTable.ForeignKeys[1].RefTable = PostsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
 	AccountTagsTable.Annotation = &entsql.Annotation{}
@@ -1082,8 +1112,4 @@ func init() {
 	NodeAssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	PostAssetsTable.ForeignKeys[0].RefTable = PostsTable
 	PostAssetsTable.ForeignKeys[1].RefTable = AssetsTable
-	TagPostsTable.ForeignKeys[0].RefTable = TagsTable
-	TagPostsTable.ForeignKeys[1].RefTable = PostsTable
-	TagNodesTable.ForeignKeys[0].RefTable = TagsTable
-	TagNodesTable.ForeignKeys[1].RefTable = NodesTable
 }

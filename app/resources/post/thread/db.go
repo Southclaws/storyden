@@ -36,6 +36,7 @@ import (
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	ent_react "github.com/Southclaws/storyden/internal/ent/react"
 	ent_tag "github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/tagpost"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
@@ -400,7 +401,7 @@ func (d *database) Get(ctx context.Context, threadID post.ID, pageParams paginat
 		ctx, span := d.ins.InstrumentNamed(ctx, "thread_tags")
 		defer span.End()
 
-		tagsResult, err := d.db.Tag.Query().Where(ent_tag.HasPostsWith(ent_post.ID(xid.ID(threadID)))).All(ctx)
+		tagsResult, err := d.db.Tag.Query().Where(ent_tag.HasPostTagsWith(tagpost.PostID(xid.ID(threadID)))).All(ctx)
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}

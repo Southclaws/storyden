@@ -62,6 +62,8 @@ const (
 	EdgeContentLinks = "content_links"
 	// EdgeCollections holds the string denoting the collections edge name in mutations.
 	EdgeCollections = "collections"
+	// EdgeNodeTags holds the string denoting the node_tags edge name in mutations.
+	EdgeNodeTags = "node_tags"
 	// EdgeCollectionNodes holds the string denoting the collection_nodes edge name in mutations.
 	EdgeCollectionNodes = "collection_nodes"
 	// Table holds the table name of the node in the database.
@@ -115,6 +117,13 @@ const (
 	// CollectionsInverseTable is the table name for the Collection entity.
 	// It exists in this package in order to avoid circular dependency with the "collection" package.
 	CollectionsInverseTable = "collections"
+	// NodeTagsTable is the table that holds the node_tags relation/edge.
+	NodeTagsTable = "tag_nodes"
+	// NodeTagsInverseTable is the table name for the TagNode entity.
+	// It exists in this package in order to avoid circular dependency with the "tagnode" package.
+	NodeTagsInverseTable = "tag_nodes"
+	// NodeTagsColumn is the table column denoting the node_tags relation/edge.
+	NodeTagsColumn = "node_id"
 	// CollectionNodesTable is the table that holds the collection_nodes relation/edge.
 	CollectionNodesTable = "collection_nodes"
 	// CollectionNodesInverseTable is the table name for the CollectionNode entity.
@@ -380,6 +389,20 @@ func ByCollections(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByNodeTagsCount orders the results by node_tags count.
+func ByNodeTagsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newNodeTagsStep(), opts...)
+	}
+}
+
+// ByNodeTags orders the results by node_tags terms.
+func ByNodeTags(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNodeTagsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByCollectionNodesCount orders the results by collection_nodes count.
 func ByCollectionNodesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -454,6 +477,13 @@ func newCollectionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CollectionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, CollectionsTable, CollectionsPrimaryKey...),
+	)
+}
+func newNodeTagsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NodeTagsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, NodeTagsTable, NodeTagsColumn),
 	)
 }
 func newCollectionNodesStep() *sqlgraph.Step {

@@ -37,6 +37,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/tagnode"
+	"github.com/Southclaws/storyden/internal/ent/tagpost"
 	"github.com/rs/xid"
 )
 
@@ -73,6 +75,8 @@ const (
 	TypeRole             = "Role"
 	TypeSetting          = "Setting"
 	TypeTag              = "Tag"
+	TypeTagNode          = "TagNode"
+	TypeTagPost          = "TagPost"
 )
 
 // AccountMutation represents an operation that mutates the Account nodes in the graph.
@@ -15180,6 +15184,9 @@ type NodeMutation struct {
 	collections          map[xid.ID]struct{}
 	removedcollections   map[xid.ID]struct{}
 	clearedcollections   bool
+	node_tags            map[xid.ID]struct{}
+	removednode_tags     map[xid.ID]struct{}
+	clearednode_tags     bool
 	done                 bool
 	oldValue             func(context.Context) (*Node, error)
 	predicates           []predicate.Node
@@ -16314,6 +16321,60 @@ func (m *NodeMutation) ResetCollections() {
 	m.removedcollections = nil
 }
 
+// AddNodeTagIDs adds the "node_tags" edge to the TagNode entity by ids.
+func (m *NodeMutation) AddNodeTagIDs(ids ...xid.ID) {
+	if m.node_tags == nil {
+		m.node_tags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.node_tags[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodeTags clears the "node_tags" edge to the TagNode entity.
+func (m *NodeMutation) ClearNodeTags() {
+	m.clearednode_tags = true
+}
+
+// NodeTagsCleared reports if the "node_tags" edge to the TagNode entity was cleared.
+func (m *NodeMutation) NodeTagsCleared() bool {
+	return m.clearednode_tags
+}
+
+// RemoveNodeTagIDs removes the "node_tags" edge to the TagNode entity by IDs.
+func (m *NodeMutation) RemoveNodeTagIDs(ids ...xid.ID) {
+	if m.removednode_tags == nil {
+		m.removednode_tags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.node_tags, ids[i])
+		m.removednode_tags[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodeTags returns the removed IDs of the "node_tags" edge to the TagNode entity.
+func (m *NodeMutation) RemovedNodeTagsIDs() (ids []xid.ID) {
+	for id := range m.removednode_tags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodeTagsIDs returns the "node_tags" edge IDs in the mutation.
+func (m *NodeMutation) NodeTagsIDs() (ids []xid.ID) {
+	for id := range m.node_tags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodeTags resets all changes to the "node_tags" edge.
+func (m *NodeMutation) ResetNodeTags() {
+	m.node_tags = nil
+	m.clearednode_tags = false
+	m.removednode_tags = nil
+}
+
 // Where appends a list predicates to the NodeMutation builder.
 func (m *NodeMutation) Where(ps ...predicate.Node) {
 	m.predicates = append(m.predicates, ps...)
@@ -16719,7 +16780,7 @@ func (m *NodeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *NodeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 10)
 	if m.owner != nil {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -16746,6 +16807,9 @@ func (m *NodeMutation) AddedEdges() []string {
 	}
 	if m.collections != nil {
 		edges = append(edges, node.EdgeCollections)
+	}
+	if m.node_tags != nil {
+		edges = append(edges, node.EdgeNodeTags)
 	}
 	return edges
 }
@@ -16800,13 +16864,19 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case node.EdgeNodeTags:
+		ids := make([]ent.Value, 0, len(m.node_tags))
+		for id := range m.node_tags {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NodeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 10)
 	if m.removednodes != nil {
 		edges = append(edges, node.EdgeNodes)
 	}
@@ -16821,6 +16891,9 @@ func (m *NodeMutation) RemovedEdges() []string {
 	}
 	if m.removedcollections != nil {
 		edges = append(edges, node.EdgeCollections)
+	}
+	if m.removednode_tags != nil {
+		edges = append(edges, node.EdgeNodeTags)
 	}
 	return edges
 }
@@ -16859,13 +16932,19 @@ func (m *NodeMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case node.EdgeNodeTags:
+		ids := make([]ent.Value, 0, len(m.removednode_tags))
+		for id := range m.removednode_tags {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *NodeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 9)
+	edges := make([]string, 0, 10)
 	if m.clearedowner {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -16893,6 +16972,9 @@ func (m *NodeMutation) ClearedEdges() []string {
 	if m.clearedcollections {
 		edges = append(edges, node.EdgeCollections)
 	}
+	if m.clearednode_tags {
+		edges = append(edges, node.EdgeNodeTags)
+	}
 	return edges
 }
 
@@ -16918,6 +17000,8 @@ func (m *NodeMutation) EdgeCleared(name string) bool {
 		return m.clearedcontent_links
 	case node.EdgeCollections:
 		return m.clearedcollections
+	case node.EdgeNodeTags:
+		return m.clearednode_tags
 	}
 	return false
 }
@@ -16972,6 +17056,9 @@ func (m *NodeMutation) ResetEdge(name string) error {
 		return nil
 	case node.EdgeCollections:
 		m.ResetCollections()
+		return nil
+	case node.EdgeNodeTags:
+		m.ResetNodeTags()
 		return nil
 	}
 	return fmt.Errorf("unknown Node edge %s", name)
@@ -17951,6 +18038,9 @@ type PostMutation struct {
 	event                map[xid.ID]struct{}
 	removedevent         map[xid.ID]struct{}
 	clearedevent         bool
+	post_tags            map[xid.ID]struct{}
+	removedpost_tags     map[xid.ID]struct{}
+	clearedpost_tags     bool
 	done                 bool
 	oldValue             func(context.Context) (*Post, error)
 	predicates           []predicate.Post
@@ -19503,6 +19593,60 @@ func (m *PostMutation) ResetEvent() {
 	m.removedevent = nil
 }
 
+// AddPostTagIDs adds the "post_tags" edge to the TagPost entity by ids.
+func (m *PostMutation) AddPostTagIDs(ids ...xid.ID) {
+	if m.post_tags == nil {
+		m.post_tags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.post_tags[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPostTags clears the "post_tags" edge to the TagPost entity.
+func (m *PostMutation) ClearPostTags() {
+	m.clearedpost_tags = true
+}
+
+// PostTagsCleared reports if the "post_tags" edge to the TagPost entity was cleared.
+func (m *PostMutation) PostTagsCleared() bool {
+	return m.clearedpost_tags
+}
+
+// RemovePostTagIDs removes the "post_tags" edge to the TagPost entity by IDs.
+func (m *PostMutation) RemovePostTagIDs(ids ...xid.ID) {
+	if m.removedpost_tags == nil {
+		m.removedpost_tags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.post_tags, ids[i])
+		m.removedpost_tags[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPostTags returns the removed IDs of the "post_tags" edge to the TagPost entity.
+func (m *PostMutation) RemovedPostTagsIDs() (ids []xid.ID) {
+	for id := range m.removedpost_tags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PostTagsIDs returns the "post_tags" edge IDs in the mutation.
+func (m *PostMutation) PostTagsIDs() (ids []xid.ID) {
+	for id := range m.post_tags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPostTags resets all changes to the "post_tags" edge.
+func (m *PostMutation) ResetPostTags() {
+	m.post_tags = nil
+	m.clearedpost_tags = false
+	m.removedpost_tags = nil
+}
+
 // Where appends a list predicates to the PostMutation builder.
 func (m *PostMutation) Where(ps ...predicate.Post) {
 	m.predicates = append(m.predicates, ps...)
@@ -19965,7 +20109,7 @@ func (m *PostMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PostMutation) AddedEdges() []string {
-	edges := make([]string, 0, 15)
+	edges := make([]string, 0, 16)
 	if m.author != nil {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -20010,6 +20154,9 @@ func (m *PostMutation) AddedEdges() []string {
 	}
 	if m.event != nil {
 		edges = append(edges, post.EdgeEvent)
+	}
+	if m.post_tags != nil {
+		edges = append(edges, post.EdgePostTags)
 	}
 	return edges
 }
@@ -20098,13 +20245,19 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgePostTags:
+		ids := make([]ent.Value, 0, len(m.post_tags))
+		for id := range m.post_tags {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PostMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 15)
+	edges := make([]string, 0, 16)
 	if m.removedtags != nil {
 		edges = append(edges, post.EdgeTags)
 	}
@@ -20134,6 +20287,9 @@ func (m *PostMutation) RemovedEdges() []string {
 	}
 	if m.removedevent != nil {
 		edges = append(edges, post.EdgeEvent)
+	}
+	if m.removedpost_tags != nil {
+		edges = append(edges, post.EdgePostTags)
 	}
 	return edges
 }
@@ -20202,13 +20358,19 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgePostTags:
+		ids := make([]ent.Value, 0, len(m.removedpost_tags))
+		for id := range m.removedpost_tags {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PostMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 15)
+	edges := make([]string, 0, 16)
 	if m.clearedauthor {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -20254,6 +20416,9 @@ func (m *PostMutation) ClearedEdges() []string {
 	if m.clearedevent {
 		edges = append(edges, post.EdgeEvent)
 	}
+	if m.clearedpost_tags {
+		edges = append(edges, post.EdgePostTags)
+	}
 	return edges
 }
 
@@ -20291,6 +20456,8 @@ func (m *PostMutation) EdgeCleared(name string) bool {
 		return m.clearedcontent_links
 	case post.EdgeEvent:
 		return m.clearedevent
+	case post.EdgePostTags:
+		return m.clearedpost_tags
 	}
 	return false
 }
@@ -20366,6 +20533,9 @@ func (m *PostMutation) ResetEdge(name string) error {
 		return nil
 	case post.EdgeEvent:
 		m.ResetEvent()
+		return nil
+	case post.EdgePostTags:
+		m.ResetPostTags()
 		return nil
 	}
 	return fmt.Errorf("unknown Post edge %s", name)
@@ -22967,24 +23137,30 @@ func (m *SettingMutation) ResetEdge(name string) error {
 // TagMutation represents an operation that mutates the Tag nodes in the graph.
 type TagMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *xid.ID
-	created_at      *time.Time
-	name            *string
-	clearedFields   map[string]struct{}
-	posts           map[xid.ID]struct{}
-	removedposts    map[xid.ID]struct{}
-	clearedposts    bool
-	nodes           map[xid.ID]struct{}
-	removednodes    map[xid.ID]struct{}
-	clearednodes    bool
-	accounts        map[xid.ID]struct{}
-	removedaccounts map[xid.ID]struct{}
-	clearedaccounts bool
-	done            bool
-	oldValue        func(context.Context) (*Tag, error)
-	predicates      []predicate.Tag
+	op               Op
+	typ              string
+	id               *xid.ID
+	created_at       *time.Time
+	name             *string
+	clearedFields    map[string]struct{}
+	posts            map[xid.ID]struct{}
+	removedposts     map[xid.ID]struct{}
+	clearedposts     bool
+	nodes            map[xid.ID]struct{}
+	removednodes     map[xid.ID]struct{}
+	clearednodes     bool
+	accounts         map[xid.ID]struct{}
+	removedaccounts  map[xid.ID]struct{}
+	clearedaccounts  bool
+	post_tags        map[xid.ID]struct{}
+	removedpost_tags map[xid.ID]struct{}
+	clearedpost_tags bool
+	node_tags        map[xid.ID]struct{}
+	removednode_tags map[xid.ID]struct{}
+	clearednode_tags bool
+	done             bool
+	oldValue         func(context.Context) (*Tag, error)
+	predicates       []predicate.Tag
 }
 
 var _ ent.Mutation = (*TagMutation)(nil)
@@ -23325,6 +23501,114 @@ func (m *TagMutation) ResetAccounts() {
 	m.removedaccounts = nil
 }
 
+// AddPostTagIDs adds the "post_tags" edge to the TagPost entity by ids.
+func (m *TagMutation) AddPostTagIDs(ids ...xid.ID) {
+	if m.post_tags == nil {
+		m.post_tags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.post_tags[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPostTags clears the "post_tags" edge to the TagPost entity.
+func (m *TagMutation) ClearPostTags() {
+	m.clearedpost_tags = true
+}
+
+// PostTagsCleared reports if the "post_tags" edge to the TagPost entity was cleared.
+func (m *TagMutation) PostTagsCleared() bool {
+	return m.clearedpost_tags
+}
+
+// RemovePostTagIDs removes the "post_tags" edge to the TagPost entity by IDs.
+func (m *TagMutation) RemovePostTagIDs(ids ...xid.ID) {
+	if m.removedpost_tags == nil {
+		m.removedpost_tags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.post_tags, ids[i])
+		m.removedpost_tags[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPostTags returns the removed IDs of the "post_tags" edge to the TagPost entity.
+func (m *TagMutation) RemovedPostTagsIDs() (ids []xid.ID) {
+	for id := range m.removedpost_tags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PostTagsIDs returns the "post_tags" edge IDs in the mutation.
+func (m *TagMutation) PostTagsIDs() (ids []xid.ID) {
+	for id := range m.post_tags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPostTags resets all changes to the "post_tags" edge.
+func (m *TagMutation) ResetPostTags() {
+	m.post_tags = nil
+	m.clearedpost_tags = false
+	m.removedpost_tags = nil
+}
+
+// AddNodeTagIDs adds the "node_tags" edge to the TagNode entity by ids.
+func (m *TagMutation) AddNodeTagIDs(ids ...xid.ID) {
+	if m.node_tags == nil {
+		m.node_tags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.node_tags[ids[i]] = struct{}{}
+	}
+}
+
+// ClearNodeTags clears the "node_tags" edge to the TagNode entity.
+func (m *TagMutation) ClearNodeTags() {
+	m.clearednode_tags = true
+}
+
+// NodeTagsCleared reports if the "node_tags" edge to the TagNode entity was cleared.
+func (m *TagMutation) NodeTagsCleared() bool {
+	return m.clearednode_tags
+}
+
+// RemoveNodeTagIDs removes the "node_tags" edge to the TagNode entity by IDs.
+func (m *TagMutation) RemoveNodeTagIDs(ids ...xid.ID) {
+	if m.removednode_tags == nil {
+		m.removednode_tags = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.node_tags, ids[i])
+		m.removednode_tags[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedNodeTags returns the removed IDs of the "node_tags" edge to the TagNode entity.
+func (m *TagMutation) RemovedNodeTagsIDs() (ids []xid.ID) {
+	for id := range m.removednode_tags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// NodeTagsIDs returns the "node_tags" edge IDs in the mutation.
+func (m *TagMutation) NodeTagsIDs() (ids []xid.ID) {
+	for id := range m.node_tags {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetNodeTags resets all changes to the "node_tags" edge.
+func (m *TagMutation) ResetNodeTags() {
+	m.node_tags = nil
+	m.clearednode_tags = false
+	m.removednode_tags = nil
+}
+
 // Where appends a list predicates to the TagMutation builder.
 func (m *TagMutation) Where(ps ...predicate.Tag) {
 	m.predicates = append(m.predicates, ps...)
@@ -23475,7 +23759,7 @@ func (m *TagMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TagMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
 	if m.posts != nil {
 		edges = append(edges, tag.EdgePosts)
 	}
@@ -23484,6 +23768,12 @@ func (m *TagMutation) AddedEdges() []string {
 	}
 	if m.accounts != nil {
 		edges = append(edges, tag.EdgeAccounts)
+	}
+	if m.post_tags != nil {
+		edges = append(edges, tag.EdgePostTags)
+	}
+	if m.node_tags != nil {
+		edges = append(edges, tag.EdgeNodeTags)
 	}
 	return edges
 }
@@ -23510,13 +23800,25 @@ func (m *TagMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case tag.EdgePostTags:
+		ids := make([]ent.Value, 0, len(m.post_tags))
+		for id := range m.post_tags {
+			ids = append(ids, id)
+		}
+		return ids
+	case tag.EdgeNodeTags:
+		ids := make([]ent.Value, 0, len(m.node_tags))
+		for id := range m.node_tags {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TagMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
 	if m.removedposts != nil {
 		edges = append(edges, tag.EdgePosts)
 	}
@@ -23525,6 +23827,12 @@ func (m *TagMutation) RemovedEdges() []string {
 	}
 	if m.removedaccounts != nil {
 		edges = append(edges, tag.EdgeAccounts)
+	}
+	if m.removedpost_tags != nil {
+		edges = append(edges, tag.EdgePostTags)
+	}
+	if m.removednode_tags != nil {
+		edges = append(edges, tag.EdgeNodeTags)
 	}
 	return edges
 }
@@ -23551,13 +23859,25 @@ func (m *TagMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case tag.EdgePostTags:
+		ids := make([]ent.Value, 0, len(m.removedpost_tags))
+		for id := range m.removedpost_tags {
+			ids = append(ids, id)
+		}
+		return ids
+	case tag.EdgeNodeTags:
+		ids := make([]ent.Value, 0, len(m.removednode_tags))
+		for id := range m.removednode_tags {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TagMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
 	if m.clearedposts {
 		edges = append(edges, tag.EdgePosts)
 	}
@@ -23566,6 +23886,12 @@ func (m *TagMutation) ClearedEdges() []string {
 	}
 	if m.clearedaccounts {
 		edges = append(edges, tag.EdgeAccounts)
+	}
+	if m.clearedpost_tags {
+		edges = append(edges, tag.EdgePostTags)
+	}
+	if m.clearednode_tags {
+		edges = append(edges, tag.EdgeNodeTags)
 	}
 	return edges
 }
@@ -23580,6 +23906,10 @@ func (m *TagMutation) EdgeCleared(name string) bool {
 		return m.clearednodes
 	case tag.EdgeAccounts:
 		return m.clearedaccounts
+	case tag.EdgePostTags:
+		return m.clearedpost_tags
+	case tag.EdgeNodeTags:
+		return m.clearednode_tags
 	}
 	return false
 }
@@ -23605,6 +23935,984 @@ func (m *TagMutation) ResetEdge(name string) error {
 	case tag.EdgeAccounts:
 		m.ResetAccounts()
 		return nil
+	case tag.EdgePostTags:
+		m.ResetPostTags()
+		return nil
+	case tag.EdgeNodeTags:
+		m.ResetNodeTags()
+		return nil
 	}
 	return fmt.Errorf("unknown Tag edge %s", name)
+}
+
+// TagNodeMutation represents an operation that mutates the TagNode nodes in the graph.
+type TagNodeMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *xid.ID
+	clearedFields map[string]struct{}
+	tag           *xid.ID
+	clearedtag    bool
+	node          *xid.ID
+	clearednode   bool
+	done          bool
+	oldValue      func(context.Context) (*TagNode, error)
+	predicates    []predicate.TagNode
+}
+
+var _ ent.Mutation = (*TagNodeMutation)(nil)
+
+// tagnodeOption allows management of the mutation configuration using functional options.
+type tagnodeOption func(*TagNodeMutation)
+
+// newTagNodeMutation creates new mutation for the TagNode entity.
+func newTagNodeMutation(c config, op Op, opts ...tagnodeOption) *TagNodeMutation {
+	m := &TagNodeMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTagNode,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTagNodeID sets the ID field of the mutation.
+func withTagNodeID(id xid.ID) tagnodeOption {
+	return func(m *TagNodeMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *TagNode
+		)
+		m.oldValue = func(ctx context.Context) (*TagNode, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().TagNode.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTagNode sets the old TagNode of the mutation.
+func withTagNode(node *TagNode) tagnodeOption {
+	return func(m *TagNodeMutation) {
+		m.oldValue = func(context.Context) (*TagNode, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TagNodeMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TagNodeMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of TagNode entities.
+func (m *TagNodeMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TagNodeMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TagNodeMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().TagNode.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTagID sets the "tag_id" field.
+func (m *TagNodeMutation) SetTagID(x xid.ID) {
+	m.tag = &x
+}
+
+// TagID returns the value of the "tag_id" field in the mutation.
+func (m *TagNodeMutation) TagID() (r xid.ID, exists bool) {
+	v := m.tag
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTagID returns the old "tag_id" field's value of the TagNode entity.
+// If the TagNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TagNodeMutation) OldTagID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTagID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTagID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTagID: %w", err)
+	}
+	return oldValue.TagID, nil
+}
+
+// ResetTagID resets all changes to the "tag_id" field.
+func (m *TagNodeMutation) ResetTagID() {
+	m.tag = nil
+}
+
+// SetNodeID sets the "node_id" field.
+func (m *TagNodeMutation) SetNodeID(x xid.ID) {
+	m.node = &x
+}
+
+// NodeID returns the value of the "node_id" field in the mutation.
+func (m *TagNodeMutation) NodeID() (r xid.ID, exists bool) {
+	v := m.node
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldNodeID returns the old "node_id" field's value of the TagNode entity.
+// If the TagNode object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TagNodeMutation) OldNodeID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldNodeID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldNodeID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldNodeID: %w", err)
+	}
+	return oldValue.NodeID, nil
+}
+
+// ResetNodeID resets all changes to the "node_id" field.
+func (m *TagNodeMutation) ResetNodeID() {
+	m.node = nil
+}
+
+// ClearTag clears the "tag" edge to the Tag entity.
+func (m *TagNodeMutation) ClearTag() {
+	m.clearedtag = true
+	m.clearedFields[tagnode.FieldTagID] = struct{}{}
+}
+
+// TagCleared reports if the "tag" edge to the Tag entity was cleared.
+func (m *TagNodeMutation) TagCleared() bool {
+	return m.clearedtag
+}
+
+// TagIDs returns the "tag" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TagID instead. It exists only for internal usage by the builders.
+func (m *TagNodeMutation) TagIDs() (ids []xid.ID) {
+	if id := m.tag; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTag resets all changes to the "tag" edge.
+func (m *TagNodeMutation) ResetTag() {
+	m.tag = nil
+	m.clearedtag = false
+}
+
+// ClearNode clears the "node" edge to the Node entity.
+func (m *TagNodeMutation) ClearNode() {
+	m.clearednode = true
+	m.clearedFields[tagnode.FieldNodeID] = struct{}{}
+}
+
+// NodeCleared reports if the "node" edge to the Node entity was cleared.
+func (m *TagNodeMutation) NodeCleared() bool {
+	return m.clearednode
+}
+
+// NodeIDs returns the "node" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// NodeID instead. It exists only for internal usage by the builders.
+func (m *TagNodeMutation) NodeIDs() (ids []xid.ID) {
+	if id := m.node; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetNode resets all changes to the "node" edge.
+func (m *TagNodeMutation) ResetNode() {
+	m.node = nil
+	m.clearednode = false
+}
+
+// Where appends a list predicates to the TagNodeMutation builder.
+func (m *TagNodeMutation) Where(ps ...predicate.TagNode) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TagNodeMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TagNodeMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.TagNode, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TagNodeMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TagNodeMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (TagNode).
+func (m *TagNodeMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TagNodeMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.tag != nil {
+		fields = append(fields, tagnode.FieldTagID)
+	}
+	if m.node != nil {
+		fields = append(fields, tagnode.FieldNodeID)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TagNodeMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case tagnode.FieldTagID:
+		return m.TagID()
+	case tagnode.FieldNodeID:
+		return m.NodeID()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TagNodeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case tagnode.FieldTagID:
+		return m.OldTagID(ctx)
+	case tagnode.FieldNodeID:
+		return m.OldNodeID(ctx)
+	}
+	return nil, fmt.Errorf("unknown TagNode field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TagNodeMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case tagnode.FieldTagID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTagID(v)
+		return nil
+	case tagnode.FieldNodeID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNodeID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TagNode field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TagNodeMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TagNodeMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TagNodeMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown TagNode numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TagNodeMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TagNodeMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TagNodeMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown TagNode nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TagNodeMutation) ResetField(name string) error {
+	switch name {
+	case tagnode.FieldTagID:
+		m.ResetTagID()
+		return nil
+	case tagnode.FieldNodeID:
+		m.ResetNodeID()
+		return nil
+	}
+	return fmt.Errorf("unknown TagNode field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TagNodeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.tag != nil {
+		edges = append(edges, tagnode.EdgeTag)
+	}
+	if m.node != nil {
+		edges = append(edges, tagnode.EdgeNode)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TagNodeMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case tagnode.EdgeTag:
+		if id := m.tag; id != nil {
+			return []ent.Value{*id}
+		}
+	case tagnode.EdgeNode:
+		if id := m.node; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TagNodeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TagNodeMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TagNodeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedtag {
+		edges = append(edges, tagnode.EdgeTag)
+	}
+	if m.clearednode {
+		edges = append(edges, tagnode.EdgeNode)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TagNodeMutation) EdgeCleared(name string) bool {
+	switch name {
+	case tagnode.EdgeTag:
+		return m.clearedtag
+	case tagnode.EdgeNode:
+		return m.clearednode
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TagNodeMutation) ClearEdge(name string) error {
+	switch name {
+	case tagnode.EdgeTag:
+		m.ClearTag()
+		return nil
+	case tagnode.EdgeNode:
+		m.ClearNode()
+		return nil
+	}
+	return fmt.Errorf("unknown TagNode unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TagNodeMutation) ResetEdge(name string) error {
+	switch name {
+	case tagnode.EdgeTag:
+		m.ResetTag()
+		return nil
+	case tagnode.EdgeNode:
+		m.ResetNode()
+		return nil
+	}
+	return fmt.Errorf("unknown TagNode edge %s", name)
+}
+
+// TagPostMutation represents an operation that mutates the TagPost nodes in the graph.
+type TagPostMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *xid.ID
+	clearedFields map[string]struct{}
+	tag           *xid.ID
+	clearedtag    bool
+	post          *xid.ID
+	clearedpost   bool
+	done          bool
+	oldValue      func(context.Context) (*TagPost, error)
+	predicates    []predicate.TagPost
+}
+
+var _ ent.Mutation = (*TagPostMutation)(nil)
+
+// tagpostOption allows management of the mutation configuration using functional options.
+type tagpostOption func(*TagPostMutation)
+
+// newTagPostMutation creates new mutation for the TagPost entity.
+func newTagPostMutation(c config, op Op, opts ...tagpostOption) *TagPostMutation {
+	m := &TagPostMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeTagPost,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withTagPostID sets the ID field of the mutation.
+func withTagPostID(id xid.ID) tagpostOption {
+	return func(m *TagPostMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *TagPost
+		)
+		m.oldValue = func(ctx context.Context) (*TagPost, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().TagPost.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withTagPost sets the old TagPost of the mutation.
+func withTagPost(node *TagPost) tagpostOption {
+	return func(m *TagPostMutation) {
+		m.oldValue = func(context.Context) (*TagPost, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m TagPostMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m TagPostMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of TagPost entities.
+func (m *TagPostMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *TagPostMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *TagPostMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().TagPost.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetTagID sets the "tag_id" field.
+func (m *TagPostMutation) SetTagID(x xid.ID) {
+	m.tag = &x
+}
+
+// TagID returns the value of the "tag_id" field in the mutation.
+func (m *TagPostMutation) TagID() (r xid.ID, exists bool) {
+	v := m.tag
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTagID returns the old "tag_id" field's value of the TagPost entity.
+// If the TagPost object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TagPostMutation) OldTagID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTagID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTagID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTagID: %w", err)
+	}
+	return oldValue.TagID, nil
+}
+
+// ResetTagID resets all changes to the "tag_id" field.
+func (m *TagPostMutation) ResetTagID() {
+	m.tag = nil
+}
+
+// SetPostID sets the "post_id" field.
+func (m *TagPostMutation) SetPostID(x xid.ID) {
+	m.post = &x
+}
+
+// PostID returns the value of the "post_id" field in the mutation.
+func (m *TagPostMutation) PostID() (r xid.ID, exists bool) {
+	v := m.post
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPostID returns the old "post_id" field's value of the TagPost entity.
+// If the TagPost object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *TagPostMutation) OldPostID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPostID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPostID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPostID: %w", err)
+	}
+	return oldValue.PostID, nil
+}
+
+// ResetPostID resets all changes to the "post_id" field.
+func (m *TagPostMutation) ResetPostID() {
+	m.post = nil
+}
+
+// ClearTag clears the "tag" edge to the Tag entity.
+func (m *TagPostMutation) ClearTag() {
+	m.clearedtag = true
+	m.clearedFields[tagpost.FieldTagID] = struct{}{}
+}
+
+// TagCleared reports if the "tag" edge to the Tag entity was cleared.
+func (m *TagPostMutation) TagCleared() bool {
+	return m.clearedtag
+}
+
+// TagIDs returns the "tag" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// TagID instead. It exists only for internal usage by the builders.
+func (m *TagPostMutation) TagIDs() (ids []xid.ID) {
+	if id := m.tag; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetTag resets all changes to the "tag" edge.
+func (m *TagPostMutation) ResetTag() {
+	m.tag = nil
+	m.clearedtag = false
+}
+
+// ClearPost clears the "post" edge to the Post entity.
+func (m *TagPostMutation) ClearPost() {
+	m.clearedpost = true
+	m.clearedFields[tagpost.FieldPostID] = struct{}{}
+}
+
+// PostCleared reports if the "post" edge to the Post entity was cleared.
+func (m *TagPostMutation) PostCleared() bool {
+	return m.clearedpost
+}
+
+// PostIDs returns the "post" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PostID instead. It exists only for internal usage by the builders.
+func (m *TagPostMutation) PostIDs() (ids []xid.ID) {
+	if id := m.post; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPost resets all changes to the "post" edge.
+func (m *TagPostMutation) ResetPost() {
+	m.post = nil
+	m.clearedpost = false
+}
+
+// Where appends a list predicates to the TagPostMutation builder.
+func (m *TagPostMutation) Where(ps ...predicate.TagPost) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the TagPostMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *TagPostMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.TagPost, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *TagPostMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *TagPostMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (TagPost).
+func (m *TagPostMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *TagPostMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.tag != nil {
+		fields = append(fields, tagpost.FieldTagID)
+	}
+	if m.post != nil {
+		fields = append(fields, tagpost.FieldPostID)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *TagPostMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case tagpost.FieldTagID:
+		return m.TagID()
+	case tagpost.FieldPostID:
+		return m.PostID()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *TagPostMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case tagpost.FieldTagID:
+		return m.OldTagID(ctx)
+	case tagpost.FieldPostID:
+		return m.OldPostID(ctx)
+	}
+	return nil, fmt.Errorf("unknown TagPost field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TagPostMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case tagpost.FieldTagID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTagID(v)
+		return nil
+	case tagpost.FieldPostID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPostID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown TagPost field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *TagPostMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *TagPostMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *TagPostMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown TagPost numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *TagPostMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *TagPostMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *TagPostMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown TagPost nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *TagPostMutation) ResetField(name string) error {
+	switch name {
+	case tagpost.FieldTagID:
+		m.ResetTagID()
+		return nil
+	case tagpost.FieldPostID:
+		m.ResetPostID()
+		return nil
+	}
+	return fmt.Errorf("unknown TagPost field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *TagPostMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.tag != nil {
+		edges = append(edges, tagpost.EdgeTag)
+	}
+	if m.post != nil {
+		edges = append(edges, tagpost.EdgePost)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *TagPostMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case tagpost.EdgeTag:
+		if id := m.tag; id != nil {
+			return []ent.Value{*id}
+		}
+	case tagpost.EdgePost:
+		if id := m.post; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *TagPostMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *TagPostMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *TagPostMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedtag {
+		edges = append(edges, tagpost.EdgeTag)
+	}
+	if m.clearedpost {
+		edges = append(edges, tagpost.EdgePost)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *TagPostMutation) EdgeCleared(name string) bool {
+	switch name {
+	case tagpost.EdgeTag:
+		return m.clearedtag
+	case tagpost.EdgePost:
+		return m.clearedpost
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *TagPostMutation) ClearEdge(name string) error {
+	switch name {
+	case tagpost.EdgeTag:
+		m.ClearTag()
+		return nil
+	case tagpost.EdgePost:
+		m.ClearPost()
+		return nil
+	}
+	return fmt.Errorf("unknown TagPost unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *TagPostMutation) ResetEdge(name string) error {
+	switch name {
+	case tagpost.EdgeTag:
+		m.ResetTag()
+		return nil
+	case tagpost.EdgePost:
+		m.ResetPost()
+		return nil
+	}
+	return fmt.Errorf("unknown TagPost edge %s", name)
 }

@@ -243,6 +243,16 @@ erDiagram
         timeDOTTime created_at
         string name
     }
+    TagNode {
+        xidDOTID id
+        xidDOTID tag_id
+        xidDOTID node_id
+    }
+    TagPost {
+        xidDOTID id
+        xidDOTID tag_id
+        xidDOTID post_id
+    }
     	Account |o--o{ Email : "emails/account"
     	Account |o--o{ Notification : "notifications/owner"
     	Account |o--o{ Notification : "triggered_notifications/source"
@@ -294,6 +304,10 @@ erDiagram
     	Role }o--o{ Account : "accounts/roles"
     	Tag }o--o{ Post : "posts/tags"
     	Tag }o--o{ Node : "nodes/tags"
+    	TagNode }o--o| Tag : "tag"
+    	TagNode }o--o| Node : "node"
+    	TagPost }o--o| Tag : "tag"
+    	TagPost }o--o| Post : "post"
 		</div>
 	<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
 	<script src="https://unpkg.com/panzoom@9.4.3/dist/panzoom.min.js"></script>

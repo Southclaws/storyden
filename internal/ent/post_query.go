@@ -24,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/tagpost"
 	"github.com/rs/xid"
 )
 
@@ -49,6 +50,7 @@ type PostQuery struct {
 	withLink         *LinkQuery
 	withContentLinks *LinkQuery
 	withEvent        *EventQuery
+	withPostTags     *TagPostQuery
 	modifiers        []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -416,6 +418,28 @@ func (pq *PostQuery) QueryEvent() *EventQuery {
 	return query
 }
 
+// QueryPostTags chains the current query on the "post_tags" edge.
+func (pq *PostQuery) QueryPostTags() *TagPostQuery {
+	query := (&TagPostClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, selector),
+			sqlgraph.To(tagpost.Table, tagpost.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, post.PostTagsTable, post.PostTagsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Post entity from the query.
 // Returns a *NotFoundError when no Post was found.
 func (pq *PostQuery) First(ctx context.Context) (*Post, error) {
@@ -623,6 +647,7 @@ func (pq *PostQuery) Clone() *PostQuery {
 		withLink:         pq.withLink.Clone(),
 		withContentLinks: pq.withContentLinks.Clone(),
 		withEvent:        pq.withEvent.Clone(),
+		withPostTags:     pq.withPostTags.Clone(),
 		// clone intermediate query.
 		sql:       pq.sql.Clone(),
 		path:      pq.path,
@@ -795,6 +820,17 @@ func (pq *PostQuery) WithEvent(opts ...func(*EventQuery)) *PostQuery {
 	return pq
 }
 
+// WithPostTags tells the query-builder to eager-load the nodes that are connected to
+// the "post_tags" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PostQuery) WithPostTags(opts ...func(*TagPostQuery)) *PostQuery {
+	query := (&TagPostClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withPostTags = query
+	return pq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -873,7 +909,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 	var (
 		nodes       = []*Post{}
 		_spec       = pq.querySpec()
-		loadedTypes = [15]bool{
+		loadedTypes = [16]bool{
 			pq.withAuthor != nil,
 			pq.withCategory != nil,
 			pq.withTags != nil,
@@ -889,6 +925,7 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 			pq.withLink != nil,
 			pq.withContentLinks != nil,
 			pq.withEvent != nil,
+			pq.withPostTags != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -1009,6 +1046,13 @@ func (pq *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		if err := pq.loadEvent(ctx, query, nodes,
 			func(n *Post) { n.Edges.Event = []*Event{} },
 			func(n *Post, e *Event) { n.Edges.Event = append(n.Edges.Event, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := pq.withPostTags; query != nil {
+		if err := pq.loadPostTags(ctx, query, nodes,
+			func(n *Post) { n.Edges.PostTags = []*TagPost{} },
+			func(n *Post, e *TagPost) { n.Edges.PostTags = append(n.Edges.PostTags, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1580,6 +1624,36 @@ func (pq *PostQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "post_event" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (pq *PostQuery) loadPostTags(ctx context.Context, query *TagPostQuery, nodes []*Post, init func(*Post), assign func(*Post, *TagPost)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Post)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(tagpost.FieldPostID)
+	}
+	query.Where(predicate.TagPost(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(post.PostTagsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.PostID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "post_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

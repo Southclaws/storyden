@@ -60,6 +60,7 @@ func (Post) Edges() []ent.Edge {
 			Comment("Category is only required for root posts. It should never be added to a child post."),
 
 		edge.From("tags", Tag.Type).
+			Through("post_tags", TagPost.Type).
 			Ref("posts").
 			Comment("Tags are only required for root posts. It should never be added to a child post."),
 

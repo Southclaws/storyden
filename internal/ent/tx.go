@@ -62,6 +62,10 @@ type Tx struct {
 	Setting *SettingClient
 	// Tag is the client for interacting with the Tag builders.
 	Tag *TagClient
+	// TagNode is the client for interacting with the TagNode builders.
+	TagNode *TagNodeClient
+	// TagPost is the client for interacting with the TagPost builders.
+	TagPost *TagPostClient
 
 	// lazily loaded.
 	client     *Client
@@ -217,6 +221,8 @@ func (tx *Tx) init() {
 	tx.Role = NewRoleClient(tx.config)
 	tx.Setting = NewSettingClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
+	tx.TagNode = NewTagNodeClient(tx.config)
+	tx.TagPost = NewTagPostClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

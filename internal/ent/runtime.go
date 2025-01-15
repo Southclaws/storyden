@@ -30,6 +30,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/tagnode"
+	"github.com/Southclaws/storyden/internal/ent/tagpost"
 	"github.com/rs/xid"
 )
 
@@ -929,6 +931,56 @@ func init() {
 	// tag.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	tag.IDValidator = func() func(string) error {
 		validators := tagDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	tagnodeMixin := schema.TagNode{}.Mixin()
+	tagnodeMixinFields0 := tagnodeMixin[0].Fields()
+	_ = tagnodeMixinFields0
+	tagnodeFields := schema.TagNode{}.Fields()
+	_ = tagnodeFields
+	// tagnodeDescID is the schema descriptor for id field.
+	tagnodeDescID := tagnodeMixinFields0[0].Descriptor()
+	// tagnode.DefaultID holds the default value on creation for the id field.
+	tagnode.DefaultID = tagnodeDescID.Default.(func() xid.ID)
+	// tagnode.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	tagnode.IDValidator = func() func(string) error {
+		validators := tagnodeDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	tagpostMixin := schema.TagPost{}.Mixin()
+	tagpostMixinFields0 := tagpostMixin[0].Fields()
+	_ = tagpostMixinFields0
+	tagpostFields := schema.TagPost{}.Fields()
+	_ = tagpostFields
+	// tagpostDescID is the schema descriptor for id field.
+	tagpostDescID := tagpostMixinFields0[0].Descriptor()
+	// tagpost.DefaultID holds the default value on creation for the id field.
+	tagpost.DefaultID = tagpostDescID.Default.(func() xid.ID)
+	// tagpost.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	tagpost.IDValidator = func() func(string) error {
+		validators := tagpostDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

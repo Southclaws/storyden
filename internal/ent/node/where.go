@@ -1123,6 +1123,29 @@ func HasCollectionsWith(preds ...predicate.Collection) predicate.Node {
 	})
 }
 
+// HasNodeTags applies the HasEdge predicate on the "node_tags" edge.
+func HasNodeTags() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, NodeTagsTable, NodeTagsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasNodeTagsWith applies the HasEdge predicate on the "node_tags" edge with a given conditions (other predicates).
+func HasNodeTagsWith(preds ...predicate.TagNode) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newNodeTagsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasCollectionNodes applies the HasEdge predicate on the "collection_nodes" edge.
 func HasCollectionNodes() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {

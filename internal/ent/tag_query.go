@@ -17,6 +17,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/tagnode"
+	"github.com/Southclaws/storyden/internal/ent/tagpost"
 	"github.com/rs/xid"
 )
 
@@ -30,6 +32,8 @@ type TagQuery struct {
 	withPosts    *PostQuery
 	withNodes    *NodeQuery
 	withAccounts *AccountQuery
+	withPostTags *TagPostQuery
+	withNodeTags *TagNodeQuery
 	modifiers    []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -126,6 +130,50 @@ func (tq *TagQuery) QueryAccounts() *AccountQuery {
 			sqlgraph.From(tag.Table, tag.FieldID, selector),
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, tag.AccountsTable, tag.AccountsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPostTags chains the current query on the "post_tags" edge.
+func (tq *TagQuery) QueryPostTags() *TagPostQuery {
+	query := (&TagPostClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tag.Table, tag.FieldID, selector),
+			sqlgraph.To(tagpost.Table, tagpost.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, tag.PostTagsTable, tag.PostTagsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryNodeTags chains the current query on the "node_tags" edge.
+func (tq *TagQuery) QueryNodeTags() *TagNodeQuery {
+	query := (&TagNodeClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tag.Table, tag.FieldID, selector),
+			sqlgraph.To(tagnode.Table, tagnode.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, tag.NodeTagsTable, tag.NodeTagsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -328,6 +376,8 @@ func (tq *TagQuery) Clone() *TagQuery {
 		withPosts:    tq.withPosts.Clone(),
 		withNodes:    tq.withNodes.Clone(),
 		withAccounts: tq.withAccounts.Clone(),
+		withPostTags: tq.withPostTags.Clone(),
+		withNodeTags: tq.withNodeTags.Clone(),
 		// clone intermediate query.
 		sql:       tq.sql.Clone(),
 		path:      tq.path,
@@ -365,6 +415,28 @@ func (tq *TagQuery) WithAccounts(opts ...func(*AccountQuery)) *TagQuery {
 		opt(query)
 	}
 	tq.withAccounts = query
+	return tq
+}
+
+// WithPostTags tells the query-builder to eager-load the nodes that are connected to
+// the "post_tags" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TagQuery) WithPostTags(opts ...func(*TagPostQuery)) *TagQuery {
+	query := (&TagPostClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withPostTags = query
+	return tq
+}
+
+// WithNodeTags tells the query-builder to eager-load the nodes that are connected to
+// the "node_tags" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TagQuery) WithNodeTags(opts ...func(*TagNodeQuery)) *TagQuery {
+	query := (&TagNodeClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withNodeTags = query
 	return tq
 }
 
@@ -446,10 +518,12 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 	var (
 		nodes       = []*Tag{}
 		_spec       = tq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [5]bool{
 			tq.withPosts != nil,
 			tq.withNodes != nil,
 			tq.withAccounts != nil,
+			tq.withPostTags != nil,
+			tq.withNodeTags != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -491,6 +565,20 @@ func (tq *TagQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tag, err
 		if err := tq.loadAccounts(ctx, query, nodes,
 			func(n *Tag) { n.Edges.Accounts = []*Account{} },
 			func(n *Tag, e *Account) { n.Edges.Accounts = append(n.Edges.Accounts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := tq.withPostTags; query != nil {
+		if err := tq.loadPostTags(ctx, query, nodes,
+			func(n *Tag) { n.Edges.PostTags = []*TagPost{} },
+			func(n *Tag, e *TagPost) { n.Edges.PostTags = append(n.Edges.PostTags, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := tq.withNodeTags; query != nil {
+		if err := tq.loadNodeTags(ctx, query, nodes,
+			func(n *Tag) { n.Edges.NodeTags = []*TagNode{} },
+			func(n *Tag, e *TagNode) { n.Edges.NodeTags = append(n.Edges.NodeTags, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -677,6 +765,66 @@ func (tq *TagQuery) loadAccounts(ctx context.Context, query *AccountQuery, nodes
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (tq *TagQuery) loadPostTags(ctx context.Context, query *TagPostQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *TagPost)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Tag)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(tagpost.FieldTagID)
+	}
+	query.Where(predicate.TagPost(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(tag.PostTagsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.TagID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "tag_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (tq *TagQuery) loadNodeTags(ctx context.Context, query *TagNodeQuery, nodes []*Tag, init func(*Tag), assign func(*Tag, *TagNode)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Tag)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(tagnode.FieldTagID)
+	}
+	query.Where(predicate.TagNode(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(tag.NodeTagsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.TagID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "tag_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

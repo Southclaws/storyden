@@ -297,6 +297,30 @@ func (f TagFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TagMutation", m)
 }
 
+// The TagNodeFunc type is an adapter to allow the use of ordinary
+// function as TagNode mutator.
+type TagNodeFunc func(context.Context, *ent.TagNodeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TagNodeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TagNodeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TagNodeMutation", m)
+}
+
+// The TagPostFunc type is an adapter to allow the use of ordinary
+// function as TagPost mutator.
+type TagPostFunc func(context.Context, *ent.TagPostMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TagPostFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TagPostMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TagPostMutation", m)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 
