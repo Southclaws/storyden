@@ -23,8 +23,13 @@ func NewQuery(ifNoneMatch opt.Optional[string], ifModifiedSince opt.Optional[tim
 // NotModified takes the current updated date of a resource and returns true if
 // the cache control query includes a Is-Modified-Since header and the resource
 // updated date is not after the header value. True means a 304 response header.
-func (q Query) NotModified(resourceUpdated time.Time) bool {
+func (q Query) NotModified(fn func() *time.Time) bool {
 	if ms, ok := q.ModifiedSince.Get(); ok {
+		resourceUpdated := fn()
+		if resourceUpdated == nil {
+			return false
+		}
+
 		// truncate the resourceUpdated to the nearest second because the actual
 		// HTTP header is already truncated but the DB time is in nanoseconds.
 		// If we didn't do this the resource time will always be slightly ahead.

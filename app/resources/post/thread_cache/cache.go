@@ -2,6 +2,7 @@ package thread_cache
 
 import (
 	"context"
+	"time"
 
 	"github.com/rs/xid"
 
@@ -28,12 +29,13 @@ func (c *Cache) IsNotModified(ctx context.Context, cq cachecontrol.Query, id xid
 	ctx, span := c.ins.Instrument(ctx, kv.String("id", id.String()))
 	defer span.End()
 
-	r, err := c.db.Post.Query().Select(post.FieldUpdatedAt).Where(post.ID(id)).Only(ctx)
-	if err != nil {
-		return false
-	}
-
-	notModified := cq.NotModified(r.UpdatedAt)
+	notModified := cq.NotModified(func() *time.Time {
+		r, err := c.db.Post.Query().Select(post.FieldUpdatedAt).Where(post.ID(id)).Only(ctx)
+		if err != nil {
+			return nil
+		}
+		return &r.UpdatedAt
+	})
 
 	return notModified
 }
