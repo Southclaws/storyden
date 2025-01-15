@@ -23,6 +23,9 @@ func (s *service) Get(
 	threadID post.ID,
 	pageParams pagination.Parameters,
 ) (*thread.Thread, error) {
+	ctx, span := s.ins.Instrument(ctx)
+	defer span.End()
+
 	session := session.GetOptAccountID(ctx)
 
 	thr, err := s.thread_repo.Get(ctx, threadID, pageParams, session)

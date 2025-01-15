@@ -46,6 +46,10 @@ func Strings(key string, value []string) Attr {
 	return Attr(attribute.StringSlice(key, value))
 }
 
+func Time(key string, d time.Time) Attr {
+	return Attr(attribute.String(key, d.Format(time.RFC3339)))
+}
+
 func Duration(key string, d time.Duration) Attr {
 	return Attr(attribute.String(key, d.String()))
 }

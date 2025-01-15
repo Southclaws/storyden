@@ -27,6 +27,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/moderation/content_policy"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/thread/thread_semdex"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -87,7 +88,8 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l *zap.Logger
+	ins spanner.Instrumentation
+	l   *zap.Logger
 
 	accountQuery *account_querier.Querier
 	thread_repo  thread.Repository
@@ -101,6 +103,7 @@ type service struct {
 }
 
 func New(
+	ins spanner.Builder,
 	l *zap.Logger,
 
 	accountQuery *account_querier.Querier,
@@ -114,7 +117,8 @@ func New(
 	cpm *content_policy.Manager,
 ) Service {
 	return &service{
-		l: l.With(zap.String("service", "thread")),
+		ins: ins.Build(),
+		l:   l.With(zap.String("service", "thread")),
 
 		accountQuery: accountQuery,
 		thread_repo:  thread_repo,
