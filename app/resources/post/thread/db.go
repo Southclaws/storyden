@@ -18,7 +18,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -37,19 +36,21 @@ import (
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	ent_react "github.com/Southclaws/storyden/internal/ent/react"
 	ent_tag "github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
 
 type database struct {
-	logger *zap.Logger
-	db     *ent.Client
-	raw    *sqlx.DB
+	ins spanner.Instrumentation
+	db  *ent.Client
+	raw *sqlx.DB
 }
 
-func New(logger *zap.Logger, db *ent.Client, raw *sqlx.DB) Repository {
+func New(ins spanner.Builder, db *ent.Client, raw *sqlx.DB) Repository {
 	return &database{
-		logger: logger,
-		db:     db,
-		raw:    raw,
+		ins: ins.Build(),
+		db:  db,
+		raw: raw,
 	}
 }
 
@@ -340,22 +341,18 @@ group by p.id
 `
 
 func (d *database) Get(ctx context.Context, threadID post.ID, pageParams pagination.Parameters, accountID opt.Optional[account.AccountID]) (*Thread, error) {
-	pool1 := pond.NewGroup()
-	logger := d.logger.With(
-		zap.String("thread_id", threadID.String()),
-		zap.String("account_id", accountID.String()),
+	ctx, span := d.ins.Instrument(ctx,
+		kv.String("thread_id", threadID.String()),
+		kv.String("account_id", accountID.String()),
 	)
+	defer span.End()
 
-	logduration := func(m string) func() {
-		start := time.Now()
-		return func() {
-			logger.Debug(m, zap.Duration("duration", time.Since(start)))
-		}
-	}
+	pool1 := pond.NewGroup()
 
 	var replyStatsMap post.PostRepliesMap
 	pool1.SubmitErr(func() error {
-		defer logduration("reply status")()
+		ctx, span := d.ins.InstrumentNamed(ctx, "replies_status")
+		defer span.End()
 
 		var replyStats post.PostRepliesResults
 		err := d.raw.SelectContext(ctx, &replyStats, repliesCountQuery, threadID.String(), accountID.String())
@@ -368,7 +365,8 @@ func (d *database) Get(ctx context.Context, threadID post.ID, pageParams paginat
 
 	var likesMap post.PostLikesMap
 	pool1.SubmitErr(func() error {
-		defer logduration("likes status")()
+		ctx, span := d.ins.InstrumentNamed(ctx, "likes_status")
+		defer span.End()
 
 		var likes post.PostLikesResults
 		err := d.raw.SelectContext(ctx, &likes, likesCountQuery, threadID.String(), accountID.String())
@@ -383,7 +381,8 @@ func (d *database) Get(ctx context.Context, threadID post.ID, pageParams paginat
 
 	var collectionsMap collection_item_status.CollectionStatusMap
 	pool1.SubmitErr(func() error {
-		defer logduration("collection status")()
+		ctx, span := d.ins.InstrumentNamed(ctx, "collections_status")
+		defer span.End()
 
 		var collections collection_item_status.CollectionStatusResults
 		err := d.raw.SelectContext(ctx, &collections, collectionsCountQuery, threadID.String(), accountID.String())
@@ -398,7 +397,8 @@ func (d *database) Get(ctx context.Context, threadID post.ID, pageParams paginat
 
 	var tags tag_ref.Tags
 	pool1.SubmitErr(func() error {
-		defer logduration("thread tags")()
+		ctx, span := d.ins.InstrumentNamed(ctx, "thread_tags")
+		defer span.End()
 
 		tagsResult, err := d.db.Tag.Query().Where(ent_tag.HasPostsWith(ent_post.ID(xid.ID(threadID)))).All(ctx)
 		if err != nil {
@@ -412,7 +412,8 @@ func (d *database) Get(ctx context.Context, threadID post.ID, pageParams paginat
 
 	var assets []*asset.Asset
 	pool1.SubmitErr(func() error {
-		defer logduration("thread assets")()
+		ctx, span := d.ins.InstrumentNamed(ctx, "thread_assets")
+		defer span.End()
 
 		r, err := d.db.Asset.Query().Where(ent_asset.HasPostsWith(ent_post.ID(xid.ID(threadID)))).All(ctx)
 		if err != nil {
@@ -426,7 +427,8 @@ func (d *database) Get(ctx context.Context, threadID post.ID, pageParams paginat
 
 	var repliesResult []*ent.Post
 	pool1.SubmitErr(func() error {
-		defer logduration("thread replies")()
+		ctx, span := d.ins.InstrumentNamed(ctx, "thread_replies")
+		defer span.End()
 
 		r, err := d.db.Post.Query().
 			Where(
@@ -449,7 +451,8 @@ func (d *database) Get(ctx context.Context, threadID post.ID, pageParams paginat
 
 	var threadResult *ent.Post
 	pool1.SubmitErr(func() error {
-		defer logduration("thread root")()
+		ctx, span := d.ins.InstrumentNamed(ctx, "thread_root")
+		defer span.End()
 
 		r, err := d.db.Post.Query().
 			Where(
