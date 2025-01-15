@@ -2,6 +2,7 @@ package profile_cache
 
 import (
 	"context"
+	"time"
 
 	"github.com/rs/xid"
 
@@ -21,12 +22,14 @@ func New(db *ent.Client) *Cache {
 }
 
 func (c *Cache) IsNotModified(ctx context.Context, cq cachecontrol.Query, id xid.ID) bool {
-	r, err := c.db.Account.Query().Select(account.FieldUpdatedAt).Where(account.ID(id)).Only(ctx)
-	if err != nil {
-		return false
-	}
+	notModified := cq.NotModified(func() *time.Time {
+		r, err := c.db.Account.Query().Select(account.FieldUpdatedAt).Where(account.ID(id)).Only(ctx)
+		if err != nil {
+			return nil
+		}
 
-	notModified := cq.NotModified(r.UpdatedAt)
+		return &r.UpdatedAt
+	})
 
 	return notModified
 }
