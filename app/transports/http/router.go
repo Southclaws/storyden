@@ -49,6 +49,11 @@ func MountOpenAPI(
 			cm.WithChaos(),
 		)
 
+		// Health check endpoint does not need any middleware, mounted directly.
+		mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+		})
+
 		// Mounting the Echo router must happen after all Echo's middleware and
 		// routes have been set up so it's done inside the start lifecycle hook.
 		mux.Handle("/", applied)
