@@ -1,14 +1,17 @@
-FROM golang:1.23
+FROM golang:1.23-alpine
 
-RUN git config --global --add safe.directory /server
+WORKDIR /storyden
 
-WORKDIR /server
-ADD . .
+RUN addgroup --system --gid 1001 storyden && adduser --system --uid 1001 storyden && chown storyden:storyden /storyden
+USER storyden
 
-# Install Taskfile
-RUN go install github.com/go-task/task/v3/cmd/task@latest
+COPY --chown=storyden:storyden . .
 
-# Build the API server binary
-RUN task backend
+RUN go mod download
+RUN go build -o storyden ./cmd/backend
 
-ENTRYPOINT [ "task", "production" ]
+RUN mkdir /storyden/data
+
+VOLUME [ "/storyden/data" ]
+
+ENTRYPOINT [ "/storyden/storyden" ]
