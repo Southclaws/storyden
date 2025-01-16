@@ -14,6 +14,7 @@ export function useThreadFeedScreen(props: Props) {
   const { data, error } = useThreadList(
     {
       page: props.initialPage.toString(),
+      categories: props.category ? [props.category.slug] : [],
     },
     {
       swr: {
