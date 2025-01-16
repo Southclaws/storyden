@@ -1,0 +1,16 @@
+.git
+.github
+.task
+.vscode
+api
+backup
+data
+deployments
+docker
+home
+tests
+web
+
+cmd/backend/__debug*
+*.env
+*.exe

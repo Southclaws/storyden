@@ -1,18 +1,19 @@
-FROM golang:1.23 AS api-builder
+#
+# BACKEND API LAYER
+#
 
-RUN git config --global --add safe.directory /server
+FROM golang:1.23-alpine AS api-builder
 
 WORKDIR /server
 
 COPY go.mod go.sum ./
 RUN go mod download
 
-ADD ./app ./app
-ADD ./cmd ./cmd
-ADD ./internal ./internal
-ADD ./Taskfile.yml .
+COPY ./app ./app
+COPY ./cmd ./cmd
+COPY ./internal ./internal
 
-RUN CGO_ENABLED=0 GOOS=linux go build ./cmd/backend
+RUN CGO_ENABLED=0 GOOS=linux go build -o storyden-api ./cmd/backend
 
 FROM node:22.12.0-alpine AS base
 
@@ -56,25 +57,23 @@ ENV NODE_ENV production
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN addgroup --system --gid 1001 storyden
-RUN adduser --system --uid 1001 storyden
-RUN chown storyden:storyden /storyden
+RUN addgroup --system --gid 1001 storyden && adduser --system --uid 1001 storyden && chown storyden:storyden /storyden
 USER storyden
 
 COPY --from=builder /storyden/public ./public
 
 RUN mkdir .next && mkdir data
 
-COPY --from=api-builder --chown=storyden:storyden /server/backend ./backend
+COPY --from=api-builder --chown=storyden:storyden /server/storyden-api ./storyden-api
 COPY --from=builder --chown=storyden:storyden /storyden/.next/standalone ./
 COPY --from=builder --chown=storyden:storyden /storyden/.next/static ./.next/static
 
-EXPOSE 3000
+EXPOSE 8000
 
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-VOLUME [ "/data" ]
+VOLUME [ "/storyden/data" ]
 
 # Instruct the API process to run the Next.js server and proxy requests to it.
 ENV RUN_FRONTEND "server.js"
@@ -91,4 +90,4 @@ ENV PUBLIC_WEB_ADDRESS="http://localhost:8000"
 # This setting is pretty much only used when both services run side by side.
 ENV SSR_API_ADDRESS="http://localhost:8000"
 
-ENTRYPOINT ["./backend"]
+ENTRYPOINT ["/storyden/storyden-api"]
