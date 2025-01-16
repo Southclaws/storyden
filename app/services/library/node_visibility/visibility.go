@@ -12,9 +12,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
+	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
@@ -24,6 +26,7 @@ type Controller struct {
 	nodeQuerier  *node_querier.Querier
 	nodeWriter   *node_writer.Writer
 	nc           node_children.Repository
+	indexQueue   pubsub.Topic[mq.IndexNode]
 }
 
 func New(
@@ -31,12 +34,14 @@ func New(
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	nc node_children.Repository,
+	indexQueue pubsub.Topic[mq.IndexNode],
 ) *Controller {
 	return &Controller{
 		accountQuery: accountQuery,
 		nodeQuerier:  nodeQuerier,
 		nodeWriter:   nodeWriter,
 		nc:           nc,
+		indexQueue:   indexQueue,
 	}
 }
 
@@ -71,7 +76,9 @@ func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, 
 	}
 
 	if vis == visibility.VisibilityPublished {
-		// TODO: Emit events, send notifications, etc.
+		if err := m.indexQueue.Publish(ctx, mq.IndexNode{ID: library.NodeID(n.Mark.ID())}); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 	}
 
 	return n, nil
