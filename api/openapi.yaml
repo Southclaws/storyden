@@ -1768,7 +1768,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/DatagraphSearchOK" }
 
-  /datagraph/qna:
+  /datagraph/ask:
     get:
       operationId: DatagraphAsk
       description: Ask questions about the community's content.
@@ -3003,7 +3003,7 @@ components:
     DatagraphAskOK:
       description: Search results.
       content:
-        text/plain:
+        text/event-stream:
           schema:
             type: string
 
