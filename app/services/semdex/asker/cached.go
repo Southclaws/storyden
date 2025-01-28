@@ -34,7 +34,7 @@ func newCachedAsker(
 	}, nil
 }
 
-func (a *cachedAsker) Ask(ctx context.Context, q string) (func(yield func(string, error) bool), error) {
+func (a *cachedAsker) Ask(ctx context.Context, q string) (semdex.AskResponseIterator, error) {
 	cached, err := a.questions.GetByQuerySlug(ctx, q)
 	if err == nil {
 		return a.cachedResult(ctx, cached)
@@ -43,7 +43,7 @@ func (a *cachedAsker) Ask(ctx context.Context, q string) (func(yield func(string
 	return a.livePrompt(ctx, q)
 }
 
-func (a *cachedAsker) cachedResult(ctx context.Context, q *question.Question) (func(yield func(string, error) bool), error) {
+func (a *cachedAsker) cachedResult(ctx context.Context, q *question.Question) (semdex.AskResponseIterator, error) {
 	md, err := htmltomarkdown.ConvertNode(q.Result.HTMLTree())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -51,7 +51,9 @@ func (a *cachedAsker) cachedResult(ctx context.Context, q *question.Question) (f
 
 	chunks := strings.SplitAfter(string(md), " ")
 
-	return func(yield func(string, error) bool) {
+	// NOTE: Stream extractor is only run on cached results here, the live
+	// prompter will run the stream extractor itself.
+	return streamExtractor(func(yield func(string, error) bool) {
 		for _, ch := range chunks {
 			select {
 			case <-ctx.Done():
@@ -64,16 +66,16 @@ func (a *cachedAsker) cachedResult(ctx context.Context, q *question.Question) (f
 			}
 			time.Sleep(time.Millisecond * 10)
 		}
-	}, nil
+	}), nil
 }
 
-func (a *cachedAsker) livePrompt(ctx context.Context, q string) (func(yield func(string, error) bool), error) {
+func (a *cachedAsker) livePrompt(ctx context.Context, q string) (semdex.AskResponseIterator, error) {
 	iter, err := a.asker.Ask(ctx, q)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return func(yield func(string, error) bool) {
+	return func(yield func(semdex.AskResponseChunk, error) bool) {
 		acc := []string{}
 
 		defer func() {
@@ -85,11 +87,14 @@ func (a *cachedAsker) livePrompt(ctx context.Context, q string) (func(yield func
 
 		for chunk, err := range iter {
 			if err != nil {
-				yield("", err)
+				yield(nil, err)
 				return
 			}
 
-			acc = append(acc, chunk)
+			if t, ok := chunk.(*semdex.AskResponseChunkText); ok {
+				acc = append(acc, t.Chunk)
+			}
+
 			if !yield(chunk, nil) {
 				return
 			}

@@ -2,7 +2,10 @@ package bindings
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -50,7 +53,7 @@ func NewDatagraph(
 			isEnabled := ii.Capabilities.Has(instance_info.CapabilitySemdex)
 
 			path := c.Path()
-			if path == "/api/datagraph/qna" {
+			if path == "/api/datagraph/ask" {
 				if !isEnabled {
 					return echo.NewHTTPError(http.StatusNotImplemented, "Semdex is not enabled")
 				}
@@ -66,7 +69,7 @@ func NewDatagraph(
 
 				w := c.Response().Writer
 
-				w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+				w.Header().Set("Content-Type", "text/event-stream; charset=utf-8")
 
 				// if fails to cast, do nothing, flusher nil, just guard clause.
 				flusher, ok := w.(http.Flusher)
@@ -81,7 +84,27 @@ func NewDatagraph(
 						return err
 					}
 
-					if _, err := w.Write([]byte(chunk)); err != nil {
+					msg := ""
+
+					switch v := chunk.(type) {
+					case *semdex.AskResponseChunkText:
+						b, err := json.Marshal(chunk)
+						if err != nil {
+							return err
+						}
+
+						msg = fmt.Sprintf("event: text\ndata: %s\n\n", string(b))
+
+					case *semdex.AskResponseChunkMeta:
+						b, err := serialiseAskResponseChunkMeta(*v)
+						if err != nil {
+							return err
+						}
+
+						msg = fmt.Sprintf("event: meta\ndata: %s\n\n", string(b))
+					}
+
+					if _, err := w.Write([]byte(msg)); err != nil {
 						return err
 					}
 
@@ -89,6 +112,16 @@ func NewDatagraph(
 						flusher.Flush()
 					}
 				}
+
+				if _, err := w.Write([]byte("event: end\n\n")); err != nil {
+					return err
+				}
+
+				if flusher != nil {
+					flusher.Flush()
+				}
+
+				return nil
 			}
 
 			return next(c)
@@ -219,4 +252,22 @@ func serialiseDatagraphItemProfile(in *profile.Public) openapi.DatagraphItemProf
 
 func serialiseDatagraphItemList(in datagraph.ItemList) openapi.DatagraphItemList {
 	return dt.Map(in, serialiseDatagraphItem)
+}
+
+func serialiseAskResponseChunkMeta(in semdex.AskResponseChunkMeta) ([]byte, error) {
+	urls := dt.Map(in.URLs, func(u url.URL) string {
+		return u.String()
+	})
+
+	refs := dt.Map(in.Refs, func(r *datagraph.Ref) map[string]any {
+		return map[string]any{
+			"id":   r.ID.String(),
+			"kind": r.Kind.String(),
+		}
+	})
+
+	return json.Marshal(map[string]any{
+		"urls": urls,
+		"refs": refs,
+	})
 }

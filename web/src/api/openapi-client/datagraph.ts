@@ -81,14 +81,14 @@ export const useDatagraphSearch = <
  */
 export const datagraphAsk = (params: DatagraphAskParams) => {
   return fetcher<DatagraphAskOKResponse>({
-    url: `/datagraph/qna`,
+    url: `/datagraph/ask`,
     method: "GET",
     params,
   });
 };
 
 export const getDatagraphAskKey = (params: DatagraphAskParams) =>
-  [`/datagraph/qna`, ...(params ? [params] : [])] as const;
+  [`/datagraph/ask`, ...(params ? [params] : [])] as const;
 
 export type DatagraphAskQueryResult = NonNullable<
   Awaited<ReturnType<typeof datagraphAsk>>
