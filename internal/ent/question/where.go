@@ -86,6 +86,11 @@ func AccountID(v xid.ID) predicate.Question {
 	return predicate.Question(sql.FieldEQ(FieldAccountID, v))
 }
 
+// ParentQuestionID applies equality check predicate on the "parent_question_id" field. It's identical to ParentQuestionIDEQ.
+func ParentQuestionID(v xid.ID) predicate.Question {
+	return predicate.Question(sql.FieldEQ(FieldParentQuestionID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Question {
 	return predicate.Question(sql.FieldEQ(FieldCreatedAt, v))
@@ -461,6 +466,86 @@ func AccountIDContainsFold(v xid.ID) predicate.Question {
 	return predicate.Question(sql.FieldContainsFold(FieldAccountID, vc))
 }
 
+// ParentQuestionIDEQ applies the EQ predicate on the "parent_question_id" field.
+func ParentQuestionIDEQ(v xid.ID) predicate.Question {
+	return predicate.Question(sql.FieldEQ(FieldParentQuestionID, v))
+}
+
+// ParentQuestionIDNEQ applies the NEQ predicate on the "parent_question_id" field.
+func ParentQuestionIDNEQ(v xid.ID) predicate.Question {
+	return predicate.Question(sql.FieldNEQ(FieldParentQuestionID, v))
+}
+
+// ParentQuestionIDIn applies the In predicate on the "parent_question_id" field.
+func ParentQuestionIDIn(vs ...xid.ID) predicate.Question {
+	return predicate.Question(sql.FieldIn(FieldParentQuestionID, vs...))
+}
+
+// ParentQuestionIDNotIn applies the NotIn predicate on the "parent_question_id" field.
+func ParentQuestionIDNotIn(vs ...xid.ID) predicate.Question {
+	return predicate.Question(sql.FieldNotIn(FieldParentQuestionID, vs...))
+}
+
+// ParentQuestionIDGT applies the GT predicate on the "parent_question_id" field.
+func ParentQuestionIDGT(v xid.ID) predicate.Question {
+	return predicate.Question(sql.FieldGT(FieldParentQuestionID, v))
+}
+
+// ParentQuestionIDGTE applies the GTE predicate on the "parent_question_id" field.
+func ParentQuestionIDGTE(v xid.ID) predicate.Question {
+	return predicate.Question(sql.FieldGTE(FieldParentQuestionID, v))
+}
+
+// ParentQuestionIDLT applies the LT predicate on the "parent_question_id" field.
+func ParentQuestionIDLT(v xid.ID) predicate.Question {
+	return predicate.Question(sql.FieldLT(FieldParentQuestionID, v))
+}
+
+// ParentQuestionIDLTE applies the LTE predicate on the "parent_question_id" field.
+func ParentQuestionIDLTE(v xid.ID) predicate.Question {
+	return predicate.Question(sql.FieldLTE(FieldParentQuestionID, v))
+}
+
+// ParentQuestionIDContains applies the Contains predicate on the "parent_question_id" field.
+func ParentQuestionIDContains(v xid.ID) predicate.Question {
+	vc := v.String()
+	return predicate.Question(sql.FieldContains(FieldParentQuestionID, vc))
+}
+
+// ParentQuestionIDHasPrefix applies the HasPrefix predicate on the "parent_question_id" field.
+func ParentQuestionIDHasPrefix(v xid.ID) predicate.Question {
+	vc := v.String()
+	return predicate.Question(sql.FieldHasPrefix(FieldParentQuestionID, vc))
+}
+
+// ParentQuestionIDHasSuffix applies the HasSuffix predicate on the "parent_question_id" field.
+func ParentQuestionIDHasSuffix(v xid.ID) predicate.Question {
+	vc := v.String()
+	return predicate.Question(sql.FieldHasSuffix(FieldParentQuestionID, vc))
+}
+
+// ParentQuestionIDIsNil applies the IsNil predicate on the "parent_question_id" field.
+func ParentQuestionIDIsNil() predicate.Question {
+	return predicate.Question(sql.FieldIsNull(FieldParentQuestionID))
+}
+
+// ParentQuestionIDNotNil applies the NotNil predicate on the "parent_question_id" field.
+func ParentQuestionIDNotNil() predicate.Question {
+	return predicate.Question(sql.FieldNotNull(FieldParentQuestionID))
+}
+
+// ParentQuestionIDEqualFold applies the EqualFold predicate on the "parent_question_id" field.
+func ParentQuestionIDEqualFold(v xid.ID) predicate.Question {
+	vc := v.String()
+	return predicate.Question(sql.FieldEqualFold(FieldParentQuestionID, vc))
+}
+
+// ParentQuestionIDContainsFold applies the ContainsFold predicate on the "parent_question_id" field.
+func ParentQuestionIDContainsFold(v xid.ID) predicate.Question {
+	vc := v.String()
+	return predicate.Question(sql.FieldContainsFold(FieldParentQuestionID, vc))
+}
+
 // HasAuthor applies the HasEdge predicate on the "author" edge.
 func HasAuthor() predicate.Question {
 	return predicate.Question(func(s *sql.Selector) {
@@ -476,6 +561,52 @@ func HasAuthor() predicate.Question {
 func HasAuthorWith(preds ...predicate.Account) predicate.Question {
 	return predicate.Question(func(s *sql.Selector) {
 		step := newAuthorStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasParent applies the HasEdge predicate on the "parent" edge.
+func HasParent() predicate.Question {
+	return predicate.Question(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasParentWith applies the HasEdge predicate on the "parent" edge with a given conditions (other predicates).
+func HasParentWith(preds ...predicate.Question) predicate.Question {
+	return predicate.Question(func(s *sql.Selector) {
+		step := newParentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasParentQuestion applies the HasEdge predicate on the "parent_question" edge.
+func HasParentQuestion() predicate.Question {
+	return predicate.Question(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ParentQuestionTable, ParentQuestionColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasParentQuestionWith applies the HasEdge predicate on the "parent_question" edge with a given conditions (other predicates).
+func HasParentQuestionWith(preds ...predicate.Question) predicate.Question {
+	return predicate.Question(func(s *sql.Selector) {
+		step := newParentQuestionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

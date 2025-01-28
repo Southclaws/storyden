@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -20,12 +21,14 @@ import (
 // QuestionQuery is the builder for querying Question entities.
 type QuestionQuery struct {
 	config
-	ctx        *QueryContext
-	order      []question.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Question
-	withAuthor *AccountQuery
-	modifiers  []func(*sql.Selector)
+	ctx                *QueryContext
+	order              []question.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Question
+	withAuthor         *AccountQuery
+	withParent         *QuestionQuery
+	withParentQuestion *QuestionQuery
+	modifiers          []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -77,6 +80,50 @@ func (qq *QuestionQuery) QueryAuthor() *AccountQuery {
 			sqlgraph.From(question.Table, question.FieldID, selector),
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, question.AuthorTable, question.AuthorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(qq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryParent chains the current query on the "parent" edge.
+func (qq *QuestionQuery) QueryParent() *QuestionQuery {
+	query := (&QuestionClient{config: qq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := qq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := qq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(question.Table, question.FieldID, selector),
+			sqlgraph.To(question.Table, question.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, question.ParentTable, question.ParentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(qq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryParentQuestion chains the current query on the "parent_question" edge.
+func (qq *QuestionQuery) QueryParentQuestion() *QuestionQuery {
+	query := (&QuestionClient{config: qq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := qq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := qq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(question.Table, question.FieldID, selector),
+			sqlgraph.To(question.Table, question.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, question.ParentQuestionTable, question.ParentQuestionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(qq.driver.Dialect(), step)
 		return fromU, nil
@@ -271,12 +318,14 @@ func (qq *QuestionQuery) Clone() *QuestionQuery {
 		return nil
 	}
 	return &QuestionQuery{
-		config:     qq.config,
-		ctx:        qq.ctx.Clone(),
-		order:      append([]question.OrderOption{}, qq.order...),
-		inters:     append([]Interceptor{}, qq.inters...),
-		predicates: append([]predicate.Question{}, qq.predicates...),
-		withAuthor: qq.withAuthor.Clone(),
+		config:             qq.config,
+		ctx:                qq.ctx.Clone(),
+		order:              append([]question.OrderOption{}, qq.order...),
+		inters:             append([]Interceptor{}, qq.inters...),
+		predicates:         append([]predicate.Question{}, qq.predicates...),
+		withAuthor:         qq.withAuthor.Clone(),
+		withParent:         qq.withParent.Clone(),
+		withParentQuestion: qq.withParentQuestion.Clone(),
 		// clone intermediate query.
 		sql:       qq.sql.Clone(),
 		path:      qq.path,
@@ -292,6 +341,28 @@ func (qq *QuestionQuery) WithAuthor(opts ...func(*AccountQuery)) *QuestionQuery 
 		opt(query)
 	}
 	qq.withAuthor = query
+	return qq
+}
+
+// WithParent tells the query-builder to eager-load the nodes that are connected to
+// the "parent" edge. The optional arguments are used to configure the query builder of the edge.
+func (qq *QuestionQuery) WithParent(opts ...func(*QuestionQuery)) *QuestionQuery {
+	query := (&QuestionClient{config: qq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	qq.withParent = query
+	return qq
+}
+
+// WithParentQuestion tells the query-builder to eager-load the nodes that are connected to
+// the "parent_question" edge. The optional arguments are used to configure the query builder of the edge.
+func (qq *QuestionQuery) WithParentQuestion(opts ...func(*QuestionQuery)) *QuestionQuery {
+	query := (&QuestionClient{config: qq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	qq.withParentQuestion = query
 	return qq
 }
 
@@ -373,8 +444,10 @@ func (qq *QuestionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Que
 	var (
 		nodes       = []*Question{}
 		_spec       = qq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [3]bool{
 			qq.withAuthor != nil,
+			qq.withParent != nil,
+			qq.withParentQuestion != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -401,6 +474,19 @@ func (qq *QuestionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Que
 	if query := qq.withAuthor; query != nil {
 		if err := qq.loadAuthor(ctx, query, nodes, nil,
 			func(n *Question, e *Account) { n.Edges.Author = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := qq.withParent; query != nil {
+		if err := qq.loadParent(ctx, query, nodes, nil,
+			func(n *Question, e *Question) { n.Edges.Parent = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := qq.withParentQuestion; query != nil {
+		if err := qq.loadParentQuestion(ctx, query, nodes,
+			func(n *Question) { n.Edges.ParentQuestion = []*Question{} },
+			func(n *Question, e *Question) { n.Edges.ParentQuestion = append(n.Edges.ParentQuestion, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -436,6 +522,65 @@ func (qq *QuestionQuery) loadAuthor(ctx context.Context, query *AccountQuery, no
 	}
 	return nil
 }
+func (qq *QuestionQuery) loadParent(ctx context.Context, query *QuestionQuery, nodes []*Question, init func(*Question), assign func(*Question, *Question)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Question)
+	for i := range nodes {
+		fk := nodes[i].ParentQuestionID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(question.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "parent_question_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (qq *QuestionQuery) loadParentQuestion(ctx context.Context, query *QuestionQuery, nodes []*Question, init func(*Question), assign func(*Question, *Question)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Question)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(question.FieldParentQuestionID)
+	}
+	query.Where(predicate.Question(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(question.ParentQuestionColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ParentQuestionID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "parent_question_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 
 func (qq *QuestionQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := qq.querySpec()
@@ -467,6 +612,9 @@ func (qq *QuestionQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if qq.withAuthor != nil {
 			_spec.Node.AddColumnOnce(question.FieldAccountID)
+		}
+		if qq.withParent != nil {
+			_spec.Node.AddColumnOnce(question.FieldParentQuestionID)
 		}
 	}
 	if ps := qq.predicates; len(ps) > 0 {

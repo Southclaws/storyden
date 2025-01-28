@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/xid"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -62,7 +63,13 @@ func NewDatagraph(
 
 				query := c.QueryParam("q")
 
-				iter, err := d.asker.Ask(ctx, query)
+				p := c.QueryParam("parent_question_id")
+				parent, err := opt.MapErr(opt.NewSafe(p, p != ""), xid.FromString)
+				if err != nil {
+					return fault.Wrap(err, fctx.With(ctx))
+				}
+
+				iter, err := d.asker.Ask(ctx, query, parent)
 				if err != nil {
 					return fault.Wrap(err, fctx.With(ctx))
 				}

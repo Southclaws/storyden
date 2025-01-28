@@ -7,16 +7,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { ParentQuestionIDParameter } from "./parentQuestionIDParameter";
-import type { RequiredSearchQueryParameter } from "./requiredSearchQueryParameter";
 
-export type DatagraphAskParams = {
-  /**
-   * Search query string.
-   */
-  q: RequiredSearchQueryParameter;
-  /**
-   * If a follow-up question, the parent question ID.
-   */
-  parent_question_id?: ParentQuestionIDParameter;
-};
+/**
+ * If a follow-up question, the parent question ID.
+ */
+export type ParentQuestionIDParameter = string;

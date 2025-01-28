@@ -41,9 +41,9 @@ security:
 
 x-types:
   cache_response_headers: &cache_response_headers
-    Cache-Control: { $ref: "#/components/headers/Cache-Control" }
-    Last-Modified: { $ref: "#/components/headers/Last-Modified" }
-    ETag: { $ref: "#/components/headers/ETag" }
+    Cache-Control: {$ref: "#/components/headers/Cache-Control"}
+    Last-Modified: {$ref: "#/components/headers/Last-Modified"}
+    ETag: {$ref: "#/components/headers/ETag"}
 
 tags:
   - name: misc
@@ -120,7 +120,7 @@ paths:
       security: []
       tags: [misc]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
+        default: {$ref: "#/components/responses/InternalServerError"}
         "200":
           description: OK
           content:
@@ -139,7 +139,7 @@ paths:
       security: []
       tags: [misc]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
+        default: {$ref: "#/components/responses/InternalServerError"}
         "200":
           description: OK
           content:
@@ -155,8 +155,8 @@ paths:
       security: []
       tags: [misc]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "200": { $ref: "#/components/responses/GetInfoOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "200": {$ref: "#/components/responses/GetInfoOK"}
 
   /info/icon/{icon_size}:
     get:
@@ -164,19 +164,19 @@ paths:
       description: Get the logo icon image.
       security: []
       tags: [misc]
-      parameters: [{ $ref: "#/components/parameters/IconSize" }]
+      parameters: [{$ref: "#/components/parameters/IconSize"}]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "200": { $ref: "#/components/responses/AssetGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "200": {$ref: "#/components/responses/AssetGetOK"}
   /info/icon:
     post:
       operationId: IconUpload
       description: Upload and process the installation's logo image.
       tags: [misc]
-      requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
+      requestBody: {$ref: "#/components/requestBodies/AssetUpload"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
         "200":
           description: OK
 
@@ -187,16 +187,16 @@ paths:
       security: []
       tags: [misc]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "200": { $ref: "#/components/responses/AssetGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "200": {$ref: "#/components/responses/AssetGetOK"}
     post:
       operationId: BannerUpload
       description: Upload and process the installation's banner image.
       tags: [misc]
-      requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
+      requestBody: {$ref: "#/components/requestBodies/AssetUpload"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
         "200":
           description: OK
 
@@ -216,12 +216,12 @@ paths:
       operationId: AdminSettingsUpdate
       description: Update non-env configuration settings for installation.
       tags: [admin]
-      requestBody: { $ref: "#/components/requestBodies/AdminSettingsUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/AdminSettingsUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AdminSettingsUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AdminSettingsUpdateOK"}
 
   /admin/bans/{account_handle}:
     post:
@@ -234,20 +234,20 @@ paths:
       tags: [admin]
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AccountGetOK"}
     delete:
       operationId: AdminAccountBanRemove
       description: Given the account is suspended, remove the suspended state.
       tags: [admin]
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AccountGetOK"}
 
   #
   #                 888
@@ -265,53 +265,53 @@ paths:
       operationId: RoleCreate
       description: Creates a role with the specified permissions granted.
       tags: [roles]
-      requestBody: { $ref: "#/components/requestBodies/RoleCreate" }
+      requestBody: {$ref: "#/components/requestBodies/RoleCreate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/RoleCreateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/RoleCreateOK"}
     get:
       operationId: RoleList
       description: List all roles and their permissions.
       tags: [roles]
       security: []
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "200": { $ref: "#/components/responses/RoleListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "200": {$ref: "#/components/responses/RoleListOK"}
 
   /roles/{role_id}:
     get:
       operationId: RoleGet
       description: Retreives a role and all its permissions.
       tags: [roles]
-      parameters: [{ $ref: "#/components/parameters/RoleIDParam" }]
+      parameters: [{$ref: "#/components/parameters/RoleIDParam"}]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/RoleGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/RoleGetOK"}
     patch:
       operationId: RoleUpdate
       description: Updates a role's attributes.
       tags: [roles]
-      parameters: [{ $ref: "#/components/parameters/RoleIDParam" }]
-      requestBody: { $ref: "#/components/requestBodies/RoleUpdate" }
+      parameters: [{$ref: "#/components/parameters/RoleIDParam"}]
+      requestBody: {$ref: "#/components/requestBodies/RoleUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/RoleGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/RoleGetOK"}
     delete:
       operationId: RoleDelete
       description: Deletes a role.
       tags: [roles]
-      parameters: [{ $ref: "#/components/parameters/RoleIDParam" }]
+      parameters: [{$ref: "#/components/parameters/RoleIDParam"}]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
 
   #
   #                   888    888
@@ -334,9 +334,9 @@ paths:
       tags: [auth]
       security: []
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AuthProviderListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "200": {$ref: "#/components/responses/AuthProviderListOK"}
 
   /auth/password/signup:
     post:
@@ -345,11 +345,11 @@ paths:
       tags: [auth]
       security: []
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
-      requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
+      requestBody: {$ref: "#/components/requestBodies/AuthPassword"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/password/signin:
     post:
@@ -357,12 +357,12 @@ paths:
       description: Sign in to an existing account with a username and password.
       tags: [auth]
       security: []
-      requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
+      requestBody: {$ref: "#/components/requestBodies/AuthPassword"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/password:
     post:
@@ -371,24 +371,24 @@ paths:
         Given the requesting account does not have a password authentication,
         add a password authentication method to it with the given password.
       tags: [auth]
-      requestBody: { $ref: "#/components/requestBodies/AuthPasswordCreate" }
+      requestBody: {$ref: "#/components/requestBodies/AuthPasswordCreate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
     patch:
       operationId: AuthPasswordUpdate
       description: |
         Given the requesting account has a password authentication, update the
         password on file.
       tags: [auth]
-      requestBody: { $ref: "#/components/requestBodies/AuthPasswordUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/AuthPasswordUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/password/reset:
     post:
@@ -398,12 +398,12 @@ paths:
         member via a reset request operation such as `AuthEmailPasswordReset`.
       tags: [auth]
       security: []
-      requestBody: { $ref: "#/components/requestBodies/AuthPasswordReset" }
+      requestBody: {$ref: "#/components/requestBodies/AuthPasswordReset"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/email-password/signup:
     post:
@@ -412,11 +412,11 @@ paths:
       tags: [auth]
       security: []
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
-      requestBody: { $ref: "#/components/requestBodies/AuthEmailPassword" }
+      requestBody: {$ref: "#/components/requestBodies/AuthEmailPassword"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/email-password/signin:
     post:
@@ -424,12 +424,12 @@ paths:
       description: Sign in to an existing account with a email and password.
       tags: [auth]
       security: []
-      requestBody: { $ref: "#/components/requestBodies/AuthEmailPassword" }
+      requestBody: {$ref: "#/components/requestBodies/AuthEmailPassword"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/email-password/reset:
     post:
@@ -438,12 +438,12 @@ paths:
         Request password reset email to be sent to the specified email address.
       tags: [auth]
       security: []
-      requestBody: { $ref: "#/components/requestBodies/AuthEmailPasswordReset" }
+      requestBody: {$ref: "#/components/requestBodies/AuthEmailPasswordReset"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
 
   /auth/email/signup:
     post:
@@ -471,13 +471,13 @@ paths:
       tags: [auth]
       security: []
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
-      requestBody: { $ref: "#/components/requestBodies/AuthEmail" }
+      requestBody: {$ref: "#/components/requestBodies/AuthEmail"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
         "422":
           description: Verification email sent but no session will be provided.
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/email/signin:
     post:
@@ -489,12 +489,12 @@ paths:
         but if magic links are preferred, the endpoint will start the code flow.
       tags: [auth]
       security: []
-      requestBody: { $ref: "#/components/requestBodies/AuthEmail" }
+      requestBody: {$ref: "#/components/requestBodies/AuthEmail"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/email/verify:
     post:
@@ -504,12 +504,12 @@ paths:
         account's email addresses either set via sign up or added later.
       tags: [auth]
       security: []
-      requestBody: { $ref: "#/components/requestBodies/AuthEmailVerify" }
+      requestBody: {$ref: "#/components/requestBodies/AuthEmailVerify"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/oauth/{oauth_provider}/callback:
     post:
@@ -518,12 +518,12 @@ paths:
       tags: [auth]
       security: []
       parameters: [$ref: "#/components/parameters/OAuthProvider"]
-      requestBody: { $ref: "#/components/requestBodies/OAuthProviderCallback" }
+      requestBody: {$ref: "#/components/requestBodies/OAuthProviderCallback"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/webauthn/make/{account_handle}:
     get:
@@ -534,9 +534,9 @@ paths:
       security: []
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/WebAuthnRequestCredentialOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "200": {$ref: "#/components/responses/WebAuthnRequestCredentialOK"}
 
   /auth/webauthn/make:
     post:
@@ -545,11 +545,11 @@ paths:
       tags: [auth]
       security: [webauthn: []]
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
-      requestBody: { $ref: "#/components/requestBodies/WebAuthnMakeCredential" }
+      requestBody: {$ref: "#/components/requestBodies/WebAuthnMakeCredential"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/webauthn/assert/{account_handle}:
     get:
@@ -559,9 +559,9 @@ paths:
       security: []
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
         "200":
           $ref: "#/components/responses/WebAuthnGetAssertionOK"
 
@@ -571,12 +571,12 @@ paths:
       description: Complete the credential assertion and sign in to an account.
       tags: [auth]
       security: [webauthn: []]
-      requestBody: { $ref: "#/components/requestBodies/WebAuthnMakeAssertion" }
+      requestBody: {$ref: "#/components/requestBodies/WebAuthnMakeAssertion"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/phone:
     post:
@@ -588,11 +588,11 @@ paths:
       tags: [auth]
       security: []
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
-      requestBody: { $ref: "#/components/requestBodies/PhoneRequestCode" }
+      requestBody: {$ref: "#/components/requestBodies/PhoneRequestCode"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/phone/{account_handle}:
     put:
@@ -603,11 +603,11 @@ paths:
       tags: [auth]
       security: []
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
-      requestBody: { $ref: "#/components/requestBodies/PhoneSubmitCode" }
+      requestBody: {$ref: "#/components/requestBodies/PhoneSubmitCode"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AuthSuccessOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "200": {$ref: "#/components/responses/AuthSuccessOK"}
 
   /auth/logout:
     get:
@@ -615,11 +615,11 @@ paths:
       description: Remove cookies from requesting client.
       tags: [auth]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
         "200":
           description: OK
-          headers: { Set-Cookie: { schema: { type: string } } }
+          headers: {Set-Cookie: {schema: {type: string}}}
 
   #
   #                                                      888
@@ -638,22 +638,22 @@ paths:
       description: Get the information for the currently authenticated account.
       tags: [accounts]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountGetOK" }
-        "304": { $ref: "#/components/responses/NotModified" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AccountGetOK"}
+        "304": {$ref: "#/components/responses/NotModified"}
 
     patch:
       operationId: AccountUpdate
       description: Update the information for the currently authenticated account.
       tags: [accounts]
-      requestBody: { $ref: "#/components/requestBodies/AccountUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/AccountUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AccountUpdateOK"}
 
   /accounts/self/auth-methods:
     get:
@@ -663,9 +663,9 @@ paths:
         ones are active for the currently authenticated account.
       tags: [accounts]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AccountAuthProviderListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "200": {$ref: "#/components/responses/AccountAuthProviderListOK"}
 
   /accounts/self/auth-methods/{auth_method_id}:
     delete:
@@ -681,46 +681,46 @@ paths:
           schema:
             type: string
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "200": { $ref: "#/components/responses/AccountAuthProviderListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "200": {$ref: "#/components/responses/AccountAuthProviderListOK"}
 
   /accounts/self/emails:
     post:
       operationId: AccountEmailAdd
       description: Add an email address to the authenticated account.
       tags: [accounts]
-      requestBody: { $ref: "#/components/requestBodies/AccountEmailAdd" }
+      requestBody: {$ref: "#/components/requestBodies/AccountEmailAdd"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountEmailUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AccountEmailUpdateOK"}
 
   /accounts/self/emails/{email_address_id}:
     delete:
       operationId: AccountEmailRemove
       description: Remove an email address from the authenticated account.
       tags: [accounts]
-      parameters: [{ $ref: "#/components/parameters/EmailAddressIDParam" }]
+      parameters: [{$ref: "#/components/parameters/EmailAddressIDParam"}]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
 
   /accounts/self/avatar:
     post:
       operationId: AccountSetAvatar
       description: Upload an avatar for the authenticated account.
       tags: [accounts]
-      requestBody: { $ref: "#/components/requestBodies/AccountSetAvatar" }
+      requestBody: {$ref: "#/components/requestBodies/AccountSetAvatar"}
       parameters: [$ref: "#/components/parameters/ContentLength"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: "OK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: "OK"}
 
   /accounts/{account_handle}/avatar:
     get:
@@ -730,10 +730,10 @@ paths:
       security: []
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountGetAvatar" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AccountGetAvatar"}
 
   /accounts/{account_handle}/roles/{role_id}:
     put:
@@ -746,10 +746,10 @@ paths:
         - $ref: "#/components/parameters/RoleIDParam"
         - $ref: "#/components/parameters/AccountHandleParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AccountUpdateOK"}
     delete:
       operationId: AccountRemoveRole
       description: |
@@ -760,10 +760,10 @@ paths:
         - $ref: "#/components/parameters/RoleIDParam"
         - $ref: "#/components/parameters/AccountHandleParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AccountUpdateOK"}
 
   /accounts/{account_handle}/roles/{role_id}/badge:
     put:
@@ -778,10 +778,10 @@ paths:
         - $ref: "#/components/parameters/RoleIDParam"
         - $ref: "#/components/parameters/AccountHandleParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AccountUpdateOK"}
     delete:
       operationId: AccountRoleRemoveBadge
       description: |
@@ -792,10 +792,10 @@ paths:
         - $ref: "#/components/parameters/RoleIDParam"
         - $ref: "#/components/parameters/AccountHandleParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AccountUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AccountUpdateOK"}
 
   #
   # d8b                   d8b 888             888    d8b
@@ -824,12 +824,12 @@ paths:
         endpoint will return all invitations for all accounts.
       tags: [invitations]
       parameters:
-        - { $ref: "#/components/parameters/AccountIDQueryParam" }
+        - {$ref: "#/components/parameters/AccountIDQueryParam"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/InvitationListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/InvitationListOK"}
     post:
       operationId: InvitationCreate
       description: |
@@ -838,12 +838,12 @@ paths:
         registration URL using the invitation's identifier which can be used in
         calls to registration operations to indicate the account was invited.
       tags: [invitations]
-      requestBody: { $ref: "#/components/requestBodies/InvitationCreate" }
+      requestBody: {$ref: "#/components/requestBodies/InvitationCreate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/InvitationCreateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/InvitationCreateOK"}
 
   /invitations/{invitation_id}:
     get:
@@ -853,22 +853,22 @@ paths:
         is publicly accessible and can be used to show invitation details before
         the client's registration flow.
       tags: [invitations]
-      parameters: [{ $ref: "#/components/parameters/InvitationIDParam" }]
+      parameters: [{$ref: "#/components/parameters/InvitationIDParam"}]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/InvitationGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/InvitationGetOK"}
     delete:
       operationId: InvitationDelete
       description: Delete an invitation. After deletion, it cannot be used.
       tags: [invitations]
-      parameters: [{ $ref: "#/components/parameters/InvitationIDParam" }]
+      parameters: [{$ref: "#/components/parameters/InvitationIDParam"}]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: "OK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: "OK"}
 
   #
   #                   888    d8b  .d888 d8b                   888    d8b
@@ -890,10 +890,10 @@ paths:
         - $ref: "#/components/parameters/PaginationQuery"
         - $ref: "#/components/parameters/NotificationStatusQuery"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NotificationListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NotificationListOK"}
 
   /notifications/{notification_id}:
     patch:
@@ -901,12 +901,12 @@ paths:
       description: Change the read status for a notification.
       tags: [notifications]
       parameters: [$ref: "#/components/parameters/NotificationIDParam"]
-      requestBody: { $ref: "#/components/requestBodies/NotificationUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/NotificationUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NotificationUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NotificationUpdateOK"}
 
   #
   #                           .d888 d8b 888
@@ -932,10 +932,10 @@ paths:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ProfileListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/ProfileListOK"}
 
   /profiles/{account_handle}:
     get:
@@ -945,11 +945,11 @@ paths:
       security: []
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ProfileGetOK" }
-        "304": { $ref: "#/components/responses/NotModified" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/ProfileGetOK"}
+        "304": {$ref: "#/components/responses/NotModified"}
 
   /profiles/{account_handle}/followers:
     get:
@@ -961,30 +961,30 @@ paths:
         - $ref: "#/components/parameters/PaginationQuery"
         - $ref: "#/components/parameters/AccountHandleParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ProfileFollowersGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/ProfileFollowersGetOK"}
     put:
       operationId: ProfileFollowersAdd
       description: Follow the specified profile as the authenticated account.
       tags: [profiles]
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
     delete:
       operationId: ProfileFollowersRemove
       description: Unfollow the specified profile as the authenticated account.
       tags: [profiles]
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
 
   /profiles/{account_handle}/following:
     get:
@@ -996,11 +996,11 @@ paths:
         - $ref: "#/components/parameters/PaginationQuery"
         - $ref: "#/components/parameters/AccountHandleParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ProfileFollowingGetOK" }
-        "304": { $ref: "#/components/responses/NotModified" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/ProfileFollowingGetOK"}
+        "304": {$ref: "#/components/responses/NotModified"}
 
   #
   #                   888                                      d8b
@@ -1021,29 +1021,29 @@ paths:
       operationId: CategoryCreate
       description: Create a category for organising posts.
       tags: [categories]
-      requestBody: { $ref: "#/components/requestBodies/CategoryCreate" }
+      requestBody: {$ref: "#/components/requestBodies/CategoryCreate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/CategoryCreateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/CategoryCreateOK"}
     get:
       operationId: CategoryList
       description: Get a list of all categories on the site.
       security: []
       tags: [categories]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "200": { $ref: "#/components/responses/CategoryListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "200": {$ref: "#/components/responses/CategoryListOK"}
     patch:
       operationId: CategoryUpdateOrder
       description: Update the sort order of categories.
       security: []
       tags: [categories]
-      requestBody: { $ref: "#/components/requestBodies/CategoryUpdateOrder" }
+      requestBody: {$ref: "#/components/requestBodies/CategoryUpdateOrder"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "200": { $ref: "#/components/responses/CategoryListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "200": {$ref: "#/components/responses/CategoryListOK"}
 
   /categories/{category_id}:
     patch:
@@ -1051,12 +1051,12 @@ paths:
       description: Create a category for organising posts.
       tags: [categories]
       parameters: [$ref: "#/components/parameters/CategoryIDParam"]
-      requestBody: { $ref: "#/components/requestBodies/CategoryUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/CategoryUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/CategoryUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "400": {$ref: "#/components/responses/BadRequest"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/CategoryUpdateOK"}
 
   #
   # 888
@@ -1080,19 +1080,19 @@ paths:
       security: []
       parameters: [$ref: "#/components/parameters/SearchQuery"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "200": { $ref: "#/components/responses/TagListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "200": {$ref: "#/components/responses/TagListOK"}
 
   /tags/{tag_name}:
     get:
       operationId: TagGet
       description: Get information about a tag.
       tags: [tags]
-      parameters: [{ $ref: "#/components/parameters/TagNameParam" }]
+      parameters: [{$ref: "#/components/parameters/TagNameParam"}]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "200": { $ref: "#/components/responses/TagGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "200": {$ref: "#/components/responses/TagGetOK"}
 
   #
   # 888    888                                    888
@@ -1110,12 +1110,12 @@ paths:
       operationId: ThreadCreate
       description: Create a new thread within the specified category.
       tags: [threads]
-      requestBody: { $ref: "#/components/requestBodies/ThreadCreate" }
+      requestBody: {$ref: "#/components/requestBodies/ThreadCreate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ThreadCreateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/ThreadCreateOK"}
 
     get:
       operationId: ThreadList
@@ -1129,23 +1129,23 @@ paths:
           description: Show only results creeated by this user.
           required: false
           in: query
-          schema: { $ref: "#/components/schemas/AccountHandle" }
+          schema: {$ref: "#/components/schemas/AccountHandle"}
         - $ref: "#/components/parameters/VisibilityParam"
         - name: tags
           description: Show only results with these tags
           required: false
           in: query
-          schema: { $ref: "#/components/schemas/TagListIDs" }
+          schema: {$ref: "#/components/schemas/TagListIDs"}
         - name: categories
           description: Show only results with these categories
           required: false
           in: query
-          schema: { $ref: "#/components/schemas/CategorySlugList" }
+          schema: {$ref: "#/components/schemas/CategorySlugList"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ThreadListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/ThreadListOK"}
 
   /threads/{thread_mark}:
     get:
@@ -1160,32 +1160,32 @@ paths:
         - $ref: "#/components/parameters/ThreadMarkParam"
         - $ref: "#/components/parameters/PaginationQuery"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ThreadGet" }
-        "304": { $ref: "#/components/responses/NotModified" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/ThreadGet"}
+        "304": {$ref: "#/components/responses/NotModified"}
     patch:
       operationId: ThreadUpdate
       description: Publish changes to a thread.
       tags: [threads]
       parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
-      requestBody: { $ref: "#/components/requestBodies/ThreadUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/ThreadUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ThreadUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/ThreadUpdateOK"}
     delete:
       operationId: ThreadDelete
       description: Archive a thread using soft-delete.
       tags: [threads]
       parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
 
   #
   #                          888 d8b
@@ -1207,12 +1207,12 @@ paths:
       description: Create a new post within a thread.
       tags: [replies]
       parameters: [$ref: "#/components/parameters/ThreadMarkParam"]
-      requestBody: { $ref: "#/components/requestBodies/ReplyCreate" }
+      requestBody: {$ref: "#/components/requestBodies/ReplyCreate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ReplyCreateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/ReplyCreateOK"}
 
   #
   #                            888
@@ -1234,22 +1234,22 @@ paths:
       description: Publish changes to a single post.
       tags: [posts]
       parameters: [$ref: "#/components/parameters/PostIDParam"]
-      requestBody: { $ref: "#/components/requestBodies/PostUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/PostUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/PostUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/PostUpdateOK"}
     delete:
       operationId: PostDelete
       description: Archive a post using soft-delete.
       tags: [posts]
       parameters: [$ref: "#/components/parameters/PostIDParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
 
   /posts/{post_id}/reacts:
     put:
@@ -1257,12 +1257,12 @@ paths:
       description: Add a reaction to a post.
       tags: [posts]
       parameters: [$ref: "#/components/parameters/PostIDParam"]
-      requestBody: { $ref: "#/components/requestBodies/PostReactAdd" }
+      requestBody: {$ref: "#/components/requestBodies/PostReactAdd"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/PostReactAddOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/PostReactAddOK"}
 
   /posts/{post_id}/reacts/{react_id}:
     delete:
@@ -1273,10 +1273,10 @@ paths:
         - $ref: "#/components/parameters/PostIDParam"
         - $ref: "#/components/parameters/ReactIDParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
   #
   #                                     888
   #                                     888
@@ -1293,7 +1293,7 @@ paths:
       operationId: AssetUpload
       description: Upload and process a media file.
       tags: [assets]
-      requestBody: { $ref: "#/components/requestBodies/AssetUpload" }
+      requestBody: {$ref: "#/components/requestBodies/AssetUpload"}
       parameters:
         - $ref: "#/components/parameters/ContentLength"
         - $ref: "#/components/parameters/AssetNameQuery"
@@ -1301,9 +1301,9 @@ paths:
         - $ref: "#/components/parameters/NodeContentFillTargetQuery"
         - $ref: "#/components/parameters/ParentAssetIDQuery"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AssetUploadOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AssetUploadOK"}
   /assets/{asset_filename}:
     get:
       operationId: AssetGet
@@ -1312,10 +1312,10 @@ paths:
       security: []
       parameters: [$ref: "#/components/parameters/AssetPathParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/AssetGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/AssetGetOK"}
 
   #
   # 888 d8b 888
@@ -1336,10 +1336,10 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PostIDParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/LikePostGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/LikePostGetOK"}
     put:
       operationId: LikePostAdd
       description: |
@@ -1351,10 +1351,10 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PostIDParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
     delete:
       operationId: LikePostRemove
       description: |
@@ -1365,10 +1365,10 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PostIDParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
 
   /likes/profiles/{account_handle}:
     get:
@@ -1379,10 +1379,10 @@ paths:
         - $ref: "#/components/parameters/AccountHandleParam"
         - $ref: "#/components/parameters/PaginationQuery"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/LikeProfileGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/LikeProfileGetOK"}
 
   #
   #                  888 888                   888    d8b
@@ -1401,23 +1401,23 @@ paths:
       description: |
         Create a collection for curating posts under the authenticated account.
       tags: [collections]
-      requestBody: { $ref: "#/components/requestBodies/CollectionCreate" }
+      requestBody: {$ref: "#/components/requestBodies/CollectionCreate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/CollectionCreateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/CollectionCreateOK"}
     get:
       operationId: CollectionList
       description: List all collections using the filtering options.
       tags: [collections]
       security: []
       parameters:
-        - { $ref: "#/components/parameters/AccountHandleQueryParam" }
-        - { $ref: "#/components/parameters/CollectionHasItemQueryParam" }
+        - {$ref: "#/components/parameters/AccountHandleQueryParam"}
+        - {$ref: "#/components/parameters/CollectionHasItemQueryParam"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "200": { $ref: "#/components/responses/CollectionListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "200": {$ref: "#/components/responses/CollectionListOK"}
 
   /collections/{collection_mark}:
     get:
@@ -1430,31 +1430,31 @@ paths:
       security: []
       parameters: [$ref: "#/components/parameters/CollectionMarkParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/CollectionGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/CollectionGetOK"}
     patch:
       operationId: CollectionUpdate
       description: Update a collection owned by the authenticated account.
       tags: [collections]
       parameters: [$ref: "#/components/parameters/CollectionMarkParam"]
-      requestBody: { $ref: "#/components/requestBodies/CollectionUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/CollectionUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/CollectionUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/CollectionUpdateOK"}
     delete:
       operationId: CollectionDelete
       description: Delete a collection owned by the authenticated account.
       tags: [collections]
       parameters: [$ref: "#/components/parameters/CollectionMarkParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
 
   /collections/{collection_mark}/posts/{post_id}:
     put:
@@ -1467,10 +1467,10 @@ paths:
         - $ref: "#/components/parameters/CollectionMarkParam"
         - $ref: "#/components/parameters/PostIDParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/CollectionAddPostOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/CollectionAddPostOK"}
     delete:
       operationId: CollectionRemovePost
       description: |
@@ -1481,10 +1481,10 @@ paths:
         - $ref: "#/components/parameters/CollectionMarkParam"
         - $ref: "#/components/parameters/PostIDParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/CollectionRemovePostOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/CollectionRemovePostOK"}
 
   /collections/{collection_mark}/nodes/{node_id}:
     put:
@@ -1498,10 +1498,10 @@ paths:
         - $ref: "#/components/parameters/CollectionMarkParam"
         - $ref: "#/components/parameters/NodeIDParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/CollectionAddNodeOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/CollectionAddNodeOK"}
     delete:
       operationId: CollectionRemoveNode
       description: |
@@ -1512,10 +1512,10 @@ paths:
         - $ref: "#/components/parameters/CollectionMarkParam"
         - $ref: "#/components/parameters/NodeIDParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/CollectionRemoveNodeOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/CollectionRemoveNodeOK"}
 
   #
   #                        888
@@ -1534,11 +1534,11 @@ paths:
       description: |
         Create a node for curating structured knowledge together.
       tags: [nodes]
-      requestBody: { $ref: "#/components/requestBodies/NodeCreate" }
+      requestBody: {$ref: "#/components/requestBodies/NodeCreate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NodeCreateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeCreateOK"}
     get:
       operationId: NodeList
       description: |
@@ -1552,19 +1552,19 @@ paths:
           description: List this node and all child nodes.
           required: false
           in: query
-          schema: { $ref: "#/components/schemas/Identifier" }
+          schema: {$ref: "#/components/schemas/Identifier"}
         - name: author
           description: Show only results owned by this account.
           required: false
           in: query
-          schema: { $ref: "#/components/schemas/AccountHandle" }
+          schema: {$ref: "#/components/schemas/AccountHandle"}
         - $ref: "#/components/parameters/VisibilityParam"
         - $ref: "#/components/parameters/TreeDepthParam"
         - $ref: "#/components/parameters/NodeListFormatParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "200": { $ref: "#/components/responses/NodeListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "200": {$ref: "#/components/responses/NodeListOK"}
 
   /nodes/{node_slug}:
     get:
@@ -1574,10 +1574,10 @@ paths:
       security: []
       parameters: [$ref: "#/components/parameters/NodeSlugParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NodeGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeGetOK"}
     patch:
       operationId: NodeUpdate
       description: Update a node.
@@ -1588,12 +1588,12 @@ paths:
         - $ref: "#/components/parameters/TagFillRuleQueryParam"
         - $ref: "#/components/parameters/NodeContentFillRuleQuery"
         - $ref: "#/components/parameters/FillSourceQuery"
-      requestBody: { $ref: "#/components/requestBodies/NodeUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/NodeUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NodeUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeUpdateOK"}
     delete:
       operationId: NodeDelete
       description: Delete a node and move all children to its parent or root.
@@ -1602,10 +1602,10 @@ paths:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/TargetNodeSlugQuery"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NodeDeleteOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeDeleteOK"}
 
   /nodes/{node_slug}/visibility:
     patch:
@@ -1616,12 +1616,12 @@ paths:
         anything to "published" is often accompanied by some other side effects.
       tags: [nodes]
       parameters: [$ref: "#/components/parameters/NodeSlugParam"]
-      requestBody: { $ref: "#/components/requestBodies/VisibilityUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/VisibilityUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NodeUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeUpdateOK"}
 
   /nodes/{node_slug}/assets/{asset_id}:
     put:
@@ -1634,10 +1634,10 @@ paths:
         - $ref: "#/components/parameters/NodeContentFillRuleQuery"
         - $ref: "#/components/parameters/NodeContentFillTargetQuery"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NodeUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeUpdateOK"}
     delete:
       operationId: NodeRemoveAsset
       description: Remove an asset from a node.
@@ -1646,10 +1646,10 @@ paths:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/AssetIDParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NodeUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeUpdateOK"}
 
   /nodes/{node_slug}/nodes/{node_slug_child}:
     put:
@@ -1660,10 +1660,10 @@ paths:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/NodeSlugChildParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NodeAddChildOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeAddChildOK"}
     delete:
       operationId: NodeRemoveNode
       description: |
@@ -1673,10 +1673,10 @@ paths:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/NodeSlugChildParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/NodeRemoveChildOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeRemoveChildOK"}
 
   #
   # 888 d8b          888
@@ -1707,11 +1707,11 @@ paths:
       parameters:
         - $ref: "#/components/parameters/NodeContentFillRuleQuery"
         - $ref: "#/components/parameters/NodeContentFillTargetQuery"
-      requestBody: { $ref: "#/components/requestBodies/LinkCreate" }
+      requestBody: {$ref: "#/components/requestBodies/LinkCreate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/LinkCreateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/LinkCreateOK"}
     get:
       operationId: LinkList
       description: List all links using the filtering options.
@@ -1721,9 +1721,9 @@ paths:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "200": { $ref: "#/components/responses/LinkListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "200": {$ref: "#/components/responses/LinkListOK"}
 
   /links/{link_slug}:
     get:
@@ -1733,11 +1733,11 @@ paths:
         which resources it's linked to and how many times it's been opened.
       tags: [links]
       security: []
-      parameters: [{ $ref: "#/components/parameters/LinkSlugParam" }]
+      parameters: [{$ref: "#/components/parameters/LinkSlugParam"}]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "200": { $ref: "#/components/responses/LinkGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "200": {$ref: "#/components/responses/LinkGetOK"}
 
   #
   #      888          888                                               888
@@ -1763,10 +1763,10 @@ paths:
         - $ref: "#/components/parameters/DatagraphKindQuery"
         - $ref: "#/components/parameters/PaginationQuery"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/DatagraphSearchOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/DatagraphSearchOK"}
 
   /datagraph/ask:
     get:
@@ -1775,11 +1775,12 @@ paths:
       tags: [datagraph]
       parameters:
         - $ref: "#/components/parameters/RequiredSearchQuery"
+        - $ref: "#/components/parameters/ParentQuestionID"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/DatagraphAskOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/DatagraphAskOK"}
 
   #
   #                                     888
@@ -1802,20 +1803,20 @@ paths:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "200": { $ref: "#/components/responses/EventListOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "200": {$ref: "#/components/responses/EventListOK"}
     post:
       operationId: EventCreate
       description: |
         Create a new event. When an event is created, a thread is also created
         which provides the means for discussion via the thread and reply APIs.
       tags: [events]
-      requestBody: { $ref: "#/components/requestBodies/EventCreate" }
+      requestBody: {$ref: "#/components/requestBodies/EventCreate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/EventCreateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/EventCreateOK"}
 
   /events/{event_mark}:
     get:
@@ -1825,10 +1826,10 @@ paths:
       security: []
       parameters: [$ref: "#/components/parameters/EventMarkParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/EventGetOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/EventGetOK"}
     patch:
       operationId: EventUpdate
       description: |
@@ -1837,22 +1838,22 @@ paths:
         possible to update that thread directly using `threads` operations.
       tags: [events]
       parameters: [$ref: "#/components/parameters/EventMarkParam"]
-      requestBody: { $ref: "#/components/requestBodies/EventUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/EventUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/EventUpdateOK" }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/EventUpdateOK"}
     delete:
       operationId: EventDelete
       description: Delete an event.
       tags: [events]
       parameters: [$ref: "#/components/parameters/EventMarkParam"]
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
 
   /events/{event_mark}/participants/{account_id}:
     put:
@@ -1886,12 +1887,12 @@ paths:
       parameters:
         - $ref: "#/components/parameters/EventMarkParam"
         - $ref: "#/components/parameters/AccountIDParam"
-      requestBody: { $ref: "#/components/requestBodies/EventParticipantUpdate" }
+      requestBody: {$ref: "#/components/requestBodies/EventParticipantUpdate"}
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
     delete:
       operationId: EventParticipantRemove
       description: |
@@ -1902,10 +1903,10 @@ paths:
         - $ref: "#/components/parameters/EventMarkParam"
         - $ref: "#/components/parameters/AccountIDParam"
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "404": { $ref: "#/components/responses/NotFound" }
-        "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { description: OK }
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {description: OK}
 
 components:
   #
@@ -2088,6 +2089,15 @@ components:
         type: string
         minLength: 0
 
+    ParentQuestionID:
+      description: If a follow-up question, the parent question ID.
+      name: parent_question_id
+      in: query
+      required: false
+      allowEmptyValue: true
+      schema:
+        type: string
+
     DatagraphKindQuery:
       description: Datagraph item kind query.
       name: kind
@@ -2097,7 +2107,7 @@ components:
       explode: true
       schema:
         type: array
-        items: { $ref: "#/components/schemas/DatagraphItemKind" }
+        items: {$ref: "#/components/schemas/DatagraphItemKind"}
 
     PaginationQuery:
       description: Pagination query parameters.
@@ -2285,7 +2295,7 @@ components:
       explode: true
       schema:
         type: array
-        items: { $ref: "#/components/schemas/Visibility" }
+        items: {$ref: "#/components/schemas/Visibility"}
 
     TreeDepthParam:
       name: depth
@@ -2339,92 +2349,92 @@ components:
     AdminSettingsUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AdminSettingsMutableProps" }
+          schema: {$ref: "#/components/schemas/AdminSettingsMutableProps"}
 
     RoleCreate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/RoleInitialProps" }
+          schema: {$ref: "#/components/schemas/RoleInitialProps"}
 
     RoleUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/RoleMutableProps" }
+          schema: {$ref: "#/components/schemas/RoleMutableProps"}
 
     AuthPassword:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AuthPair" }
+          schema: {$ref: "#/components/schemas/AuthPair"}
 
     AuthEmailPassword:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AuthEmailPasswordInitialProps" }
+          schema: {$ref: "#/components/schemas/AuthEmailPasswordInitialProps"}
 
     AuthEmailPasswordReset:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AuthEmailPasswordReset" }
+          schema: {$ref: "#/components/schemas/AuthEmailPasswordReset"}
 
     AuthEmail:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AuthEmailInitialProps" }
+          schema: {$ref: "#/components/schemas/AuthEmailInitialProps"}
 
     AuthEmailVerify:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AuthEmailVerifyProps" }
+          schema: {$ref: "#/components/schemas/AuthEmailVerifyProps"}
 
     AuthPasswordCreate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AuthPasswordInitialProps" }
+          schema: {$ref: "#/components/schemas/AuthPasswordInitialProps"}
 
     AuthPasswordUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AuthPasswordMutableProps" }
+          schema: {$ref: "#/components/schemas/AuthPasswordMutableProps"}
 
     AuthPasswordReset:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AuthPasswordResetProps" }
+          schema: {$ref: "#/components/schemas/AuthPasswordResetProps"}
 
     OAuthProviderCallback:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/OAuthCallback" }
+          schema: {$ref: "#/components/schemas/OAuthCallback"}
 
     WebAuthnMakeCredential:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PublicKeyCredential" }
+          schema: {$ref: "#/components/schemas/PublicKeyCredential"}
 
     WebAuthnMakeAssertion:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PublicKeyCredential" }
+          schema: {$ref: "#/components/schemas/PublicKeyCredential"}
 
     PhoneRequestCode:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PhoneRequestCodeProps" }
+          schema: {$ref: "#/components/schemas/PhoneRequestCodeProps"}
 
     PhoneSubmitCode:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PhoneSubmitCodeProps" }
+          schema: {$ref: "#/components/schemas/PhoneSubmitCodeProps"}
 
     AccountUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AccountMutableProps" }
+          schema: {$ref: "#/components/schemas/AccountMutableProps"}
 
     AccountEmailAdd:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/AccountEmailInitialProps" }
+          schema: {$ref: "#/components/schemas/AccountEmailInitialProps"}
 
     AccountSetAvatar:
       content:
@@ -2436,55 +2446,55 @@ components:
     InvitationCreate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/InvitationInitialProps" }
+          schema: {$ref: "#/components/schemas/InvitationInitialProps"}
 
     NotificationUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/NotificationMutableProps" }
+          schema: {$ref: "#/components/schemas/NotificationMutableProps"}
 
     CategoryCreate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/CategoryInitialProps" }
+          schema: {$ref: "#/components/schemas/CategoryInitialProps"}
 
     CategoryUpdateOrder:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/CategoryIdentifierList" }
+          schema: {$ref: "#/components/schemas/CategoryIdentifierList"}
 
     CategoryUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/CategoryMutableProps" }
+          schema: {$ref: "#/components/schemas/CategoryMutableProps"}
 
     ThreadCreate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/ThreadInitialProps" }
+          schema: {$ref: "#/components/schemas/ThreadInitialProps"}
 
     ThreadUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/ThreadMutableProps" }
+          schema: {$ref: "#/components/schemas/ThreadMutableProps"}
 
     ReplyCreate:
       description: Create a reply, which is a post within a thread.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/ReplyInitialProps" }
+          schema: {$ref: "#/components/schemas/ReplyInitialProps"}
 
     PostUpdate:
       description: Create a post within a thread.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/PostMutableProps" }
+          schema: {$ref: "#/components/schemas/PostMutableProps"}
 
     PostReactAdd:
       description: Add a reaction to a post.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/ReactInitialProps" }
+          schema: {$ref: "#/components/schemas/ReactInitialProps"}
 
     AssetUpload:
       description: Upload a file.
@@ -2497,47 +2507,47 @@ components:
     CollectionCreate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/CollectionInitialProps" }
+          schema: {$ref: "#/components/schemas/CollectionInitialProps"}
 
     CollectionUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/CollectionMutableProps" }
+          schema: {$ref: "#/components/schemas/CollectionMutableProps"}
 
     NodeCreate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/NodeInitialProps" }
+          schema: {$ref: "#/components/schemas/NodeInitialProps"}
 
     NodeUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/NodeMutableProps" }
+          schema: {$ref: "#/components/schemas/NodeMutableProps"}
 
     LinkCreate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/LinkInitialProps" }
+          schema: {$ref: "#/components/schemas/LinkInitialProps"}
 
     VisibilityUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/VisibilityMutationProps" }
+          schema: {$ref: "#/components/schemas/VisibilityMutationProps"}
 
     EventCreate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/EventInitialProps" }
+          schema: {$ref: "#/components/schemas/EventInitialProps"}
 
     EventUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/EventMutableProps" }
+          schema: {$ref: "#/components/schemas/EventMutableProps"}
 
     EventParticipantUpdate:
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/EventParticipantMutableProps" }
+          schema: {$ref: "#/components/schemas/EventParticipantMutableProps"}
 
   #
   # 8888888b.  8888888888 .d8888b.  8888888b.   .d88888b.  888b    888  .d8888b.  8888888888 .d8888b.
@@ -2553,7 +2563,7 @@ components:
   responses:
     NotModified:
       description: Not modified
-      headers: { <<: *cache_response_headers }
+      headers: {<<: *cache_response_headers}
     BadRequest:
       description: Bad request
     NotFound:
@@ -2621,8 +2631,8 @@ components:
             type: object
             required: [providers, mode]
             properties:
-              providers: { $ref: "#/components/schemas/AuthProviderList" }
-              mode: { $ref: "#/components/schemas/AuthMode" }
+              providers: {$ref: "#/components/schemas/AuthProviderList"}
+              mode: {$ref: "#/components/schemas/AuthMode"}
 
     WebAuthnRequestCredentialOK:
       description: OK
@@ -2633,7 +2643,7 @@ components:
       content:
         application/json:
           schema:
-            { $ref: "#/components/schemas/WebAuthnPublicKeyCreationOptions" }
+            {$ref: "#/components/schemas/WebAuthnPublicKeyCreationOptions"}
 
     WebAuthnGetAssertionOK:
       description: OK
@@ -2648,7 +2658,7 @@ components:
 
     AccountGetOK:
       description: OK
-      headers: { <<: *cache_response_headers }
+      headers: {<<: *cache_response_headers}
       content:
         application/json:
           schema:
@@ -2677,7 +2687,7 @@ components:
 
     AccountGetAvatar:
       description: OK
-      headers: { <<: *cache_response_headers }
+      headers: {<<: *cache_response_headers}
       content:
         image/png:
           schema:
@@ -2728,7 +2738,7 @@ components:
 
     ProfileGetOK:
       description: OK
-      headers: { <<: *cache_response_headers }
+      headers: {<<: *cache_response_headers}
       content:
         application/json:
           schema:
@@ -2801,14 +2811,14 @@ components:
       description: List of all threads.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/ThreadListResult" }
+          schema: {$ref: "#/components/schemas/ThreadListResult"}
 
     ThreadGet:
       description: The information about a thread and its posts.
-      headers: { <<: *cache_response_headers }
+      headers: {<<: *cache_response_headers}
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/Thread" }
+          schema: {$ref: "#/components/schemas/Thread"}
 
     ReplyCreateOK:
       description: Thread reply created successfully.
@@ -2840,7 +2850,7 @@ components:
 
     AssetGetOK:
       description: The new URL of an uploaded file.
-      headers: { <<: *cache_response_headers }
+      headers: {<<: *cache_response_headers}
       content:
         "*/*":
           schema:
@@ -2855,7 +2865,7 @@ components:
             type: object
             required: [likes]
             properties:
-              likes: { $ref: "#/components/schemas/ItemLikeList" }
+              likes: {$ref: "#/components/schemas/ItemLikeList"}
 
     LikeProfileGetOK:
       description: Likes that an account has given.
@@ -2879,7 +2889,7 @@ components:
             type: object
             required: [collections]
             properties:
-              collections: { $ref: "#/components/schemas/CollectionList" }
+              collections: {$ref: "#/components/schemas/CollectionList"}
 
     CollectionGetOK:
       description: Collection information and content.
@@ -2934,7 +2944,7 @@ components:
       description: Node list.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/NodeListResult" }
+          schema: {$ref: "#/components/schemas/NodeListResult"}
 
     NodeGetOK:
       description: Node information and content.
@@ -2985,7 +2995,7 @@ components:
       description: Link list.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/LinkListResult" }
+          schema: {$ref: "#/components/schemas/LinkListResult"}
 
     LinkGetOK:
       description: Link data.
@@ -2998,7 +3008,7 @@ components:
       description: Search results.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/DatagraphSearchResult" }
+          schema: {$ref: "#/components/schemas/DatagraphSearchResult"}
 
     DatagraphAskOK:
       description: Search results.
@@ -3011,25 +3021,25 @@ components:
       description: Event list.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/EventListResult" }
+          schema: {$ref: "#/components/schemas/EventListResult"}
 
     EventCreateOK:
       description: Event create.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/Event" }
+          schema: {$ref: "#/components/schemas/Event"}
 
     EventGetOK:
       description: Event get.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/Event" }
+          schema: {$ref: "#/components/schemas/Event"}
 
     EventUpdateOK:
       description: Event update.
       content:
         application/json:
-          schema: { $ref: "#/components/schemas/Event" }
+          schema: {$ref: "#/components/schemas/Event"}
 
   #
   #  .d8888b.   .d8888b.  888    888 8888888888 888b     d888        d8888  .d8888b.
@@ -3160,7 +3170,7 @@ components:
 
     InstanceCapabilityList:
       type: array
-      items: { $ref: "#/components/schemas/InstanceCapability" }
+      items: {$ref: "#/components/schemas/InstanceCapability"}
 
     FillSource:
       description: |
@@ -3232,7 +3242,7 @@ components:
       type: object
       required: [visibility]
       properties:
-        visibility: { $ref: "#/components/schemas/Visibility" }
+        visibility: {$ref: "#/components/schemas/Visibility"}
 
     Slug:
       description: A URL-safe slug for uniquely identifying resources.
@@ -3259,7 +3269,7 @@ components:
         - createdAt
         - updatedAt
       properties:
-        id: { $ref: "#/components/schemas/Identifier" }
+        id: {$ref: "#/components/schemas/Identifier"}
         createdAt:
           type: string
           format: date-time
@@ -3349,12 +3359,12 @@ components:
       description: A minimal reference to an account.
       required: [id, joined, handle, name, roles]
       properties:
-        id: { $ref: "#/components/schemas/Identifier" }
-        joined: { $ref: "#/components/schemas/MemberJoinedDate" }
-        suspended: { $ref: "#/components/schemas/MemberSuspendedDate" }
-        handle: { $ref: "#/components/schemas/AccountHandle" }
-        name: { $ref: "#/components/schemas/AccountName" }
-        roles: { $ref: "#/components/schemas/AccountRoleList" }
+        id: {$ref: "#/components/schemas/Identifier"}
+        joined: {$ref: "#/components/schemas/MemberJoinedDate"}
+        suspended: {$ref: "#/components/schemas/MemberSuspendedDate"}
+        handle: {$ref: "#/components/schemas/AccountHandle"}
+        name: {$ref: "#/components/schemas/AccountName"}
+        roles: {$ref: "#/components/schemas/AccountRoleList"}
 
     ThreadTitle:
       type: string
@@ -3365,13 +3375,13 @@ components:
       type: object
       description: A suggested title for a thread.
       properties:
-        title_suggestion: { $ref: "#/components/schemas/ThreadTitle" }
+        title_suggestion: {$ref: "#/components/schemas/ThreadTitle"}
 
     ContentSuggestion:
       type: object
       description: A suggested body content.
       properties:
-        content_suggestion: { $ref: "#/components/schemas/PostContent" }
+        content_suggestion: {$ref: "#/components/schemas/PostContent"}
 
     PostContent:
       description: |
@@ -3461,7 +3471,7 @@ components:
       type: object
       required: [roles]
       properties:
-        roles: { $ref: "#/components/schemas/RoleList" }
+        roles: {$ref: "#/components/schemas/RoleList"}
 
     RoleList:
       type: array
@@ -3617,7 +3627,7 @@ components:
       type: object
       required: [email, password]
       properties:
-        email: { $ref: "#/components/schemas/EmailAddress" }
+        email: {$ref: "#/components/schemas/EmailAddress"}
         password:
           type: string
         handle:
@@ -3627,7 +3637,7 @@ components:
       type: object
       required: [email, token_url]
       properties:
-        email: { $ref: "#/components/schemas/EmailAddress" }
+        email: {$ref: "#/components/schemas/EmailAddress"}
         token_url:
           type: object
           required: [url, query]
@@ -3647,7 +3657,7 @@ components:
       type: object
       required: [email]
       properties:
-        email: { $ref: "#/components/schemas/EmailAddress" }
+        email: {$ref: "#/components/schemas/EmailAddress"}
         handle:
           $ref: "#/components/schemas/AccountHandle"
 
@@ -3731,26 +3741,26 @@ components:
         - excludeCredentials
         - pubKeyCredParams
       properties:
-        rp: { $ref: "#/components/schemas/PublicKeyCredentialRpEntity" }
-        user: { $ref: "#/components/schemas/PublicKeyCredentialUserEntity" }
+        rp: {$ref: "#/components/schemas/PublicKeyCredentialRpEntity"}
+        user: {$ref: "#/components/schemas/PublicKeyCredentialUserEntity"}
 
         challenge:
           type: string
         pubKeyCredParams:
           type: array
-          items: { $ref: "#/components/schemas/PublicKeyCredentialParameters" }
+          items: {$ref: "#/components/schemas/PublicKeyCredentialParameters"}
 
         timeout:
           type: integer
         excludeCredentials:
           type: array
-          items: { $ref: "#/components/schemas/PublicKeyCredentialDescriptor" }
+          items: {$ref: "#/components/schemas/PublicKeyCredentialDescriptor"}
         authenticatorSelection:
-          { $ref: "#/components/schemas/AuthenticatorSelectionCriteria" }
+          {$ref: "#/components/schemas/AuthenticatorSelectionCriteria"}
         attestation:
-          { $ref: "#/components/schemas/AttestationConveyancePreference" }
+          {$ref: "#/components/schemas/AttestationConveyancePreference"}
         extensions:
-          { $ref: "#/components/schemas/AuthenticationExtensionsClientInputs" }
+          {$ref: "#/components/schemas/AuthenticationExtensionsClientInputs"}
 
     PublicKeyCredentialRpEntity:
       description: |
@@ -3881,7 +3891,7 @@ components:
           type: string
         rawId:
           type: string
-        response: { $ref: "#/components/schemas/AuthenticatorResponse" }
+        response: {$ref: "#/components/schemas/AuthenticatorResponse"}
         type:
           type: string
         clientExtensionResults:
@@ -3992,8 +4002,8 @@ components:
           admin,
         ]
       properties:
-        joined: { $ref: "#/components/schemas/MemberJoinedDate" }
-        suspended: { $ref: "#/components/schemas/MemberSuspendedDate" }
+        joined: {$ref: "#/components/schemas/MemberJoinedDate"}
+        suspended: {$ref: "#/components/schemas/MemberSuspendedDate"}
         handle:
           $ref: "#/components/schemas/AccountHandle"
         name:
@@ -4039,12 +4049,12 @@ components:
       type: object
       required: [active, available]
       properties:
-        active: { $ref: "#/components/schemas/AccountAuthMethodList" }
-        available: { $ref: "#/components/schemas/AuthProviderList" }
+        active: {$ref: "#/components/schemas/AccountAuthMethodList"}
+        available: {$ref: "#/components/schemas/AuthProviderList"}
 
     AccountAuthMethodList:
       type: array
-      items: { $ref: "#/components/schemas/AccountAuthMethod" }
+      items: {$ref: "#/components/schemas/AccountAuthMethod"}
 
     AccountAuthMethod:
       description: |
@@ -4067,7 +4077,7 @@ components:
         identifier:
           description: The external identifier (third party ID or device ID)
           type: string
-        provider: { $ref: "#/components/schemas/AuthProvider" }
+        provider: {$ref: "#/components/schemas/AuthProvider"}
 
     AccountVerifiedStatus:
       type: string
@@ -4078,14 +4088,14 @@ components:
         If the instance is configured to not use any email features for auth or
         transactional/content communications, this will always be empty.
       type: array
-      items: { $ref: "#/components/schemas/AccountEmailAddress" }
+      items: {$ref: "#/components/schemas/AccountEmailAddress"}
 
     AccountEmailAddress:
       type: object
       required: [id, email_address, verified]
       properties:
-        id: { $ref: "#/components/schemas/Identifier" }
-        email_address: { $ref: "#/components/schemas/EmailAddress" }
+        id: {$ref: "#/components/schemas/Identifier"}
+        email_address: {$ref: "#/components/schemas/EmailAddress"}
         verified:
           description: Is the email address verified to be owned by the account?
           type: boolean
@@ -4094,7 +4104,7 @@ components:
       type: object
       required: [email_address]
       properties:
-        email_address: { $ref: "#/components/schemas/EmailAddress" }
+        email_address: {$ref: "#/components/schemas/EmailAddress"}
 
     #
     # 8888888                   d8b 888             888    d8b
@@ -4115,22 +4125,22 @@ components:
 
     InvitationList:
       type: array
-      items: { $ref: "#/components/schemas/Invitation" }
+      items: {$ref: "#/components/schemas/Invitation"}
 
     InvitationListResult:
       type: object
       allOf:
-        - { $ref: "#/components/schemas/PaginatedResult" }
+        - {$ref: "#/components/schemas/PaginatedResult"}
         - type: object
           required: [invitations]
           properties:
-            invitations: { $ref: "#/components/schemas/InvitationList" }
+            invitations: {$ref: "#/components/schemas/InvitationList"}
 
     InvitationProps:
       type: object
       required: [creator]
       properties:
-        creator: { $ref: "#/components/schemas/ProfileReference" }
+        creator: {$ref: "#/components/schemas/ProfileReference"}
         message:
           type: string
 
@@ -4155,33 +4165,33 @@ components:
       type: object
       required: [id, created_at, event, status]
       properties:
-        id: { $ref: "#/components/schemas/Identifier" }
+        id: {$ref: "#/components/schemas/Identifier"}
         created_at:
           type: string
           format: date-time
           description: The time the resource was created.
-        event: { $ref: "#/components/schemas/NotificationEvent" }
-        item: { $ref: "#/components/schemas/DatagraphItem" }
-        source: { $ref: "#/components/schemas/ProfileReference" }
-        status: { $ref: "#/components/schemas/NotificationStatus" }
+        event: {$ref: "#/components/schemas/NotificationEvent"}
+        item: {$ref: "#/components/schemas/DatagraphItem"}
+        source: {$ref: "#/components/schemas/ProfileReference"}
+        status: {$ref: "#/components/schemas/NotificationStatus"}
 
     NotificationMutableProps:
       type: object
       properties:
-        status: { $ref: "#/components/schemas/NotificationStatus" }
+        status: {$ref: "#/components/schemas/NotificationStatus"}
 
     NotificationList:
       type: array
-      items: { $ref: "#/components/schemas/Notification" }
+      items: {$ref: "#/components/schemas/Notification"}
 
     NotificationListResult:
       type: object
       allOf:
-        - { $ref: "#/components/schemas/PaginatedResult" }
+        - {$ref: "#/components/schemas/PaginatedResult"}
         - type: object
           required: [notifications]
           properties:
-            notifications: { $ref: "#/components/schemas/NotificationList" }
+            notifications: {$ref: "#/components/schemas/NotificationList"}
 
     NotificationEvent:
       description: |
@@ -4196,7 +4206,7 @@ components:
 
     NotificationStatusList:
       type: array
-      items: { $ref: "#/components/schemas/NotificationStatus" }
+      items: {$ref: "#/components/schemas/NotificationStatus"}
 
     NotificationCount:
       type: integer
@@ -4233,8 +4243,8 @@ components:
             createdAt:
               deprecated: true
               type: string
-            joined: { $ref: "#/components/schemas/MemberJoinedDate" }
-            suspended: { $ref: "#/components/schemas/MemberSuspendedDate" }
+            joined: {$ref: "#/components/schemas/MemberJoinedDate"}
+            suspended: {$ref: "#/components/schemas/MemberSuspendedDate"}
             handle:
               $ref: "#/components/schemas/AccountHandle"
             name:
@@ -4262,19 +4272,19 @@ components:
 
     PublicProfileFollowersResult:
       allOf:
-        - { $ref: "#/components/schemas/PaginatedResult" }
+        - {$ref: "#/components/schemas/PaginatedResult"}
         - type: object
           required: [followers]
           properties:
-            followers: { $ref: "#/components/schemas/ProfileFollowersList" }
+            followers: {$ref: "#/components/schemas/ProfileFollowersList"}
 
     PublicProfileFollowingResult:
       allOf:
-        - { $ref: "#/components/schemas/PaginatedResult" }
+        - {$ref: "#/components/schemas/PaginatedResult"}
         - type: object
           required: [following]
           properties:
-            following: { $ref: "#/components/schemas/ProfileFollowingList" }
+            following: {$ref: "#/components/schemas/ProfileFollowingList"}
 
     ProfileExternalLinkList:
       type: array
@@ -4292,23 +4302,23 @@ components:
 
     PublicProfileListResult:
       allOf:
-        - { $ref: "#/components/schemas/PaginatedResult" }
+        - {$ref: "#/components/schemas/PaginatedResult"}
         - type: object
           required: [profiles]
           properties:
-            profiles: { $ref: "#/components/schemas/PublicProfileList" }
+            profiles: {$ref: "#/components/schemas/PublicProfileList"}
 
     PublicProfileList:
       type: array
-      items: { $ref: "#/components/schemas/PublicProfile" }
+      items: {$ref: "#/components/schemas/PublicProfile"}
 
     ProfileFollowersList:
       type: array
-      items: { $ref: "#/components/schemas/ProfileReference" }
+      items: {$ref: "#/components/schemas/ProfileReference"}
 
     ProfileFollowingList:
       type: array
-      items: { $ref: "#/components/schemas/ProfileReference" }
+      items: {$ref: "#/components/schemas/ProfileReference"}
 
     ProfileFollowersCount:
       type: integer
@@ -4369,7 +4379,7 @@ components:
           type: integer
         admin:
           type: boolean
-        meta: { $ref: "#/components/schemas/Metadata" }
+        meta: {$ref: "#/components/schemas/Metadata"}
 
     CategoryInitialProps:
       type: object
@@ -4385,7 +4395,7 @@ components:
           type: string
         admin:
           type: boolean
-        meta: { $ref: "#/components/schemas/Metadata" }
+        meta: {$ref: "#/components/schemas/Metadata"}
 
     CategoryMutableProps:
       type: object
@@ -4400,7 +4410,7 @@ components:
           type: string
         admin:
           type: boolean
-        meta: { $ref: "#/components/schemas/Metadata" }
+        meta: {$ref: "#/components/schemas/Metadata"}
 
     CategoryName:
       description: A category's user-facing name.
@@ -4429,11 +4439,11 @@ components:
       properties:
         categories:
           type: array
-          items: { $ref: "#/components/schemas/Category" }
+          items: {$ref: "#/components/schemas/Category"}
 
     CategoryIdentifierList:
       type: array
-      items: { $ref: "#/components/schemas/Identifier" }
+      items: {$ref: "#/components/schemas/Identifier"}
 
     #
     # 88888888888
@@ -4473,16 +4483,16 @@ components:
       type: object
       required: [id, items]
       properties:
-        id: { $ref: "#/components/schemas/Identifier" }
-        items: { $ref: "#/components/schemas/DatagraphItemList" }
+        id: {$ref: "#/components/schemas/Identifier"}
+        items: {$ref: "#/components/schemas/DatagraphItemList"}
 
     TagReferenceProps:
       type: object
       required: [name, colour, item_count]
       properties:
-        name: { $ref: "#/components/schemas/TagName" }
-        colour: { $ref: "#/components/schemas/TagColour" }
-        item_count: { $ref: "#/components/schemas/TagItemCount" }
+        name: {$ref: "#/components/schemas/TagName"}
+        colour: {$ref: "#/components/schemas/TagColour"}
+        item_count: {$ref: "#/components/schemas/TagItemCount"}
 
     TagName:
       type: string
@@ -4499,27 +4509,27 @@ components:
     TagReferenceList:
       type: array
       description: A list of tags.
-      items: { $ref: "#/components/schemas/TagReference" }
+      items: {$ref: "#/components/schemas/TagReference"}
 
     TagNameList:
       type: array
-      items: { $ref: "#/components/schemas/TagName" }
+      items: {$ref: "#/components/schemas/TagName"}
 
     TagListIDs:
       type: array
       description: A list of tags IDs.
-      items: { $ref: "#/components/schemas/Identifier" }
+      items: {$ref: "#/components/schemas/Identifier"}
 
     TagListResult:
       type: object
       required: [tags]
       properties:
-        tags: { $ref: "#/components/schemas/TagReferenceList" }
+        tags: {$ref: "#/components/schemas/TagReferenceList"}
 
     TagSuggestions:
       type: object
       properties:
-        tag_suggestions: { $ref: "#/components/schemas/TagNameList" }
+        tag_suggestions: {$ref: "#/components/schemas/TagNameList"}
 
     #
     # 8888888b.                   888
@@ -4540,9 +4550,9 @@ components:
         Post is used in generic use-cases where it may not matter whether you
         want a thread or a reply, such as search results or recommendations.
       allOf:
-        - { $ref: "#/components/schemas/CommonProperties" }
-        - { $ref: "#/components/schemas/PostReferenceProps" }
-        - { $ref: "#/components/schemas/PostProps" }
+        - {$ref: "#/components/schemas/CommonProperties"}
+        - {$ref: "#/components/schemas/PostReferenceProps"}
+        - {$ref: "#/components/schemas/PostProps"}
 
     PostReference:
       description: |
@@ -4550,8 +4560,8 @@ components:
         unnecessary data such as the full content or child items.
       type: object
       allOf:
-        - { $ref: "#/components/schemas/CommonProperties" }
-        - { $ref: "#/components/schemas/PostReferenceProps" }
+        - {$ref: "#/components/schemas/CommonProperties"}
+        - {$ref: "#/components/schemas/PostReferenceProps"}
 
     PostProps:
       description: |
@@ -4560,32 +4570,32 @@ components:
       type: object
       required: [body, body_links]
       properties:
-        body: { $ref: "#/components/schemas/PostContent" }
-        body_links: { $ref: "#/components/schemas/LinkReferenceList" }
+        body: {$ref: "#/components/schemas/PostContent"}
+        body_links: {$ref: "#/components/schemas/LinkReferenceList"}
 
     PostReferenceProps:
       required: [title, slug, author, assets, reacts, collections, likes]
       properties:
-        title: { $ref: "#/components/schemas/ThreadTitle" }
-        description: { $ref: "#/components/schemas/PostDescription" }
-        slug: { $ref: "#/components/schemas/ThreadMark" }
-        author: { $ref: "#/components/schemas/ProfileReference" }
-        assets: { $ref: "#/components/schemas/AssetList" }
-        reacts: { $ref: "#/components/schemas/ReactList" }
-        collections: { $ref: "#/components/schemas/CollectionStatus" }
-        likes: { $ref: "#/components/schemas/LikeData" }
-        meta: { $ref: "#/components/schemas/Metadata" }
+        title: {$ref: "#/components/schemas/ThreadTitle"}
+        description: {$ref: "#/components/schemas/PostDescription"}
+        slug: {$ref: "#/components/schemas/ThreadMark"}
+        author: {$ref: "#/components/schemas/ProfileReference"}
+        assets: {$ref: "#/components/schemas/AssetList"}
+        reacts: {$ref: "#/components/schemas/ReactList"}
+        collections: {$ref: "#/components/schemas/CollectionStatus"}
+        likes: {$ref: "#/components/schemas/LikeData"}
+        meta: {$ref: "#/components/schemas/Metadata"}
 
     PostReferenceList:
       type: array
-      items: { $ref: "#/components/schemas/PostReference" }
+      items: {$ref: "#/components/schemas/PostReference"}
 
     PostMutableProps:
       type: object
       properties:
-        body: { $ref: "#/components/schemas/PostContent" }
-        meta: { $ref: "#/components/schemas/Metadata" }
-        url: { $ref: "#/components/schemas/URL" }
+        body: {$ref: "#/components/schemas/PostContent"}
+        meta: {$ref: "#/components/schemas/Metadata"}
+        url: {$ref: "#/components/schemas/URL"}
 
     PostDescription:
       type: string
@@ -4609,7 +4619,7 @@ components:
         - type: object
           required: [replies]
           properties:
-            replies: { $ref: "#/components/schemas/PaginatedReplyList" }
+            replies: {$ref: "#/components/schemas/PaginatedReplyList"}
 
     ThreadInitialProps:
       type: object
@@ -4619,24 +4629,24 @@ components:
         - category
         - visibility
       properties:
-        title: { $ref: "#/components/schemas/ThreadTitle" }
-        body: { $ref: "#/components/schemas/PostContent" }
-        tags: { $ref: "#/components/schemas/TagNameList" }
-        meta: { $ref: "#/components/schemas/Metadata" }
-        category: { $ref: "#/components/schemas/Identifier" }
-        visibility: { $ref: "#/components/schemas/Visibility" }
-        url: { $ref: "#/components/schemas/URL" }
+        title: {$ref: "#/components/schemas/ThreadTitle"}
+        body: {$ref: "#/components/schemas/PostContent"}
+        tags: {$ref: "#/components/schemas/TagNameList"}
+        meta: {$ref: "#/components/schemas/Metadata"}
+        category: {$ref: "#/components/schemas/Identifier"}
+        visibility: {$ref: "#/components/schemas/Visibility"}
+        url: {$ref: "#/components/schemas/URL"}
 
     ThreadMutableProps:
       type: object
       properties:
-        title: { $ref: "#/components/schemas/ThreadTitle" }
-        body: { $ref: "#/components/schemas/PostContent" }
-        tags: { $ref: "#/components/schemas/TagNameList" }
-        meta: { $ref: "#/components/schemas/Metadata" }
-        category: { $ref: "#/components/schemas/Identifier" }
-        visibility: { $ref: "#/components/schemas/Visibility" }
-        url: { $ref: "#/components/schemas/URL" }
+        title: {$ref: "#/components/schemas/ThreadTitle"}
+        body: {$ref: "#/components/schemas/PostContent"}
+        tags: {$ref: "#/components/schemas/TagNameList"}
+        meta: {$ref: "#/components/schemas/Metadata"}
+        category: {$ref: "#/components/schemas/Identifier"}
+        visibility: {$ref: "#/components/schemas/Visibility"}
+        url: {$ref: "#/components/schemas/URL"}
 
     ThreadReference:
       description: |
@@ -4661,10 +4671,10 @@ components:
         pinned:
           type: boolean
           description: Whether the thread is pinned in this category.
-        reply_status: { $ref: "#/components/schemas/ReplyStatus" }
-        category: { $ref: "#/components/schemas/CategoryReference" }
-        link: { $ref: "#/components/schemas/LinkReference" }
-        tags: { $ref: "#/components/schemas/TagReferenceList" }
+        reply_status: {$ref: "#/components/schemas/ReplyStatus"}
+        category: {$ref: "#/components/schemas/CategoryReference"}
+        link: {$ref: "#/components/schemas/LinkReference"}
+        tags: {$ref: "#/components/schemas/TagReferenceList"}
 
     ReplyStatus:
       type: object
@@ -4686,11 +4696,11 @@ components:
 
     ThreadListResult:
       allOf:
-        - { $ref: "#/components/schemas/PaginatedResult" }
+        - {$ref: "#/components/schemas/PaginatedResult"}
         - type: object
           required: [threads]
           properties:
-            threads: { $ref: "#/components/schemas/ThreadList" }
+            threads: {$ref: "#/components/schemas/ThreadList"}
 
     #
     # 8888888b.                   888
@@ -4713,10 +4723,10 @@ components:
         the thread by specifying the `reply_to` property. The identifier in the
         `reply_to` value must be post within the same thread.
       allOf:
-        - { $ref: "#/components/schemas/CommonProperties" }
-        - { $ref: "#/components/schemas/PostReferenceProps" }
-        - { $ref: "#/components/schemas/PostProps" }
-        - { $ref: "#/components/schemas/ReplyProps" }
+        - {$ref: "#/components/schemas/CommonProperties"}
+        - {$ref: "#/components/schemas/PostReferenceProps"}
+        - {$ref: "#/components/schemas/PostProps"}
+        - {$ref: "#/components/schemas/ReplyProps"}
 
     PaginatedReplyList:
       allOf:
@@ -4724,28 +4734,28 @@ components:
         - type: object
           required: [replies]
           properties:
-            replies: { $ref: "#/components/schemas/ReplyList" }
+            replies: {$ref: "#/components/schemas/ReplyList"}
 
     ReplyList:
       type: array
-      items: { $ref: "#/components/schemas/Reply" }
+      items: {$ref: "#/components/schemas/Reply"}
 
     ReplyProps:
       type: object
       required: [root_id, root_slug]
       properties:
-        root_id: { $ref: "#/components/schemas/Identifier" }
-        root_slug: { $ref: "#/components/schemas/ThreadMark" }
-        reply_to: { $ref: "#/components/schemas/Identifier" }
+        root_id: {$ref: "#/components/schemas/Identifier"}
+        root_slug: {$ref: "#/components/schemas/ThreadMark"}
+        reply_to: {$ref: "#/components/schemas/Identifier"}
 
     ReplyInitialProps:
       type: object
       required: [body]
       properties:
-        body: { $ref: "#/components/schemas/PostContent" }
-        meta: { $ref: "#/components/schemas/Metadata" }
-        reply_to: { $ref: "#/components/schemas/Identifier" }
-        url: { $ref: "#/components/schemas/URL" }
+        body: {$ref: "#/components/schemas/PostContent"}
+        meta: {$ref: "#/components/schemas/Metadata"}
+        reply_to: {$ref: "#/components/schemas/Identifier"}
+        url: {$ref: "#/components/schemas/URL"}
 
     #
     # 8888888b.                            888
@@ -4762,21 +4772,21 @@ components:
       type: object
       required: [id, emoji, author]
       properties:
-        id: { $ref: "#/components/schemas/Identifier" }
-        emoji: { $ref: "#/components/schemas/ReactEmoji" }
-        author: { $ref: "#/components/schemas/ProfileReference" }
+        id: {$ref: "#/components/schemas/Identifier"}
+        emoji: {$ref: "#/components/schemas/ReactEmoji"}
+        author: {$ref: "#/components/schemas/ProfileReference"}
 
     ReactInitialProps:
       description: Reactions are currently just simple emoji characters.
       type: object
       required: [emoji]
       properties:
-        emoji: { $ref: "#/components/schemas/ReactEmoji" }
+        emoji: {$ref: "#/components/schemas/ReactEmoji"}
 
     ReactList:
       description: A list of reactions this post has had from people.
       type: array
-      items: { $ref: "#/components/schemas/React" }
+      items: {$ref: "#/components/schemas/React"}
 
     ReactEmoji:
       description: |
@@ -4800,11 +4810,11 @@ components:
 
     AssetIDs:
       type: array
-      items: { $ref: "#/components/schemas/AssetID" }
+      items: {$ref: "#/components/schemas/AssetID"}
 
     AssetList:
       type: array
-      items: { $ref: "#/components/schemas/Asset" }
+      items: {$ref: "#/components/schemas/Asset"}
 
     Asset:
       type: object
@@ -4825,7 +4835,7 @@ components:
         height:
           type: number
         # NOTE: Presence is dictated by the callee, not the API (currently.)
-        parent: { $ref: "#/components/schemas/Asset" }
+        parent: {$ref: "#/components/schemas/Asset"}
 
     AssetSourceURL:
       description:
@@ -4836,7 +4846,7 @@ components:
 
     AssetSourceList:
       type: array
-      items: { $ref: "#/components/schemas/AssetSourceURL" }
+      items: {$ref: "#/components/schemas/AssetSourceURL"}
 
     #
     # 888      d8b 888
@@ -4856,11 +4866,11 @@ components:
         - $ref: "#/components/schemas/LikeProps"
         - required: [owner]
           properties:
-            owner: { $ref: "#/components/schemas/ProfileReference" }
+            owner: {$ref: "#/components/schemas/ProfileReference"}
 
     ItemLikeList:
       type: array
-      items: { $ref: "#/components/schemas/ItemLike" }
+      items: {$ref: "#/components/schemas/ItemLike"}
 
     ProfileLike:
       description: A like on an item, contains the item only.
@@ -4869,17 +4879,17 @@ components:
         - $ref: "#/components/schemas/LikeProps"
         - required: [item]
           properties:
-            item: { $ref: "#/components/schemas/DatagraphItem" }
+            item: {$ref: "#/components/schemas/DatagraphItem"}
 
     ProfileLikeList:
       type: array
-      items: { $ref: "#/components/schemas/ProfileLike" }
+      items: {$ref: "#/components/schemas/ProfileLike"}
 
     LikeProps:
       type: object
       required: [id, created_at]
       properties:
-        id: { $ref: "#/components/schemas/Identifier" }
+        id: {$ref: "#/components/schemas/Identifier"}
         created_at:
           type: string
           format: date-time
@@ -4890,14 +4900,14 @@ components:
         - type: object
           required: [likes]
           properties:
-            likes: { $ref: "#/components/schemas/ProfileLikeList" }
+            likes: {$ref: "#/components/schemas/ProfileLikeList"}
 
     LikeData:
       type: object
       required: [likes, liked]
       properties:
-        likes: { $ref: "#/components/schemas/LikeCount" }
-        liked: { $ref: "#/components/schemas/LikeStatus" }
+        likes: {$ref: "#/components/schemas/LikeCount"}
+        liked: {$ref: "#/components/schemas/LikeStatus"}
 
     LikeCount:
       description: |
@@ -4947,17 +4957,17 @@ components:
         - $ref: "#/components/schemas/CollectionCommonProps"
         - required: [items]
           properties:
-            items: { $ref: "#/components/schemas/CollectionItemList" }
+            items: {$ref: "#/components/schemas/CollectionItemList"}
 
     CollectionCommonProps:
       description: A reference to the collection
       type: object
       required: [name, slug, owner]
       properties:
-        name: { $ref: "#/components/schemas/CollectionName" }
-        slug: { $ref: "#/components/schemas/CollectionSlug" }
-        description: { $ref: "#/components/schemas/CollectionDescription" }
-        owner: { $ref: "#/components/schemas/ProfileReference" }
+        name: {$ref: "#/components/schemas/CollectionName"}
+        slug: {$ref: "#/components/schemas/CollectionSlug"}
+        description: {$ref: "#/components/schemas/CollectionDescription"}
+        owner: {$ref: "#/components/schemas/ProfileReference"}
 
     CollectionAdditionalProps:
       type: object
@@ -4970,26 +4980,26 @@ components:
 
     CollectionList:
       type: array
-      items: { $ref: "#/components/schemas/Collection" }
+      items: {$ref: "#/components/schemas/Collection"}
 
     CollectionInitialProps:
       type: object
       required: [name]
       properties:
-        name: { $ref: "#/components/schemas/CollectionName" }
-        slug: { $ref: "#/components/schemas/CollectionSlug" }
-        description: { $ref: "#/components/schemas/CollectionDescription" }
+        name: {$ref: "#/components/schemas/CollectionName"}
+        slug: {$ref: "#/components/schemas/CollectionSlug"}
+        description: {$ref: "#/components/schemas/CollectionDescription"}
 
     CollectionMutableProps:
       type: object
       properties:
-        name: { $ref: "#/components/schemas/CollectionName" }
-        slug: { $ref: "#/components/schemas/CollectionSlug" }
-        description: { $ref: "#/components/schemas/CollectionDescription" }
+        name: {$ref: "#/components/schemas/CollectionName"}
+        slug: {$ref: "#/components/schemas/CollectionSlug"}
+        description: {$ref: "#/components/schemas/CollectionDescription"}
 
     CollectionItemList:
       type: array
-      items: { $ref: "#/components/schemas/CollectionItem" }
+      items: {$ref: "#/components/schemas/CollectionItem"}
 
     CollectionItem:
       allOf:
@@ -4997,7 +5007,7 @@ components:
         - $ref: "#/components/schemas/CollectionItemMetadata"
         - required: [item]
           properties:
-            item: { $ref: "#/components/schemas/DatagraphItem" }
+            item: {$ref: "#/components/schemas/DatagraphItem"}
 
     CollectionItemMetadata:
       type: object
@@ -5022,8 +5032,8 @@ components:
       type: object
       required: [in_collections, has_collected]
       properties:
-        in_collections: { $ref: "#/components/schemas/CollectionCount" }
-        has_collected: { $ref: "#/components/schemas/HasCollected" }
+        in_collections: {$ref: "#/components/schemas/CollectionCount"}
+        has_collected: {$ref: "#/components/schemas/HasCollected"}
 
     CollectionCount:
       description: How many collections has this item been added to?
@@ -5080,7 +5090,7 @@ components:
           properties:
             children:
               type: array
-              items: { $ref: "#/components/schemas/NodeWithChildren" }
+              items: {$ref: "#/components/schemas/NodeWithChildren"}
 
     NodeName:
       type: string
@@ -5096,68 +5106,68 @@ components:
       type: object
       required: [name, slug, assets, description, owner, tags, visibility, meta]
       properties:
-        name: { $ref: "#/components/schemas/NodeName" }
-        slug: { $ref: "#/components/schemas/NodeSlug" }
-        assets: { $ref: "#/components/schemas/AssetList" }
-        link: { $ref: "#/components/schemas/LinkReference" }
-        description: { $ref: "#/components/schemas/NodeDescription" }
-        primary_image: { $ref: "#/components/schemas/Asset" }
-        content: { $ref: "#/components/schemas/PostContent" }
-        owner: { $ref: "#/components/schemas/ProfileReference" }
-        parent: { $ref: "#/components/schemas/Node" }
-        tags: { $ref: "#/components/schemas/TagReferenceList" }
-        visibility: { $ref: "#/components/schemas/Visibility" }
-        relevance_score: { $ref: "#/components/schemas/RelevanceScore" }
-        meta: { $ref: "#/components/schemas/Metadata" }
+        name: {$ref: "#/components/schemas/NodeName"}
+        slug: {$ref: "#/components/schemas/NodeSlug"}
+        assets: {$ref: "#/components/schemas/AssetList"}
+        link: {$ref: "#/components/schemas/LinkReference"}
+        description: {$ref: "#/components/schemas/NodeDescription"}
+        primary_image: {$ref: "#/components/schemas/Asset"}
+        content: {$ref: "#/components/schemas/PostContent"}
+        owner: {$ref: "#/components/schemas/ProfileReference"}
+        parent: {$ref: "#/components/schemas/Node"}
+        tags: {$ref: "#/components/schemas/TagReferenceList"}
+        visibility: {$ref: "#/components/schemas/Visibility"}
+        relevance_score: {$ref: "#/components/schemas/RelevanceScore"}
+        meta: {$ref: "#/components/schemas/Metadata"}
 
     NodeTree:
       type: array
-      items: { $ref: "#/components/schemas/NodeWithChildren" }
+      items: {$ref: "#/components/schemas/NodeWithChildren"}
 
     NodeList:
       type: array
-      items: { $ref: "#/components/schemas/Node" }
+      items: {$ref: "#/components/schemas/Node"}
 
     NodeListResult:
       allOf:
-        - { $ref: "#/components/schemas/PaginatedResult" }
+        - {$ref: "#/components/schemas/PaginatedResult"}
         - type: object
           required: [nodes]
           properties:
-            nodes: { $ref: "#/components/schemas/NodeTree" }
+            nodes: {$ref: "#/components/schemas/NodeTree"}
 
     NodeInitialProps:
       type: object
       required: [name]
       properties:
-        name: { $ref: "#/components/schemas/NodeName" }
-        slug: { $ref: "#/components/schemas/NodeSlug" }
-        asset_ids: { $ref: "#/components/schemas/AssetIDs" }
-        asset_sources: { $ref: "#/components/schemas/AssetSourceList" }
-        url: { $ref: "#/components/schemas/URL" }
-        primary_image_asset_id: { $ref: "#/components/schemas/AssetID" }
-        content: { $ref: "#/components/schemas/PostContent" }
-        parent: { $ref: "#/components/schemas/NodeSlug" }
-        tags: { $ref: "#/components/schemas/TagNameList" }
-        visibility: { $ref: "#/components/schemas/Visibility" }
-        meta: { $ref: "#/components/schemas/Metadata" }
+        name: {$ref: "#/components/schemas/NodeName"}
+        slug: {$ref: "#/components/schemas/NodeSlug"}
+        asset_ids: {$ref: "#/components/schemas/AssetIDs"}
+        asset_sources: {$ref: "#/components/schemas/AssetSourceList"}
+        url: {$ref: "#/components/schemas/URL"}
+        primary_image_asset_id: {$ref: "#/components/schemas/AssetID"}
+        content: {$ref: "#/components/schemas/PostContent"}
+        parent: {$ref: "#/components/schemas/NodeSlug"}
+        tags: {$ref: "#/components/schemas/TagNameList"}
+        visibility: {$ref: "#/components/schemas/Visibility"}
+        meta: {$ref: "#/components/schemas/Metadata"}
 
     NodeMutableProps:
       description: |
         Note: Properties are replace-all and are not merged with existing.
       type: object
       properties:
-        name: { $ref: "#/components/schemas/NodeName" }
-        slug: { $ref: "#/components/schemas/NodeSlug" }
-        asset_ids: { $ref: "#/components/schemas/AssetIDs" }
-        asset_sources: { $ref: "#/components/schemas/AssetSourceList" }
-        url: { $ref: "#/components/schemas/URL" }
+        name: {$ref: "#/components/schemas/NodeName"}
+        slug: {$ref: "#/components/schemas/NodeSlug"}
+        asset_ids: {$ref: "#/components/schemas/AssetIDs"}
+        asset_sources: {$ref: "#/components/schemas/AssetSourceList"}
+        url: {$ref: "#/components/schemas/URL"}
         primary_image_asset_id:
-          { $ref: "#/components/schemas/NullableIdentifier" }
-        content: { $ref: "#/components/schemas/PostContent" }
-        parent: { $ref: "#/components/schemas/NodeSlug" }
-        tags: { $ref: "#/components/schemas/TagNameList" }
-        meta: { $ref: "#/components/schemas/Metadata" }
+          {$ref: "#/components/schemas/NullableIdentifier"}
+        content: {$ref: "#/components/schemas/PostContent"}
+        parent: {$ref: "#/components/schemas/NodeSlug"}
+        tags: {$ref: "#/components/schemas/TagNameList"}
+        meta: {$ref: "#/components/schemas/Metadata"}
 
     #
     # 888      d8b          888
@@ -5176,39 +5186,39 @@ components:
       type: object
       required: [url, assets, slug, domain]
       allOf:
-        - { $ref: "#/components/schemas/CommonProperties" }
-        - { $ref: "#/components/schemas/LinkReferenceProps" }
-        - { $ref: "#/components/schemas/LinkProps" }
-        - { $ref: "#/components/schemas/DatagraphRecommendations" }
+        - {$ref: "#/components/schemas/CommonProperties"}
+        - {$ref: "#/components/schemas/LinkReferenceProps"}
+        - {$ref: "#/components/schemas/LinkProps"}
+        - {$ref: "#/components/schemas/DatagraphRecommendations"}
 
     LinkReference:
       description: |
         A minimal object used to refer to a link without sending too much data.
       type: object
       allOf:
-        - { $ref: "#/components/schemas/CommonProperties" }
-        - { $ref: "#/components/schemas/LinkReferenceProps" }
+        - {$ref: "#/components/schemas/CommonProperties"}
+        - {$ref: "#/components/schemas/LinkReferenceProps"}
 
     LinkProps:
       description: |
         All the resources that a link has been referenced in. May be large.
       required: [assets, posts, nodes, collections]
       properties:
-        assets: { $ref: "#/components/schemas/AssetList" }
-        posts: { $ref: "#/components/schemas/PostReferenceList" }
-        nodes: { $ref: "#/components/schemas/NodeList" }
+        assets: {$ref: "#/components/schemas/AssetList"}
+        posts: {$ref: "#/components/schemas/PostReferenceList"}
+        nodes: {$ref: "#/components/schemas/NodeList"}
 
     LinkReferenceProps:
       type: object
       required: [url, slug, domain]
       properties:
-        url: { $ref: "#/components/schemas/URL" }
-        slug: { $ref: "#/components/schemas/LinkSlug" }
-        domain: { $ref: "#/components/schemas/LinkDomain" }
-        title: { $ref: "#/components/schemas/LinkTitle" }
-        description: { $ref: "#/components/schemas/LinkDescription" }
-        favicon_image: { $ref: "#/components/schemas/Asset" }
-        primary_image: { $ref: "#/components/schemas/Asset" }
+        url: {$ref: "#/components/schemas/URL"}
+        slug: {$ref: "#/components/schemas/LinkSlug"}
+        domain: {$ref: "#/components/schemas/LinkDomain"}
+        title: {$ref: "#/components/schemas/LinkTitle"}
+        description: {$ref: "#/components/schemas/LinkDescription"}
+        favicon_image: {$ref: "#/components/schemas/Asset"}
+        primary_image: {$ref: "#/components/schemas/Asset"}
 
     LinkTitle:
       type: string
@@ -5228,23 +5238,23 @@ components:
 
     LinkReferenceList:
       type: array
-      items: { $ref: "#/components/schemas/LinkReference" }
+      items: {$ref: "#/components/schemas/LinkReference"}
 
     LinkListResult:
       allOf:
-        - { $ref: "#/components/schemas/PaginatedResult" }
+        - {$ref: "#/components/schemas/PaginatedResult"}
         - type: object
           required: [links]
           properties:
-            links: { $ref: "#/components/schemas/LinkReferenceList" }
+            links: {$ref: "#/components/schemas/LinkReferenceList"}
 
     LinkInitialProps:
       type: object
       required: [url]
       properties:
-        url: { $ref: "#/components/schemas/URL" }
-        title: { $ref: "#/components/schemas/LinkTitle" }
-        description: { $ref: "#/components/schemas/LinkDescription" }
+        url: {$ref: "#/components/schemas/URL"}
+        title: {$ref: "#/components/schemas/LinkTitle"}
+        description: {$ref: "#/components/schemas/LinkDescription"}
 
     #
     # 8888888b.           888                                               888
@@ -5263,15 +5273,15 @@ components:
     DatagraphSearchResult:
       type: object
       allOf:
-        - { $ref: "#/components/schemas/PaginatedResult" }
+        - {$ref: "#/components/schemas/PaginatedResult"}
         - type: object
           required: [items]
           properties:
-            items: { $ref: "#/components/schemas/DatagraphItemList" }
+            items: {$ref: "#/components/schemas/DatagraphItemList"}
 
     DatagraphItemList:
       type: array
-      items: { $ref: "#/components/schemas/DatagraphItem" }
+      items: {$ref: "#/components/schemas/DatagraphItem"}
 
     DatagraphItem:
       type: object
@@ -5294,36 +5304,36 @@ components:
       type: object
       required: [kind, ref]
       properties:
-        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
-        ref: { $ref: "#/components/schemas/Post" }
+        kind: {$ref: "#/components/schemas/DatagraphItemKind"}
+        ref: {$ref: "#/components/schemas/Post"}
 
     DatagraphItemThread:
       type: object
       required: [kind, ref]
       properties:
-        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
-        ref: { $ref: "#/components/schemas/Thread" }
+        kind: {$ref: "#/components/schemas/DatagraphItemKind"}
+        ref: {$ref: "#/components/schemas/Thread"}
 
     DatagraphItemReply:
       type: object
       required: [kind, ref]
       properties:
-        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
-        ref: { $ref: "#/components/schemas/Reply" }
+        kind: {$ref: "#/components/schemas/DatagraphItemKind"}
+        ref: {$ref: "#/components/schemas/Reply"}
 
     DatagraphItemNode:
       type: object
       required: [kind, ref]
       properties:
-        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
-        ref: { $ref: "#/components/schemas/Node" }
+        kind: {$ref: "#/components/schemas/DatagraphItemKind"}
+        ref: {$ref: "#/components/schemas/Node"}
 
     DatagraphItemProfile:
       type: object
       required: [kind, ref]
       properties:
-        kind: { $ref: "#/components/schemas/DatagraphItemKind" }
-        ref: { $ref: "#/components/schemas/PublicProfile" }
+        kind: {$ref: "#/components/schemas/DatagraphItemKind"}
+        ref: {$ref: "#/components/schemas/PublicProfile"}
 
     DatagraphItemKind:
       type: string
@@ -5332,7 +5342,7 @@ components:
     DatagraphRecommendations:
       required: [recomentations]
       properties:
-        recomentations: { $ref: "#/components/schemas/DatagraphItemList" }
+        recomentations: {$ref: "#/components/schemas/DatagraphItemList"}
 
     #
     # 8888888888                           888
@@ -5355,35 +5365,35 @@ components:
         automatically created for every new event and is linked to the event.
       type: object
       allOf:
-        - { $ref: "#/components/schemas/CommonProperties" }
-        - { $ref: "#/components/schemas/EventReferenceProps" }
-        - { $ref: "#/components/schemas/EventProps" }
+        - {$ref: "#/components/schemas/CommonProperties"}
+        - {$ref: "#/components/schemas/EventReferenceProps"}
+        - {$ref: "#/components/schemas/EventProps"}
 
     EventReference:
       description: |
         A minimal object used to refer to an event without providing all data.
       type: object
       allOf:
-        - { $ref: "#/components/schemas/CommonProperties" }
-        - { $ref: "#/components/schemas/EventReferenceProps" }
+        - {$ref: "#/components/schemas/CommonProperties"}
+        - {$ref: "#/components/schemas/EventReferenceProps"}
 
     EventList:
       type: array
-      items: { $ref: "#/components/schemas/EventReference" }
+      items: {$ref: "#/components/schemas/EventReference"}
 
     EventListResult:
       allOf:
-        - { $ref: "#/components/schemas/PaginatedResult" }
+        - {$ref: "#/components/schemas/PaginatedResult"}
         - type: object
           required: [events]
           properties:
-            events: { $ref: "#/components/schemas/EventList" }
+            events: {$ref: "#/components/schemas/EventList"}
 
     EventProps:
       type: object
       required: [thread]
       properties:
-        thread: { $ref: "#/components/schemas/Thread" }
+        thread: {$ref: "#/components/schemas/Thread"}
 
     EventReferenceProps:
       type: object
@@ -5397,18 +5407,18 @@ components:
         - visibility
         - location
       properties:
-        name: { $ref: "#/components/schemas/EventName" }
-        slug: { $ref: "#/components/schemas/EventSlug" }
-        description: { $ref: "#/components/schemas/EventDescription" }
-        time_range: { $ref: "#/components/schemas/EventTimeRange" }
-        primary_image: { $ref: "#/components/schemas/Asset" }
-        participants: { $ref: "#/components/schemas/EventParticipantList" }
+        name: {$ref: "#/components/schemas/EventName"}
+        slug: {$ref: "#/components/schemas/EventSlug"}
+        description: {$ref: "#/components/schemas/EventDescription"}
+        time_range: {$ref: "#/components/schemas/EventTimeRange"}
+        primary_image: {$ref: "#/components/schemas/Asset"}
+        participants: {$ref: "#/components/schemas/EventParticipantList"}
         participation_policy:
-          { $ref: "#/components/schemas/EventParticipationPolicy" }
-        visibility: { $ref: "#/components/schemas/Visibility" }
-        location: { $ref: "#/components/schemas/EventLocation" }
-        capacity: { $ref: "#/components/schemas/EventCapacity" }
-        meta: { $ref: "#/components/schemas/Metadata" }
+          {$ref: "#/components/schemas/EventParticipationPolicy"}
+        visibility: {$ref: "#/components/schemas/Visibility"}
+        location: {$ref: "#/components/schemas/EventLocation"}
+        capacity: {$ref: "#/components/schemas/EventCapacity"}
+        meta: {$ref: "#/components/schemas/Metadata"}
 
     EventInitialProps:
       type: object
@@ -5420,35 +5430,35 @@ components:
         - visibility
         - thread_category_id
       properties:
-        name: { $ref: "#/components/schemas/EventName" }
-        slug: { $ref: "#/components/schemas/EventSlug" }
-        description: { $ref: "#/components/schemas/EventDescription" }
-        content: { $ref: "#/components/schemas/PostContent" }
-        time_range: { $ref: "#/components/schemas/EventTimeRange" }
-        primary_image_asset_id: { $ref: "#/components/schemas/AssetID" }
+        name: {$ref: "#/components/schemas/EventName"}
+        slug: {$ref: "#/components/schemas/EventSlug"}
+        description: {$ref: "#/components/schemas/EventDescription"}
+        content: {$ref: "#/components/schemas/PostContent"}
+        time_range: {$ref: "#/components/schemas/EventTimeRange"}
+        primary_image_asset_id: {$ref: "#/components/schemas/AssetID"}
         participation_policy:
-          { $ref: "#/components/schemas/EventParticipationPolicy" }
-        visibility: { $ref: "#/components/schemas/Visibility" }
-        location: { $ref: "#/components/schemas/EventLocation" }
-        capacity: { $ref: "#/components/schemas/EventCapacity" }
-        thread_category_id: { $ref: "#/components/schemas/Identifier" }
-        meta: { $ref: "#/components/schemas/Metadata" }
+          {$ref: "#/components/schemas/EventParticipationPolicy"}
+        visibility: {$ref: "#/components/schemas/Visibility"}
+        location: {$ref: "#/components/schemas/EventLocation"}
+        capacity: {$ref: "#/components/schemas/EventCapacity"}
+        thread_category_id: {$ref: "#/components/schemas/Identifier"}
+        meta: {$ref: "#/components/schemas/Metadata"}
 
     EventMutableProps:
       type: object
       properties:
-        name: { $ref: "#/components/schemas/EventName" }
-        slug: { $ref: "#/components/schemas/EventSlug" }
-        description: { $ref: "#/components/schemas/EventDescription" }
-        content: { $ref: "#/components/schemas/PostContent" }
-        time_range: { $ref: "#/components/schemas/EventTimeRange" }
-        primary_image_asset_id: { $ref: "#/components/schemas/AssetID" }
+        name: {$ref: "#/components/schemas/EventName"}
+        slug: {$ref: "#/components/schemas/EventSlug"}
+        description: {$ref: "#/components/schemas/EventDescription"}
+        content: {$ref: "#/components/schemas/PostContent"}
+        time_range: {$ref: "#/components/schemas/EventTimeRange"}
+        primary_image_asset_id: {$ref: "#/components/schemas/AssetID"}
         participation_policy:
-          { $ref: "#/components/schemas/EventParticipationPolicy" }
-        visibility: { $ref: "#/components/schemas/Visibility" }
-        location: { $ref: "#/components/schemas/EventLocation" }
-        capacity: { $ref: "#/components/schemas/EventCapacity" }
-        meta: { $ref: "#/components/schemas/Metadata" }
+          {$ref: "#/components/schemas/EventParticipationPolicy"}
+        visibility: {$ref: "#/components/schemas/Visibility"}
+        location: {$ref: "#/components/schemas/EventLocation"}
+        capacity: {$ref: "#/components/schemas/EventCapacity"}
+        meta: {$ref: "#/components/schemas/Metadata"}
 
     EventName:
       type: string
@@ -5478,22 +5488,22 @@ components:
     EventParticipantList:
       description: A list of attendees, hosts and invites for an event.
       type: array
-      items: { $ref: "#/components/schemas/EventParticipant" }
+      items: {$ref: "#/components/schemas/EventParticipant"}
 
     EventParticipant:
       type: object
       required: [profile, role, status]
       properties:
-        profile: { $ref: "#/components/schemas/ProfileReference" }
-        role: { $ref: "#/components/schemas/EventParticipantRole" }
-        status: { $ref: "#/components/schemas/EventParticipationStatus" }
+        profile: {$ref: "#/components/schemas/ProfileReference"}
+        role: {$ref: "#/components/schemas/EventParticipantRole"}
+        status: {$ref: "#/components/schemas/EventParticipationStatus"}
 
     EventParticipantMutableProps:
       type: object
-      default: { status: "requested", role: "attendee" }
+      default: {status: "requested", role: "attendee"}
       properties:
-        role: { $ref: "#/components/schemas/EventParticipantRole" }
-        status: { $ref: "#/components/schemas/EventParticipationStatus" }
+        role: {$ref: "#/components/schemas/EventParticipantRole"}
+        status: {$ref: "#/components/schemas/EventParticipationStatus"}
 
     EventParticipantRole:
       type: string

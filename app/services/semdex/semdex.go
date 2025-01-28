@@ -7,6 +7,7 @@ import (
 
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
@@ -60,7 +61,7 @@ type AskResponseChunkMeta struct {
 func (c *AskResponseChunkMeta) Type() int { return 1 }
 
 type Asker interface {
-	Ask(ctx context.Context, q string) (AskResponseIterator, error)
+	Ask(ctx context.Context, q string, parent opt.Optional[xid.ID]) (AskResponseIterator, error)
 }
 
 type Recommender interface {

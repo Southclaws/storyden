@@ -29,8 +29,14 @@ const (
 	FieldMetadata = "metadata"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
+	// FieldParentQuestionID holds the string denoting the parent_question_id field in the database.
+	FieldParentQuestionID = "parent_question_id"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
 	EdgeAuthor = "author"
+	// EdgeParent holds the string denoting the parent edge name in mutations.
+	EdgeParent = "parent"
+	// EdgeParentQuestion holds the string denoting the parent_question edge name in mutations.
+	EdgeParentQuestion = "parent_question"
 	// Table holds the table name of the question in the database.
 	Table = "questions"
 	// AuthorTable is the table that holds the author relation/edge.
@@ -40,6 +46,14 @@ const (
 	AuthorInverseTable = "accounts"
 	// AuthorColumn is the table column denoting the author relation/edge.
 	AuthorColumn = "account_id"
+	// ParentTable is the table that holds the parent relation/edge.
+	ParentTable = "questions"
+	// ParentColumn is the table column denoting the parent relation/edge.
+	ParentColumn = "parent_question_id"
+	// ParentQuestionTable is the table that holds the parent_question relation/edge.
+	ParentQuestionTable = "questions"
+	// ParentQuestionColumn is the table column denoting the parent_question relation/edge.
+	ParentQuestionColumn = "parent_question_id"
 )
 
 // Columns holds all SQL columns for question fields.
@@ -52,6 +66,7 @@ var Columns = []string{
 	FieldResult,
 	FieldMetadata,
 	FieldAccountID,
+	FieldParentQuestionID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -111,10 +126,36 @@ func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAccountID, opts...).ToFunc()
 }
 
+// ByParentQuestionID orders the results by the parent_question_id field.
+func ByParentQuestionID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParentQuestionID, opts...).ToFunc()
+}
+
 // ByAuthorField orders the results by author field.
 func ByAuthorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newAuthorStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByParentField orders the results by parent field.
+func ByParentField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newParentStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByParentQuestionCount orders the results by parent_question count.
+func ByParentQuestionCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newParentQuestionStep(), opts...)
+	}
+}
+
+// ByParentQuestion orders the results by parent_question terms.
+func ByParentQuestion(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newParentQuestionStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newAuthorStep() *sqlgraph.Step {
@@ -122,5 +163,19 @@ func newAuthorStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AuthorInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, AuthorTable, AuthorColumn),
+	)
+}
+func newParentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+	)
+}
+func newParentQuestionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(Table, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ParentQuestionTable, ParentQuestionColumn),
 	)
 }

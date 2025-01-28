@@ -91,6 +91,20 @@ func (qc *QuestionCreate) SetNillableAccountID(x *xid.ID) *QuestionCreate {
 	return qc
 }
 
+// SetParentQuestionID sets the "parent_question_id" field.
+func (qc *QuestionCreate) SetParentQuestionID(x xid.ID) *QuestionCreate {
+	qc.mutation.SetParentQuestionID(x)
+	return qc
+}
+
+// SetNillableParentQuestionID sets the "parent_question_id" field if the given value is not nil.
+func (qc *QuestionCreate) SetNillableParentQuestionID(x *xid.ID) *QuestionCreate {
+	if x != nil {
+		qc.SetParentQuestionID(*x)
+	}
+	return qc
+}
+
 // SetID sets the "id" field.
 func (qc *QuestionCreate) SetID(x xid.ID) *QuestionCreate {
 	qc.mutation.SetID(x)
@@ -122,6 +136,40 @@ func (qc *QuestionCreate) SetNillableAuthorID(id *xid.ID) *QuestionCreate {
 // SetAuthor sets the "author" edge to the Account entity.
 func (qc *QuestionCreate) SetAuthor(a *Account) *QuestionCreate {
 	return qc.SetAuthorID(a.ID)
+}
+
+// SetParentID sets the "parent" edge to the Question entity by ID.
+func (qc *QuestionCreate) SetParentID(id xid.ID) *QuestionCreate {
+	qc.mutation.SetParentID(id)
+	return qc
+}
+
+// SetNillableParentID sets the "parent" edge to the Question entity by ID if the given value is not nil.
+func (qc *QuestionCreate) SetNillableParentID(id *xid.ID) *QuestionCreate {
+	if id != nil {
+		qc = qc.SetParentID(*id)
+	}
+	return qc
+}
+
+// SetParent sets the "parent" edge to the Question entity.
+func (qc *QuestionCreate) SetParent(q *Question) *QuestionCreate {
+	return qc.SetParentID(q.ID)
+}
+
+// AddParentQuestionIDs adds the "parent_question" edge to the Question entity by IDs.
+func (qc *QuestionCreate) AddParentQuestionIDs(ids ...xid.ID) *QuestionCreate {
+	qc.mutation.AddParentQuestionIDs(ids...)
+	return qc
+}
+
+// AddParentQuestion adds the "parent_question" edges to the Question entity.
+func (qc *QuestionCreate) AddParentQuestion(q ...*Question) *QuestionCreate {
+	ids := make([]xid.ID, len(q))
+	for i := range q {
+		ids[i] = q[i].ID
+	}
+	return qc.AddParentQuestionIDs(ids...)
 }
 
 // Mutation returns the QuestionMutation object of the builder.
@@ -265,6 +313,39 @@ func (qc *QuestionCreate) createSpec() (*Question, *sqlgraph.CreateSpec) {
 		_node.AccountID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := qc.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   question.ParentTable,
+			Columns: []string{question.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.ParentQuestionID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := qc.mutation.ParentQuestionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.ParentQuestionTable,
+			Columns: []string{question.ParentQuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -404,6 +485,24 @@ func (u *QuestionUpsert) UpdateAccountID() *QuestionUpsert {
 // ClearAccountID clears the value of the "account_id" field.
 func (u *QuestionUpsert) ClearAccountID() *QuestionUpsert {
 	u.SetNull(question.FieldAccountID)
+	return u
+}
+
+// SetParentQuestionID sets the "parent_question_id" field.
+func (u *QuestionUpsert) SetParentQuestionID(v xid.ID) *QuestionUpsert {
+	u.Set(question.FieldParentQuestionID, v)
+	return u
+}
+
+// UpdateParentQuestionID sets the "parent_question_id" field to the value that was provided on create.
+func (u *QuestionUpsert) UpdateParentQuestionID() *QuestionUpsert {
+	u.SetExcluded(question.FieldParentQuestionID)
+	return u
+}
+
+// ClearParentQuestionID clears the value of the "parent_question_id" field.
+func (u *QuestionUpsert) ClearParentQuestionID() *QuestionUpsert {
+	u.SetNull(question.FieldParentQuestionID)
 	return u
 }
 
@@ -560,6 +659,27 @@ func (u *QuestionUpsertOne) UpdateAccountID() *QuestionUpsertOne {
 func (u *QuestionUpsertOne) ClearAccountID() *QuestionUpsertOne {
 	return u.Update(func(s *QuestionUpsert) {
 		s.ClearAccountID()
+	})
+}
+
+// SetParentQuestionID sets the "parent_question_id" field.
+func (u *QuestionUpsertOne) SetParentQuestionID(v xid.ID) *QuestionUpsertOne {
+	return u.Update(func(s *QuestionUpsert) {
+		s.SetParentQuestionID(v)
+	})
+}
+
+// UpdateParentQuestionID sets the "parent_question_id" field to the value that was provided on create.
+func (u *QuestionUpsertOne) UpdateParentQuestionID() *QuestionUpsertOne {
+	return u.Update(func(s *QuestionUpsert) {
+		s.UpdateParentQuestionID()
+	})
+}
+
+// ClearParentQuestionID clears the value of the "parent_question_id" field.
+func (u *QuestionUpsertOne) ClearParentQuestionID() *QuestionUpsertOne {
+	return u.Update(func(s *QuestionUpsert) {
+		s.ClearParentQuestionID()
 	})
 }
 
@@ -883,6 +1003,27 @@ func (u *QuestionUpsertBulk) UpdateAccountID() *QuestionUpsertBulk {
 func (u *QuestionUpsertBulk) ClearAccountID() *QuestionUpsertBulk {
 	return u.Update(func(s *QuestionUpsert) {
 		s.ClearAccountID()
+	})
+}
+
+// SetParentQuestionID sets the "parent_question_id" field.
+func (u *QuestionUpsertBulk) SetParentQuestionID(v xid.ID) *QuestionUpsertBulk {
+	return u.Update(func(s *QuestionUpsert) {
+		s.SetParentQuestionID(v)
+	})
+}
+
+// UpdateParentQuestionID sets the "parent_question_id" field to the value that was provided on create.
+func (u *QuestionUpsertBulk) UpdateParentQuestionID() *QuestionUpsertBulk {
+	return u.Update(func(s *QuestionUpsert) {
+		s.UpdateParentQuestionID()
+	})
+}
+
+// ClearParentQuestionID clears the value of the "parent_question_id" field.
+func (u *QuestionUpsertBulk) ClearParentQuestionID() *QuestionUpsertBulk {
+	return u.Update(func(s *QuestionUpsert) {
+		s.ClearParentQuestionID()
 	})
 }
 

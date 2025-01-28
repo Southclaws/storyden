@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/rs/xid"
@@ -24,6 +25,7 @@ func (Question) Fields() []ent.Field {
 		field.JSON("metadata", map[string]any{}).Optional(),
 
 		field.String("account_id").GoType(xid.ID{}).Optional(),
+		field.String("parent_question_id").GoType(xid.ID{}).Optional(),
 	}
 }
 
@@ -33,5 +35,11 @@ func (Question) Edges() []ent.Edge {
 			Field("account_id").
 			Ref("questions").
 			Unique(),
+
+		edge.To("parent_question", Question.Type).
+			From("parent").
+			Unique().
+			Field("parent_question_id").
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 	}
 }

@@ -299,6 +299,7 @@ export * from "./paginatedReplyListAllOf";
 export * from "./paginatedResult";
 export * from "./paginationQueryParameter";
 export * from "./parentAssetIDQueryParameter";
+export * from "./parentQuestionIDParameter";
 export * from "./permission";
 export * from "./permissionList";
 export * from "./phoneRequestCodeBody";
