@@ -16,7 +16,7 @@ type defaultAsker struct {
 	prompter ai.Prompter
 }
 
-func (a *defaultAsker) Ask(ctx context.Context, q string) (func(yield func(string, error) bool), error) {
+func (a *defaultAsker) Ask(ctx context.Context, q string) (semdex.AskResponseIterator, error) {
 	t, err := buildContextPrompt(ctx, a.searcher, q)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -27,5 +27,5 @@ func (a *defaultAsker) Ask(ctx context.Context, q string) (func(yield func(strin
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return iter, nil
+	return streamExtractor(iter), nil
 }

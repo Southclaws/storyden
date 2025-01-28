@@ -61,15 +61,16 @@ func newAsker(cfg config.Config, searcher semdex.Searcher, prompter ai.Prompter)
 }
 
 var AnswerPrompt = template.Must(template.New("").Parse(`
-You are an expert assistant. Answer the user's question accurately and concisely using the provided sources. Cite the sources in a separate list at the end of your answer. 
-Ensure that the source URLs (in "sdr" format) are kept exactly as they appear, without modification or breaking them across lines.
-You MUST include references to the sources below in your answer in addition to other sources you may have.
+You are an expert assistant. Answer the user's question using the provided "Additional sources" as a primary reference. You MUST incorporate these sources into your answer and cite them in the "Sources" section. 
+All sources must be cited in the "Sources" section without modification. Include URLs and descriptions as provided in the "Additional sources."
+You MUST include AT LEAST ONE reference to the sources below in your answer IN ADDITION to other sources you may have been provided by a system prompt.
+Combine the "Additional sources" with other sources from your system, but ensure at least one of the "Additional sources" is referenced in the response.
 
-Sources:
+Additional sources that you MUST use in your answer:
+
 {{- range .Context }}
 - URL: {{ .URL.String }}
-  Kind: {{ .Kind }}
-  Content: {{ .Content }}
+  Key points: {{ .Content }}
 {{- end }}
 
 Question: {{ .Question }}
@@ -77,10 +78,10 @@ Question: {{ .Question }}
 Answer:
 1. Provide your answer here in clear and concise paragraphs.
 2. Use information from the sources above to support your answer, but do not include citations inline.
-3. Include a "Sources" section with the source URLs listed, like this:
+3. Include a "Sources" section with the sources listed.
 
 Sources:
-- [title](url): Short description of the source content
+- <url> (<kind>) <short description of why this source was used>
 `))
 
 const maxContextForRAG = 10

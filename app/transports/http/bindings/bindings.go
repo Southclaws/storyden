@@ -185,6 +185,10 @@ func mount(
 		ErrorHandler: openapi.ValidatorErrorHandler(),
 	})
 
+	router.GET("/", func(c echo.Context) error {
+		return c.Stream(http.StatusOK, "text/html", easteregg())
+	})
+
 	openapi.RegisterHandlersWithBaseURL(router, openapi.NewStrictHandler(si, nil), apiPathPrefix)
 
 	router.Use(

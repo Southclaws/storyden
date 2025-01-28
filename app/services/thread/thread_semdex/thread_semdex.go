@@ -114,10 +114,10 @@ func newSemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		err := re.reindex(hctx, DefaultReindexThreshold, DefaultReindexChunk)
-		if err != nil {
-			return err
-		}
+		// err := re.reindex(hctx, DefaultReindexThreshold, DefaultReindexChunk)
+		// if err != nil {
+		// 	return err
+		// }
 
 		go re.schedule(ctx, DefaultReindexSchedule, DefaultReindexThreshold, DefaultReindexChunk)
 

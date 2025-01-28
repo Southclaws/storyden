@@ -36,8 +36,7 @@ import { deriveError } from "@/utils/error";
 
 type DatagraphRef = {
   id: string;
-  kp: string;
-  href: string;
+  kind: string;
 };
 
 type Props = {
@@ -59,34 +58,20 @@ export function AskScreen({ session }: Props) {
   return <Ask />;
 }
 
+type References = {
+  refs: DatagraphRef[];
+  urls: string[];
+};
+
 export function Ask() {
   const [question, setQuestion] = useState("");
   const [content, setContent] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [sources, setSources] = useState<Record<string, DatagraphRef>>({});
+  const [sources, setSources] = useState<References>({
+    refs: [],
+    urls: [],
+  });
   const isEnabled = useCapability("semdex");
-
-  useEffect(() => {
-    // Helper to extract SDR references from content
-    const extractSources = (text: string): Record<string, DatagraphRef> => {
-      const sdrRegex = /sdr:(\w+)\/([\w-]+)/g;
-      const refs = {};
-
-      text.replace(sdrRegex, (_, kind, id) => {
-        if (id.length === 20) {
-          const kp = getRouteForKind(kind);
-          refs[id] = { id, kp: kp, href: `${WEB_ADDRESS}/${kp}/${id}` };
-        }
-        return "";
-      });
-
-      return refs;
-    };
-
-    const newSources = extractSources(content);
-
-    setSources((current) => ({ ...current, ...newSources }));
-  }, [content]);
 
   // Helper to replace SDR URLs with frontend links
   const replaceSdrUrls = (text: string): string => {
@@ -108,39 +93,33 @@ export function Ask() {
 
     await handle(
       async () => {
-        const response = await fetch(
-          `${API_ADDRESS}/api/datagraph/qna?q=${encodeURIComponent(question)}`,
-          {
-            method: "GET",
-            mode: "cors",
-            credentials: "include",
-          },
+        setSources({
+          refs: [],
+          urls: [],
+        });
+
+        const source = new EventSource(
+          `${API_ADDRESS}/api/datagraph/ask?q=${encodeURIComponent(question)}`,
         );
 
-        if (response.status === 404) {
-          throw new Error("No answer could be found for this question.");
-        }
+        source.onerror = (err) => {
+          source.close();
+        };
 
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
+        source.addEventListener("text", (e) => {
+          const data = JSON.parse(e.data);
+          const { chunk } = data;
+          if (chunk) {
+            setContent((prev) => prev + chunk);
+          }
+        });
 
-        if (!response.body) {
-          throw new Error(`Error: response is empty`);
-        }
+        source.addEventListener("meta", (e) => {
+          const data = JSON.parse(e.data);
+          const { refs, urls } = data;
 
-        setSources({});
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-        let done = false;
-
-        while (!done) {
-          const { value, done: readerDone } = await reader.read();
-          done = readerDone;
-          const chunk = decoder.decode(value, { stream: true });
-          setContent((prev) => prev + chunk);
-        }
+          setSources({ refs, urls });
+        });
       },
       {
         errorToast: false,
@@ -186,8 +165,6 @@ export function Ask() {
     ul: ({ children }) => <ul className={lstack({ gap: "2" })}>{children}</ul>,
   };
 
-  const sourceList = values(sources);
-
   if (!isEnabled) {
     return (
       <UnreadyBanner error="Ask mode is not enabled for this installation." />
@@ -223,17 +200,29 @@ export function Ask() {
           {replaceSdrUrls(content)}
         </ReactMarkdown>
 
-        {sourceList.length > 0 && (
+        {sources.refs.length > 0 && (
           <LStack>
             <Heading>Sources from the community</Heading>
-            {sourceList.map((source) => (
-              <SourceCard
-                key={source.id}
-                href={source.href}
-                kp={source.kp}
-                id={source.id}
-              />
+            {sources.refs.map((source) => (
+              <SourceCard key={source.id} kind={source.kind} id={source.id} />
             ))}
+          </LStack>
+        )}
+
+        {sources.urls.length > 0 && (
+          <LStack>
+            <Heading>Sources from the web</Heading>
+            <div className="typography">
+              <ul>
+                {sources.urls.map((url) => (
+                  <li key={url}>
+                    <Link className="link" href={url}>
+                      {url}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </LStack>
         )}
       </LStack>
@@ -241,19 +230,13 @@ export function Ask() {
   );
 }
 
-function SourceCard({
-  href,
-  kp,
-  id,
-}: {
-  href: string;
-  kp: string;
-  id: string;
-}) {
-  switch (kp) {
-    case "t":
+function SourceCard({ kind, id }: { kind: string; id: string }) {
+  const kpath = getRouteForKind(kind as any);
+  const href = `${WEB_ADDRESS}/${kpath}/${id}`;
+  switch (kind) {
+    case "thread":
       return <SourceCardThread href={href} id={id} />;
-    case "l":
+    case "node":
       return <SourceCardNode href={href} id={id} />;
     default:
       return <Link href={href}>{href}</Link>;
@@ -264,7 +247,7 @@ function SourceCardThread({ href, id }: { href: string; id: string }) {
   const { error, data } = useThreadGet(id);
   if (!data) {
     if (error) {
-      return <a href={href}>href</a>;
+      return null;
     }
     return (
       <Box display="inline">
@@ -286,7 +269,7 @@ function SourceCardNode({ href, id }: { href: string; id: string }) {
   const { error, data } = useNodeGet(id);
   if (!data) {
     if (error) {
-      return <a href={href}>href</a>;
+      return null;
     }
     return (
       <Box display="inline">

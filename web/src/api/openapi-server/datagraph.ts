@@ -77,8 +77,8 @@ export const getDatagraphAskUrl = (params: DatagraphAskParams) => {
   });
 
   return normalizedParams.size
-    ? `/datagraph/qna?${normalizedParams.toString()}`
-    : `/datagraph/qna`;
+    ? `/datagraph/ask?${normalizedParams.toString()}`
+    : `/datagraph/ask`;
 };
 
 export const datagraphAsk = async (
