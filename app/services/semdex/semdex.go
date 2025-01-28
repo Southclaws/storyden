@@ -40,8 +40,27 @@ type Searcher interface {
 	SearchChunks(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) ([]*Chunk, error)
 }
 
+type AskResponseIterator = func(yield func(AskResponseChunk, error) bool)
+
+type AskResponseChunk interface {
+	Type() int
+}
+
+type AskResponseChunkText struct {
+	Chunk string `json:"chunk"`
+}
+
+func (c *AskResponseChunkText) Type() int { return 0 }
+
+type AskResponseChunkMeta struct {
+	Refs datagraph.RefList `json:"refs"`
+	URLs []url.URL         `json:"urls"`
+}
+
+func (c *AskResponseChunkMeta) Type() int { return 1 }
+
 type Asker interface {
-	Ask(ctx context.Context, q string) (func(yield func(string, error) bool), error)
+	Ask(ctx context.Context, q string) (AskResponseIterator, error)
 }
 
 type Recommender interface {

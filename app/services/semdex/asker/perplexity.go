@@ -53,7 +53,7 @@ func newPerplexityAsker(cfg config.Config, searcher semdex.Searcher) (*Perplexit
 	return s, nil
 }
 
-func (a *Perplexity) Ask(ctx context.Context, q string) (func(yield func(string, error) bool), error) {
+func (a *Perplexity) Ask(ctx context.Context, q string) (semdex.AskResponseIterator, error) {
 	t, err := buildContextPrompt(ctx, a.searcher, q)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -110,7 +110,6 @@ func (a *Perplexity) Ask(ctx context.Context, q string) (func(yield func(string,
 			}
 
 			if len(cr.Citations) == 0 {
-				fmt.Println(string(event.Data))
 				yield("", fmt.Errorf("no citations in response"))
 				return
 			}
@@ -120,9 +119,9 @@ func (a *Perplexity) Ask(ctx context.Context, q string) (func(yield func(string,
 			chunk := choice.Delta.Content
 
 			// replace [1]/[2]/etc citation markers with empty string
-			cleaned := citationMarkerRegex.ReplaceAllString(chunk, "")
+			// cleaned := citationMarkerRegex.ReplaceAllString(chunk, "")
 
-			if !yield(cleaned, nil) {
+			if !yield(chunk, nil) {
 				return
 			}
 
@@ -136,7 +135,7 @@ func (a *Perplexity) Ask(ctx context.Context, q string) (func(yield func(string,
 		}
 	}
 
-	return iter, nil
+	return streamExtractor(iter), nil
 }
 
 type Message struct {
