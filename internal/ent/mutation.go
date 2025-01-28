@@ -20374,21 +20374,26 @@ func (m *PostMutation) ResetEdge(name string) error {
 // QuestionMutation represents an operation that mutates the Question nodes in the graph.
 type QuestionMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *xid.ID
-	created_at    *time.Time
-	indexed_at    *time.Time
-	slug          *string
-	query         *string
-	result        *string
-	metadata      *map[string]interface{}
-	clearedFields map[string]struct{}
-	author        *xid.ID
-	clearedauthor bool
-	done          bool
-	oldValue      func(context.Context) (*Question, error)
-	predicates    []predicate.Question
+	op                     Op
+	typ                    string
+	id                     *xid.ID
+	created_at             *time.Time
+	indexed_at             *time.Time
+	slug                   *string
+	query                  *string
+	result                 *string
+	metadata               *map[string]interface{}
+	clearedFields          map[string]struct{}
+	author                 *xid.ID
+	clearedauthor          bool
+	parent                 *xid.ID
+	clearedparent          bool
+	parent_question        map[xid.ID]struct{}
+	removedparent_question map[xid.ID]struct{}
+	clearedparent_question bool
+	done                   bool
+	oldValue               func(context.Context) (*Question, error)
+	predicates             []predicate.Question
 }
 
 var _ ent.Mutation = (*QuestionMutation)(nil)
@@ -20786,6 +20791,55 @@ func (m *QuestionMutation) ResetAccountID() {
 	delete(m.clearedFields, question.FieldAccountID)
 }
 
+// SetParentQuestionID sets the "parent_question_id" field.
+func (m *QuestionMutation) SetParentQuestionID(x xid.ID) {
+	m.parent = &x
+}
+
+// ParentQuestionID returns the value of the "parent_question_id" field in the mutation.
+func (m *QuestionMutation) ParentQuestionID() (r xid.ID, exists bool) {
+	v := m.parent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParentQuestionID returns the old "parent_question_id" field's value of the Question entity.
+// If the Question object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *QuestionMutation) OldParentQuestionID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParentQuestionID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParentQuestionID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParentQuestionID: %w", err)
+	}
+	return oldValue.ParentQuestionID, nil
+}
+
+// ClearParentQuestionID clears the value of the "parent_question_id" field.
+func (m *QuestionMutation) ClearParentQuestionID() {
+	m.parent = nil
+	m.clearedFields[question.FieldParentQuestionID] = struct{}{}
+}
+
+// ParentQuestionIDCleared returns if the "parent_question_id" field was cleared in this mutation.
+func (m *QuestionMutation) ParentQuestionIDCleared() bool {
+	_, ok := m.clearedFields[question.FieldParentQuestionID]
+	return ok
+}
+
+// ResetParentQuestionID resets all changes to the "parent_question_id" field.
+func (m *QuestionMutation) ResetParentQuestionID() {
+	m.parent = nil
+	delete(m.clearedFields, question.FieldParentQuestionID)
+}
+
 // SetAuthorID sets the "author" edge to the Account entity by id.
 func (m *QuestionMutation) SetAuthorID(id xid.ID) {
 	m.author = &id
@@ -20826,6 +20880,100 @@ func (m *QuestionMutation) ResetAuthor() {
 	m.clearedauthor = false
 }
 
+// SetParentID sets the "parent" edge to the Question entity by id.
+func (m *QuestionMutation) SetParentID(id xid.ID) {
+	m.parent = &id
+}
+
+// ClearParent clears the "parent" edge to the Question entity.
+func (m *QuestionMutation) ClearParent() {
+	m.clearedparent = true
+	m.clearedFields[question.FieldParentQuestionID] = struct{}{}
+}
+
+// ParentCleared reports if the "parent" edge to the Question entity was cleared.
+func (m *QuestionMutation) ParentCleared() bool {
+	return m.ParentQuestionIDCleared() || m.clearedparent
+}
+
+// ParentID returns the "parent" edge ID in the mutation.
+func (m *QuestionMutation) ParentID() (id xid.ID, exists bool) {
+	if m.parent != nil {
+		return *m.parent, true
+	}
+	return
+}
+
+// ParentIDs returns the "parent" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ParentID instead. It exists only for internal usage by the builders.
+func (m *QuestionMutation) ParentIDs() (ids []xid.ID) {
+	if id := m.parent; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetParent resets all changes to the "parent" edge.
+func (m *QuestionMutation) ResetParent() {
+	m.parent = nil
+	m.clearedparent = false
+}
+
+// AddParentQuestionIDs adds the "parent_question" edge to the Question entity by ids.
+func (m *QuestionMutation) AddParentQuestionIDs(ids ...xid.ID) {
+	if m.parent_question == nil {
+		m.parent_question = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.parent_question[ids[i]] = struct{}{}
+	}
+}
+
+// ClearParentQuestion clears the "parent_question" edge to the Question entity.
+func (m *QuestionMutation) ClearParentQuestion() {
+	m.clearedparent_question = true
+}
+
+// ParentQuestionCleared reports if the "parent_question" edge to the Question entity was cleared.
+func (m *QuestionMutation) ParentQuestionCleared() bool {
+	return m.clearedparent_question
+}
+
+// RemoveParentQuestionIDs removes the "parent_question" edge to the Question entity by IDs.
+func (m *QuestionMutation) RemoveParentQuestionIDs(ids ...xid.ID) {
+	if m.removedparent_question == nil {
+		m.removedparent_question = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.parent_question, ids[i])
+		m.removedparent_question[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedParentQuestion returns the removed IDs of the "parent_question" edge to the Question entity.
+func (m *QuestionMutation) RemovedParentQuestionIDs() (ids []xid.ID) {
+	for id := range m.removedparent_question {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ParentQuestionIDs returns the "parent_question" edge IDs in the mutation.
+func (m *QuestionMutation) ParentQuestionIDs() (ids []xid.ID) {
+	for id := range m.parent_question {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetParentQuestion resets all changes to the "parent_question" edge.
+func (m *QuestionMutation) ResetParentQuestion() {
+	m.parent_question = nil
+	m.clearedparent_question = false
+	m.removedparent_question = nil
+}
+
 // Where appends a list predicates to the QuestionMutation builder.
 func (m *QuestionMutation) Where(ps ...predicate.Question) {
 	m.predicates = append(m.predicates, ps...)
@@ -20860,7 +21008,7 @@ func (m *QuestionMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *QuestionMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, question.FieldCreatedAt)
 	}
@@ -20881,6 +21029,9 @@ func (m *QuestionMutation) Fields() []string {
 	}
 	if m.author != nil {
 		fields = append(fields, question.FieldAccountID)
+	}
+	if m.parent != nil {
+		fields = append(fields, question.FieldParentQuestionID)
 	}
 	return fields
 }
@@ -20904,6 +21055,8 @@ func (m *QuestionMutation) Field(name string) (ent.Value, bool) {
 		return m.Metadata()
 	case question.FieldAccountID:
 		return m.AccountID()
+	case question.FieldParentQuestionID:
+		return m.ParentQuestionID()
 	}
 	return nil, false
 }
@@ -20927,6 +21080,8 @@ func (m *QuestionMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldMetadata(ctx)
 	case question.FieldAccountID:
 		return m.OldAccountID(ctx)
+	case question.FieldParentQuestionID:
+		return m.OldParentQuestionID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Question field %s", name)
 }
@@ -20985,6 +21140,13 @@ func (m *QuestionMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAccountID(v)
 		return nil
+	case question.FieldParentQuestionID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParentQuestionID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Question field %s", name)
 }
@@ -21024,6 +21186,9 @@ func (m *QuestionMutation) ClearedFields() []string {
 	if m.FieldCleared(question.FieldAccountID) {
 		fields = append(fields, question.FieldAccountID)
 	}
+	if m.FieldCleared(question.FieldParentQuestionID) {
+		fields = append(fields, question.FieldParentQuestionID)
+	}
 	return fields
 }
 
@@ -21046,6 +21211,9 @@ func (m *QuestionMutation) ClearField(name string) error {
 		return nil
 	case question.FieldAccountID:
 		m.ClearAccountID()
+		return nil
+	case question.FieldParentQuestionID:
+		m.ClearParentQuestionID()
 		return nil
 	}
 	return fmt.Errorf("unknown Question nullable field %s", name)
@@ -21076,15 +21244,24 @@ func (m *QuestionMutation) ResetField(name string) error {
 	case question.FieldAccountID:
 		m.ResetAccountID()
 		return nil
+	case question.FieldParentQuestionID:
+		m.ResetParentQuestionID()
+		return nil
 	}
 	return fmt.Errorf("unknown Question field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *QuestionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.author != nil {
 		edges = append(edges, question.EdgeAuthor)
+	}
+	if m.parent != nil {
+		edges = append(edges, question.EdgeParent)
+	}
+	if m.parent_question != nil {
+		edges = append(edges, question.EdgeParentQuestion)
 	}
 	return edges
 }
@@ -21097,27 +21274,54 @@ func (m *QuestionMutation) AddedIDs(name string) []ent.Value {
 		if id := m.author; id != nil {
 			return []ent.Value{*id}
 		}
+	case question.EdgeParent:
+		if id := m.parent; id != nil {
+			return []ent.Value{*id}
+		}
+	case question.EdgeParentQuestion:
+		ids := make([]ent.Value, 0, len(m.parent_question))
+		for id := range m.parent_question {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *QuestionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
+	if m.removedparent_question != nil {
+		edges = append(edges, question.EdgeParentQuestion)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *QuestionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case question.EdgeParentQuestion:
+		ids := make([]ent.Value, 0, len(m.removedparent_question))
+		for id := range m.removedparent_question {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *QuestionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.clearedauthor {
 		edges = append(edges, question.EdgeAuthor)
+	}
+	if m.clearedparent {
+		edges = append(edges, question.EdgeParent)
+	}
+	if m.clearedparent_question {
+		edges = append(edges, question.EdgeParentQuestion)
 	}
 	return edges
 }
@@ -21128,6 +21332,10 @@ func (m *QuestionMutation) EdgeCleared(name string) bool {
 	switch name {
 	case question.EdgeAuthor:
 		return m.clearedauthor
+	case question.EdgeParent:
+		return m.clearedparent
+	case question.EdgeParentQuestion:
+		return m.clearedparent_question
 	}
 	return false
 }
@@ -21139,6 +21347,9 @@ func (m *QuestionMutation) ClearEdge(name string) error {
 	case question.EdgeAuthor:
 		m.ClearAuthor()
 		return nil
+	case question.EdgeParent:
+		m.ClearParent()
+		return nil
 	}
 	return fmt.Errorf("unknown Question unique edge %s", name)
 }
@@ -21149,6 +21360,12 @@ func (m *QuestionMutation) ResetEdge(name string) error {
 	switch name {
 	case question.EdgeAuthor:
 		m.ResetAuthor()
+		return nil
+	case question.EdgeParent:
+		m.ResetParent()
+		return nil
+	case question.EdgeParentQuestion:
+		m.ResetParentQuestion()
 		return nil
 	}
 	return fmt.Errorf("unknown Question edge %s", name)

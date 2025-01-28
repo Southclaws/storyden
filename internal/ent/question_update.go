@@ -125,6 +125,26 @@ func (qu *QuestionUpdate) ClearAccountID() *QuestionUpdate {
 	return qu
 }
 
+// SetParentQuestionID sets the "parent_question_id" field.
+func (qu *QuestionUpdate) SetParentQuestionID(x xid.ID) *QuestionUpdate {
+	qu.mutation.SetParentQuestionID(x)
+	return qu
+}
+
+// SetNillableParentQuestionID sets the "parent_question_id" field if the given value is not nil.
+func (qu *QuestionUpdate) SetNillableParentQuestionID(x *xid.ID) *QuestionUpdate {
+	if x != nil {
+		qu.SetParentQuestionID(*x)
+	}
+	return qu
+}
+
+// ClearParentQuestionID clears the value of the "parent_question_id" field.
+func (qu *QuestionUpdate) ClearParentQuestionID() *QuestionUpdate {
+	qu.mutation.ClearParentQuestionID()
+	return qu
+}
+
 // SetAuthorID sets the "author" edge to the Account entity by ID.
 func (qu *QuestionUpdate) SetAuthorID(id xid.ID) *QuestionUpdate {
 	qu.mutation.SetAuthorID(id)
@@ -144,6 +164,40 @@ func (qu *QuestionUpdate) SetAuthor(a *Account) *QuestionUpdate {
 	return qu.SetAuthorID(a.ID)
 }
 
+// SetParentID sets the "parent" edge to the Question entity by ID.
+func (qu *QuestionUpdate) SetParentID(id xid.ID) *QuestionUpdate {
+	qu.mutation.SetParentID(id)
+	return qu
+}
+
+// SetNillableParentID sets the "parent" edge to the Question entity by ID if the given value is not nil.
+func (qu *QuestionUpdate) SetNillableParentID(id *xid.ID) *QuestionUpdate {
+	if id != nil {
+		qu = qu.SetParentID(*id)
+	}
+	return qu
+}
+
+// SetParent sets the "parent" edge to the Question entity.
+func (qu *QuestionUpdate) SetParent(q *Question) *QuestionUpdate {
+	return qu.SetParentID(q.ID)
+}
+
+// AddParentQuestionIDs adds the "parent_question" edge to the Question entity by IDs.
+func (qu *QuestionUpdate) AddParentQuestionIDs(ids ...xid.ID) *QuestionUpdate {
+	qu.mutation.AddParentQuestionIDs(ids...)
+	return qu
+}
+
+// AddParentQuestion adds the "parent_question" edges to the Question entity.
+func (qu *QuestionUpdate) AddParentQuestion(q ...*Question) *QuestionUpdate {
+	ids := make([]xid.ID, len(q))
+	for i := range q {
+		ids[i] = q[i].ID
+	}
+	return qu.AddParentQuestionIDs(ids...)
+}
+
 // Mutation returns the QuestionMutation object of the builder.
 func (qu *QuestionUpdate) Mutation() *QuestionMutation {
 	return qu.mutation
@@ -153,6 +207,33 @@ func (qu *QuestionUpdate) Mutation() *QuestionMutation {
 func (qu *QuestionUpdate) ClearAuthor() *QuestionUpdate {
 	qu.mutation.ClearAuthor()
 	return qu
+}
+
+// ClearParent clears the "parent" edge to the Question entity.
+func (qu *QuestionUpdate) ClearParent() *QuestionUpdate {
+	qu.mutation.ClearParent()
+	return qu
+}
+
+// ClearParentQuestion clears all "parent_question" edges to the Question entity.
+func (qu *QuestionUpdate) ClearParentQuestion() *QuestionUpdate {
+	qu.mutation.ClearParentQuestion()
+	return qu
+}
+
+// RemoveParentQuestionIDs removes the "parent_question" edge to Question entities by IDs.
+func (qu *QuestionUpdate) RemoveParentQuestionIDs(ids ...xid.ID) *QuestionUpdate {
+	qu.mutation.RemoveParentQuestionIDs(ids...)
+	return qu
+}
+
+// RemoveParentQuestion removes "parent_question" edges to Question entities.
+func (qu *QuestionUpdate) RemoveParentQuestion(q ...*Question) *QuestionUpdate {
+	ids := make([]xid.ID, len(q))
+	for i := range q {
+		ids[i] = q[i].ID
+	}
+	return qu.RemoveParentQuestionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -240,6 +321,80 @@ func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if qu.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   question.ParentTable,
+			Columns: []string{question.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := qu.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   question.ParentTable,
+			Columns: []string{question.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if qu.mutation.ParentQuestionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.ParentQuestionTable,
+			Columns: []string{question.ParentQuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := qu.mutation.RemovedParentQuestionIDs(); len(nodes) > 0 && !qu.mutation.ParentQuestionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.ParentQuestionTable,
+			Columns: []string{question.ParentQuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := qu.mutation.ParentQuestionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.ParentQuestionTable,
+			Columns: []string{question.ParentQuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -363,6 +518,26 @@ func (quo *QuestionUpdateOne) ClearAccountID() *QuestionUpdateOne {
 	return quo
 }
 
+// SetParentQuestionID sets the "parent_question_id" field.
+func (quo *QuestionUpdateOne) SetParentQuestionID(x xid.ID) *QuestionUpdateOne {
+	quo.mutation.SetParentQuestionID(x)
+	return quo
+}
+
+// SetNillableParentQuestionID sets the "parent_question_id" field if the given value is not nil.
+func (quo *QuestionUpdateOne) SetNillableParentQuestionID(x *xid.ID) *QuestionUpdateOne {
+	if x != nil {
+		quo.SetParentQuestionID(*x)
+	}
+	return quo
+}
+
+// ClearParentQuestionID clears the value of the "parent_question_id" field.
+func (quo *QuestionUpdateOne) ClearParentQuestionID() *QuestionUpdateOne {
+	quo.mutation.ClearParentQuestionID()
+	return quo
+}
+
 // SetAuthorID sets the "author" edge to the Account entity by ID.
 func (quo *QuestionUpdateOne) SetAuthorID(id xid.ID) *QuestionUpdateOne {
 	quo.mutation.SetAuthorID(id)
@@ -382,6 +557,40 @@ func (quo *QuestionUpdateOne) SetAuthor(a *Account) *QuestionUpdateOne {
 	return quo.SetAuthorID(a.ID)
 }
 
+// SetParentID sets the "parent" edge to the Question entity by ID.
+func (quo *QuestionUpdateOne) SetParentID(id xid.ID) *QuestionUpdateOne {
+	quo.mutation.SetParentID(id)
+	return quo
+}
+
+// SetNillableParentID sets the "parent" edge to the Question entity by ID if the given value is not nil.
+func (quo *QuestionUpdateOne) SetNillableParentID(id *xid.ID) *QuestionUpdateOne {
+	if id != nil {
+		quo = quo.SetParentID(*id)
+	}
+	return quo
+}
+
+// SetParent sets the "parent" edge to the Question entity.
+func (quo *QuestionUpdateOne) SetParent(q *Question) *QuestionUpdateOne {
+	return quo.SetParentID(q.ID)
+}
+
+// AddParentQuestionIDs adds the "parent_question" edge to the Question entity by IDs.
+func (quo *QuestionUpdateOne) AddParentQuestionIDs(ids ...xid.ID) *QuestionUpdateOne {
+	quo.mutation.AddParentQuestionIDs(ids...)
+	return quo
+}
+
+// AddParentQuestion adds the "parent_question" edges to the Question entity.
+func (quo *QuestionUpdateOne) AddParentQuestion(q ...*Question) *QuestionUpdateOne {
+	ids := make([]xid.ID, len(q))
+	for i := range q {
+		ids[i] = q[i].ID
+	}
+	return quo.AddParentQuestionIDs(ids...)
+}
+
 // Mutation returns the QuestionMutation object of the builder.
 func (quo *QuestionUpdateOne) Mutation() *QuestionMutation {
 	return quo.mutation
@@ -391,6 +600,33 @@ func (quo *QuestionUpdateOne) Mutation() *QuestionMutation {
 func (quo *QuestionUpdateOne) ClearAuthor() *QuestionUpdateOne {
 	quo.mutation.ClearAuthor()
 	return quo
+}
+
+// ClearParent clears the "parent" edge to the Question entity.
+func (quo *QuestionUpdateOne) ClearParent() *QuestionUpdateOne {
+	quo.mutation.ClearParent()
+	return quo
+}
+
+// ClearParentQuestion clears all "parent_question" edges to the Question entity.
+func (quo *QuestionUpdateOne) ClearParentQuestion() *QuestionUpdateOne {
+	quo.mutation.ClearParentQuestion()
+	return quo
+}
+
+// RemoveParentQuestionIDs removes the "parent_question" edge to Question entities by IDs.
+func (quo *QuestionUpdateOne) RemoveParentQuestionIDs(ids ...xid.ID) *QuestionUpdateOne {
+	quo.mutation.RemoveParentQuestionIDs(ids...)
+	return quo
+}
+
+// RemoveParentQuestion removes "parent_question" edges to Question entities.
+func (quo *QuestionUpdateOne) RemoveParentQuestion(q ...*Question) *QuestionUpdateOne {
+	ids := make([]xid.ID, len(q))
+	for i := range q {
+		ids[i] = q[i].ID
+	}
+	return quo.RemoveParentQuestionIDs(ids...)
 }
 
 // Where appends a list predicates to the QuestionUpdate builder.
@@ -508,6 +744,80 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if quo.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   question.ParentTable,
+			Columns: []string{question.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := quo.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   question.ParentTable,
+			Columns: []string{question.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if quo.mutation.ParentQuestionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.ParentQuestionTable,
+			Columns: []string{question.ParentQuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := quo.mutation.RemovedParentQuestionIDs(); len(nodes) > 0 && !quo.mutation.ParentQuestionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.ParentQuestionTable,
+			Columns: []string{question.ParentQuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := quo.mutation.ParentQuestionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.ParentQuestionTable,
+			Columns: []string{question.ParentQuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

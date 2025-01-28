@@ -8,6 +8,8 @@ import (
 	htmltomarkdown "github.com/JohannesKaufmann/html-to-markdown/v2"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -34,13 +36,13 @@ func newCachedAsker(
 	}, nil
 }
 
-func (a *cachedAsker) Ask(ctx context.Context, q string) (semdex.AskResponseIterator, error) {
+func (a *cachedAsker) Ask(ctx context.Context, q string, parent opt.Optional[xid.ID]) (semdex.AskResponseIterator, error) {
 	cached, err := a.questions.GetByQuerySlug(ctx, q)
 	if err == nil {
 		return a.cachedResult(ctx, cached)
 	}
 
-	return a.livePrompt(ctx, q)
+	return a.livePrompt(ctx, q, parent)
 }
 
 func (a *cachedAsker) cachedResult(ctx context.Context, q *question.Question) (semdex.AskResponseIterator, error) {
@@ -69,8 +71,8 @@ func (a *cachedAsker) cachedResult(ctx context.Context, q *question.Question) (s
 	}), nil
 }
 
-func (a *cachedAsker) livePrompt(ctx context.Context, q string) (semdex.AskResponseIterator, error) {
-	iter, err := a.asker.Ask(ctx, q)
+func (a *cachedAsker) livePrompt(ctx context.Context, q string, parentQuestionID opt.Optional[xid.ID]) (semdex.AskResponseIterator, error) {
+	iter, err := a.asker.Ask(ctx, q, parentQuestionID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -79,7 +81,7 @@ func (a *cachedAsker) livePrompt(ctx context.Context, q string) (semdex.AskRespo
 		acc := []string{}
 
 		defer func() {
-			err := a.cacheResult(ctx, q, acc)
+			err := a.cacheResult(ctx, q, acc, parentQuestionID)
 			if err != nil {
 				a.logger.Error("failed to cache result", zap.Error(err))
 			}
@@ -102,7 +104,7 @@ func (a *cachedAsker) livePrompt(ctx context.Context, q string) (semdex.AskRespo
 	}, nil
 }
 
-func (a *cachedAsker) cacheResult(ctx context.Context, q string, chunks []string) error {
+func (a *cachedAsker) cacheResult(ctx context.Context, q string, chunks []string, parentQuestionID opt.Optional[xid.ID]) error {
 	accountID := session.GetOptAccountID(ctx)
 
 	result := strings.Join(chunks, "")
@@ -112,7 +114,7 @@ func (a *cachedAsker) cacheResult(ctx context.Context, q string, chunks []string
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = a.questions.Store(ctx, q, acc, accountID)
+	_, err = a.questions.Store(ctx, q, acc, accountID, parentQuestionID)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

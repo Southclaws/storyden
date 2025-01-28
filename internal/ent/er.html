@@ -216,6 +216,7 @@ erDiagram
         string result
         mapLBRACKstringRBRACKinterface {} metadata
         xidDOTID account_id
+        xidDOTID parent_question_id
     }
     React {
         xidDOTID id
@@ -291,6 +292,7 @@ erDiagram
     	Post |o--o{ MentionProfile : "mentions/Post"
     	Post }o--o{ Asset : "assets/posts"
     	Post |o--o{ Event : "event/thread"
+    	Question |o--o{ Question : "parent_question/parent"
     	Role }o--o{ Account : "accounts/roles"
     	Tag }o--o{ Post : "posts/tags"
     	Tag }o--o{ Node : "nodes/tags"

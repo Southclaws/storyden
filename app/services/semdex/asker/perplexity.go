@@ -11,9 +11,12 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
+	"github.com/openai/openai-go/packages/ssestream"
+	"github.com/rs/xid"
+
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/openai/openai-go/packages/ssestream"
 )
 
 const (
@@ -53,7 +56,7 @@ func newPerplexityAsker(cfg config.Config, searcher semdex.Searcher) (*Perplexit
 	return s, nil
 }
 
-func (a *Perplexity) Ask(ctx context.Context, q string) (semdex.AskResponseIterator, error) {
+func (a *Perplexity) Ask(ctx context.Context, q string, parent opt.Optional[xid.ID]) (semdex.AskResponseIterator, error) {
 	t, err := buildContextPrompt(ctx, a.searcher, q)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

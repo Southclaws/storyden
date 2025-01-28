@@ -22,7 +22,12 @@ func New(db *ent.Client) *Repository {
 	return &Repository{db: db}
 }
 
-func (r *Repository) Store(ctx context.Context, query string, result datagraph.Content, accountID opt.Optional[account.AccountID]) (*Question, error) {
+func (r *Repository) Store(ctx context.Context,
+	query string,
+	result datagraph.Content,
+	accountID opt.Optional[account.AccountID],
+	parentID opt.Optional[xid.ID],
+) (*Question, error) {
 	create := r.db.Question.Create()
 	mutate := create.Mutation()
 
@@ -34,6 +39,10 @@ func (r *Repository) Store(ctx context.Context, query string, result datagraph.C
 
 	accountID.Call(func(id account.AccountID) {
 		mutate.SetAccountID(xid.ID(id))
+	})
+
+	parentID.Call(func(id xid.ID) {
+		mutate.SetParentID(xid.ID(id))
 	})
 
 	create.OnConflictColumns("slug").UpdateNewValues()

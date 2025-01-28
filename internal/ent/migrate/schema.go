@@ -701,6 +701,7 @@ var (
 		{Name: "result", Type: field.TypeString},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "parent_question_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// QuestionsTable holds the schema information for the "questions" table.
 	QuestionsTable = &schema.Table{
@@ -712,6 +713,12 @@ var (
 				Symbol:     "questions_accounts_questions",
 				Columns:    []*schema.Column{QuestionsColumns[7]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "questions_questions_parent_question",
+				Columns:    []*schema.Column{QuestionsColumns[8]},
+				RefColumns: []*schema.Column{QuestionsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -1067,6 +1074,7 @@ func init() {
 	PostsTable.ForeignKeys[3].RefTable = PostsTable
 	PostsTable.ForeignKeys[4].RefTable = PostsTable
 	QuestionsTable.ForeignKeys[0].RefTable = AccountsTable
+	QuestionsTable.ForeignKeys[1].RefTable = QuestionsTable
 	ReactsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable

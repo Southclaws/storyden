@@ -34,6 +34,8 @@ type Question struct {
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
+	// ParentQuestionID holds the value of the "parent_question_id" field.
+	ParentQuestionID xid.ID `json:"parent_question_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the QuestionQuery when eager-loading is set.
 	Edges        QuestionEdges `json:"edges"`
@@ -44,9 +46,13 @@ type Question struct {
 type QuestionEdges struct {
 	// Author holds the value of the author edge.
 	Author *Account `json:"author,omitempty"`
+	// Parent holds the value of the parent edge.
+	Parent *Question `json:"parent,omitempty"`
+	// ParentQuestion holds the value of the parent_question edge.
+	ParentQuestion []*Question `json:"parent_question,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [3]bool
 }
 
 // AuthorOrErr returns the Author value or an error if the edge
@@ -60,6 +66,26 @@ func (e QuestionEdges) AuthorOrErr() (*Account, error) {
 	return nil, &NotLoadedError{edge: "author"}
 }
 
+// ParentOrErr returns the Parent value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e QuestionEdges) ParentOrErr() (*Question, error) {
+	if e.Parent != nil {
+		return e.Parent, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: question.Label}
+	}
+	return nil, &NotLoadedError{edge: "parent"}
+}
+
+// ParentQuestionOrErr returns the ParentQuestion value or an error if the edge
+// was not loaded in eager-loading.
+func (e QuestionEdges) ParentQuestionOrErr() ([]*Question, error) {
+	if e.loadedTypes[2] {
+		return e.ParentQuestion, nil
+	}
+	return nil, &NotLoadedError{edge: "parent_question"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Question) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -71,7 +97,7 @@ func (*Question) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case question.FieldCreatedAt, question.FieldIndexedAt:
 			values[i] = new(sql.NullTime)
-		case question.FieldID, question.FieldAccountID:
+		case question.FieldID, question.FieldAccountID, question.FieldParentQuestionID:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -139,6 +165,12 @@ func (q *Question) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				q.AccountID = *value
 			}
+		case question.FieldParentQuestionID:
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field parent_question_id", values[i])
+			} else if value != nil {
+				q.ParentQuestionID = *value
+			}
 		default:
 			q.selectValues.Set(columns[i], values[i])
 		}
@@ -155,6 +187,16 @@ func (q *Question) Value(name string) (ent.Value, error) {
 // QueryAuthor queries the "author" edge of the Question entity.
 func (q *Question) QueryAuthor() *AccountQuery {
 	return NewQuestionClient(q.config).QueryAuthor(q)
+}
+
+// QueryParent queries the "parent" edge of the Question entity.
+func (q *Question) QueryParent() *QuestionQuery {
+	return NewQuestionClient(q.config).QueryParent(q)
+}
+
+// QueryParentQuestion queries the "parent_question" edge of the Question entity.
+func (q *Question) QueryParentQuestion() *QuestionQuery {
+	return NewQuestionClient(q.config).QueryParentQuestion(q)
 }
 
 // Update returns a builder for updating this Question.
@@ -202,6 +244,9 @@ func (q *Question) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", q.AccountID))
+	builder.WriteString(", ")
+	builder.WriteString("parent_question_id=")
+	builder.WriteString(fmt.Sprintf("%v", q.ParentQuestionID))
 	builder.WriteByte(')')
 	return builder.String()
 }
