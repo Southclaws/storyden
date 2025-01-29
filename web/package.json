@@ -89,7 +89,7 @@
   },
   "packageManager": "yarn@4.5.0",
   "engines": {
-    "node": "22.12.0"
+    "node": "22.x"
   },
   "resolutions": {
     "@types/react": "npm:types-react@19.0.0-rc.1"
