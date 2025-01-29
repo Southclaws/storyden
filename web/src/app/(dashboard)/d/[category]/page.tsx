@@ -13,8 +13,6 @@ type Props = {
   searchParams: Promise<Query>;
 };
 
-export const dynamic = "force-dynamic";
-
 const QuerySchema = z.object({
   page: z
     .string()
