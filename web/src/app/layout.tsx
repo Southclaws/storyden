@@ -12,8 +12,6 @@ import "./global.css";
 
 import { Providers } from "./providers";
 
-export const dynamic = "force-dynamic";
-
 const { API_ADDRESS, WEB_ADDRESS } = serverEnvironment();
 
 export default async function RootLayout({ children }: PropsWithChildren) {
