@@ -94,3 +94,18 @@ func (s *localStorer) Write(ctx context.Context, path string, r io.Reader, size 
 
 	return nil
 }
+
+func (s *localStorer) List(ctx context.Context, prefix string) ([]string, error) {
+	dir := filepath.Join(s.path, prefix)
+	entries, err := fs.ReadDir(s.s, dir)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	var names []string
+	for _, entry := range entries {
+		names = append(names, entry.Name())
+	}
+
+	return names, nil
+}
