@@ -24,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -785,6 +786,37 @@ func init() {
 	// post.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	post.IDValidator = func() func(string) error {
 		validators := postDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	propertyMixin := schema.Property{}.Mixin()
+	propertyMixinFields0 := propertyMixin[0].Fields()
+	_ = propertyMixinFields0
+	propertyMixinFields1 := propertyMixin[1].Fields()
+	_ = propertyMixinFields1
+	propertyFields := schema.Property{}.Fields()
+	_ = propertyFields
+	// propertyDescCreatedAt is the schema descriptor for created_at field.
+	propertyDescCreatedAt := propertyMixinFields1[0].Descriptor()
+	// property.DefaultCreatedAt holds the default value on creation for the created_at field.
+	property.DefaultCreatedAt = propertyDescCreatedAt.Default.(func() time.Time)
+	// propertyDescID is the schema descriptor for id field.
+	propertyDescID := propertyMixinFields0[0].Descriptor()
+	// property.DefaultID holds the default value on creation for the id field.
+	property.DefaultID = propertyDescID.Default.(func() xid.ID)
+	// property.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	property.IDValidator = func() func(string) error {
+		validators := propertyDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

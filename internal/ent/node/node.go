@@ -56,6 +56,8 @@ const (
 	EdgeAssets = "assets"
 	// EdgeTags holds the string denoting the tags edge name in mutations.
 	EdgeTags = "tags"
+	// EdgeProperties holds the string denoting the properties edge name in mutations.
+	EdgeProperties = "properties"
 	// EdgeLink holds the string denoting the link edge name in mutations.
 	EdgeLink = "link"
 	// EdgeContentLinks holds the string denoting the content_links edge name in mutations.
@@ -98,6 +100,13 @@ const (
 	// TagsInverseTable is the table name for the Tag entity.
 	// It exists in this package in order to avoid circular dependency with the "tag" package.
 	TagsInverseTable = "tags"
+	// PropertiesTable is the table that holds the properties relation/edge.
+	PropertiesTable = "properties"
+	// PropertiesInverseTable is the table name for the Property entity.
+	// It exists in this package in order to avoid circular dependency with the "property" package.
+	PropertiesInverseTable = "properties"
+	// PropertiesColumn is the table column denoting the properties relation/edge.
+	PropertiesColumn = "node_id"
 	// LinkTable is the table that holds the link relation/edge.
 	LinkTable = "nodes"
 	// LinkInverseTable is the table name for the Link entity.
@@ -345,6 +354,20 @@ func ByTags(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByPropertiesCount orders the results by properties count.
+func ByPropertiesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPropertiesStep(), opts...)
+	}
+}
+
+// ByProperties orders the results by properties terms.
+func ByProperties(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPropertiesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByLinkField orders the results by link field.
 func ByLinkField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -433,6 +456,13 @@ func newTagsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TagsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, TagsTable, TagsPrimaryKey...),
+	)
+}
+func newPropertiesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PropertiesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PropertiesTable, PropertiesColumn),
 	)
 }
 func newLinkStep() *sqlgraph.Step {

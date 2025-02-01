@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -299,6 +300,21 @@ func (nc *NodeCreate) AddTags(t ...*Tag) *NodeCreate {
 		ids[i] = t[i].ID
 	}
 	return nc.AddTagIDs(ids...)
+}
+
+// AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
+func (nc *NodeCreate) AddPropertyIDs(ids ...xid.ID) *NodeCreate {
+	nc.mutation.AddPropertyIDs(ids...)
+	return nc
+}
+
+// AddProperties adds the "properties" edges to the Property entity.
+func (nc *NodeCreate) AddProperties(p ...*Property) *NodeCreate {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return nc.AddPropertyIDs(ids...)
 }
 
 // SetLink sets the "link" edge to the Link entity.
@@ -590,6 +606,22 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := nc.mutation.PropertiesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   node.PropertiesTable,
+			Columns: []string{node.PropertiesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(property.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

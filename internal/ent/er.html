@@ -207,6 +207,14 @@ erDiagram
         xidDOTID category_id
         xidDOTID link_id
     }
+    Property {
+        xidDOTID id
+        timeDOTTime created_at
+        string name
+        string type
+        string value
+        xidDOTID node_id
+    }
     Question {
         xidDOTID id
         timeDOTTime created_at
@@ -285,6 +293,7 @@ erDiagram
     	Node |o--o{ Node : "nodes/parent"
     	Node }o--o| Asset : "primary_image"
     	Node }o--o{ Asset : "assets/nodes"
+    	Node |o--o{ Property : "properties/node"
     	Post |o--o{ Post : "posts/root"
     	Post |o--o{ Post : "replies/replyTo"
     	Post |o--o{ React : "reacts/Post"

@@ -37,7 +37,7 @@ func Map(in *ent.Tag) (*Tag, error) {
 		return nil, err
 	}
 
-	nodes, err := dt.MapErr(nodesEdge, library.NodeFromModel)
+	nodes, err := dt.MapErr(nodesEdge, library.MapNode(true, nil))
 	if err != nil {
 		return nil, err
 	}

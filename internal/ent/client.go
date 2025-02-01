@@ -35,6 +35,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -87,6 +88,8 @@ type Client struct {
 	Notification *NotificationClient
 	// Post is the client for interacting with the Post builders.
 	Post *PostClient
+	// Property is the client for interacting with the Property builders.
+	Property *PropertyClient
 	// Question is the client for interacting with the Question builders.
 	Question *QuestionClient
 	// React is the client for interacting with the React builders.
@@ -127,6 +130,7 @@ func (c *Client) init() {
 	c.Node = NewNodeClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
 	c.Post = NewPostClient(c.config)
+	c.Property = NewPropertyClient(c.config)
 	c.Question = NewQuestionClient(c.config)
 	c.React = NewReactClient(c.config)
 	c.Role = NewRoleClient(c.config)
@@ -243,6 +247,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Node:             NewNodeClient(cfg),
 		Notification:     NewNotificationClient(cfg),
 		Post:             NewPostClient(cfg),
+		Property:         NewPropertyClient(cfg),
 		Question:         NewQuestionClient(cfg),
 		React:            NewReactClient(cfg),
 		Role:             NewRoleClient(cfg),
@@ -286,6 +291,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Node:             NewNodeClient(cfg),
 		Notification:     NewNotificationClient(cfg),
 		Post:             NewPostClient(cfg),
+		Property:         NewPropertyClient(cfg),
 		Question:         NewQuestionClient(cfg),
 		React:            NewReactClient(cfg),
 		Role:             NewRoleClient(cfg),
@@ -323,7 +329,8 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
 		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
 		c.EventParticipant, c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.Node,
-		c.Notification, c.Post, c.Question, c.React, c.Role, c.Setting, c.Tag,
+		c.Notification, c.Post, c.Property, c.Question, c.React, c.Role, c.Setting,
+		c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -336,7 +343,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
 		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
 		c.EventParticipant, c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.Node,
-		c.Notification, c.Post, c.Question, c.React, c.Role, c.Setting, c.Tag,
+		c.Notification, c.Post, c.Property, c.Question, c.React, c.Role, c.Setting,
+		c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -383,6 +391,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Notification.mutate(ctx, m)
 	case *PostMutation:
 		return c.Post.mutate(ctx, m)
+	case *PropertyMutation:
+		return c.Property.mutate(ctx, m)
 	case *QuestionMutation:
 		return c.Question.mutate(ctx, m)
 	case *ReactMutation:
@@ -3624,6 +3634,22 @@ func (c *NodeClient) QueryTags(n *Node) *TagQuery {
 	return query
 }
 
+// QueryProperties queries the properties edge of a Node.
+func (c *NodeClient) QueryProperties(n *Node) *PropertyQuery {
+	query := (&PropertyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := n.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(property.Table, property.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, node.PropertiesTable, node.PropertiesColumn),
+		)
+		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryLink queries the link edge of a Node.
 func (c *NodeClient) QueryLink(n *Node) *LinkQuery {
 	query := (&LinkClient{config: c.config}).Query()
@@ -4248,6 +4274,155 @@ func (c *PostClient) mutate(ctx context.Context, m *PostMutation) (Value, error)
 		return (&PostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Post mutation op: %q", m.Op())
+	}
+}
+
+// PropertyClient is a client for the Property schema.
+type PropertyClient struct {
+	config
+}
+
+// NewPropertyClient returns a client for the Property from the given config.
+func NewPropertyClient(c config) *PropertyClient {
+	return &PropertyClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `property.Hooks(f(g(h())))`.
+func (c *PropertyClient) Use(hooks ...Hook) {
+	c.hooks.Property = append(c.hooks.Property, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `property.Intercept(f(g(h())))`.
+func (c *PropertyClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Property = append(c.inters.Property, interceptors...)
+}
+
+// Create returns a builder for creating a Property entity.
+func (c *PropertyClient) Create() *PropertyCreate {
+	mutation := newPropertyMutation(c.config, OpCreate)
+	return &PropertyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Property entities.
+func (c *PropertyClient) CreateBulk(builders ...*PropertyCreate) *PropertyCreateBulk {
+	return &PropertyCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PropertyClient) MapCreateBulk(slice any, setFunc func(*PropertyCreate, int)) *PropertyCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PropertyCreateBulk{err: fmt.Errorf("calling to PropertyClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PropertyCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PropertyCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Property.
+func (c *PropertyClient) Update() *PropertyUpdate {
+	mutation := newPropertyMutation(c.config, OpUpdate)
+	return &PropertyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PropertyClient) UpdateOne(pr *Property) *PropertyUpdateOne {
+	mutation := newPropertyMutation(c.config, OpUpdateOne, withProperty(pr))
+	return &PropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PropertyClient) UpdateOneID(id xid.ID) *PropertyUpdateOne {
+	mutation := newPropertyMutation(c.config, OpUpdateOne, withPropertyID(id))
+	return &PropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Property.
+func (c *PropertyClient) Delete() *PropertyDelete {
+	mutation := newPropertyMutation(c.config, OpDelete)
+	return &PropertyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PropertyClient) DeleteOne(pr *Property) *PropertyDeleteOne {
+	return c.DeleteOneID(pr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PropertyClient) DeleteOneID(id xid.ID) *PropertyDeleteOne {
+	builder := c.Delete().Where(property.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PropertyDeleteOne{builder}
+}
+
+// Query returns a query builder for Property.
+func (c *PropertyClient) Query() *PropertyQuery {
+	return &PropertyQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeProperty},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Property entity by its id.
+func (c *PropertyClient) Get(ctx context.Context, id xid.ID) (*Property, error) {
+	return c.Query().Where(property.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PropertyClient) GetX(ctx context.Context, id xid.ID) *Property {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryNode queries the node edge of a Property.
+func (c *PropertyClient) QueryNode(pr *Property) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(property.Table, property.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, property.NodeTable, property.NodeColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PropertyClient) Hooks() []Hook {
+	return c.hooks.Property
+}
+
+// Interceptors returns the client interceptors.
+func (c *PropertyClient) Interceptors() []Interceptor {
+	return c.inters.Property
+}
+
+func (c *PropertyClient) mutate(ctx context.Context, m *PropertyMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PropertyCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PropertyUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PropertyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Property mutation op: %q", m.Op())
 	}
 }
 
@@ -5081,14 +5256,14 @@ type (
 	hooks struct {
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, Question,
-		React, Role, Setting, Tag []ent.Hook
+		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, Property,
+		Question, React, Role, Setting, Tag []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, Question,
-		React, Role, Setting, Tag []ent.Interceptor
+		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, Property,
+		Question, React, Role, Setting, Tag []ent.Interceptor
 	}
 )
 

@@ -67,7 +67,7 @@ func Map(in *ent.Link) (*Link, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	nodes, err := dt.MapErr(nodeEdge, library.NodeFromModel)
+	nodes, err := dt.MapErr(nodeEdge, library.MapNode(true, nil))
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

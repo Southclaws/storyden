@@ -1054,6 +1054,29 @@ func HasTagsWith(preds ...predicate.Tag) predicate.Node {
 	})
 }
 
+// HasProperties applies the HasEdge predicate on the "properties" edge.
+func HasProperties() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PropertiesTable, PropertiesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPropertiesWith applies the HasEdge predicate on the "properties" edge with a given conditions (other predicates).
+func HasPropertiesWith(preds ...predicate.Property) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newPropertiesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasLink applies the HasEdge predicate on the "link" edge.
 func HasLink() predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
