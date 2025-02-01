@@ -19,8 +19,14 @@ func (t Type) String() string {
 }
 
 func New(s string) Type {
+	m := mimetype.Lookup(s)
+	if m == nil {
+		return Type{
+			mt: *mimetype.Lookup(DefaultMIME),
+		}
+	}
 	return Type{
-		mt: *mimetype.Lookup(s),
+		mt: *m,
 	}
 }
 
