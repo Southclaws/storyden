@@ -37,19 +37,21 @@ type Node struct {
 	UpdatedAt time.Time
 	IndexedAt opt.Optional[time.Time]
 
-	Name           string
-	Assets         []*asset.Asset
-	WebLink        opt.Optional[link_ref.LinkRef]
-	Content        opt.Optional[datagraph.Content]
-	Description    opt.Optional[string]
-	PrimaryImage   opt.Optional[asset.Asset]
-	Owner          profile.Public
-	Parent         opt.Optional[Node]
-	Tags           tag_ref.Tags
-	Collections    collection_item_status.Status // NOTE: Not done yet
-	Visibility     visibility.Visibility
-	RelevanceScore opt.Optional[float64]
-	Metadata       map[string]any
+	Name            string
+	Assets          []*asset.Asset
+	WebLink         opt.Optional[link_ref.LinkRef]
+	Content         opt.Optional[datagraph.Content]
+	Description     opt.Optional[string]
+	PrimaryImage    opt.Optional[asset.Asset]
+	Owner           profile.Public
+	Parent          opt.Optional[Node]
+	Properties      PropertyTable
+	ChildProperties PropertySchemas
+	Tags            tag_ref.Tags
+	Collections     collection_item_status.Status // NOTE: Not done yet
+	Visibility      visibility.Visibility
+	RelevanceScore  opt.Optional[float64]
+	Metadata        map[string]any
 
 	Nodes []*Node
 }

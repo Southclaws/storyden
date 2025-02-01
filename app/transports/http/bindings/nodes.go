@@ -433,11 +433,13 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
-		Tags:           serialiseTagReferenceList(in.Tags),
-		Visibility:     serialiseVisibility(in.Visibility),
-		RelevanceScore: rs.Ptr(),
-		Meta:           in.Metadata,
-		Children:       dt.Map(in.Nodes, serialiseNodeWithItems),
+		Properties:          serialisePropertyList(in.Properties),
+		ChildPropertySchema: serialisePropertySchemaList(in.ChildProperties),
+		Tags:                serialiseTagReferenceList(in.Tags),
+		Visibility:          serialiseVisibility(in.Visibility),
+		RelevanceScore:      rs.Ptr(),
+		Meta:                in.Metadata,
+		Children:            dt.Map(in.Nodes, serialiseNodeWithItems),
 	}
 }
 
@@ -480,6 +482,33 @@ func deserialiseContentFillRule(in openapi.ContentFillRule) (asset.ContentFillRu
 
 func deserialiseFillSource(in openapi.FillSource) (asset.FillSource, error) {
 	return asset.NewFillSource(string(in))
+}
+
+func serialiseProperty(in library.Property) openapi.Property {
+	return openapi.Property{
+		Name:  in.Name,
+		Type:  in.Type,
+		Value: opt.Map(in.Value, func(v string) string { return v }).Ptr(),
+	}
+}
+
+func serialisePropertyList(in library.PropertyTable) openapi.PropertyList {
+	return dt.Map(in, serialiseProperty)
+}
+
+func serialisePropertySchema(in library.PropertySchema) openapi.PropertySchema {
+	return openapi.PropertySchema{
+		Name: in.Name,
+		Type: in.Type,
+	}
+}
+
+func serialisePropertySchemaList(in library.PropertySchemas) *openapi.PropertySchemaList {
+	if len(in) == 0 {
+		return nil
+	}
+	schemas := dt.Map(in, serialisePropertySchema)
+	return &schemas
 }
 
 func getContentFillRuleSourceCommand(contentFillRuleParam *openapi.ContentFillRule, contentFillSourceParam *openapi.FillSourceQuery) (opt.Optional[asset.ContentFillCommand], error) {

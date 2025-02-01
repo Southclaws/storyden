@@ -65,7 +65,7 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, err
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nodes, err := dt.MapErr(cs, library.NodeFromModel)
+	nodes, err := dt.MapErr(cs, library.MapNode(true, nil))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -211,7 +211,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 			panic("recursive query result was not present in hydrated node map")
 		}
 
-		return library.NodeFromModel(hydratedNode)
+		return library.MapNode(true, nil)(hydratedNode)
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to hydrate nodes"))

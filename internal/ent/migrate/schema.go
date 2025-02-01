@@ -691,6 +691,46 @@ var (
 			},
 		},
 	}
+	// PropertiesColumns holds the columns for the "properties" table.
+	PropertiesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "name", Type: field.TypeString},
+		{Name: "type", Type: field.TypeString},
+		{Name: "value", Type: field.TypeString},
+		{Name: "node_id", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// PropertiesTable holds the schema information for the "properties" table.
+	PropertiesTable = &schema.Table{
+		Name:       "properties",
+		Columns:    PropertiesColumns,
+		PrimaryKey: []*schema.Column{PropertiesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "properties_nodes_properties",
+				Columns:    []*schema.Column{PropertiesColumns[5]},
+				RefColumns: []*schema.Column{NodesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "property_node_id_name",
+				Unique:  true,
+				Columns: []*schema.Column{PropertiesColumns[5], PropertiesColumns[2]},
+			},
+			{
+				Name:    "property_name",
+				Unique:  false,
+				Columns: []*schema.Column{PropertiesColumns[2]},
+			},
+			{
+				Name:    "property_node_id",
+				Unique:  false,
+				Columns: []*schema.Column{PropertiesColumns[5]},
+			},
+		},
+	}
 	// QuestionsColumns holds the columns for the "questions" table.
 	QuestionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -1019,6 +1059,7 @@ var (
 		NodesTable,
 		NotificationsTable,
 		PostsTable,
+		PropertiesTable,
 		QuestionsTable,
 		ReactsTable,
 		RolesTable,
@@ -1073,6 +1114,7 @@ func init() {
 	PostsTable.ForeignKeys[2].RefTable = LinksTable
 	PostsTable.ForeignKeys[3].RefTable = PostsTable
 	PostsTable.ForeignKeys[4].RefTable = PostsTable
+	PropertiesTable.ForeignKeys[0].RefTable = NodesTable
 	QuestionsTable.ForeignKeys[0].RefTable = AccountsTable
 	QuestionsTable.ForeignKeys[1].RefTable = QuestionsTable
 	ReactsTable.ForeignKeys[0].RefTable = AccountsTable

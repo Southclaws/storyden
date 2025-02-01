@@ -60,6 +60,8 @@ func (Node) Edges() []ent.Edge {
 		edge.From("tags", Tag.Type).
 			Ref("nodes"),
 
+		edge.To("properties", Property.Type),
+
 		edge.From("link", Link.Type).
 			Field("link_id").
 			Ref("nodes").

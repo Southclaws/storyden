@@ -5086,8 +5086,11 @@ components:
       allOf:
         - $ref: "#/components/schemas/Node"
         - $ref: "#/components/schemas/DatagraphRecommendations"
-        - required: [children]
+        - required: [properties, children]
           properties:
+            properties: {$ref: "#/components/schemas/PropertyList"}
+            child_property_schema:
+              $ref: "#/components/schemas/PropertySchemaList"
             children:
               type: array
               items: {$ref: "#/components/schemas/NodeWithChildren"}
@@ -5168,6 +5171,39 @@ components:
         parent: {$ref: "#/components/schemas/NodeSlug"}
         tags: {$ref: "#/components/schemas/TagNameList"}
         meta: {$ref: "#/components/schemas/Metadata"}
+
+    Property:
+      type: object
+      required: [name, type]
+      properties:
+        name: {$ref: "#/components/schemas/PropertyName"}
+        type: {$ref: "#/components/schemas/PropertyType"}
+        value: {$ref: "#/components/schemas/PropertyValue"}
+
+    PropertyList:
+      type: array
+      items: {$ref: "#/components/schemas/Property"}
+
+    PropertyName:
+      type: string
+
+    PropertyType:
+      type: string
+      # TODO: Enumerate this type.
+    PropertyValue:
+      type: string
+      # TODO: Enumerate this type.
+
+    PropertySchema:
+      type: object
+      required: [name, type]
+      properties:
+        name: {$ref: "#/components/schemas/PropertyName"}
+        type: {$ref: "#/components/schemas/PropertyType"}
+
+    PropertySchemaList:
+      type: array
+      items: {$ref: "#/components/schemas/PropertySchema"}
 
     #
     # 888      d8b          888

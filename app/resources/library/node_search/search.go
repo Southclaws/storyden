@@ -99,7 +99,7 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nodes, err := dt.MapErr(r, library.NodeFromModel)
+	nodes, err := dt.MapErr(r, library.MapNode(true, nil))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

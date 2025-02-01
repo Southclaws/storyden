@@ -70,6 +70,8 @@ type NodeEdges struct {
 	Assets []*Asset `json:"assets,omitempty"`
 	// Tags holds the value of the tags edge.
 	Tags []*Tag `json:"tags,omitempty"`
+	// Properties holds the value of the properties edge.
+	Properties []*Property `json:"properties,omitempty"`
 	// Link holds the value of the link edge.
 	Link *Link `json:"link,omitempty"`
 	// ContentLinks holds the value of the content_links edge.
@@ -80,7 +82,7 @@ type NodeEdges struct {
 	CollectionNodes []*CollectionNode `json:"collection_nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [10]bool
+	loadedTypes [11]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -143,12 +145,21 @@ func (e NodeEdges) TagsOrErr() ([]*Tag, error) {
 	return nil, &NotLoadedError{edge: "tags"}
 }
 
+// PropertiesOrErr returns the Properties value or an error if the edge
+// was not loaded in eager-loading.
+func (e NodeEdges) PropertiesOrErr() ([]*Property, error) {
+	if e.loadedTypes[6] {
+		return e.Properties, nil
+	}
+	return nil, &NotLoadedError{edge: "properties"}
+}
+
 // LinkOrErr returns the Link value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e NodeEdges) LinkOrErr() (*Link, error) {
 	if e.Link != nil {
 		return e.Link, nil
-	} else if e.loadedTypes[6] {
+	} else if e.loadedTypes[7] {
 		return nil, &NotFoundError{label: link.Label}
 	}
 	return nil, &NotLoadedError{edge: "link"}
@@ -157,7 +168,7 @@ func (e NodeEdges) LinkOrErr() (*Link, error) {
 // ContentLinksOrErr returns the ContentLinks value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) ContentLinksOrErr() ([]*Link, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[8] {
 		return e.ContentLinks, nil
 	}
 	return nil, &NotLoadedError{edge: "content_links"}
@@ -166,7 +177,7 @@ func (e NodeEdges) ContentLinksOrErr() ([]*Link, error) {
 // CollectionsOrErr returns the Collections value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) CollectionsOrErr() ([]*Collection, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[9] {
 		return e.Collections, nil
 	}
 	return nil, &NotLoadedError{edge: "collections"}
@@ -175,7 +186,7 @@ func (e NodeEdges) CollectionsOrErr() ([]*Collection, error) {
 // CollectionNodesOrErr returns the CollectionNodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) CollectionNodesOrErr() ([]*CollectionNode, error) {
-	if e.loadedTypes[9] {
+	if e.loadedTypes[10] {
 		return e.CollectionNodes, nil
 	}
 	return nil, &NotLoadedError{edge: "collection_nodes"}
@@ -349,6 +360,11 @@ func (n *Node) QueryAssets() *AssetQuery {
 // QueryTags queries the "tags" edge of the Node entity.
 func (n *Node) QueryTags() *TagQuery {
 	return NewNodeClient(n.config).QueryTags(n)
+}
+
+// QueryProperties queries the "properties" edge of the Node entity.
+func (n *Node) QueryProperties() *PropertyQuery {
+	return NewNodeClient(n.config).QueryProperties(n)
 }
 
 // QueryLink queries the "link" edge of the Node entity.
