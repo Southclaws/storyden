@@ -51,7 +51,7 @@ func Map(in *ent.Tag) (*Tag, error) {
 	}
 
 	return &Tag{
-		Tag: *tag,
-		// Items: items,
+		Tag:   *tag,
+		Items: items,
 	}, nil
 }
