@@ -21,6 +21,12 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex"
 )
 
+const (
+	DefaultAutoCut     = 2
+	VectorKeywordAlpha = 0.75
+	RelevanceThreshold = 0.5
+)
+
 func (s *weaviateSemdexer) Search(ctx context.Context, q string, p pagination.Parameters, opts searcher.Options) (*pagination.Result[datagraph.Item], error) {
 	refs, err := s.SearchRefs(ctx, q, p, opts)
 	if err != nil {
@@ -77,14 +83,14 @@ func (s *weaviateSemdexer) searchObjects(ctx context.Context, q string, p pagina
 		}},
 	}
 
-	autocut := 2
+	autocut := DefaultAutoCut
 	if p.PageZeroIndexed() > 0 {
 		autocut = 0
 	}
 
 	arg := s.wc.GraphQL().
 		HybridArgumentBuilder().
-		WithAlpha(0.25).
+		WithAlpha(VectorKeywordAlpha).
 		WithFusionType(graphql.RelativeScore).
 		WithQuery(q)
 
@@ -166,7 +172,7 @@ func (s *weaviateSemdexer) countObjects(ctx context.Context, countQuery graphql.
 
 func filterChunks(results []*datagraph.Ref) []*datagraph.Ref {
 	filtered := dt.Filter(results, func(r *datagraph.Ref) bool {
-		return r.Relevance > 0.5
+		return r.Relevance > RelevanceThreshold
 	})
 
 	return filtered
