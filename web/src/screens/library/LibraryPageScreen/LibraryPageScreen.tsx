@@ -14,6 +14,7 @@ import { LibraryPageAssetList } from "@/components/library/LibraryPageAssetList/
 import { LibraryPageCoverImageControl } from "@/components/library/LibraryPageCoverImageControl/LibraryPageCoverImageControl";
 import { LibraryPageImportFromURL } from "@/components/library/LibraryPageImportFromURL/LibraryPageImportFromURL";
 import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
+import { LibraryPagePropertyTable } from "@/components/library/LibraryPagePropertyTable/LibraryPagePropertyTable";
 import { LibraryPageTagsList } from "@/components/library/LibraryPageTagsList/LibraryPageTagsList";
 import { IntelligenceAction } from "@/components/site/Action/Intelligence";
 import { UnreadyBanner } from "@/components/site/Unready";
@@ -212,31 +213,36 @@ export function LibraryPage(props: Props) {
             </LStack>
           </LStack>
 
-          <LibraryPageTagsList<Form>
+          <HStack w="full">
+            {!editing && node.link?.url && (
+              <LinkButton href={node.link?.url} size="xs" variant="subtle">
+                {node.link?.domain}
+              </LinkButton>
+            )}
+
+            <LibraryPageTagsList<Form>
+              control={form.control}
+              name="tags"
+              editing={editing}
+              node={node}
+            />
+          </HStack>
+
+          {editing && (
+            <LibraryPageImportFromURL
+              control={form.control}
+              name="link"
+              node={node}
+              onImport={handleImportFromLink}
+            />
+          )}
+
+          <LibraryPagePropertyTable
             control={form.control}
-            name="tags"
+            name="properties"
             editing={editing}
             node={node}
           />
-
-          <LStack gap="2">
-            <HStack w="full">
-              {editing ? (
-                <LibraryPageImportFromURL
-                  control={form.control}
-                  name="link"
-                  node={node}
-                  onImport={handleImportFromLink}
-                />
-              ) : (
-                node.link?.url && (
-                  <LinkButton href={node.link?.url} size="xs" variant="subtle">
-                    {node.link?.domain}
-                  </LinkButton>
-                )
-              )}
-            </HStack>
-          </LStack>
 
           <ContentInput
             // TODO: Fix this via ref
