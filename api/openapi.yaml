@@ -1607,19 +1607,6 @@ paths:
         "401": {$ref: "#/components/responses/Unauthorised"}
         "200": {$ref: "#/components/responses/NodeDeleteOK"}
 
-  /nodes/{node_slug}/properties:
-    patch:
-      operationId: NodeUpdateProperties
-      description: Update the properties of a node.
-      tags: [nodes]
-      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
-      requestBody: {$ref: "#/components/requestBodies/NodeUpdateProperties"}
-      responses:
-        default: {$ref: "#/components/responses/InternalServerError"}
-        "404": {$ref: "#/components/responses/NotFound"}
-        "401": {$ref: "#/components/responses/Unauthorised"}
-        "200": {$ref: "#/components/responses/NodeUpdatePropertiesOK"}
-
   /nodes/{node_slug}/children/property-schema:
     patch:
       operationId: NodeUpdateChildrenPropertySchema
@@ -1643,6 +1630,19 @@ paths:
         "401": {$ref: "#/components/responses/Unauthorised"}
         "200":
           $ref: "#/components/responses/NodeUpdateChildrenPropertySchemaOK"
+
+  /nodes/{node_slug}/properties:
+    patch:
+      operationId: NodeUpdateProperties
+      description: Update the properties of a node.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody: {$ref: "#/components/requestBodies/NodeUpdateProperties"}
+      responses:
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeUpdatePropertiesOK"}
 
   /nodes/{node_slug}/visibility:
     patch:
@@ -2569,7 +2569,9 @@ components:
     NodeUpdateChildrenPropertySchema:
       content:
         application/json:
-          schema: {$ref: "#/components/schemas/PropertySchemaList"}
+          schema:
+            type: array
+            items: {$ref: "#/components/schemas/PropertySchemaMutableProps"}
 
     LinkCreate:
       content:
@@ -3023,6 +3025,7 @@ components:
         application/json:
           schema:
             type: object
+            required: [properties]
             properties:
               properties:
                 $ref: "#/components/schemas/PropertySchemaList"
@@ -5283,6 +5286,23 @@ components:
     PropertySchemaList:
       type: array
       items: {$ref: "#/components/schemas/PropertySchema"}
+
+    PropertySchemaMutableProps:
+      description: |
+        Mutating property schemas permits updating existing fields as well as
+        adding new fields. The discinction is determined by the presence of the
+        `id` field. When an `id` field is provided, the operation is treated as
+        an update operation where any of the other fields will be used to write
+        new values. If an `id` field is omitted, the schema is considered a new
+        field and is subject to a uniqueness constraint on the `name` field.
+      type: object
+      required: [name, type, sort]
+      properties:
+        id: {$ref: "#/components/schemas/Identifier"}
+        name: {$ref: "#/components/schemas/PropertyName"}
+        type: {$ref: "#/components/schemas/PropertyType"}
+        sort:
+          type: string
 
     #
     # 888      d8b          888

@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/tag"
@@ -37,6 +38,7 @@ type Nodes struct {
 	nv           *node_visibility.Controller
 	ntree        nodetree.Graph
 	ntr          node_traversal.Repository
+	nsr          node_properties.SchemaWriter
 }
 
 func NewNodes(
@@ -46,6 +48,7 @@ func NewNodes(
 	nv *node_visibility.Controller,
 	ntree nodetree.Graph,
 	ntr node_traversal.Repository,
+	nsr node_properties.SchemaWriter,
 ) Nodes {
 	return Nodes{
 		accountQuery: accountQuery,
@@ -54,6 +57,7 @@ func NewNodes(
 		nv:           nv,
 		ntree:        ntree,
 		ntr:          ntr,
+		nsr:          nsr,
 	}
 }
 
@@ -317,7 +321,25 @@ func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteReques
 }
 
 func (c *Nodes) NodeUpdateChildrenPropertySchema(ctx context.Context, request openapi.NodeUpdateChildrenPropertySchemaRequestObject) (openapi.NodeUpdateChildrenPropertySchemaResponseObject, error) {
-	return nil, nil
+	schemas := dt.Map(*request.Body, func(p openapi.PropertySchemaMutableProps) *node_properties.SchemaMutation {
+		return &node_properties.SchemaMutation{
+			ID:   opt.Map(opt.NewPtr(p.Id), deserialiseID),
+			Name: p.Name,
+			Type: p.Type,
+			Sort: p.Sort,
+		}
+	})
+
+	updated, err := c.nsr.UpdateChildren(ctx, deserialiseNodeMark(request.NodeSlug), schemas)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.NodeUpdateChildrenPropertySchema200JSONResponse{
+		NodeUpdateChildrenPropertySchemaOKJSONResponse: openapi.NodeUpdateChildrenPropertySchemaOKJSONResponse{
+			Properties: serialisePropertySchemas(updated),
+		},
+	}, nil
 }
 
 func (c *Nodes) NodeUpdateProperties(ctx context.Context, request openapi.NodeUpdatePropertiesRequestObject) (openapi.NodeUpdatePropertiesResponseObject, error) {
@@ -492,7 +514,7 @@ func deserialiseFillSource(in openapi.FillSource) (asset.FillSource, error) {
 	return asset.NewFillSource(string(in))
 }
 
-func serialiseProperty(in library.Property) openapi.Property {
+func serialiseProperty(in *library.Property) openapi.Property {
 	return openapi.Property{
 		Name:  in.Name,
 		Type:  in.Type,
@@ -504,11 +526,15 @@ func serialisePropertyList(in library.PropertyTable) openapi.PropertyList {
 	return dt.Map(in, serialiseProperty)
 }
 
-func serialisePropertySchema(in library.PropertySchema) openapi.PropertySchema {
+func serialisePropertySchema(in *library.PropertySchema) openapi.PropertySchema {
 	return openapi.PropertySchema{
 		Name: in.Name,
 		Type: in.Type,
 	}
+}
+
+func serialisePropertySchemas(in library.PropertySchemas) openapi.PropertySchemaList {
+	return dt.Map(in, serialisePropertySchema)
 }
 
 func serialisePropertySchemaList(in library.PropertySchemas) *openapi.PropertySchemaList {

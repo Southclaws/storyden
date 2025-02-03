@@ -390,11 +390,11 @@ func (m *Mapping) NodeDelete() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }
 
-func (m *Mapping) NodeUpdateProperties() (bool, *rbac.Permission) {
+func (m *Mapping) NodeUpdateChildrenPropertySchema() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }
 
-func (m *Mapping) NodeUpdateChildrenPropertySchema() (bool, *rbac.Permission) {
+func (m *Mapping) NodeUpdateProperties() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }
 
