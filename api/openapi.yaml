@@ -1607,6 +1607,43 @@ paths:
         "401": {$ref: "#/components/responses/Unauthorised"}
         "200": {$ref: "#/components/responses/NodeDeleteOK"}
 
+  /nodes/{node_slug}/properties:
+    patch:
+      operationId: NodeUpdateProperties
+      description: Update the properties of a node.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody: {$ref: "#/components/requestBodies/NodeUpdateProperties"}
+      responses:
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeUpdatePropertiesOK"}
+
+  /nodes/{node_slug}/children/property-schema:
+    patch:
+      operationId: NodeUpdateChildrenPropertySchema
+      description: |
+        Updates the property schema of the children of this node. All children
+        of a node use the same schema for properties resulting in a table-like
+        structure and behaviour. Property schemas are loosely structured and can
+        automatically cast their values sometimes. A failed cast will not change
+        data and instead just yield an empty value when reading however changing
+        the schema back to the original type (or a type compatible with what the
+        type was before changing) will retain the original data upon next read.
+        This permits clients to undo changes to the schema easily while allowing
+        quick schema changes without the need to remove or update values before.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody:
+        {$ref: "#/components/requestBodies/NodeUpdateChildrenPropertySchema"}
+      responses:
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200":
+          $ref: "#/components/responses/NodeUpdateChildrenPropertySchemaOK"
+
   /nodes/{node_slug}/visibility:
     patch:
       operationId: NodeUpdateVisibility
@@ -2524,6 +2561,16 @@ components:
         application/json:
           schema: {$ref: "#/components/schemas/NodeMutableProps"}
 
+    NodeUpdateProperties:
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/PropertyMutableProps"}
+
+    NodeUpdateChildrenPropertySchema:
+      content:
+        application/json:
+          schema: {$ref: "#/components/schemas/PropertySchemaList"}
+
     LinkCreate:
       content:
         application/json:
@@ -2959,6 +3006,26 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Node"
+
+    NodeUpdatePropertiesOK:
+      description: Node properties updated.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              properties:
+                $ref: "#/components/schemas/PropertyList"
+
+    NodeUpdateChildrenPropertySchemaOK:
+      description: Node children schema updated.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              properties:
+                $ref: "#/components/schemas/PropertySchemaList"
 
     NodeDeleteOK:
       description: Node deleted.
@@ -5151,6 +5218,7 @@ components:
         primary_image_asset_id: {$ref: "#/components/schemas/AssetID"}
         content: {$ref: "#/components/schemas/PostContent"}
         parent: {$ref: "#/components/schemas/NodeSlug"}
+        properties: {$ref: "#/components/schemas/PropertyList"}
         tags: {$ref: "#/components/schemas/TagNameList"}
         visibility: {$ref: "#/components/schemas/Visibility"}
         meta: {$ref: "#/components/schemas/Metadata"}
@@ -5172,10 +5240,18 @@ components:
         tags: {$ref: "#/components/schemas/TagNameList"}
         meta: {$ref: "#/components/schemas/Metadata"}
 
+    PropertyMutableProps:
+      description: |
+        Note: Properties are replace-all and are not merged with existing.
+      type: object
+      properties:
+        properties: {$ref: "#/components/schemas/PropertyList"}
+
     Property:
       type: object
-      required: [name, type]
+      required: [id, name, type]
       properties:
+        id: {$ref: "#/components/schemas/Identifier"}
         name: {$ref: "#/components/schemas/PropertyName"}
         type: {$ref: "#/components/schemas/PropertyType"}
         value: {$ref: "#/components/schemas/PropertyValue"}
@@ -5196,10 +5272,13 @@ components:
 
     PropertySchema:
       type: object
-      required: [name, type]
+      required: [id, name, type, sort]
       properties:
+        id: {$ref: "#/components/schemas/Identifier"}
         name: {$ref: "#/components/schemas/PropertyName"}
         type: {$ref: "#/components/schemas/PropertyType"}
+        sort:
+          type: string
 
     PropertySchemaList:
       type: array

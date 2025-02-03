@@ -316,6 +316,14 @@ func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteReques
 	}, nil
 }
 
+func (c *Nodes) NodeUpdateChildrenPropertySchema(ctx context.Context, request openapi.NodeUpdateChildrenPropertySchemaRequestObject) (openapi.NodeUpdateChildrenPropertySchemaResponseObject, error) {
+	return nil, nil
+}
+
+func (c *Nodes) NodeUpdateProperties(ctx context.Context, request openapi.NodeUpdatePropertiesRequestObject) (openapi.NodeUpdatePropertiesResponseObject, error) {
+	return nil, nil
+}
+
 func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRequestObject) (openapi.NodeAddAssetResponseObject, error) {
 	id := openapi.ParseID(request.AssetId)
 
