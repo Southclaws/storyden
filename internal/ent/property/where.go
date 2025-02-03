@@ -61,24 +61,14 @@ func CreatedAt(v time.Time) predicate.Property {
 	return predicate.Property(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
-func Name(v string) predicate.Property {
-	return predicate.Property(sql.FieldEQ(FieldName, v))
-}
-
-// Type applies equality check predicate on the "type" field. It's identical to TypeEQ.
-func Type(v string) predicate.Property {
-	return predicate.Property(sql.FieldEQ(FieldType, v))
+// NodeID applies equality check predicate on the "node_id" field. It's identical to NodeIDEQ.
+func NodeID(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldEQ(FieldNodeID, v))
 }
 
 // Value applies equality check predicate on the "value" field. It's identical to ValueEQ.
 func Value(v string) predicate.Property {
 	return predicate.Property(sql.FieldEQ(FieldValue, v))
-}
-
-// NodeID applies equality check predicate on the "node_id" field. It's identical to NodeIDEQ.
-func NodeID(v xid.ID) predicate.Property {
-	return predicate.Property(sql.FieldEQ(FieldNodeID, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -121,134 +111,144 @@ func CreatedAtLTE(v time.Time) predicate.Property {
 	return predicate.Property(sql.FieldLTE(FieldCreatedAt, v))
 }
 
-// NameEQ applies the EQ predicate on the "name" field.
-func NameEQ(v string) predicate.Property {
-	return predicate.Property(sql.FieldEQ(FieldName, v))
+// NodeIDEQ applies the EQ predicate on the "node_id" field.
+func NodeIDEQ(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldEQ(FieldNodeID, v))
 }
 
-// NameNEQ applies the NEQ predicate on the "name" field.
-func NameNEQ(v string) predicate.Property {
-	return predicate.Property(sql.FieldNEQ(FieldName, v))
+// NodeIDNEQ applies the NEQ predicate on the "node_id" field.
+func NodeIDNEQ(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldNEQ(FieldNodeID, v))
 }
 
-// NameIn applies the In predicate on the "name" field.
-func NameIn(vs ...string) predicate.Property {
-	return predicate.Property(sql.FieldIn(FieldName, vs...))
+// NodeIDIn applies the In predicate on the "node_id" field.
+func NodeIDIn(vs ...xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldIn(FieldNodeID, vs...))
 }
 
-// NameNotIn applies the NotIn predicate on the "name" field.
-func NameNotIn(vs ...string) predicate.Property {
-	return predicate.Property(sql.FieldNotIn(FieldName, vs...))
+// NodeIDNotIn applies the NotIn predicate on the "node_id" field.
+func NodeIDNotIn(vs ...xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldNotIn(FieldNodeID, vs...))
 }
 
-// NameGT applies the GT predicate on the "name" field.
-func NameGT(v string) predicate.Property {
-	return predicate.Property(sql.FieldGT(FieldName, v))
+// NodeIDGT applies the GT predicate on the "node_id" field.
+func NodeIDGT(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldGT(FieldNodeID, v))
 }
 
-// NameGTE applies the GTE predicate on the "name" field.
-func NameGTE(v string) predicate.Property {
-	return predicate.Property(sql.FieldGTE(FieldName, v))
+// NodeIDGTE applies the GTE predicate on the "node_id" field.
+func NodeIDGTE(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldGTE(FieldNodeID, v))
 }
 
-// NameLT applies the LT predicate on the "name" field.
-func NameLT(v string) predicate.Property {
-	return predicate.Property(sql.FieldLT(FieldName, v))
+// NodeIDLT applies the LT predicate on the "node_id" field.
+func NodeIDLT(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldLT(FieldNodeID, v))
 }
 
-// NameLTE applies the LTE predicate on the "name" field.
-func NameLTE(v string) predicate.Property {
-	return predicate.Property(sql.FieldLTE(FieldName, v))
+// NodeIDLTE applies the LTE predicate on the "node_id" field.
+func NodeIDLTE(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldLTE(FieldNodeID, v))
 }
 
-// NameContains applies the Contains predicate on the "name" field.
-func NameContains(v string) predicate.Property {
-	return predicate.Property(sql.FieldContains(FieldName, v))
+// NodeIDContains applies the Contains predicate on the "node_id" field.
+func NodeIDContains(v xid.ID) predicate.Property {
+	vc := v.String()
+	return predicate.Property(sql.FieldContains(FieldNodeID, vc))
 }
 
-// NameHasPrefix applies the HasPrefix predicate on the "name" field.
-func NameHasPrefix(v string) predicate.Property {
-	return predicate.Property(sql.FieldHasPrefix(FieldName, v))
+// NodeIDHasPrefix applies the HasPrefix predicate on the "node_id" field.
+func NodeIDHasPrefix(v xid.ID) predicate.Property {
+	vc := v.String()
+	return predicate.Property(sql.FieldHasPrefix(FieldNodeID, vc))
 }
 
-// NameHasSuffix applies the HasSuffix predicate on the "name" field.
-func NameHasSuffix(v string) predicate.Property {
-	return predicate.Property(sql.FieldHasSuffix(FieldName, v))
+// NodeIDHasSuffix applies the HasSuffix predicate on the "node_id" field.
+func NodeIDHasSuffix(v xid.ID) predicate.Property {
+	vc := v.String()
+	return predicate.Property(sql.FieldHasSuffix(FieldNodeID, vc))
 }
 
-// NameEqualFold applies the EqualFold predicate on the "name" field.
-func NameEqualFold(v string) predicate.Property {
-	return predicate.Property(sql.FieldEqualFold(FieldName, v))
+// NodeIDEqualFold applies the EqualFold predicate on the "node_id" field.
+func NodeIDEqualFold(v xid.ID) predicate.Property {
+	vc := v.String()
+	return predicate.Property(sql.FieldEqualFold(FieldNodeID, vc))
 }
 
-// NameContainsFold applies the ContainsFold predicate on the "name" field.
-func NameContainsFold(v string) predicate.Property {
-	return predicate.Property(sql.FieldContainsFold(FieldName, v))
+// NodeIDContainsFold applies the ContainsFold predicate on the "node_id" field.
+func NodeIDContainsFold(v xid.ID) predicate.Property {
+	vc := v.String()
+	return predicate.Property(sql.FieldContainsFold(FieldNodeID, vc))
 }
 
-// TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v string) predicate.Property {
-	return predicate.Property(sql.FieldEQ(FieldType, v))
+// FieldIDEQ applies the EQ predicate on the "field_id" field.
+func FieldIDEQ(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldEQ(FieldFieldID, v))
 }
 
-// TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v string) predicate.Property {
-	return predicate.Property(sql.FieldNEQ(FieldType, v))
+// FieldIDNEQ applies the NEQ predicate on the "field_id" field.
+func FieldIDNEQ(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldNEQ(FieldFieldID, v))
 }
 
-// TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...string) predicate.Property {
-	return predicate.Property(sql.FieldIn(FieldType, vs...))
+// FieldIDIn applies the In predicate on the "field_id" field.
+func FieldIDIn(vs ...xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldIn(FieldFieldID, vs...))
 }
 
-// TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...string) predicate.Property {
-	return predicate.Property(sql.FieldNotIn(FieldType, vs...))
+// FieldIDNotIn applies the NotIn predicate on the "field_id" field.
+func FieldIDNotIn(vs ...xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldNotIn(FieldFieldID, vs...))
 }
 
-// TypeGT applies the GT predicate on the "type" field.
-func TypeGT(v string) predicate.Property {
-	return predicate.Property(sql.FieldGT(FieldType, v))
+// FieldIDGT applies the GT predicate on the "field_id" field.
+func FieldIDGT(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldGT(FieldFieldID, v))
 }
 
-// TypeGTE applies the GTE predicate on the "type" field.
-func TypeGTE(v string) predicate.Property {
-	return predicate.Property(sql.FieldGTE(FieldType, v))
+// FieldIDGTE applies the GTE predicate on the "field_id" field.
+func FieldIDGTE(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldGTE(FieldFieldID, v))
 }
 
-// TypeLT applies the LT predicate on the "type" field.
-func TypeLT(v string) predicate.Property {
-	return predicate.Property(sql.FieldLT(FieldType, v))
+// FieldIDLT applies the LT predicate on the "field_id" field.
+func FieldIDLT(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldLT(FieldFieldID, v))
 }
 
-// TypeLTE applies the LTE predicate on the "type" field.
-func TypeLTE(v string) predicate.Property {
-	return predicate.Property(sql.FieldLTE(FieldType, v))
+// FieldIDLTE applies the LTE predicate on the "field_id" field.
+func FieldIDLTE(v xid.ID) predicate.Property {
+	return predicate.Property(sql.FieldLTE(FieldFieldID, v))
 }
 
-// TypeContains applies the Contains predicate on the "type" field.
-func TypeContains(v string) predicate.Property {
-	return predicate.Property(sql.FieldContains(FieldType, v))
+// FieldIDContains applies the Contains predicate on the "field_id" field.
+func FieldIDContains(v xid.ID) predicate.Property {
+	vc := v.String()
+	return predicate.Property(sql.FieldContains(FieldFieldID, vc))
 }
 
-// TypeHasPrefix applies the HasPrefix predicate on the "type" field.
-func TypeHasPrefix(v string) predicate.Property {
-	return predicate.Property(sql.FieldHasPrefix(FieldType, v))
+// FieldIDHasPrefix applies the HasPrefix predicate on the "field_id" field.
+func FieldIDHasPrefix(v xid.ID) predicate.Property {
+	vc := v.String()
+	return predicate.Property(sql.FieldHasPrefix(FieldFieldID, vc))
 }
 
-// TypeHasSuffix applies the HasSuffix predicate on the "type" field.
-func TypeHasSuffix(v string) predicate.Property {
-	return predicate.Property(sql.FieldHasSuffix(FieldType, v))
+// FieldIDHasSuffix applies the HasSuffix predicate on the "field_id" field.
+func FieldIDHasSuffix(v xid.ID) predicate.Property {
+	vc := v.String()
+	return predicate.Property(sql.FieldHasSuffix(FieldFieldID, vc))
 }
 
-// TypeEqualFold applies the EqualFold predicate on the "type" field.
-func TypeEqualFold(v string) predicate.Property {
-	return predicate.Property(sql.FieldEqualFold(FieldType, v))
+// FieldIDEqualFold applies the EqualFold predicate on the "field_id" field.
+func FieldIDEqualFold(v xid.ID) predicate.Property {
+	vc := v.String()
+	return predicate.Property(sql.FieldEqualFold(FieldFieldID, vc))
 }
 
-// TypeContainsFold applies the ContainsFold predicate on the "type" field.
-func TypeContainsFold(v string) predicate.Property {
-	return predicate.Property(sql.FieldContainsFold(FieldType, v))
+// FieldIDContainsFold applies the ContainsFold predicate on the "field_id" field.
+func FieldIDContainsFold(v xid.ID) predicate.Property {
+	vc := v.String()
+	return predicate.Property(sql.FieldContainsFold(FieldFieldID, vc))
 }
 
 // ValueEQ applies the EQ predicate on the "value" field.
@@ -316,86 +316,6 @@ func ValueContainsFold(v string) predicate.Property {
 	return predicate.Property(sql.FieldContainsFold(FieldValue, v))
 }
 
-// NodeIDEQ applies the EQ predicate on the "node_id" field.
-func NodeIDEQ(v xid.ID) predicate.Property {
-	return predicate.Property(sql.FieldEQ(FieldNodeID, v))
-}
-
-// NodeIDNEQ applies the NEQ predicate on the "node_id" field.
-func NodeIDNEQ(v xid.ID) predicate.Property {
-	return predicate.Property(sql.FieldNEQ(FieldNodeID, v))
-}
-
-// NodeIDIn applies the In predicate on the "node_id" field.
-func NodeIDIn(vs ...xid.ID) predicate.Property {
-	return predicate.Property(sql.FieldIn(FieldNodeID, vs...))
-}
-
-// NodeIDNotIn applies the NotIn predicate on the "node_id" field.
-func NodeIDNotIn(vs ...xid.ID) predicate.Property {
-	return predicate.Property(sql.FieldNotIn(FieldNodeID, vs...))
-}
-
-// NodeIDGT applies the GT predicate on the "node_id" field.
-func NodeIDGT(v xid.ID) predicate.Property {
-	return predicate.Property(sql.FieldGT(FieldNodeID, v))
-}
-
-// NodeIDGTE applies the GTE predicate on the "node_id" field.
-func NodeIDGTE(v xid.ID) predicate.Property {
-	return predicate.Property(sql.FieldGTE(FieldNodeID, v))
-}
-
-// NodeIDLT applies the LT predicate on the "node_id" field.
-func NodeIDLT(v xid.ID) predicate.Property {
-	return predicate.Property(sql.FieldLT(FieldNodeID, v))
-}
-
-// NodeIDLTE applies the LTE predicate on the "node_id" field.
-func NodeIDLTE(v xid.ID) predicate.Property {
-	return predicate.Property(sql.FieldLTE(FieldNodeID, v))
-}
-
-// NodeIDContains applies the Contains predicate on the "node_id" field.
-func NodeIDContains(v xid.ID) predicate.Property {
-	vc := v.String()
-	return predicate.Property(sql.FieldContains(FieldNodeID, vc))
-}
-
-// NodeIDHasPrefix applies the HasPrefix predicate on the "node_id" field.
-func NodeIDHasPrefix(v xid.ID) predicate.Property {
-	vc := v.String()
-	return predicate.Property(sql.FieldHasPrefix(FieldNodeID, vc))
-}
-
-// NodeIDHasSuffix applies the HasSuffix predicate on the "node_id" field.
-func NodeIDHasSuffix(v xid.ID) predicate.Property {
-	vc := v.String()
-	return predicate.Property(sql.FieldHasSuffix(FieldNodeID, vc))
-}
-
-// NodeIDIsNil applies the IsNil predicate on the "node_id" field.
-func NodeIDIsNil() predicate.Property {
-	return predicate.Property(sql.FieldIsNull(FieldNodeID))
-}
-
-// NodeIDNotNil applies the NotNil predicate on the "node_id" field.
-func NodeIDNotNil() predicate.Property {
-	return predicate.Property(sql.FieldNotNull(FieldNodeID))
-}
-
-// NodeIDEqualFold applies the EqualFold predicate on the "node_id" field.
-func NodeIDEqualFold(v xid.ID) predicate.Property {
-	vc := v.String()
-	return predicate.Property(sql.FieldEqualFold(FieldNodeID, vc))
-}
-
-// NodeIDContainsFold applies the ContainsFold predicate on the "node_id" field.
-func NodeIDContainsFold(v xid.ID) predicate.Property {
-	vc := v.String()
-	return predicate.Property(sql.FieldContainsFold(FieldNodeID, vc))
-}
-
 // HasNode applies the HasEdge predicate on the "node" edge.
 func HasNode() predicate.Property {
 	return predicate.Property(func(s *sql.Selector) {
@@ -411,6 +331,29 @@ func HasNode() predicate.Property {
 func HasNodeWith(preds ...predicate.Node) predicate.Property {
 	return predicate.Property(func(s *sql.Selector) {
 		step := newNodeStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSchema applies the HasEdge predicate on the "schema" edge.
+func HasSchema() predicate.Property {
+	return predicate.Property(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, SchemaTable, SchemaColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSchemaWith applies the HasEdge predicate on the "schema" edge with a given conditions (other predicates).
+func HasSchemaWith(preds ...predicate.PropertySchemaField) predicate.Property {
+	return predicate.Property(func(s *sql.Selector) {
+		step := newSchemaStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -171,6 +171,7 @@ erDiagram
         string content
         xidDOTID parent_node_id
         xidDOTID account_id
+        xidDOTID property_schema_id
         xidDOTID primary_asset_id
         xidDOTID link_id
         nodeDOTVisibility visibility
@@ -210,10 +211,18 @@ erDiagram
     Property {
         xidDOTID id
         timeDOTTime created_at
+        xidDOTID node_id
+        xidDOTID field_id
+        string value
+    }
+    PropertySchema {
+        xidDOTID id
+    }
+    PropertySchemaField {
+        xidDOTID id
         string name
         string type
-        string value
-        xidDOTID node_id
+        xidDOTID schema_id
     }
     Question {
         xidDOTID id
@@ -301,6 +310,9 @@ erDiagram
     	Post |o--o{ MentionProfile : "mentions/Post"
     	Post }o--o{ Asset : "assets/posts"
     	Post |o--o{ Event : "event/thread"
+    	PropertySchema |o--o{ Node : "node/property_schemas"
+    	PropertySchema |o--o{ PropertySchemaField : "fields/schema"
+    	PropertySchemaField |o--o{ Property : "properties/schema"
     	Question |o--o{ Question : "parent_question/parent"
     	Role }o--o{ Account : "accounts/roles"
     	Tag }o--o{ Post : "posts/tags"

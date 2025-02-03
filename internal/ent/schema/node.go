@@ -24,6 +24,7 @@ func (Node) Fields() []ent.Field {
 		field.String("content").Optional().Nillable(),
 		field.String("parent_node_id").GoType(xid.ID{}).Optional(),
 		field.String("account_id").GoType(xid.ID{}),
+		field.String("property_schema_id").GoType(xid.ID{}).Optional(),
 		field.String("primary_asset_id").GoType(xid.ID{}).Optional().Nillable(),
 		field.String("link_id").GoType(xid.ID{}).Optional(),
 		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
@@ -61,6 +62,10 @@ func (Node) Edges() []ent.Edge {
 			Ref("nodes"),
 
 		edge.To("properties", Property.Type),
+		edge.From("property_schemas", PropertySchema.Type).
+			Field("property_schema_id").
+			Ref("node").
+			Unique(),
 
 		edge.From("link", Link.Type).
 			Field("link_id").

@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/property"
+	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -143,6 +144,20 @@ func (nc *NodeCreate) SetNillableParentNodeID(x *xid.ID) *NodeCreate {
 // SetAccountID sets the "account_id" field.
 func (nc *NodeCreate) SetAccountID(x xid.ID) *NodeCreate {
 	nc.mutation.SetAccountID(x)
+	return nc
+}
+
+// SetPropertySchemaID sets the "property_schema_id" field.
+func (nc *NodeCreate) SetPropertySchemaID(x xid.ID) *NodeCreate {
+	nc.mutation.SetPropertySchemaID(x)
+	return nc
+}
+
+// SetNillablePropertySchemaID sets the "property_schema_id" field if the given value is not nil.
+func (nc *NodeCreate) SetNillablePropertySchemaID(x *xid.ID) *NodeCreate {
+	if x != nil {
+		nc.SetPropertySchemaID(*x)
+	}
 	return nc
 }
 
@@ -315,6 +330,25 @@ func (nc *NodeCreate) AddProperties(p ...*Property) *NodeCreate {
 		ids[i] = p[i].ID
 	}
 	return nc.AddPropertyIDs(ids...)
+}
+
+// SetPropertySchemasID sets the "property_schemas" edge to the PropertySchema entity by ID.
+func (nc *NodeCreate) SetPropertySchemasID(id xid.ID) *NodeCreate {
+	nc.mutation.SetPropertySchemasID(id)
+	return nc
+}
+
+// SetNillablePropertySchemasID sets the "property_schemas" edge to the PropertySchema entity by ID if the given value is not nil.
+func (nc *NodeCreate) SetNillablePropertySchemasID(id *xid.ID) *NodeCreate {
+	if id != nil {
+		nc = nc.SetPropertySchemasID(*id)
+	}
+	return nc
+}
+
+// SetPropertySchemas sets the "property_schemas" edge to the PropertySchema entity.
+func (nc *NodeCreate) SetPropertySchemas(p *PropertySchema) *NodeCreate {
+	return nc.SetPropertySchemasID(p.ID)
 }
 
 // SetLink sets the "link" edge to the Link entity.
@@ -629,6 +663,23 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := nc.mutation.PropertySchemasIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   node.PropertySchemasTable,
+			Columns: []string{node.PropertySchemasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(propertyschema.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.PropertySchemaID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := nc.mutation.LinkIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -869,6 +920,24 @@ func (u *NodeUpsert) SetAccountID(v xid.ID) *NodeUpsert {
 // UpdateAccountID sets the "account_id" field to the value that was provided on create.
 func (u *NodeUpsert) UpdateAccountID() *NodeUpsert {
 	u.SetExcluded(node.FieldAccountID)
+	return u
+}
+
+// SetPropertySchemaID sets the "property_schema_id" field.
+func (u *NodeUpsert) SetPropertySchemaID(v xid.ID) *NodeUpsert {
+	u.Set(node.FieldPropertySchemaID, v)
+	return u
+}
+
+// UpdatePropertySchemaID sets the "property_schema_id" field to the value that was provided on create.
+func (u *NodeUpsert) UpdatePropertySchemaID() *NodeUpsert {
+	u.SetExcluded(node.FieldPropertySchemaID)
+	return u
+}
+
+// ClearPropertySchemaID clears the value of the "property_schema_id" field.
+func (u *NodeUpsert) ClearPropertySchemaID() *NodeUpsert {
+	u.SetNull(node.FieldPropertySchemaID)
 	return u
 }
 
@@ -1147,6 +1216,27 @@ func (u *NodeUpsertOne) SetAccountID(v xid.ID) *NodeUpsertOne {
 func (u *NodeUpsertOne) UpdateAccountID() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetPropertySchemaID sets the "property_schema_id" field.
+func (u *NodeUpsertOne) SetPropertySchemaID(v xid.ID) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetPropertySchemaID(v)
+	})
+}
+
+// UpdatePropertySchemaID sets the "property_schema_id" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdatePropertySchemaID() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdatePropertySchemaID()
+	})
+}
+
+// ClearPropertySchemaID clears the value of the "property_schema_id" field.
+func (u *NodeUpsertOne) ClearPropertySchemaID() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearPropertySchemaID()
 	})
 }
 
@@ -1603,6 +1693,27 @@ func (u *NodeUpsertBulk) SetAccountID(v xid.ID) *NodeUpsertBulk {
 func (u *NodeUpsertBulk) UpdateAccountID() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateAccountID()
+	})
+}
+
+// SetPropertySchemaID sets the "property_schema_id" field.
+func (u *NodeUpsertBulk) SetPropertySchemaID(v xid.ID) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetPropertySchemaID(v)
+	})
+}
+
+// UpdatePropertySchemaID sets the "property_schema_id" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdatePropertySchemaID() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdatePropertySchemaID()
+	})
+}
+
+// ClearPropertySchemaID clears the value of the "property_schema_id" field.
+func (u *NodeUpsertBulk) ClearPropertySchemaID() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.ClearPropertySchemaID()
 	})
 }
 

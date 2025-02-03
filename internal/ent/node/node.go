@@ -36,6 +36,8 @@ const (
 	FieldParentNodeID = "parent_node_id"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
+	// FieldPropertySchemaID holds the string denoting the property_schema_id field in the database.
+	FieldPropertySchemaID = "property_schema_id"
 	// FieldPrimaryAssetID holds the string denoting the primary_asset_id field in the database.
 	FieldPrimaryAssetID = "primary_asset_id"
 	// FieldLinkID holds the string denoting the link_id field in the database.
@@ -58,6 +60,8 @@ const (
 	EdgeTags = "tags"
 	// EdgeProperties holds the string denoting the properties edge name in mutations.
 	EdgeProperties = "properties"
+	// EdgePropertySchemas holds the string denoting the property_schemas edge name in mutations.
+	EdgePropertySchemas = "property_schemas"
 	// EdgeLink holds the string denoting the link edge name in mutations.
 	EdgeLink = "link"
 	// EdgeContentLinks holds the string denoting the content_links edge name in mutations.
@@ -107,6 +111,13 @@ const (
 	PropertiesInverseTable = "properties"
 	// PropertiesColumn is the table column denoting the properties relation/edge.
 	PropertiesColumn = "node_id"
+	// PropertySchemasTable is the table that holds the property_schemas relation/edge.
+	PropertySchemasTable = "nodes"
+	// PropertySchemasInverseTable is the table name for the PropertySchema entity.
+	// It exists in this package in order to avoid circular dependency with the "propertyschema" package.
+	PropertySchemasInverseTable = "property_schemas"
+	// PropertySchemasColumn is the table column denoting the property_schemas relation/edge.
+	PropertySchemasColumn = "property_schema_id"
 	// LinkTable is the table that holds the link relation/edge.
 	LinkTable = "nodes"
 	// LinkInverseTable is the table name for the Link entity.
@@ -146,6 +157,7 @@ var Columns = []string{
 	FieldContent,
 	FieldParentNodeID,
 	FieldAccountID,
+	FieldPropertySchemaID,
 	FieldPrimaryAssetID,
 	FieldLinkID,
 	FieldVisibility,
@@ -276,6 +288,11 @@ func ByAccountID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAccountID, opts...).ToFunc()
 }
 
+// ByPropertySchemaID orders the results by the property_schema_id field.
+func ByPropertySchemaID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPropertySchemaID, opts...).ToFunc()
+}
+
 // ByPrimaryAssetID orders the results by the primary_asset_id field.
 func ByPrimaryAssetID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPrimaryAssetID, opts...).ToFunc()
@@ -365,6 +382,13 @@ func ByPropertiesCount(opts ...sql.OrderTermOption) OrderOption {
 func ByProperties(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newPropertiesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByPropertySchemasField orders the results by property_schemas field.
+func ByPropertySchemasField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPropertySchemasStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -463,6 +487,13 @@ func newPropertiesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PropertiesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, PropertiesTable, PropertiesColumn),
+	)
+}
+func newPropertySchemasStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PropertySchemasInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, PropertySchemasTable, PropertySchemasColumn),
 	)
 }
 func newLinkStep() *sqlgraph.Step {

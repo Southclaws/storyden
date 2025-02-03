@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/property"
+	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -181,6 +182,26 @@ func (nu *NodeUpdate) SetNillableAccountID(x *xid.ID) *NodeUpdate {
 	if x != nil {
 		nu.SetAccountID(*x)
 	}
+	return nu
+}
+
+// SetPropertySchemaID sets the "property_schema_id" field.
+func (nu *NodeUpdate) SetPropertySchemaID(x xid.ID) *NodeUpdate {
+	nu.mutation.SetPropertySchemaID(x)
+	return nu
+}
+
+// SetNillablePropertySchemaID sets the "property_schema_id" field if the given value is not nil.
+func (nu *NodeUpdate) SetNillablePropertySchemaID(x *xid.ID) *NodeUpdate {
+	if x != nil {
+		nu.SetPropertySchemaID(*x)
+	}
+	return nu
+}
+
+// ClearPropertySchemaID clears the value of the "property_schema_id" field.
+func (nu *NodeUpdate) ClearPropertySchemaID() *NodeUpdate {
+	nu.mutation.ClearPropertySchemaID()
 	return nu
 }
 
@@ -359,6 +380,25 @@ func (nu *NodeUpdate) AddProperties(p ...*Property) *NodeUpdate {
 	return nu.AddPropertyIDs(ids...)
 }
 
+// SetPropertySchemasID sets the "property_schemas" edge to the PropertySchema entity by ID.
+func (nu *NodeUpdate) SetPropertySchemasID(id xid.ID) *NodeUpdate {
+	nu.mutation.SetPropertySchemasID(id)
+	return nu
+}
+
+// SetNillablePropertySchemasID sets the "property_schemas" edge to the PropertySchema entity by ID if the given value is not nil.
+func (nu *NodeUpdate) SetNillablePropertySchemasID(id *xid.ID) *NodeUpdate {
+	if id != nil {
+		nu = nu.SetPropertySchemasID(*id)
+	}
+	return nu
+}
+
+// SetPropertySchemas sets the "property_schemas" edge to the PropertySchema entity.
+func (nu *NodeUpdate) SetPropertySchemas(p *PropertySchema) *NodeUpdate {
+	return nu.SetPropertySchemasID(p.ID)
+}
+
 // SetLink sets the "link" edge to the Link entity.
 func (nu *NodeUpdate) SetLink(l *Link) *NodeUpdate {
 	return nu.SetLinkID(l.ID)
@@ -499,6 +539,12 @@ func (nu *NodeUpdate) RemoveProperties(p ...*Property) *NodeUpdate {
 		ids[i] = p[i].ID
 	}
 	return nu.RemovePropertyIDs(ids...)
+}
+
+// ClearPropertySchemas clears the "property_schemas" edge to the PropertySchema entity.
+func (nu *NodeUpdate) ClearPropertySchemas() *NodeUpdate {
+	nu.mutation.ClearPropertySchemas()
+	return nu
 }
 
 // ClearLink clears the "link" edge to the Link entity.
@@ -925,6 +971,35 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if nu.mutation.PropertySchemasCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   node.PropertySchemasTable,
+			Columns: []string{node.PropertySchemasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(propertyschema.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.PropertySchemasIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   node.PropertySchemasTable,
+			Columns: []string{node.PropertySchemasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(propertyschema.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if nu.mutation.LinkCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -1226,6 +1301,26 @@ func (nuo *NodeUpdateOne) SetNillableAccountID(x *xid.ID) *NodeUpdateOne {
 	return nuo
 }
 
+// SetPropertySchemaID sets the "property_schema_id" field.
+func (nuo *NodeUpdateOne) SetPropertySchemaID(x xid.ID) *NodeUpdateOne {
+	nuo.mutation.SetPropertySchemaID(x)
+	return nuo
+}
+
+// SetNillablePropertySchemaID sets the "property_schema_id" field if the given value is not nil.
+func (nuo *NodeUpdateOne) SetNillablePropertySchemaID(x *xid.ID) *NodeUpdateOne {
+	if x != nil {
+		nuo.SetPropertySchemaID(*x)
+	}
+	return nuo
+}
+
+// ClearPropertySchemaID clears the value of the "property_schema_id" field.
+func (nuo *NodeUpdateOne) ClearPropertySchemaID() *NodeUpdateOne {
+	nuo.mutation.ClearPropertySchemaID()
+	return nuo
+}
+
 // SetPrimaryAssetID sets the "primary_asset_id" field.
 func (nuo *NodeUpdateOne) SetPrimaryAssetID(x xid.ID) *NodeUpdateOne {
 	nuo.mutation.SetPrimaryAssetID(x)
@@ -1401,6 +1496,25 @@ func (nuo *NodeUpdateOne) AddProperties(p ...*Property) *NodeUpdateOne {
 	return nuo.AddPropertyIDs(ids...)
 }
 
+// SetPropertySchemasID sets the "property_schemas" edge to the PropertySchema entity by ID.
+func (nuo *NodeUpdateOne) SetPropertySchemasID(id xid.ID) *NodeUpdateOne {
+	nuo.mutation.SetPropertySchemasID(id)
+	return nuo
+}
+
+// SetNillablePropertySchemasID sets the "property_schemas" edge to the PropertySchema entity by ID if the given value is not nil.
+func (nuo *NodeUpdateOne) SetNillablePropertySchemasID(id *xid.ID) *NodeUpdateOne {
+	if id != nil {
+		nuo = nuo.SetPropertySchemasID(*id)
+	}
+	return nuo
+}
+
+// SetPropertySchemas sets the "property_schemas" edge to the PropertySchema entity.
+func (nuo *NodeUpdateOne) SetPropertySchemas(p *PropertySchema) *NodeUpdateOne {
+	return nuo.SetPropertySchemasID(p.ID)
+}
+
 // SetLink sets the "link" edge to the Link entity.
 func (nuo *NodeUpdateOne) SetLink(l *Link) *NodeUpdateOne {
 	return nuo.SetLinkID(l.ID)
@@ -1541,6 +1655,12 @@ func (nuo *NodeUpdateOne) RemoveProperties(p ...*Property) *NodeUpdateOne {
 		ids[i] = p[i].ID
 	}
 	return nuo.RemovePropertyIDs(ids...)
+}
+
+// ClearPropertySchemas clears the "property_schemas" edge to the PropertySchema entity.
+func (nuo *NodeUpdateOne) ClearPropertySchemas() *NodeUpdateOne {
+	nuo.mutation.ClearPropertySchemas()
+	return nuo
 }
 
 // ClearLink clears the "link" edge to the Link entity.
@@ -1990,6 +2110,35 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(property.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nuo.mutation.PropertySchemasCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   node.PropertySchemasTable,
+			Columns: []string{node.PropertySchemasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(propertyschema.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.PropertySchemasIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   node.PropertySchemasTable,
+			Columns: []string{node.PropertySchemasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(propertyschema.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

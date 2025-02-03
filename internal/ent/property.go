@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/property"
+	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
 	"github.com/rs/xid"
 )
 
@@ -21,14 +22,12 @@ type Property struct {
 	ID xid.ID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
-	// Name holds the value of the "name" field.
-	Name string `json:"name,omitempty"`
-	// Type holds the value of the "type" field.
-	Type string `json:"type,omitempty"`
-	// Value holds the value of the "value" field.
-	Value string `json:"value,omitempty"`
 	// NodeID holds the value of the "node_id" field.
 	NodeID xid.ID `json:"node_id,omitempty"`
+	// FieldID holds the value of the "field_id" field.
+	FieldID xid.ID `json:"field_id,omitempty"`
+	// Value holds the value of the "value" field.
+	Value string `json:"value,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the PropertyQuery when eager-loading is set.
 	Edges        PropertyEdges `json:"edges"`
@@ -39,9 +38,11 @@ type Property struct {
 type PropertyEdges struct {
 	// Node holds the value of the node edge.
 	Node *Node `json:"node,omitempty"`
+	// Schema holds the value of the schema edge.
+	Schema *PropertySchemaField `json:"schema,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // NodeOrErr returns the Node value or an error if the edge
@@ -55,16 +56,27 @@ func (e PropertyEdges) NodeOrErr() (*Node, error) {
 	return nil, &NotLoadedError{edge: "node"}
 }
 
+// SchemaOrErr returns the Schema value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e PropertyEdges) SchemaOrErr() (*PropertySchemaField, error) {
+	if e.Schema != nil {
+		return e.Schema, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: propertyschemafield.Label}
+	}
+	return nil, &NotLoadedError{edge: "schema"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Property) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case property.FieldName, property.FieldType, property.FieldValue:
+		case property.FieldValue:
 			values[i] = new(sql.NullString)
 		case property.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case property.FieldID, property.FieldNodeID:
+		case property.FieldID, property.FieldNodeID, property.FieldFieldID:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -93,29 +105,23 @@ func (pr *Property) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pr.CreatedAt = value.Time
 			}
-		case property.FieldName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field name", values[i])
-			} else if value.Valid {
-				pr.Name = value.String
+		case property.FieldNodeID:
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field node_id", values[i])
+			} else if value != nil {
+				pr.NodeID = *value
 			}
-		case property.FieldType:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field type", values[i])
-			} else if value.Valid {
-				pr.Type = value.String
+		case property.FieldFieldID:
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field field_id", values[i])
+			} else if value != nil {
+				pr.FieldID = *value
 			}
 		case property.FieldValue:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field value", values[i])
 			} else if value.Valid {
 				pr.Value = value.String
-			}
-		case property.FieldNodeID:
-			if value, ok := values[i].(*xid.ID); !ok {
-				return fmt.Errorf("unexpected type %T for field node_id", values[i])
-			} else if value != nil {
-				pr.NodeID = *value
 			}
 		default:
 			pr.selectValues.Set(columns[i], values[i])
@@ -133,6 +139,11 @@ func (pr *Property) GetValue(name string) (ent.Value, error) {
 // QueryNode queries the "node" edge of the Property entity.
 func (pr *Property) QueryNode() *NodeQuery {
 	return NewPropertyClient(pr.config).QueryNode(pr)
+}
+
+// QuerySchema queries the "schema" edge of the Property entity.
+func (pr *Property) QuerySchema() *PropertySchemaFieldQuery {
+	return NewPropertyClient(pr.config).QuerySchema(pr)
 }
 
 // Update returns a builder for updating this Property.
@@ -161,17 +172,14 @@ func (pr *Property) String() string {
 	builder.WriteString("created_at=")
 	builder.WriteString(pr.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("name=")
-	builder.WriteString(pr.Name)
+	builder.WriteString("node_id=")
+	builder.WriteString(fmt.Sprintf("%v", pr.NodeID))
 	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(pr.Type)
+	builder.WriteString("field_id=")
+	builder.WriteString(fmt.Sprintf("%v", pr.FieldID))
 	builder.WriteString(", ")
 	builder.WriteString("value=")
 	builder.WriteString(pr.Value)
-	builder.WriteString(", ")
-	builder.WriteString("node_id=")
-	builder.WriteString(fmt.Sprintf("%v", pr.NodeID))
 	builder.WriteByte(')')
 	return builder.String()
 }

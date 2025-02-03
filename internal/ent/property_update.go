@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/property"
+	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
 	"github.com/rs/xid"
 )
 
@@ -30,30 +31,30 @@ func (pu *PropertyUpdate) Where(ps ...predicate.Property) *PropertyUpdate {
 	return pu
 }
 
-// SetName sets the "name" field.
-func (pu *PropertyUpdate) SetName(s string) *PropertyUpdate {
-	pu.mutation.SetName(s)
+// SetNodeID sets the "node_id" field.
+func (pu *PropertyUpdate) SetNodeID(x xid.ID) *PropertyUpdate {
+	pu.mutation.SetNodeID(x)
 	return pu
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (pu *PropertyUpdate) SetNillableName(s *string) *PropertyUpdate {
-	if s != nil {
-		pu.SetName(*s)
+// SetNillableNodeID sets the "node_id" field if the given value is not nil.
+func (pu *PropertyUpdate) SetNillableNodeID(x *xid.ID) *PropertyUpdate {
+	if x != nil {
+		pu.SetNodeID(*x)
 	}
 	return pu
 }
 
-// SetType sets the "type" field.
-func (pu *PropertyUpdate) SetType(s string) *PropertyUpdate {
-	pu.mutation.SetType(s)
+// SetFieldID sets the "field_id" field.
+func (pu *PropertyUpdate) SetFieldID(x xid.ID) *PropertyUpdate {
+	pu.mutation.SetFieldID(x)
 	return pu
 }
 
-// SetNillableType sets the "type" field if the given value is not nil.
-func (pu *PropertyUpdate) SetNillableType(s *string) *PropertyUpdate {
-	if s != nil {
-		pu.SetType(*s)
+// SetNillableFieldID sets the "field_id" field if the given value is not nil.
+func (pu *PropertyUpdate) SetNillableFieldID(x *xid.ID) *PropertyUpdate {
+	if x != nil {
+		pu.SetFieldID(*x)
 	}
 	return pu
 }
@@ -72,29 +73,20 @@ func (pu *PropertyUpdate) SetNillableValue(s *string) *PropertyUpdate {
 	return pu
 }
 
-// SetNodeID sets the "node_id" field.
-func (pu *PropertyUpdate) SetNodeID(x xid.ID) *PropertyUpdate {
-	pu.mutation.SetNodeID(x)
-	return pu
-}
-
-// SetNillableNodeID sets the "node_id" field if the given value is not nil.
-func (pu *PropertyUpdate) SetNillableNodeID(x *xid.ID) *PropertyUpdate {
-	if x != nil {
-		pu.SetNodeID(*x)
-	}
-	return pu
-}
-
-// ClearNodeID clears the value of the "node_id" field.
-func (pu *PropertyUpdate) ClearNodeID() *PropertyUpdate {
-	pu.mutation.ClearNodeID()
-	return pu
-}
-
 // SetNode sets the "node" edge to the Node entity.
 func (pu *PropertyUpdate) SetNode(n *Node) *PropertyUpdate {
 	return pu.SetNodeID(n.ID)
+}
+
+// SetSchemaID sets the "schema" edge to the PropertySchemaField entity by ID.
+func (pu *PropertyUpdate) SetSchemaID(id xid.ID) *PropertyUpdate {
+	pu.mutation.SetSchemaID(id)
+	return pu
+}
+
+// SetSchema sets the "schema" edge to the PropertySchemaField entity.
+func (pu *PropertyUpdate) SetSchema(p *PropertySchemaField) *PropertyUpdate {
+	return pu.SetSchemaID(p.ID)
 }
 
 // Mutation returns the PropertyMutation object of the builder.
@@ -105,6 +97,12 @@ func (pu *PropertyUpdate) Mutation() *PropertyMutation {
 // ClearNode clears the "node" edge to the Node entity.
 func (pu *PropertyUpdate) ClearNode() *PropertyUpdate {
 	pu.mutation.ClearNode()
+	return pu
+}
+
+// ClearSchema clears the "schema" edge to the PropertySchemaField entity.
+func (pu *PropertyUpdate) ClearSchema() *PropertyUpdate {
+	pu.mutation.ClearSchema()
 	return pu
 }
 
@@ -135,6 +133,17 @@ func (pu *PropertyUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (pu *PropertyUpdate) check() error {
+	if pu.mutation.NodeCleared() && len(pu.mutation.NodeIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Property.node"`)
+	}
+	if pu.mutation.SchemaCleared() && len(pu.mutation.SchemaIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Property.schema"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (pu *PropertyUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PropertyUpdate {
 	pu.modifiers = append(pu.modifiers, modifiers...)
@@ -142,6 +151,9 @@ func (pu *PropertyUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *Prope
 }
 
 func (pu *PropertyUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := pu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(property.Table, property.Columns, sqlgraph.NewFieldSpec(property.FieldID, field.TypeString))
 	if ps := pu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -149,12 +161,6 @@ func (pu *PropertyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := pu.mutation.Name(); ok {
-		_spec.SetField(property.FieldName, field.TypeString, value)
-	}
-	if value, ok := pu.mutation.GetType(); ok {
-		_spec.SetField(property.FieldType, field.TypeString, value)
 	}
 	if value, ok := pu.mutation.Value(); ok {
 		_spec.SetField(property.FieldValue, field.TypeString, value)
@@ -188,6 +194,35 @@ func (pu *PropertyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if pu.mutation.SchemaCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   property.SchemaTable,
+			Columns: []string{property.SchemaColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(propertyschemafield.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.SchemaIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   property.SchemaTable,
+			Columns: []string{property.SchemaColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(propertyschemafield.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(pu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -210,30 +245,30 @@ type PropertyUpdateOne struct {
 	modifiers []func(*sql.UpdateBuilder)
 }
 
-// SetName sets the "name" field.
-func (puo *PropertyUpdateOne) SetName(s string) *PropertyUpdateOne {
-	puo.mutation.SetName(s)
+// SetNodeID sets the "node_id" field.
+func (puo *PropertyUpdateOne) SetNodeID(x xid.ID) *PropertyUpdateOne {
+	puo.mutation.SetNodeID(x)
 	return puo
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (puo *PropertyUpdateOne) SetNillableName(s *string) *PropertyUpdateOne {
-	if s != nil {
-		puo.SetName(*s)
+// SetNillableNodeID sets the "node_id" field if the given value is not nil.
+func (puo *PropertyUpdateOne) SetNillableNodeID(x *xid.ID) *PropertyUpdateOne {
+	if x != nil {
+		puo.SetNodeID(*x)
 	}
 	return puo
 }
 
-// SetType sets the "type" field.
-func (puo *PropertyUpdateOne) SetType(s string) *PropertyUpdateOne {
-	puo.mutation.SetType(s)
+// SetFieldID sets the "field_id" field.
+func (puo *PropertyUpdateOne) SetFieldID(x xid.ID) *PropertyUpdateOne {
+	puo.mutation.SetFieldID(x)
 	return puo
 }
 
-// SetNillableType sets the "type" field if the given value is not nil.
-func (puo *PropertyUpdateOne) SetNillableType(s *string) *PropertyUpdateOne {
-	if s != nil {
-		puo.SetType(*s)
+// SetNillableFieldID sets the "field_id" field if the given value is not nil.
+func (puo *PropertyUpdateOne) SetNillableFieldID(x *xid.ID) *PropertyUpdateOne {
+	if x != nil {
+		puo.SetFieldID(*x)
 	}
 	return puo
 }
@@ -252,29 +287,20 @@ func (puo *PropertyUpdateOne) SetNillableValue(s *string) *PropertyUpdateOne {
 	return puo
 }
 
-// SetNodeID sets the "node_id" field.
-func (puo *PropertyUpdateOne) SetNodeID(x xid.ID) *PropertyUpdateOne {
-	puo.mutation.SetNodeID(x)
-	return puo
-}
-
-// SetNillableNodeID sets the "node_id" field if the given value is not nil.
-func (puo *PropertyUpdateOne) SetNillableNodeID(x *xid.ID) *PropertyUpdateOne {
-	if x != nil {
-		puo.SetNodeID(*x)
-	}
-	return puo
-}
-
-// ClearNodeID clears the value of the "node_id" field.
-func (puo *PropertyUpdateOne) ClearNodeID() *PropertyUpdateOne {
-	puo.mutation.ClearNodeID()
-	return puo
-}
-
 // SetNode sets the "node" edge to the Node entity.
 func (puo *PropertyUpdateOne) SetNode(n *Node) *PropertyUpdateOne {
 	return puo.SetNodeID(n.ID)
+}
+
+// SetSchemaID sets the "schema" edge to the PropertySchemaField entity by ID.
+func (puo *PropertyUpdateOne) SetSchemaID(id xid.ID) *PropertyUpdateOne {
+	puo.mutation.SetSchemaID(id)
+	return puo
+}
+
+// SetSchema sets the "schema" edge to the PropertySchemaField entity.
+func (puo *PropertyUpdateOne) SetSchema(p *PropertySchemaField) *PropertyUpdateOne {
+	return puo.SetSchemaID(p.ID)
 }
 
 // Mutation returns the PropertyMutation object of the builder.
@@ -285,6 +311,12 @@ func (puo *PropertyUpdateOne) Mutation() *PropertyMutation {
 // ClearNode clears the "node" edge to the Node entity.
 func (puo *PropertyUpdateOne) ClearNode() *PropertyUpdateOne {
 	puo.mutation.ClearNode()
+	return puo
+}
+
+// ClearSchema clears the "schema" edge to the PropertySchemaField entity.
+func (puo *PropertyUpdateOne) ClearSchema() *PropertyUpdateOne {
+	puo.mutation.ClearSchema()
 	return puo
 }
 
@@ -328,6 +360,17 @@ func (puo *PropertyUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (puo *PropertyUpdateOne) check() error {
+	if puo.mutation.NodeCleared() && len(puo.mutation.NodeIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Property.node"`)
+	}
+	if puo.mutation.SchemaCleared() && len(puo.mutation.SchemaIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Property.schema"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (puo *PropertyUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PropertyUpdateOne {
 	puo.modifiers = append(puo.modifiers, modifiers...)
@@ -335,6 +378,9 @@ func (puo *PropertyUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *P
 }
 
 func (puo *PropertyUpdateOne) sqlSave(ctx context.Context) (_node *Property, err error) {
+	if err := puo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(property.Table, property.Columns, sqlgraph.NewFieldSpec(property.FieldID, field.TypeString))
 	id, ok := puo.mutation.ID()
 	if !ok {
@@ -359,12 +405,6 @@ func (puo *PropertyUpdateOne) sqlSave(ctx context.Context) (_node *Property, err
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := puo.mutation.Name(); ok {
-		_spec.SetField(property.FieldName, field.TypeString, value)
-	}
-	if value, ok := puo.mutation.GetType(); ok {
-		_spec.SetField(property.FieldType, field.TypeString, value)
 	}
 	if value, ok := puo.mutation.Value(); ok {
 		_spec.SetField(property.FieldValue, field.TypeString, value)
@@ -391,6 +431,35 @@ func (puo *PropertyUpdateOne) sqlSave(ctx context.Context) (_node *Property, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.SchemaCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   property.SchemaTable,
+			Columns: []string{property.SchemaColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(propertyschemafield.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.SchemaIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   property.SchemaTable,
+			Columns: []string{property.SchemaColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(propertyschemafield.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

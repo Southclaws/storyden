@@ -48,34 +48,38 @@ func WithVisibilityRulesApplied(accountID *account.AccountID) Option {
 const nodePropertiesQuery = `with
   sibling_properties as (
     select
-      sp.name,
-      sp.type,
+      psf.id,
+      psf.name,
+      psf.type,
       'sibling' as source
     from
       nodes n
       left join nodes sn on sn.parent_node_id = n.parent_node_id
-      inner join properties sp on sp.node_id = sn.id
-      or sp.node_id = n.id
+      inner join property_schemas ps on ps.id = sn.property_schema_id
+      or ps.id = n.property_schema_id
+      inner join property_schema_fields psf on psf.schema_id = ps.id
     where
       n.id = $1
     group by
-      sp.name,
-      sp.type
+      psf.name,
+      psf.type
   ),
   child_properties as (
     select
-      cp.name,
-      cp.type,
+      psf.id,
+      psf.name,
+      psf.type,
       'child' as source
     from
       nodes n
       inner join nodes cn on cn.parent_node_id = n.id
-      inner join properties cp on cp.node_id = cn.id
+      inner join property_schemas ps on ps.id = cn.property_schema_id
+      inner join property_schema_fields psf on psf.schema_id = ps.id
     where
       n.id = $1
     group by
-      cp.name,
-      cp.type
+      psf.name,
+      psf.type
   )
 select
   *

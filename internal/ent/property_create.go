@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/property"
+	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
 	"github.com/rs/xid"
 )
 
@@ -39,35 +40,21 @@ func (pc *PropertyCreate) SetNillableCreatedAt(t *time.Time) *PropertyCreate {
 	return pc
 }
 
-// SetName sets the "name" field.
-func (pc *PropertyCreate) SetName(s string) *PropertyCreate {
-	pc.mutation.SetName(s)
-	return pc
-}
-
-// SetType sets the "type" field.
-func (pc *PropertyCreate) SetType(s string) *PropertyCreate {
-	pc.mutation.SetType(s)
-	return pc
-}
-
-// SetValue sets the "value" field.
-func (pc *PropertyCreate) SetValue(s string) *PropertyCreate {
-	pc.mutation.SetValue(s)
-	return pc
-}
-
 // SetNodeID sets the "node_id" field.
 func (pc *PropertyCreate) SetNodeID(x xid.ID) *PropertyCreate {
 	pc.mutation.SetNodeID(x)
 	return pc
 }
 
-// SetNillableNodeID sets the "node_id" field if the given value is not nil.
-func (pc *PropertyCreate) SetNillableNodeID(x *xid.ID) *PropertyCreate {
-	if x != nil {
-		pc.SetNodeID(*x)
-	}
+// SetFieldID sets the "field_id" field.
+func (pc *PropertyCreate) SetFieldID(x xid.ID) *PropertyCreate {
+	pc.mutation.SetFieldID(x)
+	return pc
+}
+
+// SetValue sets the "value" field.
+func (pc *PropertyCreate) SetValue(s string) *PropertyCreate {
+	pc.mutation.SetValue(s)
 	return pc
 }
 
@@ -88,6 +75,17 @@ func (pc *PropertyCreate) SetNillableID(x *xid.ID) *PropertyCreate {
 // SetNode sets the "node" edge to the Node entity.
 func (pc *PropertyCreate) SetNode(n *Node) *PropertyCreate {
 	return pc.SetNodeID(n.ID)
+}
+
+// SetSchemaID sets the "schema" edge to the PropertySchemaField entity by ID.
+func (pc *PropertyCreate) SetSchemaID(id xid.ID) *PropertyCreate {
+	pc.mutation.SetSchemaID(id)
+	return pc
+}
+
+// SetSchema sets the "schema" edge to the PropertySchemaField entity.
+func (pc *PropertyCreate) SetSchema(p *PropertySchemaField) *PropertyCreate {
+	return pc.SetSchemaID(p.ID)
 }
 
 // Mutation returns the PropertyMutation object of the builder.
@@ -140,11 +138,11 @@ func (pc *PropertyCreate) check() error {
 	if _, ok := pc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Property.created_at"`)}
 	}
-	if _, ok := pc.mutation.Name(); !ok {
-		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Property.name"`)}
+	if _, ok := pc.mutation.NodeID(); !ok {
+		return &ValidationError{Name: "node_id", err: errors.New(`ent: missing required field "Property.node_id"`)}
 	}
-	if _, ok := pc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Property.type"`)}
+	if _, ok := pc.mutation.FieldID(); !ok {
+		return &ValidationError{Name: "field_id", err: errors.New(`ent: missing required field "Property.field_id"`)}
 	}
 	if _, ok := pc.mutation.Value(); !ok {
 		return &ValidationError{Name: "value", err: errors.New(`ent: missing required field "Property.value"`)}
@@ -153,6 +151,12 @@ func (pc *PropertyCreate) check() error {
 		if err := property.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Property.id": %w`, err)}
 		}
+	}
+	if len(pc.mutation.NodeIDs()) == 0 {
+		return &ValidationError{Name: "node", err: errors.New(`ent: missing required edge "Property.node"`)}
+	}
+	if len(pc.mutation.SchemaIDs()) == 0 {
+		return &ValidationError{Name: "schema", err: errors.New(`ent: missing required edge "Property.schema"`)}
 	}
 	return nil
 }
@@ -194,14 +198,6 @@ func (pc *PropertyCreate) createSpec() (*Property, *sqlgraph.CreateSpec) {
 		_spec.SetField(property.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := pc.mutation.Name(); ok {
-		_spec.SetField(property.FieldName, field.TypeString, value)
-		_node.Name = value
-	}
-	if value, ok := pc.mutation.GetType(); ok {
-		_spec.SetField(property.FieldType, field.TypeString, value)
-		_node.Type = value
-	}
 	if value, ok := pc.mutation.Value(); ok {
 		_spec.SetField(property.FieldValue, field.TypeString, value)
 		_node.Value = value
@@ -221,6 +217,23 @@ func (pc *PropertyCreate) createSpec() (*Property, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.NodeID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.SchemaIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   property.SchemaTable,
+			Columns: []string{property.SchemaColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(propertyschemafield.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.FieldID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -275,42 +288,6 @@ type (
 	}
 )
 
-// SetName sets the "name" field.
-func (u *PropertyUpsert) SetName(v string) *PropertyUpsert {
-	u.Set(property.FieldName, v)
-	return u
-}
-
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *PropertyUpsert) UpdateName() *PropertyUpsert {
-	u.SetExcluded(property.FieldName)
-	return u
-}
-
-// SetType sets the "type" field.
-func (u *PropertyUpsert) SetType(v string) *PropertyUpsert {
-	u.Set(property.FieldType, v)
-	return u
-}
-
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *PropertyUpsert) UpdateType() *PropertyUpsert {
-	u.SetExcluded(property.FieldType)
-	return u
-}
-
-// SetValue sets the "value" field.
-func (u *PropertyUpsert) SetValue(v string) *PropertyUpsert {
-	u.Set(property.FieldValue, v)
-	return u
-}
-
-// UpdateValue sets the "value" field to the value that was provided on create.
-func (u *PropertyUpsert) UpdateValue() *PropertyUpsert {
-	u.SetExcluded(property.FieldValue)
-	return u
-}
-
 // SetNodeID sets the "node_id" field.
 func (u *PropertyUpsert) SetNodeID(v xid.ID) *PropertyUpsert {
 	u.Set(property.FieldNodeID, v)
@@ -323,9 +300,27 @@ func (u *PropertyUpsert) UpdateNodeID() *PropertyUpsert {
 	return u
 }
 
-// ClearNodeID clears the value of the "node_id" field.
-func (u *PropertyUpsert) ClearNodeID() *PropertyUpsert {
-	u.SetNull(property.FieldNodeID)
+// SetFieldID sets the "field_id" field.
+func (u *PropertyUpsert) SetFieldID(v xid.ID) *PropertyUpsert {
+	u.Set(property.FieldFieldID, v)
+	return u
+}
+
+// UpdateFieldID sets the "field_id" field to the value that was provided on create.
+func (u *PropertyUpsert) UpdateFieldID() *PropertyUpsert {
+	u.SetExcluded(property.FieldFieldID)
+	return u
+}
+
+// SetValue sets the "value" field.
+func (u *PropertyUpsert) SetValue(v string) *PropertyUpsert {
+	u.Set(property.FieldValue, v)
+	return u
+}
+
+// UpdateValue sets the "value" field to the value that was provided on create.
+func (u *PropertyUpsert) UpdateValue() *PropertyUpsert {
+	u.SetExcluded(property.FieldValue)
 	return u
 }
 
@@ -380,48 +375,6 @@ func (u *PropertyUpsertOne) Update(set func(*PropertyUpsert)) *PropertyUpsertOne
 	return u
 }
 
-// SetName sets the "name" field.
-func (u *PropertyUpsertOne) SetName(v string) *PropertyUpsertOne {
-	return u.Update(func(s *PropertyUpsert) {
-		s.SetName(v)
-	})
-}
-
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *PropertyUpsertOne) UpdateName() *PropertyUpsertOne {
-	return u.Update(func(s *PropertyUpsert) {
-		s.UpdateName()
-	})
-}
-
-// SetType sets the "type" field.
-func (u *PropertyUpsertOne) SetType(v string) *PropertyUpsertOne {
-	return u.Update(func(s *PropertyUpsert) {
-		s.SetType(v)
-	})
-}
-
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *PropertyUpsertOne) UpdateType() *PropertyUpsertOne {
-	return u.Update(func(s *PropertyUpsert) {
-		s.UpdateType()
-	})
-}
-
-// SetValue sets the "value" field.
-func (u *PropertyUpsertOne) SetValue(v string) *PropertyUpsertOne {
-	return u.Update(func(s *PropertyUpsert) {
-		s.SetValue(v)
-	})
-}
-
-// UpdateValue sets the "value" field to the value that was provided on create.
-func (u *PropertyUpsertOne) UpdateValue() *PropertyUpsertOne {
-	return u.Update(func(s *PropertyUpsert) {
-		s.UpdateValue()
-	})
-}
-
 // SetNodeID sets the "node_id" field.
 func (u *PropertyUpsertOne) SetNodeID(v xid.ID) *PropertyUpsertOne {
 	return u.Update(func(s *PropertyUpsert) {
@@ -436,10 +389,31 @@ func (u *PropertyUpsertOne) UpdateNodeID() *PropertyUpsertOne {
 	})
 }
 
-// ClearNodeID clears the value of the "node_id" field.
-func (u *PropertyUpsertOne) ClearNodeID() *PropertyUpsertOne {
+// SetFieldID sets the "field_id" field.
+func (u *PropertyUpsertOne) SetFieldID(v xid.ID) *PropertyUpsertOne {
 	return u.Update(func(s *PropertyUpsert) {
-		s.ClearNodeID()
+		s.SetFieldID(v)
+	})
+}
+
+// UpdateFieldID sets the "field_id" field to the value that was provided on create.
+func (u *PropertyUpsertOne) UpdateFieldID() *PropertyUpsertOne {
+	return u.Update(func(s *PropertyUpsert) {
+		s.UpdateFieldID()
+	})
+}
+
+// SetValue sets the "value" field.
+func (u *PropertyUpsertOne) SetValue(v string) *PropertyUpsertOne {
+	return u.Update(func(s *PropertyUpsert) {
+		s.SetValue(v)
+	})
+}
+
+// UpdateValue sets the "value" field to the value that was provided on create.
+func (u *PropertyUpsertOne) UpdateValue() *PropertyUpsertOne {
+	return u.Update(func(s *PropertyUpsert) {
+		s.UpdateValue()
 	})
 }
 
@@ -661,48 +635,6 @@ func (u *PropertyUpsertBulk) Update(set func(*PropertyUpsert)) *PropertyUpsertBu
 	return u
 }
 
-// SetName sets the "name" field.
-func (u *PropertyUpsertBulk) SetName(v string) *PropertyUpsertBulk {
-	return u.Update(func(s *PropertyUpsert) {
-		s.SetName(v)
-	})
-}
-
-// UpdateName sets the "name" field to the value that was provided on create.
-func (u *PropertyUpsertBulk) UpdateName() *PropertyUpsertBulk {
-	return u.Update(func(s *PropertyUpsert) {
-		s.UpdateName()
-	})
-}
-
-// SetType sets the "type" field.
-func (u *PropertyUpsertBulk) SetType(v string) *PropertyUpsertBulk {
-	return u.Update(func(s *PropertyUpsert) {
-		s.SetType(v)
-	})
-}
-
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *PropertyUpsertBulk) UpdateType() *PropertyUpsertBulk {
-	return u.Update(func(s *PropertyUpsert) {
-		s.UpdateType()
-	})
-}
-
-// SetValue sets the "value" field.
-func (u *PropertyUpsertBulk) SetValue(v string) *PropertyUpsertBulk {
-	return u.Update(func(s *PropertyUpsert) {
-		s.SetValue(v)
-	})
-}
-
-// UpdateValue sets the "value" field to the value that was provided on create.
-func (u *PropertyUpsertBulk) UpdateValue() *PropertyUpsertBulk {
-	return u.Update(func(s *PropertyUpsert) {
-		s.UpdateValue()
-	})
-}
-
 // SetNodeID sets the "node_id" field.
 func (u *PropertyUpsertBulk) SetNodeID(v xid.ID) *PropertyUpsertBulk {
 	return u.Update(func(s *PropertyUpsert) {
@@ -717,10 +649,31 @@ func (u *PropertyUpsertBulk) UpdateNodeID() *PropertyUpsertBulk {
 	})
 }
 
-// ClearNodeID clears the value of the "node_id" field.
-func (u *PropertyUpsertBulk) ClearNodeID() *PropertyUpsertBulk {
+// SetFieldID sets the "field_id" field.
+func (u *PropertyUpsertBulk) SetFieldID(v xid.ID) *PropertyUpsertBulk {
 	return u.Update(func(s *PropertyUpsert) {
-		s.ClearNodeID()
+		s.SetFieldID(v)
+	})
+}
+
+// UpdateFieldID sets the "field_id" field to the value that was provided on create.
+func (u *PropertyUpsertBulk) UpdateFieldID() *PropertyUpsertBulk {
+	return u.Update(func(s *PropertyUpsert) {
+		s.UpdateFieldID()
+	})
+}
+
+// SetValue sets the "value" field.
+func (u *PropertyUpsertBulk) SetValue(v string) *PropertyUpsertBulk {
+	return u.Update(func(s *PropertyUpsert) {
+		s.SetValue(v)
+	})
+}
+
+// UpdateValue sets the "value" field to the value that was provided on create.
+func (u *PropertyUpsertBulk) UpdateValue() *PropertyUpsertBulk {
+	return u.Update(func(s *PropertyUpsert) {
+		s.UpdateValue()
 	})
 }
 
