@@ -37,6 +37,12 @@ func (psfc *PropertySchemaFieldCreate) SetType(s string) *PropertySchemaFieldCre
 	return psfc
 }
 
+// SetSort sets the "sort" field.
+func (psfc *PropertySchemaFieldCreate) SetSort(s string) *PropertySchemaFieldCreate {
+	psfc.mutation.SetSort(s)
+	return psfc
+}
+
 // SetSchemaID sets the "schema_id" field.
 func (psfc *PropertySchemaFieldCreate) SetSchemaID(x xid.ID) *PropertySchemaFieldCreate {
 	psfc.mutation.SetSchemaID(x)
@@ -126,6 +132,9 @@ func (psfc *PropertySchemaFieldCreate) check() error {
 	if _, ok := psfc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "PropertySchemaField.type"`)}
 	}
+	if _, ok := psfc.mutation.Sort(); !ok {
+		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "PropertySchemaField.sort"`)}
+	}
 	if _, ok := psfc.mutation.SchemaID(); !ok {
 		return &ValidationError{Name: "schema_id", err: errors.New(`ent: missing required field "PropertySchemaField.schema_id"`)}
 	}
@@ -180,6 +189,10 @@ func (psfc *PropertySchemaFieldCreate) createSpec() (*PropertySchemaField, *sqlg
 	if value, ok := psfc.mutation.GetType(); ok {
 		_spec.SetField(propertyschemafield.FieldType, field.TypeString, value)
 		_node.Type = value
+	}
+	if value, ok := psfc.mutation.Sort(); ok {
+		_spec.SetField(propertyschemafield.FieldSort, field.TypeString, value)
+		_node.Sort = value
 	}
 	if nodes := psfc.mutation.SchemaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -290,6 +303,18 @@ func (u *PropertySchemaFieldUpsert) UpdateType() *PropertySchemaFieldUpsert {
 	return u
 }
 
+// SetSort sets the "sort" field.
+func (u *PropertySchemaFieldUpsert) SetSort(v string) *PropertySchemaFieldUpsert {
+	u.Set(propertyschemafield.FieldSort, v)
+	return u
+}
+
+// UpdateSort sets the "sort" field to the value that was provided on create.
+func (u *PropertySchemaFieldUpsert) UpdateSort() *PropertySchemaFieldUpsert {
+	u.SetExcluded(propertyschemafield.FieldSort)
+	return u
+}
+
 // SetSchemaID sets the "schema_id" field.
 func (u *PropertySchemaFieldUpsert) SetSchemaID(v xid.ID) *PropertySchemaFieldUpsert {
 	u.Set(propertyschemafield.FieldSchemaID, v)
@@ -375,6 +400,20 @@ func (u *PropertySchemaFieldUpsertOne) SetType(v string) *PropertySchemaFieldUps
 func (u *PropertySchemaFieldUpsertOne) UpdateType() *PropertySchemaFieldUpsertOne {
 	return u.Update(func(s *PropertySchemaFieldUpsert) {
 		s.UpdateType()
+	})
+}
+
+// SetSort sets the "sort" field.
+func (u *PropertySchemaFieldUpsertOne) SetSort(v string) *PropertySchemaFieldUpsertOne {
+	return u.Update(func(s *PropertySchemaFieldUpsert) {
+		s.SetSort(v)
+	})
+}
+
+// UpdateSort sets the "sort" field to the value that was provided on create.
+func (u *PropertySchemaFieldUpsertOne) UpdateSort() *PropertySchemaFieldUpsertOne {
+	return u.Update(func(s *PropertySchemaFieldUpsert) {
+		s.UpdateSort()
 	})
 }
 
@@ -632,6 +671,20 @@ func (u *PropertySchemaFieldUpsertBulk) SetType(v string) *PropertySchemaFieldUp
 func (u *PropertySchemaFieldUpsertBulk) UpdateType() *PropertySchemaFieldUpsertBulk {
 	return u.Update(func(s *PropertySchemaFieldUpsert) {
 		s.UpdateType()
+	})
+}
+
+// SetSort sets the "sort" field.
+func (u *PropertySchemaFieldUpsertBulk) SetSort(v string) *PropertySchemaFieldUpsertBulk {
+	return u.Update(func(s *PropertySchemaFieldUpsert) {
+		s.SetSort(v)
+	})
+}
+
+// UpdateSort sets the "sort" field to the value that was provided on create.
+func (u *PropertySchemaFieldUpsertBulk) UpdateSort() *PropertySchemaFieldUpsertBulk {
+	return u.Update(func(s *PropertySchemaFieldUpsert) {
+		s.UpdateSort()
 	})
 }
 

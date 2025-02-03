@@ -758,6 +758,7 @@ var (
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "name", Type: field.TypeString},
 		{Name: "type", Type: field.TypeString},
+		{Name: "sort", Type: field.TypeString},
 		{Name: "schema_id", Type: field.TypeString, Size: 20},
 	}
 	// PropertySchemaFieldsTable holds the schema information for the "property_schema_fields" table.
@@ -768,7 +769,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "property_schema_fields_property_schemas_fields",
-				Columns:    []*schema.Column{PropertySchemaFieldsColumns[3]},
+				Columns:    []*schema.Column{PropertySchemaFieldsColumns[4]},
 				RefColumns: []*schema.Column{PropertySchemasColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -777,7 +778,7 @@ var (
 			{
 				Name:    "propertyschemafield_schema_id_name",
 				Unique:  true,
-				Columns: []*schema.Column{PropertySchemaFieldsColumns[3], PropertySchemaFieldsColumns[1]},
+				Columns: []*schema.Column{PropertySchemaFieldsColumns[4], PropertySchemaFieldsColumns[1]},
 			},
 			{
 				Name:    "propertyschemafield_name",

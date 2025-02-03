@@ -17,6 +17,8 @@ const (
 	FieldName = "name"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
+	// FieldSort holds the string denoting the sort field in the database.
+	FieldSort = "sort"
 	// FieldSchemaID holds the string denoting the schema_id field in the database.
 	FieldSchemaID = "schema_id"
 	// EdgeSchema holds the string denoting the schema edge name in mutations.
@@ -46,6 +48,7 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldType,
+	FieldSort,
 	FieldSchemaID,
 }
 
@@ -82,6 +85,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByType orders the results by the type field.
 func ByType(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldType, opts...).ToFunc()
+}
+
+// BySort orders the results by the sort field.
+func BySort(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSort, opts...).ToFunc()
 }
 
 // BySchemaID orders the results by the schema_id field.

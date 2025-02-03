@@ -64,6 +64,11 @@ func Type(v string) predicate.PropertySchemaField {
 	return predicate.PropertySchemaField(sql.FieldEQ(FieldType, v))
 }
 
+// Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
+func Sort(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldEQ(FieldSort, v))
+}
+
 // SchemaID applies equality check predicate on the "schema_id" field. It's identical to SchemaIDEQ.
 func SchemaID(v xid.ID) predicate.PropertySchemaField {
 	return predicate.PropertySchemaField(sql.FieldEQ(FieldSchemaID, v))
@@ -197,6 +202,71 @@ func TypeEqualFold(v string) predicate.PropertySchemaField {
 // TypeContainsFold applies the ContainsFold predicate on the "type" field.
 func TypeContainsFold(v string) predicate.PropertySchemaField {
 	return predicate.PropertySchemaField(sql.FieldContainsFold(FieldType, v))
+}
+
+// SortEQ applies the EQ predicate on the "sort" field.
+func SortEQ(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldEQ(FieldSort, v))
+}
+
+// SortNEQ applies the NEQ predicate on the "sort" field.
+func SortNEQ(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldNEQ(FieldSort, v))
+}
+
+// SortIn applies the In predicate on the "sort" field.
+func SortIn(vs ...string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldIn(FieldSort, vs...))
+}
+
+// SortNotIn applies the NotIn predicate on the "sort" field.
+func SortNotIn(vs ...string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldNotIn(FieldSort, vs...))
+}
+
+// SortGT applies the GT predicate on the "sort" field.
+func SortGT(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldGT(FieldSort, v))
+}
+
+// SortGTE applies the GTE predicate on the "sort" field.
+func SortGTE(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldGTE(FieldSort, v))
+}
+
+// SortLT applies the LT predicate on the "sort" field.
+func SortLT(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldLT(FieldSort, v))
+}
+
+// SortLTE applies the LTE predicate on the "sort" field.
+func SortLTE(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldLTE(FieldSort, v))
+}
+
+// SortContains applies the Contains predicate on the "sort" field.
+func SortContains(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldContains(FieldSort, v))
+}
+
+// SortHasPrefix applies the HasPrefix predicate on the "sort" field.
+func SortHasPrefix(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldHasPrefix(FieldSort, v))
+}
+
+// SortHasSuffix applies the HasSuffix predicate on the "sort" field.
+func SortHasSuffix(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldHasSuffix(FieldSort, v))
+}
+
+// SortEqualFold applies the EqualFold predicate on the "sort" field.
+func SortEqualFold(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldEqualFold(FieldSort, v))
+}
+
+// SortContainsFold applies the ContainsFold predicate on the "sort" field.
+func SortContainsFold(v string) predicate.PropertySchemaField {
+	return predicate.PropertySchemaField(sql.FieldContainsFold(FieldSort, v))
 }
 
 // SchemaIDEQ applies the EQ predicate on the "schema_id" field.

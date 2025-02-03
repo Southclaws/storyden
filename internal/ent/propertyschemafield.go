@@ -22,6 +22,8 @@ type PropertySchemaField struct {
 	Name string `json:"name,omitempty"`
 	// Type holds the value of the "type" field.
 	Type string `json:"type,omitempty"`
+	// Sort holds the value of the "sort" field.
+	Sort string `json:"sort,omitempty"`
 	// SchemaID holds the value of the "schema_id" field.
 	SchemaID xid.ID `json:"schema_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -66,7 +68,7 @@ func (*PropertySchemaField) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case propertyschemafield.FieldName, propertyschemafield.FieldType:
+		case propertyschemafield.FieldName, propertyschemafield.FieldType, propertyschemafield.FieldSort:
 			values[i] = new(sql.NullString)
 		case propertyschemafield.FieldID, propertyschemafield.FieldSchemaID:
 			values[i] = new(xid.ID)
@@ -102,6 +104,12 @@ func (psf *PropertySchemaField) assignValues(columns []string, values []any) err
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				psf.Type = value.String
+			}
+		case propertyschemafield.FieldSort:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field sort", values[i])
+			} else if value.Valid {
+				psf.Sort = value.String
 			}
 		case propertyschemafield.FieldSchemaID:
 			if value, ok := values[i].(*xid.ID); !ok {
@@ -160,6 +168,9 @@ func (psf *PropertySchemaField) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(psf.Type)
+	builder.WriteString(", ")
+	builder.WriteString("sort=")
+	builder.WriteString(psf.Sort)
 	builder.WriteString(", ")
 	builder.WriteString("schema_id=")
 	builder.WriteString(fmt.Sprintf("%v", psf.SchemaID))
