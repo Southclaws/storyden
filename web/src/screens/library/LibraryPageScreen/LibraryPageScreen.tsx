@@ -213,7 +213,17 @@ export function LibraryPage(props: Props) {
             </LStack>
           </LStack>
 
-          <HStack w="full">
+          <HStack
+            w="full"
+            flexDirection={{
+              base: "column-reverse",
+              sm: "row",
+            }}
+            alignItems={{
+              base: "start",
+              sm: "center",
+            }}
+          >
             {!editing && node.link?.url && (
               <LinkButton href={node.link?.url} size="xs" variant="subtle">
                 {node.link?.domain}
