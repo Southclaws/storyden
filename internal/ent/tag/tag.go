@@ -25,6 +25,10 @@ const (
 	EdgeNodes = "nodes"
 	// EdgeAccounts holds the string denoting the accounts edge name in mutations.
 	EdgeAccounts = "accounts"
+	// EdgePostTags holds the string denoting the post_tags edge name in mutations.
+	EdgePostTags = "post_tags"
+	// EdgeNodeTags holds the string denoting the node_tags edge name in mutations.
+	EdgeNodeTags = "node_tags"
 	// Table holds the table name of the tag in the database.
 	Table = "tags"
 	// PostsTable is the table that holds the posts relation/edge. The primary key declared below.
@@ -42,6 +46,20 @@ const (
 	// AccountsInverseTable is the table name for the Account entity.
 	// It exists in this package in order to avoid circular dependency with the "account" package.
 	AccountsInverseTable = "accounts"
+	// PostTagsTable is the table that holds the post_tags relation/edge.
+	PostTagsTable = "tag_posts"
+	// PostTagsInverseTable is the table name for the TagPost entity.
+	// It exists in this package in order to avoid circular dependency with the "tagpost" package.
+	PostTagsInverseTable = "tag_posts"
+	// PostTagsColumn is the table column denoting the post_tags relation/edge.
+	PostTagsColumn = "tag_id"
+	// NodeTagsTable is the table that holds the node_tags relation/edge.
+	NodeTagsTable = "tag_nodes"
+	// NodeTagsInverseTable is the table name for the TagNode entity.
+	// It exists in this package in order to avoid circular dependency with the "tagnode" package.
+	NodeTagsInverseTable = "tag_nodes"
+	// NodeTagsColumn is the table column denoting the node_tags relation/edge.
+	NodeTagsColumn = "tag_id"
 )
 
 // Columns holds all SQL columns for tag fields.
@@ -141,6 +159,34 @@ func ByAccounts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAccountsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByPostTagsCount orders the results by post_tags count.
+func ByPostTagsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPostTagsStep(), opts...)
+	}
+}
+
+// ByPostTags orders the results by post_tags terms.
+func ByPostTags(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPostTagsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByNodeTagsCount orders the results by node_tags count.
+func ByNodeTagsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newNodeTagsStep(), opts...)
+	}
+}
+
+// ByNodeTags orders the results by node_tags terms.
+func ByNodeTags(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newNodeTagsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newPostsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -160,5 +206,19 @@ func newAccountsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AccountsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, AccountsTable, AccountsPrimaryKey...),
+	)
+}
+func newPostTagsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PostTagsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, PostTagsTable, PostTagsColumn),
+	)
+}
+func newNodeTagsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(NodeTagsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, NodeTagsTable, NodeTagsColumn),
 	)
 }

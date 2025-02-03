@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/tagnode"
 	"github.com/rs/xid"
 )
 
@@ -378,6 +379,21 @@ func (nu *NodeUpdate) AddCollections(c ...*Collection) *NodeUpdate {
 	return nu.AddCollectionIDs(ids...)
 }
 
+// AddNodeTagIDs adds the "node_tags" edge to the TagNode entity by IDs.
+func (nu *NodeUpdate) AddNodeTagIDs(ids ...xid.ID) *NodeUpdate {
+	nu.mutation.AddNodeTagIDs(ids...)
+	return nu
+}
+
+// AddNodeTags adds the "node_tags" edges to the TagNode entity.
+func (nu *NodeUpdate) AddNodeTags(t ...*TagNode) *NodeUpdate {
+	ids := make([]xid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return nu.AddNodeTagIDs(ids...)
+}
+
 // Mutation returns the NodeMutation object of the builder.
 func (nu *NodeUpdate) Mutation() *NodeMutation {
 	return nu.mutation
@@ -510,6 +526,27 @@ func (nu *NodeUpdate) RemoveCollections(c ...*Collection) *NodeUpdate {
 		ids[i] = c[i].ID
 	}
 	return nu.RemoveCollectionIDs(ids...)
+}
+
+// ClearNodeTags clears all "node_tags" edges to the TagNode entity.
+func (nu *NodeUpdate) ClearNodeTags() *NodeUpdate {
+	nu.mutation.ClearNodeTags()
+	return nu
+}
+
+// RemoveNodeTagIDs removes the "node_tags" edge to TagNode entities by IDs.
+func (nu *NodeUpdate) RemoveNodeTagIDs(ids ...xid.ID) *NodeUpdate {
+	nu.mutation.RemoveNodeTagIDs(ids...)
+	return nu
+}
+
+// RemoveNodeTags removes "node_tags" edges to TagNode entities.
+func (nu *NodeUpdate) RemoveNodeTags(t ...*TagNode) *NodeUpdate {
+	ids := make([]xid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return nu.RemoveNodeTagIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -809,6 +846,13 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
+		createE := &TagNodeCreate{config: nu.config, mutation: newTagNodeMutation(nu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
+		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := nu.mutation.RemovedTagsIDs(); len(nodes) > 0 && !nu.mutation.TagsCleared() {
@@ -825,6 +869,13 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &TagNodeCreate{config: nu.config, mutation: newTagNodeMutation(nu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
+		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := nu.mutation.TagsIDs(); len(nodes) > 0 {
@@ -840,6 +891,13 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &TagNodeCreate{config: nu.config, mutation: newTagNodeMutation(nu.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
@@ -972,6 +1030,51 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nu.mutation.NodeTagsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.NodeTagsTable,
+			Columns: []string{node.NodeTagsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tagnode.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.RemovedNodeTagsIDs(); len(nodes) > 0 && !nu.mutation.NodeTagsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.NodeTagsTable,
+			Columns: []string{node.NodeTagsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tagnode.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nu.mutation.NodeTagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.NodeTagsTable,
+			Columns: []string{node.NodeTagsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tagnode.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(nu.modifiers...)
@@ -1339,6 +1442,21 @@ func (nuo *NodeUpdateOne) AddCollections(c ...*Collection) *NodeUpdateOne {
 	return nuo.AddCollectionIDs(ids...)
 }
 
+// AddNodeTagIDs adds the "node_tags" edge to the TagNode entity by IDs.
+func (nuo *NodeUpdateOne) AddNodeTagIDs(ids ...xid.ID) *NodeUpdateOne {
+	nuo.mutation.AddNodeTagIDs(ids...)
+	return nuo
+}
+
+// AddNodeTags adds the "node_tags" edges to the TagNode entity.
+func (nuo *NodeUpdateOne) AddNodeTags(t ...*TagNode) *NodeUpdateOne {
+	ids := make([]xid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return nuo.AddNodeTagIDs(ids...)
+}
+
 // Mutation returns the NodeMutation object of the builder.
 func (nuo *NodeUpdateOne) Mutation() *NodeMutation {
 	return nuo.mutation
@@ -1471,6 +1589,27 @@ func (nuo *NodeUpdateOne) RemoveCollections(c ...*Collection) *NodeUpdateOne {
 		ids[i] = c[i].ID
 	}
 	return nuo.RemoveCollectionIDs(ids...)
+}
+
+// ClearNodeTags clears all "node_tags" edges to the TagNode entity.
+func (nuo *NodeUpdateOne) ClearNodeTags() *NodeUpdateOne {
+	nuo.mutation.ClearNodeTags()
+	return nuo
+}
+
+// RemoveNodeTagIDs removes the "node_tags" edge to TagNode entities by IDs.
+func (nuo *NodeUpdateOne) RemoveNodeTagIDs(ids ...xid.ID) *NodeUpdateOne {
+	nuo.mutation.RemoveNodeTagIDs(ids...)
+	return nuo
+}
+
+// RemoveNodeTags removes "node_tags" edges to TagNode entities.
+func (nuo *NodeUpdateOne) RemoveNodeTags(t ...*TagNode) *NodeUpdateOne {
+	ids := make([]xid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return nuo.RemoveNodeTagIDs(ids...)
 }
 
 // Where appends a list predicates to the NodeUpdate builder.
@@ -1800,6 +1939,13 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
 			},
 		}
+		createE := &TagNodeCreate{config: nuo.config, mutation: newTagNodeMutation(nuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
+		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := nuo.mutation.RemovedTagsIDs(); len(nodes) > 0 && !nuo.mutation.TagsCleared() {
@@ -1816,6 +1962,13 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &TagNodeCreate{config: nuo.config, mutation: newTagNodeMutation(nuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
+		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := nuo.mutation.TagsIDs(); len(nodes) > 0 {
@@ -1831,6 +1984,13 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &TagNodeCreate{config: nuo.config, mutation: newTagNodeMutation(nuo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
@@ -1963,6 +2123,51 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if nuo.mutation.NodeTagsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.NodeTagsTable,
+			Columns: []string{node.NodeTagsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tagnode.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.RemovedNodeTagsIDs(); len(nodes) > 0 && !nuo.mutation.NodeTagsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.NodeTagsTable,
+			Columns: []string{node.NodeTagsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tagnode.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := nuo.mutation.NodeTagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.NodeTagsTable,
+			Columns: []string{node.NodeTagsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tagnode.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(nuo.modifiers...)

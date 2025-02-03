@@ -23,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/tagpost"
 	"github.com/rs/xid"
 )
 
@@ -447,6 +448,21 @@ func (pc *PostCreate) AddEvent(e ...*Event) *PostCreate {
 	return pc.AddEventIDs(ids...)
 }
 
+// AddPostTagIDs adds the "post_tags" edge to the TagPost entity by IDs.
+func (pc *PostCreate) AddPostTagIDs(ids ...xid.ID) *PostCreate {
+	pc.mutation.AddPostTagIDs(ids...)
+	return pc
+}
+
+// AddPostTags adds the "post_tags" edges to the TagPost entity.
+func (pc *PostCreate) AddPostTags(t ...*TagPost) *PostCreate {
+	ids := make([]xid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return pc.AddPostTagIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (pc *PostCreate) Mutation() *PostMutation {
 	return pc.mutation
@@ -671,6 +687,13 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &TagPostCreate{config: pc.config, mutation: newTagPostMutation(pc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.RootIDs(); len(nodes) > 0 {
@@ -861,6 +884,22 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.PostTagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   post.PostTagsTable,
+			Columns: []string{post.PostTagsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tagpost.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

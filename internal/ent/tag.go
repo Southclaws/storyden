@@ -36,9 +36,13 @@ type TagEdges struct {
 	Nodes []*Node `json:"nodes,omitempty"`
 	// Accounts holds the value of the accounts edge.
 	Accounts []*Account `json:"accounts,omitempty"`
+	// PostTags holds the value of the post_tags edge.
+	PostTags []*TagPost `json:"post_tags,omitempty"`
+	// NodeTags holds the value of the node_tags edge.
+	NodeTags []*TagNode `json:"node_tags,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [5]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -66,6 +70,24 @@ func (e TagEdges) AccountsOrErr() ([]*Account, error) {
 		return e.Accounts, nil
 	}
 	return nil, &NotLoadedError{edge: "accounts"}
+}
+
+// PostTagsOrErr returns the PostTags value or an error if the edge
+// was not loaded in eager-loading.
+func (e TagEdges) PostTagsOrErr() ([]*TagPost, error) {
+	if e.loadedTypes[3] {
+		return e.PostTags, nil
+	}
+	return nil, &NotLoadedError{edge: "post_tags"}
+}
+
+// NodeTagsOrErr returns the NodeTags value or an error if the edge
+// was not loaded in eager-loading.
+func (e TagEdges) NodeTagsOrErr() ([]*TagNode, error) {
+	if e.loadedTypes[4] {
+		return e.NodeTags, nil
+	}
+	return nil, &NotLoadedError{edge: "node_tags"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -138,6 +160,16 @@ func (t *Tag) QueryNodes() *NodeQuery {
 // QueryAccounts queries the "accounts" edge of the Tag entity.
 func (t *Tag) QueryAccounts() *AccountQuery {
 	return NewTagClient(t.config).QueryAccounts(t)
+}
+
+// QueryPostTags queries the "post_tags" edge of the Tag entity.
+func (t *Tag) QueryPostTags() *TagPostQuery {
+	return NewTagClient(t.config).QueryPostTags(t)
+}
+
+// QueryNodeTags queries the "node_tags" edge of the Tag entity.
+func (t *Tag) QueryNodeTags() *TagNodeQuery {
+	return NewTagClient(t.config).QueryNodeTags(t)
 }
 
 // Update returns a builder for updating this Tag.

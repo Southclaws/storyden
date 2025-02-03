@@ -1376,6 +1376,29 @@ func HasEventWith(preds ...predicate.Event) predicate.Post {
 	})
 }
 
+// HasPostTags applies the HasEdge predicate on the "post_tags" edge.
+func HasPostTags() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, PostTagsTable, PostTagsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPostTagsWith applies the HasEdge predicate on the "post_tags" edge with a given conditions (other predicates).
+func HasPostTagsWith(preds ...predicate.TagPost) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := newPostTagsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Post) predicate.Post {
 	return predicate.Post(sql.AndPredicates(predicates...))

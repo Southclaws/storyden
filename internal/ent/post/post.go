@@ -80,6 +80,8 @@ const (
 	EdgeContentLinks = "content_links"
 	// EdgeEvent holds the string denoting the event edge name in mutations.
 	EdgeEvent = "event"
+	// EdgePostTags holds the string denoting the post_tags edge name in mutations.
+	EdgePostTags = "post_tags"
 	// Table holds the table name of the post in the database.
 	Table = "posts"
 	// AuthorTable is the table that holds the author relation/edge.
@@ -167,6 +169,13 @@ const (
 	EventInverseTable = "events"
 	// EventColumn is the table column denoting the event relation/edge.
 	EventColumn = "post_event"
+	// PostTagsTable is the table that holds the post_tags relation/edge.
+	PostTagsTable = "tag_posts"
+	// PostTagsInverseTable is the table name for the TagPost entity.
+	// It exists in this package in order to avoid circular dependency with the "tagpost" package.
+	PostTagsInverseTable = "tag_posts"
+	// PostTagsColumn is the table column denoting the post_tags relation/edge.
+	PostTagsColumn = "post_id"
 )
 
 // Columns holds all SQL columns for post fields.
@@ -517,6 +526,20 @@ func ByEvent(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newEventStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByPostTagsCount orders the results by post_tags count.
+func ByPostTagsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPostTagsStep(), opts...)
+	}
+}
+
+// ByPostTags orders the results by post_tags terms.
+func ByPostTags(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPostTagsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newAuthorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -620,5 +643,12 @@ func newEventStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EventInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, EventTable, EventColumn),
+	)
+}
+func newPostTagsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PostTagsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, PostTagsTable, PostTagsColumn),
 	)
 }

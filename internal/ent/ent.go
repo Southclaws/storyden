@@ -36,6 +36,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/tagnode"
+	"github.com/Southclaws/storyden/internal/ent/tagpost"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -120,6 +122,8 @@ func checkColumn(table, column string) error {
 			role.Table:             role.ValidColumn,
 			setting.Table:          setting.ValidColumn,
 			tag.Table:              tag.ValidColumn,
+			tagnode.Table:          tagnode.ValidColumn,
+			tagpost.Table:          tagpost.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

@@ -16,6 +16,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/tagnode"
+	"github.com/Southclaws/storyden/internal/ent/tagpost"
 	"github.com/rs/xid"
 )
 
@@ -104,6 +106,36 @@ func (tc *TagCreate) AddAccounts(a ...*Account) *TagCreate {
 		ids[i] = a[i].ID
 	}
 	return tc.AddAccountIDs(ids...)
+}
+
+// AddPostTagIDs adds the "post_tags" edge to the TagPost entity by IDs.
+func (tc *TagCreate) AddPostTagIDs(ids ...xid.ID) *TagCreate {
+	tc.mutation.AddPostTagIDs(ids...)
+	return tc
+}
+
+// AddPostTags adds the "post_tags" edges to the TagPost entity.
+func (tc *TagCreate) AddPostTags(t ...*TagPost) *TagCreate {
+	ids := make([]xid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return tc.AddPostTagIDs(ids...)
+}
+
+// AddNodeTagIDs adds the "node_tags" edge to the TagNode entity by IDs.
+func (tc *TagCreate) AddNodeTagIDs(ids ...xid.ID) *TagCreate {
+	tc.mutation.AddNodeTagIDs(ids...)
+	return tc
+}
+
+// AddNodeTags adds the "node_tags" edges to the TagNode entity.
+func (tc *TagCreate) AddNodeTags(t ...*TagNode) *TagCreate {
+	ids := make([]xid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return tc.AddNodeTagIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
@@ -222,6 +254,13 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &TagPostCreate{config: tc.config, mutation: newTagPostMutation(tc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := tc.mutation.NodesIDs(); len(nodes) > 0 {
@@ -238,6 +277,13 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &TagNodeCreate{config: tc.config, mutation: newTagNodeMutation(tc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := tc.mutation.AccountsIDs(); len(nodes) > 0 {
@@ -249,6 +295,38 @@ func (tc *TagCreate) createSpec() (*Tag, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.PostTagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   tag.PostTagsTable,
+			Columns: []string{tag.PostTagsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tagpost.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := tc.mutation.NodeTagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   tag.NodeTagsTable,
+			Columns: []string{tag.NodeTagsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tagnode.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

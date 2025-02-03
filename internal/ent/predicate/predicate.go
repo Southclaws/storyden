@@ -77,3 +77,9 @@ type Setting func(*sql.Selector)
 
 // Tag is the predicate function for tag builders.
 type Tag func(*sql.Selector)
+
+// TagNode is the predicate function for tagnode builders.
+type TagNode func(*sql.Selector)
+
+// TagPost is the predicate function for tagpost builders.
+type TagPost func(*sql.Selector)

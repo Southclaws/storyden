@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/ent/tagnode"
 	"github.com/rs/xid"
 )
 
@@ -336,6 +337,21 @@ func (nc *NodeCreate) AddCollections(c ...*Collection) *NodeCreate {
 	return nc.AddCollectionIDs(ids...)
 }
 
+// AddNodeTagIDs adds the "node_tags" edge to the TagNode entity by IDs.
+func (nc *NodeCreate) AddNodeTagIDs(ids ...xid.ID) *NodeCreate {
+	nc.mutation.AddNodeTagIDs(ids...)
+	return nc
+}
+
+// AddNodeTags adds the "node_tags" edges to the TagNode entity.
+func (nc *NodeCreate) AddNodeTags(t ...*TagNode) *NodeCreate {
+	ids := make([]xid.ID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return nc.AddNodeTagIDs(ids...)
+}
+
 // Mutation returns the NodeMutation object of the builder.
 func (nc *NodeCreate) Mutation() *NodeMutation {
 	return nc.mutation
@@ -595,6 +611,13 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		createE := &TagNodeCreate{config: nc.config, mutation: newTagNodeMutation(nc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		if specE.ID.Value != nil {
+			edge.Target.Fields = append(edge.Target.Fields, specE.ID)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := nc.mutation.LinkIDs(); len(nodes) > 0 {
@@ -648,6 +671,22 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := nc.mutation.NodeTagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   node.NodeTagsTable,
+			Columns: []string{node.NodeTagsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tagnode.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
