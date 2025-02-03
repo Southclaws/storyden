@@ -20,6 +20,7 @@ func (PropertySchemaField) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name"),
 		field.String("type"),
+		field.String("sort"),
 		field.String("schema_id").GoType(xid.ID{}),
 	}
 }

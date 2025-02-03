@@ -59,6 +59,20 @@ func (psfu *PropertySchemaFieldUpdate) SetNillableType(s *string) *PropertySchem
 	return psfu
 }
 
+// SetSort sets the "sort" field.
+func (psfu *PropertySchemaFieldUpdate) SetSort(s string) *PropertySchemaFieldUpdate {
+	psfu.mutation.SetSort(s)
+	return psfu
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (psfu *PropertySchemaFieldUpdate) SetNillableSort(s *string) *PropertySchemaFieldUpdate {
+	if s != nil {
+		psfu.SetSort(*s)
+	}
+	return psfu
+}
+
 // SetSchemaID sets the "schema_id" field.
 func (psfu *PropertySchemaFieldUpdate) SetSchemaID(x xid.ID) *PropertySchemaFieldUpdate {
 	psfu.mutation.SetSchemaID(x)
@@ -184,6 +198,9 @@ func (psfu *PropertySchemaFieldUpdate) sqlSave(ctx context.Context) (n int, err 
 	if value, ok := psfu.mutation.GetType(); ok {
 		_spec.SetField(propertyschemafield.FieldType, field.TypeString, value)
 	}
+	if value, ok := psfu.mutation.Sort(); ok {
+		_spec.SetField(propertyschemafield.FieldSort, field.TypeString, value)
+	}
 	if psfu.mutation.SchemaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -304,6 +321,20 @@ func (psfuo *PropertySchemaFieldUpdateOne) SetType(s string) *PropertySchemaFiel
 func (psfuo *PropertySchemaFieldUpdateOne) SetNillableType(s *string) *PropertySchemaFieldUpdateOne {
 	if s != nil {
 		psfuo.SetType(*s)
+	}
+	return psfuo
+}
+
+// SetSort sets the "sort" field.
+func (psfuo *PropertySchemaFieldUpdateOne) SetSort(s string) *PropertySchemaFieldUpdateOne {
+	psfuo.mutation.SetSort(s)
+	return psfuo
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (psfuo *PropertySchemaFieldUpdateOne) SetNillableSort(s *string) *PropertySchemaFieldUpdateOne {
+	if s != nil {
+		psfuo.SetSort(*s)
 	}
 	return psfuo
 }
@@ -462,6 +493,9 @@ func (psfuo *PropertySchemaFieldUpdateOne) sqlSave(ctx context.Context) (_node *
 	}
 	if value, ok := psfuo.mutation.GetType(); ok {
 		_spec.SetField(propertyschemafield.FieldType, field.TypeString, value)
+	}
+	if value, ok := psfuo.mutation.Sort(); ok {
+		_spec.SetField(propertyschemafield.FieldSort, field.TypeString, value)
 	}
 	if psfuo.mutation.SchemaCleared() {
 		edge := &sqlgraph.EdgeSpec{

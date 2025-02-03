@@ -11,6 +11,7 @@ import (
 type PropertySchema struct {
 	Name string
 	Type string
+	Sort string
 }
 
 type Property struct {
@@ -26,6 +27,7 @@ func MapPropertySchema(in PropertySchemaQueryRow) PropertySchema {
 	return PropertySchema{
 		Name: in.Name,
 		Type: in.Type,
+		Sort: in.Sort,
 	}
 }
 
@@ -35,6 +37,7 @@ type PropertySchemaQueryRow struct {
 	FieldID string `db:"id"`
 	Name    string `db:"name"`
 	Type    string `db:"type"`
+	Sort    string `db:"sort"`
 	Source  string `db:"source"`
 }
 
@@ -103,6 +106,7 @@ func (r PropertySchemaTable) ChildSchemas() PropertySchemas {
 		return PropertySchema{
 			Name: r.Name,
 			Type: r.Type,
+			Sort: r.Sort,
 		}
 	})
 }

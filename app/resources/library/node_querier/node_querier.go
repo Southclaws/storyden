@@ -51,6 +51,7 @@ const nodePropertiesQuery = `with
       psf.id,
       psf.name,
       psf.type,
+	  psf.sort,
       'sibling' as source
     from
       nodes n
@@ -69,6 +70,7 @@ const nodePropertiesQuery = `with
       psf.id,
       psf.name,
       psf.type,
+	  psf.sort,
       'child' as source
     from
       nodes n
@@ -90,6 +92,7 @@ select
   *
 from
   child_properties
+order by sort asc
 `
 
 func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) (*library.Node, error) {

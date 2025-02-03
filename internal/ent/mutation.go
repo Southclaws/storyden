@@ -21653,6 +21653,7 @@ type PropertySchemaFieldMutation struct {
 	id                *xid.ID
 	name              *string
 	_type             *string
+	sort              *string
 	clearedFields     map[string]struct{}
 	schema            *xid.ID
 	clearedschema     bool
@@ -21840,6 +21841,42 @@ func (m *PropertySchemaFieldMutation) ResetType() {
 	m._type = nil
 }
 
+// SetSort sets the "sort" field.
+func (m *PropertySchemaFieldMutation) SetSort(s string) {
+	m.sort = &s
+}
+
+// Sort returns the value of the "sort" field in the mutation.
+func (m *PropertySchemaFieldMutation) Sort() (r string, exists bool) {
+	v := m.sort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSort returns the old "sort" field's value of the PropertySchemaField entity.
+// If the PropertySchemaField object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PropertySchemaFieldMutation) OldSort(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSort is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSort requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSort: %w", err)
+	}
+	return oldValue.Sort, nil
+}
+
+// ResetSort resets all changes to the "sort" field.
+func (m *PropertySchemaFieldMutation) ResetSort() {
+	m.sort = nil
+}
+
 // SetSchemaID sets the "schema_id" field.
 func (m *PropertySchemaFieldMutation) SetSchemaID(x xid.ID) {
 	m.schema = &x
@@ -21991,12 +22028,15 @@ func (m *PropertySchemaFieldMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PropertySchemaFieldMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.name != nil {
 		fields = append(fields, propertyschemafield.FieldName)
 	}
 	if m._type != nil {
 		fields = append(fields, propertyschemafield.FieldType)
+	}
+	if m.sort != nil {
+		fields = append(fields, propertyschemafield.FieldSort)
 	}
 	if m.schema != nil {
 		fields = append(fields, propertyschemafield.FieldSchemaID)
@@ -22013,6 +22053,8 @@ func (m *PropertySchemaFieldMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case propertyschemafield.FieldType:
 		return m.GetType()
+	case propertyschemafield.FieldSort:
+		return m.Sort()
 	case propertyschemafield.FieldSchemaID:
 		return m.SchemaID()
 	}
@@ -22028,6 +22070,8 @@ func (m *PropertySchemaFieldMutation) OldField(ctx context.Context, name string)
 		return m.OldName(ctx)
 	case propertyschemafield.FieldType:
 		return m.OldType(ctx)
+	case propertyschemafield.FieldSort:
+		return m.OldSort(ctx)
 	case propertyschemafield.FieldSchemaID:
 		return m.OldSchemaID(ctx)
 	}
@@ -22052,6 +22096,13 @@ func (m *PropertySchemaFieldMutation) SetField(name string, value ent.Value) err
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetType(v)
+		return nil
+	case propertyschemafield.FieldSort:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSort(v)
 		return nil
 	case propertyschemafield.FieldSchemaID:
 		v, ok := value.(xid.ID)
@@ -22114,6 +22165,9 @@ func (m *PropertySchemaFieldMutation) ResetField(name string) error {
 		return nil
 	case propertyschemafield.FieldType:
 		m.ResetType()
+		return nil
+	case propertyschemafield.FieldSort:
+		m.ResetSort()
 		return nil
 	case propertyschemafield.FieldSchemaID:
 		m.ResetSchemaID()
