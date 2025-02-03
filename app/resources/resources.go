@@ -26,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/event/participation/participant_querier"
 	"github.com/Southclaws/storyden/app/resources/event/participation/participant_writer"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
+	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_search"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
@@ -88,6 +89,7 @@ func Build() fx.Option {
 			node_traversal.New,
 			node_children.New,
 			node_search.New,
+			node_properties.New,
 			link_querier.New,
 			link_writer.New,
 			profile_search.New,

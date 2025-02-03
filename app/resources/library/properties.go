@@ -19,9 +19,9 @@ type Property struct {
 	Value opt.Optional[string]
 }
 
-type PropertyTable []Property
+type PropertyTable []*Property
 
-type PropertySchemas []PropertySchema
+type PropertySchemas []*PropertySchema
 
 func MapPropertySchema(in PropertySchemaQueryRow) PropertySchema {
 	return PropertySchema{
@@ -82,7 +82,7 @@ func (r *PropertySchemaTable) BuildPropertyTable(in []*ent.Property, isRoot bool
 	for _, p := range in {
 		if s, ok := propMap[p.FieldID.String()]; ok {
 			delete(propMap, p.FieldID.String())
-			out = append(out, Property{
+			out = append(out, &Property{
 				PropertySchema: MapPropertySchema(s),
 				Value:          opt.New(p.Value),
 			})
@@ -94,7 +94,7 @@ func (r *PropertySchemaTable) BuildPropertyTable(in []*ent.Property, isRoot bool
 
 	// Add the remaining property schemas that do not have values.
 	for _, p := range propMap {
-		out = append(out, Property{
+		out = append(out, &Property{
 			PropertySchema: MapPropertySchema(p),
 		})
 	}
@@ -102,8 +102,8 @@ func (r *PropertySchemaTable) BuildPropertyTable(in []*ent.Property, isRoot bool
 }
 
 func (r PropertySchemaTable) ChildSchemas() PropertySchemas {
-	return dt.Map(r.childSchemas, func(r PropertySchemaQueryRow) PropertySchema {
-		return PropertySchema{
+	return dt.Map(r.childSchemas, func(r PropertySchemaQueryRow) *PropertySchema {
+		return &PropertySchema{
 			Name: r.Name,
 			Type: r.Type,
 			Sort: r.Sort,
