@@ -7,10 +7,13 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { Identifier } from "./identifier";
 import type { PropertyName } from "./propertyName";
 import type { PropertyType } from "./propertyType";
 
 export interface PropertySchema {
+  id: Identifier;
   name: PropertyName;
+  sort: string;
   type: PropertyType;
 }

@@ -7,14 +7,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { Identifier } from "./identifier";
-import type { PropertyName } from "./propertyName";
-import type { PropertyType } from "./propertyType";
-import type { PropertyValue } from "./propertyValue";
+import type { PropertyList } from "./propertyList";
 
-export interface Property {
-  id: Identifier;
-  name: PropertyName;
-  type: PropertyType;
-  value?: PropertyValue;
-}
+export type NodeUpdatePropertiesOKResponse = {
+  properties?: PropertyList;
+};
