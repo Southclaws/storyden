@@ -14,6 +14,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/property"
+	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
 	"github.com/rs/xid"
 )
 
@@ -25,6 +26,7 @@ type PropertyQuery struct {
 	inters     []Interceptor
 	predicates []predicate.Property
 	withNode   *NodeQuery
+	withSchema *PropertySchemaFieldQuery
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -77,6 +79,28 @@ func (pq *PropertyQuery) QueryNode() *NodeQuery {
 			sqlgraph.From(property.Table, property.FieldID, selector),
 			sqlgraph.To(node.Table, node.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, property.NodeTable, property.NodeColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySchema chains the current query on the "schema" edge.
+func (pq *PropertyQuery) QuerySchema() *PropertySchemaFieldQuery {
+	query := (&PropertySchemaFieldClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(property.Table, property.FieldID, selector),
+			sqlgraph.To(propertyschemafield.Table, propertyschemafield.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, property.SchemaTable, property.SchemaColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -277,6 +301,7 @@ func (pq *PropertyQuery) Clone() *PropertyQuery {
 		inters:     append([]Interceptor{}, pq.inters...),
 		predicates: append([]predicate.Property{}, pq.predicates...),
 		withNode:   pq.withNode.Clone(),
+		withSchema: pq.withSchema.Clone(),
 		// clone intermediate query.
 		sql:       pq.sql.Clone(),
 		path:      pq.path,
@@ -292,6 +317,17 @@ func (pq *PropertyQuery) WithNode(opts ...func(*NodeQuery)) *PropertyQuery {
 		opt(query)
 	}
 	pq.withNode = query
+	return pq
+}
+
+// WithSchema tells the query-builder to eager-load the nodes that are connected to
+// the "schema" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *PropertyQuery) WithSchema(opts ...func(*PropertySchemaFieldQuery)) *PropertyQuery {
+	query := (&PropertySchemaFieldClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withSchema = query
 	return pq
 }
 
@@ -373,8 +409,9 @@ func (pq *PropertyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Pro
 	var (
 		nodes       = []*Property{}
 		_spec       = pq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			pq.withNode != nil,
+			pq.withSchema != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -404,6 +441,12 @@ func (pq *PropertyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Pro
 			return nil, err
 		}
 	}
+	if query := pq.withSchema; query != nil {
+		if err := pq.loadSchema(ctx, query, nodes, nil,
+			func(n *Property, e *PropertySchemaField) { n.Edges.Schema = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
@@ -429,6 +472,35 @@ func (pq *PropertyQuery) loadNode(ctx context.Context, query *NodeQuery, nodes [
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "node_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (pq *PropertyQuery) loadSchema(ctx context.Context, query *PropertySchemaFieldQuery, nodes []*Property, init func(*Property), assign func(*Property, *PropertySchemaField)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Property)
+	for i := range nodes {
+		fk := nodes[i].FieldID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(propertyschemafield.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "field_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -467,6 +539,9 @@ func (pq *PropertyQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if pq.withNode != nil {
 			_spec.Node.AddColumnOnce(property.FieldNodeID)
+		}
+		if pq.withSchema != nil {
+			_spec.Node.AddColumnOnce(property.FieldFieldID)
 		}
 	}
 	if ps := pq.predicates; len(ps) > 0 {

@@ -17,16 +17,16 @@ const (
 	FieldID = "id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "type"
-	// FieldValue holds the string denoting the value field in the database.
-	FieldValue = "value"
 	// FieldNodeID holds the string denoting the node_id field in the database.
 	FieldNodeID = "node_id"
+	// FieldFieldID holds the string denoting the field_id field in the database.
+	FieldFieldID = "field_id"
+	// FieldValue holds the string denoting the value field in the database.
+	FieldValue = "value"
 	// EdgeNode holds the string denoting the node edge name in mutations.
 	EdgeNode = "node"
+	// EdgeSchema holds the string denoting the schema edge name in mutations.
+	EdgeSchema = "schema"
 	// Table holds the table name of the property in the database.
 	Table = "properties"
 	// NodeTable is the table that holds the node relation/edge.
@@ -36,16 +36,22 @@ const (
 	NodeInverseTable = "nodes"
 	// NodeColumn is the table column denoting the node relation/edge.
 	NodeColumn = "node_id"
+	// SchemaTable is the table that holds the schema relation/edge.
+	SchemaTable = "properties"
+	// SchemaInverseTable is the table name for the PropertySchemaField entity.
+	// It exists in this package in order to avoid circular dependency with the "propertyschemafield" package.
+	SchemaInverseTable = "property_schema_fields"
+	// SchemaColumn is the table column denoting the schema relation/edge.
+	SchemaColumn = "field_id"
 )
 
 // Columns holds all SQL columns for property fields.
 var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
-	FieldName,
-	FieldType,
-	FieldValue,
 	FieldNodeID,
+	FieldFieldID,
+	FieldValue,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -80,24 +86,19 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }
 
-// ByName orders the results by the name field.
-func ByName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldName, opts...).ToFunc()
+// ByNodeID orders the results by the node_id field.
+func ByNodeID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNodeID, opts...).ToFunc()
 }
 
-// ByType orders the results by the type field.
-func ByType(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldType, opts...).ToFunc()
+// ByFieldID orders the results by the field_id field.
+func ByFieldID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFieldID, opts...).ToFunc()
 }
 
 // ByValue orders the results by the value field.
 func ByValue(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldValue, opts...).ToFunc()
-}
-
-// ByNodeID orders the results by the node_id field.
-func ByNodeID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldNodeID, opts...).ToFunc()
 }
 
 // ByNodeField orders the results by node field.
@@ -106,10 +107,24 @@ func ByNodeField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newNodeStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// BySchemaField orders the results by schema field.
+func BySchemaField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSchemaStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newNodeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(NodeInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, NodeTable, NodeColumn),
+	)
+}
+func newSchemaStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SchemaInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SchemaTable, SchemaColumn),
 	)
 }

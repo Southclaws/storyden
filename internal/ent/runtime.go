@@ -25,6 +25,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/property"
+	"github.com/Southclaws/storyden/internal/ent/propertyschema"
+	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -817,6 +819,56 @@ func init() {
 	// property.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	property.IDValidator = func() func(string) error {
 		validators := propertyDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	propertyschemaMixin := schema.PropertySchema{}.Mixin()
+	propertyschemaMixinFields0 := propertyschemaMixin[0].Fields()
+	_ = propertyschemaMixinFields0
+	propertyschemaFields := schema.PropertySchema{}.Fields()
+	_ = propertyschemaFields
+	// propertyschemaDescID is the schema descriptor for id field.
+	propertyschemaDescID := propertyschemaMixinFields0[0].Descriptor()
+	// propertyschema.DefaultID holds the default value on creation for the id field.
+	propertyschema.DefaultID = propertyschemaDescID.Default.(func() xid.ID)
+	// propertyschema.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	propertyschema.IDValidator = func() func(string) error {
+		validators := propertyschemaDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	propertyschemafieldMixin := schema.PropertySchemaField{}.Mixin()
+	propertyschemafieldMixinFields0 := propertyschemafieldMixin[0].Fields()
+	_ = propertyschemafieldMixinFields0
+	propertyschemafieldFields := schema.PropertySchemaField{}.Fields()
+	_ = propertyschemafieldFields
+	// propertyschemafieldDescID is the schema descriptor for id field.
+	propertyschemafieldDescID := propertyschemafieldMixinFields0[0].Descriptor()
+	// propertyschemafield.DefaultID holds the default value on creation for the id field.
+	propertyschemafield.DefaultID = propertyschemafieldDescID.Default.(func() xid.ID)
+	// propertyschemafield.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	propertyschemafield.IDValidator = func() func(string) error {
+		validators := propertyschemafieldDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

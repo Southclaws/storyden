@@ -54,6 +54,10 @@ type Tx struct {
 	Post *PostClient
 	// Property is the client for interacting with the Property builders.
 	Property *PropertyClient
+	// PropertySchema is the client for interacting with the PropertySchema builders.
+	PropertySchema *PropertySchemaClient
+	// PropertySchemaField is the client for interacting with the PropertySchemaField builders.
+	PropertySchemaField *PropertySchemaFieldClient
 	// Question is the client for interacting with the Question builders.
 	Question *QuestionClient
 	// React is the client for interacting with the React builders.
@@ -215,6 +219,8 @@ func (tx *Tx) init() {
 	tx.Notification = NewNotificationClient(tx.config)
 	tx.Post = NewPostClient(tx.config)
 	tx.Property = NewPropertyClient(tx.config)
+	tx.PropertySchema = NewPropertySchemaClient(tx.config)
+	tx.PropertySchemaField = NewPropertySchemaFieldClient(tx.config)
 	tx.Question = NewQuestionClient(tx.config)
 	tx.React = NewReactClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)

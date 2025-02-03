@@ -8,24 +8,17 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
+type PropertySchema struct {
+	Name string
+	Type string
+}
+
 type Property struct {
 	PropertySchema
 	Value opt.Optional[string]
 }
 
 type PropertyTable []Property
-
-func MapProperty(in *ent.Property) Property {
-	return Property{
-		PropertySchema: MapPropertyValueSchema(in),
-		Value:          opt.New(in.Value),
-	}
-}
-
-type PropertySchema struct {
-	Name string
-	Type string
-}
 
 type PropertySchemas []PropertySchema
 
@@ -36,19 +29,13 @@ func MapPropertySchema(in PropertySchemaQueryRow) PropertySchema {
 	}
 }
 
-func MapPropertyValueSchema(in *ent.Property) PropertySchema {
-	return PropertySchema{
-		Name: in.Name,
-		Type: in.Type,
-	}
-}
-
 // PropertySchemaQueryRow is a row from the property schema query which pulls
 // all the property schemas for both sibling and child properties of a node.
 type PropertySchemaQueryRow struct {
-	Name   string `db:"name"`
-	Type   string `db:"type"`
-	Source string `db:"source"`
+	FieldID string `db:"id"`
+	Name    string `db:"name"`
+	Type    string `db:"type"`
+	Source  string `db:"source"`
 }
 
 type PropertySchemaQueryRows []PropertySchemaQueryRow
@@ -70,23 +57,36 @@ func (r PropertySchemaQueryRows) Map() *PropertySchemaTable {
 	}
 }
 
-// SiblingProperties yields the properties that are set on the node and also the
+// BuildPropertyTable yields the properties that are set for the node and also
 // properties that don't have values by merging in the unused property schemas.
-func (r *PropertySchemaTable) SiblingProperties(in []*ent.Property) PropertyTable {
+func (r *PropertySchemaTable) BuildPropertyTable(in []*ent.Property, isRoot bool) PropertyTable {
 	if r == nil {
 		return nil
 	}
 
-	propMap := lo.KeyBy(r.siblingSchemas, func(r PropertySchemaQueryRow) string { return r.Name })
+	// When mapping a node with children, we fetch the entire list of schemas
+	// from the perspective of the root fetched node. So when mapping properties
+	// we need to switch the source of schemas depending on the mapping context.
+	schemas := r.siblingSchemas
+	if !isRoot {
+		schemas = r.childSchemas
+	}
+	propMap := lo.KeyBy(schemas, func(r PropertySchemaQueryRow) string { return r.FieldID })
 
-	out := make(PropertyTable, len(in))
+	out := PropertyTable{}
 
 	// Add all the properties that have values.
-	for i, p := range in {
-		if _, ok := propMap[p.Name]; ok {
-			delete(propMap, p.Name)
+	for _, p := range in {
+		if s, ok := propMap[p.FieldID.String()]; ok {
+			delete(propMap, p.FieldID.String())
+			out = append(out, Property{
+				PropertySchema: MapPropertySchema(s),
+				Value:          opt.New(p.Value),
+			})
 		}
-		out[i] = MapProperty(p)
+
+		// If a property was not in the schema, ignore it. The member might move
+		// a node back to a parent that had a different schema so we retain data
 	}
 
 	// Add the remaining property schemas that do not have values.

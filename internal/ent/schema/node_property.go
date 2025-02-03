@@ -18,10 +18,9 @@ func (Property) Mixin() []ent.Mixin {
 
 func (Property) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name"),
-		field.String("type"),
+		field.String("node_id").GoType(xid.ID{}),
+		field.String("field_id").GoType(xid.ID{}),
 		field.String("value"),
-		field.String("node_id").GoType(xid.ID{}).Optional(),
 	}
 }
 
@@ -30,14 +29,21 @@ func (Property) Edges() []ent.Edge {
 		edge.From("node", Node.Type).
 			Field("node_id").
 			Ref("properties").
+			Required().
+			Unique(),
+
+		edge.From("schema", PropertySchemaField.Type).
+			Field("field_id").
+			Ref("properties").
+			Required().
 			Unique(),
 	}
 }
 
 func (Property) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("node_id", "name").Unique(),
-		index.Fields("name"),
+		index.Fields("field_id", "node_id").Unique(),
+		index.Fields("field_id"),
 		index.Fields("node_id"),
 	}
 }
