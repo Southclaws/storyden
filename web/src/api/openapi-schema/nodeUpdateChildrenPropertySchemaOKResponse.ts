@@ -10,5 +10,5 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { PropertySchemaList } from "./propertySchemaList";
 
 export type NodeUpdateChildrenPropertySchemaOKResponse = {
-  properties?: PropertySchemaList;
+  properties: PropertySchemaList;
 };

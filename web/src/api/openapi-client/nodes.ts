@@ -324,70 +324,6 @@ export const useNodeDelete = <
   };
 };
 /**
- * Update the properties of a node.
- */
-export const nodeUpdateProperties = (
-  nodeSlug: string,
-  nodeUpdatePropertiesBody: NodeUpdatePropertiesBody,
-) => {
-  return fetcher<NodeUpdatePropertiesOKResponse>({
-    url: `/nodes/${nodeSlug}/properties`,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    data: nodeUpdatePropertiesBody,
-  });
-};
-
-export const getNodeUpdatePropertiesMutationFetcher = (nodeSlug: string) => {
-  return (
-    _: Key,
-    { arg }: { arg: NodeUpdatePropertiesBody },
-  ): Promise<NodeUpdatePropertiesOKResponse> => {
-    return nodeUpdateProperties(nodeSlug, arg);
-  };
-};
-export const getNodeUpdatePropertiesMutationKey = (nodeSlug: string) =>
-  [`/nodes/${nodeSlug}/properties`] as const;
-
-export type NodeUpdatePropertiesMutationResult = NonNullable<
-  Awaited<ReturnType<typeof nodeUpdateProperties>>
->;
-export type NodeUpdatePropertiesMutationError =
-  | UnauthorisedResponse
-  | NotFoundResponse
-  | InternalServerErrorResponse;
-
-export const useNodeUpdateProperties = <
-  TError =
-    | UnauthorisedResponse
-    | NotFoundResponse
-    | InternalServerErrorResponse,
->(
-  nodeSlug: string,
-  options?: {
-    swr?: SWRMutationConfiguration<
-      Awaited<ReturnType<typeof nodeUpdateProperties>>,
-      TError,
-      Key,
-      NodeUpdatePropertiesBody,
-      Awaited<ReturnType<typeof nodeUpdateProperties>>
-    > & { swrKey?: string };
-  },
-) => {
-  const { swr: swrOptions } = options ?? {};
-
-  const swrKey =
-    swrOptions?.swrKey ?? getNodeUpdatePropertiesMutationKey(nodeSlug);
-  const swrFn = getNodeUpdatePropertiesMutationFetcher(nodeSlug);
-
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
-
-  return {
-    swrKey,
-    ...query,
-  };
-};
-/**
  * Updates the property schema of the children of this node. All children
 of a node use the same schema for properties resulting in a table-like
 structure and behaviour. Property schemas are loosely structured and can
@@ -456,6 +392,70 @@ export const useNodeUpdateChildrenPropertySchema = <
     swrOptions?.swrKey ??
     getNodeUpdateChildrenPropertySchemaMutationKey(nodeSlug);
   const swrFn = getNodeUpdateChildrenPropertySchemaMutationFetcher(nodeSlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the properties of a node.
+ */
+export const nodeUpdateProperties = (
+  nodeSlug: string,
+  nodeUpdatePropertiesBody: NodeUpdatePropertiesBody,
+) => {
+  return fetcher<NodeUpdatePropertiesOKResponse>({
+    url: `/nodes/${nodeSlug}/properties`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: nodeUpdatePropertiesBody,
+  });
+};
+
+export const getNodeUpdatePropertiesMutationFetcher = (nodeSlug: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: NodeUpdatePropertiesBody },
+  ): Promise<NodeUpdatePropertiesOKResponse> => {
+    return nodeUpdateProperties(nodeSlug, arg);
+  };
+};
+export const getNodeUpdatePropertiesMutationKey = (nodeSlug: string) =>
+  [`/nodes/${nodeSlug}/properties`] as const;
+
+export type NodeUpdatePropertiesMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeUpdateProperties>>
+>;
+export type NodeUpdatePropertiesMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeUpdateProperties = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeUpdateProperties>>,
+      TError,
+      Key,
+      NodeUpdatePropertiesBody,
+      Awaited<ReturnType<typeof nodeUpdateProperties>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNodeUpdatePropertiesMutationKey(nodeSlug);
+  const swrFn = getNodeUpdatePropertiesMutationFetcher(nodeSlug);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

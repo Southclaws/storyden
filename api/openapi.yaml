@@ -5156,7 +5156,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/Node"
         - $ref: "#/components/schemas/DatagraphRecommendations"
-        - required: [properties, children]
+        - required: [properties, child_property_schema, children]
           properties:
             properties: {$ref: "#/components/schemas/PropertyList"}
             child_property_schema:
@@ -5252,12 +5252,14 @@ components:
 
     Property:
       type: object
-      required: [id, name, type]
+      required: [id, name, type, sort]
       properties:
         id: {$ref: "#/components/schemas/Identifier"}
         name: {$ref: "#/components/schemas/PropertyName"}
         type: {$ref: "#/components/schemas/PropertyType"}
         value: {$ref: "#/components/schemas/PropertyValue"}
+        sort:
+          type: string
 
     PropertyList:
       type: array

@@ -200,34 +200,6 @@ export const nodeDelete = async (
 };
 
 /**
- * Update the properties of a node.
- */
-export type nodeUpdatePropertiesResponse = {
-  data: NodeUpdatePropertiesOKResponse;
-  status: number;
-};
-
-export const getNodeUpdatePropertiesUrl = (nodeSlug: string) => {
-  return `/nodes/${nodeSlug}/properties`;
-};
-
-export const nodeUpdateProperties = async (
-  nodeSlug: string,
-  nodeUpdatePropertiesBody: NodeUpdatePropertiesBody,
-  options?: RequestInit,
-): Promise<nodeUpdatePropertiesResponse> => {
-  return fetcher<Promise<nodeUpdatePropertiesResponse>>(
-    getNodeUpdatePropertiesUrl(nodeSlug),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(nodeUpdatePropertiesBody),
-    },
-  );
-};
-
-/**
  * Updates the property schema of the children of this node. All children
 of a node use the same schema for properties resulting in a table-like
 structure and behaviour. Property schemas are loosely structured and can
@@ -260,6 +232,34 @@ export const nodeUpdateChildrenPropertySchema = async (
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(nodeUpdateChildrenPropertySchemaBody),
+    },
+  );
+};
+
+/**
+ * Update the properties of a node.
+ */
+export type nodeUpdatePropertiesResponse = {
+  data: NodeUpdatePropertiesOKResponse;
+  status: number;
+};
+
+export const getNodeUpdatePropertiesUrl = (nodeSlug: string) => {
+  return `/nodes/${nodeSlug}/properties`;
+};
+
+export const nodeUpdateProperties = async (
+  nodeSlug: string,
+  nodeUpdatePropertiesBody: NodeUpdatePropertiesBody,
+  options?: RequestInit,
+): Promise<nodeUpdatePropertiesResponse> => {
+  return fetcher<Promise<nodeUpdatePropertiesResponse>>(
+    getNodeUpdatePropertiesUrl(nodeSlug),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(nodeUpdatePropertiesBody),
     },
   );
 };

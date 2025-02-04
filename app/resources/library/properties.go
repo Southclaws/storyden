@@ -3,12 +3,14 @@ package library
 import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
 type PropertySchema struct {
+	ID   xid.ID
 	Name string
 	Type string
 	Sort string
@@ -25,6 +27,7 @@ type PropertySchemas []*PropertySchema
 
 func MapPropertySchema(in PropertySchemaQueryRow) PropertySchema {
 	return PropertySchema{
+		ID:   in.FieldID,
 		Name: in.Name,
 		Type: in.Type,
 		Sort: in.Sort,
@@ -34,7 +37,7 @@ func MapPropertySchema(in PropertySchemaQueryRow) PropertySchema {
 // PropertySchemaQueryRow is a row from the property schema query which pulls
 // all the property schemas for both sibling and child properties of a node.
 type PropertySchemaQueryRow struct {
-	FieldID string `db:"id"`
+	FieldID xid.ID `db:"id"`
 	Name    string `db:"name"`
 	Type    string `db:"type"`
 	Sort    string `db:"sort"`
@@ -74,14 +77,14 @@ func (r *PropertySchemaTable) BuildPropertyTable(in []*ent.Property, isRoot bool
 	if !isRoot {
 		schemas = r.childSchemas
 	}
-	propMap := lo.KeyBy(schemas, func(r PropertySchemaQueryRow) string { return r.FieldID })
+	propMap := lo.KeyBy(schemas, func(r PropertySchemaQueryRow) xid.ID { return r.FieldID })
 
 	out := PropertyTable{}
 
 	// Add all the properties that have values.
 	for _, p := range in {
-		if s, ok := propMap[p.FieldID.String()]; ok {
-			delete(propMap, p.FieldID.String())
+		if s, ok := propMap[p.FieldID]; ok {
+			delete(propMap, p.FieldID)
 			out = append(out, &Property{
 				PropertySchema: MapPropertySchema(s),
 				Value:          opt.New(p.Value),
@@ -104,6 +107,7 @@ func (r *PropertySchemaTable) BuildPropertyTable(in []*ent.Property, isRoot bool
 func (r PropertySchemaTable) ChildSchemas() PropertySchemas {
 	return dt.Map(r.childSchemas, func(r PropertySchemaQueryRow) *PropertySchema {
 		return &PropertySchema{
+			ID:   r.FieldID,
 			Name: r.Name,
 			Type: r.Type,
 			Sort: r.Sort,
