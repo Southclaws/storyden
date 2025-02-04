@@ -10,12 +10,19 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { Identifier } from "./identifier";
 import type { PropertyName } from "./propertyName";
 import type { PropertyType } from "./propertyType";
-import type { PropertyValue } from "./propertyValue";
 
-export interface Property {
-  id: Identifier;
+/**
+ * Mutating property schemas permits updating existing fields as well as
+adding new fields. The discinction is determined by the presence of the
+`id` field. When an `id` field is provided, the operation is treated as
+an update operation where any of the other fields will be used to write
+new values. If an `id` field is omitted, the schema is considered a new
+field and is subject to a uniqueness constraint on the `name` field.
+
+ */
+export interface PropertySchemaMutableProps {
+  id?: Identifier;
   name: PropertyName;
   sort: string;
   type: PropertyType;
-  value?: PropertyValue;
 }

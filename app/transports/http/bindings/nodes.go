@@ -38,7 +38,7 @@ type Nodes struct {
 	nv           *node_visibility.Controller
 	ntree        nodetree.Graph
 	ntr          node_traversal.Repository
-	nsr          node_properties.SchemaWriter
+	nsr          *node_properties.SchemaWriter
 }
 
 func NewNodes(
@@ -48,7 +48,7 @@ func NewNodes(
 	nv *node_visibility.Controller,
 	ntree nodetree.Graph,
 	ntr node_traversal.Repository,
-	nsr node_properties.SchemaWriter,
+	nsr *node_properties.SchemaWriter,
 ) Nodes {
 	return Nodes{
 		accountQuery: accountQuery,
@@ -518,6 +518,7 @@ func serialiseProperty(in *library.Property) openapi.Property {
 	return openapi.Property{
 		Name:  in.Name,
 		Type:  in.Type,
+		Sort:  in.Sort,
 		Value: opt.Map(in.Value, func(v string) string { return v }).Ptr(),
 	}
 }
@@ -528,8 +529,10 @@ func serialisePropertyList(in library.PropertyTable) openapi.PropertyList {
 
 func serialisePropertySchema(in *library.PropertySchema) openapi.PropertySchema {
 	return openapi.PropertySchema{
+		Id:   in.ID.String(),
 		Name: in.Name,
 		Type: in.Type,
+		Sort: in.Sort,
 	}
 }
 
@@ -537,12 +540,12 @@ func serialisePropertySchemas(in library.PropertySchemas) openapi.PropertySchema
 	return dt.Map(in, serialisePropertySchema)
 }
 
-func serialisePropertySchemaList(in library.PropertySchemas) *openapi.PropertySchemaList {
+func serialisePropertySchemaList(in library.PropertySchemas) openapi.PropertySchemaList {
 	if len(in) == 0 {
 		return nil
 	}
 	schemas := dt.Map(in, serialisePropertySchema)
-	return &schemas
+	return schemas
 }
 
 func getContentFillRuleSourceCommand(contentFillRuleParam *openapi.ContentFillRule, contentFillSourceParam *openapi.FillSourceQuery) (opt.Optional[asset.ContentFillCommand], error) {

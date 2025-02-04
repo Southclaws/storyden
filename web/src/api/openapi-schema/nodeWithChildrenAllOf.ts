@@ -12,7 +12,7 @@ import type { PropertyList } from "./propertyList";
 import type { PropertySchemaList } from "./propertySchemaList";
 
 export type NodeWithChildrenAllOf = {
-  child_property_schema?: PropertySchemaList;
+  child_property_schema: PropertySchemaList;
   children: NodeWithChildren[];
   properties: PropertyList;
 };

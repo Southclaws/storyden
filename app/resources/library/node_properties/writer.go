@@ -9,6 +9,7 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -62,9 +63,15 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 
 	creates := SchemaMutations{}
 	updates := SchemaMutations{}
-	deletes := lo.KeyBy(currentSchema.Edges.Fields, func(f *ent.PropertySchemaField) xid.ID { return f.ID })
+	deletes := map[xid.ID]*ent.PropertySchemaField{}
+
+	if currentSchema != nil {
+		deletes = lo.KeyBy(currentSchema.Edges.Fields, func(f *ent.PropertySchemaField) xid.ID { return f.ID })
+	}
+
 	for _, s := range schemas {
 		id, ok := s.ID.Get()
+		delete(deletes, id)
 		if !ok {
 			creates = append(creates, s)
 			continue
@@ -72,13 +79,6 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 
 		updates = append(updates, s)
 
-		delete(deletes, id)
-	}
-
-	deleteIDs := dt.Map(lo.Values(deletes), func(f *ent.PropertySchemaField) xid.ID { return f.ID })
-	_, err = w.db.PropertySchemaField.Delete().Where(propertyschemafield.IDIn(deleteIDs...)).Exec(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	tx, err := w.db.Tx(ctx)
@@ -89,22 +89,52 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 		err = tx.Rollback()
 	}()
 
-	// Update fields
-	for _, s := range updates {
-		// we know this is non-zero already.
-		id := s.ID.OrZero()
+	// Create schema if it doesn't exist
+	if currentSchema == nil {
+		currentSchema, err = tx.PropertySchema.Create().Save(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 
-		err = tx.PropertySchemaField.UpdateOneID(id).SetName(s.Name).SetSort(s.Sort).SetType(s.Type).Exec(ctx)
+		childIDs := dt.Map(children, func(n *ent.Node) xid.ID { return n.ID })
+
+		// assign schema to all child nodes
+		err = tx.Node.Update().Where(node.IDIn(childIDs...)).SetPropertySchemas(currentSchema).Exec(ctx)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 	}
 
-	// Create fields
-	for _, s := range creates {
-		err = tx.PropertySchemaField.Create().SetName(s.Name).SetSort(s.Sort).SetType(s.Type).Exec(ctx)
+	// Delete fields
+
+	if len(deletes) > 0 {
+		deleteIDs := dt.Map(lo.Values(deletes), func(f *ent.PropertySchemaField) xid.ID { return f.ID })
+		_, err = tx.PropertySchemaField.Delete().Where(propertyschemafield.IDIn(deleteIDs...)).Exec(ctx)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
+	// Update fields
+	if len(updates) > 0 {
+		for _, s := range updates {
+			// we know this is non-zero already.
+			id := s.ID.OrZero()
+
+			err = tx.PropertySchemaField.UpdateOneID(id).SetName(s.Name).SetSort(s.Sort).SetType(s.Type).Exec(ctx)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+		}
+	}
+
+	// Create fields
+	if len(creates) > 0 {
+		for _, s := range creates {
+			err = tx.PropertySchemaField.Create().SetName(s.Name).SetSort(s.Sort).SetType(s.Type).SetSchemaID(currentSchema.ID).Exec(ctx)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
 		}
 	}
 

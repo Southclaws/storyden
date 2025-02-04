@@ -348,6 +348,7 @@ export * from "./propertyMutableProps";
 export * from "./propertyName";
 export * from "./propertySchema";
 export * from "./propertySchemaList";
+export * from "./propertySchemaMutableProps";
 export * from "./propertyType";
 export * from "./propertyValue";
 export * from "./publicKeyCredential";
