@@ -75,7 +75,7 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 
 				res, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parent.JSON200.Slug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
 					{Name: "weight", Type: "number", Sort: "1"},
-				})
+				}, session)
 				tests.Ok(t, err, res)
 
 				parent, err := cl.NodeGetWithResponse(ctx, parent.JSON200.Slug, session)
@@ -93,7 +93,7 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 					{Fid: &weightField.Fid, Name: "weight", Type: "number", Sort: "1"},
 					{Name: "kind", Type: "string", Sort: "2"},
 					{Name: "added", Type: "timestamp", Sort: "3"},
-				})
+				}, session)
 				tests.Ok(t, err, res)
 
 				parent, err = cl.NodeGetWithResponse(ctx, parent.JSON200.Slug, session)
@@ -107,7 +107,7 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 
 				// Delete the schema
 
-				res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parent.JSON200.Slug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{})
+				res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parent.JSON200.Slug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{}, session)
 				tests.Ok(t, err, res)
 
 				parent, err = cl.NodeGetWithResponse(ctx, parent.JSON200.Slug, session)

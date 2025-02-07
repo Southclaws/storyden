@@ -24,18 +24,21 @@ func TestNodesProperty(t *testing.T) {
 
 	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
 		lc fx.Lifecycle,
-		ctx context.Context,
+		root context.Context,
 		cl *openapi.ClientWithResponses,
 		cj *session_cookie.Jar,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
-			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
-			session := e2e.WithSession(ctx, cj)
+			ctx1, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			session := e2e.WithSession(ctx1, cj)
+
+			ctx2, _ := e2e.WithAccount(root, aw, seed.Account_007_Freyr)
+			randomUser := e2e.WithSession(ctx2, cj)
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()
-			parent, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			parent, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 				Name: parentname,
 				Slug: &parentslug,
 			}, session)
@@ -45,7 +48,7 @@ func TestNodesProperty(t *testing.T) {
 
 			name1 := "child-1"
 			slug1 := name1 + uuid.NewString()
-			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node1, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 				Name:   name1,
 				Slug:   &slug1,
 				Parent: &parent.JSON200.Slug,
@@ -54,7 +57,7 @@ func TestNodesProperty(t *testing.T) {
 
 			name2 := "child-2"
 			slug2 := name2 + uuid.NewString()
-			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node2, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 				Name:   name2,
 				Slug:   &slug2,
 				Parent: &parent.JSON200.Slug,
@@ -63,7 +66,7 @@ func TestNodesProperty(t *testing.T) {
 
 			name3 := "child-3"
 			slug3 := name3 + uuid.NewString()
-			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node3, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 				Name:   name3,
 				Slug:   &slug3,
 				Parent: &parent.JSON200.Slug,
@@ -74,7 +77,7 @@ func TestNodesProperty(t *testing.T) {
 
 			name34 := "child-3-4"
 			slug34 := name34 + uuid.NewString()
-			node34, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node34, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 				Name:   name34,
 				Slug:   &slug34,
 				Parent: &node3.JSON200.Slug,
@@ -83,31 +86,63 @@ func TestNodesProperty(t *testing.T) {
 
 			name35 := "child-3-5"
 			slug35 := name35 + uuid.NewString()
-			node35, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+			node35, err := cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 				Name:   name35,
 				Slug:   &slug35,
 				Parent: &node3.JSON200.Slug,
 			}, session)
 			tests.Ok(t, err, node35)
 
-			res, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parentslug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
+			res, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(root, parentslug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
 				{Name: "weight", Type: "number", Sort: "1"},
 				{Name: "kind", Type: "string", Sort: "2"},
 				{Name: "added", Type: "timestamp", Sort: "3"},
-			})
+			}, session)
 			tests.Ok(t, err, res)
 
-			res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, slug3, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
+			res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(root, slug3, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
 				{Name: "size", Type: "number", Sort: "1"},
 				{Name: "brand", Type: "string", Sort: "2"},
-			})
+			}, session)
 			tests.Ok(t, err, res)
+
+			t.Run("fail_unauthenticated", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				update, err := cl.NodeUpdatePropertiesWithResponse(root, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
+					Properties: openapi.PropertyMutationList{
+						{Name: "weight", Value: "5"},
+						{Name: "kind", Value: "mythical"},
+						{Name: "added", Value: "2025-01-01T12:59:21Z"},
+						{Name: "new", Value: "prop"},
+					},
+				})
+				r.NoError(err)
+				a.Equal(403, update.StatusCode())
+			})
+
+			t.Run("fail_no_permission", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				update, err := cl.NodeUpdatePropertiesWithResponse(root, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
+					Properties: openapi.PropertyMutationList{
+						{Name: "weight", Value: "5"},
+						{Name: "kind", Value: "mythical"},
+						{Name: "added", Value: "2025-01-01T12:59:21Z"},
+						{Name: "new", Value: "prop"},
+					},
+				}, randomUser)
+				r.NoError(err)
+				a.Equal(401, update.StatusCode())
+			})
 
 			t.Run("fail_missing_new_property_type", func(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				update, err := cl.NodeUpdatePropertiesWithResponse(ctx, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
+				update, err := cl.NodeUpdatePropertiesWithResponse(root, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
 					Properties: openapi.PropertyMutationList{
 						{Name: "weight", Value: "5"},
 						{Name: "kind", Value: "mythical"},
@@ -123,7 +158,7 @@ func TestNodesProperty(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				update, err := cl.NodeUpdatePropertiesWithResponse(ctx, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
+				update, err := cl.NodeUpdatePropertiesWithResponse(root, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
 					Properties: openapi.PropertyMutationList{
 						{Name: "weight", Value: "4"},
 						{Name: "kind", Value: "legendary"},
@@ -140,7 +175,7 @@ func TestNodesProperty(t *testing.T) {
 
 				ptype := "string"
 
-				update, err := cl.NodeUpdatePropertiesWithResponse(ctx, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
+				update, err := cl.NodeUpdatePropertiesWithResponse(root, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
 					Properties: openapi.PropertyMutationList{
 						{Name: "weight", Value: "5"},
 						{Name: "kind", Value: "mythical"},
@@ -210,7 +245,7 @@ func TestNodesPropertyFieldOrdering(t *testing.T) {
 				{Name: "weight", Type: "number", Sort: "1"},
 				{Name: "kind", Type: "string", Sort: "2"},
 				{Name: "added", Type: "timestamp", Sort: "3"},
-			})
+			}, session)
 			tests.Ok(t, err, res)
 
 			t.Run("sort_fields", func(t *testing.T) {
@@ -248,7 +283,7 @@ func TestNodesPropertyFieldOrdering(t *testing.T) {
 					{Fid: field1ID, Name: "weight", Type: "number", Sort: "3"},
 					{Fid: field2ID, Name: "kind", Type: "string", Sort: "1"},
 					{Fid: field3ID, Name: "added", Type: "timestamp", Sort: "2"},
-				})
+				}, session)
 				tests.Ok(t, err, res)
 
 				updatedFields := dt.Map(schemaUpdate.JSON200.Properties, func(p openapi.PropertySchema) string {
@@ -339,13 +374,13 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 				{Name: "weight", Type: "number", Sort: "1"},
 				{Name: "kind", Type: "string", Sort: "2"},
 				{Name: "added", Type: "timestamp", Sort: "3"},
-			})
+			}, session)
 			tests.Ok(t, err, res)
 
 			res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, slug3, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
 				{Name: "size", Type: "number", Sort: "1"},
 				{Name: "brand", Type: "string", Sort: "2"},
-			})
+			}, session)
 			tests.Ok(t, err, res)
 
 			update, err := cl.NodeUpdatePropertiesWithResponse(ctx, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
@@ -382,7 +417,7 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 	}))
 }
 
-func matchSchemaToProperties(t *testing.T, schema openapi.PropertySchemaList, properties []openapi.Property) bool {
+func matchSchemaToProperties(t *testing.T, schema openapi.PropertySchemaList, properties []openapi.Property) {
 	a := assert.New(t)
 
 	for i := range schema {
@@ -394,5 +429,5 @@ func matchSchemaToProperties(t *testing.T, schema openapi.PropertySchemaList, pr
 		a.Equal(schemaField.Type, propertyField.Type)
 		a.Equal(schemaField.Sort, propertyField.Sort)
 	}
-	return false
+	return
 }
