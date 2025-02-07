@@ -7,8 +7,5 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { PropertyList } from "./propertyList";
 
-export type NodeUpdatePropertiesOKResponse = {
-  properties: PropertyList;
-};
+export type PropertySortKey = string;

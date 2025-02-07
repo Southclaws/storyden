@@ -12,7 +12,7 @@ import type { PropertyName } from "./propertyName";
 import type { PropertyType } from "./propertyType";
 
 export interface PropertySchema {
-  id: Identifier;
+  fid: Identifier;
   name: PropertyName;
   sort: string;
   type: PropertyType;

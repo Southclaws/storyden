@@ -45,8 +45,8 @@ type Node struct {
 	PrimaryImage    opt.Optional[asset.Asset]
 	Owner           profile.Public
 	Parent          opt.Optional[Node]
-	Properties      PropertyTable
-	ChildProperties PropertySchemas
+	Properties      opt.Optional[PropertyTable]
+	ChildProperties opt.Optional[PropertySchema]
 	Tags            tag_ref.Tags
 	Collections     collection_item_status.Status // NOTE: Not done yet
 	Visibility      visibility.Visibility
