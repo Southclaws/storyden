@@ -24,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
+	"github.com/Southclaws/storyden/app/services/library/node_property_schema"
 	"github.com/Southclaws/storyden/app/services/library/node_read"
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
@@ -32,13 +33,13 @@ import (
 )
 
 type Nodes struct {
-	accountQuery *account_querier.Querier
-	nodeMutator  *node_mutate.Manager
-	nodeReader   *node_read.HydratedQuerier
-	nv           *node_visibility.Controller
-	ntree        nodetree.Graph
-	ntr          node_traversal.Repository
-	nsr          *node_properties.SchemaWriter
+	accountQuery  *account_querier.Querier
+	nodeMutator   *node_mutate.Manager
+	nodeReader    *node_read.HydratedQuerier
+	nv            *node_visibility.Controller
+	ntree         nodetree.Graph
+	ntr           node_traversal.Repository
+	schemaUpdater *node_property_schema.Updater
 }
 
 func NewNodes(
@@ -48,16 +49,16 @@ func NewNodes(
 	nv *node_visibility.Controller,
 	ntree nodetree.Graph,
 	ntr node_traversal.Repository,
-	nsr *node_properties.SchemaWriter,
+	schemaUpdater *node_property_schema.Updater,
 ) Nodes {
 	return Nodes{
-		accountQuery: accountQuery,
-		nodeMutator:  nodeMutator,
-		nodeReader:   nodeReader,
-		nv:           nv,
-		ntree:        ntree,
-		ntr:          ntr,
-		nsr:          nsr,
+		accountQuery:  accountQuery,
+		nodeMutator:   nodeMutator,
+		nodeReader:    nodeReader,
+		nv:            nv,
+		ntree:         ntree,
+		ntr:           ntr,
+		schemaUpdater: schemaUpdater,
 	}
 }
 
@@ -330,8 +331,7 @@ func (c *Nodes) NodeUpdateChildrenPropertySchema(ctx context.Context, request op
 		}
 	})
 
-	// TODO: Authentication check for ownership/visibility/etc
-	updated, err := c.nsr.UpdateChildren(ctx, deserialiseNodeMark(request.NodeSlug), schemas)
+	updated, err := c.schemaUpdater.UpdateChildren(ctx, deserialiseNodeMark(request.NodeSlug), schemas)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
