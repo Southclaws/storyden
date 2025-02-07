@@ -321,15 +321,16 @@ func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteReques
 }
 
 func (c *Nodes) NodeUpdateChildrenPropertySchema(ctx context.Context, request openapi.NodeUpdateChildrenPropertySchemaRequestObject) (openapi.NodeUpdateChildrenPropertySchemaResponseObject, error) {
-	schemas := dt.Map(*request.Body, func(p openapi.PropertySchemaMutableProps) *node_properties.SchemaMutation {
-		return &node_properties.SchemaMutation{
-			ID:   opt.Map(opt.NewPtr(p.Id), deserialiseID),
+	schemas := dt.Map(*request.Body, func(p openapi.PropertySchemaMutableProps) *node_properties.SchemaFieldMutation {
+		return &node_properties.SchemaFieldMutation{
+			ID:   opt.Map(opt.NewPtr(p.Fid), deserialiseID),
 			Name: p.Name,
 			Type: p.Type,
 			Sort: p.Sort,
 		}
 	})
 
+	// TODO: Authentication check for ownership/visibility/etc
 	updated, err := c.nsr.UpdateChildren(ctx, deserialiseNodeMark(request.NodeSlug), schemas)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -337,13 +338,28 @@ func (c *Nodes) NodeUpdateChildrenPropertySchema(ctx context.Context, request op
 
 	return openapi.NodeUpdateChildrenPropertySchema200JSONResponse{
 		NodeUpdateChildrenPropertySchemaOKJSONResponse: openapi.NodeUpdateChildrenPropertySchemaOKJSONResponse{
-			Properties: serialisePropertySchemas(updated),
+			Properties: serialisePropertySchemas(*updated),
 		},
 	}, nil
 }
 
 func (c *Nodes) NodeUpdateProperties(ctx context.Context, request openapi.NodeUpdatePropertiesRequestObject) (openapi.NodeUpdatePropertiesResponseObject, error) {
-	return nil, nil
+	pml := deserialisePropertyMutationList(request.Body.Properties)
+
+	updated, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
+		Properties: opt.New(pml),
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	properties := opt.Map(updated.Properties, serialisePropertyList)
+
+	return openapi.NodeUpdateProperties200JSONResponse{
+		NodeUpdatePropertiesOKJSONResponse: openapi.NodeUpdatePropertiesOKJSONResponse{
+			Properties: properties.OrZero(),
+		},
+	}, nil
 }
 
 func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRequestObject) (openapi.NodeAddAssetResponseObject, error) {
@@ -448,6 +464,9 @@ func serialiseNode(in *library.Node) openapi.Node {
 
 func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 	rs := opt.Map(in.RelevanceScore, func(v float64) float32 { return float32(v) })
+	properties := opt.Map(in.Properties, serialisePropertyList)
+	childPropertySchema := opt.Map(in.ChildProperties, serialisePropertySchemaList)
+
 	return openapi.NodeWithChildren{
 		Id:           in.Mark.ID().String(),
 		CreatedAt:    in.CreatedAt,
@@ -463,8 +482,8 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
-		Properties:          serialisePropertyList(in.Properties),
-		ChildPropertySchema: serialisePropertySchemaList(in.ChildProperties),
+		Properties:          properties.OrZero(),
+		ChildPropertySchema: childPropertySchema.OrZero(),
 		Tags:                serialiseTagReferenceList(in.Tags),
 		Visibility:          serialiseVisibility(in.Visibility),
 		RelevanceScore:      rs.Ptr(),
@@ -516,36 +535,50 @@ func deserialiseFillSource(in openapi.FillSource) (asset.FillSource, error) {
 
 func serialiseProperty(in *library.Property) openapi.Property {
 	return openapi.Property{
-		Name:  in.Name,
-		Type:  in.Type,
-		Sort:  in.Sort,
+		Fid:   in.Field.ID.String(),
+		Name:  in.Field.Name,
+		Type:  in.Field.Type,
+		Sort:  in.Field.Sort,
 		Value: opt.Map(in.Value, func(v string) string { return v }).Ptr(),
 	}
 }
 
 func serialisePropertyList(in library.PropertyTable) openapi.PropertyList {
-	return dt.Map(in, serialiseProperty)
+	return dt.Map(in.Properties, serialiseProperty)
 }
 
-func serialisePropertySchema(in *library.PropertySchema) openapi.PropertySchema {
+func serialisePropertySchema(in *library.PropertySchemaField) openapi.PropertySchema {
 	return openapi.PropertySchema{
-		Id:   in.ID.String(),
+		Fid:  in.ID.String(),
 		Name: in.Name,
 		Type: in.Type,
 		Sort: in.Sort,
 	}
 }
 
-func serialisePropertySchemas(in library.PropertySchemas) openapi.PropertySchemaList {
-	return dt.Map(in, serialisePropertySchema)
+func serialisePropertySchemas(in library.PropertySchema) openapi.PropertySchemaList {
+	return dt.Map(in.Fields, serialisePropertySchema)
 }
 
-func serialisePropertySchemaList(in library.PropertySchemas) openapi.PropertySchemaList {
-	if len(in) == 0 {
+func serialisePropertySchemaList(in library.PropertySchema) openapi.PropertySchemaList {
+	if len(in.Fields) == 0 {
 		return nil
 	}
-	schemas := dt.Map(in, serialisePropertySchema)
+	schemas := dt.Map(in.Fields, serialisePropertySchema)
 	return schemas
+}
+
+func deserialisePropertyMutationList(in openapi.PropertyMutationList) library.PropertyMutationList {
+	return dt.Map(in, deserialisePropertyMutation)
+}
+
+func deserialisePropertyMutation(in openapi.PropertyMutation) library.PropertyMutation {
+	return library.PropertyMutation{
+		Name:  in.Name,
+		Value: in.Value,
+		Type:  opt.NewPtr(in.Type),
+		Sort:  opt.NewPtr(in.Sort),
+	}
 }
 
 func getContentFillRuleSourceCommand(contentFillRuleParam *openapi.ContentFillRule, contentFillSourceParam *openapi.FillSourceQuery) (opt.Optional[asset.ContentFillCommand], error) {

@@ -7,34 +7,53 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
+	"github.com/samber/lo"
+
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
-	"github.com/rs/xid"
-	"github.com/samber/lo"
 )
 
 type SchemaWriter struct {
 	db *ent.Client
 }
 
-func New(db *ent.Client) *SchemaWriter {
+func New(db *ent.Client) (*SchemaWriter, *Writer) {
 	return &SchemaWriter{
-		db: db,
-	}
+			db: db,
+		}, &Writer{
+			db: db,
+		}
 }
 
-type SchemaMutation struct {
+type SchemaFieldMutation struct {
 	ID   opt.Optional[xid.ID]
 	Name string
 	Type string
 	Sort string
 }
 
-type SchemaMutations []*SchemaMutation
+type FieldSchemaMutations []*SchemaFieldMutation
 
-func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, schemas SchemaMutations) (library.PropertySchemas, error) {
+func (w SchemaWriter) CreateForNode(ctx context.Context, nodeID library.NodeID, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
+	node, err := w.db.Node.Get(ctx, xid.ID(nodeID))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	schemaID, err := w.doSchemaUpdates(ctx, node.Edges.PropertySchemas, schemas, node)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return &library.PropertySchema{
+		ID: *schemaID,
+	}, nil
+}
+
+func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
 	parent, err := w.db.Node.Query().Where(qk.Predicate()).WithNodes(func(nq *ent.NodeQuery) {
 		nq.WithPropertySchemas(func(psq *ent.PropertySchemaQuery) {
 			psq.WithFields()
@@ -46,8 +65,8 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 
 	children := parent.Edges.Nodes
 	if len(children) == 0 {
-		// no children to update, no-op.w
-		return library.PropertySchemas{}, nil
+		// no children to update, no-op.
+		return &library.PropertySchema{}, nil
 	}
 
 	grouping := lo.GroupBy(children, func(n *ent.Node) string {
@@ -61,8 +80,57 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 
 	currentSchema := children[0].Edges.PropertySchemas
 
-	creates := SchemaMutations{}
-	updates := SchemaMutations{}
+	schemaID, err := w.doSchemaUpdates(ctx, currentSchema, schemas, children...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	// Mutations finished, query the final result for returning.
+
+	return w.Get(ctx, *schemaID)
+}
+
+func (w *SchemaWriter) Get(ctx context.Context, schemaID xid.ID) (*library.PropertySchema, error) {
+	schemaFields, err := w.db.PropertySchemaField.Query().
+		Where(propertyschemafield.SchemaID(schemaID)).
+		Order(ent.Asc(propertyschemafield.FieldSort)).
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	updatedSchemas := dt.Map(schemaFields, func(f *ent.PropertySchemaField) *library.PropertySchemaField {
+		return &library.PropertySchemaField{
+			ID:   f.ID,
+			Name: f.Name,
+			Type: f.Type,
+			Sort: f.Sort,
+		}
+	})
+
+	return &library.PropertySchema{
+		ID:     schemaID,
+		Fields: updatedSchemas,
+	}, nil
+}
+
+func (w *SchemaWriter) AddFields(ctx context.Context, schemaID xid.ID, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
+	fields := []*ent.PropertySchemaFieldCreate{}
+	for _, s := range schemas {
+		fields = append(fields, w.db.PropertySchemaField.Create().SetName(s.Name).SetSort(s.Sort).SetType(s.Type).SetSchemaID(schemaID))
+	}
+
+	err := w.db.PropertySchemaField.CreateBulk(fields...).Exec(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return w.Get(ctx, schemaID)
+}
+
+func (w *SchemaWriter) doSchemaUpdates(ctx context.Context, currentSchema *ent.PropertySchema, schemas FieldSchemaMutations, children ...*ent.Node) (*xid.ID, error) {
+	creates := FieldSchemaMutations{}
+	updates := FieldSchemaMutations{}
 	deletes := map[xid.ID]*ent.PropertySchemaField{}
 
 	if currentSchema != nil {
@@ -142,20 +210,5 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	// Mutations finished, query the final result for returning.
-
-	schemaFields, err := w.db.PropertySchemaField.Query().Where(propertyschemafield.SchemaID(currentSchema.ID)).All(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	updatedSchemas := dt.Map(schemaFields, func(f *ent.PropertySchemaField) *library.PropertySchema {
-		return &library.PropertySchema{
-			Name: f.Name,
-			Type: f.Type,
-			Sort: f.Sort,
-		}
-	})
-
-	return updatedSchemas, nil
+	return &currentSchema.ID, nil
 }

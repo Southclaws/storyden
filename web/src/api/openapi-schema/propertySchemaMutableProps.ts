@@ -21,7 +21,7 @@ field and is subject to a uniqueness constraint on the `name` field.
 
  */
 export interface PropertySchemaMutableProps {
-  id?: Identifier;
+  fid?: Identifier;
   name: PropertyName;
   sort: string;
   type: PropertyType;

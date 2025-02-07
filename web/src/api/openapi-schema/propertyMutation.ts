@@ -7,15 +7,20 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { Identifier } from "./identifier";
 import type { PropertyName } from "./propertyName";
+import type { PropertySortKey } from "./propertySortKey";
 import type { PropertyType } from "./propertyType";
 import type { PropertyValue } from "./propertyValue";
 
-export interface Property {
-  fid: Identifier;
+/**
+ * A property mutation is a change to a property on a node. It can be used
+to update existing properties or add new properties to a node. When a
+property already exists by name, the type and sort columns are optional.
+
+ */
+export interface PropertyMutation {
   name: PropertyName;
-  sort: string;
-  type: PropertyType;
-  value?: PropertyValue;
+  sort?: PropertySortKey;
+  type?: PropertyType;
+  value: PropertyValue;
 }

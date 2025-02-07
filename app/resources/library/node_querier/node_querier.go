@@ -48,10 +48,11 @@ func WithVisibilityRulesApplied(accountID *account.AccountID) Option {
 const nodePropertiesQuery = `with
   sibling_properties as (
     select
-      psf.id,
-      psf.name,
-      psf.type,
-	  psf.sort,
+      ps.id         schema_id,
+      min(psf.id)   field_id,
+      min(psf.name) name,
+      min(psf.type) type,
+      min(psf.sort) sort,
       'sibling' as source
     from
       nodes n
@@ -61,16 +62,15 @@ const nodePropertiesQuery = `with
       inner join property_schema_fields psf on psf.schema_id = ps.id
     where
       n.id = $1
-    group by
-      psf.name,
-      psf.type
+    group by ps.id, psf.id
   ),
   child_properties as (
     select
-      psf.id,
-      psf.name,
-      psf.type,
-	  psf.sort,
+      ps.id         schema_id,
+      min(psf.id)   field_id,
+      min(psf.name) name,
+      min(psf.type) type,
+      min(psf.sort) sort,
       'child' as source
     from
       nodes n
@@ -79,9 +79,7 @@ const nodePropertiesQuery = `with
       inner join property_schema_fields psf on psf.schema_id = ps.id
     where
       n.id = $1
-    group by
-      psf.name,
-      psf.type
+    group by ps.id, psf.id
   )
 select
   *
@@ -92,7 +90,7 @@ select
   *
 from
   child_properties
-order by sort asc
+order by source desc, sort asc
 `
 
 func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) (*library.Node, error) {
@@ -157,7 +155,10 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 				})
 		}).
 		WithTags().
-		WithProperties()
+		WithProperties().
+		WithPropertySchemas(func(psq *ent.PropertySchemaQuery) {
+			psq.WithFields()
+		})
 
 	applyVisibilityRulesPredicate(query)
 

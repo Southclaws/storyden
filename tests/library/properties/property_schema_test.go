@@ -90,7 +90,7 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 				weightField := parent.JSON200.ChildPropertySchema[0]
 
 				res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parent.JSON200.Slug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-					{Id: &weightField.Id, Name: "weight", Type: "number", Sort: "1"},
+					{Fid: &weightField.Fid, Name: "weight", Type: "number", Sort: "1"},
 					{Name: "kind", Type: "string", Sort: "2"},
 					{Name: "added", Type: "timestamp", Sort: "3"},
 				})

@@ -237,7 +237,10 @@ export const nodeUpdateChildrenPropertySchema = async (
 };
 
 /**
- * Update the properties of a node.
+ * Update the properties of a node. New schema fields will result in the
+schema of the node being updated before values are assigned. This will
+also propagate to all sibling nodes as they all share the same schema.
+
  */
 export type nodeUpdatePropertiesResponse = {
   data: NodeUpdatePropertiesOKResponse;

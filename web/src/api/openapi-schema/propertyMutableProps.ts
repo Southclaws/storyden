@@ -7,12 +7,12 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { PropertyList } from "./propertyList";
+import type { PropertyMutationList } from "./propertyMutationList";
 
 /**
  * Note: Properties are replace-all and are not merged with existing.
 
  */
 export interface PropertyMutableProps {
-  properties?: PropertyList;
+  properties: PropertyMutationList;
 }

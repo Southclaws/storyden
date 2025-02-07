@@ -90,12 +90,14 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 			Metadata:   c.Metadata,
 		}
 
-		// Sibling properties may contain values, so we pass in the edge.
-		n.Properties = ps.BuildPropertyTable(c.Edges.Properties, isRoot)
+		if ps != nil {
+			// Sibling properties may contain values, so we pass in the edge.
+			n.Properties = opt.NewPtr(ps.BuildPropertyTable(c.Edges.Properties, isRoot))
 
-		if isRoot {
-			// Child properties don't contain values, only the property schemas.
-			n.ChildProperties = ps.ChildSchemas()
+			if isRoot {
+				// Child properties don't contain values, only the property schemas.
+				n.ChildProperties = opt.NewPtr(ps.ChildSchemas())
+			}
 		}
 
 		return n, nil

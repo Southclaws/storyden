@@ -14,6 +14,7 @@ import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
+  BadRequestResponse,
   InternalServerErrorResponse,
   NodeAddAssetParams,
   NodeAddChildOKResponse,
@@ -401,7 +402,10 @@ export const useNodeUpdateChildrenPropertySchema = <
   };
 };
 /**
- * Update the properties of a node.
+ * Update the properties of a node. New schema fields will result in the
+schema of the node being updated before values are assigned. This will
+also propagate to all sibling nodes as they all share the same schema.
+
  */
 export const nodeUpdateProperties = (
   nodeSlug: string,
@@ -430,12 +434,14 @@ export type NodeUpdatePropertiesMutationResult = NonNullable<
   Awaited<ReturnType<typeof nodeUpdateProperties>>
 >;
 export type NodeUpdatePropertiesMutationError =
+  | BadRequestResponse
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
 export const useNodeUpdateProperties = <
   TError =
+    | BadRequestResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,
