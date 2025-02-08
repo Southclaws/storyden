@@ -284,7 +284,7 @@ func TestNodesPropertyFieldOrdering(t *testing.T) {
 					{Fid: field2ID, Name: "kind", Type: "string", Sort: "1"},
 					{Fid: field3ID, Name: "added", Type: "timestamp", Sort: "2"},
 				}, session)
-				tests.Ok(t, err, res)
+				tests.Ok(t, err, schemaUpdate)
 
 				updatedFields := dt.Map(schemaUpdate.JSON200.Properties, func(p openapi.PropertySchema) string {
 					return p.Name
