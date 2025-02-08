@@ -332,23 +332,9 @@ func (nc *NodeCreate) AddProperties(p ...*Property) *NodeCreate {
 	return nc.AddPropertyIDs(ids...)
 }
 
-// SetPropertySchemasID sets the "property_schemas" edge to the PropertySchema entity by ID.
-func (nc *NodeCreate) SetPropertySchemasID(id xid.ID) *NodeCreate {
-	nc.mutation.SetPropertySchemasID(id)
-	return nc
-}
-
-// SetNillablePropertySchemasID sets the "property_schemas" edge to the PropertySchema entity by ID if the given value is not nil.
-func (nc *NodeCreate) SetNillablePropertySchemasID(id *xid.ID) *NodeCreate {
-	if id != nil {
-		nc = nc.SetPropertySchemasID(*id)
-	}
-	return nc
-}
-
-// SetPropertySchemas sets the "property_schemas" edge to the PropertySchema entity.
-func (nc *NodeCreate) SetPropertySchemas(p *PropertySchema) *NodeCreate {
-	return nc.SetPropertySchemasID(p.ID)
+// SetPropertySchema sets the "property_schema" edge to the PropertySchema entity.
+func (nc *NodeCreate) SetPropertySchema(p *PropertySchema) *NodeCreate {
+	return nc.SetPropertySchemaID(p.ID)
 }
 
 // SetLink sets the "link" edge to the Link entity.
@@ -663,12 +649,12 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.PropertySchemasIDs(); len(nodes) > 0 {
+	if nodes := nc.mutation.PropertySchemaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   node.PropertySchemasTable,
-			Columns: []string{node.PropertySchemasColumn},
+			Table:   node.PropertySchemaTable,
+			Columns: []string{node.PropertySchemaColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(propertyschema.FieldID, field.TypeString),

@@ -15149,51 +15149,51 @@ func (m *MentionProfileMutation) ResetEdge(name string) error {
 // NodeMutation represents an operation that mutates the Node nodes in the graph.
 type NodeMutation struct {
 	config
-	op                      Op
-	typ                     string
-	id                      *xid.ID
-	created_at              *time.Time
-	updated_at              *time.Time
-	deleted_at              *time.Time
-	indexed_at              *time.Time
-	name                    *string
-	slug                    *string
-	description             *string
-	content                 *string
-	visibility              *node.Visibility
-	metadata                *map[string]interface{}
-	clearedFields           map[string]struct{}
-	owner                   *xid.ID
-	clearedowner            bool
-	parent                  *xid.ID
-	clearedparent           bool
-	nodes                   map[xid.ID]struct{}
-	removednodes            map[xid.ID]struct{}
-	clearednodes            bool
-	primary_image           *xid.ID
-	clearedprimary_image    bool
-	assets                  map[xid.ID]struct{}
-	removedassets           map[xid.ID]struct{}
-	clearedassets           bool
-	tags                    map[xid.ID]struct{}
-	removedtags             map[xid.ID]struct{}
-	clearedtags             bool
-	properties              map[xid.ID]struct{}
-	removedproperties       map[xid.ID]struct{}
-	clearedproperties       bool
-	property_schemas        *xid.ID
-	clearedproperty_schemas bool
-	link                    *xid.ID
-	clearedlink             bool
-	content_links           map[xid.ID]struct{}
-	removedcontent_links    map[xid.ID]struct{}
-	clearedcontent_links    bool
-	collections             map[xid.ID]struct{}
-	removedcollections      map[xid.ID]struct{}
-	clearedcollections      bool
-	done                    bool
-	oldValue                func(context.Context) (*Node, error)
-	predicates              []predicate.Node
+	op                     Op
+	typ                    string
+	id                     *xid.ID
+	created_at             *time.Time
+	updated_at             *time.Time
+	deleted_at             *time.Time
+	indexed_at             *time.Time
+	name                   *string
+	slug                   *string
+	description            *string
+	content                *string
+	visibility             *node.Visibility
+	metadata               *map[string]interface{}
+	clearedFields          map[string]struct{}
+	owner                  *xid.ID
+	clearedowner           bool
+	parent                 *xid.ID
+	clearedparent          bool
+	nodes                  map[xid.ID]struct{}
+	removednodes           map[xid.ID]struct{}
+	clearednodes           bool
+	primary_image          *xid.ID
+	clearedprimary_image   bool
+	assets                 map[xid.ID]struct{}
+	removedassets          map[xid.ID]struct{}
+	clearedassets          bool
+	tags                   map[xid.ID]struct{}
+	removedtags            map[xid.ID]struct{}
+	clearedtags            bool
+	properties             map[xid.ID]struct{}
+	removedproperties      map[xid.ID]struct{}
+	clearedproperties      bool
+	property_schema        *xid.ID
+	clearedproperty_schema bool
+	link                   *xid.ID
+	clearedlink            bool
+	content_links          map[xid.ID]struct{}
+	removedcontent_links   map[xid.ID]struct{}
+	clearedcontent_links   bool
+	collections            map[xid.ID]struct{}
+	removedcollections     map[xid.ID]struct{}
+	clearedcollections     bool
+	done                   bool
+	oldValue               func(context.Context) (*Node, error)
+	predicates             []predicate.Node
 }
 
 var _ ent.Mutation = (*NodeMutation)(nil)
@@ -15727,12 +15727,12 @@ func (m *NodeMutation) ResetAccountID() {
 
 // SetPropertySchemaID sets the "property_schema_id" field.
 func (m *NodeMutation) SetPropertySchemaID(x xid.ID) {
-	m.property_schemas = &x
+	m.property_schema = &x
 }
 
 // PropertySchemaID returns the value of the "property_schema_id" field in the mutation.
 func (m *NodeMutation) PropertySchemaID() (r xid.ID, exists bool) {
-	v := m.property_schemas
+	v := m.property_schema
 	if v == nil {
 		return
 	}
@@ -15758,7 +15758,7 @@ func (m *NodeMutation) OldPropertySchemaID(ctx context.Context) (v xid.ID, err e
 
 // ClearPropertySchemaID clears the value of the "property_schema_id" field.
 func (m *NodeMutation) ClearPropertySchemaID() {
-	m.property_schemas = nil
+	m.property_schema = nil
 	m.clearedFields[node.FieldPropertySchemaID] = struct{}{}
 }
 
@@ -15770,7 +15770,7 @@ func (m *NodeMutation) PropertySchemaIDCleared() bool {
 
 // ResetPropertySchemaID resets all changes to the "property_schema_id" field.
 func (m *NodeMutation) ResetPropertySchemaID() {
-	m.property_schemas = nil
+	m.property_schema = nil
 	delete(m.clearedFields, node.FieldPropertySchemaID)
 }
 
@@ -16293,44 +16293,31 @@ func (m *NodeMutation) ResetProperties() {
 	m.removedproperties = nil
 }
 
-// SetPropertySchemasID sets the "property_schemas" edge to the PropertySchema entity by id.
-func (m *NodeMutation) SetPropertySchemasID(id xid.ID) {
-	m.property_schemas = &id
-}
-
-// ClearPropertySchemas clears the "property_schemas" edge to the PropertySchema entity.
-func (m *NodeMutation) ClearPropertySchemas() {
-	m.clearedproperty_schemas = true
+// ClearPropertySchema clears the "property_schema" edge to the PropertySchema entity.
+func (m *NodeMutation) ClearPropertySchema() {
+	m.clearedproperty_schema = true
 	m.clearedFields[node.FieldPropertySchemaID] = struct{}{}
 }
 
-// PropertySchemasCleared reports if the "property_schemas" edge to the PropertySchema entity was cleared.
-func (m *NodeMutation) PropertySchemasCleared() bool {
-	return m.PropertySchemaIDCleared() || m.clearedproperty_schemas
+// PropertySchemaCleared reports if the "property_schema" edge to the PropertySchema entity was cleared.
+func (m *NodeMutation) PropertySchemaCleared() bool {
+	return m.PropertySchemaIDCleared() || m.clearedproperty_schema
 }
 
-// PropertySchemasID returns the "property_schemas" edge ID in the mutation.
-func (m *NodeMutation) PropertySchemasID() (id xid.ID, exists bool) {
-	if m.property_schemas != nil {
-		return *m.property_schemas, true
-	}
-	return
-}
-
-// PropertySchemasIDs returns the "property_schemas" edge IDs in the mutation.
+// PropertySchemaIDs returns the "property_schema" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// PropertySchemasID instead. It exists only for internal usage by the builders.
-func (m *NodeMutation) PropertySchemasIDs() (ids []xid.ID) {
-	if id := m.property_schemas; id != nil {
+// PropertySchemaID instead. It exists only for internal usage by the builders.
+func (m *NodeMutation) PropertySchemaIDs() (ids []xid.ID) {
+	if id := m.property_schema; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetPropertySchemas resets all changes to the "property_schemas" edge.
-func (m *NodeMutation) ResetPropertySchemas() {
-	m.property_schemas = nil
-	m.clearedproperty_schemas = false
+// ResetPropertySchema resets all changes to the "property_schema" edge.
+func (m *NodeMutation) ResetPropertySchema() {
+	m.property_schema = nil
+	m.clearedproperty_schema = false
 }
 
 // ClearLink clears the "link" edge to the Link entity.
@@ -16533,7 +16520,7 @@ func (m *NodeMutation) Fields() []string {
 	if m.owner != nil {
 		fields = append(fields, node.FieldAccountID)
 	}
-	if m.property_schemas != nil {
+	if m.property_schema != nil {
 		fields = append(fields, node.FieldPropertySchemaID)
 	}
 	if m.primary_image != nil {
@@ -16918,8 +16905,8 @@ func (m *NodeMutation) AddedEdges() []string {
 	if m.properties != nil {
 		edges = append(edges, node.EdgeProperties)
 	}
-	if m.property_schemas != nil {
-		edges = append(edges, node.EdgePropertySchemas)
+	if m.property_schema != nil {
+		edges = append(edges, node.EdgePropertySchema)
 	}
 	if m.link != nil {
 		edges = append(edges, node.EdgeLink)
@@ -16973,8 +16960,8 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case node.EdgePropertySchemas:
-		if id := m.property_schemas; id != nil {
+	case node.EdgePropertySchema:
+		if id := m.property_schema; id != nil {
 			return []ent.Value{*id}
 		}
 	case node.EdgeLink:
@@ -17089,8 +17076,8 @@ func (m *NodeMutation) ClearedEdges() []string {
 	if m.clearedproperties {
 		edges = append(edges, node.EdgeProperties)
 	}
-	if m.clearedproperty_schemas {
-		edges = append(edges, node.EdgePropertySchemas)
+	if m.clearedproperty_schema {
+		edges = append(edges, node.EdgePropertySchema)
 	}
 	if m.clearedlink {
 		edges = append(edges, node.EdgeLink)
@@ -17122,8 +17109,8 @@ func (m *NodeMutation) EdgeCleared(name string) bool {
 		return m.clearedtags
 	case node.EdgeProperties:
 		return m.clearedproperties
-	case node.EdgePropertySchemas:
-		return m.clearedproperty_schemas
+	case node.EdgePropertySchema:
+		return m.clearedproperty_schema
 	case node.EdgeLink:
 		return m.clearedlink
 	case node.EdgeContentLinks:
@@ -17147,8 +17134,8 @@ func (m *NodeMutation) ClearEdge(name string) error {
 	case node.EdgePrimaryImage:
 		m.ClearPrimaryImage()
 		return nil
-	case node.EdgePropertySchemas:
-		m.ClearPropertySchemas()
+	case node.EdgePropertySchema:
+		m.ClearPropertySchema()
 		return nil
 	case node.EdgeLink:
 		m.ClearLink()
@@ -17182,8 +17169,8 @@ func (m *NodeMutation) ResetEdge(name string) error {
 	case node.EdgeProperties:
 		m.ResetProperties()
 		return nil
-	case node.EdgePropertySchemas:
-		m.ResetPropertySchemas()
+	case node.EdgePropertySchema:
+		m.ResetPropertySchema()
 		return nil
 	case node.EdgeLink:
 		m.ResetLink()

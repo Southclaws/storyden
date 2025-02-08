@@ -14,6 +14,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
 	"github.com/Southclaws/storyden/tests"
@@ -305,6 +308,7 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 		cl *openapi.ClientWithResponses,
 		cj *session_cookie.Jar,
 		aw *account_writer.Writer,
+		db *ent.Client,
 	) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
@@ -412,6 +416,27 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 				a.Len(child.JSON200.ChildPropertySchema, 2)
 				r.Equal(len(child.JSON200.Properties), len(parent.JSON200.ChildPropertySchema))
 				matchSchemaToProperties(t, parent.JSON200.ChildPropertySchema, child.JSON200.Properties)
+			})
+
+			t.Run("deleting_nodes_is_unconstrained_by_properties", func(t *testing.T) {
+				r := require.New(t)
+				// get the schema ID used by these nodes
+				n, err := db.Node.Query().Where(node.Slug(slug1)).Only(ctx)
+				r.NoError(err)
+				r.NotNil(n)
+
+				schemaID := n.PropertySchemaID
+
+				delete, err := cl.NodeDeleteWithResponse(ctx, slug1, &openapi.NodeDeleteParams{}, session)
+				tests.Ok(t, err, delete)
+				delete, err = cl.NodeDeleteWithResponse(ctx, slug2, &openapi.NodeDeleteParams{}, session)
+				tests.Ok(t, err, delete)
+				delete, err = cl.NodeDeleteWithResponse(ctx, slug3, &openapi.NodeDeleteParams{}, session)
+				tests.Ok(t, err, delete)
+
+				c, err := db.PropertySchema.Query().Where(propertyschema.ID(schemaID)).Count(ctx)
+				r.NoError(err)
+				r.Equal(0, c, "property schema should be deleted as it is no longer in use by any nodes")
 			})
 		}))
 	}))

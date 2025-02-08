@@ -43,7 +43,7 @@ func (w SchemaWriter) CreateForNode(ctx context.Context, nodeID library.NodeID, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	schemaID, err := w.doSchemaUpdates(ctx, node.Edges.PropertySchemas, schemas, node)
+	schemaID, err := w.doSchemaUpdates(ctx, node.Edges.PropertySchema, schemas, node)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -55,7 +55,7 @@ func (w SchemaWriter) CreateForNode(ctx context.Context, nodeID library.NodeID, 
 
 func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
 	parent, err := w.db.Node.Query().Where(qk.Predicate()).WithNodes(func(nq *ent.NodeQuery) {
-		nq.WithPropertySchemas(func(psq *ent.PropertySchemaQuery) {
+		nq.WithPropertySchema(func(psq *ent.PropertySchemaQuery) {
 			psq.WithFields()
 		})
 	}).Only(ctx)
@@ -78,7 +78,7 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 		panic("schema mismatch")
 	}
 
-	currentSchema := children[0].Edges.PropertySchemas
+	currentSchema := children[0].Edges.PropertySchema
 
 	schemaID, err := w.doSchemaUpdates(ctx, currentSchema, schemas, children...)
 	if err != nil {
@@ -167,7 +167,7 @@ func (w *SchemaWriter) doSchemaUpdates(ctx context.Context, currentSchema *ent.P
 		childIDs := dt.Map(children, func(n *ent.Node) xid.ID { return n.ID })
 
 		// assign schema to all child nodes
-		err = tx.Node.Update().Where(node.IDIn(childIDs...)).SetPropertySchemas(currentSchema).Exec(ctx)
+		err = tx.Node.Update().Where(node.IDIn(childIDs...)).SetPropertySchema(currentSchema).Exec(ctx)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
