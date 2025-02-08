@@ -60,8 +60,8 @@ const (
 	EdgeTags = "tags"
 	// EdgeProperties holds the string denoting the properties edge name in mutations.
 	EdgeProperties = "properties"
-	// EdgePropertySchemas holds the string denoting the property_schemas edge name in mutations.
-	EdgePropertySchemas = "property_schemas"
+	// EdgePropertySchema holds the string denoting the property_schema edge name in mutations.
+	EdgePropertySchema = "property_schema"
 	// EdgeLink holds the string denoting the link edge name in mutations.
 	EdgeLink = "link"
 	// EdgeContentLinks holds the string denoting the content_links edge name in mutations.
@@ -111,13 +111,13 @@ const (
 	PropertiesInverseTable = "properties"
 	// PropertiesColumn is the table column denoting the properties relation/edge.
 	PropertiesColumn = "node_id"
-	// PropertySchemasTable is the table that holds the property_schemas relation/edge.
-	PropertySchemasTable = "nodes"
-	// PropertySchemasInverseTable is the table name for the PropertySchema entity.
+	// PropertySchemaTable is the table that holds the property_schema relation/edge.
+	PropertySchemaTable = "nodes"
+	// PropertySchemaInverseTable is the table name for the PropertySchema entity.
 	// It exists in this package in order to avoid circular dependency with the "propertyschema" package.
-	PropertySchemasInverseTable = "property_schemas"
-	// PropertySchemasColumn is the table column denoting the property_schemas relation/edge.
-	PropertySchemasColumn = "property_schema_id"
+	PropertySchemaInverseTable = "property_schemas"
+	// PropertySchemaColumn is the table column denoting the property_schema relation/edge.
+	PropertySchemaColumn = "property_schema_id"
 	// LinkTable is the table that holds the link relation/edge.
 	LinkTable = "nodes"
 	// LinkInverseTable is the table name for the Link entity.
@@ -385,10 +385,10 @@ func ByProperties(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByPropertySchemasField orders the results by property_schemas field.
-func ByPropertySchemasField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByPropertySchemaField orders the results by property_schema field.
+func ByPropertySchemaField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newPropertySchemasStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newPropertySchemaStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -489,11 +489,11 @@ func newPropertiesStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, PropertiesTable, PropertiesColumn),
 	)
 }
-func newPropertySchemasStep() *sqlgraph.Step {
+func newPropertySchemaStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(PropertySchemasInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, PropertySchemasTable, PropertySchemasColumn),
+		sqlgraph.To(PropertySchemaInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, PropertySchemaTable, PropertySchemaColumn),
 	)
 }
 func newLinkStep() *sqlgraph.Step {

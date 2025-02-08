@@ -716,7 +716,7 @@ var (
 				Symbol:     "properties_nodes_properties",
 				Columns:    []*schema.Column{PropertiesColumns[3]},
 				RefColumns: []*schema.Column{NodesColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 			{
 				Symbol:     "properties_property_schema_fields_properties",
@@ -771,7 +771,7 @@ var (
 				Symbol:     "property_schema_fields_property_schemas_fields",
 				Columns:    []*schema.Column{PropertySchemaFieldsColumns[4]},
 				RefColumns: []*schema.Column{PropertySchemasColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{

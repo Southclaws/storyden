@@ -156,7 +156,7 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		}).
 		WithTags().
 		WithProperties().
-		WithPropertySchemas(func(psq *ent.PropertySchemaQuery) {
+		WithPropertySchema(func(psq *ent.PropertySchemaQuery) {
 			psq.WithFields()
 		})
 

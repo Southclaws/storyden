@@ -21,6 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 )
 
 type Writer struct {
@@ -225,5 +226,26 @@ func (w *Writer) Delete(ctx context.Context, qk library.QueryKey) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
+	// NOTE: This should probably be run separately either as a background job
+	// or in parallel. However, running in a goroutine here for some reason does
+	// not delete anything, presumably because SQLite has not committed deletion
+	// performed above to disk and is running in a mode that prevents this. It
+	// may work fine on Postgres or CockroachDB though but for now this is fine.
+	w.CleanupOrphanedSchemas(ctx)
+
 	return nil
+}
+
+func (w *Writer) CleanupOrphanedSchemas(ctx context.Context) {
+	// error handling doesn't matter this is run in parallel and doesn't matter.
+	w.db.Debug().PropertySchema.
+		Delete().
+		Where(
+			propertyschema.Not(
+				propertyschema.HasNode(),
+			),
+		).
+		Exec(ctx)
+
+	return
 }

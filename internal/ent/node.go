@@ -75,8 +75,8 @@ type NodeEdges struct {
 	Tags []*Tag `json:"tags,omitempty"`
 	// Properties holds the value of the properties edge.
 	Properties []*Property `json:"properties,omitempty"`
-	// PropertySchemas holds the value of the property_schemas edge.
-	PropertySchemas *PropertySchema `json:"property_schemas,omitempty"`
+	// PropertySchema holds the value of the property_schema edge.
+	PropertySchema *PropertySchema `json:"property_schema,omitempty"`
 	// Link holds the value of the link edge.
 	Link *Link `json:"link,omitempty"`
 	// ContentLinks holds the value of the content_links edge.
@@ -159,15 +159,15 @@ func (e NodeEdges) PropertiesOrErr() ([]*Property, error) {
 	return nil, &NotLoadedError{edge: "properties"}
 }
 
-// PropertySchemasOrErr returns the PropertySchemas value or an error if the edge
+// PropertySchemaOrErr returns the PropertySchema value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e NodeEdges) PropertySchemasOrErr() (*PropertySchema, error) {
-	if e.PropertySchemas != nil {
-		return e.PropertySchemas, nil
+func (e NodeEdges) PropertySchemaOrErr() (*PropertySchema, error) {
+	if e.PropertySchema != nil {
+		return e.PropertySchema, nil
 	} else if e.loadedTypes[7] {
 		return nil, &NotFoundError{label: propertyschema.Label}
 	}
-	return nil, &NotLoadedError{edge: "property_schemas"}
+	return nil, &NotLoadedError{edge: "property_schema"}
 }
 
 // LinkOrErr returns the Link value or an error if the edge
@@ -389,9 +389,9 @@ func (n *Node) QueryProperties() *PropertyQuery {
 	return NewNodeClient(n.config).QueryProperties(n)
 }
 
-// QueryPropertySchemas queries the "property_schemas" edge of the Node entity.
-func (n *Node) QueryPropertySchemas() *PropertySchemaQuery {
-	return NewNodeClient(n.config).QueryPropertySchemas(n)
+// QueryPropertySchema queries the "property_schema" edge of the Node entity.
+func (n *Node) QueryPropertySchema() *PropertySchemaQuery {
+	return NewNodeClient(n.config).QueryPropertySchema(n)
 }
 
 // QueryLink queries the "link" edge of the Node entity.

@@ -3666,15 +3666,15 @@ func (c *NodeClient) QueryProperties(n *Node) *PropertyQuery {
 	return query
 }
 
-// QueryPropertySchemas queries the property_schemas edge of a Node.
-func (c *NodeClient) QueryPropertySchemas(n *Node) *PropertySchemaQuery {
+// QueryPropertySchema queries the property_schema edge of a Node.
+func (c *NodeClient) QueryPropertySchema(n *Node) *PropertySchemaQuery {
 	query := (&PropertySchemaClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := n.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(propertyschema.Table, propertyschema.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, node.PropertySchemasTable, node.PropertySchemasColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, node.PropertySchemaTable, node.PropertySchemaColumn),
 		)
 		fromV = sqlgraph.Neighbors(n.driver.Dialect(), step)
 		return fromV, nil

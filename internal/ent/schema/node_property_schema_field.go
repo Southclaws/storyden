@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -31,7 +32,8 @@ func (PropertySchemaField) Edges() []ent.Edge {
 			Field("schema_id").
 			Ref("fields").
 			Required().
-			Unique(),
+			Unique().
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.To("properties", Property.Type),
 	}

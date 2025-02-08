@@ -39,7 +39,7 @@ type NodeQuery struct {
 	withAssets          *AssetQuery
 	withTags            *TagQuery
 	withProperties      *PropertyQuery
-	withPropertySchemas *PropertySchemaQuery
+	withPropertySchema  *PropertySchemaQuery
 	withLink            *LinkQuery
 	withContentLinks    *LinkQuery
 	withCollections     *CollectionQuery
@@ -235,8 +235,8 @@ func (nq *NodeQuery) QueryProperties() *PropertyQuery {
 	return query
 }
 
-// QueryPropertySchemas chains the current query on the "property_schemas" edge.
-func (nq *NodeQuery) QueryPropertySchemas() *PropertySchemaQuery {
+// QueryPropertySchema chains the current query on the "property_schema" edge.
+func (nq *NodeQuery) QueryPropertySchema() *PropertySchemaQuery {
 	query := (&PropertySchemaClient{config: nq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := nq.prepareQuery(ctx); err != nil {
@@ -249,7 +249,7 @@ func (nq *NodeQuery) QueryPropertySchemas() *PropertySchemaQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(propertyschema.Table, propertyschema.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, node.PropertySchemasTable, node.PropertySchemasColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, node.PropertySchemaTable, node.PropertySchemaColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(nq.driver.Dialect(), step)
 		return fromU, nil
@@ -544,7 +544,7 @@ func (nq *NodeQuery) Clone() *NodeQuery {
 		withAssets:          nq.withAssets.Clone(),
 		withTags:            nq.withTags.Clone(),
 		withProperties:      nq.withProperties.Clone(),
-		withPropertySchemas: nq.withPropertySchemas.Clone(),
+		withPropertySchema:  nq.withPropertySchema.Clone(),
 		withLink:            nq.withLink.Clone(),
 		withContentLinks:    nq.withContentLinks.Clone(),
 		withCollections:     nq.withCollections.Clone(),
@@ -633,14 +633,14 @@ func (nq *NodeQuery) WithProperties(opts ...func(*PropertyQuery)) *NodeQuery {
 	return nq
 }
 
-// WithPropertySchemas tells the query-builder to eager-load the nodes that are connected to
-// the "property_schemas" edge. The optional arguments are used to configure the query builder of the edge.
-func (nq *NodeQuery) WithPropertySchemas(opts ...func(*PropertySchemaQuery)) *NodeQuery {
+// WithPropertySchema tells the query-builder to eager-load the nodes that are connected to
+// the "property_schema" edge. The optional arguments are used to configure the query builder of the edge.
+func (nq *NodeQuery) WithPropertySchema(opts ...func(*PropertySchemaQuery)) *NodeQuery {
 	query := (&PropertySchemaClient{config: nq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	nq.withPropertySchemas = query
+	nq.withPropertySchema = query
 	return nq
 }
 
@@ -774,7 +774,7 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 			nq.withAssets != nil,
 			nq.withTags != nil,
 			nq.withProperties != nil,
-			nq.withPropertySchemas != nil,
+			nq.withPropertySchema != nil,
 			nq.withLink != nil,
 			nq.withContentLinks != nil,
 			nq.withCollections != nil,
@@ -848,9 +848,9 @@ func (nq *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 			return nil, err
 		}
 	}
-	if query := nq.withPropertySchemas; query != nil {
-		if err := nq.loadPropertySchemas(ctx, query, nodes, nil,
-			func(n *Node, e *PropertySchema) { n.Edges.PropertySchemas = e }); err != nil {
+	if query := nq.withPropertySchema; query != nil {
+		if err := nq.loadPropertySchema(ctx, query, nodes, nil,
+			func(n *Node, e *PropertySchema) { n.Edges.PropertySchema = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -1156,7 +1156,7 @@ func (nq *NodeQuery) loadProperties(ctx context.Context, query *PropertyQuery, n
 	}
 	return nil
 }
-func (nq *NodeQuery) loadPropertySchemas(ctx context.Context, query *PropertySchemaQuery, nodes []*Node, init func(*Node), assign func(*Node, *PropertySchema)) error {
+func (nq *NodeQuery) loadPropertySchema(ctx context.Context, query *PropertySchemaQuery, nodes []*Node, init func(*Node), assign func(*Node, *PropertySchema)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Node)
 	for i := range nodes {
@@ -1404,7 +1404,7 @@ func (nq *NodeQuery) querySpec() *sqlgraph.QuerySpec {
 		if nq.withPrimaryImage != nil {
 			_spec.Node.AddColumnOnce(node.FieldPrimaryAssetID)
 		}
-		if nq.withPropertySchemas != nil {
+		if nq.withPropertySchema != nil {
 			_spec.Node.AddColumnOnce(node.FieldPropertySchemaID)
 		}
 		if nq.withLink != nil {
