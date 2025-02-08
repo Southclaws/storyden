@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
@@ -19,12 +20,13 @@ import (
 )
 
 type Querier struct {
-	db *ent.Client
-	aq *account_querier.Querier
+	db  *ent.Client
+	raw *sqlx.DB
+	aq  *account_querier.Querier
 }
 
-func New(db *ent.Client, aq *account_querier.Querier) *Querier {
-	return &Querier{db, aq}
+func New(db *ent.Client, raw *sqlx.DB, aq *account_querier.Querier) *Querier {
+	return &Querier{db, raw, aq}
 }
 
 type options struct {
@@ -43,8 +45,56 @@ func WithVisibilityRulesApplied(accountID *account.AccountID) Option {
 	}
 }
 
+const nodePropertiesQuery = `with
+  sibling_properties as (
+    select
+      ps.id         schema_id,
+      min(psf.id)   field_id,
+      min(psf.name) name,
+      min(psf.type) type,
+      min(psf.sort) sort,
+      'sibling' as source
+    from
+      nodes n
+      left join nodes sn on sn.parent_node_id = n.parent_node_id
+      inner join property_schemas ps on ps.id = sn.property_schema_id
+      or ps.id = n.property_schema_id
+      inner join property_schema_fields psf on psf.schema_id = ps.id
+    where
+      n.id = $1
+    group by ps.id, psf.id
+  ),
+  child_properties as (
+    select
+      ps.id         schema_id,
+      min(psf.id)   field_id,
+      min(psf.name) name,
+      min(psf.type) type,
+      min(psf.sort) sort,
+      'child' as source
+    from
+      nodes n
+      inner join nodes cn on cn.parent_node_id = n.id
+      inner join property_schemas ps on ps.id = cn.property_schema_id
+      inner join property_schema_fields psf on psf.schema_id = ps.id
+    where
+      n.id = $1
+    group by ps.id, psf.id
+  )
+select
+  *
+from
+  sibling_properties
+union all
+select
+  *
+from
+  child_properties
+order by source desc, sort asc
+`
+
 func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) (*library.Node, error) {
-	query := q.db.Node.Query()
+	query := q.db.Debug().Node.Query()
 
 	query.Where(qk.Predicate())
 
@@ -104,7 +154,11 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 				})
 		}).
-		WithTags()
+		WithTags().
+		WithProperties().
+		WithPropertySchema(func(psq *ent.PropertySchemaQuery) {
+			psq.WithFields()
+		})
 
 	applyVisibilityRulesPredicate(query)
 
@@ -116,6 +170,7 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 			WithOwner(func(aq *ent.AccountQuery) {
 				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 			}).
+			WithProperties().
 			Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
 	})
 
@@ -124,7 +179,13 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, err := library.NodeFromModel(col)
+	propSchema := library.PropertySchemaQueryRows{}
+	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, col.ID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	r, err := library.MapNode(true, propSchema.Map())(col)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -147,7 +208,7 @@ func (q *Querier) Probe(ctx context.Context, id library.NodeID) (*library.Node, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, err := library.NodeFromModel(col)
+	r, err := library.MapNode(true, nil)(col)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

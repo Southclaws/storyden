@@ -237,6 +237,42 @@ func (f PostFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PostMutation", m)
 }
 
+// The PropertyFunc type is an adapter to allow the use of ordinary
+// function as Property mutator.
+type PropertyFunc func(context.Context, *ent.PropertyMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PropertyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PropertyMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PropertyMutation", m)
+}
+
+// The PropertySchemaFunc type is an adapter to allow the use of ordinary
+// function as PropertySchema mutator.
+type PropertySchemaFunc func(context.Context, *ent.PropertySchemaMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PropertySchemaFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PropertySchemaMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PropertySchemaMutation", m)
+}
+
+// The PropertySchemaFieldFunc type is an adapter to allow the use of ordinary
+// function as PropertySchemaField mutator.
+type PropertySchemaFieldFunc func(context.Context, *ent.PropertySchemaFieldMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PropertySchemaFieldFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PropertySchemaFieldMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PropertySchemaFieldMutation", m)
+}
+
 // The QuestionFunc type is an adapter to allow the use of ordinary
 // function as Question mutator.
 type QuestionFunc func(context.Context, *ent.QuestionMutation) (ent.Value, error)

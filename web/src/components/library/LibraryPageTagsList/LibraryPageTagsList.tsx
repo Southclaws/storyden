@@ -105,7 +105,6 @@ export function LibraryPageTagsList<T extends FieldValues>(props: Props<T>) {
                   title="Suggest tags for this page"
                   onClick={handleSuggestTags}
                   variant="subtle"
-                  h="full"
                   loading={loadingTags}
                 />
               )}

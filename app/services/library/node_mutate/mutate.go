@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
+	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
@@ -33,6 +34,7 @@ type Partial struct {
 	PrimaryImage deletable.Value[asset.AssetID]
 	Content      opt.Optional[datagraph.Content]
 	Parent       opt.Optional[library.QueryKey]
+	Properties   opt.Optional[library.PropertyMutationList]
 	Tags         opt.Optional[tag_ref.Names]
 	Visibility   opt.Optional[visibility.Visibility]
 	Metadata     opt.Optional[map[string]any]
@@ -50,6 +52,8 @@ type Manager struct {
 	accountQuery      *account_querier.Querier
 	nodeQuerier       *node_querier.Querier
 	nodeWriter        *node_writer.Writer
+	schemaWriter      *node_properties.SchemaWriter
+	propWriter        *node_properties.Writer
 	tagWriter         *tag_writer.Writer
 	titler            generative.Titler
 	tagger            *autotagger.Tagger
@@ -66,6 +70,8 @@ func New(
 	accountQuery *account_querier.Querier,
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
+	schemaWriter *node_properties.SchemaWriter,
+	propWriter *node_properties.Writer,
 	tagWriter *tag_writer.Writer,
 	titler generative.Titler,
 	tagger *autotagger.Tagger,
@@ -81,6 +87,8 @@ func New(
 		accountQuery:      accountQuery,
 		nodeQuerier:       nodeQuerier,
 		nodeWriter:        nodeWriter,
+		schemaWriter:      schemaWriter,
+		propWriter:        propWriter,
 		tagWriter:         tagWriter,
 		titler:            titler,
 		tagger:            tagger,

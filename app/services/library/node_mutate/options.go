@@ -6,6 +6,8 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -13,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/tag"
@@ -28,9 +31,10 @@ type preMutationResult struct {
 	// returns tag suggestions which can be opted out of being applied directly.
 	// This may change in future but it would require breaking public API change
 	// and it works pretty well at the moment as an API design, so not critical.
-	tags    opt.Optional[tag_ref.Names]
-	title   opt.Optional[string]
-	content opt.Optional[datagraph.Content]
+	tags       opt.Optional[tag_ref.Names]
+	title      opt.Optional[string]
+	content    opt.Optional[datagraph.Content]
+	properties opt.Optional[library.PropertyMutationList]
 }
 
 // preMutation constructs node_writer options for a create or partial update.
@@ -185,10 +189,11 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 	}
 
 	return &preMutationResult{
-		opts:    opts,
-		tags:    tagSuggestions,
-		title:   titleSuggestion,
-		content: contentSuggestion,
+		opts:       opts,
+		tags:       tagSuggestions,
+		title:      titleSuggestion,
+		content:    contentSuggestion,
+		properties: p.Properties,
 	}, nil
 }
 
@@ -292,4 +297,74 @@ func (s *Manager) buildSummaryOpts(ctx context.Context, content datagraph.Conten
 	}
 
 	return &newContent, nil
+}
+
+type postMutationResult struct {
+	properties opt.Optional[library.PropertyTable]
+}
+
+// NOTE: "post" as in afterwards, not "post" as in thread/reply post...
+func (s *Manager) postMutation(ctx context.Context, n *library.Node, pre *preMutationResult) (*postMutationResult, error) {
+	updatedProperties := opt.New(library.PropertyTable{})
+
+	if properties, ok := pre.properties.Get(); ok {
+		schema, hasSchema := n.Properties.Get()
+
+		newProperties, existingProperties := schema.Schema.Split(properties)
+
+		if !hasSchema {
+			mutations, err := dt.MapErr(newProperties, mapNewPropertyMutation)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+
+			newSchema, err := s.schemaWriter.CreateForNode(ctx, library.NodeID(n.Mark.ID()), mutations)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+
+			schema.Schema = *newSchema
+		}
+
+		if len(newProperties) > 0 {
+			newSchemaFields, err := dt.MapErr(newProperties, mapNewPropertyMutation)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+
+			newSchema, err := s.schemaWriter.AddFields(ctx, schema.Schema.ID, newSchemaFields)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+
+			schema.Schema = *newSchema
+		}
+
+		_, existingProperties = schema.Schema.Split(properties)
+
+		// Assumption: all schema changes are done by this point. Update no
+		// longer needs to actually check the schema, just write the data.
+		updated, err := s.propWriter.Update(ctx, library.NodeID(n.GetID()), schema.Schema, existingProperties)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		updatedProperties = opt.NewPtr(updated)
+	}
+
+	return &postMutationResult{
+		properties: updatedProperties,
+	}, nil
+}
+
+func mapNewPropertyMutation(pm library.PropertyMutation) (*node_properties.SchemaFieldMutation, error) {
+	ft, ok := pm.Type.Get()
+	if !ok {
+		return nil, fault.Wrap(fault.New("no type on new field"), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("missing type", "You must provide a field type when adding a new property."))
+	}
+	return &node_properties.SchemaFieldMutation{
+		Name: pm.Name,
+		Type: ft,
+		Sort: pm.Sort.OrZero(),
+	}, nil
 }

@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -24,6 +25,7 @@ func (Node) Fields() []ent.Field {
 		field.String("content").Optional().Nillable(),
 		field.String("parent_node_id").GoType(xid.ID{}).Optional(),
 		field.String("account_id").GoType(xid.ID{}),
+		field.String("property_schema_id").GoType(xid.ID{}).Optional(),
 		field.String("primary_asset_id").GoType(xid.ID{}).Optional().Nillable(),
 		field.String("link_id").GoType(xid.ID{}).Optional(),
 		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
@@ -59,6 +61,14 @@ func (Node) Edges() []ent.Edge {
 
 		edge.From("tags", Tag.Type).
 			Ref("nodes"),
+
+		edge.To("properties", Property.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+		edge.From("property_schema", PropertySchema.Type).
+			Field("property_schema_id").
+			Ref("node").
+			Unique().
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.From("link", Link.Type).
 			Field("link_id").

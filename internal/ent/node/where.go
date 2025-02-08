@@ -106,6 +106,11 @@ func AccountID(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldAccountID, v))
 }
 
+// PropertySchemaID applies equality check predicate on the "property_schema_id" field. It's identical to PropertySchemaIDEQ.
+func PropertySchemaID(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldPropertySchemaID, v))
+}
+
 // PrimaryAssetID applies equality check predicate on the "primary_asset_id" field. It's identical to PrimaryAssetIDEQ.
 func PrimaryAssetID(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldPrimaryAssetID, v))
@@ -726,6 +731,86 @@ func AccountIDContainsFold(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldContainsFold(FieldAccountID, vc))
 }
 
+// PropertySchemaIDEQ applies the EQ predicate on the "property_schema_id" field.
+func PropertySchemaIDEQ(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldPropertySchemaID, v))
+}
+
+// PropertySchemaIDNEQ applies the NEQ predicate on the "property_schema_id" field.
+func PropertySchemaIDNEQ(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldNEQ(FieldPropertySchemaID, v))
+}
+
+// PropertySchemaIDIn applies the In predicate on the "property_schema_id" field.
+func PropertySchemaIDIn(vs ...xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldIn(FieldPropertySchemaID, vs...))
+}
+
+// PropertySchemaIDNotIn applies the NotIn predicate on the "property_schema_id" field.
+func PropertySchemaIDNotIn(vs ...xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldNotIn(FieldPropertySchemaID, vs...))
+}
+
+// PropertySchemaIDGT applies the GT predicate on the "property_schema_id" field.
+func PropertySchemaIDGT(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldGT(FieldPropertySchemaID, v))
+}
+
+// PropertySchemaIDGTE applies the GTE predicate on the "property_schema_id" field.
+func PropertySchemaIDGTE(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldGTE(FieldPropertySchemaID, v))
+}
+
+// PropertySchemaIDLT applies the LT predicate on the "property_schema_id" field.
+func PropertySchemaIDLT(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldLT(FieldPropertySchemaID, v))
+}
+
+// PropertySchemaIDLTE applies the LTE predicate on the "property_schema_id" field.
+func PropertySchemaIDLTE(v xid.ID) predicate.Node {
+	return predicate.Node(sql.FieldLTE(FieldPropertySchemaID, v))
+}
+
+// PropertySchemaIDContains applies the Contains predicate on the "property_schema_id" field.
+func PropertySchemaIDContains(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldContains(FieldPropertySchemaID, vc))
+}
+
+// PropertySchemaIDHasPrefix applies the HasPrefix predicate on the "property_schema_id" field.
+func PropertySchemaIDHasPrefix(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldHasPrefix(FieldPropertySchemaID, vc))
+}
+
+// PropertySchemaIDHasSuffix applies the HasSuffix predicate on the "property_schema_id" field.
+func PropertySchemaIDHasSuffix(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldHasSuffix(FieldPropertySchemaID, vc))
+}
+
+// PropertySchemaIDIsNil applies the IsNil predicate on the "property_schema_id" field.
+func PropertySchemaIDIsNil() predicate.Node {
+	return predicate.Node(sql.FieldIsNull(FieldPropertySchemaID))
+}
+
+// PropertySchemaIDNotNil applies the NotNil predicate on the "property_schema_id" field.
+func PropertySchemaIDNotNil() predicate.Node {
+	return predicate.Node(sql.FieldNotNull(FieldPropertySchemaID))
+}
+
+// PropertySchemaIDEqualFold applies the EqualFold predicate on the "property_schema_id" field.
+func PropertySchemaIDEqualFold(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldEqualFold(FieldPropertySchemaID, vc))
+}
+
+// PropertySchemaIDContainsFold applies the ContainsFold predicate on the "property_schema_id" field.
+func PropertySchemaIDContainsFold(v xid.ID) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldContainsFold(FieldPropertySchemaID, vc))
+}
+
 // PrimaryAssetIDEQ applies the EQ predicate on the "primary_asset_id" field.
 func PrimaryAssetIDEQ(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldPrimaryAssetID, v))
@@ -1046,6 +1131,52 @@ func HasTags() predicate.Node {
 func HasTagsWith(preds ...predicate.Tag) predicate.Node {
 	return predicate.Node(func(s *sql.Selector) {
 		step := newTagsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasProperties applies the HasEdge predicate on the "properties" edge.
+func HasProperties() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PropertiesTable, PropertiesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPropertiesWith applies the HasEdge predicate on the "properties" edge with a given conditions (other predicates).
+func HasPropertiesWith(preds ...predicate.Property) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newPropertiesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasPropertySchema applies the HasEdge predicate on the "property_schema" edge.
+func HasPropertySchema() predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, PropertySchemaTable, PropertySchemaColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPropertySchemaWith applies the HasEdge predicate on the "property_schema" edge with a given conditions (other predicates).
+func HasPropertySchemaWith(preds ...predicate.PropertySchema) predicate.Node {
+	return predicate.Node(func(s *sql.Selector) {
+		step := newPropertySchemaStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
