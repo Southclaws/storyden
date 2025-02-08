@@ -31,6 +31,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/property"
+	"github.com/Southclaws/storyden/internal/ent/propertyschema"
+	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
@@ -96,30 +99,33 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			account.Table:          account.ValidColumn,
-			accountfollow.Table:    accountfollow.ValidColumn,
-			accountroles.Table:     accountroles.ValidColumn,
-			asset.Table:            asset.ValidColumn,
-			authentication.Table:   authentication.ValidColumn,
-			category.Table:         category.ValidColumn,
-			collection.Table:       collection.ValidColumn,
-			collectionnode.Table:   collectionnode.ValidColumn,
-			collectionpost.Table:   collectionpost.ValidColumn,
-			email.Table:            email.ValidColumn,
-			event.Table:            event.ValidColumn,
-			eventparticipant.Table: eventparticipant.ValidColumn,
-			invitation.Table:       invitation.ValidColumn,
-			likepost.Table:         likepost.ValidColumn,
-			link.Table:             link.ValidColumn,
-			mentionprofile.Table:   mentionprofile.ValidColumn,
-			node.Table:             node.ValidColumn,
-			notification.Table:     notification.ValidColumn,
-			post.Table:             post.ValidColumn,
-			question.Table:         question.ValidColumn,
-			react.Table:            react.ValidColumn,
-			role.Table:             role.ValidColumn,
-			setting.Table:          setting.ValidColumn,
-			tag.Table:              tag.ValidColumn,
+			account.Table:             account.ValidColumn,
+			accountfollow.Table:       accountfollow.ValidColumn,
+			accountroles.Table:        accountroles.ValidColumn,
+			asset.Table:               asset.ValidColumn,
+			authentication.Table:      authentication.ValidColumn,
+			category.Table:            category.ValidColumn,
+			collection.Table:          collection.ValidColumn,
+			collectionnode.Table:      collectionnode.ValidColumn,
+			collectionpost.Table:      collectionpost.ValidColumn,
+			email.Table:               email.ValidColumn,
+			event.Table:               event.ValidColumn,
+			eventparticipant.Table:    eventparticipant.ValidColumn,
+			invitation.Table:          invitation.ValidColumn,
+			likepost.Table:            likepost.ValidColumn,
+			link.Table:                link.ValidColumn,
+			mentionprofile.Table:      mentionprofile.ValidColumn,
+			node.Table:                node.ValidColumn,
+			notification.Table:        notification.ValidColumn,
+			post.Table:                post.ValidColumn,
+			property.Table:            property.ValidColumn,
+			propertyschema.Table:      propertyschema.ValidColumn,
+			propertyschemafield.Table: propertyschemafield.ValidColumn,
+			question.Table:            question.ValidColumn,
+			react.Table:               react.ValidColumn,
+			role.Table:                role.ValidColumn,
+			setting.Table:             setting.ValidColumn,
+			tag.Table:                 tag.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

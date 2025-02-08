@@ -13,6 +13,7 @@ import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
 import type { NodeName } from "./nodeName";
 import type { PostContent } from "./postContent";
+import type { PropertyList } from "./propertyList";
 import type { Slug } from "./slug";
 import type { TagNameList } from "./tagNameList";
 import type { Url } from "./url";
@@ -26,6 +27,7 @@ export interface NodeInitialProps {
   name: NodeName;
   parent?: Slug;
   primary_image_asset_id?: Identifier;
+  properties?: PropertyList;
   slug?: Slug;
   tags?: TagNameList;
   url?: Url;

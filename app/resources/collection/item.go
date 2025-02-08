@@ -111,7 +111,7 @@ func MapNode(n *ent.CollectionNode) (*CollectionItem, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	item, err := library.NodeFromModel(p)
+	item, err := library.MapNode(true, nil)(p)
 	if err != nil {
 		return nil, err
 	}

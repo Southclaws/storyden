@@ -560,6 +560,7 @@ var (
 		{Name: "link_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "parent_node_id", Type: field.TypeString, Nullable: true, Size: 20},
 		{Name: "primary_asset_id", Type: field.TypeString, Nullable: true, Size: 20},
+		{Name: "property_schema_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// NodesTable holds the schema information for the "nodes" table.
 	NodesTable = &schema.Table{
@@ -589,6 +590,12 @@ var (
 				Symbol:     "nodes_assets_primary_image",
 				Columns:    []*schema.Column{NodesColumns[14]},
 				RefColumns: []*schema.Column{AssetsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "nodes_property_schemas_node",
+				Columns:    []*schema.Column{NodesColumns[15]},
+				RefColumns: []*schema.Column{PropertySchemasColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -688,6 +695,95 @@ var (
 				Columns:    []*schema.Column{PostsColumns[17]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// PropertiesColumns holds the columns for the "properties" table.
+	PropertiesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "value", Type: field.TypeString},
+		{Name: "node_id", Type: field.TypeString, Size: 20},
+		{Name: "field_id", Type: field.TypeString, Size: 20},
+	}
+	// PropertiesTable holds the schema information for the "properties" table.
+	PropertiesTable = &schema.Table{
+		Name:       "properties",
+		Columns:    PropertiesColumns,
+		PrimaryKey: []*schema.Column{PropertiesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "properties_nodes_properties",
+				Columns:    []*schema.Column{PropertiesColumns[3]},
+				RefColumns: []*schema.Column{NodesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "properties_property_schema_fields_properties",
+				Columns:    []*schema.Column{PropertiesColumns[4]},
+				RefColumns: []*schema.Column{PropertySchemaFieldsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "property_field_id_node_id",
+				Unique:  true,
+				Columns: []*schema.Column{PropertiesColumns[4], PropertiesColumns[3]},
+			},
+			{
+				Name:    "property_field_id",
+				Unique:  false,
+				Columns: []*schema.Column{PropertiesColumns[4]},
+			},
+			{
+				Name:    "property_node_id",
+				Unique:  false,
+				Columns: []*schema.Column{PropertiesColumns[3]},
+			},
+		},
+	}
+	// PropertySchemasColumns holds the columns for the "property_schemas" table.
+	PropertySchemasColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+	}
+	// PropertySchemasTable holds the schema information for the "property_schemas" table.
+	PropertySchemasTable = &schema.Table{
+		Name:       "property_schemas",
+		Columns:    PropertySchemasColumns,
+		PrimaryKey: []*schema.Column{PropertySchemasColumns[0]},
+	}
+	// PropertySchemaFieldsColumns holds the columns for the "property_schema_fields" table.
+	PropertySchemaFieldsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "name", Type: field.TypeString},
+		{Name: "type", Type: field.TypeString},
+		{Name: "sort", Type: field.TypeString},
+		{Name: "schema_id", Type: field.TypeString, Size: 20},
+	}
+	// PropertySchemaFieldsTable holds the schema information for the "property_schema_fields" table.
+	PropertySchemaFieldsTable = &schema.Table{
+		Name:       "property_schema_fields",
+		Columns:    PropertySchemaFieldsColumns,
+		PrimaryKey: []*schema.Column{PropertySchemaFieldsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "property_schema_fields_property_schemas_fields",
+				Columns:    []*schema.Column{PropertySchemaFieldsColumns[4]},
+				RefColumns: []*schema.Column{PropertySchemasColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "propertyschemafield_schema_id_name",
+				Unique:  true,
+				Columns: []*schema.Column{PropertySchemaFieldsColumns[4], PropertySchemaFieldsColumns[1]},
+			},
+			{
+				Name:    "propertyschemafield_name",
+				Unique:  false,
+				Columns: []*schema.Column{PropertySchemaFieldsColumns[1]},
 			},
 		},
 	}
@@ -1019,6 +1115,9 @@ var (
 		NodesTable,
 		NotificationsTable,
 		PostsTable,
+		PropertiesTable,
+		PropertySchemasTable,
+		PropertySchemaFieldsTable,
 		QuestionsTable,
 		ReactsTable,
 		RolesTable,
@@ -1066,6 +1165,7 @@ func init() {
 	NodesTable.ForeignKeys[1].RefTable = LinksTable
 	NodesTable.ForeignKeys[2].RefTable = NodesTable
 	NodesTable.ForeignKeys[3].RefTable = AssetsTable
+	NodesTable.ForeignKeys[4].RefTable = PropertySchemasTable
 	NotificationsTable.ForeignKeys[0].RefTable = AccountsTable
 	NotificationsTable.ForeignKeys[1].RefTable = AccountsTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
@@ -1073,6 +1173,9 @@ func init() {
 	PostsTable.ForeignKeys[2].RefTable = LinksTable
 	PostsTable.ForeignKeys[3].RefTable = PostsTable
 	PostsTable.ForeignKeys[4].RefTable = PostsTable
+	PropertiesTable.ForeignKeys[0].RefTable = NodesTable
+	PropertiesTable.ForeignKeys[1].RefTable = PropertySchemaFieldsTable
+	PropertySchemaFieldsTable.ForeignKeys[0].RefTable = PropertySchemasTable
 	QuestionsTable.ForeignKeys[0].RefTable = AccountsTable
 	QuestionsTable.ForeignKeys[1].RefTable = QuestionsTable
 	ReactsTable.ForeignKeys[0].RefTable = AccountsTable

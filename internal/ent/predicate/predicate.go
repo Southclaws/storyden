@@ -63,6 +63,15 @@ type Notification func(*sql.Selector)
 // Post is the predicate function for post builders.
 type Post func(*sql.Selector)
 
+// Property is the predicate function for property builders.
+type Property func(*sql.Selector)
+
+// PropertySchema is the predicate function for propertyschema builders.
+type PropertySchema func(*sql.Selector)
+
+// PropertySchemaField is the predicate function for propertyschemafield builders.
+type PropertySchemaField func(*sql.Selector)
+
 // Question is the predicate function for question builders.
 type Question func(*sql.Selector)
 

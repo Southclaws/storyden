@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/tag"
@@ -23,6 +24,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
+	"github.com/Southclaws/storyden/app/services/library/node_property_schema"
 	"github.com/Southclaws/storyden/app/services/library/node_read"
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
@@ -31,12 +33,13 @@ import (
 )
 
 type Nodes struct {
-	accountQuery *account_querier.Querier
-	nodeMutator  *node_mutate.Manager
-	nodeReader   *node_read.HydratedQuerier
-	nv           *node_visibility.Controller
-	ntree        nodetree.Graph
-	ntr          node_traversal.Repository
+	accountQuery  *account_querier.Querier
+	nodeMutator   *node_mutate.Manager
+	nodeReader    *node_read.HydratedQuerier
+	nv            *node_visibility.Controller
+	ntree         nodetree.Graph
+	ntr           node_traversal.Repository
+	schemaUpdater *node_property_schema.Updater
 }
 
 func NewNodes(
@@ -46,14 +49,16 @@ func NewNodes(
 	nv *node_visibility.Controller,
 	ntree nodetree.Graph,
 	ntr node_traversal.Repository,
+	schemaUpdater *node_property_schema.Updater,
 ) Nodes {
 	return Nodes{
-		accountQuery: accountQuery,
-		nodeMutator:  nodeMutator,
-		nodeReader:   nodeReader,
-		nv:           nv,
-		ntree:        ntree,
-		ntr:          ntr,
+		accountQuery:  accountQuery,
+		nodeMutator:   nodeMutator,
+		nodeReader:    nodeReader,
+		nv:            nv,
+		ntree:         ntree,
+		ntr:           ntr,
+		schemaUpdater: schemaUpdater,
 	}
 }
 
@@ -316,6 +321,47 @@ func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteReques
 	}, nil
 }
 
+func (c *Nodes) NodeUpdateChildrenPropertySchema(ctx context.Context, request openapi.NodeUpdateChildrenPropertySchemaRequestObject) (openapi.NodeUpdateChildrenPropertySchemaResponseObject, error) {
+	schemas := dt.Map(*request.Body, func(p openapi.PropertySchemaMutableProps) *node_properties.SchemaFieldMutation {
+		return &node_properties.SchemaFieldMutation{
+			ID:   opt.Map(opt.NewPtr(p.Fid), deserialiseID),
+			Name: p.Name,
+			Type: p.Type,
+			Sort: p.Sort,
+		}
+	})
+
+	updated, err := c.schemaUpdater.UpdateChildren(ctx, deserialiseNodeMark(request.NodeSlug), schemas)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.NodeUpdateChildrenPropertySchema200JSONResponse{
+		NodeUpdateChildrenPropertySchemaOKJSONResponse: openapi.NodeUpdateChildrenPropertySchemaOKJSONResponse{
+			Properties: serialisePropertySchemas(*updated),
+		},
+	}, nil
+}
+
+func (c *Nodes) NodeUpdateProperties(ctx context.Context, request openapi.NodeUpdatePropertiesRequestObject) (openapi.NodeUpdatePropertiesResponseObject, error) {
+	pml := deserialisePropertyMutationList(request.Body.Properties)
+
+	updated, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
+		Properties: opt.New(pml),
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	properties := opt.Map(updated.Properties, serialisePropertyList)
+
+	return openapi.NodeUpdateProperties200JSONResponse{
+		NodeUpdatePropertiesOKJSONResponse: openapi.NodeUpdatePropertiesOKJSONResponse{
+			Properties: properties.OrZero(),
+		},
+	}, nil
+}
+
 func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRequestObject) (openapi.NodeAddAssetResponseObject, error) {
 	id := openapi.ParseID(request.AssetId)
 
@@ -418,6 +464,9 @@ func serialiseNode(in *library.Node) openapi.Node {
 
 func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 	rs := opt.Map(in.RelevanceScore, func(v float64) float32 { return float32(v) })
+	properties := opt.Map(in.Properties, serialisePropertyList)
+	childPropertySchema := opt.Map(in.ChildProperties, serialisePropertySchemaList)
+
 	return openapi.NodeWithChildren{
 		Id:           in.Mark.ID().String(),
 		CreatedAt:    in.CreatedAt,
@@ -433,11 +482,13 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
-		Tags:           serialiseTagReferenceList(in.Tags),
-		Visibility:     serialiseVisibility(in.Visibility),
-		RelevanceScore: rs.Ptr(),
-		Meta:           in.Metadata,
-		Children:       dt.Map(in.Nodes, serialiseNodeWithItems),
+		Properties:          properties.OrZero(),
+		ChildPropertySchema: childPropertySchema.OrZero(),
+		Tags:                serialiseTagReferenceList(in.Tags),
+		Visibility:          serialiseVisibility(in.Visibility),
+		RelevanceScore:      rs.Ptr(),
+		Meta:                in.Metadata,
+		Children:            dt.Map(in.Nodes, serialiseNodeWithItems),
 	}
 }
 
@@ -480,6 +531,54 @@ func deserialiseContentFillRule(in openapi.ContentFillRule) (asset.ContentFillRu
 
 func deserialiseFillSource(in openapi.FillSource) (asset.FillSource, error) {
 	return asset.NewFillSource(string(in))
+}
+
+func serialiseProperty(in *library.Property) openapi.Property {
+	return openapi.Property{
+		Fid:   in.Field.ID.String(),
+		Name:  in.Field.Name,
+		Type:  in.Field.Type,
+		Sort:  in.Field.Sort,
+		Value: opt.Map(in.Value, func(v string) string { return v }).Ptr(),
+	}
+}
+
+func serialisePropertyList(in library.PropertyTable) openapi.PropertyList {
+	return dt.Map(in.Properties, serialiseProperty)
+}
+
+func serialisePropertySchema(in *library.PropertySchemaField) openapi.PropertySchema {
+	return openapi.PropertySchema{
+		Fid:  in.ID.String(),
+		Name: in.Name,
+		Type: in.Type,
+		Sort: in.Sort,
+	}
+}
+
+func serialisePropertySchemas(in library.PropertySchema) openapi.PropertySchemaList {
+	return dt.Map(in.Fields, serialisePropertySchema)
+}
+
+func serialisePropertySchemaList(in library.PropertySchema) openapi.PropertySchemaList {
+	if len(in.Fields) == 0 {
+		return nil
+	}
+	schemas := dt.Map(in.Fields, serialisePropertySchema)
+	return schemas
+}
+
+func deserialisePropertyMutationList(in openapi.PropertyMutationList) library.PropertyMutationList {
+	return dt.Map(in, deserialisePropertyMutation)
+}
+
+func deserialisePropertyMutation(in openapi.PropertyMutation) library.PropertyMutation {
+	return library.PropertyMutation{
+		Name:  in.Name,
+		Value: in.Value,
+		Type:  opt.NewPtr(in.Type),
+		Sort:  opt.NewPtr(in.Sort),
+	}
 }
 
 func getContentFillRuleSourceCommand(contentFillRuleParam *openapi.ContentFillRule, contentFillSourceParam *openapi.FillSourceQuery) (opt.Optional[asset.ContentFillCommand], error) {

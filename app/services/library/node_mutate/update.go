@@ -54,6 +54,16 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	post, err := s.postMutation(ctx, n, pre)
+	if err != nil {
+		// TODO: Does this need to error?
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if post.properties != nil {
+		n.Properties = post.properties
+	}
+
 	if n.Visibility == visibility.VisibilityPublished {
 		if err := s.indexQueue.Publish(ctx, mq.IndexNode{
 			ID: library.NodeID(n.Mark.ID()),

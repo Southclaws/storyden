@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/services/library/node_fill"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
+	"github.com/Southclaws/storyden/app/services/library/node_property_schema"
 	"github.com/Southclaws/storyden/app/services/library/node_read"
 	"github.com/Southclaws/storyden/app/services/library/node_semdex"
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
@@ -13,7 +14,7 @@ import (
 
 func Build() fx.Option {
 	return fx.Options(
-		fx.Provide(node_read.New, node_mutate.New, nodetree.New, node_visibility.New, node_fill.New),
+		fx.Provide(node_read.New, node_mutate.New, nodetree.New, node_visibility.New, node_fill.New, node_property_schema.New),
 		node_semdex.Build(),
 	)
 }

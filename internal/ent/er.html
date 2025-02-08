@@ -171,6 +171,7 @@ erDiagram
         string content
         xidDOTID parent_node_id
         xidDOTID account_id
+        xidDOTID property_schema_id
         xidDOTID primary_asset_id
         xidDOTID link_id
         nodeDOTVisibility visibility
@@ -206,6 +207,23 @@ erDiagram
         xidDOTID account_posts
         xidDOTID category_id
         xidDOTID link_id
+    }
+    Property {
+        xidDOTID id
+        timeDOTTime created_at
+        xidDOTID node_id
+        xidDOTID field_id
+        string value
+    }
+    PropertySchema {
+        xidDOTID id
+    }
+    PropertySchemaField {
+        xidDOTID id
+        string name
+        string type
+        string sort
+        xidDOTID schema_id
     }
     Question {
         xidDOTID id
@@ -285,6 +303,7 @@ erDiagram
     	Node |o--o{ Node : "nodes/parent"
     	Node }o--o| Asset : "primary_image"
     	Node }o--o{ Asset : "assets/nodes"
+    	Node |o--o{ Property : "properties/node"
     	Post |o--o{ Post : "posts/root"
     	Post |o--o{ Post : "replies/replyTo"
     	Post |o--o{ React : "reacts/Post"
@@ -292,6 +311,9 @@ erDiagram
     	Post |o--o{ MentionProfile : "mentions/Post"
     	Post }o--o{ Asset : "assets/posts"
     	Post |o--o{ Event : "event/thread"
+    	PropertySchema |o--o{ Node : "node/property_schema"
+    	PropertySchema |o--o{ PropertySchemaField : "fields/schema"
+    	PropertySchemaField |o--o{ Property : "properties/schema"
     	Question |o--o{ Question : "parent_question/parent"
     	Role }o--o{ Account : "accounts/roles"
     	Tag }o--o{ Post : "posts/tags"
