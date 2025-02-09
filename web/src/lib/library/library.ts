@@ -122,6 +122,8 @@ export function useLibraryMutation(node?: Node) {
       slug: slugify(name),
       description: "",
       owner: session,
+      properties: [],
+      child_property_schema: [],
       meta: {},
       children: [],
       assets: [],

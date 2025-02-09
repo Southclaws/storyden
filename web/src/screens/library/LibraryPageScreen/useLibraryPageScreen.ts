@@ -46,6 +46,7 @@ const CoverImageFormSchema = z.union([
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name."),
   slug: z.string().optional(),
+  properties: z.array(z.tuple([z.string(), z.string()])).optional(),
   tags: z.string().array().optional(),
   link: z.preprocess((v) => {
     if (typeof v === "string" && v === "") {
@@ -100,6 +101,7 @@ export function useLibraryPageScreen({ node }: Props) {
     () => ({
       name: node.name,
       slug: node.slug,
+      properties: node.properties.map((p) => [p.name, p.value ?? ""]),
       tags: node.tags.map((t) => t.name),
       link: node.link?.url,
       description: node.description,
