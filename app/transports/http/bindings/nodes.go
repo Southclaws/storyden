@@ -353,11 +353,11 @@ func (c *Nodes) NodeUpdateProperties(ctx context.Context, request openapi.NodeUp
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	properties := opt.Map(updated.Properties, serialisePropertyList)
+	properties := serialisePropertyTableOpt(updated.Properties)
 
 	return openapi.NodeUpdateProperties200JSONResponse{
 		NodeUpdatePropertiesOKJSONResponse: openapi.NodeUpdatePropertiesOKJSONResponse{
-			Properties: properties.OrZero(),
+			Properties: properties,
 		},
 	}, nil
 }
@@ -464,7 +464,7 @@ func serialiseNode(in *library.Node) openapi.Node {
 
 func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 	rs := opt.Map(in.RelevanceScore, func(v float64) float32 { return float32(v) })
-	properties := opt.Map(in.Properties, serialisePropertyList)
+	properties := opt.Map(in.Properties, serialisePropertyTable)
 	childPropertySchema := opt.Map(in.ChildProperties, serialisePropertySchemaList)
 
 	return openapi.NodeWithChildren{
@@ -482,8 +482,8 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
-		Properties:          properties.OrZero(),
-		ChildPropertySchema: childPropertySchema.OrZero(),
+		Properties:          properties.Or([]openapi.Property{}),
+		ChildPropertySchema: childPropertySchema.Or([]openapi.PropertySchema{}),
 		Tags:                serialiseTagReferenceList(in.Tags),
 		Visibility:          serialiseVisibility(in.Visibility),
 		RelevanceScore:      rs.Ptr(),
@@ -543,8 +543,24 @@ func serialiseProperty(in *library.Property) openapi.Property {
 	}
 }
 
-func serialisePropertyList(in library.PropertyTable) openapi.PropertyList {
-	return dt.Map(in.Properties, serialiseProperty)
+func serialisePropertyList(in library.Properties) openapi.PropertyList {
+	return dt.Map(in, serialiseProperty)
+}
+
+func serialisePropertyTable(in library.PropertyTable) openapi.PropertyList {
+	if len(in.Properties) == 0 {
+		return openapi.PropertyList{}
+	}
+
+	return serialisePropertyList(in.Properties)
+}
+
+func serialisePropertyTableOpt(in opt.Optional[library.PropertyTable]) openapi.PropertyList {
+	pt, ok := in.Get()
+	if !ok {
+		return openapi.PropertyList{}
+	}
+	return serialisePropertyList(pt.Properties)
 }
 
 func serialisePropertySchema(in *library.PropertySchemaField) openapi.PropertySchema {
@@ -562,10 +578,18 @@ func serialisePropertySchemas(in library.PropertySchema) openapi.PropertySchemaL
 
 func serialisePropertySchemaList(in library.PropertySchema) openapi.PropertySchemaList {
 	if len(in.Fields) == 0 {
-		return nil
+		return openapi.PropertySchemaList{}
 	}
-	schemas := dt.Map(in.Fields, serialisePropertySchema)
-	return schemas
+
+	return dt.Map(in.Fields, serialisePropertySchema)
+}
+
+func serialisePropertySchemaListOpt(in opt.Optional[library.PropertySchema]) openapi.PropertySchemaList {
+	pt, ok := in.Get()
+	if !ok {
+		return openapi.PropertySchemaList{}
+	}
+	return serialisePropertySchemaList(pt)
 }
 
 func deserialisePropertyMutationList(in openapi.PropertyMutationList) library.PropertyMutationList {

@@ -24,50 +24,61 @@ export type Props<T extends FieldValues> = Omit<
   node: NodeWithChildren;
 };
 
-export function LibraryPagePropertyTable<T extends FieldValues>(
-  props: Props<T>,
-) {
+export function LibraryPagePropertyTable<T extends FieldValues>({
+  editing,
+  node,
+  ...props
+}: Props<T>) {
   return (
-    <styled.dl display="table" borderCollapse="collapse">
-      {props.node.properties.map((p) => {
-        if (!p.value) {
-          return null;
-        }
+    <Controller
+      {...props}
+      render={({ field, fieldState, formState }) => {
+        //
 
         return (
-          <HStack key={p.name} display="table-row">
-            <styled.dt
-              display="table-cell"
-              w="32"
-              p="1"
-              borderRadius="sm"
-              textOverflow="ellipsis"
-              overflowX="hidden"
-              color="fg.muted"
-              _hover={{
-                color: "fg.default",
-                background: "bg.muted",
-                cursor: "pointer",
-              }}
-            >
-              {p.name}
-            </styled.dt>
-            <styled.dd
-              display="table-cell"
-              p="1"
-              w="min"
-              borderRadius="sm"
-              _hover={{
-                color: "fg.default",
-                background: "bg.muted",
-                cursor: "pointer",
-              }}
-            >
-              {p.value}
-            </styled.dd>
-          </HStack>
+          <styled.dl display="table" borderCollapse="collapse">
+            {node.properties.map((p) => {
+              if (!p.value) {
+                return null;
+              }
+
+              return (
+                <HStack key={p.name} display="table-row">
+                  <styled.dt
+                    display="table-cell"
+                    w="32"
+                    p="1"
+                    borderRadius="sm"
+                    textOverflow="ellipsis"
+                    overflowX="hidden"
+                    color="fg.muted"
+                    _hover={{
+                      color: "fg.default",
+                      background: "bg.muted",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {p.name}
+                  </styled.dt>
+                  <styled.dd
+                    display="table-cell"
+                    p="1"
+                    w="min"
+                    borderRadius="sm"
+                    _hover={{
+                      color: "fg.default",
+                      background: "bg.muted",
+                      cursor: "pointer",
+                    }}
+                  >
+                    {p.value}
+                  </styled.dd>
+                </HStack>
+              );
+            })}
+          </styled.dl>
         );
-      })}
-    </styled.dl>
+      }}
+    />
   );
 }
