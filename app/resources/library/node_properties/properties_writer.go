@@ -17,7 +17,7 @@ type Writer struct {
 }
 
 func (w *Writer) Update(ctx context.Context, nid library.NodeID, schema library.PropertySchema, props library.ExistingPropertyMutations) (*library.PropertyTable, error) {
-	tx, err := w.db.Debug().Tx(ctx)
+	tx, err := w.db.Tx(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

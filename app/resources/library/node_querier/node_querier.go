@@ -94,7 +94,7 @@ order by source desc, sort asc
 `
 
 func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) (*library.Node, error) {
-	query := q.db.Debug().Node.Query()
+	query := q.db.Node.Query()
 
 	query.Where(qk.Predicate())
 

@@ -238,7 +238,7 @@ func (w *Writer) Delete(ctx context.Context, qk library.QueryKey) error {
 
 func (w *Writer) CleanupOrphanedSchemas(ctx context.Context) {
 	// error handling doesn't matter this is run in parallel and doesn't matter.
-	w.db.Debug().PropertySchema.
+	w.db.PropertySchema.
 		Delete().
 		Where(
 			propertyschema.Not(
