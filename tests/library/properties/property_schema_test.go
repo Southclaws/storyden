@@ -113,7 +113,7 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 				parent, err = cl.NodeGetWithResponse(ctx, parent.JSON200.Slug, session)
 				tests.Ok(t, err, parent)
 				r.Equal(0, len(parent.JSON200.ChildPropertySchema))
-				a.Nil(parent.JSON200.ChildPropertySchema)
+				a.Empty(parent.JSON200.ChildPropertySchema)
 			})
 		}))
 	}))
