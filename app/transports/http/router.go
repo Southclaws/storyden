@@ -7,6 +7,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/transports/http/embedded_frontend"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/chaos"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/frontend"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/headers"
@@ -27,6 +28,8 @@ func MountOpenAPI(
 	logger *zap.Logger,
 	mux *http.ServeMux,
 	router *echo.Echo,
+
+	ef embedded_frontend.Handler,
 
 	// Middleware providers
 	co *origin.Middleware,
@@ -57,5 +60,7 @@ func MountOpenAPI(
 		// Mounting the Echo router must happen after all Echo's middleware and
 		// routes have been set up so it's done inside the start lifecycle hook.
 		mux.Handle("/", applied)
+
+		mux.Handle("/fe", ef)
 	}))
 }

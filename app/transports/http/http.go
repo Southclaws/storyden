@@ -10,6 +10,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/transports/http/bindings"
+	"github.com/Southclaws/storyden/app/transports/http/embedded_frontend"
 	"github.com/Southclaws/storyden/app/transports/http/middleware"
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 )
@@ -22,6 +23,8 @@ func Build() fx.Option {
 
 		// Build all middleware dependencies.
 		middleware.Build(),
+
+		fx.Provide(embedded_frontend.New),
 
 		// Binds all the generated spec code for services to the *http.ServeMux.
 		bindings.Build(),

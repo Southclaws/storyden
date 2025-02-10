@@ -30,11 +30,12 @@ require github.com/Southclaws/fault v0.8.1
 
 require (
 	github.com/JohannesKaufmann/html-to-markdown/v2 v2.2.2
-	github.com/PuerkitoBio/goquery v1.10.0
+	github.com/PuerkitoBio/goquery v1.10.1
 	github.com/Southclaws/opt v0.6.1
 	github.com/Southclaws/swirl v1.0.1
 	github.com/ThreeDotsLabs/watermill v1.4.1
 	github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.0
+	github.com/a-h/templ v0.3.833
 	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
 	github.com/alitto/pond/v2 v2.1.6
 	github.com/bwmarrin/discordgo v0.28.1
