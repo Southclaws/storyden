@@ -44,9 +44,11 @@ func (e *jwtEncrypterDecrypter) Encrypt(data endec.Claims, lifespan time.Duratio
 		return "", fault.Wrap(err)
 	}
 
+	expires := time.Now().UTC().Add(lifespan)
+
 	claims := jwt.MapClaims{
 		"jti": nonce,
-		"exp": time.Now().UTC().Add(lifespan).Unix(),
+		"exp": jwt.NewNumericDate(expires),
 	}
 
 	for k, v := range data {
