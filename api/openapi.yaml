@@ -2862,6 +2862,7 @@ components:
 
     ThreadListOK:
       description: List of all threads.
+      headers: {<<: *cache_response_headers}
       content:
         application/json:
           schema: {$ref: "#/components/schemas/ThreadListResult"}
