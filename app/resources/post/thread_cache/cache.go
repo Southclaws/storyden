@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/rs/xid"
+	"github.com/samber/lo"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/post"
@@ -30,11 +32,29 @@ func (c *Cache) IsNotModified(ctx context.Context, cq cachecontrol.Query, id xid
 	defer span.End()
 
 	notModified := cq.NotModified(func() *time.Time {
-		r, err := c.db.Post.Query().Select(post.FieldUpdatedAt).Where(post.ID(id)).Only(ctx)
+		// TODO: Be more clever about this. This query runs for every request
+		// with a If-Modified-Since header, and in the worst case it will not
+		// result in a cache hit resulting in a full query to the database as
+		// well as this query (which is 2 + n queries where n is the post repo
+		// query count, which is surprisingly high...) a good fix for this could
+		// be to store the last_replied_at timestamp on the post itself and also
+		// store this value in the cache so that conditional requests are fast.
+		r, err := c.db.Debug().Post.
+			Query().
+			// Select(post.FieldUpdatedAt).
+			WithPosts(func(pq *ent.PostQuery) {
+				pq.Where(post.DeletedAtIsNil())
+			}).
+			Where(post.ID(id)).
+			Only(ctx)
 		if err != nil {
 			return nil
 		}
-		return &r.UpdatedAt
+		dates := append(dt.Map(r.Edges.Posts, func(r *ent.Post) time.Time { return r.CreatedAt }), r.UpdatedAt)
+
+		latest := lo.MaxBy(dates, func(a time.Time, b time.Time) bool { return a.After(b) })
+
+		return &latest
 	})
 
 	return notModified
