@@ -1,6 +1,7 @@
 import { uniqueId } from "lodash";
+import { revalidatePath } from "next/cache";
 import { useEffect, useRef } from "react";
-import { MutatorCallback, useSWRConfig } from "swr";
+import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 
 import {
   postDelete,
@@ -17,6 +18,7 @@ import {
   Reply,
   ReplyInitialProps,
   Thread,
+  ThreadGetParams,
   ThreadGetResponse,
   ThreadReference,
 } from "@/api/openapi-schema";
@@ -31,7 +33,22 @@ export function useThreadMutations(thread: ThreadReference) {
 
   const { mutate } = useSWRConfig();
 
-  const key = getThreadGetKey(thread.slug);
+  const threadGetKey = getThreadGetKey(thread.slug);
+  const key = (key: Arguments) => {
+    if (!Array.isArray(key)) return false;
+
+    const path = key[0];
+    const params = key.length > 1 ? (key[1] as ThreadGetParams) : undefined;
+
+    const pathMatch = path === threadGetKey[0];
+    if (!pathMatch) return false;
+
+    const paramsMatch = params?.page === threadGetKey[1]?.page;
+
+    const match = pathMatch && paramsMatch;
+
+    return match;
+  };
 
   const createReply = async (reply: ReplyInitialProps) => {
     const mutator: MutatorCallback<ThreadGetResponse> = (data) => {
