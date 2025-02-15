@@ -4649,6 +4649,7 @@ components:
         body_links: {$ref: "#/components/schemas/LinkReferenceList"}
 
     PostReferenceProps:
+      type: object
       required: [title, slug, author, assets, reacts, collections, likes]
       properties:
         title: {$ref: "#/components/schemas/ThreadTitle"}
@@ -4724,6 +4725,7 @@ components:
         url: {$ref: "#/components/schemas/URL"}
 
     ThreadReference:
+      type: object
       description: |
         A thread reference includes most of the information about a thread but
         does not include the posts within the thread. Useful for rendering large
