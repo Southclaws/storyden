@@ -200,12 +200,17 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 
 	return openapi.ThreadList200JSONResponse{
 		ThreadListOKJSONResponse: openapi.ThreadListOKJSONResponse{
-			CurrentPage: page,
-			NextPage:    nextPage.Ptr(),
-			PageSize:    result.PageSize,
-			Results:     result.Results,
-			Threads:     dt.Map(result.Threads, serialiseThreadReference),
-			TotalPages:  result.TotalPages,
+			Body: openapi.ThreadListResult{
+				CurrentPage: page,
+				NextPage:    nextPage.Ptr(),
+				PageSize:    result.PageSize,
+				Results:     result.Results,
+				Threads:     dt.Map(result.Threads, serialiseThreadReference),
+				TotalPages:  result.TotalPages,
+			},
+			Headers: openapi.ThreadListOKResponseHeaders{
+				CacheControl: "no-store",
+			},
 		},
 	}, nil
 }
