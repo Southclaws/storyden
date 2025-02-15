@@ -9,6 +9,11 @@ const nextConfig = {
     loaderFile: "./src/lib/asset/loader.js",
     unoptimized: true,
   },
+  logging: {
+    fetches: {
+      fullUrl: true,
+    },
+  },
 };
 
 module.exports = nextConfig;
