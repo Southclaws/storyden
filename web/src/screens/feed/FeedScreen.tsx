@@ -60,9 +60,20 @@ async function FeedScreenContent({
 
 async function ThreadFeedScreenContent({ initialSession, page }: PageProps) {
   try {
-    const threads = await threadList({
-      page: page.toString(),
-    });
+    const threads = await threadList(
+      {
+        page: page.toString(),
+      },
+      {
+        cache: "no-store",
+        next: {
+          tags: ["feed"],
+          revalidate: 0,
+        },
+      },
+    );
+
+    console.log("[ThreadFeedScreenContent] threads", threads);
 
     return (
       <ThreadFeedScreen

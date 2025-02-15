@@ -14,14 +14,18 @@ type Result<T> = {
   status: number;
 };
 
-export const fetcher = async <T>(url: string, opts: Options): Promise<T> => {
-  const headers = Object.fromEntries(new Headers(opts.headers).entries());
+export const fetcher = async <T>(
+  url: string,
+  { method, ...opts }: Options,
+): Promise<T> => {
+  const { headers: requestHeaders, ...requestInit } = opts;
+  const headers = Object.fromEntries(new Headers(requestHeaders).entries());
 
   const req = buildRequest({
     url,
     headers,
-    method: opts.method as any,
-    data: opts.body,
+    method: method as any,
+    data: requestInit.body,
     // Server side requests are cached a little more aggressively than client
     // side hydration requests. The downside of this is a user may see a flash
     // of stale data as the server render loads which will be replaced by the
@@ -38,6 +42,7 @@ export const fetcher = async <T>(url: string, opts: Options): Promise<T> => {
     // if Next.js adds support for HTTP Conditional Requests and ETag headers.
     revalidate: 60,
     cache: "force-cache",
+    ...requestInit,
   });
 
   req.headers.set("Cookie", await getCookieHeader());
