@@ -12,37 +12,16 @@ type Props = {
 };
 
 export function TitleInput({ imperativeValue, onResetImperativeValue }: Props) {
-  const { control, formState } = useFormContext<Form>();
-
-  const fieldError = formState.errors?.["name"];
-
   return (
-    <FormControl>
-      <Controller
-        render={({ field: { onChange, ...field }, formState }) => {
-          function handleChangeAndReset(event: any) {
-            onChange(event);
-            onResetImperativeValue?.();
-          }
-
-          return (
-            <HeadingInput
-              id="name-input"
-              size={"2xl" as any}
-              fontWeight="bold"
-              placeholder="Name..."
-              onValueChange={handleChangeAndReset}
-              defaultValue={formState.defaultValues?.["name"]}
-              {...field}
-              value={imperativeValue ?? field.value}
-            />
-          );
-        }}
-        control={control}
-        name="name"
-      />
-
-      <FormErrorText>{fieldError?.message?.toString()}</FormErrorText>
-    </FormControl>
+    <HeadingInput
+      id="name-input"
+      size={"2xl" as any}
+      fontWeight="bold"
+      placeholder="Name..."
+      // onValueChange={handleChangeAndReset}
+      // defaultValue={formState.defaultValues?.["name"]}
+      value={imperativeValue}
+      onValueChange={console.log}
+    />
   );
 }

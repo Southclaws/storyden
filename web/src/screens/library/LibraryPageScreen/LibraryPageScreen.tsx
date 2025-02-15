@@ -53,7 +53,6 @@ export function LibraryPageScreen(props: Props) {
 
 export function LibraryPage(props: Props) {
   const {
-    form,
     handlers: {
       handleSubmit,
       handleEditMode,
@@ -77,195 +76,174 @@ export function LibraryPage(props: Props) {
   } = useLibraryPageScreen(props);
 
   return (
-    <styled.form
+    <LStack
       display="flex"
       flexDir="column"
       w="full"
       h="full"
       gap="3"
       alignItems="start"
-      onSubmit={handleSubmit}
     >
-      <FormProvider {...form}>
-        <LStack h="full">
-          <WStack alignItems="start">
-            <Breadcrumbs
-              libraryPath={libraryPath}
-              visibility={node.visibility}
-              create={editing ? "edit" : "show"}
-              defaultValue={node.slug}
-              {...form.register("slug")}
-            />
-            {isAllowedToEdit && (
-              <HStack>
-                {editing ? (
-                  <>
-                    <CancelAction type="button" onClick={handleEditMode}>
-                      Cancel
-                    </CancelAction>
-                    <SaveAction type="submit">Save</SaveAction>
-                  </>
-                ) : (
-                  <>
-                    <EditAction onClick={handleEditMode}>Edit</EditAction>
-                  </>
-                )}
-                <LibraryPageMenu node={node} />
-              </HStack>
+      <WStack alignItems="start">
+        <Breadcrumbs
+          libraryPath={libraryPath}
+          visibility={node.visibility}
+          create={editing ? "edit" : "show"}
+          defaultValue={node.slug}
+        />
+        {isAllowedToEdit && (
+          <HStack>
+            {editing ? (
+              <>
+                <CancelAction type="button" onClick={handleEditMode}>
+                  Cancel
+                </CancelAction>
+                <SaveAction type="submit">Save</SaveAction>
+              </>
+            ) : (
+              <>
+                <EditAction onClick={handleEditMode}>Edit</EditAction>
+              </>
             )}
-          </WStack>
+            <LibraryPageMenu node={node} />
+          </HStack>
+        )}
+      </WStack>
 
-          {editing && (
-            <HStack w="full" justify="end">
-              {/* TODO: Icons/emojis custom for pages too */}
-              {/* <Button size="xs" variant="outline">
+      {editing && (
+        <HStack w="full" justify="end">
+          {/* TODO: Icons/emojis custom for pages too */}
+          {/* <Button size="xs" variant="outline">
                 <SmilePlusIcon /> page icon
               </Button> */}
-              <LibraryPageCoverImageControl node={node} />
-              {/* TODO: Import from other sources */}
-              {/* <Button size="xs" variant="outline">
+          <LibraryPageCoverImageControl node={node} />
+          {/* TODO: Import from other sources */}
+          {/* <Button size="xs" variant="outline">
                 <ImportIcon /> import
               </Button> */}
-            </HStack>
-          )}
+        </HStack>
+      )}
 
-          {editing && primaryAssetEditingURL ? (
-            <Box width="full" height="64">
-              <FixedCropper
-                ref={cropperRef}
-                className={css({
-                  maxWidth: "full",
-                  maxHeight: "64",
-                  borderRadius: "md",
-                  // TODO: Remove black background when empty
-                  backgroundColor: "bg.default",
-                })}
-                defaultPosition={
-                  initialCoverCoordinates && {
-                    top: initialCoverCoordinates.top,
-                    left: initialCoverCoordinates.left,
-                  }
-                }
-                backgroundWrapperProps={{
-                  scaleImage: false,
-                }}
-                stencilProps={{
-                  handlers: false,
-                  lines: false,
-                  movable: false,
-                  resizable: false,
-                }}
-                stencilSize={{
-                  width: CROP_STENCIL_WIDTH,
-                  height: CROP_STENCIL_HEIGHT,
-                }}
-                imageRestriction={ImageRestriction.stencil}
-                src={primaryAssetEditingURL}
-              />
-            </Box>
-          ) : (
-            primaryAssetURL && (
-              <Box height="64" width="full">
-                <Image
-                  className={css({
-                    width: "full",
-                    height: "full",
-                    borderRadius: "md",
-                    objectFit: "cover",
-                    objectPosition: "center",
-                  })}
-                  src={primaryAssetURL}
-                  alt=""
-                  width={CROP_STENCIL_WIDTH}
-                  height={CROP_STENCIL_HEIGHT}
-                />
-              </Box>
-            )
-          )}
-
-          <LibraryPageAssetList node={node} />
-
-          <LStack gap="2">
-            <LStack minW="0">
-              <WStack alignItems="end">
-                {editing ? (
-                  <>
-                    <TitleInput
-                      imperativeValue={generatedTitle}
-                      onResetImperativeValue={handleResetGeneratedTitle}
-                    />
-                    {isTitleSuggestEnabled && (
-                      <IntelligenceAction
-                        title="Suggest a title for this page"
-                        onClick={handleSuggestTitle}
-                        variant="subtle"
-                        h="full"
-                        loading={isLoadingSuggestTitle}
-                      />
-                    )}
-                  </>
-                ) : (
-                  <Heading fontSize="heading.2" fontWeight="bold">
-                    {node.name || "(untitled)"}
-                  </Heading>
-                )}
-              </WStack>
-            </LStack>
-          </LStack>
-
-          <HStack
-            w="full"
-            flexDirection={{
-              base: "column-reverse",
-              sm: "row",
-            }}
-            alignItems={{
-              base: "start",
-              sm: "center",
-            }}
-          >
-            {!editing && node.link?.url && (
-              <LinkButton href={node.link?.url} size="xs" variant="subtle">
-                {node.link?.domain}
-              </LinkButton>
-            )}
-
-            <LibraryPageTagsList<Form>
-              control={form.control}
-              name="tags"
-              editing={editing}
-              node={node}
-            />
-          </HStack>
-
-          {editing && (
-            <LibraryPageImportFromURL
-              control={form.control}
-              name="link"
-              node={node}
-              onImport={handleImportFromLink}
-            />
-          )}
-
-          <LibraryPagePropertyTable<Form>
-            control={form.control}
-            name="properties"
-            editing={editing}
-            node={node}
-          />
-
-          <ContentInput
-            // TODO: Fix this via ref
-            // value={form.getValues().content}
-            disabled={!editing}
-            onAssetUpload={handleAssetUpload}
-            initialValue={
-              node.content ?? form.formState.defaultValues?.["content"]
+      {editing && primaryAssetEditingURL ? (
+        <Box width="full" height="64">
+          <FixedCropper
+            ref={cropperRef}
+            className={css({
+              maxWidth: "full",
+              maxHeight: "64",
+              borderRadius: "md",
+              // TODO: Remove black background when empty
+              backgroundColor: "bg.default",
+            })}
+            defaultPosition={
+              initialCoverCoordinates && {
+                top: initialCoverCoordinates.top,
+                left: initialCoverCoordinates.left,
+              }
             }
-            value={generatedContent}
+            backgroundWrapperProps={{
+              scaleImage: false,
+            }}
+            stencilProps={{
+              handlers: false,
+              lines: false,
+              movable: false,
+              resizable: false,
+            }}
+            stencilSize={{
+              width: CROP_STENCIL_WIDTH,
+              height: CROP_STENCIL_HEIGHT,
+            }}
+            imageRestriction={ImageRestriction.stencil}
+            src={primaryAssetEditingURL}
           />
-        </LStack>
-      </FormProvider>
-    </styled.form>
+        </Box>
+      ) : (
+        primaryAssetURL && (
+          <Box height="64" width="full">
+            <Image
+              className={css({
+                width: "full",
+                height: "full",
+                borderRadius: "md",
+                objectFit: "cover",
+                objectPosition: "center",
+              })}
+              src={primaryAssetURL}
+              alt=""
+              width={CROP_STENCIL_WIDTH}
+              height={CROP_STENCIL_HEIGHT}
+            />
+          </Box>
+        )
+      )}
+
+      <LibraryPageAssetList node={node} />
+
+      <WStack alignItems="end">
+        {editing ? (
+          <>
+            <TitleInput
+              imperativeValue={generatedTitle}
+              onResetImperativeValue={handleResetGeneratedTitle}
+            />
+            {isTitleSuggestEnabled && (
+              <IntelligenceAction
+                title="Suggest a title for this page"
+                onClick={handleSuggestTitle}
+                variant="subtle"
+                h="full"
+                loading={isLoadingSuggestTitle}
+              />
+            )}
+          </>
+        ) : (
+          <Heading fontSize="heading.2" fontWeight="bold">
+            {node.name || "(untitled)"}
+          </Heading>
+        )}
+      </WStack>
+
+      {/* <HStack
+        w="full"
+        flexDirection={{
+          base: "column-reverse",
+          sm: "row",
+        }}
+        alignItems={{
+          base: "start",
+          sm: "center",
+        }}
+      >
+        {!editing && node.link?.url && (
+          <LinkButton href={node.link?.url} size="xs" variant="subtle">
+            {node.link?.domain}
+          </LinkButton>
+        )}
+
+        <LibraryPageTagsList<Form> name="tags" editing={editing} node={node} />
+      </HStack> */}
+
+      {/* {editing && (
+        <LibraryPageImportFromURL
+          name="link"
+          node={node}
+          onImport={handleImportFromLink}
+        />
+      )} */}
+
+      {/* <LibraryPagePropertyTable<Form>
+        name="properties"
+        editing={editing}
+        node={node}
+      /> */}
+
+      {/* <ContentInput
+        disabled={!editing}
+        onAssetUpload={handleAssetUpload}
+        initialValue={node.content}
+        value={generatedContent}
+      /> */}
+    </LStack>
   );
 }

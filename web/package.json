@@ -56,6 +56,8 @@
     "react-hook-form": "^7.53.0",
     "react-markdown": "^9.0.1",
     "remark-parse": "^11.0.0",
+    "rxdb": "^16.6.1",
+    "rxjs": "^7.8.1",
     "server-only": "^0.0.1",
     "sonner": "^1.5.0",
     "swr": "^2.2.5",
@@ -67,6 +69,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@apidevtools/json-schema-ref-parser": "^11.9.1",
     "@pandacss/dev": "^0.51.1",
     "@pandacss/types": "^0.51.1",
     "@park-ui/panda-preset": "^0.42.0",
