@@ -229,6 +229,8 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	pml := opt.Map(opt.NewPtr(request.Body.Properties), deserialisePropertyMutationList)
+
 	titleFillRuleParam, err := opt.MapErr(opt.NewPtr(request.Params.TitleFillRule), deserialiseTitleFillRule)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -264,6 +266,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		Content:      content,
 		PrimaryImage: primaryImage,
 		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
+		Properties:   pml,
 		Tags:         tags,
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
 		FillSource:   fillSource,
@@ -300,7 +303,7 @@ func (c *Nodes) NodeUpdateVisibility(ctx context.Context, request openapi.NodeUp
 	}
 
 	return openapi.NodeUpdateVisibility200JSONResponse{
-		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseNode(node)),
+		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseNodeWithItems(node)),
 	}, nil
 }
 
@@ -337,7 +340,29 @@ func (c *Nodes) NodeUpdateChildrenPropertySchema(ctx context.Context, request op
 	}
 
 	return openapi.NodeUpdateChildrenPropertySchema200JSONResponse{
-		NodeUpdateChildrenPropertySchemaOKJSONResponse: openapi.NodeUpdateChildrenPropertySchemaOKJSONResponse{
+		NodeUpdatePropertySchemaOKJSONResponse: openapi.NodeUpdatePropertySchemaOKJSONResponse{
+			Properties: serialisePropertySchemas(*updated),
+		},
+	}, nil
+}
+
+func (c *Nodes) NodeUpdatePropertySchema(ctx context.Context, request openapi.NodeUpdatePropertySchemaRequestObject) (openapi.NodeUpdatePropertySchemaResponseObject, error) {
+	schemas := dt.Map(*request.Body, func(p openapi.PropertySchemaMutableProps) *node_properties.SchemaFieldMutation {
+		return &node_properties.SchemaFieldMutation{
+			ID:   opt.Map(opt.NewPtr(p.Fid), deserialiseID),
+			Name: p.Name,
+			Type: p.Type,
+			Sort: p.Sort,
+		}
+	})
+
+	updated, err := c.schemaUpdater.UpdateSiblings(ctx, deserialiseNodeMark(request.NodeSlug), schemas)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.NodeUpdatePropertySchema200JSONResponse{
+		NodeUpdatePropertySchemaOKJSONResponse: openapi.NodeUpdatePropertySchemaOKJSONResponse{
 			Properties: serialisePropertySchemas(*updated),
 		},
 	}, nil
@@ -420,8 +445,8 @@ func (c *Nodes) NodeRemoveNode(ctx context.Context, request openapi.NodeRemoveNo
 	}, nil
 }
 
-func serialiseUpdatedNode(in *node_mutate.Updated) openapi.Node {
-	n := serialiseNode(&in.Node)
+func serialiseUpdatedNode(in *node_mutate.Updated) openapi.NodeWithChildren {
+	n := serialiseNodeWithItems(&in.Node)
 
 	if ts, ok := in.TitleSuggestion.Get(); ok {
 		n.TitleSuggestion = &ts
@@ -552,6 +577,8 @@ func serialisePropertyTable(in library.PropertyTable) openapi.PropertyList {
 		return openapi.PropertyList{}
 	}
 
+	// TODO: Serialise the schema first so all fields are present, then hydrate
+	// any properties left over with actual values if any.
 	return serialisePropertyList(in.Properties)
 }
 
