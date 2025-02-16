@@ -23,7 +23,13 @@ export default async function Page(props: Props) {
       throw new Error("Library page not found");
     }
 
-    const { data } = await nodeGet(targetSlug);
+    const { data } = await nodeGet(targetSlug, {
+      cache: "no-store",
+      next: {
+        tags: ["library", "node"],
+        revalidate: 1,
+      },
+    });
 
     return <LibraryPageScreen node={data} />;
   } catch (e) {

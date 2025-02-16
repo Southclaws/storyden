@@ -7,9 +7,9 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { Node } from "./node";
+import type { NodeWithChildren } from "./nodeWithChildren";
 
 /**
  * Node updated.
  */
-export type NodeUpdateOKResponse = Node;
+export type NodeUpdateOKResponse = NodeWithChildren;

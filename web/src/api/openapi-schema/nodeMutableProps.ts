@@ -13,6 +13,7 @@ import type { Metadata } from "./metadata";
 import type { NodeName } from "./nodeName";
 import type { NullableIdentifier } from "./nullableIdentifier";
 import type { PostContent } from "./postContent";
+import type { PropertyMutationList } from "./propertyMutationList";
 import type { Slug } from "./slug";
 import type { TagNameList } from "./tagNameList";
 import type { Url } from "./url";
@@ -29,6 +30,7 @@ export interface NodeMutableProps {
   name?: NodeName;
   parent?: Slug;
   primary_image_asset_id?: NullableIdentifier;
+  properties?: PropertyMutationList;
   slug?: Slug;
   tags?: TagNameList;
   url?: Url;

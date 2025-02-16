@@ -31,7 +31,8 @@ func (Property) Edges() []ent.Edge {
 			Field("node_id").
 			Ref("properties").
 			Required().
-			Unique(),
+			Unique().
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 
 		edge.From("schema", PropertySchemaField.Type).
 			Field("field_id").

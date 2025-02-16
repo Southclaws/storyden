@@ -54,12 +54,12 @@ func (p PropertySchema) GetField(name string) (*PropertySchemaField, bool) {
 // two lists, one for properties that need to be added to the schema and current
 // schema fields which can be processed as simple property update operations.
 // We also need to get the actual field ID for each existing property.
-func (p PropertySchema) Split(mutation PropertyMutationList) (newProps PropertyMutationList, existingProps ExistingPropertyMutations) {
+func (p PropertySchema) Split(mutation PropertyMutationList) (newProps PropertyMutationList, existingProps ExistingPropertyMutations, removedProps ExistingPropertyMutations) {
 	mutationFieldMap := lo.KeyBy(mutation, func(p PropertyMutation) string { return p.Name })
 	mutationFieldNames := dt.Map(mutation, func(p PropertyMutation) string { return p.Name })
 
 	// split by existence in the schema. this would be simpler with a DiffBy().
-	_, newPropertyNames := lo.Difference(p.FieldNames(), mutationFieldNames)
+	removedPropertyNames, newPropertyNames := lo.Difference(p.FieldNames(), mutationFieldNames)
 	existingProperties := lo.Intersect(mutationFieldNames, p.FieldNames())
 
 	existingProps = dt.Map(existingProperties, func(name string) *ExistingPropertyMutation {
@@ -75,6 +75,17 @@ func (p PropertySchema) Split(mutation PropertyMutationList) (newProps PropertyM
 
 	newProps = dt.Map(newPropertyNames, func(name string) PropertyMutation {
 		return mutationFieldMap[name]
+	})
+
+	removedProps = dt.Map(removedPropertyNames, func(name string) *ExistingPropertyMutation {
+		f, ok := p.GetField(name)
+		if !ok {
+			panic("field not found in schema")
+		}
+		return &ExistingPropertyMutation{
+			PropertySchemaField: *f,
+			Value:               mutationFieldMap[name].Value,
+		}
 	})
 
 	return

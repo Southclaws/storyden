@@ -247,7 +247,7 @@ export function LibraryPage(props: Props) {
             />
           )}
 
-          <LibraryPagePropertyTable<Form>
+          <LibraryPagePropertyTable
             control={form.control}
             name="properties"
             editing={editing}
