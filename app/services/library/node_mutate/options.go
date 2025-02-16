@@ -310,7 +310,7 @@ func (s *Manager) postMutation(ctx context.Context, n *library.Node, pre *preMut
 	if properties, ok := pre.properties.Get(); ok {
 		schema, hasSchema := n.Properties.Get()
 
-		newProperties, existingProperties := schema.Schema.Split(properties)
+		newProperties, existingProperties, removedProps := schema.Schema.Split(properties)
 
 		if !hasSchema {
 			mutations, err := dt.MapErr(newProperties, mapNewPropertyMutation)
@@ -324,7 +324,11 @@ func (s *Manager) postMutation(ctx context.Context, n *library.Node, pre *preMut
 			}
 
 			schema.Schema = *newSchema
+
 		}
+
+		// re-validate the schema properties mutation plan.
+		newProperties, existingProperties, removedProps = schema.Schema.Split(properties)
 
 		if len(newProperties) > 0 {
 			newSchemaFields, err := dt.MapErr(newProperties, mapNewPropertyMutation)
@@ -340,7 +344,18 @@ func (s *Manager) postMutation(ctx context.Context, n *library.Node, pre *preMut
 			schema.Schema = *newSchema
 		}
 
-		_, existingProperties = schema.Schema.Split(properties)
+		if len(removedProps) > 0 {
+			removedSchemaFields, err := dt.MapErr(removedProps, mapExistingPropertyMutation)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+			newSchema, err := s.schemaWriter.RemoveFields(ctx, schema.Schema.ID, removedSchemaFields)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+
+			schema.Schema = *newSchema
+		}
 
 		// Assumption: all schema changes are done by this point. Update no
 		// longer needs to actually check the schema, just write the data.
@@ -366,5 +381,14 @@ func mapNewPropertyMutation(pm library.PropertyMutation) (*node_properties.Schem
 		Name: pm.Name,
 		Type: ft,
 		Sort: pm.Sort.OrZero(),
+	}, nil
+}
+
+func mapExistingPropertyMutation(pm *library.ExistingPropertyMutation) (*node_properties.SchemaFieldMutation, error) {
+	return &node_properties.SchemaFieldMutation{
+		ID:   opt.New(pm.ID),
+		Name: pm.Name,
+		Type: pm.Type,
+		Sort: pm.Sort,
 	}, nil
 }
