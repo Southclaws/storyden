@@ -27,12 +27,12 @@ import type {
   NodeListParams,
   NodeRemoveChildOKResponse,
   NodeUpdateBody,
-  NodeUpdateChildrenPropertySchemaBody,
-  NodeUpdateChildrenPropertySchemaOKResponse,
   NodeUpdateOKResponse,
   NodeUpdateParams,
   NodeUpdatePropertiesBody,
   NodeUpdatePropertiesOKResponse,
+  NodeUpdatePropertySchemaBody,
+  NodeUpdatePropertySchemaOKResponse,
   NotFoundResponse,
   UnauthorisedResponse,
   VisibilityUpdateBody,
@@ -327,24 +327,18 @@ export const useNodeDelete = <
 /**
  * Updates the property schema of the children of this node. All children
 of a node use the same schema for properties resulting in a table-like
-structure and behaviour. Property schemas are loosely structured and can
-automatically cast their values sometimes. A failed cast will not change
-data and instead just yield an empty value when reading however changing
-the schema back to the original type (or a type compatible with what the
-type was before changing) will retain the original data upon next read.
-This permits clients to undo changes to the schema easily while allowing
-quick schema changes without the need to remove or update values before.
+structure and behaviour. See also: NodeUpdatePropertySchema
 
  */
 export const nodeUpdateChildrenPropertySchema = (
   nodeSlug: string,
-  nodeUpdateChildrenPropertySchemaBody: NodeUpdateChildrenPropertySchemaBody,
+  nodeUpdatePropertySchemaBody: NodeUpdatePropertySchemaBody,
 ) => {
-  return fetcher<NodeUpdateChildrenPropertySchemaOKResponse>({
+  return fetcher<NodeUpdatePropertySchemaOKResponse>({
     url: `/nodes/${nodeSlug}/children/property-schema`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    data: nodeUpdateChildrenPropertySchemaBody,
+    data: nodeUpdatePropertySchemaBody,
   });
 };
 
@@ -353,8 +347,8 @@ export const getNodeUpdateChildrenPropertySchemaMutationFetcher = (
 ) => {
   return (
     _: Key,
-    { arg }: { arg: NodeUpdateChildrenPropertySchemaBody },
-  ): Promise<NodeUpdateChildrenPropertySchemaOKResponse> => {
+    { arg }: { arg: NodeUpdatePropertySchemaBody },
+  ): Promise<NodeUpdatePropertySchemaOKResponse> => {
     return nodeUpdateChildrenPropertySchema(nodeSlug, arg);
   };
 };
@@ -382,7 +376,7 @@ export const useNodeUpdateChildrenPropertySchema = <
       Awaited<ReturnType<typeof nodeUpdateChildrenPropertySchema>>,
       TError,
       Key,
-      NodeUpdateChildrenPropertySchemaBody,
+      NodeUpdatePropertySchemaBody,
       Awaited<ReturnType<typeof nodeUpdateChildrenPropertySchema>>
     > & { swrKey?: string };
   },
@@ -393,6 +387,81 @@ export const useNodeUpdateChildrenPropertySchema = <
     swrOptions?.swrKey ??
     getNodeUpdateChildrenPropertySchemaMutationKey(nodeSlug);
   const swrFn = getNodeUpdateChildrenPropertySchemaMutationFetcher(nodeSlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Updates the property schema of this node and its siblings. All children
+of a node use the same schema for properties resulting in a table-like
+structure and behaviour. Property schemas are loosely structured and can
+automatically cast their values sometimes. A failed cast will not change
+data and instead just yield an empty value when reading however changing
+the schema back to the original type (or a type compatible with what the
+type was before changing) will retain the original data upon next read.
+This permits clients to undo changes to the schema easily while allowing
+quick schema changes without the need to remove or update values before.
+
+ */
+export const nodeUpdatePropertySchema = (
+  nodeSlug: string,
+  nodeUpdatePropertySchemaBody: NodeUpdatePropertySchemaBody,
+) => {
+  return fetcher<NodeUpdatePropertySchemaOKResponse>({
+    url: `/nodes/${nodeSlug}/property-schema`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: nodeUpdatePropertySchemaBody,
+  });
+};
+
+export const getNodeUpdatePropertySchemaMutationFetcher = (
+  nodeSlug: string,
+) => {
+  return (
+    _: Key,
+    { arg }: { arg: NodeUpdatePropertySchemaBody },
+  ): Promise<NodeUpdatePropertySchemaOKResponse> => {
+    return nodeUpdatePropertySchema(nodeSlug, arg);
+  };
+};
+export const getNodeUpdatePropertySchemaMutationKey = (nodeSlug: string) =>
+  [`/nodes/${nodeSlug}/property-schema`] as const;
+
+export type NodeUpdatePropertySchemaMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeUpdatePropertySchema>>
+>;
+export type NodeUpdatePropertySchemaMutationError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeUpdatePropertySchema = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeUpdatePropertySchema>>,
+      TError,
+      Key,
+      NodeUpdatePropertySchemaBody,
+      Awaited<ReturnType<typeof nodeUpdatePropertySchema>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNodeUpdatePropertySchemaMutationKey(nodeSlug);
+  const swrFn = getNodeUpdatePropertySchemaMutationFetcher(nodeSlug);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

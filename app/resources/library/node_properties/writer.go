@@ -69,7 +69,33 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 		return &library.PropertySchema{}, nil
 	}
 
-	grouping := lo.GroupBy(children, func(n *ent.Node) string {
+	return w.updateNodes(ctx, schemas, children...)
+}
+
+func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
+	current, err := w.db.Node.Query().Where(
+		node.Or(qk.Predicate()),
+	).Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	children, err := w.db.Node.Query().Where(
+		node.HasParentWith(node.ID(current.ParentNodeID)),
+	).All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return w.updateNodes(ctx, schemas, children...)
+}
+
+func (w *SchemaWriter) updateNodes(ctx context.Context, schemas FieldSchemaMutations, nodes ...*ent.Node) (*library.PropertySchema, error) {
+	if len(nodes) == 0 {
+		return &library.PropertySchema{}, nil
+	}
+
+	grouping := lo.GroupBy(nodes, func(n *ent.Node) string {
 		return n.PropertySchemaID.String()
 	})
 
@@ -78,9 +104,9 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 		panic("schema mismatch")
 	}
 
-	currentSchema := children[0].Edges.PropertySchema
+	currentSchema := nodes[0].Edges.PropertySchema
 
-	schemaID, err := w.doSchemaUpdates(ctx, currentSchema, schemas, children...)
+	schemaID, err := w.doSchemaUpdates(ctx, currentSchema, schemas, nodes...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

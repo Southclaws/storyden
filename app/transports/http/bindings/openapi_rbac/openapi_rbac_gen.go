@@ -99,6 +99,7 @@ type OperationPermissions interface {
 	NodeUpdate() (bool, *rbac.Permission)
 	NodeDelete() (bool, *rbac.Permission)
 	NodeUpdateChildrenPropertySchema() (bool, *rbac.Permission)
+	NodeUpdatePropertySchema() (bool, *rbac.Permission)
 	NodeUpdateProperties() (bool, *rbac.Permission)
 	NodeUpdateVisibility() (bool, *rbac.Permission)
 	NodeAddAsset() (bool, *rbac.Permission)
@@ -313,6 +314,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.NodeDelete()
 	case "NodeUpdateChildrenPropertySchema":
 		return optable.NodeUpdateChildrenPropertySchema()
+	case "NodeUpdatePropertySchema":
+		return optable.NodeUpdatePropertySchema()
 	case "NodeUpdateProperties":
 		return optable.NodeUpdateProperties()
 	case "NodeUpdateVisibility":

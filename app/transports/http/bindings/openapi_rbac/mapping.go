@@ -394,6 +394,10 @@ func (m *Mapping) NodeUpdateChildrenPropertySchema() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }
 
+func (m *Mapping) NodeUpdatePropertySchema() (bool, *rbac.Permission) {
+	return true, nil // See NOTE.
+}
+
 func (m *Mapping) NodeUpdateProperties() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }
