@@ -48,9 +48,7 @@ func (w SchemaWriter) CreateForNode(ctx context.Context, nodeID library.NodeID, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return &library.PropertySchema{
-		ID: *schemaID,
-	}, nil
+	return w.Get(ctx, *schemaID)
 }
 
 func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
@@ -148,6 +146,33 @@ func (w *SchemaWriter) AddFields(ctx context.Context, schemaID xid.ID, schemas F
 
 	err := w.db.PropertySchemaField.CreateBulk(fields...).Exec(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return w.Get(ctx, schemaID)
+}
+
+func (w *SchemaWriter) RemoveFields(ctx context.Context, schemaID xid.ID, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
+	tx, err := w.db.Tx(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	defer tx.Rollback()
+
+	for _, s := range schemas {
+		_, err = tx.PropertySchemaField.Delete().
+			Where(
+				propertyschemafield.SchemaID(schemaID),
+				propertyschemafield.Name(s.Name),
+			).
+			Exec(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
+	if err := tx.Commit(); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

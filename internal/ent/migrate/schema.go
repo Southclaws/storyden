@@ -722,7 +722,7 @@ var (
 				Symbol:     "properties_property_schema_fields_properties",
 				Columns:    []*schema.Column{PropertiesColumns[4]},
 				RefColumns: []*schema.Column{PropertySchemaFieldsColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.Cascade,
 			},
 		},
 		Indexes: []*schema.Index{
