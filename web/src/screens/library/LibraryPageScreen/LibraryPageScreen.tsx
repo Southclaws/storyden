@@ -44,6 +44,8 @@ export function LibraryPageScreen(props: Props) {
     return <UnreadyBanner error={error} />;
   }
 
+  console.log("useNodeGet", data);
+
   // NOTE: There's a bug in SWR here where if the fallback data for an array
   // is passed as empty, it becomes undefined. Maybe cache or mutate related?
   data.tags = data.tags ?? [];

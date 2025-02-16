@@ -43,10 +43,17 @@ const CoverImageFormSchema = z.union([
   }),
 ]);
 
+export const FormNodePropertySchema = z.object({
+  name: z.string(),
+  type: z.string(),
+  value: z.string().optional(),
+});
+export type FormNodeProperty = z.infer<typeof FormNodePropertySchema>;
+
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name."),
   slug: z.string().optional(),
-  properties: z.array(z.tuple([z.string(), z.string()])).optional(),
+  properties: z.array(FormNodePropertySchema).optional(),
   tags: z.string().array().optional(),
   link: z.preprocess((v) => {
     if (typeof v === "string" && v === "") {
@@ -101,7 +108,11 @@ export function useLibraryPageScreen({ node }: Props) {
     () => ({
       name: node.name,
       slug: node.slug,
-      properties: node.properties.map((p) => [p.name, p.value ?? ""]),
+      properties: node.properties.map((p) => ({
+        name: p.name,
+        type: p.type,
+        value: p.value,
+      })),
       tags: node.tags.map((t) => t.name),
       link: node.link?.url,
       description: node.description,
@@ -109,6 +120,8 @@ export function useLibraryPageScreen({ node }: Props) {
     }),
     [node],
   );
+
+  console.log("useLibraryPageScreen", { node, defaults });
 
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
@@ -293,6 +306,8 @@ export function useLibraryPageScreen({ node }: Props) {
     await handle(
       async () => {
         const coverConfig = await uploadCroppedCover();
+
+        console.log("handleSubmit", payload);
 
         const isRedirecting = await updateNode(
           node.slug,
