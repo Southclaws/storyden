@@ -50,6 +50,7 @@ require (
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/go-github/v66 v66.0.0
+	github.com/google/go-github/v69 v69.2.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgx/v5 v5.7.1
 	github.com/jmoiron/sqlx v1.4.0
@@ -67,7 +68,8 @@ require (
 	github.com/openai/openai-go v0.1.0-alpha.39
 	github.com/pb33f/libopenapi v0.18.7
 	github.com/philippgille/chromem-go v0.7.0
-	github.com/pinecone-io/go-pinecone v1.1.2-0.20241220212044-af29d07e7c68
+	github.com/pinecone-io/go-pinecone v1.1.1
+	github.com/pinecone-io/go-pinecone/v2 v2.2.0
 	github.com/puzpuzpuz/xsync/v3 v3.4.0
 	github.com/redis/rueidis v1.0.49
 	github.com/rs/cors v1.11.1
