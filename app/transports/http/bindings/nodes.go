@@ -625,6 +625,7 @@ func deserialisePropertyMutationList(in openapi.PropertyMutationList) library.Pr
 
 func deserialisePropertyMutation(in openapi.PropertyMutation) library.PropertyMutation {
 	return library.PropertyMutation{
+		ID:    opt.Map(opt.NewPtr(in.Fid), deserialiseID),
 		Name:  in.Name,
 		Value: in.Value,
 		Type:  opt.NewPtr(in.Type),

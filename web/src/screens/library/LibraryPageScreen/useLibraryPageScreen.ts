@@ -300,15 +300,6 @@ export function useLibraryPageScreen({ node }: Props) {
     );
   }
 
-  function cleanProperties(props: PropertyMutationList): PropertyMutationList {
-    const o = omit("fid");
-    return props.map((p) => {
-      const newProperty = o(p) as PropertyMutation;
-
-      return newProperty;
-    });
-  }
-
   const handleSubmit = form.handleSubmit(async (payload: Form) => {
     await handle(
       async () => {
@@ -318,7 +309,6 @@ export function useLibraryPageScreen({ node }: Props) {
           node.slug,
           {
             ...payload,
-            properties: cleanProperties(payload.properties),
             url: payload.link,
           },
           coverConfig,

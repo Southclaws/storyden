@@ -35,11 +35,7 @@ export function LibraryPagePropertyTable({
 
   return (
     <styled.dl display="table" borderCollapse="collapse">
-      {node.properties?.map((p) => {
-        if (p.value == null) {
-          return null;
-        }
-
+      {node.properties.map((p) => {
         return (
           <HStack key={p.name} display="table-row">
             <styled.dt

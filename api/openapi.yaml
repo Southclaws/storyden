@@ -5307,10 +5307,11 @@ components:
       description: |
         A property mutation is a change to a property on a node. It can be used
         to update existing properties or add new properties to a node. When a
-        property already exists by name, the type and sort columns are optional.
+        property already exists by name/fid, type and sort columns are optional.
       type: object
       required: [name, value]
       properties:
+        fid: {$ref: "#/components/schemas/Identifier"}
         name: {$ref: "#/components/schemas/PropertyName"}
         value: {$ref: "#/components/schemas/PropertyValue"}
         type: {$ref: "#/components/schemas/PropertyType"}

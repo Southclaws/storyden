@@ -324,7 +324,28 @@ func (s *Manager) postMutation(ctx context.Context, n *library.Node, pre *preMut
 			}
 
 			schema.Schema = *newSchema
+		} else {
+			schemaUpdates := []*node_properties.SchemaFieldMutation{}
 
+			schemaUpdates = lo.FilterMap(existingProperties, func(pm *library.ExistingPropertyMutation, _ int) (*node_properties.SchemaFieldMutation, bool) {
+				if !pm.IsSchemaChanged {
+					return nil, false
+				}
+
+				return &node_properties.SchemaFieldMutation{
+					ID:   opt.New(pm.ID),
+					Name: pm.Name,
+					Type: pm.Type,
+					Sort: pm.Sort,
+				}, true
+			})
+
+			newSchema, err := s.schemaWriter.UpdateSiblings(ctx, library.QueryKey{n.Mark.Queryable()}, schemaUpdates)
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
+
+			schema.Schema = *newSchema
 		}
 
 		// re-validate the schema properties mutation plan.

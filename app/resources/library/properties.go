@@ -38,15 +38,13 @@ type PropertySchema struct {
 	Fields PropertySchemaFields
 }
 
-func (p PropertySchema) FieldNames() []string {
-	return dt.Map(p.Fields, func(f *PropertySchemaField) string {
-		return f.Name
-	})
+func (p PropertySchema) FieldIDs() []xid.ID {
+	return dt.Map(p.Fields, func(f *PropertySchemaField) xid.ID { return f.ID })
 }
 
-func (p PropertySchema) GetField(name string) (*PropertySchemaField, bool) {
-	lookup := lo.KeyBy(p.Fields, func(f *PropertySchemaField) string { return f.Name })
-	f, ok := lookup[name]
+func (p PropertySchema) GetField(id xid.ID) (*PropertySchemaField, bool) {
+	lookup := lo.KeyBy(p.Fields, func(f *PropertySchemaField) xid.ID { return f.ID })
+	f, ok := lookup[id]
 	return f, ok
 }
 
@@ -55,44 +53,65 @@ func (p PropertySchema) GetField(name string) (*PropertySchemaField, bool) {
 // schema fields which can be processed as simple property update operations.
 // We also need to get the actual field ID for each existing property.
 func (p PropertySchema) Split(mutation PropertyMutationList) (newProps PropertyMutationList, existingProps ExistingPropertyMutations, removedProps ExistingPropertyMutations) {
-	mutationFieldMap := lo.KeyBy(mutation, func(p PropertyMutation) string { return p.Name })
-	mutationFieldNames := dt.Map(mutation, func(p PropertyMutation) string { return p.Name })
+	fids := lo.FilterMap(mutation, func(p PropertyMutation, _ int) (xid.ID, bool) { return p.ID.Get() })
 
 	// split by existence in the schema. this would be simpler with a DiffBy().
-	removedPropertyNames, newPropertyNames := lo.Difference(p.FieldNames(), mutationFieldNames)
-	existingProperties := lo.Intersect(mutationFieldNames, p.FieldNames())
+	removedIDs, _ := lo.Difference(p.FieldIDs(), fids)
+	existingProperties, newProps := lo.FilterReject(mutation, func(m PropertyMutation, _ int) bool {
+		return m.ID.Ok()
+	})
 
-	existingProps = dt.Map(existingProperties, func(name string) *ExistingPropertyMutation {
-		f, ok := p.GetField(name)
+	existingProps = dt.Map(existingProperties, func(m PropertyMutation) *ExistingPropertyMutation {
+		return p.getSchemaMutationFromPropertyMutation(m)
+	})
+
+	removedProps = dt.Map(removedIDs, func(fid xid.ID) *ExistingPropertyMutation {
+		f, ok := p.GetField(fid)
 		if !ok {
 			panic("field not found in schema")
 		}
 		return &ExistingPropertyMutation{
 			PropertySchemaField: *f,
-			Value:               mutationFieldMap[name].Value,
-		}
-	})
-
-	newProps = dt.Map(newPropertyNames, func(name string) PropertyMutation {
-		return mutationFieldMap[name]
-	})
-
-	removedProps = dt.Map(removedPropertyNames, func(name string) *ExistingPropertyMutation {
-		f, ok := p.GetField(name)
-		if !ok {
-			panic("field not found in schema")
-		}
-		return &ExistingPropertyMutation{
-			PropertySchemaField: *f,
-			Value:               mutationFieldMap[name].Value,
 		}
 	})
 
 	return
 }
 
+func (p PropertySchema) getSchemaMutationFromPropertyMutation(pm PropertyMutation) *ExistingPropertyMutation {
+	f, ok := p.GetField(pm.ID.OrZero())
+	if !ok {
+		panic("field not found in schema")
+	}
+
+	// During a property mutation, the request may also change the schema by
+	// changing the name, type or sort properties. Mark as changed if so.
+	isChanged := false
+	if f.Name != pm.Name {
+		isChanged = true
+		f.Name = pm.Name
+	}
+	if t, ok := pm.Type.Get(); ok && t != f.Type {
+		isChanged = true
+		f.Type = t
+	}
+	if s, ok := pm.Sort.Get(); ok && s != f.Sort {
+		isChanged = true
+		f.Sort = s
+	}
+
+	return &ExistingPropertyMutation{
+		PropertySchemaField: *f,
+		IsSchemaChanged:     isChanged,
+		Value:               pm.Value,
+	}
+}
+
 // Property mutations are used to update properties on a node.
 type PropertyMutation struct {
+	// ID is optional, when set the mutation is modifying an existing field and
+	// when not set, the mutation assumes it's a new field.
+	ID    opt.Optional[xid.ID]
 	Name  string
 	Value string
 	Type  opt.Optional[string]
@@ -103,7 +122,8 @@ type PropertyMutationList []PropertyMutation
 
 type ExistingPropertyMutation struct {
 	PropertySchemaField
-	Value string
+	IsSchemaChanged bool
+	Value           string
 }
 
 type ExistingPropertyMutations []*ExistingPropertyMutation

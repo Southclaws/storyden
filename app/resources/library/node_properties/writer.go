@@ -71,21 +71,27 @@ func (w *SchemaWriter) UpdateChildren(ctx context.Context, qk library.QueryKey, 
 }
 
 func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
-	current, err := w.db.Node.Query().Where(
-		node.Or(qk.Predicate()),
-	).Only(ctx)
+	current, err := w.db.Node.Query().
+		Where(
+			node.Or(qk.Predicate()),
+		).
+		WithPropertySchema().
+		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	children, err := w.db.Node.Query().Where(
-		node.HasParentWith(node.ID(current.ParentNodeID)),
-	).All(ctx)
+	children, err := w.db.Node.Query().
+		Where(
+			node.HasParentWith(node.ID(current.ParentNodeID)),
+		).
+		WithPropertySchema().
+		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return w.updateNodes(ctx, schemas, children...)
+	return w.updateNodes(ctx, schemas, append(children, current)...)
 }
 
 func (w *SchemaWriter) updateNodes(ctx context.Context, schemas FieldSchemaMutations, nodes ...*ent.Node) (*library.PropertySchema, error) {
