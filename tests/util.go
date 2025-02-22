@@ -18,19 +18,19 @@ type WithStatusCode interface {
 func Ok(t *testing.T, err error, resp WithStatusCode) {
 	t.Helper()
 
+	logAPIError(t, resp)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, http.StatusOK, resp.StatusCode())
-	logAPIError(t, resp)
 }
 
 func Status(t *testing.T, err error, resp WithStatusCode, status int) {
 	t.Helper()
 
+	logAPIError(t, resp)
 	require.NoError(t, err)
 	require.NotNil(t, resp)
 	require.Equal(t, status, resp.StatusCode())
-	logAPIError(t, resp)
 }
 
 func AssertRequest[T interface {
@@ -53,7 +53,7 @@ type ResponseShape struct {
 func logAPIError(t *testing.T, resp WithStatusCode) {
 	if resp.StatusCode() != http.StatusOK {
 		if ae := getAPIError(resp); ae != nil {
-			t.Logf(`%s message: "%v"`,
+			t.Logf(`API error response: "%s" message: "%v"`,
 				ae.Error,
 				opt.NewPtr(ae.Message).OrZero(),
 			)
