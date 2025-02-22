@@ -95,10 +95,13 @@ func newExporter(ctx context.Context,
 			trace.WithBatcher(otlp),
 		}, nil
 
-	default:
+	case "logger":
 		return []trace.TracerProviderOption{
 			trace.WithSyncer(newLoggingTracer(logger)),
 		}, nil
+
+	default:
+		return []trace.TracerProviderOption{}, nil
 	}
 }
 
