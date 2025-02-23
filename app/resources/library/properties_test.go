@@ -6,11 +6,13 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestPropertySchema_Split(t *testing.T) {
 	t.Run("all_existing", func(t *testing.T) {
 		a := assert.New(t)
+		r := require.New(t)
 
 		f0 := xid.New()
 		f1 := xid.New()
@@ -29,14 +31,16 @@ func TestPropertySchema_Split(t *testing.T) {
 			{ID: opt.New(f2), Name: "dob", Value: "2025-01-01T12:59:21Z"},
 		}
 
-		n, e, r := schema.Split(pml)
-		a.Len(n, 0)
-		a.Len(e, 3)
-		a.Len(r, 0)
+		mut, err := schema.Split(pml)
+		r.NoError(err)
+		a.Len(mut.NewProps, 0)
+		a.Len(mut.ExistingProps, 3)
+		a.Len(mut.RemovedProps, 0)
 	})
 
 	t.Run("some_existing_one_removed", func(t *testing.T) {
 		a := assert.New(t)
+		r := require.New(t)
 
 		f0 := xid.New()
 		f1 := xid.New()
@@ -54,14 +58,16 @@ func TestPropertySchema_Split(t *testing.T) {
 			{ID: opt.New(f1), Name: "age", Value: "25"},
 		}
 
-		n, e, r := schema.Split(pml)
-		a.Len(n, 0)
-		a.Len(e, 2)
-		a.Len(r, 1)
+		mut, err := schema.Split(pml)
+		r.NoError(err)
+		a.Len(mut.NewProps, 0)
+		a.Len(mut.ExistingProps, 2)
+		a.Len(mut.RemovedProps, 1)
 	})
 
 	t.Run("all_removed", func(t *testing.T) {
 		a := assert.New(t)
+		r := require.New(t)
 
 		schema := PropertySchema{
 			Fields: PropertySchemaFields{
@@ -72,14 +78,16 @@ func TestPropertySchema_Split(t *testing.T) {
 		}
 		pml := PropertyMutationList{}
 
-		n, e, r := schema.Split(pml)
-		a.Len(n, 0)
-		a.Len(e, 0)
-		a.Len(r, 3)
+		mut, err := schema.Split(pml)
+		r.NoError(err)
+		a.Len(mut.NewProps, 0)
+		a.Len(mut.ExistingProps, 0)
+		a.Len(mut.RemovedProps, 3)
 	})
 
 	t.Run("some_new", func(t *testing.T) {
 		a := assert.New(t)
+		r := require.New(t)
 
 		f0 := xid.New()
 		f1 := xid.New()
@@ -99,14 +107,16 @@ func TestPropertySchema_Split(t *testing.T) {
 			{Name: "strength", Value: "69"},
 		}
 
-		n, e, r := schema.Split(pml)
-		a.Len(n, 1)
-		a.Len(e, 3)
-		a.Len(r, 0)
+		mut, err := schema.Split(pml)
+		r.NoError(err)
+		a.Len(mut.NewProps, 1)
+		a.Len(mut.ExistingProps, 3)
+		a.Len(mut.RemovedProps, 0)
 	})
 
 	t.Run("all_new_replace_existing", func(t *testing.T) {
 		a := assert.New(t)
+		r := require.New(t)
 
 		schema := PropertySchema{
 			Fields: PropertySchemaFields{
@@ -121,9 +131,10 @@ func TestPropertySchema_Split(t *testing.T) {
 			{Name: "damage", Value: "420"},
 		}
 
-		n, e, r := schema.Split(pml)
-		a.Len(n, 3)
-		a.Len(e, 0)
-		a.Len(r, 3)
+		mut, err := schema.Split(pml)
+		r.NoError(err)
+		a.Len(mut.NewProps, 3)
+		a.Len(mut.ExistingProps, 0)
+		a.Len(mut.RemovedProps, 3)
 	})
 }

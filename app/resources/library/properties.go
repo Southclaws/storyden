@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -48,11 +50,17 @@ func (p PropertySchema) GetField(id xid.ID) (*PropertySchemaField, bool) {
 	return f, ok
 }
 
+type PropertySchemaMutation struct {
+	NewProps      PropertyMutationList
+	ExistingProps ExistingPropertyMutations
+	RemovedProps  ExistingPropertyMutations
+}
+
 // Split takes a mutation (a list of properties to update) and splits it into
 // two lists, one for properties that need to be added to the schema and current
 // schema fields which can be processed as simple property update operations.
 // We also need to get the actual field ID for each existing property.
-func (p PropertySchema) Split(mutation PropertyMutationList) (newProps PropertyMutationList, existingProps ExistingPropertyMutations, removedProps ExistingPropertyMutations) {
+func (p PropertySchema) Split(mutation PropertyMutationList) (*PropertySchemaMutation, error) {
 	fids := lo.FilterMap(mutation, func(p PropertyMutation, _ int) (xid.ID, bool) { return p.ID.Get() })
 
 	// split by existence in the schema. this would be simpler with a DiffBy().
@@ -61,27 +69,55 @@ func (p PropertySchema) Split(mutation PropertyMutationList) (newProps PropertyM
 		return m.ID.Ok()
 	})
 
-	existingProps = dt.Map(existingProperties, func(m PropertyMutation) *ExistingPropertyMutation {
-		return p.getSchemaMutationFromPropertyMutation(m)
-	})
+	existingProps, err := dt.MapErr(existingProperties, p.getSchemaMutationFromPropertyMutation)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
 
-	removedProps = dt.Map(removedIDs, func(fid xid.ID) *ExistingPropertyMutation {
+	removedProps, err := dt.MapErr(removedIDs, func(fid xid.ID) (*ExistingPropertyMutation, error) {
 		f, ok := p.GetField(fid)
 		if !ok {
-			panic("field not found in schema")
+			return nil, fault.Wrap(fault.Newf("field ID '%v' not found in schema", fid), ftag.With(ftag.InvalidArgument))
 		}
 		return &ExistingPropertyMutation{
 			PropertySchemaField: *f,
-		}
+		}, nil
 	})
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
 
-	return
+	// Check for missing IDs, where the request contains a named property that
+	// exists but the ID is not set. The above code will interpret this as the
+	// field being removed and added again. This is not what we want so error.
+
+	if len(removedProps) > 0 && len(newProps) > 0 {
+		removedNames := dt.Map(removedProps, func(p *ExistingPropertyMutation) string { return p.Name })
+		newNames := dt.Map(newProps, func(p PropertyMutation) string { return p.Name })
+
+		// If the intersection of the two lists is not empty, then we have a
+		// conflict where a property is being removed and added again in the same
+		// mutation. This is not allowed.
+		intersect := lo.Intersect(removedNames, newNames)
+		if len(intersect) > 0 {
+			return nil, fault.Wrap(
+				fault.Newf("cannot remove and add the same property in the same mutation: %v did you miss a field ID?", intersect),
+				ftag.With(ftag.InvalidArgument),
+			)
+		}
+	}
+
+	return &PropertySchemaMutation{
+		NewProps:      newProps,
+		ExistingProps: existingProps,
+		RemovedProps:  removedProps,
+	}, nil
 }
 
-func (p PropertySchema) getSchemaMutationFromPropertyMutation(pm PropertyMutation) *ExistingPropertyMutation {
+func (p PropertySchema) getSchemaMutationFromPropertyMutation(pm PropertyMutation) (*ExistingPropertyMutation, error) {
 	f, ok := p.GetField(pm.ID.OrZero())
 	if !ok {
-		panic("field not found in schema")
+		return nil, fault.Wrap(fault.Newf("field '%v' not found in schema", pm.ID), ftag.With(ftag.InvalidArgument))
 	}
 
 	// During a property mutation, the request may also change the schema by
@@ -104,7 +140,7 @@ func (p PropertySchema) getSchemaMutationFromPropertyMutation(pm PropertyMutatio
 		PropertySchemaField: *f,
 		IsSchemaChanged:     isChanged,
 		Value:               pm.Value,
-	}
+	}, nil
 }
 
 // Property mutations are used to update properties on a node.
