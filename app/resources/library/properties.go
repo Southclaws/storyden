@@ -63,11 +63,12 @@ type PropertySchemaMutation struct {
 func (p PropertySchema) Split(mutation PropertyMutationList) (*PropertySchemaMutation, error) {
 	fids := lo.FilterMap(mutation, func(p PropertyMutation, _ int) (xid.ID, bool) { return p.ID.Get() })
 
-	// split by existence in the schema. this would be simpler with a DiffBy().
-	removedIDs, _ := lo.Difference(p.FieldIDs(), fids)
 	existingProperties, newProps := lo.FilterReject(mutation, func(m PropertyMutation, _ int) bool {
 		return m.ID.Ok()
 	})
+
+	// split by existence in the schema. this would be simpler with a DiffBy().
+	removedIDs, _ := lo.Difference(p.FieldIDs(), fids)
 
 	existingProps, err := dt.MapErr(existingProperties, p.getSchemaMutationFromPropertyMutation)
 	if err != nil {

@@ -166,7 +166,7 @@ export function useLibraryMutation(node?: Node) {
         properties:
           newNode.properties?.map((p: PropertyMutation) => {
             return {
-              fid: p.fid ?? p.name,
+              fid: p.fid ?? uniqueId("new_field_"),
               sort: p.sort ?? "",
               type: p.type ?? "text",
               ...p,

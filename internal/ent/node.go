@@ -44,7 +44,7 @@ type Node struct {
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
 	// PropertySchemaID holds the value of the "property_schema_id" field.
-	PropertySchemaID xid.ID `json:"property_schema_id,omitempty"`
+	PropertySchemaID *xid.ID `json:"property_schema_id,omitempty"`
 	// PrimaryAssetID holds the value of the "primary_asset_id" field.
 	PrimaryAssetID *xid.ID `json:"primary_asset_id,omitempty"`
 	// LinkID holds the value of the "link_id" field.
@@ -213,7 +213,7 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case node.FieldPrimaryAssetID:
+		case node.FieldPropertySchemaID, node.FieldPrimaryAssetID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case node.FieldMetadata:
 			values[i] = new([]byte)
@@ -221,7 +221,7 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case node.FieldCreatedAt, node.FieldUpdatedAt, node.FieldDeletedAt, node.FieldIndexedAt:
 			values[i] = new(sql.NullTime)
-		case node.FieldID, node.FieldParentNodeID, node.FieldAccountID, node.FieldPropertySchemaID, node.FieldLinkID:
+		case node.FieldID, node.FieldParentNodeID, node.FieldAccountID, node.FieldLinkID:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -309,10 +309,11 @@ func (n *Node) assignValues(columns []string, values []any) error {
 				n.AccountID = *value
 			}
 		case node.FieldPropertySchemaID:
-			if value, ok := values[i].(*xid.ID); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field property_schema_id", values[i])
-			} else if value != nil {
-				n.PropertySchemaID = *value
+			} else if value.Valid {
+				n.PropertySchemaID = new(xid.ID)
+				*n.PropertySchemaID = *value.S.(*xid.ID)
 			}
 		case node.FieldPrimaryAssetID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -475,8 +476,10 @@ func (n *Node) String() string {
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", n.AccountID))
 	builder.WriteString(", ")
-	builder.WriteString("property_schema_id=")
-	builder.WriteString(fmt.Sprintf("%v", n.PropertySchemaID))
+	if v := n.PropertySchemaID; v != nil {
+		builder.WriteString("property_schema_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	if v := n.PrimaryAssetID; v != nil {
 		builder.WriteString("primary_asset_id=")

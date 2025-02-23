@@ -91,11 +91,18 @@ export function LibraryPagePropertyTableEditable({
         const current = fieldValue ?? initialValue ?? [];
 
         async function handleAddProperty() {
+          const existingNames = new Set(current.map((f) => f.name));
+          let newName = "Field 1";
+          let counter = 1;
+          while (existingNames.has(newName)) {
+            newName = `Field ${counter++}`;
+          }
+
           field.onChange([
             ...current,
             {
               fid: uniqueId("new_field_"),
-              name: uniqueId("Field"),
+              name: newName,
               type: "text",
               sort: "5",
               value: "",

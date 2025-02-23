@@ -474,7 +474,7 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 				delete, err = cl.NodeDeleteWithResponse(ctx, slug3, &openapi.NodeDeleteParams{}, session)
 				tests.Ok(t, err, delete)
 
-				c, err := db.PropertySchema.Query().Where(propertyschema.ID(schemaID)).Count(ctx)
+				c, err := db.PropertySchema.Query().Where(propertyschema.ID(*schemaID)).Count(ctx)
 				r.NoError(err)
 				r.Equal(0, c, "property schema should be deleted as it is no longer in use by any nodes")
 			})

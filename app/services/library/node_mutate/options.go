@@ -351,6 +351,25 @@ func (s *Manager) postMutation(ctx context.Context, n *library.Node, pre *preMut
 			schema.Schema = *newSchema
 		}
 
+		for _, newProp := range migration.NewProps {
+			newSchemaProp, found := lo.Find(schema.Schema.Fields, func(f *library.PropertySchemaField) bool {
+				return f.Name == newProp.Name
+			})
+			if !found {
+				continue
+			}
+			for i, mutProp := range properties {
+				if newProp.Name == mutProp.Name {
+					properties[i].ID = opt.New(newSchemaProp.ID)
+				}
+			}
+		}
+
+		// TODO: Remove all this code below and move other migrations into the
+		// above UpdateSiblings call. Currently that call only does existing
+		// field updates but it should perform all migrations. This means we
+		// would no longer need to call .Split() twice and mutate properties.
+
 		// re-validate the schema properties mutation plan.
 		migration, err = schema.Schema.Split(properties)
 		if err != nil {
@@ -369,6 +388,20 @@ func (s *Manager) postMutation(ctx context.Context, n *library.Node, pre *preMut
 			}
 
 			schema.Schema = *newSchema
+
+			for _, newProp := range migration.NewProps {
+				newSchemaProp, found := lo.Find(schema.Schema.Fields, func(f *library.PropertySchemaField) bool {
+					return f.Name == newProp.Name
+				})
+				if !found {
+					continue
+				}
+
+				migration.ExistingProps = append(migration.ExistingProps, &library.ExistingPropertyMutation{
+					PropertySchemaField: *newSchemaProp,
+					Value:               newProp.Value,
+				})
+			}
 		}
 
 		if len(migration.RemovedProps) > 0 {

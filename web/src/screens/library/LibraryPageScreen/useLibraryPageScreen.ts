@@ -50,7 +50,7 @@ const CoverImageFormSchema = z.union([
 ]);
 
 export const FormNodePropertySchema = z.object({
-  fid: z.string(),
+  fid: z.string().optional(),
   name: z.string(),
   type: z.string(),
   sort: z.string(),
@@ -309,6 +309,12 @@ export function useLibraryPageScreen({ node }: Props) {
           node.slug,
           {
             ...payload,
+            properties: payload.properties.map((p) => {
+              if (p.fid?.startsWith("new_field_")) {
+                return omit("fid", p);
+              }
+              return p;
+            }),
             url: payload.link,
           },
           coverConfig,

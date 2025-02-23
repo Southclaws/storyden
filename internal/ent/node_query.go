@@ -1160,7 +1160,10 @@ func (nq *NodeQuery) loadPropertySchema(ctx context.Context, query *PropertySche
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Node)
 	for i := range nodes {
-		fk := nodes[i].PropertySchemaID
+		if nodes[i].PropertySchemaID == nil {
+			continue
+		}
+		fk := *nodes[i].PropertySchemaID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
