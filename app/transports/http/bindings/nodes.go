@@ -10,6 +10,8 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
+	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -568,18 +570,31 @@ func serialiseProperty(in *library.Property) openapi.Property {
 	}
 }
 
-func serialisePropertyList(in library.Properties) openapi.PropertyList {
-	return dt.Map(in, serialiseProperty)
-}
-
 func serialisePropertyTable(in library.PropertyTable) openapi.PropertyList {
 	if len(in.Properties) == 0 {
 		return openapi.PropertyList{}
 	}
 
-	// TODO: Serialise the schema first so all fields are present, then hydrate
-	// any properties left over with actual values if any.
-	return serialisePropertyList(in.Properties)
+	propertyFieldMap := lo.KeyBy(in.Properties, func(f *library.Property) xid.ID {
+		return f.Field.ID
+	})
+
+	pl := dt.Map(in.Schema.Fields, func(f *library.PropertySchemaField) openapi.Property {
+		p, ok := propertyFieldMap[f.ID]
+		if !ok {
+			return openapi.Property{
+				Fid:   f.ID.String(),
+				Name:  f.Name,
+				Type:  f.Type,
+				Sort:  f.Sort,
+				Value: nil,
+			}
+		}
+
+		return serialiseProperty(p)
+	})
+
+	return pl
 }
 
 func serialisePropertyTableOpt(in opt.Optional[library.PropertyTable]) openapi.PropertyList {
@@ -587,7 +602,7 @@ func serialisePropertyTableOpt(in opt.Optional[library.PropertyTable]) openapi.P
 	if !ok {
 		return openapi.PropertyList{}
 	}
-	return serialisePropertyList(pt.Properties)
+	return serialisePropertyTable(pt)
 }
 
 func serialisePropertySchema(in *library.PropertySchemaField) openapi.PropertySchema {
