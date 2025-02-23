@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -38,50 +40,115 @@ type PropertySchema struct {
 	Fields PropertySchemaFields
 }
 
-func (p PropertySchema) FieldNames() []string {
-	return dt.Map(p.Fields, func(f *PropertySchemaField) string {
-		return f.Name
-	})
+func (p PropertySchema) FieldIDs() []xid.ID {
+	return dt.Map(p.Fields, func(f *PropertySchemaField) xid.ID { return f.ID })
 }
 
-func (p PropertySchema) GetField(name string) (*PropertySchemaField, bool) {
-	lookup := lo.KeyBy(p.Fields, func(f *PropertySchemaField) string { return f.Name })
-	f, ok := lookup[name]
+func (p PropertySchema) GetField(id xid.ID) (*PropertySchemaField, bool) {
+	lookup := lo.KeyBy(p.Fields, func(f *PropertySchemaField) xid.ID { return f.ID })
+	f, ok := lookup[id]
 	return f, ok
+}
+
+type PropertySchemaMutation struct {
+	NewProps      PropertyMutationList
+	ExistingProps ExistingPropertyMutations
+	RemovedProps  ExistingPropertyMutations
 }
 
 // Split takes a mutation (a list of properties to update) and splits it into
 // two lists, one for properties that need to be added to the schema and current
 // schema fields which can be processed as simple property update operations.
 // We also need to get the actual field ID for each existing property.
-func (p PropertySchema) Split(mutation PropertyMutationList) (newProps PropertyMutationList, existingProps ExistingPropertyMutations) {
-	mutationFieldMap := lo.KeyBy(mutation, func(p PropertyMutation) string { return p.Name })
-	mutationFieldNames := dt.Map(mutation, func(p PropertyMutation) string { return p.Name })
+func (p PropertySchema) Split(mutation PropertyMutationList) (*PropertySchemaMutation, error) {
+	fids := lo.FilterMap(mutation, func(p PropertyMutation, _ int) (xid.ID, bool) { return p.ID.Get() })
+
+	existingProperties, newProps := lo.FilterReject(mutation, func(m PropertyMutation, _ int) bool {
+		return m.ID.Ok()
+	})
 
 	// split by existence in the schema. this would be simpler with a DiffBy().
-	_, newPropertyNames := lo.Difference(p.FieldNames(), mutationFieldNames)
-	existingProperties := lo.Intersect(mutationFieldNames, p.FieldNames())
+	removedIDs, _ := lo.Difference(p.FieldIDs(), fids)
 
-	existingProps = dt.Map(existingProperties, func(name string) *ExistingPropertyMutation {
-		f, ok := p.GetField(name)
+	existingProps, err := dt.MapErr(existingProperties, p.getSchemaMutationFromPropertyMutation)
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	removedProps, err := dt.MapErr(removedIDs, func(fid xid.ID) (*ExistingPropertyMutation, error) {
+		f, ok := p.GetField(fid)
 		if !ok {
-			panic("field not found in schema")
+			return nil, fault.Wrap(fault.Newf("field ID '%v' not found in schema", fid), ftag.With(ftag.InvalidArgument))
 		}
 		return &ExistingPropertyMutation{
 			PropertySchemaField: *f,
-			Value:               mutationFieldMap[name].Value,
+		}, nil
+	})
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+
+	// Check for missing IDs, where the request contains a named property that
+	// exists but the ID is not set. The above code will interpret this as the
+	// field being removed and added again. This is not what we want so error.
+
+	if len(removedProps) > 0 && len(newProps) > 0 {
+		removedNames := dt.Map(removedProps, func(p *ExistingPropertyMutation) string { return p.Name })
+		newNames := dt.Map(newProps, func(p PropertyMutation) string { return p.Name })
+
+		// If the intersection of the two lists is not empty, then we have a
+		// conflict where a property is being removed and added again in the same
+		// mutation. This is not allowed.
+		intersect := lo.Intersect(removedNames, newNames)
+		if len(intersect) > 0 {
+			return nil, fault.Wrap(
+				fault.Newf("cannot remove and add the same property in the same mutation: %v did you miss a field ID?", intersect),
+				ftag.With(ftag.InvalidArgument),
+			)
 		}
-	})
+	}
 
-	newProps = dt.Map(newPropertyNames, func(name string) PropertyMutation {
-		return mutationFieldMap[name]
-	})
+	return &PropertySchemaMutation{
+		NewProps:      newProps,
+		ExistingProps: existingProps,
+		RemovedProps:  removedProps,
+	}, nil
+}
 
-	return
+func (p PropertySchema) getSchemaMutationFromPropertyMutation(pm PropertyMutation) (*ExistingPropertyMutation, error) {
+	f, ok := p.GetField(pm.ID.OrZero())
+	if !ok {
+		return nil, fault.Wrap(fault.Newf("field '%v' not found in schema", pm.ID), ftag.With(ftag.InvalidArgument))
+	}
+
+	// During a property mutation, the request may also change the schema by
+	// changing the name, type or sort properties. Mark as changed if so.
+	isChanged := false
+	if f.Name != pm.Name {
+		isChanged = true
+		f.Name = pm.Name
+	}
+	if t, ok := pm.Type.Get(); ok && t != f.Type {
+		isChanged = true
+		f.Type = t
+	}
+	if s, ok := pm.Sort.Get(); ok && s != f.Sort {
+		isChanged = true
+		f.Sort = s
+	}
+
+	return &ExistingPropertyMutation{
+		PropertySchemaField: *f,
+		IsSchemaChanged:     isChanged,
+		Value:               pm.Value,
+	}, nil
 }
 
 // Property mutations are used to update properties on a node.
 type PropertyMutation struct {
+	// ID is optional, when set the mutation is modifying an existing field and
+	// when not set, the mutation assumes it's a new field.
+	ID    opt.Optional[xid.ID]
 	Name  string
 	Value string
 	Type  opt.Optional[string]
@@ -92,7 +159,8 @@ type PropertyMutationList []PropertyMutation
 
 type ExistingPropertyMutation struct {
 	PropertySchemaField
-	Value string
+	IsSchemaChanged bool
+	Value           string
 }
 
 type ExistingPropertyMutations []*ExistingPropertyMutation

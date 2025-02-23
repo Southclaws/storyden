@@ -10,6 +10,8 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
+	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -229,6 +231,8 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	pml := opt.Map(opt.NewPtr(request.Body.Properties), deserialisePropertyMutationList)
+
 	titleFillRuleParam, err := opt.MapErr(opt.NewPtr(request.Params.TitleFillRule), deserialiseTitleFillRule)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -264,6 +268,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		Content:      content,
 		PrimaryImage: primaryImage,
 		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
+		Properties:   pml,
 		Tags:         tags,
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
 		FillSource:   fillSource,
@@ -300,7 +305,7 @@ func (c *Nodes) NodeUpdateVisibility(ctx context.Context, request openapi.NodeUp
 	}
 
 	return openapi.NodeUpdateVisibility200JSONResponse{
-		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseNode(node)),
+		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseNodeWithItems(node)),
 	}, nil
 }
 
@@ -337,7 +342,29 @@ func (c *Nodes) NodeUpdateChildrenPropertySchema(ctx context.Context, request op
 	}
 
 	return openapi.NodeUpdateChildrenPropertySchema200JSONResponse{
-		NodeUpdateChildrenPropertySchemaOKJSONResponse: openapi.NodeUpdateChildrenPropertySchemaOKJSONResponse{
+		NodeUpdatePropertySchemaOKJSONResponse: openapi.NodeUpdatePropertySchemaOKJSONResponse{
+			Properties: serialisePropertySchemas(*updated),
+		},
+	}, nil
+}
+
+func (c *Nodes) NodeUpdatePropertySchema(ctx context.Context, request openapi.NodeUpdatePropertySchemaRequestObject) (openapi.NodeUpdatePropertySchemaResponseObject, error) {
+	schemas := dt.Map(*request.Body, func(p openapi.PropertySchemaMutableProps) *node_properties.SchemaFieldMutation {
+		return &node_properties.SchemaFieldMutation{
+			ID:   opt.Map(opt.NewPtr(p.Fid), deserialiseID),
+			Name: p.Name,
+			Type: p.Type,
+			Sort: p.Sort,
+		}
+	})
+
+	updated, err := c.schemaUpdater.UpdateSiblings(ctx, deserialiseNodeMark(request.NodeSlug), schemas)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.NodeUpdatePropertySchema200JSONResponse{
+		NodeUpdatePropertySchemaOKJSONResponse: openapi.NodeUpdatePropertySchemaOKJSONResponse{
 			Properties: serialisePropertySchemas(*updated),
 		},
 	}, nil
@@ -420,8 +447,8 @@ func (c *Nodes) NodeRemoveNode(ctx context.Context, request openapi.NodeRemoveNo
 	}, nil
 }
 
-func serialiseUpdatedNode(in *node_mutate.Updated) openapi.Node {
-	n := serialiseNode(&in.Node)
+func serialiseUpdatedNode(in *node_mutate.Updated) openapi.NodeWithChildren {
+	n := serialiseNodeWithItems(&in.Node)
 
 	if ts, ok := in.TitleSuggestion.Get(); ok {
 		n.TitleSuggestion = &ts
@@ -543,16 +570,31 @@ func serialiseProperty(in *library.Property) openapi.Property {
 	}
 }
 
-func serialisePropertyList(in library.Properties) openapi.PropertyList {
-	return dt.Map(in, serialiseProperty)
-}
-
 func serialisePropertyTable(in library.PropertyTable) openapi.PropertyList {
 	if len(in.Properties) == 0 {
 		return openapi.PropertyList{}
 	}
 
-	return serialisePropertyList(in.Properties)
+	propertyFieldMap := lo.KeyBy(in.Properties, func(f *library.Property) xid.ID {
+		return f.Field.ID
+	})
+
+	pl := dt.Map(in.Schema.Fields, func(f *library.PropertySchemaField) openapi.Property {
+		p, ok := propertyFieldMap[f.ID]
+		if !ok {
+			return openapi.Property{
+				Fid:   f.ID.String(),
+				Name:  f.Name,
+				Type:  f.Type,
+				Sort:  f.Sort,
+				Value: nil,
+			}
+		}
+
+		return serialiseProperty(p)
+	})
+
+	return pl
 }
 
 func serialisePropertyTableOpt(in opt.Optional[library.PropertyTable]) openapi.PropertyList {
@@ -560,7 +602,7 @@ func serialisePropertyTableOpt(in opt.Optional[library.PropertyTable]) openapi.P
 	if !ok {
 		return openapi.PropertyList{}
 	}
-	return serialisePropertyList(pt.Properties)
+	return serialisePropertyTable(pt)
 }
 
 func serialisePropertySchema(in *library.PropertySchemaField) openapi.PropertySchema {
@@ -598,6 +640,7 @@ func deserialisePropertyMutationList(in openapi.PropertyMutationList) library.Pr
 
 func deserialisePropertyMutation(in openapi.PropertyMutation) library.PropertyMutation {
 	return library.PropertyMutation{
+		ID:    opt.Map(opt.NewPtr(in.Fid), deserialiseID),
 		Name:  in.Name,
 		Value: in.Value,
 		Type:  opt.NewPtr(in.Type),

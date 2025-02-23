@@ -1613,6 +1613,23 @@ paths:
       description: |
         Updates the property schema of the children of this node. All children
         of a node use the same schema for properties resulting in a table-like
+        structure and behaviour. See also: NodeUpdatePropertySchema
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody: {$ref: "#/components/requestBodies/NodeUpdatePropertySchema"}
+      responses:
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200":
+          $ref: "#/components/responses/NodeUpdatePropertySchemaOK"
+
+  /nodes/{node_slug}/property-schema:
+    patch:
+      operationId: NodeUpdatePropertySchema
+      description: |
+        Updates the property schema of this node and its siblings. All children
+        of a node use the same schema for properties resulting in a table-like
         structure and behaviour. Property schemas are loosely structured and can
         automatically cast their values sometimes. A failed cast will not change
         data and instead just yield an empty value when reading however changing
@@ -1622,14 +1639,13 @@ paths:
         quick schema changes without the need to remove or update values before.
       tags: [nodes]
       parameters: [$ref: "#/components/parameters/NodeSlugParam"]
-      requestBody:
-        {$ref: "#/components/requestBodies/NodeUpdateChildrenPropertySchema"}
+      requestBody: {$ref: "#/components/requestBodies/NodeUpdatePropertySchema"}
       responses:
         default: {$ref: "#/components/responses/InternalServerError"}
         "404": {$ref: "#/components/responses/NotFound"}
         "401": {$ref: "#/components/responses/Unauthorised"}
         "200":
-          $ref: "#/components/responses/NodeUpdateChildrenPropertySchemaOK"
+          $ref: "#/components/responses/NodeUpdatePropertySchemaOK"
 
   /nodes/{node_slug}/properties:
     patch:
@@ -2570,7 +2586,7 @@ components:
         application/json:
           schema: {$ref: "#/components/schemas/PropertyMutableProps"}
 
-    NodeUpdateChildrenPropertySchema:
+    NodeUpdatePropertySchema:
       content:
         application/json:
           schema:
@@ -3012,7 +3028,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Node"
+            $ref: "#/components/schemas/NodeWithChildren"
 
     NodeUpdatePropertiesOK:
       description: Node properties updated.
@@ -3025,7 +3041,7 @@ components:
               properties:
                 $ref: "#/components/schemas/PropertyList"
 
-    NodeUpdateChildrenPropertySchemaOK:
+    NodeUpdatePropertySchemaOK:
       description: Node children schema updated.
       content:
         application/json:
@@ -5248,6 +5264,7 @@ components:
           {$ref: "#/components/schemas/NullableIdentifier"}
         content: {$ref: "#/components/schemas/PostContent"}
         parent: {$ref: "#/components/schemas/NodeSlug"}
+        properties: {$ref: "#/components/schemas/PropertyMutationList"}
         tags: {$ref: "#/components/schemas/TagNameList"}
         meta: {$ref: "#/components/schemas/Metadata"}
 
@@ -5290,10 +5307,11 @@ components:
       description: |
         A property mutation is a change to a property on a node. It can be used
         to update existing properties or add new properties to a node. When a
-        property already exists by name, the type and sort columns are optional.
+        property already exists by name/fid, type and sort columns are optional.
       type: object
       required: [name, value]
       properties:
+        fid: {$ref: "#/components/schemas/Identifier"}
         name: {$ref: "#/components/schemas/PropertyName"}
         value: {$ref: "#/components/schemas/PropertyValue"}
         type: {$ref: "#/components/schemas/PropertyType"}

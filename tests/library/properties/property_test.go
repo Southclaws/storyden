@@ -4,12 +4,12 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Southclaws/dt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
@@ -103,11 +103,26 @@ func TestNodesProperty(t *testing.T) {
 			}, session)
 			tests.Ok(t, err, res)
 
+			s1fieldIDs := dt.Map(res.JSON200.Properties, func(p openapi.PropertySchema) string {
+				return p.Fid
+			})
+
+			s1field1ID := &s1fieldIDs[0]
+			s1field2ID := &s1fieldIDs[1]
+			s1field3ID := &s1fieldIDs[2]
+
 			res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(root, slug3, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
 				{Name: "size", Type: "number", Sort: "1"},
 				{Name: "brand", Type: "string", Sort: "2"},
 			}, session)
 			tests.Ok(t, err, res)
+
+			// s2fieldIDs := dt.Map(res.JSON200.Properties, func(p openapi.PropertySchema) string {
+			// 	return p.Fid
+			// })
+
+			// s2field1ID := &s2fieldIDs[0]
+			// s2field2ID := &s2fieldIDs[1]
 
 			t.Run("fail_unauthenticated", func(t *testing.T) {
 				r := require.New(t)
@@ -115,9 +130,9 @@ func TestNodesProperty(t *testing.T) {
 
 				update, err := cl.NodeUpdatePropertiesWithResponse(root, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
 					Properties: openapi.PropertyMutationList{
-						{Name: "weight", Value: "5"},
-						{Name: "kind", Value: "mythical"},
-						{Name: "added", Value: "2025-01-01T12:59:21Z"},
+						{Fid: s1field1ID, Name: "weight", Value: "5"},
+						{Fid: s1field2ID, Name: "kind", Value: "mythical"},
+						{Fid: s1field3ID, Name: "added", Value: "2025-01-01T12:59:21Z"},
 						{Name: "new", Value: "prop"},
 					},
 				})
@@ -131,9 +146,9 @@ func TestNodesProperty(t *testing.T) {
 
 				update, err := cl.NodeUpdatePropertiesWithResponse(root, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
 					Properties: openapi.PropertyMutationList{
-						{Name: "weight", Value: "5"},
-						{Name: "kind", Value: "mythical"},
-						{Name: "added", Value: "2025-01-01T12:59:21Z"},
+						{Fid: s1field1ID, Name: "weight", Value: "5"},
+						{Fid: s1field2ID, Name: "kind", Value: "mythical"},
+						{Fid: s1field3ID, Name: "added", Value: "2025-01-01T12:59:21Z"},
 						{Name: "new", Value: "prop"},
 					},
 				}, randomUser)
@@ -147,9 +162,9 @@ func TestNodesProperty(t *testing.T) {
 
 				update, err := cl.NodeUpdatePropertiesWithResponse(root, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
 					Properties: openapi.PropertyMutationList{
-						{Name: "weight", Value: "5"},
-						{Name: "kind", Value: "mythical"},
-						{Name: "added", Value: "2025-01-01T12:59:21Z"},
+						{Fid: s1field1ID, Name: "weight", Value: "5"},
+						{Fid: s1field2ID, Name: "kind", Value: "mythical"},
+						{Fid: s1field3ID, Name: "added", Value: "2025-01-01T12:59:21Z"},
 						{Name: "new", Value: "prop"},
 					},
 				}, session)
@@ -163,9 +178,9 @@ func TestNodesProperty(t *testing.T) {
 
 				update, err := cl.NodeUpdatePropertiesWithResponse(root, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
 					Properties: openapi.PropertyMutationList{
-						{Name: "weight", Value: "4"},
-						{Name: "kind", Value: "legendary"},
-						{Name: "added", Value: "2025-02-06T20:59:21Z"},
+						{Fid: s1field1ID, Name: "weight", Value: "4"},
+						{Fid: s1field2ID, Name: "kind", Value: "legendary"},
+						{Fid: s1field3ID, Name: "added", Value: "2025-02-06T20:59:21Z"},
 					},
 				}, session)
 				r.NoError(err)
@@ -180,9 +195,9 @@ func TestNodesProperty(t *testing.T) {
 
 				update, err := cl.NodeUpdatePropertiesWithResponse(root, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
 					Properties: openapi.PropertyMutationList{
-						{Name: "weight", Value: "5"},
-						{Name: "kind", Value: "mythical"},
-						{Name: "added", Value: "2025-01-01T12:59:21Z"},
+						{Fid: s1field1ID, Name: "weight", Value: "5"},
+						{Fid: s1field2ID, Name: "kind", Value: "mythical"},
+						{Fid: s1field3ID, Name: "added", Value: "2025-01-01T12:59:21Z"},
 						{Name: "new", Value: "prop", Type: &ptype},
 					},
 				}, session)
@@ -251,15 +266,23 @@ func TestNodesPropertyFieldOrdering(t *testing.T) {
 			}, session)
 			tests.Ok(t, err, res)
 
+			fieldIDs := dt.Map(res.JSON200.Properties, func(p openapi.PropertySchema) string {
+				return p.Fid
+			})
+
+			field1ID := &fieldIDs[0]
+			field2ID := &fieldIDs[1]
+			field3ID := &fieldIDs[2]
+
 			t.Run("sort_fields", func(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
 				update, err := cl.NodeUpdatePropertiesWithResponse(ctx, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
 					Properties: openapi.PropertyMutationList{
-						{Name: "added", Value: "2025-01-01T12:59:21Z"},
-						{Name: "weight", Value: "5"},
-						{Name: "kind", Value: "mythical"},
+						{Fid: field3ID, Name: "added", Value: "2025-01-01T12:59:21Z"},
+						{Fid: field1ID, Name: "weight", Value: "5"},
+						{Fid: field2ID, Name: "kind", Value: "mythical"},
 					},
 				}, session)
 				r.NoError(err)
@@ -316,6 +339,16 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 
 			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
 			session := e2e.WithSession(ctx, cj)
+
+			// Create the following node tree:
+			//
+			// parent
+			//  |- child-1
+			//  |- child-2
+			//  |- child-3
+			//      |- child-3-4
+			//      |- child-3-5
+			//
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()
@@ -381,6 +414,13 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 			}, session)
 			tests.Ok(t, err, res)
 
+			s1fieldIDs := dt.Map(res.JSON200.Properties, func(p openapi.PropertySchema) string { return p.Fid })
+			s1field1ID := &s1fieldIDs[0]
+			s1field2ID := &s1fieldIDs[1]
+			s1field3ID := &s1fieldIDs[2]
+
+			// Update children of child-3 schema
+
 			res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, slug3, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
 				{Name: "size", Type: "number", Sort: "1"},
 				{Name: "brand", Type: "string", Sort: "2"},
@@ -389,9 +429,9 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 
 			update, err := cl.NodeUpdatePropertiesWithResponse(ctx, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
 				Properties: openapi.PropertyMutationList{
-					{Name: "weight", Value: "4"},
-					{Name: "kind", Value: "legendary"},
-					{Name: "added", Value: "2025-02-06T20:59:21Z"},
+					{Fid: s1field1ID, Name: "weight", Value: "4"},
+					{Fid: s1field2ID, Name: "kind", Value: "legendary"},
+					{Fid: s1field3ID, Name: "added", Value: "2025-02-06T20:59:21Z"},
 				},
 			}, session)
 			r.NoError(err)
@@ -434,9 +474,80 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 				delete, err = cl.NodeDeleteWithResponse(ctx, slug3, &openapi.NodeDeleteParams{}, session)
 				tests.Ok(t, err, delete)
 
-				c, err := db.PropertySchema.Query().Where(propertyschema.ID(schemaID)).Count(ctx)
+				c, err := db.PropertySchema.Query().Where(propertyschema.ID(*schemaID)).Count(ctx)
 				r.NoError(err)
 				r.Equal(0, c, "property schema should be deleted as it is no longer in use by any nodes")
+			})
+		}))
+	}))
+}
+
+func TestNodesPropertySchemaBadRequests(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		cl *openapi.ClientWithResponses,
+		cj *session_cookie.Jar,
+		aw *account_writer.Writer,
+		db *ent.Client,
+	) {
+		lc.Append(fx.StartHook(func() {
+			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			session := e2e.WithSession(ctx, cj)
+
+			parentname := "parent"
+			parentslug := parentname + uuid.NewString()
+			parent, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name: parentname,
+				Slug: &parentslug,
+			}, session)
+			tests.Ok(t, err, parent)
+
+			// add 3 child nodes to parent
+
+			name1 := "child-1"
+			slug1 := name1 + uuid.NewString()
+			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name:   name1,
+				Slug:   &slug1,
+				Parent: &parent.JSON200.Slug,
+			}, session)
+			tests.Ok(t, err, node1)
+
+			res, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parentslug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
+				{Name: "weight", Type: "number", Sort: "1"},
+				{Name: "kind", Type: "string", Sort: "2"},
+				{Name: "added", Type: "timestamp", Sort: "3"},
+			}, session)
+			tests.Ok(t, err, res)
+
+			s1fieldIDs := dt.Map(res.JSON200.Properties, func(p openapi.PropertySchema) string { return p.Fid })
+			s1field1ID := &s1fieldIDs[0]
+			s1field2ID := &s1fieldIDs[1]
+
+			// Update children of child-3 schema
+
+			res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, slug1, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
+				{Name: "size", Type: "number", Sort: "1"},
+				{Name: "brand", Type: "string", Sort: "2"},
+			}, session)
+			tests.Ok(t, err, res)
+
+			t.Run("update_properties_missing_id", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				update, err := cl.NodeUpdatePropertiesWithResponse(ctx, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
+					Properties: openapi.PropertyMutationList{
+						{Fid: s1field1ID, Name: "weight", Value: "4"},
+						{Fid: s1field2ID, Name: "kind", Value: "legendary"},
+						{Name: "added", Value: "2025-02-06T20:59:21Z"},
+					},
+				}, session)
+				r.NoError(err)
+				a.Equal(400, update.StatusCode())
 			})
 		}))
 	}))

@@ -25,6 +25,8 @@ import {
   NodeListParams,
   NodeMutableProps,
   NodeWithChildren,
+  Property,
+  PropertyMutation,
   TagReference,
   Visibility,
 } from "@/api/openapi-schema";
@@ -160,6 +162,18 @@ export function useLibraryMutation(node?: Node) {
 
       const nodeProps = omit(newNode, "parent");
 
+      const withProperties = {
+        properties:
+          newNode.properties?.map((p: PropertyMutation) => {
+            return {
+              fid: p.fid ?? uniqueId("new_field_"),
+              sort: p.sort ?? "",
+              type: p.type ?? "text",
+              ...p,
+            } satisfies Property;
+          }) ?? data.properties,
+      };
+
       const withNewCover = cover?.asset && mergePrimaryImageAsset(data, cover);
 
       const withTags = {
@@ -177,6 +191,7 @@ export function useLibraryMutation(node?: Node) {
       const updated = {
         ...data,
         ...nodeProps,
+        ...withProperties,
         ...withNewCover,
         ...withTags,
       } satisfies NodeWithChildren;

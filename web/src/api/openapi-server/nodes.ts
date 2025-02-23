@@ -19,12 +19,12 @@ import type {
   NodeListParams,
   NodeRemoveChildOKResponse,
   NodeUpdateBody,
-  NodeUpdateChildrenPropertySchemaBody,
-  NodeUpdateChildrenPropertySchemaOKResponse,
   NodeUpdateOKResponse,
   NodeUpdateParams,
   NodeUpdatePropertiesBody,
   NodeUpdatePropertiesOKResponse,
+  NodeUpdatePropertySchemaBody,
+  NodeUpdatePropertySchemaOKResponse,
   VisibilityUpdateBody,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -202,17 +202,11 @@ export const nodeDelete = async (
 /**
  * Updates the property schema of the children of this node. All children
 of a node use the same schema for properties resulting in a table-like
-structure and behaviour. Property schemas are loosely structured and can
-automatically cast their values sometimes. A failed cast will not change
-data and instead just yield an empty value when reading however changing
-the schema back to the original type (or a type compatible with what the
-type was before changing) will retain the original data upon next read.
-This permits clients to undo changes to the schema easily while allowing
-quick schema changes without the need to remove or update values before.
+structure and behaviour. See also: NodeUpdatePropertySchema
 
  */
 export type nodeUpdateChildrenPropertySchemaResponse = {
-  data: NodeUpdateChildrenPropertySchemaOKResponse;
+  data: NodeUpdatePropertySchemaOKResponse;
   status: number;
 };
 
@@ -222,7 +216,7 @@ export const getNodeUpdateChildrenPropertySchemaUrl = (nodeSlug: string) => {
 
 export const nodeUpdateChildrenPropertySchema = async (
   nodeSlug: string,
-  nodeUpdateChildrenPropertySchemaBody: NodeUpdateChildrenPropertySchemaBody,
+  nodeUpdatePropertySchemaBody: NodeUpdatePropertySchemaBody,
   options?: RequestInit,
 ): Promise<nodeUpdateChildrenPropertySchemaResponse> => {
   return fetcher<Promise<nodeUpdateChildrenPropertySchemaResponse>>(
@@ -231,7 +225,44 @@ export const nodeUpdateChildrenPropertySchema = async (
       ...options,
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(nodeUpdateChildrenPropertySchemaBody),
+      body: JSON.stringify(nodeUpdatePropertySchemaBody),
+    },
+  );
+};
+
+/**
+ * Updates the property schema of this node and its siblings. All children
+of a node use the same schema for properties resulting in a table-like
+structure and behaviour. Property schemas are loosely structured and can
+automatically cast their values sometimes. A failed cast will not change
+data and instead just yield an empty value when reading however changing
+the schema back to the original type (or a type compatible with what the
+type was before changing) will retain the original data upon next read.
+This permits clients to undo changes to the schema easily while allowing
+quick schema changes without the need to remove or update values before.
+
+ */
+export type nodeUpdatePropertySchemaResponse = {
+  data: NodeUpdatePropertySchemaOKResponse;
+  status: number;
+};
+
+export const getNodeUpdatePropertySchemaUrl = (nodeSlug: string) => {
+  return `/nodes/${nodeSlug}/property-schema`;
+};
+
+export const nodeUpdatePropertySchema = async (
+  nodeSlug: string,
+  nodeUpdatePropertySchemaBody: NodeUpdatePropertySchemaBody,
+  options?: RequestInit,
+): Promise<nodeUpdatePropertySchemaResponse> => {
+  return fetcher<Promise<nodeUpdatePropertySchemaResponse>>(
+    getNodeUpdatePropertySchemaUrl(nodeSlug),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(nodeUpdatePropertySchemaBody),
     },
   );
 };

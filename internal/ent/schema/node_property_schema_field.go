@@ -35,7 +35,8 @@ func (PropertySchemaField) Edges() []ent.Edge {
 			Unique().
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 
-		edge.To("properties", Property.Type),
+		edge.To("properties", Property.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 	}
 }
 

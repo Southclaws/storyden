@@ -15742,7 +15742,7 @@ func (m *NodeMutation) PropertySchemaID() (r xid.ID, exists bool) {
 // OldPropertySchemaID returns the old "property_schema_id" field's value of the Node entity.
 // If the Node object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NodeMutation) OldPropertySchemaID(ctx context.Context) (v xid.ID, err error) {
+func (m *NodeMutation) OldPropertySchemaID(ctx context.Context) (v *xid.ID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldPropertySchemaID is only allowed on UpdateOne operations")
 	}

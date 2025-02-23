@@ -58,3 +58,31 @@ func (u *Updater) UpdateChildren(ctx context.Context, qk library.QueryKey, schem
 
 	return schema, nil
 }
+
+func (u *Updater) UpdateSiblings(ctx context.Context, qk library.QueryKey, schemas node_properties.FieldSchemaMutations) (*library.PropertySchema, error) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err := u.accountQuery.GetByID(ctx, accountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	n, err := u.nodeQuerier.Get(ctx, qk)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := node_auth.AuthoriseNodeMutation(ctx, acc, n); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	schema, err := u.nsr.UpdateSiblings(ctx, qk, schemas)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return schema, nil
+}

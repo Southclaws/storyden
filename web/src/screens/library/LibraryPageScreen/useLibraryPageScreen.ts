@@ -1,9 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import slugify from "@sindresorhus/slugify";
+import { dequal } from "dequal";
+import { omit, values } from "lodash/fp";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FixedCropperRef } from "react-advanced-cropper";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { match } from "ts-pattern";
 import { z } from "zod";
 
@@ -14,6 +17,9 @@ import {
   LinkReference,
   NodeWithChildren,
   Permission,
+  PropertyList,
+  PropertyMutation,
+  PropertyMutationList,
   Visibility,
 } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
@@ -43,10 +49,19 @@ const CoverImageFormSchema = z.union([
   }),
 ]);
 
+export const FormNodePropertySchema = z.object({
+  fid: z.string().optional(),
+  name: z.string(),
+  type: z.string(),
+  sort: z.string(),
+  value: z.string(),
+});
+export type FormNodeProperty = z.infer<typeof FormNodePropertySchema>;
+
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name."),
   slug: z.string().optional(),
-  properties: z.array(z.tuple([z.string(), z.string()])).optional(),
+  properties: z.array(FormNodePropertySchema),
   tags: z.string().array().optional(),
   link: z.preprocess((v) => {
     if (typeof v === "string" && v === "") {
@@ -97,16 +112,22 @@ export function useLibraryPageScreen({ node }: Props) {
     Permission.MANAGE_LIBRARY,
   );
 
-  const defaults: Form = useMemo(
-    () => ({
-      name: node.name,
-      slug: node.slug,
-      properties: node.properties.map((p) => [p.name, p.value ?? ""]),
-      tags: node.tags.map((t) => t.name),
-      link: node.link?.url,
-      description: node.description,
-      content: node.content,
-    }),
+  const defaults = useMemo<Form>(
+    () =>
+      ({
+        name: node.name,
+        slug: node.slug,
+        properties: node.properties.map((p, i) => ({
+          fid: p.fid,
+          name: p.name ?? `Field ${i}`,
+          type: p.type ?? "text",
+          sort: p.sort,
+          value: p.value ?? "",
+        })),
+        tags: node.tags.map((t) => t.name),
+        link: node.link?.url,
+        content: node.content,
+      }) satisfies Form,
     [node],
   );
 
@@ -186,23 +207,13 @@ export function useLibraryPageScreen({ node }: Props) {
     if (editing) {
       setEditing(false);
 
-      form.reset({
-        name: node.name,
-        slug: node.slug,
-        link: node.link?.url,
-        content: node.content,
-      });
+      form.reset(defaults);
     } else {
       if (!isAllowedToEdit) return;
 
       setEditing(true);
 
-      form.reset({
-        name: node.name,
-        slug: node.slug,
-        link: node.link?.url,
-        content: node.content,
-      });
+      form.reset(defaults);
     }
   }
 
@@ -298,6 +309,12 @@ export function useLibraryPageScreen({ node }: Props) {
           node.slug,
           {
             ...payload,
+            properties: payload.properties.map((p) => {
+              if (p.fid?.startsWith("new_field_")) {
+                return omit("fid", p);
+              }
+              return p;
+            }),
             url: payload.link,
           },
           coverConfig,
