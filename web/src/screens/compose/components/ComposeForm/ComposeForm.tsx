@@ -11,8 +11,7 @@ import { TitleInput } from "../TitleInput/TitleInput";
 import { Props, useComposeForm } from "./useComposeForm";
 
 export function ComposeForm(props: Props) {
-  const { formContext, onPublish, onSave, onAssetUpload } =
-    useComposeForm(props);
+  const { form, state, handlers } = useComposeForm(props);
 
   return (
     <styled.form
@@ -22,15 +21,15 @@ export function ComposeForm(props: Props) {
       w="full"
       h="full"
       gap="2"
-      onSubmit={onPublish}
+      onSubmit={handlers.handlePublish}
     >
-      <FormProvider {...formContext}>
+      <FormProvider {...form}>
         <WStack>
           <HStack width="full">
             <CategorySelect />
             <TagListField
               name="tags"
-              control={formContext.control}
+              control={form.control}
               initialTags={props.initialDraft?.tags}
             />
           </HStack>
@@ -39,8 +38,9 @@ export function ComposeForm(props: Props) {
             <Button
               variant="ghost"
               size="xs"
-              disabled={!formContext.formState.isValid}
-              onClick={onSave}
+              disabled={!form.formState.isValid}
+              onClick={handlers.handleSaveDraft}
+              loading={state.isSavingDraft}
             >
               Save draft
             </Button>
@@ -49,8 +49,8 @@ export function ComposeForm(props: Props) {
               variant="subtle"
               size="xs"
               type="submit"
-              disabled={!formContext.formState.isValid}
-              // isLoading={formContext.formState.isSubmitting}
+              disabled={!form.formState.isValid}
+              loading={state.isPublishing}
             >
               Post
             </Button>
@@ -63,7 +63,7 @@ export function ComposeForm(props: Props) {
           </HStack>
         </HStack>
 
-        <BodyInput onAssetUpload={onAssetUpload} />
+        <BodyInput onAssetUpload={handlers.handleAssetUpload} />
       </FormProvider>
     </styled.form>
   );
