@@ -131,11 +131,11 @@ paths:
   /openapi.json:
     get:
       operationId: GetSpec
-      summary: Get the OpenAPI 3.0 specification as JSON.
+      summary: OpenAPI specification
       description: |
-        Note: the generator creates a `map[string]interface{}` if this is set to
-        `application/json`... so I'm just using plain text for now.
-
+        This endpoint returns the OpenAPI specification for the Storyden API in
+        JSON format. This is useful for clients that want to dynamically load
+        the API specification for documentation or code generation.
       security: []
       tags: [misc]
       responses:
@@ -143,7 +143,26 @@ paths:
         "200":
           description: OK
           content:
-            text/plain:
+            application/vnd.oai.openapi+json;version=3.1.0:
+              schema:
+                type: object
+
+  /docs:
+    get:
+      operationId: GetDocs
+      summary: API documentation
+      description: |
+        This endpoint returns the OpenAPI documentation for the Storyden API in
+        an interactive HTML format. This is useful for developers who want to
+        explore the API and test endpoints without writing code.
+      security: []
+      tags: [misc]
+      responses:
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "200":
+          description: OK
+          content:
+            text/html:
               schema:
                 type: string
 

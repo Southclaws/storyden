@@ -5,6 +5,7 @@ import "github.com/Southclaws/storyden/app/resources/rbac"
 type OperationPermissions interface {
 	GetVersion() (bool, *rbac.Permission)
 	GetSpec() (bool, *rbac.Permission)
+	GetDocs() (bool, *rbac.Permission)
 	GetInfo() (bool, *rbac.Permission)
 	IconGet() (bool, *rbac.Permission)
 	IconUpload() (bool, *rbac.Permission)
@@ -126,6 +127,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.GetVersion()
 	case "GetSpec":
 		return optable.GetSpec()
+	case "GetDocs":
+		return optable.GetDocs()
 	case "GetInfo":
 		return optable.GetInfo()
 	case "IconGet":
