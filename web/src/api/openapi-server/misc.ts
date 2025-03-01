@@ -39,10 +39,11 @@ export const getVersion = async (
 };
 
 /**
- * Note: the generator creates a `map[string]interface{}` if this is set to
-`application/json`... so I'm just using plain text for now.
+ * This endpoint returns the OpenAPI specification for the Storyden API in
+JSON format. This is useful for clients that want to dynamically load
+the API specification for documentation or code generation.
 
- * @summary Get the OpenAPI 3.0 specification as JSON.
+ * @summary Get the OpenAPI specification as JSON.
  */
 export type getSpecResponse = {
   data: string;
@@ -57,6 +58,31 @@ export const getSpec = async (
   options?: RequestInit,
 ): Promise<getSpecResponse> => {
   return fetcher<Promise<getSpecResponse>>(getGetSpecUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+/**
+ * This endpoint returns the OpenAPI documentation for the Storyden API in
+an interactive HTML format. This is useful for developers who want to
+explore the API and test endpoints without writing code.
+
+ * @summary Get the OpenAPI documentation as an interactive HTML document.
+ */
+export type getDocsResponse = {
+  data: string;
+  status: number;
+};
+
+export const getGetDocsUrl = () => {
+  return `/docs`;
+};
+
+export const getDocs = async (
+  options?: RequestInit,
+): Promise<getDocsResponse> => {
+  return fetcher<Promise<getDocsResponse>>(getGetDocsUrl(), {
     ...options,
     method: "GET",
   });
