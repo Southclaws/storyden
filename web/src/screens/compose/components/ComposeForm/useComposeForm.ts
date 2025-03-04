@@ -73,19 +73,25 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       return;
     }
 
-    const updatedBody = {
-      title,
-      body,
-      category,
-      visibility: Visibility.published,
-      tags,
-      url,
-    };
     if (editing) {
-      const { slug } = await threadUpdate(editing, updatedBody);
+      const { slug } = await threadUpdate(editing, {
+        title,
+        body,
+        category,
+        visibility: Visibility.published,
+        tags,
+        url,
+      });
       router.push(`/t/${slug}`);
     } else {
-      const { slug } = await threadCreate(updatedBody);
+      const { slug } = await threadCreate({
+        title,
+        body,
+        category,
+        visibility: Visibility.published,
+        tags,
+        url,
+      });
       router.push(`/t/${slug}`);
     }
   };
