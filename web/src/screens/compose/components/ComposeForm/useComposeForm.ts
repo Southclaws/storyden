@@ -168,6 +168,10 @@ export function useComposeForm({ initialDraft, editing }: Props) {
     );
   };
 
+  function handleBack() {
+    router.back();
+  }
+
   return {
     form,
     state: {
@@ -178,7 +182,8 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       handleSaveDraft,
       handlePublish,
       handleAssetDelete,
-      handleAssetUpload
+      handleAssetUpload,
+      handleBack
     }
   };
 }
