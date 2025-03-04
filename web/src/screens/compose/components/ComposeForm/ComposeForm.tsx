@@ -38,7 +38,7 @@ export function ComposeForm(props: Props) {
             <Button
               variant="ghost"
               size="xs"
-              disabled={!form.formState.isValid}
+              disabled={!form.formState.isValid || state.isSavingDraft}
               onClick={handlers.handleSaveDraft}
               loading={state.isSavingDraft}
             >
@@ -49,7 +49,7 @@ export function ComposeForm(props: Props) {
               variant="subtle"
               size="xs"
               type="submit"
-              disabled={!form.formState.isValid}
+              disabled={!form.formState.isValid || state.isPublishing}
               loading={state.isPublishing}
             >
               Post
