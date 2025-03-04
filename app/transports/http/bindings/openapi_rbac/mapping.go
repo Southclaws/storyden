@@ -14,6 +14,10 @@ func (m *Mapping) GetSpec() (bool, *rbac.Permission) {
 	return false, nil // Public
 }
 
+func (m *Mapping) GetDocs() (bool, *rbac.Permission) {
+	return false, nil // Public
+}
+
 func (m *Mapping) GetInfo() (bool, *rbac.Permission) {
 	return false, nil // Public
 }

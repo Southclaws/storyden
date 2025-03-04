@@ -66,10 +66,11 @@ export const useGetVersion = <TError = InternalServerErrorResponse>(options?: {
   };
 };
 /**
- * Note: the generator creates a `map[string]interface{}` if this is set to
-`application/json`... so I'm just using plain text for now.
+ * This endpoint returns the OpenAPI specification for the Storyden API in
+JSON format. This is useful for clients that want to dynamically load
+the API specification for documentation or code generation.
 
- * @summary Get the OpenAPI 3.0 specification as JSON.
+ * @summary Get the OpenAPI specification as JSON.
  */
 export const getSpec = () => {
   return fetcher<string>({ url: `/openapi.json`, method: "GET" });
@@ -83,7 +84,7 @@ export type GetSpecQueryResult = NonNullable<
 export type GetSpecQueryError = InternalServerErrorResponse;
 
 /**
- * @summary Get the OpenAPI 3.0 specification as JSON.
+ * @summary Get the OpenAPI specification as JSON.
  */
 export const useGetSpec = <TError = InternalServerErrorResponse>(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof getSpec>>, TError> & {
@@ -97,6 +98,51 @@ export const useGetSpec = <TError = InternalServerErrorResponse>(options?: {
   const swrKey =
     swrOptions?.swrKey ?? (() => (isEnabled ? getGetSpecKey() : null));
   const swrFn = () => getSpec();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * This endpoint returns the OpenAPI documentation for the Storyden API in
+an interactive HTML format. This is useful for developers who want to
+explore the API and test endpoints without writing code.
+
+ * @summary Get the OpenAPI documentation as an interactive HTML document.
+ */
+export const getDocs = () => {
+  return fetcher<string>({ url: `/docs`, method: "GET" });
+};
+
+export const getGetDocsKey = () => [`/docs`] as const;
+
+export type GetDocsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getDocs>>
+>;
+export type GetDocsQueryError = InternalServerErrorResponse;
+
+/**
+ * @summary Get the OpenAPI documentation as an interactive HTML document.
+ */
+export const useGetDocs = <TError = InternalServerErrorResponse>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof getDocs>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getGetDocsKey() : null));
+  const swrFn = () => getDocs();
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
