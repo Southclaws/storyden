@@ -7,6 +7,7 @@ import (
 	"go.uber.org/fx"
 	"go.uber.org/zap"
 
+	"github.com/Southclaws/storyden/app/transports/http/mcp"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/chaos"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/frontend"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/headers"
@@ -36,6 +37,8 @@ func MountOpenAPI(
 	cj *session_cookie.Jar,
 	rl *limiter.Middleware,
 	cm *chaos.Middleware,
+
+	mcp mcp.Handler,
 ) {
 	lc.Append(fx.StartHook(func() {
 		applied := httpserver.Apply(router,
@@ -57,5 +60,7 @@ func MountOpenAPI(
 		// Mounting the Echo router must happen after all Echo's middleware and
 		// routes have been set up so it's done inside the start lifecycle hook.
 		mux.Handle("/", applied)
+
+		mux.Handle("/mcp/", http.StripPrefix("/mcp", mcp))
 	}))
 }
