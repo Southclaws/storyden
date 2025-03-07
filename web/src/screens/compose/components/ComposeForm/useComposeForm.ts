@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { useState } from "react";
 import { z } from "zod";
 
 import { useCategoryList } from "src/api/openapi-client/categories";
@@ -23,8 +24,11 @@ export type FormShape = z.infer<typeof FormShapeSchema>;
 export function useComposeForm({ initialDraft, editing }: Props) {
   const router = useRouter();
 
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+
   const { data } = useCategoryList();
-  const formContext = useForm<FormShape>({
+  const form = useForm<FormShape>({
     resolver: zodResolver(FormShapeSchema),
     reValidateMode: "onChange",
     defaultValues: initialDraft
@@ -40,7 +44,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
         },
   });
 
-  const doSave = async (data: FormShape) => {
+  const saveDraft = async (data: FormShape) => {
     const payload: ThreadInitialProps = {
       ...data,
 
@@ -57,14 +61,13 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       await threadUpdate(editing, payload);
     } else {
       const { id } = await threadCreate(payload);
-
       router.push(`/new?id=${id}`);
     }
-  };
+  }
 
-  const doPublish = async ({ title, body, category, tags, url }: FormShape) => {
+  const publish = async ({ title, body, category, tags, url }: FormShape) => {
     if (title.length < 1) {
-      formContext.setError("title", {
+      form.setError("title", {
         message: "Your post must have a title to be published",
       });
       return;
@@ -93,42 +96,94 @@ export function useComposeForm({ initialDraft, editing }: Props) {
     }
   };
 
-  const onAssetUpload = async () => {
-    const state = formContext.getValues();
-    await handle(async () => {
-      await doSave(state);
-    });
+  const handleSaveDraft = form.handleSubmit((data) =>
+    handle(
+      async () => {
+        setIsSavingDraft(true);
+        await saveDraft(data);
+      },
+      {
+        promiseToast: {
+          loading: "Saving draft...",
+          success: "Draft saved!"
+        },
+        cleanup: async () => {
+          setIsSavingDraft(false);
+        }
+      }
+  ));
+
+  const handlePublish = form.handleSubmit((data) =>
+    handle(
+      async () => {
+        setIsPublishing(true);
+        await publish(data);
+      },
+      {
+        promiseToast: {
+          loading: "Publishing post...",
+          success: "Post published!"
+        },
+        cleanup: async () => {
+          setIsPublishing(false);
+        }
+      }
+  ));
+
+  const handleAssetUpload = async () => {
+    await handle(
+      async () => {
+        setIsSavingDraft(true);
+        const state = form.getValues();
+        await saveDraft(state);
+      },
+      {
+        promiseToast: {
+          loading: "Saving draft...",
+          success: "Draft saved!"
+        },
+        cleanup: async () => {
+          setIsSavingDraft(false);
+        }
+      }
+    );
   };
 
-  const onAssetDelete = async () => {
-    const state = formContext.getValues();
-    await handle(async () => {
-      await doSave(state);
-    });
+  const handleAssetDelete = async () => {
+    await handle(
+      async () => {
+        setIsSavingDraft(true);
+        const state = form.getValues();
+        await saveDraft(state);
+      },
+      {
+        promiseToast: {
+          loading: "Saving draft...",
+          success: "Draft saved!"
+        },
+        cleanup: async () => {
+          setIsSavingDraft(false);
+        }
+      }
+    );
   };
 
-  function onBack() {
+  function handleBack() {
     router.back();
   }
 
-  const onSave = formContext.handleSubmit((data) =>
-    handle(async () => {
-      await doSave(data);
-    }),
-  );
-
-  const onPublish = formContext.handleSubmit((data) =>
-    handle(async () => {
-      await doPublish(data);
-    }),
-  );
-
   return {
-    onBack,
-    onSave,
-    onPublish,
-    onAssetUpload,
-    onAssetDelete,
-    formContext,
+    form,
+    state: {
+      isPublishing,
+      isSavingDraft
+    },
+    handlers: {
+      handleSaveDraft,
+      handlePublish,
+      handleAssetDelete,
+      handleAssetUpload,
+      handleBack
+    }
   };
 }
