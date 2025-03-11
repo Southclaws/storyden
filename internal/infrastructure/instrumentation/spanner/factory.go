@@ -5,6 +5,7 @@ import (
 
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/fx"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/tracing"
@@ -23,6 +24,7 @@ type Span interface {
 	End()
 	Annotate(a ...kv.Attr) context.Context
 	Event(name string, a ...kv.Attr)
+	Logger() *zap.Logger
 	Wrap(err error, msg string, a ...kv.Attr) error
 }
 
@@ -34,14 +36,16 @@ func SpanID(ctx context.Context) string {
 	return trace.SpanFromContext(ctx).SpanContext().SpanID().String()
 }
 
-func New(lc fx.Lifecycle, logger, tf tracing.Factory) Builder {
+func New(lc fx.Lifecycle, lg *zap.Logger, tf tracing.Factory) Builder {
 	return &service{
 		lc: lc,
 		tf: tf,
+		lg: lg,
 	}
 }
 
 type service struct {
 	lc fx.Lifecycle
+	lg *zap.Logger
 	tf tracing.Factory
 }
