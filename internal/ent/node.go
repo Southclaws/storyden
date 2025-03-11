@@ -40,7 +40,7 @@ type Node struct {
 	// Content holds the value of the "content" field.
 	Content *string `json:"content,omitempty"`
 	// ParentNodeID holds the value of the "parent_node_id" field.
-	ParentNodeID xid.ID `json:"parent_node_id,omitempty"`
+	ParentNodeID *xid.ID `json:"parent_node_id,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
 	// PropertySchemaID holds the value of the "property_schema_id" field.
@@ -213,7 +213,7 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case node.FieldPropertySchemaID, node.FieldPrimaryAssetID:
+		case node.FieldParentNodeID, node.FieldPropertySchemaID, node.FieldPrimaryAssetID:
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case node.FieldMetadata:
 			values[i] = new([]byte)
@@ -221,7 +221,7 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case node.FieldCreatedAt, node.FieldUpdatedAt, node.FieldDeletedAt, node.FieldIndexedAt:
 			values[i] = new(sql.NullTime)
-		case node.FieldID, node.FieldParentNodeID, node.FieldAccountID, node.FieldLinkID:
+		case node.FieldID, node.FieldAccountID, node.FieldLinkID:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -297,10 +297,11 @@ func (n *Node) assignValues(columns []string, values []any) error {
 				*n.Content = value.String
 			}
 		case node.FieldParentNodeID:
-			if value, ok := values[i].(*xid.ID); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_node_id", values[i])
-			} else if value != nil {
-				n.ParentNodeID = *value
+			} else if value.Valid {
+				n.ParentNodeID = new(xid.ID)
+				*n.ParentNodeID = *value.S.(*xid.ID)
 			}
 		case node.FieldAccountID:
 			if value, ok := values[i].(*xid.ID); !ok {
@@ -470,8 +471,10 @@ func (n *Node) String() string {
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("parent_node_id=")
-	builder.WriteString(fmt.Sprintf("%v", n.ParentNodeID))
+	if v := n.ParentNodeID; v != nil {
+		builder.WriteString("parent_node_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", n.AccountID))
