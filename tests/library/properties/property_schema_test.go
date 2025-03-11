@@ -174,6 +174,103 @@ func TestNodesPropertySchemas_UpdateSchema_RootLevelNodes(t *testing.T) {
 	}))
 }
 
+func TestNodesPropertySchemas_UpdateSchema_InvalidStates(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		cl *openapi.ClientWithResponses,
+		cj *session_cookie.Jar,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			session := e2e.WithSession(ctx, cj)
+
+			t.Run("same_request_same_all_field_props", func(t *testing.T) {
+				r := require.New(t)
+
+				name1 := "child-1"
+				slug1 := name1 + uuid.NewString()
+				node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+					Name: name1,
+					Slug: &slug1,
+				}, session)
+				tests.Ok(t, err, node1)
+
+				tests.AssertRequest(
+					cl.NodeUpdatePropertySchemaWithResponse(ctx, slug1, openapi.NodeUpdatePropertySchemaJSONRequestBody{
+						{Name: "age", Type: "number", Sort: "1"},
+						{Name: "age", Type: "number", Sort: "1"},
+					}, session),
+				)(t, http.StatusBadRequest)
+
+				// Assert the node wasn't modified (tx rolled back)
+				n1 := tests.AssertRequest(
+					cl.NodeGetWithResponse(ctx, slug1, session),
+				)(t, http.StatusOK)
+				r.Equal(0, len(n1.JSON200.Properties))
+			})
+
+			t.Run("same_request_same_different_field_props", func(t *testing.T) {
+				r := require.New(t)
+
+				name1 := "child-1"
+				slug1 := name1 + uuid.NewString()
+				node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+					Name: name1,
+					Slug: &slug1,
+				}, session)
+				tests.Ok(t, err, node1)
+
+				tests.AssertRequest(
+					cl.NodeUpdatePropertySchemaWithResponse(ctx, slug1, openapi.NodeUpdatePropertySchemaJSONRequestBody{
+						{Name: "age", Type: "number", Sort: "1"},
+						{Name: "age", Type: "text", Sort: "2"},
+					}, session),
+				)(t, http.StatusBadRequest)
+
+				// Assert the node wasn't modified (tx rolled back)
+				n1 := tests.AssertRequest(
+					cl.NodeGetWithResponse(ctx, slug1, session),
+				)(t, http.StatusOK)
+				r.Equal(0, len(n1.JSON200.Properties))
+			})
+
+			t.Run("separate_request", func(t *testing.T) {
+				r := require.New(t)
+
+				name1 := "child-1"
+				slug1 := name1 + uuid.NewString()
+				node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+					Name: name1,
+					Slug: &slug1,
+				}, session)
+				tests.Ok(t, err, node1)
+
+				tests.AssertRequest(
+					cl.NodeUpdatePropertySchemaWithResponse(ctx, slug1, openapi.NodeUpdatePropertySchemaJSONRequestBody{
+						{Name: "age", Type: "number", Sort: "1"},
+					}, session),
+				)(t, http.StatusOK)
+
+				tests.AssertRequest(
+					cl.NodeUpdatePropertySchemaWithResponse(ctx, slug1, openapi.NodeUpdatePropertySchemaJSONRequestBody{
+						{Name: "age", Type: "text", Sort: "1"},
+					}, session),
+				)(t, http.StatusBadRequest)
+
+				// Assert the node wasn't modified (tx rolled back)
+				n1 := tests.AssertRequest(
+					cl.NodeGetWithResponse(ctx, slug1, session),
+				)(t, http.StatusOK)
+				r.Equal(1, len(n1.JSON200.Properties))
+			})
+		}))
+	}))
+}
+
 func matchSchema(t *testing.T, want openapi.PropertySchemaList, got openapi.PropertySchemaList) {
 	t.Helper()
 	a := assert.New(t)

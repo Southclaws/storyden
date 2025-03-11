@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -313,6 +314,9 @@ func (w *SchemaWriter) doSchemaUpdates(ctx context.Context, currentSchema *ent.P
 		for _, s := range creates {
 			err = tx.PropertySchemaField.Create().SetName(s.Name).SetSort(s.Sort).SetType(s.Type).SetSchemaID(currentSchema.ID).Exec(ctx)
 			if err != nil {
+				if ent.IsConstraintError(err) {
+					err = fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+				}
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 		}
