@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
+	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/tracing"
@@ -26,11 +27,13 @@ func (i *service) Build() Instrumentation {
 	tr := i.tf.Build(i.lc, pkg)
 
 	return &impl{
+		logger: i.lg,
 		tracer: tr,
 	}
 }
 
 type impl struct {
+	logger *zap.Logger
 	tracer tracing.Tracer
 }
 
@@ -46,6 +49,8 @@ func (i *impl) Instrument(ctx context.Context, a ...kv.Attr) (context.Context, S
 }
 
 func (i *impl) InstrumentNamed(ctx context.Context, name string, a ...kv.Attr) (context.Context, Span) {
+	logger := i.logger.With(kv.Attrs(a).ToZap()...)
+
 	// Create a child span with the KV data as attributes.
 	ctx, span := i.tracer.Start(ctx, name, trace.WithAttributes(kv.Attrs(a).ToAttributes()...))
 
@@ -54,11 +59,12 @@ func (i *impl) InstrumentNamed(ctx context.Context, name string, a ...kv.Attr) (
 
 	// NOTE: We store the context into the tracking span so it can be mutated
 	// and new child contexts can be returned with the new attributes.
-	return ctx, &trackingSpan{span, ctx, name}
+	return ctx, &trackingSpan{span, logger, ctx, name}
 }
 
 type trackingSpan struct {
-	span trace.Span
+	span   trace.Span
+	logger *zap.Logger
 	// NOTE: We store ctx because we need to mutate it in Annotate.
 	//nolint:containedctx
 	ctx    context.Context
@@ -85,11 +91,18 @@ func (t *trackingSpan) Annotate(a ...kv.Attr) context.Context {
 	// Add the attributes to the span. This is a slightly more obvious mutation.
 	t.span.SetAttributes(kv.Attrs(a).ToAttributes()...)
 
+	// Mutate the stored logger with the same attributes.
+	t.logger = t.logger.With(kv.Attrs(a).ToZap()...)
+
 	return t.ctx
 }
 
 func (t *trackingSpan) Event(name string, a ...kv.Attr) {
 	t.span.AddEvent(name, trace.WithStackTrace(true), trace.WithAttributes(kv.Attrs(a).ToAttributes()...))
+}
+
+func (t *trackingSpan) Logger() *zap.Logger {
+	return t.logger
 }
 
 func (t *trackingSpan) Wrap(err error, msg string, a ...kv.Attr) error {

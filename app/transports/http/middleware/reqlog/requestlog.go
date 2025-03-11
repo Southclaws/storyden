@@ -6,6 +6,8 @@ import (
 	"runtime/debug"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
@@ -51,7 +53,6 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 				kv.String("http.request.header.origin", origin),
 				kv.String("client.address", r.RemoteAddr),
 				kv.String("http.request.method", r.Method),
-				kv.String("http.route", r.URL.Path),
 				kv.String("url.query", r.URL.Query().Encode()),
 				kv.Int("http.request.body.size", int(r.ContentLength)),
 			)
@@ -62,6 +63,10 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 					kv.Duration("duration", time.Since(start)),
 					kv.Int("http.response.status_code", wr.statusCode),
 				)
+
+				logger := span.Logger()
+
+				logger.Info(title)
 
 				if recovery := recover(); recovery != nil {
 					err := func(v any) error {
@@ -76,7 +81,9 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 
 					errorlog := title + ": " + err.Error()
 
-					_ = span.Wrap(err, errorlog, kv.String("trace", string(trace)))
+					logger.Error(errorlog,
+						zap.Error(span.Wrap(err, errorlog, kv.String("trace", string(trace)))),
+					)
 
 					w.WriteHeader(http.StatusInternalServerError)
 					return
