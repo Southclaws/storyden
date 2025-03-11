@@ -2,6 +2,7 @@ package properties_test
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/google/uuid"
@@ -114,6 +115,60 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 				tests.Ok(t, err, parent)
 				r.Equal(0, len(parent.JSON200.ChildPropertySchema))
 				a.Empty(parent.JSON200.ChildPropertySchema)
+			})
+		}))
+	}))
+}
+
+func TestNodesPropertySchemas_UpdateSchema_RootLevelNodes(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		cl *openapi.ClientWithResponses,
+		cj *session_cookie.Jar,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			session := e2e.WithSession(ctx, cj)
+
+			name1 := "child-1"
+			slug1 := name1 + uuid.NewString()
+			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name: name1,
+				Slug: &slug1,
+			}, session)
+			tests.Ok(t, err, node1)
+
+			name2 := "child-2"
+			slug2 := name2 + uuid.NewString()
+			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name: name2,
+				Slug: &slug2,
+			}, session)
+			tests.Ok(t, err, node2)
+
+			t.Run("schema_update_siblings", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				schema := tests.AssertRequest(
+					cl.NodeUpdatePropertySchemaWithResponse(ctx, slug1, openapi.NodeUpdatePropertySchemaJSONRequestBody{
+						{Name: "age", Type: "number", Sort: "1"},
+					}, session),
+				)(t, http.StatusOK)
+
+				r.Equal(1, len(schema.JSON200.Properties))
+				a.Equal("age", schema.JSON200.Properties[0].Name)
+				a.Equal("number", schema.JSON200.Properties[0].Type)
+				a.Equal("1", schema.JSON200.Properties[0].Sort)
+
+				node2 := tests.AssertRequest(
+					cl.NodeGetWithResponse(ctx, slug2, session),
+				)(t, http.StatusOK)
+				r.Equal(1, len(node2.JSON200.Properties))
 			})
 		}))
 	}))

@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
 )
 
@@ -81,10 +82,15 @@ func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	predicate := []predicate.Node{}
+	if current.ParentNodeID != nil {
+		predicate = append(predicate, node.ParentNodeID(*current.ParentNodeID))
+	} else {
+		predicate = append(predicate, node.ParentNodeIDIsNil())
+	}
+
 	siblings, err := w.db.Node.Query().
-		Where(
-			node.HasParentWith(node.ID(current.ParentNodeID)),
-		).
+		Where(predicate...).
 		WithPropertySchema().
 		All(ctx)
 	if err != nil {
