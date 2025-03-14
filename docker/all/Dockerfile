@@ -2,7 +2,7 @@
 # BACKEND API LAYER
 #
 
-FROM golang:1.23-alpine AS api-builder
+FROM golang:1.24-alpine AS api-builder
 
 WORKDIR /server
 
@@ -15,7 +15,7 @@ COPY ./internal ./internal
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o storyden-api ./cmd/backend
 
-FROM node:22.12.0-alpine AS base
+FROM node:22.14.0-alpine AS base
 
 #
 # DEPENDENCIES LAYER
