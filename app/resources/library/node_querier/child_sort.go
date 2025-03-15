@@ -104,7 +104,7 @@ func (q *Querier) sortedByPropertyValue(ctx context.Context, ids []string, csr C
 	switch q.raw.DriverName() {
 	case "sqlite":
 		queryTemplate = querySortedByPropertyValue_sqlite
-	case "postgres":
+	case "postgresql":
 		queryTemplate = querySortedByPropertyValue_postgres
 	default:
 		return nil, fault.New("unexpected failure in database driver switch")
