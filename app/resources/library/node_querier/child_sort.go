@@ -72,15 +72,11 @@ from
 where
   n.id in (%s)
 order by
-  case f.type
-    when 'text'      then p.value
-    when 'number'    then cast(p.value as numeric)
-    when 'timestamp' then cast(p.value as timestamp)
-    when 'boolean'   then cast(p.value as boolean)
-    else p.value
-
-  end %s
-
+  case f.type when 'text'      then p.value                            end %s,
+  case f.type when 'number'    then cast(p.value as numeric)           end %s,
+  case f.type when 'timestamp' then cast(p.value as timestamp)         end %s,
+  case f.type when 'boolean'   then cast(p.value as boolean)           end %s,
+  p.value %s
 limit  %d
 offset %d
 `
@@ -102,27 +98,36 @@ func (q *Querier) sortedByPropertyValue(ctx context.Context, ids []string, csr C
 	// you can never convince me sql has a standard that anyone has ever read...
 	var queryTemplate string
 	switch q.raw.DriverName() {
-	case "sqlite":
-		queryTemplate = querySortedByPropertyValue_sqlite
-	case "pgx":
-		queryTemplate = querySortedByPropertyValue_postgres
-	default:
-		return nil, fault.New("unexpected failure in database driver switch")
-	}
-
 	// NOTE: Safe injection here as csr.Dir is statically assigned to either
 	// "asc" or "desc" in NewChildSortRule. Unfortunately both Go and SQL don't
 	// allow parameterizing the ORDER BY direction because nothing about SQL has
 	// improved since 1973...
-	withParams := fmt.Sprintf(queryTemplate,
-		safeFieldName,
-		idList,
-		csr.Dir,
-		csr.Page.Limit(),
-		csr.Page.Offset(),
-	)
+	case "sqlite":
+		queryTemplate = fmt.Sprintf(querySortedByPropertyValue_sqlite,
+			safeFieldName,
+			idList,
+			csr.Dir,
+			csr.Page.Limit(),
+			csr.Page.Offset(),
+		)
 
-	err := q.raw.SelectContext(ctx, &rows, withParams)
+	case "pgx":
+		queryTemplate = fmt.Sprintf(querySortedByPropertyValue_postgres,
+			safeFieldName,
+			idList,
+			csr.Dir, // this
+			csr.Dir, // is
+			csr.Dir, // so
+			csr.Dir, // fuckin
+			csr.Dir, // dumb
+			csr.Page.Limit(),
+			csr.Page.Offset(),
+		)
+	default:
+		return nil, fault.New("unexpected failure in database driver switch")
+	}
+
+	err := q.raw.SelectContext(ctx, &rows, queryTemplate)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
