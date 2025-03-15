@@ -17,7 +17,7 @@ import (
 type PropertySchemaField struct {
 	ID   xid.ID
 	Name string
-	Type string
+	Type PropertyType
 	Sort string
 }
 
@@ -61,9 +61,9 @@ type PropertySchemaMutation struct {
 // schema fields which can be processed as simple property update operations.
 // We also need to get the actual field ID for each existing property.
 func (p PropertySchema) Split(mutation PropertyMutationList) (*PropertySchemaMutation, error) {
-	fids := lo.FilterMap(mutation, func(p PropertyMutation, _ int) (xid.ID, bool) { return p.ID.Get() })
+	fids := lo.FilterMap(mutation, func(p *PropertyMutation, _ int) (xid.ID, bool) { return p.ID.Get() })
 
-	existingProperties, newProps := lo.FilterReject(mutation, func(m PropertyMutation, _ int) bool {
+	existingProperties, newProps := lo.FilterReject(mutation, func(m *PropertyMutation, _ int) bool {
 		return m.ID.Ok()
 	})
 
@@ -94,7 +94,7 @@ func (p PropertySchema) Split(mutation PropertyMutationList) (*PropertySchemaMut
 
 	if len(removedProps) > 0 && len(newProps) > 0 {
 		removedNames := dt.Map(removedProps, func(p *ExistingPropertyMutation) string { return p.Name })
-		newNames := dt.Map(newProps, func(p PropertyMutation) string { return p.Name })
+		newNames := dt.Map(newProps, func(p *PropertyMutation) string { return p.Name })
 
 		// If the intersection of the two lists is not empty, then we have a
 		// conflict where a property is being removed and added again in the same
@@ -115,7 +115,7 @@ func (p PropertySchema) Split(mutation PropertyMutationList) (*PropertySchemaMut
 	}, nil
 }
 
-func (p PropertySchema) getSchemaMutationFromPropertyMutation(pm PropertyMutation) (*ExistingPropertyMutation, error) {
+func (p PropertySchema) getSchemaMutationFromPropertyMutation(pm *PropertyMutation) (*ExistingPropertyMutation, error) {
 	f, ok := p.GetField(pm.ID.OrZero())
 	if !ok {
 		return nil, fault.Wrap(fault.Newf("field '%v' not found in schema", pm.ID), ftag.With(ftag.InvalidArgument))
@@ -155,11 +155,11 @@ type PropertyMutation struct {
 	ID    opt.Optional[xid.ID]
 	Name  string
 	Value string
-	Type  opt.Optional[string]
+	Type  opt.Optional[PropertyType]
 	Sort  opt.Optional[string]
 }
 
-type PropertyMutationList []PropertyMutation
+type PropertyMutationList []*PropertyMutation
 
 type ExistingPropertyMutation struct {
 	PropertySchemaField
@@ -181,12 +181,12 @@ func MapPropertyFieldSchema(in PropertySchemaQueryRow) PropertySchemaField {
 // PropertySchemaQueryRow is a row from the property schema query which pulls
 // all the property schemas for both sibling and child properties of a node.
 type PropertySchemaQueryRow struct {
-	SchemaID xid.ID `db:"schema_id"`
-	FieldID  xid.ID `db:"field_id"`
-	Name     string `db:"name"`
-	Type     string `db:"type"`
-	Sort     string `db:"sort"`
-	Source   string `db:"source"`
+	SchemaID xid.ID       `db:"schema_id"`
+	FieldID  xid.ID       `db:"field_id"`
+	Name     string       `db:"name"`
+	Type     PropertyType `db:"type"`
+	Sort     string       `db:"sort"`
+	Source   string       `db:"source"`
 }
 
 type PropertySchemaQueryRows []PropertySchemaQueryRow

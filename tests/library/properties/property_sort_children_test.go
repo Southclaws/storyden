@@ -58,9 +58,9 @@ func TestNodesPropertySorting(t *testing.T) {
 			res := tests.AssertRequest(
 				cl.NodeUpdatePropertiesWithResponse(root, node1.JSON200.Slug, openapi.PropertyMutableProps{
 					Properties: openapi.PropertyMutationList{
-						{Name: "weight", Type: opt.New("number").Ptr(), Value: "4", Sort: opt.New("1").Ptr()},
-						{Name: "height", Type: opt.New("number").Ptr(), Value: "6", Sort: opt.New("2").Ptr()},
-						{Name: "nickname", Type: opt.New("text").Ptr(), Value: "ahmed", Sort: opt.New("3").Ptr()},
+						{Name: "weight", Type: opt.New(openapi.Number).Ptr(), Value: "4", Sort: opt.New("1").Ptr()},
+						{Name: "height", Type: opt.New(openapi.Number).Ptr(), Value: "6", Sort: opt.New("2").Ptr()},
+						{Name: "nickname", Type: opt.New(openapi.Text).Ptr(), Value: "ahmed", Sort: opt.New("3").Ptr()},
 					},
 				}, session),
 			)(t, http.StatusOK)
@@ -177,9 +177,9 @@ func TestNodesPropertySorting_WithEmptyValues(t *testing.T) {
 			res := tests.AssertRequest(
 				cl.NodeUpdatePropertiesWithResponse(root, node1.JSON200.Slug, openapi.PropertyMutableProps{
 					Properties: openapi.PropertyMutationList{
-						{Name: "weight", Type: opt.New("number").Ptr(), Value: "4", Sort: opt.New("1").Ptr()},
-						{Name: "height", Type: opt.New("number").Ptr(), Value: "6", Sort: opt.New("2").Ptr()},
-						{Name: "nickname", Type: opt.New("text").Ptr(), Value: "ahmed", Sort: opt.New("3").Ptr()},
+						{Name: "weight", Type: opt.New(openapi.Number).Ptr(), Value: "4", Sort: opt.New("1").Ptr()},
+						{Name: "height", Type: opt.New(openapi.Number).Ptr(), Value: "6", Sort: opt.New("2").Ptr()},
+						{Name: "nickname", Type: opt.New(openapi.Text).Ptr(), Value: "ahmed", Sort: opt.New("3").Ptr()},
 					},
 				}, session),
 			)(t, http.StatusOK)

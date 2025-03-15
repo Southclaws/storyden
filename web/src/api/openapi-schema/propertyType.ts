@@ -8,4 +8,12 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 
-export type PropertyType = string;
+export type PropertyType = (typeof PropertyType)[keyof typeof PropertyType];
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare
+export const PropertyType = {
+  text: "text",
+  number: "number",
+  timestamp: "timestamp",
+  boolean: "boolean",
+} as const;

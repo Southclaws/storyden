@@ -5326,6 +5326,11 @@ components:
 
     PropertyType:
       type: string
+      enum:
+        - text
+        - number
+        - timestamp
+        - boolean
 
     PropertyValue:
       type: string
