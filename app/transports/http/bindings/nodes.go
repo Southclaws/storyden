@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_properties"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/tag"
@@ -91,6 +92,8 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	pml := opt.Map(opt.NewPtr(request.Body.Properties), deserialisePropertyMutationList)
+
 	tags := opt.Map(opt.NewPtr(request.Body.Tags), func(tags []string) tag_ref.Names {
 		return dt.Map(tags, deserialiseTagName)
 	})
@@ -116,6 +119,7 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 			Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
 			Tags:         tags,
 			Visibility:   vis,
+			Properties:   pml,
 		},
 	)
 	if err != nil {
@@ -199,7 +203,13 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 }
 
 func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObject) (openapi.NodeGetResponseObject, error) {
-	node, err := c.nodeReader.GetBySlug(ctx, deserialiseNodeMark(request.NodeSlug))
+	temp := "1"
+	pp := deserialisePageParams(&temp, 50)
+	sortChildrenBy := opt.NewPtrMap(request.Params.ChildrenSort, func(cs string) node_querier.ChildSortRule {
+		return node_querier.NewChildSortRule(cs, pp)
+	})
+
+	node, err := c.nodeReader.GetBySlug(ctx, deserialiseNodeMark(request.NodeSlug), sortChildrenBy)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

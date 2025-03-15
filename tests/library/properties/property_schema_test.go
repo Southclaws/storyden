@@ -78,7 +78,7 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 				}, session)
 				tests.Ok(t, err, res)
 
-				parent, err := cl.NodeGetWithResponse(ctx, parent.JSON200.Slug, session)
+				parent, err := cl.NodeGetWithResponse(ctx, parent.JSON200.Slug, &openapi.NodeGetParams{}, session)
 				tests.Ok(t, err, parent)
 				r.Equal(1, len(parent.JSON200.ChildPropertySchema))
 				matchSchema(t, openapi.PropertySchemaList{
@@ -96,7 +96,7 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 				}, session)
 				tests.Ok(t, err, res)
 
-				parent, err = cl.NodeGetWithResponse(ctx, parent.JSON200.Slug, session)
+				parent, err = cl.NodeGetWithResponse(ctx, parent.JSON200.Slug, &openapi.NodeGetParams{}, session)
 				tests.Ok(t, err, parent)
 				r.Equal(3, len(parent.JSON200.ChildPropertySchema))
 				matchSchema(t, openapi.PropertySchemaList{
@@ -110,7 +110,7 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 				res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parent.JSON200.Slug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{}, session)
 				tests.Ok(t, err, res)
 
-				parent, err = cl.NodeGetWithResponse(ctx, parent.JSON200.Slug, session)
+				parent, err = cl.NodeGetWithResponse(ctx, parent.JSON200.Slug, &openapi.NodeGetParams{}, session)
 				tests.Ok(t, err, parent)
 				r.Equal(0, len(parent.JSON200.ChildPropertySchema))
 				a.Empty(parent.JSON200.ChildPropertySchema)

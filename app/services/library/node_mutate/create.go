@@ -50,6 +50,16 @@ func (s *Manager) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	post, err := s.postMutation(ctx, n, pre)
+	if err != nil {
+		// TODO: Does this need to error?
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if post.properties != nil {
+		n.Properties = post.properties
+	}
+
 	if p.Visibility.OrZero() == visibility.VisibilityPublished {
 		if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: library.NodeID(n.Mark.ID())}); err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))

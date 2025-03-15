@@ -442,14 +442,14 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 				a := assert.New(t)
 
 				// get the parent
-				parent, err := cl.NodeGetWithResponse(ctx, parentslug, session)
+				parent, err := cl.NodeGetWithResponse(ctx, parentslug, &openapi.NodeGetParams{}, session)
 				r.NoError(err)
 				r.NotNil(parent)
 				// yield the children's schema
 				a.Len(parent.JSON200.ChildPropertySchema, 3)
 
 				// get the child
-				child, err := cl.NodeGetWithResponse(ctx, slug3, session)
+				child, err := cl.NodeGetWithResponse(ctx, slug3, &openapi.NodeGetParams{}, session)
 				r.NoError(err)
 				r.NotNil(child)
 				// yield the children's schema and its own schema

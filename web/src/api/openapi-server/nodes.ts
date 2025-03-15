@@ -15,6 +15,7 @@ import type {
   NodeDeleteOKResponse,
   NodeDeleteParams,
   NodeGetOKResponse,
+  NodeGetParams,
   NodeListOKResponse,
   NodeListParams,
   NodeRemoveChildOKResponse,
@@ -104,15 +105,26 @@ export type nodeGetResponse = {
   status: number;
 };
 
-export const getNodeGetUrl = (nodeSlug: string) => {
-  return `/nodes/${nodeSlug}`;
+export const getNodeGetUrl = (nodeSlug: string, params?: NodeGetParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/nodes/${nodeSlug}?${normalizedParams.toString()}`
+    : `/nodes/${nodeSlug}`;
 };
 
 export const nodeGet = async (
   nodeSlug: string,
+  params?: NodeGetParams,
   options?: RequestInit,
 ): Promise<nodeGetResponse> => {
-  return fetcher<Promise<nodeGetResponse>>(getNodeGetUrl(nodeSlug), {
+  return fetcher<Promise<nodeGetResponse>>(getNodeGetUrl(nodeSlug, params), {
     ...options,
     method: "GET",
   });

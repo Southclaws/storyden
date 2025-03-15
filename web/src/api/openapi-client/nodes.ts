@@ -23,6 +23,7 @@ import type {
   NodeDeleteOKResponse,
   NodeDeleteParams,
   NodeGetOKResponse,
+  NodeGetParams,
   NodeListOKResponse,
   NodeListParams,
   NodeRemoveChildOKResponse,
@@ -139,15 +140,16 @@ export const useNodeList = <
 /**
  * Get a node by its URL slug.
  */
-export const nodeGet = (nodeSlug: string) => {
+export const nodeGet = (nodeSlug: string, params?: NodeGetParams) => {
   return fetcher<NodeGetOKResponse>({
     url: `/nodes/${nodeSlug}`,
     method: "GET",
+    params,
   });
 };
 
-export const getNodeGetKey = (nodeSlug: string) =>
-  [`/nodes/${nodeSlug}`] as const;
+export const getNodeGetKey = (nodeSlug: string, params?: NodeGetParams) =>
+  [`/nodes/${nodeSlug}`, ...(params ? [params] : [])] as const;
 
 export type NodeGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof nodeGet>>
@@ -164,6 +166,7 @@ export const useNodeGet = <
     | InternalServerErrorResponse,
 >(
   nodeSlug: string,
+  params?: NodeGetParams,
   options?: {
     swr?: SWRConfiguration<Awaited<ReturnType<typeof nodeGet>>, TError> & {
       swrKey?: Key;
@@ -175,8 +178,9 @@ export const useNodeGet = <
 
   const isEnabled = swrOptions?.enabled !== false && !!nodeSlug;
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getNodeGetKey(nodeSlug) : null));
-  const swrFn = () => nodeGet(nodeSlug);
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getNodeGetKey(nodeSlug, params) : null));
+  const swrFn = () => nodeGet(nodeSlug, params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

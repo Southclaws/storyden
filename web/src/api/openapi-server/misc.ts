@@ -11,6 +11,7 @@ import type {
   AssetGetOKResponse,
   AssetUploadBody,
   GetInfoOKResponse,
+  GetSpec200,
 } from "../openapi-schema";
 import { fetcher } from "../server";
 
@@ -43,10 +44,10 @@ export const getVersion = async (
 JSON format. This is useful for clients that want to dynamically load
 the API specification for documentation or code generation.
 
- * @summary Get the OpenAPI specification as JSON.
+ * @summary OpenAPI specification
  */
 export type getSpecResponse = {
-  data: string;
+  data: GetSpec200;
   status: number;
 };
 
@@ -68,7 +69,7 @@ export const getSpec = async (
 an interactive HTML format. This is useful for developers who want to
 explore the API and test endpoints without writing code.
 
- * @summary Get the OpenAPI documentation as an interactive HTML document.
+ * @summary API documentation
  */
 export type getDocsResponse = {
   data: string;

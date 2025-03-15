@@ -124,7 +124,11 @@ func (p PropertySchema) getSchemaMutationFromPropertyMutation(pm PropertyMutatio
 	// During a property mutation, the request may also change the schema by
 	// changing the name, type or sort properties. Mark as changed if so.
 	isChanged := false
-	if f.Name != pm.Name {
+	// NOTE: A small hack here checking if the mutation name is empty. This will
+	// permit property assignments by just the fid but as a result creates some
+	// undefined behaviour when explicitly setting the field name to "". This
+	// whole code path needs a refactor.
+	if f.Name != pm.Name && pm.Name != "" {
 		isChanged = true
 		f.Name = pm.Name
 	}

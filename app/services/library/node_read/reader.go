@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -30,7 +31,7 @@ func New(
 	}
 }
 
-func (q *HydratedQuerier) GetBySlug(ctx context.Context, qk library.QueryKey) (*library.Node, error) {
+func (q *HydratedQuerier) GetBySlug(ctx context.Context, qk library.QueryKey, sortChildrenBy opt.Optional[node_querier.ChildSortRule]) (*library.Node, error) {
 	session := q.session.AccountMaybe(ctx)
 
 	opts := []node_querier.Option{}
@@ -40,6 +41,10 @@ func (q *HydratedQuerier) GetBySlug(ctx context.Context, qk library.QueryKey) (*
 	} else {
 		opts = append(opts, node_querier.WithVisibilityRulesApplied(nil))
 	}
+
+	sortChildrenBy.Call(func(v node_querier.ChildSortRule) {
+		opts = append(opts, node_querier.WithSortChildrenBy(v))
+	})
 
 	n, err := q.nodereader.Get(ctx, qk, opts...)
 	if err != nil {

@@ -2,8 +2,10 @@ package node_querier
 
 import (
 	"context"
+	"slices"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
@@ -30,6 +32,7 @@ func New(db *ent.Client, raw *sqlx.DB, aq *account_querier.Querier) *Querier {
 }
 
 type options struct {
+	sortChildrenBy    *ChildSortRule
 	visibilityRules   bool
 	requestingAccount *account.AccountID
 }
@@ -42,6 +45,12 @@ func WithVisibilityRulesApplied(accountID *account.AccountID) Option {
 	return func(o *options) {
 		o.visibilityRules = true
 		o.requestingAccount = accountID
+	}
+}
+
+func WithSortChildrenBy(field ChildSortRule) Option {
+	return func(o *options) {
+		o.sortChildrenBy = &field
 	}
 }
 
@@ -183,6 +192,18 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, col.ID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if o.sortChildrenBy != nil && len(col.Edges.Nodes) > 0 {
+		children := dt.Map(col.Edges.Nodes, func(n *ent.Node) string { return n.ID.String() })
+		sortmap, err := q.sortedByPropertyValue(ctx, children, *o.sortChildrenBy)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		slices.SortFunc(col.Edges.Nodes, func(a, b *ent.Node) int {
+			return sortmap[a.ID] - sortmap[b.ID]
+		})
 	}
 
 	r, err := library.MapNode(true, propSchema.Map())(col)
