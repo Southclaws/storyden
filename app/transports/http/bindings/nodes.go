@@ -206,8 +206,7 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 }
 
 func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObject) (openapi.NodeGetResponseObject, error) {
-	temp := "1"
-	pp := deserialisePageParams(&temp, 50)
+	pp := deserialisePageParams(request.Params.Page, 100)
 	sortChildrenBy := opt.NewPtrMap(request.Params.ChildrenSort, func(cs string) node_querier.ChildSortRule {
 		return node_querier.NewChildSortRule(cs, pp)
 	})

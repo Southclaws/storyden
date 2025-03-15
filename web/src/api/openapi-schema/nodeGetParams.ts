@@ -8,6 +8,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type { NodeChildrenSortParamParameter } from "./nodeChildrenSortParamParameter";
+import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
 export type NodeGetParams = {
   /**
@@ -15,4 +16,8 @@ export type NodeGetParams = {
 
  */
   children_sort?: NodeChildrenSortParamParameter;
+  /**
+   * Pagination query parameters.
+   */
+  page?: PaginationQueryParameter;
 };

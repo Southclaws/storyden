@@ -1594,6 +1594,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/NodeChildrenSortParam"
+        - $ref: "#/components/parameters/PaginationQuery"
       responses:
         default: {$ref: "#/components/responses/InternalServerError"}
         "404": {$ref: "#/components/responses/NotFound"}
