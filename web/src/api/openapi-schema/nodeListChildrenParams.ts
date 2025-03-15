@@ -7,13 +7,17 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { NodeChildrenSortParamParameter } from "./nodeChildrenSortParamParameter";
+import type { PaginationQueryParameter } from "./paginationQueryParameter";
 
-export type PropertyType = (typeof PropertyType)[keyof typeof PropertyType];
+export type NodeListChildrenParams = {
+  /**
+ * The field (either in schema or in property schema) to sort by.
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const PropertyType = {
-  text: "text",
-  number: "number",
-  timestamp: "timestamp",
-  boolean: "boolean",
-} as const;
+ */
+  children_sort?: NodeChildrenSortParamParameter;
+  /**
+   * Pagination query parameters.
+   */
+  page?: PaginationQueryParameter;
+};

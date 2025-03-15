@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_properties"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/tag"
@@ -91,6 +92,11 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
+	pml, err := opt.MapErr(opt.NewPtr(request.Body.Properties), deserialisePropertyMutationList)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	tags := opt.Map(opt.NewPtr(request.Body.Tags), func(tags []string) tag_ref.Names {
 		return dt.Map(tags, deserialiseTagName)
 	})
@@ -116,6 +122,7 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 			Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
 			Tags:         tags,
 			Visibility:   vis,
+			Properties:   pml,
 		},
 	)
 	if err != nil {
@@ -199,13 +206,41 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 }
 
 func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObject) (openapi.NodeGetResponseObject, error) {
-	node, err := c.nodeReader.GetBySlug(ctx, deserialiseNodeMark(request.NodeSlug))
+	pp := deserialisePageParams(request.Params.Page, 100)
+	sortChildrenBy := opt.NewPtrMap(request.Params.ChildrenSort, func(cs string) node_querier.ChildSortRule {
+		return node_querier.NewChildSortRule(cs, pp)
+	})
+
+	node, err := c.nodeReader.GetBySlug(ctx, deserialiseNodeMark(request.NodeSlug), sortChildrenBy)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.NodeGet200JSONResponse{
 		NodeGetOKJSONResponse: openapi.NodeGetOKJSONResponse(serialiseNodeWithItems(node)),
+	}, nil
+}
+
+func (c *Nodes) NodeListChildren(ctx context.Context, request openapi.NodeListChildrenRequestObject) (openapi.NodeListChildrenResponseObject, error) {
+	pp := deserialisePageParams(request.Params.Page, 100)
+	sortChildrenBy := opt.NewPtrMap(request.Params.ChildrenSort, func(cs string) node_querier.ChildSortRule {
+		return node_querier.NewChildSortRule(cs, pp)
+	})
+
+	r, err := c.nodeReader.ListChildren(ctx, deserialiseNodeMark(request.NodeSlug), pp, sortChildrenBy)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.NodeListChildren200JSONResponse{
+		NodeListOKJSONResponse: openapi.NodeListOKJSONResponse{
+			CurrentPage: r.CurrentPage,
+			NextPage:    r.NextPage.Ptr(),
+			PageSize:    r.Size,
+			Results:     r.Results,
+			Nodes:       dt.Map(r.Items, serialiseNodeWithItems),
+			TotalPages:  r.TotalPages,
+		},
 	}, nil
 }
 
@@ -231,7 +266,10 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pml := opt.Map(opt.NewPtr(request.Body.Properties), deserialisePropertyMutationList)
+	pml, err := opt.MapErr(opt.NewPtr(request.Body.Properties), deserialisePropertyMutationList)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	titleFillRuleParam, err := opt.MapErr(opt.NewPtr(request.Params.TitleFillRule), deserialiseTitleFillRule)
 	if err != nil {
@@ -327,14 +365,10 @@ func (c *Nodes) NodeDelete(ctx context.Context, request openapi.NodeDeleteReques
 }
 
 func (c *Nodes) NodeUpdateChildrenPropertySchema(ctx context.Context, request openapi.NodeUpdateChildrenPropertySchemaRequestObject) (openapi.NodeUpdateChildrenPropertySchemaResponseObject, error) {
-	schemas := dt.Map(*request.Body, func(p openapi.PropertySchemaMutableProps) *node_properties.SchemaFieldMutation {
-		return &node_properties.SchemaFieldMutation{
-			ID:   opt.Map(opt.NewPtr(p.Fid), deserialiseID),
-			Name: p.Name,
-			Type: p.Type,
-			Sort: p.Sort,
-		}
-	})
+	schemas, err := dt.MapErr(*request.Body, deserialisePropertySchemaMutation)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	updated, err := c.schemaUpdater.UpdateChildren(ctx, deserialiseNodeMark(request.NodeSlug), schemas)
 	if err != nil {
@@ -349,14 +383,10 @@ func (c *Nodes) NodeUpdateChildrenPropertySchema(ctx context.Context, request op
 }
 
 func (c *Nodes) NodeUpdatePropertySchema(ctx context.Context, request openapi.NodeUpdatePropertySchemaRequestObject) (openapi.NodeUpdatePropertySchemaResponseObject, error) {
-	schemas := dt.Map(*request.Body, func(p openapi.PropertySchemaMutableProps) *node_properties.SchemaFieldMutation {
-		return &node_properties.SchemaFieldMutation{
-			ID:   opt.Map(opt.NewPtr(p.Fid), deserialiseID),
-			Name: p.Name,
-			Type: p.Type,
-			Sort: p.Sort,
-		}
-	})
+	schemas, err := dt.MapErr(*request.Body, deserialisePropertySchemaMutation)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	updated, err := c.schemaUpdater.UpdateSiblings(ctx, deserialiseNodeMark(request.NodeSlug), schemas)
 	if err != nil {
@@ -371,7 +401,10 @@ func (c *Nodes) NodeUpdatePropertySchema(ctx context.Context, request openapi.No
 }
 
 func (c *Nodes) NodeUpdateProperties(ctx context.Context, request openapi.NodeUpdatePropertiesRequestObject) (openapi.NodeUpdatePropertiesResponseObject, error) {
-	pml := deserialisePropertyMutationList(request.Body.Properties)
+	pml, err := deserialisePropertyMutationList(request.Body.Properties)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	updated, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
 		Properties: opt.New(pml),
@@ -564,7 +597,7 @@ func serialiseProperty(in *library.Property) openapi.Property {
 	return openapi.Property{
 		Fid:   in.Field.ID.String(),
 		Name:  in.Field.Name,
-		Type:  in.Field.Type,
+		Type:  openapi.PropertyType(in.Field.Type.String()),
 		Sort:  in.Field.Sort,
 		Value: opt.Map(in.Value, func(v string) string { return v }).Ptr(),
 	}
@@ -585,7 +618,7 @@ func serialisePropertyTable(in library.PropertyTable) openapi.PropertyList {
 			return openapi.Property{
 				Fid:   f.ID.String(),
 				Name:  f.Name,
-				Type:  f.Type,
+				Type:  openapi.PropertyType(f.Type.String()),
 				Sort:  f.Sort,
 				Value: nil,
 			}
@@ -609,7 +642,7 @@ func serialisePropertySchema(in *library.PropertySchemaField) openapi.PropertySc
 	return openapi.PropertySchema{
 		Fid:  in.ID.String(),
 		Name: in.Name,
-		Type: in.Type,
+		Type: openapi.PropertyType(in.Type.String()),
 		Sort: in.Sort,
 	}
 }
@@ -634,18 +667,39 @@ func serialisePropertySchemaListOpt(in opt.Optional[library.PropertySchema]) ope
 	return serialisePropertySchemaList(pt)
 }
 
-func deserialisePropertyMutationList(in openapi.PropertyMutationList) library.PropertyMutationList {
-	return dt.Map(in, deserialisePropertyMutation)
+func deserialisePropertySchemaMutation(in openapi.PropertySchemaMutableProps) (*node_properties.SchemaFieldMutation, error) {
+	t, err := library.NewPropertyType(string(in.Type))
+	if err != nil {
+		return nil, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+	}
+
+	return &node_properties.SchemaFieldMutation{
+		ID:   opt.Map(opt.NewPtr(in.Fid), deserialiseID),
+		Name: in.Name,
+		Type: t,
+		Sort: in.Sort,
+	}, nil
 }
 
-func deserialisePropertyMutation(in openapi.PropertyMutation) library.PropertyMutation {
-	return library.PropertyMutation{
+func deserialisePropertyMutationList(in openapi.PropertyMutationList) (library.PropertyMutationList, error) {
+	return dt.MapErr(in, deserialisePropertyMutation)
+}
+
+func deserialisePropertyMutation(in openapi.PropertyMutation) (*library.PropertyMutation, error) {
+	t, err := opt.MapErr(opt.NewPtr(in.Type), func(s openapi.PropertyType) (library.PropertyType, error) {
+		return library.NewPropertyType(string(s))
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
+	}
+
+	return &library.PropertyMutation{
 		ID:    opt.Map(opt.NewPtr(in.Fid), deserialiseID),
 		Name:  in.Name,
 		Value: in.Value,
-		Type:  opt.NewPtr(in.Type),
+		Type:  t,
 		Sort:  opt.NewPtr(in.Sort),
-	}
+	}, nil
 }
 
 func getContentFillRuleSourceCommand(contentFillRuleParam *openapi.ContentFillRule, contentFillSourceParam *openapi.FillSourceQuery) (opt.Optional[asset.ContentFillCommand], error) {

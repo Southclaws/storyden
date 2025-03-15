@@ -97,9 +97,9 @@ func TestNodesProperty(t *testing.T) {
 			tests.Ok(t, err, node35)
 
 			res, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(root, parentslug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-				{Name: "weight", Type: "number", Sort: "1"},
-				{Name: "kind", Type: "string", Sort: "2"},
-				{Name: "added", Type: "timestamp", Sort: "3"},
+				{Name: "weight", Type: openapi.Number, Sort: "1"},
+				{Name: "kind", Type: openapi.Text, Sort: "2"},
+				{Name: "added", Type: openapi.Timestamp, Sort: "3"},
 			}, session)
 			tests.Ok(t, err, res)
 
@@ -112,8 +112,8 @@ func TestNodesProperty(t *testing.T) {
 			s1field3ID := &s1fieldIDs[2]
 
 			res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(root, slug3, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-				{Name: "size", Type: "number", Sort: "1"},
-				{Name: "brand", Type: "string", Sort: "2"},
+				{Name: "size", Type: openapi.Number, Sort: "1"},
+				{Name: "brand", Type: openapi.Text, Sort: "2"},
 			}, session)
 			tests.Ok(t, err, res)
 
@@ -191,7 +191,7 @@ func TestNodesProperty(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				ptype := "string"
+				ptype := openapi.Text
 
 				update, err := cl.NodeUpdatePropertiesWithResponse(root, slug1, openapi.NodeUpdatePropertiesJSONRequestBody{
 					Properties: openapi.PropertyMutationList{
@@ -260,9 +260,9 @@ func TestNodesPropertyFieldOrdering(t *testing.T) {
 			tests.Ok(t, err, node3)
 
 			res, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parentslug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-				{Name: "weight", Type: "number", Sort: "1"},
-				{Name: "kind", Type: "string", Sort: "2"},
-				{Name: "added", Type: "timestamp", Sort: "3"},
+				{Name: "weight", Type: openapi.Number, Sort: "1"},
+				{Name: "kind", Type: openapi.Text, Sort: "2"},
+				{Name: "added", Type: openapi.Timestamp, Sort: "3"},
 			}, session)
 			tests.Ok(t, err, res)
 
@@ -306,9 +306,9 @@ func TestNodesPropertyFieldOrdering(t *testing.T) {
 				field3ID := &fieldIDs[2]
 
 				schemaUpdate, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parentslug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-					{Fid: field1ID, Name: "weight", Type: "number", Sort: "3"},
-					{Fid: field2ID, Name: "kind", Type: "string", Sort: "1"},
-					{Fid: field3ID, Name: "added", Type: "timestamp", Sort: "2"},
+					{Fid: field1ID, Name: "weight", Type: openapi.Number, Sort: "3"},
+					{Fid: field2ID, Name: "kind", Type: openapi.Text, Sort: "1"},
+					{Fid: field3ID, Name: "added", Type: openapi.Timestamp, Sort: "2"},
 				}, session)
 				tests.Ok(t, err, schemaUpdate)
 
@@ -408,9 +408,9 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 			tests.Ok(t, err, node35)
 
 			res, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parentslug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-				{Name: "weight", Type: "number", Sort: "1"},
-				{Name: "kind", Type: "string", Sort: "2"},
-				{Name: "added", Type: "timestamp", Sort: "3"},
+				{Name: "weight", Type: openapi.Number, Sort: "1"},
+				{Name: "kind", Type: openapi.Text, Sort: "2"},
+				{Name: "added", Type: openapi.Timestamp, Sort: "3"},
 			}, session)
 			tests.Ok(t, err, res)
 
@@ -422,8 +422,8 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 			// Update children of child-3 schema
 
 			res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, slug3, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-				{Name: "size", Type: "number", Sort: "1"},
-				{Name: "brand", Type: "string", Sort: "2"},
+				{Name: "size", Type: openapi.Number, Sort: "1"},
+				{Name: "brand", Type: openapi.Text, Sort: "2"},
 			}, session)
 			tests.Ok(t, err, res)
 
@@ -442,14 +442,14 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 				a := assert.New(t)
 
 				// get the parent
-				parent, err := cl.NodeGetWithResponse(ctx, parentslug, session)
+				parent, err := cl.NodeGetWithResponse(ctx, parentslug, &openapi.NodeGetParams{}, session)
 				r.NoError(err)
 				r.NotNil(parent)
 				// yield the children's schema
 				a.Len(parent.JSON200.ChildPropertySchema, 3)
 
 				// get the child
-				child, err := cl.NodeGetWithResponse(ctx, slug3, session)
+				child, err := cl.NodeGetWithResponse(ctx, slug3, &openapi.NodeGetParams{}, session)
 				r.NoError(err)
 				r.NotNil(child)
 				// yield the children's schema and its own schema
@@ -517,9 +517,9 @@ func TestNodesPropertySchemaBadRequests(t *testing.T) {
 			tests.Ok(t, err, node1)
 
 			res, err := cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, parentslug, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-				{Name: "weight", Type: "number", Sort: "1"},
-				{Name: "kind", Type: "string", Sort: "2"},
-				{Name: "added", Type: "timestamp", Sort: "3"},
+				{Name: "weight", Type: openapi.Number, Sort: "1"},
+				{Name: "kind", Type: openapi.Text, Sort: "2"},
+				{Name: "added", Type: openapi.Timestamp, Sort: "3"},
 			}, session)
 			tests.Ok(t, err, res)
 
@@ -530,8 +530,8 @@ func TestNodesPropertySchemaBadRequests(t *testing.T) {
 			// Update children of child-3 schema
 
 			res, err = cl.NodeUpdateChildrenPropertySchemaWithResponse(ctx, slug1, openapi.NodeUpdateChildrenPropertySchemaJSONRequestBody{
-				{Name: "size", Type: "number", Sort: "1"},
-				{Name: "brand", Type: "string", Sort: "2"},
+				{Name: "size", Type: openapi.Number, Sort: "1"},
+				{Name: "brand", Type: openapi.Text, Sort: "2"},
 			}, session)
 			tests.Ok(t, err, res)
 

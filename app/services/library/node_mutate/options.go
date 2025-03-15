@@ -432,7 +432,7 @@ func (s *Manager) postMutation(ctx context.Context, n *library.Node, pre *preMut
 	}, nil
 }
 
-func mapNewPropertyMutation(pm library.PropertyMutation) (*node_properties.SchemaFieldMutation, error) {
+func mapNewPropertyMutation(pm *library.PropertyMutation) (*node_properties.SchemaFieldMutation, error) {
 	ft, ok := pm.Type.Get()
 	if !ok {
 		return nil, fault.Wrap(fault.New("no type on new field"), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("missing type", "You must provide a field type when adding a new property."))

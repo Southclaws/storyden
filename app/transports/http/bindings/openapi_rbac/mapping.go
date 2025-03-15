@@ -386,6 +386,10 @@ func (m *Mapping) NodeGet() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionReadPublishedLibrary
 }
 
+func (m *Mapping) NodeListChildren() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionReadPublishedLibrary
+}
+
 func (m *Mapping) NodeUpdate() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }

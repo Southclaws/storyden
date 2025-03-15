@@ -31,7 +31,7 @@ func New(db *ent.Client) (*SchemaWriter, *Writer) {
 type SchemaFieldMutation struct {
 	ID   opt.Optional[xid.ID]
 	Name string
-	Type string
+	Type library.PropertyType
 	Sort string
 }
 
@@ -178,14 +178,22 @@ func (w *SchemaWriter) Get(ctx context.Context, schemaID xid.ID) (*library.Prope
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	updatedSchemas := dt.Map(schemaFields, func(f *ent.PropertySchemaField) *library.PropertySchemaField {
+	updatedSchemas, err := dt.MapErr(schemaFields, func(f *ent.PropertySchemaField) (*library.PropertySchemaField, error) {
+		t, err := library.NewPropertyType(f.Type)
+		if err != nil {
+			return nil, err
+		}
+
 		return &library.PropertySchemaField{
 			ID:   f.ID,
 			Name: f.Name,
-			Type: f.Type,
+			Type: t,
 			Sort: f.Sort,
-		}
+		}, nil
 	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return &library.PropertySchema{
 		ID:     schemaID,
@@ -196,7 +204,7 @@ func (w *SchemaWriter) Get(ctx context.Context, schemaID xid.ID) (*library.Prope
 func (w *SchemaWriter) AddFields(ctx context.Context, schemaID xid.ID, schemas FieldSchemaMutations) (*library.PropertySchema, error) {
 	fields := []*ent.PropertySchemaFieldCreate{}
 	for _, s := range schemas {
-		fields = append(fields, w.db.PropertySchemaField.Create().SetName(s.Name).SetSort(s.Sort).SetType(s.Type).SetSchemaID(schemaID))
+		fields = append(fields, w.db.PropertySchemaField.Create().SetName(s.Name).SetSort(s.Sort).SetType(s.Type.String()).SetSchemaID(schemaID))
 	}
 
 	err := w.db.PropertySchemaField.CreateBulk(fields...).Exec(ctx)
@@ -295,7 +303,12 @@ func (w *SchemaWriter) doSchemaUpdates(ctx context.Context, currentSchema *ent.P
 			// we know this is non-zero already.
 			id := s.ID.OrZero()
 
-			err = tx.PropertySchemaField.UpdateOneID(id).SetName(s.Name).SetSort(s.Sort).SetType(s.Type).Exec(ctx)
+			err = tx.PropertySchemaField.
+				UpdateOneID(id).
+				SetName(s.Name).
+				SetSort(s.Sort).
+				SetType(s.Type.String()).
+				Exec(ctx)
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
@@ -305,7 +318,12 @@ func (w *SchemaWriter) doSchemaUpdates(ctx context.Context, currentSchema *ent.P
 	// Create fields
 	if len(creates) > 0 {
 		for _, s := range creates {
-			err = tx.PropertySchemaField.Create().SetName(s.Name).SetSort(s.Sort).SetType(s.Type).SetSchemaID(currentSchema.ID).Exec(ctx)
+			err = tx.PropertySchemaField.Create().
+				SetName(s.Name).
+				SetSort(s.Sort).
+				SetType(s.Type.String()).
+				SetSchemaID(currentSchema.ID).
+				Exec(ctx)
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}

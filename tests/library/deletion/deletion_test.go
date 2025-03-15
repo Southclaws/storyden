@@ -56,10 +56,10 @@ func TestLibraryNodeDeletion(t *testing.T) {
 				tests.Ok(t, err, cdel)
 				a.Nil(cdel.JSON200.Destination)
 
-				node3get, err := cl.NodeGetWithResponse(ctx, node3.JSON200.Slug, session)
+				node3get, err := cl.NodeGetWithResponse(ctx, node3.JSON200.Slug, &openapi.NodeGetParams{}, session)
 				tests.Status(t, err, node3get, http.StatusNotFound)
 
-				node2get, err := cl.NodeGetWithResponse(ctx, node2.JSON200.Slug, session)
+				node2get, err := cl.NodeGetWithResponse(ctx, node2.JSON200.Slug, &openapi.NodeGetParams{}, session)
 				tests.Ok(t, err, node2get)
 				a.Len(node2get.JSON200.Children, 0)
 			})
@@ -85,7 +85,7 @@ func TestLibraryNodeDeletion(t *testing.T) {
 				a.NotNil(cdel.JSON200.Destination)
 				a.Equal(node1.JSON200.Id, cdel.JSON200.Destination.Id)
 
-				node1get, err := cl.NodeGetWithResponse(ctx, node1.JSON200.Slug, session)
+				node1get, err := cl.NodeGetWithResponse(ctx, node1.JSON200.Slug, &openapi.NodeGetParams{}, session)
 				tests.Ok(t, err, node1get)
 				a.Len(node1get.JSON200.Children, 1, "node3 is moved under node1 when node2 is deleted")
 			})
@@ -108,12 +108,12 @@ func TestLibraryNodeDeletion(t *testing.T) {
 				tests.Ok(t, err, ndelete)
 				a.Nil(ndelete.JSON200.Destination)
 
-				node1get, err := cl.NodeGetWithResponse(ctx, node1.JSON200.Slug, session)
+				node1get, err := cl.NodeGetWithResponse(ctx, node1.JSON200.Slug, &openapi.NodeGetParams{}, session)
 				tests.Ok(t, err, node1get)
 				a.Len(node1get.JSON200.Children, 0)
 
 				// node3 is moved to root, with no parent
-				node3get, err := cl.NodeGetWithResponse(ctx, node3.JSON200.Slug, session)
+				node3get, err := cl.NodeGetWithResponse(ctx, node3.JSON200.Slug, &openapi.NodeGetParams{}, session)
 				tests.Ok(t, err, node3get)
 				a.Nil(node3get.JSON200.Parent)
 			})

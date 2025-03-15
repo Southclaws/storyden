@@ -37,7 +37,7 @@ import {
 } from "./useLibraryPageScreen";
 
 export function LibraryPageScreen(props: Props) {
-  const { data, error } = useNodeGet(props.node.slug, {
+  const { data, error } = useNodeGet(props.node.slug, undefined, {
     swr: { fallbackData: props.node },
   });
   if (!data) {
