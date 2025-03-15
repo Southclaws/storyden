@@ -45,7 +45,7 @@ select
 from
   nodes n
   left join properties p on n.id = p.node_id
-  inner join property_schema_fields f on p.field_id = f.id and f.name = '%s'
+  inner join property_schema_fields f on p.field_id = f.id and f.name = $1
 where
   n.id in (%s)
 order by
@@ -68,7 +68,7 @@ select
 from
   nodes n
   left join properties p on n.id = p.node_id
-  inner join property_schema_fields f on p.field_id = f.id and f.name = '%s'
+  inner join property_schema_fields f on p.field_id = f.id and f.name = $1
 where
   n.id in (%s)
 order by
@@ -86,12 +86,6 @@ func (q *Querier) sortedByPropertyValue(ctx context.Context, ids []string, csr C
 		ID xid.ID `db:"id"`
 	}
 
-	// Because of the shortcomings of the driver, can't use a prepared statement
-	// below (sqlite throws a cryptic error for the where in (?) clause and pg
-	// throws a different error, sqlx.In did not work for another reason...)
-	// so we have to manually escape the field name to prevent injection.
-	safeFieldName := strings.Replace(csr.Field, "'", "''", -1)
-
 	quotedIDs := dt.Map(ids, func(id string) string { return fmt.Sprintf("'%s'", id) })
 	idList := strings.Join(quotedIDs, ",")
 
@@ -104,7 +98,6 @@ func (q *Querier) sortedByPropertyValue(ctx context.Context, ids []string, csr C
 	// improved since 1973...
 	case "sqlite":
 		queryTemplate = fmt.Sprintf(querySortedByPropertyValue_sqlite,
-			safeFieldName,
 			idList,
 			csr.Dir,
 			csr.Page.Limit(),
@@ -113,7 +106,6 @@ func (q *Querier) sortedByPropertyValue(ctx context.Context, ids []string, csr C
 
 	case "pgx":
 		queryTemplate = fmt.Sprintf(querySortedByPropertyValue_postgres,
-			safeFieldName,
 			idList,
 			csr.Dir, // this
 			csr.Dir, // is
@@ -127,7 +119,7 @@ func (q *Querier) sortedByPropertyValue(ctx context.Context, ids []string, csr C
 		return nil, fault.New("unexpected failure in database driver switch")
 	}
 
-	err := q.raw.SelectContext(ctx, &rows, queryTemplate)
+	err := q.raw.SelectContext(ctx, &rows, queryTemplate, csr.Field)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
