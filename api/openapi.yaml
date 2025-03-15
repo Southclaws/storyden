@@ -1629,6 +1629,25 @@ paths:
         "401": {$ref: "#/components/responses/Unauthorised"}
         "200": {$ref: "#/components/responses/NodeDeleteOK"}
 
+  /nodes/{node_slug}/children:
+    get:
+      operationId: NodeListChildren
+      description: |
+        Get all the children of a given node using the provided filters and page
+        parameters. This can be used for rendering the child nodes of the given
+        node as an interactive table where properties can be used as columns.
+      tags: [nodes]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/NodeChildrenSortParam"
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeListOK"}
+
   /nodes/{node_slug}/children/property-schema:
     patch:
       operationId: NodeUpdateChildrenPropertySchema

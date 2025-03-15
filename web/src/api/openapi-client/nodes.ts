@@ -24,6 +24,7 @@ import type {
   NodeDeleteParams,
   NodeGetOKResponse,
   NodeGetParams,
+  NodeListChildrenParams,
   NodeListOKResponse,
   NodeListParams,
   NodeRemoveChildOKResponse,
@@ -322,6 +323,70 @@ export const useNodeDelete = <
   const swrFn = getNodeDeleteMutationFetcher(nodeSlug, params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Get all the children of a given node using the provided filters and page
+parameters. This can be used for rendering the child nodes of the given
+node as an interactive table where properties can be used as columns.
+
+ */
+export const nodeListChildren = (
+  nodeSlug: string,
+  params?: NodeListChildrenParams,
+) => {
+  return fetcher<NodeListOKResponse>({
+    url: `/nodes/${nodeSlug}/children`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getNodeListChildrenKey = (
+  nodeSlug: string,
+  params?: NodeListChildrenParams,
+) => [`/nodes/${nodeSlug}/children`, ...(params ? [params] : [])] as const;
+
+export type NodeListChildrenQueryResult = NonNullable<
+  Awaited<ReturnType<typeof nodeListChildren>>
+>;
+export type NodeListChildrenQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeListChildren = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  params?: NodeListChildrenParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof nodeListChildren>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!nodeSlug;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getNodeListChildrenKey(nodeSlug, params) : null));
+  const swrFn = () => nodeListChildren(nodeSlug, params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
 
   return {
     swrKey,

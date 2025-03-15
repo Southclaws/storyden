@@ -16,6 +16,7 @@ import type {
   NodeDeleteParams,
   NodeGetOKResponse,
   NodeGetParams,
+  NodeListChildrenParams,
   NodeListOKResponse,
   NodeListParams,
   NodeRemoveChildOKResponse,
@@ -207,6 +208,48 @@ export const nodeDelete = async (
     {
       ...options,
       method: "DELETE",
+    },
+  );
+};
+
+/**
+ * Get all the children of a given node using the provided filters and page
+parameters. This can be used for rendering the child nodes of the given
+node as an interactive table where properties can be used as columns.
+
+ */
+export type nodeListChildrenResponse = {
+  data: NodeListOKResponse;
+  status: number;
+};
+
+export const getNodeListChildrenUrl = (
+  nodeSlug: string,
+  params?: NodeListChildrenParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/nodes/${nodeSlug}/children?${normalizedParams.toString()}`
+    : `/nodes/${nodeSlug}/children`;
+};
+
+export const nodeListChildren = async (
+  nodeSlug: string,
+  params?: NodeListChildrenParams,
+  options?: RequestInit,
+): Promise<nodeListChildrenResponse> => {
+  return fetcher<Promise<nodeListChildrenResponse>>(
+    getNodeListChildrenUrl(nodeSlug, params),
+    {
+      ...options,
+      method: "GET",
     },
   );
 };

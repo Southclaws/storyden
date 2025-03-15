@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
@@ -52,4 +53,27 @@ func (q *HydratedQuerier) GetBySlug(ctx context.Context, qk library.QueryKey, so
 	}
 
 	return n, nil
+}
+
+func (q *HydratedQuerier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagination.Parameters, sortChildrenBy opt.Optional[node_querier.ChildSortRule]) (*pagination.Result[*library.Node], error) {
+	session := q.session.AccountMaybe(ctx)
+
+	opts := []node_querier.Option{}
+
+	if s, ok := session.Get(); ok {
+		opts = append(opts, node_querier.WithVisibilityRulesApplied(&s.ID))
+	} else {
+		opts = append(opts, node_querier.WithVisibilityRulesApplied(nil))
+	}
+
+	sortChildrenBy.Call(func(v node_querier.ChildSortRule) {
+		opts = append(opts, node_querier.WithSortChildrenBy(v))
+	})
+
+	r, err := q.nodereader.ListChildren(ctx, qk, pp, opts...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return r, nil
 }

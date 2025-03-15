@@ -136,6 +136,27 @@ func TestNodesPropertySorting(t *testing.T) {
 				wantSlugs = []string{slug1, slug3, slug2}
 				a.Equal(wantSlugs, slugs)
 			})
+
+			t.Run("sort_by_weight_direct_children", func(t *testing.T) {
+				r := require.New(t)
+				a := assert.New(t)
+
+				n := tests.AssertRequest(cl.NodeListChildrenWithResponse(root, parentslug, &openapi.NodeListChildrenParams{
+					ChildrenSort: opt.New("-weight").Ptr(),
+				}, session))(t, http.StatusOK)
+				r.Len(n.JSON200.Nodes, 3)
+				slugs := dt.Map(n.JSON200.Nodes, bySlug)
+				wantSlugs := []string{slug2, slug3, slug1}
+				a.Equal(wantSlugs, slugs)
+
+				n = tests.AssertRequest(cl.NodeListChildrenWithResponse(root, parentslug, &openapi.NodeListChildrenParams{
+					ChildrenSort: opt.New("weight").Ptr(),
+				}, session))(t, http.StatusOK)
+				r.Len(n.JSON200.Nodes, 3)
+				slugs = dt.Map(n.JSON200.Nodes, bySlug)
+				wantSlugs = []string{slug1, slug3, slug2}
+				a.Equal(wantSlugs, slugs)
+			})
 		}))
 	}))
 }

@@ -262,6 +262,7 @@ export * from "./nodeGetOKResponse";
 export * from "./nodeGetParams";
 export * from "./nodeInitialProps";
 export * from "./nodeList";
+export * from "./nodeListChildrenParams";
 export * from "./nodeListFormatParamParameter";
 export * from "./nodeListOKResponse";
 export * from "./nodeListParams";
