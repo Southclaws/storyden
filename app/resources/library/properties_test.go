@@ -20,9 +20,9 @@ func TestPropertySchema_Split(t *testing.T) {
 
 		schema := PropertySchema{
 			Fields: PropertySchemaFields{
-				{ID: f0, Name: "name", Type: "string", Sort: "1"},
-				{ID: f1, Name: "age", Type: "number", Sort: "2"},
-				{ID: f2, Name: "dob", Type: "timestamp", Sort: "3"},
+				{ID: f0, Name: "name", Type: PropertyTypeEnumText, Sort: "1"},
+				{ID: f1, Name: "age", Type: PropertyTypeEnumNumber, Sort: "2"},
+				{ID: f2, Name: "dob", Type: PropertyTypeEnumTimestamp, Sort: "3"},
 			},
 		}
 		pml := PropertyMutationList{
@@ -48,9 +48,9 @@ func TestPropertySchema_Split(t *testing.T) {
 
 		schema := PropertySchema{
 			Fields: PropertySchemaFields{
-				{ID: f0, Name: "name", Type: "string", Sort: "1"},
-				{ID: f1, Name: "age", Type: "number", Sort: "2"},
-				{ID: f2, Name: "dob", Type: "timestamp", Sort: "3"},
+				{ID: f0, Name: "name", Type: PropertyTypeEnumText, Sort: "1"},
+				{ID: f1, Name: "age", Type: PropertyTypeEnumNumber, Sort: "2"},
+				{ID: f2, Name: "dob", Type: PropertyTypeEnumTimestamp, Sort: "3"},
 			},
 		}
 		pml := PropertyMutationList{
@@ -71,9 +71,9 @@ func TestPropertySchema_Split(t *testing.T) {
 
 		schema := PropertySchema{
 			Fields: PropertySchemaFields{
-				{Name: "name", Type: "string", Sort: "1"},
-				{Name: "age", Type: "number", Sort: "2"},
-				{Name: "dob", Type: "timestamp", Sort: "3"},
+				{Name: "name", Type: PropertyTypeEnumText, Sort: "1"},
+				{Name: "age", Type: PropertyTypeEnumNumber, Sort: "2"},
+				{Name: "dob", Type: PropertyTypeEnumTimestamp, Sort: "3"},
 			},
 		}
 		pml := PropertyMutationList{}
@@ -95,9 +95,9 @@ func TestPropertySchema_Split(t *testing.T) {
 
 		schema := PropertySchema{
 			Fields: PropertySchemaFields{
-				{ID: f0, Name: "name", Type: "string", Sort: "1"},
-				{ID: f1, Name: "age", Type: "number", Sort: "2"},
-				{ID: f2, Name: "dob", Type: "timestamp", Sort: "3"},
+				{ID: f0, Name: "name", Type: PropertyTypeEnumText, Sort: "1"},
+				{ID: f1, Name: "age", Type: PropertyTypeEnumNumber, Sort: "2"},
+				{ID: f2, Name: "dob", Type: PropertyTypeEnumTimestamp, Sort: "3"},
 			},
 		}
 		pml := PropertyMutationList{
@@ -120,9 +120,9 @@ func TestPropertySchema_Split(t *testing.T) {
 
 		schema := PropertySchema{
 			Fields: PropertySchemaFields{
-				{Name: "name", Type: "string", Sort: "1"},
-				{Name: "age", Type: "number", Sort: "2"},
-				{Name: "dob", Type: "timestamp", Sort: "3"},
+				{Name: "name", Type: PropertyTypeEnumText, Sort: "1"},
+				{Name: "age", Type: PropertyTypeEnumNumber, Sort: "2"},
+				{Name: "dob", Type: PropertyTypeEnumTimestamp, Sort: "3"},
 			},
 		}
 		pml := PropertyMutationList{

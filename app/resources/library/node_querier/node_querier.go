@@ -2,8 +2,10 @@ package node_querier
 
 import (
 	"context"
+	"slices"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
@@ -13,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/link"
@@ -30,6 +33,7 @@ func New(db *ent.Client, raw *sqlx.DB, aq *account_querier.Querier) *Querier {
 }
 
 type options struct {
+	sortChildrenBy    *ChildSortRule
 	visibilityRules   bool
 	requestingAccount *account.AccountID
 }
@@ -42,6 +46,12 @@ func WithVisibilityRulesApplied(accountID *account.AccountID) Option {
 	return func(o *options) {
 		o.visibilityRules = true
 		o.requestingAccount = accountID
+	}
+}
+
+func WithSortChildrenBy(field ChildSortRule) Option {
+	return func(o *options) {
+		o.sortChildrenBy = &field
 	}
 }
 
@@ -185,12 +195,128 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if o.sortChildrenBy != nil && len(col.Edges.Nodes) > 0 {
+		children := dt.Map(col.Edges.Nodes, func(n *ent.Node) string { return n.ID.String() })
+		sortmap, err := q.sortedByPropertyValue(ctx, children, *o.sortChildrenBy)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		slices.SortFunc(col.Edges.Nodes, func(a, b *ent.Node) int {
+			return sortmap[a.ID] - sortmap[b.ID]
+		})
+	}
+
 	r, err := library.MapNode(true, propSchema.Map())(col)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return r, nil
+}
+
+func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagination.Parameters, opts ...Option) (*pagination.Result[*library.Node], error) {
+	query := q.db.Node.Query()
+
+	query.Where(qk.Predicate())
+
+	o := &options{}
+	for _, opt := range opts {
+		opt(o)
+	}
+
+	requestingAccount, err := q.getRequestingAccount(ctx, o)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	applyVisibilityRulesPredicate := func(nq *ent.NodeQuery) {
+		if !o.visibilityRules {
+			return
+		}
+
+		// Apply visibility rules:
+		// - published nodes are visible to everyone
+		// - non-published nodes are not visible to anyone except the owner
+		if acc, ok := requestingAccount.Get(); ok {
+
+			canViewInReview := acc.Roles.Permissions().HasAny(rbac.PermissionAdministrator, rbac.PermissionManageLibrary)
+
+			if canViewInReview {
+				nq.Where(node.Or(
+					node.AccountID(xid.ID(*o.requestingAccount)),
+					node.VisibilityIn(node.VisibilityPublished, node.VisibilityReview),
+				))
+			} else {
+				nq.Where(node.Or(
+					node.AccountID(xid.ID(*o.requestingAccount)),
+					node.VisibilityEQ(node.VisibilityPublished),
+				))
+			}
+		} else {
+			nq.Where(node.VisibilityEQ(node.VisibilityPublished))
+		}
+	}
+
+	applyVisibilityRulesPredicate(query)
+
+	query.WithNodes(func(cq *ent.NodeQuery) {
+		applyVisibilityRulesPredicate(cq)
+
+		cq.
+			WithOwner(func(aq *ent.AccountQuery) {
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+			}).
+			WithPrimaryImage(func(aq *ent.AssetQuery) {
+				aq.WithParent()
+			}).
+			WithAssets().
+			WithLink(func(lq *ent.LinkQuery) {
+				lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+			}).
+			WithTags().
+			WithProperties().
+			WithPropertySchema(func(psq *ent.PropertySchemaQuery) {
+				psq.WithFields()
+			})
+	})
+
+	col, err := query.Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	propSchema := library.PropertySchemaQueryRows{}
+	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, col.ID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	nodes := col.Edges.Nodes
+
+	if o.sortChildrenBy != nil && len(nodes) > 0 {
+		// override with the func param, todo: refactor? idk
+		o.sortChildrenBy.Page = pp
+
+		children := dt.Map(nodes, func(n *ent.Node) string { return n.ID.String() })
+		sortmap, err := q.sortedByPropertyValue(ctx, children, *o.sortChildrenBy)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		slices.SortFunc(nodes, func(a, b *ent.Node) int {
+			return sortmap[a.ID] - sortmap[b.ID]
+		})
+	}
+
+	rs, err := dt.MapErr(nodes, library.MapNode(true, propSchema.Map()))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	r := pagination.NewPageResult(pp, len(rs), rs)
+
+	return &r, nil
 }
 
 // Probe does not pull edges, only the node itself, it's fast for quick checks.

@@ -1,6 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import slugify from "@sindresorhus/slugify";
 import { dequal } from "dequal";
+import { keys } from "lodash";
 import { omit, values } from "lodash/fp";
 import { parseAsBoolean, useQueryState } from "nuqs";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -20,6 +21,7 @@ import {
   PropertyList,
   PropertyMutation,
   PropertyMutationList,
+  PropertyType,
   Visibility,
 } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
@@ -49,10 +51,17 @@ const CoverImageFormSchema = z.union([
   }),
 ]);
 
+const PropertyTypes = Object.keys(PropertyType) as unknown as readonly [
+  PropertyType,
+  ...PropertyType[],
+];
+
+console.log("PropertyTypes", PropertyTypes);
+
 export const FormNodePropertySchema = z.object({
   fid: z.string().optional(),
   name: z.string(),
-  type: z.string(),
+  type: z.enum(PropertyTypes),
   sort: z.string(),
   value: z.string(),
 });
@@ -120,7 +129,7 @@ export function useLibraryPageScreen({ node }: Props) {
         properties: node.properties.map((p, i) => ({
           fid: p.fid,
           name: p.name ?? `Field ${i}`,
-          type: p.type ?? "text",
+          type: p.type ?? PropertyType.text,
           sort: p.sort,
           value: p.value ?? "",
         })),
@@ -313,7 +322,10 @@ export function useLibraryPageScreen({ node }: Props) {
               if (p.fid?.startsWith("new_field_")) {
                 return omit("fid", p);
               }
-              return p;
+              return {
+                ...p,
+                type: p.type as PropertyType,
+              } satisfies PropertyMutation;
             }),
             url: payload.link,
           },

@@ -60,7 +60,7 @@ func TestNodesHappyPath(t *testing.T) {
 
 			// Get the one just created
 
-			node1get, err := cl.NodeGetWithResponse(ctx, slug1)
+			node1get, err := cl.NodeGetWithResponse(ctx, slug1, &openapi.NodeGetParams{})
 			tests.Ok(t, err, node1get)
 
 			a.Equal(name1, node1get.JSON200.Name)
@@ -132,7 +132,7 @@ func TestNodesErrors(t *testing.T) {
 
 			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
 
-			get404, err := cl.NodeGetWithResponse(ctx, "nonexistent")
+			get404, err := cl.NodeGetWithResponse(ctx, "nonexistent", &openapi.NodeGetParams{})
 			r.NoError(err)
 			r.NotNil(get404)
 			a.Equal(http.StatusNotFound, get404.StatusCode())

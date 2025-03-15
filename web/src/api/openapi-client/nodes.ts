@@ -23,6 +23,8 @@ import type {
   NodeDeleteOKResponse,
   NodeDeleteParams,
   NodeGetOKResponse,
+  NodeGetParams,
+  NodeListChildrenParams,
   NodeListOKResponse,
   NodeListParams,
   NodeRemoveChildOKResponse,
@@ -139,15 +141,16 @@ export const useNodeList = <
 /**
  * Get a node by its URL slug.
  */
-export const nodeGet = (nodeSlug: string) => {
+export const nodeGet = (nodeSlug: string, params?: NodeGetParams) => {
   return fetcher<NodeGetOKResponse>({
     url: `/nodes/${nodeSlug}`,
     method: "GET",
+    params,
   });
 };
 
-export const getNodeGetKey = (nodeSlug: string) =>
-  [`/nodes/${nodeSlug}`] as const;
+export const getNodeGetKey = (nodeSlug: string, params?: NodeGetParams) =>
+  [`/nodes/${nodeSlug}`, ...(params ? [params] : [])] as const;
 
 export type NodeGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof nodeGet>>
@@ -164,6 +167,7 @@ export const useNodeGet = <
     | InternalServerErrorResponse,
 >(
   nodeSlug: string,
+  params?: NodeGetParams,
   options?: {
     swr?: SWRConfiguration<Awaited<ReturnType<typeof nodeGet>>, TError> & {
       swrKey?: Key;
@@ -175,8 +179,9 @@ export const useNodeGet = <
 
   const isEnabled = swrOptions?.enabled !== false && !!nodeSlug;
   const swrKey =
-    swrOptions?.swrKey ?? (() => (isEnabled ? getNodeGetKey(nodeSlug) : null));
-  const swrFn = () => nodeGet(nodeSlug);
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getNodeGetKey(nodeSlug, params) : null));
+  const swrFn = () => nodeGet(nodeSlug, params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,
@@ -318,6 +323,70 @@ export const useNodeDelete = <
   const swrFn = getNodeDeleteMutationFetcher(nodeSlug, params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Get all the children of a given node using the provided filters and page
+parameters. This can be used for rendering the child nodes of the given
+node as an interactive table where properties can be used as columns.
+
+ */
+export const nodeListChildren = (
+  nodeSlug: string,
+  params?: NodeListChildrenParams,
+) => {
+  return fetcher<NodeListOKResponse>({
+    url: `/nodes/${nodeSlug}/children`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getNodeListChildrenKey = (
+  nodeSlug: string,
+  params?: NodeListChildrenParams,
+) => [`/nodes/${nodeSlug}/children`, ...(params ? [params] : [])] as const;
+
+export type NodeListChildrenQueryResult = NonNullable<
+  Awaited<ReturnType<typeof nodeListChildren>>
+>;
+export type NodeListChildrenQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeListChildren = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  params?: NodeListChildrenParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof nodeListChildren>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!nodeSlug;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getNodeListChildrenKey(nodeSlug, params) : null));
+  const swrFn = () => nodeListChildren(nodeSlug, params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
 
   return {
     swrKey,

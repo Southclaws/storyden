@@ -1591,7 +1591,10 @@ paths:
       description: Get a node by its URL slug.
       tags: [nodes]
       security: []
-      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      parameters:
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/NodeChildrenSortParam"
+        - $ref: "#/components/parameters/PaginationQuery"
       responses:
         default: {$ref: "#/components/responses/InternalServerError"}
         "404": {$ref: "#/components/responses/NotFound"}
@@ -1625,6 +1628,25 @@ paths:
         "404": {$ref: "#/components/responses/NotFound"}
         "401": {$ref: "#/components/responses/Unauthorised"}
         "200": {$ref: "#/components/responses/NodeDeleteOK"}
+
+  /nodes/{node_slug}/children:
+    get:
+      operationId: NodeListChildren
+      description: |
+        Get all the children of a given node using the provided filters and page
+        parameters. This can be used for rendering the child nodes of the given
+        node as an interactive table where properties can be used as columns.
+      tags: [nodes]
+      security: []
+      parameters:
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/NodeChildrenSortParam"
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: {$ref: "#/components/responses/InternalServerError"}
+        "404": {$ref: "#/components/responses/NotFound"}
+        "401": {$ref: "#/components/responses/Unauthorised"}
+        "200": {$ref: "#/components/responses/NodeListOK"}
 
   /nodes/{node_slug}/children/property-schema:
     patch:
@@ -2303,6 +2325,15 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
+
+    NodeChildrenSortParam:
+      description: |
+        The field (either in schema or in property schema) to sort by.
+      name: children_sort
+      in: query
+      required: false
+      schema:
+        type: string
 
     NodeContentFillRuleQuery:
       description: |
@@ -5264,7 +5295,7 @@ components:
         primary_image_asset_id: {$ref: "#/components/schemas/AssetID"}
         content: {$ref: "#/components/schemas/PostContent"}
         parent: {$ref: "#/components/schemas/NodeSlug"}
-        properties: {$ref: "#/components/schemas/PropertyList"}
+        properties: {$ref: "#/components/schemas/PropertyMutationList"}
         tags: {$ref: "#/components/schemas/TagNameList"}
         visibility: {$ref: "#/components/schemas/Visibility"}
         meta: {$ref: "#/components/schemas/Metadata"}
@@ -5315,6 +5346,11 @@ components:
 
     PropertyType:
       type: string
+      enum:
+        - text
+        - number
+        - timestamp
+        - boolean
 
     PropertyValue:
       type: string

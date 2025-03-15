@@ -211,7 +211,7 @@ func TestNodesVisibility(t *testing.T) {
 				a.Contains(ids, node3.JSON200.Id, "in review so is now visible to admins")
 				a.NotContains(ids, node4.JSON200.Id, "")
 
-				get3 := tests.AssertRequest(cl.NodeGetWithResponse(root, node3.JSON200.Slug, adminSession))(t, http.StatusOK)
+				get3 := tests.AssertRequest(cl.NodeGetWithResponse(root, node3.JSON200.Slug, &openapi.NodeGetParams{}, adminSession))(t, http.StatusOK)
 				a.Equal(openapi.Review, get3.JSON200.Visibility)
 			})
 
@@ -273,17 +273,17 @@ func TestNodesVisibility(t *testing.T) {
 				node2 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft, Parent: &node1.JSON200.Slug}, authorSession))(t, http.StatusOK)
 				node3 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft, Parent: &node1.JSON200.Slug}, randoSession))(t, http.StatusOK)
 
-				get1asAuthor := tests.AssertRequest(cl.NodeGetWithResponse(root, node1.JSON200.Slug, authorSession))(t, http.StatusOK)
+				get1asAuthor := tests.AssertRequest(cl.NodeGetWithResponse(root, node1.JSON200.Slug, &openapi.NodeGetParams{}, authorSession))(t, http.StatusOK)
 				ids := dt.Map(get1asAuthor.JSON200.Children, func(c openapi.NodeWithChildren) string { return c.Id })
 				a.Contains(ids, node2.JSON200.Id, "author can see child of node1 because they own it")
 				a.NotContains(ids, node3.JSON200.Id, "cannot see node3 as it is not owned by the author")
 
-				get1asRando := tests.AssertRequest(cl.NodeGetWithResponse(root, node1.JSON200.Slug, randoSession))(t, http.StatusOK)
+				get1asRando := tests.AssertRequest(cl.NodeGetWithResponse(root, node1.JSON200.Slug, &openapi.NodeGetParams{}, randoSession))(t, http.StatusOK)
 				ids = dt.Map(get1asRando.JSON200.Children, func(c openapi.NodeWithChildren) string { return c.Id })
 				a.NotContains(ids, node2.JSON200.Id, "cannot see node2 as it is not published and owned by another member")
 				a.Contains(ids, node3.JSON200.Id, "can see node3 as it is owned by this member")
 
-				get1asGuest := tests.AssertRequest(cl.NodeGetWithResponse(root, node1.JSON200.Slug))(t, http.StatusOK)
+				get1asGuest := tests.AssertRequest(cl.NodeGetWithResponse(root, node1.JSON200.Slug, &openapi.NodeGetParams{}))(t, http.StatusOK)
 				ids = dt.Map(get1asGuest.JSON200.Children, func(c openapi.NodeWithChildren) string { return c.Id })
 				a.NotContains(ids, node2.JSON200.Id, "guest cannot see node2 as it is not published")
 				a.NotContains(ids, node3.JSON200.Id, "guest cannot see node3 as it is not published")
@@ -298,13 +298,13 @@ func TestNodesVisibility(t *testing.T) {
 				node1 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, adminSession))(t, http.StatusOK)
 				node2 := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft, Parent: &node1.JSON200.Slug}, authorSession))(t, http.StatusOK)
 
-				get1asAuthor, err := cl.NodeGetWithResponse(root, node2.JSON200.Slug, authorSession)
+				get1asAuthor, err := cl.NodeGetWithResponse(root, node2.JSON200.Slug, &openapi.NodeGetParams{}, authorSession)
 				tests.Ok(t, err, get1asAuthor)
 
-				get1asRando, err := cl.NodeGetWithResponse(root, node2.JSON200.Slug, randoSession)
+				get1asRando, err := cl.NodeGetWithResponse(root, node2.JSON200.Slug, &openapi.NodeGetParams{}, randoSession)
 				tests.Status(t, err, get1asRando, http.StatusNotFound)
 
-				get1asGuest, err := cl.NodeGetWithResponse(root, node2.JSON200.Slug)
+				get1asGuest, err := cl.NodeGetWithResponse(root, node2.JSON200.Slug, &openapi.NodeGetParams{})
 				tests.Status(t, err, get1asGuest, http.StatusNotFound)
 			})
 		}))

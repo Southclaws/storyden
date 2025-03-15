@@ -17,6 +17,7 @@ import type {
   AssetGetOKResponse,
   AssetUploadBody,
   GetInfoOKResponse,
+  GetSpec200,
   InternalServerErrorResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
@@ -70,10 +71,10 @@ export const useGetVersion = <TError = InternalServerErrorResponse>(options?: {
 JSON format. This is useful for clients that want to dynamically load
 the API specification for documentation or code generation.
 
- * @summary Get the OpenAPI specification as JSON.
+ * @summary OpenAPI specification
  */
 export const getSpec = () => {
-  return fetcher<string>({ url: `/openapi.json`, method: "GET" });
+  return fetcher<GetSpec200>({ url: `/openapi.json`, method: "GET" });
 };
 
 export const getGetSpecKey = () => [`/openapi.json`] as const;
@@ -84,7 +85,7 @@ export type GetSpecQueryResult = NonNullable<
 export type GetSpecQueryError = InternalServerErrorResponse;
 
 /**
- * @summary Get the OpenAPI specification as JSON.
+ * @summary OpenAPI specification
  */
 export const useGetSpec = <TError = InternalServerErrorResponse>(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof getSpec>>, TError> & {
@@ -115,7 +116,7 @@ export const useGetSpec = <TError = InternalServerErrorResponse>(options?: {
 an interactive HTML format. This is useful for developers who want to
 explore the API and test endpoints without writing code.
 
- * @summary Get the OpenAPI documentation as an interactive HTML document.
+ * @summary API documentation
  */
 export const getDocs = () => {
   return fetcher<string>({ url: `/docs`, method: "GET" });
@@ -129,7 +130,7 @@ export type GetDocsQueryResult = NonNullable<
 export type GetDocsQueryError = InternalServerErrorResponse;
 
 /**
- * @summary Get the OpenAPI documentation as an interactive HTML document.
+ * @summary API documentation
  */
 export const useGetDocs = <TError = InternalServerErrorResponse>(options?: {
   swr?: SWRConfiguration<Awaited<ReturnType<typeof getDocs>>, TError> & {

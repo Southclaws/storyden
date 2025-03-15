@@ -27,6 +27,7 @@ import {
   NodeWithChildren,
   Property,
   PropertyMutation,
+  PropertyType,
   TagReference,
   Visibility,
 } from "@/api/openapi-schema";
@@ -168,7 +169,7 @@ export function useLibraryMutation(node?: Node) {
             return {
               fid: p.fid ?? uniqueId("new_field_"),
               sort: p.sort ?? "",
-              type: p.type ?? "text",
+              type: p.type ?? PropertyType.text,
               ...p,
             } satisfies Property;
           }) ?? data.properties,

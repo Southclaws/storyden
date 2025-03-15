@@ -15,6 +15,8 @@ import type {
   NodeDeleteOKResponse,
   NodeDeleteParams,
   NodeGetOKResponse,
+  NodeGetParams,
+  NodeListChildrenParams,
   NodeListOKResponse,
   NodeListParams,
   NodeRemoveChildOKResponse,
@@ -104,15 +106,26 @@ export type nodeGetResponse = {
   status: number;
 };
 
-export const getNodeGetUrl = (nodeSlug: string) => {
-  return `/nodes/${nodeSlug}`;
+export const getNodeGetUrl = (nodeSlug: string, params?: NodeGetParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/nodes/${nodeSlug}?${normalizedParams.toString()}`
+    : `/nodes/${nodeSlug}`;
 };
 
 export const nodeGet = async (
   nodeSlug: string,
+  params?: NodeGetParams,
   options?: RequestInit,
 ): Promise<nodeGetResponse> => {
-  return fetcher<Promise<nodeGetResponse>>(getNodeGetUrl(nodeSlug), {
+  return fetcher<Promise<nodeGetResponse>>(getNodeGetUrl(nodeSlug, params), {
     ...options,
     method: "GET",
   });
@@ -195,6 +208,48 @@ export const nodeDelete = async (
     {
       ...options,
       method: "DELETE",
+    },
+  );
+};
+
+/**
+ * Get all the children of a given node using the provided filters and page
+parameters. This can be used for rendering the child nodes of the given
+node as an interactive table where properties can be used as columns.
+
+ */
+export type nodeListChildrenResponse = {
+  data: NodeListOKResponse;
+  status: number;
+};
+
+export const getNodeListChildrenUrl = (
+  nodeSlug: string,
+  params?: NodeListChildrenParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/nodes/${nodeSlug}/children?${normalizedParams.toString()}`
+    : `/nodes/${nodeSlug}/children`;
+};
+
+export const nodeListChildren = async (
+  nodeSlug: string,
+  params?: NodeListChildrenParams,
+  options?: RequestInit,
+): Promise<nodeListChildrenResponse> => {
+  return fetcher<Promise<nodeListChildrenResponse>>(
+    getNodeListChildrenUrl(nodeSlug, params),
+    {
+      ...options,
+      method: "GET",
     },
   );
 };
