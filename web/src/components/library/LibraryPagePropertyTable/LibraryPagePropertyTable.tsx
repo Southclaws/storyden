@@ -2,7 +2,11 @@ import { uniqueId } from "lodash/fp";
 import { ChangeEvent } from "react";
 import { Controller, ControllerProps, FieldValues } from "react-hook-form";
 
-import { NodeWithChildren, PropertyName } from "@/api/openapi-schema";
+import {
+  NodeWithChildren,
+  PropertyName,
+  PropertyType,
+} from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
@@ -103,7 +107,7 @@ export function LibraryPagePropertyTableEditable({
             {
               fid: uniqueId("new_field_"),
               name: newName,
-              type: "text",
+              type: PropertyType.text, // TODO: Add actual UI for types
               sort: "5",
               value: "",
             },
