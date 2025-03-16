@@ -42,6 +42,19 @@ func New[T any](q *QueueFactory) pubsub.Topic[T] {
 	}
 }
 
+func NewNamed[T any](q *QueueFactory, topic string) pubsub.Topic[T] {
+	logger := q.log.With(zap.String("topic", topic))
+
+	logger.Debug("registered new queue")
+
+	return &watermillQueue[T]{
+		logger,
+		topic,
+		q.pub,
+		q.sub,
+	}
+}
+
 type watermillQueue[T any] struct {
 	log   *zap.Logger
 	topic string
