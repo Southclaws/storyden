@@ -6,7 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
-	"github.com/weaviate/weaviate-go-client/v4/weaviate/filters"
+	"github.com/weaviate/weaviate-go-client/v5/weaviate/filters"
 )
 
 func (w *weaviateSemdexer) Delete(ctx context.Context, id xid.ID) (int, error) {
