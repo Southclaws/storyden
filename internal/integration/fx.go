@@ -41,8 +41,6 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		EmailProvider:    "mock",
 	}
 
-	os.Setenv("DATABASE_URL", "postgresql://default:default@localhost:5432/postgres?sslmode=disable")
-
 	if dbURL := os.Getenv("DATABASE_URL"); dbURL != "" {
 		if isMaybeProdDB(dbURL) {
 			panic("maybe accidental prod DATABASE_URL in integration tests!")
