@@ -54,7 +54,6 @@ require (
 	github.com/getsentry/sentry-go/otel v0.31.1
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/golang-jwt/jwt/v5 v5.2.2
-	github.com/google/go-github/v66 v66.0.0
 	github.com/google/go-github/v70 v70.0.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgx/v5 v5.7.3
@@ -73,7 +72,6 @@ require (
 	github.com/openai/openai-go v0.1.0-beta.1
 	github.com/pb33f/libopenapi v0.21.8
 	github.com/philippgille/chromem-go v0.7.0
-	github.com/pinecone-io/go-pinecone v1.1.1
 	github.com/pinecone-io/go-pinecone/v3 v3.1.0
 	github.com/puzpuzpuz/xsync/v3 v3.5.1
 	github.com/redis/rueidis v1.0.56
@@ -218,13 +216,11 @@ require (
 	github.com/go-openapi/jsonpointer v0.21.1 // indirect
 	github.com/go-openapi/swag v0.23.1 // indirect
 	github.com/go-webauthn/webauthn v0.12.2
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
 	github.com/hashicorp/hcl/v2 v2.23.0 // indirect
-	github.com/invopop/yaml v0.3.1 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
