@@ -3,7 +3,7 @@ package semdexer
 import (
 	"context"
 
-	"github.com/weaviate/weaviate-go-client/v4/weaviate"
+	"github.com/weaviate/weaviate-go-client/v5/weaviate"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/fault"

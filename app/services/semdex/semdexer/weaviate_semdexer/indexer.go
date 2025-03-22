@@ -9,7 +9,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
-	weaviate_errors "github.com/weaviate/weaviate-go-client/v4/weaviate/fault"
+	weaviate_errors "github.com/weaviate/weaviate-go-client/v5/weaviate/fault"
 	"github.com/weaviate/weaviate/entities/models"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
