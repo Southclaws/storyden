@@ -136,7 +136,7 @@ func (s *pineconeSemdexer) buildIndexOps(ctx context.Context, object datagraph.I
 
 			return &pinecone.Vector{
 				Id:       id,
-				Values:   vec,
+				Values:   &vec,
 				Metadata: metadata,
 			}, nil
 		})

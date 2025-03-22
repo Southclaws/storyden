@@ -6,7 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/pinecone-io/go-pinecone/pinecone"
+	"github.com/pinecone-io/go-pinecone/v3/pinecone"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
@@ -39,7 +39,7 @@ func (s *pineconeSemdexer) RecommendRefs(ctx context.Context, object datagraph.I
 	chunkvecs := [][]float32{}
 
 	for _, v := range response.Vectors {
-		chunkvecs = append(chunkvecs, v.Values)
+		chunkvecs = append(chunkvecs, *v.Values)
 	}
 
 	targetvec := averageVectors(chunkvecs)
