@@ -3,6 +3,8 @@ import {
   TreeView as ArkTreeView,
   type TreeViewRootProps,
 } from "@ark-ui/react/tree-view";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { keyBy } from "lodash";
 import Link from "next/link";
 import { JSX, forwardRef } from "react";
@@ -138,7 +140,6 @@ export const LibraryPageTree = forwardRef<HTMLDivElement, TreeViewProps>(
                   styles={styles}
                   child={child}
                   isHighlighted={isHighlighted}
-                  isRoot={isRoot}
                 />
               ),
             )}
@@ -175,18 +176,27 @@ type BranchProps = {
   child: NodeWithChildren;
   styles: any;
   isHighlighted: boolean;
-  isRoot: boolean;
+  isRoot?: boolean;
 };
 
 function TreeBranch({ styles, child, isHighlighted, isRoot }: BranchProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: child.id,
+  });
+
   const isPublished = child.visibility === Visibility.published;
-
   const label = isPublished ? child.name : `${child.name}`;
-
   const branchColourPalette = visibilityColour(child.visibility);
 
   const visibilityStyles = isRoot
-    ? "" // Don't show the visibility state styles for root items, is cluttered.
+    ? ""
     : css({
         paddingX: "0.5",
         borderRadius: "sm",
@@ -199,46 +209,88 @@ function TreeBranch({ styles, child, isHighlighted, isRoot }: BranchProps) {
       });
 
   const highlightStyles = css({
-    background: isHighlighted ? "gray.a2" : undefined,
+    colorPalette: branchColourPalette,
+    backgroundColor: isHighlighted ? "colorPalette.2" : undefined,
   });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  };
 
   return (
     <ArkTreeView.BranchControl
-      className={cx("group", styles.branchControl, highlightStyles)}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className={cx(
+        styles.branchControl,
+        css({
+          cursor: "grab",
+          _active: {
+            cursor: "grabbing",
+          },
+        }),
+        visibilityStyles,
+        highlightStyles,
+      )}
     >
       <ArkTreeView.BranchIndicator className={styles.branchIndicator}>
-        {child.children?.length ? <ChevronRightIcon /> : <BulletIcon />}
+        <ChevronRightIcon />
       </ArkTreeView.BranchIndicator>
 
-      <ArkTreeView.BranchText asChild className={cx(styles.branchText)}>
-        <Link href={`/l/${child.slug}`}>
-          <span className={visibilityStyles}>{label}</span>
+      <ArkTreeView.BranchText asChild className={styles.branchText}>
+        <Link href={`/library/${child.slug}`}>
+          {label}
         </Link>
       </ArkTreeView.BranchText>
 
-      <HStack
-        className="library-page-tree__menu"
-        opacity={{
-          base: "0",
-          _groupHover: "full",
-        }}
-        gap="1"
-        minW="min"
-        flexShrink="0"
-      >
-        <CreatePageAction variant="ghost" hideLabel parentSlug={child.slug} />
-        <LibraryPageMenu variant="ghost" node={child} />
-      </HStack>
+      <LibraryPageMenu node={child} />
     </ArkTreeView.BranchControl>
   );
 }
 
-function TreeItem({ styles, child }: BranchProps) {
+function TreeItem({ styles, child, isHighlighted }: BranchProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: child.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : undefined,
+  };
+
   return (
-    <ArkTreeView.Item value={child.slug} className={cx(styles.item)}>
+    <ArkTreeView.Item
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      value={child.slug}
+      className={cx(
+        styles.item,
+        css({
+          cursor: "grab",
+          _active: {
+            cursor: "grabbing",
+          },
+        }),
+      )}
+    >
       <ArkTreeView.ItemText className={styles.itemText}>
-        <Link href={`/l/${child.slug}`}>{child.name}</Link>
+        <Link href={`/library/${child.slug}`}>{child.name}</Link>
       </ArkTreeView.ItemText>
+      <LibraryPageMenu node={child} />
     </ArkTreeView.Item>
   );
 }

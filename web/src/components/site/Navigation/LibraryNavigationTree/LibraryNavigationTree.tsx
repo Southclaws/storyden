@@ -1,6 +1,7 @@
 "use client";
 
 import { CreatePageAction } from "@/components/library/CreatePage";
+import { DraggableLibraryPageTree } from "@/components/library/LibraryPageTree/DraggableLibraryPageTree";
 import { LibraryPageTree } from "@/components/library/LibraryPageTree/LibraryPageTree";
 import { Unready } from "@/components/site/Unready";
 import { LibraryIcon } from "@/components/ui/icons/Library";
@@ -34,11 +35,19 @@ export function LibraryNavigationTree(props: Props) {
         </HStack>
       </NavigationHeader>
 
-      <LibraryPageTree
-        currentNode={currentNode}
+      <DraggableLibraryPageTree
         data={{
           label: LibraryLabel,
           children: data.nodes,
+        }}
+        currentNode={currentNode}
+        onReorder={(sourceId, targetId) => {
+          // Handle reordering within same parent
+          console.log("onReorder", sourceId, targetId);
+        }}
+        onMove={(sourceId, targetId) => {
+          // Handle moving to different parent
+          console.log("onMove", sourceId, targetId);
         }}
       />
     </LStack>

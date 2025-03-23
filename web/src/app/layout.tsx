@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { PropsWithChildren } from "react";
 
 import { getColourAsHex } from "src/utils/colour";
@@ -25,7 +26,7 @@ export default async function RootLayout({ children }: PropsWithChildren) {
           the window object. This allows us to set the API/frontend addresses
           without rebuilding the entire app.
         */}
-        <script>{`
+        <script id="storyden-ssr-config">{`
           window.__storyden__ = {"API_ADDRESS":"${API_ADDRESS}", "WEB_ADDRESS":"${WEB_ADDRESS}", "source": "script"};
           console.log("set up window config", window.__storyden__);
         `}</script>
