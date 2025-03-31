@@ -1,0 +1,57 @@
+---
+title: Local development
+---
+
+To run Storyden locally via the repository, it's pretty easy! You can use this approach for testing, experimenting and contributing.
+
+For full development and contribution documentation, please visit the [GitHub repository](https://github.com/Southclaws/storyden).
+
+## Prerequisites
+
+To run Storyden locally, you need to have the following installed:
+
+- [Go](https://go.dev/dl) - the API is written in Go!
+- [Node.js](https://nodejs.org/) - the frontend is built with Next.js
+- [Yarn](https://yarnpkg.com/) - the package manager for the frontend
+
+<Callout>
+  If anything is missing from this list, please hit edit this page or [open an
+  issue!](https://github.com/Southclaws/storyden/issues/new)
+</Callout>
+
+## Go
+
+First, clone the repository:
+
+```sh
+git clone https://github.com/Southclaws/storyden.git
+```
+
+From inside the Storyden directory, you can then run the API service:
+
+```sh
+go run ./cmd/backend
+```
+
+This will start the API server with default configuration. You'll get:
+
+- `./data/data.db` SQLite database
+- `./data/assets` to store assets (avatars, images, files, etc.)
+- A local server running at `http://localhost:8000`
+- OpenAPI documentation at `http://localhost:8000/api/docs`
+- CORS and cookie rules configured to support localhost
+
+You can also run the frontend service:
+
+```sh
+cd web
+yarn
+yarn dev
+```
+
+<Callout>
+  Please note that currently, Storyden's web frontend does not support Next.js
+  `--turbo` due to some minor issues with Panda CSS.
+</Callout>
+
+The frontend will be available at `http://localhost:3000` and will by default automatically connect to the API at `http://localhost:8000`.

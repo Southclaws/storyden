@@ -1,0 +1,272 @@
+---
+title: Fly.io
+description: Setting up a Storyden instance on Fly.io in under 5 minutes!
+---
+
+Fly.io is a platform for running Docker containers on a global network of edge servers. It's a great fit for Storyden because it's container-native and super simple to get started!
+
+![A rocket sitting on the launch pad](/docs/introduction/fly/start_your_engines.png)
+
+## Deployment
+
+Relevant documentation: https://fly.io/docs/apps/launch
+
+<Callout>
+  Fly.io will update their UI and CLI from time to time, so the examples in this
+  documentation may fall out of date. In general, the process should remain
+  roughly the same but if you spot a major difference, please let us know by
+  [opening an issue!](https://github.com/Southclaws/storyden/issues/new)
+</Callout>
+
+Create a new directory for your configuration and `cd` into it in your terminal.
+
+```sh
+cd storyden-fly-example
+```
+
+Once you've created an account on Fly.io and set up the CLI, you can launch a Storyden instance with a single command:
+
+```sh
+fly launch --image ghcr.io/southclaws/storyden --name storyden --internal-port 8000
+```
+
+- `--image` is the Docker image to use. This is the latest version of Storyden from the GitHub Container Registry.
+- `--name` is the name of the app. This will be used to generate a URL for your app.
+- `--internal-port` is the port that the app runs on _inside_ the container. This is 8000 by default.
+
+You'll see a confirmation of the app name, region, organisation, etc:
+
+```yaml
+❯ fly launch --image ghcr.io/southclaws/storyden --name storyden --internal-port 8000
+Using image ghcr.io/southclaws/storyden
+Creating app in D:\Work\storyden-fly-example
+We're about to launch your app on Fly.io. Here's what you're getting:
+
+Organization: Your Name              (fly launch defaults to the personal org)
+Name:         my-storyden            (specified on the command line)
+Region:       London, United Kingdom (this is the fastest region for you)
+App Machines: shared-cpu-1x, 1GB RAM (most apps need about 1GB of RAM)
+Postgres:     <none>                 (not requested)
+Redis:        <none>                 (not requested)
+Tigris:       <none>                 (not requested)
+```
+
+Storyden idles at around ~80MB of RAM so 1GB is plenty and should support a small to medium sized community.
+
+<Callout>
+  Storyden is written in Go which is a garbage-collected language, usage *will*
+  increase based on the features you enable, the amount of traffic and the
+  average size of content being processed. Keep an eye on Fly.io's grafana
+  dashboards to track memory usage and scale up if necessary.
+</Callout>
+
+`fly launch` will open a browser window to confirm settings, make sure the internal port is set to 8000. Once you've confirmed, after a short time you'll see:
+
+```
+Waiting for launch data... Done
+Created app 'my-storyden' in organization 'personal'
+Admin URL: https://fly.io/apps/my-storyden
+Hostname: my-storyden.fly.dev
+Wrote config file fly.toml
+Validating D:\Work\storyden-fly-example\fly.toml
+✓ Configuration is valid
+==> Building image
+
+...
+
+Visit your newly deployed app at https://my-storyden.fly.dev/
+```
+
+Fly.io will also generate a `fly.toml` file for you in the current directory. We'll use this in the next section to make Storyden production-ready.
+
+For now though, admire your brand new instance of Storyden!
+
+![Storyden running on Fly.io!](/docs/introduction/fly/browser_fly.png)
+
+You can visit the URL that Fly.io gives you and you'll see your Storyden instance - _almost_ ready to use!
+
+## Necessary configuration
+
+That's only half the story though. You have an instance but
+
+1. it's entirely **ephemeral**! This means that if the instance is restarted, it will lose all its data.
+2. it has no idea what its public address is! This means session cookies won't work.
+
+For this section, we'll be working with the `fly.toml` file that was generated when you ran `fly launch`. This file is used by Fly.io to configure your app. It'll look something like this:
+
+```toml
+app = 'my-storyden'
+primary_region = 'lhr'
+
+[build]
+  image = 'ghcr.io/southclaws/storyden'
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
+```
+
+<Callout>
+  Over time the defaults may change and what you see in your `fly.toml` file may
+  be different to what's here. Please refer to the [Fly.io
+  documentation](https://fly.io/docs/) for additional guidance.
+</Callout>
+
+### Persistent storage
+
+Relevant documentation: https://fly.io/docs/volumes
+
+To create a volume for the SQLite database, assets and other persisted data, we need to create a Fly volume:
+
+```sh
+fly volumes create storyden_data -r lhr -n 2
+```
+
+What this means:
+
+- `storyden_data` is the name of the volume. This is what we'll use to mount it in the `fly.toml` file.
+- `-r lhr` is the region to create the volume in. This should be the same region as your app.
+- `-n 2` is the number of replicas to create, in this example we're using 2 because by default, `fly launch` creates two replicas of the app's machine.
+
+To finish up, we need to mount the volume to the app by using the `[mounts]` section of `fly.toml`.
+
+```diff
+    app = 'my-storyden'
+    primary_region = 'lhr'
+
+    [build]
+      image = 'ghcr.io/southclaws/storyden'
+
+    [http_service]
+      internal_port = 8000
+      force_https = true
+      auto_stop_machines = 'stop'
+      auto_start_machines = true
+      min_machines_running = 0
+      processes = ['app']
+
+    [[vm]]
+      memory = '1gb'
+      cpu_kind = 'shared'
+      cpus = 1
++
++   [mounts]
++     source="storyden_data"
++     destination="/data"
+```
+
+Run Fly Deploy to attach the volume:
+
+```sh
+fly deploy
+```
+
+### Secrets
+
+There's one secret that you need to set for your deployment to be secure: `SESSION_KEY`
+
+The [session key](/docs/operation/configuration#session_key) is an important security value. It's used to encrypt session tokens so that they can't be tampered with. It's important to set this to a unique value that is kept secret. You can use any trusted source of randomness on your local machine to generate it.
+
+<Callout type="warning" emoji="⚠️">
+  A session key must be a hexadecimal string with 16 or more characters.
+</Callout>
+
+Create a random string of hexadecimal characters using a tool of your choice. For example, using `openssl`:
+
+```sh
+openssl rand -hex 32
+```
+
+<Callout>
+  An example value is intentionally omitted here. You should *always* generate
+  cryptographic source secrets yourself.
+</Callout>
+
+Then apply this value to the `SESSION_KEY` secret:
+
+```sh
+fly secrets set SESSION_KEY=yoursupersecretvalue
+```
+
+### Environment Variables
+
+Relevant documentation: https://fly.io/docs/reference/configuration#the-env-variables-section
+
+Storyden uses secure cookies for session authentication. As a result, it needs to know two things:
+
+- what domain it's running on so it can set the `Domain` flag on the cookie
+- a unique encryption key to keep session tokens secure
+
+```diff
+    app = 'my-storyden'
+    primary_region = 'lhr'
+
+    [build]
+      image = 'ghcr.io/southclaws/storyden'
+
+    [http_service]
+      internal_port = 8000
+      force_https = true
+      auto_stop_machines = 'stop'
+      auto_start_machines = true
+      min_machines_running = 0
+      processes = ['app']
+
+    [[vm]]
+      memory = '1gb'
+      cpu_kind = 'shared'
+      cpus = 1
+
+    [mounts]
+      source="storyden_data"
+      destination="/data"
++
++   [env]
++     PUBLIC_API_ADDRESS = "https://my-storyden.fly.dev"
++     PUBLIC_WEB_ADDRESS = "https://my-storyden.fly.dev"
+```
+
+#### The `PUBLIC_API_ADDRESS` and `PUBLIC_WEB_ADDRESS` variables
+
+The [public API address](/docs/operation/configuration#public_api_address) and [public web address](/docs/operation/configuration#public_web_address) variables are necessary for Storyden to manage sessions using cookies and a few other things such as knowing where links should point to.
+
+In the above section, when you ran `fly launch`, it gives you the URL of your app. This URL will look something like:
+
+```
+https://my-storyden.fly.dev
+```
+
+It's a subdomain of `fly.dev` and is uniquely generated based on your app name. You can refer to the [Fly.io domains documentation](https://fly.io/docs/networking/custom-domain/) for information on setting up a custom domain.
+
+<Callout type="info" emoji="ℹ️">
+  For this quick start guide, your instance is all hosted on a single domain,
+  that means the API and the frontend both run on `https://my-storyden.fly.dev`.
+  But if you're using separate backend and frontend deployments (hosting the
+  frontend on Vercel for example) it's necessary that both share the same root
+  domain. So you'd put the API on something like `api.mycommunity.com` and the
+  frontend on `mycommunity.com`. Cookies will be issued to the root domain,
+  `mycommunity.com` in this example and will be included in requests to both the
+  API and the frontend's SSR rendering backend if you're using a framework such
+  as Next.js.
+</Callout>
+
+Once you've set these two environment variables, plus anything else from the [configuration](/docs/operation/configuration), you can now re-deploy the app:
+
+```sh
+fly deploy
+```
+
+And that's it! You now have your own Storyden instance running on Fly.io!
+
+Visit your app's URL, invite your friends and start building your community's knowledgebase!
+
+![A rocket taking off](/docs/introduction/fly/lift_off.png)
