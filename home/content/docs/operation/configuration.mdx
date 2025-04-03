@@ -1,5 +1,5 @@
 ---
-title: Configuration via Environment Variables
+title: Configuration Environment Variables
 description: Reference for configuring Storyden with environment variables.
 ---
 
@@ -14,8 +14,14 @@ These settings general infrastructure-level configuration settings for managing 
 ### `PRODUCTION`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>`false`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`false`</td>
+  </tr>
 </table>
 
 Deprecated, to be removed. The only thing this affects currently is:
@@ -26,8 +32,17 @@ Deprecated, to be removed. The only thing this affects currently is:
 ### `LOG_LEVEL`
 
 <table>
-<tr><td>type</td><td>`debug`, `info`, `warn`, `error`, `dpanic`, `panic`, `fatal` (case insensitive)</td></tr>
-<tr><td>default</td><td>`info`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>
+      `debug`, `info`, `warn`, `error`, `dpanic`, `panic`, `fatal` (case
+      insensitive)
+    </td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`info`</td>
+  </tr>
 </table>
 
 Can be set to either:
@@ -40,8 +55,14 @@ Can be set to either:
 ### `RUN_FRONTEND`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 Determines whether or not the backend service will also start the frontend Node.js process. When empty, it will not
@@ -51,8 +72,14 @@ When a path is provided, Storyden will execute `node <path>` to start the fronte
 ### `PROXY_FRONTEND_ADDRESS`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 Used in conjunction with `RUN_FRONTEND`. This is the address that the frontend will be available at. This is used by the fullstack Docker image to proxy requests that don't match any `/api` or other routes to the frontend process.
@@ -66,8 +93,14 @@ Configuration settings for aiding in development of Storyden clients.
 ### `DEV_CHAOS_SLOW_MODE`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Simulates slow requests.
@@ -77,8 +110,14 @@ This will add a random delay between zero and this value to all requests. This i
 ### `DEV_CHAOS_FAIL_RATE`
 
 <table>
-<tr><td>type</td><td>float (e.g. `1.0`, `1.5`)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>float (e.g. `1.0`, `1.5`)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 A value between 0 and 1 which simulates failed requests.
@@ -92,21 +131,34 @@ Configuration settings for core functionality, pretty much all of these will nee
 ### `DATABASE_URL`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`sqlite://data/data.db?_pragma=foreign_keys(1)`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`sqlite://data/data.db?_pragma=foreign_keys(1)`</td>
+  </tr>
 </table>
 
 The database URL to connect to. This can be a SQLite, PostgreSQL, or CockroachDB URL.
 
 The accepted schemes for this URL are:
+
 - `sqlite://` or `sqlite3://` for SQLite or Litestream.
 - `postgres://` or `postgresql://` for PostgreSQL, CockroachDB and any other PostgreSQL-compatible database
 
 ### `LISTEN_ADDR`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`0.0.0.0:8000`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`0.0.0.0:8000`</td>
+  </tr>
 </table>
 
 The interface on which the API service will for HTTP requests.
@@ -116,8 +168,14 @@ Typically, in a containerised environment, this should be all interfaces (`0.0.0
 ### `SESSION_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`0000000000000000`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`0000000000000000`</td>
+  </tr>
 </table>
 
 The key used to encrypt session data. This should be a hexadecimal string of 16 or more characters.
@@ -131,8 +189,14 @@ Pending deprecation in favour of a init-time generated key that is stored in the
 ### `PUBLIC_WEB_ADDRESS`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>`http://localhost:3000`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`http://localhost:3000`</td>
+  </tr>
 </table>
 
 The address at which the web frontend will be hosted.
@@ -144,8 +208,14 @@ This is by default `http://localhost:3000` when running locally, or when deployi
 ### `PUBLIC_API_ADDRESS`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>`http://localhost:8000`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`http://localhost:8000`</td>
+  </tr>
 </table>
 
 The address at which the public API will be accessible.
@@ -167,8 +237,14 @@ The rate limiter will store its state in-memory unless a `CACHE_PROVIDER` is con
 ### `RATE_LIMIT`
 
 <table>
-<tr><td>type</td><td>`integer` (number without decimal point)</td></tr>
-<tr><td>default</td><td>`1000`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`integer` (number without decimal point)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`1000`</td>
+  </tr>
 </table>
 
 The amount of requests that a user can make within the `RATE_LIMIT_PERIOD`.
@@ -176,8 +252,14 @@ The amount of requests that a user can make within the `RATE_LIMIT_PERIOD`.
 ### `RATE_LIMIT_PERIOD`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`1h`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`1h`</td>
+  </tr>
 </table>
 
 The period of time in which the `RATE_LIMIT` is applied.
@@ -187,8 +269,14 @@ This is a sliding window, so the `RATE_LIMIT` is applied to the last `RATE_LIMIT
 ### `RATE_LIMIT_EXPIRE`
 
 <table>
-<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
-<tr><td>default</td><td>`1m`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>duration (e.g. 1h, 1m, 1s)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`1m`</td>
+  </tr>
 </table>
 
 The expiry time of the rate limit counters.
@@ -200,11 +288,18 @@ Configuration for monitoring via OpenTelemetry-compatible software.
 ### `OTEL_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 Either:
+
 - `otlp` for any standard OpenTelemetry collector.
 - `sentry` for Sentry (which is OpenTelemetry-compatible, however requires its own specific configuration.)
 - `logger` for local logging to the console. This is only really useful for Storyden developers and is very noisy.
@@ -212,8 +307,14 @@ Either:
 ### `OTEL_EXPORTER_OTLP_ENDPOINT`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 The collector endpoint for sending OTEL data.
@@ -221,8 +322,14 @@ The collector endpoint for sending OTEL data.
 ### `SENTRY_DSN`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 When `OTEL_PROVIDER` is set to `sentry`, this is the DSN for the Sentry project.
@@ -234,8 +341,14 @@ Email sending configuration. This must be enabled in order to enable email-based
 ### `EMAIL_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 Either:
@@ -252,8 +365,14 @@ Configuration for storing files such as avatars, uploaded images, etc.
 ### `ASSET_STORAGE_TYPE`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Either:
@@ -264,8 +383,14 @@ Either:
 ### `ASSET_STORAGE_LOCAL_PATH`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 When `ASSET_STORAGE_TYPE` is set to `local`, this is the path to the directory where files will be stored.
@@ -273,8 +398,14 @@ When `ASSET_STORAGE_TYPE` is set to `local`, this is the path to the directory w
 ### `S3_SECURE`
 
 <table>
-<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
-<tr><td>default</td><td>`true`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>boolean (`true` or `false`, case sensitive)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`true`</td>
+  </tr>
 </table>
 
 When `ASSET_STORAGE_TYPE` is set to `s3`, this determines whether or not to use HTTPS for the S3 connection. You should always set this to `true` unless your S3-compatible storage provider is internally but not publicly accessible, such as in a Kubernetes cluster or running on the same host.
@@ -282,8 +413,14 @@ When `ASSET_STORAGE_TYPE` is set to `s3`, this determines whether or not to use 
 ### `S3_ENDPOINT`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The endpoint for the S3-compatible storage provider. This is typically the base URL of the provider, such as `https://s3.amazonaws.com` for AWS S3, or `https://storage.googleapis.com` for Google Cloud Storage, etc.
@@ -291,8 +428,14 @@ The endpoint for the S3-compatible storage provider. This is typically the base 
 ### `S3_BUCKET`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The bucket name for Storyden assets to be stored in.
@@ -300,8 +443,14 @@ The bucket name for Storyden assets to be stored in.
 ### `S3_REGION`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Most S3-compatible storage providers require a region to be specified. This is typically the region in which the bucket is located, such as `us-east-1` for AWS S3.
@@ -311,8 +460,14 @@ However, some providers do not use regions but S3-compatible clients still requi
 ### `S3_ACCESS_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The access key for the S3-compatible storage provider.
@@ -320,8 +475,14 @@ The access key for the S3-compatible storage provider.
 ### `S3_SECRET_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The secret key for the S3-compatible storage provider.
@@ -333,8 +494,14 @@ Configuration for cachine. Caching is optional in Storyden, but is recommended f
 ### `CACHE_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 When empty, caching will use an efficient in-memory store. This is usually fine for small to medium-sized deployments however it's worth keeping an eye on your deployment's machine memory usage.
@@ -346,8 +513,14 @@ This is necessary for deploying replica instances of Storyden that are backed by
 ### `REDIS_URL`
 
 <table>
-<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>url (e.g. http://example.com)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 The Redis URL to connect to.
@@ -361,8 +534,14 @@ Configuration for message/job queue. This is not required for Storyden to run, b
 ### `QUEUE_TYPE`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`internal`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`internal`</td>
+  </tr>
 </table>
 
 Either:
@@ -373,8 +552,14 @@ Either:
 ### `AMQP_URL`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`amqp://guest:guest@localhost:5672/`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`amqp://guest:guest@localhost:5672/`</td>
+  </tr>
 </table>
 
 The RabbitMQ URL to connect to.
@@ -392,8 +577,14 @@ Configuration for optional AI features. These can be useful for organising large
 ### `LANGUAGE_MODEL_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The provider for language model features.
@@ -403,8 +594,14 @@ The provider for language model features.
 ### `OPENAI_API_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the OpenAI API.
@@ -412,8 +609,14 @@ When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the O
 ### `ASKER_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 The Asker feature provides a conversational interface for exploring the community's content across library pages, threads, links, profiles, etc. It is separate from the language model provider as some providers support different features.
@@ -426,8 +629,14 @@ This can be set to either:
 ### `PERPLEXITY_API_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 If `ASKER_PROVIDER` is set to `perplexity`, this is the API key for the Perplexity API.
@@ -436,16 +645,23 @@ If `ASKER_PROVIDER` is set to `perplexity`, this is the API key for the Perplexi
 
 The Semdex is a semantic index that provides vector-based storage of content. This is used for things like recommendations, search, etc.
 
- The Semdex works with the language model provider to create embeddings of content. Thus, enabling the Semdex requires a `LANGUAGE_MODEL_PROVIDER` to be set.
+The Semdex works with the language model provider to create embeddings of content. Thus, enabling the Semdex requires a `LANGUAGE_MODEL_PROVIDER` to be set.
 
 ### `SEMDEX_PROVIDER`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>(empty string)</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>(empty string)</td>
+  </tr>
 </table>
 
 Either:
+
 - `chromem` for an experimental local vector database. This is not recommended for use in large deployments as it's rather slow and memory-hungry.
 - `weaviate` for Weaviate, a self-hostable or managed vector database.
 - `pinecone` for Pinecone, a fully managed vector database.
@@ -457,8 +673,14 @@ Configuration for when `SEMDEX_PROVIDER` is set to `chromem`.
 ### `SEMDEX_LOCAL_PATH`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`data/semdex`</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>`data/semdex`</td>
+  </tr>
 </table>
 
 The path to the directory where Chromem will store vector indexes.
@@ -470,8 +692,14 @@ Configuration for when `SEMDEX_PROVIDER` is set to `weaviate`.
 ### `WEAVIATE_URL`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The Weaviate API URL. This can be set to a self-hosted instance of Weaviate or the Weaviate Cloud API.
@@ -479,8 +707,14 @@ The Weaviate API URL. This can be set to a self-hosted instance of Weaviate or t
 ### `WEAVIATE_API_TOKEN`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 For self-hosted Weaviate where authentication is enabled, or when using Weaviate Cloud.
@@ -488,8 +722,14 @@ For self-hosted Weaviate where authentication is enabled, or when using Weaviate
 ### `WEAVIATE_CLASS_NAME`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The class name for Weaviate. This value actually controls which model is used for embeddings and other configuration. In future, there will be a more flexible configuration for Weaviate.
@@ -506,8 +746,14 @@ Configuration for when `SEMDEX_PROVIDER` is set to `pinecone`.
 ### `PINECONE_API_KEY`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Your Pinecone API key. This is required for all Pinecone API requests.
@@ -515,8 +761,14 @@ Your Pinecone API key. This is required for all Pinecone API requests.
 ### `PINECONE_INDEX`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 The index name that Storyden will use in your Pinecone workspace.
@@ -524,8 +776,14 @@ The index name that Storyden will use in your Pinecone workspace.
 ### `PINECONE_DIMENSIONS`
 
 <table>
-<tr><td>type</td><td>integer (e.g. `1`, `2`, `3`)</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>integer (e.g. `1`, `2`, `3`)</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 This value is dependent on the underlying OpenAI configuration. Currently this is static and set to 3072 dimensions. In future, Storyden will provide more flexible configuration for language model providers.
@@ -533,8 +791,14 @@ This value is dependent on the underlying OpenAI configuration. Currently this i
 ### `PINECONE_CLOUD`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Pinecone provides hosting on different cloud providers, see the Pinecone documentation for more information. The cloud provider you choose will be reflected in your Pinecone dashboard.
@@ -542,9 +806,14 @@ Pinecone provides hosting on different cloud providers, see the Pinecone documen
 ### `PINECONE_REGION`
 
 <table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>none</td></tr>
+  <tr>
+    <td>type</td>
+    <td>`string`</td>
+  </tr>
+  <tr>
+    <td>default</td>
+    <td>none</td>
+  </tr>
 </table>
 
 Same as above, but for the region. As with any third party providers, it's recommended to choose the region closest to both your Storyden deployment and your community members for best performance and experience.
-
