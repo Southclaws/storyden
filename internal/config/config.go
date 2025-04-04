@@ -88,7 +88,7 @@ type Config struct {
 
 	   You must always set this value when deploying to production. When left as the default value, you are vulnerable to session hijacking attacks as the key is known to everyone.
 
-	   Pending deprecation in favour of a init-time generated key that is stored in the database.
+	   Pending deprecation in favour of an init-time generated key that is stored in the database.
 	*/
 	SessionKey string `default:"0000000000000000" envconfig:"SESSION_KEY"`
 	/*
