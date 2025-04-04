@@ -1,0 +1,550 @@
+---
+title: Configuration via Environment Variables
+description: Reference for configuring Storyden with environment variables.
+---
+
+"Configuration" throughout the documentation and codebase refers to these variables which are statically set when the process launches. Changing them requires a restart, however they don't need to be changed much once set.
+
+The term "Settings" is distinct from these and refers to runtime-configurable values which are stored in the database and not via environment variables. These can be changed at any time via the API or the Admin settings page.
+
+## General
+
+These settings general infrastructure-level configuration settings for managing a Storyden deployment.
+
+### `PRODUCTION`
+
+<table>
+<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
+<tr><td>default</td><td>`false`</td></tr>
+</table>
+
+Deprecated, to be removed. The only thing this affects currently is:
+
+- If set to true, logs will be formatted as JSON. (pending switch to `LOG_LEVEL`)
+- If set to true, SMS messages will be sent via Twilio. (pending switch to `SMS_PROVIDER`)
+
+### `LOG_LEVEL`
+
+<table>
+<tr><td>type</td><td>`debug`, `info`, `warn`, `error`, `dpanic`, `panic`, `fatal` (case insensitive)</td></tr>
+<tr><td>default</td><td>`info`</td></tr>
+</table>
+
+Can be set to either:
+
+- `debug`
+- `info`
+- `warn`
+- `error`
+
+### `RUN_FRONTEND`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>(empty string)</td></tr>
+</table>
+
+Determines whether or not the backend service will also start the frontend Node.js process. When empty, it will not
+
+When a path is provided, Storyden will execute `node <path>` to start the frontend process. This is used by the fullstack Docker image to start the frontend process in the same container as the backend.
+
+### `PROXY_FRONTEND_ADDRESS`
+
+<table>
+<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
+<tr><td>default</td><td>(empty string)</td></tr>
+</table>
+
+Used in conjunction with `RUN_FRONTEND`. This is the address that the frontend will be available at. This is used by the fullstack Docker image to proxy requests that don't match any `/api` or other routes to the frontend process.
+
+In the default `fullstack` image, this is set to `http://localhost:3000` which is the default port for the Next.js process.
+
+## Development tools
+
+Configuration settings for aiding in development of Storyden clients.
+
+### `DEV_CHAOS_SLOW_MODE`
+
+<table>
+<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Simulates slow requests.
+
+This will add a random delay between zero and this value to all requests. This is useful for testing how the client handles slow responses.
+
+### `DEV_CHAOS_FAIL_RATE`
+
+<table>
+<tr><td>type</td><td>float (e.g. `1.0`, `1.5`)</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+A value between 0 and 1 which simulates failed requests.
+
+This will add a random failure to all requests. This is useful for testing how the client handles "internal server error" responses.
+
+## Core configuration
+
+Configuration settings for core functionality, pretty much all of these will need to be configured for production installations, excepting perhaps `LISTEN_ADDR`.
+
+### `DATABASE_URL`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>`sqlite://data/data.db?_pragma=foreign_keys(1)`</td></tr>
+</table>
+
+The database URL to connect to. This can be a SQLite, PostgreSQL, or CockroachDB URL.
+
+The accepted schemes for this URL are:
+- `sqlite://` or `sqlite3://` for SQLite or Litestream.
+- `postgres://` or `postgresql://` for PostgreSQL, CockroachDB and any other PostgreSQL-compatible database
+
+### `LISTEN_ADDR`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>`0.0.0.0:8000`</td></tr>
+</table>
+
+The interface on which the API service will for HTTP requests.
+
+Typically, in a containerised environment, this should be all interfaces (`0.0.0.0`.)
+
+### `SESSION_KEY`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>`0000000000000000`</td></tr>
+</table>
+
+The key used to encrypt session data. This should be a hexadecimal string of 16 or more characters.
+
+This is used by nacl/secretbox to encrypt cookies for tracking sessions.
+
+You must always set this value when deploying to production. When left as the default value, you are vulnerable to session hijacking attacks as the key is known to everyone.
+
+Pending deprecation in favour of an init-time generated key that is stored in the database.
+
+### `PUBLIC_WEB_ADDRESS`
+
+<table>
+<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
+<tr><td>default</td><td>`http://localhost:3000`</td></tr>
+</table>
+
+The address at which the web frontend will be hosted.
+
+This must be set to the public URL that users of the instance will access the frontend client. It is used to determine things such as cookie domain attributes, CORS policy, WebAuthn attributes and other necessary settings. The scheme may be used by some internal components to determine whether the instance is running in a secure context or not.
+
+This is by default `http://localhost:3000` when running locally, or when deploying to production, `https://<your-domain>`.
+
+### `PUBLIC_API_ADDRESS`
+
+<table>
+<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
+<tr><td>default</td><td>`http://localhost:8000`</td></tr>
+</table>
+
+The address at which the public API will be accessible.
+
+This is also used for things such as cookies, CORS, etc.
+
+Please note that both the public API address and public web address must share the same root domain name as Storyden cookies are configured to be issued under this assumption. It also makes a lot of cross-origin and cookie configurations easier to make secure.
+
+## Rate limiting
+
+You can (and should) set rate limiting parameters for any production deployment. Storyden uses a sliding-window-incrementing-counters algorithm to track usage by members and bots which is friendly to bursts of activity while still preventing persistent abuse patterns.
+
+The default values should be sufficient for a small to medium-sized deployment, but you may want to increase them for larger deployments while maintaining adequate hardware and database resources.
+
+Currently, rate limits are applied based on the client's IP address (taking into account various proxy-forwarded headers.)
+
+The rate limiter will store its state in-memory unless a `CACHE_PROVIDER` is configured. In that case, the rate limiter will store its state in the cache provider.
+
+### `RATE_LIMIT`
+
+<table>
+<tr><td>type</td><td>`integer` (number without decimal point)</td></tr>
+<tr><td>default</td><td>`1000`</td></tr>
+</table>
+
+The amount of requests that a user can make within the `RATE_LIMIT_PERIOD`.
+
+### `RATE_LIMIT_PERIOD`
+
+<table>
+<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
+<tr><td>default</td><td>`1h`</td></tr>
+</table>
+
+The period of time in which the `RATE_LIMIT` is applied.
+
+This is a sliding window, so the `RATE_LIMIT` is applied to the last `RATE_LIMIT_PERIOD` of requests.
+
+### `RATE_LIMIT_EXPIRE`
+
+<table>
+<tr><td>type</td><td>duration (e.g. 1h, 1m, 1s)</td></tr>
+<tr><td>default</td><td>`1m`</td></tr>
+</table>
+
+The expiry time of the rate limit counters.
+
+## Telemetry and monitoring
+
+Configuration for monitoring via OpenTelemetry-compatible software.
+
+### `OTEL_PROVIDER`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>(empty string)</td></tr>
+</table>
+
+Either:
+- `otlp` for any standard OpenTelemetry collector.
+- `sentry` for Sentry (which is OpenTelemetry-compatible, however requires its own specific configuration.)
+- `logger` for local logging to the console. This is only really useful for Storyden developers and is very noisy.
+
+### `OTEL_EXPORTER_OTLP_ENDPOINT`
+
+<table>
+<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
+<tr><td>default</td><td>(empty string)</td></tr>
+</table>
+
+The collector endpoint for sending OTEL data.
+
+### `SENTRY_DSN`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>(empty string)</td></tr>
+</table>
+
+When `OTEL_PROVIDER` is set to `sentry`, this is the DSN for the Sentry project.
+
+## Email
+
+Email sending configuration. This must be enabled in order to enable email-based authentication and password reset functionality.
+
+### `EMAIL_PROVIDER`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>(empty string)</td></tr>
+</table>
+
+Either:
+
+- `sendgrid` for SendGrid based email sending.
+- `mock` for logging emails to the console. Only useful for Storyden developers.
+
+Please note: SendGrid configuration settings are not currently exposed in the configuration file. This will be fixed soon.
+
+## Assets/file storage
+
+Configuration for storing files such as avatars, uploaded images, etc.
+
+### `ASSET_STORAGE_TYPE`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Either:
+
+- `local` for local file storage.
+- `s3` for any Amazon S3-compatible storage, such as S3 itself (obviously...), Google Cloud Storage, Cloudflare R2, Minio, etc.
+
+### `ASSET_STORAGE_LOCAL_PATH`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+When `ASSET_STORAGE_TYPE` is set to `local`, this is the path to the directory where files will be stored.
+
+### `S3_SECURE`
+
+<table>
+<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
+<tr><td>default</td><td>`true`</td></tr>
+</table>
+
+When `ASSET_STORAGE_TYPE` is set to `s3`, this determines whether or not to use HTTPS for the S3 connection. You should always set this to `true` unless your S3-compatible storage provider is internally but not publicly accessible, such as in a Kubernetes cluster or running on the same host.
+
+### `S3_ENDPOINT`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The endpoint for the S3-compatible storage provider. This is typically the base URL of the provider, such as `https://s3.amazonaws.com` for AWS S3, or `https://storage.googleapis.com` for Google Cloud Storage, etc.
+
+### `S3_BUCKET`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The bucket name for Storyden assets to be stored in.
+
+### `S3_REGION`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Most S3-compatible storage providers require a region to be specified. This is typically the region in which the bucket is located, such as `us-east-1` for AWS S3.
+
+However, some providers do not use regions but S3-compatible clients still require this to be set. In most cases, the provider will give you a value for this, such as `auto` when using Cloudflare R2.
+
+### `S3_ACCESS_KEY`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The access key for the S3-compatible storage provider.
+
+### `S3_SECRET_KEY`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The secret key for the S3-compatible storage provider.
+
+## Cache
+
+Configuration for cachine. Caching is optional in Storyden, but is recommended for larger deployments to reduce process memory usage.
+
+### `CACHE_PROVIDER`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>(empty string)</td></tr>
+</table>
+
+When empty, caching will use an efficient in-memory store. This is usually fine for small to medium-sized deployments however it's worth keeping an eye on your deployment's machine memory usage.
+
+When set to `redis`, Storyden will use Redis as a cache provider. This is recommended for larger deployments that receive a lot of traffic. The cache provider is also used for the rate limiter so that it can be shared across multiple instances of Storyden.
+
+This is necessary for deploying replica instances of Storyden that are backed by the same persistence layers (database, asset storage, etc.)
+
+### `REDIS_URL`
+
+<table>
+<tr><td>type</td><td>url (e.g. http://example.com)</td></tr>
+<tr><td>default</td><td>(empty string)</td></tr>
+</table>
+
+The Redis URL to connect to.
+
+This is a full URL with `redis://` as the scheme. You can set the username and password using the URL format, for example: `redis://<username>:<password>@<host>:<port>`.
+
+## Message queue
+
+Configuration for message/job queue. This is not required for Storyden to run, but it can improve performance, reliability and reduce memory usage in larger deployments.
+
+### `QUEUE_TYPE`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>`internal`</td></tr>
+</table>
+
+Either:
+
+- Default (no value): in-memory Go channels. This is fast and efficient, but not persistent across restarts and will add a bit of memory usage to the process.
+- `amqp`: RabbitMQ. This is a persistent message queue that is fast and reliable. It is recommended for larger deployments and is necessary for deploying replica instances of Storyden.
+
+### `AMQP_URL`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>`amqp://guest:guest@localhost:5672/`</td></tr>
+</table>
+
+The RabbitMQ URL to connect to.
+
+This is a full URL with `amqp://` as the scheme. You can set the username and password using the URL format, for example: `amqp://<username>:<password>@<host>:<port>`.
+
+The default value is `amqp://guest:guest@localhost:5672/` which is the default RabbitMQ URL.
+
+Storyden does not currently support `amqps://` (secure) URLs, but this will be added soon.
+
+## Artificial intelligence/language models
+
+Configuration for optional AI features. These can be useful for organising large amounts of library pages and threads, but it can also provide other features such as recommendations and ask-based conversational searching.
+
+### `LANGUAGE_MODEL_PROVIDER`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The provider for language model features.
+
+`openai` is currently the only supported provider.
+
+### `OPENAI_API_KEY`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the OpenAI API.
+
+### `ASKER_PROVIDER`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>(empty string)</td></tr>
+</table>
+
+The Asker feature provides a conversational interface for exploring the community's content across library pages, threads, links, profiles, etc. It is separate from the language model provider as some providers support different features.
+
+This can be set to either:
+
+- `openai` for OpenAI
+- `perplexity` for Perplexity AI - note that Perplexity does not currently support all the features necessary to be a `LANGUAGE_MODEL_PROVIDER` so it is only available as an `ASKER_PROVIDER`.
+
+### `PERPLEXITY_API_KEY`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+If `ASKER_PROVIDER` is set to `perplexity`, this is the API key for the Perplexity API.
+
+## Semdex
+
+The Semdex is a semantic index that provides vector-based storage of content. This is used for things like recommendations, search, etc.
+
+ The Semdex works with the language model provider to create embeddings of content. Thus, enabling the Semdex requires a `LANGUAGE_MODEL_PROVIDER` to be set.
+
+### `SEMDEX_PROVIDER`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>(empty string)</td></tr>
+</table>
+
+Either:
+- `chromem` for an experimental local vector database. This is not recommended for use in large deployments as it's rather slow and memory-hungry.
+- `weaviate` for Weaviate, a self-hostable or managed vector database.
+- `pinecone` for Pinecone, a fully managed vector database.
+
+## Local Semdex
+
+Configuration for when `SEMDEX_PROVIDER` is set to `chromem`.
+
+### `SEMDEX_LOCAL_PATH`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>`data/semdex`</td></tr>
+</table>
+
+The path to the directory where Chromem will store vector indexes.
+
+## Weaviate Semdex
+
+Configuration for when `SEMDEX_PROVIDER` is set to `weaviate`.
+
+### `WEAVIATE_URL`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The Weaviate API URL. This can be set to a self-hosted instance of Weaviate or the Weaviate Cloud API.
+
+### `WEAVIATE_API_TOKEN`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+For self-hosted Weaviate where authentication is enabled, or when using Weaviate Cloud.
+
+### `WEAVIATE_CLASS_NAME`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The class name for Weaviate. This value actually controls which model is used for embeddings and other configuration. In future, there will be a more flexible configuration for Weaviate.
+
+Value values are:
+
+- `text2vec-transformers`: requires that the Weaviate instance is using the `text2vec-transformers` module. This is for calculating embeddings locally using a GPU (or very slowly, using a CPU.) This is only available when self-hosting Weaviate.
+- `text2vec-openai`: requires that the Weaviate instance is using the `text2vec-openai` module. This uses OpenAI's API to calculate embeddings. This works on both self-hosted and Weaviate Cloud instances.
+
+## Pinecone Semdex
+
+Configuration for when `SEMDEX_PROVIDER` is set to `pinecone`.
+
+### `PINECONE_API_KEY`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Your Pinecone API key. This is required for all Pinecone API requests.
+
+### `PINECONE_INDEX`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The index name that Storyden will use in your Pinecone workspace.
+
+### `PINECONE_DIMENSIONS`
+
+<table>
+<tr><td>type</td><td>integer (e.g. `1`, `2`, `3`)</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+This value is dependent on the underlying OpenAI configuration. Currently this is static and set to 3072 dimensions. In future, Storyden will provide more flexible configuration for language model providers.
+
+### `PINECONE_CLOUD`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Pinecone provides hosting on different cloud providers, see the Pinecone documentation for more information. The cloud provider you choose will be reflected in your Pinecone dashboard.
+
+### `PINECONE_REGION`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Same as above, but for the region. As with any third party providers, it's recommended to choose the region closest to both your Storyden deployment and your community members for best performance and experience.
+

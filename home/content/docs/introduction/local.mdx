@@ -1,0 +1,32 @@
+---
+title: Docker
+description: Setting up a Storyden instance on your local machine in a few seconds.
+---
+
+You can spin up a local Storyden instance using Docker to try it out. The main Docker image includes both frontend and API services and can be started with:
+
+```sh
+docker run -p 8000:8000 ghcr.io/southclaws/storyden
+```
+
+This will start the full stack (API and web interface) accessible at `http://localhost:8000`.
+
+![Storyden web UI](/docs/introduction/local/browser_home.png)
+
+From here, you can register a new account. The first account that is registered will automatically be given the Admin role which provides you all the permissions necessary to play around.
+
+## API only
+
+If you're looking to just play with the API, you can run the API-only container image:
+
+```sh
+docker run -p 8000:8000 ghcr.io/southclaws/storyden:edge-backend
+```
+
+This will run the API at `http://localhost:8000` and you can check the OpenAPI documentation at `http://localhost:8000/api/docs`.
+
+All CORS and cookie rules are default configured to support localhost on port 8000 out of the box.
+
+![Storyden web UI](/docs/introduction/local/browser_docs.png)
+
+## Done!

@@ -1,90 +1,302 @@
+// Package config contains all environment variable based configuration.
+// THIS FILE IS GENERATED. DO NOT EDIT MANUALLY.
+// To edit configuration variables, edit the config.yaml file and run codegen.
 package config
 
 import (
+	zapcore "go.uber.org/zap/zapcore"
 	"net/url"
 	"time"
-
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fmsg"
-	"github.com/kelseyhightower/envconfig"
-	"go.uber.org/fx"
-	"go.uber.org/zap/zapcore"
 )
 
 // Config represents environment variable configuration parameters
+
 type Config struct {
-	Production    bool          `envconfig:"PRODUCTION"   default:"false"`
-	LogLevel      zapcore.Level `envconfig:"LOG_LEVEL"    default:"info"`
-	RunFrontend   string        `envconfig:"RUN_FRONTEND" default:""`           // Path to server.js for running frontend process
-	FrontendProxy url.URL       `envconfig:"PROXY_FRONTEND_ADDRESS" default:""` // Proxy non-/api requests to this address
 
-	DevChaosSlowMode time.Duration `envconfig:"DEV_CHAOS_SLOW_MODE"` // Simulates slow requests
-	DevChaosFailRate float64       `envconfig:"DEV_CHAOS_FAIL_RATE"` // Simulates failed requests
+	// -
+	// General
+	// -
 
-	DatabaseURL      string  `envconfig:"DATABASE_URL"           default:"sqlite://data/data.db?_pragma=foreign_keys(1)"`
-	ListenAddr       string  `envconfig:"LISTEN_ADDR"            default:"0.0.0.0:8000"`
-	SessionKey       string  `envconfig:"SESSION_KEY"            default:"0000000000000000"`
-	PublicWebAddress url.URL `envconfig:"PUBLIC_WEB_ADDRESS"     default:"http://localhost:3000"`
-	PublicAPIAddress url.URL `envconfig:"PUBLIC_API_ADDRESS"     default:"http://localhost:8000"`
+	/*
+	   Deprecated, to be removed. The only thing this affects currently is:
 
-	RateLimit       int           `envconfig:"RATE_LIMIT"        default:"1000"`
-	RateLimitPeriod time.Duration `envconfig:"RATE_LIMIT_PERIOD" default:"1h"`
-	RateLimitExpire time.Duration `envconfig:"RATE_LIMIT_EXPIRE" default:"1m"`
+	   - If set to true, logs will be formatted as JSON. (pending switch to `LOG_LEVEL`)
+	   - If set to true, SMS messages will be sent via Twilio. (pending switch to `SMS_PROVIDER`)
+	*/
+	Production bool `default:"false" envconfig:"PRODUCTION"`
+	/*
+	   Can be set to either:
 
-	// logger (default) or sentry
-	OTELProvider string  `envconfig:"OTEL_PROVIDER"               default:""`
-	OTELEndpoint url.URL `envconfig:"OTEL_EXPORTER_OTLP_ENDPOINT" default:""`
-	SentryDSN    string  `envconfig:"SENTRY_DSN"                  default:""` // required when OTLPProvider = sentry
+	   - `debug`
+	   - `info`
+	   - `warn`
+	   - `error`
+	*/
+	LogLevel zapcore.Level `default:"info" envconfig:"LOG_LEVEL"`
+	/*
+	   Determines whether or not the backend service will also start the frontend Node.js process. When empty, it will not
 
-	EmailProvider string `envconfig:"EMAIL_PROVIDER"         default:""`
+	   When a path is provided, Storyden will execute `node <path>` to start the frontend process. This is used by the fullstack Docker image to start the frontend process in the same container as the backend.
+	*/
+	RunFrontend string `default:"" envconfig:"RUN_FRONTEND"`
+	/*
+	   Used in conjunction with `RUN_FRONTEND`. This is the address that the frontend will be available at. This is used by the fullstack Docker image to proxy requests that don't match any `/api` or other routes to the frontend process.
 
-	AssetStorageType      string `envconfig:"ASSET_STORAGE_TYPE"`
+	   In the default `fullstack` image, this is set to `http://localhost:3000` which is the default port for the Next.js process.
+	*/
+	FrontendProxy url.URL `default:"" envconfig:"PROXY_FRONTEND_ADDRESS"`
+
+	// -
+	// Development tools
+	// -
+
+	/*
+	   Simulates slow requests.
+
+	   This will add a random delay between zero and this value to all requests. This is useful for testing how the client handles slow responses.
+	*/
+	DevChaosSlowMode time.Duration `envconfig:"DEV_CHAOS_SLOW_MODE"`
+	/*
+	   A value between 0 and 1 which simulates failed requests.
+
+	   This will add a random failure to all requests. This is useful for testing how the client handles "internal server error" responses.
+	*/
+	DevChaosFailRate float64 `envconfig:"DEV_CHAOS_FAIL_RATE"`
+
+	// -
+	// Core configuration
+	// -
+
+	/*
+	   The database URL to connect to. This can be a SQLite, PostgreSQL, or CockroachDB URL.
+
+	   The accepted schemes for this URL are:
+	   - `sqlite://` or `sqlite3://` for SQLite or Litestream.
+	   - `postgres://` or `postgresql://` for PostgreSQL, CockroachDB and any other PostgreSQL-compatible database
+	*/
+	DatabaseURL string `default:"sqlite://data/data.db?_pragma=foreign_keys(1)" envconfig:"DATABASE_URL"`
+	/*
+	   The interface on which the API service will for HTTP requests.
+
+	   Typically, in a containerised environment, this should be all interfaces (`0.0.0.0`.)
+	*/
+	ListenAddr string `default:"0.0.0.0:8000" envconfig:"LISTEN_ADDR"`
+	/*
+	   The key used to encrypt session data. This should be a hexadecimal string of 16 or more characters.
+
+	   This is used by nacl/secretbox to encrypt cookies for tracking sessions.
+
+	   You must always set this value when deploying to production. When left as the default value, you are vulnerable to session hijacking attacks as the key is known to everyone.
+
+	   Pending deprecation in favour of an init-time generated key that is stored in the database.
+	*/
+	SessionKey string `default:"0000000000000000" envconfig:"SESSION_KEY"`
+	/*
+	   The address at which the web frontend will be hosted.
+
+	   This must be set to the public URL that users of the instance will access the frontend client. It is used to determine things such as cookie domain attributes, CORS policy, WebAuthn attributes and other necessary settings. The scheme may be used by some internal components to determine whether the instance is running in a secure context or not.
+
+	   This is by default `http://localhost:3000` when running locally, or when deploying to production, `https://<your-domain>`.
+	*/
+	PublicWebAddress url.URL `default:"http://localhost:3000" envconfig:"PUBLIC_WEB_ADDRESS"`
+	/*
+	   The address at which the public API will be accessible.
+
+	   This is also used for things such as cookies, CORS, etc.
+
+	   Please note that both the public API address and public web address must share the same root domain name as Storyden cookies are configured to be issued under this assumption. It also makes a lot of cross-origin and cookie configurations easier to make secure.
+	*/
+	PublicAPIAddress url.URL `default:"http://localhost:8000" envconfig:"PUBLIC_API_ADDRESS"`
+
+	// -
+	// Rate limiting
+	// -
+
+	// The amount of requests that a user can make within the `RATE_LIMIT_PERIOD`.
+	RateLimit int `default:"1000" envconfig:"RATE_LIMIT"`
+	/*
+	   The period of time in which the `RATE_LIMIT` is applied.
+
+	   This is a sliding window, so the `RATE_LIMIT` is applied to the last `RATE_LIMIT_PERIOD` of requests.
+	*/
+	RateLimitPeriod time.Duration `default:"1h" envconfig:"RATE_LIMIT_PERIOD"`
+	// The expiry time of the rate limit counters.
+	RateLimitExpire time.Duration `default:"1m" envconfig:"RATE_LIMIT_EXPIRE"`
+
+	// -
+	// Telemetry and monitoring
+	// -
+
+	/*
+	   Either:
+	   - `otlp` for any standard OpenTelemetry collector.
+	   - `sentry` for Sentry (which is OpenTelemetry-compatible, however requires its own specific configuration.)
+	   - `logger` for local logging to the console. This is only really useful for Storyden developers and is very noisy.
+	*/
+	OTELProvider string `default:"" envconfig:"OTEL_PROVIDER"`
+	// The collector endpoint for sending OTEL data.
+	OTELEndpoint url.URL `default:"" envconfig:"OTEL_EXPORTER_OTLP_ENDPOINT"`
+	// When `OTEL_PROVIDER` is set to `sentry`, this is the DSN for the Sentry project.
+	SentryDSN string `default:"" envconfig:"SENTRY_DSN"`
+
+	// -
+	// Email
+	// -
+
+	/*
+	   Either:
+
+	   - `sendgrid` for SendGrid based email sending.
+	   - `mock` for logging emails to the console. Only useful for Storyden developers.
+
+	   Please note: SendGrid configuration settings are not currently exposed in the configuration file. This will be fixed soon.
+	*/
+	EmailProvider string `default:"" envconfig:"EMAIL_PROVIDER"`
+
+	// -
+	// Assets/file storage
+	// -
+
+	/*
+	   Either:
+
+	   - `local` for local file storage.
+	   - `s3` for any Amazon S3-compatible storage, such as S3 itself (obviously...), Google Cloud Storage, Cloudflare R2, Minio, etc.
+	*/
+	AssetStorageType string `envconfig:"ASSET_STORAGE_TYPE"`
+	// When `ASSET_STORAGE_TYPE` is set to `local`, this is the path to the directory where files will be stored.
 	AssetStorageLocalPath string `envconfig:"ASSET_STORAGE_LOCAL_PATH"`
-	S3Secure              bool   `envconfig:"S3_SECURE" default:"true"`
-	S3Endpoint            string `envconfig:"S3_ENDPOINT"`
-	S3Bucket              string `envconfig:"S3_BUCKET"`
-	S3Region              string `envconfig:"S3_REGION"`
-	S3AccessKey           string `envconfig:"S3_ACCESS_KEY"`
-	S3SecretKey           string `envconfig:"S3_SECRET_KEY"`
+	// When `ASSET_STORAGE_TYPE` is set to `s3`, this determines whether or not to use HTTPS for the S3 connection. You should always set this to `true` unless your S3-compatible storage provider is internally but not publicly accessible, such as in a Kubernetes cluster or running on the same host.
+	S3Secure bool `default:"true" envconfig:"S3_SECURE"`
+	// The endpoint for the S3-compatible storage provider. This is typically the base URL of the provider, such as `https://s3.amazonaws.com` for AWS S3, or `https://storage.googleapis.com` for Google Cloud Storage, etc.
+	S3Endpoint string `envconfig:"S3_ENDPOINT"`
+	// The bucket name for Storyden assets to be stored in.
+	S3Bucket string `envconfig:"S3_BUCKET"`
+	/*
+	   Most S3-compatible storage providers require a region to be specified. This is typically the region in which the bucket is located, such as `us-east-1` for AWS S3.
 
-	CacheProvider string  `envconfig:"CACHE_PROVIDER" default:""`
-	RedisURL      url.URL `envconfig:"REDIS_URL"      default:""`
+	   However, some providers do not use regions but S3-compatible clients still require this to be set. In most cases, the provider will give you a value for this, such as `auto` when using Cloudflare R2.
+	*/
+	S3Region string `envconfig:"S3_REGION"`
+	// The access key for the S3-compatible storage provider.
+	S3AccessKey string `envconfig:"S3_ACCESS_KEY"`
+	// The secret key for the S3-compatible storage provider.
+	S3SecretKey string `envconfig:"S3_SECRET_KEY"`
 
-	QueueType string `envconfig:"QUEUE_TYPE" default:"internal"`
-	AmqpURL   string `envconfig:"AMQP_URL"   default:"amqp://guest:guest@localhost:5672/"`
+	// -
+	// Cache
+	// -
 
+	/*
+	   When empty, caching will use an efficient in-memory store. This is usually fine for small to medium-sized deployments however it's worth keeping an eye on your deployment's machine memory usage.
+
+	   When set to `redis`, Storyden will use Redis as a cache provider. This is recommended for larger deployments that receive a lot of traffic. The cache provider is also used for the rate limiter so that it can be shared across multiple instances of Storyden.
+
+	   This is necessary for deploying replica instances of Storyden that are backed by the same persistence layers (database, asset storage, etc.)
+	*/
+	CacheProvider string `default:"" envconfig:"CACHE_PROVIDER"`
+	/*
+	   The Redis URL to connect to.
+
+	   This is a full URL with `redis://` as the scheme. You can set the username and password using the URL format, for example: `redis://<username>:<password>@<host>:<port>`.
+	*/
+	RedisURL url.URL `default:"" envconfig:"REDIS_URL"`
+
+	// -
+	// Message queue
+	// -
+
+	/*
+	   Either:
+
+	   - Default (no value): in-memory Go channels. This is fast and efficient, but not persistent across restarts and will add a bit of memory usage to the process.
+	   - `amqp`: RabbitMQ. This is a persistent message queue that is fast and reliable. It is recommended for larger deployments and is necessary for deploying replica instances of Storyden.
+	*/
+	QueueType string `default:"internal" envconfig:"QUEUE_TYPE"`
+	/*
+	   The RabbitMQ URL to connect to.
+
+	   This is a full URL with `amqp://` as the scheme. You can set the username and password using the URL format, for example: `amqp://<username>:<password>@<host>:<port>`.
+
+	   The default value is `amqp://guest:guest@localhost:5672/` which is the default RabbitMQ URL.
+
+	   Storyden does not currently support `amqps://` (secure) URLs, but this will be added soon.
+	*/
+	AmqpURL string `default:"amqp://guest:guest@localhost:5672/" envconfig:"AMQP_URL"`
+
+	// -
+	// Artificial intelligence/language models
+	// -
+
+	/*
+	   The provider for language model features.
+
+	   `openai` is currently the only supported provider.
+	*/
 	LanguageModelProvider string `envconfig:"LANGUAGE_MODEL_PROVIDER"`
-	OpenAIKey             string `envconfig:"OPENAI_API_KEY"`
+	// When `LANGUAGE_MODEL_PROVIDER` is set to `openai`, this is the API key for the OpenAI API.
+	OpenAIKey string `envconfig:"OPENAI_API_KEY"`
+	/*
+	   The Asker feature provides a conversational interface for exploring the community's content across library pages, threads, links, profiles, etc. It is separate from the language model provider as some providers support different features.
 
-	// default (whatever LanguageModelProvider is) or perplexity
-	AskerProvider    string `envconfig:"ASKER_PROVIDER" default:""`
+	   This can be set to either:
+
+	   - `openai` for OpenAI
+	   - `perplexity` for Perplexity AI - note that Perplexity does not currently support all the features necessary to be a `LANGUAGE_MODEL_PROVIDER` so it is only available as an `ASKER_PROVIDER`.
+	*/
+	AskerProvider string `default:"" envconfig:"ASKER_PROVIDER"`
+	// If `ASKER_PROVIDER` is set to `perplexity`, this is the API key for the Perplexity API.
 	PerplexityAPIKey string `envconfig:"PERPLEXITY_API_KEY"`
 
-	// chromem (local), weaviate, pinecone
-	SemdexProvider string `envconfig:"SEMDEX_PROVIDER" default:""`
+	// -
+	// Semdex
+	// -
 
-	// Chromem
-	SemdexLocalPath string `envconfig:"SEMDEX_LOCAL_PATH" default:"data/semdex"`
+	/*
+	   Either:
+	   - `chromem` for an experimental local vector database. This is not recommended for use in large deployments as it's rather slow and memory-hungry.
+	   - `weaviate` for Weaviate, a self-hostable or managed vector database.
+	   - `pinecone` for Pinecone, a fully managed vector database.
+	*/
+	SemdexProvider string `default:"" envconfig:"SEMDEX_PROVIDER"`
 
-	// Weaviate
-	WeaviateURL       string `envconfig:"WEAVIATE_URL"`
-	WeaviateToken     string `envconfig:"WEAVIATE_API_TOKEN"`
+	// -
+	// Local Semdex
+	// -
+
+	// The path to the directory where Chromem will store vector indexes.
+	SemdexLocalPath string `default:"data/semdex" envconfig:"SEMDEX_LOCAL_PATH"`
+
+	// -
+	// Weaviate Semdex
+	// -
+
+	// The Weaviate API URL. This can be set to a self-hosted instance of Weaviate or the Weaviate Cloud API.
+	WeaviateURL string `envconfig:"WEAVIATE_URL"`
+	// For self-hosted Weaviate where authentication is enabled, or when using Weaviate Cloud.
+	WeaviateToken string `envconfig:"WEAVIATE_API_TOKEN"`
+	/*
+	   The class name for Weaviate. This value actually controls which model is used for embeddings and other configuration. In future, there will be a more flexible configuration for Weaviate.
+
+	   Value values are:
+
+	   - `text2vec-transformers`: requires that the Weaviate instance is using the `text2vec-transformers` module. This is for calculating embeddings locally using a GPU (or very slowly, using a CPU.) This is only available when self-hosting Weaviate.
+	   - `text2vec-openai`: requires that the Weaviate instance is using the `text2vec-openai` module. This uses OpenAI's API to calculate embeddings. This works on both self-hosted and Weaviate Cloud instances.
+	*/
 	WeaviateClassName string `envconfig:"WEAVIATE_CLASS_NAME"`
 
-	// Pinecone
-	PineconeAPIKey     string `envconfig:"PINECONE_API_KEY"`
-	PineconeIndex      string `envconfig:"PINECONE_INDEX"`
-	PineconeDimensions int32  `envconfig:"PINECONE_DIMENSIONS"`
-	PineconeCloud      string `envconfig:"PINECONE_CLOUD"`
-	PineconeRegion     string `envconfig:"PINECONE_REGION"`
-}
+	// -
+	// Pinecone Semdex
+	// -
 
-func Build() fx.Option {
-	return fx.Provide(func() (c Config, err error) {
-		if err = envconfig.Process("", &c); err != nil {
-			return c, fault.Wrap(err, fmsg.With("failed to parse configuration from environment variables"))
-		}
-
-		return
-	})
+	// Your Pinecone API key. This is required for all Pinecone API requests.
+	PineconeAPIKey string `envconfig:"PINECONE_API_KEY"`
+	// The index name that Storyden will use in your Pinecone workspace.
+	PineconeIndex string `envconfig:"PINECONE_INDEX"`
+	// This value is dependent on the underlying OpenAI configuration. Currently this is static and set to 3072 dimensions. In future, Storyden will provide more flexible configuration for language model providers.
+	PineconeDimensions int32 `envconfig:"PINECONE_DIMENSIONS"`
+	// Pinecone provides hosting on different cloud providers, see the Pinecone documentation for more information. The cloud provider you choose will be reflected in your Pinecone dashboard.
+	PineconeCloud string `envconfig:"PINECONE_CLOUD"`
+	// Same as above, but for the region. As with any third party providers, it's recommended to choose the region closest to both your Storyden deployment and your community members for best performance and experience.
+	PineconeRegion string `envconfig:"PINECONE_REGION"`
 }

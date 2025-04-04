@@ -1,0 +1,15 @@
+{
+    "root": true,
+    "title": "Introduction",
+    "description": "Getting started with Storyden.",
+    "defaultOpen": true,
+    "pages": [
+        "---Introduction---",
+        "index",
+        "what-is-storyden",
+        "---Setup---",
+        "local",
+        "fly",
+        "local-dev"
+    ]
+}
