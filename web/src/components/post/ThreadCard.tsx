@@ -11,6 +11,7 @@ import { HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
 import { ThreadMenu } from "../thread/ThreadMenu/ThreadMenu";
+import { LikeButton } from "./LikeButton/LikeButton";
 import {
   DiscussionIcon,
   DiscussionParticipatingIcon,
@@ -48,6 +49,7 @@ export const ThreadReferenceCard = memo(({ thread }: Props) => {
       controls={
         session && (
           <HStack>
+            <LikeButton thread={thread} />
             <CollectionMenu account={session} thread={thread} />
             <ThreadMenu thread={thread} />
           </HStack>
