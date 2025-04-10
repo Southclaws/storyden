@@ -1,11 +1,5 @@
-import { VStack } from "@/styled-system/jsx";
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function Page() {
-  return (
-    <VStack pt="16">
-      <h1>docs home</h1>
-      <Link href="/docs/introduction">Get started</Link>
-    </VStack>
-  );
+export default async function Page() {
+  redirect("/docs/introduction");
 }
