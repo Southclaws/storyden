@@ -1,0 +1,28 @@
+{
+    "root": true,
+    "title": "Introduction",
+    "description": "Getting started with Storyden.",
+    "defaultOpen": true,
+    "pages": [
+        "---Introduction---",
+        "index",
+        "what-is-storyden",
+        "---Setup---",
+        "vps",
+        "fly",
+        "local-dev",
+        "---Concepts---",
+        "discussion",
+        "library",
+        "semdex",
+        "collections",
+        "links",
+        "members",
+        "roles",
+        "marks",
+        "---Extending---",
+        "api",
+        "plugins",
+        "custom-frontend"
+    ]
+}

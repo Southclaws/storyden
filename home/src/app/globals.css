@@ -1,0 +1,125 @@
+@layer reset, theme, base, panda_base, components,  panda_tokens, panda_recipes, panda_utilities, utilities;
+
+*::selection {
+  color: hsla(160, 9%, 92%, 1);
+  background-color: hsla(0, 0%, 19%, 1);
+}
+
+@supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+  .story__text-overlay {
+    background-color: rgba(8, 8, 8, 0.4);
+  }
+}
+
+/* @supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+  .story__text-overlay {
+    background-color: rgba(48, 48, 48, 0.1);
+  }
+} */
+
+body {
+  text-transform: initial;
+}
+
+@layer base {
+  :root {
+    color-scheme: light only;
+    font-family: var(--fonts-worksans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5 {
+    font-family: var(--fonts-joie);
+  }
+  p {
+    font-family: var(--fonts-worksans);
+  }
+
+  article p {
+    font-family: var(--fonts-hedvig);
+  }
+
+  h1 {
+    font-size: xx-large;
+    font-weight: var(--font-weights-bold);
+  }
+
+  h2 {
+    font-size: x-large;
+    font-weight: var(--font-weights-bold);
+  }
+
+  h3 {
+    font-size: large;
+    font-weight: var(--font-weights-bold);
+  }
+
+  h4 {
+    font-size: medium;
+    font-weight: var(--font-weights-bold);
+  }
+
+  h5 {
+    font-size: small;
+    font-weight: var(--font-weights-bold);
+  }
+
+  code {
+    font-family: var(--fonts-intelone);
+  }
+
+  @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+    .story__text-overlay {
+      background-color: rgba(8, 8, 8, 0.4);
+    }
+  }
+}
+
+#nd-home-layout {
+  padding: 0;
+  margin: 0;
+}
+
+details {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  background-color: #f9f9f9;
+  transition: all 0.2s ease;
+}
+
+details[open] {
+  background-color: #fefefe;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+summary > p {
+  display: inline;
+  margin: 0;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 500;
+  outline: none;
+  list-style: none;
+  display: inline-block;
+}
+
+summary::-webkit-details-marker {
+  display: none;
+}
+
+summary::before {
+  content: "▸";
+  display: inline-block;
+  margin-right: 0.5rem;
+  transition: transform 0.2s ease;
+}
+
+details[open] summary::before {
+  transform: rotate(90deg);
+}

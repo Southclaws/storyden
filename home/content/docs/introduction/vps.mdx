@@ -1,0 +1,144 @@
+---
+title: Docker
+description: Setting up a Storyden container with Docker
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+Getting an instance of Storyden online is criminally easy. There's almost zero configuration required and lots of sane defaults which you can adapt later as needed.
+
+## Running the container
+
+You can spin up a local Storyden instance using Docker. The main Docker image includes both frontend and API services and can be started with:
+
+```sh
+docker run -p 8000:8000 ghcr.io/southclaws/storyden
+```
+
+This will start the full stack (API and web interface) accessible at `http://localhost:8000`.
+
+![Storyden web UI](/docs/introduction/local/browser_home.png)
+
+<Callout type="warn">
+  The first account that is registered will automatically be given the Admin
+  role which provides you all permissions. When deploying a new *public*
+  instance, be careful with how long you leave the freshly deployed instance
+  without registering the admin account.
+</Callout>
+
+### API only
+
+If you're looking to just play with the API, you can run the API-only container image:
+
+```sh
+docker run -p 8000:8000 ghcr.io/southclaws/storyden:edge-backend
+```
+
+This will run the API at `http://localhost:8000` and you can check the OpenAPI documentation at `http://localhost:8000/api/docs`.
+
+All CORS and cookie rules are default configured to support `localhost:8000` out of the box.
+
+![Storyden web UI](/docs/introduction/local/browser_docs.png)
+
+## Configuration
+
+When running a production instance of Storyden, you must set some configuration values to ensure basic functionality and security.
+
+Storyden's infrastructure-level configuration is applied via environment variables. You can read more about the available options [here](/docs/operation/configuration).
+
+For this guide, we'll focus on the bare minimum to get up and running.
+
+### `SESSION_KEY`
+
+The [session key](/docs/operation/configuration#session_key) is an important security value. It's used to encrypt session tokens so that they can't be tampered with. It's important to set this to a unique value that is kept secret. You can use any trusted source of randomness on your local machine to generate it.
+
+<Callout type="warning" emoji="⚠️">
+  A session key must be a hexadecimal string with 16 or more characters.
+</Callout>
+
+Create a random string of hexadecimal characters using a tool of your choice. For example, using `openssl`:
+
+```sh
+openssl rand -hex 32
+```
+
+Then apply this value to the `SESSION_KEY` secret:
+
+```sh
+docker run
+  -p 8000:8000
+  -e SESSION_KEY=yoursupersecretvalue
+  ghcr.io/southclaws/storyden
+```
+
+### `PUBLIC_WEB_ADDRESS`
+
+This is the frontend address, or, the URL users will visit in their browser. [More info.](/docs/operation/configuration#public_web_address)
+
+Example: `PUBLIC_WEB_ADDRESS=https://the-secret-agent.club`
+
+### `PUBLIC_API_ADDRESS`
+
+This is the API address, where the web frontend sends API calls. [More info.](/docs/operation/configuration#public_api_address)
+
+Example: `PUBLIC_API_ADDRESS=https://api.the-secret-agent.club`
+
+<Callout>
+  These can be the same, for example when running the full-stack image and both
+  your browser requests and API requests go to the same container. In this case,
+  set both environment variables to the same value.
+</Callout>
+
+## Mounting `/data`
+
+Storyden does not depend on external services by default, so unless you specify, persistent storage such as the database and assets are stored on the local disk.
+
+- If you haven't specified a [`DATABASE_URL`](/docs/operation/configuration#database_url) a local embedded SQLite database will be used.
+- If you haven't specified a [`ASSET_STORAGE_TYPE`](/docs/operation/configuration#asset_storage_type) uploaded files will be stored to disk.
+
+The Docker image data directory is `/data` so mount this directory when starting your container.
+
+so mount your host directory to `/data` when starting the container
+
+## All together
+
+<Tabs groupId="shell" items={["Escaped", "One line", "NuShell"]}>
+  <Tab value="Escaped">
+
+    ```sh
+    docker run \
+      --name storyden \
+      --publish 8000:8000 \
+      --volume /my/storyden/data:/data \
+      --env SESSION_KEY=yoursupersecretvalue \
+      --env PUBLIC_WEB_ADDRESS=https://the-secret-agent.club \
+      --env PUBLIC_API_ADDRESS=https://api.the-secret-agent.club \
+      ghcr.io/southclaws/storyden
+    ```
+
+  </Tab>
+
+  <Tab value="One line">
+
+    ```sh
+    docker run --name storyden --publish 8000:8000 --volume /my/storyden/data:/data --env SESSION_KEY=yoursupersecretvalue --env PUBLIC_WEB_ADDRESS=https://the-secret-agent.club --env PUBLIC_API_ADDRESS=https://api.the-secret-agent.club ghcr.io/southclaws/storyden
+    ```
+
+  </Tab>
+
+    <Tab value="NuShell">
+
+    ```sh
+    (docker run
+      --name storyden
+      --publish 8000:8000
+      --volume /my/storyden/data:/data
+      --env SESSION_KEY=yoursupersecretvalue
+      --env PUBLIC_WEB_ADDRESS=https://the-secret-agent.club
+      --env PUBLIC_API_ADDRESS=https://api.the-secret-agent.club
+      ghcr.io/southclaws/storyden)
+    ```
+
+  </Tab>
+
+</Tabs>

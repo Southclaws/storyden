@@ -1,0 +1,44 @@
+---
+title: Welcome to Storyden!
+description: It's really cool!
+---
+
+Storyden is the platform for managing community and content, wherever they call home. Run a forum, a blog, post news, curate cool sites, build a directory, a knowledgebase and more. [Learn more here.](/docs/introduction/what-is-storyden)
+
+<Callout>
+  Storyden is in an early research and development phase and we're aiming to get
+  as much feedback as possible. Please feel free to share any thoughts,
+  experiences, bugs or suggestions on
+  [GitHub](https://github.com/Southclaws/storyden) or via this form:
+  https://airtable.com/shrLY0jDp9CuXPB2X
+</Callout>
+
+## Quickstart
+
+Start your stopwatch, let's get a community up and running in record time!
+
+Storyden values modern approaches and simplicity. The best way to try it out is spin up a local instance with Docker:
+
+```sh
+docker run -p 8000:8000 ghcr.io/southclaws/storyden
+```
+
+This will make Storyden accessible at `http://localhost:8000` for you to play around with.
+
+![Storyden web UI](/docs/introduction/local/browser_home.png)
+
+From here, you can register a new account and explore the platform.
+
+## Deploying
+
+Storyden runs anywhere Docker containers do. Deploy to production on your own hardware, a VPS or Fly.io:
+
+<Cards>
+<Card href="/docs/introduction/local" title="Docker">
+  Get set up in seconds with a Docker image
+</Card>
+
+<Card href="/docs/introduction/fly" title="Fly.io">
+  Deploy Storyden onto Fly.io
+</Card>
+</Cards>

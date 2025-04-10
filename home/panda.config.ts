@@ -4,11 +4,74 @@ import {
   defineTokens,
 } from "@pandacss/dev";
 
+const tokens = defineTokens({
+  fonts: {
+    joie: { value: "var(--font-joie)" },
+    worksans: { value: "var(--font-worksans)" },
+    hedvig: { value: "var(--font-hedvig)" },
+    intelone: { value: "var(--font-intelone)" },
+  },
+  colors: {
+    Mono: {
+      ink: {
+        type: "color",
+        value: "#131b1a",
+      },
+      slush: {
+        type: "color",
+        value: "#f2f0ef",
+      },
+    },
+    Primary: {
+      forest: {
+        type: "color",
+        value: "#307343",
+      },
+      saddle: {
+        type: "color",
+        value: "#854627",
+      },
+      campfire: {
+        type: "color",
+        value: "#d68e4d",
+      },
+      moonlit: {
+        type: "color",
+        value: "#104059",
+      },
+    },
+    Shades: {
+      iron: {
+        type: "color",
+        value: "#303e47",
+      },
+      slate: {
+        type: "color",
+        value: "#212429",
+      },
+      newspaper: {
+        type: "color",
+        value: "#d8dbcd",
+      },
+      stone: {
+        type: "color",
+        value: "#8cada4",
+      },
+    },
+  },
+});
+
 export default defineConfig({
-  preflight: true,
+  preflight: false,
   strictPropertyValues: true,
   strictTokens: false,
-  include: ["./src/**/*.{js,jsx,ts,tsx}", "./pages/**/*.{js,jsx,ts,tsx}"],
+  layers: {
+    base: "panda_base",
+    tokens: "panda_tokens",
+    recipes: "panda_recipes",
+    utilities: "panda_utilities",
+  },
+  include: ["./src/**/*.{js,jsx,ts,tsx}"],
   exclude: [],
   patterns: {
     extend: {
@@ -119,67 +182,34 @@ export default defineConfig({
     extend: {
       semanticTokens: defineSemanticTokens({
         colors: {
-          fg: {
-            default: {
-              value: {
-                base: "{colors.blackAlpha.700}",
-                _dark: "{colors.gray.50}",
-              },
-            },
-          },
-          bg: {
-            canvas: { value: "{colors.gray.100}" },
-            default: {
-              value: { base: "{colors.white}", _dark: "{colors.gray.200}" },
-            },
-            opaque: {
-              value: {
-                base: "{colors.whiteAlpha.700}",
-                _dark: "{colors.blackAlpha.700}",
-              },
-            },
-          },
+          // fg: {
+          //   default: {
+          //     value: {
+          //       base: "{colors.blackAlpha.700}",
+          //       _dark: "{colors.gray.50}",
+          //     },
+          //   },
+          // },
+          // bg: {
+          //   canvas: { value: "{colors.gray.100}" },
+          //   default: {
+          //     value: { base: "{colors.white}", _dark: "{colors.gray.200}" },
+          //   },
+          //   opaque: {
+          //     value: {
+          //       base: "{colors.whiteAlpha.700}",
+          //       _dark: "{colors.blackAlpha.700}",
+          //     },
+          //   },
+          // },
         },
         blurs: {
           frosted: { value: "8px" },
         },
       }),
-      tokens: {
-        fonts: {
-          mona: {
-            value:
-              "var(--font-mona-sans), Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif",
-          },
-        },
-        colors: defineTokens.colors({
-          whiteAlpha: {
-            50: { value: "rgba(255, 255, 255, 0.04)" },
-            100: { value: "rgba(255, 255, 255, 0.06)" },
-            200: { value: "rgba(255, 255, 255, 0.08)" },
-            300: { value: "rgba(255, 255, 255, 0.16)" },
-            400: { value: "rgba(255, 255, 255, 0.24)" },
-            500: { value: "rgba(255, 255, 255, 0.36)" },
-            600: { value: "rgba(255, 255, 255, 0.48)" },
-            700: { value: "rgba(255, 255, 255, 0.64)" },
-            800: { value: "rgba(255, 255, 255, 0.80)" },
-            900: { value: "rgba(255, 255, 255, 0.92)" },
-          },
-          blackAlpha: {
-            50: { value: "rgba(0, 0, 0, 0.04)" },
-            100: { value: "rgba(0, 0, 0, 0.06)" },
-            200: { value: "rgba(0, 0, 0, 0.08)" },
-            300: { value: "rgba(0, 0, 0, 0.16)" },
-            400: { value: "rgba(0, 0, 0, 0.24)" },
-            500: { value: "rgba(0, 0, 0, 0.36)" },
-            600: { value: "rgba(0, 0, 0, 0.48)" },
-            700: { value: "rgba(0, 0, 0, 0.64)" },
-            800: { value: "rgba(0, 0, 0, 0.80)" },
-            900: { value: "rgba(0, 0, 0, 0.92)" },
-          },
-        }),
-      },
+      tokens: tokens,
     },
   },
-  outdir: "styled-system",
+  outdir: "src/styled-system",
   jsxFramework: "react",
 });
