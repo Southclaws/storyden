@@ -76,7 +76,8 @@ A reply is a post in reply to a thread. Replies can be nested, forming a tree st
 Replies do not have a title, category, or tags. They are always associated with a thread and are accessible through the `/threads/{thread_mark}` endpoint.
 
 <Callout type="info" emoji="ℹ️">
-  What's a `thread_mark`!? [See the documentation here](marks).
+  What's a `thread_mark`!? [See the documentation
+  here](/docs/introduction/marks).
 </Callout>
 
 Replies may also refer to another reply in the same thread, sort of like quotes on X or oldschool forums. This self-referential relationship allows for Reddit-style comment trees.
@@ -85,11 +86,11 @@ A frontend implementation is free to display these replies in a flat list or as 
 
 ## Likes, Reacts and Collections
 
-Any post can be liked, reacted to and added to a member's [collection](collections).
+Any post can be liked, reacted to and added to a member's [collection](/docs/introduction/collections).
 
 Likes are the lowest form of interaction, a simple thumbs up. Reacts are more expressive, allowing members to choose from a set of emojis. Collections are a way to save posts for later reading or reference.
 
-Each of these interactions is used by the [Semdex](semdex) to inform recommendations and feed algorithms.
+Each of these interactions is used by the [Semdex](/docs/introduction/semdex) to inform recommendations and feed algorithms.
 
 ## Technical details
 
@@ -119,7 +120,7 @@ Valid resource kinds are:
 
 - `profile`: Member profile
 - `post`: A post (thread or reply)
-- `node`: A [library node](/library)
+- `node`: A [library node](/docs/introduction/library)
 
 For example, you can mention a user with a `href` value of `sdr:profile/<identifier>`. In a body value, this looks like:
 
@@ -135,11 +136,11 @@ For example, you can mention a user with a `href` value of `sdr:profile/<identif
 
 When Storyden receives a post with this content, it will parse the URIs and look for any containing the `sdr` scheme. It will then use the resource kind (`profile`) and identifier (`crk0gvqfunp7891n7ah0`) to link the post to a profile. It will then dispatch a notification to the mentioned member, letting them know someone's talking about them.
 
-This functionality can be used for any Datagraph items, such as [library nodes](/library) or [threads](#threads).
+This functionality can be used for any Datagraph items, such as [library nodes](/docs/introduction/library) or [threads](#threads).
 
 #### Security
 
-The HTML content is sanitized on the server to prevent XSS attacks using the [microcosm-cc/bluemonday](github.com/microcosm-cc/bluemonday) package. The only exceptions to the built in policy are:
+The HTML content is sanitized on the server to prevent XSS attacks using the [microcosm-cc/bluemonday](https://github.com/microcosm-cc/bluemonday) package. The only exceptions to the built in policy are:
 
 - `data` attributes
 - `sdr:` scheme for anchor tags
