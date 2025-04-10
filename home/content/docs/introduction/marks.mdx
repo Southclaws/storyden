@@ -1,0 +1,41 @@
+---
+title: Marks
+description: Marks are flexible shapeshifting identifiers for use in slugs and API calls.
+---
+
+# Marks
+
+Marks are the way resources are identified on the Storyden API.
+
+## The problem
+
+This is ugly, and not SEO friendly:
+
+![An ugly URL slug with a UUID](/docs/2024-09-21-10-53-18.png)
+
+This is not necessarily uniqueness friendly, and given slugs are generated from titles, it's not totally unlikely two threads could result in the same slug:
+
+![A pretty URL with a not so unique slug](/docs/2024-09-21-10-55-17.png)
+
+## The solution
+
+You've probably seen this on many other platforms, a unique identifier followed by an SEO-friendly URL slug, derived from the post's title:
+
+![A thread mark URL](/docs/2024-09-21-10-56-22.png)
+
+## How they're used
+
+Storyden resources will always provide an ID and a slug in the payload. The ID is an xid format ID, and the slug is a URL-friendly version of the title.
+
+When reading data from the API, you'll almost always have these two pieces of information. However there are cases where only an ID is provided, such as with [content references](posts-threads-replies#a-references-mentions-and-other-links).
+
+Whenever a URL parameter or field on the API uses a mark, it means the ID or the full mark are interchangeable. This allows for flexibility in how you identify resources.
+
+For example, the post at `makeroom.club/p/crk0h7afunp7891n7cg0-very-demure` may be addressed via:
+
+- `crk0h7afunp7891n7cg0-very-demure` the full slug
+- `crk0h7afunp7891n7cg0` just the ID
+
+## Technical details
+
+When a request comes in with a mark, it's parsed into a data structure containing either the ID or the full mark. This is then turned into a predicate at the resource layer during queries. This means there are no `OR` clauses or multiple queries to handle both cases.

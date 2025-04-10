@@ -1,0 +1,73 @@
+---
+title: Power Of Community Knowledgebase
+date: 2024-02-02
+description: >-
+  The power of a community knowledgebase can mean the difference between a
+  mediocre group chat and a valuable long-lasting public resource. But why?
+---
+
+# The power of a community-driven knowledgebase
+
+I'm writing this from a Eurostar train on my way to Brussels to attend [FOSDEM 2024](https://fosdem.org/) along with some good friends I've known for years thanks to the internet.
+
+![The view out of the window](/blog/train_400x398.png)
+
+> The view out of the window on this bleak winter morning in the French countryside.
+
+Those good friends I know because of a multiplayer game we all played years ago. There were forums for asking questions and showing off what you'd made and a wiki for documenting the scripting APIs and other things like models, textures, skins, vehicles, etc.
+
+I love Discord, it's what we use nowadays for this community and a few others, it's what we used to organise the first FOSDEM trip, our trip to Poland, Iceland, Switzerland and many other lands. Projects have been born there, jobs have been found, advice given and memories made. But it's not the be-all-end-all of online community experience.
+
+## Asynchronous still has its place
+
+Discord, Slack, WhatsApp and others fit into a category of communication tools known as "synchronous". This means that, most of the time, you need to be online at the same time as the other members to communicate. There's message history but it's rare you can or even want to keep up with every single message.
+
+One of the side effects of this is discussions, links shared and advice can get lost. Even with fairly modern search tools it's not always easy to find that one link someone shared a few months ago that you know you need now. What makes this worse for the data side is that conversations are often interspersed and there can easily be two or three discussions happening at once. People may find this easy to follow, especially if you've grown up with IRC, MSN groups or WhatsApp chats. But for a computer system it's very difficult to figure out what's related to what.
+
+```
+Amir: @Southclaws did you see my PR?
+Southclaws: @Michael have you tried AsyncAPI yet?
+Amir: LMAO
+Amir: <twitter.com/...>
+Michael: not yet, but it looks nice
+Southclaws: @Amir yeah I replied on gh
+Marcel: @Amir wanna game?
+Southclaws: lmao nice
+Southclaws: yeah I'm thinking of async api for storyden websockets
+```
+
+> try and string this tiny snippet from Makeroom's Discord chat together into independent threads...
+
+Searching this word-by-word may be easy but topic based semantic search becomes difficult. While a relatively new technology, it does a better job with fewer, larger pieces of text. Chats are difficult to index and difficult to search because you're often not quite sure what you're looking for. It's all a very fuzzy problem space but traditional fuzzy-match-based-search may not work as well.
+
+Now, it's worth noting the old forums weren't much better. In fact, they were much worse because your search queries were often exact matches rather than somewhat fuzzy. I can search for "repos" and Discord is smart enough to turn that shorthand plural into a singular token ("repo") and show me results for both "repo" and "repos."
+
+![Searching for repos in Discord](/blog/discord-search.png)
+
+But I think what makes most of the difference is how content is written and organised. In a synchronous platform, members will write a high volume of very small messages, some of which are single words or even single characters. In an asynchronous such as GitHub issues, Discourse and traditional forums, members will (most of the time) write a lower volume of longer messages.
+
+The interfaces of both of these are designed around this idea. Single line text box where media is treated as an "attachment" and formatting is minimal vs. larger text area, maybe with WYSIWYG formatting and richer content such as images and videos interspersed with text.
+
+And it shows, Discourse has found a solid market in the customer support space. Discord added "Forum channels" which are effectively somewhere between chat and forums. GitHub issues are used for bug tracking but they also added "Discussions" which is just an oldschool forum. The need for this slightly longer form and lower volume format is clear.
+
+## Search is hard
+
+I'm not all-in on semantic search either. I do find it aggrevating when I'm trying to find what I _know_ to be an exact word match in some website search and it's trying to Be Clever™ by using some kind of LLM based semantic search. This often doesn't help
+
+Semantic has its place but you _need_ to give users options. Not having options really ruins user experiences and it gives off this aura of "We know better" pretentiousness. It's one of the huge issues I personally have with Apple products!
+
+So when _is_ semantic search useful? When you're not quite sure what you're looking for but you have a rough idea. Language models are amazing in this problem space and it's one reason I think the latest wave of LLM hype is well earned compared to the days of natural language processing I spent way too many caffeine induced nights trying to get right in uni!
+
+It also gets better the larger the dataset is! So...
+
+## Knowledge aggregation is a team sport
+
+In a previous article about [link aggregators and social bookmarking](/blog/what-are-social-bookmarks-link-aggregators) we discussed how useful and natural collecting a big pile of URLs is to most folks on the internet. And multiplying that by a group of people can have awesome effects.
+
+A combination of chat apps, link aggregating and building a directory of resources around which a community interest grows. Clubs, mentorship, support, teams, gaming can all benefit from this approach.
+
+Storyden's [architecture](/blog/the-architecture-of-modern-forum-software) is centered around organising information. It's like a little baby version of ["organising the world's information and making it universally accessible and useful"](https://www.google.com/intl/en_uk/search/howsearchworks/our-approach/), you could say it's... [your own personal Google!](https://www.youtube.com/watch?v=u1xrNaTO1bI) how about, "organising your community's information and making it searchable and useful"? If it wasn't such an obvious rip, I'd use it on the landing page!
+
+So if any of that resonates with you, why not give [Storyden](/docs) a try? I'd love to hear your feedback and input as we develop entirely in the open! Community style.
+
+Thanks for reading! Maybe see you next [FOSDEM](https://fosdem.org/2025) 👀? (yes, at the time of writing this is a 404 but I'm sure it'll appear at some point in the year! my SEO will not like that but I'll 100% forget to come back and add a link...)

@@ -219,6 +219,13 @@ func getDriver(databaseURL string) (string, string, error) {
 			}
 		}
 
+		// Try to write to the directory. This provides a better error message
+		// compared to SQLite which will give you nonsense if it can't write.
+		testwrite := filepath.Join(filepath.Dir(path), ".perm_check")
+		if err := os.WriteFile(testwrite, []byte("ok"), 0o644); err != nil {
+			return "", "", fault.Wrap(err, fmsg.With(fmt.Sprintf("cannot write to directory for sqlite database: %s", u)))
+		}
+
 		return "sqlite", path, nil
 
 	default:
