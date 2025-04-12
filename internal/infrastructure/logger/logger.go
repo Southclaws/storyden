@@ -19,10 +19,13 @@ func Build() fx.Option {
 
 func newLogger(cfg config.Config) (*zap.Logger, error) {
 	var zapconfig zap.Config
-	if cfg.Production {
+
+	switch cfg.LogFormat {
+	case "json":
 		zapconfig = zap.NewProductionConfig()
 		zapconfig.InitialFields = map[string]interface{}{"v": config.Version}
-	} else {
+
+	default:
 		zapconfig = zap.NewDevelopmentConfig()
 	}
 
@@ -44,8 +47,4 @@ func replaceGlobals(c config.Config, l *zap.Logger) {
 	// dependents most of the time using DI, the global logger is used
 	// in a couple of places during startup/shutdown.
 	zap.ReplaceGlobals(l)
-
-	if !c.Production {
-		l.Debug("logger configured in development mode")
-	}
 }

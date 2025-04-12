@@ -18,13 +18,6 @@ type Config struct {
 	// -
 
 	/*
-	   Deprecated, to be removed. The only thing this affects currently is:
-
-	   - If set to true, logs will be formatted as JSON. (pending switch to `LOG_LEVEL`)
-	   - If set to true, SMS messages will be sent via Twilio. (pending switch to `SMS_PROVIDER`)
-	*/
-	Production bool `default:"false" envconfig:"PRODUCTION"`
-	/*
 	   Can be set to either:
 
 	   - `debug`
@@ -33,6 +26,13 @@ type Config struct {
 	   - `error`
 	*/
 	LogLevel zapcore.Level `default:"info" envconfig:"LOG_LEVEL"`
+	/*
+	   Can be set to either:
+
+	   - `(not set)` (default) somewhat human readable logs for simple setups
+	   - `json` for machine-readable logs, mainly for log aggregators, etc.
+	*/
+	LogFormat string `envconfig:"LOG_FORMAT"`
 	/*
 	   Determines whether or not the backend service will also start the frontend Node.js process. When empty, it will not
 
