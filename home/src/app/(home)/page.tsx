@@ -94,6 +94,43 @@ function Hero() {
   );
 }
 
+function Screenshot() {
+  return (
+    <Box maxW="100vw" w="full" bgColor="black">
+      <VStack
+        position="relative"
+        zIndex="20"
+        top={{
+          base: "-16",
+          xl: "-32",
+        }}
+        w="full"
+        paddingX={{
+          base: "4",
+          sm: "8",
+          md: "12",
+          xl: "16",
+        }}
+      >
+        <picture>
+          <source
+            media="(max-width: 768px)"
+            srcSet="2025_app_screenshot_viewport.png"
+          />
+          <source media="(min-width: 768px)" srcSet="2025_app_screenshot.png" />
+          <img
+            src="2025_app_screenshot.png"
+            alt=""
+            role="presentation"
+            width={1469}
+            height={961}
+          />
+        </picture>
+      </VStack>
+    </Box>
+  );
+}
+
 function Story() {
   return (
     <Grid
@@ -252,7 +289,7 @@ function Story() {
 
 function Why() {
   return (
-    <Flex
+    <VStack
       flexDir={{
         base: "column",
         lg: "row",
@@ -265,42 +302,28 @@ function Why() {
       gap={4}
       flex="1"
     >
-      <Box>
-        <styled.h1
-          textAlign="right"
-          fontFamily="joie"
-          fontStyle="normal"
-          fontWeight="900"
-          fontSize={{
-            base: "4xl",
-            md: "7xl",
-            lg: "6xl",
-            xl: "7xl",
-            "2xl": "8xl",
-          }}
-          width={{ base: "max-content", lg: "min-content" }}
-          lineHeight="1"
-        >
-          Why
-          <wbr /> Storyden
-        </styled.h1>
-      </Box>
-
-      <Flex flexDir="column" gap="2" pt="10.1px">
-        <styled.p>Storyden is a platform for building communities.</styled.p>
+      <Flex
+        flexDir="column"
+        gap="8"
+        textWrap="balanced"
+        textWrapStyle="balance"
+        maxW="md"
+        textAlign="center"
+      >
+        <styled.p>
+          Storyden is a platform for <strong>building communities</strong>.
+        </styled.p>
         <styled.p wordBreak="keep-all">
-          But not just another chat app or another forum site.
-          <wbr /> Storyden is a modern take on oldschool bulletin board
-          <wbr /> forums you may remember from the earlier days of the
-          <wbr /> internet.
+          But not just another chat app or another forum site. Storyden is a
+          modern take on oldschool bulletin board forums you may remember from
+          the earlier days of the internet.
         </styled.p>
         <styled.p>
-          With a fresh perspective and new objectives, Storyden is
-          <wbr /> designed to be the community platform for the next era of
-          <wbr /> internet culture.
+          With a fresh perspective and new objectives, Storyden is designed to
+          be the community platform for the next era of internet culture.
         </styled.p>
       </Flex>
-    </Flex>
+    </VStack>
   );
 }
 
@@ -333,8 +356,8 @@ function Features() {
       <Feature
         image="/web3.webp"
         alt=""
-        heading="Web3"
-        body="Love it or hate it, it’s here and it’s staying. So we embrace the new web and provide features such as wallet based login, NFT avatars and more for web3 communities."
+        heading="Intelligent"
+        body="Just the right amount of A.I. Optionally enhance your community’s knowledge base with semantic search, question-answering and recommendation."
       />
 
       <Feature
@@ -882,7 +905,8 @@ export default function Home() {
   return (
     <Box>
       <Hero />
-      <Story />
+      <Screenshot />
+      {/* <Story /> */}
       <Why />
       <Features />
       <ForCommunityLeaders />
