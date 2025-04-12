@@ -7,7 +7,7 @@ import "./globals.css";
 
 import Script from "next/script";
 import { cx } from "@/styled-system/css";
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 
 export default function Layout({ children }: { children: ReactNode }) {
   return (
@@ -71,7 +71,6 @@ export const metadata: Metadata = {
   title: "Storyden: A forum for the modern age.",
   description:
     "Storyden is a platform for building communities. A modern take on oldschool bulletin board forums. Designed to be the community platform for the next era of internet culture.",
-  themeColor: "#d8dbcd",
   openGraph: {
     type: "website",
     locale: "en_GB",
@@ -91,4 +90,8 @@ export const metadata: Metadata = {
     site: "@Southclaws",
     card: "summary_large_image",
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#d8dbcd",
 };
