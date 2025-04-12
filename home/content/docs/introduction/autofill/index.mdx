@@ -1,0 +1,46 @@
+---
+title: Autofill
+description: Autofill resource properties using language models.
+---
+
+Being built with AI at the core, Storyden has a few powerful time-saving tools for automatically suggesting and filling certain properties of resources.
+
+These features can be enabled by [configuring a language model provider](/docs/operation/configuration#language_model_provider) but does not require configuring the Semdex (vector database.)
+
+Autofill features are available for various APIs and through the UI.
+
+## UI
+
+When editing a Library Page, if a [language model provider](/docs/operation/configuration#language_model_provider) is configured, you will buttons to autofill various properties of the page. The supported properties are:
+
+- Title
+- Tags
+- Import from URL
+
+These buttons are on the right hand side of the inputs during edit mode:
+
+![2025-04-12-22-43-29.png](/docs/introduction/autofill/autofill.png)
+
+"Import" will attempt to import everything from the provided link. This will set a title, tags, description and summarised content based on the web page.
+
+## API
+
+### Fill rules
+
+When making a `PATCH` call to a node, you can provide
+
+- `title_fill_rule`
+- `tag_fill_rule`
+- `content_fill_rule`
+
+These will return a suggestion for the respective property. The client is responsible for prompting the user to accept and apply the suggestion to the node.
+
+### Autofill a Node from a URL
+
+You can use the `fill_source=url` to autofill a node from a URL. This will set the title, tags and content of the node based on the web page.
+
+### Autofill a Node from an Asset
+
+Setting `content_fill_rule` while creating an asset will automatically create or update a Library Node with the asset's content. Currently, only PDF files are supported. Text will be extracted, summarised and used as the content for the node.
+
+See the OpenAPI spec for more information and details on the behaviour of the autofill rules.
