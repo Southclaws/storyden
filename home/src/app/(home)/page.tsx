@@ -62,6 +62,7 @@ function Hero() {
 
           <HStack gap={4}>
             <Link
+              target="_blank"
               className={linkButton({
                 backgroundColor: "white",
               })}
@@ -70,6 +71,7 @@ function Hero() {
               Live demo
             </Link>
             <Link
+              target="_blank"
               className={cx(
                 "story__text-overlay",
                 linkButton({
