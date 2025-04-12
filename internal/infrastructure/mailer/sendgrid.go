@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/kelseyhightower/envconfig"
+	"github.com/Southclaws/storyden/internal/config"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 	"go.uber.org/zap"
@@ -23,25 +23,14 @@ type SendGrid struct {
 	fromAddress string
 }
 
-type Configuration struct {
-	FromName    string `envconfig:"SENDGRID_FROM_NAME"    required:"true"`
-	FromAddress string `envconfig:"SENDGRID_FROM_ADDRESS" required:"true"`
-	APIKey      string `envconfig:"SENDGRID_API_KEY"      required:"true"`
-}
-
 const attachmentContentDisposition = "attachment"
 
-func newSendgridMailer(l *zap.Logger) (*SendGrid, error) {
-	pc := Configuration{}
-	if err := envconfig.Process("", &pc); err != nil {
-		return nil, fault.Wrap(err)
-	}
-
+func newSendgridMailer(l *zap.Logger, cfg config.Config) (*SendGrid, error) {
 	sg := &SendGrid{
 		l:           l.With(zap.String("mailer", "sendgrid")),
-		client:      sendgrid.NewSendClient(pc.APIKey),
-		fromName:    pc.FromName,
-		fromAddress: pc.FromAddress,
+		client:      sendgrid.NewSendClient(cfg.SendGridAPIKey),
+		fromName:    cfg.SendGridFromName,
+		fromAddress: cfg.SendGridFromAddress,
 	}
 
 	return sg, nil

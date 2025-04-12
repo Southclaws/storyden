@@ -7,43 +7,27 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/kelseyhightower/envconfig"
 	"github.com/twilio/twilio-go"
 	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
 	"go.uber.org/zap"
+
+	"github.com/Southclaws/storyden/internal/config"
 )
 
 var errFailedToSend = fault.New("failed to send sms")
-
-type Configuration struct {
-	Enabled     bool   `envconfig:"TWILIO_ENABLED"`
-	AccountSID  string `envconfig:"TWILIO_ACCOUNT_SID"`
-	AuthToken   string `envconfig:"TWILIO_AUTH_TOKEN"`
-	PhoneNumber string `envconfig:"TWILIO_PHONE_NUMBER"`
-}
 
 type TwilioSender struct {
 	client *twilio.RestClient
 	number string
 }
 
-func newTwilio(l *zap.Logger) (Sender, error) {
-	pc := Configuration{}
-	if err := envconfig.Process("", &pc); err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	if !pc.Enabled {
-		l.Info("twilio disabled")
-		return nil, nil
-	}
-
+func newTwilio(l *zap.Logger, cfg config.Config) (Sender, error) {
 	client := twilio.NewRestClientWithParams(twilio.ClientParams{
-		Username: pc.AccountSID,
-		Password: pc.AuthToken,
+		Username: cfg.TwilioAccountSID,
+		Password: cfg.TwilioAuthToken,
 	})
 
-	acc, err := client.Api.FetchAccount(pc.AccountSID)
+	acc, err := client.Api.FetchAccount(cfg.TwilioAccountSID)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -52,7 +36,7 @@ func newTwilio(l *zap.Logger) (Sender, error) {
 
 	return &TwilioSender{
 		client: client,
-		number: pc.PhoneNumber,
+		number: cfg.TwilioPhoneNumber,
 	}, nil
 }
 

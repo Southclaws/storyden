@@ -146,12 +146,56 @@ type Config struct {
 	/*
 	   Either:
 
+	   - `none` (default) for no email sending. Email sending is not a requirement for a production deployment.
 	   - `sendgrid` for SendGrid based email sending.
-	   - `mock` for logging emails to the console. Only useful for Storyden developers.
-
-	   Please note: SendGrid configuration settings are not currently exposed in the configuration file. This will be fixed soon.
+	   - `mock` for logging emails to the console. Only useful for Storyden developers and testing.
 	*/
-	EmailProvider string `default:"" envconfig:"EMAIL_PROVIDER"`
+	EmailProvider string `default:"none" envconfig:"EMAIL_PROVIDER"`
+	/*
+	   The name that will be used as the sender name for emails sent via SendGrid.
+
+	   This is typically the name of your community or organisation.
+	*/
+	SendGridFromName string `envconfig:"SENDGRID_FROM_NAME"`
+	/*
+	   The email address that will be used as the sender address for emails sent via SendGrid.
+
+	   This is typically a no-reply address, such as `no-reply@<your-domain>`.
+	*/
+	SendGridFromAddress string `envconfig:"SENDGRID_FROM_ADDRESS"`
+	/*
+	   The API key for the SendGrid account. This is required for sending emails via SendGrid.
+
+	   This is typically a long string of characters that you can generate in the SendGrid dashboard.
+	*/
+	SendGridAPIKey string `envconfig:"SENDGRID_API_KEY"`
+
+	// -
+	// SMS
+	// -
+
+	/*
+	   Either:
+
+	   - `none` (default) for no SMS sending. SMS sending is not a requirement for a production deployment.
+	   - `twilio` for Twilio based SMS sending.
+	   - `mock` for logging SMS to the console. Only useful for Storyden developers and testing.
+	*/
+	SMSProvider string `default:"none" envconfig:"SMS_PROVIDER"`
+	/*
+	   The account SID for the Twilio account.
+
+	   This is typically a long string of characters that you can view in the Twilio dashboard.
+	*/
+	TwilioAccountSID string `envconfig:"TWILIO_ACCOUNT_SID"`
+	// The phone number that will be used as the sender number for SMS sent via Twilio.
+	TwilioPhoneNumber string `envconfig:"TWILIO_PHONE_NUMBER"`
+	/*
+	   The auth token for the Twilio account. This is required for sending SMS via Twilio.
+
+	   This is typically a long string of characters that you can generate in the Twilio dashboard.
+	*/
+	TwilioAuthToken string `envconfig:"TWILIO_AUTH_TOKEN"`
 
 	// -
 	// Assets/file storage
