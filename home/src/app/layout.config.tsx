@@ -3,6 +3,9 @@ import { Box } from "@/styled-system/jsx";
 import type { BaseLayoutProps } from "fumadocs-ui/layouts/shared";
 
 export const baseOptions: BaseLayoutProps = {
+  themeSwitch: {
+    enabled: false,
+  },
   nav: {
     title: (
       <>
