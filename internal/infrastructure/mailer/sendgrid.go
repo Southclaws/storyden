@@ -2,6 +2,7 @@ package mailer
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 
 	"github.com/Southclaws/fault"
@@ -10,14 +11,12 @@ import (
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
-	"go.uber.org/zap"
 )
 
 var ErrSendgridFailed = fault.New("sendgrid responded with an unexpected status code")
 
 type SendGrid struct {
-	l *zap.Logger
-
+	logger      *slog.Logger
 	client      *sendgrid.Client
 	fromName    string
 	fromAddress string
@@ -25,9 +24,9 @@ type SendGrid struct {
 
 const attachmentContentDisposition = "attachment"
 
-func newSendgridMailer(l *zap.Logger, cfg config.Config) (*SendGrid, error) {
+func newSendgridMailer(logger *slog.Logger, cfg config.Config) (*SendGrid, error) {
 	sg := &SendGrid{
-		l:           l.With(zap.String("mailer", "sendgrid")),
+		logger:      logger.With(slog.String("mailer", "sendgrid")),
 		client:      sendgrid.NewSendClient(cfg.SendGridAPIKey),
 		fromName:    cfg.SendGridFromName,
 		fromAddress: cfg.SendGridFromAddress,
@@ -44,10 +43,10 @@ func (m *SendGrid) Send(
 	to := mail.NewEmail(msg.Name, msg.Address.Address)
 	message := mail.NewSingleEmail(from, msg.Subject, to, msg.Content.Plain, msg.Content.HTML)
 
-	m.l.Info("sending live email",
-		zap.String("email", to.Address),
-		zap.String("name", to.Name),
-		zap.String("subject", msg.Subject),
+	m.logger.Info("sending live email",
+		slog.String("email", to.Address),
+		slog.String("name", to.Name),
+		slog.String("subject", msg.Subject),
 	)
 
 	res, err := m.client.SendWithContext(ctx, message)

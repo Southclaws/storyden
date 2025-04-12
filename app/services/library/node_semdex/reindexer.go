@@ -2,6 +2,7 @@ package node_semdex
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"github.com/Southclaws/dt"
@@ -9,7 +10,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
@@ -21,7 +21,7 @@ func (r *semdexer) schedule(ctx context.Context, schedule time.Duration, reindex
 	for range time.NewTicker(schedule).C {
 		err := r.reindex(ctx, reindexThreshold, reindexChunk)
 		if err != nil {
-			r.logger.Error("failed to run reindex job", zap.Error(err))
+			r.logger.Error("failed to run reindex job", slog.String("error", err.Error()))
 		}
 	}
 }
@@ -56,9 +56,9 @@ func (r *semdexer) reindex(ctx context.Context, reindexThreshold time.Duration, 
 	deleted := discardIDs
 
 	r.logger.Debug("reindexing nodes",
-		zap.Int("all", len(nodes)),
-		zap.Int("updated", len(updated)),
-		zap.Int("deleted", len(deleted)),
+		slog.Int("all", len(nodes)),
+		slog.Int("updated", len(updated)),
+		slog.Int("deleted", len(deleted)),
 	)
 
 	toIndex := dt.Map(updated, func(id xid.ID) mq.IndexNode {

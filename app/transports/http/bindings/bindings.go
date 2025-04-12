@@ -30,6 +30,7 @@
 package bindings
 
 import (
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -40,7 +41,6 @@ import (
 	oapi_middleware "github.com/oapi-codegen/echo-middleware"
 	"github.com/samber/lo"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -147,7 +147,7 @@ func bindings(s Bindings) openapi.StrictServerInterface {
 // mounts the OpenAPI routes and middleware onto the /api path. Everything that
 // is outside of the `/api` path is considered separate from the OpenAPI spec.
 func mount(
-	l *zap.Logger,
+	logger *slog.Logger,
 	router *echo.Echo,
 	auth *Authorisation,
 	si openapi.StrictServerInterface,
@@ -196,8 +196,8 @@ func mount(
 		openapi.ParameterContext,
 	)
 
-	l.Debug("mounted OpenAPI to service bindings",
-		zap.Strings("routes", lo.Map(router.Routes(), func(r *echo.Route, _ int) string {
+	logger.Debug("mounted OpenAPI to service bindings",
+		slog.Any("routes", lo.Map(router.Routes(), func(r *echo.Route, _ int) string {
 			return r.Path
 		})),
 	)
@@ -205,9 +205,9 @@ func mount(
 	return nil
 }
 
-func newRouter(l *zap.Logger) *echo.Echo {
+func newRouter(logger *slog.Logger) *echo.Echo {
 	router := echo.New()
-	router.HTTPErrorHandler = openapi.HTTPErrorHandler(l)
+	router.HTTPErrorHandler = openapi.HTTPErrorHandler(logger)
 
 	return router
 }

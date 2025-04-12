@@ -10,7 +10,6 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
 	"github.com/rs/xid"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -35,7 +34,6 @@ import (
 var errNotAuthorised = fault.New("not authorised")
 
 type Manager struct {
-	logger       *zap.Logger
 	accountQuery *account_querier.Querier
 	querier      *event_querier.Querier
 	writer       *event_writer.Writer
@@ -46,7 +44,6 @@ type Manager struct {
 }
 
 func New(
-	logger *zap.Logger,
 	accountQuery *account_querier.Querier,
 	querier *event_querier.Querier,
 	writer *event_writer.Writer,
@@ -55,7 +52,6 @@ func New(
 	queue pubsub.Topic[mq.CreateEvent],
 ) *Manager {
 	return &Manager{
-		logger:       logger,
 		accountQuery: accountQuery,
 		querier:      querier,
 		writer:       writer,
@@ -140,11 +136,9 @@ func (m *Manager) Create(ctx context.Context,
 	}
 
 	if vis == visibility.VisibilityPublished {
-		if err := m.queue.Publish(ctx, mq.CreateEvent{
+		m.queue.PublishAndForget(ctx, mq.CreateEvent{
 			ID: evt.ID,
-		}); err != nil {
-			m.logger.Error("failed to publish new event message", zap.Error(err))
-		}
+		})
 	}
 
 	return evt, nil
@@ -195,11 +189,9 @@ func (m *Manager) Update(ctx context.Context, mk event_ref.QueryKey, partial Par
 
 	if vis, ok := partial.Visibility.Get(); ok && vis == visibility.VisibilityPublished {
 		if current.Visibility != evt.Visibility {
-			if err := m.queue.Publish(ctx, mq.CreateEvent{
+			m.queue.PublishAndForget(ctx, mq.CreateEvent{
 				ID: evt.ID,
-			}); err != nil {
-				m.logger.Error("failed to publish new event message", zap.Error(err))
-			}
+			})
 		}
 	}
 

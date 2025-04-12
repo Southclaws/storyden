@@ -4,7 +4,7 @@
 package config
 
 import (
-	zapcore "go.uber.org/zap/zapcore"
+	"log/slog"
 	"net/url"
 	"time"
 )
@@ -25,7 +25,7 @@ type Config struct {
 	   - `warn`
 	   - `error`
 	*/
-	LogLevel zapcore.Level `default:"info" envconfig:"LOG_LEVEL"`
+	LogLevel slog.Level `default:"info" envconfig:"LOG_LEVEL"`
 	/*
 	   Can be set to either:
 

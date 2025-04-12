@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log/slog"
 	"math"
 	"net/url"
 	"regexp"
@@ -16,7 +17,6 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 	"github.com/russross/blackfriday/v2"
 	"github.com/samber/lo"
-	"go.uber.org/zap"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
@@ -263,7 +263,8 @@ func extractReferences(htmlTree *html.Node, baseURL *url.URL) (*html.Node, []str
 	for _, v := range sdrs {
 		r, err := NewRefFromSDR(v)
 		if err != nil {
-			zap.L().Warn("invalid SDR in content", zap.Error(err), zap.String("ref", v.Opaque))
+			slog.Warn("invalid SDR in content", slog.String("error", err.Error()), slog.String("ref", v.Opaque))
+
 			continue
 		}
 		refs = append(refs, r)

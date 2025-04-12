@@ -1,15 +1,16 @@
 package watermill
 
 import (
+	"log/slog"
+
 	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
 )
 
-func NewWatermillQueue(cfg config.Config, l *zap.Logger) (message.Subscriber, message.Publisher, error) {
+func NewWatermillQueue(cfg config.Config, l *slog.Logger) (message.Subscriber, message.Publisher, error) {
 	logger := &logAdapter{l}
 
 	switch cfg.QueueType {

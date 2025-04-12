@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"go.uber.org/zap"
-
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -21,18 +19,15 @@ import (
 )
 
 type Hydrator struct {
-	logger  *zap.Logger
 	querier *collection_querier.Querier
 	session *session.Provider
 }
 
 func New(
-	logger *zap.Logger,
 	querier *collection_querier.Querier,
 	session *session.Provider,
 ) *Hydrator {
 	return &Hydrator{
-		logger:  logger,
 		querier: querier,
 		session: session,
 	}

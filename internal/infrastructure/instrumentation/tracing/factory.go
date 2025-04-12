@@ -2,6 +2,7 @@ package tracing
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
@@ -13,7 +14,6 @@ import (
 	"go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.17.0"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
 )
@@ -29,11 +29,11 @@ func Build() fx.Option {
 
 func newTracerFactory(ctx context.Context,
 	cfg config.Config,
-	logger *zap.Logger,
+	logger *slog.Logger,
 	opts []trace.TracerProviderOption,
 ) (Factory, error) {
 	otel.SetErrorHandler(otel.ErrorHandlerFunc(func(err error) {
-		logger.Error("otel error", zap.String("error", err.Error()))
+		logger.Error("otel error", slog.String("error", err.Error()))
 	}))
 
 	return factory{
@@ -44,7 +44,7 @@ func newTracerFactory(ctx context.Context,
 
 func newExporter(ctx context.Context,
 	cfg config.Config,
-	logger *zap.Logger,
+	logger *slog.Logger,
 ) ([]trace.TracerProviderOption, error) {
 	switch cfg.OTELProvider {
 	case "sentry":

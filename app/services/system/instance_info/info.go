@@ -2,12 +2,12 @@ package instance_info
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/opt"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/settings"
@@ -16,14 +16,14 @@ import (
 )
 
 type Provider struct {
-	logger     *zap.Logger
+	logger     *slog.Logger
 	config     config.Config
 	settings   *settings.SettingsRepository
 	onboarding onboarding.Service
 }
 
 func New(
-	logger *zap.Logger,
+	logger *slog.Logger,
 	config config.Config,
 	settings *settings.SettingsRepository,
 	onboarding onboarding.Service,
@@ -72,7 +72,9 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 		caps = append(caps, CapabilityEmailClient)
 	}
 
-	// TODO: SMS client check
+	if p.config.SMSProvider != "" {
+		caps = append(caps, CapabilitySMSClient)
+	}
 
 	return &Info{
 		Settings:         settings,

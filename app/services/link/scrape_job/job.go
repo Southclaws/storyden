@@ -2,9 +2,9 @@ package scrape_job
 
 import (
 	"context"
+	"log/slog"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/mq"
@@ -15,7 +15,7 @@ import (
 func runScrapeConsumer(
 	ctx context.Context,
 	lc fx.Lifecycle,
-	l *zap.Logger,
+	logger *slog.Logger,
 
 	queue pubsub.Topic[mq.ScrapeLink],
 
@@ -32,7 +32,7 @@ func runScrapeConsumer(
 				ctx = session.GetSessionFromMessage(ctx, msg)
 
 				if err := ic.scrapeLink(ctx, msg.Payload.URL, opt.NewPtr(msg.Payload.Item)); err != nil {
-					l.Error("failed to scrape link", zap.Error(err))
+					logger.Error("failed to scrape link", slog.String("error", err.Error()))
 				}
 
 				msg.Ack()

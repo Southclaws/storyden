@@ -2,6 +2,7 @@ package tracing
 
 import (
 	"context"
+	"log/slog"
 	"sync"
 
 	"github.com/Southclaws/fault"
@@ -11,17 +12,16 @@ import (
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/sdk/trace"
 	"go.opentelemetry.io/otel/sdk/trace/tracetest"
-	"go.uber.org/zap"
 )
 
 type slogExporter struct {
-	logger *zap.Logger
+	logger *slog.Logger
 
 	stoppedMu sync.RWMutex
 	stopped   bool
 }
 
-func newLoggingTracer(logger *zap.Logger) trace.SpanExporter {
+func newLoggingTracer(logger *slog.Logger) trace.SpanExporter {
 	return &slogExporter{
 		logger: logger,
 	}
@@ -49,19 +49,19 @@ func (e *slogExporter) ExportSpans(ctx context.Context, spans []trace.ReadOnlySp
 
 		duration := stub.EndTime.Sub(stub.StartTime)
 
-		args := []zap.Field{
-			zap.String("trace_id", stub.SpanContext.TraceID().String()),
-			zap.String("span_id", stub.SpanContext.SpanID().String()),
-			zap.Duration("duration", duration),
+		args := []any{
+			slog.String("trace_id", stub.SpanContext.TraceID().String()),
+			slog.String("span_id", stub.SpanContext.SpanID().String()),
+			slog.Duration("duration", duration),
 		}
 
 		for _, attr := range stub.Attributes {
-			args = append(args, toZap(attr))
+			args = append(args, toSlog(attr))
 		}
 
 		for _, ev := range stub.Events {
 			for _, attr := range ev.Attributes {
-				args = append(args, toZap(attr))
+				args = append(args, toSlog(attr))
 			}
 		}
 
@@ -71,7 +71,7 @@ func (e *slogExporter) ExportSpans(ctx context.Context, spans []trace.ReadOnlySp
 	return nil
 }
 
-func (e *slogExporter) stubLevel(stub *tracetest.SpanStub) func(string, ...zap.Field) {
+func (e *slogExporter) stubLevel(stub *tracetest.SpanStub) func(string, ...any) {
 	switch stub.Status.Code {
 	case codes.Error:
 		return e.logger.Error
@@ -93,26 +93,26 @@ func (e *slogExporter) MarshalLog() interface{} {
 		Type           string
 		WithTimestamps bool
 	}{
-		Type:           "zap",
+		Type:           "log",
 		WithTimestamps: true,
 	}
 }
 
-func toZap(attr attribute.KeyValue) zap.Field {
+func toSlog(attr attribute.KeyValue) any {
 	switch attr.Value.Type() {
 	case attribute.BOOL:
-		return zap.Bool(string(attr.Key), attr.Value.AsBool())
+		return slog.Bool(string(attr.Key), attr.Value.AsBool())
 
 	case attribute.INT64:
-		return zap.Int64(string(attr.Key), attr.Value.AsInt64())
+		return slog.Int64(string(attr.Key), attr.Value.AsInt64())
 
 	case attribute.FLOAT64:
-		return zap.Float64(string(attr.Key), attr.Value.AsFloat64())
+		return slog.Float64(string(attr.Key), attr.Value.AsFloat64())
 
 	case attribute.STRING:
-		return zap.String(string(attr.Key), attr.Value.AsString())
+		return slog.String(string(attr.Key), attr.Value.AsString())
 
 	default:
-		return zap.Any(string(attr.Key), attr.Value.AsInterface())
+		return slog.Any(string(attr.Key), attr.Value.AsInterface())
 	}
 }

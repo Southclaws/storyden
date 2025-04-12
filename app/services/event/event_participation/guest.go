@@ -2,13 +2,13 @@ package event_participation
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/samber/lo"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
@@ -41,14 +41,14 @@ func (m *Manager) updateGuest(ctx context.Context, acc *account.Account, mk even
 	isTargetHost := targetParticipation.Role == participation.RoleHost
 
 	logger := m.logger.With(
-		zap.String("event_id", evt.ID.String()),
-		zap.Bool("is_self_host", isSelfHost),
-		zap.Bool("is_self_attending", isSelfAttending),
-		zap.Bool("is_target_host", isTargetHost),
-		zap.Bool("is_target_attending", isTargetAttending),
-		zap.Int("participant_count", len(evt.Participants)),
-		zap.Int("host_count", len(hosts)),
-		zap.Int("other_host_count", len(otherHosts)),
+		slog.String("event_id", evt.ID.String()),
+		slog.Bool("is_self_host", isSelfHost),
+		slog.Bool("is_self_attending", isSelfAttending),
+		slog.Bool("is_target_host", isTargetHost),
+		slog.Bool("is_target_attending", isTargetAttending),
+		slog.Int("participant_count", len(evt.Participants)),
+		slog.Int("host_count", len(hosts)),
+		slog.Int("other_host_count", len(otherHosts)),
 	)
 
 	logger.Info("updating other member event participation")

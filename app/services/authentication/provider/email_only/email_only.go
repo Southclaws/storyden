@@ -2,6 +2,7 @@ package email_only
 
 import (
 	"context"
+	"log/slog"
 	"net/mail"
 
 	"github.com/Southclaws/fault"
@@ -10,7 +11,6 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -38,7 +38,7 @@ var (
 )
 
 type Provider struct {
-	logger       *zap.Logger
+	logger       *slog.Logger
 	settings     *settings.SettingsRepository
 	accountQuery *account_querier.Querier
 	auth         authentication.Repository
@@ -50,7 +50,7 @@ type Provider struct {
 }
 
 func New(
-	logger *zap.Logger,
+	logger *slog.Logger,
 	settings *settings.SettingsRepository,
 	accountQuery *account_querier.Querier,
 	auth authentication.Repository,

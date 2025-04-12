@@ -2,6 +2,7 @@ package password
 
 import (
 	"context"
+	"log/slog"
 	"net/mail"
 
 	"github.com/Southclaws/fault"
@@ -9,7 +10,6 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/alexedwards/argon2id"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -37,7 +37,7 @@ var (
 var tokenType = authentication.TokenTypePasswordHash
 
 type Provider struct {
-	logger       *zap.Logger
+	logger       *slog.Logger
 	settings     *settings.SettingsRepository
 	system       *instance_info.Provider
 	auth         authentication.Repository
@@ -53,7 +53,7 @@ type Provider struct {
 var service = authentication.ServicePassword
 
 func New(
-	logger *zap.Logger,
+	logger *slog.Logger,
 	settings *settings.SettingsRepository,
 	system *instance_info.Provider,
 	auth authentication.Repository,

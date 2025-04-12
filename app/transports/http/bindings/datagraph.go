@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/url"
 
@@ -13,7 +14,6 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/labstack/echo/v4"
 	"github.com/rs/xid"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -216,7 +216,7 @@ func serialiseDatagraphItem(v datagraph.Item) openapi.DatagraphItem {
 	}
 
 	if err != nil {
-		zap.L().Error("failed to serialise datagraph item", zap.Error(err))
+		slog.Error("failed to serialise datagraph item", slog.String("error", err.Error()))
 	}
 
 	return out

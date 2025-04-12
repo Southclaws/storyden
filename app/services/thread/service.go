@@ -9,7 +9,6 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -89,7 +88,6 @@ func Build() fx.Option {
 
 type service struct {
 	ins spanner.Instrumentation
-	l   *zap.Logger
 
 	accountQuery *account_querier.Querier
 	thread_repo  thread.Repository
@@ -104,7 +102,6 @@ type service struct {
 
 func New(
 	ins spanner.Builder,
-	l *zap.Logger,
 
 	accountQuery *account_querier.Querier,
 	thread_repo thread.Repository,
@@ -118,7 +115,6 @@ func New(
 ) Service {
 	return &service{
 		ins: ins.Build(),
-		l:   l.With(zap.String("service", "thread")),
 
 		accountQuery: accountQuery,
 		thread_repo:  thread_repo,

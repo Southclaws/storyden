@@ -27,7 +27,6 @@ require (
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/dig v1.18.1
 	go.uber.org/fx v1.23.0
-	go.uber.org/zap v1.27.0
 	golang.org/x/oauth2 v0.28.0
 )
 
@@ -53,6 +52,7 @@ require (
 	github.com/getsentry/sentry-go v0.31.1
 	github.com/getsentry/sentry-go/otel v0.31.1
 	github.com/glebarez/go-sqlite v1.22.0
+	github.com/golang-cz/devslog v0.0.12
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/go-github/v70 v70.0.0
 	github.com/iancoleman/strcase v0.3.0
@@ -186,6 +186,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.35.0 // indirect
 	go.opentelemetry.io/otel/metric v1.35.0 // indirect
 	go.opentelemetry.io/proto/otlp v1.5.0 // indirect
+	go.uber.org/zap v1.26.0 // indirect
 	golang.org/x/image v0.25.0 // indirect
 	golang.org/x/tools v0.31.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250313205543-e70fdf4c4cb4 // indirect

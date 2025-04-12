@@ -5,7 +5,6 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -20,8 +19,6 @@ import (
 )
 
 type indexerConsumer struct {
-	l *zap.Logger
-
 	threadRepo   thread.Repository
 	replyRepo    reply.Repository
 	nodeQuerier  *node_querier.Querier
@@ -35,8 +32,6 @@ type indexerConsumer struct {
 }
 
 func newIndexConsumer(
-	l *zap.Logger,
-
 	threadRepo thread.Repository,
 	replyRepo reply.Repository,
 	nodeQuerier *node_querier.Querier,
@@ -50,7 +45,6 @@ func newIndexConsumer(
 	indexer semdex.Mutator,
 ) *indexerConsumer {
 	return &indexerConsumer{
-		l:            l,
 		threadRepo:   threadRepo,
 		replyRepo:    replyRepo,
 		nodeQuerier:  nodeQuerier,

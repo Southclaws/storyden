@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"log/slog"
 	"net/http"
 	"syscall"
 
@@ -14,7 +15,6 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -24,7 +24,7 @@ import (
 // to HTTP status codes. This is achieved (currently) with the use of a library
 // called "ftag" which enables the decoration of error chains with a basic kind
 // of category which helps organise the kind of errors that occur within an app.
-func HTTPErrorHandler(l *zap.Logger) func(err error, c echo.Context) {
+func HTTPErrorHandler(logger *slog.Logger) func(err error, c echo.Context) {
 	return func(err error, c echo.Context) {
 		errmsg := err.Error()
 		errtag, status := categorise(err)
@@ -33,13 +33,13 @@ func HTTPErrorHandler(l *zap.Logger) func(err error, c echo.Context) {
 		chain := fault.Flatten(err)
 
 		if status == http.StatusInternalServerError {
-			l.Error(errmsg,
-				zap.String("package", "http"),
-				zap.String("message", message),
-				zap.String("path", c.Path()),
-				zap.String("tag", string(errtag)),
-				zap.Any("metadata", errctx),
-				zap.Any("trace", chain),
+			logger.Error(errmsg,
+				slog.String("package", "http"),
+				slog.String("message", message),
+				slog.String("path", c.Path()),
+				slog.String("tag", string(errtag)),
+				slog.Any("metadata", errctx),
+				slog.Any("trace", chain),
 			)
 		}
 

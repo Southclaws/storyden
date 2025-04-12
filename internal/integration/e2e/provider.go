@@ -3,12 +3,12 @@ package e2e
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"net/http/httptest"
 
 	"github.com/Southclaws/fault"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	http_transport "github.com/Southclaws/storyden/app/transports/http"
 	"github.com/Southclaws/storyden/app/transports/http/bindings"
@@ -18,7 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 )
 
-func newHttpTestServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router *http.ServeMux) *httptest.Server {
+func newHttpTestServer(lc fx.Lifecycle, l *slog.Logger, cfg config.Config, router *http.ServeMux) *httptest.Server {
 	server := httptest.NewServer(router)
 
 	lc.Append(fx.Hook{

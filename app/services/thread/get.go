@@ -57,7 +57,7 @@ func (s *service) Get(
 
 	// recommendations, err := s.recommender.Recommend(ctx, thr)
 	// if err != nil {
-	// 	s.l.Warn("failed to aggregate recommendations", zap.Error(err))
+	// 	s.l.Warn("failed to aggregate recommendations", slog.String("error", err.Error()))
 	// } else {
 	// 	thr.Related = append(thr.Related, recommendations...)
 	// }

@@ -2,6 +2,7 @@ package register
 
 import (
 	"context"
+	"log/slog"
 	"net/mail"
 
 	"github.com/Southclaws/fault"
@@ -10,7 +11,6 @@ import (
 	"github.com/Southclaws/opt"
 	petname "github.com/dustinkirkland/golang-petname"
 	"github.com/samber/lo"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -29,7 +29,7 @@ var (
 )
 
 type Registrar struct {
-	logger         *zap.Logger
+	logger         *slog.Logger
 	session        *session.Provider
 	accountWriter  *account_writer.Writer
 	accountQuerier *account_querier.Querier
@@ -40,7 +40,7 @@ type Registrar struct {
 }
 
 func New(
-	logger *zap.Logger,
+	logger *slog.Logger,
 	session *session.Provider,
 	writer *account_writer.Writer,
 	accountQuerier *account_querier.Querier,
@@ -133,12 +133,12 @@ func (s *Registrar) GetOrCreateViaEmail(
 	}()
 
 	logger := s.logger.With(
-		zap.String("handle", handle),
-		zap.String("name", name),
-		zap.String("email", email.Address),
-		zap.Bool("auth_method_exists", authMethodExists),
-		zap.Bool("email_exists", emailExists),
-		zap.Bool("email_verified", isVerified),
+		slog.String("handle", handle),
+		slog.String("name", name),
+		slog.String("email", email.Address),
+		slog.Bool("auth_method_exists", authMethodExists),
+		slog.Bool("email_exists", emailExists),
+		slog.Bool("email_verified", isVerified),
 	)
 
 	switch {
@@ -244,10 +244,10 @@ func (s *Registrar) GetOrCreateViaHandle(
 	}
 
 	logger := s.logger.With(
-		zap.String("handle", handle),
-		zap.String("name", name),
-		zap.Bool("auth_method_exists", authMethodExists),
-		zap.Bool("handle_exists", handleExists),
+		slog.String("handle", handle),
+		slog.String("name", name),
+		slog.Bool("auth_method_exists", authMethodExists),
+		slog.Bool("handle_exists", handleExists),
 	)
 
 	switch {

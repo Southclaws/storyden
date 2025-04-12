@@ -5,7 +5,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/transports/http/middleware/chaos"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/frontend"
@@ -24,7 +23,6 @@ func MountOpenAPI(
 	lc fx.Lifecycle,
 
 	cfg config.Config,
-	logger *zap.Logger,
 	mux *http.ServeMux,
 	router *echo.Echo,
 

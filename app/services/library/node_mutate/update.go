@@ -6,7 +6,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -65,11 +64,9 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 	}
 
 	if n.Visibility == visibility.VisibilityPublished {
-		if err := s.indexQueue.Publish(ctx, mq.IndexNode{
+		s.indexQueue.PublishAndForget(ctx, mq.IndexNode{
 			ID: library.NodeID(n.Mark.ID()),
-		}); err != nil {
-			s.logger.Error("failed to publish index post message", zap.Error(err))
-		}
+		})
 	} else {
 		if err := s.deleteQueue.Publish(ctx, mq.DeleteNode{
 			ID: library.NodeID(n.GetID()),

@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/rs/xid"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -69,11 +68,9 @@ func (s *service) Create(ctx context.Context,
 	}
 
 	if partial.Visibility.OrZero() == visibility.VisibilityPublished {
-		if err := s.indexQueue.Publish(ctx, mq.IndexThread{
+		s.indexQueue.PublishAndForget(ctx, mq.IndexThread{
 			ID: thr.ID,
-		}); err != nil {
-			s.l.Error("failed to publish index post message", zap.Error(err))
-		}
+		})
 	}
 
 	s.fetcher.HydrateContentURLs(ctx, thr)

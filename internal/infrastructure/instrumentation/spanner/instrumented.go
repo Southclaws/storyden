@@ -3,6 +3,7 @@ package spanner
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"path/filepath"
 	"runtime"
 	"strings"
@@ -12,7 +13,6 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/tracing"
@@ -33,7 +33,7 @@ func (i *service) Build() Instrumentation {
 }
 
 type impl struct {
-	logger *zap.Logger
+	logger *slog.Logger
 	tracer tracing.Tracer
 }
 
@@ -49,7 +49,7 @@ func (i *impl) Instrument(ctx context.Context, a ...kv.Attr) (context.Context, S
 }
 
 func (i *impl) InstrumentNamed(ctx context.Context, name string, a ...kv.Attr) (context.Context, Span) {
-	logger := i.logger.With(kv.Attrs(a).ToZap()...)
+	logger := i.logger.With(kv.Attrs(a).ToSlog()...)
 
 	// Create a child span with the KV data as attributes.
 	ctx, span := i.tracer.Start(ctx, name, trace.WithAttributes(kv.Attrs(a).ToAttributes()...))
@@ -64,7 +64,7 @@ func (i *impl) InstrumentNamed(ctx context.Context, name string, a ...kv.Attr) (
 
 type trackingSpan struct {
 	span   trace.Span
-	logger *zap.Logger
+	logger *slog.Logger
 	// NOTE: We store ctx because we need to mutate it in Annotate.
 	//nolint:containedctx
 	ctx    context.Context
@@ -92,7 +92,7 @@ func (t *trackingSpan) Annotate(a ...kv.Attr) context.Context {
 	t.span.SetAttributes(kv.Attrs(a).ToAttributes()...)
 
 	// Mutate the stored logger with the same attributes.
-	t.logger = t.logger.With(kv.Attrs(a).ToZap()...)
+	t.logger = t.logger.With(kv.Attrs(a).ToSlog()...)
 
 	return t.ctx
 }
@@ -101,7 +101,7 @@ func (t *trackingSpan) Event(name string, a ...kv.Attr) {
 	t.span.AddEvent(name, trace.WithStackTrace(true), trace.WithAttributes(kv.Attrs(a).ToAttributes()...))
 }
 
-func (t *trackingSpan) Logger() *zap.Logger {
+func (t *trackingSpan) Logger() *slog.Logger {
 	return t.logger
 }
 

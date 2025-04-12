@@ -5,7 +5,7 @@
   fields:
     - env: "LOG_LEVEL"
       name: LogLevel
-      type: go.uber.org/zap/zapcore.Level
+      type: log/slog.Level
       default: info
       description: |-
         Can be set to either:
@@ -21,7 +21,8 @@
       description: |-
         Can be set to either:
 
-        - `(not set)` (default) somewhat human readable logs for simple setups
+        - `(not set)` (default) somewhat human readable "logfmt" format logs for simple setups
+        - `dev` for developer-friendly logs, with colours and attributes on separate lines for readability
         - `json` for machine-readable logs, mainly for log aggregators, etc.
 
     - env: "RUN_FRONTEND"

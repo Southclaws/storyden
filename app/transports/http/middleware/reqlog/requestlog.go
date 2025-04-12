@@ -2,11 +2,10 @@ package reqlog
 
 import (
 	"fmt"
+	"log/slog"
 	"net/http"
 	"runtime/debug"
 	"time"
-
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/transports/http/middleware/origin"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
@@ -82,7 +81,7 @@ func (m *Middleware) WithLogger() func(http.Handler) http.Handler {
 					errorlog := title + ": " + err.Error()
 
 					logger.Error(errorlog,
-						zap.Error(span.Wrap(err, errorlog, kv.String("trace", string(trace)))),
+						slog.String("error", span.Wrap(err, errorlog, kv.String("trace", string(trace))).Error()),
 					)
 
 					w.WriteHeader(http.StatusInternalServerError)

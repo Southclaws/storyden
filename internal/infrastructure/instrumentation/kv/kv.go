@@ -1,11 +1,11 @@
 package kv
 
 import (
+	"log/slog"
 	"time"
 
 	"github.com/Southclaws/dt"
 	"go.opentelemetry.io/otel/attribute"
-	"go.uber.org/zap"
 )
 
 type Attr attribute.KeyValue
@@ -28,35 +28,35 @@ func (a Attrs) ToFault() []string {
 	return out
 }
 
-func (a Attrs) ToZap() []zap.Field {
-	return dt.Map(a, func(attr Attr) zap.Field {
+func (a Attrs) ToSlog() []any {
+	return dt.Map(a, func(attr Attr) any {
 		switch attr.Value.Type() {
 		case attribute.BOOL:
-			return zap.Bool(string(attr.Key), attr.Value.AsBool())
+			return slog.Bool(string(attr.Key), attr.Value.AsBool())
 
 		case attribute.INT64:
-			return zap.Int64(string(attr.Key), attr.Value.AsInt64())
+			return slog.Int64(string(attr.Key), attr.Value.AsInt64())
 
 		case attribute.FLOAT64:
-			return zap.Float64(string(attr.Key), attr.Value.AsFloat64())
+			return slog.Float64(string(attr.Key), attr.Value.AsFloat64())
 
 		case attribute.STRING:
-			return zap.String(string(attr.Key), attr.Value.AsString())
+			return slog.String(string(attr.Key), attr.Value.AsString())
 
 		case attribute.BOOLSLICE:
-			return zap.Bools(string(attr.Key), attr.Value.AsBoolSlice())
+			return slog.Any(string(attr.Key), attr.Value.AsBoolSlice())
 
 		case attribute.INT64SLICE:
-			return zap.Int64s(string(attr.Key), attr.Value.AsInt64Slice())
+			return slog.Any(string(attr.Key), attr.Value.AsInt64Slice())
 
 		case attribute.FLOAT64SLICE:
-			return zap.Float64s(string(attr.Key), attr.Value.AsFloat64Slice())
+			return slog.Any(string(attr.Key), attr.Value.AsFloat64Slice())
 
 		case attribute.STRINGSLICE:
-			return zap.Strings(string(attr.Key), attr.Value.AsStringSlice())
+			return slog.Any(string(attr.Key), attr.Value.AsStringSlice())
 		}
 
-		return zap.Any(string(attr.Key), attr.Value.Emit())
+		return slog.Any(string(attr.Key), attr.Value.Emit())
 	})
 }
 

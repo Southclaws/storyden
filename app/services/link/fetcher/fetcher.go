@@ -3,6 +3,7 @@ package fetcher
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 	"net/url"
 
@@ -11,7 +12,6 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -28,7 +28,7 @@ import (
 var errEmptyLink = fault.New("empty link")
 
 type Fetcher struct {
-	l        *zap.Logger
+	logger   *slog.Logger
 	uploader *asset_upload.Uploader
 	lq       *link_querier.LinkQuerier
 	lr       *link_writer.LinkWriter
@@ -38,7 +38,7 @@ type Fetcher struct {
 }
 
 func New(
-	l *zap.Logger,
+	logger *slog.Logger,
 	uploader *asset_upload.Uploader,
 	lq *link_querier.LinkQuerier,
 	lr *link_writer.LinkWriter,
@@ -47,7 +47,7 @@ func New(
 	queue pubsub.Topic[mq.ScrapeLink],
 ) *Fetcher {
 	return &Fetcher{
-		l:        l.With(zap.String("service", "hydrator")),
+		logger:   logger,
 		uploader: uploader,
 		lq:       lq,
 		lr:       lr,
@@ -71,12 +71,7 @@ func (s *Fetcher) Fetch(ctx context.Context, u url.URL, opts Options) (*link_ref
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	if len(r.Links) > 0 {
-		if err := s.queue.Publish(ctx, mq.ScrapeLink{URL: u}); err != nil {
-			s.l.Error("failed to publish scrape link message",
-				zap.Error(err),
-				zap.String("url", u.String()))
-		}
-
+		s.queue.PublishAndForget(ctx, mq.ScrapeLink{URL: u})
 		return r.Links[0], nil
 	}
 
@@ -116,14 +111,10 @@ func (s *Fetcher) HydrateContentURLs(ctx context.Context, item datagraph.Item) {
 // QueueForItem queues a scrape request for a URL that is linked to an item.
 // When the scrape job is done, the scraped link will be related to the item.
 func (s *Fetcher) QueueForItem(ctx context.Context, u url.URL, item datagraph.Item) error {
-	if err := s.queue.Publish(ctx, mq.ScrapeLink{
+	s.queue.PublishAndForget(ctx, mq.ScrapeLink{
 		URL:  u,
 		Item: datagraph.NewRef(item),
-	}); err != nil {
-		s.l.Error("failed to publish scrape link message",
-			zap.Error(err),
-			zap.String("url", u.String()))
-	}
+	})
 
 	return nil
 }
@@ -139,7 +130,7 @@ func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.Link
 	if wc.Favicon != "" {
 		a, err := s.CopyAsset(ctx, wc.Favicon)
 		if err != nil {
-			s.l.Warn("failed to scrape web content favicon image", zap.Error(err), zap.String("url", u.String()))
+			s.logger.Warn("failed to scrape web content favicon image", slog.String("error", err.Error()), slog.String("url", u.String()))
 		} else {
 			opts = append(opts, link_writer.WithFaviconImage(a.ID))
 		}
@@ -148,7 +139,7 @@ func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.Link
 	if wc.Image != "" {
 		a, err := s.CopyAsset(ctx, wc.Image)
 		if err != nil {
-			s.l.Warn("failed to scrape web content primary image", zap.Error(err), zap.String("url", u.String()))
+			s.logger.Warn("failed to scrape web content primary image", slog.String("error", err.Error()), slog.String("url", u.String()))
 		} else {
 			opts = append(opts, link_writer.WithPrimaryImage(a.ID))
 		}

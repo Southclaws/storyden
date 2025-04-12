@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -13,7 +12,6 @@ import (
 func runEventUpdateConsumer(
 	ctx context.Context,
 	lc fx.Lifecycle,
-	l *zap.Logger,
 
 	queue pubsub.Topic[mq.CreateEvent],
 

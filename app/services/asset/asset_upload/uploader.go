@@ -3,12 +3,12 @@ package asset_upload
 import (
 	"context"
 	"io"
+	"log/slog"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
@@ -23,8 +23,7 @@ import (
 )
 
 type Uploader struct {
-	l *zap.Logger
-
+	logger     *slog.Logger
 	nodewriter *node_writer.Writer
 	assets     *asset_writer.Writer
 	objects    object.Storer
@@ -32,7 +31,7 @@ type Uploader struct {
 }
 
 func New(
-	l *zap.Logger,
+	logger *slog.Logger,
 
 	nodewriter *node_writer.Writer,
 	assets *asset_writer.Writer,
@@ -40,8 +39,7 @@ func New(
 	queue pubsub.Topic[mq.AnalyseAsset],
 ) *Uploader {
 	return &Uploader{
-		l: l.With(zap.String("service", "asset")),
-
+		logger:     logger,
 		nodewriter: nodewriter,
 		assets:     assets,
 		objects:    objects,
@@ -96,12 +94,10 @@ func (s *Uploader) Upload(ctx context.Context, or io.Reader, size int64, name as
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.queue.Publish(ctx, mq.AnalyseAsset{
+	s.queue.PublishAndForget(ctx, mq.AnalyseAsset{
 		AssetID:         a.ID,
 		ContentFillRule: opts.ContentFill,
-	}); err != nil {
-		s.l.Error("failed to publish analyse asset message", zap.Error(err))
-	}
+	})
 
 	return a, nil
 }

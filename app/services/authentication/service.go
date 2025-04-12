@@ -2,13 +2,13 @@ package authentication
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/samber/lo"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/settings"
@@ -50,7 +50,7 @@ func Build() fx.Option {
 }
 
 func New(
-	l *zap.Logger,
+	logger *slog.Logger,
 	settings *settings.SettingsRepository,
 
 	pw *password.Provider,
@@ -71,8 +71,8 @@ func New(
 		pp,
 	}
 
-	l.Debug("initialised auth providers",
-		zap.Strings("providers", dt.Map(providers, name)),
+	logger.Debug("initialised auth providers",
+		slog.Any("providers", dt.Map(providers, name)),
 	)
 
 	return &Manager{

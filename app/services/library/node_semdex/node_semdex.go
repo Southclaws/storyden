@@ -2,10 +2,10 @@ package node_semdex
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
@@ -42,7 +42,7 @@ var (
 )
 
 type semdexer struct {
-	logger *zap.Logger
+	logger *slog.Logger
 	db     *ent.Client
 
 	nodeQuerier *node_querier.Querier
@@ -64,7 +64,7 @@ func newSemdexer(
 	ctx context.Context,
 	lc fx.Lifecycle,
 	cfg config.Config,
-	l *zap.Logger,
+	logger *slog.Logger,
 
 	db *ent.Client,
 	nodeQuerier *node_querier.Querier,
@@ -84,7 +84,7 @@ func newSemdexer(
 	}
 
 	re := semdexer{
-		logger:        l,
+		logger:        logger,
 		db:            db,
 		nodeQuerier:   nodeQuerier,
 		nodeWriter:    nodeWriter,
@@ -118,7 +118,7 @@ func newSemdexer(
 		go func() {
 			for msg := range sub {
 				if err := re.index(ctx, msg.Payload.ID); err != nil {
-					l.Error("failed to index node", zap.Error(err))
+					logger.Error("failed to index node", slog.String("error", err.Error()))
 				}
 
 				msg.Ack()
@@ -137,7 +137,7 @@ func newSemdexer(
 		go func() {
 			for msg := range sub {
 				if err := re.deindex(ctx, msg.Payload.ID); err != nil {
-					l.Error("failed to index node", zap.Error(err))
+					logger.Error("failed to index node", slog.String("error", err.Error()))
 				}
 
 				msg.Ack()
@@ -158,7 +158,7 @@ func newSemdexer(
 				ctx = session.GetSessionFromMessage(ctx, msg)
 
 				if err := re.autofill(ctx, msg.Payload.ID, msg.Payload.AutoTitle, msg.Payload.AutoTag); err != nil {
-					l.Error("failed to autofill node", zap.Error(err))
+					logger.Error("failed to autofill node", slog.String("error", err.Error()))
 				}
 
 				msg.Ack()

@@ -7,7 +7,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/post/category"
@@ -33,21 +32,15 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l *zap.Logger
-
 	accountQuery  *account_querier.Querier
 	category_repo category.Repository
 }
 
 func New(
-	l *zap.Logger,
-
 	accountQuery *account_querier.Querier,
 	category_repo category.Repository,
 ) Service {
 	return &service{
-		l: l.With(zap.String("service", "collection")),
-
 		accountQuery:  accountQuery,
 		category_repo: category_repo,
 	}

@@ -2,9 +2,9 @@ package sms
 
 import (
 	"context"
+	"log/slog"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/storyden/internal/config"
@@ -15,14 +15,12 @@ type Sender interface {
 }
 
 func Build() fx.Option {
-	return fx.Provide(func(cfg config.Config, l *zap.Logger) (Sender, error) {
+	return fx.Provide(func(cfg config.Config, l *slog.Logger) (Sender, error) {
 		switch cfg.SMSProvider {
 		case "none":
-			l.Info("initialising with no SMS provider")
 			return nil, nil
 
 		case "twilio":
-			l.Info("initialising Twilio SMS provider")
 			return newTwilio(l, cfg)
 
 		case "mock":

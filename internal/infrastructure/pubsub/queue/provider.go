@@ -2,18 +2,19 @@ package queue
 
 import (
 	"context"
+	"log/slog"
+
+	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/watermill"
-	"go.uber.org/fx"
-	"go.uber.org/zap"
 )
 
 func Build() fx.Option {
 	return fx.Provide(func(
 		ctx context.Context,
 		cfg config.Config,
-		l *zap.Logger,
+		l *slog.Logger,
 	) (*QueueFactory, error) {
 		sub, pub, err := watermill.NewWatermillQueue(cfg, l)
 		if err != nil {
@@ -21,9 +22,9 @@ func Build() fx.Option {
 		}
 
 		return &QueueFactory{
-			log: l,
-			pub: pub,
-			sub: sub,
+			logger: l,
+			pub:    pub,
+			sub:    sub,
 		}, nil
 	})
 }

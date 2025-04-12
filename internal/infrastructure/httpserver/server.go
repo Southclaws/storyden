@@ -2,16 +2,17 @@ package httpserver
 
 import (
 	"context"
+	"log/slog"
 	"net"
 	"net/http"
+	"os"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
 )
 
-func NewServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router *http.ServeMux) *http.Server {
+func NewServer(lc fx.Lifecycle, logger *slog.Logger, cfg config.Config, router *http.ServeMux) *http.Server {
 	server := &http.Server{
 		Handler: router,
 		Addr:    cfg.ListenAddr,
@@ -27,15 +28,16 @@ func NewServer(lc fx.Lifecycle, l *zap.Logger, cfg config.Config, router *http.S
 				// it depends on everything else being initialised first. So, if
 				// the app reaches this point, its considered a successful boot!
 
-				l.Info("storyden http server starting",
-					zap.String("address", cfg.ListenAddr),
-					zap.String("api_address", cfg.PublicAPIAddress.String()),
-					zap.String("web_address", cfg.PublicWebAddress.String()),
-					zap.String("log_level", cfg.LogLevel.String()),
+				logger.Info("storyden http server starting",
+					slog.String("address", cfg.ListenAddr),
+					slog.String("api_address", cfg.PublicAPIAddress.String()),
+					slog.String("web_address", cfg.PublicWebAddress.String()),
+					slog.String("log_level", cfg.LogLevel.String()),
 				)
 
 				if err := server.ListenAndServe(); err != nil {
-					l.Fatal("http server stopped unexpectedly", zap.Error(err))
+					logger.Error("http server stopped unexpectedly", slog.String("error", err.Error()))
+					os.Exit(1)
 				}
 			}()
 			return nil

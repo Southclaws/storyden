@@ -2,12 +2,12 @@ package event_participation
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -30,7 +30,7 @@ var (
 )
 
 type Manager struct {
-	logger         *zap.Logger
+	logger         *slog.Logger
 	accountQuerier *account_querier.Querier
 	eventQuerier   *event_querier.Querier
 	querier        *participant_querier.Querier
@@ -39,7 +39,7 @@ type Manager struct {
 }
 
 func New(
-	logger *zap.Logger,
+	logger *slog.Logger,
 	accountQuerier *account_querier.Querier,
 	eventQuerier *event_querier.Querier,
 	querier *participant_querier.Querier,
@@ -131,12 +131,12 @@ type notificationTarget struct {
 // 	_, isAffectingOtherParticipants := lo.Find(updates, func(update Spec) bool { return update.AccountID != session })
 
 // 	logger := m.logger.With(
-// 		zap.String("event", mark.Key(eventID).String()),
-// 		zap.Bool("is_host", isHost),
-// 		zap.Bool("is_affecting_other_participants", isAffectingOtherParticipants),
-// 		zap.Bool("is_attending", isAttending),
-// 		zap.Int("participant_count", len(evt.Participants)),
-// 		zap.Int("update_count", len(updates)),
+// 		slog.String("event", mark.Key(eventID).String()),
+// 		slog.Bool("is_host", isHost),
+// 		slog.Bool("is_affecting_other_participants", isAffectingOtherParticipants),
+// 		slog.Bool("is_attending", isAttending),
+// 		slog.Int("participant_count", len(evt.Participants)),
+// 		slog.Int("update_count", len(updates)),
 // 	)
 
 // 	logger.Info("updating event participation")

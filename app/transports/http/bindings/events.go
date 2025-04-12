@@ -2,13 +2,13 @@ package bindings
 
 import (
 	"context"
+	"log/slog"
 	"net/url"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/event"
@@ -276,7 +276,7 @@ func serialiseLocation(in location.Location) openapi.EventLocation {
 	}
 
 	if err != nil {
-		zap.L().Error("failed to serialise event location", zap.Error(err), zap.Any("location", in))
+		slog.Error("failed to serialise event location", slog.String("error", err.Error()), slog.Any("location", in))
 	}
 
 	return l

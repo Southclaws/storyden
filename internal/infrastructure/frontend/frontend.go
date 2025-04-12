@@ -4,9 +4,9 @@ package frontend
 
 import (
 	"context"
+	"log/slog"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
 )
@@ -16,12 +16,12 @@ type Frontend interface {
 }
 
 func Build() fx.Option {
-	return fx.Invoke(func(lc fx.Lifecycle, l *zap.Logger, cfg config.Config) {
+	return fx.Invoke(func(lc fx.Lifecycle, logger *slog.Logger, cfg config.Config) {
 		if cfg.RunFrontend == "" {
 			return
 		}
 
-		var fe Frontend = &NextjsProcess{l}
+		var fe Frontend = &NextjsProcess{logger: logger}
 
 		lc.Append(fx.StartHook(func(ctx context.Context) {
 			go fe.Run(ctx, cfg.RunFrontend)
