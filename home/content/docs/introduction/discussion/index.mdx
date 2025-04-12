@@ -92,62 +92,13 @@ Likes are the lowest form of interaction, a simple thumbs up. Reacts are more ex
 
 Each of these interactions is used by the [Semdex](/docs/introduction/semdex) to inform recommendations and feed algorithms.
 
-## Technical details
+## Content format
 
-### Body content
-
-The chosen format for the body content of posts (and all rich text content within Storyden) is HTML. This allows for a wide range of formatting options and is easy to parse and display in a frontend.
-
-```html
-<body>
-  <p>hey southclaws!</p>
-</body>
-```
-
-It also means frontend implementations (webapps, mobile apps) are free to include any custom data attributes or classes (see [security](#security) section for information on XSS) in the HTML content. This can be useful for adding custom styling or functionality.
-
-#### `<a>` References (@Mentions and other links)
-
-Anchor tags in any rich text content may contain special URIs understood by Storyden as references to other resources. These references are used by the [Datagraph](datagraph) to build a graph of linked content. The format is:
-
-```
-sdr:<resource_kind>/<resource_identifier>
-```
-
-The URI scheme is `sdr:` followed by the resource kind and the resource identifier in xid format.
-
-Valid resource kinds are:
-
-- `profile`: Member profile
-- `post`: A post (thread or reply)
-- `node`: A [library node](/docs/introduction/library)
-
-For example, you can mention a user with a `href` value of `sdr:profile/<identifier>`. In a body value, this looks like:
-
-```html
-<body>
-  <p>
-    yo
-    <a href="sdr:profile/crk0gvqfunp7891n7ah0">@odin</a>
-    what&#39;s up
-  </p>
-</body>
-```
-
-When Storyden receives a post with this content, it will parse the URIs and look for any containing the `sdr` scheme. It will then use the resource kind (`profile`) and identifier (`crk0gvqfunp7891n7ah0`) to link the post to a profile. It will then dispatch a notification to the mentioned member, letting them know someone's talking about them.
-
-This functionality can be used for any Datagraph items, such as [library nodes](/docs/introduction/library) or [threads](#threads).
-
-#### Security
-
-The HTML content is sanitized on the server to prevent XSS attacks using the [microcosm-cc/bluemonday](https://github.com/microcosm-cc/bluemonday) package. The only exceptions to the built in policy are:
-
-- `data` attributes
-- `sdr:` scheme for anchor tags
+The chosen format for the body content of posts (and all rich text content within Storyden) is HTML. This allows for a wide range of formatting options and is easy to parse and display in a frontend. You can read more about that [here](/docs/introduction/content).
 
 ### Database model
 
-The database model for posts is a single table with a polymorphic relationship to itself. This allows for threads to have replies and replies to have replies, forming a tree structure.
+The database model for posts is a single table with a recursive relationship to itself. This allows for threads to have replies and replies to have replies, forming a tree structure.
 
 There are two columns that make this work:
 

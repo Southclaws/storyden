@@ -1,0 +1,42 @@
+---
+title: References
+description: The backbone of the datagraph.
+---
+
+The Storyden reference format for URIs in `<a>` tags facilitates a rich content graph of related resources. Anchor tags in any rich text content may contain special URIs understood by Storyden as references to other resources. These references are used by the [Datagraph](/docs/introduction/datagraph) to build a graph of linked content.
+
+The URI scheme is `sdr:` followed by the resource kind and the resource identifier in xid format.
+
+```
+sdr:<resource_kind>/<resource_identifier>
+```
+
+Where the parts refer to:
+
+| when `resource_kind` is | `resource_identifier` points to                              |
+| ----------------------- | ------------------------------------------------------------ |
+| `post`                  | A generic post (thread or reply)                             |
+| `thread`                | A [thread](/docs/introduction/discussion/threads)            |
+| `reply`                 | A [reply](/docs/introduction/discussion/replies) to a thread |
+| `node`                  | A [library node](/docs/introduction/library)                 |
+| `collection`            | A member's [collection](/docs/introduction/collections)      |
+| `profile`               | A member profile                                             |
+| `event`                 | An event                                                     |
+
+For example, you can mention a user with a `href` value of `sdr:profile/<identifier>`. In a body value, this looks like:
+
+```html
+<body>
+  <p>
+    yo <a href="sdr:profile/crk0gvqfunp7891n7ah0">@southclaws</a> what&#39;s up
+  </p>
+</body>
+```
+
+When Storyden receives a post with this content, it will parse the URIs and look for any containing the `sdr` scheme. It will then use the resource kind (`profile`) and identifier (`crk0gvqfunp7891n7ah0`) to link the post to a profile. It will then dispatch a notification to the mentioned member, letting them know someone's talking about them.
+
+This functionality can be used for any Datagraph items, such as [library nodes](/docs/introduction/library) or [threads](#threads).
+
+## Security
+
+All HTML is strictly validated and sanitised before being stored. You can read more about this in the [security](/docs/introduction/content/security) section.
