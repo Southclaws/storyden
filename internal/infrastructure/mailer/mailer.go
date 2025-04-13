@@ -22,7 +22,7 @@ func Build() fx.Option {
 
 func newMailer(logger *slog.Logger, cfg config.Config) (Sender, error) {
 	switch cfg.EmailProvider {
-	case "none":
+	case "":
 		return nil, nil
 
 	case "sendgrid":

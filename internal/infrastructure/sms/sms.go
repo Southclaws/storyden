@@ -17,7 +17,7 @@ type Sender interface {
 func Build() fx.Option {
 	return fx.Provide(func(cfg config.Config, l *slog.Logger) (Sender, error) {
 		switch cfg.SMSProvider {
-		case "none":
+		case "":
 			return nil, nil
 
 		case "twilio":
