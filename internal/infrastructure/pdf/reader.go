@@ -3,6 +3,7 @@ package pdf
 import (
 	"context"
 	_ "embed"
+	"log/slog"
 	"strings"
 	"sync"
 	"time"
@@ -13,13 +14,12 @@ import (
 	"github.com/klippa-app/go-pdfium/requests"
 	"github.com/klippa-app/go-pdfium/webassembly"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 )
 
 type Extractor struct {
-	l        *zap.Logger
+	logger   *slog.Logger
 	pool     pdfium.Pool
 	instance pdfium.Pdfium
 
@@ -28,9 +28,8 @@ type Extractor struct {
 	readyChan chan bool
 }
 
-func New(lc fx.Lifecycle, l *zap.Logger) (*Extractor, error) {
+func New(lc fx.Lifecycle, logger *slog.Logger) (*Extractor, error) {
 	e := Extractor{
-		l:         l.With(zap.String("package", "pdf")),
 		readyChan: make(chan bool, 1),
 	}
 
@@ -58,7 +57,7 @@ func New(lc fx.Lifecycle, l *zap.Logger) (*Extractor, error) {
 			e.pool = pool
 			e.instance = instance
 
-			l.Info("pdf worker pool initialised", zap.Duration("time_taken", time.Since(start)))
+			logger.Debug("pdf worker pool initialised", slog.Duration("time_taken", time.Since(start)))
 
 			e.readyChan <- true
 
@@ -67,7 +66,7 @@ func New(lc fx.Lifecycle, l *zap.Logger) (*Extractor, error) {
 
 		go func() {
 			if err := init(); err != nil {
-				l.Fatal("failed to initialize PDFium worker pool", zap.Error(err))
+				logger.Error("failed to initialize PDFium worker pool", slog.String("error", err.Error()))
 			}
 		}()
 
@@ -122,7 +121,7 @@ func (e *Extractor) Extract(ctx context.Context, buf []byte) (*ExtractionResult,
 			Document: doc.Document,
 		})
 		if err != nil {
-			e.l.Error("failed to close document", zap.Error(err))
+			e.logger.Error("failed to close document", slog.String("error", err.Error()))
 		}
 	}()
 

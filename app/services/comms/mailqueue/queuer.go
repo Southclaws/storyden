@@ -2,13 +2,13 @@ package mailqueue
 
 import (
 	"context"
+	"log/slog"
 	"net/mail"
 	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -38,7 +38,7 @@ func Build() fx.Option {
 		fx.Provide(func(
 			ctx context.Context,
 			lc fx.Lifecycle,
-			logger *zap.Logger,
+			logger *slog.Logger,
 
 			templates *mailtemplate.Builder,
 			ratelimit *rate.LimiterFactory,
@@ -63,7 +63,7 @@ func Build() fx.Option {
 						ctx = session.GetSessionFromMessage(ctx, msg)
 
 						if err := q.sender.Send(ctx, msg.Payload.Message); err != nil {
-							logger.Error("failed to send email", zap.Error(err))
+							logger.Error("failed to send email", slog.String("error", err.Error()))
 						}
 
 						msg.Ack()

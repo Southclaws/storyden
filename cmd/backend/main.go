@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
 	"time"
@@ -11,7 +12,6 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	"go.uber.org/dig"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources"
 	"github.com/Southclaws/storyden/app/services"
@@ -55,7 +55,7 @@ func Start(ctx context.Context) {
 	defer cf()
 
 	if err := app.Stop(ctx); err != nil {
-		zap.L().Error("fatal error occurred", zap.Error(err))
+		slog.Error("fatal error occurred", slog.String("error", err.Error()))
 	}
 }
 

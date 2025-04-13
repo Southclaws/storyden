@@ -3,13 +3,12 @@ package sms
 import (
 	"context"
 	"fmt"
-
-	"go.uber.org/zap"
+	"log/slog"
 )
 
 type MockSender struct{}
 
-func newMock(l *zap.Logger) (Sender, error) {
+func newMock(l *slog.Logger) (Sender, error) {
 	l.Debug("using mock sms sender - check the console for outgoing messages")
 	return &MockSender{}, nil
 }

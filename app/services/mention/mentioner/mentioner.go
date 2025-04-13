@@ -2,8 +2,7 @@ package mentioner
 
 import (
 	"context"
-
-	"go.uber.org/zap"
+	"log/slog"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -13,18 +12,19 @@ import (
 )
 
 type Mentioner struct {
-	l *zap.Logger
-	q pubsub.Topic[mq.Mention]
+	logger *slog.Logger
+	q      pubsub.Topic[mq.Mention]
 }
 
-func New(l *zap.Logger, q pubsub.Topic[mq.Mention]) *Mentioner {
-	return &Mentioner{l: l, q: q}
+func New(logger *slog.Logger, q pubsub.Topic[mq.Mention]) *Mentioner {
+	return &Mentioner{logger: logger, q: q}
 }
 
 func (n *Mentioner) Send(ctx context.Context, source datagraph.Ref, items ...*datagraph.Ref) {
 	sender, err := session.GetAccountID(ctx)
 	if err != nil {
-		n.l.Warn("cannot send notification without source session", zap.Error(err))
+		n.logger.Warn("cannot send notification without source session", slog.String("error", err.Error()))
+		return
 	}
 
 	for _, i := range items {
@@ -33,12 +33,9 @@ func (n *Mentioner) Send(ctx context.Context, source datagraph.Ref, items ...*da
 			continue
 		}
 
-		err := n.q.Publish(ctx, mq.Mention{
+		n.q.PublishAndForget(ctx, mq.Mention{
 			Source: source,
 			Item:   *i,
 		})
-		if err != nil {
-			n.l.Error("failed to publish mention message", zap.Error(err))
-		}
 	}
 }

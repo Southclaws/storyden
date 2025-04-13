@@ -3,6 +3,7 @@ package settings
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -10,7 +11,6 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/puzpuzpuz/xsync/v3"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/utils/errutil"
@@ -23,8 +23,8 @@ import (
 const StorydenPrimarySettingsKey = "storyden_system"
 
 type SettingsRepository struct {
-	log *zap.Logger
-	db  *ent.Client
+	logger *slog.Logger
+	db     *ent.Client
 
 	// cached stores the most recent copy of all the settings from the database.
 	// Directly changing settings via external database queries will result in
@@ -33,9 +33,9 @@ type SettingsRepository struct {
 	cacheLastFetch time.Time
 }
 
-func New(ctx context.Context, lc fx.Lifecycle, log *zap.Logger, db *ent.Client) (*SettingsRepository, error) {
+func New(ctx context.Context, lc fx.Lifecycle, logger *slog.Logger, db *ent.Client) (*SettingsRepository, error) {
 	d := &SettingsRepository{
-		log:            log,
+		logger:         logger,
 		db:             db,
 		cachedSettings: xsync.NewMapOf[string, any](),
 	}
@@ -185,7 +185,7 @@ func (d *SettingsRepository) recache(ctx context.Context) {
 			return
 		}
 
-		d.log.Error("failed to recache settings", zap.Error(err))
+		d.logger.Error("failed to recache settings", slog.String("error", err.Error()))
 		return
 	}
 

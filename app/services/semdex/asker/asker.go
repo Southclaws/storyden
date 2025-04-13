@@ -3,12 +3,12 @@ package asker
 import (
 	"context"
 	"html/template"
+	"log/slog"
 	"strings"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/question"
@@ -20,7 +20,7 @@ import (
 
 func New(
 	cfg config.Config,
-	logger *zap.Logger,
+	logger *slog.Logger,
 	searcher semdex.Searcher,
 	prompter ai.Prompter,
 	questions *question.Repository,

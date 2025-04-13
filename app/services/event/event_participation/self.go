@@ -2,12 +2,12 @@ package event_participation
 
 import (
 	"context"
+	"log/slog"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/samber/lo"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
@@ -50,12 +50,12 @@ func (m *Manager) updateSelf(ctx context.Context, acc *account.Account, mk event
 	isHost := selfParticipation.Role == participation.RoleHost
 
 	logger := m.logger.With(
-		zap.String("event_id", evt.ID.String()),
-		zap.Bool("is_host", isHost),
-		zap.Bool("is_attending", isAttending),
-		zap.Int("participant_count", len(evt.Participants)),
-		zap.Int("host_count", len(hosts)),
-		zap.Int("other_host_count", len(otherHosts)),
+		slog.String("event_id", evt.ID.String()),
+		slog.Bool("is_host", isHost),
+		slog.Bool("is_attending", isAttending),
+		slog.Int("participant_count", len(evt.Participants)),
+		slog.Int("host_count", len(hosts)),
+		slog.Int("other_host_count", len(otherHosts)),
 	)
 
 	logger.Info("updating self event participation")

@@ -6,7 +6,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/mq"
@@ -43,11 +42,9 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to delete thread"))
 	}
 
-	if err := s.deleteQueue.Publish(ctx, mq.DeleteThread{
+	s.deleteQueue.PublishAndForget(ctx, mq.DeleteThread{
 		ID: thr.ID,
-	}); err != nil {
-		s.l.Error("failed to publish index post message", zap.Error(err))
-	}
+	})
 
 	return nil
 }

@@ -181,8 +181,8 @@ func splitImportPath(s string) (string, string) {
 
 func getNonTechnicalTypeName(s string) string {
 	switch s {
-	case "go.uber.org/zap/zapcore.Level":
-		return "`debug`, `info`, `warn`, `error`, `dpanic`, `panic`, `fatal` (case insensitive)"
+	case "log/slog.Level":
+		return "`debug`, `info`, `warn`, `error`"
 	case "time.Duration":
 		return "duration (e.g. 1h, 1m, 1s)"
 	case "net/url.URL":

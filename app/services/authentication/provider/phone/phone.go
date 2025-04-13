@@ -3,6 +3,7 @@ package phone
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -11,7 +12,6 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -40,7 +40,7 @@ var (
 const template = `Your unique one-time login code is: %s`
 
 type Provider struct {
-	logger   *zap.Logger
+	logger   *slog.Logger
 	settings *settings.SettingsRepository
 	auth     authentication.Repository
 	account  *account_querier.Querier
@@ -50,7 +50,7 @@ type Provider struct {
 }
 
 func New(
-	logger *zap.Logger,
+	logger *slog.Logger,
 	settings *settings.SettingsRepository,
 	auth authentication.Repository,
 	account *account_querier.Querier,

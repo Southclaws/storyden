@@ -2,9 +2,9 @@ package notify_job
 
 import (
 	"context"
+	"log/slog"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -14,7 +14,7 @@ import (
 func runNotifyConsumer(
 	ctx context.Context,
 	lc fx.Lifecycle,
-	l *zap.Logger,
+	logger *slog.Logger,
 
 	queue pubsub.Topic[mq.Notification],
 
@@ -31,7 +31,7 @@ func runNotifyConsumer(
 				ctx = session.GetSessionFromMessage(ctx, msg)
 
 				if err := ic.notify(ctx, msg.Payload.TargetID, msg.Payload.Event, msg.Payload.Item); err != nil {
-					l.Error("failed to notify", zap.Error(err))
+					logger.Error("failed to notify", slog.String("error", err.Error()))
 				}
 
 				msg.Ack()

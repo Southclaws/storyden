@@ -1,12 +1,12 @@
 package frontend
 
 import (
+	"log/slog"
 	"net/http"
 	"net/http/httputil"
 	"strings"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/internal/config"
@@ -18,7 +18,7 @@ type Provider struct {
 
 func New(
 	cfg config.Config,
-	logger *zap.Logger,
+	logger *slog.Logger,
 	mux *http.ServeMux,
 	cj *session_cookie.Jar,
 ) *Provider {

@@ -6,7 +6,6 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_querier"
@@ -14,20 +13,15 @@ import (
 )
 
 type Downloader struct {
-	l *zap.Logger
-
 	assets  *asset_querier.Querier
 	objects object.Storer
 }
 
 func New(
-	l *zap.Logger,
-
 	assets *asset_querier.Querier,
 	objects object.Storer,
 ) *Downloader {
 	return &Downloader{
-		l:       l.With(zap.String("service", "asset")),
 		assets:  assets,
 		objects: objects,
 	}

@@ -2,9 +2,9 @@ package analyse_job
 
 import (
 	"context"
+	"log/slog"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -14,7 +14,7 @@ import (
 func runAnalyseConsumer(
 	ctx context.Context,
 	lc fx.Lifecycle,
-	l *zap.Logger,
+	logger *slog.Logger,
 
 	analyseQueue pubsub.Topic[mq.AnalyseAsset],
 	downloadQueue pubsub.Topic[mq.DownloadAsset],
@@ -31,7 +31,7 @@ func runAnalyseConsumer(
 				nctx := session.GetSessionFromMessage(ctx, msg)
 
 				if err := consumer.analyseAsset(nctx, msg.Payload.AssetID, msg.Payload.ContentFillRule); err != nil {
-					l.Error("failed to analyse asset", zap.Error(err))
+					logger.Error("failed to analyse asset", slog.String("error", err.Error()))
 				}
 
 				msg.Ack()
@@ -48,7 +48,7 @@ func runAnalyseConsumer(
 				nctx := session.GetSessionFromMessage(ctx, msg)
 
 				if err := consumer.downloadAsset(nctx, msg.Payload.URL, msg.Payload.ContentFillRule); err != nil {
-					l.Error("failed to download asset", zap.Error(err))
+					logger.Error("failed to download asset", slog.String("error", err.Error()))
 				}
 
 				msg.Ack()

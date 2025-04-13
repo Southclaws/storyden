@@ -5,7 +5,6 @@ import (
 	"io"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -24,22 +23,17 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l *zap.Logger
-
 	accountQuery *account_querier.Querier
 	generator    avatar_gen.AvatarGenerator
 	storage      object.Storer
 }
 
 func New(
-	l *zap.Logger,
-
 	accountQuery *account_querier.Querier,
 	generator avatar_gen.AvatarGenerator,
 	storage object.Storer,
 ) Service {
 	return &service{
-		l:            l.With(zap.String("service", "avatar")),
 		accountQuery: accountQuery,
 		generator:    generator,
 		storage:      storage,

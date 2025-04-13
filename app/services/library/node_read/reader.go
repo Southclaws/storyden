@@ -6,7 +6,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
@@ -15,18 +14,15 @@ import (
 )
 
 type HydratedQuerier struct {
-	logger     *zap.Logger
 	session    *session.Provider
 	nodereader *node_querier.Querier
 }
 
 func New(
-	logger *zap.Logger,
 	session *session.Provider,
 	nodereader *node_querier.Querier,
 ) *HydratedQuerier {
 	return &HydratedQuerier{
-		logger:     logger,
 		session:    session,
 		nodereader: nodereader,
 	}

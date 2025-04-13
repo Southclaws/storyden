@@ -6,7 +6,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -55,11 +54,9 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.indexQueue.Publish(ctx, mq.IndexReply{
+	s.indexQueue.PublishAndForget(ctx, mq.IndexReply{
 		ID: p.ID,
-	}); err != nil {
-		s.l.Error("failed to publish index post message", zap.Error(err))
-	}
+	})
 
 	s.fetcher.HydrateContentURLs(ctx, p)
 

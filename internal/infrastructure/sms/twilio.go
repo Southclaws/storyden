@@ -3,13 +3,13 @@ package sms
 import (
 	"context"
 	"fmt"
+	"log/slog"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/twilio/twilio-go"
 	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/internal/config"
 )
@@ -21,7 +21,7 @@ type TwilioSender struct {
 	number string
 }
 
-func newTwilio(l *zap.Logger, cfg config.Config) (Sender, error) {
+func newTwilio(l *slog.Logger, cfg config.Config) (Sender, error) {
 	client := twilio.NewRestClientWithParams(twilio.ClientParams{
 		Username: cfg.TwilioAccountSID,
 		Password: cfg.TwilioAuthToken,
@@ -32,7 +32,7 @@ func newTwilio(l *zap.Logger, cfg config.Config) (Sender, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	l.Info("twilio enabled", zap.String("account_id", *acc.Sid))
+	l.Info("twilio enabled", slog.String("account_id", *acc.Sid))
 
 	return &TwilioSender{
 		client: client,

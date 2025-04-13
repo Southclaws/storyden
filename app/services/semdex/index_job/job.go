@@ -2,9 +2,9 @@ package index_job
 
 import (
 	"context"
+	"log/slog"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -13,7 +13,7 @@ import (
 func runIndexConsumer(
 	ctx context.Context,
 	lc fx.Lifecycle,
-	l *zap.Logger,
+	logger *slog.Logger,
 
 	qnode pubsub.Topic[mq.IndexNode],
 	qthread pubsub.Topic[mq.IndexThread],
@@ -36,7 +36,7 @@ func runIndexConsumer(
 		go func() {
 			for msg := range replyChan {
 				if err := ic.indexReply(ctx, msg.Payload.ID); err != nil {
-					l.Error("failed to index post", zap.Error(err))
+					logger.Error("failed to index post", slog.String("error", err.Error()))
 					msg.Nack()
 					continue
 				}
@@ -48,7 +48,7 @@ func runIndexConsumer(
 		go func() {
 			for msg := range profileChan {
 				if err := ic.indexProfile(ctx, msg.Payload.ID); err != nil {
-					l.Error("failed to index post", zap.Error(err))
+					logger.Error("failed to index post", slog.String("error", err.Error()))
 					msg.Nack()
 					continue
 				}

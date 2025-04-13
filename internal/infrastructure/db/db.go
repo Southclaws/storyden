@@ -110,37 +110,6 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 		})
 	})
 
-	// client.Intercept(ent.InterceptFunc(func(next ent.Querier) ent.Querier {
-	// 	return ent.QuerierFunc(func(ctx context.Context, query ent.Query) (ent.Value, error) {
-	// 		qc := entgo.QueryFromContext(ctx)
-	// 		spanName := fmt.Sprintf("ent %s %s", qc.Op, qc.Type)
-
-	// 		start := time.Now()
-	// 		id := xid.New()
-	// 		t := reflect.ValueOf(query)
-
-	// 		defer func() {
-	// 			logger.Debug("END   "+spanName,
-	// 				zap.String("id", id.String()),
-	// 				zap.String("type", t.Elem().String()),
-	// 				zap.Duration("duration", time.Since(start)),
-	// 			)
-	// 		}()
-
-	// 		logger.Debug("BEGIN "+spanName,
-	// 			zap.String("id", id.String()),
-	// 			zap.String("type", t.Elem().String()),
-	// 		)
-
-	// 		v, err := next.Query(ctx, query)
-	// 		if err != nil {
-	// 			return nil, fault.Wrap(err, fctx.With(ctx))
-	// 		}
-
-	// 		return v, nil
-	// 	})
-	// }))
-
 	lc.Append(fx.Hook{
 		OnStart: func(ctx context.Context) error {
 			schemaLock.Lock()

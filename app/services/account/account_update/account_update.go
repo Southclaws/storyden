@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
@@ -19,7 +18,6 @@ import (
 type Updater struct {
 	fx.In
 
-	Log        *zap.Logger
 	Writer     *account_writer.Writer
 	IndexQueue pubsub.Topic[mq.IndexProfile]
 }
@@ -60,11 +58,9 @@ func (u *Updater) Update(ctx context.Context, id account.AccountID, params Parti
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := u.IndexQueue.Publish(ctx, mq.IndexProfile{
+	u.IndexQueue.PublishAndForget(ctx, mq.IndexProfile{
 		ID: id,
-	}); err != nil {
-		u.Log.Error("failed to publish index post message", zap.Error(err))
-	}
+	})
 
 	return acc, nil
 }

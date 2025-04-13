@@ -6,8 +6,6 @@ import (
 	"strconv"
 	"time"
 
-	"go.uber.org/zap"
-
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/rate"
 )
@@ -21,7 +19,6 @@ const (
 )
 
 type Middleware struct {
-	logger    *zap.Logger
 	rl        rate.Limiter
 	kf        KeyFunc
 	sizeLimit int64
@@ -29,13 +26,12 @@ type Middleware struct {
 
 func New(
 	cfg config.Config,
-	logger *zap.Logger,
+
 	f *rate.LimiterFactory,
 ) *Middleware {
 	rl := f.NewLimiter(cfg.RateLimit, cfg.RateLimitPeriod, cfg.RateLimitExpire)
 
 	return &Middleware{
-		logger:    logger,
 		rl:        rl,
 		kf:        fromIP("CF-Connecting-IP", "X-Real-IP", "True-Client-IP"),
 		sizeLimit: MaxRequestSizeBytes, // TODO: cfg.MaxRequestSize

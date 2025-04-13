@@ -6,7 +6,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
@@ -55,11 +54,9 @@ func (s *Manager) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := s.deleteQueue.Publish(ctx, mq.DeleteNode{
+	s.deleteQueue.PublishAndForget(ctx, mq.DeleteNode{
 		ID: library.NodeID(n.GetID()),
-	}); err != nil {
-		s.logger.Error("failed to publish index post message", zap.Error(err))
-	}
+	})
 
 	return destination.Ptr(), nil
 }

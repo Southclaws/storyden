@@ -2,9 +2,9 @@ package mention_job
 
 import (
 	"context"
+	"log/slog"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -14,7 +14,7 @@ import (
 func runMentionConsumer(
 	ctx context.Context,
 	lc fx.Lifecycle,
-	l *zap.Logger,
+	logger *slog.Logger,
 
 	queue pubsub.Topic[mq.Mention],
 
@@ -31,7 +31,7 @@ func runMentionConsumer(
 				ctx = session.GetSessionFromMessage(ctx, msg)
 
 				if err := ic.mention(ctx, msg.Payload.Source, msg.Payload.Item); err != nil {
-					l.Error("failed to record mention", zap.Error(err))
+					logger.Error("failed to record mention", slog.String("error", err.Error()))
 				}
 
 				msg.Ack()

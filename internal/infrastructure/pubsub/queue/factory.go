@@ -3,6 +3,7 @@ package queue
 import (
 	"context"
 	"encoding/json"
+	"log/slog"
 	"reflect"
 
 	"github.com/Southclaws/dt"
@@ -13,7 +14,6 @@ import (
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/rs/xid"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -22,15 +22,15 @@ import (
 const actorIDMetadataKey = "actor_id"
 
 type QueueFactory struct {
-	log *zap.Logger
-	pub message.Publisher
-	sub message.Subscriber
+	logger *slog.Logger
+	pub    message.Publisher
+	sub    message.Subscriber
 }
 
 func New[T any](q *QueueFactory) pubsub.Topic[T] {
 	topic := typename[T]()
 
-	logger := q.log.With(zap.String("topic", topic))
+	logger := q.logger.With(slog.String("topic", topic))
 
 	logger.Debug("registered new queue")
 
@@ -43,10 +43,10 @@ func New[T any](q *QueueFactory) pubsub.Topic[T] {
 }
 
 type watermillQueue[T any] struct {
-	log   *zap.Logger
-	topic string
-	pub   message.Publisher
-	sub   message.Subscriber
+	logger *slog.Logger
+	topic  string
+	pub    message.Publisher
+	sub    message.Subscriber
 }
 
 func (q *watermillQueue[T]) Subscribe(ctx context.Context) (<-chan *pubsub.Message[T], error) {
@@ -65,14 +65,14 @@ func (q *watermillQueue[T]) Subscribe(ctx context.Context) (<-chan *pubsub.Messa
 
 			case msg := <-ch:
 				if msg == nil {
-					q.log.Warn("nil message received by subscriber")
+					q.logger.Warn("nil message received by subscriber")
 					continue
 				}
 
 				var payload T
 				if err := json.Unmarshal(msg.Payload, &payload); err != nil {
-					q.log.Error("failed to decode message payload",
-						zap.Error(err))
+					q.logger.Error("failed to decode message payload",
+						slog.String("error", err.Error()))
 
 					// Payload is malformed so do not ack and cause retry loop.
 					msg.Ack()
@@ -82,8 +82,8 @@ func (q *watermillQueue[T]) Subscribe(ctx context.Context) (<-chan *pubsub.Messa
 
 				actorID, err := getActorID(msg)
 				if err != nil {
-					q.log.Error("failed to get actor ID from message metadata",
-						zap.Error(err))
+					q.logger.Error("failed to get actor ID from message metadata",
+						slog.String("error", err.Error()))
 				}
 
 				recv <- &pubsub.Message[T]{
@@ -126,6 +126,13 @@ func (q *watermillQueue[T]) Publish(ctx context.Context, payloads ...T) error {
 	}
 
 	return nil
+}
+
+func (q *watermillQueue[T]) PublishAndForget(ctx context.Context, messages ...T) {
+	err := q.Publish(ctx, messages...)
+	if err != nil {
+		q.logger.Error("failed to publish message", slog.String("error", err.Error()))
+	}
 }
 
 // so we don't need to be manually specifying topic names, derive from name of T

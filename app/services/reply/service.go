@@ -6,7 +6,6 @@ import (
 
 	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -52,8 +51,6 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l *zap.Logger
-
 	accountQuery *account_querier.Querier
 	post_repo    reply.Repository
 	fetcher      *fetcher.Fetcher
@@ -63,8 +60,6 @@ type service struct {
 }
 
 func New(
-	l *zap.Logger,
-
 	accountQuery *account_querier.Querier,
 	post_repo reply.Repository,
 	fetcher *fetcher.Fetcher,
@@ -73,8 +68,6 @@ func New(
 	cpm *content_policy.Manager,
 ) Service {
 	return &service{
-		l: l.With(zap.String("service", "reply")),
-
 		accountQuery: accountQuery,
 		post_repo:    post_repo,
 		fetcher:      fetcher,

@@ -8,7 +8,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
@@ -26,8 +25,6 @@ func Build() fx.Option {
 }
 
 type service struct {
-	l *zap.Logger
-
 	auth_repo      authentication_repo.Repository
 	account_writer *account_writer.Writer
 
@@ -35,15 +32,12 @@ type service struct {
 }
 
 func New(
-	l *zap.Logger,
-
 	auth_repo authentication_repo.Repository,
 	account_writer *account_writer.Writer,
 
 	auth_svc *authentication.Manager,
 ) Service {
 	return &service{
-		l:              l.With(zap.String("service", "account")),
 		auth_repo:      auth_repo,
 		account_writer: account_writer,
 		auth_svc:       auth_svc,

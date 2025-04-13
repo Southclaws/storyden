@@ -4,7 +4,6 @@ import (
 	"net/url"
 
 	"github.com/Southclaws/opt"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -48,7 +47,6 @@ type Partial struct {
 }
 
 type Manager struct {
-	logger            *zap.Logger
 	accountQuery      *account_querier.Querier
 	nodeQuerier       *node_querier.Querier
 	nodeWriter        *node_writer.Writer
@@ -66,7 +64,6 @@ type Manager struct {
 }
 
 func New(
-	logger *zap.Logger,
 	accountQuery *account_querier.Querier,
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
@@ -83,7 +80,6 @@ func New(
 	assetAnalyseQueue pubsub.Topic[mq.AnalyseAsset],
 ) *Manager {
 	return &Manager{
-		logger:            logger,
 		accountQuery:      accountQuery,
 		nodeQuerier:       nodeQuerier,
 		nodeWriter:        nodeWriter,

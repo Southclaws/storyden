@@ -2,10 +2,10 @@ package thread_semdex
 
 import (
 	"context"
+	"log/slog"
 	"time"
 
 	"go.uber.org/fx"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -36,7 +36,7 @@ var (
 )
 
 type semdexer struct {
-	logger        *zap.Logger
+	logger        *slog.Logger
 	db            *ent.Client
 	threadQuerier thread.Repository
 	threadWriter  thread.Repository
@@ -50,7 +50,7 @@ func newSemdexer(
 	ctx context.Context,
 	lc fx.Lifecycle,
 	cfg config.Config,
-	l *zap.Logger,
+	logger *slog.Logger,
 
 	db *ent.Client,
 	threadQuerier thread.Repository,
@@ -65,7 +65,7 @@ func newSemdexer(
 	}
 
 	re := semdexer{
-		logger:        l,
+		logger:        logger,
 		db:            db,
 		threadQuerier: threadQuerier,
 		threadWriter:  threadQuerier,
@@ -84,7 +84,7 @@ func newSemdexer(
 		go func() {
 			for msg := range sub {
 				if err := re.indexThread(ctx, msg.Payload.ID); err != nil {
-					l.Error("failed to index post", zap.Error(err))
+					logger.Error("failed to index post", slog.String("error", err.Error()))
 				}
 
 				msg.Ack()
@@ -103,7 +103,7 @@ func newSemdexer(
 		go func() {
 			for msg := range sub {
 				if err := re.deindexThread(ctx, msg.Payload.ID); err != nil {
-					l.Error("failed to deindex post", zap.Error(err))
+					logger.Error("failed to deindex post", slog.String("error", err.Error()))
 				}
 
 				msg.Ack()

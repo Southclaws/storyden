@@ -2,14 +2,13 @@ package frontend
 
 import (
 	"context"
+	"log/slog"
 	"os"
 	"os/exec"
-
-	"go.uber.org/zap"
 )
 
 type NextjsProcess struct {
-	l *zap.Logger
+	logger *slog.Logger
 }
 
 func (p *NextjsProcess) Run(ctx context.Context, path string) {
@@ -17,9 +16,7 @@ func (p *NextjsProcess) Run(ctx context.Context, path string) {
 	cmd.Stderr = os.Stderr
 	cmd.Stdout = os.Stdout
 
-	p.l.Info("storyden frontend server starting",
-		zap.String("path", path),
-	)
+	p.logger.Info("storyden frontend server starting", slog.String("path", path))
 
 	err := cmd.Run()
 	if err != nil {

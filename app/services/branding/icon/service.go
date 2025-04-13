@@ -17,7 +17,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/disintegration/imaging"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -62,8 +61,6 @@ type Service interface {
 }
 
 type service struct {
-	l *zap.Logger
-
 	accountQuery *account_querier.Querier
 	uploader     *asset_upload.Uploader
 	downloader   *asset_download.Downloader
@@ -75,8 +72,6 @@ type service struct {
 }
 
 func New(
-	l *zap.Logger,
-
 	accountQuery *account_querier.Querier,
 	uploader *asset_upload.Uploader,
 	downloader *asset_download.Downloader,
@@ -86,8 +81,6 @@ func New(
 	cfg config.Config,
 ) Service {
 	return &service{
-		l: l.With(zap.String("service", "icon")),
-
 		accountQuery: accountQuery,
 		uploader:     uploader,
 		downloader:   downloader,

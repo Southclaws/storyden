@@ -9,7 +9,6 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/mq"
@@ -86,17 +85,13 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 	}
 
 	if thr.Visibility == visibility.VisibilityPublished {
-		if err := s.indexQueue.Publish(ctx, mq.IndexThread{
+		s.indexQueue.PublishAndForget(ctx, mq.IndexThread{
 			ID: thr.ID,
-		}); err != nil {
-			s.l.Error("failed to publish index post message", zap.Error(err))
-		}
+		})
 	} else {
-		if err := s.deleteQueue.Publish(ctx, mq.DeleteThread{
+		s.deleteQueue.PublishAndForget(ctx, mq.DeleteThread{
 			ID: thr.ID,
-		}); err != nil {
-			s.l.Error("failed to publish index post message", zap.Error(err))
-		}
+		})
 	}
 
 	return thr, nil

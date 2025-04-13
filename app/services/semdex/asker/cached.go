@@ -2,6 +2,7 @@ package asker
 
 import (
 	"context"
+	"log/slog"
 	"strings"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
-	"go.uber.org/zap"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/question"
@@ -19,13 +19,13 @@ import (
 )
 
 type cachedAsker struct {
-	logger    *zap.Logger
+	logger    *slog.Logger
 	asker     semdex.Asker
 	questions *question.Repository
 }
 
 func newCachedAsker(
-	logger *zap.Logger,
+	logger *slog.Logger,
 	asker semdex.Asker,
 	questions *question.Repository,
 ) (semdex.Asker, error) {
@@ -83,7 +83,7 @@ func (a *cachedAsker) livePrompt(ctx context.Context, q string, parentQuestionID
 		defer func() {
 			err := a.cacheResult(ctx, q, acc, parentQuestionID)
 			if err != nil {
-				a.logger.Error("failed to cache result", zap.Error(err))
+				a.logger.Error("failed to cache result", slog.String("error", err.Error()))
 			}
 		}()
 

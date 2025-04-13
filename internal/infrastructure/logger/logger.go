@@ -1,11 +1,11 @@
 package logger
 
 import (
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fmsg"
+	"log/slog"
+	"os"
+
+	"github.com/golang-cz/devslog"
 	"go.uber.org/fx"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 
 	"github.com/Southclaws/storyden/internal/config"
 )
@@ -17,34 +17,30 @@ func Build() fx.Option {
 	)
 }
 
-func newLogger(cfg config.Config) (*zap.Logger, error) {
-	var zapconfig zap.Config
-
-	switch cfg.LogFormat {
-	case "json":
-		zapconfig = zap.NewProductionConfig()
-		zapconfig.InitialFields = map[string]interface{}{"v": config.Version}
-
-	default:
-		zapconfig = zap.NewDevelopmentConfig()
+func newLogger(cfg config.Config) *slog.Logger {
+	opts := &slog.HandlerOptions{
+		Level: cfg.LogLevel,
 	}
 
-	zapconfig.DisableStacktrace = true
+	logger := slog.New(func() slog.Handler {
+		switch cfg.LogFormat {
+		case "json":
+			return slog.NewJSONHandler(os.Stdout, opts)
 
-	zapconfig.Level.SetLevel(cfg.LogLevel)
-	zapconfig.EncoderConfig.EncodeTime = zapcore.ISO8601TimeEncoder
+		case "dev":
+			return devslog.NewHandler(os.Stdout, &devslog.Options{HandlerOptions: opts})
 
-	logger, err := zapconfig.Build()
-	if err != nil {
-		return nil, fault.Wrap(err, fmsg.With("failed to build zap config"))
-	}
+		default:
+			return slog.NewTextHandler(os.Stdout, opts)
+		}
+	}())
 
-	return logger, nil
+	return logger
 }
 
-func replaceGlobals(c config.Config, l *zap.Logger) {
+func replaceGlobals(c config.Config, l *slog.Logger) {
 	// Use our logger for globals too, even though it's passed to
 	// dependents most of the time using DI, the global logger is used
 	// in a couple of places during startup/shutdown.
-	zap.ReplaceGlobals(l)
+	slog.SetDefault(l)
 }
