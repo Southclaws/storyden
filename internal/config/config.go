@@ -29,7 +29,8 @@ type Config struct {
 	/*
 	   Can be set to either:
 
-	   - `(not set)` (default) somewhat human readable logs for simple setups
+	   - `(not set)` (default) somewhat human readable "logfmt" format logs for simple setups
+	   - `dev` for developer-friendly logs, with colours and attributes on separate lines for readability
 	   - `json` for machine-readable logs, mainly for log aggregators, etc.
 	*/
 	LogFormat string `envconfig:"LOG_FORMAT"`
@@ -146,11 +147,11 @@ type Config struct {
 	/*
 	   Either:
 
-	   - `none` (default) for no email sending. Email sending is not a requirement for a production deployment.
+	   - unset (default) for no email sending. Email sending is not a requirement for a production deployment.
 	   - `sendgrid` for SendGrid based email sending.
 	   - `mock` for logging emails to the console. Only useful for Storyden developers and testing.
 	*/
-	EmailProvider string `default:"none" envconfig:"EMAIL_PROVIDER"`
+	EmailProvider string `envconfig:"EMAIL_PROVIDER"`
 	/*
 	   The name that will be used as the sender name for emails sent via SendGrid.
 
@@ -177,11 +178,11 @@ type Config struct {
 	/*
 	   Either:
 
-	   - `none` (default) for no SMS sending. SMS sending is not a requirement for a production deployment.
+	   - unset (default) for no SMS sending. SMS sending is not a requirement for a production deployment.
 	   - `twilio` for Twilio based SMS sending.
 	   - `mock` for logging SMS to the console. Only useful for Storyden developers and testing.
 	*/
-	SMSProvider string `default:"none" envconfig:"SMS_PROVIDER"`
+	SMSProvider string `envconfig:"SMS_PROVIDER"`
 	/*
 	   The account SID for the Twilio account.
 

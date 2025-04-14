@@ -34,7 +34,8 @@ Can be set to either:
 
 Can be set to either:
 
-- `(not set)` (default) somewhat human readable logs for simple setups
+- `(not set)` (default) somewhat human readable "logfmt" format logs for simple setups
+- `dev` for developer-friendly logs, with colours and attributes on separate lines for readability
 - `json` for machine-readable logs, mainly for log aggregators, etc.
 
 ### `RUN_FRONTEND`
@@ -235,12 +236,12 @@ Email sending configuration. This must be enabled in order to enable email-based
 
 <table>
 <tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`none`</td></tr>
+<tr><td>default</td><td>none</td></tr>
 </table>
 
 Either:
 
-- `none` (default) for no email sending. Email sending is not a requirement for a production deployment.
+- unset (default) for no email sending. Email sending is not a requirement for a production deployment.
 - `sendgrid` for SendGrid based email sending.
 - `mock` for logging emails to the console. Only useful for Storyden developers and testing.
 
@@ -285,12 +286,12 @@ SMS sending configuration. This must be enabled in order to support SMS-based au
 
 <table>
 <tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`none`</td></tr>
+<tr><td>default</td><td>none</td></tr>
 </table>
 
 Either:
 
-- `none` (default) for no SMS sending. SMS sending is not a requirement for a production deployment.
+- unset (default) for no SMS sending. SMS sending is not a requirement for a production deployment.
 - `twilio` for Twilio based SMS sending.
 - `mock` for logging SMS to the console. Only useful for Storyden developers and testing.
 
