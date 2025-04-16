@@ -145,8 +145,8 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
             ...thread,
             likes: {
               likes: thread.likes.likes + 1,
-              liked: true
-            }
+              liked: true,
+            },
           };
         }
         return thread;
@@ -175,8 +175,8 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
             ...thread,
             likes: {
               likes: thread.likes.likes - 1,
-              liked: false
-            }
+              liked: false,
+            },
           };
         }
         return thread;

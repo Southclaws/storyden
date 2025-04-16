@@ -8,28 +8,25 @@ export type UseLikeButtonProps = {
 };
 
 export function useLikeButton({ thread }: UseLikeButtonProps) {
- const { likePost, unlikePost, revalidate } = useFeedMutations();
+  const { likePost, unlikePost, revalidate } = useFeedMutations();
 
- const cleanupHandler = async () => revalidate();
-
- const handleClick = async () => {
-   // This is a toggle button, so we'll either like or unlike depending on what they have now.
-   if (thread.likes.liked) {
-     await handle(
-       async () => {
-         await unlikePost(thread.id);
-       },
-       { cleanup: cleanupHandler }
-     );
-   } else {
-     await handle(
-       async () => {
-         await likePost(thread.id);
-       },
-       { cleanup: cleanupHandler }
-     );
-   }
- };
+  const handleClick = async () => {
+    await handle(
+      async () => {
+        // This is a toggle button, so we'll either like or unlike depending on what they have now.
+        if (thread.likes.liked) {
+          await unlikePost(thread.id);
+        } else {
+          await likePost(thread.id);
+        }
+      },
+      {
+        async cleanup() {
+          await revalidate();
+        },
+      },
+    );
+  }
 
  return {
    ready: true as const,
