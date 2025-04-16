@@ -3,11 +3,11 @@ import { PostReference } from "src/api/openapi-schema";
 import { handle } from "@/api/client";
 import { useFeedMutations } from "@/lib/feed/mutation";
 
-export type UseLikeButtonProps = {
+export type Props = {
  thread: PostReference;
 };
 
-export function useLikeButton({ thread }: UseLikeButtonProps) {
+export function useLikeButton({ thread }: Props) {
   const { likePost, unlikePost, revalidate } = useFeedMutations();
 
   const handleClick = async () => {
