@@ -1,0 +1,107 @@
+---
+title: "2025: Gearing up for take-off"
+description: Setting on a direction and full (ish) steam ahead!
+date: 2025-04-16
+---
+
+> TL;DR: New site! New docs! Bit of a brand refresh and some reflections on direction. What 2025 holds for the launch of stable production-ready-to-use.
+
+The [last entry](/blog/2024-development-update) was a sort of "how we got here". The conclusion was that the idea of a community knowledge-base is at the core of Storyden.
+
+That doesn't remove the forum aspect, it plays on it. Internet forums of the 2000s, which I grew up on, solved a problem for that era. This is a new era with new problems so rehashing phpBB or SMF won’t cut it.
+
+Most of my circles live on Discord, but good luck finding that great link someone shared last month.
+
+<Callout>
+  **Why should you care?** You ever dig through Discord to find that one link
+  someone shared? Want a collaborative, evolving directory for your group? Miss
+  old-school forums but not their dated UX? That’s what Storyden is for.
+</Callout>
+
+Since launching the project, I've received some great feedback via [this form](https://airtable.com/shrLY0jDp9CuXPB2X) one stuck out to me and really resonated with the north star that has guided Storyden's development over the last couple of years:
+
+> Discord is too real time -- Discourse is too detached from people's daily work. So we need a way to create HN + Discord
+
+Which, really nails the origins and reasons I started the project. See any of the other articles on this site to dive deeper.
+
+## Try it out right here, right now!
+
+Visit our community: https://makeroom.club/
+
+Or [get started here](/docs/introduction) and run one yourself:
+
+```sh
+docker run -p 8000:8000 ghcr.io/southclaws/storyden
+```
+
+![Storyden web UI](/docs/introduction/local/browser_home.png)
+
+---
+
+So what next? Keep building out features ad infinitum? No.
+
+This site is brand new, along with some touch-ups to the brand identity and a _whole_ lot more documentation.
+
+## New Site
+
+The new homepage for Storyden runs on [Fumadocs](https://fumadocs.vercel.app/) which I was extremely happy to discover on an X thread. It's a documentation site builder for Next.js which replaces Nextra in all the ways I wanted it to.
+
+![The new documentation site](/blog/docs.png)
+
+Nextra was great, but it suffered from a few weird issues I couldn't figure out, plus it was stuck on the old "Pages" mode of Next.js, making certain newer functionality of the framework more difficult to use.
+
+Fumadocs runs on the latext Next.js version with the "App" directory system. As a Next.js nerd this pleases me somewhat! It also means I can more easily use layouts, opengraph images, custom page designs, etc. Great work Fuma Nama, no notes.
+
+## Brand Refresh
+
+My partner said I should stop obsessing over design details and just ship the product. Which, yes, she has a point. But a bit of burnout, getting stuck on some complex features (node properties was a nightmare) and attempted fundamental changes to the frontend (RxDB is really complicated) was cured by a weekend of obsessing over typefaces, colour palettes, styleboards, kerning, more colours and other good design stuff I just really enjoy.
+
+So yes, was a rebrand necessary before the product is even "released"? No. Was it necessary for my mental health? Certainly.
+
+The new mark uses this beautiful typeface I found by the [Identity Letters](https://www.identity-letters.com/) foundry, designed by [Moritz Kleinsorge](https://www.linkedin.com/in/moritz-kleinsorge-62487b183/). It's a perfectly balance of smart-casual playfulness that fits Storyden so well.
+
+![The Storyden wordmark](/brand/fullmark_colour_horizontal_campfire.png)
+![The Storyden wordmark](/brand/fullmark_colour_horizontal_moonlit.png)
+![The Storyden wordmark](/brand/fullmark_colour_horizontal_newspaper.png)
+
+The rest of the type is set with:
+
+- Work Sans by Wei Huang for general interface body text
+- Hedvig Serif by Kanon Foundry for longform body text
+- Intel One Mono by Intel for code examples
+
+![Typography styleboard](/blog/typography.png)
+
+## What's ready?
+
+So, you can deploy Storyden [right now](http://localhost:3000/docs/introduction/vps). To production. And have lots of fun.
+
+All the fundamentals are documented now, peruse the new pages and begin imagining how useful it could be to your community.
+
+You can:
+
+- Run a discussion forum
+- Let your members sign up with just a username, an email or go full OAuth2 with Discord, Google and GitHub (more on the way!)
+- Run a directory
+- Let your members contribute to the library and grow your collective information repository, whether it's links to cool sites, items in a video game organised by stats, your favourite indie clothing brands, whatever floats your boat!
+- Enable AI features for asking, semantic search and automated organisation
+
+You can't: (yet)
+
+- Connect to Discord/WhatsApp/Slack: for me, these would close the gap between where my folks hang out and where we want to store all the great links they share. There are a few features I want to get right here so this bit is top of mind for the next iteration.
+- Organise nodes by property in database views: I am shamelessly copying Notion here but in the spirit of solving my own problems, I want to go deep down the directory route and make Storyden the easiest place to build well-organised directories. The foundation is there (node properties) but the UI needs love and the APIs need smarter filtering, grouping, etc.
+- Extend the platform: this is a huge one, and what I believe makes any software product long-lived. Go beyond the boundaries I've created and really turn your Storyden into whatever you want. Spoiler: it involves extremely simple WebAssembly stdin/stdout RPC.
+
+## What's next?
+
+On the product side: those three things right above ☝️
+
+On the marketing side: figure out how to really gain proper traction, find the people who share the problems that I'm solving for myself and sell the dream!
+
+Hosted: for the non-technical folks, a simple hosting platform. Harder than it seems but fun to build and surprisingly cheap enough to offer just a free tier for the time being (full transparency: business administration is time consuming and not something I really want to deal with right now) reach out if you want to be in the first cohort!
+
+Open source: there have been a lot of interesting problems solved in the dark depths of the Storyden codebase, one goal is to pull out some of those bits and libraryise them for easier use in the open source community.
+
+Anyway, I've got a friend's wedding to attend now so, until next time 👋
+
+Barney
