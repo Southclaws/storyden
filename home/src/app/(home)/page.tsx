@@ -617,8 +617,8 @@ function ForYou() {
       <HStack maxW={{ base: "full", sm: "container.md" }} gap={4}>
         <styled.p textAlign="right" width="60%">
           Rough relationship with <b>email</b>? Just don’t enable it then. Sign
-          in with <b>Passkey</b>, WebAuthn, Web3 <b>wallet</b>, or choose from a
-          variety of popular OAuth2 and <b>SSO</b> providers.
+          in with <b>usernames</b> only, or choose from a variety of popular{" "}
+          <b>OAuth2/SSO</b> providers.
         </styled.p>
 
         <Box flex="2 0 auto">
