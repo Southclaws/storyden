@@ -551,7 +551,7 @@ function ForDevops() {
         gap={4}
         maxW={{ base: "full", sm: "container.lg" }}
       >
-        <Box flex="2 0 auto">
+        <Box>
           <Image
             alt="a silly fake terminal example"
             src="/terminal.png"
