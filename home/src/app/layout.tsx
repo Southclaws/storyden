@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     url: "https://www.storyden.org/",
     images: [
       {
-        url: "https://www.storyden.org/social-1280-640.png",
+        url: "https://www.storyden.org/opengraph-1280-640.png",
         width: 1280,
         height: 640,
         alt: "Storyden: A forum for the modern age.",
