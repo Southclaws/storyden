@@ -252,6 +252,13 @@ erDiagram
         LBRACKRBRACKstring permissions
         float64 sort_key
     }
+    Session {
+        xidDOTID id
+        timeDOTTime created_at
+        xidDOTID account_id
+        timeDOTTime expires_at
+        timeDOTTime revoked_at
+    }
     Setting {
         string id
         string value
@@ -262,6 +269,7 @@ erDiagram
         timeDOTTime created_at
         string name
     }
+    	Account |o--o{ Session : "sessions/account"
     	Account |o--o{ Email : "emails/account"
     	Account |o--o{ Notification : "notifications/owner"
     	Account |o--o{ Notification : "triggered_notifications/source"

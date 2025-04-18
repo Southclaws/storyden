@@ -38,11 +38,16 @@ func (i *Authentication) AuthEmailSignup(ctx context.Context, request openapi.Au
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	t, err := i.si.Issue(ctx, acc.ID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.AuthEmailSignup200JSONResponse{
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccessOK{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.cj.Create(acc.ID.String()).String(),
+				SetCookie: i.cj.Create(*t).String(),
 			},
 		},
 	}, nil

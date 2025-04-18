@@ -37,6 +37,8 @@ const (
 	FieldMetadata = "metadata"
 	// FieldInvitedByID holds the string denoting the invited_by_id field in the database.
 	FieldInvitedByID = "invited_by_id"
+	// EdgeSessions holds the string denoting the sessions edge name in mutations.
+	EdgeSessions = "sessions"
 	// EdgeEmails holds the string denoting the emails edge name in mutations.
 	EdgeEmails = "emails"
 	// EdgeNotifications holds the string denoting the notifications edge name in mutations.
@@ -79,6 +81,13 @@ const (
 	EdgeAccountRoles = "account_roles"
 	// Table holds the table name of the account in the database.
 	Table = "accounts"
+	// SessionsTable is the table that holds the sessions relation/edge.
+	SessionsTable = "sessions"
+	// SessionsInverseTable is the table name for the Session entity.
+	// It exists in this package in order to avoid circular dependency with the "session" package.
+	SessionsInverseTable = "sessions"
+	// SessionsColumn is the table column denoting the sessions relation/edge.
+	SessionsColumn = "account_id"
 	// EmailsTable is the table that holds the emails relation/edge.
 	EmailsTable = "emails"
 	// EmailsInverseTable is the table name for the Email entity.
@@ -322,6 +331,20 @@ func ByAdmin(opts ...sql.OrderTermOption) OrderOption {
 // ByInvitedByID orders the results by the invited_by_id field.
 func ByInvitedByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldInvitedByID, opts...).ToFunc()
+}
+
+// BySessionsCount orders the results by sessions count.
+func BySessionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSessionsStep(), opts...)
+	}
+}
+
+// BySessions orders the results by sessions terms.
+func BySessions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSessionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
 }
 
 // ByEmailsCount orders the results by emails count.
@@ -595,6 +618,13 @@ func ByAccountRoles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newAccountRolesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
+}
+func newSessionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SessionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SessionsTable, SessionsColumn),
+	)
 }
 func newEmailsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

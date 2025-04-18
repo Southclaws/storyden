@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -29,7 +28,7 @@ func TestPublicProfiles(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session1.Jar,
+		sh *e2e.SessionHelper,
 		ar *account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -89,19 +88,19 @@ func TestUpdateProfile(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session1.Jar,
+		sh *e2e.SessionHelper,
 		accountQuery *account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
 			handle1 := "user-" + xid.New().String()
 			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle1, "password"})
 			tests.Ok(t, err, acc1)
-			session1 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))), cj)
+			session1 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))))
 
 			handle2 := "user-" + xid.New().String()
 			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle2, "password"})
 			tests.Ok(t, err, acc2)
-			session2 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))), cj)
+			session2 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))))
 
 			t.Run("update_profile", func(t *testing.T) {
 				r := require.New(t)

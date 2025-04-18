@@ -13,7 +13,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -27,7 +26,7 @@ func TestNodesVisibility(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -36,9 +35,9 @@ func TestNodesVisibility(t *testing.T) {
 			ctxAdmin, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			ctxAuthor, accAuthor := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
 			ctxRando, _ := e2e.WithAccount(root, aw, seed.Account_004_Loki)
-			adminSession := e2e.WithSession(ctxAdmin, cj)
-			authorSession := e2e.WithSession(ctxAuthor, cj)
-			randoSession := e2e.WithSession(ctxRando, cj)
+			adminSession := sh.WithSession(ctxAdmin)
+			authorSession := sh.WithSession(ctxAuthor)
+			randoSession := sh.WithSession(ctxRando)
 
 			t.Run("public_only", func(t *testing.T) {
 				t.Parallel()

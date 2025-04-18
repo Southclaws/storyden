@@ -41,6 +41,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
+	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/setting"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 
@@ -102,6 +103,8 @@ type Client struct {
 	React *ReactClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
+	// Session is the client for interacting with the Session builders.
+	Session *SessionClient
 	// Setting is the client for interacting with the Setting builders.
 	Setting *SettingClient
 	// Tag is the client for interacting with the Tag builders.
@@ -142,6 +145,7 @@ func (c *Client) init() {
 	c.Question = NewQuestionClient(c.config)
 	c.React = NewReactClient(c.config)
 	c.Role = NewRoleClient(c.config)
+	c.Session = NewSessionClient(c.config)
 	c.Setting = NewSettingClient(c.config)
 	c.Tag = NewTagClient(c.config)
 }
@@ -261,6 +265,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Question:            NewQuestionClient(cfg),
 		React:               NewReactClient(cfg),
 		Role:                NewRoleClient(cfg),
+		Session:             NewSessionClient(cfg),
 		Setting:             NewSettingClient(cfg),
 		Tag:                 NewTagClient(cfg),
 	}, nil
@@ -307,6 +312,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Question:            NewQuestionClient(cfg),
 		React:               NewReactClient(cfg),
 		Role:                NewRoleClient(cfg),
+		Session:             NewSessionClient(cfg),
 		Setting:             NewSettingClient(cfg),
 		Tag:                 NewTagClient(cfg),
 	}, nil
@@ -342,7 +348,7 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
 		c.EventParticipant, c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.Node,
 		c.Notification, c.Post, c.Property, c.PropertySchema, c.PropertySchemaField,
-		c.Question, c.React, c.Role, c.Setting, c.Tag,
+		c.Question, c.React, c.Role, c.Session, c.Setting, c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -356,7 +362,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
 		c.EventParticipant, c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.Node,
 		c.Notification, c.Post, c.Property, c.PropertySchema, c.PropertySchemaField,
-		c.Question, c.React, c.Role, c.Setting, c.Tag,
+		c.Question, c.React, c.Role, c.Session, c.Setting, c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -415,6 +421,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.React.mutate(ctx, m)
 	case *RoleMutation:
 		return c.Role.mutate(ctx, m)
+	case *SessionMutation:
+		return c.Session.mutate(ctx, m)
 	case *SettingMutation:
 		return c.Setting.mutate(ctx, m)
 	case *TagMutation:
@@ -530,6 +538,22 @@ func (c *AccountClient) GetX(ctx context.Context, id xid.ID) *Account {
 		panic(err)
 	}
 	return obj
+}
+
+// QuerySessions queries the sessions edge of a Account.
+func (c *AccountClient) QuerySessions(a *Account) *SessionQuery {
+	query := (&SessionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(session.Table, session.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.SessionsTable, account.SessionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // QueryEmails queries the emails edge of a Account.
@@ -5315,6 +5339,155 @@ func (c *RoleClient) mutate(ctx context.Context, m *RoleMutation) (Value, error)
 	}
 }
 
+// SessionClient is a client for the Session schema.
+type SessionClient struct {
+	config
+}
+
+// NewSessionClient returns a client for the Session from the given config.
+func NewSessionClient(c config) *SessionClient {
+	return &SessionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `session.Hooks(f(g(h())))`.
+func (c *SessionClient) Use(hooks ...Hook) {
+	c.hooks.Session = append(c.hooks.Session, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `session.Intercept(f(g(h())))`.
+func (c *SessionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Session = append(c.inters.Session, interceptors...)
+}
+
+// Create returns a builder for creating a Session entity.
+func (c *SessionClient) Create() *SessionCreate {
+	mutation := newSessionMutation(c.config, OpCreate)
+	return &SessionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Session entities.
+func (c *SessionClient) CreateBulk(builders ...*SessionCreate) *SessionCreateBulk {
+	return &SessionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SessionClient) MapCreateBulk(slice any, setFunc func(*SessionCreate, int)) *SessionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SessionCreateBulk{err: fmt.Errorf("calling to SessionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SessionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SessionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Session.
+func (c *SessionClient) Update() *SessionUpdate {
+	mutation := newSessionMutation(c.config, OpUpdate)
+	return &SessionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SessionClient) UpdateOne(s *Session) *SessionUpdateOne {
+	mutation := newSessionMutation(c.config, OpUpdateOne, withSession(s))
+	return &SessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SessionClient) UpdateOneID(id xid.ID) *SessionUpdateOne {
+	mutation := newSessionMutation(c.config, OpUpdateOne, withSessionID(id))
+	return &SessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Session.
+func (c *SessionClient) Delete() *SessionDelete {
+	mutation := newSessionMutation(c.config, OpDelete)
+	return &SessionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SessionClient) DeleteOne(s *Session) *SessionDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SessionClient) DeleteOneID(id xid.ID) *SessionDeleteOne {
+	builder := c.Delete().Where(session.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SessionDeleteOne{builder}
+}
+
+// Query returns a query builder for Session.
+func (c *SessionClient) Query() *SessionQuery {
+	return &SessionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSession},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Session entity by its id.
+func (c *SessionClient) Get(ctx context.Context, id xid.ID) (*Session, error) {
+	return c.Query().Where(session.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SessionClient) GetX(ctx context.Context, id xid.ID) *Session {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAccount queries the account edge of a Session.
+func (c *SessionClient) QueryAccount(s *Session) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(session.Table, session.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, session.AccountTable, session.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SessionClient) Hooks() []Hook {
+	return c.hooks.Session
+}
+
+// Interceptors returns the client interceptors.
+func (c *SessionClient) Interceptors() []Interceptor {
+	return c.inters.Session
+}
+
+func (c *SessionClient) mutate(ctx context.Context, m *SessionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SessionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SessionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SessionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SessionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Session mutation op: %q", m.Op())
+	}
+}
+
 // SettingClient is a client for the Setting schema.
 type SettingClient struct {
 	config
@@ -5635,14 +5808,14 @@ type (
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
 		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, Property,
-		PropertySchema, PropertySchemaField, Question, React, Role, Setting,
+		PropertySchema, PropertySchemaField, Question, React, Role, Session, Setting,
 		Tag []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
 		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, Property,
-		PropertySchema, PropertySchemaField, Question, React, Role, Setting,
+		PropertySchema, PropertySchemaField, Question, React, Role, Session, Setting,
 		Tag []ent.Interceptor
 	}
 )

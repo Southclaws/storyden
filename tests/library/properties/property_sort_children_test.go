@@ -14,7 +14,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -28,12 +27,12 @@ func TestNodesPropertySorting(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			ctx1, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			session := e2e.WithSession(ctx1, cj)
+			session := sh.WithSession(ctx1)
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()
@@ -168,12 +167,12 @@ func TestNodesPropertySorting_WithEmptyValues(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			ctx1, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			session := e2e.WithSession(ctx1, cj)
+			session := sh.WithSession(ctx1)
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()

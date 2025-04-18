@@ -15,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -30,7 +29,7 @@ func TestCollectionCRUD(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session1.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -39,19 +38,19 @@ func TestCollectionCRUD(t *testing.T) {
 			handle1 := xid.New().String()
 			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle1, "password"})
 			tests.Ok(t, err, acc1)
-			session1 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))), cj)
+			session1 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))))
 
 			handle2 := xid.New().String()
 			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle2, "password"})
 			tests.Ok(t, err, acc2)
-			session2 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))), cj)
+			session2 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))))
 
 			cat1, err := cl.CategoryCreateWithResponse(adminCtx, openapi.CategoryInitialProps{
 				Admin:       false,
 				Colour:      "",
 				Description: "cat",
 				Name:        xid.New().String(),
-			}, e2e.WithSession(adminCtx, cj))
+			}, sh.WithSession(adminCtx))
 			tests.Ok(t, err, cat1)
 
 			t.Run("unauthenticated", func(t *testing.T) {

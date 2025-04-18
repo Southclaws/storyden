@@ -11,7 +11,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -25,7 +24,7 @@ func TestLikeThreads(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -35,9 +34,9 @@ func TestLikeThreads(t *testing.T) {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			user1Ctx, user1Acc := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
 			user2Ctx, user2Acc := e2e.WithAccount(root, aw, seed.Account_004_Loki)
-			adminSession := e2e.WithSession(adminCtx, cj)
-			user1Session := e2e.WithSession(user1Ctx, cj)
-			user2Session := e2e.WithSession(user2Ctx, cj)
+			adminSession := sh.WithSession(adminCtx)
+			user1Session := sh.WithSession(user1Ctx)
+			user2Session := sh.WithSession(user2Ctx)
 
 			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, adminSession)
 			tests.Ok(t, err, cat1create)
@@ -120,7 +119,7 @@ func TestLikeReplies(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -130,9 +129,9 @@ func TestLikeReplies(t *testing.T) {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			user1Ctx, user1Acc := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
 			user2Ctx, user2Acc := e2e.WithAccount(root, aw, seed.Account_004_Loki)
-			adminSession := e2e.WithSession(adminCtx, cj)
-			user1Session := e2e.WithSession(user1Ctx, cj)
-			user2Session := e2e.WithSession(user2Ctx, cj)
+			adminSession := sh.WithSession(adminCtx)
+			user1Session := sh.WithSession(user1Ctx)
+			user2Session := sh.WithSession(user2Ctx)
 
 			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, adminSession)
 			tests.Ok(t, err, cat1create)

@@ -11,7 +11,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -25,7 +24,7 @@ func TestNodesFiltering(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -44,7 +43,7 @@ func TestNodesFiltering(t *testing.T) {
 				Slug:       &slug1,
 				Content:    &content1,
 				Visibility: &visibility,
-			}, e2e.WithSession(ctx1, cj))
+			}, sh.WithSession(ctx1))
 			tests.Ok(t, err, node1)
 
 			name2 := "test-node-owned-by-2"
@@ -55,7 +54,7 @@ func TestNodesFiltering(t *testing.T) {
 				Slug:       &slug2,
 				Content:    &content2,
 				Visibility: &visibility,
-			}, e2e.WithSession(ctx2, cj))
+			}, sh.WithSession(ctx2))
 			tests.Ok(t, err, node2)
 
 			clist, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{

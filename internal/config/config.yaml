@@ -87,19 +87,6 @@
 
         Typically, in a containerised environment, this should be all interfaces (`0.0.0.0`.)
 
-    - env: "SESSION_KEY"
-      name: SessionKey
-      type: string
-      default: 0000000000000000
-      description: |-
-        The key used to encrypt session data. This should be a hexadecimal string of 16 or more characters.
-
-        This is used by nacl/secretbox to encrypt cookies for tracking sessions.
-
-        You must always set this value when deploying to production. When left as the default value, you are vulnerable to session hijacking attacks as the key is known to everyone.
-
-        Pending deprecation in favour of an init-time generated key that is stored in the database.
-
     - env: "PUBLIC_WEB_ADDRESS"
       name: PublicWebAddress
       type: net/url.URL

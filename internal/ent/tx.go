@@ -64,6 +64,8 @@ type Tx struct {
 	React *ReactClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
+	// Session is the client for interacting with the Session builders.
+	Session *SessionClient
 	// Setting is the client for interacting with the Setting builders.
 	Setting *SettingClient
 	// Tag is the client for interacting with the Tag builders.
@@ -224,6 +226,7 @@ func (tx *Tx) init() {
 	tx.Question = NewQuestionClient(tx.config)
 	tx.React = NewReactClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
+	tx.Session = NewSessionClient(tx.config)
 	tx.Setting = NewSettingClient(tx.config)
 	tx.Tag = NewTagClient(tx.config)
 }

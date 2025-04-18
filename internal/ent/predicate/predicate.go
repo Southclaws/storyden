@@ -81,6 +81,9 @@ type React func(*sql.Selector)
 // Role is the predicate function for role builders.
 type Role func(*sql.Selector)
 
+// Session is the predicate function for session builders.
+type Session func(*sql.Selector)
+
 // Setting is the predicate function for setting builders.
 type Setting func(*sql.Selector)
 

@@ -33,11 +33,16 @@ func (o *Authentication) OAuthProviderCallback(ctx context.Context, request open
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	t, err := o.si.Issue(ctx, account.ID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.OAuthProviderCallback200JSONResponse{
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccess{Id: account.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: o.cj.Create(account.ID.String()).String(),
+				SetCookie: o.cj.Create(*t).String(),
 			},
 		},
 	}, nil

@@ -51,7 +51,7 @@ func Setup() fx.Option {
 		// httpserver.Build() provider, we provide the http.ServeMux and then we
 		// mount it onto the httptest.Server instead of http.Server.
 		//
-		fx.Provide(httpserver.NewRouter, newHttpTestServer, newClient),
+		fx.Provide(httpserver.NewRouter, newHttpTestServer, newClient, newSessionHelper),
 
 		middleware.Build(),
 

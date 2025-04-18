@@ -114,21 +114,6 @@ The interface on which the API service will for HTTP requests.
 
 Typically, in a containerised environment, this should be all interfaces (`0.0.0.0`.)
 
-### `SESSION_KEY`
-
-<table>
-<tr><td>type</td><td>`string`</td></tr>
-<tr><td>default</td><td>`0000000000000000`</td></tr>
-</table>
-
-The key used to encrypt session data. This should be a hexadecimal string of 16 or more characters.
-
-This is used by nacl/secretbox to encrypt cookies for tracking sessions.
-
-You must always set this value when deploying to production. When left as the default value, you are vulnerable to session hijacking attacks as the key is known to everyone.
-
-Pending deprecation in favour of an init-time generated key that is stored in the database.
-
 ### `PUBLIC_WEB_ADDRESS`
 
 <table>

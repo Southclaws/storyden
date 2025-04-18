@@ -17,12 +17,14 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/email_only"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
 type Authentication struct {
 	cj                            *session_cookie.Jar
+	si                            *session.Issuer
 	settings                      *settings.SettingsRepository
 	passwordAuthProvider          *password.Provider
 	emailVerificationAuthProvider *email_only.Provider
@@ -34,6 +36,7 @@ type Authentication struct {
 
 func NewAuthentication(
 	cj *session_cookie.Jar,
+	si *session.Issuer,
 	settings *settings.SettingsRepository,
 	passwordAuthProvider *password.Provider,
 	emailVerificationAuthProvider *email_only.Provider,
@@ -44,6 +47,7 @@ func NewAuthentication(
 ) Authentication {
 	return Authentication{
 		cj:                            cj,
+		si:                            si,
 		settings:                      settings,
 		passwordAuthProvider:          passwordAuthProvider,
 		emailVerificationAuthProvider: emailVerificationAuthProvider,

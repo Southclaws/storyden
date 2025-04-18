@@ -12,7 +12,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/node"
@@ -29,15 +28,15 @@ func TestNodesProperty(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			ctx1, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			session := e2e.WithSession(ctx1, cj)
+			session := sh.WithSession(ctx1)
 
 			ctx2, _ := e2e.WithAccount(root, aw, seed.Account_007_Freyr)
-			randomUser := e2e.WithSession(ctx2, cj)
+			randomUser := sh.WithSession(ctx2)
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()
@@ -215,12 +214,12 @@ func TestNodesPropertyFieldOrdering(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
-			session := e2e.WithSession(ctx, cj)
+			session := sh.WithSession(ctx)
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()
@@ -329,7 +328,7 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 		db *ent.Client,
 	) {
@@ -338,7 +337,7 @@ func TestNodesPropertySchemaOnParentAndChildNodes(t *testing.T) {
 			a := assert.New(t)
 
 			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
-			session := e2e.WithSession(ctx, cj)
+			session := sh.WithSession(ctx)
 
 			// Create the following node tree:
 			//
@@ -489,13 +488,13 @@ func TestNodesPropertySchemaBadRequests(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 		db *ent.Client,
 	) {
 		lc.Append(fx.StartHook(func() {
 			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
-			session := e2e.WithSession(ctx, cj)
+			session := sh.WithSession(ctx)
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()

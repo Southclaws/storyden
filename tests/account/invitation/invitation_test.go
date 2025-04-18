@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	authSession "github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -29,7 +28,7 @@ func TestAccountInvitations(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 		accountQuery *account_querier.Querier,
 	) {
@@ -38,7 +37,7 @@ func TestAccountInvitations(t *testing.T) {
 			a := assert.New(t)
 
 			inviterCtx, inviter := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			inviterSession := e2e.WithSession(inviterCtx, cj)
+			inviterSession := sh.WithSession(inviterCtx)
 
 			message := "Join me on Storyden!"
 			invResponse, err := cl.InvitationCreateWithResponse(root, openapi.InvitationInitialProps{
@@ -62,7 +61,7 @@ func TestAccountInvitations(t *testing.T) {
 				tests.Ok(t, err, inviteeResponse)
 				id := account.AccountID(utils.Must(xid.FromString(inviteeResponse.JSON200.Id)))
 
-				invitee, err := cl.AccountGetWithResponse(root, e2e.WithSession(authSession.WithAccountID(root, id), cj))
+				invitee, err := cl.AccountGetWithResponse(root, sh.WithSession(authSession.WithAccountID(root, id)))
 				tests.Ok(t, err, invitee)
 				r.NotNil(invitee.JSON200.InvitedBy)
 				a.Equal(inviter.ID.String(), invitee.JSON200.InvitedBy.Id)
@@ -84,7 +83,7 @@ func TestAccountInvitations(t *testing.T) {
 				tests.Ok(t, err, inviteeResponse)
 				id := account.AccountID(utils.Must(xid.FromString(inviteeResponse.JSON200.Id)))
 
-				invitee, err := cl.AccountGetWithResponse(root, e2e.WithSession(authSession.WithAccountID(root, id), cj))
+				invitee, err := cl.AccountGetWithResponse(root, sh.WithSession(authSession.WithAccountID(root, id)))
 				tests.Ok(t, err, invitee)
 				r.NotNil(invitee.JSON200.InvitedBy)
 				a.Equal(inviter.ID.String(), invitee.JSON200.InvitedBy.Id)

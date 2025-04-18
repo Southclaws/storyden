@@ -596,6 +596,29 @@ func InvitedByIDContainsFold(v xid.ID) predicate.Account {
 	return predicate.Account(sql.FieldContainsFold(FieldInvitedByID, vc))
 }
 
+// HasSessions applies the HasEdge predicate on the "sessions" edge.
+func HasSessions() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SessionsTable, SessionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSessionsWith applies the HasEdge predicate on the "sessions" edge with a given conditions (other predicates).
+func HasSessionsWith(preds ...predicate.Session) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newSessionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasEmails applies the HasEdge predicate on the "emails" edge.
 func HasEmails() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

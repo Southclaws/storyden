@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -28,7 +27,7 @@ func TestFollows(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session1.Jar,
+		sh *e2e.SessionHelper,
 		ar *account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -38,7 +37,7 @@ func TestFollows(t *testing.T) {
 
 				acc1 := newAccount(t, root, cl, ar, "acc1")
 				acc2 := newAccount(t, root, cl, ar, "acc2")
-				acc1session := e2e.WithSession(session.WithAccountID(root, acc1.ID), cj)
+				acc1session := sh.WithSession(session.WithAccountID(root, acc1.ID))
 
 				// Follow acc2 from acc1
 				f1, err := cl.ProfileFollowersAddWithResponse(root, acc2.Handle, acc1session)
@@ -87,8 +86,8 @@ func TestFollows(t *testing.T) {
 
 				acc1 := newAccount(t, root, cl, ar, "acc1")
 				acc2 := newAccount(t, root, cl, ar, "acc2")
-				acc1session := e2e.WithSession(session.WithAccountID(root, acc1.ID), cj)
-				acc2session := e2e.WithSession(session.WithAccountID(root, acc2.ID), cj)
+				acc1session := sh.WithSession(session.WithAccountID(root, acc1.ID))
+				acc2session := sh.WithSession(session.WithAccountID(root, acc2.ID))
 
 				// Follow acc2 from acc1
 				f1, err := cl.ProfileFollowersAddWithResponse(root, acc2.Handle, acc1session)
@@ -131,7 +130,7 @@ func TestFollows(t *testing.T) {
 
 				acc1 := newAccount(t, root, cl, ar, "acc1")
 				acc2 := newAccount(t, root, cl, ar, "acc2")
-				acc1session := e2e.WithSession(session.WithAccountID(root, acc1.ID), cj)
+				acc1session := sh.WithSession(session.WithAccountID(root, acc1.ID))
 
 				// Follow acc2 from acc1
 				f1, err := cl.ProfileFollowersAddWithResponse(root, acc2.Handle, acc1session)
