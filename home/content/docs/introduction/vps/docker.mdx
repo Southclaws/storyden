@@ -7,6 +7,13 @@ import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
 Getting an instance of Storyden online is criminally easy. There's almost zero configuration required and lots of sane defaults which you can adapt later as needed.
 
+<Callout type="warn">
+  Note that this guide assumes you already have SSL termination set up for your
+  server. Storyden does not accept HTTPS connections and always assumes that
+  it's behind a load balancer or reverse proxy. We recommend
+  [Caddy](https://caddyserver.com/) as an easy to set up reverse proxy.
+</Callout>
+
 ## Running the container
 
 You can spin up a local Storyden instance using Docker. The main Docker image includes both frontend and API services and can be started with:
@@ -156,3 +163,15 @@ Or with a directory mounted into the container:
   </Tab>
 
 </Tabs>
+
+## Next Steps
+
+Now you've got an instance running, you must expose it to the internet using a reverse proxy. Storyden does not accept HTTPS connections but it requires that the site itself run on a HTTPS address for security reasons.
+
+We recommend using something like [Caddy](https://caddyserver.com/) or [Traefik](https://traefik.io/) to act as a reverse proxy that handles HTTPS.
+
+Alternatively, you can expose Storyden's container on port 80 and use [Cloudflare](https://www.cloudflare.com/en-gb/learning/cdn/glossary/reverse-proxy/) to handle SSL termination.
+
+```yaml
+--publish 80:8000
+```

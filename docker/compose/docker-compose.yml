@@ -1,0 +1,18 @@
+# A super simple Compose setup.
+# This assumes you already have a reverse proxy pointing at
+# localhost:8000 which handles SSL termination for HTTPS.
+#
+# To run this: set the PUBLIC_WEB_ADDRESS and PUBLIC_API_ADDRESS
+# environment variables to the public URL of your server. Remember that these
+# are full URLs, scheme included, so ensure `https://` is included.
+#
+services:
+  storyden:
+    image: ghcr.io/southclaws/storyden:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/storyden/data
+    environment:
+      - PUBLIC_WEB_ADDRESS=${PUBLIC_WEB_ADDRESS}
+      - PUBLIC_API_ADDRESS=${PUBLIC_API_ADDRESS}

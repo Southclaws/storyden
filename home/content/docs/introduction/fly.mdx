@@ -94,7 +94,7 @@ That's only half the story though. You have an instance but
 
 For this section, we'll be working with the `fly.toml` file that was generated when you ran `fly launch`. This file is used by Fly.io to configure your app. It'll look something like this:
 
-```toml
+```toml title="fly.toml"
 app = 'my-storyden'
 primary_region = 'lhr'
 
@@ -139,7 +139,7 @@ What this means:
 
 To finish up, we need to mount the volume to the app by using the `[mounts]` section of `fly.toml`.
 
-```diff
+```diff title="fly.toml"
     app = 'my-storyden'
     primary_region = 'lhr'
 
@@ -176,7 +176,7 @@ Relevant documentation: https://fly.io/docs/reference/configuration#the-env-vari
 
 Storyden uses secure cookies for session authentication. As a result, it needs to know what domain it's running on so it can set the `Domain` flag on the cookie.
 
-```diff
+```diff title="fly.toml"
     app = 'my-storyden'
     primary_region = 'lhr'
 

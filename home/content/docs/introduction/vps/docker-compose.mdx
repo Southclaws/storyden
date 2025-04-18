@@ -1,0 +1,61 @@
+---
+title: Docker Compose
+description: Setting up a Storyden container with Docker Compose
+---
+
+This guide will get you set up with a Storyden instance behind [Caddy](https://caddyserver.com/). There are various additional optional dependencies for Storyden which are covered later, but for now we'll start simple with SQLite.
+
+Prerequisites:
+
+- A Linux server
+- Docker and Docker Compose installed
+- A domain name pointing at your server.
+
+<Callout>We'll use the domain `secret-agent.club` for the docs.</Callout>
+
+## With Caddy
+
+This configuration will set up a simple Storyden instance that's production-ready and uses Caddy as a reverse proxy.
+
+First, create `docker-compose.yml`
+
+```yaml title="docker-compose.yml"
+services:
+  storyden:
+    image: ghcr.io/southclaws/storyden:latest
+    expose:
+      - "8000"
+    volumes:
+      - ./data:/storyden/data
+    environment:
+      - PUBLIC_WEB_ADDRESS=https://secret-agent.club
+      - PUBLIC_API_ADDRESS=https://secret-agent.club
+
+  caddy:
+    image: caddy:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  caddy_data:
+  caddy_config:
+```
+
+Then configure `Caddyfile` to use your domain name and reverse-proxy to the `storyden` container.
+
+```nginx title="Caddyfile"
+secret-agent.club {
+  reverse_proxy storyden:8000
+}
+```
+
+Run the stack and once Caddy has set up your SSL certificate, visit your new Storyden site in your browser!
+
+```sh
+docker compose up -d
+```
