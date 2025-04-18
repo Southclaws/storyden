@@ -38,6 +38,25 @@ func (t Token) String() string {
 	return t.ID.String()
 }
 
+// MarshalJSON encodes the token as a bare string (`"c5n4mpk1..."`).
+func (t Token) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.String())
+}
+
+// UnmarshalJSON decodes the token from a bare string.
+func (t *Token) UnmarshalJSON(b []byte) error {
+	var s string
+	if err := json.Unmarshal(b, &s); err != nil {
+		return err
+	}
+	id, err := xid.FromString(s)
+	if err != nil {
+		return err
+	}
+	*t = Token{id}
+	return nil
+}
+
 type Session struct {
 	Token     Token                   `json:"t"`
 	AccountID account.AccountID       `json:"a"`
