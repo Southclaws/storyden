@@ -30,6 +30,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
+	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -41,6 +42,7 @@ type AccountQuery struct {
 	order                      []account.OrderOption
 	inters                     []Interceptor
 	predicates                 []predicate.Account
+	withSessions               *SessionQuery
 	withEmails                 *EmailQuery
 	withNotifications          *NotificationQuery
 	withTriggeredNotifications *NotificationQuery
@@ -96,6 +98,28 @@ func (aq *AccountQuery) Unique(unique bool) *AccountQuery {
 func (aq *AccountQuery) Order(o ...account.OrderOption) *AccountQuery {
 	aq.order = append(aq.order, o...)
 	return aq
+}
+
+// QuerySessions chains the current query on the "sessions" edge.
+func (aq *AccountQuery) QuerySessions() *SessionQuery {
+	query := (&SessionClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(session.Table, session.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.SessionsTable, account.SessionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // QueryEmails chains the current query on the "emails" edge.
@@ -730,6 +754,7 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		order:                      append([]account.OrderOption{}, aq.order...),
 		inters:                     append([]Interceptor{}, aq.inters...),
 		predicates:                 append([]predicate.Account{}, aq.predicates...),
+		withSessions:               aq.withSessions.Clone(),
 		withEmails:                 aq.withEmails.Clone(),
 		withNotifications:          aq.withNotifications.Clone(),
 		withTriggeredNotifications: aq.withTriggeredNotifications.Clone(),
@@ -755,6 +780,17 @@ func (aq *AccountQuery) Clone() *AccountQuery {
 		path:      aq.path,
 		modifiers: append([]func(*sql.Selector){}, aq.modifiers...),
 	}
+}
+
+// WithSessions tells the query-builder to eager-load the nodes that are connected to
+// the "sessions" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AccountQuery) WithSessions(opts ...func(*SessionQuery)) *AccountQuery {
+	query := (&SessionClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withSessions = query
+	return aq
 }
 
 // WithEmails tells the query-builder to eager-load the nodes that are connected to
@@ -1055,7 +1091,8 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = aq.querySpec()
-		loadedTypes = [20]bool{
+		loadedTypes = [21]bool{
+			aq.withSessions != nil,
 			aq.withEmails != nil,
 			aq.withNotifications != nil,
 			aq.withTriggeredNotifications != nil,
@@ -1098,6 +1135,13 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
+	}
+	if query := aq.withSessions; query != nil {
+		if err := aq.loadSessions(ctx, query, nodes,
+			func(n *Account) { n.Edges.Sessions = []*Session{} },
+			func(n *Account, e *Session) { n.Edges.Sessions = append(n.Edges.Sessions, e) }); err != nil {
+			return nil, err
+		}
 	}
 	if query := aq.withEmails; query != nil {
 		if err := aq.loadEmails(ctx, query, nodes,
@@ -1243,6 +1287,36 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	return nodes, nil
 }
 
+func (aq *AccountQuery) loadSessions(ctx context.Context, query *SessionQuery, nodes []*Account, init func(*Account), assign func(*Account, *Session)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(session.FieldAccountID)
+	}
+	query.Where(predicate.Session(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.SessionsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 func (aq *AccountQuery) loadEmails(ctx context.Context, query *EmailQuery, nodes []*Account, init func(*Account), assign func(*Account, *Email)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)

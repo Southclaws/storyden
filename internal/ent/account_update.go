@@ -31,6 +31,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/schema"
+	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -205,6 +206,21 @@ func (au *AccountUpdate) SetNillableInvitedByID(x *xid.ID) *AccountUpdate {
 func (au *AccountUpdate) ClearInvitedByID() *AccountUpdate {
 	au.mutation.ClearInvitedByID()
 	return au
+}
+
+// AddSessionIDs adds the "sessions" edge to the Session entity by IDs.
+func (au *AccountUpdate) AddSessionIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.AddSessionIDs(ids...)
+	return au
+}
+
+// AddSessions adds the "sessions" edges to the Session entity.
+func (au *AccountUpdate) AddSessions(s ...*Session) *AccountUpdate {
+	ids := make([]xid.ID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.AddSessionIDs(ids...)
 }
 
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
@@ -500,6 +516,27 @@ func (au *AccountUpdate) AddAccountRoles(a ...*AccountRoles) *AccountUpdate {
 // Mutation returns the AccountMutation object of the builder.
 func (au *AccountUpdate) Mutation() *AccountMutation {
 	return au.mutation
+}
+
+// ClearSessions clears all "sessions" edges to the Session entity.
+func (au *AccountUpdate) ClearSessions() *AccountUpdate {
+	au.mutation.ClearSessions()
+	return au
+}
+
+// RemoveSessionIDs removes the "sessions" edge to Session entities by IDs.
+func (au *AccountUpdate) RemoveSessionIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.RemoveSessionIDs(ids...)
+	return au
+}
+
+// RemoveSessions removes "sessions" edges to Session entities.
+func (au *AccountUpdate) RemoveSessions(s ...*Session) *AccountUpdate {
+	ids := make([]xid.ID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.RemoveSessionIDs(ids...)
 }
 
 // ClearEmails clears all "emails" edges to the Email entity.
@@ -1022,6 +1059,51 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if au.mutation.MetadataCleared() {
 		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
+	}
+	if au.mutation.SessionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.SessionsTable,
+			Columns: []string{account.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedSessionsIDs(); len(nodes) > 0 && !au.mutation.SessionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.SessionsTable,
+			Columns: []string{account.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.SessionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.SessionsTable,
+			Columns: []string{account.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if au.mutation.EmailsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -2108,6 +2190,21 @@ func (auo *AccountUpdateOne) ClearInvitedByID() *AccountUpdateOne {
 	return auo
 }
 
+// AddSessionIDs adds the "sessions" edge to the Session entity by IDs.
+func (auo *AccountUpdateOne) AddSessionIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.AddSessionIDs(ids...)
+	return auo
+}
+
+// AddSessions adds the "sessions" edges to the Session entity.
+func (auo *AccountUpdateOne) AddSessions(s ...*Session) *AccountUpdateOne {
+	ids := make([]xid.ID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.AddSessionIDs(ids...)
+}
+
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
 func (auo *AccountUpdateOne) AddEmailIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddEmailIDs(ids...)
@@ -2401,6 +2498,27 @@ func (auo *AccountUpdateOne) AddAccountRoles(a ...*AccountRoles) *AccountUpdateO
 // Mutation returns the AccountMutation object of the builder.
 func (auo *AccountUpdateOne) Mutation() *AccountMutation {
 	return auo.mutation
+}
+
+// ClearSessions clears all "sessions" edges to the Session entity.
+func (auo *AccountUpdateOne) ClearSessions() *AccountUpdateOne {
+	auo.mutation.ClearSessions()
+	return auo
+}
+
+// RemoveSessionIDs removes the "sessions" edge to Session entities by IDs.
+func (auo *AccountUpdateOne) RemoveSessionIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.RemoveSessionIDs(ids...)
+	return auo
+}
+
+// RemoveSessions removes "sessions" edges to Session entities.
+func (auo *AccountUpdateOne) RemoveSessions(s ...*Session) *AccountUpdateOne {
+	ids := make([]xid.ID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.RemoveSessionIDs(ids...)
 }
 
 // ClearEmails clears all "emails" edges to the Email entity.
@@ -2953,6 +3071,51 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	}
 	if auo.mutation.MetadataCleared() {
 		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
+	}
+	if auo.mutation.SessionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.SessionsTable,
+			Columns: []string{account.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedSessionsIDs(); len(nodes) > 0 && !auo.mutation.SessionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.SessionsTable,
+			Columns: []string{account.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.SessionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.SessionsTable,
+			Columns: []string{account.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if auo.mutation.EmailsCleared() {
 		edge := &sqlgraph.EdgeSpec{

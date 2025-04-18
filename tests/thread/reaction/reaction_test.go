@@ -11,7 +11,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -25,7 +24,7 @@ func TestReactions(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -34,8 +33,8 @@ func TestReactions(t *testing.T) {
 
 			ctx1, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			ctx2, acc2 := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
-			session1 := e2e.WithSession(ctx1, cj)
-			session2 := e2e.WithSession(ctx2, cj)
+			session1 := sh.WithSession(ctx1)
+			session2 := sh.WithSession(ctx2)
 
 			cat1name := "Category " + uuid.NewString()
 

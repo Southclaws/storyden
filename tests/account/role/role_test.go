@@ -13,7 +13,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -27,7 +26,7 @@ func TestRoles(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -35,7 +34,7 @@ func TestRoles(t *testing.T) {
 			a := assert.New(t)
 
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			adminSession := e2e.WithSession(adminCtx, cj)
+			adminSession := sh.WithSession(adminCtx)
 
 			t.Run("role_assignment", func(t *testing.T) {
 				t.Parallel()
@@ -48,7 +47,7 @@ func TestRoles(t *testing.T) {
 				tests.Ok(t, err, role)
 
 				guestCtx, guest1 := e2e.WithAccount(root, aw, seed.Account_004_Loki)
-				guest1Session := e2e.WithSession(guestCtx, cj)
+				guest1Session := sh.WithSession(guestCtx)
 
 				// guest1 cannot create categories
 				cat1, err := cl.CategoryCreateWithResponse(guestCtx, openapi.CategoryCreateJSONRequestBody{Name: xid.New().String(), Description: "d", Colour: "c"}, guest1Session)
@@ -97,7 +96,7 @@ func TestRoles(t *testing.T) {
 				tests.Ok(t, err, role)
 
 				guestCtx, guest1 := e2e.WithAccount(root, aw, seed.Account_004_Loki)
-				guest1Session := e2e.WithSession(guestCtx, cj)
+				guest1Session := sh.WithSession(guestCtx)
 
 				vis := openapi.Published
 
@@ -142,7 +141,7 @@ func TestRoleBadges(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -150,10 +149,10 @@ func TestRoleBadges(t *testing.T) {
 			a := assert.New(t)
 
 			adminCtx, admin := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			adminSession := e2e.WithSession(adminCtx, cj)
+			adminSession := sh.WithSession(adminCtx)
 
 			guestCtx, guest1 := e2e.WithAccount(root, aw, seed.Account_004_Loki)
-			guest1Session := e2e.WithSession(guestCtx, cj)
+			guest1Session := sh.WithSession(guestCtx)
 
 			colour := "green"
 			permissions := openapi.PermissionList{ /* purely aesthetic role, no permissions*/ }

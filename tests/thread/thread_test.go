@@ -14,7 +14,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -28,7 +27,7 @@ func TestThreads(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -36,8 +35,8 @@ func TestThreads(t *testing.T) {
 
 			acc1ctx, acc1 := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			acc2ctx, acc2 := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
-			session1 := e2e.WithSession(acc1ctx, cj)
-			session2 := e2e.WithSession(acc2ctx, cj)
+			session1 := sh.WithSession(acc1ctx)
+			session2 := sh.WithSession(acc2ctx)
 
 			cat1name := "Category " + uuid.NewString()
 
@@ -150,7 +149,7 @@ func TestThreads(t *testing.T) {
 				a := assert.New(t)
 
 				ctx1, _ := e2e.WithAccount(root, aw, seed.Account_002_Frigg)
-				session := e2e.WithSession(ctx1, cj)
+				session := sh.WithSession(ctx1)
 
 				catname := "Category " + uuid.NewString()
 				cat, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{

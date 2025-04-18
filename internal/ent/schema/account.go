@@ -39,6 +39,9 @@ func (Account) Fields() []ent.Field {
 
 func (Account) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.To("sessions", Session.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
 		edge.To("emails", Email.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
 

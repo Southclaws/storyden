@@ -12,7 +12,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -26,7 +25,7 @@ func TestAccountAdmin(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session1.Jar,
+		sh *e2e.SessionHelper,
 		accountWrite *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -42,7 +41,7 @@ func TestAccountAdmin(t *testing.T) {
 			r.NoError(err)
 			r.Equal(http.StatusOK, admin.StatusCode())
 			adminID := account.AccountID(utils.Must(xid.FromString(admin.JSON200.Id)))
-			adminSession := e2e.WithSession(session.WithAccountID(root, adminID), cj)
+			adminSession := sh.WithSession(session.WithAccountID(root, adminID))
 
 			accountWrite.Update(root, adminID, account_writer.SetAdmin(true))
 
@@ -50,13 +49,13 @@ func TestAccountAdmin(t *testing.T) {
 			r.NoError(err)
 			r.Equal(http.StatusOK, victim.StatusCode())
 			victimID := account.AccountID(utils.Must(xid.FromString(victim.JSON200.Id)))
-			victimSession := e2e.WithSession(session.WithAccountID(root, victimID), cj)
+			victimSession := sh.WithSession(session.WithAccountID(root, victimID))
 
 			random, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: randomHandle, Token: "password"})
 			r.NoError(err)
 			r.Equal(http.StatusOK, random.StatusCode())
 			randomID := account.AccountID(utils.Must(xid.FromString(random.JSON200.Id)))
-			randomSession := e2e.WithSession(session.WithAccountID(root, randomID), cj)
+			randomSession := sh.WithSession(session.WithAccountID(root, randomID))
 
 			// Try to suspend the account without being logged in - fails
 

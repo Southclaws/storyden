@@ -30,6 +30,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/schema"
+	"github.com/Southclaws/storyden/internal/ent/session"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
 )
@@ -176,6 +177,21 @@ func (ac *AccountCreate) SetNillableID(x *xid.ID) *AccountCreate {
 		ac.SetID(*x)
 	}
 	return ac
+}
+
+// AddSessionIDs adds the "sessions" edge to the Session entity by IDs.
+func (ac *AccountCreate) AddSessionIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddSessionIDs(ids...)
+	return ac
+}
+
+// AddSessions adds the "sessions" edges to the Session entity.
+func (ac *AccountCreate) AddSessions(s ...*Session) *AccountCreate {
+	ids := make([]xid.ID, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return ac.AddSessionIDs(ids...)
 }
 
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
@@ -628,6 +644,22 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	if value, ok := ac.mutation.Metadata(); ok {
 		_spec.SetField(account.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
+	}
+	if nodes := ac.mutation.SessionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.SessionsTable,
+			Columns: []string{account.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ac.mutation.EmailsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

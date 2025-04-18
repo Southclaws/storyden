@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
+	"github.com/Southclaws/storyden/app/resources/account/token"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_querier"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
 	collection_items "github.com/Southclaws/storyden/app/resources/collection/collection_item"
@@ -103,5 +104,6 @@ func Build() fx.Option {
 			hydrate.New,
 			question.New,
 		),
+		token.Build(),
 	)
 }

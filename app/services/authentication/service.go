@@ -45,7 +45,7 @@ func Build() fx.Option {
 		),
 		fx.Provide(email_verify.New),
 		fx.Provide(password_reset.NewTokenProvider, password_reset.NewEmailResetter),
-		fx.Provide(New, session.New),
+		fx.Provide(New, session.New, session.NewValidator, session.NewIssuer),
 	)
 }
 

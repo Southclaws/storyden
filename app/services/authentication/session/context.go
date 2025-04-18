@@ -17,7 +17,6 @@ var ErrNoAccountInContext = errors.New("no account in context")
 
 var contextKey = struct{}{}
 
-// WithAccountID stores the ID of the account making the request.
 func WithAccountID(ctx context.Context, u account.AccountID) context.Context {
 	return context.WithValue(ctx, contextKey, u)
 }

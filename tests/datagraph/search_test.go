@@ -15,7 +15,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -31,7 +30,7 @@ func TestSearchMultipleKinds(t *testing.T) {
 		lc fx.Lifecycle,
 		cfg config.Config,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		if cfg.SemdexProvider == "" {
@@ -40,11 +39,11 @@ func TestSearchMultipleKinds(t *testing.T) {
 
 		lc.Append(fx.StartHook(func() {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			adminSession := e2e.WithSession(adminCtx, cj)
+			adminSession := sh.WithSession(adminCtx)
 			ctx1, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
-			session1 := e2e.WithSession(ctx1, cj)
+			session1 := sh.WithSession(ctx1)
 			ctx2, _ := e2e.WithAccount(root, aw, seed.Account_004_Loki)
-			session2 := e2e.WithSession(ctx2, cj)
+			session2 := sh.WithSession(ctx2)
 
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Name: uuid.NewString(), Colour: "#000"}, adminSession)
 			tests.Ok(t, err, cat1)
@@ -199,7 +198,7 @@ func TestSearchVisibilityRules(t *testing.T) {
 		lc fx.Lifecycle,
 		cfg config.Config,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		if cfg.SemdexProvider == "" {
@@ -208,11 +207,11 @@ func TestSearchVisibilityRules(t *testing.T) {
 
 		lc.Append(fx.StartHook(func() {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			adminSession := e2e.WithSession(adminCtx, cj)
+			adminSession := sh.WithSession(adminCtx)
 			ctx1, _ := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
-			session1 := e2e.WithSession(ctx1, cj)
+			session1 := sh.WithSession(ctx1)
 			ctx2, _ := e2e.WithAccount(root, aw, seed.Account_004_Loki)
-			session2 := e2e.WithSession(ctx2, cj)
+			session2 := sh.WithSession(ctx2)
 
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Name: uuid.NewString(), Colour: "#000"}, adminSession)
 			tests.Ok(t, err, cat1)

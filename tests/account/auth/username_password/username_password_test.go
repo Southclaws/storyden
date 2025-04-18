@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -27,7 +26,7 @@ func TestUsernamePasswordAuth(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session1.Jar,
+		sh *e2e.SessionHelper,
 		accountQuery *account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -49,7 +48,7 @@ func TestUsernamePasswordAuth(t *testing.T) {
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
 				ctx1 := session.WithAccountID(root, accountID)
-				session := e2e.WithSession(ctx1, cj)
+				session := sh.WithSession(ctx1)
 
 				// Get own account
 				get, err := cl.AccountGetWithResponse(root, session)
@@ -92,7 +91,7 @@ func TestUsernamePasswordAuth(t *testing.T) {
 				ctx1 := session.WithAccountID(root, account.AccountID(id1))
 
 				// Get the new account
-				get1, err := cl.AccountGetWithResponse(root, e2e.WithSession(ctx1, cj))
+				get1, err := cl.AccountGetWithResponse(root, sh.WithSession(ctx1))
 				r.NoError(err)
 				r.NotNil(get1)
 				r.Equal(http.StatusOK, get1.StatusCode())
@@ -102,7 +101,7 @@ func TestUsernamePasswordAuth(t *testing.T) {
 				change1, err := cl.AuthPasswordUpdateWithResponse(root, openapi.AuthPasswordMutableProps{
 					Old: "password",
 					New: "wordpass",
-				}, e2e.WithSession(ctx1, cj))
+				}, sh.WithSession(ctx1))
 				r.NoError(err)
 				r.NotNil(change1)
 				r.Equal(http.StatusOK, change1.StatusCode())
@@ -126,7 +125,7 @@ func TestUsernamePasswordAuth(t *testing.T) {
 				r.Equal(http.StatusOK, signin2.StatusCode())
 
 				// Sign out
-				signout, err := cl.AuthProviderLogoutWithResponse(root, e2e.WithSession(ctx1, cj))
+				signout, err := cl.AuthProviderLogoutWithResponse(root, sh.WithSession(ctx1))
 				tests.Ok(t, err, signout)
 				a.Contains(signout.HTTPResponse.Header.Get("Set-Cookie"), "storyden-session=;")
 			})
@@ -172,7 +171,7 @@ func TestUsernamePasswordAuthMultiMethod(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session1.Jar,
+		sh *e2e.SessionHelper,
 		accountQuery *account_querier.Querier,
 	) {
 		lc.Append(fx.StartHook(func() {

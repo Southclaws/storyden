@@ -19,8 +19,8 @@ package notification
 
 // 			ctx1, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 // 			ctx2, acc2 := e2e.WithAccount(root, aw, seed.Account_003_Baldur)
-// 			user1session := e2e.WithSession(ctx1, cj)
-// 			user2session := e2e.WithSession(ctx2, cj)
+// 			user1session := sh.WithSession(ctx1)
+// 			user2session := sh.WithSession(ctx2)
 
 // 			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, user1session)
 // 			tests.Ok(t, err, cat1create)

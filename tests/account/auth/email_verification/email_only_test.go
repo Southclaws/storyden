@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -29,7 +28,7 @@ func TestEmailOnlyAuth(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session1.Jar,
+		sh *e2e.SessionHelper,
 		accountQuery *account_querier.Querier,
 		mail mailer.Sender,
 	) {
@@ -48,7 +47,7 @@ func TestEmailOnlyAuth(t *testing.T) {
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
 				ctx1 := session.WithAccountID(root, accountID)
-				session := e2e.WithSession(ctx1, cj)
+				session := sh.WithSession(ctx1)
 
 				// Get own account, currently unverified
 				unverified, err := cl.AccountGetWithResponse(root, session)
@@ -103,7 +102,7 @@ func TestEmailOnlyAuth(t *testing.T) {
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
 				ctx1 := session.WithAccountID(root, accountID)
-				session := e2e.WithSession(ctx1, cj)
+				session := sh.WithSession(ctx1)
 
 				// Get own account, currently unverified
 				unverified, err := cl.AccountGetWithResponse(root, session)

@@ -13,7 +13,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -27,7 +26,7 @@ func TestNodesTreeMutations(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -48,7 +47,7 @@ func TestNodesTreeMutations(t *testing.T) {
 				Name:       name1,
 				Slug:       &slug1,
 				Visibility: &visibility,
-			}, e2e.WithSession(ctx, cj))
+			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node1)
 
 			name2 := "test-node-2"
@@ -57,7 +56,7 @@ func TestNodesTreeMutations(t *testing.T) {
 				Name:       name2,
 				Slug:       &slug2,
 				Visibility: &visibility,
-			}, e2e.WithSession(ctx, cj))
+			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node2)
 
 			name3 := "test-node-3"
@@ -67,7 +66,7 @@ func TestNodesTreeMutations(t *testing.T) {
 				Slug:       &slug3,
 				Parent:     &slug2,
 				Visibility: &visibility,
-			}, e2e.WithSession(ctx, cj))
+			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node3)
 
 			name4 := "test-node-4"
@@ -77,7 +76,7 @@ func TestNodesTreeMutations(t *testing.T) {
 				Slug:       &slug4,
 				Parent:     &slug3,
 				Visibility: &visibility,
-			}, e2e.WithSession(ctx, cj))
+			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node4)
 
 			t.Run("change_tree_structure", func(t *testing.T) {
@@ -90,7 +89,7 @@ func TestNodesTreeMutations(t *testing.T) {
 					Name:       name5,
 					Slug:       &slug5,
 					Visibility: &visibility,
-				}, e2e.WithSession(ctx, cj))
+				}, sh.WithSession(ctx))
 				tests.Ok(t, err, node5)
 
 				// List nodes and check that the new node is in the root nodes
@@ -103,7 +102,7 @@ func TestNodesTreeMutations(t *testing.T) {
 
 				// Add node5 as a child of node1
 
-				addresponse, err := cl.NodeAddNodeWithResponse(ctx, slug1, slug5, e2e.WithSession(ctx, cj))
+				addresponse, err := cl.NodeAddNodeWithResponse(ctx, slug1, slug5, sh.WithSession(ctx))
 				tests.Ok(t, err, addresponse)
 				a.Equal(node1.JSON200.Id, addresponse.JSON200.Id)
 
@@ -129,7 +128,7 @@ func TestNodesTreeMutations(t *testing.T) {
 
 				// Remove node5	from node1
 
-				removeresponse, err := cl.NodeRemoveNodeWithResponse(ctx, slug1, slug5, e2e.WithSession(ctx, cj))
+				removeresponse, err := cl.NodeRemoveNodeWithResponse(ctx, slug1, slug5, sh.WithSession(ctx))
 				tests.Ok(t, err, removeresponse)
 
 				// Current situation:
@@ -155,7 +154,7 @@ func TestNodesTreeMutations(t *testing.T) {
 				a := assert.New(t)
 				// r := require.New(t)
 
-				addresponse, err := cl.NodeAddNodeWithResponse(ctx, slug1, slug1, e2e.WithSession(ctx, cj))
+				addresponse, err := cl.NodeAddNodeWithResponse(ctx, slug1, slug1, sh.WithSession(ctx))
 				tests.Status(t, err, addresponse, 400)
 
 				listresponse1, err := cl.NodeListWithResponse(ctx, &openapi.NodeListParams{})
@@ -175,7 +174,7 @@ func TestNodesTreeMutations(t *testing.T) {
 					Name:       nameP1,
 					Slug:       &slugP1,
 					Visibility: &visibility,
-				}, e2e.WithSession(ctx, cj))
+				}, sh.WithSession(ctx))
 				tests.Ok(t, err, nodeP1)
 
 				nameC1 := "test-node-c1"
@@ -184,15 +183,15 @@ func TestNodesTreeMutations(t *testing.T) {
 					Name:       nameC1,
 					Slug:       &slugC1,
 					Visibility: &visibility,
-				}, e2e.WithSession(ctx, cj))
+				}, sh.WithSession(ctx))
 				tests.Ok(t, err, nodeC1)
 
 				// First make C1 a child of P1
-				addresponse, err := cl.NodeAddNodeWithResponse(ctx, slugP1, slugC1, e2e.WithSession(ctx, cj))
+				addresponse, err := cl.NodeAddNodeWithResponse(ctx, slugP1, slugC1, sh.WithSession(ctx))
 				tests.Ok(t, err, addresponse)
 
 				// Then move P1 to be a child of C1
-				addresponse2, err := cl.NodeAddNodeWithResponse(ctx, slugC1, slugP1, e2e.WithSession(ctx, cj))
+				addresponse2, err := cl.NodeAddNodeWithResponse(ctx, slugC1, slugP1, sh.WithSession(ctx))
 				tests.Ok(t, err, addresponse2)
 
 				// C1 must now be a root node without a parent because there

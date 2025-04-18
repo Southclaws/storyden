@@ -869,6 +869,28 @@ var (
 		Columns:    RolesColumns,
 		PrimaryKey: []*schema.Column{RolesColumns[0]},
 	}
+	// SessionsColumns holds the columns for the "sessions" table.
+	SessionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "expires_at", Type: field.TypeTime},
+		{Name: "revoked_at", Type: field.TypeTime, Nullable: true},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+	}
+	// SessionsTable holds the schema information for the "sessions" table.
+	SessionsTable = &schema.Table{
+		Name:       "sessions",
+		Columns:    SessionsColumns,
+		PrimaryKey: []*schema.Column{SessionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "sessions_accounts_sessions",
+				Columns:    []*schema.Column{SessionsColumns[4]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// SettingsColumns holds the columns for the "settings" table.
 	SettingsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
@@ -1120,6 +1142,7 @@ var (
 		QuestionsTable,
 		ReactsTable,
 		RolesTable,
+		SessionsTable,
 		SettingsTable,
 		TagsTable,
 		AccountTagsTable,
@@ -1179,6 +1202,7 @@ func init() {
 	QuestionsTable.ForeignKeys[1].RefTable = QuestionsTable
 	ReactsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
+	SessionsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable
 	LinkPostContentReferencesTable.ForeignKeys[0].RefTable = LinksTable

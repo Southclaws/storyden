@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	session1 "github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -29,24 +28,24 @@ func TestCollectionSubmissions(t *testing.T) {
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session1.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
-			adminSession := e2e.WithSession(adminCtx, cj)
+			adminSession := sh.WithSession(adminCtx)
 
 			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{xid.New().String(), "password"})
 			tests.Ok(t, err, acc1)
-			session1 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))), cj)
+			session1 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))))
 
 			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{xid.New().String(), "password"})
 			tests.Ok(t, err, acc2)
-			session2 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))), cj)
+			session2 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))))
 
 			acc3, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{xid.New().String(), "password"})
 			tests.Ok(t, err, acc3)
-			session3 := e2e.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc3.JSON200.Id)))), cj)
+			session3 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc3.JSON200.Id)))))
 
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 				Admin:       false,

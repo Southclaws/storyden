@@ -13,7 +13,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -27,7 +26,7 @@ func TestNodesVisibilityRules_Draft(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -40,40 +39,40 @@ func TestNodesVisibilityRules_Draft(t *testing.T) {
 			review := openapi.Review
 			published := openapi.Published
 
-			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
+			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
 
 			t.Run("draft_child_succeeds", func(t *testing.T) {
-				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, draftNode.JSON200.Id)
 			})
 
 			t.Run("unlisted_child_fails", func(t *testing.T) {
-				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
+				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusBadRequest)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, unlistedNode.JSON200.Id)
 			})
 
 			t.Run("review_child_fails", func(t *testing.T) {
-				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
+				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusBadRequest)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, reviewNode.JSON200.Id)
 			})
 
 			t.Run("published_child_fails", func(t *testing.T) {
-				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
+				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusBadRequest)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.Contains(t, ids, publishedNode.JSON200.Id)
 			})
@@ -88,7 +87,7 @@ func TestNodesVisibilityRules_Unlisted(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -101,40 +100,40 @@ func TestNodesVisibilityRules_Unlisted(t *testing.T) {
 			review := openapi.Review
 			published := openapi.Published
 
-			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
+			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
 
 			t.Run("draft_child_fails", func(t *testing.T) {
-				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
+				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusBadRequest)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, draftNode.JSON200.Id)
 			})
 
 			t.Run("unlisted_child_succeeds", func(t *testing.T) {
-				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, unlistedNode.JSON200.Id)
 			})
 
 			t.Run("review_child_fails", func(t *testing.T) {
-				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
+				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusBadRequest)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, reviewNode.JSON200.Id)
 			})
 
 			t.Run("published_child_fails", func(t *testing.T) {
-				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
+				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusBadRequest)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.Contains(t, ids, publishedNode.JSON200.Id)
 			})
@@ -149,7 +148,7 @@ func TestNodesVisibilityRules_Review(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -162,40 +161,40 @@ func TestNodesVisibilityRules_Review(t *testing.T) {
 			review := openapi.Review
 			published := openapi.Published
 
-			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
+			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
 
 			t.Run("draft_child_succeeds", func(t *testing.T) {
-				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, draftNode.JSON200.Id)
 			})
 
 			t.Run("unlisted_child_fails", func(t *testing.T) {
-				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
+				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusBadRequest)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, unlistedNode.JSON200.Id)
 			})
 
 			t.Run("review_child_succeeds", func(t *testing.T) {
-				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, reviewNode.JSON200.Id)
 			})
 
 			t.Run("published_child_fails", func(t *testing.T) {
-				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
+				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusBadRequest)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.Contains(t, ids, publishedNode.JSON200.Id)
 			})
@@ -210,7 +209,7 @@ func TestNodesVisibilityRules_Published(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -223,40 +222,40 @@ func TestNodesVisibilityRules_Published(t *testing.T) {
 			review := openapi.Review
 			published := openapi.Published
 
-			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+			parentNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n1", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &published}, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
 
 			t.Run("draft_child_succeeds", func(t *testing.T) {
-				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, draftNode.JSON200.Id)
 			})
 
 			t.Run("unlisted_child_fails", func(t *testing.T) {
-				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusBadRequest)
+				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusBadRequest)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, unlistedNode.JSON200.Id)
 			})
 
 			t.Run("review_child_succeeds", func(t *testing.T) {
-				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+				reviewNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &review}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, reviewNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, reviewNode.JSON200.Id)
 			})
 
 			t.Run("published_child_succeeds", func(t *testing.T) {
-				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, e2e.WithSession(ctxAuthor, cj)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, e2e.WithSession(ctxAdmin, cj)))(t, http.StatusOK)
+				publishedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, publishedNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
 
-				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, e2e.WithSession(ctxRando, cj)))(t, http.StatusOK)
+				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
 				assert.NotContains(t, ids, publishedNode.JSON200.Id)
 			})

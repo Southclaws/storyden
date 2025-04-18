@@ -32,11 +32,16 @@ func (i *Authentication) AuthEmailPasswordSignup(ctx context.Context, request op
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	t, err := i.si.Issue(ctx, acc.ID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.AuthEmailPasswordSignup200JSONResponse{
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccessOK{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.cj.Create(acc.ID.String()).String(),
+				SetCookie: i.cj.Create(*t).String(),
 			},
 		},
 	}, nil
@@ -48,16 +53,21 @@ func (i *Authentication) AuthEmailPasswordSignin(ctx context.Context, request op
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	u, err := i.passwordAuthProvider.LoginWithEmail(ctx, *address, request.Body.Password)
+	acc, err := i.passwordAuthProvider.LoginWithEmail(ctx, *address, request.Body.Password)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	t, err := i.si.Issue(ctx, acc.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return openapi.AuthEmailPasswordSignin200JSONResponse{
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
-			Body: openapi.AuthSuccess{Id: u.ID.String()},
+			Body: openapi.AuthSuccess{Id: acc.ID.String()},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: i.cj.Create(u.ID.String()).String(),
+				SetCookie: i.cj.Create(*t).String(),
 			},
 		},
 	}, nil

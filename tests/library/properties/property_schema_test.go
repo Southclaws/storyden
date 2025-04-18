@@ -11,7 +11,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -25,12 +24,12 @@ func TestNodesPropertySchemas_Create(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
 			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
-			session := e2e.WithSession(ctx, cj)
+			session := sh.WithSession(ctx)
 
 			parentname := "parent"
 			parentslug := parentname + uuid.NewString()

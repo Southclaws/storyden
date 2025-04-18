@@ -23,6 +23,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	waprovider "github.com/Southclaws/storyden/app/services/authentication/provider/webauthn"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/config"
@@ -34,6 +35,7 @@ var errNoCookie = fault.New("no webauthn session cookie")
 
 type WebAuthn struct {
 	cj           *session_cookie.Jar
+	si           *session.Issuer
 	accountQuery *account_querier.Querier
 	wa           *waprovider.Provider
 	address      url.URL
@@ -41,6 +43,7 @@ type WebAuthn struct {
 
 func NewWebAuthn(
 	cfg config.Config,
+	si *session.Issuer,
 	accountQuery *account_querier.Querier,
 	cj *session_cookie.Jar,
 	wa *waprovider.Provider,
@@ -67,7 +70,7 @@ func NewWebAuthn(
 		}
 	})
 
-	return WebAuthn{cj, accountQuery, wa, cfg.PublicAPIAddress}
+	return WebAuthn{cj, si, accountQuery, wa, cfg.PublicAPIAddress}
 }
 
 func (a *WebAuthn) WebAuthnRequestCredential(ctx context.Context, request openapi.WebAuthnRequestCredentialRequestObject) (openapi.WebAuthnRequestCredentialResponseObject, error) {
@@ -149,13 +152,18 @@ func (a *WebAuthn) WebAuthnMakeCredential(ctx context.Context, request openapi.W
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	t, err := a.si.Issue(ctx, accountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.WebAuthnMakeCredential200JSONResponse{
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccess{
 				Id: xid.NilID().String(),
 			},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: a.cj.Create(accountID.String()).String(),
+				SetCookie: a.cj.Create(*t).String(),
 			},
 		},
 	}, nil
@@ -232,13 +240,18 @@ func (a *WebAuthn) WebAuthnMakeAssertion(ctx context.Context, request openapi.We
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	t, err := a.si.Issue(ctx, acc.ID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return openapi.WebAuthnMakeAssertion200JSONResponse{
 		AuthSuccessOKJSONResponse: openapi.AuthSuccessOKJSONResponse{
 			Body: openapi.AuthSuccess{
 				Id: xid.NilID().String(),
 			},
 			Headers: openapi.AuthSuccessOKResponseHeaders{
-				SetCookie: a.cj.Create(acc.ID.String()).String(),
+				SetCookie: a.cj.Create(*t).String(),
 			},
 		},
 	}, nil

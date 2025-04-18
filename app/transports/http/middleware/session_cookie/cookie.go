@@ -8,14 +8,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/rs/xid"
-
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/token"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/infrastructure/endec/securecookie"
 )
 
 // TODO: Allow changing this via config.
@@ -30,12 +27,13 @@ func expiryFunc() time.Time {
 }
 
 type Jar struct {
-	ss               *securecookie.Session
+	validator        *session.Validator
+	issuer           *session.Issuer
 	domain           string
 	secureCookieName string
 }
 
-func New(cfg config.Config, ss *securecookie.Session) (*Jar, error) {
+func New(cfg config.Config, v *session.Validator) (*Jar, error) {
 	domain, err := getCookieDomain(cfg.PublicAPIAddress, cfg.PublicWebAddress)
 	if err != nil {
 		return nil, fault.Wrap(err, fmsg.With("failed to parse domain from public API address"))
@@ -43,7 +41,7 @@ func New(cfg config.Config, ss *securecookie.Session) (*Jar, error) {
 
 	return &Jar{
 		domain:           domain,
-		ss:               ss,
+		validator:        v,
 		secureCookieName: secureCookieName,
 	}, nil
 }
@@ -65,8 +63,8 @@ func (j *Jar) createWithValue(value string, expire time.Time) *http.Cookie {
 	}
 }
 
-func (j *Jar) Create(accountID string) *http.Cookie {
-	return j.createWithValue(j.ss.Encrypt(accountID), expiryFunc())
+func (j *Jar) Create(t token.Token) *http.Cookie {
+	return j.createWithValue(t.String(), expiryFunc())
 }
 
 func (j *Jar) Destroy() *http.Cookie {
@@ -80,17 +78,12 @@ func (j *Jar) WithSession(r *http.Request) context.Context {
 		return r.Context()
 	}
 
-	accountID, ok := j.ss.Decrypt(cookie.Value)
-	if !ok {
-		return r.Context()
-	}
-
-	id, err := xid.FromString(accountID)
+	ctx, err := j.validator.Validate(r.Context(), cookie.Value)
 	if err != nil {
 		return r.Context()
 	}
 
-	return session.WithAccountID(r.Context(), account.AccountID(id))
+	return ctx
 }
 
 // WithAuth simply pulls out the session from the cookie and propagates it.

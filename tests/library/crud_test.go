@@ -12,7 +12,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -26,7 +25,7 @@ func TestNodesHappyPath(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -47,7 +46,7 @@ func TestNodesHappyPath(t *testing.T) {
 				Content:    &content1,
 				Url:        &url1,
 				Visibility: &visibility, // Admin account can post directly to published
-			}, e2e.WithSession(ctx, cj))
+			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node1)
 
 			a.Equal(name1, node1.JSON200.Name)
@@ -84,7 +83,7 @@ func TestNodesHappyPath(t *testing.T) {
 				Content: &cont1,
 				Url:     &url1,
 				Meta:    &prop1,
-			}, e2e.WithSession(ctx, cj))
+			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node1update)
 
 			a.Equal(name1, node1update.JSON200.Name)
@@ -102,7 +101,7 @@ func TestNodesHappyPath(t *testing.T) {
 					Name:       name2,
 					Slug:       &slug2,
 					Visibility: &visibility,
-				}, e2e.WithSession(ctx, cj))
+				}, sh.WithSession(ctx))
 				tests.Ok(t, err, node2)
 
 				a.Equal(name2, node2.JSON200.Name)
@@ -123,7 +122,7 @@ func TestNodesErrors(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -142,7 +141,7 @@ func TestNodesErrors(t *testing.T) {
 			r.NotNil(update403)
 			a.Equal(http.StatusForbidden, update403.StatusCode())
 
-			update404, err := cl.NodeUpdateWithResponse(ctx, "nonexistent", nil, openapi.NodeMutableProps{}, e2e.WithSession(ctx, cj))
+			update404, err := cl.NodeUpdateWithResponse(ctx, "nonexistent", nil, openapi.NodeMutableProps{}, sh.WithSession(ctx))
 			r.NoError(err)
 			r.NotNil(update404)
 			a.Equal(http.StatusNotFound, update404.StatusCode())
@@ -153,7 +152,7 @@ func TestNodesErrors(t *testing.T) {
 				create, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 					Name: name,
 					Slug: &slug,
-				}, e2e.WithSession(ctx, cj))
+				}, sh.WithSession(ctx))
 				tests.Status(t, err, create, http.StatusBadRequest)
 			})
 		}))

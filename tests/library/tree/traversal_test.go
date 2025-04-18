@@ -13,7 +13,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -27,7 +26,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 		lc fx.Lifecycle,
 		ctx context.Context,
 		cl *openapi.ClientWithResponses,
-		cj *session_cookie.Jar,
+		sh *e2e.SessionHelper,
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
@@ -48,7 +47,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 				Name:       name1,
 				Slug:       &slug1,
 				Visibility: &visibility,
-			}, e2e.WithSession(ctx, cj))
+			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node1)
 
 			name2 := "test-node-2"
@@ -58,7 +57,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 				Slug:       &slug2,
 				Parent:     &slug1,
 				Visibility: &visibility,
-			}, e2e.WithSession(ctx, cj))
+			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node2)
 
 			name3 := "test-node-3"
@@ -68,7 +67,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 				Slug:       &slug3,
 				Parent:     &slug1,
 				Visibility: &visibility,
-			}, e2e.WithSession(ctx, cj))
+			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node3)
 
 			name4 := "test-node-4"
@@ -78,7 +77,7 @@ func TestNodesTreeQuerying(t *testing.T) {
 				Slug:       &slug4,
 				Parent:     &slug3,
 				Visibility: &visibility,
-			}, e2e.WithSession(ctx, cj))
+			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node4)
 
 			t.Run("query_all_top_level", func(t *testing.T) {
