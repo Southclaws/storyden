@@ -1,6 +1,6 @@
 <p align="center">
   <a aria-label="storyden logo" href="https://storyden.org">
-    <img src="home/public/social-1584-396.png"  />
+    <img src="home/public/opengraph-1584-396.png"  />
   </a>
 </p>
 
