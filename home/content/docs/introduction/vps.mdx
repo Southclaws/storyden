@@ -48,29 +48,6 @@ Storyden's infrastructure-level configuration is applied via environment variabl
 
 For this guide, we'll focus on the bare minimum to get up and running.
 
-### `SESSION_KEY`
-
-The [session key](/docs/operation/configuration#session_key) is an important security value. It's used to encrypt session tokens so that they can't be tampered with. It's important to set this to a unique value that is kept secret. You can use any trusted source of randomness on your local machine to generate it.
-
-<Callout type="warning" emoji="⚠️">
-  A session key must be a hexadecimal string with 16 or more characters.
-</Callout>
-
-Create a random string of hexadecimal characters using a tool of your choice. For example, using `openssl`:
-
-```sh
-openssl rand -hex 32
-```
-
-Then apply this value to the `SESSION_KEY` secret:
-
-```sh
-docker run
-  -p 8000:8000
-  -e SESSION_KEY=yoursupersecretvalue
-  ghcr.io/southclaws/storyden
-```
-
 ### `PUBLIC_WEB_ADDRESS`
 
 This is the frontend address, or, the URL users will visit in their browser. [More info.](/docs/operation/configuration#public_web_address)
@@ -89,18 +66,18 @@ Example: `PUBLIC_API_ADDRESS=https://api.the-secret-agent.club`
   set both environment variables to the same value.
 </Callout>
 
-## Mounting `/data`
+## Mounting `/storyden/data`
 
 Storyden does not depend on external services by default, so unless you specify, persistent storage such as the database and assets are stored on the local disk.
 
 - If you haven't specified a [`DATABASE_URL`](/docs/operation/configuration#database_url) a local embedded SQLite database will be used.
 - If you haven't specified a [`ASSET_STORAGE_TYPE`](/docs/operation/configuration#asset_storage_type) uploaded files will be stored to disk.
 
-The Docker image data directory is `/data` so mount this directory when starting your container.
-
-so mount your host directory to `/data` when starting the container
+The Docker image data directory is `/storyden/data` which is set as a volume by default, if you want to mount a local directory instead of a Docker-managed volume, you can specify the `--volume` flag and bind it to a directory on your host machine's filesystem.
 
 ## All together
+
+Using Docker's managed volume:
 
 <Tabs groupId="shell" items={["Escaped", "One line", "NuShell"]}>
   <Tab value="Escaped">
@@ -109,8 +86,6 @@ so mount your host directory to `/data` when starting the container
     docker run \
       --name storyden \
       --publish 8000:8000 \
-      --volume /my/storyden/data:/data \
-      --env SESSION_KEY=yoursupersecretvalue \
       --env PUBLIC_WEB_ADDRESS=https://the-secret-agent.club \
       --env PUBLIC_API_ADDRESS=https://api.the-secret-agent.club \
       ghcr.io/southclaws/storyden
@@ -121,7 +96,7 @@ so mount your host directory to `/data` when starting the container
   <Tab value="One line">
 
     ```sh
-    docker run --name storyden --publish 8000:8000 --volume /my/storyden/data:/data --env SESSION_KEY=yoursupersecretvalue --env PUBLIC_WEB_ADDRESS=https://the-secret-agent.club --env PUBLIC_API_ADDRESS=https://api.the-secret-agent.club ghcr.io/southclaws/storyden
+    docker run --name storyden --publish 8000:8000 --env PUBLIC_WEB_ADDRESS=https://the-secret-agent.club --env PUBLIC_API_ADDRESS=https://api.the-secret-agent.club ghcr.io/southclaws/storyden
     ```
 
   </Tab>
@@ -132,8 +107,47 @@ so mount your host directory to `/data` when starting the container
     (docker run
       --name storyden
       --publish 8000:8000
-      --volume /my/storyden/data:/data
-      --env SESSION_KEY=yoursupersecretvalue
+      --env PUBLIC_WEB_ADDRESS=https://the-secret-agent.club
+      --env PUBLIC_API_ADDRESS=https://api.the-secret-agent.club
+      ghcr.io/southclaws/storyden)
+    ```
+
+  </Tab>
+
+</Tabs>
+
+Or with a directory mounted into the container:
+
+<Tabs groupId="shell" items={["Escaped", "One line", "NuShell"]}>
+  <Tab value="Escaped">
+
+    ```sh
+    docker run \
+      --name storyden \
+      --publish 8000:8000 \
+      --volume /my/local/storyden/data:/storyden/data \
+      --env PUBLIC_WEB_ADDRESS=https://the-secret-agent.club \
+      --env PUBLIC_API_ADDRESS=https://api.the-secret-agent.club \
+      ghcr.io/southclaws/storyden
+    ```
+
+  </Tab>
+
+  <Tab value="One line">
+
+    ```sh
+    docker run --name storyden --publish 8000:8000 --volume /my/storyden/data:/storyden/data --env PUBLIC_WEB_ADDRESS=https://the-secret-agent.club --env PUBLIC_API_ADDRESS=https://api.the-secret-agent.club ghcr.io/southclaws/storyden
+    ```
+
+  </Tab>
+
+    <Tab value="NuShell">
+
+    ```sh
+    (docker run
+      --name storyden
+      --publish 8000:8000
+      --volume /my/storyden/data:/storyden/data
       --env PUBLIC_WEB_ADDRESS=https://the-secret-agent.club
       --env PUBLIC_API_ADDRESS=https://api.the-secret-agent.club
       ghcr.io/southclaws/storyden)

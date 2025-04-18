@@ -161,7 +161,7 @@ To finish up, we need to mount the volume to the app by using the `[mounts]` sec
 +
 +   [mounts]
 +     source="storyden_data"
-+     destination="/data"
++     destination="/storyden/data"
 ```
 
 Run Fly Deploy to attach the volume:
@@ -170,41 +170,11 @@ Run Fly Deploy to attach the volume:
 fly deploy
 ```
 
-### Secrets
-
-There's one secret that you need to set for your deployment to be secure: `SESSION_KEY`
-
-The [session key](/docs/operation/configuration#session_key) is an important security value. It's used to encrypt session tokens so that they can't be tampered with. It's important to set this to a unique value that is kept secret. You can use any trusted source of randomness on your local machine to generate it.
-
-<Callout type="warning" emoji="⚠️">
-  A session key must be a hexadecimal string with 16 or more characters.
-</Callout>
-
-Create a random string of hexadecimal characters using a tool of your choice. For example, using `openssl`:
-
-```sh
-openssl rand -hex 32
-```
-
-<Callout>
-  An example value is intentionally omitted here. You should *always* generate
-  cryptographic source secrets yourself.
-</Callout>
-
-Then apply this value to the `SESSION_KEY` secret:
-
-```sh
-fly secrets set SESSION_KEY=yoursupersecretvalue
-```
-
 ### Environment Variables
 
 Relevant documentation: https://fly.io/docs/reference/configuration#the-env-variables-section
 
-Storyden uses secure cookies for session authentication. As a result, it needs to know two things:
-
-- what domain it's running on so it can set the `Domain` flag on the cookie
-- a unique encryption key to keep session tokens secure
+Storyden uses secure cookies for session authentication. As a result, it needs to know what domain it's running on so it can set the `Domain` flag on the cookie.
 
 ```diff
     app = 'my-storyden'
@@ -228,7 +198,7 @@ Storyden uses secure cookies for session authentication. As a result, it needs t
 
     [mounts]
       source="storyden_data"
-      destination="/data"
+      destination="/storyden/data"
 +
 +   [env]
 +     PUBLIC_API_ADDRESS = "https://my-storyden.fly.dev"
