@@ -2,6 +2,7 @@ package token
 
 import (
 	"context"
+	"time"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -81,6 +82,8 @@ func (r *cachedRepo) get(ctx context.Context, t Token) (*Validated, bool, error)
 	raw, err := r.store.Get(ctx, t.ID.String())
 	if err != nil {
 		// Cache miss, found=false
+		// TODO: Expose a "cache miss" error/return value and distinguish
+		// between network/cache errors and cache misses.
 		return nil, false, nil
 	}
 
@@ -103,7 +106,12 @@ func (r *cachedRepo) cache(ctx context.Context, s Session) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = r.store.Set(ctx, s.Token.String(), string(payload), Expiry)
+	ttl := time.Until(s.ExpiresAt)
+	if ttl <= 0 {
+		return nil
+	}
+
+	err = r.store.Set(ctx, s.Token.String(), string(payload), ttl)
 	if err != nil {
 		return err
 	}
