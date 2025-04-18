@@ -83,16 +83,6 @@ type Config struct {
 	*/
 	ListenAddr string `default:"0.0.0.0:8000" envconfig:"LISTEN_ADDR"`
 	/*
-	   The key used to encrypt session data. This should be a hexadecimal string of 16 or more characters.
-
-	   This is used by nacl/secretbox to encrypt cookies for tracking sessions.
-
-	   You must always set this value when deploying to production. When left as the default value, you are vulnerable to session hijacking attacks as the key is known to everyone.
-
-	   Pending deprecation in favour of an init-time generated key that is stored in the database.
-	*/
-	SessionKey string `default:"0000000000000000" envconfig:"SESSION_KEY"`
-	/*
 	   The address at which the web frontend will be hosted.
 
 	   This must be set to the public URL that users of the instance will access the frontend client. It is used to determine things such as cookie domain attributes, CORS policy, WebAuthn attributes and other necessary settings. The scheme may be used by some internal components to determine whether the instance is running in a secure context or not.
