@@ -47,7 +47,9 @@ func (r *persistedRepository) Issue(ctx context.Context, accountID account.Accou
 }
 
 func (r *persistedRepository) Revoke(ctx context.Context, id Token) error {
-	update := r.db.Session.Update()
+	update := r.db.Session.Update().Where(session.ID(id.ID))
+
+	update.SetRevokedAt(time.Now())
 
 	err := update.Exec(ctx)
 	if err != nil {
