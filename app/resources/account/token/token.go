@@ -66,7 +66,7 @@ type Session struct {
 
 type Validated Session
 
-func (s *Session) Validate() (*Validated, error) {
+func (s Session) Validate() (*Validated, error) {
 	if s.RevokedAt.Ok() {
 		return nil, ErrTokenRevoked
 	}
@@ -75,7 +75,7 @@ func (s *Session) Validate() (*Validated, error) {
 		return nil, ErrTokenExpired
 	}
 
-	return (*Validated)(s), nil
+	return (*Validated)(&s), nil
 }
 
 func (t Session) Serialise() ([]byte, error) {
