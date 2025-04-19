@@ -1068,7 +1068,7 @@ paths:
   /categories/{category_id}:
     patch:
       operationId: CategoryUpdate
-      description: Create a category for organising posts.
+      description: Update a category's information.
       tags: [categories]
       parameters: [$ref: "#/components/parameters/CategoryIDParam"]
       requestBody: { $ref: "#/components/requestBodies/CategoryUpdate" }

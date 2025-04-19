@@ -90,7 +90,7 @@ export const categoryUpdateOrder = async (
 };
 
 /**
- * Create a category for organising posts.
+ * Update a category's information.
  */
 export type categoryUpdateResponse = {
   data: CategoryUpdateOKResponse;

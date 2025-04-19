@@ -174,7 +174,7 @@ export const useCategoryUpdateOrder = <
   };
 };
 /**
- * Create a category for organising posts.
+ * Update a category's information.
  */
 export const categoryUpdate = (
   categoryId: string,

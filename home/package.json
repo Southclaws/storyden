@@ -7,6 +7,7 @@
     "dev": "next dev",
     "start": "next start",
     "prepare": "panda codegen",
+    "openapi": "node generate-openapi.mjs",
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
@@ -15,11 +16,14 @@
     "date-fns": "^4.1.0",
     "fumadocs-core": "15.2.8",
     "fumadocs-mdx": "11.6.0",
+    "fumadocs-openapi": "8.0.2",
     "fumadocs-ui": "15.2.8",
     "lodash": "^4.17.21",
     "next": "15.3.1",
+    "prettier": "^3.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "shiki": "3.2.2",
     "zod": "^3.24.3"
   },
   "devDependencies": {

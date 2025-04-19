@@ -1,0 +1,148 @@
+---
+title: Overview
+description: Build powerful clients, automations and more with the API.
+---
+
+import { Tab, Tabs } from "fumadocs-ui/components/tabs";
+
+Unlike other forum software, Storyden is built around a (fairly) HTTP standards-compliant RESTful API. This enables endless possibilities for developers to build powerful frontends, automations, integrations and more.
+
+## Using the API
+
+To start experimenting with the API, get a local instance running:
+
+```
+docker run -p 8000:8000 ghcr.io/southclaws/storyden
+```
+
+Once you've waited roughly 1 millisecond for Storyden to boot up, you can start interacting with it via your favourite HTTP client. The OpenAPI specification is available at:
+
+```
+/api/openapi.json
+```
+
+You can also access interactive API documentation, powered by Scalar, at:
+
+```
+/api/docs
+```
+
+Because Storyden uses simple browser cookies, you can use the docs to immediately start playing with the API.
+
+## Authentication
+
+Storyden uses secure cookies for authentication. You can register for an account or log in using the API or normally, via a browser to obtain a session token. You'll find the session cookie under a cookie named:
+
+```
+storyden-session
+```
+
+Include this with all requests to the API. For example, using curl register for a new account on a fresh local instance:
+
+<Tabs groupId="shell" items={["Escaped", "One line", "NuShell"]}>
+  <Tab value="Escaped">
+
+    ```bash
+    curl -c cookies.txt http://localhost:8000/api/auth/password/signup \
+      --request POST \
+      --header 'Content-Type: application/json' \
+      --data '{
+      "identifier": "storyden",
+      "token": "password"
+    }'
+    ```
+
+  </Tab>
+
+  <Tab value="One line">
+
+    ```sh
+    curl -c cookies.txt http://localhost:8000/api/auth/password/signup --request POST --header 'Content-Type: application/json' --data '{"identifier":"storyden","token":"password"}'
+    ```
+
+  </Tab>
+
+    <Tab value="NuShell">
+
+    ```sh
+    (curl -c cookies.txt http://localhost:8000/api/auth/password/signup
+      --request POST
+      --header 'Content-Type: application/json'
+      --data '{
+      "identifier": "storyden",
+      "token": "password"
+    }')
+    ```
+
+    Note: we cannot use Nushell's `http` command here as it doesn't support cookies.
+
+  </Tab>
+
+</Tabs>
+
+Now use the `-b cookies.txt` option for cURL to include the session cookie in all requests. For example, to get a list of all members, you will see yourself in the list:
+
+```bash
+curl -b cookies.txt http://localhost:8000/api/accounts
+```
+
+You'll see your account information in the response:
+
+```json
+{
+  // The first signup is admin by default.
+  "admin": true,
+  // Your bio can be written with rich text formatting.
+  "bio": "<body></body>",
+  // Accounts may have multiple email addresses if email features are enabled.
+  "email_addresses": [],
+  // The identifier you signed up with
+  "handle": "storyden",
+  "id": "d01oa6i37ros73bk14rg", // Your unique ID
+  "joined": "2025-04-19T11:12:26.873686708Z",
+  // Your display name is the same as your handle by default, you can change this to anything you want.
+  "name": "storyden",
+  // Roles provide permissions, since this would be the first account created, it receives both the Member role with default permissions and the Admin role with all permissions denoted by "ADMINISTRATOR".
+  "roles": [
+    {
+      "badge": false,
+      "colour": "green",
+      "createdAt": "0001-01-01T00:00:00Z",
+      "default": true,
+      "id": "00000000000000000010",
+      "name": "Member",
+      "permissions": [
+        "CREATE_POST",
+        "READ_PUBLISHED_THREADS",
+        "CREATE_REACTION",
+        "READ_PUBLISHED_LIBRARY",
+        "SUBMIT_LIBRARY_NODE",
+        "UPLOAD_ASSET",
+        "LIST_PROFILES",
+        "READ_PROFILE",
+        "CREATE_COLLECTION",
+        "LIST_COLLECTIONS",
+        "READ_COLLECTION",
+        "COLLECTION_SUBMIT"
+      ],
+      "updatedAt": "0001-01-01T00:00:00Z"
+    },
+    {
+      "badge": false,
+      "colour": "red",
+      "createdAt": "0001-01-01T00:00:00Z",
+      "default": true,
+      "id": "00000000000000000020",
+      "name": "Admin",
+      "permissions": ["ADMINISTRATOR"],
+      "updatedAt": "0001-01-01T00:00:00Z"
+    }
+  ]
+}
+```
+
+## API tokens
+
+<Callout>
+  Service account tokens for programmatic/bot access is coming soon!
+</Callout>

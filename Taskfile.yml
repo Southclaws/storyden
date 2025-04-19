@@ -52,11 +52,18 @@ tasks:
     cmds: [go generate ./internal/ent]
 
   generate:openapi:
-    deps: [generate:openapi:backend, generate:openapi:frontend]
+    deps:
+      - generate:openapi:backend
+      - generate:openapi:frontend
+      - generate:openapi:docs
+
   generate:openapi:backend:
     cmds: [go generate .]
   generate:openapi:frontend:
     dir: web
+    cmds: [yarn openapi]
+  generate:openapi:docs:
+    dir: home
     cmds: [yarn openapi]
   # -
   # Database
