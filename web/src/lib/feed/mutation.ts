@@ -16,6 +16,7 @@ import {
   ThreadListParams,
   ThreadReference,
 } from "@/api/openapi-schema";
+import { likePostAdd, likePostRemove } from "@/api/openapi-client/likes";
 
 export function useFeedMutations(session?: Account, params?: ThreadListParams) {
   const { mutate } = useSWRConfig();
@@ -134,9 +135,71 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
     await threadDelete(id);
   }
 
+  async function likePost(id: Identifier) {
+    const mutator: MutatorCallback<ThreadListOKResponse> = (data) => {
+      if (!data) return;
+
+      const newThreads = data.threads.map((thread) => {
+        if (thread.id === id) {
+          return {
+            ...thread,
+            likes: {
+              likes: thread.likes.likes + 1,
+              liked: true,
+            },
+          };
+        }
+        return thread;
+      });
+
+      return {
+        ...data,
+        threads: newThreads,
+      };
+    }
+
+    await mutate(threadListKeyFilterFn, mutator, {
+      revalidate: false,
+    });
+
+    await likePostAdd(id);
+  }
+
+  async function unlikePost(id: Identifier) {
+    const mutator: MutatorCallback<ThreadListOKResponse> = (data) => {
+      if (!data) return;
+
+      const newThreads = data.threads.map((thread) => {
+        if (thread.id === id) {
+          return {
+            ...thread,
+            likes: {
+              likes: thread.likes.likes - 1,
+              liked: false,
+            },
+          };
+        }
+        return thread;
+      });
+
+      return {
+        ...data,
+        threads: newThreads,
+      };
+    }
+
+    await mutate(threadListKeyFilterFn, mutator, {
+      revalidate: false,
+    });
+
+    await likePostRemove(id);
+  }
+
   return {
     createThread,
     deleteThread,
+    likePost,
+    unlikePost,
     revalidate,
   };
 }
