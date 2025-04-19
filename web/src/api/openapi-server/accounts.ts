@@ -91,8 +91,9 @@ export const accountAuthProviderList = async (
 };
 
 /**
- * Retrieve a list of authentication providers with a flag indicating which
-ones are active for the currently authenticated account.
+ * Deletes the specified authentication method from the account. This is
+irreversible however if this authentication method is the only remaining
+method for the account, this operation will fail with a 400 bad request.
 
  */
 export type accountAuthMethodDeleteResponse = {
