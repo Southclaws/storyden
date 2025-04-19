@@ -23,7 +23,7 @@ kill_timeout = 5
 
 [[services]]
   http_checks = [
-    { interval = 10000, grace_period = "5s", method = "get", path = "/api/version", protocol = "http", timeout = 2000 },
+    { interval = 10000, grace_period = "5s", method = "get", path = "/healthz", protocol = "http", timeout = 2000 },
   ]
   internal_port = 8000
   processes = ["app"]
