@@ -8,6 +8,7 @@ import {
 import { notFound } from "next/navigation";
 import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
 import { getMDXComponents } from "@/mdx-components";
+import { Metadata } from "next";
 
 export default async function Page(props: {
   params: Promise<{ slug?: string[] }>;
@@ -53,11 +54,21 @@ export async function generateMetadata(props: {
   params: Promise<{ slug?: string[] }>;
 }) {
   const params = await props.params;
+  const { slug = [] } = params;
   const page = source.getPage(params.slug);
   if (!page) notFound();
+
+  const image = ["/docs-og", ...slug, "image.png"].join("/");
 
   return {
     title: page.data.title,
     description: page.data.description,
-  };
+    openGraph: {
+      images: image,
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: image,
+    },
+  } satisfies Metadata;
 }
