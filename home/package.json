@@ -6,7 +6,8 @@
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
-    "prepare": "panda codegen ; node generate-openapi.mjs",
+    "prepare": "panda codegen",
+    "openapi": "node generate-openapi.mjs",
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {

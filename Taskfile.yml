@@ -64,7 +64,7 @@ tasks:
     cmds: [yarn openapi]
   generate:openapi:docs:
     dir: home
-    cmds: [yarn prepare]
+    cmds: [yarn openapi]
   # -
   # Database
   # -
