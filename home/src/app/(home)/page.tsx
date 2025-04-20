@@ -62,13 +62,12 @@ function Hero() {
 
           <HStack gap={4}>
             <Link
-              target="_blank"
               className={linkButton({
                 backgroundColor: "white",
               })}
-              href="https://makeroom.club"
+              href="/docs/introduction"
             >
-              Live demo
+              Get Started
             </Link>
             <Link
               target="_blank"
@@ -85,9 +84,9 @@ function Hero() {
                   },
                 })
               )}
-              href="https://github.com/Southclaws/storyden"
+              href="https://makeroom.club"
             >
-              Source code
+              Live Demo
             </Link>
           </HStack>
         </VStack>
