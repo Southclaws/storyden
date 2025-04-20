@@ -13,7 +13,14 @@ export const joeiBold = async () => {
   return f;
 };
 
-// export const workSans = () =>
-//   fetch(new URL("./static/WorkSans-Medium.woff2", import.meta.url)).then(
-//     (res) => res.arrayBuffer()
-//   );
+export const workSans = async () => {
+  const rel = "./static/WorkSans-Medium.otf";
+  const dirUrl = new URL(import.meta.url);
+  const dir = dirname(dirUrl.pathname);
+
+  const full = join(dir, rel);
+
+  const f = await readFile(full);
+
+  return f;
+};
