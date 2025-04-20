@@ -40,7 +40,7 @@ require (
 	github.com/ThreeDotsLabs/watermill v1.4.6
 	github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.1
 	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
-	github.com/alitto/pond/v2 v2.3.2
+	github.com/alitto/pond/v2 v2.3.4
 	github.com/bwmarrin/discordgo v0.28.1
 	github.com/cixtor/readability v1.0.0
 	github.com/dave/jennifer v1.7.1
@@ -48,7 +48,7 @@ require (
 	github.com/dgraph-io/ristretto/v2 v2.2.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/dustinkirkland/golang-petname v0.0.0-20240428194347-eebcea082ee0
-	github.com/gabriel-vasile/mimetype v1.4.8
+	github.com/gabriel-vasile/mimetype v1.4.9
 	github.com/getsentry/sentry-go v0.32.0
 	github.com/getsentry/sentry-go/otel v0.32.0
 	github.com/glebarez/go-sqlite v1.22.0
@@ -80,7 +80,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	github.com/shirou/gopsutil/v4 v4.25.3
 	github.com/twilio/twilio-go v1.25.1
-	github.com/weaviate/weaviate v1.30.0
+	github.com/weaviate/weaviate v1.30.1
 	github.com/weaviate/weaviate-go-client/v5 v5.1.0
 	go.opentelemetry.io/otel v1.35.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.35.0
