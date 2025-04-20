@@ -10,7 +10,7 @@ export const joeiBold = async () => {
 
   const f = await readFile(full);
 
-  return f.buffer;
+  return f;
 };
 
 // export const workSans = () =>
