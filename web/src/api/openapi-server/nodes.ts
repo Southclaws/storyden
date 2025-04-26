@@ -23,6 +23,7 @@ import type {
   NodeUpdateBody,
   NodeUpdateOKResponse,
   NodeUpdateParams,
+  NodeUpdatePositionBody,
   NodeUpdatePropertiesBody,
   NodeUpdatePropertiesOKResponse,
   NodeUpdatePropertySchemaBody,
@@ -503,6 +504,40 @@ export const nodeRemoveNode = async (
     {
       ...options,
       method: "DELETE",
+    },
+  );
+};
+
+/**
+ * Update the node's position in the tree, which optionally allows for 
+changing the node's parent either to another node or to `null` which
+severs the parent and moves the node to the root. This endpoint also
+allows for moving the node's sort position within either its current
+parent, or when moving it to a new parent. Use this operation for a
+draggable tree interface or a table interface.
+
+ */
+export type nodeUpdatePositionResponse = {
+  data: NodeUpdateOKResponse;
+  status: number;
+};
+
+export const getNodeUpdatePositionUrl = (nodeSlug: string) => {
+  return `/nodes/${nodeSlug}/position`;
+};
+
+export const nodeUpdatePosition = async (
+  nodeSlug: string,
+  nodeUpdatePositionBody: NodeUpdatePositionBody,
+  options?: RequestInit,
+): Promise<nodeUpdatePositionResponse> => {
+  return fetcher<Promise<nodeUpdatePositionResponse>>(
+    getNodeUpdatePositionUrl(nodeSlug),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(nodeUpdatePositionBody),
     },
   );
 };

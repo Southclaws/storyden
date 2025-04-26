@@ -430,6 +430,10 @@ func (m *Mapping) NodeRemoveNode() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }
 
+func (m *Mapping) NodeUpdatePosition() (bool, *rbac.Permission) {
+	return true, nil // See NOTE.
+}
+
 func (m *Mapping) LinkCreate() (bool, *rbac.Permission) {
 	return true, nil
 }

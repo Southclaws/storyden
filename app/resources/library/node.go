@@ -3,6 +3,7 @@ package library
 import (
 	"time"
 
+	"github.com/Southclaws/lexorank"
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
@@ -50,6 +51,7 @@ type Node struct {
 	Tags            tag_ref.Tags
 	Collections     collection_item_status.Status // NOTE: Not done yet
 	Visibility      visibility.Visibility
+	SortKey         lexorank.Key
 	RelevanceScore  opt.Optional[float64]
 	Metadata        map[string]any
 

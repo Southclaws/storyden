@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
+	"github.com/Southclaws/lexorank"
 	"github.com/rs/xid"
 )
 
@@ -29,6 +30,9 @@ func (Node) Fields() []ent.Field {
 		field.String("primary_asset_id").GoType(xid.ID{}).Optional().Nillable(),
 		field.String("link_id").GoType(xid.ID{}).Optional(),
 		field.Enum("visibility").Values(VisibilityTypes...).Default(VisibilityTypesDraft),
+		field.String("sort").GoType(lexorank.Key{}).DefaultFunc(func() lexorank.Key {
+			return lexorank.Top
+		}),
 		field.JSON("metadata", map[string]any{}).Optional(),
 	}
 }

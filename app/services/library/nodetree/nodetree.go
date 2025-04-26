@@ -10,6 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -38,15 +39,20 @@ type service struct {
 }
 
 func New(
+	nodeChildren *node_children.Writer,
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	accountQuery *account_querier.Querier,
-) Graph {
-	return &service{
+) (Graph, *Position) {
+	g := &service{
 		nodeQuerier:  nodeQuerier,
 		nodeWriter:   nodeWriter,
 		accountQuery: accountQuery,
 	}
+
+	p := NewPositionService(nodeChildren, nodeQuerier, nodeWriter, g, accountQuery)
+
+	return g, p
 }
 
 func (s *service) Move(ctx context.Context, child library.QueryKey, parent library.QueryKey) (*library.Node, error) {

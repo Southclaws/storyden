@@ -2,6 +2,7 @@ package node_querier
 
 import (
 	"context"
+	"math"
 	"slices"
 
 	"entgo.io/ent/dialect/sql"
@@ -181,7 +182,7 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 			}).
 			WithProperties().
-			Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc()))
+			Order(node.BySort(sql.OrderAsc()))
 	})
 
 	col, err := query.Only(ctx)
@@ -200,6 +201,16 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		sortmap, err := q.sortedByPropertyValue(ctx, children, *o.sortChildrenBy)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		// For any children that lack values, insert a max int value
+		// in order to force these nodes to sort to the end always.
+		if len(sortmap) != len(col.Edges.Nodes) {
+			for _, node := range col.Edges.Nodes {
+				if _, ok := sortmap[node.ID]; !ok {
+					sortmap[node.ID] = math.MaxInt
+				}
+			}
 		}
 
 		slices.SortFunc(col.Edges.Nodes, func(a, b *ent.Node) int {
@@ -278,7 +289,8 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 			WithProperties().
 			WithPropertySchema(func(psq *ent.PropertySchemaQuery) {
 				psq.WithFields()
-			})
+			}).
+			Order(node.BySort(sql.OrderAsc()))
 	})
 
 	col, err := query.Only(ctx)

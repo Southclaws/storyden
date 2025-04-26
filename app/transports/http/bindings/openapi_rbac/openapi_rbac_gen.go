@@ -108,6 +108,7 @@ type OperationPermissions interface {
 	NodeRemoveAsset() (bool, *rbac.Permission)
 	NodeAddNode() (bool, *rbac.Permission)
 	NodeRemoveNode() (bool, *rbac.Permission)
+	NodeUpdatePosition() (bool, *rbac.Permission)
 	LinkCreate() (bool, *rbac.Permission)
 	LinkList() (bool, *rbac.Permission)
 	LinkGet() (bool, *rbac.Permission)
@@ -334,6 +335,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.NodeAddNode()
 	case "NodeRemoveNode":
 		return optable.NodeRemoveNode()
+	case "NodeUpdatePosition":
+		return optable.NodeUpdatePosition()
 	case "LinkCreate":
 		return optable.LinkCreate()
 	case "LinkList":

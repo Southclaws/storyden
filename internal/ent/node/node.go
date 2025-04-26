@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/Southclaws/lexorank"
 	"github.com/rs/xid"
 )
 
@@ -44,6 +45,8 @@ const (
 	FieldLinkID = "link_id"
 	// FieldVisibility holds the string denoting the visibility field in the database.
 	FieldVisibility = "visibility"
+	// FieldSort holds the string denoting the sort field in the database.
+	FieldSort = "sort"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
@@ -161,6 +164,7 @@ var Columns = []string{
 	FieldPrimaryAssetID,
 	FieldLinkID,
 	FieldVisibility,
+	FieldSort,
 	FieldMetadata,
 }
 
@@ -196,6 +200,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultSort holds the default value on creation for the "sort" field.
+	DefaultSort func() lexorank.Key
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -306,6 +312,11 @@ func ByLinkID(opts ...sql.OrderTermOption) OrderOption {
 // ByVisibility orders the results by the visibility field.
 func ByVisibility(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldVisibility, opts...).ToFunc()
+}
+
+// BySort orders the results by the sort field.
+func BySort(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSort, opts...).ToFunc()
 }
 
 // ByOwnerField orders the results by owner field.

@@ -87,6 +87,7 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 			},
 			Nodes:      nodes,
 			Visibility: visibility,
+			SortKey:    c.Sort,
 			Metadata:   c.Metadata,
 		}
 

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/lexorank"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/collection"
@@ -255,6 +256,20 @@ func (nu *NodeUpdate) SetVisibility(n node.Visibility) *NodeUpdate {
 func (nu *NodeUpdate) SetNillableVisibility(n *node.Visibility) *NodeUpdate {
 	if n != nil {
 		nu.SetVisibility(*n)
+	}
+	return nu
+}
+
+// SetSort sets the "sort" field.
+func (nu *NodeUpdate) SetSort(l lexorank.Key) *NodeUpdate {
+	nu.mutation.SetSort(l)
+	return nu
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (nu *NodeUpdate) SetNillableSort(l *lexorank.Key) *NodeUpdate {
+	if l != nil {
+		nu.SetSort(*l)
 	}
 	return nu
 }
@@ -683,6 +698,9 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := nu.mutation.Visibility(); ok {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)
+	}
+	if value, ok := nu.mutation.Sort(); ok {
+		_spec.SetField(node.FieldSort, field.TypeString, value)
 	}
 	if value, ok := nu.mutation.Metadata(); ok {
 		_spec.SetField(node.FieldMetadata, field.TypeJSON, value)
@@ -1361,6 +1379,20 @@ func (nuo *NodeUpdateOne) SetNillableVisibility(n *node.Visibility) *NodeUpdateO
 	return nuo
 }
 
+// SetSort sets the "sort" field.
+func (nuo *NodeUpdateOne) SetSort(l lexorank.Key) *NodeUpdateOne {
+	nuo.mutation.SetSort(l)
+	return nuo
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (nuo *NodeUpdateOne) SetNillableSort(l *lexorank.Key) *NodeUpdateOne {
+	if l != nil {
+		nuo.SetSort(*l)
+	}
+	return nuo
+}
+
 // SetMetadata sets the "metadata" field.
 func (nuo *NodeUpdateOne) SetMetadata(m map[string]interface{}) *NodeUpdateOne {
 	nuo.mutation.SetMetadata(m)
@@ -1815,6 +1847,9 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	}
 	if value, ok := nuo.mutation.Visibility(); ok {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)
+	}
+	if value, ok := nuo.mutation.Sort(); ok {
+		_spec.SetField(node.FieldSort, field.TypeString, value)
 	}
 	if value, ok := nuo.mutation.Metadata(); ok {
 		_spec.SetField(node.FieldMetadata, field.TypeJSON, value)
