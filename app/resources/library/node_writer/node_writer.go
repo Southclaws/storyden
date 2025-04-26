@@ -9,12 +9,15 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/lexorank"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -25,12 +28,17 @@ import (
 )
 
 type Writer struct {
-	db      *ent.Client
-	querier *node_querier.Querier
+	db          *ent.Client
+	querier     *node_querier.Querier
+	childWriter *node_children.Writer
 }
 
-func New(db *ent.Client, querier *node_querier.Querier) *Writer {
-	return &Writer{db, querier}
+func New(db *ent.Client, querier *node_querier.Querier, childWriter *node_children.Writer) *Writer {
+	return &Writer{
+		db:          db,
+		querier:     querier,
+		childWriter: childWriter,
+	}
 }
 
 type Option func(*ent.NodeMutation)
@@ -175,6 +183,14 @@ func (w *Writer) Create(
 		fn(mutate)
 	}
 
+	parent := opt.NewSafe(mutate.ParentID())
+	sortkey, err := w.getNextSortKey(ctx, parent)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	mutate.SetSort(*sortkey)
+
 	col, err := create.Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
@@ -188,6 +204,55 @@ func (w *Writer) Create(
 	}
 
 	return w.querier.Get(ctx, library.QueryKey{mark.NewQueryKeyID(col.ID)})
+}
+
+func (w *Writer) getNextSortKey(ctx context.Context, parent opt.Optional[xid.ID]) (*lexorank.Key, error) {
+	siblingQuery := w.db.Node.Query().
+		Select(node.FieldSort).
+		Limit(1).
+		Order(ent.Desc(node.FieldSort))
+
+	// If the parent is not nil, we need to filter by the parent ID. Otherwise
+	// the target node is at the root level and its siblings are too.
+	if parentID, ok := parent.Get(); ok {
+		siblingQuery.Where(node.ParentNodeID(parentID))
+	} else {
+		siblingQuery.Where(node.ParentNodeIDIsNil())
+	}
+
+	var lerr error
+
+	for range 2 {
+		siblings, err := siblingQuery.All(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		if len(siblings) == 1 {
+			sibling := siblings[0]
+
+			sortkey, ok := sibling.Sort.After(100)
+			if !ok {
+				err := w.childWriter.Normalise(ctx, parent.Ptr())
+				if err != nil {
+					return nil, fault.Wrap(err, fctx.With(ctx))
+				}
+
+				lerr = fault.Newf("failed to get next sort key between %s and %s", lexorank.Top, sibling.Sort)
+				continue
+			}
+
+			return sortkey, nil
+		} else {
+			return &lexorank.Middle, nil
+		}
+	}
+	if lerr == nil {
+		lerr = fault.New("failed to get next sort key: unknown")
+	}
+
+	// TODO: Explore if returning a random sortkey instead of an error is good.
+	return nil, fault.Wrap(lerr, fctx.With(ctx))
 }
 
 func (w *Writer) Update(ctx context.Context, qk library.QueryKey, opts ...Option) (*library.Node, error) {

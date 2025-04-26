@@ -1,4 +1,4 @@
-package datagraph_test
+package children_test
 
 import (
 	"context"

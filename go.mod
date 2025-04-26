@@ -35,6 +35,7 @@ require github.com/Southclaws/fault v0.8.1
 require (
 	github.com/JohannesKaufmann/html-to-markdown/v2 v2.3.1
 	github.com/PuerkitoBio/goquery v1.10.3
+	github.com/Southclaws/lexorank v1.2.3
 	github.com/Southclaws/opt v0.6.1
 	github.com/Southclaws/swirl v1.0.1
 	github.com/ThreeDotsLabs/watermill v1.4.6
@@ -239,7 +240,7 @@ require (
 	github.com/x448/float16 v0.8.4 // indirect
 	github.com/zclconf/go-cty v1.16.2 // indirect
 	go.uber.org/multierr v1.11.0
-	golang.org/x/crypto v0.37.0
+	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/net v0.39.0
 	golang.org/x/sys v0.32.0 // indirect

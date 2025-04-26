@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/lexorank"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/link"
@@ -51,6 +52,8 @@ type Node struct {
 	LinkID xid.ID `json:"link_id,omitempty"`
 	// Visibility holds the value of the "visibility" field.
 	Visibility node.Visibility `json:"visibility,omitempty"`
+	// Sort holds the value of the "sort" field.
+	Sort lexorank.Key `json:"sort,omitempty"`
 	// Metadata holds the value of the "metadata" field.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -217,6 +220,8 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case node.FieldMetadata:
 			values[i] = new([]byte)
+		case node.FieldSort:
+			values[i] = new(lexorank.Key)
 		case node.FieldName, node.FieldSlug, node.FieldDescription, node.FieldContent, node.FieldVisibility:
 			values[i] = new(sql.NullString)
 		case node.FieldCreatedAt, node.FieldUpdatedAt, node.FieldDeletedAt, node.FieldIndexedAt:
@@ -333,6 +338,12 @@ func (n *Node) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field visibility", values[i])
 			} else if value.Valid {
 				n.Visibility = node.Visibility(value.String)
+			}
+		case node.FieldSort:
+			if value, ok := values[i].(*lexorank.Key); !ok {
+				return fmt.Errorf("unexpected type %T for field sort", values[i])
+			} else if value != nil {
+				n.Sort = *value
 			}
 		case node.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -491,6 +502,9 @@ func (n *Node) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("visibility=")
 	builder.WriteString(fmt.Sprintf("%v", n.Visibility))
+	builder.WriteString(", ")
+	builder.WriteString("sort=")
+	builder.WriteString(fmt.Sprintf("%v", n.Sort))
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", n.Metadata))

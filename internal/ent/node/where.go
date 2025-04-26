@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/Southclaws/lexorank"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/rs/xid"
 )
@@ -119,6 +120,11 @@ func PrimaryAssetID(v xid.ID) predicate.Node {
 // LinkID applies equality check predicate on the "link_id" field. It's identical to LinkIDEQ.
 func LinkID(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldLinkID, v))
+}
+
+// Sort applies equality check predicate on the "sort" field. It's identical to SortEQ.
+func Sort(v lexorank.Key) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldSort, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -989,6 +995,76 @@ func VisibilityIn(vs ...Visibility) predicate.Node {
 // VisibilityNotIn applies the NotIn predicate on the "visibility" field.
 func VisibilityNotIn(vs ...Visibility) predicate.Node {
 	return predicate.Node(sql.FieldNotIn(FieldVisibility, vs...))
+}
+
+// SortEQ applies the EQ predicate on the "sort" field.
+func SortEQ(v lexorank.Key) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldSort, v))
+}
+
+// SortNEQ applies the NEQ predicate on the "sort" field.
+func SortNEQ(v lexorank.Key) predicate.Node {
+	return predicate.Node(sql.FieldNEQ(FieldSort, v))
+}
+
+// SortIn applies the In predicate on the "sort" field.
+func SortIn(vs ...lexorank.Key) predicate.Node {
+	return predicate.Node(sql.FieldIn(FieldSort, vs...))
+}
+
+// SortNotIn applies the NotIn predicate on the "sort" field.
+func SortNotIn(vs ...lexorank.Key) predicate.Node {
+	return predicate.Node(sql.FieldNotIn(FieldSort, vs...))
+}
+
+// SortGT applies the GT predicate on the "sort" field.
+func SortGT(v lexorank.Key) predicate.Node {
+	return predicate.Node(sql.FieldGT(FieldSort, v))
+}
+
+// SortGTE applies the GTE predicate on the "sort" field.
+func SortGTE(v lexorank.Key) predicate.Node {
+	return predicate.Node(sql.FieldGTE(FieldSort, v))
+}
+
+// SortLT applies the LT predicate on the "sort" field.
+func SortLT(v lexorank.Key) predicate.Node {
+	return predicate.Node(sql.FieldLT(FieldSort, v))
+}
+
+// SortLTE applies the LTE predicate on the "sort" field.
+func SortLTE(v lexorank.Key) predicate.Node {
+	return predicate.Node(sql.FieldLTE(FieldSort, v))
+}
+
+// SortContains applies the Contains predicate on the "sort" field.
+func SortContains(v lexorank.Key) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldContains(FieldSort, vc))
+}
+
+// SortHasPrefix applies the HasPrefix predicate on the "sort" field.
+func SortHasPrefix(v lexorank.Key) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldHasPrefix(FieldSort, vc))
+}
+
+// SortHasSuffix applies the HasSuffix predicate on the "sort" field.
+func SortHasSuffix(v lexorank.Key) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldHasSuffix(FieldSort, vc))
+}
+
+// SortEqualFold applies the EqualFold predicate on the "sort" field.
+func SortEqualFold(v lexorank.Key) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldEqualFold(FieldSort, vc))
+}
+
+// SortContainsFold applies the ContainsFold predicate on the "sort" field.
+func SortContainsFold(v lexorank.Key) predicate.Node {
+	vc := v.String()
+	return predicate.Node(sql.FieldContainsFold(FieldSort, vc))
 }
 
 // MetadataIsNil applies the IsNil predicate on the "metadata" field.

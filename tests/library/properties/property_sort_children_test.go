@@ -265,7 +265,7 @@ func TestNodesPropertySorting_WithEmptyValues(t *testing.T) {
 				}, session))(t, http.StatusOK)
 				r.Len(n.JSON200.Children, 3)
 				slugs := dt.Map(n.JSON200.Children, bySlug)
-				wantSlugs := []string{slug3, slug2, slug1}
+				wantSlugs := []string{slug2, slug1, slug3}
 				a.Equal(wantSlugs, slugs)
 
 				n = tests.AssertRequest(cl.NodeGetWithResponse(root, parentslug, &openapi.NodeGetParams{
@@ -273,7 +273,7 @@ func TestNodesPropertySorting_WithEmptyValues(t *testing.T) {
 				}, session))(t, http.StatusOK)
 				r.Len(n.JSON200.Children, 3)
 				slugs = dt.Map(n.JSON200.Children, bySlug)
-				wantSlugs = []string{slug3, slug1, slug2}
+				wantSlugs = []string{slug1, slug2, slug3}
 				a.Equal(wantSlugs, slugs)
 			})
 		}))

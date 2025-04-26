@@ -55,7 +55,7 @@ type Manager struct {
 	tagWriter         *tag_writer.Writer
 	titler            generative.Titler
 	tagger            *autotagger.Tagger
-	nc                node_children.Repository
+	nc                *node_children.Writer
 	fetcher           *fetcher.Fetcher
 	summariser        generative.Summariser
 	indexQueue        pubsub.Topic[mq.IndexNode]
@@ -72,7 +72,7 @@ func New(
 	tagWriter *tag_writer.Writer,
 	titler generative.Titler,
 	tagger *autotagger.Tagger,
-	nc node_children.Repository,
+	nc *node_children.Writer,
 	fetcher *fetcher.Fetcher,
 	summariser generative.Summariser,
 	indexQueue pubsub.Topic[mq.IndexNode],

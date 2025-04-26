@@ -41,6 +41,25 @@ func NewMap[T, R any](value nullable.Nullable[T], fn func(T) R) Value[R] {
 	return Value[R]{v: opt.NewMap(v, fn)}
 }
 
+func NewMapErr[T, R any](value nullable.Nullable[T], fn func(T) (R, error)) (Value[R], error) {
+	if value.IsNull() {
+		return Value[R]{v: opt.NewEmpty[R](), delete: true}, nil
+	}
+
+	v, err := value.Get()
+	if err != nil {
+		return Value[R]{v: opt.NewEmpty[R]()}, nil
+	}
+
+	pv := opt.New(v)
+
+	mv, err := opt.MapErr(pv, fn)
+	if err != nil {
+		return Value[R]{}, err
+	}
+	return Value[R]{v: mv}, nil
+}
+
 // Skip is an opt-out for cases where the inbound type is not a nullable type,
 // but the receiving location is a deletable type. Not common, but a minor
 // workaround to save designing more complex APIs at the service layer. Mostly

@@ -25,7 +25,7 @@ type Controller struct {
 	accountQuery *account_querier.Querier
 	nodeQuerier  *node_querier.Querier
 	nodeWriter   *node_writer.Writer
-	nc           node_children.Repository
+	nc           *node_children.Writer
 	indexQueue   pubsub.Topic[mq.IndexNode]
 }
 
@@ -33,7 +33,7 @@ func New(
 	accountQuery *account_querier.Querier,
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
-	nc node_children.Repository,
+	nc *node_children.Writer,
 	indexQueue pubsub.Topic[mq.IndexNode],
 ) *Controller {
 	return &Controller{

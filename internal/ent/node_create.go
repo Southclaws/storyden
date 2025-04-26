@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/lexorank"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/collection"
@@ -199,6 +200,20 @@ func (nc *NodeCreate) SetVisibility(n node.Visibility) *NodeCreate {
 func (nc *NodeCreate) SetNillableVisibility(n *node.Visibility) *NodeCreate {
 	if n != nil {
 		nc.SetVisibility(*n)
+	}
+	return nc
+}
+
+// SetSort sets the "sort" field.
+func (nc *NodeCreate) SetSort(l lexorank.Key) *NodeCreate {
+	nc.mutation.SetSort(l)
+	return nc
+}
+
+// SetNillableSort sets the "sort" field if the given value is not nil.
+func (nc *NodeCreate) SetNillableSort(l *lexorank.Key) *NodeCreate {
+	if l != nil {
+		nc.SetSort(*l)
 	}
 	return nc
 }
@@ -419,6 +434,10 @@ func (nc *NodeCreate) defaults() {
 		v := node.DefaultVisibility
 		nc.mutation.SetVisibility(v)
 	}
+	if _, ok := nc.mutation.Sort(); !ok {
+		v := node.DefaultSort()
+		nc.mutation.SetSort(v)
+	}
 	if _, ok := nc.mutation.ID(); !ok {
 		v := node.DefaultID()
 		nc.mutation.SetID(v)
@@ -449,6 +468,9 @@ func (nc *NodeCreate) check() error {
 		if err := node.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Node.visibility": %w`, err)}
 		}
+	}
+	if _, ok := nc.mutation.Sort(); !ok {
+		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "Node.sort"`)}
 	}
 	if v, ok := nc.mutation.ID(); ok {
 		if err := node.IDValidator(v.String()); err != nil {
@@ -529,6 +551,10 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 	if value, ok := nc.mutation.Visibility(); ok {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)
 		_node.Visibility = value
+	}
+	if value, ok := nc.mutation.Sort(); ok {
+		_spec.SetField(node.FieldSort, field.TypeString, value)
+		_node.Sort = value
 	}
 	if value, ok := nc.mutation.Metadata(); ok {
 		_spec.SetField(node.FieldMetadata, field.TypeJSON, value)
@@ -975,6 +1001,18 @@ func (u *NodeUpsert) UpdateVisibility() *NodeUpsert {
 	return u
 }
 
+// SetSort sets the "sort" field.
+func (u *NodeUpsert) SetSort(v lexorank.Key) *NodeUpsert {
+	u.Set(node.FieldSort, v)
+	return u
+}
+
+// UpdateSort sets the "sort" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateSort() *NodeUpsert {
+	u.SetExcluded(node.FieldSort)
+	return u
+}
+
 // SetMetadata sets the "metadata" field.
 func (u *NodeUpsert) SetMetadata(v map[string]interface{}) *NodeUpsert {
 	u.Set(node.FieldMetadata, v)
@@ -1279,6 +1317,20 @@ func (u *NodeUpsertOne) SetVisibility(v node.Visibility) *NodeUpsertOne {
 func (u *NodeUpsertOne) UpdateVisibility() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateVisibility()
+	})
+}
+
+// SetSort sets the "sort" field.
+func (u *NodeUpsertOne) SetSort(v lexorank.Key) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetSort(v)
+	})
+}
+
+// UpdateSort sets the "sort" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateSort() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateSort()
 	})
 }
 
@@ -1756,6 +1808,20 @@ func (u *NodeUpsertBulk) SetVisibility(v node.Visibility) *NodeUpsertBulk {
 func (u *NodeUpsertBulk) UpdateVisibility() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.UpdateVisibility()
+	})
+}
+
+// SetSort sets the "sort" field.
+func (u *NodeUpsertBulk) SetSort(v lexorank.Key) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetSort(v)
+	})
+}
+
+// UpdateSort sets the "sort" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateSort() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateSort()
 	})
 }
 

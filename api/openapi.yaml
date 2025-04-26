@@ -1779,6 +1779,26 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NodeRemoveChildOK" }
 
+  /nodes/{node_slug}/position:
+    patch:
+      operationId: NodeUpdatePosition
+      description: |
+        Update the node's position in the tree, which optionally allows for 
+        changing the node's parent either to another node or to `null` which
+        severs the parent and moves the node to the root. This endpoint also
+        allows for moving the node's sort position within either its current
+        parent, or when moving it to a new parent. Use this operation for a
+        draggable tree interface or a table interface.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/NodeUpdatePosition" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/NodeUpdateOK" }
+
   #
   # 888 d8b          888
   # 888 Y8P          888
@@ -2645,6 +2665,11 @@ components:
           schema:
             type: array
             items: { $ref: "#/components/schemas/PropertySchemaMutableProps" }
+
+    NodeUpdatePosition:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NodePositionMutableProps" }
 
     LinkCreate:
       content:
@@ -5409,6 +5434,29 @@ components:
         type: { $ref: "#/components/schemas/PropertyType" }
         sort:
           type: string
+
+    NodePositionMutableProps:
+      type: object
+      description: |
+        Parameters for repositioning a node in the hierarchy. You may change the
+        node's parent using `parent`, and/or reposition it among its siblings
+        using one of: `before`, `after`, or `index`. Using multiple reordering
+        properties is not allowed.
+      properties:
+        parent:
+          type: string
+          nullable: true
+          description: |
+            Optional new parent node slug. Set to null to move node to the root.
+        before:
+          type: string
+          description: Move this node before the sibling with this ID.
+        after:
+          type: string
+          description: Move this node after the sibling with this ID.
+      example:
+        parent: "d031a8do2dtqtahe9nl0"
+        before: "cc5lnd2s1s4652adtu50"
 
     #
     # 888      d8b          888

@@ -10,6 +10,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/lexorank"
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/jmoiron/sqlx"
@@ -39,7 +40,8 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, err
 		WithOwner(func(aq *ent.AccountQuery) {
 			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 		}).
-		WithAssets()
+		WithAssets().
+		Order(node.ByParentNodeID(), node.BySort())
 
 	f := filters{}
 	for _, fn := range fs {
@@ -73,10 +75,11 @@ func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, err
 	return nodes, nil
 }
 
-const ddl = `with recursive children (parent, id, depth) as (
+const ddl = `with recursive children (parent, id, sort, depth) as (
     select
         parent_node_id,
         id,
+        sort,
         0
     from
         nodes
@@ -85,6 +88,7 @@ union
     select
         d.parent,
         s.id,
+        s.sort,
         d.depth + 1
     from
         children d
@@ -94,7 +98,8 @@ select
     distinct n.id       node_id,
     n.account_id        node_account_id,
     n.visibility        node_visibility,
-	depth
+    n.sort              node_sort_key,
+    depth
 from
     children
     inner join nodes n on n.id = children.id
@@ -104,13 +109,14 @@ from
 %s
 
 order by
-    depth
+    depth, node_sort_key
 `
 
 type subtreeRow struct {
 	NodeId         xid.ID                `db:"node_id"`
 	NodeAccountId  xid.ID                `db:"node_account_id"`
 	NodeVisibility visibility.Visibility `db:"node_visibility"`
+	NodeSortKey    lexorank.Key          `db:"node_sort_key"`
 	Depth          int                   `db:"depth"`
 }
 

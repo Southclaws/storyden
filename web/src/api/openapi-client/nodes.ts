@@ -31,6 +31,7 @@ import type {
   NodeUpdateBody,
   NodeUpdateOKResponse,
   NodeUpdateParams,
+  NodeUpdatePositionBody,
   NodeUpdatePropertiesBody,
   NodeUpdatePropertiesOKResponse,
   NodeUpdatePropertySchemaBody,
@@ -931,6 +932,78 @@ export const useNodeRemoveNode = <
   const swrKey =
     swrOptions?.swrKey ?? getNodeRemoveNodeMutationKey(nodeSlug, nodeSlugChild);
   const swrFn = getNodeRemoveNodeMutationFetcher(nodeSlug, nodeSlugChild);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the node's position in the tree, which optionally allows for 
+changing the node's parent either to another node or to `null` which
+severs the parent and moves the node to the root. This endpoint also
+allows for moving the node's sort position within either its current
+parent, or when moving it to a new parent. Use this operation for a
+draggable tree interface or a table interface.
+
+ */
+export const nodeUpdatePosition = (
+  nodeSlug: string,
+  nodeUpdatePositionBody: NodeUpdatePositionBody,
+) => {
+  return fetcher<NodeUpdateOKResponse>({
+    url: `/nodes/${nodeSlug}/position`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: nodeUpdatePositionBody,
+  });
+};
+
+export const getNodeUpdatePositionMutationFetcher = (nodeSlug: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: NodeUpdatePositionBody },
+  ): Promise<NodeUpdateOKResponse> => {
+    return nodeUpdatePosition(nodeSlug, arg);
+  };
+};
+export const getNodeUpdatePositionMutationKey = (nodeSlug: string) =>
+  [`/nodes/${nodeSlug}/position`] as const;
+
+export type NodeUpdatePositionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeUpdatePosition>>
+>;
+export type NodeUpdatePositionMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeUpdatePosition = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeUpdatePosition>>,
+      TError,
+      Key,
+      NodeUpdatePositionBody,
+      Awaited<ReturnType<typeof nodeUpdatePosition>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNodeUpdatePositionMutationKey(nodeSlug);
+  const swrFn = getNodeUpdatePositionMutationFetcher(nodeSlug);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

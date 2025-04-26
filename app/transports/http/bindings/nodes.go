@@ -41,6 +41,7 @@ type Nodes struct {
 	nodeReader    *node_read.HydratedQuerier
 	nv            *node_visibility.Controller
 	ntree         nodetree.Graph
+	npos          *nodetree.Position
 	ntr           node_traversal.Repository
 	schemaUpdater *node_property_schema.Updater
 }
@@ -51,6 +52,7 @@ func NewNodes(
 	nodeReader *node_read.HydratedQuerier,
 	nv *node_visibility.Controller,
 	ntree nodetree.Graph,
+	npos *nodetree.Position,
 	ntr node_traversal.Repository,
 	schemaUpdater *node_property_schema.Updater,
 ) Nodes {
@@ -60,6 +62,7 @@ func NewNodes(
 		nodeReader:    nodeReader,
 		nv:            nv,
 		ntree:         ntree,
+		npos:          npos,
 		ntr:           ntr,
 		schemaUpdater: schemaUpdater,
 	}
@@ -477,6 +480,47 @@ func (c *Nodes) NodeRemoveNode(ctx context.Context, request openapi.NodeRemoveNo
 
 	return openapi.NodeRemoveNode200JSONResponse{
 		NodeRemoveChildOKJSONResponse: openapi.NodeRemoveChildOKJSONResponse(serialiseNode(node)),
+	}, nil
+}
+
+func (c *Nodes) NodeUpdatePosition(ctx context.Context, request openapi.NodeUpdatePositionRequestObject) (openapi.NodeUpdatePositionResponseObject, error) {
+	opts := nodetree.Options{}
+
+	beforeID, err := opt.MapErr(opt.NewPtr(request.Body.Before), func(s string) (library.NodeID, error) {
+		id, err := xid.FromString(s)
+		return library.NodeID(id), err
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	afterID, err := opt.MapErr(opt.NewPtr(request.Body.After), func(s string) (library.NodeID, error) {
+		id, err := xid.FromString(s)
+		return library.NodeID(id), err
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	parentID, err := deletable.NewMapErr(request.Body.Parent, func(s string) (library.QueryKey, error) {
+		id, err := xid.FromString(s)
+		return library.NewID(id), err
+	})
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	opts.Parent = parentID
+	opts.Before = beforeID
+	opts.After = afterID
+
+	n, err := c.npos.Move(ctx, deserialiseNodeMark(request.NodeSlug), opts)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.NodeUpdatePosition200JSONResponse{
+		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseNodeWithItems(n)),
 	}, nil
 }
 

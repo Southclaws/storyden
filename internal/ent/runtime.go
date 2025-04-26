@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 
+	"github.com/Southclaws/lexorank"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/accountfollow"
 	"github.com/Southclaws/storyden/internal/ent/accountroles"
@@ -716,6 +717,10 @@ func init() {
 	node.DefaultUpdatedAt = nodeDescUpdatedAt.Default.(func() time.Time)
 	// node.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	node.UpdateDefaultUpdatedAt = nodeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// nodeDescSort is the schema descriptor for sort field.
+	nodeDescSort := nodeFields[10].Descriptor()
+	// node.DefaultSort holds the default value on creation for the sort field.
+	node.DefaultSort = nodeDescSort.Default.(func() lexorank.Key)
 	// nodeDescID is the schema descriptor for id field.
 	nodeDescID := nodeMixinFields0[0].Descriptor()
 	// node.DefaultID holds the default value on creation for the id field.

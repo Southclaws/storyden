@@ -11,6 +11,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/Southclaws/lexorank"
 	"github.com/Southclaws/storyden/internal/ent/account"
 	"github.com/Southclaws/storyden/internal/ent/accountfollow"
 	"github.com/Southclaws/storyden/internal/ent/accountroles"
@@ -15246,6 +15247,7 @@ type NodeMutation struct {
 	description            *string
 	content                *string
 	visibility             *node.Visibility
+	sort                   *lexorank.Key
 	metadata               *map[string]interface{}
 	clearedFields          map[string]struct{}
 	owner                  *xid.ID
@@ -15993,6 +15995,42 @@ func (m *NodeMutation) ResetVisibility() {
 	m.visibility = nil
 }
 
+// SetSort sets the "sort" field.
+func (m *NodeMutation) SetSort(l lexorank.Key) {
+	m.sort = &l
+}
+
+// Sort returns the value of the "sort" field in the mutation.
+func (m *NodeMutation) Sort() (r lexorank.Key, exists bool) {
+	v := m.sort
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSort returns the old "sort" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldSort(ctx context.Context) (v lexorank.Key, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSort is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSort requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSort: %w", err)
+	}
+	return oldValue.Sort, nil
+}
+
+// ResetSort resets all changes to the "sort" field.
+func (m *NodeMutation) ResetSort() {
+	m.sort = nil
+}
+
 // SetMetadata sets the "metadata" field.
 func (m *NodeMutation) SetMetadata(value map[string]interface{}) {
 	m.metadata = &value
@@ -16574,7 +16612,7 @@ func (m *NodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NodeMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 16)
 	if m.created_at != nil {
 		fields = append(fields, node.FieldCreatedAt)
 	}
@@ -16617,6 +16655,9 @@ func (m *NodeMutation) Fields() []string {
 	if m.visibility != nil {
 		fields = append(fields, node.FieldVisibility)
 	}
+	if m.sort != nil {
+		fields = append(fields, node.FieldSort)
+	}
 	if m.metadata != nil {
 		fields = append(fields, node.FieldMetadata)
 	}
@@ -16656,6 +16697,8 @@ func (m *NodeMutation) Field(name string) (ent.Value, bool) {
 		return m.LinkID()
 	case node.FieldVisibility:
 		return m.Visibility()
+	case node.FieldSort:
+		return m.Sort()
 	case node.FieldMetadata:
 		return m.Metadata()
 	}
@@ -16695,6 +16738,8 @@ func (m *NodeMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldLinkID(ctx)
 	case node.FieldVisibility:
 		return m.OldVisibility(ctx)
+	case node.FieldSort:
+		return m.OldSort(ctx)
 	case node.FieldMetadata:
 		return m.OldMetadata(ctx)
 	}
@@ -16803,6 +16848,13 @@ func (m *NodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetVisibility(v)
+		return nil
+	case node.FieldSort:
+		v, ok := value.(lexorank.Key)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSort(v)
 		return nil
 	case node.FieldMetadata:
 		v, ok := value.(map[string]interface{})
@@ -16958,6 +17010,9 @@ func (m *NodeMutation) ResetField(name string) error {
 		return nil
 	case node.FieldVisibility:
 		m.ResetVisibility()
+		return nil
+	case node.FieldSort:
+		m.ResetSort()
 		return nil
 	case node.FieldMetadata:
 		m.ResetMetadata()
