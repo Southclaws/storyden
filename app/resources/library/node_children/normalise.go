@@ -41,20 +41,20 @@ func (d *Writer) Normalise(ctx context.Context, parent *xid.ID) error {
 
 	rol.Normalise()
 
-	// NOTE: This transaction deadlocked once in a test so I think on larger
+	// NOTE: This transaction deadlocked a bit in the tests so I think on larger
 	// nodes with many children during high traffic this could be a problem.
 	// TODO: Explore potential background job alternatives for full normalise
 	// and do a smaller rebalance-until-safe for insertion time rebalance.
-	tx, err := d.db.Tx(ctx)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-	defer tx.Rollback()
+	// tx, err := d.db.Tx(ctx)
+	// if err != nil {
+	// 	return fault.Wrap(err, fctx.With(ctx))
+	// }
+	// defer tx.Rollback()
 
 	for _, l := range rol {
 		n := l.(*reorderableNode)
 
-		err := tx.Node.UpdateOneID(n.id).
+		err := d.db.Node.UpdateOneID(n.id).
 			SetSort(n.sort).
 			Exec(ctx)
 		if err != nil {
@@ -62,9 +62,9 @@ func (d *Writer) Normalise(ctx context.Context, parent *xid.ID) error {
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
+	// if err := tx.Commit(); err != nil {
+	// 	return fault.Wrap(err, fctx.With(ctx))
+	// }
 
 	return nil
 }
