@@ -42,42 +42,6 @@ const progressSlotNames = [
   [
     "circleRange",
     "progress__circleRange"
-  ],
-  [
-    "root",
-    "progress__root"
-  ],
-  [
-    "label",
-    "progress__label"
-  ],
-  [
-    "track",
-    "progress__track"
-  ],
-  [
-    "range",
-    "progress__range"
-  ],
-  [
-    "valueText",
-    "progress__valueText"
-  ],
-  [
-    "view",
-    "progress__view"
-  ],
-  [
-    "circle",
-    "progress__circle"
-  ],
-  [
-    "circleTrack",
-    "progress__circleTrack"
-  ],
-  [
-    "circleRange",
-    "progress__circleRange"
   ]
 ]
 const progressSlotFns = /* @__PURE__ */ progressSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, progressDefaultVariants, getSlotCompoundVariant(progressCompoundVariants, slotName))])

@@ -19,7 +19,7 @@ export type CarouselVariantProps = {
 
 export interface CarouselRecipe {
   __type: CarouselVariantProps
-  (props?: CarouselVariantProps): Pretty<Record<"root" | "viewport" | "itemGroup" | "item" | "nextTrigger" | "prevTrigger" | "indicatorGroup" | "indicator" | "control" | "root" | "viewport" | "itemGroup" | "item" | "nextTrigger" | "prevTrigger" | "indicatorGroup" | "indicator" | "control", string>>
+  (props?: CarouselVariantProps): Pretty<Record<"root" | "viewport" | "itemGroup" | "item" | "nextTrigger" | "prevTrigger" | "indicatorGroup" | "indicator" | "control", string>>
   raw: (props?: CarouselVariantProps) => CarouselVariantProps
   variantMap: CarouselVariantMap
   variantKeys: Array<keyof CarouselVariant>

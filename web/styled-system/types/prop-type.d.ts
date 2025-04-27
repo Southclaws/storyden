@@ -114,6 +114,8 @@ export interface UtilityValues {
 	borderLeftWidth: Tokens["borderWidths"];
 	borderRightWidth: Tokens["borderWidths"];
 	borderBottomWidth: Tokens["borderWidths"];
+	borderBlockStartWidth: Tokens["borderWidths"];
+	borderBlockEndWidth: Tokens["borderWidths"];
 	borderColor: Tokens["colors"];
 	borderInline: Tokens["borders"];
 	borderInlineWidth: Tokens["borderWidths"];
@@ -203,7 +205,7 @@ export interface UtilityValues {
 	strokeWidth: Tokens["borderWidths"];
 	srOnly: boolean;
 	debug: boolean;
-	colorPalette: "current" | "black" | "white" | "transparent" | "amber" | "amber.light" | "amber.dark" | "blue" | "blue.light" | "blue.dark" | "bronze" | "bronze.light" | "bronze.dark" | "brown" | "brown.light" | "brown.dark" | "crimson" | "crimson.light" | "crimson.dark" | "cyan" | "cyan.light" | "cyan.dark" | "gold" | "gold.light" | "gold.dark" | "grass" | "grass.light" | "grass.dark" | "gray" | "gray.light" | "gray.dark" | "green" | "green.light" | "green.dark" | "indigo" | "indigo.light" | "indigo.dark" | "iris" | "iris.light" | "iris.dark" | "jade" | "jade.light" | "jade.dark" | "lime" | "lime.light" | "lime.dark" | "mauve" | "mauve.light" | "mauve.dark" | "mint" | "mint.light" | "mint.dark" | "olive" | "olive.light" | "olive.dark" | "orange" | "orange.light" | "orange.dark" | "pink" | "pink.light" | "pink.dark" | "plum" | "plum.light" | "plum.dark" | "purple" | "purple.light" | "purple.dark" | "red" | "red.light" | "red.dark" | "ruby" | "ruby.light" | "ruby.dark" | "sage" | "sage.light" | "sage.dark" | "sand" | "sand.light" | "sand.dark" | "sky" | "sky.light" | "sky.dark" | "slate" | "slate.light" | "slate.dark" | "teal" | "teal.light" | "teal.dark" | "tomato" | "tomato.light" | "tomato.dark" | "violet" | "violet.light" | "violet.dark" | "yellow" | "yellow.light" | "yellow.dark" | "neutral" | "neutral.light" | "neutral.dark" | "accent" | "accent.text" | "accent.dark" | "accent.dark.text" | "whiteAlpha" | "blackAlpha" | "bg" | "fg" | "border" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV";
+	colorPalette: "current" | "black" | "white" | "transparent" | "gray" | "gray.light" | "gray.dark" | "amber" | "blue" | "bronze" | "brown" | "crimson" | "cyan" | "gold" | "grass" | "green" | "indigo" | "iris" | "jade" | "lime" | "mauve" | "mint" | "neutral" | "neutral.light" | "neutral.dark" | "olive" | "orange" | "pink" | "plum" | "purple" | "red" | "red.light" | "red.dark" | "ruby" | "sage" | "sand" | "sky" | "slate" | "teal" | "tomato" | "violet" | "yellow" | "accent" | "accent.text" | "accent.dark" | "accent.dark.text" | "whiteAlpha" | "blackAlpha" | "bg" | "fg" | "border" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV";
 	textStyle: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl";
 }
 

@@ -16,7 +16,7 @@ export type EditableVariantProps = {
 
 export interface EditableRecipe {
   __type: EditableVariantProps
-  (props?: EditableVariantProps): Pretty<Record<"root" | "area" | "label" | "preview" | "input" | "editTrigger" | "submitTrigger" | "cancelTrigger" | "control" | "root" | "area" | "label" | "preview" | "input" | "editTrigger" | "submitTrigger" | "cancelTrigger" | "control", string>>
+  (props?: EditableVariantProps): Pretty<Record<"root" | "area" | "label" | "preview" | "input" | "editTrigger" | "submitTrigger" | "cancelTrigger" | "control", string>>
   raw: (props?: EditableVariantProps) => EditableVariantProps
   variantMap: EditableVariantMap
   variantKeys: Array<keyof EditableVariant>

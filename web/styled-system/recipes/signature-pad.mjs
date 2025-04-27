@@ -32,34 +32,6 @@ const signaturePadSlotNames = [
   [
     "label",
     "signaturePad__label"
-  ],
-  [
-    "root",
-    "signaturePad__root"
-  ],
-  [
-    "control",
-    "signaturePad__control"
-  ],
-  [
-    "segment",
-    "signaturePad__segment"
-  ],
-  [
-    "segmentPath",
-    "signaturePad__segmentPath"
-  ],
-  [
-    "guide",
-    "signaturePad__guide"
-  ],
-  [
-    "clearTrigger",
-    "signaturePad__clearTrigger"
-  ],
-  [
-    "label",
-    "signaturePad__label"
   ]
 ]
 const signaturePadSlotFns = /* @__PURE__ */ signaturePadSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, signaturePadDefaultVariants, getSlotCompoundVariant(signaturePadCompoundVariants, slotName))])

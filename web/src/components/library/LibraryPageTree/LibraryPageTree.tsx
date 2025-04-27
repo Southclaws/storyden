@@ -1,11 +1,9 @@
-import type { Assign } from "@ark-ui/react";
 import {
   TreeView as ArkTreeView,
-  type TreeViewRootProps,
+  createTreeCollection,
 } from "@ark-ui/react/tree-view";
-import { keyBy } from "lodash";
 import Link from "next/link";
-import { JSX, forwardRef } from "react";
+import { Fragment, JSX } from "react";
 
 import { NodeWithChildren, Visibility } from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
@@ -14,22 +12,14 @@ import { DraftIcon } from "@/components/ui/icons/Draft";
 import { ReviewIcon, UnlistedIcon } from "@/components/ui/icons/Visibility";
 import { visibilityColour } from "@/lib/library/visibilityColours";
 import { css, cx } from "@/styled-system/css";
-import { HStack, splitCssProps } from "@/styled-system/jsx";
-import { type TreeViewVariantProps, treeView } from "@/styled-system/recipes";
+import { HStack } from "@/styled-system/jsx";
+import { treeView } from "@/styled-system/recipes";
 import { token } from "@/styled-system/tokens";
-import type { JsxStyleProps } from "@/styled-system/types";
 
 import { LibraryPageMenu } from "../LibraryPageMenu/LibraryPageMenu";
 
-export interface TreeViewData {
-  label: string;
-  children: NodeWithChildren[];
-}
-
-export interface TreeViewProps
-  extends Assign<JsxStyleProps, TreeViewRootProps>,
-    TreeViewVariantProps {
-  data: TreeViewData;
+export interface LibraryPageTreeProps {
+  nodes: NodeWithChildren[];
   currentNode: string | undefined;
 }
 
@@ -54,136 +44,124 @@ const visibilityIcons: Record<Visibility, JSX.Element> = {
   [Visibility.unlisted]: <UnlistedIcon />,
 };
 
-export const LibraryPageTree = forwardRef<HTMLDivElement, TreeViewProps>(
-  (props, ref) => {
-    const [cssProps, localProps] = splitCssProps(props);
-    const { data, currentNode, className, ...rootProps } = localProps;
+export const LibraryPageTree = (props: LibraryPageTreeProps) => {
+  const { nodes, currentNode } = props;
 
-    const styles = treeView();
+  const styles = treeView();
 
-    const defaultExpandedValue: string[] = [];
+  const defaultExpandedValue: string[] = [];
 
-    const rootNodeMap = keyBy(data.children, (child) => child.id);
+  const findCurrentNode = (node: NodeWithChildren) => {
+    if (node.slug === currentNode) {
+      defaultExpandedValue.push(node.id);
+      return true;
+    }
 
-    // recursively find currentNode in data and add each parent to defaultExpandedValue
-    const findCurrentNode = (node: NodeWithChildren) => {
-      if (node.slug === currentNode) {
-        defaultExpandedValue.push(node.slug);
-        return true;
-      }
-
-      if (node.children) {
-        for (const child of node.children) {
-          if (findCurrentNode(child)) {
-            defaultExpandedValue.push(node.slug);
-            return true;
-          }
+    if (node.children) {
+      for (const child of node.children) {
+        if (findCurrentNode(child)) {
+          defaultExpandedValue.push(node.id);
+          return true;
         }
       }
+    }
 
-      return false;
-    };
+    return false;
+  };
 
-    data.children.forEach(findCurrentNode);
+  nodes.forEach(findCurrentNode);
 
-    const renderChild = (child: NodeWithChildren, index: number) => {
-      const previous = index > 0 ? data.children[index - 1] : null;
+  const sortedByVisibility = nodes.sort((a, b) => {
+    return visibilitySortKey[a.visibility] - visibilitySortKey[b.visibility];
+  });
 
-      const sameVisibilityAsPrevious = previous
-        ? previous.visibility === child.visibility
-        : true;
+  const collection = createTreeCollection<NodeWithChildren>({
+    nodeToValue: (n: NodeWithChildren) => {
+      return n.id;
+    },
+    nodeToString: (n: NodeWithChildren) => {
+      return n.slug;
+    },
+    nodeToChildren: (n: NodeWithChildren) => {
+      return n.children;
+    },
+    rootNode: {
+      children: sortedByVisibility,
+    } as NodeWithChildren,
+  });
 
-      const isRoot = Boolean(rootNodeMap[child.id]);
+  const rootNodes = collection.rootNode.children;
 
-      const dividerLabel = visibilityLabels[child.visibility];
-      const dividerIcon = visibilityIcons[child.visibility];
+  return (
+    <ArkTreeView.Root
+      className={styles.root}
+      collection={collection}
+      defaultExpandedValue={defaultExpandedValue}
+    >
+      <ArkTreeView.Tree className={cx(styles.tree)}>
+        {rootNodes.map((node, index) => {
+          const previous = index > 0 ? rootNodes[index - 1] : null;
 
-      // We only show dividers on the root list, as this is the only list that's
-      // sorted by visibility.
-      const showDivider = isRoot && !sameVisibilityAsPrevious;
+          const sameVisibilityAsPrevious = previous
+            ? previous.visibility === node.visibility
+            : true;
 
-      const isHighlighted = child.slug === currentNode;
+          const dividerLabel = visibilityLabels[node.visibility];
+          const dividerIcon = visibilityIcons[node.visibility];
 
-      return (
-        <ArkTreeView.Branch
-          key={child.id}
-          value={child.slug}
-          className={styles.branch}
-        >
-          {showDivider && (
-            <HStack mb="1">
-              <NavigationHeader href="/drafts">
-                <HStack>
-                  {dividerIcon}
-                  {dividerLabel}
+          // We only show dividers on the root list, as this is the only list that's
+          // sorted by visibility.
+          const showDivider = !sameVisibilityAsPrevious;
+
+          return (
+            <Fragment key={node.id}>
+              {showDivider && (
+                <HStack mb="1">
+                  <NavigationHeader href="/drafts">
+                    <HStack>
+                      {dividerIcon}
+                      {dividerLabel}
+                    </HStack>
+                  </NavigationHeader>
                 </HStack>
-              </NavigationHeader>
-            </HStack>
-          )}
+              )}
 
-          <TreeBranch
-            styles={styles}
-            child={child}
-            isHighlighted={isHighlighted}
-            isRoot={isRoot}
-          />
-
-          <ArkTreeView.BranchContent className={styles.branchContent}>
-            {child.children?.map((child, i) =>
-              child.children ? (
-                renderChild(child, i)
-              ) : (
-                <TreeItem
-                  key={child.id}
-                  styles={styles}
-                  child={child}
-                  isHighlighted={isHighlighted}
-                  isRoot={isRoot}
-                />
-              ),
-            )}
-          </ArkTreeView.BranchContent>
-        </ArkTreeView.Branch>
-      );
-    };
-
-    const sortedByVisibility = data.children.sort((a, b) => {
-      return visibilitySortKey[a.visibility] - visibilitySortKey[b.visibility];
-    });
-
-    return (
-      <ArkTreeView.Root
-        ref={ref}
-        aria-label={data.label}
-        className={cx(styles.root, css(cssProps), className)}
-        defaultExpandedValue={defaultExpandedValue}
-        selectedValue={defaultExpandedValue}
-        focusedValue={currentNode}
-        {...rootProps}
-      >
-        <ArkTreeView.Tree className={styles.tree}>
-          {sortedByVisibility.map(renderChild)}
-        </ArkTreeView.Tree>
-      </ArkTreeView.Root>
-    );
-  },
-);
-
-LibraryPageTree.displayName = "DatagraphNodeTree";
-
-type BranchProps = {
-  child: NodeWithChildren;
-  styles: any;
-  isHighlighted: boolean;
-  isRoot: boolean;
+              <TreeNode
+                currentNode={currentNode}
+                node={node}
+                indexPath={[]}
+                isRoot={true}
+                styles={styles}
+              />
+            </Fragment>
+          );
+        })}
+      </ArkTreeView.Tree>
+    </ArkTreeView.Root>
+  );
 };
 
-function TreeBranch({ styles, child, isHighlighted, isRoot }: BranchProps) {
-  const isPublished = child.visibility === Visibility.published;
+type TreeNodeProps = {
+  currentNode: string | undefined;
+  node: NodeWithChildren;
+  styles: any;
+  isRoot: boolean;
+  indexPath: number[];
+};
 
-  const label = isPublished ? child.name : `${child.name}`;
+function TreeNode({
+  currentNode,
+  styles,
+  node,
+  isRoot,
+  indexPath,
+}: TreeNodeProps) {
+  const isPublished = node.visibility === Visibility.published;
+  const isHighlighted = node.slug === currentNode;
 
-  const branchColourPalette = visibilityColour(child.visibility);
+  const label = isPublished ? node.name : `${node.name}`;
+
+  const branchColourPalette = visibilityColour(node.visibility);
 
   const visibilityStyles = isRoot
     ? "" // Don't show the visibility state styles for root items, is cluttered.
@@ -191,11 +169,10 @@ function TreeBranch({ styles, child, isHighlighted, isRoot }: BranchProps) {
         paddingX: "0.5",
         borderRadius: "sm",
         colorPalette: branchColourPalette,
-        borderWidth:
-          child.visibility === Visibility.published ? "none" : "thin",
+        borderWidth: node.visibility === Visibility.published ? "none" : "thin",
         borderColor: "colorPalette.8",
         borderStyle:
-          child.visibility === Visibility.published ? "solid" : "dashed",
+          node.visibility === Visibility.published ? "solid" : "dashed",
       });
 
   const highlightStyles = css({
@@ -203,43 +180,61 @@ function TreeBranch({ styles, child, isHighlighted, isRoot }: BranchProps) {
   });
 
   return (
-    <ArkTreeView.BranchControl
-      className={cx("group", styles.branchControl, highlightStyles)}
+    <ArkTreeView.NodeProvider
+      key={node.id}
+      node={node}
+      indexPath={indexPath}
+      data-visibility={node.visibility}
     >
-      <ArkTreeView.BranchIndicator className={styles.branchIndicator}>
-        {child.children?.length ? <ChevronRightIcon /> : <BulletIcon />}
-      </ArkTreeView.BranchIndicator>
+      <ArkTreeView.Branch className={cx(styles.branch)}>
+        <ArkTreeView.BranchControl
+          className={cx("group", styles.branchControl, highlightStyles)}
+        >
+          <ArkTreeView.BranchIndicator className={styles.branchIndicator}>
+            {node.children?.length ? <ChevronRightIcon /> : <BulletIcon />}
+          </ArkTreeView.BranchIndicator>
 
-      <ArkTreeView.BranchText asChild className={cx(styles.branchText)}>
-        <Link href={`/l/${child.slug}`}>
-          <span className={visibilityStyles}>{label}</span>
-        </Link>
-      </ArkTreeView.BranchText>
+          <ArkTreeView.BranchText
+            asChild
+            className={cx(styles.branchText, visibilityStyles)}
+          >
+            <Link href={`/l/${node.slug}`}>{label}</Link>
+          </ArkTreeView.BranchText>
 
-      <HStack
-        className="library-page-tree__menu"
-        opacity={{
-          base: "0",
-          _groupHover: "full",
-        }}
-        gap="1"
-        minW="min"
-        flexShrink="0"
-      >
-        <CreatePageAction variant="ghost" hideLabel parentSlug={child.slug} />
-        <LibraryPageMenu variant="ghost" node={child} />
-      </HStack>
-    </ArkTreeView.BranchControl>
-  );
-}
+          <HStack
+            opacity={{
+              base: "0",
+              _groupHover: "full",
+            }}
+            gap="1"
+            minW="min"
+            flexShrink="0"
+          >
+            <CreatePageAction
+              variant="ghost"
+              hideLabel
+              parentSlug={node.slug}
+            />
+            <LibraryPageMenu variant="ghost" node={node} />
+          </HStack>
+        </ArkTreeView.BranchControl>
 
-function TreeItem({ styles, child }: BranchProps) {
-  return (
-    <ArkTreeView.Item value={child.slug} className={cx(styles.item)}>
-      <ArkTreeView.ItemText className={styles.itemText}>
-        <Link href={`/l/${child.slug}`}>{child.name}</Link>
-      </ArkTreeView.ItemText>
-    </ArkTreeView.Item>
+        <ArkTreeView.BranchContent className={styles.branchContent}>
+          {node.children.map((child, index) => {
+            return (
+              <TreeNode
+                key={child.id}
+                currentNode={currentNode}
+                node={child}
+                indexPath={[...indexPath, index]}
+                isRoot={false}
+                styles={styles}
+              />
+            );
+          })}
+        </ArkTreeView.BranchContent>
+      </ArkTreeView.Branch>
+    </ArkTreeView.NodeProvider>
   );
 }
 

@@ -28,30 +28,6 @@ const clipboardSlotNames = [
   [
     "label",
     "clipboard__label"
-  ],
-  [
-    "root",
-    "clipboard__root"
-  ],
-  [
-    "control",
-    "clipboard__control"
-  ],
-  [
-    "trigger",
-    "clipboard__trigger"
-  ],
-  [
-    "indicator",
-    "clipboard__indicator"
-  ],
-  [
-    "input",
-    "clipboard__input"
-  ],
-  [
-    "label",
-    "clipboard__label"
   ]
 ]
 const clipboardSlotFns = /* @__PURE__ */ clipboardSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, clipboardDefaultVariants, getSlotCompoundVariant(clipboardCompoundVariants, slotName))])

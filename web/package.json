@@ -11,7 +11,7 @@
     "openapi": "orval"
   },
   "dependencies": {
-    "@ark-ui/react": "4.1.0",
+    "@ark-ui/react": "5.7.0",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/sortable": "^8.0.0",
     "@heroicons/react": "^2.1.5",
@@ -67,9 +67,9 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@pandacss/dev": "^0.51.1",
-    "@pandacss/types": "^0.51.1",
-    "@park-ui/panda-preset": "^0.42.0",
+    "@pandacss/dev": "^0.53.5",
+    "@pandacss/types": "^0.53.5",
+    "@park-ui/panda-preset": "^0.43.1",
     "@simplewebauthn/types": "^10.0.0",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "@types/chroma-js": "^2.4.4",

@@ -73,8 +73,6 @@ async function ThreadFeedScreenContent({ initialSession, page }: PageProps) {
       },
     );
 
-    console.log("[ThreadFeedScreenContent] threads", threads);
-
     return (
       <ThreadFeedScreen
         initialSession={initialSession}

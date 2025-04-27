@@ -16,7 +16,7 @@ export type HoverCardVariantProps = {
 
 export interface HoverCardRecipe {
   __type: HoverCardVariantProps
-  (props?: HoverCardVariantProps): Pretty<Record<"arrow" | "arrowTip" | "trigger" | "positioner" | "content" | "arrow" | "arrowTip" | "trigger" | "positioner" | "content", string>>
+  (props?: HoverCardVariantProps): Pretty<Record<"arrow" | "arrowTip" | "trigger" | "positioner" | "content", string>>
   raw: (props?: HoverCardVariantProps) => HoverCardVariantProps
   variantMap: HoverCardVariantMap
   variantKeys: Array<keyof HoverCardVariant>

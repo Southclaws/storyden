@@ -19,7 +19,7 @@ export type NumberInputVariantProps = {
 
 export interface NumberInputRecipe {
   __type: NumberInputVariantProps
-  (props?: NumberInputVariantProps): Pretty<Record<"root" | "label" | "input" | "control" | "valueText" | "incrementTrigger" | "decrementTrigger" | "scrubber" | "root" | "label" | "input" | "control" | "valueText" | "incrementTrigger" | "decrementTrigger" | "scrubber", string>>
+  (props?: NumberInputVariantProps): Pretty<Record<"root" | "label" | "input" | "control" | "valueText" | "incrementTrigger" | "decrementTrigger" | "scrubber", string>>
   raw: (props?: NumberInputVariantProps) => NumberInputVariantProps
   variantMap: NumberInputVariantMap
   variantKeys: Array<keyof NumberInputVariant>

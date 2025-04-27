@@ -16,7 +16,7 @@ export type SignaturePadVariantProps = {
 
 export interface SignaturePadRecipe {
   __type: SignaturePadVariantProps
-  (props?: SignaturePadVariantProps): Pretty<Record<"root" | "control" | "segment" | "segmentPath" | "guide" | "clearTrigger" | "label" | "root" | "control" | "segment" | "segmentPath" | "guide" | "clearTrigger" | "label", string>>
+  (props?: SignaturePadVariantProps): Pretty<Record<"root" | "control" | "segment" | "segmentPath" | "guide" | "clearTrigger" | "label", string>>
   raw: (props?: SignaturePadVariantProps) => SignaturePadVariantProps
   variantMap: SignaturePadVariantMap
   variantKeys: Array<keyof SignaturePadVariant>

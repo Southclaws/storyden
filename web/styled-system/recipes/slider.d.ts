@@ -19,7 +19,7 @@ export type SliderVariantProps = {
 
 export interface SliderRecipe {
   __type: SliderVariantProps
-  (props?: SliderVariantProps): Pretty<Record<"root" | "label" | "thumb" | "valueText" | "track" | "range" | "control" | "markerGroup" | "marker" | "root" | "label" | "thumb" | "valueText" | "track" | "range" | "control" | "markerGroup" | "marker", string>>
+  (props?: SliderVariantProps): Pretty<Record<"root" | "label" | "thumb" | "valueText" | "track" | "range" | "control" | "markerGroup" | "marker", string>>
   raw: (props?: SliderVariantProps) => SliderVariantProps
   variantMap: SliderVariantMap
   variantKeys: Array<keyof SliderVariant>

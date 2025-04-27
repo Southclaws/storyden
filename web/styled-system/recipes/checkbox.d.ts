@@ -19,7 +19,7 @@ export type CheckboxVariantProps = {
 
 export interface CheckboxRecipe {
   __type: CheckboxVariantProps
-  (props?: CheckboxVariantProps): Pretty<Record<"root" | "label" | "control" | "indicator" | "group" | "root" | "label" | "control" | "indicator" | "group", string>>
+  (props?: CheckboxVariantProps): Pretty<Record<"root" | "label" | "control" | "indicator" | "group", string>>
   raw: (props?: CheckboxVariantProps) => CheckboxVariantProps
   variantMap: CheckboxVariantMap
   variantKeys: Array<keyof CheckboxVariant>

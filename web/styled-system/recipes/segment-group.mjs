@@ -30,30 +30,6 @@ const segmentGroupSlotNames = [
   [
     "indicator",
     "segmentGroup__indicator"
-  ],
-  [
-    "root",
-    "segmentGroup__root"
-  ],
-  [
-    "label",
-    "segmentGroup__label"
-  ],
-  [
-    "item",
-    "segmentGroup__item"
-  ],
-  [
-    "itemText",
-    "segmentGroup__itemText"
-  ],
-  [
-    "itemControl",
-    "segmentGroup__itemControl"
-  ],
-  [
-    "indicator",
-    "segmentGroup__indicator"
   ]
 ]
 const segmentGroupSlotFns = /* @__PURE__ */ segmentGroupSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, segmentGroupDefaultVariants, getSlotCompoundVariant(segmentGroupCompoundVariants, slotName))])

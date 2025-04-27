@@ -16,7 +16,7 @@ export type FieldVariantProps = {
 
 export interface FieldRecipe {
   __type: FieldVariantProps
-  (props?: FieldVariantProps): Pretty<Record<"root" | "errorText" | "helperText" | "input" | "label" | "select" | "textarea" | "root" | "errorText" | "helperText" | "input" | "label" | "select" | "textarea", string>>
+  (props?: FieldVariantProps): Pretty<Record<"root" | "errorText" | "helperText" | "input" | "label" | "select" | "textarea", string>>
   raw: (props?: FieldVariantProps) => FieldVariantProps
   variantMap: FieldVariantMap
   variantKeys: Array<keyof FieldVariant>

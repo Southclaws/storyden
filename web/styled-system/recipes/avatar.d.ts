@@ -19,7 +19,7 @@ export type AvatarVariantProps = {
 
 export interface AvatarRecipe {
   __type: AvatarVariantProps
-  (props?: AvatarVariantProps): Pretty<Record<"root" | "image" | "fallback" | "root" | "image" | "fallback", string>>
+  (props?: AvatarVariantProps): Pretty<Record<"root" | "image" | "fallback", string>>
   raw: (props?: AvatarVariantProps) => AvatarVariantProps
   variantMap: AvatarVariantMap
   variantKeys: Array<keyof AvatarVariant>

@@ -19,7 +19,7 @@ export type SegmentGroupVariantProps = {
 
 export interface SegmentGroupRecipe {
   __type: SegmentGroupVariantProps
-  (props?: SegmentGroupVariantProps): Pretty<Record<"root" | "label" | "item" | "itemText" | "itemControl" | "indicator" | "root" | "label" | "item" | "itemText" | "itemControl" | "indicator", string>>
+  (props?: SegmentGroupVariantProps): Pretty<Record<"root" | "label" | "item" | "itemText" | "itemControl" | "indicator", string>>
   raw: (props?: SegmentGroupVariantProps) => SegmentGroupVariantProps
   variantMap: SegmentGroupVariantMap
   variantKeys: Array<keyof SegmentGroupVariant>

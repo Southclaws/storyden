@@ -19,7 +19,7 @@ export type ProgressVariantProps = {
 
 export interface ProgressRecipe {
   __type: ProgressVariantProps
-  (props?: ProgressVariantProps): Pretty<Record<"root" | "label" | "track" | "range" | "valueText" | "view" | "circle" | "circleTrack" | "circleRange" | "root" | "label" | "track" | "range" | "valueText" | "view" | "circle" | "circleTrack" | "circleRange", string>>
+  (props?: ProgressVariantProps): Pretty<Record<"root" | "label" | "track" | "range" | "valueText" | "view" | "circle" | "circleTrack" | "circleRange", string>>
   raw: (props?: ProgressVariantProps) => ProgressVariantProps
   variantMap: ProgressVariantMap
   variantKeys: Array<keyof ProgressVariant>

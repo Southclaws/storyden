@@ -19,7 +19,7 @@ export type AccordionVariantProps = {
 
 export interface AccordionRecipe {
   __type: AccordionVariantProps
-  (props?: AccordionVariantProps): Pretty<Record<"root" | "item" | "itemTrigger" | "itemContent" | "itemIndicator" | "root" | "item" | "itemTrigger" | "itemContent" | "itemIndicator", string>>
+  (props?: AccordionVariantProps): Pretty<Record<"root" | "item" | "itemTrigger" | "itemContent" | "itemIndicator", string>>
   raw: (props?: AccordionVariantProps) => AccordionVariantProps
   variantMap: AccordionVariantMap
   variantKeys: Array<keyof AccordionVariant>

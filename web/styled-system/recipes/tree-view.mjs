@@ -56,52 +56,8 @@ const treeViewSlotNames = [
     "treeView__branchIndicator"
   ],
   [
-    "root",
-    "treeView__root"
-  ],
-  [
-    "label",
-    "treeView__label"
-  ],
-  [
-    "tree",
-    "treeView__tree"
-  ],
-  [
-    "item",
-    "treeView__item"
-  ],
-  [
-    "itemIndicator",
-    "treeView__itemIndicator"
-  ],
-  [
-    "itemText",
-    "treeView__itemText"
-  ],
-  [
-    "branch",
-    "treeView__branch"
-  ],
-  [
-    "branchControl",
-    "treeView__branchControl"
-  ],
-  [
-    "branchTrigger",
-    "treeView__branchTrigger"
-  ],
-  [
-    "branchContent",
-    "treeView__branchContent"
-  ],
-  [
-    "branchText",
-    "treeView__branchText"
-  ],
-  [
-    "branchIndicator",
-    "treeView__branchIndicator"
+    "branchIndentGuide",
+    "treeView__branchIndentGuide"
   ],
   [
     "root",

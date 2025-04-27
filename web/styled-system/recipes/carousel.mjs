@@ -42,42 +42,6 @@ const carouselSlotNames = [
   [
     "control",
     "carousel__control"
-  ],
-  [
-    "root",
-    "carousel__root"
-  ],
-  [
-    "viewport",
-    "carousel__viewport"
-  ],
-  [
-    "itemGroup",
-    "carousel__itemGroup"
-  ],
-  [
-    "item",
-    "carousel__item"
-  ],
-  [
-    "nextTrigger",
-    "carousel__nextTrigger"
-  ],
-  [
-    "prevTrigger",
-    "carousel__prevTrigger"
-  ],
-  [
-    "indicatorGroup",
-    "carousel__indicatorGroup"
-  ],
-  [
-    "indicator",
-    "carousel__indicator"
-  ],
-  [
-    "control",
-    "carousel__control"
   ]
 ]
 const carouselSlotFns = /* @__PURE__ */ carouselSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, carouselDefaultVariants, getSlotCompoundVariant(carouselCompoundVariants, slotName))])

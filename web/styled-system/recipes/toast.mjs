@@ -28,30 +28,6 @@ const toastSlotNames = [
   [
     "closeTrigger",
     "toast__closeTrigger"
-  ],
-  [
-    "group",
-    "toast__group"
-  ],
-  [
-    "root",
-    "toast__root"
-  ],
-  [
-    "title",
-    "toast__title"
-  ],
-  [
-    "description",
-    "toast__description"
-  ],
-  [
-    "actionTrigger",
-    "toast__actionTrigger"
-  ],
-  [
-    "closeTrigger",
-    "toast__closeTrigger"
   ]
 ]
 const toastSlotFns = /* @__PURE__ */ toastSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, toastDefaultVariants, getSlotCompoundVariant(toastCompoundVariants, slotName))])
