@@ -316,6 +316,10 @@ func getSummary(article readability.Article) string {
 const roughMaxSentenceSize = 350
 
 func (c Content) Split() []string {
+	if c.IsEmpty() {
+		return []string{}
+	}
+
 	r := []html.Node{}
 
 	// first, walk the tree for the top-most block-content nodes.
