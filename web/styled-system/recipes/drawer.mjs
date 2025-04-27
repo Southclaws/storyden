@@ -46,46 +46,6 @@ const drawerSlotNames = [
   [
     "footer",
     "drawer__footer"
-  ],
-  [
-    "trigger",
-    "drawer__trigger"
-  ],
-  [
-    "backdrop",
-    "drawer__backdrop"
-  ],
-  [
-    "positioner",
-    "drawer__positioner"
-  ],
-  [
-    "content",
-    "drawer__content"
-  ],
-  [
-    "title",
-    "drawer__title"
-  ],
-  [
-    "description",
-    "drawer__description"
-  ],
-  [
-    "closeTrigger",
-    "drawer__closeTrigger"
-  ],
-  [
-    "header",
-    "drawer__header"
-  ],
-  [
-    "body",
-    "drawer__body"
-  ],
-  [
-    "footer",
-    "drawer__footer"
   ]
 ]
 const drawerSlotFns = /* @__PURE__ */ drawerSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, drawerDefaultVariants, getSlotCompoundVariant(drawerCompoundVariants, slotName))])

@@ -16,7 +16,7 @@ export type QrCodeVariantProps = {
 
 export interface QrCodeRecipe {
   __type: QrCodeVariantProps
-  (props?: QrCodeVariantProps): Pretty<Record<"root" | "frame" | "pattern" | "overlay" | "root" | "frame" | "pattern" | "overlay", string>>
+  (props?: QrCodeVariantProps): Pretty<Record<"root" | "frame" | "pattern" | "overlay", string>>
   raw: (props?: QrCodeVariantProps) => QrCodeVariantProps
   variantMap: QrCodeVariantMap
   variantKeys: Array<keyof QrCodeVariant>

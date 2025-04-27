@@ -31,30 +31,6 @@ const radioButtonGroupSlotNames = [
   [
     "indicator",
     "radioButtonGroup__indicator"
-  ],
-  [
-    "root",
-    "radioButtonGroup__root"
-  ],
-  [
-    "label",
-    "radioButtonGroup__label"
-  ],
-  [
-    "item",
-    "radioButtonGroup__item"
-  ],
-  [
-    "itemText",
-    "radioButtonGroup__itemText"
-  ],
-  [
-    "itemControl",
-    "radioButtonGroup__itemControl"
-  ],
-  [
-    "indicator",
-    "radioButtonGroup__indicator"
   ]
 ]
 const radioButtonGroupSlotFns = /* @__PURE__ */ radioButtonGroupSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, radioButtonGroupDefaultVariants, getSlotCompoundVariant(radioButtonGroupCompoundVariants, slotName))])

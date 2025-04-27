@@ -19,7 +19,7 @@ export type SwitchRecipeVariantProps = {
 
 export interface SwitchRecipeRecipe {
   __type: SwitchRecipeVariantProps
-  (props?: SwitchRecipeVariantProps): Pretty<Record<"root" | "label" | "control" | "thumb" | "root" | "label" | "control" | "thumb", string>>
+  (props?: SwitchRecipeVariantProps): Pretty<Record<"root" | "label" | "control" | "thumb", string>>
   raw: (props?: SwitchRecipeVariantProps) => SwitchRecipeVariantProps
   variantMap: SwitchRecipeVariantMap
   variantKeys: Array<keyof SwitchRecipeVariant>

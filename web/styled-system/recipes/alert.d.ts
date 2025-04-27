@@ -16,7 +16,7 @@ export type AlertVariantProps = {
 
 export interface AlertRecipe {
   __type: AlertVariantProps
-  (props?: AlertVariantProps): Pretty<Record<"root" | "content" | "description" | "icon" | "title" | "root" | "content" | "description" | "icon" | "title", string>>
+  (props?: AlertVariantProps): Pretty<Record<"root" | "content" | "description" | "icon" | "title", string>>
   raw: (props?: AlertVariantProps) => AlertVariantProps
   variantMap: AlertVariantMap
   variantKeys: Array<keyof AlertVariant>

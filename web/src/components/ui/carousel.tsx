@@ -26,7 +26,6 @@ export const PrevTrigger = withContext(
   styled(Carousel.PrevTrigger),
   "prevTrigger",
 );
-export const Viewport = withContext(styled(Carousel.Viewport), "viewport");
 
 export interface RootProps extends ComponentProps<typeof Root> {}
 export interface ControlProps extends ComponentProps<typeof Control> {}
@@ -37,4 +36,3 @@ export interface ItemProps extends ComponentProps<typeof Item> {}
 export interface ItemGroupProps extends ComponentProps<typeof ItemGroup> {}
 export interface NextTriggerProps extends ComponentProps<typeof NextTrigger> {}
 export interface PrevTriggerProps extends ComponentProps<typeof PrevTrigger> {}
-export interface ViewportProps extends ComponentProps<typeof Viewport> {}

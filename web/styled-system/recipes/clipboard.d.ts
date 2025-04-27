@@ -16,7 +16,7 @@ export type ClipboardVariantProps = {
 
 export interface ClipboardRecipe {
   __type: ClipboardVariantProps
-  (props?: ClipboardVariantProps): Pretty<Record<"root" | "control" | "trigger" | "indicator" | "input" | "label" | "root" | "control" | "trigger" | "indicator" | "input" | "label", string>>
+  (props?: ClipboardVariantProps): Pretty<Record<"root" | "control" | "trigger" | "indicator" | "input" | "label", string>>
   raw: (props?: ClipboardVariantProps) => ClipboardVariantProps
   variantMap: ClipboardVariantMap
   variantKeys: Array<keyof ClipboardVariant>

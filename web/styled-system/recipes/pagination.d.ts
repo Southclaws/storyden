@@ -16,7 +16,7 @@ export type PaginationVariantProps = {
 
 export interface PaginationRecipe {
   __type: PaginationVariantProps
-  (props?: PaginationVariantProps): Pretty<Record<"root" | "item" | "ellipsis" | "prevTrigger" | "nextTrigger" | "root" | "item" | "ellipsis" | "prevTrigger" | "nextTrigger", string>>
+  (props?: PaginationVariantProps): Pretty<Record<"root" | "item" | "ellipsis" | "prevTrigger" | "nextTrigger", string>>
   raw: (props?: PaginationVariantProps) => PaginationVariantProps
   variantMap: PaginationVariantMap
   variantKeys: Array<keyof PaginationVariant>

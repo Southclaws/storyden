@@ -20,22 +20,6 @@ const qrCodeSlotNames = [
   [
     "overlay",
     "qrCode__overlay"
-  ],
-  [
-    "root",
-    "qrCode__root"
-  ],
-  [
-    "frame",
-    "qrCode__frame"
-  ],
-  [
-    "pattern",
-    "qrCode__pattern"
-  ],
-  [
-    "overlay",
-    "qrCode__overlay"
   ]
 ]
 const qrCodeSlotFns = /* @__PURE__ */ qrCodeSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, qrCodeDefaultVariants, getSlotCompoundVariant(qrCodeCompoundVariants, slotName))])

@@ -34,13 +34,7 @@ export function LibraryNavigationTree(props: Props) {
         </HStack>
       </NavigationHeader>
 
-      <LibraryPageTree
-        currentNode={currentNode}
-        data={{
-          label: LibraryLabel,
-          children: data.nodes,
-        }}
-      />
+      <LibraryPageTree currentNode={currentNode} nodes={data.nodes} />
     </LStack>
   );
 }

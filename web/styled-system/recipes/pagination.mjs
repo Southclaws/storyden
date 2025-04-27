@@ -24,26 +24,6 @@ const paginationSlotNames = [
   [
     "nextTrigger",
     "pagination__nextTrigger"
-  ],
-  [
-    "root",
-    "pagination__root"
-  ],
-  [
-    "item",
-    "pagination__item"
-  ],
-  [
-    "ellipsis",
-    "pagination__ellipsis"
-  ],
-  [
-    "prevTrigger",
-    "pagination__prevTrigger"
-  ],
-  [
-    "nextTrigger",
-    "pagination__nextTrigger"
   ]
 ]
 const paginationSlotFns = /* @__PURE__ */ paginationSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, paginationDefaultVariants, getSlotCompoundVariant(paginationCompoundVariants, slotName))])

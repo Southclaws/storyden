@@ -16,7 +16,7 @@ export type FieldsetVariantProps = {
 
 export interface FieldsetRecipe {
   __type: FieldsetVariantProps
-  (props?: FieldsetVariantProps): Pretty<Record<"root" | "errorText" | "helperText" | "legend" | "control" | "root" | "errorText" | "helperText" | "legend" | "control", string>>
+  (props?: FieldsetVariantProps): Pretty<Record<"root" | "errorText" | "helperText" | "legend" | "control", string>>
   raw: (props?: FieldsetVariantProps) => FieldsetVariantProps
   variantMap: FieldsetVariantMap
   variantKeys: Array<keyof FieldsetVariant>

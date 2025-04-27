@@ -28,30 +28,6 @@ const cardSlotNames = [
   [
     "description",
     "card__description"
-  ],
-  [
-    "root",
-    "card__root"
-  ],
-  [
-    "header",
-    "card__header"
-  ],
-  [
-    "body",
-    "card__body"
-  ],
-  [
-    "footer",
-    "card__footer"
-  ],
-  [
-    "title",
-    "card__title"
-  ],
-  [
-    "description",
-    "card__description"
   ]
 ]
 const cardSlotFns = /* @__PURE__ */ cardSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, cardDefaultVariants, getSlotCompoundVariant(cardCompoundVariants, slotName))])

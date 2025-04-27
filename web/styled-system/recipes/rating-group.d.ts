@@ -19,7 +19,7 @@ export type RatingGroupVariantProps = {
 
 export interface RatingGroupRecipe {
   __type: RatingGroupVariantProps
-  (props?: RatingGroupVariantProps): Pretty<Record<"root" | "label" | "item" | "control" | "root" | "label" | "item" | "control", string>>
+  (props?: RatingGroupVariantProps): Pretty<Record<"root" | "label" | "item" | "control", string>>
   raw: (props?: RatingGroupVariantProps) => RatingGroupVariantProps
   variantMap: RatingGroupVariantMap
   variantKeys: Array<keyof RatingGroupVariant>

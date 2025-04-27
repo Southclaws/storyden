@@ -45,8 +45,8 @@ export const treeView = defineSlotRecipe({
         ps: "1",
       },
       "&[data-depth='1'] > [data-part='branch-text'] ": {
-        fontWeight: "semibold",
-        color: "fg.default",
+        fontWeight: "medium",
+        color: "fg.muted",
       },
       _hover: {
         background: "gray.a2",
@@ -82,8 +82,8 @@ export const treeView = defineSlotRecipe({
       transitionTimingFunction: "default",
       "&[data-depth='1']": {
         ps: "6",
-        fontWeight: "semibold",
-        color: "fg.default",
+        fontWeight: "medium",
+        color: "fg.muted",
         _selected: {
           _before: {
             bg: "transparent",
