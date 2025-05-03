@@ -6,7 +6,13 @@ import type { MDXComponents } from "mdx/types";
 export function getMDXComponents(components?: MDXComponents): MDXComponents {
   return {
     ...defaultComponents,
-    APIPage: (props) => <APIPage {...openapi.getAPIPageProps(props)} />,
+    APIPage: (props) => {
+      return (
+        <div>
+          <APIPage {...openapi.getAPIPageProps(props)} />
+        </div>
+      );
+    },
     ...components,
   };
 }

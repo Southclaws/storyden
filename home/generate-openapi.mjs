@@ -1,7 +1,14 @@
 import { generateFiles } from "fumadocs-openapi";
 
 void generateFiles({
-  input: ["../api/openapi.yaml"],
+  input: [
+    "https://raw.githubusercontent.com/Southclaws/storyden/refs/heads/main/api/openapi.yaml",
+  ],
   output: "./content/docs/api",
-  groupBy: "tag",
+
+  // NOTE: Currently broken so don't try to re-generate docs!
+  // Waiting for a fumadocs fix. Right now it will generate both folders and
+  // files with duplicate docs content when grouped by tags.
+  groupBy: "tags",
+  per: "tag",
 });
