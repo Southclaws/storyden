@@ -1,8 +1,13 @@
+import { NextRequest } from "next/server";
 import "server-only";
 
 import { AuthProvider } from "src/api/openapi-schema";
 
-import { authProviderList } from "@/api/openapi-server/auth";
+import {
+  authProviderList,
+  getAuthProviderListUrl,
+} from "@/api/openapi-server/auth";
+import { fetcher } from "@/api/server";
 import { groupAuthProviders } from "@/lib/auth/utils";
 
 interface Providers {
@@ -19,7 +24,12 @@ interface Providers {
  * @returns Available auth providers with password/phone separated.
  */
 export async function getProviders(): Promise<Providers> {
-  const { data } = await authProviderList();
+  const { data } = await authProviderList(
+    {
+      revalidate: 0,
+      cache: "no-store",
+    } as any /* HACK: "revalidate" is passed to next options. */,
+  );
 
   return groupAuthProviders(data.providers);
 }
