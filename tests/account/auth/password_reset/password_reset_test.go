@@ -12,6 +12,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -21,7 +22,9 @@ import (
 func TestPasswordReset(t *testing.T) {
 	t.Parallel()
 
-	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+	integration.Test(t, &config.Config{
+		JWTSecret: []byte("07d422e512b23a056ccc953994d1593f"),
+	}, e2e.Setup(), fx.Invoke(func(
 		lc fx.Lifecycle,
 		root context.Context,
 		cl *openapi.ClientWithResponses,
