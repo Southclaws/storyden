@@ -2,6 +2,7 @@ package password_reset_test
 
 import (
 	"context"
+	"net/http"
 	"regexp"
 	"testing"
 	"time"
@@ -34,6 +35,24 @@ func TestPasswordReset(t *testing.T) {
 		inbox := mail.(*mailer.Mock)
 
 		lc.Append(fx.StartHook(func() {
+			t.Run("nonexistent", func(t *testing.T) {
+				r := require.New(t)
+
+				email := xid.New().String() + "@storyden.org"
+				request, err := cl.AuthPasswordResetRequestEmailWithResponse(root, openapi.AuthEmailPasswordReset{
+					Email: email,
+					TokenUrl: struct {
+						Query string `json:"query"`
+						Url   string `json:"url"`
+					}{
+						Url:   "http://localhost:3000/reset",
+						Query: "token",
+					},
+				})
+				r.NoError(err)
+				r.Equal(http.StatusNotFound, request.StatusCode())
+			})
+
 			t.Run("reset_password", func(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
