@@ -9,6 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/endec"
 )
 
@@ -26,16 +27,8 @@ func Build() fx.Option {
 	)
 }
 
-func New() (endec.EncrypterDecrypter, error) {
-	// NOTE: This is currently not compatible when running replicas of the pod
-	// in a cluster, as the key is generated randomly each boot.
-	// TODO: Move this key generation to Settings init and load key from there.
-	key := make([]byte, 32)
-	if _, err := io.ReadFull(rand.Reader, key); err != nil {
-		return nil, fault.Wrap(err)
-	}
-
-	return &jwtEncrypterDecrypter{key: key}, nil
+func New(cfg config.Config) (endec.EncrypterDecrypter, error) {
+	return &jwtEncrypterDecrypter{key: cfg.JWTSecret}, nil
 }
 
 func (e *jwtEncrypterDecrypter) Encrypt(data endec.Claims, lifespan time.Duration) (string, error) {

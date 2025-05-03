@@ -206,6 +206,20 @@
 
         This is typically a long string of characters that you can generate in the SendGrid dashboard.
 
+- section: Authentication
+  description: |-
+    Authentication providers configuration. These are all optional, you can choose to enable any combination of them to allow members of your community to sign up and sign in using a third party provider.
+
+    In order to enable any of these providers, you must set a JWT secret. This is used to sign the state objects for validating the OAuth2 flow.
+  fields:
+    - env: "JWT_SECRET"
+      name: JWTSecret
+      type: "[]byte"
+      description: |-
+        The secret key used to sign JWT tokens. This is used for authentication and should be kept secret.
+
+        This is typically a long string of characters that you can generate using a secure random generator such as `openssl rand -hex 12`.
+
 - section: SMS
   description: |-
     SMS sending configuration. This must be enabled in order to support SMS-based authentication.

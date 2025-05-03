@@ -263,6 +263,23 @@ The API key for the SendGrid account. This is required for sending emails via Se
 
 This is typically a long string of characters that you can generate in the SendGrid dashboard.
 
+## Authentication
+
+Authentication providers configuration. These are all optional, you can choose to enable any combination of them to allow members of your community to sign up and sign in using a third party provider.
+
+In order to enable any of these providers, you must set a JWT secret. This is used to sign the state objects for validating the OAuth2 flow.
+
+### `JWT_SECRET`
+
+<table>
+<tr><td>type</td><td>`[]byte`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The secret key used to sign JWT tokens. This is used for authentication and should be kept secret.
+
+This is typically a long string of characters that you can generate using a secure random generator such as `openssl rand -hex 12`.
+
 ## SMS
 
 SMS sending configuration. This must be enabled in order to support SMS-based authentication.

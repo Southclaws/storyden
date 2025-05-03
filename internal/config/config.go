@@ -162,6 +162,17 @@ type Config struct {
 	SendGridAPIKey string `envconfig:"SENDGRID_API_KEY"`
 
 	// -
+	// Authentication
+	// -
+
+	/*
+	   The secret key used to sign JWT tokens. This is used for authentication and should be kept secret.
+
+	   This is typically a long string of characters that you can generate using a secure random generator such as `openssl rand -hex 12`.
+	*/
+	JWTSecret []byte `envconfig:"JWT_SECRET"`
+
+	// -
 	// SMS
 	// -
 
