@@ -32,6 +32,10 @@ func New(cfg config.Config) (endec.EncrypterDecrypter, error) {
 }
 
 func (e *jwtEncrypterDecrypter) Encrypt(data endec.Claims, lifespan time.Duration) (string, error) {
+	if len(e.key) == 0 {
+		return "", fault.New("no JWT secret provided")
+	}
+
 	var nonce [24]byte
 	if _, err := io.ReadFull(rand.Reader, nonce[:]); err != nil {
 		return "", fault.Wrap(err)
