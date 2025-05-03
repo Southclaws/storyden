@@ -1,13 +1,16 @@
+import { AuthProvider } from "@/api/openapi-schema";
 import { LinkButton } from "@/components/ui/link-button";
 import { Text } from "@/components/ui/text";
 import { OAuthProvider, filterWithLink } from "@/lib/auth/oauth";
 import { getProviders } from "@/lib/auth/providers";
 import { Divider, VStack, WStack, styled } from "@/styled-system/jsx";
 
-export async function OAuthProviderList() {
-  const { oauth: all } = await getProviders();
+type Props = {
+  providers: AuthProvider[];
+};
 
-  const oauth = filterWithLink(all);
+export async function OAuthProviderList({ providers }: Props) {
+  const oauth = filterWithLink(providers);
 
   if (oauth.length === 0) {
     return null;
