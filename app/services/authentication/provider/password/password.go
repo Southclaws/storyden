@@ -24,14 +24,14 @@ import (
 )
 
 var (
-	ErrHandleRegistrationDisabled = fault.New("cannot register while in non-handle authentication mode")
-	ErrEmailRegistrationDisabled  = fault.New("cannot register while in non-email authentication mode")
-	ErrAccountAlreadyExists       = fault.New("account already exists")
-	ErrPasswordMismatch           = fault.New("password mismatch")
-	ErrNoPassword                 = fault.New("password not enabled")
-	ErrPasswordAlreadySet         = fault.New("password already enabled")
-	ErrPasswordTooShort           = fault.New("password too short")
-	ErrNotFound                   = fault.New("account not found")
+	ErrHandleRegistrationDisabled = fault.New("cannot register while in non-handle authentication mode", ftag.With(ftag.PermissionDenied))
+	ErrEmailRegistrationDisabled  = fault.New("cannot register while in non-email authentication mode", ftag.With(ftag.PermissionDenied))
+	ErrAccountAlreadyExists       = fault.New("account already exists", ftag.With(ftag.AlreadyExists))
+	ErrPasswordMismatch           = fault.New("password mismatch", ftag.With(ftag.PermissionDenied))
+	ErrNoPassword                 = fault.New("password not enabled", ftag.With(ftag.InvalidArgument))
+	ErrPasswordAlreadySet         = fault.New("password already enabled", ftag.With(ftag.InvalidArgument))
+	ErrPasswordTooShort           = fault.New("password too short", ftag.With(ftag.InvalidArgument))
+	ErrNotFound                   = fault.New("account not found", ftag.With(ftag.NotFound))
 )
 
 var tokenType = authentication.TokenTypePasswordHash
