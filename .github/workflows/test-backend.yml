@@ -2,6 +2,21 @@ name: Test backend
 
 on:
   push:
+    paths-ignore:
+      - "home/**"
+      - "web/**"
+      - ".github/**"
+      - ".vscode/**"
+      - "*.md"
+      - "docker/**"
+      - "docker-compose.yml"
+      - "fly.toml"
+      - "renovate.json"
+      - "*.yml"
+      - "*.yaml"
+      - ".nvmrc"
+      - ".vercelignore"
+      - "Taskfile.yml"
 
 jobs:
   backend-test:
