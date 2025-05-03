@@ -33,7 +33,7 @@ export const treeView = defineSlotRecipe({
       display: "flex",
       fontWeight: "medium",
       gap: "1",
-      ps: "calc((var(--depth) - 1) * 22px)",
+      ps: "calc((var(--depth)) * 22px)",
       py: "1",
       pr: "1",
       h: "8",
@@ -42,7 +42,7 @@ export const treeView = defineSlotRecipe({
       transitionProperty: "background, color",
       transitionTimingFunction: "default",
       "&[data-depth='1']": {
-        ps: "1",
+        ps: "calc((var(--depth)) * 22px)",
       },
       "&[data-depth='1'] > [data-part='branch-text'] ": {
         fontWeight: "medium",
@@ -74,14 +74,14 @@ export const treeView = defineSlotRecipe({
       cursor: "pointer",
       fontWeight: "medium",
       position: "relative",
-      ps: "calc(((var(--depth) - 1) * 22px) + 22px)",
+      ps: "calc(((var(--depth)) * 22px) + 22px)",
       py: "1",
       textStyle: "sm",
       transitionDuration: "normal",
       transitionProperty: "background, color",
       transitionTimingFunction: "default",
       "&[data-depth='1']": {
-        ps: "6",
+        ps: "calc(((var(--depth)) * 22px) + 22px)",
         fontWeight: "medium",
         color: "fg.muted",
         _selected: {
@@ -122,7 +122,7 @@ export const treeView = defineSlotRecipe({
     tree: {
       display: "flex",
       flexDirection: "column",
-      gap: "1",
+      gap: "0",
     },
   },
   defaultVariants: {

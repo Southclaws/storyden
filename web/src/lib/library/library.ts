@@ -14,6 +14,7 @@ import {
   nodeDelete,
   nodeRemoveAsset,
   nodeUpdate,
+  nodeUpdatePosition,
   nodeUpdateVisibility,
 } from "@/api/openapi-client/nodes";
 import {
@@ -22,8 +23,8 @@ import {
   Node,
   NodeGetOKResponse,
   NodeListOKResponse,
-  NodeListParams,
   NodeMutableProps,
+  NodeUpdatePositionBody,
   NodeWithChildren,
   Property,
   PropertyMutation,
@@ -430,6 +431,51 @@ export function useLibraryMutation(node?: Node) {
     }
   };
 
+  const moveNode = async (
+    draggingNodeId: string,
+    dropTargetId: string,
+    dropPosition: "above" | "below" | "inside",
+    newParent: string | null,
+  ) => {
+    const mutator: MutatorCallback<NodeListOKResponse> = (prevData) => {
+      if (!prevData) return prevData;
+
+      const newNodes = moveNodeInTree({
+        tree: prevData.nodes,
+        draggingNodeId,
+        dropTargetId,
+        dropPosition,
+      });
+
+      return { ...prevData, nodes: newNodes };
+    };
+
+    await mutate(nodeListAllKeyFn, mutator, { revalidate: false });
+
+    const params: NodeUpdatePositionBody = (() => {
+      switch (dropPosition) {
+        case "above":
+          return {
+            before: dropTargetId,
+            parent: newParent,
+          };
+
+        case "below":
+          return {
+            after: dropTargetId,
+            parent: newParent,
+          };
+
+        case "inside":
+          return {
+            parent: dropTargetId,
+          };
+      }
+    })();
+
+    await nodeUpdatePosition(draggingNodeId, params);
+  };
+
   const revalidate = async (data?: MutatorCallback<NodeListOKResponse>) => {
     await mutate(nodeListAllKeyFn, data);
     if (node) {
@@ -449,6 +495,7 @@ export function useLibraryMutation(node?: Node) {
     addAsset,
     removeAsset,
     deleteNode,
+    moveNode,
     revalidate,
   };
 }
@@ -472,4 +519,71 @@ function mergePrimaryImageAsset(
     primary_image: { ...coverConfig.asset, parent: parentAsset },
     meta: { ...oldNode.meta, coverImage: coverConfig.config },
   };
+}
+
+interface MoveNodeParams {
+  tree: NodeWithChildren[];
+  draggingNodeId: string;
+  dropTargetId: string;
+  dropPosition: "above" | "below" | "inside";
+}
+
+function moveNodeInTree({
+  tree,
+  draggingNodeId,
+  dropTargetId,
+  dropPosition,
+}: MoveNodeParams): NodeWithChildren[] {
+  let draggedNode: NodeWithChildren | null = null;
+
+  function removeNode(nodes: NodeWithChildren[]): NodeWithChildren[] {
+    return nodes.reduce<NodeWithChildren[]>((acc, node) => {
+      if (node.id === draggingNodeId) {
+        draggedNode = { ...node };
+        return acc;
+      }
+
+      const newChildren = removeNode(node.children || []);
+      acc.push({ ...node, children: newChildren });
+      return acc;
+    }, []);
+  }
+
+  function insertNode(nodes: NodeWithChildren[]): NodeWithChildren[] {
+    return nodes.reduce<NodeWithChildren[]>((acc, node) => {
+      if (node.id === dropTargetId) {
+        if (dropPosition === "inside") {
+          // Insert as first child
+          const newChildren = [draggedNode!, ...(node.children || [])];
+          acc.push({ ...node, children: newChildren });
+        } else {
+          // Insert above or below at sibling level
+          if (dropPosition === "above") {
+            acc.push(draggedNode!);
+            acc.push(node);
+          } else if (dropPosition === "below") {
+            acc.push(node);
+            acc.push(draggedNode!);
+          }
+        }
+      } else {
+        // Normal node
+        const newChildren = insertNode(node.children || []);
+        acc.push({ ...node, children: newChildren });
+      }
+
+      return acc;
+    }, []);
+  }
+
+  const treeWithoutDragged = removeNode(tree);
+
+  if (!draggedNode) {
+    console.warn("Dragged node not found");
+    return tree;
+  }
+
+  const newTree = insertNode(treeWithoutDragged);
+
+  return newTree;
 }

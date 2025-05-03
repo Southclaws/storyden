@@ -7,6 +7,7 @@ import { SWRConfig } from "swr";
 import { AuthProvider } from "src/auth/AuthProvider";
 
 import { useCacheProvider } from "@/lib/cache/swr-cache";
+import { DndProvider } from "@/lib/dragdrop/provider";
 
 export function Providers({ children }: PropsWithChildren) {
   const provider = useCacheProvider();
@@ -19,11 +20,13 @@ export function Providers({ children }: PropsWithChildren) {
           // provider: provider,
         }}
       >
-        <Toaster />
+        <DndProvider>
+          <Toaster />
 
-        {/* -- */}
-        {children}
-        {/* -- */}
+          {/* -- */}
+          {children}
+          {/* -- */}
+        </DndProvider>
       </SWRConfig>
     </AuthProvider>
   );

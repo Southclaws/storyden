@@ -2,14 +2,30 @@ import {
   TreeView as ArkTreeView,
   createTreeCollection,
 } from "@ark-ui/react/tree-view";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
+import { SortableContext, rectSortingStrategy } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
-import { Fragment, JSX } from "react";
+import { ExpandedChangeDetails } from "node_modules/@ark-ui/react/dist/components/tree-view/tree-view";
+import {
+  CSSProperties,
+  Fragment,
+  JSX,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
-import { NodeWithChildren, Visibility } from "@/api/openapi-schema";
+import { Identifier, NodeWithChildren, Visibility } from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
 import { NavigationHeader } from "@/components/site/Navigation/ContentNavigationList/NavigationHeader";
 import { DraftIcon } from "@/components/ui/icons/Draft";
 import { ReviewIcon, UnlistedIcon } from "@/components/ui/icons/Visibility";
+import {
+  DragItemData,
+  DragItemDivider,
+  DragItemNode,
+} from "@/lib/dragdrop/provider";
 import { visibilityColour } from "@/lib/library/visibilityColours";
 import { css, cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
@@ -44,6 +60,27 @@ const visibilityIcons: Record<Visibility, JSX.Element> = {
   [Visibility.unlisted]: <UnlistedIcon />,
 };
 
+export type PositionInList = "top" | "in" | "bottom" | "only";
+
+export function getPositionInList(
+  numberOfNodes: number,
+  index: number,
+): PositionInList {
+  if (numberOfNodes === 1) {
+    return "only";
+  }
+
+  if (index === 0) {
+    return "top";
+  }
+
+  if (index === numberOfNodes - 1) {
+    return "bottom";
+  }
+
+  return "in";
+}
+
 export const LibraryPageTree = (props: LibraryPageTreeProps) => {
   const { nodes, currentNode } = props;
 
@@ -76,14 +113,15 @@ export const LibraryPageTree = (props: LibraryPageTreeProps) => {
   });
 
   const collection = createTreeCollection<NodeWithChildren>({
-    nodeToValue: (n: NodeWithChildren) => {
-      return n.id;
+    // NOTE: Ark bug where sometimes these functions receive an undefined value.
+    nodeToValue: (n?: NodeWithChildren) => {
+      return n?.id ?? "";
     },
-    nodeToString: (n: NodeWithChildren) => {
-      return n.slug;
+    nodeToString: (n?: NodeWithChildren) => {
+      return n?.slug ?? "";
     },
-    nodeToChildren: (n: NodeWithChildren) => {
-      return n.children;
+    nodeToChildren: (n?: NodeWithChildren) => {
+      return n?.children ?? [];
     },
     rootNode: {
       children: sortedByVisibility,
@@ -92,70 +130,191 @@ export const LibraryPageTree = (props: LibraryPageTreeProps) => {
 
   const rootNodes = collection.rootNode.children;
 
+  const [expandedValue, setExpandedValue] = useState(defaultExpandedValue);
+
+  function handleExpandedChange(e: ExpandedChangeDetails) {
+    setExpandedValue(e.expandedValue);
+  }
+
+  function handleExpandNode(id: string) {
+    setExpandedValue((prev) => {
+      return [...prev, id];
+    });
+  }
+
   return (
     <ArkTreeView.Root
       className={styles.root}
       collection={collection}
       defaultExpandedValue={defaultExpandedValue}
+      expandedValue={expandedValue}
+      onExpandedChange={handleExpandedChange}
     >
       <ArkTreeView.Tree className={cx(styles.tree)}>
-        {rootNodes.map((node, index) => {
-          const previous = index > 0 ? rootNodes[index - 1] : null;
+        <SortableContext items={rootNodes.map((child) => child.id)}>
+          {rootNodes.map((node, index) => {
+            const previous = index > 0 ? rootNodes[index - 1] : null;
 
-          const sameVisibilityAsPrevious = previous
-            ? previous.visibility === node.visibility
-            : true;
+            const sameVisibilityAsPrevious = previous
+              ? previous.visibility === node.visibility
+              : true;
 
-          const dividerLabel = visibilityLabels[node.visibility];
-          const dividerIcon = visibilityIcons[node.visibility];
+            const dividerLabel = visibilityLabels[node.visibility];
+            const dividerIcon = visibilityIcons[node.visibility];
 
-          // We only show dividers on the root list, as this is the only list that's
-          // sorted by visibility.
-          const showDivider = !sameVisibilityAsPrevious;
+            // We only show dividers on the root list, as this is the only list that's
+            // sorted by visibility.
+            const showDivider = !sameVisibilityAsPrevious;
 
-          return (
-            <Fragment key={node.id}>
-              {showDivider && (
-                <HStack mb="1">
-                  <NavigationHeader href="/drafts">
-                    <HStack>
-                      {dividerIcon}
-                      {dividerLabel}
-                    </HStack>
-                  </NavigationHeader>
-                </HStack>
-              )}
+            return (
+              <Fragment key={node.id}>
+                {showDivider && (
+                  <HStack mb="1">
+                    <NavigationHeader href="/drafts">
+                      <HStack>
+                        {dividerIcon}
+                        {dividerLabel}
+                      </HStack>
+                    </NavigationHeader>
+                  </HStack>
+                )}
 
-              <TreeNode
-                currentNode={currentNode}
-                node={node}
-                indexPath={[]}
-                isRoot={true}
-                styles={styles}
-              />
-            </Fragment>
-          );
-        })}
+                <TreeNode
+                  fullTree={nodes}
+                  currentNode={currentNode}
+                  parentID={null}
+                  node={node}
+                  indexPath={[]}
+                  isRoot={true}
+                  styles={styles}
+                  positionInList={getPositionInList(rootNodes.length, index)}
+                  handleExpandNode={handleExpandNode}
+                />
+              </Fragment>
+            );
+          })}
+        </SortableContext>
       </ArkTreeView.Tree>
     </ArkTreeView.Root>
   );
 };
 
 type TreeNodeProps = {
+  fullTree: NodeWithChildren[];
   currentNode: string | undefined;
+  parentID: Identifier | null;
   node: NodeWithChildren;
   styles: any;
   isRoot: boolean;
   indexPath: number[];
+  positionInList: PositionInList;
+  handleExpandNode: (id: string) => void;
 };
 
 function TreeNode({
+  fullTree,
   currentNode,
+  parentID,
   styles,
   node,
   isRoot,
   indexPath,
+  positionInList,
+  handleExpandNode,
 }: TreeNodeProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef: setDraggableNodeRef,
+    transform,
+    isDragging,
+    active,
+    over,
+  } = useDraggable({
+    id: node.id,
+    data: {
+      type: "node",
+      node,
+    } satisfies DragItemNode,
+  });
+
+  const dragged = active?.data.current as DragItemNode | undefined;
+  const draggedID = dragged?.node.id;
+
+  const isDescendantOfDraggedNode = draggedID
+    ? isDescendant(fullTree, draggedID, node.id)
+    : false;
+
+  const { setNodeRef: setDroppableNodeRef } = useDroppable({
+    disabled: isDescendantOfDraggedNode,
+    id: node.id,
+    data: {
+      type: "node",
+      node,
+    } satisfies DragItemNode,
+    resizeObserverConfig: {
+      updateMeasurementsFor: [],
+    },
+  });
+
+  const overItem = over?.data.current as DragItemData | undefined;
+
+  const isDraggingOver =
+    !isDescendantOfDraggedNode &&
+    overItem?.type === "node" &&
+    overItem?.node.id === node.id &&
+    !isDragging;
+
+  // handle drag-over to expand
+  const expandTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (isDraggingOver) {
+      expandTimeout.current = setTimeout(() => {
+        handleExpandNode(node.id);
+      }, 600);
+    } else {
+      if (expandTimeout.current) {
+        clearTimeout(expandTimeout.current);
+        expandTimeout.current = null;
+      }
+    }
+
+    return () => {
+      if (expandTimeout.current) {
+        clearTimeout(expandTimeout.current);
+        expandTimeout.current = null;
+      }
+    };
+  }, [isDraggingOver, node.id, handleExpandNode]);
+
+  function handleLinkClick(e: React.MouseEvent) {
+    if (isDragging) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+
+  const branchControlDragStyles: CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    opacity: isDragging ? 0.5 : 1,
+    ...(isDragging
+      ? {
+          pointerEvents: "none",
+        }
+      : {
+          pointerEvents: "all",
+        }),
+  };
+
+  const showTopDivider =
+    overItem?.type === "divider" &&
+    overItem?.siblingNode.id === node.id &&
+    overItem?.direction === "above";
+  const showBottomDivider =
+    overItem?.type === "divider" &&
+    overItem?.siblingNode.id === node.id &&
+    overItem?.direction === "below";
+
   const isPublished = node.visibility === Visibility.published;
   const isHighlighted = node.slug === currentNode;
 
@@ -175,20 +334,48 @@ function TreeNode({
           node.visibility === Visibility.published ? "solid" : "dashed",
       });
 
+  const draggingOverStyles = isDraggingOver
+    ? css({
+        borderRadius: "md",
+        colorPalette: branchColourPalette,
+        outlineWidth: "thin",
+        outlineStyle: "dashed",
+        outlineColor: "colorPalette.8",
+        outlineOffset: "-0.5",
+      })
+    : "";
+
   const highlightStyles = css({
     background: isHighlighted ? "gray.a2" : undefined,
   });
 
   return (
-    <ArkTreeView.NodeProvider
-      key={node.id}
-      node={node}
-      indexPath={indexPath}
-      data-visibility={node.visibility}
-    >
-      <ArkTreeView.Branch className={cx(styles.branch)}>
+    <ArkTreeView.NodeProvider key={node.id} node={node} indexPath={indexPath}>
+      <DropIndicator
+        node={node}
+        direction="above"
+        active={showTopDivider}
+        positionInList={positionInList}
+        parentID={parentID}
+      />
+
+      <ArkTreeView.Branch
+        ref={setDroppableNodeRef}
+        className={cx(styles.branch)}
+        data-visibility={node.visibility}
+        data-position={positionInList}
+      >
         <ArkTreeView.BranchControl
-          className={cx("group", styles.branchControl, highlightStyles)}
+          className={cx(
+            "group",
+            styles.branchControl,
+            highlightStyles,
+            draggingOverStyles,
+          )}
+          ref={setDraggableNodeRef}
+          style={branchControlDragStyles}
+          {...attributes}
+          {...listeners}
         >
           <ArkTreeView.BranchIndicator className={styles.branchIndicator}>
             {node.children?.length ? <ChevronRightIcon /> : <BulletIcon />}
@@ -198,7 +385,9 @@ function TreeNode({
             asChild
             className={cx(styles.branchText, visibilityStyles)}
           >
-            <Link href={`/l/${node.slug}`}>{label}</Link>
+            <Link onClick={handleLinkClick} href={`/l/${node.slug}`}>
+              {label}
+            </Link>
           </ArkTreeView.BranchText>
 
           <HStack
@@ -220,22 +409,117 @@ function TreeNode({
         </ArkTreeView.BranchControl>
 
         <ArkTreeView.BranchContent className={styles.branchContent}>
-          {node.children.map((child, index) => {
-            return (
-              <TreeNode
-                key={child.id}
-                currentNode={currentNode}
-                node={child}
-                indexPath={[...indexPath, index]}
-                isRoot={false}
-                styles={styles}
-              />
-            );
-          })}
+          <SortableContext
+            items={node.children.map((child) => child.id)}
+            strategy={rectSortingStrategy}
+          >
+            {node.children.map((child, index) => {
+              return (
+                <TreeNode
+                  key={child.id}
+                  fullTree={fullTree}
+                  currentNode={currentNode}
+                  parentID={node.id}
+                  node={child}
+                  indexPath={[...indexPath, index]}
+                  isRoot={false}
+                  styles={styles}
+                  positionInList={getPositionInList(
+                    node.children.length,
+                    index,
+                  )}
+                  handleExpandNode={handleExpandNode}
+                />
+              );
+            })}
+          </SortableContext>
         </ArkTreeView.BranchContent>
       </ArkTreeView.Branch>
+      {positionInList === "bottom" ||
+        (positionInList === "only" && (
+          <DropIndicator
+            node={node}
+            direction="below"
+            active={showBottomDivider}
+            positionInList={positionInList}
+            parentID={parentID}
+          />
+        ))}
     </ArkTreeView.NodeProvider>
   );
+}
+
+function DropIndicator({
+  node,
+  direction,
+  active,
+  positionInList,
+  parentID,
+}: {
+  parentID: Identifier | null;
+  node: NodeWithChildren;
+  direction: "above" | "below";
+  active: boolean;
+  positionInList: PositionInList;
+}) {
+  const { setNodeRef } = useDroppable({
+    id: `${node.id}_${direction}`,
+    data: {
+      type: "divider",
+      direction,
+      siblingNode: node,
+      parentID: parentID,
+    } satisfies DragItemDivider,
+    resizeObserverConfig: {
+      updateMeasurementsFor: [],
+    },
+  });
+
+  return (
+    <div
+      data-divider-node-id={node.id}
+      data-divider-direction={direction}
+      data-divider-active={active}
+      data-divider-position={positionInList}
+      style={{
+        position: "relative",
+        height: "1px",
+        marginInlineStart: "calc(((var(--depth)) * 22px) + 22px)",
+      }}
+    >
+      <div
+        ref={setNodeRef}
+        style={{
+          position: "absolute",
+          top: "-1px",
+          left: 0,
+          right: 0,
+          height: "3px",
+          background: active ? "var(--colors-bg-disabled)" : "transparent",
+          opacity: active ? 1 : 0,
+          transition: "opacity 0.2s",
+          pointerEvents: "none",
+        }}
+      />
+    </div>
+  );
+}
+
+export function isDescendant(
+  nodes: NodeWithChildren[],
+  ancestorId: string,
+  descendantId: string,
+): boolean {
+  function dfs(node: NodeWithChildren): boolean {
+    if (node.id === descendantId) {
+      return true;
+    }
+    return node.children?.some(dfs) ?? false;
+  }
+
+  const ancestorNode = nodes.find((n) => n.id === ancestorId);
+  if (!ancestorNode) return false;
+  return dfs(ancestorNode);
 }
 
 const ChevronRightIcon = () => (
