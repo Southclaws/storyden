@@ -43,7 +43,7 @@ func TestNodesVisibilityRules_Draft(t *testing.T) {
 
 			t.Run("draft_child_succeeds", func(t *testing.T) {
 				draftNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &draft}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, draftNode.JSON200.Slug, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
 
 				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)
@@ -113,7 +113,7 @@ func TestNodesVisibilityRules_Unlisted(t *testing.T) {
 
 			t.Run("unlisted_child_succeeds", func(t *testing.T) {
 				unlistedNode := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{Name: "n2", Slug: opt.New(uuid.NewString()).Ptr(), Visibility: &unlisted}, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
-				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, sh.WithSession(ctxAdmin)))(t, http.StatusOK)
+				tests.AssertRequest(cl.NodeAddNodeWithResponse(ctx, parentNode.JSON200.Slug, unlistedNode.JSON200.Slug, sh.WithSession(ctxAuthor)))(t, http.StatusOK)
 
 				list := tests.AssertRequest(cl.NodeListWithResponse(ctx, &openapi.NodeListParams{}, sh.WithSession(ctxRando)))(t, http.StatusOK)
 				ids := nodeIDs(list.JSON200.Nodes)

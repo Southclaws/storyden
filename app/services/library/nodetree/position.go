@@ -65,13 +65,11 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 		var err error
 
 		parentNode, ok := thisnode.Parent.Get()
-		if !ok {
-			return nil, fault.Wrap(ErrNoParent, fctx.With(ctx))
-		}
-
-		thisnode, err = p.graph.Sever(ctx, nm, library.QueryKey{parentNode.Mark.Queryable()})
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
+		if ok {
+			thisnode, err = p.graph.Sever(ctx, nm, library.QueryKey{parentNode.Mark.Queryable()})
+			if err != nil {
+				return nil, fault.Wrap(err, fctx.With(ctx))
+			}
 		}
 	} else if parentNode, ok := parent.Get(); ok {
 		// If the parent ID is explicitly set to a value, move the node.
