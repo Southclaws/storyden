@@ -462,7 +462,12 @@ func (c *Nodes) NodeRemoveAsset(ctx context.Context, request openapi.NodeRemoveA
 }
 
 func (c *Nodes) NodeAddNode(ctx context.Context, request openapi.NodeAddNodeRequestObject) (openapi.NodeAddNodeResponseObject, error) {
-	node, err := c.ntree.Move(ctx, deserialiseNodeMark(request.NodeSlugChild), deserialiseNodeMark(request.NodeSlug))
+	_, err := c.ntree.Move(ctx, deserialiseNodeMark(request.NodeSlugChild), deserialiseNodeMark(request.NodeSlug))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	node, err := c.nodeReader.GetBySlug(ctx, deserialiseNodeMark(request.NodeSlug), opt.NewEmpty[node_querier.ChildSortRule]())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

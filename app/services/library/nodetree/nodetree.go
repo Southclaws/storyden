@@ -101,12 +101,12 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		}
 	}
 
-	pnode, err = s.nodeWriter.Update(ctx, library.QueryKey{pnode.Mark.Queryable()}, node_writer.WithChildNodeAdd(xid.ID(cnode.Mark.ID())))
+	cnode, err = s.nodeWriter.Update(ctx, library.QueryKey{cnode.Mark.Queryable()}, node_writer.WithParent(library.NodeID(pnode.Mark.ID())))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return pnode, nil
+	return cnode, nil
 }
 
 func (s *service) Sever(ctx context.Context, child library.QueryKey, parent library.QueryKey) (*library.Node, error) {
@@ -137,12 +137,12 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	pnode, err = s.nodeWriter.Update(ctx, library.QueryKey{pnode.Mark.Queryable()}, node_writer.WithChildNodeRemove(xid.ID(cnode.Mark.ID())))
+	_, err = s.nodeWriter.Update(ctx, library.QueryKey{pnode.Mark.Queryable()}, node_writer.WithChildNodeRemove(xid.ID(cnode.Mark.ID())))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return pnode, nil
+	return s.nodeQuerier.Get(ctx, child)
 }
 
 // visibilityRules defines the rules for which visibility levels can be nested.
