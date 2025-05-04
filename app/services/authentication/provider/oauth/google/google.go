@@ -21,14 +21,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/services/account/register"
-	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/all"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/endec"
-)
-
-var (
-	ErrAccessToken  = fault.New("failed to get access token")
-	ErrMissingToken = fault.New("no access token in response")
 )
 
 var (
@@ -37,11 +32,9 @@ var (
 )
 
 type Provider struct {
+	config   oauth.Configuration
 	register *register.Registrar
 	ed       endec.EncrypterDecrypter
-
-	callback string
-	config   *all.Configuration
 }
 
 func New(
@@ -49,18 +42,18 @@ func New(
 	register *register.Registrar,
 	ed endec.EncrypterDecrypter,
 ) (*Provider, error) {
-	config, err := all.LoadProvider(service)
-	if err != nil {
-		return nil, fault.Wrap(err)
+	if cfg.GoogleEnabled && ed == nil {
+		return nil, fault.New("JWT provider must be enabled by setting JWT_SECRET for Google OAuth provider")
 	}
 
-	callback := all.Redirect(cfg, service)
-
 	return &Provider{
+		config: oauth.Configuration{
+			Enabled:      cfg.GoogleEnabled,
+			ClientID:     cfg.GoogleClientID,
+			ClientSecret: cfg.GoogleClientSecret,
+		},
 		register: register,
 		ed:       ed,
-		config:   config,
-		callback: callback,
 	}, nil
 }
 
@@ -68,19 +61,15 @@ func (p *Provider) Service() authentication.Service { return service }
 func (p *Provider) Token() authentication.TokenType { return tokenType }
 
 func (p *Provider) Enabled(ctx context.Context) (bool, error) {
-	return p.config != nil, nil
+	return p.config.Enabled, nil
 }
 
-func (p *Provider) oauthConfig() *oauth2.Config {
-	if p.config == nil {
-		return nil
-	}
-
+func (p *Provider) oauthConfig(redirect string) *oauth2.Config {
 	return &oauth2.Config{
 		ClientID:     p.config.ClientID,
 		ClientSecret: p.config.ClientSecret,
 		Endpoint:     google.Endpoint,
-		RedirectURL:  p.callback,
+		RedirectURL:  redirect,
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",
@@ -96,13 +85,13 @@ func (p *Provider) Link(redirectPath string) (string, error) {
 		return "", fault.Wrap(err)
 	}
 
-	oac := p.oauthConfig()
+	oac := p.oauthConfig(redirectPath)
 
 	return oac.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
 }
 
 func (p *Provider) Login(ctx context.Context, state, code string) (*account.Account, error) {
-	_, err := p.ed.Decrypt(state)
+	c, err := p.ed.Decrypt(state)
 	if err != nil {
 		return nil, fault.Wrap(err,
 			fctx.With(ctx),
@@ -110,7 +99,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		)
 	}
 
-	oac := p.oauthConfig()
+	oac := p.oauthConfig(c["redirect"].(string))
 
 	token, err := oac.Exchange(ctx, code, oauth2.AccessTypeOffline)
 	if err != nil {

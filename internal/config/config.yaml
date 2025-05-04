@@ -220,6 +220,60 @@
 
         This is typically a long string of characters that you can generate using a secure random generator such as `openssl rand -hex 12`.
 
+    - env: OAUTH_GOOGLE_ENABLED
+      name: GoogleEnabled
+      type: bool
+      description: |-
+        Enable Google SSO authentication.
+
+    - env: OAUTH_GOOGLE_CLIENT_ID
+      name: GoogleClientID
+      type: string
+      description: |-
+        The client ID for the Google OAuth2 application.
+
+    - env: OAUTH_GOOGLE_CLIENT_SECRET
+      name: GoogleClientSecret
+      type: string
+      description: |-
+        The client secret for the Google OAuth2 application.
+
+    - env: OAUTH_GITHUB_ENABLED
+      name: GitHubEnabled
+      type: bool
+      description: |-
+        Enable GitHub SSO authentication.
+
+    - env: OAUTH_GITHUB_CLIENT_ID
+      name: GitHubClientID
+      type: string
+      description: |-
+        The client ID for the GitHub OAuth2 application.
+
+    - env: OAUTH_GITHUB_CLIENT_SECRET
+      name: GitHubClientSecret
+      type: string
+      description: |-
+        The client secret for the GitHub OAuth2 application.
+
+    - env: OAUTH_DISCORD_ENABLED
+      name: DiscordEnabled
+      type: bool
+      description: |-
+        Enable Discord SSO authentication.
+
+    - env: OAUTH_DISCORD_CLIENT_ID
+      name: DiscordClientID
+      type: string
+      description: |-
+        The client ID for the Discord OAuth2 application.
+
+    - env: OAUTH_DISCORD_CLIENT_SECRET
+      name: DiscordClientSecret
+      type: string
+      description: |-
+        The client secret for the Discord OAuth2 application.
+
 - section: SMS
   description: |-
     SMS sending configuration. This must be enabled in order to support SMS-based authentication.

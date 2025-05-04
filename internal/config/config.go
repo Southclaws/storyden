@@ -171,6 +171,24 @@ type Config struct {
 	   This is typically a long string of characters that you can generate using a secure random generator such as `openssl rand -hex 12`.
 	*/
 	JWTSecret []byte `envconfig:"JWT_SECRET"`
+	// Enable Google SSO authentication.
+	GoogleEnabled bool `envconfig:"OAUTH_GOOGLE_ENABLED"`
+	// The client ID for the Google OAuth2 application.
+	GoogleClientID string `envconfig:"OAUTH_GOOGLE_CLIENT_ID"`
+	// The client secret for the Google OAuth2 application.
+	GoogleClientSecret string `envconfig:"OAUTH_GOOGLE_CLIENT_SECRET"`
+	// Enable GitHub SSO authentication.
+	GitHubEnabled bool `envconfig:"OAUTH_GITHUB_ENABLED"`
+	// The client ID for the GitHub OAuth2 application.
+	GitHubClientID string `envconfig:"OAUTH_GITHUB_CLIENT_ID"`
+	// The client secret for the GitHub OAuth2 application.
+	GitHubClientSecret string `envconfig:"OAUTH_GITHUB_CLIENT_SECRET"`
+	// Enable Discord SSO authentication.
+	DiscordEnabled bool `envconfig:"OAUTH_DISCORD_ENABLED"`
+	// The client ID for the Discord OAuth2 application.
+	DiscordClientID string `envconfig:"OAUTH_DISCORD_CLIENT_ID"`
+	// The client secret for the Discord OAuth2 application.
+	DiscordClientSecret string `envconfig:"OAUTH_DISCORD_CLIENT_SECRET"`
 
 	// -
 	// SMS

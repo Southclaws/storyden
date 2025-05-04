@@ -280,6 +280,87 @@ The secret key used to sign JWT tokens. This is used for authentication and shou
 
 This is typically a long string of characters that you can generate using a secure random generator such as `openssl rand -hex 12`.
 
+### `OAUTH_GOOGLE_ENABLED`
+
+<table>
+<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Enable Google SSO authentication.
+
+### `OAUTH_GOOGLE_CLIENT_ID`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The client ID for the Google OAuth2 application.
+
+### `OAUTH_GOOGLE_CLIENT_SECRET`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The client secret for the Google OAuth2 application.
+
+### `OAUTH_GITHUB_ENABLED`
+
+<table>
+<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Enable GitHub SSO authentication.
+
+### `OAUTH_GITHUB_CLIENT_ID`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The client ID for the GitHub OAuth2 application.
+
+### `OAUTH_GITHUB_CLIENT_SECRET`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The client secret for the GitHub OAuth2 application.
+
+### `OAUTH_DISCORD_ENABLED`
+
+<table>
+<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+Enable Discord SSO authentication.
+
+### `OAUTH_DISCORD_CLIENT_ID`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The client ID for the Discord OAuth2 application.
+
+### `OAUTH_DISCORD_CLIENT_SECRET`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The client secret for the Discord OAuth2 application.
+
 ## SMS
 
 SMS sending configuration. This must be enabled in order to support SMS-based authentication.

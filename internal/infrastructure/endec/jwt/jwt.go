@@ -28,6 +28,10 @@ func Build() fx.Option {
 }
 
 func New(cfg config.Config) (endec.EncrypterDecrypter, error) {
+	if len(cfg.JWTSecret) == 0 {
+		return nil, nil
+	}
+
 	return &jwtEncrypterDecrypter{key: cfg.JWTSecret}, nil
 }
 

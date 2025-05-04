@@ -13,14 +13,15 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/google/go-github/v70/github"
+	"github.com/google/go-github/v71/github"
 	"golang.org/x/oauth2"
 	oauth2_github "golang.org/x/oauth2/github"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/services/account/register"
-	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/all"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth"
+
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure/endec"
 )
@@ -31,11 +32,9 @@ var (
 )
 
 type Provider struct {
+	config   oauth.Configuration
 	register *register.Registrar
 	ed       endec.EncrypterDecrypter
-
-	callback string
-	config   *all.Configuration
 }
 
 func New(
@@ -43,16 +42,18 @@ func New(
 	register *register.Registrar,
 	ed endec.EncrypterDecrypter,
 ) (*Provider, error) {
-	config, err := all.LoadProvider(service)
-	if err != nil {
-		return nil, fault.Wrap(err)
+	if cfg.GitHubEnabled && ed == nil {
+		return nil, fault.New("JWT provider must be enabled by setting JWT_SECRET for GitHub OAuth provider")
 	}
 
 	return &Provider{
+		config: oauth.Configuration{
+			Enabled:      cfg.GitHubEnabled,
+			ClientID:     cfg.GitHubClientID,
+			ClientSecret: cfg.GitHubClientSecret,
+		},
 		register: register,
 		ed:       ed,
-		config:   config,
-		callback: all.Redirect(cfg, service),
 	}, nil
 }
 
@@ -60,19 +61,15 @@ func (p *Provider) Service() authentication.Service { return service }
 func (p *Provider) Token() authentication.TokenType { return tokenType }
 
 func (p *Provider) Enabled(ctx context.Context) (bool, error) {
-	return p.config != nil, nil
+	return p.config.Enabled, nil
 }
 
-func (p *Provider) oauthConfig() *oauth2.Config {
-	if p.config == nil {
-		return nil
-	}
-
+func (p *Provider) oauthConfig(redirect string) *oauth2.Config {
 	return &oauth2.Config{
 		ClientID:     p.config.ClientID,
 		ClientSecret: p.config.ClientSecret,
 		Endpoint:     oauth2_github.Endpoint,
-		RedirectURL:  p.callback,
+		RedirectURL:  redirect,
 		Scopes: []string{
 			"read:user",
 			"user:email",
@@ -88,13 +85,13 @@ func (p *Provider) Link(redirectPath string) (string, error) {
 		return "", fault.Wrap(err)
 	}
 
-	oac := p.oauthConfig()
+	oac := p.oauthConfig(redirectPath)
 
 	return oac.AuthCodeURL(state, oauth2.AccessTypeOffline), nil
 }
 
 func (p *Provider) Login(ctx context.Context, state, code string) (*account.Account, error) {
-	_, err := p.ed.Decrypt(state)
+	c, err := p.ed.Decrypt(state)
 	if err != nil {
 		return nil, fault.Wrap(err,
 			fctx.With(ctx),
@@ -102,7 +99,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		)
 	}
 
-	oac := p.oauthConfig()
+	oac := p.oauthConfig(c["redirect"].(string))
 
 	token, err := oac.Exchange(ctx, code, oauth2.AccessTypeOffline)
 	if err != nil {
