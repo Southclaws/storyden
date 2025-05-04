@@ -4847,6 +4847,10 @@ components:
         category: { $ref: "#/components/schemas/CategoryReference" }
         link: { $ref: "#/components/schemas/LinkReference" }
         tags: { $ref: "#/components/schemas/TagReferenceList" }
+        last_reply_at:
+          type: string
+          format: date-time
+          description: The time of the last reply to the thread.
 
     ReplyStatus:
       type: object

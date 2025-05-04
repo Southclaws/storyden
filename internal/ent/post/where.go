@@ -96,6 +96,11 @@ func Pinned(v bool) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldPinned, v))
 }
 
+// LastReplyAt applies equality check predicate on the "last_reply_at" field. It's identical to LastReplyAtEQ.
+func LastReplyAt(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldLastReplyAt, v))
+}
+
 // RootPostID applies equality check predicate on the "root_post_id" field. It's identical to RootPostIDEQ.
 func RootPostID(v xid.ID) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldRootPostID, v))
@@ -479,6 +484,56 @@ func PinnedEQ(v bool) predicate.Post {
 // PinnedNEQ applies the NEQ predicate on the "pinned" field.
 func PinnedNEQ(v bool) predicate.Post {
 	return predicate.Post(sql.FieldNEQ(FieldPinned, v))
+}
+
+// LastReplyAtEQ applies the EQ predicate on the "last_reply_at" field.
+func LastReplyAtEQ(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldEQ(FieldLastReplyAt, v))
+}
+
+// LastReplyAtNEQ applies the NEQ predicate on the "last_reply_at" field.
+func LastReplyAtNEQ(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldNEQ(FieldLastReplyAt, v))
+}
+
+// LastReplyAtIn applies the In predicate on the "last_reply_at" field.
+func LastReplyAtIn(vs ...time.Time) predicate.Post {
+	return predicate.Post(sql.FieldIn(FieldLastReplyAt, vs...))
+}
+
+// LastReplyAtNotIn applies the NotIn predicate on the "last_reply_at" field.
+func LastReplyAtNotIn(vs ...time.Time) predicate.Post {
+	return predicate.Post(sql.FieldNotIn(FieldLastReplyAt, vs...))
+}
+
+// LastReplyAtGT applies the GT predicate on the "last_reply_at" field.
+func LastReplyAtGT(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldGT(FieldLastReplyAt, v))
+}
+
+// LastReplyAtGTE applies the GTE predicate on the "last_reply_at" field.
+func LastReplyAtGTE(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldGTE(FieldLastReplyAt, v))
+}
+
+// LastReplyAtLT applies the LT predicate on the "last_reply_at" field.
+func LastReplyAtLT(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldLT(FieldLastReplyAt, v))
+}
+
+// LastReplyAtLTE applies the LTE predicate on the "last_reply_at" field.
+func LastReplyAtLTE(v time.Time) predicate.Post {
+	return predicate.Post(sql.FieldLTE(FieldLastReplyAt, v))
+}
+
+// LastReplyAtIsNil applies the IsNil predicate on the "last_reply_at" field.
+func LastReplyAtIsNil() predicate.Post {
+	return predicate.Post(sql.FieldIsNull(FieldLastReplyAt))
+}
+
+// LastReplyAtNotNil applies the NotNil predicate on the "last_reply_at" field.
+func LastReplyAtNotNil() predicate.Post {
+	return predicate.Post(sql.FieldNotNull(FieldLastReplyAt))
 }
 
 // RootPostIDEQ applies the EQ predicate on the "root_post_id" field.

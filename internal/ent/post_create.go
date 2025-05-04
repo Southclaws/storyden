@@ -130,6 +130,20 @@ func (pc *PostCreate) SetNillablePinned(b *bool) *PostCreate {
 	return pc
 }
 
+// SetLastReplyAt sets the "last_reply_at" field.
+func (pc *PostCreate) SetLastReplyAt(t time.Time) *PostCreate {
+	pc.mutation.SetLastReplyAt(t)
+	return pc
+}
+
+// SetNillableLastReplyAt sets the "last_reply_at" field if the given value is not nil.
+func (pc *PostCreate) SetNillableLastReplyAt(t *time.Time) *PostCreate {
+	if t != nil {
+		pc.SetLastReplyAt(*t)
+	}
+	return pc
+}
+
 // SetRootPostID sets the "root_post_id" field.
 func (pc *PostCreate) SetRootPostID(x xid.ID) *PostCreate {
 	pc.mutation.SetRootPostID(x)
@@ -607,6 +621,10 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_spec.SetField(post.FieldPinned, field.TypeBool, value)
 		_node.Pinned = value
 	}
+	if value, ok := pc.mutation.LastReplyAt(); ok {
+		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
+		_node.LastReplyAt = &value
+	}
 	if value, ok := pc.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
 		_node.Body = value
@@ -1028,6 +1046,24 @@ func (u *PostUpsert) UpdatePinned() *PostUpsert {
 	return u
 }
 
+// SetLastReplyAt sets the "last_reply_at" field.
+func (u *PostUpsert) SetLastReplyAt(v time.Time) *PostUpsert {
+	u.Set(post.FieldLastReplyAt, v)
+	return u
+}
+
+// UpdateLastReplyAt sets the "last_reply_at" field to the value that was provided on create.
+func (u *PostUpsert) UpdateLastReplyAt() *PostUpsert {
+	u.SetExcluded(post.FieldLastReplyAt)
+	return u
+}
+
+// ClearLastReplyAt clears the value of the "last_reply_at" field.
+func (u *PostUpsert) ClearLastReplyAt() *PostUpsert {
+	u.SetNull(post.FieldLastReplyAt)
+	return u
+}
+
 // SetRootPostID sets the "root_post_id" field.
 func (u *PostUpsert) SetRootPostID(v xid.ID) *PostUpsert {
 	u.Set(post.FieldRootPostID, v)
@@ -1340,6 +1376,27 @@ func (u *PostUpsertOne) SetPinned(v bool) *PostUpsertOne {
 func (u *PostUpsertOne) UpdatePinned() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdatePinned()
+	})
+}
+
+// SetLastReplyAt sets the "last_reply_at" field.
+func (u *PostUpsertOne) SetLastReplyAt(v time.Time) *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.SetLastReplyAt(v)
+	})
+}
+
+// UpdateLastReplyAt sets the "last_reply_at" field to the value that was provided on create.
+func (u *PostUpsertOne) UpdateLastReplyAt() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateLastReplyAt()
+	})
+}
+
+// ClearLastReplyAt clears the value of the "last_reply_at" field.
+func (u *PostUpsertOne) ClearLastReplyAt() *PostUpsertOne {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearLastReplyAt()
 	})
 }
 
@@ -1845,6 +1902,27 @@ func (u *PostUpsertBulk) SetPinned(v bool) *PostUpsertBulk {
 func (u *PostUpsertBulk) UpdatePinned() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdatePinned()
+	})
+}
+
+// SetLastReplyAt sets the "last_reply_at" field.
+func (u *PostUpsertBulk) SetLastReplyAt(v time.Time) *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.SetLastReplyAt(v)
+	})
+}
+
+// UpdateLastReplyAt sets the "last_reply_at" field to the value that was provided on create.
+func (u *PostUpsertBulk) UpdateLastReplyAt() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.UpdateLastReplyAt()
+	})
+}
+
+// ClearLastReplyAt clears the value of the "last_reply_at" field.
+func (u *PostUpsertBulk) ClearLastReplyAt() *PostUpsertBulk {
+	return u.Update(func(s *PostUpsert) {
+		s.ClearLastReplyAt()
 	})
 }
 

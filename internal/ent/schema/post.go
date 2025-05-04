@@ -24,6 +24,7 @@ func (Post) Fields() []ent.Field {
 		field.String("title").Optional(),
 		field.String("slug").Optional(),
 		field.Bool("pinned").Default(false),
+		field.Time("last_reply_at").Optional().Nillable(),
 
 		// child posts
 		field.String("root_post_id").GoType(xid.ID{}).Optional(),

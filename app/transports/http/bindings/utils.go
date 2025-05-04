@@ -83,6 +83,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Description: &t.Short,
 		Body:        t.Content.HTML(),
 		Meta:        (*openapi.Metadata)(&t.Meta),
+		LastReplyAt: t.LastReplyAt.Ptr(),
 
 		Category:    serialiseCategoryReference(&t.Category),
 		Pinned:      t.Pinned,
@@ -123,6 +124,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Tags:           serialiseTagReferenceList(t.Tags),
 		Title:          t.Title,
 		UpdatedAt:      t.UpdatedAt,
+		LastReplyAt:    t.LastReplyAt.Ptr(),
 	}
 }
 

@@ -14,6 +14,8 @@ import type { TagReferenceList } from "./tagReferenceList";
 
 export interface ThreadReferenceProps {
   category: CategoryReference;
+  /** The time of the last reply to the thread. */
+  last_reply_at?: string;
   link?: LinkReference;
   /** Whether the thread is pinned in this category. */
   pinned: boolean;

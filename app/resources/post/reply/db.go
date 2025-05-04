@@ -84,6 +84,14 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
+	err = d.db.Post.
+		UpdateOneID(xid.ID(parentID)).
+		SetLastReplyAt(time.Now()).
+		Exec(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return Map(p)
 }
 

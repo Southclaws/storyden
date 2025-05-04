@@ -27,10 +27,11 @@ import (
 type Thread struct {
 	post.Post
 
-	Title  string
-	Slug   string
-	Short  string
-	Pinned bool
+	Title       string
+	Slug        string
+	Short       string
+	Pinned      bool
+	LastReplyAt opt.Optional[time.Time]
 
 	ReplyStatus post.ReplyStatus
 	Replies     pagination.Result[*reply.Reply]
@@ -87,10 +88,11 @@ func Map(m *ent.Post) (*Thread, error) {
 			DeletedAt: opt.NewPtr(m.DeletedAt),
 		},
 
-		Title:  m.Title,
-		Slug:   m.Slug,
-		Short:  m.Short,
-		Pinned: m.Pinned,
+		Title:       m.Title,
+		Slug:        m.Slug,
+		Short:       m.Short,
+		Pinned:      m.Pinned,
+		LastReplyAt: opt.NewPtr(m.LastReplyAt),
 
 		Category:   *category,
 		Visibility: visibility.NewVisibilityFromEnt(m.Visibility),
@@ -151,10 +153,11 @@ func Mapper(
 				DeletedAt: opt.NewPtr(m.DeletedAt),
 			},
 
-			Title:  m.Title,
-			Slug:   m.Slug,
-			Short:  m.Short,
-			Pinned: m.Pinned,
+			Title:       m.Title,
+			Slug:        m.Slug,
+			Short:       m.Short,
+			Pinned:      m.Pinned,
+			LastReplyAt: opt.NewPtr(m.LastReplyAt),
 
 			ReplyStatus: rs.Status(m.ID),
 			Category:    *category,
