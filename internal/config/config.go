@@ -169,6 +169,8 @@ type Config struct {
 	   The secret key used to sign JWT tokens. This is used for authentication and should be kept secret.
 
 	   This is typically a long string of characters that you can generate using a secure random generator such as `openssl rand -hex 12`.
+
+	   The JWT secret is required if you enable any of the OAuth providers or enable email features. This is because JWTs are used to verify callbacks as well as verify password-reset and other tokens.
 	*/
 	JWTSecret []byte `envconfig:"JWT_SECRET"`
 	// Enable Google SSO authentication.
