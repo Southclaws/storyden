@@ -2,7 +2,6 @@ import { Metadata } from "next";
 
 import { nodeGet } from "@/api/openapi-server/nodes";
 import { getTargetSlug } from "@/components/library/utils";
-import { UnreadyBanner } from "@/components/site/Unready";
 import { WEB_ADDRESS } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
@@ -13,28 +12,24 @@ export type Props = {
 };
 
 export default async function Page(props: Props) {
-  try {
-    const { slug } = ParamsSchema.parse(await props.params);
+  const { slug } = ParamsSchema.parse(await props.params);
 
-    const targetSlug = getTargetSlug(slug);
+  const targetSlug = getTargetSlug(slug);
 
-    if (!targetSlug) {
-      // NOTE: This state is probably not possible to reach due to the params.
-      throw new Error("Library page not found");
-    }
-
-    const { data } = await nodeGet(targetSlug, undefined, {
-      cache: "no-store",
-      next: {
-        tags: ["library", "node"],
-        revalidate: 1,
-      },
-    });
-
-    return <LibraryPageScreen node={data} />;
-  } catch (e) {
-    return <UnreadyBanner error={e} />;
+  if (!targetSlug) {
+    // NOTE: This state is probably not possible to reach due to the params.
+    throw new Error("Library page not found");
   }
+
+  const { data } = await nodeGet(targetSlug, undefined, {
+    cache: "no-store",
+    next: {
+      tags: ["library", "node"],
+      revalidate: 1,
+    },
+  });
+
+  return <LibraryPageScreen node={data} />;
 }
 
 export async function generateMetadata(props: Props) {

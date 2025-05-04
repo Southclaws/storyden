@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
+import { notFound } from "next/navigation";
 
-import { buildRequest, buildResult } from "./common";
+import { RequestError, buildRequest, buildResult } from "./common";
 
 // Server side variant of fetcher that includes SSR cookies.
 
@@ -48,12 +49,20 @@ export const fetcher = async <T>(
   req.headers.set("Cookie", await getCookieHeader());
 
   const response = await fetch(req);
-  const result = await buildResult<T>(response);
 
-  // Orval generated types are incorrect here. For some reason it generates a
-  // struct with a `data` field, but the actual result type is just the data.
-  // However the generated caller passes T as Promise<T> so we need to cast it.
-  return { data: result, status: response.status } as T;
+  try {
+    const result = await buildResult<T>(response);
+
+    // Orval generated types are incorrect here. For some reason it generates a
+    // struct with a `data` field, but the actual result type is just the data.
+    // However the generated caller passes T as Promise<T> so we need to cast it.
+    return { data: result, status: response.status } as T;
+  } catch (e) {
+    if (e instanceof RequestError && e.status === 404) {
+      notFound();
+    }
+    throw e;
+  }
 };
 
 async function getCookieHeader(): Promise<string> {

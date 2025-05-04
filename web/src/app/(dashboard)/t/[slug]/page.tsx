@@ -27,13 +27,9 @@ export default async function Page(props: Props) {
 
   const { page } = QuerySchema.parse(searchParams);
 
-  try {
-    const { data } = await threadGet(slug);
+  const { data } = await threadGet(slug);
 
-    return <ThreadScreen initialPage={page} slug={slug} thread={data} />;
-  } catch (e) {
-    return <UnreadyBanner error={e} />;
-  }
+  return <ThreadScreen initialPage={page} slug={slug} thread={data} />;
 }
 
 export async function generateMetadata(props: Props) {
