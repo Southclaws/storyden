@@ -422,11 +422,13 @@ function TreeNode({
             minW="min"
             flexShrink="0"
           >
-            <CreatePageAction
-              variant="ghost"
-              hideLabel
-              parentSlug={node.slug}
-            />
+            {canManageLibrary && (
+              <CreatePageAction
+                variant="ghost"
+                hideLabel
+                parentSlug={node.slug}
+              />
+            )}
             <LibraryPageMenu variant="ghost" node={node} />
           </HStack>
         </ArkTreeView.BranchControl>
