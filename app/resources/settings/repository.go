@@ -9,7 +9,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/puzpuzpuz/xsync/v3"
+	"github.com/puzpuzpuz/xsync/v4"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/ent"
@@ -29,7 +29,7 @@ type SettingsRepository struct {
 	// cached stores the most recent copy of all the settings from the database.
 	// Directly changing settings via external database queries will result in
 	// settings not immediately updating so it's advised to always go via API.
-	cachedSettings *xsync.MapOf[string, any]
+	cachedSettings *xsync.Map[string, any]
 	cacheLastFetch time.Time
 }
 
@@ -37,7 +37,7 @@ func New(ctx context.Context, lc fx.Lifecycle, logger *slog.Logger, db *ent.Clie
 	d := &SettingsRepository{
 		logger:         logger,
 		db:             db,
-		cachedSettings: xsync.NewMapOf[string, any](),
+		cachedSettings: xsync.NewMap[string, any](),
 	}
 
 	lc.Append(fx.StartHook(func() error {
