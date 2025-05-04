@@ -84,7 +84,10 @@ func newSemdexer(
 		go func() {
 			for msg := range sub {
 				if err := re.indexThread(ctx, msg.Payload.ID); err != nil {
-					logger.Error("failed to index post", slog.String("error", err.Error()))
+					logger.Error("failed to index thread",
+						slog.String("error", err.Error()),
+						slog.String("post_id", msg.Payload.ID.String()),
+					)
 				}
 
 				msg.Ack()

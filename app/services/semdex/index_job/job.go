@@ -36,7 +36,10 @@ func runIndexConsumer(
 		go func() {
 			for msg := range replyChan {
 				if err := ic.indexReply(ctx, msg.Payload.ID); err != nil {
-					logger.Error("failed to index post", slog.String("error", err.Error()))
+					logger.Error("failed to index reply",
+						slog.String("error", err.Error()),
+						slog.String("post_id", msg.Payload.ID.String()),
+					)
 					msg.Nack()
 					continue
 				}
@@ -48,7 +51,10 @@ func runIndexConsumer(
 		go func() {
 			for msg := range profileChan {
 				if err := ic.indexProfile(ctx, msg.Payload.ID); err != nil {
-					logger.Error("failed to index post", slog.String("error", err.Error()))
+					logger.Error("failed to index profile",
+						slog.String("error", err.Error()),
+						slog.String("account_id", msg.Payload.ID.String()),
+					)
 					msg.Nack()
 					continue
 				}
