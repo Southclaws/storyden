@@ -21,6 +21,10 @@ func Build() fx.Option {
 }
 
 func newMailer(logger *slog.Logger, cfg config.Config) (Sender, error) {
+	if cfg.EmailProvider != "" && len(cfg.JWTSecret) == 0 {
+		return nil, fault.New("JWT secret must be provided when enabling email features, set JWT_SECRET in the environment")
+	}
+
 	switch cfg.EmailProvider {
 	case "":
 		return nil, nil

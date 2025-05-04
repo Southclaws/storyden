@@ -40,14 +40,6 @@ func TestEncryptDecrypt(t *testing.T) {
 			JWTSecret: []byte{},
 		})
 		r.NoError(err)
-
-		token, err := ed.Encrypt(claims, time.Hour)
-		r.Error(err)
-		a.EqualError(err, "no JWT secret provided")
-
-		gotClaims, err := ed.Decrypt(token)
-		r.Error(err)
-		a.EqualError(err, "token is malformed: token contains an invalid number of segments: token is malformed")
-		a.Nil(gotClaims)
+		r.Nil(ed)
 	})
 }
