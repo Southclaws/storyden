@@ -37,6 +37,7 @@ import { LibraryPageMenu } from "../LibraryPageMenu/LibraryPageMenu";
 export interface LibraryPageTreeProps {
   nodes: NodeWithChildren[];
   currentNode: string | undefined;
+  canManageLibrary: boolean;
 }
 
 const visibilitySortKey: Record<Visibility, number> = {
@@ -189,6 +190,7 @@ export const LibraryPageTree = (props: LibraryPageTreeProps) => {
                   styles={styles}
                   positionInList={getPositionInList(rootNodes.length, index)}
                   handleExpandNode={handleExpandNode}
+                  canManageLibrary={props.canManageLibrary}
                 />
               </Fragment>
             );
@@ -209,6 +211,7 @@ type TreeNodeProps = {
   indexPath: number[];
   positionInList: PositionInList;
   handleExpandNode: (id: string) => void;
+  canManageLibrary: boolean;
 };
 
 const linkStyles = css({
@@ -228,6 +231,7 @@ function TreeNode({
   indexPath,
   positionInList,
   handleExpandNode,
+  canManageLibrary,
 }: TreeNodeProps) {
   const {
     attributes,
@@ -238,6 +242,7 @@ function TreeNode({
     active,
     over,
   } = useDraggable({
+    disabled: !canManageLibrary,
     id: node.id,
     data: {
       type: "node",
@@ -253,7 +258,7 @@ function TreeNode({
     : false;
 
   const { setNodeRef: setDroppableNodeRef } = useDroppable({
-    disabled: isDescendantOfDraggedNode,
+    disabled: isDescendantOfDraggedNode || !canManageLibrary,
     id: node.id,
     data: {
       type: "node",
@@ -447,6 +452,7 @@ function TreeNode({
                     index,
                   )}
                   handleExpandNode={handleExpandNode}
+                  canManageLibrary={canManageLibrary}
                 />
               );
             })}

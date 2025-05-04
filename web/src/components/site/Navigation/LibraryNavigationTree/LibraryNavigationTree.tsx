@@ -34,7 +34,11 @@ export function LibraryNavigationTree(props: Props) {
         </HStack>
       </NavigationHeader>
 
-      <LibraryPageTree currentNode={currentNode} nodes={data.nodes} />
+      <LibraryPageTree
+        currentNode={currentNode}
+        nodes={data.nodes}
+        canManageLibrary={canManageLibrary}
+      />
     </LStack>
   );
 }
