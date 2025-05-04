@@ -107,6 +107,84 @@ func TestThreads(t *testing.T) {
 				a.Equal(thread2get.JSON200.ReplyStatus.Replied, 1, "ctx2 replied")
 			})
 
+			t.Run("threads_ordered_by_last_reply", func(t *testing.T) {
+				t.Parallel()
+
+				r := require.New(t)
+				a := assert.New(t)
+
+				thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					Body:       "<p>thread one</p>",
+					Category:   cat1create.JSON200.Id,
+					Visibility: openapi.Published,
+					Title:      "1",
+				}, session1)
+				tests.Ok(t, err, thread1create)
+
+				thread2create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					Body:       "<p>thread two</p>",
+					Category:   cat1create.JSON200.Id,
+					Visibility: openapi.Published,
+					Title:      "2",
+				}, session1)
+				tests.Ok(t, err, thread2create)
+
+				id1, id2 := thread1create.JSON200.Id, thread2create.JSON200.Id
+
+				{
+					threadlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
+					tests.Ok(t, err, threadlist)
+					threads := filterThreads(threadlist.JSON200.Threads, id1, id2)
+					ids := getIDs(threads)
+					r.Len(ids, 2)
+					wantIDs := []openapi.Identifier{id2, id1}
+					a.Equal(wantIDs, ids)
+					gotThread1 := threads[1]
+					gotThread2 := threads[0]
+					r.Nil(gotThread1.LastReplyAt)
+					r.Nil(gotThread2.LastReplyAt)
+				}
+
+				// Reply to thread 1, bumping it to the top
+				reply1create, err := cl.ReplyCreateWithResponse(root, thread1create.JSON200.Slug, openapi.ReplyInitialProps{
+					Body: "this is a reply",
+				}, session2)
+				tests.Ok(t, err, reply1create)
+
+				{
+					threadlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
+					tests.Ok(t, err, threadlist)
+					threads := filterThreads(threadlist.JSON200.Threads, id1, id2)
+					ids2 := getIDs(threads)
+					r.Len(ids2, 2)
+					wantIDs2 := []openapi.Identifier{id1, id2}
+					r.Equal(wantIDs2, ids2)
+					gotThread1 := threads[0]
+					gotThread2 := threads[1]
+					r.NotNil(gotThread1.LastReplyAt)
+					r.Nil(gotThread2.LastReplyAt)
+				}
+
+				// Reply to thread 2, bumping it to the top
+				reply2create, err := cl.ReplyCreateWithResponse(root, thread2create.JSON200.Slug, openapi.ReplyInitialProps{
+					Body: "this is a reply",
+				}, session2)
+				tests.Ok(t, err, reply2create)
+
+				{
+					threadlist, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
+					tests.Ok(t, err, threadlist)
+					threads := filterThreads(threadlist.JSON200.Threads, id1, id2)
+					ids2 := getIDs(threads)
+					r.Len(ids2, 2)
+					wantIDs2 := []openapi.Identifier{id2, id1}
+					a.Equal(wantIDs2, ids2)
+					gotThread1 := threads[1]
+					gotThread2 := threads[0]
+					a.Less(*gotThread1.LastReplyAt, *gotThread2.LastReplyAt)
+				}
+			})
+
 			t.Run("delete_replies", func(t *testing.T) {
 				t.Parallel()
 
@@ -216,4 +294,16 @@ func TestThreads(t *testing.T) {
 			})
 		}))
 	}))
+}
+
+func getIDs(t []openapi.ThreadReference) []openapi.Identifier {
+	return dt.Map(t, func(th openapi.ThreadReference) string { return th.Id })
+}
+
+func filterThreads(ts []openapi.ThreadReference, ids ...openapi.Identifier) []openapi.ThreadReference {
+	filtered := dt.Filter(ts, func(t openapi.ThreadReference) bool {
+		return lo.Contains(ids, t.Id)
+	})
+
+	return filtered
 }

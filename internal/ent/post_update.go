@@ -162,6 +162,26 @@ func (pu *PostUpdate) SetNillablePinned(b *bool) *PostUpdate {
 	return pu
 }
 
+// SetLastReplyAt sets the "last_reply_at" field.
+func (pu *PostUpdate) SetLastReplyAt(t time.Time) *PostUpdate {
+	pu.mutation.SetLastReplyAt(t)
+	return pu
+}
+
+// SetNillableLastReplyAt sets the "last_reply_at" field if the given value is not nil.
+func (pu *PostUpdate) SetNillableLastReplyAt(t *time.Time) *PostUpdate {
+	if t != nil {
+		pu.SetLastReplyAt(*t)
+	}
+	return pu
+}
+
+// ClearLastReplyAt clears the value of the "last_reply_at" field.
+func (pu *PostUpdate) ClearLastReplyAt() *PostUpdate {
+	pu.mutation.ClearLastReplyAt()
+	return pu
+}
+
 // SetRootPostID sets the "root_post_id" field.
 func (pu *PostUpdate) SetRootPostID(x xid.ID) *PostUpdate {
 	pu.mutation.SetRootPostID(x)
@@ -854,6 +874,12 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.Pinned(); ok {
 		_spec.SetField(post.FieldPinned, field.TypeBool, value)
+	}
+	if value, ok := pu.mutation.LastReplyAt(); ok {
+		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
+	}
+	if pu.mutation.LastReplyAtCleared() {
+		_spec.ClearField(post.FieldLastReplyAt, field.TypeTime)
 	}
 	if value, ok := pu.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
@@ -1609,6 +1635,26 @@ func (puo *PostUpdateOne) SetNillablePinned(b *bool) *PostUpdateOne {
 	return puo
 }
 
+// SetLastReplyAt sets the "last_reply_at" field.
+func (puo *PostUpdateOne) SetLastReplyAt(t time.Time) *PostUpdateOne {
+	puo.mutation.SetLastReplyAt(t)
+	return puo
+}
+
+// SetNillableLastReplyAt sets the "last_reply_at" field if the given value is not nil.
+func (puo *PostUpdateOne) SetNillableLastReplyAt(t *time.Time) *PostUpdateOne {
+	if t != nil {
+		puo.SetLastReplyAt(*t)
+	}
+	return puo
+}
+
+// ClearLastReplyAt clears the value of the "last_reply_at" field.
+func (puo *PostUpdateOne) ClearLastReplyAt() *PostUpdateOne {
+	puo.mutation.ClearLastReplyAt()
+	return puo
+}
+
 // SetRootPostID sets the "root_post_id" field.
 func (puo *PostUpdateOne) SetRootPostID(x xid.ID) *PostUpdateOne {
 	puo.mutation.SetRootPostID(x)
@@ -2331,6 +2377,12 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 	}
 	if value, ok := puo.mutation.Pinned(); ok {
 		_spec.SetField(post.FieldPinned, field.TypeBool, value)
+	}
+	if value, ok := puo.mutation.LastReplyAt(); ok {
+		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
+	}
+	if puo.mutation.LastReplyAtCleared() {
+		_spec.ClearField(post.FieldLastReplyAt, field.TypeTime)
 	}
 	if value, ok := puo.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)

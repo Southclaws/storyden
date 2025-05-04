@@ -241,7 +241,7 @@ func (d *database) List(
 			lq.WithFaviconImage().WithPrimaryImage()
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
-		Order(ent_post.ByUpdatedAt(sql.OrderDesc()), ent_post.ByCreatedAt(sql.OrderDesc()))
+		Order(ent_post.ByLastReplyAt(sql.OrderDesc(), sql.OrderNullsLast()), ent_post.ByCreatedAt(sql.OrderDesc()))
 
 	total, err := query.Count(ctx)
 	if err != nil {

@@ -32,6 +32,8 @@ const (
 	FieldSlug = "slug"
 	// FieldPinned holds the string denoting the pinned field in the database.
 	FieldPinned = "pinned"
+	// FieldLastReplyAt holds the string denoting the last_reply_at field in the database.
+	FieldLastReplyAt = "last_reply_at"
 	// FieldRootPostID holds the string denoting the root_post_id field in the database.
 	FieldRootPostID = "root_post_id"
 	// FieldReplyToPostID holds the string denoting the reply_to_post_id field in the database.
@@ -180,6 +182,7 @@ var Columns = []string{
 	FieldTitle,
 	FieldSlug,
 	FieldPinned,
+	FieldLastReplyAt,
 	FieldRootPostID,
 	FieldReplyToPostID,
 	FieldBody,
@@ -301,6 +304,11 @@ func BySlug(opts ...sql.OrderTermOption) OrderOption {
 // ByPinned orders the results by the pinned field.
 func ByPinned(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPinned, opts...).ToFunc()
+}
+
+// ByLastReplyAt orders the results by the last_reply_at field.
+func ByLastReplyAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastReplyAt, opts...).ToFunc()
 }
 
 // ByRootPostID orders the results by the root_post_id field.
