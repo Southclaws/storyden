@@ -211,6 +211,13 @@ type TreeNodeProps = {
   handleExpandNode: (id: string) => void;
 };
 
+const linkStyles = css({
+  // disable ios preview
+  touchAction: "none",
+  userSelect: "none",
+  WebkitTouchCallout: "none",
+});
+
 function TreeNode({
   fullTree,
   currentNode,
@@ -291,6 +298,12 @@ function TreeNode({
     if (isDragging) {
       e.preventDefault();
       e.stopPropagation();
+    }
+  }
+
+  function handleLinkTouchStart(e: React.TouchEvent) {
+    if (isDragging) {
+      e.preventDefault();
     }
   }
 
@@ -385,7 +398,12 @@ function TreeNode({
             asChild
             className={cx(styles.branchText, visibilityStyles)}
           >
-            <Link onClick={handleLinkClick} href={`/l/${node.slug}`}>
+            <Link
+              className={linkStyles}
+              onClick={handleLinkClick}
+              onTouchStart={handleLinkTouchStart}
+              href={`/l/${node.slug}`}
+            >
               {label}
             </Link>
           </ArkTreeView.BranchText>
