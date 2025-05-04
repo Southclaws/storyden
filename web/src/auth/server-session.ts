@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 
+import { RequestError } from "@/api/common";
 import { accountGet } from "@/api/openapi-server/accounts";
 
 export async function getServerSession() {
@@ -14,7 +15,14 @@ export async function getServerSession() {
 
     return data;
   } catch (e) {
-    console.error(e);
+    if (e instanceof RequestError) {
+      if (e.status === 401 || e.status === 403) {
+        console.debug("user not authenticated or authorised:", e);
+        return;
+      }
+    }
+
+    console.error("get server session failed:", e);
     return;
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { CategoryMenu } from "@/components/category/CategoryMenu/CategoryMenu";
-import { Unready } from "@/components/site/Unready";
+import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
 
@@ -16,7 +16,7 @@ type ScreenProps = {
 export function CategoryScreen(props: ScreenProps) {
   const { ready, data, error } = useCategoryScreen(props);
   if (!ready) {
-    return <Unready error={error} />;
+    return <UnreadyBanner error={error} />;
   }
 
   const { category } = data;
