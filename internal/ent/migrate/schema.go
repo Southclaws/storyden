@@ -553,7 +553,7 @@ var (
 		{Name: "slug", Type: field.TypeString, Unique: true},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "content", Type: field.TypeString, Nullable: true},
-		{Name: "hide_child_tree", Type: field.TypeBool, Default: "false"},
+		{Name: "hide_child_tree", Type: field.TypeBool, Default: map[string]schema.Expr{"postgres": "false", "sqlite3": "0"}},
 		{Name: "visibility", Type: field.TypeEnum, Enums: []string{"draft", "unlisted", "review", "published"}, Default: "draft"},
 		{Name: "sort", Type: field.TypeString},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},

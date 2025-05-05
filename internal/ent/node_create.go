@@ -476,8 +476,11 @@ func (nc *NodeCreate) check() error {
 	if _, ok := nc.mutation.Slug(); !ok {
 		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Node.slug"`)}
 	}
-	if _, ok := nc.mutation.HideChildTree(); !ok {
-		return &ValidationError{Name: "hide_child_tree", err: errors.New(`ent: missing required field "Node.hide_child_tree"`)}
+	switch nc.driver.Dialect() {
+	case dialect.MySQL, dialect.SQLite:
+		if _, ok := nc.mutation.HideChildTree(); !ok {
+			return &ValidationError{Name: "hide_child_tree", err: errors.New(`ent: missing required field "Node.hide_child_tree"`)}
+		}
 	}
 	if _, ok := nc.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "Node.account_id"`)}
