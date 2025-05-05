@@ -15744,7 +15744,7 @@ func (m *NodeMutation) ParentNodeID() (r xid.ID, exists bool) {
 // OldParentNodeID returns the old "parent_node_id" field's value of the Node entity.
 // If the Node object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *NodeMutation) OldParentNodeID(ctx context.Context) (v xid.ID, err error) {
+func (m *NodeMutation) OldParentNodeID(ctx context.Context) (v *xid.ID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldParentNodeID is only allowed on UpdateOne operations")
 	}

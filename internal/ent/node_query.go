@@ -917,7 +917,10 @@ func (nq *NodeQuery) loadParent(ctx context.Context, query *NodeQuery, nodes []*
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Node)
 	for i := range nodes {
-		fk := nodes[i].ParentNodeID
+		if nodes[i].ParentNodeID == nil {
+			continue
+		}
+		fk := *nodes[i].ParentNodeID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -964,9 +967,12 @@ func (nq *NodeQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*N
 	}
 	for _, n := range neighbors {
 		fk := n.ParentNodeID
-		node, ok := nodeids[fk]
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "parent_node_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "parent_node_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "parent_node_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

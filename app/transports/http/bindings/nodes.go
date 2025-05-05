@@ -398,7 +398,7 @@ func (c *Nodes) NodeUpdatePropertySchema(ctx context.Context, request openapi.No
 
 	return openapi.NodeUpdatePropertySchema200JSONResponse{
 		NodeUpdatePropertySchemaOKJSONResponse: openapi.NodeUpdatePropertySchemaOKJSONResponse{
-			Properties: serialisePropertySchemas(*updated),
+			Properties: serialisePropertySchemaList(*updated),
 		},
 	}, nil
 }
