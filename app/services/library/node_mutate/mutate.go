@@ -33,6 +33,7 @@ type Partial struct {
 	PrimaryImage deletable.Value[asset.AssetID]
 	Content      opt.Optional[datagraph.Content]
 	Parent       opt.Optional[library.QueryKey]
+	HideChildren opt.Optional[bool]
 	Properties   opt.Optional[library.PropertyMutationList]
 	Tags         opt.Optional[tag_ref.Names]
 	Visibility   opt.Optional[visibility.Visibility]

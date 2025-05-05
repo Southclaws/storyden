@@ -15246,6 +15246,7 @@ type NodeMutation struct {
 	slug                   *string
 	description            *string
 	content                *string
+	hide_child_tree        *bool
 	visibility             *node.Visibility
 	sort                   *lexorank.Key
 	metadata               *map[string]interface{}
@@ -15774,6 +15775,42 @@ func (m *NodeMutation) ParentNodeIDCleared() bool {
 func (m *NodeMutation) ResetParentNodeID() {
 	m.parent = nil
 	delete(m.clearedFields, node.FieldParentNodeID)
+}
+
+// SetHideChildTree sets the "hide_child_tree" field.
+func (m *NodeMutation) SetHideChildTree(b bool) {
+	m.hide_child_tree = &b
+}
+
+// HideChildTree returns the value of the "hide_child_tree" field in the mutation.
+func (m *NodeMutation) HideChildTree() (r bool, exists bool) {
+	v := m.hide_child_tree
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHideChildTree returns the old "hide_child_tree" field's value of the Node entity.
+// If the Node object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *NodeMutation) OldHideChildTree(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHideChildTree is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHideChildTree requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHideChildTree: %w", err)
+	}
+	return oldValue.HideChildTree, nil
+}
+
+// ResetHideChildTree resets all changes to the "hide_child_tree" field.
+func (m *NodeMutation) ResetHideChildTree() {
+	m.hide_child_tree = nil
 }
 
 // SetAccountID sets the "account_id" field.
@@ -16612,7 +16649,7 @@ func (m *NodeMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *NodeMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 17)
 	if m.created_at != nil {
 		fields = append(fields, node.FieldCreatedAt)
 	}
@@ -16639,6 +16676,9 @@ func (m *NodeMutation) Fields() []string {
 	}
 	if m.parent != nil {
 		fields = append(fields, node.FieldParentNodeID)
+	}
+	if m.hide_child_tree != nil {
+		fields = append(fields, node.FieldHideChildTree)
 	}
 	if m.owner != nil {
 		fields = append(fields, node.FieldAccountID)
@@ -16687,6 +16727,8 @@ func (m *NodeMutation) Field(name string) (ent.Value, bool) {
 		return m.Content()
 	case node.FieldParentNodeID:
 		return m.ParentNodeID()
+	case node.FieldHideChildTree:
+		return m.HideChildTree()
 	case node.FieldAccountID:
 		return m.AccountID()
 	case node.FieldPropertySchemaID:
@@ -16728,6 +16770,8 @@ func (m *NodeMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldContent(ctx)
 	case node.FieldParentNodeID:
 		return m.OldParentNodeID(ctx)
+	case node.FieldHideChildTree:
+		return m.OldHideChildTree(ctx)
 	case node.FieldAccountID:
 		return m.OldAccountID(ctx)
 	case node.FieldPropertySchemaID:
@@ -16813,6 +16857,13 @@ func (m *NodeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetParentNodeID(v)
+		return nil
+	case node.FieldHideChildTree:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHideChildTree(v)
 		return nil
 	case node.FieldAccountID:
 		v, ok := value.(xid.ID)
@@ -16995,6 +17046,9 @@ func (m *NodeMutation) ResetField(name string) error {
 		return nil
 	case node.FieldParentNodeID:
 		m.ResetParentNodeID()
+		return nil
+	case node.FieldHideChildTree:
+		m.ResetHideChildTree()
 		return nil
 	case node.FieldAccountID:
 		m.ResetAccountID()

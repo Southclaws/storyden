@@ -128,6 +128,7 @@ export function useLibraryMutation(node?: Node) {
       owner: session,
       properties: [],
       child_property_schema: [],
+      hide_child_tree: false,
       meta: {},
       children: [],
       assets: [],

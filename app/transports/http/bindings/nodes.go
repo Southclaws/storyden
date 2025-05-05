@@ -123,9 +123,9 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 			AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 			AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
 			Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
-			Tags:         tags,
-			Visibility:   vis,
-			Properties:   pml,
+			HideChildren: opt.NewPtr(request.Body.HideChildTree), Tags: tags,
+			Visibility: vis,
+			Properties: pml,
 		},
 	)
 	if err != nil {
@@ -309,6 +309,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		Content:      content,
 		PrimaryImage: primaryImage,
 		Parent:       opt.NewPtrMap(request.Body.Parent, deserialiseNodeMark),
+		HideChildren: opt.NewPtr(request.Body.HideChildTree),
 		Properties:   pml,
 		Tags:         tags,
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
@@ -565,9 +566,10 @@ func serialiseNode(in *library.Node) openapi.Node {
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
-		Tags:       serialiseTagReferenceList(in.Tags),
-		Visibility: serialiseVisibility(in.Visibility),
-		Meta:       in.Metadata,
+		HideChildTree: in.HideChildTree,
+		Tags:          serialiseTagReferenceList(in.Tags),
+		Visibility:    serialiseVisibility(in.Visibility),
+		Meta:          in.Metadata,
 	}
 }
 
@@ -591,6 +593,7 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 		Parent: opt.PtrMap(in.Parent, func(in library.Node) openapi.Node {
 			return serialiseNode(&in)
 		}),
+		HideChildTree:       in.HideChildTree,
 		Properties:          properties.Or([]openapi.Property{}),
 		ChildPropertySchema: childPropertySchema.Or([]openapi.PropertySchema{}),
 		Tags:                serialiseTagReferenceList(in.Tags),

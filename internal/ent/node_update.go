@@ -172,6 +172,20 @@ func (nu *NodeUpdate) ClearParentNodeID() *NodeUpdate {
 	return nu
 }
 
+// SetHideChildTree sets the "hide_child_tree" field.
+func (nu *NodeUpdate) SetHideChildTree(b bool) *NodeUpdate {
+	nu.mutation.SetHideChildTree(b)
+	return nu
+}
+
+// SetNillableHideChildTree sets the "hide_child_tree" field if the given value is not nil.
+func (nu *NodeUpdate) SetNillableHideChildTree(b *bool) *NodeUpdate {
+	if b != nil {
+		nu.SetHideChildTree(*b)
+	}
+	return nu
+}
+
 // SetAccountID sets the "account_id" field.
 func (nu *NodeUpdate) SetAccountID(x xid.ID) *NodeUpdate {
 	nu.mutation.SetAccountID(x)
@@ -695,6 +709,9 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nu.mutation.ContentCleared() {
 		_spec.ClearField(node.FieldContent, field.TypeString)
+	}
+	if value, ok := nu.mutation.HideChildTree(); ok {
+		_spec.SetField(node.FieldHideChildTree, field.TypeBool, value)
 	}
 	if value, ok := nu.mutation.Visibility(); ok {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)
@@ -1291,6 +1308,20 @@ func (nuo *NodeUpdateOne) ClearParentNodeID() *NodeUpdateOne {
 	return nuo
 }
 
+// SetHideChildTree sets the "hide_child_tree" field.
+func (nuo *NodeUpdateOne) SetHideChildTree(b bool) *NodeUpdateOne {
+	nuo.mutation.SetHideChildTree(b)
+	return nuo
+}
+
+// SetNillableHideChildTree sets the "hide_child_tree" field if the given value is not nil.
+func (nuo *NodeUpdateOne) SetNillableHideChildTree(b *bool) *NodeUpdateOne {
+	if b != nil {
+		nuo.SetHideChildTree(*b)
+	}
+	return nuo
+}
+
 // SetAccountID sets the "account_id" field.
 func (nuo *NodeUpdateOne) SetAccountID(x xid.ID) *NodeUpdateOne {
 	nuo.mutation.SetAccountID(x)
@@ -1844,6 +1875,9 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 	}
 	if nuo.mutation.ContentCleared() {
 		_spec.ClearField(node.FieldContent, field.TypeString)
+	}
+	if value, ok := nuo.mutation.HideChildTree(); ok {
+		_spec.SetField(node.FieldHideChildTree, field.TypeBool, value)
 	}
 	if value, ok := nuo.mutation.Visibility(); ok {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)

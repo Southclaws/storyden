@@ -102,6 +102,11 @@ func ParentNodeID(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldParentNodeID, v))
 }
 
+// HideChildTree applies equality check predicate on the "hide_child_tree" field. It's identical to HideChildTreeEQ.
+func HideChildTree(v bool) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldHideChildTree, v))
+}
+
 // AccountID applies equality check predicate on the "account_id" field. It's identical to AccountIDEQ.
 func AccountID(v xid.ID) predicate.Node {
 	return predicate.Node(sql.FieldEQ(FieldAccountID, v))
@@ -665,6 +670,16 @@ func ParentNodeIDEqualFold(v xid.ID) predicate.Node {
 func ParentNodeIDContainsFold(v xid.ID) predicate.Node {
 	vc := v.String()
 	return predicate.Node(sql.FieldContainsFold(FieldParentNodeID, vc))
+}
+
+// HideChildTreeEQ applies the EQ predicate on the "hide_child_tree" field.
+func HideChildTreeEQ(v bool) predicate.Node {
+	return predicate.Node(sql.FieldEQ(FieldHideChildTree, v))
+}
+
+// HideChildTreeNEQ applies the NEQ predicate on the "hide_child_tree" field.
+func HideChildTreeNEQ(v bool) predicate.Node {
+	return predicate.Node(sql.FieldNEQ(FieldHideChildTree, v))
 }
 
 // AccountIDEQ applies the EQ predicate on the "account_id" field.

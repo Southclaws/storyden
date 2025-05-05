@@ -92,7 +92,10 @@ union
         d.depth + 1
     from
         children d
+        join nodes parent_node on parent_node.id = d.id
         join nodes s on d.id = s.parent_node_id
+    where
+        parent_node.hide_child_tree = false
 )
 select
     distinct n.id       node_id,

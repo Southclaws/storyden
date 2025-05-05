@@ -26,6 +26,7 @@ export interface NodeMutableProps {
   asset_ids?: AssetIDs;
   asset_sources?: AssetSourceList;
   content?: PostContent;
+  hide_child_tree?: boolean;
   meta?: Metadata;
   name?: NodeName;
   parent?: Slug;

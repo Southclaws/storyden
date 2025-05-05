@@ -717,8 +717,12 @@ func init() {
 	node.DefaultUpdatedAt = nodeDescUpdatedAt.Default.(func() time.Time)
 	// node.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	node.UpdateDefaultUpdatedAt = nodeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// nodeDescHideChildTree is the schema descriptor for hide_child_tree field.
+	nodeDescHideChildTree := nodeFields[5].Descriptor()
+	// node.DefaultHideChildTree holds the default value on creation for the hide_child_tree field.
+	node.DefaultHideChildTree = nodeDescHideChildTree.Default.(bool)
 	// nodeDescSort is the schema descriptor for sort field.
-	nodeDescSort := nodeFields[10].Descriptor()
+	nodeDescSort := nodeFields[11].Descriptor()
 	// node.DefaultSort holds the default value on creation for the sort field.
 	node.DefaultSort = nodeDescSort.Default.(func() lexorank.Key)
 	// nodeDescID is the schema descriptor for id field.
