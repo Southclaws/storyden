@@ -8,10 +8,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
-
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
 )
@@ -69,20 +68,21 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 		})
 
 		n := &Node{
-			Mark:         NewMark(c.ID, c.Slug),
-			CreatedAt:    c.CreatedAt,
-			UpdatedAt:    c.UpdatedAt,
-			IndexedAt:    opt.NewPtr(c.IndexedAt),
-			Name:         c.Name,
-			Assets:       assets,
-			WebLink:      link,
-			Content:      richContent,
-			Description:  opt.NewPtr(c.Description),
-			PrimaryImage: primaryImage,
-			Owner:        *pro,
-			Parent:       parent,
-			Tags:         tags,
-			Collections:  collection_item_status.Status{
+			Mark:          NewMark(c.ID, c.Slug),
+			CreatedAt:     c.CreatedAt,
+			UpdatedAt:     c.UpdatedAt,
+			IndexedAt:     opt.NewPtr(c.IndexedAt),
+			Name:          c.Name,
+			Assets:        assets,
+			WebLink:       link,
+			Content:       richContent,
+			Description:   opt.NewPtr(c.Description),
+			PrimaryImage:  primaryImage,
+			Owner:         *pro,
+			Parent:        parent,
+			HideChildTree: c.HideChildTree,
+			Tags:          tags,
+			Collections:   collection_item_status.Status{
 				// NOTE: Members cannot yet add nodes to collections.
 			},
 			Nodes:      nodes,

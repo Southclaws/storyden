@@ -35,6 +35,8 @@ const (
 	FieldContent = "content"
 	// FieldParentNodeID holds the string denoting the parent_node_id field in the database.
 	FieldParentNodeID = "parent_node_id"
+	// FieldHideChildTree holds the string denoting the hide_child_tree field in the database.
+	FieldHideChildTree = "hide_child_tree"
 	// FieldAccountID holds the string denoting the account_id field in the database.
 	FieldAccountID = "account_id"
 	// FieldPropertySchemaID holds the string denoting the property_schema_id field in the database.
@@ -159,6 +161,7 @@ var Columns = []string{
 	FieldDescription,
 	FieldContent,
 	FieldParentNodeID,
+	FieldHideChildTree,
 	FieldAccountID,
 	FieldPropertySchemaID,
 	FieldPrimaryAssetID,
@@ -200,6 +203,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultHideChildTree holds the default value on creation for the "hide_child_tree" field.
+	DefaultHideChildTree bool
 	// DefaultSort holds the default value on creation for the "sort" field.
 	DefaultSort func() lexorank.Key
 	// DefaultID holds the default value on creation for the "id" field.
@@ -287,6 +292,11 @@ func ByContent(opts ...sql.OrderTermOption) OrderOption {
 // ByParentNodeID orders the results by the parent_node_id field.
 func ByParentNodeID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldParentNodeID, opts...).ToFunc()
+}
+
+// ByHideChildTree orders the results by the hide_child_tree field.
+func ByHideChildTree(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHideChildTree, opts...).ToFunc()
 }
 
 // ByAccountID orders the results by the account_id field.

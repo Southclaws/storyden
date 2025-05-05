@@ -25,6 +25,7 @@ func (Node) Fields() []ent.Field {
 		field.String("description").Optional().Nillable(),
 		field.String("content").Optional().Nillable(),
 		field.String("parent_node_id").GoType(xid.ID{}).Optional(),
+		field.Bool("hide_child_tree").Default(false).Annotations(entsql.Default("false")),
 		field.String("account_id").GoType(xid.ID{}),
 		field.String("property_schema_id").GoType(xid.ID{}).Optional().Nillable(),
 		field.String("primary_asset_id").GoType(xid.ID{}).Optional().Nillable(),

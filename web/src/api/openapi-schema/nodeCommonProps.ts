@@ -28,6 +28,13 @@ export interface NodeCommonProps {
   assets: AssetList;
   content?: PostContent;
   description: NodeDescription;
+  /** A boolean indicating if the children of this node tree are hidden
+when querying the full tree. This is useful for nodes that contain
+a large amount of children and do not need to be rendered in a tree
+view (such as a sidebar navigation). These children can still be
+accessed via the node or node children GET operations for rendering.
+ */
+  hide_child_tree: boolean;
   link?: LinkReference;
   meta: Metadata;
   name: NodeName;

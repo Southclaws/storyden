@@ -54,6 +54,7 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 	p.AssetsAdd.Call(func(value []asset.AssetID) { opts = append(opts, node_writer.WithAssets(value)) })
 	p.AssetsRemove.Call(func(value []asset.AssetID) { opts = append(opts, node_writer.WithAssetsRemoved(value)) })
 	p.Visibility.Call(func(value visibility.Visibility) { opts = append(opts, node_writer.WithVisibility(value)) })
+	p.HideChildren.Call(func(value bool) { opts = append(opts, node_writer.WithHideChildren(value)) })
 
 	// If the mutation includes a parent node, we need to query it because the
 	// WithParent API only accepts a node ID, not a node mark (slug or ID).

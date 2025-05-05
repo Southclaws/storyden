@@ -42,6 +42,8 @@ type Node struct {
 	Content *string `json:"content,omitempty"`
 	// ParentNodeID holds the value of the "parent_node_id" field.
 	ParentNodeID xid.ID `json:"parent_node_id,omitempty"`
+	// HideChildTree holds the value of the "hide_child_tree" field.
+	HideChildTree bool `json:"hide_child_tree,omitempty"`
 	// AccountID holds the value of the "account_id" field.
 	AccountID xid.ID `json:"account_id,omitempty"`
 	// PropertySchemaID holds the value of the "property_schema_id" field.
@@ -222,6 +224,8 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case node.FieldSort:
 			values[i] = new(lexorank.Key)
+		case node.FieldHideChildTree:
+			values[i] = new(sql.NullBool)
 		case node.FieldName, node.FieldSlug, node.FieldDescription, node.FieldContent, node.FieldVisibility:
 			values[i] = new(sql.NullString)
 		case node.FieldCreatedAt, node.FieldUpdatedAt, node.FieldDeletedAt, node.FieldIndexedAt:
@@ -306,6 +310,12 @@ func (n *Node) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field parent_node_id", values[i])
 			} else if value != nil {
 				n.ParentNodeID = *value
+			}
+		case node.FieldHideChildTree:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field hide_child_tree", values[i])
+			} else if value.Valid {
+				n.HideChildTree = value.Bool
 			}
 		case node.FieldAccountID:
 			if value, ok := values[i].(*xid.ID); !ok {
@@ -483,6 +493,9 @@ func (n *Node) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("parent_node_id=")
 	builder.WriteString(fmt.Sprintf("%v", n.ParentNodeID))
+	builder.WriteString(", ")
+	builder.WriteString("hide_child_tree=")
+	builder.WriteString(fmt.Sprintf("%v", n.HideChildTree))
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
 	builder.WriteString(fmt.Sprintf("%v", n.AccountID))

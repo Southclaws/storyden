@@ -2,9 +2,11 @@ package library_test
 
 import (
 	"context"
+	"net/http"
 	"testing"
 
 	"github.com/Southclaws/dt"
+	"github.com/Southclaws/opt"
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
@@ -225,6 +227,132 @@ func TestNodesTreeQuerying(t *testing.T) {
 				a.Nil(n4.Parent, "node4 appears in the children list of node3 so it must not have a parent field set since this would just be duplicated information")
 
 				r.Len(n4.Children, 0, "node4 has no children")
+			})
+		}))
+	}))
+}
+
+func TestNodesTreeQuerying_WithHiddenChildNodes(t *testing.T) {
+	t.Parallel()
+
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		ctx context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			ctx, _ := e2e.WithAccount(ctx, aw, seed.Account_001_Odin)
+			session := sh.WithSession(ctx)
+
+			visibility := openapi.Published
+
+			// SETUP
+			//
+			// node1       <- root               has 2 children: node2 and node3
+			// |- node2    <- child of node1     has no children
+			// |- node3    <- child of node1     has 2 children: node4 and node5 - is set to hide child nodes in tree queries so 4 and 5 should not appear
+			//    |- node4 <- child of node3     has no children
+			//    |- node5 <- child of node3     has no children
+
+			name1 := "test-node-1"
+			slug1 := name1 + uuid.NewString()
+			node1, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name:       name1,
+				Slug:       &slug1,
+				Visibility: &visibility,
+			}, sh.WithSession(ctx))
+			tests.Ok(t, err, node1)
+
+			name2 := "test-node-2"
+			slug2 := name2 + uuid.NewString()
+			node2, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name:       name2,
+				Slug:       &slug2,
+				Parent:     &slug1,
+				Visibility: &visibility,
+			}, sh.WithSession(ctx))
+			tests.Ok(t, err, node2)
+
+			name3 := "test-node-3"
+			slug3 := name3 + uuid.NewString()
+			node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name:       name3,
+				Slug:       &slug3,
+				Parent:     &slug1,
+				Visibility: &visibility,
+			}, sh.WithSession(ctx))
+			tests.Ok(t, err, node3)
+
+			name4 := "test-node-4"
+			slug4 := name4 + uuid.NewString()
+			node4, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name:       name4,
+				Slug:       &slug4,
+				Parent:     &slug3,
+				Visibility: &visibility,
+			}, sh.WithSession(ctx))
+			tests.Ok(t, err, node4)
+
+			name5 := "test-node-5"
+			slug5 := name5 + uuid.NewString()
+			node5, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+				Name:       name5,
+				Slug:       &slug5,
+				Parent:     &slug3,
+				Visibility: &visibility,
+			}, sh.WithSession(ctx))
+			tests.Ok(t, err, node5)
+
+			t.Run("query_tree_without_hidden_children", func(t *testing.T) {
+				a := assert.New(t)
+				r := require.New(t)
+
+				depth := "3"
+				{
+					list := tests.AssertRequest(
+						cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
+							Depth: &depth,
+						}),
+					)(t, http.StatusOK)
+					node1, found := lo.Find(list.JSON200.Nodes, func(c openapi.NodeWithChildren) bool { return c.Id == node1.JSON200.Id })
+					r.True(found)
+					node1children := node1.Children
+					r.Len(node1children, 2)
+					node3resp, found := lo.Find(node1children, func(c openapi.NodeWithChildren) bool { return c.Id == node3.JSON200.Id })
+					r.True(found)
+					a.Len(node3resp.Children, 2, "has 2 non-hidden children: node4 and node5")
+				}
+
+				// Mark Node 3 as hidden children in tree traversal
+				updated := tests.AssertRequest(
+					cl.NodeUpdateWithResponse(ctx, node3.JSON200.Slug, &openapi.NodeUpdateParams{}, openapi.NodeMutableProps{
+						HideChildTree: opt.New(true).Ptr(),
+					}, session),
+				)(t, http.StatusOK)
+				r.True(updated.JSON200.HideChildTree)
+
+				get := tests.AssertRequest(
+					cl.NodeGetWithResponse(ctx, node3.JSON200.Slug, &openapi.NodeGetParams{}),
+				)(t, http.StatusOK)
+				r.True(get.JSON200.HideChildTree, "node3 should have HideChildTree set to true")
+
+				{
+					list := tests.AssertRequest(
+						cl.NodeListWithResponse(ctx, &openapi.NodeListParams{
+							Depth: &depth,
+						}),
+					)(t, http.StatusOK)
+					node1, found := lo.Find(list.JSON200.Nodes, func(c openapi.NodeWithChildren) bool { return c.Id == node1.JSON200.Id })
+					r.True(found)
+					node1children := node1.Children
+					r.Len(node1children, 2)
+					node3resp, found := lo.Find(node1children, func(c openapi.NodeWithChildren) bool { return c.Id == node3.JSON200.Id })
+					r.True(found)
+					a.True(node3resp.HideChildTree)
+					a.Len(node3resp.Children, 0, "has 2 now-hidden children: node4 and node5")
+				}
 			})
 		}))
 	}))

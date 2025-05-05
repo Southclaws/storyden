@@ -122,6 +122,12 @@ func WithParent(v library.NodeID) Option {
 	}
 }
 
+func WithHideChildren(v bool) Option {
+	return func(c *ent.NodeMutation) {
+		c.SetHideChildTree(v)
+	}
+}
+
 func WithVisibility(v visibility.Visibility) Option {
 	return func(c *ent.NodeMutation) {
 		c.SetVisibility(node.Visibility(v.String()))

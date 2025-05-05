@@ -5,14 +5,14 @@ import (
 
 	"github.com/Southclaws/lexorank"
 	"github.com/Southclaws/opt"
-	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
-	"github.com/Southclaws/storyden/app/resources/link/link_ref"
-	"github.com/Southclaws/storyden/app/resources/profile"
-	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/link/link_ref"
+	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
@@ -48,6 +48,7 @@ type Node struct {
 	Parent          opt.Optional[Node]
 	Properties      opt.Optional[PropertyTable]
 	ChildProperties opt.Optional[PropertySchema]
+	HideChildTree   bool
 	Tags            tag_ref.Tags
 	Collections     collection_item_status.Status // NOTE: Not done yet
 	Visibility      visibility.Visibility

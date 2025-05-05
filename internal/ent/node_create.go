@@ -142,6 +142,20 @@ func (nc *NodeCreate) SetNillableParentNodeID(x *xid.ID) *NodeCreate {
 	return nc
 }
 
+// SetHideChildTree sets the "hide_child_tree" field.
+func (nc *NodeCreate) SetHideChildTree(b bool) *NodeCreate {
+	nc.mutation.SetHideChildTree(b)
+	return nc
+}
+
+// SetNillableHideChildTree sets the "hide_child_tree" field if the given value is not nil.
+func (nc *NodeCreate) SetNillableHideChildTree(b *bool) *NodeCreate {
+	if b != nil {
+		nc.SetHideChildTree(*b)
+	}
+	return nc
+}
+
 // SetAccountID sets the "account_id" field.
 func (nc *NodeCreate) SetAccountID(x xid.ID) *NodeCreate {
 	nc.mutation.SetAccountID(x)
@@ -430,6 +444,10 @@ func (nc *NodeCreate) defaults() {
 		v := node.DefaultUpdatedAt()
 		nc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := nc.mutation.HideChildTree(); !ok {
+		v := node.DefaultHideChildTree
+		nc.mutation.SetHideChildTree(v)
+	}
 	if _, ok := nc.mutation.Visibility(); !ok {
 		v := node.DefaultVisibility
 		nc.mutation.SetVisibility(v)
@@ -457,6 +475,9 @@ func (nc *NodeCreate) check() error {
 	}
 	if _, ok := nc.mutation.Slug(); !ok {
 		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Node.slug"`)}
+	}
+	if _, ok := nc.mutation.HideChildTree(); !ok {
+		return &ValidationError{Name: "hide_child_tree", err: errors.New(`ent: missing required field "Node.hide_child_tree"`)}
 	}
 	if _, ok := nc.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "Node.account_id"`)}
@@ -547,6 +568,10 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 	if value, ok := nc.mutation.Content(); ok {
 		_spec.SetField(node.FieldContent, field.TypeString, value)
 		_node.Content = &value
+	}
+	if value, ok := nc.mutation.HideChildTree(); ok {
+		_spec.SetField(node.FieldHideChildTree, field.TypeBool, value)
+		_node.HideChildTree = value
 	}
 	if value, ok := nc.mutation.Visibility(); ok {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)
@@ -923,6 +948,18 @@ func (u *NodeUpsert) ClearParentNodeID() *NodeUpsert {
 	return u
 }
 
+// SetHideChildTree sets the "hide_child_tree" field.
+func (u *NodeUpsert) SetHideChildTree(v bool) *NodeUpsert {
+	u.Set(node.FieldHideChildTree, v)
+	return u
+}
+
+// UpdateHideChildTree sets the "hide_child_tree" field to the value that was provided on create.
+func (u *NodeUpsert) UpdateHideChildTree() *NodeUpsert {
+	u.SetExcluded(node.FieldHideChildTree)
+	return u
+}
+
 // SetAccountID sets the "account_id" field.
 func (u *NodeUpsert) SetAccountID(v xid.ID) *NodeUpsert {
 	u.Set(node.FieldAccountID, v)
@@ -1226,6 +1263,20 @@ func (u *NodeUpsertOne) UpdateParentNodeID() *NodeUpsertOne {
 func (u *NodeUpsertOne) ClearParentNodeID() *NodeUpsertOne {
 	return u.Update(func(s *NodeUpsert) {
 		s.ClearParentNodeID()
+	})
+}
+
+// SetHideChildTree sets the "hide_child_tree" field.
+func (u *NodeUpsertOne) SetHideChildTree(v bool) *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetHideChildTree(v)
+	})
+}
+
+// UpdateHideChildTree sets the "hide_child_tree" field to the value that was provided on create.
+func (u *NodeUpsertOne) UpdateHideChildTree() *NodeUpsertOne {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateHideChildTree()
 	})
 }
 
@@ -1717,6 +1768,20 @@ func (u *NodeUpsertBulk) UpdateParentNodeID() *NodeUpsertBulk {
 func (u *NodeUpsertBulk) ClearParentNodeID() *NodeUpsertBulk {
 	return u.Update(func(s *NodeUpsert) {
 		s.ClearParentNodeID()
+	})
+}
+
+// SetHideChildTree sets the "hide_child_tree" field.
+func (u *NodeUpsertBulk) SetHideChildTree(v bool) *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.SetHideChildTree(v)
+	})
+}
+
+// UpdateHideChildTree sets the "hide_child_tree" field to the value that was provided on create.
+func (u *NodeUpsertBulk) UpdateHideChildTree() *NodeUpsertBulk {
+	return u.Update(func(s *NodeUpsert) {
+		s.UpdateHideChildTree()
 	})
 }
 
