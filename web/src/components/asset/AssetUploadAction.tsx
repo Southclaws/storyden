@@ -25,11 +25,13 @@ type Props = AssetUploadActionProps & ButtonVariantProps & FileUpload.RootProps;
 
 export function AssetUploadAction({
   children,
+  parentAssetID,
+  operation,
+  onFinish,
+  hideLabel,
   ...props
 }: PropsWithChildren<Props>) {
-  const [buttonVariantProps, rest] = button.splitVariantProps(props);
-
-  const { onFinish, ...fileUploadProps } = rest;
+  const [buttonVariantProps, fileUploadProps] = button.splitVariantProps(props);
 
   const acceptedMIMEs = getMIMEs(props.accept);
 
@@ -44,10 +46,10 @@ export function AssetUploadAction({
 
       const asset = await assetUpload(file, {
         filename: file.name,
-        parent_asset_id: props.parentAssetID,
+        parent_asset_id: parentAssetID,
       });
 
-      props.onFinish(asset);
+      onFinish(asset);
     });
   }
 
@@ -114,14 +116,14 @@ export function AssetUploadAction({
             variant="outline"
             {...buttonVariantProps}
           >
-            {props.operation === "add" ? (
+            {operation === "add" ? (
               <>
                 <MediaAddIcon />
-                {props.hideLabel ? "" : "add cover"}
+                {hideLabel ? "" : "add cover"}
               </>
             ) : (
               <>
-                <MediaIcon /> {props.hideLabel ? "" : "replace cover"}
+                <MediaIcon /> {hideLabel ? "" : "replace cover"}
               </>
             )}
           </Button>

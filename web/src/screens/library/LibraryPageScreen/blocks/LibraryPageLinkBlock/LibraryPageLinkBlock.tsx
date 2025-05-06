@@ -1,91 +1,50 @@
-"use client";
-
-import { ChangeEvent, useState } from "react";
-import {
-  Controller,
-  ControllerProps,
-  ControllerRenderProps,
-} from "react-hook-form";
-import { toast } from "sonner";
+import { ChangeEvent } from "react";
+import { Controller, ControllerRenderProps } from "react-hook-form";
 import { match } from "ts-pattern";
 
-import { handle } from "@/api/client";
-import { linkCreate } from "@/api/openapi-client/links";
-import { LinkReference, Node } from "@/api/openapi-schema";
+import { LinkCard } from "@/components/library/links/LinkCard";
 import { InfoTip } from "@/components/site/InfoTip";
 import { Unready } from "@/components/site/Unready";
 import { FormErrorText } from "@/components/ui/FormErrorText";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Form } from "@/screens/library/LibraryPageScreen/useLibraryPageScreen";
+import { LinkButton } from "@/components/ui/link-button";
 import { HStack, LStack, WStack } from "@/styled-system/jsx";
 
-import { LinkCard } from "../links/LinkCard";
+import { useLibraryPageContext } from "../../Context";
+import { Form } from "../../form";
+import { useEditState } from "../../useEditState";
 
-type Props = Omit<ControllerProps<Form>, "render"> & {
-  node: Node;
-  onImport: (link: LinkReference) => Promise<void>;
-};
+import { useLibraryPageLinkBlock } from "./useLibraryPageLinkBlock";
 
-function useLibraryPageImportFromURL({ node, onImport }: Props) {
-  const [link, setLink] = useState<LinkReference | null | undefined>(null);
-  const [isImporting, setIsImporting] = useState(false);
+export function LibraryPageLinkBlock() {
+  const { editing } = useEditState();
+  const { node } = useLibraryPageContext();
 
-  async function handleURL(s: string) {
-    if (s === "") {
-      setLink(null);
-      return;
-    }
-
-    await handle(async () => {
-      try {
-        setLink(undefined);
-
-        const u = new URL(s);
-
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const link = await linkCreate({ url: u.toString() });
-        setLink(link);
-      } catch (_) {
-        // do nothing for invalid URL, already handled by parent form logic.
-        setLink(null);
-      }
-    });
+  if (editing) {
+    return <LibraryPageLinkBlockEditing />;
   }
 
-  async function handleImport() {
-    if (!link) {
-      toast.error("No link available to import.");
-      return;
-    }
-
-    setIsImporting(true);
-    await onImport(link);
-    setIsImporting(false);
+  if (!node.link?.url) {
+    return null;
   }
 
-  return {
-    data: {
-      link,
-      isImporting,
-    },
-    handlers: {
-      handleURL,
-      handleImport,
-    },
-  };
+  return (
+    <LinkButton href={node.link.url} size="xs" variant="subtle">
+      {node.link?.domain}
+    </LinkButton>
+  );
 }
 
-export function LibraryPageImportFromURL(props: Props) {
-  const { data, handlers } = useLibraryPageImportFromURL(props);
+function LibraryPageLinkBlockEditing() {
+  const { form, data, handlers } = useLibraryPageLinkBlock();
 
   const { link, isImporting } = data;
 
   return (
     <Controller<Form>
-      control={props.control}
-      name={props.name}
+      control={form.control}
+      name="link"
       render={(form) => {
         function handleChange(e: ChangeEvent<HTMLInputElement>) {
           handlers.handleURL(e.target.value);

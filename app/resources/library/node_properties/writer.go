@@ -96,6 +96,7 @@ func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, 
 
 func (w *SchemaWriter) updateNodes(ctx context.Context, schemas FieldSchemaMutations, nodes ...*ent.Node) (*library.PropertySchema, error) {
 	if len(nodes) == 0 {
+		// NOTE: This is wrong...
 		return &library.PropertySchema{}, nil
 	}
 

@@ -344,12 +344,14 @@ func (s *Manager) postMutation(ctx context.Context, n *library.Node, pre *preMut
 				}, true
 			})
 
-			newSchema, err := s.schemaWriter.UpdateSiblings(ctx, library.QueryKey{n.Mark.Queryable()}, schemaUpdates)
-			if err != nil {
-				return nil, fault.Wrap(err, fctx.With(ctx))
-			}
+			if len(schemaUpdates) > 0 {
+				newSchema, err := s.schemaWriter.UpdateSiblings(ctx, library.QueryKey{n.Mark.Queryable()}, schemaUpdates)
+				if err != nil {
+					return nil, fault.Wrap(err, fctx.With(ctx))
+				}
 
-			schema.Schema = *newSchema
+				schema.Schema = *newSchema
+			}
 		}
 
 		for _, newProp := range migration.NewProps {
