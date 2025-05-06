@@ -1,4 +1,5 @@
-import { useState } from "react";
+import slugify from "@sindresorhus/slugify";
+import { useEffect, useState } from "react";
 
 import { handle } from "@/api/client";
 import { InstanceCapability, NodeWithChildren } from "@/api/openapi-schema";
@@ -13,6 +14,16 @@ export function useLibraryPageTitleBlock() {
   const [value, setValue] = useState<string | undefined>(undefined);
   const [isLoading, setLoading] = useState(false);
   const isTitleSuggestEnabled = useCapability(InstanceCapability.gen_ai);
+
+  const { name } = form.watch();
+
+  // Update the slug with a slugified version of the name if it's not dirty.
+  useEffect(() => {
+    if (!form.getFieldState("slug").isDirty) {
+      const autoSlug = slugify(name);
+      form.setValue("slug", autoSlug);
+    }
+  }, [form, name]);
 
   function handleReset() {
     setValue(undefined);

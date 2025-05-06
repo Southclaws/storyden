@@ -5,16 +5,17 @@ import { EditAction } from "@/components/site/Action/Edit";
 import { SaveAction } from "@/components/site/Action/Save";
 import { HStack, WStack } from "@/styled-system/jsx";
 
-import { useLibraryPath } from "../../useLibraryPath";
-import { useLibraryPageContext } from "../Context";
-import { useLibraryPagePermissions } from "../permissions";
-import { useEditState } from "../useEditState";
+import { useLibraryPath } from "../useLibraryPath";
+
+import { useLibraryPageContext } from "./Context";
+import { useLibraryPagePermissions } from "./permissions";
+import { useEditState } from "./useEditState";
 
 export function LibraryPageControls() {
   const libraryPath = useLibraryPath();
   const { node, form } = useLibraryPageContext();
-  const { editing, handleToggleEditMode } = useEditState();
   const { isAllowedToEdit } = useLibraryPagePermissions(node);
+  const { editing } = useEditState();
 
   return (
     <WStack alignItems="start">
@@ -26,23 +27,27 @@ export function LibraryPageControls() {
         {...form.register("slug")}
       />
 
-      {isAllowedToEdit && (
-        <HStack>
-          {editing ? (
-            <>
-              <CancelAction type="button" onClick={handleToggleEditMode}>
-                Cancel
-              </CancelAction>
-              <SaveAction type="submit">Save</SaveAction>
-            </>
-          ) : (
-            <>
-              <EditAction onClick={handleToggleEditMode}>Edit</EditAction>
-            </>
-          )}
-          <LibraryPageMenu node={node} />
-        </HStack>
-      )}
+      <HStack>
+        {isAllowedToEdit && <EditControls />}
+        <LibraryPageMenu node={node} />
+      </HStack>
     </WStack>
+  );
+}
+
+function EditControls() {
+  const { editing, handleToggleEditMode } = useEditState();
+
+  if (!editing) {
+    return <EditAction onClick={handleToggleEditMode}>Edit</EditAction>;
+  }
+
+  return (
+    <>
+      <CancelAction type="button" onClick={handleToggleEditMode}>
+        Cancel
+      </CancelAction>
+      <SaveAction type="submit">Save</SaveAction>
+    </>
   );
 }

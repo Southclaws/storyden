@@ -7,14 +7,14 @@ import { LStack, styled } from "@/styled-system/jsx";
 import "react-advanced-cropper/dist/style.css";
 
 import { LibraryPageProvider, Props } from "./Context";
+import { LibraryPageControls } from "./LibraryPageControls";
 import { LibraryPageAssetsBlock } from "./blocks/LibraryPageAssetsBlock/LibraryPageAssetsBlock";
 import { LibraryPageContentBlock } from "./blocks/LibraryPageContentBlock/LibraryPageContentBlock";
 import { LibraryPageCoverBlock } from "./blocks/LibraryPageCoverBlock/LibraryPageCoverBlock";
 import { LibraryPageLinkBlock } from "./blocks/LibraryPageLinkBlock/LibraryPageLinkBlock";
+import { LibraryPagePropertiesBlock } from "./blocks/LibraryPagePropertiesBlock/LibraryPagePropertiesBlock";
 import { LibraryPageTagsBlock } from "./blocks/LibraryPageTagsBlock/LibraryPageTagsBlock";
 import { LibraryPageTitleBlock } from "./blocks/LibraryPageTitleBlock/LibraryPageTitleBlock";
-import { LibraryPagePropertiesBlock } from "./blocks/LibraryPropertiesBlock/LibraryPropertiesBlock";
-import { LibraryPageControls } from "./components/LibraryPageBreadcrumbs";
 import { useCoverImage } from "./useCoverImage";
 import { useSave } from "./useSave";
 
