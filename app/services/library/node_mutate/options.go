@@ -322,12 +322,14 @@ func (s *Manager) postMutation(ctx context.Context, n *library.Node, pre *preMut
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 
-			newSchema, err := s.schemaWriter.CreateForNode(ctx, library.NodeID(n.Mark.ID()), mutations)
-			if err != nil {
-				return nil, fault.Wrap(err, fctx.With(ctx))
-			}
+			if len(mutations) > 0 {
+				newSchema, err := s.schemaWriter.CreateForNode(ctx, library.NodeID(n.Mark.ID()), mutations)
+				if err != nil {
+					return nil, fault.Wrap(err, fctx.With(ctx))
+				}
 
-			schema.Schema = *newSchema
+				schema.Schema = *newSchema
+			}
 		} else {
 			schemaUpdates := []*node_properties.SchemaFieldMutation{}
 
@@ -385,25 +387,27 @@ func (s *Manager) postMutation(ctx context.Context, n *library.Node, pre *preMut
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 
-			newSchema, err := s.schemaWriter.AddFields(ctx, schema.Schema.ID, newSchemaFields)
-			if err != nil {
-				return nil, fault.Wrap(err, fctx.With(ctx))
-			}
-
-			schema.Schema = *newSchema
-
-			for _, newProp := range migration.NewProps {
-				newSchemaProp, found := lo.Find(schema.Schema.Fields, func(f *library.PropertySchemaField) bool {
-					return f.Name == newProp.Name
-				})
-				if !found {
-					continue
+			if len(newSchemaFields) > 0 {
+				newSchema, err := s.schemaWriter.AddFields(ctx, schema.Schema.ID, newSchemaFields)
+				if err != nil {
+					return nil, fault.Wrap(err, fctx.With(ctx))
 				}
 
-				migration.ExistingProps = append(migration.ExistingProps, &library.ExistingPropertyMutation{
-					PropertySchemaField: *newSchemaProp,
-					Value:               newProp.Value,
-				})
+				schema.Schema = *newSchema
+
+				for _, newProp := range migration.NewProps {
+					newSchemaProp, found := lo.Find(schema.Schema.Fields, func(f *library.PropertySchemaField) bool {
+						return f.Name == newProp.Name
+					})
+					if !found {
+						continue
+					}
+
+					migration.ExistingProps = append(migration.ExistingProps, &library.ExistingPropertyMutation{
+						PropertySchemaField: *newSchemaProp,
+						Value:               newProp.Value,
+					})
+				}
 			}
 		}
 
