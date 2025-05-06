@@ -1,4 +1,5 @@
 import { MenuSelectionDetails } from "@ark-ui/react";
+import { match } from "ts-pattern";
 
 import { Account, Node, Permission, Visibility } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
@@ -47,13 +48,22 @@ export function useLibraryPageMenu(props: Props) {
     );
   }
 
-  function handleVisibilityChange(visibility: Visibility) {
-    handle(
+  async function handleVisibilityChange(visibility: Visibility) {
+    await handle(
       async () => {
         await updateNodeVisibility(props.node.slug, visibility);
       },
       {
-        cleanup: async () => await revalidate(),
+        promiseToast: {
+          loading: "Saving...",
+          success: match(visibility)
+            .with(Visibility.published, () => "Published")
+            .with(Visibility.draft, () => "Set to draft")
+            .with(Visibility.review, () => "Submitted for review")
+            .with(Visibility.unlisted, () => "Set to unlisted")
+            .exhaustive(),
+        },
+        cleanup: () => revalidate(),
       },
     );
   }

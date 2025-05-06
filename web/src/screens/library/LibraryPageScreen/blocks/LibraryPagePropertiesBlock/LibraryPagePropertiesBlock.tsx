@@ -1,40 +1,24 @@
 import { uniqueId } from "lodash/fp";
 import { ChangeEvent } from "react";
-import { Controller, ControllerProps, FieldValues } from "react-hook-form";
+import { Controller } from "react-hook-form";
 
-import {
-  NodeWithChildren,
-  PropertyName,
-  PropertyType,
-} from "@/api/openapi-schema";
+import { PropertyName, PropertyType } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { Input } from "@/components/ui/input";
-import { Form } from "@/screens/library/LibraryPageScreen/useLibraryPageScreen";
 import { Center, HStack, LStack, styled } from "@/styled-system/jsx";
 
-export type Props<T extends FieldValues> = Omit<
-  ControllerProps<T>,
-  "render"
-> & {
-  editing: boolean;
-  node: NodeWithChildren;
-};
+import { useLibraryPageContext } from "../../Context";
+import { Form } from "../../form";
+import { useEditState } from "../../useEditState";
 
-export function LibraryPagePropertyTable({
-  editing,
-  node,
-  ...props
-}: Props<Form>) {
+export function LibraryPagePropertiesBlock() {
+  const { editing } = useEditState();
+  const { node } = useLibraryPageContext();
+
   if (editing) {
-    return (
-      <LibraryPagePropertyTableEditable
-        {...props}
-        editing={editing}
-        node={node}
-      />
-    );
+    return <LibraryPagePropertiesBlockEditable />;
   }
 
   return (
@@ -78,14 +62,11 @@ export function LibraryPagePropertyTable({
   );
 }
 
-export function LibraryPagePropertyTableEditable({
-  editing,
-  node,
-  ...props
-}: Props<Form>) {
+function LibraryPagePropertiesBlockEditable() {
+  const { node, form } = useLibraryPageContext();
   return (
     <Controller<Form>
-      control={props.control}
+      control={form.control}
       name="properties"
       render={({ field, fieldState, formState }) => {
         const fieldValue = field.value as Form["properties"];

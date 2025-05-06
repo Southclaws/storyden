@@ -96,6 +96,12 @@ func (w *SchemaWriter) UpdateSiblings(ctx context.Context, qk library.QueryKey, 
 
 func (w *SchemaWriter) updateNodes(ctx context.Context, schemas FieldSchemaMutations, nodes ...*ent.Node) (*library.PropertySchema, error) {
 	if len(nodes) == 0 {
+		// NOTE: This is wrong... but awkward to fix. If the caller provides
+		// arguments that result in zero nodes to update, it does not result
+		// in a new schema being returned (we can't query the schema here as
+		// there's no node to query from, and the current node in the caller
+		// may not have a schema). So right now, callers just need to be careful
+		// to not pass in zero nodes and only re-assign the schema if present.
 		return &library.PropertySchema{}, nil
 	}
 
