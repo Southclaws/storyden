@@ -185,6 +185,57 @@ func TestThreads(t *testing.T) {
 				}
 			})
 
+			t.Run("threads_ordered_by_last_reply_nulls_first", func(t *testing.T) {
+				t.Parallel()
+
+				r := require.New(t)
+				a := assert.New(t)
+
+				// create thread a and reply to it (so it gets last_reply_at set)
+				threadA, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					Body:       "<p>thread A</p>",
+					Category:   cat1create.JSON200.Id,
+					Visibility: openapi.Published,
+					Title:      "Thread A",
+				}, session1)
+				tests.Ok(t, err, threadA)
+
+				replyA, err := cl.ReplyCreateWithResponse(root, threadA.JSON200.Slug, openapi.ReplyInitialProps{
+					Body: "reply to thread A",
+				}, session2)
+				tests.Ok(t, err, replyA)
+
+				// create thread b (no replies, so last_reply_at will be null)
+				threadB, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					Body:       "<p>thread B</p>",
+					Category:   cat1create.JSON200.Id,
+					Visibility: openapi.Published,
+					Title:      "Thread B",
+				}, session1)
+				tests.Ok(t, err, threadB)
+
+				idA := threadA.JSON200.Id
+				idB := threadB.JSON200.Id
+
+				// check ordering: threadb (no last_reply_at) should appear first
+				threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
+				tests.Ok(t, err, threadList)
+
+				threads := filterThreads(threadList.JSON200.Threads, idA, idB)
+				r.Len(threads, 2)
+
+				gotIDs := getIDs(threads)
+				wantIDs := []openapi.Identifier{idB, idA}
+				a.Equal(wantIDs, gotIDs)
+
+				gotThreadA := threads[1]
+				gotThreadB := threads[0]
+
+				// Assertions for clarity
+				a.NotNil(gotThreadA.LastReplyAt, "Thread A should have a last_reply_at because it has a reply")
+				a.Nil(gotThreadB.LastReplyAt, "Thread B should have no last_reply_at because it has no replies")
+			})
+
 			t.Run("delete_replies", func(t *testing.T) {
 				t.Parallel()
 
