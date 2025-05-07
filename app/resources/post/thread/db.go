@@ -241,7 +241,12 @@ func (d *database) List(
 			lq.WithFaviconImage().WithPrimaryImage()
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
-		Order(ent_post.ByLastReplyAt(sql.OrderDesc(), sql.OrderNullsLast()), ent_post.ByCreatedAt(sql.OrderDesc()))
+		Order(func(s *sql.Selector) {
+			s.OrderBy(fmt.Sprintf("COALESCE(%s, %s) DESC",
+				s.C(ent_post.FieldLastReplyAt),
+				s.C(ent_post.FieldCreatedAt)),
+			)
+		})
 
 	total, err := query.Count(ctx)
 	if err != nil {
