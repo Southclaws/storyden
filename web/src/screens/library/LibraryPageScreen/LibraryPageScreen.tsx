@@ -13,6 +13,7 @@ import { LibraryPageContentBlock } from "./blocks/LibraryPageContentBlock/Librar
 import { LibraryPageCoverBlock } from "./blocks/LibraryPageCoverBlock/LibraryPageCoverBlock";
 import { LibraryPageLinkBlock } from "./blocks/LibraryPageLinkBlock/LibraryPageLinkBlock";
 import { LibraryPagePropertiesBlock } from "./blocks/LibraryPagePropertiesBlock/LibraryPagePropertiesBlock";
+import { LibraryPageTableBlock } from "./blocks/LibraryPageTableBlock/LibraryPageTableBlock";
 import { LibraryPageTagsBlock } from "./blocks/LibraryPageTagsBlock/LibraryPageTagsBlock";
 import { LibraryPageTitleBlock } from "./blocks/LibraryPageTitleBlock/LibraryPageTitleBlock";
 import { useCoverImage } from "./useCoverImage";
@@ -66,6 +67,7 @@ export function LibraryPage() {
         <LibraryPageTagsBlock />
         <LibraryPageLinkBlock />
         <LibraryPagePropertiesBlock />
+        <LibraryPageTableBlock />
         <LibraryPageContentBlock />
       </LStack>
     </styled.form>

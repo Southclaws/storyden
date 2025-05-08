@@ -93,6 +93,7 @@ export const table = /* @__PURE__ */ Object.assign(tableFn, {
   variantMap: {
   "variant": [
     "outline",
+    "dense",
     "plain"
   ],
   "size": [

@@ -321,7 +321,7 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 		})
 	}
 
-	rs, err := dt.MapErr(nodes, library.MapNode(true, propSchema.Map()))
+	rs, err := dt.MapErr(nodes, library.MapNode(false, propSchema.Map()))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

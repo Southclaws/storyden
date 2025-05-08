@@ -6,7 +6,7 @@ interface TableVariant {
   /**
  * @default "plain"
  */
-variant: "outline" | "plain"
+variant: "outline" | "dense" | "plain"
 /**
  * @default "md"
  */

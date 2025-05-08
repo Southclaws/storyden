@@ -45,12 +45,23 @@ export const table = defineSlotRecipe({
   },
   variants: {
     variant: {
-      outline: {
+      dense: {
         root: {
           borderWidth: "1px",
+          borderRadius: "lg",
+          overflow: "hidden",
+          overflowX: "scroll",
         },
         head: {
           bg: "bg.subtle",
+        },
+        row: {
+          "& td, & th": {
+            borderRightWidth: "1px",
+            _last: {
+              borderRightWidth: "0",
+            },
+          },
         },
       },
       plain: {
@@ -67,18 +78,18 @@ export const table = defineSlotRecipe({
     size: {
       sm: {
         root: {
-          textStyle: "xs",
+          textStyle: "sm",
         },
         caption: {
           mt: "1",
         },
         cell: {
-          height: "8",
-          px: "2",
+          height: "auto",
+          p: "2",
         },
         header: {
-          height: "11",
-          px: "3",
+          height: "auto",
+          p: "2",
         },
       },
       md: {
