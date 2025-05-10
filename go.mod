@@ -56,6 +56,7 @@ require (
 	github.com/golang-cz/devslog v0.0.13
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/go-github/v71 v71.0.0
+	github.com/google/go-github/v72 v72.0.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgx/v5 v5.7.4
 	github.com/jmoiron/sqlx v1.4.0
