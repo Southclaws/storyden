@@ -21,11 +21,17 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
       )}
 
       <HStack w="full">
-        <Button w="full">Cancel</Button>
+        <Button
+          //w="full"
+          flexGrow="1"
+        >
+          Cancel
+        </Button>
 
         {props.profile.suspended ? (
           <Button
-            w="full"
+            // w="full"
+            flexGrow="1"
             colorPalette="red"
             onClick={handlers.handleReinstate}
           >
@@ -33,7 +39,8 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
           </Button>
         ) : (
           <Button
-            w="full"
+            // w="full"
+            flexGrow="1"
             colorPalette="red"
             onClick={handlers.handleSuspension}
           >
