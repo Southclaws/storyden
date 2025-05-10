@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"log/slog"
+	"sync"
 	"time"
 
 	"github.com/Southclaws/fault"
@@ -30,6 +31,9 @@ type SettingsRepository struct {
 	// Directly changing settings via external database queries will result in
 	// settings not immediately updating so it's advised to always go via API.
 	cachedSettings *xsync.Map[string, any]
+
+	// mutex protects access to cacheLastFetch
+	cacheMu        sync.RWMutex
 	cacheLastFetch time.Time
 }
 
@@ -171,11 +175,18 @@ func (d *SettingsRepository) tryCached() (*Settings, bool) {
 
 func (d *SettingsRepository) cache(s *Settings) {
 	d.cachedSettings.Store(StorydenPrimarySettingsKey, s)
+
+	d.cacheMu.Lock()
 	d.cacheLastFetch = time.Now()
+	d.cacheMu.Unlock()
 }
 
 func (d *SettingsRepository) recache(ctx context.Context) {
-	if time.Since(d.cacheLastFetch) < 5*time.Minute {
+	d.cacheMu.RLock()
+	timeSinceLastFetch := time.Since(d.cacheLastFetch)
+	d.cacheMu.RUnlock()
+
+	if timeSinceLastFetch < 5*time.Minute {
 		return
 	}
 
