@@ -1,7 +1,8 @@
 import { blog } from "@/lib/source";
+import { getMDXComponents } from "@/mdx-components";
 import { styled, VStack } from "@/styled-system/jsx";
 import { linkButton } from "@/styled-system/patterns";
-import defaultMdxComponents, { createRelativeLink } from "fumadocs-ui/mdx";
+import { createRelativeLink } from "fumadocs-ui/mdx";
 import { notFound } from "next/navigation";
 
 export default async function Page(props: {
@@ -31,8 +32,8 @@ export default async function Page(props: {
 
         <MDXContent
           components={{
-            ...defaultMdxComponents,
             a: createRelativeLink(blog, page),
+            ...getMDXComponents(),
           }}
         />
 

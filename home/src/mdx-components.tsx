@@ -1,12 +1,13 @@
-import defaultComponents from "fumadocs-ui/mdx";
-import { APIPage } from "fumadocs-openapi/ui";
 import { openapi } from "@/lib/source";
+import { APIPage } from "fumadocs-openapi/ui";
+import defaultComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";
+import { Mermaid } from "@/components/Mermaid";
 
-export function getMDXComponents(components?: MDXComponents): MDXComponents {
+export function getMDXComponents(): MDXComponents {
   return {
     ...defaultComponents,
     APIPage: (props) => <APIPage {...openapi.getAPIPageProps(props)} />,
-    ...components,
+    Mermaid,
   };
 }
