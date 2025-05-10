@@ -1,7 +1,9 @@
 import { generateFiles } from "fumadocs-openapi";
 
 void generateFiles({
-  input: ["../api/openapi.yaml"],
+  input: [
+    "https://raw.githubusercontent.com/Southclaws/storyden/refs/heads/main/api/openapi.yaml",
+  ],
   output: "./content/docs/api",
   per: "tag",
 });
