@@ -7,7 +7,7 @@ import {
   useDeleteDeviceScreen,
 } from "./useDeleteDeviceScreen";
 
-export function RoleCreateScreen(props: WithDisclosure<Props>) {
+export function DeleteDeviceScreen(props: WithDisclosure<Props>) {
   const { handleConfirm } = useDeleteDeviceScreen(props);
 
   return (
@@ -24,10 +24,15 @@ export function RoleCreateScreen(props: WithDisclosure<Props>) {
         pb="3"
         gap="4"
       >
-        <Button w="full" size="sm" variant="ghost" onClick={props.onClose}>
+        <Button flexGrow="1" size="sm" variant="ghost" onClick={props.onClose}>
           Cancel
         </Button>
-        <Button w="full" size="sm" colorPalette="red" onClick={handleConfirm}>
+        <Button
+          flexGrow="1"
+          size="sm"
+          colorPalette="red"
+          onClick={handleConfirm}
+        >
           Delete
         </Button>
       </HStack>

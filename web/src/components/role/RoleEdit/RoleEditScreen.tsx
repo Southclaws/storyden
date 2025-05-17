@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { CardGroupSelect } from "@/components/ui/form/CardGroupSelect";
 import { Input } from "@/components/ui/input";
 import { PermissionList } from "@/lib/permission/permission";
-import { HStack, LStack, styled } from "@/styled-system/jsx";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { Props, useRoleEditScreen } from "./useRoleEdit";
@@ -53,16 +53,20 @@ export function RoleEditScreen(props: Props) {
         </FormControl>
       </LStack>
 
-      <HStack w="full">
+      <WStack>
         <DeleteWithConfirmationButton
           type="button"
-          w="full"
+          flexGrow="1"
           onDelete={handleDelete}
         />
-        <Button w="full" variant="outline" disabled={!form.formState.isDirty}>
+        <Button
+          flexGrow="1"
+          variant="outline"
+          disabled={!form.formState.isDirty}
+        >
           Save
         </Button>
-      </HStack>
+      </WStack>
     </styled.form>
   );
 }

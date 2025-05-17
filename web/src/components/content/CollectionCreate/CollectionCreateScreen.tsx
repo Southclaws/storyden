@@ -42,14 +42,14 @@ export function CollectionCreateScreen(props: Props) {
 
         <WStack>
           <Button
-            w="full"
+            flexGrow="1"
             type="button"
             variant="outline"
             onClick={props.onClose}
           >
             Cancel
           </Button>
-          <Button w="full" type="submit">
+          <Button flexGrow="1" type="submit">
             Create
           </Button>
         </WStack>

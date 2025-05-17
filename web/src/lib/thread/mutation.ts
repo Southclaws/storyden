@@ -1,5 +1,4 @@
 import { uniqueId } from "lodash";
-import { revalidatePath } from "next/cache";
 import { useEffect, useRef } from "react";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 

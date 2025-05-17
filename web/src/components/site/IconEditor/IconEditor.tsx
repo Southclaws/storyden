@@ -83,7 +83,7 @@ export function IconEditor(props: Props) {
 
         <Flex flexDirection="row" w="full" marginTop="0" gap="0">
           <styled.label
-            w="full"
+            flexGrow="1"
             borderRightRadius="none"
             borderTopRadius="none"
             borderRadius="xl"
@@ -95,7 +95,7 @@ export function IconEditor(props: Props) {
             Edit
           </styled.label>
           <Button
-            w="full"
+            flexGrow="1"
             borderLeftRadius="none"
             borderTopRadius="none"
             borderRadius="xl"

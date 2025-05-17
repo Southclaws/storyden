@@ -1,6 +1,6 @@
 import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
 
-import { RoleCreateScreen } from "./DeleteDeviceScreen";
+import { DeleteDeviceScreen } from "./DeleteDeviceScreen";
 import { Props, WithDisclosure } from "./useDeleteDeviceScreen";
 
 export function DeleteDeviceModal(props: WithDisclosure<Props>) {
@@ -11,7 +11,7 @@ export function DeleteDeviceModal(props: WithDisclosure<Props>) {
         onClose={props.onClose}
         title="Delete device"
       >
-        <RoleCreateScreen onClose={props.onClose} id={props.id} />
+        <DeleteDeviceScreen onClose={props.onClose} id={props.id} />
       </ModalDrawer>
     </>
   );
