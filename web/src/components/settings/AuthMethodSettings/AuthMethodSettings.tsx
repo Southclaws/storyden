@@ -4,7 +4,6 @@ import { Heading } from "@/components/ui/heading";
 import { CardBox, LStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
-import { Devices } from "./Devices/Devices";
 import { OAuth } from "./OAuth/OAuth";
 import { Password } from "./Password/Password";
 import { useAuthMethodSettings } from "./useAuthMethodSettings";
@@ -30,7 +29,8 @@ export function AuthMethodSettings() {
 
       {available.password && <Password active={active.password.length > 0} />}
 
-      {available.webauthn && <Devices active={active.webauthn} />}
+      {/* NOTE: WebAuthn is not enabled as a 2FA yet. */}
+      {/* {available.webauthn && <Devices active={active.webauthn} />} */}
 
       {(available.oauth.length > 0 || active.methods.length > 0) && (
         <OAuth active={active.methods} available={available.oauth} />
