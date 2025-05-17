@@ -59,7 +59,7 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if post.properties != nil {
+	if post.properties.Ok() {
 		n.Properties = post.properties
 	}
 
