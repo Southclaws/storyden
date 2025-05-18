@@ -50,6 +50,7 @@ export function LibraryPageContentBlock() {
         name="content"
         render={({ field }) => (
           <ContentComposer
+            onChange={field.onChange}
             disabled={!editing}
             onAssetUpload={handleAssetUpload}
             initialValue={
