@@ -1,6 +1,5 @@
 import {
   Box,
-  Divider,
   Flex,
   Grid,
   GridItem,
@@ -11,8 +10,9 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
-import { css, cx } from "@/styled-system/css";
+import { cx } from "@/styled-system/css";
 import { linkButton } from "@/styled-system/patterns";
+import { Globe } from "./Globe";
 
 function Hero() {
   return (
@@ -129,6 +129,162 @@ function Screenshot() {
         </picture>
       </VStack>
     </Box>
+  );
+}
+
+function CollectiveMemory() {
+  return (
+    <VStack
+      bgColor="Mono.slush"
+      py="32"
+      px={{ base: "4", sm: "8", md: "12", lg: "96" }}
+      gap="16"
+    >
+      <header>
+        <h1>
+          Collective memory.
+          <br />
+          Without the noise.
+        </h1>
+      </header>
+
+      <Grid
+        maxW={{
+          base: "auto",
+          lg: "1200px",
+        }}
+        id="collective-memory__grid"
+        w="full"
+        gridTemplateRows={{ base: "1fr 1fr" }}
+        gridTemplateColumns={{ base: "1fr 1fr 1fr" }}
+      >
+        <GridItem
+          bgColor="#F6F6F6"
+          borderRadius="md"
+          boxShadow="sm"
+          gridColumn={{ sm: "1/3" }}
+          display="flex"
+          p="4"
+        >
+          <VStack
+            h="full"
+            alignItems="start"
+            flexGrow="3"
+            justifyContent="space-around"
+            gap="0"
+            py="4"
+          >
+            <h2>Communities deserve permanence.</h2>
+            <styled.p>
+              In a web of fleeting <strong>feeds</strong> and forgotten threads,
+              Storyden makes <strong>what matters</strong> stay discoverable,
+              readable, and shareable. <strong>Forever</strong>.
+            </styled.p>
+            <p>
+              Own your <strong>data</strong>. Run your own Reddit, your own
+              Pinterest, your own Hacker News, your own <strong>corner</strong>{" "}
+              of the web.
+            </p>
+          </VStack>
+
+          <Box flexGrow="1" h="full" w="1/3" aspectRatio="1" borderRadius="lg">
+            <Globe w="full" />
+          </Box>
+        </GridItem>
+        <GridItem
+          position="relative"
+          bgColor="#F6F6F6"
+          borderRadius="md"
+          boxShadow="sm"
+          backgroundImage="linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(245, 245, 245, 0.62) 63%, rgba(245, 245, 245, 1) 86%), url('/square-tree-smol.png')"
+          backgroundSize="cover"
+          backgroundPosition="top"
+          overflowClipMargin="unset"
+          display="flex"
+          flexDir="column"
+          justifyContent="space-between"
+          overflow="hidden"
+        >
+          {/* <Image
+            className={css({
+              position: "absolute",
+              top: "0",
+              left: "0",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              borderTopRadius: "md",
+              borderBottomRadius: "2xl",
+              background:
+                "linear-gradient(180deg, rgba(1, 1, 1, 0.1) 25%, rgba(240, 240, 240, 1) 100%)",
+            })}
+            src="/square-tree-smol.png"
+            width="1024"
+            height="1024"
+            alt=""
+          /> */}
+          <Box p="4">
+            <styled.h2
+              color="Mono.slush"
+              textShadow="4px 5px 8px rgba(0,0,0,1)"
+            >
+              Knowledge gardens, not content farms.
+            </styled.h2>
+          </Box>
+
+          <Box height={{ base: "12" }} />
+
+          <styled.p
+            backgroundColor="white/20"
+            backdropBlur="sm"
+            backdropFilter="auto"
+            // background="linear-gradient(180deg, rgba(1, 1, 1, 0.1) 25%, rgba(240, 240, 240, 1) 100%)"
+            borderBottomRadius="md"
+            p="6"
+            textWrap="pretty"
+          >
+            From fan <strong>clubs</strong> to research groups, digital zines to
+            esports <strong>teams</strong>. For anyone who cares about ideas and
+            the <strong>people</strong> behind them.
+          </styled.p>
+        </GridItem>
+        <GridItem
+          bgColor="#F6F6F6"
+          borderRadius="md"
+          boxShadow="sm"
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          p="6"
+          gap="2"
+        >
+          <Box p="4">
+            <Image
+              src="/accessibility.png"
+              width="120"
+              height="120"
+              alt="The accessibility icon"
+            />
+          </Box>
+          <styled.p textWrap="pretty">
+            Optimised for <strong>humans</strong>, ready for the web{" "}
+            <strong>renaissance</strong>. A stable foundation for the future
+            decades of internet citizens and the <strong>networks</strong> they
+            build.
+          </styled.p>
+        </GridItem>
+        <GridItem
+          bgColor="#F6F6F6"
+          borderRadius="md"
+          boxShadow="sm"
+          gridColumn={{ sm: "3/4" }}
+          gridRow={{ sm: "1/3" }}
+          p="4"
+        >
+          <h2>Extensible simplicity.</h2>
+        </GridItem>
+      </Grid>
+    </VStack>
   );
 }
 
@@ -802,13 +958,14 @@ export default function Home() {
     <Box>
       <Hero />
       <Screenshot />
+      <CollectiveMemory />
       {/* <Story /> */}
-      <Why />
+      {/* <Why />
       <Features />
       <ForCommunityLeaders />
       <ForDevops />
       <ForYou />
-      <CTA />
+      <CTA /> */}
     </Box>
   );
 }
