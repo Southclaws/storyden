@@ -137,7 +137,13 @@ function CollectiveMemory() {
     <VStack
       bgColor="Mono.slush"
       py="32"
-      px={{ base: "4", sm: "8", md: "12", lg: "96" }}
+      px={{
+        base: "4",
+        sm: "8",
+        md: "12",
+        lg: "32",
+        xl: "48",
+      }}
       gap="16"
     >
       <header>
@@ -151,7 +157,7 @@ function CollectiveMemory() {
       <Grid
         maxW={{
           base: "auto",
-          lg: "1200px",
+          xl: "1200px",
         }}
         id="collective-memory__grid"
         w="full"
