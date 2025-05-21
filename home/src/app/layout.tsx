@@ -68,6 +68,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 }
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.storyden.org"),
   title: "Storyden: A forum for the modern age.",
   description:
     "Storyden is a platform for building communities. A modern take on oldschool bulletin board forums. Designed to be the community platform for the next era of internet culture.",
