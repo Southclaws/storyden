@@ -161,12 +161,13 @@ function CollectiveMemory() {
         }}
         id="collective-memory__grid"
         w="full"
+        gap="4"
         gridTemplateRows={{ base: "1fr 1fr" }}
         gridTemplateColumns={{ base: "1fr 1fr 1fr" }}
       >
         <GridItem
           bgColor="#F6F6F6"
-          borderRadius="md"
+          borderRadius="xl"
           boxShadow="sm"
           gridColumn={{ sm: "1/3" }}
           display="flex"
@@ -200,7 +201,7 @@ function CollectiveMemory() {
         <GridItem
           position="relative"
           bgColor="#F6F6F6"
-          borderRadius="md"
+          borderRadius="xl"
           boxShadow="sm"
           backgroundImage="linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(245, 245, 245, 0.62) 63%, rgba(245, 245, 245, 1) 86%), url('/square-tree-smol.png')"
           backgroundSize="cover"
@@ -256,7 +257,7 @@ function CollectiveMemory() {
         </GridItem>
         <GridItem
           bgColor="#F6F6F6"
-          borderRadius="md"
+          borderRadius="xl"
           boxShadow="sm"
           display="flex"
           flexDirection="column"
@@ -281,13 +282,52 @@ function CollectiveMemory() {
         </GridItem>
         <GridItem
           bgColor="#F6F6F6"
-          borderRadius="md"
+          borderRadius="xl"
           boxShadow="sm"
           gridColumn={{ sm: "3/4" }}
           gridRow={{ sm: "1/3" }}
           p="4"
+          display="flex"
+          flexDir="column"
+          gap="4"
+          // Maybe?
+          // transform="perspective(1500px) rotateX(2deg) rotateY(-2deg)"
         >
-          <h2>Extensible simplicity.</h2>
+          <Box>
+            <h2>Extensible simplicity.</h2>
+
+            <p>
+              Storyden gives you the core tools of a forum, wiki and curation
+              platform. Progressively enhanced with plugins.
+            </p>
+          </Box>
+
+          <Box
+            bgColor="Shades.stone"
+            height="full"
+            borderRadius="md"
+            shadow="xs"
+          >
+            thread
+          </Box>
+
+          <Box
+            bgColor="Shades.stone"
+            height="full"
+            borderRadius="md"
+            shadow="xs"
+          >
+            library
+          </Box>
+
+          <Box
+            bgColor="Shades.stone"
+            height="full"
+            borderRadius="md"
+            shadow="xs"
+          >
+            organisation - auto tag?
+          </Box>
         </GridItem>
       </Grid>
     </VStack>
