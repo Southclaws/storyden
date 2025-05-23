@@ -18,8 +18,20 @@ export default async function Page() {
     }
 
     const [threads, nodes] = await Promise.all([
-      threadList({ author: session.handle, visibility: [Visibility.draft] }),
-      nodeList({ author: session.handle, visibility: [Visibility.draft] }),
+      threadList(
+        { author: session.handle, visibility: [Visibility.draft] },
+        {
+          cache: "no-store",
+          next: { revalidate: 0 },
+        },
+      ),
+      nodeList(
+        { author: session.handle, visibility: [Visibility.draft] },
+        {
+          cache: "no-store",
+          next: { revalidate: 0 },
+        },
+      ),
     ]);
 
     return (
