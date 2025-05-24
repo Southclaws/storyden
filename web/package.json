@@ -11,7 +11,7 @@
     "openapi": "orval"
   },
   "dependencies": {
-    "@ark-ui/react": "5.8.0",
+    "@ark-ui/react": "5.9.1",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/sortable": "^8.0.0",
     "@heroicons/react": "^2.1.5",
@@ -43,7 +43,7 @@
     "framer-motion": "^11.11.4",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.507.0",
+    "lucide-react": "^0.511.0",
     "mime-db": "^1.53.0",
     "next": "15.3.2",
     "nuqs": "^1.20.0",
@@ -77,13 +77,13 @@
     "@types/lodash": "^4.17.10",
     "@types/mime-db": "^1",
     "@types/node": "^22.10.5",
-    "@types/react": "19.1.4",
+    "@types/react": "19.1.5",
     "@types/react-avatar-editor": "^13.0.3",
     "@typescript-eslint/eslint-plugin": "^8.19.0",
     "@typescript-eslint/parser": "^8.19.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "15.3.2",
-    "orval": "7.2.0",
+    "orval": "7.9.0",
     "prettier": "^3.3.3",
     "typescript": "^5.7.2"
   },
@@ -92,6 +92,6 @@
     "node": "22.x"
   },
   "resolutions": {
-    "@types/react": "19.1.4"
+    "@types/react": "19.1.5"
   }
 }
