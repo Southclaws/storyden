@@ -13,6 +13,12 @@ import Link from "next/link";
 import { cx } from "@/styled-system/css";
 import { linkButton } from "@/styled-system/patterns";
 import { Globe } from "./Globe";
+import {
+  EllipsisIcon,
+  PlusIcon,
+  SparkleIcon,
+  SparklesIcon,
+} from "lucide-react";
 
 function Hero() {
   return (
@@ -177,21 +183,24 @@ function CollectiveMemory() {
             h="full"
             alignItems="start"
             flexGrow="3"
-            justifyContent="space-around"
-            gap="0"
-            py="4"
+            // justifyContent="space-between"
+            gap="4"
           >
             <h2>Communities deserve permanence.</h2>
-            <styled.p>
-              In a web of fleeting <strong>feeds</strong> and forgotten threads,
-              Storyden makes <strong>what matters</strong> stay discoverable,
-              readable, and shareable. <strong>Forever</strong>.
-            </styled.p>
-            <p>
-              Own your <strong>data</strong>. Run your own Reddit, your own
-              Pinterest, your own Hacker News, your own <strong>corner</strong>{" "}
-              of the web.
-            </p>
+
+            <VStack h="full" justify="center">
+              <styled.p>
+                In a web of fleeting <strong>feeds</strong> and forgotten
+                threads, Storyden makes <strong>what matters</strong> stay
+                discoverable, readable, and shareable. <strong>Forever</strong>.
+              </styled.p>
+              <p>~</p>
+              <p>
+                Own your <strong>data</strong>. Run your own Reddit, your own
+                Pinterest, your own Hacker News, your own{" "}
+                <strong>corner</strong> of the web.
+              </p>
+            </VStack>
           </VStack>
 
           <Box flexGrow="1" h="full" w="1/3" aspectRatio="1" borderRadius="lg">
@@ -298,38 +307,259 @@ function CollectiveMemory() {
 
             <p>
               Storyden gives you the core tools of a forum, wiki and curation
-              platform. Progressively enhanced with plugins.
+              platform.
             </p>
           </Box>
 
-          <Box
-            bgColor="Shades.stone"
-            height="full"
-            borderRadius="md"
-            shadow="xs"
-          >
-            thread
-          </Box>
-
-          <Box
-            bgColor="Shades.stone"
-            height="full"
-            borderRadius="md"
-            shadow="xs"
-          >
-            library
-          </Box>
-
-          <Box
-            bgColor="Shades.stone"
-            height="full"
-            borderRadius="md"
-            shadow="xs"
-          >
-            organisation - auto tag?
-          </Box>
+          <VStack h="full" justify="space-between" alignItems="start">
+            <styled.h3 color="Shades.iron/80">Discuss.</styled.h3>
+            <ThreadDemo />
+            <styled.h3 color="Shades.iron/80">Curate.</styled.h3>
+            <LibraryDemo />
+            <styled.h3 color="Shades.iron/80">Effortlessly.</styled.h3>
+            <AIDemo />
+          </VStack>
         </GridItem>
       </Grid>
+    </VStack>
+  );
+}
+
+function ThreadDemo() {
+  return (
+    <VStack
+      bgColor="white"
+      borderRadius="md"
+      boxShadow="md"
+      width="full"
+      height="min"
+      p="2"
+      fontFamily="worksans"
+      alignItems="start"
+      justify="space-between"
+      // transform="perspective(2500px) rotateX(-10deg) rotateY(10deg)"
+    >
+      <VStack gap="1" alignItems="start">
+        <styled.p fontWeight="semibold" lineClamp="1">
+          The Hardest Working Font in Manhattan
+        </styled.p>
+        <styled.p lineClamp="2" color="black/70">
+          For the typograhy nerds, I thought this was really cool, check it out:{" "}
+          <styled.a
+            textOverflow="ellipsis"
+            wordBreak="break-all"
+            href="https://aresluna.org/the-hardest-working-font-in-manhattan"
+          >
+            https://aresluna.org/the-hardest-working-font-in-manhattan
+          </styled.a>
+        </styled.p>
+      </VStack>
+
+      <HStack w="full" alignItems="center" justify="space-between">
+        <HStack alignItems="center" gap="1">
+          <Image src="/landing/avatar.png" width="24" height="24" alt="" />
+          <styled.p color="gray.500">
+            <HStack gap="1">
+              <span>@southclaws</span>
+              <span>•</span>
+              <span>1h ago</span>
+            </HStack>
+          </styled.p>
+        </HStack>
+
+        <Box _hover={{ bgColor: "black/5" }} borderRadius="sm" p="1">
+          <EllipsisIcon width="16" height="16" />
+        </Box>
+      </HStack>
+    </VStack>
+  );
+}
+
+function LibraryDemo() {
+  return (
+    <VStack
+      bgColor="white"
+      borderRadius="md"
+      boxShadow="md"
+      width="full"
+      height="min"
+      p="2"
+      fontFamily="worksans"
+      alignItems="start"
+      justify="space-between"
+      // transform="perspective(2500px) rotateX(-10deg) rotateY(10deg)"
+    >
+      <VStack gap="1" alignItems="start">
+        <HStack w="full" justify="space-between" alignItems="center">
+          <styled.p fontWeight="semibold">Design Resources</styled.p>
+          <styled.span
+            bgColor="black/10"
+            borderRadius="md"
+            px="2"
+            fontSize="sm"
+          >
+            67 items
+          </styled.span>
+        </HStack>
+        <styled.p lineClamp="2" color="black/70">
+          A curated list by our members of the best resources for design skills.
+          Contribute your own best finds!
+        </styled.p>
+      </VStack>
+
+      <HStack w="full" alignItems="center" justify="space-between">
+        <HStack alignItems="center" gap="1">
+          <Box
+            bgColor="green.700"
+            color="green.400"
+            borderRadius="md"
+            px="1"
+            fontSize="sm"
+          >
+            <span>design</span>
+          </Box>
+          <Box
+            bgColor="blue.600"
+            color="blue.200"
+            borderRadius="md"
+            px="1"
+            fontSize="sm"
+          >
+            <span>list</span>
+          </Box>
+          <Box
+            bgColor="pink.600"
+            color="pink.200"
+            borderRadius="md"
+            px="1"
+            fontSize="sm"
+          >
+            <span>career</span>
+          </Box>
+          <Box
+            bgColor="teal.600"
+            color="teal.200"
+            borderRadius="md"
+            px="1"
+            fontSize="sm"
+          >
+            <span>resources</span>
+          </Box>
+        </HStack>
+
+        <Box _hover={{ bgColor: "black/5" }} borderRadius="sm" p="1">
+          <EllipsisIcon width="16" height="16" />
+        </Box>
+      </HStack>
+    </VStack>
+  );
+}
+
+function AIDemo() {
+  return (
+    <VStack
+      bgColor="white"
+      borderRadius="md"
+      boxShadow="md"
+      width="full"
+      height="min"
+      p="2"
+      fontFamily="worksans"
+      alignItems="start"
+      justify="space-between"
+      // transform="perspective(2500px) rotateX(-10deg) rotateY(10deg)"
+      cursor="default"
+      userSelect="none"
+    >
+      <VStack w="full" gap="2" alignItems="start">
+        <HStack w="full" alignItems="center">
+          {/* <styled.p
+            fontWeight="semibold"
+            display="inline-flex"
+            alignItems="center"
+            gap="1"
+          >
+            <span>New page </span>
+            
+          </styled.p>
+          <styled.span
+            bgColor="black/10"
+            borderRadius="md"
+            px="1"
+            fontSize="sm"
+          >
+            source: URL
+          </styled.span> */}
+
+          <styled.span
+            fontWeight="semibold"
+            display="inline-flex"
+            alignItems="center"
+            gap="1"
+            bgColor="black/80"
+            color="white/90"
+            borderRadius="md"
+            pr="2"
+            pl="1"
+          >
+            <PlusIcon width="16" />
+            New page
+          </styled.span>
+        </HStack>
+
+        <HStack w="full">
+          <styled.input
+            value="https://www.typewolf.com/"
+            w="full"
+            minW="0"
+            maxW="full"
+            bgColor="white/90"
+            borderWidth="thin"
+            borderStyle="solid"
+            borderColor="black/10"
+            borderRadius="md"
+            _active={{
+              outline: "none",
+            }}
+            _focus={{
+              outline: "none",
+            }}
+            px="2"
+          />
+        </HStack>
+
+        <styled.p lineClamp="1">
+          <styled.span fontWeight="medium">Title: </styled.span>
+          <styled.span fontStyle="italic">
+            What’s Trending in Type · Typewolf
+          </styled.span>
+        </styled.p>
+      </VStack>
+
+      <HStack w="full" alignItems="center" gap="2">
+        <HStack
+          bgColor="black/10"
+          color="Mono.ink/80"
+          borderRadius="md"
+          px="1"
+          fontSize="sm"
+          gap="1"
+        >
+          <SparklesIcon width="16" />
+          <span>auto-tag</span>
+        </HStack>
+        <HStack
+          bgColor="black/10"
+          color="Mono.ink/80"
+          borderRadius="md"
+          px="1"
+          fontSize="sm"
+          gap="1"
+        >
+          <SparklesIcon width="16" />
+          <span>auto-place</span>
+        </HStack>
+      </HStack>
     </VStack>
   );
 }
