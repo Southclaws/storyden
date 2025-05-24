@@ -10,7 +10,7 @@ tool (
 )
 
 require (
-	ariga.io/atlas v0.32.1 // indirect
+	ariga.io/atlas v0.33.1 // indirect
 	dario.cat/mergo v1.0.2
 	entgo.io/ent v0.14.4
 	github.com/Southclaws/dt v1.0.1
@@ -55,7 +55,6 @@ require (
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/golang-cz/devslog v0.0.13
 	github.com/golang-jwt/jwt/v5 v5.2.2
-	github.com/google/go-github/v71 v71.0.0
 	github.com/google/go-github/v72 v72.0.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgx/v5 v5.7.5
@@ -109,10 +108,9 @@ require (
 	github.com/bmatcuk/doublestar v1.3.4 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/cenkalti/backoff/v3 v3.2.2 // indirect
-	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.2 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/dprotaso/go-yit v0.0.0-20240618133044-5a0af90af097 // indirect
+	github.com/dprotaso/go-yit v0.0.0-20250513224043-18a80f8f6df4 // indirect
 	github.com/ebitengine/purego v0.8.2 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
@@ -129,7 +127,6 @@ require (
 	github.com/go-openapi/validate v0.24.0 // indirect
 	github.com/go-webauthn/x v0.1.21 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
-	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/go-tpm v0.9.5 // indirect
@@ -167,7 +164,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/speakeasy-api/jsonpath v0.6.2 // indirect
-	github.com/speakeasy-api/openapi-overlay v0.10.1 // indirect
+	github.com/speakeasy-api/openapi-overlay v0.10.2 // indirect
 	github.com/spf13/cobra v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
@@ -242,7 +239,7 @@ require (
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
-	github.com/zclconf/go-cty v1.16.2 // indirect
+	github.com/zclconf/go-cty v1.16.3 // indirect
 	go.uber.org/multierr v1.11.0
 	golang.org/x/crypto v0.38.0 // indirect
 	golang.org/x/mod v0.24.0 // indirect
