@@ -56,6 +56,7 @@ require (
 	github.com/golang-cz/devslog v0.0.13
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/go-github/v71 v71.0.0
+	github.com/google/go-github/v72 v72.0.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/jmoiron/sqlx v1.4.0
@@ -70,7 +71,7 @@ require (
 	github.com/oapi-codegen/nullable v1.1.0
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/openai/openai-go v0.1.0-beta.11
+	github.com/openai/openai-go v1.1.0
 	github.com/pb33f/libopenapi v0.21.12
 	github.com/philippgille/chromem-go v0.7.0
 	github.com/pinecone-io/go-pinecone/v3 v3.1.0
