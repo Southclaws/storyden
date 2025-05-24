@@ -15,7 +15,7 @@ COPY ./internal ./internal
 
 RUN CGO_ENABLED=0 GOOS=linux go build -o storyden-api ./cmd/backend
 
-FROM node:22.15.0-alpine AS base
+FROM node:22.16.0-alpine AS base
 
 #
 # DEPENDENCIES LAYER
