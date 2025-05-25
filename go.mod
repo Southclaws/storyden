@@ -33,7 +33,7 @@ require (
 require github.com/Southclaws/fault v0.8.1
 
 require (
-	github.com/JohannesKaufmann/html-to-markdown/v2 v2.3.2
+	github.com/JohannesKaufmann/html-to-markdown/v2 v2.3.3
 	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/Southclaws/lexorank v1.2.3
 	github.com/Southclaws/opt v0.6.1
@@ -81,7 +81,7 @@ require (
 	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
 	github.com/shirou/gopsutil/v4 v4.25.4
 	github.com/twilio/twilio-go v1.26.1
-	github.com/weaviate/weaviate v1.30.5
+	github.com/weaviate/weaviate v1.30.6
 	github.com/weaviate/weaviate-go-client/v5 v5.1.0
 	go.opentelemetry.io/otel v1.36.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.36.0
