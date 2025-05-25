@@ -20,6 +20,8 @@ github.com/JohannesKaufmann/dom v0.2.0 h1:1bragmEb19K8lHAqgFgqCpiPCFEZMTXzOIEjux
 github.com/JohannesKaufmann/dom v0.2.0/go.mod h1:57iSUl5RKric4bUkgos4zu6Xt5LMHUnw3TF1l5CbGZo=
 github.com/JohannesKaufmann/html-to-markdown/v2 v2.3.2 h1:eeMLttqTjTgILD6no79Ge96V7Wv8pWDfMVn4jy+koIY=
 github.com/JohannesKaufmann/html-to-markdown/v2 v2.3.2/go.mod h1:HtsP+1Fchp4dVvaiIsLHAl/yqL3H1YLwqLC9kNwqQEg=
+github.com/JohannesKaufmann/html-to-markdown/v2 v2.3.3 h1:r3fokGFRDk/8pHmwLwJ8zsX4qiqfS1/1TZm2BH8ueY8=
+github.com/JohannesKaufmann/html-to-markdown/v2 v2.3.3/go.mod h1:HtsP+1Fchp4dVvaiIsLHAl/yqL3H1YLwqLC9kNwqQEg=
 github.com/Masterminds/goutils v1.1.1 h1:5nUrii3FMTL5diU80unEVvNevw1nH4+ZV4DSLVJLSYI=
 github.com/Masterminds/goutils v1.1.1/go.mod h1:8cTjp+g8YejhMuvIA5y2vz3BpJxksy863GQaJW2MFNU=
 github.com/Masterminds/semver v1.4.2/go.mod h1:MB6lktGJrhw8PrUyiEoblNEGEQ+RzHPF078ddwwvV3Y=
@@ -513,6 +515,8 @@ github.com/vmware-labs/yaml-jsonpath v0.3.2 h1:/5QKeCBGdsInyDCyVNLbXyilb61MXGi9N
 github.com/vmware-labs/yaml-jsonpath v0.3.2/go.mod h1:U6whw1z03QyqgWdgXxvVnQ90zN1BWz5V+51Ewf8k+rQ=
 github.com/weaviate/weaviate v1.30.5 h1:pP2YSnv57EjLb7Y4e6sRElmrNTel6dfVK32yr3lI7SM=
 github.com/weaviate/weaviate v1.30.5/go.mod h1:+jXsVuNNoOk/POeu9Ks/B3BAgLZYJ6DzgSnVbTErc60=
+github.com/weaviate/weaviate v1.30.6 h1:aw7ekk4hRpdc0fSvJdHmPcUaFCswGQLoKmPu6lNKX9U=
+github.com/weaviate/weaviate v1.30.6/go.mod h1:+jXsVuNNoOk/POeu9Ks/B3BAgLZYJ6DzgSnVbTErc60=
 github.com/weaviate/weaviate-go-client/v5 v5.1.0 h1:3wSf4fktKLvspPHwDYnn07u0sKfDAhrA5JeRe+R4ENg=
 github.com/weaviate/weaviate-go-client/v5 v5.1.0/go.mod h1:gg5qyiHk53+HMZW2ynkrgm+cMQDD2Ewyma84rBeChz4=
 github.com/wk8/go-ordered-map/v2 v2.1.9-0.20250401010720-46d686821e33 h1:VDXCpjGQPaNBkmuHllIpYxsjuugfoaFD0zIDjtqevjk=
