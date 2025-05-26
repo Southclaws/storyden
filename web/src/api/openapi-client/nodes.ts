@@ -16,12 +16,17 @@ import { fetcher } from "../client";
 import type {
   BadRequestResponse,
   InternalServerErrorResponse,
-  NodeAddAssetParams,
   NodeAddChildOKResponse,
   NodeCreateBody,
   NodeCreateOKResponse,
   NodeDeleteOKResponse,
   NodeDeleteParams,
+  NodeGenerateContentBody,
+  NodeGenerateContentOKResponse,
+  NodeGenerateTagsBody,
+  NodeGenerateTagsOKResponse,
+  NodeGenerateTitleBody,
+  NodeGenerateTitleOKResponse,
   NodeGetOKResponse,
   NodeGetParams,
   NodeListChildrenParams,
@@ -30,13 +35,13 @@ import type {
   NodeRemoveChildOKResponse,
   NodeUpdateBody,
   NodeUpdateOKResponse,
-  NodeUpdateParams,
   NodeUpdatePositionBody,
   NodeUpdatePropertiesBody,
   NodeUpdatePropertiesOKResponse,
   NodeUpdatePropertySchemaBody,
   NodeUpdatePropertySchemaOKResponse,
   NotFoundResponse,
+  NotImplementedResponse,
   UnauthorisedResponse,
   VisibilityUpdateBody,
 } from "../openapi-schema";
@@ -201,32 +206,25 @@ export const useNodeGet = <
 export const nodeUpdate = (
   nodeSlug: string,
   nodeUpdateBody: NodeUpdateBody,
-  params?: NodeUpdateParams,
 ) => {
   return fetcher<NodeUpdateOKResponse>({
     url: `/nodes/${nodeSlug}`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: nodeUpdateBody,
-    params,
   });
 };
 
-export const getNodeUpdateMutationFetcher = (
-  nodeSlug: string,
-  params?: NodeUpdateParams,
-) => {
+export const getNodeUpdateMutationFetcher = (nodeSlug: string) => {
   return (
     _: Key,
     { arg }: { arg: NodeUpdateBody },
   ): Promise<NodeUpdateOKResponse> => {
-    return nodeUpdate(nodeSlug, arg, params);
+    return nodeUpdate(nodeSlug, arg);
   };
 };
-export const getNodeUpdateMutationKey = (
-  nodeSlug: string,
-  params?: NodeUpdateParams,
-) => [`/nodes/${nodeSlug}`, ...(params ? [params] : [])] as const;
+export const getNodeUpdateMutationKey = (nodeSlug: string) =>
+  [`/nodes/${nodeSlug}`] as const;
 
 export type NodeUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof nodeUpdate>>
@@ -243,7 +241,6 @@ export const useNodeUpdate = <
     | InternalServerErrorResponse,
 >(
   nodeSlug: string,
-  params?: NodeUpdateParams,
   options?: {
     swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof nodeUpdate>>,
@@ -256,9 +253,8 @@ export const useNodeUpdate = <
 ) => {
   const { swr: swrOptions } = options ?? {};
 
-  const swrKey =
-    swrOptions?.swrKey ?? getNodeUpdateMutationKey(nodeSlug, params);
-  const swrFn = getNodeUpdateMutationFetcher(nodeSlug, params);
+  const swrKey = swrOptions?.swrKey ?? getNodeUpdateMutationKey(nodeSlug);
+  const swrFn = getNodeUpdateMutationFetcher(nodeSlug);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -322,6 +318,218 @@ export const useNodeDelete = <
   const swrKey =
     swrOptions?.swrKey ?? getNodeDeleteMutationKey(nodeSlug, params);
   const swrFn = getNodeDeleteMutationFetcher(nodeSlug, params);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Generate a proposed title for the specified node. Will not actually
+mutate the specified node, instead will return a proposal based on the
+output from a language model call.
+
+ */
+export const nodeGenerateTitle = (
+  nodeSlug: string,
+  nodeGenerateTitleBody: NodeGenerateTitleBody,
+) => {
+  return fetcher<NodeGenerateTitleOKResponse>({
+    url: `/nodes/${nodeSlug}/title`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: nodeGenerateTitleBody,
+  });
+};
+
+export const getNodeGenerateTitleMutationFetcher = (nodeSlug: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: NodeGenerateTitleBody },
+  ): Promise<NodeGenerateTitleOKResponse> => {
+    return nodeGenerateTitle(nodeSlug, arg);
+  };
+};
+export const getNodeGenerateTitleMutationKey = (nodeSlug: string) =>
+  [`/nodes/${nodeSlug}/title`] as const;
+
+export type NodeGenerateTitleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeGenerateTitle>>
+>;
+export type NodeGenerateTitleMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | NotImplementedResponse
+  | InternalServerErrorResponse;
+
+export const useNodeGenerateTitle = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | NotImplementedResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeGenerateTitle>>,
+      TError,
+      Key,
+      NodeGenerateTitleBody,
+      Awaited<ReturnType<typeof nodeGenerateTitle>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNodeGenerateTitleMutationKey(nodeSlug);
+  const swrFn = getNodeGenerateTitleMutationFetcher(nodeSlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Generate proposed tags for the specified node. Will not actually mutate
+the specified node, instead will return a proposal based on the output
+from a language model call.
+
+ */
+export const nodeGenerateTags = (
+  nodeSlug: string,
+  nodeGenerateTagsBody: NodeGenerateTagsBody,
+) => {
+  return fetcher<NodeGenerateTagsOKResponse>({
+    url: `/nodes/${nodeSlug}/tags`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: nodeGenerateTagsBody,
+  });
+};
+
+export const getNodeGenerateTagsMutationFetcher = (nodeSlug: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: NodeGenerateTagsBody },
+  ): Promise<NodeGenerateTagsOKResponse> => {
+    return nodeGenerateTags(nodeSlug, arg);
+  };
+};
+export const getNodeGenerateTagsMutationKey = (nodeSlug: string) =>
+  [`/nodes/${nodeSlug}/tags`] as const;
+
+export type NodeGenerateTagsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeGenerateTags>>
+>;
+export type NodeGenerateTagsMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | NotImplementedResponse
+  | InternalServerErrorResponse;
+
+export const useNodeGenerateTags = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | NotImplementedResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeGenerateTags>>,
+      TError,
+      Key,
+      NodeGenerateTagsBody,
+      Awaited<ReturnType<typeof nodeGenerateTags>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getNodeGenerateTagsMutationKey(nodeSlug);
+  const swrFn = getNodeGenerateTagsMutationFetcher(nodeSlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Generate proposed content for the specified node. Will not actually
+mutate the specified node, instead will return a proposal based on the
+output from a language model call.
+
+ */
+export const nodeGenerateContent = (
+  nodeSlug: string,
+  nodeGenerateContentBody: NodeGenerateContentBody,
+) => {
+  return fetcher<NodeGenerateContentOKResponse>({
+    url: `/nodes/${nodeSlug}/content`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: nodeGenerateContentBody,
+  });
+};
+
+export const getNodeGenerateContentMutationFetcher = (nodeSlug: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: NodeGenerateContentBody },
+  ): Promise<NodeGenerateContentOKResponse> => {
+    return nodeGenerateContent(nodeSlug, arg);
+  };
+};
+export const getNodeGenerateContentMutationKey = (nodeSlug: string) =>
+  [`/nodes/${nodeSlug}/content`] as const;
+
+export type NodeGenerateContentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeGenerateContent>>
+>;
+export type NodeGenerateContentMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | NotImplementedResponse
+  | InternalServerErrorResponse;
+
+export const useNodeGenerateContent = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | NotImplementedResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeGenerateContent>>,
+      TError,
+      Key,
+      NodeGenerateContentBody,
+      Awaited<ReturnType<typeof nodeGenerateContent>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNodeGenerateContentMutationKey(nodeSlug);
+  const swrFn = getNodeGenerateContentMutationFetcher(nodeSlug);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
@@ -679,36 +887,23 @@ export const useNodeUpdateVisibility = <
 /**
  * Add an asset to a node.
  */
-export const nodeAddAsset = (
-  nodeSlug: string,
-  assetId: string,
-  params?: NodeAddAssetParams,
-) => {
+export const nodeAddAsset = (nodeSlug: string, assetId: string) => {
   return fetcher<NodeUpdateOKResponse>({
     url: `/nodes/${nodeSlug}/assets/${assetId}`,
     method: "PUT",
-    params,
   });
 };
 
 export const getNodeAddAssetMutationFetcher = (
   nodeSlug: string,
   assetId: string,
-  params?: NodeAddAssetParams,
 ) => {
   return (_: Key, __: { arg: Arguments }): Promise<NodeUpdateOKResponse> => {
-    return nodeAddAsset(nodeSlug, assetId, params);
+    return nodeAddAsset(nodeSlug, assetId);
   };
 };
-export const getNodeAddAssetMutationKey = (
-  nodeSlug: string,
-  assetId: string,
-  params?: NodeAddAssetParams,
-) =>
-  [
-    `/nodes/${nodeSlug}/assets/${assetId}`,
-    ...(params ? [params] : []),
-  ] as const;
+export const getNodeAddAssetMutationKey = (nodeSlug: string, assetId: string) =>
+  [`/nodes/${nodeSlug}/assets/${assetId}`] as const;
 
 export type NodeAddAssetMutationResult = NonNullable<
   Awaited<ReturnType<typeof nodeAddAsset>>
@@ -726,7 +921,6 @@ export const useNodeAddAsset = <
 >(
   nodeSlug: string,
   assetId: string,
-  params?: NodeAddAssetParams,
   options?: {
     swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof nodeAddAsset>>,
@@ -740,8 +934,8 @@ export const useNodeAddAsset = <
   const { swr: swrOptions } = options ?? {};
 
   const swrKey =
-    swrOptions?.swrKey ?? getNodeAddAssetMutationKey(nodeSlug, assetId, params);
-  const swrFn = getNodeAddAssetMutationFetcher(nodeSlug, assetId, params);
+    swrOptions?.swrKey ?? getNodeAddAssetMutationKey(nodeSlug, assetId);
+  const swrFn = getNodeAddAssetMutationFetcher(nodeSlug, assetId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

@@ -8,12 +8,17 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type {
-  NodeAddAssetParams,
   NodeAddChildOKResponse,
   NodeCreateBody,
   NodeCreateOKResponse,
   NodeDeleteOKResponse,
   NodeDeleteParams,
+  NodeGenerateContentBody,
+  NodeGenerateContentOKResponse,
+  NodeGenerateTagsBody,
+  NodeGenerateTagsOKResponse,
+  NodeGenerateTitleBody,
+  NodeGenerateTitleOKResponse,
   NodeGetOKResponse,
   NodeGetParams,
   NodeListChildrenParams,
@@ -22,7 +27,6 @@ import type {
   NodeRemoveChildOKResponse,
   NodeUpdateBody,
   NodeUpdateOKResponse,
-  NodeUpdateParams,
   NodeUpdatePositionBody,
   NodeUpdatePropertiesBody,
   NodeUpdatePropertiesOKResponse,
@@ -140,38 +144,21 @@ export type nodeUpdateResponse = {
   status: number;
 };
 
-export const getNodeUpdateUrl = (
-  nodeSlug: string,
-  params?: NodeUpdateParams,
-) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
-    }
-  });
-
-  return normalizedParams.size
-    ? `/nodes/${nodeSlug}?${normalizedParams.toString()}`
-    : `/nodes/${nodeSlug}`;
+export const getNodeUpdateUrl = (nodeSlug: string) => {
+  return `/nodes/${nodeSlug}`;
 };
 
 export const nodeUpdate = async (
   nodeSlug: string,
   nodeUpdateBody: NodeUpdateBody,
-  params?: NodeUpdateParams,
   options?: RequestInit,
 ): Promise<nodeUpdateResponse> => {
-  return fetcher<Promise<nodeUpdateResponse>>(
-    getNodeUpdateUrl(nodeSlug, params),
-    {
-      ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(nodeUpdateBody),
-    },
-  );
+  return fetcher<Promise<nodeUpdateResponse>>(getNodeUpdateUrl(nodeSlug), {
+    ...options,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(nodeUpdateBody),
+  });
 };
 
 /**
@@ -209,6 +196,99 @@ export const nodeDelete = async (
     {
       ...options,
       method: "DELETE",
+    },
+  );
+};
+
+/**
+ * Generate a proposed title for the specified node. Will not actually
+mutate the specified node, instead will return a proposal based on the
+output from a language model call.
+
+ */
+export type nodeGenerateTitleResponse = {
+  data: NodeGenerateTitleOKResponse;
+  status: number;
+};
+
+export const getNodeGenerateTitleUrl = (nodeSlug: string) => {
+  return `/nodes/${nodeSlug}/title`;
+};
+
+export const nodeGenerateTitle = async (
+  nodeSlug: string,
+  nodeGenerateTitleBody: NodeGenerateTitleBody,
+  options?: RequestInit,
+): Promise<nodeGenerateTitleResponse> => {
+  return fetcher<Promise<nodeGenerateTitleResponse>>(
+    getNodeGenerateTitleUrl(nodeSlug),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(nodeGenerateTitleBody),
+    },
+  );
+};
+
+/**
+ * Generate proposed tags for the specified node. Will not actually mutate
+the specified node, instead will return a proposal based on the output
+from a language model call.
+
+ */
+export type nodeGenerateTagsResponse = {
+  data: NodeGenerateTagsOKResponse;
+  status: number;
+};
+
+export const getNodeGenerateTagsUrl = (nodeSlug: string) => {
+  return `/nodes/${nodeSlug}/tags`;
+};
+
+export const nodeGenerateTags = async (
+  nodeSlug: string,
+  nodeGenerateTagsBody: NodeGenerateTagsBody,
+  options?: RequestInit,
+): Promise<nodeGenerateTagsResponse> => {
+  return fetcher<Promise<nodeGenerateTagsResponse>>(
+    getNodeGenerateTagsUrl(nodeSlug),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(nodeGenerateTagsBody),
+    },
+  );
+};
+
+/**
+ * Generate proposed content for the specified node. Will not actually
+mutate the specified node, instead will return a proposal based on the
+output from a language model call.
+
+ */
+export type nodeGenerateContentResponse = {
+  data: NodeGenerateContentOKResponse;
+  status: number;
+};
+
+export const getNodeGenerateContentUrl = (nodeSlug: string) => {
+  return `/nodes/${nodeSlug}/content`;
+};
+
+export const nodeGenerateContent = async (
+  nodeSlug: string,
+  nodeGenerateContentBody: NodeGenerateContentBody,
+  options?: RequestInit,
+): Promise<nodeGenerateContentResponse> => {
+  return fetcher<Promise<nodeGenerateContentResponse>>(
+    getNodeGenerateContentUrl(nodeSlug),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(nodeGenerateContentBody),
     },
   );
 };
@@ -393,32 +473,17 @@ export type nodeAddAssetResponse = {
   status: number;
 };
 
-export const getNodeAddAssetUrl = (
-  nodeSlug: string,
-  assetId: string,
-  params?: NodeAddAssetParams,
-) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
-    }
-  });
-
-  return normalizedParams.size
-    ? `/nodes/${nodeSlug}/assets/${assetId}?${normalizedParams.toString()}`
-    : `/nodes/${nodeSlug}/assets/${assetId}`;
+export const getNodeAddAssetUrl = (nodeSlug: string, assetId: string) => {
+  return `/nodes/${nodeSlug}/assets/${assetId}`;
 };
 
 export const nodeAddAsset = async (
   nodeSlug: string,
   assetId: string,
-  params?: NodeAddAssetParams,
   options?: RequestInit,
 ): Promise<nodeAddAssetResponse> => {
   return fetcher<Promise<nodeAddAssetResponse>>(
-    getNodeAddAssetUrl(nodeSlug, assetId, params),
+    getNodeAddAssetUrl(nodeSlug, assetId),
     {
       ...options,
       method: "PUT",
