@@ -77,7 +77,7 @@ func TestNodesHappyPath(t *testing.T) {
 			prop1 := openapi.Metadata(map[string]any{
 				"key": "value",
 			})
-			node1update, err := cl.NodeUpdateWithResponse(ctx, node1.JSON200.Slug, nil, openapi.NodeMutableProps{
+			node1update, err := cl.NodeUpdateWithResponse(ctx, node1.JSON200.Slug, openapi.NodeMutableProps{
 				Name:    &name1,
 				Slug:    &slug1,
 				Content: &cont1,
@@ -136,12 +136,12 @@ func TestNodesErrors(t *testing.T) {
 			r.NotNil(get404)
 			a.Equal(http.StatusNotFound, get404.StatusCode())
 
-			update403, err := cl.NodeUpdateWithResponse(ctx, "nonexistent", nil, openapi.NodeMutableProps{})
+			update403, err := cl.NodeUpdateWithResponse(ctx, "nonexistent", openapi.NodeMutableProps{})
 			r.NoError(err)
 			r.NotNil(update403)
 			a.Equal(http.StatusForbidden, update403.StatusCode())
 
-			update404, err := cl.NodeUpdateWithResponse(ctx, "nonexistent", nil, openapi.NodeMutableProps{}, sh.WithSession(ctx))
+			update404, err := cl.NodeUpdateWithResponse(ctx, "nonexistent", openapi.NodeMutableProps{}, sh.WithSession(ctx))
 			r.NoError(err)
 			r.NotNil(update404)
 			a.Equal(http.StatusNotFound, update404.StatusCode())

@@ -20,12 +20,6 @@ type IndexNode struct {
 	ID library.NodeID
 }
 
-type AutoFillNode struct {
-	ID        library.NodeID
-	AutoTitle bool
-	AutoTag   bool
-}
-
 type DeleteNode struct {
 	ID library.NodeID
 }

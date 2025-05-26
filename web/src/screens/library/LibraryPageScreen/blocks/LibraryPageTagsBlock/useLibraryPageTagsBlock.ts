@@ -16,6 +16,7 @@ export function useLibraryPageTagsBlockEditing() {
   const { suggestTags } = useLibraryMutation(node);
   const ref = useRef<CombotagsHandle>(null);
   const [loadingTags, setLoadingTags] = useState(false);
+  const { content } = form.watch();
 
   const currentTags = node.tags.map((t) => t.name);
 
@@ -34,8 +35,12 @@ export function useLibraryPageTagsBlockEditing() {
   async function handleSuggestTags() {
     await handle(
       async () => {
+        if (!content) {
+          throw new Error("Content is required to suggest tags.");
+        }
+
         setLoadingTags(true);
-        const tags = await suggestTags(node.slug);
+        const tags = await suggestTags(node.slug, content);
 
         if (!tags) {
           throw new Error(

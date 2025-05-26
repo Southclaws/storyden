@@ -82,10 +82,6 @@ func deserialiseTagName(in string) tag_ref.Name {
 	return tag_ref.NewName(in)
 }
 
-func deserialiseTagFillRule(in openapi.TagFillRule) (tag.TagFillRule, error) {
-	return tag.NewTagFillRule(string(in))
-}
-
 func tagsIDs(i openapi.TagListIDs) []xid.ID {
 	return dt.Map(i, deserialiseID)
 }

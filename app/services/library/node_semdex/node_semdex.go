@@ -11,7 +11,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
@@ -26,7 +25,6 @@ func Build() fx.Option {
 		fx.Provide(
 			queue.New[mq.IndexNode],
 			queue.New[mq.DeleteNode],
-			queue.New[mq.AutoFillNode],
 		),
 		fx.Invoke(newSemdexer),
 	)
@@ -49,9 +47,8 @@ type semdexer struct {
 	nodeWriter  *node_writer.Writer
 	nodeUpdater *node_mutate.Manager
 
-	indexQueue    pubsub.Topic[mq.IndexNode]
-	deleteQueue   pubsub.Topic[mq.DeleteNode]
-	autoFillQueue pubsub.Topic[mq.AutoFillNode]
+	indexQueue  pubsub.Topic[mq.IndexNode]
+	deleteQueue pubsub.Topic[mq.DeleteNode]
 
 	semdexMutator semdex.Mutator
 	semdexQuerier semdex.Querier
@@ -72,7 +69,6 @@ func newSemdexer(
 	nodeUpdater *node_mutate.Manager,
 	indexQueue pubsub.Topic[mq.IndexNode],
 	deleteQueue pubsub.Topic[mq.DeleteNode],
-	autoFillQueue pubsub.Topic[mq.AutoFillNode],
 	semdexMutator semdex.Mutator,
 	semdexQuerier semdex.Querier,
 
@@ -138,27 +134,6 @@ func newSemdexer(
 			for msg := range sub {
 				if err := re.deindex(ctx, msg.Payload.ID); err != nil {
 					logger.Error("failed to index node", slog.String("error", err.Error()))
-				}
-
-				msg.Ack()
-			}
-		}()
-
-		return nil
-	}))
-
-	lc.Append(fx.StartHook(func(_ context.Context) error {
-		sub, err := autoFillQueue.Subscribe(ctx)
-		if err != nil {
-			return err
-		}
-
-		go func() {
-			for msg := range sub {
-				ctx = session.GetSessionFromMessage(ctx, msg)
-
-				if err := re.autofill(ctx, msg.Payload.ID, msg.Payload.AutoTitle, msg.Payload.AutoTag); err != nil {
-					logger.Error("failed to autofill node", slog.String("error", err.Error()))
 				}
 
 				msg.Ack()

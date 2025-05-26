@@ -7,9 +7,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/services/asset/asset_download"
@@ -53,14 +51,8 @@ func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadReq
 
 	parentID := opt.NewPtrMap(request.Params.ParentAssetId, deserialiseAssetID)
 
-	contentFillCmd, err := getContentFillRuleCommand(request.Params.ContentFillRule, request.Params.NodeContentFillTarget)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-	}
-
 	opts := asset_upload.Options{
-		ParentID:    parentID,
-		ContentFill: contentFillCmd,
+		ParentID: parentID,
 	}
 
 	a, err := i.uploader.Upload(ctx, request.Body, request.Params.ContentLength, filename, opts)
@@ -71,31 +63,6 @@ func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadReq
 	return openapi.AssetUpload200JSONResponse{
 		AssetUploadOKJSONResponse: openapi.AssetUploadOKJSONResponse(serialiseAssetPtr(a)),
 	}, nil
-}
-
-func getContentFillRuleCommand(contentFillRuleParam *openapi.ContentFillRule, contentFillTargetParam *string) (opt.Optional[asset.ContentFillCommand], error) {
-	if contentFillRuleParam != nil {
-		if contentFillTargetParam == nil {
-			return nil, fault.New("node_content_fill_target is required when content_fill_rule is specified")
-		}
-
-		rule, err := asset.NewContentFillRule((string)(*contentFillRuleParam))
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-
-		nodeID, err := xid.FromString(*contentFillTargetParam)
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-
-		return opt.New(asset.ContentFillCommand{
-			TargetNodeID: opt.New(nodeID),
-			FillRule:     rule,
-		}), nil
-	}
-
-	return opt.NewEmpty[asset.ContentFillCommand](), nil
 }
 
 func serialiseAsset(a asset.Asset) openapi.Asset {

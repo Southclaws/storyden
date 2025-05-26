@@ -22,15 +22,16 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/app/services/generative"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
 	"github.com/Southclaws/storyden/app/services/library/node_property_schema"
 	"github.com/Southclaws/storyden/app/services/library/node_read"
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
+	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/deletable"
 )
@@ -38,6 +39,9 @@ import (
 type Nodes struct {
 	accountQuery  *account_querier.Querier
 	nodeMutator   *node_mutate.Manager
+	tagger        *autotagger.Tagger
+	summariser    generative.Summariser
+	titler        generative.Titler
 	nodeReader    *node_read.HydratedQuerier
 	nv            *node_visibility.Controller
 	ntree         nodetree.Graph
@@ -49,6 +53,9 @@ type Nodes struct {
 func NewNodes(
 	accountQuery *account_querier.Querier,
 	nodeMutator *node_mutate.Manager,
+	tagger *autotagger.Tagger,
+	summariser generative.Summariser,
+	titler generative.Titler,
 	nodeReader *node_read.HydratedQuerier,
 	nv *node_visibility.Controller,
 	ntree nodetree.Graph,
@@ -59,6 +66,9 @@ func NewNodes(
 	return Nodes{
 		accountQuery:  accountQuery,
 		nodeMutator:   nodeMutator,
+		tagger:        tagger,
+		summariser:    summariser,
+		titler:        titler,
 		nodeReader:    nodeReader,
 		nv:            nv,
 		ntree:         ntree,
@@ -274,26 +284,6 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	titleFillRuleParam, err := opt.MapErr(opt.NewPtr(request.Params.TitleFillRule), deserialiseTitleFillRule)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	tagFillRuleParam, err := opt.MapErr(opt.NewPtr(request.Params.TagFillRule), deserialiseTagFillRule)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	fillSource, err := opt.MapErr(opt.NewPtr(request.Params.FillSource), deserialiseFillSource)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-	}
-
-	contentFillCmd, err := getContentFillRuleSourceCommand(request.Params.ContentFillRule, request.Params.FillSource)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-	}
-
 	tags := opt.Map(opt.NewPtr(request.Body.Tags), func(tags []string) tag_ref.Names {
 		return dt.Map(tags, deserialiseTagName)
 	})
@@ -313,16 +303,6 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		Properties:   pml,
 		Tags:         tags,
 		Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
-		FillSource:   fillSource,
-		ContentFill:  contentFillCmd,
-	}
-
-	if tfr, ok := titleFillRuleParam.Get(); ok {
-		partial.TitleFill = opt.New(datagraph.TitleFillCommand{FillRule: tfr})
-	}
-
-	if tfr, ok := tagFillRuleParam.Get(); ok {
-		partial.TagFill = opt.New(tag.TagFillCommand{FillRule: tfr})
 	}
 
 	node, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), partial)
@@ -332,6 +312,67 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 
 	return openapi.NodeUpdate200JSONResponse{
 		NodeUpdateOKJSONResponse: openapi.NodeUpdateOKJSONResponse(serialiseUpdatedNode(node)),
+	}, nil
+}
+
+func (c *Nodes) NodeGenerateContent(ctx context.Context, request openapi.NodeGenerateContentRequestObject) (openapi.NodeGenerateContentResponseObject, error) {
+	content, err := datagraph.NewRichText(request.Body.Content)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	summary, err := c.summariser.Summarise(ctx, content)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.NodeGenerateContent200JSONResponse{
+		NodeGenerateContentOKJSONResponse: openapi.NodeGenerateContentOKJSONResponse{
+			Content: summary,
+		},
+	}, nil
+}
+
+func (c *Nodes) NodeGenerateTags(ctx context.Context, request openapi.NodeGenerateTagsRequestObject) (openapi.NodeGenerateTagsResponseObject, error) {
+	content, err := datagraph.NewRichText(request.Body.Content)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	tags, err := c.tagger.Gather(ctx, content)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.NodeGenerateTags200JSONResponse{
+		NodeGenerateTagsOKJSONResponse: openapi.NodeGenerateTagsOKJSONResponse{
+			Tags: dt.Map(tags, func(t tag_ref.Name) string {
+				return t.String()
+			}),
+		},
+	}, nil
+}
+
+func (c *Nodes) NodeGenerateTitle(ctx context.Context, request openapi.NodeGenerateTitleRequestObject) (openapi.NodeGenerateTitleResponseObject, error) {
+	content, err := datagraph.NewRichText(request.Body.Content)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+	}
+
+	title, err := c.titler.SuggestTitle(ctx, content)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	// TODO: Support multiple suggestions in API.
+	if len(title) == 0 {
+		return nil, fault.New("no title suggestions returned", fctx.With(ctx), ftag.With(ftag.Internal))
+	}
+
+	return openapi.NodeGenerateTitle200JSONResponse{
+		NodeGenerateTitleOKJSONResponse: openapi.NodeGenerateTitleOKJSONResponse{
+			Title: title[0],
+		},
 	}, nil
 }
 
@@ -429,14 +470,8 @@ func (c *Nodes) NodeUpdateProperties(ctx context.Context, request openapi.NodeUp
 func (c *Nodes) NodeAddAsset(ctx context.Context, request openapi.NodeAddAssetRequestObject) (openapi.NodeAddAssetResponseObject, error) {
 	id := openapi.ParseID(request.AssetId)
 
-	contentFillCmd, err := getContentFillRuleCommand(request.Params.ContentFillRule, request.Params.NodeContentFillTarget)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
-	}
-
 	node, err := c.nodeMutator.Update(ctx, deserialiseNodeMark(request.NodeSlug), node_mutate.Partial{
-		AssetsAdd:   opt.New([]asset.AssetID{id}),
-		ContentFill: contentFillCmd,
+		AssetsAdd: opt.New([]asset.AssetID{id}),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -530,24 +565,8 @@ func (c *Nodes) NodeUpdatePosition(ctx context.Context, request openapi.NodeUpda
 	}, nil
 }
 
-func serialiseUpdatedNode(in *node_mutate.Updated) openapi.NodeWithChildren {
-	n := serialiseNodeWithItems(&in.Node)
-
-	if ts, ok := in.TitleSuggestion.Get(); ok {
-		n.TitleSuggestion = &ts
-	}
-
-	if ts, ok := in.TagSuggestions.Get(); ok {
-		s := ts.Strings()
-		n.TagSuggestions = &s
-	}
-
-	if cs, ok := in.ContentSuggestion.Get(); ok {
-		html := cs.HTML()
-		n.ContentSuggestion = &html
-	}
-
-	return n
+func serialiseUpdatedNode(in *library.Node) openapi.NodeWithChildren {
+	return serialiseNodeWithItems(in)
 }
 
 func serialiseNode(in *library.Node) openapi.Node {
@@ -631,18 +650,6 @@ func deserialiseInputSlug(in *string) (opt.Optional[mark.Slug], error) {
 	}
 
 	return opt.New(*slug), nil
-}
-
-func deserialiseTitleFillRule(in openapi.TitleFillRule) (datagraph.TitleFillRule, error) {
-	return datagraph.NewTitleFillRule(string(in))
-}
-
-func deserialiseContentFillRule(in openapi.ContentFillRule) (asset.ContentFillRule, error) {
-	return asset.NewContentFillRule(string(in))
-}
-
-func deserialiseFillSource(in openapi.FillSource) (asset.FillSource, error) {
-	return asset.NewFillSource(string(in))
 }
 
 func serialiseProperty(in *library.Property) openapi.Property {
@@ -752,29 +759,4 @@ func deserialisePropertyMutation(in openapi.PropertyMutation) (*library.Property
 		Type:  t,
 		Sort:  opt.NewPtr(in.Sort),
 	}, nil
-}
-
-func getContentFillRuleSourceCommand(contentFillRuleParam *openapi.ContentFillRule, contentFillSourceParam *openapi.FillSourceQuery) (opt.Optional[asset.ContentFillCommand], error) {
-	if contentFillRuleParam != nil {
-		if contentFillSourceParam == nil {
-			return nil, fault.New("node_content_fill_target is required when content_fill_rule is specified")
-		}
-
-		rule, err := asset.NewContentFillRule((string)(*contentFillRuleParam))
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-
-		sourceType, err := asset.NewFillSource((string)(*contentFillSourceParam))
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-
-		return opt.New(asset.ContentFillCommand{
-			SourceType: opt.New(sourceType),
-			FillRule:   rule,
-		}), nil
-	}
-
-	return opt.NewEmpty[asset.ContentFillCommand](), nil
 }
