@@ -10,7 +10,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   LinkCreateBody,
   LinkCreateOKResponse,
-  LinkCreateParams,
   LinkGetOKResponse,
   LinkListOKResponse,
   LinkListParams,
@@ -35,26 +34,15 @@ export type linkCreateResponse = {
   status: number;
 };
 
-export const getLinkCreateUrl = (params?: LinkCreateParams) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
-    }
-  });
-
-  return normalizedParams.size
-    ? `/links?${normalizedParams.toString()}`
-    : `/links`;
+export const getLinkCreateUrl = () => {
+  return `/links`;
 };
 
 export const linkCreate = async (
   linkCreateBody: LinkCreateBody,
-  params?: LinkCreateParams,
   options?: RequestInit,
 ): Promise<linkCreateResponse> => {
-  return fetcher<Promise<linkCreateResponse>>(getLinkCreateUrl(params), {
+  return fetcher<Promise<linkCreateResponse>>(getLinkCreateUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },

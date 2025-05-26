@@ -9,14 +9,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 
 /**
- * A title fill rule defines a strategy for automatically generating a 
-title for a piece of content using semantic/LLM features.
-
+ * Not implemented
  */
-export type TitleFillRule = (typeof TitleFillRule)[keyof typeof TitleFillRule];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TitleFillRule = {
-  query: "query",
-  replace: "replace",
-} as const;
+export type NotImplementedResponse = void;

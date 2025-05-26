@@ -7,14 +7,14 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { CommonProperties } from "./commonProperties";
-import type { NodeCommonProps } from "./nodeCommonProps";
 
 /**
- * A node is a text document with children and assets. It serves as an
-abstraction for grouping structured data objects. It can represent
-things such as brands, manufacturers, authors, directors, etc. Nodes
-can be referenced in content posts and they also have their own content.
+ * A request for generated content for a node. A request for generated content
+does not use the existing content on a node but takes the current
+client's content state (from an "edit mode" text box for example) and
+sends that in order to generate potential content using an LLM.
 
  */
-export type Node = CommonProperties & NodeCommonProps;
+export interface NodeGenerateContentRequest {
+  content: string;
+}

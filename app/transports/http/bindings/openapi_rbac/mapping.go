@@ -394,6 +394,18 @@ func (m *Mapping) NodeUpdate() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }
 
+func (m *Mapping) NodeGenerateContent() (bool, *rbac.Permission) {
+	return true, nil // See NOTE.
+}
+
+func (m *Mapping) NodeGenerateTags() (bool, *rbac.Permission) {
+	return true, nil // See NOTE.
+}
+
+func (m *Mapping) NodeGenerateTitle() (bool, *rbac.Permission) {
+	return true, nil // See NOTE.
+}
+
 func (m *Mapping) NodeDelete() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }

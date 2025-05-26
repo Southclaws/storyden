@@ -6,12 +6,16 @@ import { toast } from "sonner";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 import { Xid } from "xid-ts";
 
+import { linkCreate } from "@/api/openapi-client/links";
 import {
   getNodeGetKey,
   getNodeListKey,
   nodeAddAsset,
   nodeCreate,
   nodeDelete,
+  nodeGenerateContent,
+  nodeGenerateTags,
+  nodeGenerateTitle,
   nodeRemoveAsset,
   nodeUpdate,
   nodeUpdatePosition,
@@ -135,7 +139,6 @@ export function useLibraryMutation(node?: Node) {
       tags: [],
       visibility: "draft",
       recomentations: [],
-      tag_suggestions: [],
     };
 
     const mutator: MutatorCallback<NodeListOKResponse> = (data) => {
@@ -265,51 +268,34 @@ export function useLibraryMutation(node?: Node) {
     return slugChanged;
   };
 
-  const suggestTags = async (slug: string) => {
-    const { tag_suggestions } = await nodeUpdate(
-      slug,
-      {},
-      { tag_fill_rule: "query" },
-    );
+  const suggestTags = async (slug: string, content: string) => {
+    const { tags } = await nodeGenerateTags(slug, { content });
 
-    return tag_suggestions;
+    return tags;
   };
 
-  const suggestTitle = async (slug: string) => {
-    const { title_suggestion } = await nodeUpdate(
-      slug,
-      {},
-      { title_fill_rule: "query" },
-    );
+  const suggestTitle = async (slug: string, content: string) => {
+    const { title } = await nodeGenerateTitle(slug, { content });
 
-    return title_suggestion;
+    return title;
   };
 
-  const suggestSummary = async (slug: string) => {
-    const { title_suggestion } = await nodeUpdate(
-      slug,
-      {},
-      { content_fill_rule: "query" },
-    );
+  const suggestSummary = async (slug: string, currentContent: string) => {
+    const { content } = await nodeGenerateContent(slug, {
+      content: currentContent,
+    });
 
-    return title_suggestion;
+    return content;
   };
 
   const importFromLink = async (slug: string, url: string) => {
-    const { title_suggestion, tag_suggestions, content_suggestion } =
-      await nodeUpdate(
-        slug,
-        { url },
-        {
-          // generate all these fields from the provided URL:
-          fill_source: "url",
-          // title_fill_rule: "query",
-          tag_fill_rule: "query",
-          content_fill_rule: "query",
-        },
-      );
+    const { title, description } = await linkCreate({ url });
 
-    return { title_suggestion, tag_suggestions, content_suggestion };
+    return {
+      title_suggestion: title,
+      tag_suggestions: [], // TODO
+      content_suggestion: description, // TODO: Generate summary from content
+    };
   };
 
   const removeNodeCoverImage = async (slug: string) => {

@@ -8,8 +8,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type { AssetNameQueryParameter } from "./assetNameQueryParameter";
-import type { NodeContentFillRuleQueryParameter } from "./nodeContentFillRuleQueryParameter";
-import type { NodeContentFillTargetQueryParameter } from "./nodeContentFillTargetQueryParameter";
 import type { ParentAssetIDQueryParameter } from "./parentAssetIDQueryParameter";
 
 export type AssetUploadParams = {
@@ -17,20 +15,6 @@ export type AssetUploadParams = {
    * The client-provided file name for the asset.
    */
   filename?: AssetNameQueryParameter;
-  /**
- * Use the content extracted from the child resource to modify the target
-resource. This can be used to populate a node from a asset or link. For
-example, if you wanted to create a node that held the contents of a PDF
-file, you can upload the file with a target node and a fill rule set.
-
- */
-  content_fill_rule?: NodeContentFillRuleQueryParameter;
-  /**
- * When NodeContentFillRuleQuery is used, this option must be set in order
-to specify which node will receive content extracted from the source.
-
- */
-  node_content_fill_target?: NodeContentFillTargetQueryParameter;
   /**
  * For uploading new versions of an existing asset, set this parameter to
 the asset ID of the parent asset. This must be an ID and not a filename.

@@ -12,9 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
-	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
-	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
@@ -48,8 +46,7 @@ func New(
 }
 
 type Options struct {
-	ContentFill opt.Optional[asset.ContentFillCommand]
-	ParentID    opt.Optional[asset.AssetID]
+	ParentID opt.Optional[asset.AssetID]
 }
 
 func (s *Uploader) Upload(ctx context.Context, or io.Reader, size int64, name asset.Filename, opts Options) (*asset.Asset, error) {
@@ -74,30 +71,11 @@ func (s *Uploader) Upload(ctx context.Context, or io.Reader, size int64, name as
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if cfr, ok := opts.ContentFill.Get(); ok {
-		targetNode, ok := cfr.TargetNodeID.Get()
-		if !ok {
-			return nil, fault.New("target node ID not set", fctx.With(ctx))
-		}
-
-		nodeID := library.QueryKey{mark.NewQueryKeyID(targetNode)}
-
-		_, err := s.nodewriter.Update(ctx, nodeID, node_writer.WithAssets([]asset.AssetID{a.ID}))
-		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
-	}
-
 	path := asset.BuildAssetPath(a.Name)
 
 	if err := s.objects.Write(ctx, path, r, size); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	s.queue.PublishAndForget(ctx, mq.AnalyseAsset{
-		AssetID:         a.ID,
-		ContentFillRule: opts.ContentFill,
-	})
 
 	return a, nil
 }

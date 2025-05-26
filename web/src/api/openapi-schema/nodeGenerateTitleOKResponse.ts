@@ -7,17 +7,9 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { NodeGenerateTitleResult } from "./nodeGenerateTitleResult";
 
 /**
- * A title fill rule defines a strategy for automatically generating a 
-title for a piece of content using semantic/LLM features.
-
+ * Node title generated.
  */
-export type TitleFillRuleQueryParamParameter =
-  (typeof TitleFillRuleQueryParamParameter)[keyof typeof TitleFillRuleQueryParamParameter];
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare
-export const TitleFillRuleQueryParamParameter = {
-  query: "query",
-  replace: "replace",
-} as const;
+export type NodeGenerateTitleOKResponse = NodeGenerateTitleResult;

@@ -1317,8 +1317,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ContentLength"
         - $ref: "#/components/parameters/AssetNameQuery"
-        - $ref: "#/components/parameters/NodeContentFillRuleQuery"
-        - $ref: "#/components/parameters/NodeContentFillTargetQuery"
         - $ref: "#/components/parameters/ParentAssetIDQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1607,10 +1605,6 @@ paths:
       tags: [nodes]
       parameters:
         - $ref: "#/components/parameters/NodeSlugParam"
-        - $ref: "#/components/parameters/TitleFillRuleQueryParam"
-        - $ref: "#/components/parameters/TagFillRuleQueryParam"
-        - $ref: "#/components/parameters/NodeContentFillRuleQuery"
-        - $ref: "#/components/parameters/FillSourceQuery"
       requestBody: { $ref: "#/components/requestBodies/NodeUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1629,6 +1623,60 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NodeDeleteOK" }
+
+  /nodes/{node_slug}/title:
+    post:
+      operationId: NodeGenerateTitle
+      description: |
+        Generate a proposed title for the specified node. Will not actually
+        mutate the specified node, instead will return a proposal based on the
+        output from a language model call.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/NodeGenerateTitle" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "501": { $ref: "#/components/responses/NotImplemented" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/NodeGenerateTitleOK" }
+
+  /nodes/{node_slug}/tags:
+    post:
+      operationId: NodeGenerateTags
+      description: |
+        Generate proposed tags for the specified node. Will not actually mutate
+        the specified node, instead will return a proposal based on the output
+        from a language model call.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/NodeGenerateTags" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "501": { $ref: "#/components/responses/NotImplemented" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/NodeGenerateTagsOK" }
+
+  /nodes/{node_slug}/content:
+    post:
+      operationId: NodeGenerateContent
+      description: |
+        Generate proposed content for the specified node. Will not actually
+        mutate the specified node, instead will return a proposal based on the
+        output from a language model call.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/NodeGenerateContent" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "501": { $ref: "#/components/responses/NotImplemented" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/NodeGenerateContentOK" }
 
   /nodes/{node_slug}/children:
     get:
@@ -1732,8 +1780,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/AssetIDParam"
-        - $ref: "#/components/parameters/NodeContentFillRuleQuery"
-        - $ref: "#/components/parameters/NodeContentFillTargetQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -1825,9 +1871,6 @@ paths:
 
         When a link is submitted, it is first "cleaned" to remove any fragments.
       tags: [links]
-      parameters:
-        - $ref: "#/components/parameters/NodeContentFillRuleQuery"
-        - $ref: "#/components/parameters/NodeContentFillTargetQuery"
       requestBody: { $ref: "#/components/requestBodies/LinkCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -2313,26 +2356,6 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
-    TitleFillRuleQueryParam:
-      description: |
-        Use the content extracted from the child resource to suggest a title.
-      name: title_fill_rule
-      in: query
-      required: false
-      schema:
-        $ref: "#/components/schemas/TitleFillRule"
-
-    TagFillRuleQueryParam:
-      description: |
-        Use the content extracted from the child resource to determine a set of
-        tags (existing or new) to either write directly into the resource or to
-        return as part of the response in order to prompt for confirmation.
-      name: tag_fill_rule
-      in: query
-      required: false
-      schema:
-        $ref: "#/components/schemas/TagFillRule"
-
     NodeSlugParam:
       description: Unique node Slug.
       name: node_slug
@@ -2357,42 +2380,6 @@ components:
       required: false
       schema:
         type: string
-
-    NodeContentFillRuleQuery:
-      description: |
-        Use the content extracted from the child resource to modify the target
-        resource. This can be used to populate a node from a asset or link. For
-        example, if you wanted to create a node that held the contents of a PDF
-        file, you can upload the file with a target node and a fill rule set.
-      # NOTE: We may use content fill features for other content in future, such
-      # as posts or profiles, so this param does is not prefixed with "node_".
-      name: content_fill_rule
-      in: query
-      required: false
-      schema:
-        $ref: "#/components/schemas/ContentFillRule"
-
-    FillSourceQuery:
-      description: |
-        When NodeContentFillRuleQuery is used, this option must be set in order
-        to specify the source of the content-fill command. This allows you to
-        fill a page with either a summary of the content (existing or new) or
-        from the URL by scraping the content.
-      name: fill_source
-      in: query
-      required: false
-      schema:
-        $ref: "#/components/schemas/FillSource"
-
-    NodeContentFillTargetQuery:
-      description: |
-        When NodeContentFillRuleQuery is used, this option must be set in order
-        to specify which node will receive content extracted from the source.
-      name: node_content_fill_target
-      in: query
-      required: false
-      schema:
-        $ref: "#/components/schemas/Identifier"
 
     TargetNodeSlugQuery:
       description: |
@@ -2654,6 +2641,21 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/NodeMutableProps" }
 
+    NodeGenerateTitle:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NodeGenerateTitleRequest" }
+
+    NodeGenerateTags:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NodeGenerateTagsRequest" }
+
+    NodeGenerateContent:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NodeGenerateContentRequest" }
+
     NodeUpdateProperties:
       content:
         application/json:
@@ -2708,6 +2710,8 @@ components:
   #
 
   responses:
+    NotImplemented:
+      description: Not implemented
     NotModified:
       description: Not modified
       headers: { <<: *cache_response_headers }
@@ -3108,6 +3112,24 @@ components:
           schema:
             $ref: "#/components/schemas/NodeWithChildren"
 
+    NodeGenerateTitleOK:
+      description: Node title generated.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NodeGenerateTitleResult" }
+
+    NodeGenerateTagsOK:
+      description: Node tags generated.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NodeGenerateTagsResult" }
+
+    NodeGenerateContentOK:
+      description: Node content generated.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NodeGenerateContentResult" }
+
     NodeUpdatePropertiesOK:
       description: Node properties updated.
       content:
@@ -3341,64 +3363,6 @@ components:
     InstanceCapabilityList:
       type: array
       items: { $ref: "#/components/schemas/InstanceCapability" }
-
-    FillSource:
-      description: |
-        Where to yield fill results from. When set to `url` the link
-        will be fetched first and the content will be used to fill the target.
-        When set to `content` the content of the resource will be used. If used
-        on a patch request, fill rules will use any parameters in the patch over
-        existing current data in the resource. Otherwise it'll use the resource.
-
-        Data filling occurs in a specific order: summary, title and tags. This
-        means that if you set a content fill rule to summarise content, then the
-        output of that summarisation is used to generate the title and tags.
-      type: string
-      enum:
-        - url
-        - content
-
-    TitleFillRule:
-      description: |
-        A title fill rule defines a strategy for automatically generating a 
-        title for a piece of content using semantic/LLM features.
-      type: string
-      enum:
-        - query
-        - replace
-
-    TagFillRule:
-      description: |
-        A tag fill-rule defines a strategy for automatically generating a set of
-        tags for a datagraph item using semantic/LLM features. Using `query` as
-        a rule will not modify the resource but return the tags as part of the
-        response for the frontend implementation to present to the user as a set
-        of suggestions. Using `replace` as a rule will automatically update the
-        tags of the affected resource with those sourced by the semdex LLM.
-      type: string
-      enum:
-        - query
-        - replace
-
-    ContentFillRule:
-      description: |
-        A content fill rule defines a strategy for automatically generating the
-        body content of a resource using semantic/LLM features. Using `query` as
-        a rule will not modify the resource but return the content as part of a
-        response for the frontend implementation to present to the user as a
-        suggestion. Using `replace` as a rule will automatically update the
-        content of the affected resource with that sourced by the semdex LLM.
-      type: string
-      enum:
-        # Don't modify the underlying resource, instead return proposed content.
-        - query
-        # Create a new resource with the proposed content. Currently only links.
-        - create
-        # Perform a write operation without prompting the client for review.
-        - replace
-        # NOTE: Prepend and append are not implemented yet.
-        # - prepend
-        # - append
 
     Visibility:
       type: string
@@ -5250,9 +5214,6 @@ components:
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
         - $ref: "#/components/schemas/NodeCommonProps"
-        - $ref: "#/components/schemas/TitleSuggestion"
-        - $ref: "#/components/schemas/TagSuggestions"
-        - $ref: "#/components/schemas/ContentSuggestion"
 
     NodeWithChildren:
       description: |
@@ -5370,6 +5331,65 @@ components:
         properties: { $ref: "#/components/schemas/PropertyMutationList" }
         tags: { $ref: "#/components/schemas/TagNameList" }
         meta: { $ref: "#/components/schemas/Metadata" }
+
+    NodeGenerateTitleRequest:
+      description: |
+        A request for a generated title for a node. A request for a generated
+        title does not use the existing content on a node but takes the current
+        client's content state (from an "edit mode" text box for example) and
+        sends that in order to generate a potential title using an LLM.
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+
+    NodeGenerateTitleResult:
+      description: The result of a title generation request from an LLM.
+      type: object
+      required: [title]
+      properties:
+        title:
+          type: string
+
+    NodeGenerateTagsRequest:
+      description: |
+        A request for generated tags for a node. A request for generated tags
+        does not use the existing content on a node but takes the current
+        client's content state (from an "edit mode" text box for example) and
+        sends that in order to generate potential tags using an LLM.
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+
+    NodeGenerateTagsResult:
+      description: The result of a tag generation request from an LLM.
+      type: object
+      required: [tags]
+      properties:
+        tags: { $ref: "#/components/schemas/TagNameList" }
+
+    NodeGenerateContentRequest:
+      description: |
+        A request for generated content for a node. A request for generated content
+        does not use the existing content on a node but takes the current
+        client's content state (from an "edit mode" text box for example) and
+        sends that in order to generate potential content using an LLM.
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
+
+    NodeGenerateContentResult:
+      description: The result of a content generation request from an LLM.
+      type: object
+      required: [content]
+      properties:
+        content:
+          type: string
 
     PropertyMutableProps:
       description: |

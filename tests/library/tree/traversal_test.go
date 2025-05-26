@@ -327,7 +327,7 @@ func TestNodesTreeQuerying_WithHiddenChildNodes(t *testing.T) {
 
 				// Mark Node 3 as hidden children in tree traversal
 				updated := tests.AssertRequest(
-					cl.NodeUpdateWithResponse(ctx, node3.JSON200.Slug, &openapi.NodeUpdateParams{}, openapi.NodeMutableProps{
+					cl.NodeUpdateWithResponse(ctx, node3.JSON200.Slug, openapi.NodeMutableProps{
 						HideChildTree: opt.New(true).Ptr(),
 					}, session),
 				)(t, http.StatusOK)

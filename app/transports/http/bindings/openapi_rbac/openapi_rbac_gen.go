@@ -99,6 +99,9 @@ type OperationPermissions interface {
 	NodeGet() (bool, *rbac.Permission)
 	NodeUpdate() (bool, *rbac.Permission)
 	NodeDelete() (bool, *rbac.Permission)
+	NodeGenerateTitle() (bool, *rbac.Permission)
+	NodeGenerateTags() (bool, *rbac.Permission)
+	NodeGenerateContent() (bool, *rbac.Permission)
 	NodeListChildren() (bool, *rbac.Permission)
 	NodeUpdateChildrenPropertySchema() (bool, *rbac.Permission)
 	NodeUpdatePropertySchema() (bool, *rbac.Permission)
@@ -317,6 +320,12 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.NodeUpdate()
 	case "NodeDelete":
 		return optable.NodeDelete()
+	case "NodeGenerateTitle":
+		return optable.NodeGenerateTitle()
+	case "NodeGenerateTags":
+		return optable.NodeGenerateTags()
+	case "NodeGenerateContent":
+		return optable.NodeGenerateContent()
 	case "NodeListChildren":
 		return optable.NodeListChildren()
 	case "NodeUpdateChildrenPropertySchema":

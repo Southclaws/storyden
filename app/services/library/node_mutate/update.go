@@ -7,23 +7,14 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_auth"
 )
 
-type Updated struct {
-	library.Node
-	TitleSuggestion   opt.Optional[string]
-	TagSuggestions    opt.Optional[tag_ref.Names]
-	ContentSuggestion opt.Optional[datagraph.Content]
-}
-
-func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*Updated, error) {
+func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*library.Node, error) {
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -53,14 +44,13 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	post, err := s.postMutation(ctx, n, pre)
-	if err != nil {
-		// TODO: Does this need to error?
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
+	if props, ok := p.Properties.Get(); ok {
+		updatedProperties, err := s.applyPropertyMutations(ctx, n, props)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 
-	if post.properties.Ok() {
-		n.Properties = post.properties
+		n.Properties = opt.New(*updatedProperties)
 	}
 
 	if n.Visibility == visibility.VisibilityPublished {
@@ -78,12 +68,5 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 
 	s.fetcher.HydrateContentURLs(ctx, n)
 
-	u := Updated{
-		Node:              *n,
-		TagSuggestions:    pre.tags,
-		TitleSuggestion:   pre.title,
-		ContentSuggestion: pre.content,
-	}
-
-	return &u, nil
+	return n, nil
 }
