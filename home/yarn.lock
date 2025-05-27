@@ -2976,6 +2976,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cobe@npm:^0.6.3":
+  version: 0.6.3
+  resolution: "cobe@npm:0.6.3"
+  dependencies:
+    phenomenon: "npm:^1.6.0"
+  checksum: 10c0/ffb647d5fe3706534b896cb48594dcaae9dfbd97d35a408f084f4b8ad11d1cbb3583977371670d05d518e67e38ef88fb24c843d191fd49c03e576a4a9d81cf63
+  languageName: node
+  linkType: hard
+
 "code-block-writer@npm:^13.0.3":
   version: 13.0.3
   resolution: "code-block-writer@npm:13.0.3"
@@ -4339,6 +4348,7 @@ __metadata:
     "@types/react": "npm:^19.1.5"
     "@types/react-dom": "npm:^19.1.5"
     autoprefixer: "npm:^10.4.21"
+    cobe: "npm:^0.6.3"
     date-fns: "npm:^4.1.0"
     fumadocs-core: "npm:15.3.4"
     fumadocs-mdx: "npm:11.6.5"
@@ -5820,6 +5830,13 @@ __metadata:
   version: 1.0.0
   resolution: "perfect-debounce@npm:1.0.0"
   checksum: 10c0/e2baac416cae046ef1b270812cf9ccfb0f91c04ea36ac7f5b00bc84cb7f41bdbba087c0ab21b4e02a7ef3a1f1f6db399f137cecec46868bd7d8d88c2a9ee431f
+  languageName: node
+  linkType: hard
+
+"phenomenon@npm:^1.6.0":
+  version: 1.6.0
+  resolution: "phenomenon@npm:1.6.0"
+  checksum: 10c0/32216a8861e69ab1d96c8fa96217769073f446173f3135fbe369ea61f0959c453347004b5aefb22ba18f725273e7c57ce2d2a29c4db6ac431a2839b7bacf9778
   languageName: node
   linkType: hard
 
