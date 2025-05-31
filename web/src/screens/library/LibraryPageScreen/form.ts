@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { PropertyType } from "src/api/openapi-schema";
 
-import { CoverImageSchema } from "@/lib/library/metadata";
+import { CoverImageSchema, NodeMetadataSchema } from "@/lib/library/metadata";
 
 const CoverImageFormSchema = z.union([
   CoverImageSchema,
@@ -39,5 +39,6 @@ export const FormSchema = z.object({
   }, z.string().url("Invalid URL").optional()),
   coverImage: CoverImageFormSchema.optional(),
   content: z.string().optional(),
+  meta: NodeMetadataSchema,
 });
 export type Form = z.infer<typeof FormSchema>;

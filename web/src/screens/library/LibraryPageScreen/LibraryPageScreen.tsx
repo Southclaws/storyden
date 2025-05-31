@@ -8,14 +8,7 @@ import "react-advanced-cropper/dist/style.css";
 
 import { LibraryPageProvider, Props } from "./Context";
 import { LibraryPageControls } from "./LibraryPageControls";
-import { LibraryPageAssetsBlock } from "./blocks/LibraryPageAssetsBlock/LibraryPageAssetsBlock";
-import { LibraryPageContentBlock } from "./blocks/LibraryPageContentBlock/LibraryPageContentBlock";
-import { LibraryPageCoverBlock } from "./blocks/LibraryPageCoverBlock/LibraryPageCoverBlock";
-import { LibraryPageLinkBlock } from "./blocks/LibraryPageLinkBlock/LibraryPageLinkBlock";
-import { LibraryPagePropertiesBlock } from "./blocks/LibraryPagePropertiesBlock/LibraryPagePropertiesBlock";
-import { LibraryPageTableBlock } from "./blocks/LibraryPageTableBlock/LibraryPageTableBlock";
-import { LibraryPageTagsBlock } from "./blocks/LibraryPageTagsBlock/LibraryPageTagsBlock";
-import { LibraryPageTitleBlock } from "./blocks/LibraryPageTitleBlock/LibraryPageTitleBlock";
+import { LibraryPageBlocks } from "./blocks/LibraryPageBlocks";
 import { useCoverImage } from "./useCoverImage";
 import { useSave } from "./useSave";
 
@@ -56,19 +49,13 @@ export function LibraryPage() {
       w="full"
       h="full"
       gap="3"
+      pl="3"
       alignItems="start"
       onSubmit={handleSubmit}
     >
       <LStack h="full">
         <LibraryPageControls />
-        <LibraryPageCoverBlock ref={cropperRef} />
-        <LibraryPageAssetsBlock />
-        <LibraryPageTitleBlock />
-        <LibraryPageTagsBlock />
-        <LibraryPageLinkBlock />
-        <LibraryPagePropertiesBlock />
-        <LibraryPageTableBlock />
-        <LibraryPageContentBlock />
+        <LibraryPageBlocks cropperRef={cropperRef} />
       </LStack>
     </styled.form>
   );

@@ -138,11 +138,15 @@
     opacity: 0;
     display: block;
     grid-area: leftbar;
-    overflow: hidden;
+    /* overflow: hidden; */
 
     /* NOTE: This maintains the shadow bleed despite the overflow hidden prop. */
-    margin: -15px;
-    padding: 15px;
+    margin-left: -15px;
+    margin-top: -15px;
+    margin-bottom: -15px;
+    padding-left: 15px;
+    padding-top: 15px;
+    padding-bottom: 15px;
   }
 
   .rightbar {
