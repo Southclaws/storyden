@@ -70,26 +70,26 @@ require (
 	github.com/oapi-codegen/nullable v1.1.0
 	github.com/oapi-codegen/oapi-codegen/v2 v2.4.1
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/openai/openai-go v1.1.0
-	github.com/pb33f/libopenapi v0.21.12
+	github.com/openai/openai-go v1.2.0
+	github.com/pb33f/libopenapi v0.22.2
 	github.com/philippgille/chromem-go v0.7.0
 	github.com/pinecone-io/go-pinecone/v3 v3.1.0
 	github.com/puzpuzpuz/xsync/v4 v4.1.0
 	github.com/redis/rueidis v1.0.60
 	github.com/rs/cors v1.11.1
 	github.com/russross/blackfriday/v2 v2.1.0
-	github.com/sendgrid/sendgrid-go v3.16.0+incompatible
+	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
 	github.com/shirou/gopsutil/v4 v4.25.4
-	github.com/twilio/twilio-go v1.26.1
-	github.com/weaviate/weaviate v1.30.6
+	github.com/twilio/twilio-go v1.26.2
+	github.com/weaviate/weaviate v1.31.0
 	github.com/weaviate/weaviate-go-client/v5 v5.1.0
 	go.opentelemetry.io/otel v1.36.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.36.0
 	go.opentelemetry.io/otel/sdk v1.36.0
 	go.opentelemetry.io/otel/trace v1.36.0
-	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
+	golang.org/x/exp v0.0.0-20250531010427-b6e5de432a8b
 	golang.org/x/sync v0.14.0
-	google.golang.org/api v0.234.0
+	google.golang.org/api v0.235.0
 )
 
 require (
