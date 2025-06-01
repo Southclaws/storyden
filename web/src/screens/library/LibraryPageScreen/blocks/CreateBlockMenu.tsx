@@ -1,29 +1,26 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 import { keyBy } from "lodash";
 
-import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
-import { MoreIcon } from "@/components/ui/icons/More";
 import * as Menu from "@/components/ui/menu";
 import { useEmitLibraryBlockEvent } from "@/lib/library/events";
-import { LibraryPageBlock } from "@/lib/library/metadata";
+import { LibraryPageBlock, LibraryPageBlockName } from "@/lib/library/metadata";
 
 import { useLibraryPageContext } from "../Context";
 
 type BlockItem = {
   type: LibraryPageBlock["type"];
-  label: string;
 };
 
 const blocks: BlockItem[] = [
-  { type: "title", label: "Title" },
-  { type: "cover", label: "Cover" },
-  { type: "content", label: "Content" },
-  { type: "properties", label: "Properties" },
-  { type: "tags", label: "Tags" },
-  { type: "assets", label: "Assets" },
-  { type: "link", label: "Link" },
-  { type: "table", label: "Table" },
+  { type: "title" },
+  { type: "cover" },
+  { type: "content" },
+  { type: "properties" },
+  { type: "tags" },
+  { type: "assets" },
+  { type: "link" },
+  { type: "table" },
 ];
 
 export function CreateBlockMenu() {
@@ -57,7 +54,7 @@ export function CreateBlockMenu() {
             {blockList.map((block) => {
               return (
                 <Menu.Item key={block.type} value={block.type}>
-                  {block.label}
+                  {LibraryPageBlockName[block.type]}
                 </Menu.Item>
               );
             })}

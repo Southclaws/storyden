@@ -8,16 +8,9 @@ import { useCallback } from "react";
 import { FixedCropperRef } from "react-advanced-cropper";
 
 import { NodeWithChildren } from "@/api/openapi-schema";
-import { Button } from "@/components/ui/button";
-import { IconButton } from "@/components/ui/icon-button";
-import { AddIcon } from "@/components/ui/icons/Add";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
-import { MenuIcon } from "@/components/ui/icons/Menu";
 import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
-import {
-  useEmitLibraryBlockEvent,
-  useLibraryBlockEvent,
-} from "@/lib/library/events";
+import { useLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
 import { Box, HStack, VStack } from "@/styled-system/jsx";
 

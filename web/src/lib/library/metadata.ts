@@ -8,6 +8,17 @@ export const CoverImageSchema = z.object({
 });
 export type CoverImage = z.infer<typeof CoverImageSchema>;
 
+export const LibraryPageBlockName: Record<LibraryPageBlockType, string> = {
+  title: "Title",
+  cover: "Cover image",
+  link: "External link",
+  content: "Rich text content",
+  assets: "Gallery",
+  properties: "Page properties",
+  table: "Child page table",
+  tags: "Tag list",
+};
+
 export const LibraryPageBlockTypeSchema = z.enum([
   "title",
   "cover",
