@@ -3,25 +3,11 @@ import { keyBy } from "lodash";
 
 import { AddIcon } from "@/components/ui/icons/Add";
 import * as Menu from "@/components/ui/menu";
+import { allBlockTypes } from "@/lib/library/blockTypes";
 import { useEmitLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockName } from "@/lib/library/metadata";
 
 import { useLibraryPageContext } from "../Context";
-
-type BlockItem = {
-  type: LibraryPageBlock["type"];
-};
-
-const blocks: BlockItem[] = [
-  { type: "title" },
-  { type: "cover" },
-  { type: "content" },
-  { type: "properties" },
-  { type: "tags" },
-  { type: "assets" },
-  { type: "link" },
-  { type: "table" },
-];
 
 export function CreateBlockMenu() {
   const { node, form } = useLibraryPageContext();
@@ -37,7 +23,7 @@ export function CreateBlockMenu() {
 
   const existingBlocks = keyBy(currentMetadata.layout?.blocks, (b) => b.type);
 
-  const blockList = blocks.filter((b) => !existingBlocks[b.type]);
+  const blockList = allBlockTypes.filter((b) => !existingBlocks[b]);
 
   return (
     <Menu.Root lazyMount onSelect={handleSelect}>
@@ -53,8 +39,8 @@ export function CreateBlockMenu() {
           <Menu.Content minW="36">
             {blockList.map((block) => {
               return (
-                <Menu.Item key={block.type} value={block.type}>
-                  {LibraryPageBlockName[block.type]}
+                <Menu.Item key={block} value={block}>
+                  {LibraryPageBlockName[block]}
                 </Menu.Item>
               );
             })}
