@@ -11050,6 +11050,7 @@ __metadata:
     lodash: "npm:^4.17.21"
     lucide-react: "npm:^0.511.0"
     mime-db: "npm:^1.53.0"
+    mitt: "npm:^3.0.1"
     next: "npm:15.3.2"
     nuqs: "npm:^1.20.0"
     orval: "npm:7.2.0"

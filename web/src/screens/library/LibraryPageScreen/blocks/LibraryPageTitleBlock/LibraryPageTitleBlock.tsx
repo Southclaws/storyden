@@ -51,6 +51,7 @@ function LibraryPageTitleBlockEditing() {
               onClick={handleSuggest}
               variant="subtle"
               h="full"
+              minH="8"
               loading={isLoading}
             />
           )}

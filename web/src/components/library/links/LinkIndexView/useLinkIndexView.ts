@@ -65,7 +65,6 @@ export function useLinkIndexView(props: Props) {
 
   useEffect(() => {
     if (!url) {
-      console.log("resetting because no url");
       setIndexing({
         state: "not-indexing",
       });

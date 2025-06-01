@@ -124,52 +124,54 @@ function LibraryPagePropertiesBlockEditable() {
 
         return (
           <LStack w="64">
-            <styled.dl display="table" borderCollapse="collapse">
-              {current.map((p) => {
-                function handleRemove() {
-                  handleRemoveProperty(p.name);
-                }
+            {current.length > 0 && (
+              <styled.dl display="table" borderCollapse="collapse">
+                {current.map((p) => {
+                  function handleRemove() {
+                    handleRemoveProperty(p.name);
+                  }
 
-                function handleNameChange(e: ChangeEvent<HTMLInputElement>) {
-                  handlePropertyNameChange(p.name, e.target.value);
-                }
+                  function handleNameChange(e: ChangeEvent<HTMLInputElement>) {
+                    handlePropertyNameChange(p.name, e.target.value);
+                  }
 
-                function handleValueChange(e: ChangeEvent<HTMLInputElement>) {
-                  handlePropertyValueChange(p.name, e.target.value);
-                }
+                  function handleValueChange(e: ChangeEvent<HTMLInputElement>) {
+                    handlePropertyValueChange(p.name, e.target.value);
+                  }
 
-                return (
-                  <HStack key={p.fid} display="table-row">
-                    <styled.dt display="table-cell" p="1" color="fg.muted">
-                      <Input
-                        variant="ghost"
-                        defaultValue={p.name}
-                        onChange={handleNameChange}
-                      />
-                    </styled.dt>
-                    <styled.dd display="table-cell" p="1">
-                      <Input
-                        variant="ghost"
-                        defaultValue={p.value}
-                        onChange={handleValueChange}
-                      />
-                    </styled.dd>
+                  return (
+                    <HStack key={p.fid} display="table-row">
+                      <styled.dt display="table-cell" p="1" color="fg.muted">
+                        <Input
+                          variant="ghost"
+                          defaultValue={p.name}
+                          onChange={handleNameChange}
+                        />
+                      </styled.dt>
+                      <styled.dd display="table-cell" p="1">
+                        <Input
+                          variant="ghost"
+                          defaultValue={p.value}
+                          onChange={handleValueChange}
+                        />
+                      </styled.dd>
 
-                    <Center>
-                      <IconButton
-                        type="button"
-                        variant="ghost"
-                        color="fg.destructive"
-                        size="sm"
-                        onClick={handleRemove}
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </Center>
-                  </HStack>
-                );
-              })}
-            </styled.dl>
+                      <Center>
+                        <IconButton
+                          type="button"
+                          variant="ghost"
+                          color="fg.destructive"
+                          size="sm"
+                          onClick={handleRemove}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Center>
+                    </HStack>
+                  );
+                })}
+              </styled.dl>
+            )}
             <Button
               type="button"
               w="full"

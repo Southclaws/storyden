@@ -16,9 +16,8 @@ export type Props = {
 
 export function useLibraryPageMenu(props: Props) {
   const account = useSession();
-  const { deleteNode, updateNodeVisibility, revalidate } = useLibraryMutation(
-    props.node,
-  );
+  const { deleteNode, updateNode, updateNodeVisibility, revalidate } =
+    useLibraryMutation(props.node);
 
   const {
     isConfirming: isConfirmingDelete,
@@ -36,6 +35,27 @@ export function useLibraryPageMenu(props: Props) {
   // Managers can delete any page, owners can only delete non-published pages.
   const deleteEnabled =
     isManager || (isOwner && props.node.visibility !== Visibility.published);
+
+  const isChildrenHidden = props.node.hide_child_tree;
+
+  async function handleToggleChildrenVisibility() {
+    await handle(
+      async () => {
+        await updateNode(props.node.slug, {
+          hide_child_tree: !isChildrenHidden,
+        });
+      },
+      {
+        promiseToast: {
+          loading: "Saving...",
+          success: match(!isChildrenHidden)
+            .with(true, () => "Children hidden from sidebar")
+            .with(false, () => "Children visible in sidebar")
+            .exhaustive(),
+        },
+      },
+    );
+  }
 
   async function handleDelete() {
     return handle(
@@ -69,7 +89,10 @@ export function useLibraryPageMenu(props: Props) {
   }
 
   function handleSelect({ value }: MenuSelectionDetails) {
-    switch (value as Visibility | "delete") {
+    switch (value as Visibility | "toggle-hide-in-tree" | "delete") {
+      case "toggle-hide-in-tree":
+        return handleToggleChildrenVisibility();
+
       case "delete":
         return handleConfirmDelete();
 
@@ -91,6 +114,7 @@ export function useLibraryPageMenu(props: Props) {
     availableOperations,
     deleteEnabled,
     isConfirmingDelete,
+    isChildrenHidden,
     handlers: {
       handleCancelDelete,
       handleSelect,

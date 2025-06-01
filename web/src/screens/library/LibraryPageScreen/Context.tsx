@@ -4,10 +4,12 @@ import { FormProvider, UseFormReturn, useForm } from "react-hook-form";
 
 import { NodeWithChildren, PropertyType } from "src/api/openapi-schema";
 
+import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
+
 import { Form, FormSchema } from "./form";
 
 type LibraryPageContext = {
-  node: NodeWithChildren;
+  node: WithMetadata<NodeWithChildren>;
   form: UseFormReturn<Form>;
   defaultFormValues: Form;
 };
@@ -33,23 +35,26 @@ export function LibraryPageProvider({
   node,
   children,
 }: PropsWithChildren<Props>) {
+  const nodeWithMeta = hydrateNode(node);
+
   const defaultFormValues = useMemo<Form>(
     () =>
       ({
-        name: node.name,
-        slug: node.slug,
-        properties: node.properties.map((p, i) => ({
+        name: nodeWithMeta.name,
+        slug: nodeWithMeta.slug,
+        properties: nodeWithMeta.properties.map((p, i) => ({
           fid: p.fid,
           name: p.name ?? `Field ${i}`,
           type: p.type ?? PropertyType.text,
           sort: p.sort,
           value: p.value ?? "",
         })),
-        tags: node.tags.map((t) => t.name),
-        link: node.link?.url,
-        content: node.content,
+        tags: nodeWithMeta.tags.map((t) => t.name),
+        link: nodeWithMeta.link?.url,
+        content: nodeWithMeta.content,
+        meta: nodeWithMeta.meta,
       }) satisfies Form,
-    [node],
+    [nodeWithMeta],
   );
 
   const form = useForm<Form>({
@@ -60,7 +65,7 @@ export function LibraryPageProvider({
   return (
     <Context.Provider
       value={{
-        node,
+        node: nodeWithMeta,
         form,
         defaultFormValues,
       }}

@@ -160,6 +160,11 @@ export function useLibraryMutation(node?: Node) {
     newNode: NodeMutableProps,
     cover?: CoverImageArgs,
   ) => {
+    // if moving from hidden children to displayed children, the actual data is
+    // not present in the swr cache, so we need to trigger a full revalidation.
+    const nonOptimisticMutation =
+      newNode.hide_child_tree == false && node?.hide_child_tree === true;
+
     const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
       if (!data) return;
 
@@ -191,12 +196,17 @@ export function useLibraryMutation(node?: Node) {
           ) ?? [],
       };
 
+      const withHiddenChildren = {
+        children: newNode.hide_child_tree ? [] : data.children,
+      };
+
       const updated = {
         ...data,
         ...nodeProps,
         ...withProperties,
         ...withNewCover,
         ...withTags,
+        ...withHiddenChildren,
       } satisfies NodeWithChildren;
 
       return updated;
@@ -225,14 +235,13 @@ export function useLibraryMutation(node?: Node) {
     await mutate(nodeListAllKeyFn, listMutator, { revalidate: false });
     await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
 
-    const newMeta =
-      cover && !cover.isReplacement
-        ? ({
-            // TODO: Spread original node metadata here
-            coverImage: cover.config,
-          } satisfies NodeMetadata)
-        : undefined;
-
+    const newMeta = {
+      ...node?.meta,
+      ...newNode.meta,
+      ...(cover && !cover.isReplacement
+        ? { coverImage: cover.config }
+        : undefined),
+    };
     await nodeUpdate(slug, {
       ...newNode,
       primary_image_asset_id: cover?.asset.id,
@@ -247,6 +256,10 @@ export function useLibraryMutation(node?: Node) {
     if (slugChanged && newNode.slug /* Needed for TS narrowing */) {
       const newPath = replaceLibraryPath(libraryPath, slug, newNode.slug);
       router.push(newPath);
+    }
+
+    if (nonOptimisticMutation) {
+      await revalidate();
     }
 
     return slugChanged;
