@@ -4,9 +4,12 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { useCallback } from "react";
 import { FixedCropperRef } from "react-advanced-cropper";
 
 import { NodeWithChildren } from "@/api/openapi-schema";
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { MenuIcon } from "@/components/ui/icons/Menu";
 import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
@@ -17,6 +20,7 @@ import { Box, HStack, VStack } from "@/styled-system/jsx";
 import { useLibraryPageContext } from "../Context";
 import { useEditState } from "../useEditState";
 
+import { LibraryPageMenu } from "./BlockMenu";
 import { LibraryPageAssetsBlock } from "./LibraryPageAssetsBlock/LibraryPageAssetsBlock";
 import { LibraryPageContentBlock } from "./LibraryPageContentBlock/LibraryPageContentBlock";
 import { LibraryPageCoverBlock } from "./LibraryPageCoverBlock/LibraryPageCoverBlock";
@@ -34,52 +38,93 @@ export function LibraryPageBlocks({ cropperRef }: Props) {
   const { node, form } = useLibraryPageContext();
   const { editing } = useEditState();
 
-  useLibraryBlockEvent("library:reorder-block", ({ activeId, overId }) => {
-    if (!node.meta.layout) {
-      return;
-    }
+  const meta = form.watch("meta", node.meta);
 
-    const currentBlocks = node.meta.layout.blocks;
-
-    const reOrderBlocks = () => {
-      const activeIndex = currentBlocks.findIndex((b) => b.type === activeId);
-      const overIndex = currentBlocks.findIndex((b) => b.type === overId);
-
-      if (activeIndex === -1 || overIndex === -1 || activeIndex === overIndex) {
-        return currentBlocks;
+  const handleReorder = useCallback(
+    (activeId: LibraryPageBlockType, overId: LibraryPageBlockType) => {
+      if (!meta.layout) {
+        return;
       }
 
-      const newBlocks = [...currentBlocks];
-      const [movedBlock] = newBlocks.splice(activeIndex, 1);
-      if (!movedBlock) {
+      const currentBlocks = meta.layout.blocks;
+
+      const reOrderBlocks = () => {
+        const activeIndex = currentBlocks.findIndex((b) => b.type === activeId);
+        const overIndex = currentBlocks.findIndex((b) => b.type === overId);
+
+        if (
+          activeIndex === -1 ||
+          overIndex === -1 ||
+          activeIndex === overIndex
+        ) {
+          return currentBlocks;
+        }
+
+        const newBlocks = [...currentBlocks];
+        const [movedBlock] = newBlocks.splice(activeIndex, 1);
+        if (!movedBlock) {
+          return newBlocks;
+        }
+
+        newBlocks.splice(overIndex, 0, movedBlock);
+
         return newBlocks;
+      };
+
+      const newBlocks = reOrderBlocks();
+
+      const newMeta = {
+        ...meta,
+        layout: {
+          ...meta.layout,
+          blocks: newBlocks,
+        },
+      };
+
+      form.setValue("meta", newMeta);
+    },
+    [form, meta],
+  );
+
+  const handleRemoveBlock = useCallback(
+    (type: LibraryPageBlockType) => {
+      if (!meta.layout) {
+        return;
       }
 
-      newBlocks.splice(overIndex, 0, movedBlock);
+      const currentBlocks = meta.layout.blocks;
 
-      return newBlocks;
-    };
+      const newBlocks = currentBlocks.filter(
+        (block) => block.type !== type,
+      ) as LibraryPageBlock[];
 
-    const newBlocks = reOrderBlocks();
+      const newMeta = {
+        ...meta,
+        layout: {
+          ...meta.layout,
+          blocks: newBlocks,
+        },
+      };
 
-    const newMeta = {
-      ...node.meta,
-      layout: {
-        ...node.meta.layout,
-        blocks: newBlocks,
-      },
-    };
+      form.setValue("meta", newMeta);
+    },
+    [form, meta],
+  );
 
-    form.setValue("meta", newMeta);
+  useLibraryBlockEvent("library:reorder-block", ({ activeId, overId }) => {
+    handleReorder(activeId, overId);
   });
 
-  const blocks = node.meta.layout?.blocks ?? [];
+  useLibraryBlockEvent("library:remove-block", ({ type }) => {
+    handleRemoveBlock(type);
+  });
+
+  const blocks = meta.layout?.blocks ?? [];
 
   const blockIds = blocks.map((block) => block.type);
 
   if (editing) {
-    const editStateBlocks =
-      form.getValues("meta.layout.blocks") ?? node.meta.layout?.blocks ?? [];
+    const editStateBlocks = meta.layout?.blocks ?? [];
 
     return (
       <SortableContext items={blockIds} strategy={verticalListSortingStrategy}>
@@ -187,8 +232,10 @@ function LibraryPageBlockEditable({
         pr="1"
         alignItems="start"
         height="full"
+        position="relative"
       >
         <VStack
+          position="absolute"
           w="full"
           color="fg.subtle"
           borderRadius="sm"
@@ -198,8 +245,10 @@ function LibraryPageBlockEditable({
             visibility: "visible",
           }}
           title={block.type}
+          gap="1"
         >
           <DragHandleIcon width="4" />
+          <LibraryPageMenu node={node} block={block} />
         </VStack>
       </VStack>
       <Box w="full" minW="0">

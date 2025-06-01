@@ -8,8 +8,8 @@ export type LibraryBlockEvents = {
     activeId: LibraryPageBlockType;
     overId: LibraryPageBlockType;
   };
-  "library:add-block": { type: string };
-  "library:remove-block": { type: string };
+  "library:add-block": { type: LibraryPageBlockType };
+  "library:remove-block": { type: LibraryPageBlockType };
 };
 
 export const libraryBus = mitt<LibraryBlockEvents>();

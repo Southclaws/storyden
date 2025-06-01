@@ -40,21 +40,21 @@ export function LibraryPageProvider({
   const defaultFormValues = useMemo<Form>(
     () =>
       ({
-        name: node.name,
-        slug: node.slug,
-        properties: node.properties.map((p, i) => ({
+        name: nodeWithMeta.name,
+        slug: nodeWithMeta.slug,
+        properties: nodeWithMeta.properties.map((p, i) => ({
           fid: p.fid,
           name: p.name ?? `Field ${i}`,
           type: p.type ?? PropertyType.text,
           sort: p.sort,
           value: p.value ?? "",
         })),
-        tags: node.tags.map((t) => t.name),
-        link: node.link?.url,
-        content: node.content,
-        meta: node.meta,
+        tags: nodeWithMeta.tags.map((t) => t.name),
+        link: nodeWithMeta.link?.url,
+        content: nodeWithMeta.content,
+        meta: nodeWithMeta.meta,
       }) satisfies Form,
-    [node],
+    [nodeWithMeta],
   );
 
   const form = useForm<Form>({
