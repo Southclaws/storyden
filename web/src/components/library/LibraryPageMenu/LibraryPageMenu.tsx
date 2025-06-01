@@ -16,11 +16,16 @@ export function LibraryPageMenu({
   onClose,
   ...props
 }: Props & ButtonProps) {
-  const { availableOperations, deleteEnabled, isConfirmingDelete, handlers } =
-    useLibraryPageMenu({
-      node,
-      onClose,
-    });
+  const {
+    availableOperations,
+    deleteEnabled,
+    isChildrenHidden,
+    isConfirmingDelete,
+    handlers,
+  } = useLibraryPageMenu({
+    node,
+    onClose,
+  });
 
   function handleOpenChange(d: MenuOpenChangeDetails) {
     if (!d.open) {
@@ -74,6 +79,12 @@ export function LibraryPageMenu({
                   {op.label}
                 </Menu.Item>
               ))}
+
+              <Menu.Item value="toggle-hide-in-tree">
+                {isChildrenHidden
+                  ? "Show children in tree"
+                  : "Hide children in tree"}
+              </Menu.Item>
 
               {deleteEnabled &&
                 (isConfirmingDelete ? (
