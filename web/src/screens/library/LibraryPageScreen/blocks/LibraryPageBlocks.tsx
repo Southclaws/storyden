@@ -38,7 +38,6 @@ export function LibraryPageBlocks({ cropperRef }: Props) {
     if (!node.meta.layout) {
       return;
     }
-    console.log("Reordering block", activeId, overId);
 
     const currentBlocks = node.meta.layout.blocks;
 
@@ -70,8 +69,6 @@ export function LibraryPageBlocks({ cropperRef }: Props) {
         blocks: newBlocks,
       },
     };
-
-    console.log("reOrderBlocks", { newBlocks, newMeta });
 
     form.setValue("meta", newMeta);
   });

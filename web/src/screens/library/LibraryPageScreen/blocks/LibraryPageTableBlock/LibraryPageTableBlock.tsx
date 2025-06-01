@@ -110,8 +110,6 @@ export function LibraryPageTableBlock() {
                   (p) => p.fid === property.fid,
                 )?.value;
 
-                console.log(child.properties, property);
-
                 return <Table.Header key={property.fid}>{value}</Table.Header>;
               })}
             </Table.Row>
