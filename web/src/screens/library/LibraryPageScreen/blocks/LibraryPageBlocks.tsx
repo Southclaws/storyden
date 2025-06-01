@@ -152,10 +152,10 @@ export function LibraryPageBlocks({ cropperRef }: Props) {
 
     return (
       <SortableContext items={blockIds} strategy={verticalListSortingStrategy}>
-        {editStateBlocks.map((block, index) => {
+        {editStateBlocks.map((block) => {
           return (
             <LibraryPageBlockEditable
-              key={index}
+              key={block.type}
               cropperRef={cropperRef}
               block={block}
               node={node}
@@ -168,10 +168,10 @@ export function LibraryPageBlocks({ cropperRef }: Props) {
 
   return (
     <>
-      {blocks.map((block, index) => {
+      {blocks.map((block) => {
         return (
           <LibraryPageBlockRender
-            key={index}
+            key={block.type}
             cropperRef={cropperRef}
             block={block}
           />
