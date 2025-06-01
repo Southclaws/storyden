@@ -138,7 +138,8 @@
     opacity: 0;
     display: block;
     grid-area: leftbar;
-    /* overflow: hidden; */
+    max-height: 100%;
+    min-height: 0;
 
     /* NOTE: This maintains the shadow bleed despite the overflow hidden prop. */
     margin-left: -15px;
