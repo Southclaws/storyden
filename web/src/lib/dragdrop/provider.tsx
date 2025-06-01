@@ -106,6 +106,11 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
 
     if (activeData.type === "block") {
       const active = activeData as DragItemNodeBlock;
+
+      if (targetData.type !== "block") {
+        return;
+      }
+
       const target = targetData as DragItemNodeBlock;
 
       emitLibraryBlockEvent("library:reorder-block", {
