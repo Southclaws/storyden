@@ -50,14 +50,14 @@ func (s *Manager) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	post, err := s.postMutation(ctx, n, pre)
-	if err != nil {
-		// TODO: Does this need to error?
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if post.properties != nil {
-		n.Properties = post.properties
+	if props, ok := p.Properties.Get(); ok {
+		updatedProps, err := s.applyPropertyMutations(ctx, n, props)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+		if updatedProps != nil {
+			n.Properties = opt.New(*updatedProps)
+		}
 	}
 
 	if p.Visibility.OrZero() == visibility.VisibilityPublished {

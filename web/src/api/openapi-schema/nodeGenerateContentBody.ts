@@ -7,10 +7,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
+import type { NodeGenerateContentRequest } from "./nodeGenerateContentRequest";
 
-/**
- * When NodeContentFillRuleQuery is used, this option must be set in order
-to specify which node will receive content extracted from the source.
-
- */
-export type NodeContentFillTargetQueryParameter = string;
+export type NodeGenerateContentBody = NodeGenerateContentRequest;

@@ -15,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/app/resources/tag"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -41,10 +40,6 @@ type Partial struct {
 	AssetsAdd    opt.Optional[[]asset.AssetID]
 	AssetsRemove opt.Optional[[]asset.AssetID]
 	AssetSources opt.Optional[[]string]
-	FillSource   opt.Optional[asset.FillSource]
-	TitleFill    opt.Optional[datagraph.TitleFillCommand]
-	TagFill      opt.Optional[tag.TagFillCommand]
-	ContentFill  opt.Optional[asset.ContentFillCommand]
 }
 
 type Manager struct {

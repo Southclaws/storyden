@@ -25,23 +25,20 @@ import (
 var errFillRuleNotAvailale = fault.New("fill rule not available")
 
 type Filler struct {
-	nodeWriter    *node_writer.Writer
-	indexQueue    pubsub.Topic[mq.IndexNode]
-	assetQueue    pubsub.Topic[mq.DownloadAsset]
-	autoFillQueue pubsub.Topic[mq.AutoFillNode]
+	nodeWriter *node_writer.Writer
+	indexQueue pubsub.Topic[mq.IndexNode]
+	assetQueue pubsub.Topic[mq.DownloadAsset]
 }
 
 func New(
 	nodeWriter *node_writer.Writer,
 	indexQueue pubsub.Topic[mq.IndexNode],
 	assetQueue pubsub.Topic[mq.DownloadAsset],
-	autoFillQueue pubsub.Topic[mq.AutoFillNode],
 ) *Filler {
 	return &Filler{
-		nodeWriter:    nodeWriter,
-		indexQueue:    indexQueue,
-		assetQueue:    assetQueue,
-		autoFillQueue: autoFillQueue,
+		nodeWriter: nodeWriter,
+		indexQueue: indexQueue,
+		assetQueue: assetQueue,
 	}
 }
 
@@ -94,13 +91,14 @@ func (f *Filler) FillContentFromLink(ctx context.Context, link *link_ref.LinkRef
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 
-		err = f.autoFillQueue.Publish(ctx, mq.AutoFillNode{
-			ID:      library.NodeID(n.Mark.ID()),
-			AutoTag: true,
-		})
-		if err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
-		}
+		// TODO: Decide what to do here, code is still useful.
+		// err = f.autoFillQueue.Publish(ctx, mq.AutoFillNode{
+		// 	ID:      library.NodeID(n.Mark.ID()),
+		// 	AutoTag: true,
+		// })
+		// if err != nil {
+		// 	return fault.Wrap(err, fctx.With(ctx))
+		// }
 
 		if vis == visibility.VisibilityPublished {
 			if err := f.indexQueue.Publish(ctx, mq.IndexNode{
@@ -111,18 +109,20 @@ func (f *Filler) FillContentFromLink(ctx context.Context, link *link_ref.LinkRef
 		}
 
 	case asset.ContentFillRuleReplace:
-		targetNode, ok := cfr.TargetNodeID.Get()
-		if !ok {
-			return fault.New("target node ID not set", fctx.With(ctx))
-		}
+		// TODO: Decide what to do here, code is still useful.
 
-		err = f.autoFillQueue.Publish(ctx, mq.AutoFillNode{
-			ID:      library.NodeID(library.NodeID(targetNode)),
-			AutoTag: true,
-		})
-		if err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
-		}
+		// targetNode, ok := cfr.TargetNodeID.Get()
+		// if !ok {
+		// 	return fault.New("target node ID not set", fctx.With(ctx))
+		// }
+
+		// err = f.autoFillQueue.Publish(ctx, mq.AutoFillNode{
+		// 	ID:      library.NodeID(library.NodeID(targetNode)),
+		// 	AutoTag: true,
+		// })
+		// if err != nil {
+		// 	return fault.Wrap(err, fctx.With(ctx))
+		// }
 
 	default:
 		return fault.Wrap(errFillRuleNotAvailale, fctx.With(ctx))

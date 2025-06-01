@@ -15,7 +15,7 @@ export function useLibraryPageTitleBlock() {
   const [isLoading, setLoading] = useState(false);
   const isTitleSuggestEnabled = useCapability(InstanceCapability.gen_ai);
 
-  const { name } = form.watch();
+  const { name, content } = form.watch();
 
   // Update the slug with a slugified version of the name if it's not dirty.
   useEffect(() => {
@@ -36,9 +36,13 @@ export function useLibraryPageTitleBlock() {
 
     await handle(
       async () => {
+        if (!content) {
+          throw new Error("Content is required to suggest a title.");
+        }
+
         setLoading(true);
 
-        const title = await suggestTitle(node.id);
+        const title = await suggestTitle(node.id, content);
         if (!title) {
           throw new Error("No title could be suggested for this content.");
         }
