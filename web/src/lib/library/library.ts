@@ -236,12 +236,10 @@ export function useLibraryMutation(node?: Node) {
     await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
 
     const newMeta = {
+      ...node?.meta,
       ...newNode.meta,
       ...(cover && !cover.isReplacement
-        ? ({
-            // TODO: Spread original node metadata here
-            coverImage: cover.config,
-          } satisfies NodeMetadata)
+        ? { coverImage: cover.config }
         : undefined),
     };
     await nodeUpdate(slug, {
