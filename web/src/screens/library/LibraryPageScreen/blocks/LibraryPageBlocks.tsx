@@ -10,17 +10,21 @@ import { FixedCropperRef } from "react-advanced-cropper";
 import { NodeWithChildren } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { AddIcon } from "@/components/ui/icons/Add";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { MenuIcon } from "@/components/ui/icons/Menu";
 import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
-import { useLibraryBlockEvent } from "@/lib/library/events";
+import {
+  useEmitLibraryBlockEvent,
+  useLibraryBlockEvent,
+} from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
 import { Box, HStack, VStack } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../Context";
 import { useEditState } from "../useEditState";
 
-import { LibraryPageMenu } from "./BlockMenu";
+import { BlockMenu } from "./BlockMenu";
 import { LibraryPageAssetsBlock } from "./LibraryPageAssetsBlock/LibraryPageAssetsBlock";
 import { LibraryPageContentBlock } from "./LibraryPageContentBlock/LibraryPageContentBlock";
 import { LibraryPageCoverBlock } from "./LibraryPageCoverBlock/LibraryPageCoverBlock";
@@ -86,6 +90,29 @@ export function LibraryPageBlocks({ cropperRef }: Props) {
     [form, meta],
   );
 
+  const handleAddBlock = useCallback(
+    (type: LibraryPageBlockType) => {
+      if (!meta.layout) {
+        return;
+      }
+
+      const currentBlocks = meta.layout.blocks;
+
+      const newBlocks = [...currentBlocks, { type }] as LibraryPageBlock[];
+
+      const newMeta = {
+        ...meta,
+        layout: {
+          ...meta.layout,
+          blocks: newBlocks,
+        },
+      };
+
+      form.setValue("meta", newMeta);
+    },
+    [form, meta],
+  );
+
   const handleRemoveBlock = useCallback(
     (type: LibraryPageBlockType) => {
       if (!meta.layout) {
@@ -113,6 +140,10 @@ export function LibraryPageBlocks({ cropperRef }: Props) {
 
   useLibraryBlockEvent("library:reorder-block", ({ activeId, overId }) => {
     handleReorder(activeId, overId);
+  });
+
+  useLibraryBlockEvent("library:add-block", ({ type }) => {
+    handleAddBlock(type);
   });
 
   useLibraryBlockEvent("library:remove-block", ({ type }) => {
@@ -248,7 +279,7 @@ function LibraryPageBlockEditable({
           gap="1"
         >
           <DragHandleIcon width="4" />
-          <LibraryPageMenu node={node} block={block} />
+          <BlockMenu node={node} block={block} />
         </VStack>
       </VStack>
       <Box w="full" minW="0">

@@ -3,18 +3,22 @@ import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 import { NodeWithChildren } from "@/api/openapi-schema";
 import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { AddIcon } from "@/components/ui/icons/Add";
+import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { MoreIcon } from "@/components/ui/icons/More";
 import * as Menu from "@/components/ui/menu";
 import { useEmitLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, WithMetadata } from "@/lib/library/metadata";
 import { styled } from "@/styled-system/jsx";
 
+import { CreateBlockMenu } from "./CreateBlockMenu";
+
 type Props = {
   node: WithMetadata<NodeWithChildren>;
   block: LibraryPageBlock;
 };
 
-export function LibraryPageMenu({ node, block }: Props & ButtonProps) {
+export function BlockMenu({ node, block }: Props & ButtonProps) {
   const emit = useEmitLibraryBlockEvent();
 
   function handleSelect(value: MenuSelectionDetails) {
@@ -49,7 +53,11 @@ export function LibraryPageMenu({ node, block }: Props & ButtonProps) {
 
               <Menu.Separator />
 
-              <Menu.Item value="delete">Delete</Menu.Item>
+              <Menu.Item value="delete">
+                <DeleteIcon />
+                &nbsp;Delete
+              </Menu.Item>
+              <CreateBlockMenu />
             </Menu.ItemGroup>
           </Menu.Content>
         </Menu.Positioner>
