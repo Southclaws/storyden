@@ -320,7 +320,7 @@ function TreeNode({
           pointerEvents: "none",
         }
       : {
-          pointerEvents: "all",
+          pointerEvents: "unset",
         }),
   };
 
