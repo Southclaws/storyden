@@ -1,178 +1,23 @@
 import { SortableContext } from "@dnd-kit/sortable";
 
 import { useNodeListChildren } from "@/api/openapi-client/nodes";
-import {
-  Identifier,
-  NodeWithChildren,
-  PropertyName,
-  PropertySchemaList,
-  PropertyType,
-  PropertyValue,
-} from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
 import {
   SortIndicator,
   useSortIndicator,
 } from "@/components/site/SortIndicator";
 import { Unready } from "@/components/site/Unready";
+import { IconButton } from "@/components/ui/icon-button";
 import * as Table from "@/components/ui/table";
-import {
-  LibraryPageBlockTypeTable,
-  LibraryPageBlockTypeTableConfig,
-} from "@/lib/library/metadata";
 import { Box } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
 
-type ColumnDefinitionCommon = {
-  fid: Identifier;
-  name: PropertyName;
-  type: PropertyType;
-  hidden: boolean;
-};
-
-type ColumnDefinitionProperty = ColumnDefinitionCommon & {
-  _fixedFieldName?: undefined;
-};
-
-type ColumnDefinitionFixed = ColumnDefinitionCommon & {
-  fid: `fixed:${MappableNodeField}`;
-  name: MappableNodeField; // TODO: Pretty names for fixed fields
-  _fixedFieldName: MappableNodeField;
-};
-
-type ColumnDefinition = ColumnDefinitionProperty | ColumnDefinitionFixed;
-
-type ColumnValue = {
-  fid: Identifier;
-  value: PropertyValue;
-};
-
-type MappableNodeField = Extract<
-  "slug" | "name" | "link" | "description",
-  keyof NodeWithChildren
->;
-
-const MappableNodeFields: Array<MappableNodeField> = [
-  "slug",
-  "name",
-  "link",
-  "description",
-];
-
-type ProcessedConfig = {
-  columns: Array<ColumnDefinition>;
-};
-
-function getDefaultBlockConfig(ps: PropertySchemaList): ProcessedConfig {
-  const fixedCols: ColumnDefinitionFixed[] = MappableNodeFields.map(
-    (field) =>
-      ({
-        fid: `fixed:${field}`,
-        name: field,
-        type: "text" as const,
-        hidden: false,
-        _fixedFieldName: field as MappableNodeField,
-      }) satisfies ColumnDefinitionFixed,
-  );
-
-  const propCols: ColumnDefinitionProperty[] = ps.map((property) => ({
-    fid: property.fid,
-    name: property.name,
-    type: property.type,
-    sort: property.sort,
-    hidden: false,
-  }));
-
-  const columns: ColumnDefinition[] = [...fixedCols, ...propCols];
-
-  return {
-    columns,
-  };
-}
-
-function processBlockConfig(
-  config: LibraryPageBlockTypeTableConfig,
-): ProcessedConfig {
-  const columns: ColumnDefinition[] = config.columns.map((column) => {
-    if (column.fid.startsWith("fixed:")) {
-      return {
-        fid: column.fid as `fixed:${MappableNodeField}`,
-        name: column.name as MappableNodeField, // TODO: Pretty names for fixed fields
-        type: "text" as const, // Fixed fields are always text for now
-        hidden: column.hidden,
-        _fixedFieldName: column.fid.replace("fixed:", "") as MappableNodeField,
-      } satisfies ColumnDefinitionFixed;
-    }
-
-    return column as ColumnDefinitionProperty;
-  });
-
-  return {
-    ...config,
-    columns,
-  };
-}
-
-function mergeFieldsAndPropertySchema(
-  node: NodeWithChildren,
-  block: LibraryPageBlockTypeTable,
-): ColumnDefinition[] {
-  const config =
-    block.config === undefined
-      ? getDefaultBlockConfig(node.child_property_schema)
-      : processBlockConfig(block.config);
-
-  const columns: ColumnDefinition[] = config.columns.map((column) => {
-    const r: ColumnDefinition = {
-      fid: column.fid,
-      name: column.name,
-      type: column.type as PropertyType,
-      hidden: column.hidden ?? false,
-      _fixedFieldName: undefined,
-    };
-
-    return r;
-  });
-
-  return columns;
-}
-
-function mergeFieldsAndProperties(
-  schema: PropertySchemaList,
-  node: NodeWithChildren,
-  block: LibraryPageBlockTypeTable,
-): ColumnValue[] {
-  const config =
-    block.config === undefined
-      ? getDefaultBlockConfig(schema)
-      : processBlockConfig(block.config);
-
-  const columns: ColumnValue[] = config.columns.map((column) => {
-    if (column._fixedFieldName) {
-      if (column._fixedFieldName === "link") {
-        return {
-          fid: column.fid,
-          value: node.link?.url ?? "",
-        };
-      }
-
-      return {
-        fid: column.fid,
-        value: node[column._fixedFieldName] ?? "",
-      };
-    } else {
-      const value = node.properties.find((p) => p.fid === column.fid)?.value;
-
-      return {
-        fid: column.fid,
-        value: value ?? "",
-      };
-    }
-  });
-
-  return columns;
-}
+import { ColumnMenu } from "./ColumnMenu";
+import {
+  mergeFieldsAndProperties,
+  mergeFieldsAndPropertySchema,
+} from "./column";
 
 export function LibraryPageTableBlock() {
   const { node, form } = useLibraryPageContext();
@@ -239,7 +84,6 @@ export function LibraryPageTableBlock() {
             return (
               <Table.Header
                 key={property.fid}
-                onClick={handleClickSortAction}
                 cursor="pointer"
                 {...(isSorting && {
                   "data-active": "",
@@ -250,16 +94,30 @@ export function LibraryPageTableBlock() {
                 _active={{
                   bg: "bg.muted",
                 }}
+                p="0"
               >
-                <Box
-                  display="inline-flex"
-                  alignItems="center"
-                  gap="1"
-                  flexWrap="nowrap"
-                >
-                  {property.name}
-                  <SortIndicator order={sortState} />
-                </Box>
+                <ColumnMenu column={property}>
+                  <Box
+                    p="2"
+                    display="inline-flex"
+                    w="full"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    gap="1"
+                    flexWrap="nowrap"
+                    fontWeight="semibold"
+                  >
+                    {property.name}
+                    <IconButton
+                      type="button"
+                      variant="ghost"
+                      size="xs"
+                      onClick={handleClickSortAction}
+                    >
+                      <SortIndicator order={sortState} />
+                    </IconButton>
+                  </Box>
+                </ColumnMenu>
               </Table.Header>
             );
           })}
