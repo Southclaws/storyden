@@ -3,14 +3,13 @@ import { SortableContext } from "@dnd-kit/sortable";
 import { useNodeListChildren } from "@/api/openapi-client/nodes";
 import {
   Identifier,
-  Node,
   NodeWithChildren,
   PropertyName,
-  PropertySchema,
   PropertySchemaList,
   PropertyType,
   PropertyValue,
 } from "@/api/openapi-schema";
+import { CreatePageAction } from "@/components/library/CreatePage";
 import {
   SortIndicator,
   useSortIndicator,
@@ -219,7 +218,7 @@ export function LibraryPageTableBlock() {
   const columns = mergeFieldsAndPropertySchema(node, block);
 
   return (
-    <Table.Root size="sm" variant="dense">
+    <Table.Root size="sm" variant="dense" borderStyle="none">
       <Table.Head>
         <Table.Row position="relative">
           {columns.map((property) => {
@@ -275,13 +274,11 @@ export function LibraryPageTableBlock() {
               block,
             );
 
-            console.log(columns);
-
             return (
               <Table.Row key={child.id}>
                 {columns.map((column) => {
                   return (
-                    <Table.Header key={column.fid}>{column.value}</Table.Header>
+                    <Table.Cell key={column.fid}>{column.value}</Table.Cell>
                   );
                 })}
               </Table.Row>
@@ -289,6 +286,21 @@ export function LibraryPageTableBlock() {
           })}
         </SortableContext>
       </Table.Body>
+      <Table.Foot
+        borderBottomStyle="solid"
+        borderBottomWidth="thin"
+        borderBlockColor="border.subtle"
+      >
+        <Table.Row>
+          <Table.Cell colSpan={columns.length} display="flex">
+            <CreatePageAction
+              variant="ghost"
+              size="xs"
+              parentSlug={node.slug}
+            />
+          </Table.Cell>
+        </Table.Row>
+      </Table.Foot>
     </Table.Root>
   );
 }
