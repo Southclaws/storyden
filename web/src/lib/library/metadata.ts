@@ -77,16 +77,16 @@ export type LibraryPageBlockTypeProperties = z.infer<
   typeof LibraryPageBlockTypePropertiesSchema
 >;
 
+export const LibraryPageBlockTypeTableColumnSchema = z.object({
+  fid: z.string(),
+  hidden: z.boolean(),
+});
+export type LibraryPageBlockTypeTableColumn = z.infer<
+  typeof LibraryPageBlockTypeTableColumnSchema
+>;
+
 export const LibraryPageBlockTypeTableConfigSchema = z.object({
-  columns: z.array(
-    z.object({
-      fid: z.string(),
-      name: z.string(),
-      sort: z.string().optional(),
-      type: z.string(),
-      hidden: z.boolean(),
-    }),
-  ),
+  columns: z.array(LibraryPageBlockTypeTableColumnSchema),
 });
 export type LibraryPageBlockTypeTableConfig = z.infer<
   typeof LibraryPageBlockTypeTableConfigSchema

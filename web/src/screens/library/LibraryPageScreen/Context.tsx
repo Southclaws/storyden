@@ -49,6 +49,7 @@ export function LibraryPageProvider({
           sort: p.sort,
           value: p.value ?? "",
         })),
+        childPropertySchema: nodeWithMeta.child_property_schema,
         tags: nodeWithMeta.tags.map((t) => t.name),
         link: nodeWithMeta.link?.url,
         content: nodeWithMeta.content,

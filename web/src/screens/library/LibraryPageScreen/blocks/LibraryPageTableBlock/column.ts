@@ -1,3 +1,5 @@
+import { keyBy } from "lodash";
+
 import {
   Identifier,
   NodeWithChildren,
@@ -19,10 +21,12 @@ export type ColumnDefinitionCommon = {
 };
 
 export type ColumnDefinitionProperty = ColumnDefinitionCommon & {
+  fixed: false;
   _fixedFieldName?: undefined;
 };
 
 export type ColumnDefinitionFixed = ColumnDefinitionCommon & {
+  fixed: true;
   fid: `fixed:${MappableNodeField}`;
   name: MappableNodeField; // TODO: Pretty names for fixed fields
   _fixedFieldName: MappableNodeField;
@@ -33,15 +37,15 @@ export type ColumnDefinition = ColumnDefinitionProperty | ColumnDefinitionFixed;
 export type ColumnValue = {
   fid: Identifier;
   value: PropertyValue;
+  href?: string;
 };
 
 export type MappableNodeField = Extract<
-  "slug" | "name" | "link" | "description",
+  "name" | "link" | "description",
   keyof NodeWithChildren
 >;
 
 export const MappableNodeFields: Array<MappableNodeField> = [
-  "slug",
   "name",
   "link",
   "description",
@@ -52,18 +56,19 @@ export type ProcessedConfig = {
 };
 
 export function getDefaultBlockConfig(ps: PropertySchemaList): ProcessedConfig {
-  const fixedCols: ColumnDefinitionFixed[] = MappableNodeFields.map(
-    (field) =>
-      ({
-        fid: `fixed:${field}`,
-        name: field,
-        type: "text" as const,
-        hidden: false,
-        _fixedFieldName: field as MappableNodeField,
-      }) satisfies ColumnDefinitionFixed,
-  );
+  const fixedCols: ColumnDefinitionFixed[] = MappableNodeFields.map((field) => {
+    return {
+      fixed: true,
+      fid: `fixed:${field}`,
+      name: field,
+      type: "text" as const,
+      hidden: false,
+      _fixedFieldName: field as MappableNodeField,
+    } satisfies ColumnDefinitionFixed;
+  });
 
   const propCols: ColumnDefinitionProperty[] = ps.map((property) => ({
+    fixed: false,
     fid: property.fid,
     name: property.name,
     type: property.type,
@@ -79,21 +84,44 @@ export function getDefaultBlockConfig(ps: PropertySchemaList): ProcessedConfig {
 }
 
 export function processBlockConfig(
+  ps: PropertySchemaList,
   config: LibraryPageBlockTypeTableConfig,
 ): ProcessedConfig {
-  const columns: ColumnDefinition[] = config.columns.map((column) => {
+  const schemaMap = keyBy(ps, "fid");
+
+  const columns: ColumnDefinition[] = config.columns.reduce((prev, column) => {
+    if (column.hidden) {
+      return prev;
+    }
+
     if (column.fid.startsWith("fixed:")) {
-      return {
+      const fixedColumn = {
+        fixed: true,
         fid: column.fid as `fixed:${MappableNodeField}`,
-        name: column.name as MappableNodeField, // TODO: Pretty names for fixed fields
+        name: column.fid.replace("fixed:", "") as MappableNodeField,
         type: "text" as const, // Fixed fields are always text for now
         hidden: column.hidden,
         _fixedFieldName: column.fid.replace("fixed:", "") as MappableNodeField,
       } satisfies ColumnDefinitionFixed;
+
+      return [...prev, fixedColumn];
     }
 
-    return column as ColumnDefinitionProperty;
-  });
+    const schema = schemaMap[column.fid];
+    if (!schema) {
+      return prev;
+    }
+
+    const next = {
+      fixed: false,
+      fid: schema.fid,
+      name: schema.name,
+      type: schema.type as PropertyType,
+      hidden: column.hidden ?? false,
+    } satisfies ColumnDefinitionProperty;
+
+    return [...prev, next];
+  }, [] as ColumnDefinition[]);
 
   return {
     ...config,
@@ -102,27 +130,15 @@ export function processBlockConfig(
 }
 
 export function mergeFieldsAndPropertySchema(
-  node: NodeWithChildren,
+  ps: PropertySchemaList,
   block: LibraryPageBlockTypeTable,
 ): ColumnDefinition[] {
   const config =
     block.config === undefined
-      ? getDefaultBlockConfig(node.child_property_schema)
-      : processBlockConfig(block.config);
+      ? getDefaultBlockConfig(ps)
+      : processBlockConfig(ps, block.config);
 
-  const columns: ColumnDefinition[] = config.columns.map((column) => {
-    const r: ColumnDefinition = {
-      fid: column.fid,
-      name: column.name,
-      type: column.type as PropertyType,
-      hidden: column.hidden ?? false,
-      _fixedFieldName: undefined,
-    };
-
-    return r;
-  });
-
-  return columns;
+  return config.columns;
 }
 
 export function mergeFieldsAndProperties(
@@ -133,30 +149,53 @@ export function mergeFieldsAndProperties(
   const config =
     block.config === undefined
       ? getDefaultBlockConfig(schema)
-      : processBlockConfig(block.config);
+      : processBlockConfig(schema, block.config);
 
-  const columns: ColumnValue[] = config.columns.map((column) => {
+  const columns: ColumnValue[] = config.columns.reduce((prev, column) => {
+    if (column.hidden) {
+      return prev;
+    }
+
     if (column._fixedFieldName) {
       if (column._fixedFieldName === "link") {
-        return {
-          fid: column.fid,
-          value: node.link?.url ?? "",
-        };
+        return [
+          ...prev,
+          {
+            fid: column.fid,
+            value: node.link?.url ?? "",
+            href: node.link?.url ?? "",
+          },
+        ];
       }
 
-      return {
+      if (column._fixedFieldName === "name") {
+        return [
+          ...prev,
+          {
+            fid: column.fid,
+            value: node.name ?? "",
+            href: `/l/${node.slug}`,
+          },
+        ];
+      }
+
+      const next = {
         fid: column.fid,
         value: node[column._fixedFieldName] ?? "",
       };
+
+      return [...prev, next];
     } else {
       const value = node.properties.find((p) => p.fid === column.fid)?.value;
 
-      return {
+      const next = {
         fid: column.fid,
         value: value ?? "",
       };
+
+      return [...prev, next];
     }
-  });
+  }, [] as ColumnValue[]);
 
   return columns;
 }
