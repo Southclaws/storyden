@@ -1,6 +1,10 @@
 import { useState } from "react";
 
-import { ChevronDownIcon, ChevronUpIcon } from "@/components/ui/icons/Chevron";
+import {
+  ChevronDownIcon,
+  ChevronUpDownIcon,
+  ChevronUpIcon,
+} from "@/components/ui/icons/Chevron";
 import { Box, styled } from "@/styled-system/jsx";
 
 type Direction = "asc" | "desc" | "none";
@@ -47,7 +51,7 @@ export function SortIndicator({ order }: Props) {
   return (
     <styled.span width="4" height="4" aria-label={label} title={label}>
       {order === "none" ? (
-        <>&nbsp;</>
+        <ChevronUpDownIcon width="4" height="4" color="fg.muted" />
       ) : order === "asc" ? (
         <ChevronUpIcon width="4" height="4" />
       ) : (

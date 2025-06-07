@@ -22,8 +22,9 @@ export const input = defineRecipe({
       cursor: "not-allowed",
     },
     _focus: {
-      borderColor: "colorPalette.default",
-      boxShadow: "0 0 0 1px var(--colors-color-palette-default)",
+      outline: "0",
+      borderColor: "none",
+      boxShadow: "none",
     },
     _invalid: {
       borderColor: "fg.error",
