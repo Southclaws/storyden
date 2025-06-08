@@ -8,17 +8,21 @@ import { useLibraryMutation } from "@/lib/library/library";
 import { useCapability } from "@/lib/settings/capabilities";
 
 import { useLibraryPageContext } from "../../Context";
+import { useWatch } from "../../store";
 
 export function useLibraryPageTagsBlockEditing() {
-  const { node, form } = useLibraryPageContext();
+  const { store, currentNode } = useLibraryPageContext();
+  const { setTags } = store.getState();
+  const tags = useWatch((s) => s.draft.tags);
+  const content = useWatch((s) => s.draft.content);
+
   const isSuggestEnabled = useCapability(InstanceCapability.gen_ai);
 
-  const { suggestTags } = useLibraryMutation(node);
+  const { suggestTags } = useLibraryMutation(currentNode);
   const ref = useRef<CombotagsHandle>(null);
   const [loadingTags, setLoadingTags] = useState(false);
-  const { content } = form.watch();
 
-  const currentTags = node.tags.map((t) => t.name);
+  const currentTags = tags.map((t) => t.name);
 
   async function handleQuery(q: string): Promise<TagNameList> {
     const tags =
@@ -40,7 +44,7 @@ export function useLibraryPageTagsBlockEditing() {
         }
 
         setLoadingTags(true);
-        const tags = await suggestTags(node.slug, content);
+        const tags = await suggestTags(currentNode.slug, content);
 
         if (!tags) {
           throw new Error(
@@ -58,13 +62,19 @@ export function useLibraryPageTagsBlockEditing() {
     );
   }
 
+  async function handleChange(tags: string[]) {
+    const newTags = [...currentTags, ...tags];
+
+    setTags(newTags);
+  }
+
   return {
     ref,
-    form,
     currentTags,
     isSuggestEnabled,
     loadingTags,
     handleQuery,
     handleSuggestTags,
+    handleChange,
   };
 }

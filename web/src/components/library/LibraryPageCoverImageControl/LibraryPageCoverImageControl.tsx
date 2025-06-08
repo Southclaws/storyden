@@ -2,16 +2,13 @@ import { AssetUploadAction } from "@/components/asset/AssetUploadAction";
 import { Button } from "@/components/ui/button";
 import { MediaRemoveIcon } from "@/components/ui/icons/Media";
 
-import {
-  Props,
-  useLibraryPageCoverImageControl,
-} from "./useLibraryPageCoverImageControl";
+import { useLibraryPageCoverImageControl } from "./useLibraryPageCoverImageControl";
 
-export function LibraryPageCoverImageControl(props: Props) {
+export function LibraryPageCoverImageControl() {
   const {
     hasCoverImage,
     handlers: { handleUploadCoverImage, handleRemoveCoverImage },
-  } = useLibraryPageCoverImageControl(props);
+  } = useLibraryPageCoverImageControl();
 
   // TODO: When we add more options to this editing toolbar, group these up.
   return (

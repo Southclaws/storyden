@@ -1,23 +1,22 @@
 import { handle } from "@/api/client";
-import { Asset, Node } from "@/api/openapi-schema";
+import { Asset } from "@/api/openapi-schema";
 import { useLibraryMutation } from "@/lib/library/library";
+import { useLibraryPageContext } from "@/screens/library/LibraryPageScreen/Context";
 
-export type Props = {
-  node: Node;
-};
+export function useLibraryPageCoverImageControl() {
+  const { store } = useLibraryPageContext();
+  const node = store.getState().draft;
 
-export function useLibraryPageCoverImageControl(props: Props) {
-  const { updateNode, removeNodeCoverImage, revalidate } = useLibraryMutation(
-    props.node,
-  );
+  const { updateNode, removeNodeCoverImage, revalidate } =
+    useLibraryMutation(node);
 
-  const hasCoverImage = Boolean(props.node.primary_image);
+  const hasCoverImage = Boolean(node.primary_image);
 
   async function handleUploadCoverImage(asset: Asset) {
     await handle(
       async () => {
         await updateNode(
-          props.node.slug,
+          node.slug,
           {},
           {
             asset,
@@ -34,7 +33,7 @@ export function useLibraryPageCoverImageControl(props: Props) {
   async function handleRemoveCoverImage() {
     await handle(
       async () => {
-        await removeNodeCoverImage(props.node.slug);
+        await removeNodeCoverImage(node.slug);
       },
       {
         cleanup: async () => await revalidate(),

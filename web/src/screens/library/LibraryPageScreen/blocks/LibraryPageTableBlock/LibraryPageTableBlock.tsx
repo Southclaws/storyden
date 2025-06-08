@@ -13,6 +13,7 @@ import * as Table from "@/components/ui/table";
 import { Box } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
+import { useWatch } from "../../store";
 
 import { ColumnMenu } from "./ColumnMenu";
 import {
@@ -21,7 +22,7 @@ import {
 } from "./column";
 
 export function LibraryPageTableBlock() {
-  const { node, form } = useLibraryPageContext();
+  const { currentNode } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
 
   // format the sort property as "name" or "-name" for asc/desc
@@ -32,9 +33,14 @@ export function LibraryPageTableBlock() {
         : `-${sort.property}`
       : undefined;
 
-  const { data, error } = useNodeListChildren(node.slug, {
+  const { data, error } = useNodeListChildren(currentNode.slug, {
     children_sort: childrenSort,
   });
+
+  const currentMeta = useWatch((s) => s.draft.meta);
+  const currentChildPropertySchema = useWatch(
+    (s) => s.draft.child_property_schema,
+  );
 
   if (!data) {
     return <Unready error={error} />;
@@ -46,15 +52,9 @@ export function LibraryPageTableBlock() {
     return null;
   }
 
-  if (!node.hide_child_tree) {
+  if (!currentNode.hide_child_tree) {
     return null;
   }
-
-  const currentMeta = form.watch("meta");
-  const currentChildPropertySchema = form.watch(
-    "childPropertySchema",
-    node.child_property_schema,
-  );
 
   const block = currentMeta.layout?.blocks.find((b) => b.type === "table");
 
@@ -145,7 +145,7 @@ export function LibraryPageTableBlock() {
           <SortableContext items={nodes}>
             {nodes.map((child) => {
               const columns = mergeFieldsAndProperties(
-                node.child_property_schema,
+                currentNode.child_property_schema,
                 child,
                 block,
               );
@@ -186,7 +186,7 @@ export function LibraryPageTableBlock() {
               <CreatePageAction
                 variant="ghost"
                 size="xs"
-                parentSlug={node.slug}
+                parentSlug={currentNode.slug}
               />
             </Table.Cell>
           </Table.Row>

@@ -8,6 +8,7 @@ import * as Menu from "@/components/ui/menu";
 import { LibraryPageBlockTypeTable } from "@/lib/library/metadata";
 
 import { useLibraryPageContext } from "../../Context";
+import { useWatch } from "../../store";
 
 import { ColumnDefinition, getDefaultBlockConfig } from "./column";
 
@@ -16,12 +17,12 @@ type Props = {
 };
 
 export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
-  const { node, form } = useLibraryPageContext();
+  const { store, currentNode } = useLibraryPageContext();
+  const { setMeta } = store.getState();
 
-  const currentMetadata = form.watch("meta", node.meta);
-  const currentChildPropertySchema = form.watch(
-    "childPropertySchema",
-    node.child_property_schema,
+  const currentMetadata = useWatch((s) => s.draft.meta);
+  const currentChildPropertySchema = useWatch(
+    (s) => s.draft.child_property_schema,
   );
 
   const currentTableBlockIndex = currentMetadata.layout?.blocks.findIndex(
@@ -37,11 +38,9 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
     currentTableBlockIndex
   ] as LibraryPageBlockTypeTable;
 
-  if (currentTableBlock.config === undefined) {
-    currentTableBlock.config = getDefaultBlockConfig(
-      currentChildPropertySchema,
-    );
-  }
+  const columnConfig =
+    currentTableBlock.config ??
+    getDefaultBlockConfig(currentChildPropertySchema);
 
   function handleSelect(value: MenuSelectionDetails) {
     switch (value.value) {
@@ -64,7 +63,8 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
       return ps;
     });
 
-    form.setValue("childPropertySchema", nextChildPropertySchema);
+    // setChildPropertySchema(nextChildPropertySchema);
+    // form.setValue("childPropertySchema", nextChildPropertySchema);
   }
 
   function handleColumnHide() {
@@ -72,7 +72,7 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
       currentMetadata.layout?.blocks.map((block) => {
         if (block.type === "table") {
           const nextColumns =
-            currentTableBlock.config?.columns.map((col) => {
+            columnConfig.columns.map((col) => {
               if (col.fid === column.fid) {
                 return { ...col, hidden: true };
               }
@@ -93,7 +93,13 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
         return block;
       }) ?? [];
 
-    form.setValue("meta.layout.blocks", nextBlocks);
+    setMeta({
+      ...currentMetadata,
+      layout: {
+        ...currentMetadata.layout,
+        blocks: nextBlocks,
+      },
+    });
   }
 
   return (
@@ -103,7 +109,8 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
       <Portal>
         <Menu.Positioner>
           <Menu.Content minW="36">
-            {!column.fixed && (
+            {/* TODO: Add property schema mutations to store */}
+            {/* {!column.fixed && (
               <Menu.ItemGroup pl="2" py="2">
                 <Input
                   size="sm"
@@ -111,7 +118,7 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
                   onChange={handleColumnNameChange}
                 />
               </Menu.ItemGroup>
-            )}
+            )} */}
 
             <Menu.ItemGroup>
               <Menu.Item value="hide-show">
@@ -119,12 +126,12 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
                 &nbsp;Hide
               </Menu.Item>
 
-              {!column.fixed && (
+              {/* {!column.fixed && (
                 <Menu.Item value="delete">
                   <DeleteIcon />
                   &nbsp;Delete
                 </Menu.Item>
-              )}
+              )} */}
 
               <Menu.Item value="filter">
                 <FilterIcon />

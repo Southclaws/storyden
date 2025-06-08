@@ -4,13 +4,17 @@ import { FixedCropperRef } from "react-advanced-cropper";
 import { assetUpload } from "@/api/openapi-client/assets";
 import { CoverImage } from "@/lib/library/metadata";
 
-import { useLibraryPageContext } from "./Context";
+import { useLibraryPageContext } from "../../Context";
+
+import "react-advanced-cropper/dist/style.css";
 
 export const CROP_STENCIL_WIDTH = 1536;
 export const CROP_STENCIL_HEIGHT = 384;
 
-export function useCoverImage() {
-  const { node } = useLibraryPageContext();
+export function useLibraryPageCoverBlock() {
+  const { store } = useLibraryPageContext();
+  const { draft } = store.getState();
+
   const cropperRef = useRef<FixedCropperRef>(null);
 
   async function handleUploadCroppedCover() {
@@ -42,20 +46,20 @@ export function useCoverImage() {
       });
     });
 
-    if (node.primary_image) {
+    if (draft.primary_image) {
       // TODO: Delete the original asset maybe?
     }
 
     // The cover image is determined to be a copy of an original if it has a
     // parent asset associated with it. Original assets do not have parents.
-    const isCopy = node.primary_image?.parent?.id !== undefined;
+    const isCopy = draft.primary_image?.parent?.id !== undefined;
 
     const parent_asset_id = isCopy
       ? // If the primary image is already a copy, use the existing parent.
-        node.primary_image?.parent?.id
+        draft.primary_image?.parent?.id
       : // Otherwise, use the primary image asset ID, which will result in
         // this ID becoming the parent.
-        node.primary_image?.id;
+        draft.primary_image?.id;
 
     // The result of this is that when the asset revalidates, the original
     // asset will be present in the primary image asset object. This means

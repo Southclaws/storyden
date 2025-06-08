@@ -238,21 +238,19 @@ export function useLibraryMutation(node?: Node) {
     await mutate(nodeListAllKeyFn, listMutator, { revalidate: false });
     await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
 
-    const newMeta = {
-      ...node?.meta,
-      ...newNode.meta,
-      ...(cover && !cover.isReplacement
-        ? { coverImage: cover.config }
-        : undefined),
-    };
-    await nodeUpdate(slug, {
+    // const newMeta = {
+    //   // ...node?.meta, // NOTE: Test if this is needed any more
+    //   ...newNode.meta,
+    //   ...(cover && !cover.isReplacement
+    //     ? { coverImage: cover.config }
+    //     : undefined),
+    // };
+
+    // console.log("newMeta", newMeta);
+
+    const updated = await nodeUpdate(slug, {
       ...newNode,
-      primary_image_asset_id: cover?.asset.id,
-      // NOTE: We don't have access to the original node's meta, so we have to
-      // fully replace it. Right now no other features use metadata, but this
-      // will need to be fixed eventually. Probably by either calling the API
-      // within this hook to fetch the latest version of the node and spreading.
-      meta: newMeta,
+      // primary_image_asset_id: cover?.asset.id,
     });
 
     // Handle slug changes properly by redirecting to the new path.
@@ -265,7 +263,7 @@ export function useLibraryMutation(node?: Node) {
       await revalidate();
     }
 
-    return slugChanged;
+    return { slugChanged, updated };
   };
 
   const suggestTags = async (slug: string, content: string) => {

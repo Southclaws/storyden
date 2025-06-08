@@ -39,22 +39,3 @@ export const FormNodeChildPropertySchemaSchema = z.object({
 export type FormNodeChildPropertySchema = z.infer<
   typeof FormNodeChildPropertySchemaSchema
 >;
-
-export const FormSchema = z.object({
-  name: z.string().min(1, "Please enter a name."),
-  slug: z.string().optional(),
-  properties: z.array(FormNodePropertySchema),
-  childPropertySchema: z.array(FormNodeChildPropertySchemaSchema),
-  tags: z.string().array().optional(),
-  link: z.preprocess((v) => {
-    if (typeof v === "string" && v === "") {
-      return undefined;
-    }
-
-    return v;
-  }, z.string().url("Invalid URL").optional()),
-  coverImage: CoverImageFormSchema.optional(),
-  content: z.string().optional(),
-  meta: NodeMetadataSchema,
-});
-export type Form = z.infer<typeof FormSchema>;

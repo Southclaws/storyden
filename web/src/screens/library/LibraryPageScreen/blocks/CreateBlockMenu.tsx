@@ -7,13 +7,12 @@ import { allBlockTypes } from "@/lib/library/blockTypes";
 import { useEmitLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockName } from "@/lib/library/metadata";
 
-import { useLibraryPageContext } from "../Context";
+import { useWatch } from "../store";
 
 export function CreateBlockMenu() {
-  const { node, form } = useLibraryPageContext();
   const emit = useEmitLibraryBlockEvent();
 
-  const currentMetadata = form.watch("meta", node.meta);
+  const currentMetadata = useWatch((s) => s.draft.meta);
 
   function handleSelect(value: MenuSelectionDetails) {
     emit("library:add-block", {
