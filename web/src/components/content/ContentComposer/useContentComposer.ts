@@ -107,7 +107,7 @@ export function useContentComposer(props: ContentComposerProps) {
       return;
     }
 
-    editor.setEditable(!props.disabled);
+    editor.setEditable(!props.disabled, false);
   }, [editor, props.disabled]);
 
   async function handleFiles(files: File[]) {
