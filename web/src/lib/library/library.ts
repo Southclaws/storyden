@@ -196,7 +196,7 @@ export function useLibraryMutation(node?: Node) {
                 colour: "white",
                 item_count: 1,
               }) satisfies TagReference,
-          ) ?? [],
+          ) ?? data.tags,
       };
 
       const withHiddenChildren = {
