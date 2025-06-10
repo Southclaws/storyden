@@ -63,9 +63,7 @@ export function useLibraryPageTagsBlockEditing() {
   }
 
   async function handleChange(tags: string[]) {
-    const newTags = [...currentTags, ...tags];
-
-    setTags(newTags);
+    setTags(tags);
   }
 
   return {
