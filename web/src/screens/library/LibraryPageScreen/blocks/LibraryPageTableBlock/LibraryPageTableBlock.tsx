@@ -9,13 +9,17 @@ import {
 } from "@/components/site/SortIndicator";
 import { Unready } from "@/components/site/Unready";
 import { IconButton } from "@/components/ui/icon-button";
+import { AddIcon } from "@/components/ui/icons/Add";
+import { MenuIcon } from "@/components/ui/icons/Menu";
 import * as Table from "@/components/ui/table";
-import { Box } from "@/styled-system/jsx";
+import { Box, Center } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
 
+import { AddPropertyMenu } from "./AddPropertyMenu/AddPropertyMenu";
 import { ColumnMenu } from "./ColumnMenu";
+import { PropertyListMenu } from "./PropertyListMenu/PropertyListMenu";
 import {
   mergeFieldsAndProperties,
   mergeFieldsAndPropertySchema,
@@ -131,14 +135,20 @@ export function LibraryPageTableBlock() {
               );
             })}
 
-            {/* NOTE: Not available until we move edit mode to immediate mutations */}
-            {/* <Table.Header p="1">
-              <AddPropertyMenu>
-                <IconButton size="xs" variant="ghost">
-                  <AddIcon />
-                </IconButton>
-              </AddPropertyMenu>
-            </Table.Header> */}
+            <Table.Header>
+              <Center>
+                <AddPropertyMenu>
+                  <IconButton size="xs" variant="ghost">
+                    <AddIcon />
+                  </IconButton>
+                </AddPropertyMenu>
+                <PropertyListMenu>
+                  <IconButton size="xs" variant="ghost">
+                    <MenuIcon />
+                  </IconButton>
+                </PropertyListMenu>
+              </Center>
+            </Table.Header>
           </Table.Row>
         </Table.Head>
         <Table.Body>

@@ -1,8 +1,10 @@
-import { Portal } from "@ark-ui/react";
+import { MenuSelectionDetails, Portal } from "@ark-ui/react";
+import { useClickAway } from "@uidotdev/usehooks";
 import { PropsWithChildren, useState } from "react";
 
-import { PropertySchema, PropertySchemaList } from "@/api/openapi-schema";
-import { Button } from "@/components/ui/button";
+import { handle } from "@/api/client";
+import { nodeUpdateChildrenPropertySchema } from "@/api/openapi-client/nodes";
+import { PropertyType } from "@/api/openapi-schema";
 import { Input } from "@/components/ui/input";
 import * as Menu from "@/components/ui/menu";
 import {
@@ -11,16 +13,23 @@ import {
 } from "@/lib/library/metadata";
 
 import { useLibraryPageContext } from "../../../Context";
+import { useWatch } from "../../../store";
 import { getDefaultBlockConfig } from "../column";
 
 export function AddPropertyMenu({ children }: PropsWithChildren) {
-  const { node, form } = useLibraryPageContext();
+  const { currentNode, store } = useLibraryPageContext();
   const [name, setName] = useState<string>("");
+  const { setMeta } = store.getState();
 
-  const currentMetadata = form.watch("meta", node.meta);
-  const currentChildPropertySchema = form.watch(
-    "childPropertySchema",
-    node.child_property_schema,
+  // Menu opening logic. We circumvent the default behaviour here because we
+  // want to keep the menu open during the creation of a new property then close
+  // it as soon as the change has been committed to the node's state store.
+  const [open, setOpen] = useState(false);
+  const ref = useClickAway<HTMLDivElement>(() => setOpen(false));
+
+  const currentMetadata = useWatch((s) => s.draft.meta);
+  const currentChildPropertySchema = useWatch(
+    (s) => s.draft.child_property_schema,
   );
 
   const currentTableBlockIndex = currentMetadata.layout?.blocks.findIndex(
@@ -32,6 +41,7 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
     );
     return null;
   }
+
   const currentTableBlock = currentMetadata.layout?.blocks[
     currentTableBlockIndex
   ] as LibraryPageBlockTypeTable;
@@ -48,14 +58,41 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
     setName(event.target.value);
   }
 
-  function handleSave() {
+  async function handleSave(): Promise<boolean> {
     const trimmed = name.trim();
     if (trimmed === "") {
-      return;
+      return false;
+    }
+
+    const updatedChildPropertySchema = [
+      ...currentChildPropertySchema,
+      {
+        name: trimmed,
+        sort: "",
+        type: PropertyType.text,
+      },
+    ];
+
+    const newSchema = await handle(async () => {
+      return await nodeUpdateChildrenPropertySchema(
+        // NOTE: Will break if slug changes - replace with live watch state.
+        currentNode.slug,
+        updatedChildPropertySchema,
+      );
+    });
+    if (!newSchema) {
+      console.error("Failed to update child property schema");
+      return false;
+    }
+
+    const newProperty = newSchema.properties.find((p) => p.name === trimmed);
+    if (!newProperty) {
+      console.error("New property not found in updated schema");
+      return false;
     }
 
     const newColumn: LibraryPageBlockTypeTableColumn = {
-      fid: `new_field_${Date.now()}`,
+      fid: newProperty.fid,
       hidden: false,
     };
 
@@ -80,37 +117,40 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
       },
     };
 
-    console.log(updatedMeta);
+    setMeta(updatedMeta);
 
-    const updatedChildPropertySchema: PropertySchemaList = [
-      ...currentChildPropertySchema,
-      {
-        fid: newColumn.fid,
-        name: trimmed,
-        sort: "",
-        type: "text",
-      } satisfies PropertySchema,
-    ];
+    setName("");
 
-    form.setValue("meta", updatedMeta);
-    form.setValue("childPropertySchema", updatedChildPropertySchema);
+    return true;
+  }
 
-    setName(""); // Reset the input field
+  async function handleSelect(value: MenuSelectionDetails) {
+    if (value.value === "create") {
+      const close = await handleSave();
+      if (close) {
+        setOpen(() => false);
+      }
+    }
   }
 
   return (
     <Menu.Root
-      closeOnSelect={true}
+      open={open}
       lazyMount
       size="xs"
       positioning={{
         placement: "bottom-end",
       }}
+      closeOnSelect={false}
+      onSelect={handleSelect}
+      onEscapeKeyDown={() => setOpen(false)}
     >
-      <Menu.Trigger asChild>{children}</Menu.Trigger>
+      <Menu.Trigger asChild onClick={() => setOpen(!open)}>
+        {children}
+      </Menu.Trigger>
 
       <Portal>
-        <Menu.Positioner>
+        <Menu.Positioner ref={ref}>
           <Menu.Content minW="36">
             <Menu.ItemGroup pl="2" py="1">
               <Menu.ItemGroupLabel>New property</Menu.ItemGroupLabel>
@@ -125,14 +165,15 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
             </Menu.ItemGroup> */}
 
             <Menu.ItemGroup pl="2" py="1">
-              <Button
-                size="xs"
-                variant="subtle"
-                type="button"
-                onClick={handleSave}
+              <Menu.Item
+                value="create"
+                bgColor="bg.subtle"
+                _hover={{
+                  bgColor: "bg.muted",
+                }}
               >
                 Create
-              </Button>
+              </Menu.Item>
             </Menu.ItemGroup>
           </Menu.Content>
         </Menu.Positioner>

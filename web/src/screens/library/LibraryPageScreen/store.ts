@@ -48,8 +48,6 @@ export const createNodeStore = (initState: State) => {
         set((state) => {
           Object.assign(state.draft, data);
           state.draftEvents.push({ type: "patch", data });
-
-          console.log(state.draftEvents);
         });
 
       const commit = async (
