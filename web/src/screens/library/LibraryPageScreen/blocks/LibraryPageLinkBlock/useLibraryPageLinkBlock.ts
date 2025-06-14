@@ -17,7 +17,8 @@ export function useLibraryPageLinkBlock() {
   const { setLink, setName, setTags } = store.getState();
   const tags = useWatch((s) => s.draft.tags);
 
-  const [inputValue, setInputValue] = useState("");
+  const defaultLinkURL = currentNode.link?.url || "";
+  const [inputValue, setInputValue] = useState(defaultLinkURL);
   const [resolvedLink, setResolvedLink] = useState<
     LinkReference | null | undefined
   >(null);
@@ -99,6 +100,7 @@ export function useLibraryPageLinkBlock() {
     data: {
       inputValue,
       resolvedLink,
+      defaultLinkURL,
       isImporting,
     },
     handlers: {

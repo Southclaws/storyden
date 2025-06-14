@@ -35,8 +35,6 @@ export function LibraryPageLinkBlock() {
 function LibraryPageLinkBlockEditing() {
   const { data, handlers } = useLibraryPageLinkBlock();
 
-  const { resolvedLink, isImporting } = data;
-
   return (
     <LStack gap="0">
       <WStack>
@@ -48,6 +46,7 @@ function LibraryPageLinkBlockEditing() {
           placeholder="External URL..."
           onChange={handlers.handleInputValueChange}
           value={data.inputValue}
+          defaultValue={data.defaultLinkURL}
         />
 
         <HStack>
@@ -58,8 +57,8 @@ function LibraryPageLinkBlockEditing() {
             type="button"
             size="xs"
             variant="subtle"
-            disabled={!resolvedLink}
-            loading={isImporting}
+            disabled={!data.resolvedLink}
+            loading={data.isImporting}
             onClick={handlers.handleImport}
           >
             Import
@@ -67,7 +66,7 @@ function LibraryPageLinkBlockEditing() {
         </HStack>
       </WStack>
 
-      {match(resolvedLink)
+      {match(data.resolvedLink)
         .with(null, () => null)
         .with(undefined, () => <Unready />)
         .otherwise((link) => (
