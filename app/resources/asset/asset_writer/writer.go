@@ -60,7 +60,12 @@ func (w *Writer) AddVersion(ctx context.Context,
 		SetAccountID(xid.ID(accountID)).
 		Save(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	r, err = w.db.Asset.Query().Where(ent_asset.ID(r.ID)).WithParent().First(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return asset.Map(r), nil

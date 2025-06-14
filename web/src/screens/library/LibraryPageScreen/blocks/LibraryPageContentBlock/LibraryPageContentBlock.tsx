@@ -1,19 +1,14 @@
 import { useEffect, useState } from "react";
-import { Controller } from "react-hook-form";
 
 import { ContentComposer } from "src/components/content/ContentComposer/ContentComposer";
 
-import { FormControl } from "@/components/ui/form/FormControl";
-
 import { useLibraryPageContext } from "../../Context";
-import { Form } from "../../form";
+import { useWatch } from "../../store";
 import { useAssets } from "../../useAssets";
 import { useEditState } from "../../useEditState";
 
 export function useLibraryPageContentBlock() {
-  const { form } = useLibraryPageContext();
-
-  const { content } = form.getValues();
+  const content = useWatch((s) => s.draft.content);
 
   const [generatedContent, setGeneratedContent] = useState<string | undefined>(
     undefined,
@@ -29,7 +24,7 @@ export function useLibraryPageContentBlock() {
       // value, reset this controlled value to move it back to uncontrolled.
       setGeneratedContent(undefined);
     }
-  }, [form, content, generatedContent]);
+  }, [content, generatedContent]);
 
   return {
     handleResetGeneratedContent,
@@ -38,28 +33,23 @@ export function useLibraryPageContentBlock() {
 }
 
 export function LibraryPageContentBlock() {
-  const { form, node } = useLibraryPageContext();
+  const { store, currentNode } = useLibraryPageContext();
+  const { setContent } = store.getState();
   const { editing } = useEditState();
-  const { handleAssetUpload } = useAssets(node);
+  const { handleAssetUpload } = useAssets(currentNode);
   const { generatedContent } = useLibraryPageContentBlock();
 
+  function handleChange(value: string) {
+    setContent(value);
+  }
+
   return (
-    <FormControl>
-      <Controller<Form>
-        control={form.control}
-        name="content"
-        render={({ field }) => (
-          <ContentComposer
-            onChange={field.onChange}
-            disabled={!editing}
-            onAssetUpload={handleAssetUpload}
-            initialValue={
-              node.content ?? form.formState.defaultValues?.["content"]
-            }
-            value={generatedContent}
-          />
-        )}
-      />
-    </FormControl>
+    <ContentComposer
+      onChange={handleChange}
+      disabled={!editing}
+      onAssetUpload={handleAssetUpload}
+      initialValue={currentNode.content}
+      value={generatedContent}
+    />
   );
 }

@@ -129,12 +129,12 @@ export const NodeLayoutSchema = z.object({
 export type NodeLayout = z.infer<typeof NodeLayoutSchema>;
 
 export const NodeMetadataSchema = z.object({
-  coverImage: CoverImageSchema.optional(),
+  coverImage: CoverImageSchema.optional().nullable(),
   layout: NodeLayoutSchema.optional(),
 });
 export type NodeMetadata = z.infer<typeof NodeMetadataSchema>;
 
-const DefaultLayout: NodeLayout = {
+export const DefaultLayout: NodeLayout = {
   blocks: [
     { type: "cover" as const },
     { type: "title" as const },

@@ -1,18 +1,29 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { PropsWithChildren, createContext, useContext, useMemo } from "react";
-import { FormProvider, UseFormReturn, useForm } from "react-hook-form";
+import { dequal } from "dequal";
+import { debounce } from "lodash";
+import { parseAsBoolean, useQueryState } from "nuqs";
+import {
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
 
-import { NodeWithChildren, PropertyType } from "src/api/openapi-schema";
+import { NodeMutableProps, NodeWithChildren } from "src/api/openapi-schema";
 
+import { nodeUpdate } from "@/api/openapi-client/nodes";
+import { deriveMutationFromDifference } from "@/lib/library/diff";
+import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
 
-import { Form, FormSchema } from "./form";
+import { createNodeStore } from "./store";
 
 type LibraryPageContext = {
-  node: WithMetadata<NodeWithChildren>;
-  form: UseFormReturn<Form>;
-  defaultFormValues: Form;
+  currentNode: WithMetadata<NodeWithChildren>;
+  store: ReturnType<typeof createNodeStore>;
 };
+
+type NodeStoreAPI = ReturnType<typeof createNodeStore>;
 
 const Context = createContext<LibraryPageContext | null>(null);
 
@@ -36,45 +47,85 @@ export function LibraryPageProvider({
   children,
 }: PropsWithChildren<Props>) {
   const nodeWithMeta = hydrateNode(node);
+  const { revalidate } = useLibraryMutation(node);
 
-  const defaultFormValues = useMemo<Form>(
-    () =>
-      ({
-        name: nodeWithMeta.name,
-        slug: nodeWithMeta.slug,
-        properties: nodeWithMeta.properties.map((p, i) => ({
-          fid: p.fid,
-          name: p.name ?? `Field ${i}`,
-          type: p.type ?? PropertyType.text,
-          sort: p.sort,
-          value: p.value ?? "",
-        })),
-        childPropertySchema: nodeWithMeta.child_property_schema,
-        tags: nodeWithMeta.tags.map((t) => t.name),
-        link: nodeWithMeta.link?.url,
-        content: nodeWithMeta.content,
-        meta: nodeWithMeta.meta,
-      }) satisfies Form,
-    [nodeWithMeta],
-  );
-
-  const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: defaultFormValues,
+  // NOTE: Copied from useEditState - cannot call here though, not in context.
+  const [editing] = useQueryState("edit", {
+    ...parseAsBoolean,
+    defaultValue: false,
+    clearOnDefault: true,
   });
+
+  const storeRef = useRef<NodeStoreAPI | null>(null);
+  if (storeRef.current === null) {
+    storeRef.current = createNodeStore({
+      draft: nodeWithMeta,
+      draftEvents: [],
+    });
+  }
+
+  // Handle external changes to the original node state. This happens if another
+  // source triggers a mutation+revalidation via SWR and the initial must update
+  useEffect(() => {
+    if (!storeRef.current) {
+      return;
+    }
+
+    storeRef.current.setState((state) => {
+      state.draft = nodeWithMeta;
+    });
+  }, [nodeWithMeta]);
+
+  const saveDraft = useRef(
+    debounce(() => {
+      if (!storeRef.current) {
+        return;
+      }
+
+      const current = storeRef.current.getInitialState().draft;
+      const updated = storeRef.current.getState().draft;
+      const patch = deriveMutationFromDifference(current, updated);
+      console.log("experimental patch:", patch);
+
+      storeRef.current.getState().commit(async (patch: NodeMutableProps) => {
+        console.log("Saving patch:", patch);
+
+        const updated = await nodeUpdate(node.id, patch);
+        await revalidate(updated);
+
+        const slugChanged = updated.slug !== current.slug;
+        if (slugChanged) {
+          const query = editing ? "?edit=true" : "";
+          window.history.replaceState(null, "", `/l/${updated.slug}${query}`);
+        }
+
+        return updated;
+      });
+    }, 500),
+  ).current;
+
+  useEffect(() => {
+    if (!storeRef.current) {
+      return;
+    }
+
+    const unsub = storeRef.current.subscribe((state, prev) => {
+      if (!dequal(state.draft, prev.draft)) {
+        saveDraft();
+      }
+    });
+
+    return unsub;
+  }, [saveDraft]);
 
   return (
     <Context.Provider
       value={{
-        node: nodeWithMeta,
-        form,
-        defaultFormValues,
+        currentNode: nodeWithMeta,
+        store: storeRef.current,
       }}
     >
-      <FormProvider {...form}>
-        {/*  */}
-        {children}
-      </FormProvider>
+      {children}
     </Context.Provider>
   );
 }
