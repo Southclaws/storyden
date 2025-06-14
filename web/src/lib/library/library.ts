@@ -17,6 +17,7 @@ import {
   nodeGenerateTags,
   nodeGenerateTitle,
   nodeRemoveAsset,
+  nodeUpdate,
   nodeUpdatePosition,
   nodeUpdateVisibility,
 } from "@/api/openapi-client/nodes";
@@ -253,6 +254,14 @@ export function useLibraryMutation(node?: Node) {
 
     await mutate(nodeListAllKeyFn, nodeListMutator, { revalidate: false });
     await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
+
+    const updated = await nodeUpdate(slug, {
+      hide_child_tree: hideChildTree,
+    });
+
+    revalidate();
+
+    return updated;
   };
 
   const addAsset = async (slug: string, asset: Asset) => {
