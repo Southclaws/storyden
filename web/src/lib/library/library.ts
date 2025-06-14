@@ -39,6 +39,11 @@ import {
 import { useLibraryPath } from "@/screens/library/useLibraryPath";
 
 import { CoverImage } from "./metadata";
+import {
+  buildNodeKey,
+  buildNodeListKey,
+  nodeListPrivateKeyFn,
+} from "./mutator-keys";
 
 export type CreateNodeArgs = {
   initialName?: string;
@@ -74,34 +79,6 @@ export function useLibraryMutation(node?: Node) {
   const { mutate } = useSWRConfig();
   const router = useRouter();
   const libraryPath = useLibraryPath();
-
-  // for revalidating all node list queries (published and private)
-  const nodeListKey = getNodeListKey();
-  const nodeListAllKeyFn = (key: Arguments) => {
-    return (
-      Array.isArray(key) &&
-      key[0].startsWith(nodeListKey) &&
-      // Don't pass for /nodes/<slug> keys
-      // NOTE: This may be buggy for cases with query params...
-      !key[0].startsWith(nodeListKey + "/")
-    );
-  };
-  // for revalidating only private node list queries
-  const nodeListPrivateKey = getNodeListKey({
-    // NOTE: The order here matters.
-    visibility: [Visibility.draft, Visibility.review, Visibility.unlisted],
-  });
-  const nodeListPrivateKeyFn = (key: Arguments) => {
-    return dequal(key, nodeListPrivateKey);
-  };
-
-  // For revalidating one specific node.
-  const nodeKey = node && getNodeGetKey(node.slug);
-  const nodeKeyFn =
-    node &&
-    ((key: Arguments) => {
-      return Array.isArray(key) && key[0].startsWith(nodeKey);
-    });
 
   const createNode = async ({ initialName, parentSlug }: CreateNodeArgs) => {
     if (!session) return;
@@ -215,7 +192,9 @@ export function useLibraryMutation(node?: Node) {
       };
     };
 
-    await mutate(nodeListAllKeyFn, mutator, { revalidate: false });
+    const keyFn = buildNodeListKey();
+
+    await mutate(keyFn, mutator, { revalidate: false });
 
     await nodeUpdateVisibility(slug, { visibility });
   };
@@ -252,7 +231,10 @@ export function useLibraryMutation(node?: Node) {
       };
     };
 
-    await mutate(nodeListAllKeyFn, nodeListMutator, { revalidate: false });
+    const listKeyFn = buildNodeListKey();
+    await mutate(listKeyFn, nodeListMutator, { revalidate: false });
+
+    const nodeKeyFn = buildNodeKey(slug);
     await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
 
     const updated = await nodeUpdate(slug, {
@@ -324,7 +306,8 @@ export function useLibraryMutation(node?: Node) {
       };
     };
 
-    await mutate(nodeListAllKeyFn, mutator, { revalidate: false });
+    const listKeyFn = buildNodeListKey();
+    await mutate(listKeyFn, mutator, { revalidate: false });
 
     await nodeDelete(slug, { target_node: newParent });
 
@@ -356,7 +339,8 @@ export function useLibraryMutation(node?: Node) {
       return { ...prevData, nodes: newNodes };
     };
 
-    await mutate(nodeListAllKeyFn, mutator, { revalidate: false });
+    const listKeyFn = buildNodeListKey();
+    await mutate(listKeyFn, mutator, { revalidate: false });
 
     const params: NodeUpdatePositionBody = (() => {
       switch (dropPosition) {
@@ -382,9 +366,12 @@ export function useLibraryMutation(node?: Node) {
     await nodeUpdatePosition(draggingNodeId, params);
   };
 
-  const revalidate = async (data?: MutatorCallback<NodeListOKResponse>) => {
-    await mutate(nodeListAllKeyFn, data);
+  const revalidate = async () => {
+    const listKeyFn = buildNodeListKey();
+    await mutate(listKeyFn);
+
     if (node) {
+      const nodeKeyFn = buildNodeKey(node.slug);
       await mutate(nodeKeyFn);
     }
   };
