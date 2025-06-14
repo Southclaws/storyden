@@ -15,7 +15,7 @@ import { useEditState } from "../../useEditState";
 
 export function LibraryPagePropertiesBlock() {
   const { editing } = useEditState();
-  const { currentNode } = useLibraryPageContext();
+  const properties = useWatch((s) => s.draft.properties);
 
   if (editing) {
     return <LibraryPagePropertiesBlockEditable />;
@@ -23,7 +23,7 @@ export function LibraryPagePropertiesBlock() {
 
   return (
     <styled.dl display="table" borderCollapse="collapse">
-      {currentNode.properties.map((p) => {
+      {properties.map((p) => {
         return (
           <HStack key={p.name} display="table-row">
             <styled.dt
@@ -67,7 +67,6 @@ function LibraryPagePropertiesBlockEditable() {
   const {
     addProperty,
     removePropertyByName,
-
     setPropertyName,
     setPropertyValue,
   } = store.getState();

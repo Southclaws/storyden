@@ -44,7 +44,7 @@ export function useLibraryPageTagsBlockEditing() {
         }
 
         setLoadingTags(true);
-        const tags = await suggestTags(currentNode.slug, content);
+        const tags = await suggestTags(currentNode.id, content);
 
         if (!tags) {
           throw new Error(

@@ -37,7 +37,7 @@ export function LibraryPageTableBlock() {
         : `-${sort.property}`
       : undefined;
 
-  const { data, error } = useNodeListChildren(currentNode.slug, {
+  const { data, error } = useNodeListChildren(currentNode.id, {
     children_sort: childrenSort,
   });
 
@@ -196,7 +196,7 @@ export function LibraryPageTableBlock() {
               <CreatePageAction
                 variant="ghost"
                 size="xs"
-                parentSlug={currentNode.slug}
+                parentSlug={currentNode.id}
               />
             </Table.Cell>
           </Table.Row>

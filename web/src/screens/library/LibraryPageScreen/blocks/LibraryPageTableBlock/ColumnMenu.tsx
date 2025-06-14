@@ -17,7 +17,7 @@ type Props = {
 };
 
 export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
-  const { store, currentNode } = useLibraryPageContext();
+  const { store } = useLibraryPageContext();
   const { setChildPropertyHiddenState } = store.getState();
 
   const currentMetadata = useWatch((s) => s.draft.meta);

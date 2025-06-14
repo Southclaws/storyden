@@ -46,7 +46,7 @@ import {
 
 export type CreateNodeArgs = {
   initialName?: string;
-  parentSlug?: string;
+  parentID?: string;
 };
 
 export type CoverImageArgs =
@@ -79,7 +79,7 @@ export function useLibraryMutation(node?: Node) {
   const router = useRouter();
   const libraryPath = useLibraryPath();
 
-  const createNode = async ({ initialName, parentSlug }: CreateNodeArgs) => {
+  const createNode = async ({ initialName, parentID }: CreateNodeArgs) => {
     if (!session) return;
 
     // NOTE: This is a stopgap until the API deals with initial empty states in
@@ -123,7 +123,7 @@ export function useLibraryMutation(node?: Node) {
 
     await mutate(nodeListPrivateKeyFn, mutator, { revalidate: false });
 
-    const created = await nodeCreate({ name: name, parent: parentSlug });
+    const created = await nodeCreate({ name: name, parent: parentID });
     const newPath = joinLibraryPath(libraryPath, created.slug);
 
     router.push(`/l/${newPath}?edit=true`);
@@ -149,7 +149,7 @@ export function useLibraryMutation(node?: Node) {
     return content;
   };
 
-  const importFromLink = async (slug: string, url: string) => {
+  const importFromLink = async (id: string, url: string) => {
     const { title, description } = await linkCreate({ url });
 
     return {
@@ -245,7 +245,7 @@ export function useLibraryMutation(node?: Node) {
     return updated;
   };
 
-  const addAsset = async (slug: string, asset: Asset) => {
+  const addAsset = async (id: string, asset: Asset) => {
     const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
       if (!data) return;
 
@@ -259,14 +259,14 @@ export function useLibraryMutation(node?: Node) {
       return updated;
     };
 
-    const nodeKey = getNodeGetKey(slug);
+    const nodeKey = getNodeGetKey(id);
     const nodeKeyFn = (key: Arguments) => {
       return Array.isArray(key) && key[0].startsWith(nodeKey);
     };
 
     await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
 
-    await nodeAddAsset(slug, asset.id);
+    await nodeAddAsset(id, asset.id);
   };
 
   const removeAsset = async (slug: string, assetID: AssetID) => {

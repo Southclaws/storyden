@@ -20,7 +20,7 @@ export function useLibraryPageAssetsBlock() {
   async function handleUpload(a: Asset) {
     await handle(
       async () => {
-        await addAsset(currentNode.slug, a);
+        await addAsset(currentNode.id, a);
       },
       {
         promiseToast: {
@@ -35,7 +35,7 @@ export function useLibraryPageAssetsBlock() {
   async function handleRemove(a: Asset) {
     await handle(
       async () => {
-        await removeAsset(currentNode.slug, a.id);
+        await removeAsset(currentNode.id, a.id);
       },
       {
         promiseToast: {

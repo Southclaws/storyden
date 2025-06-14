@@ -48,8 +48,7 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
 
     const newSchema = await handle(async () => {
       return await nodeUpdateChildrenPropertySchema(
-        // NOTE: Will break if slug changes - replace with live watch state.
-        currentNode.slug,
+        currentNode.id,
         updatedChildPropertySchema,
       );
     });

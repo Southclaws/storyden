@@ -30,7 +30,7 @@ export function useLibraryPageLinkBlock() {
     await handle(
       async () => {
         const { title_suggestion, tag_suggestions, content_suggestion } =
-          await importFromLink(currentNode.slug, link.url);
+          await importFromLink(currentNode.id, link.url);
 
         // TODO: Expose this from suggestion hooks
         // setGeneratedTitle(title_suggestion);
