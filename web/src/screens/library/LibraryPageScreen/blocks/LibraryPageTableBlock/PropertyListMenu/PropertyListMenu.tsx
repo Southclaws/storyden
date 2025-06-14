@@ -1,5 +1,4 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
-import { zipWith } from "lodash";
 import { PropsWithChildren } from "react";
 
 import { HideIcon } from "@/components/ui/icons/HideIcon";
@@ -8,6 +7,7 @@ import * as Menu from "@/components/ui/menu";
 
 import { useLibraryPageContext } from "../../../Context";
 import { useWatch } from "../../../store";
+import { mergeFieldsAndPropertySchema } from "../column";
 import { useTableBlock } from "../useTableBlock";
 
 export function PropertyListMenu({ children }: PropsWithChildren) {
@@ -29,15 +29,10 @@ export function PropertyListMenu({ children }: PropsWithChildren) {
     setChildPropertyHiddenState(fid, !hidden);
   }
 
-  const properties = zipWith(
+  const columns = mergeFieldsAndPropertySchema(
     currentChildPropertySchema,
-    currentTableBlock.config?.columns ?? [],
-    (a, b) => {
-      return {
-        ...a,
-        ...b,
-      };
-    },
+    currentTableBlock,
+    true,
   );
 
   return (
@@ -58,7 +53,7 @@ export function PropertyListMenu({ children }: PropsWithChildren) {
             <Menu.ItemGroup pl="2" py="1">
               <Menu.ItemGroupLabel>Properties</Menu.ItemGroupLabel>
 
-              {properties.map((property) => (
+              {columns.map((property) => (
                 <Menu.Item key={property.fid} value={property.fid}>
                   {property.hidden ? <HideIcon /> : <ShowIcon />}
                   &nbsp;

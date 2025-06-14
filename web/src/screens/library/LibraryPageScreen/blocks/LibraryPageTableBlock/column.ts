@@ -86,11 +86,12 @@ export function getDefaultBlockConfig(ps: PropertySchemaList): ProcessedConfig {
 export function processBlockConfig(
   ps: PropertySchemaList,
   config: LibraryPageBlockTypeTableConfig,
+  showHidden = false,
 ): ProcessedConfig {
   const schemaMap = keyBy(ps, "fid");
 
   const columns: ColumnDefinition[] = config.columns.reduce((prev, column) => {
-    if (column.hidden) {
+    if (showHidden === false && column.hidden) {
       return prev;
     }
 
@@ -132,11 +133,12 @@ export function processBlockConfig(
 export function mergeFieldsAndPropertySchema(
   ps: PropertySchemaList,
   block: LibraryPageBlockTypeTable,
+  showHidden = false,
 ): ColumnDefinition[] {
   const config =
     block.config === undefined
       ? getDefaultBlockConfig(ps)
-      : processBlockConfig(ps, block.config);
+      : processBlockConfig(ps, block.config, showHidden);
 
   return config.columns;
 }
