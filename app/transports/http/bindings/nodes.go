@@ -658,7 +658,7 @@ func serialiseProperty(in *library.Property) openapi.Property {
 		Name:  in.Field.Name,
 		Type:  openapi.PropertyType(in.Field.Type.String()),
 		Sort:  in.Field.Sort,
-		Value: opt.Map(in.Value, func(v string) string { return v }).Ptr(),
+		Value: in.Value.OrZero(),
 	}
 }
 
@@ -679,7 +679,7 @@ func serialisePropertyTable(in library.PropertyTable) openapi.PropertyList {
 				Name:  f.Name,
 				Type:  openapi.PropertyType(f.Type.String()),
 				Sort:  f.Sort,
-				Value: nil,
+				Value: "",
 			}
 		}
 
