@@ -38,7 +38,9 @@ export function buildNodeListKey(params?: NodeListParams) {
 
     const paramsEqual = params === undefined ? true : dequal(key[1], params);
 
-    return isNodeListKey && notNodeKey && paramsEqual;
+    const matches = isNodeListKey && notNodeKey && paramsEqual;
+
+    return matches;
   };
 
   return nodeListKeyFn;
@@ -53,7 +55,7 @@ export function buildNodeKey(slug: Identifier, params?: NodeGetParams) {
 
     const path = key[0] as string;
 
-    const pathMatches = path.startsWith(nodeKeyPath);
+    const pathMatches = path === nodeKeyPath;
 
     return pathMatches;
   };

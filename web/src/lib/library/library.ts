@@ -1,5 +1,4 @@
 import slugify from "@sindresorhus/slugify";
-import { dequal } from "dequal/lite";
 import { uniqueId } from "lodash";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -9,7 +8,6 @@ import { Xid } from "xid-ts";
 import { linkCreate } from "@/api/openapi-client/links";
 import {
   getNodeGetKey,
-  getNodeListKey,
   nodeAddAsset,
   nodeCreate,
   nodeDelete,
@@ -39,6 +37,7 @@ import {
 import { useLibraryPath } from "@/screens/library/useLibraryPath";
 
 import { CoverImage } from "./metadata";
+import { nodeListMutator, nodeMutator } from "./mutator-functions";
 import {
   buildNodeKey,
   buildNodeListKey,
@@ -366,13 +365,19 @@ export function useLibraryMutation(node?: Node) {
     await nodeUpdatePosition(draggingNodeId, params);
   };
 
-  const revalidate = async () => {
+  const revalidate = async (updated?: NodeWithChildren) => {
     const listKeyFn = buildNodeListKey();
-    await mutate(listKeyFn);
+    await mutate<NodeListOKResponse>(
+      listKeyFn,
+      updated ? nodeListMutator(updated) : undefined,
+    );
 
     if (node) {
-      const nodeKeyFn = buildNodeKey(node.slug);
-      await mutate(nodeKeyFn);
+      const nodeKeyFn = buildNodeKey(updated?.slug ?? node.slug);
+      await mutate<NodeGetOKResponse>(
+        nodeKeyFn,
+        updated ? nodeMutator(updated) : undefined,
+      );
     }
   };
 

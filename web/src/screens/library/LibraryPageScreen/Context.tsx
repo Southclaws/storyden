@@ -1,5 +1,6 @@
 import { dequal } from "dequal";
 import { debounce } from "lodash";
+import { parseAsBoolean, useQueryState } from "nuqs";
 import {
   PropsWithChildren,
   createContext,
@@ -48,6 +49,13 @@ export function LibraryPageProvider({
   const nodeWithMeta = hydrateNode(node);
   const { revalidate } = useLibraryMutation(node);
 
+  // NOTE: Copied from useEditState - cannot call here though, not in context.
+  const [editing] = useQueryState("edit", {
+    ...parseAsBoolean,
+    defaultValue: false,
+    clearOnDefault: true,
+  });
+
   const storeRef = useRef<NodeStoreAPI | null>(null);
   if (storeRef.current === null) {
     storeRef.current = createNodeStore({
@@ -82,14 +90,13 @@ export function LibraryPageProvider({
       storeRef.current.getState().commit(async (patch: NodeMutableProps) => {
         console.log("Saving patch:", patch);
 
-        const updated = await nodeUpdate(node.slug, patch);
-
-        // TODO: Revalidate the list contexts too.
-        revalidate();
+        const updated = await nodeUpdate(node.id, patch);
+        await revalidate(updated);
 
         const slugChanged = updated.slug !== current.slug;
         if (slugChanged) {
-          console.log("slugChanged", slugChanged);
+          const query = editing ? "?edit=true" : "";
+          window.history.replaceState(null, "", `/l/${updated.slug}${query}`);
         }
 
         return updated;
