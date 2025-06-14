@@ -135,7 +135,7 @@ export function LibraryPageTableBlock() {
               );
             })}
 
-            <Table.Header>
+            <Table.Header width="0">
               <Center>
                 <AddPropertyMenu>
                   <IconButton size="xs" variant="ghost">
