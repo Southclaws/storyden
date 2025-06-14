@@ -7,11 +7,14 @@ import {
   useEffect,
   useRef,
 } from "react";
+import { useSWRConfig } from "swr";
 
 import { NodeMutableProps, NodeWithChildren } from "src/api/openapi-schema";
 
+import { nodeUpdate } from "@/api/openapi-client/nodes";
 import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
+import { deriveMutationFromDifference } from "@/lib/library/mutators";
 
 import { createNodeStore } from "./store";
 
@@ -44,8 +47,7 @@ export function LibraryPageProvider({
   children,
 }: PropsWithChildren<Props>) {
   const nodeWithMeta = hydrateNode(node);
-
-  const { updateNode } = useLibraryMutation(node);
+  const { revalidate } = useLibraryMutation(node);
 
   const storeRef = useRef<NodeStoreAPI | null>(null);
   if (storeRef.current === null) {
@@ -73,11 +75,20 @@ export function LibraryPageProvider({
         return;
       }
 
+      const current = storeRef.current.getInitialState().draft;
+      const updated = storeRef.current.getState().draft;
+      const patch = deriveMutationFromDifference(current, updated);
+      console.log("experimental patch:", patch);
+
       storeRef.current.getState().commit(async (patch: NodeMutableProps) => {
         console.log("Saving patch:", patch);
 
-        const { slugChanged, updated } = await updateNode(node.slug, patch);
+        const updated = await nodeUpdate(node.slug, patch);
 
+        // TODO: Revalidate the list contexts too.
+        revalidate();
+
+        const slugChanged = updated.slug !== current.slug;
         if (slugChanged) {
           console.log("slugChanged", slugChanged);
         }

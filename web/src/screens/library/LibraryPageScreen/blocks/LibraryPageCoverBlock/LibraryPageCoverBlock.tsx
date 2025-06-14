@@ -1,19 +1,12 @@
 import Image from "next/image";
-import { useRef } from "react";
-import {
-  FixedCropper,
-  FixedCropperRef,
-  ImageRestriction,
-} from "react-advanced-cropper";
+import { FixedCropper, ImageRestriction } from "react-advanced-cropper";
 
-import { handle } from "@/api/client";
 import { LibraryPageCoverImageControl } from "@/components/library/LibraryPageCoverImageControl/LibraryPageCoverImageControl";
 import { parseNodeMetadata } from "@/lib/library/metadata";
 import { css } from "@/styled-system/css";
 import { Box, HStack } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
-import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
 import { useEditState } from "../../useEditState";
 
@@ -59,9 +52,7 @@ export function LibraryPageCoverBlock() {
 }
 
 function LibraryPageCoverBlockEditing() {
-  const { store } = useLibraryPageContext();
-  const { setPrimaryImage, setMeta } = store.getState();
-  const { cropperRef, handleUploadCroppedCover } = useLibraryPageCoverBlock();
+  const { cropperRef, handleInteractionEnd } = useLibraryPageCoverBlock();
 
   const primary_image = useWatch((s) => s.draft.primary_image);
   const meta = useWatch((s) => s.draft.meta);
@@ -85,19 +76,6 @@ function LibraryPageCoverBlockEditing() {
     );
   }
 
-  async function handleInteractionEnd() {
-    await handle(async () => {
-      const result = await handleUploadCroppedCover();
-      if (!result) {
-        console.warn("unable to upload cropped cover image: no result");
-        return;
-      }
-
-      setPrimaryImage(result?.asset.id);
-      setMeta({ ...meta, coverImage: result?.config });
-    });
-  }
-
   return (
     <Box width="full" height="64">
       <FixedCropper
@@ -111,10 +89,12 @@ function LibraryPageCoverBlockEditing() {
         })}
         onInteractionEnd={handleInteractionEnd}
         defaultPosition={
-          initialCoverCoordinates && {
-            top: initialCoverCoordinates.top,
-            left: initialCoverCoordinates.left,
-          }
+          initialCoverCoordinates
+            ? {
+                top: initialCoverCoordinates.top,
+                left: initialCoverCoordinates.left,
+              }
+            : undefined
         }
         backgroundWrapperProps={{
           scaleImage: false,

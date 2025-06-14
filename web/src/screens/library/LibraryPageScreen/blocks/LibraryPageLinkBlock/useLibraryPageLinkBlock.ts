@@ -66,12 +66,11 @@ export function useLibraryPageLinkBlock() {
 
       const url = u.toString();
 
-      setLink(url);
-
       await handle(async () => {
         setResolvedLink(undefined);
         const link = await linkCreate({ url });
         setResolvedLink(link);
+        setLink(link);
       });
     }, 500),
   ).current;

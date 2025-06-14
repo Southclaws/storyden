@@ -1,23 +1,22 @@
 import { useRef } from "react";
 import { FixedCropperRef } from "react-advanced-cropper";
 
+import { handle } from "@/api/client";
 import { assetUpload } from "@/api/openapi-client/assets";
 import { CoverImage } from "@/lib/library/metadata";
 
 import { useLibraryPageContext } from "../../Context";
-
-import "react-advanced-cropper/dist/style.css";
 
 export const CROP_STENCIL_WIDTH = 1536;
 export const CROP_STENCIL_HEIGHT = 384;
 
 export function useLibraryPageCoverBlock() {
   const { store } = useLibraryPageContext();
-  const { draft } = store.getState();
+  const { draft, setPrimaryImage } = store.getState();
 
   const cropperRef = useRef<FixedCropperRef>(null);
 
-  async function handleUploadCroppedCover() {
+  async function uploadCroppedImageState() {
     if (!cropperRef.current) {
       return;
     }
@@ -79,8 +78,26 @@ export function useLibraryPageCoverBlock() {
     };
   }
 
+  async function handleInteractionEnd() {
+    await handle(
+      async () => {
+        const result = await uploadCroppedImageState();
+        if (!result) {
+          throw new Error(
+            "An unexpected error occurred with the image editor.",
+          );
+        }
+
+        setPrimaryImage(result);
+      },
+      {
+        errorToast: true,
+      },
+    );
+  }
+
   return {
     cropperRef,
-    handleUploadCroppedCover,
+    handleInteractionEnd,
   };
 }

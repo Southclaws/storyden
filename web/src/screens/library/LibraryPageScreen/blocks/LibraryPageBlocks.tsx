@@ -5,10 +5,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useCallback } from "react";
-import { FixedCropperRef } from "react-advanced-cropper";
-import { useStore } from "zustand";
 
-import { NodeWithChildren } from "@/api/openapi-schema";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
 import { useLibraryBlockEvent } from "@/lib/library/events";
@@ -31,7 +28,7 @@ import { LibraryPageTitleBlock } from "./LibraryPageTitleBlock/LibraryPageTitleB
 
 export function LibraryPageBlocks() {
   const { store } = useLibraryPageContext();
-  const { setMeta } = store.getState();
+  const { moveBlock, addBlock, removeBlock } = store.getState();
   const { editing } = useEditState();
 
   const meta = useWatch((s) => s.draft.meta);
@@ -39,105 +36,35 @@ export function LibraryPageBlocks() {
   const handleReorder = useCallback(
     (activeId: LibraryPageBlockType, overId: LibraryPageBlockType) => {
       if (!meta.layout) {
-        return;
+        throw new Error("No layout found in metadata");
       }
 
-      const currentBlocks = meta.layout.blocks;
+      const index = meta.layout.blocks.findIndex((b) => b.type === overId);
 
-      const reOrderBlocks = () => {
-        const activeIndex = currentBlocks.findIndex((b) => b.type === activeId);
-        const overIndex = currentBlocks.findIndex((b) => b.type === overId);
-
-        if (
-          activeIndex === -1 ||
-          overIndex === -1 ||
-          activeIndex === overIndex
-        ) {
-          return currentBlocks;
-        }
-
-        const newBlocks = [...currentBlocks];
-        const [movedBlock] = newBlocks.splice(activeIndex, 1);
-        if (!movedBlock) {
-          return newBlocks;
-        }
-
-        newBlocks.splice(overIndex, 0, movedBlock);
-
-        return newBlocks;
-      };
-
-      const newBlocks = reOrderBlocks();
-
-      const newMeta = {
-        ...meta,
-        layout: {
-          ...meta.layout,
-          blocks: newBlocks,
-        },
-      };
-
-      setMeta(newMeta);
+      moveBlock(activeId, index);
     },
-    [store, meta],
+    [moveBlock, meta],
   );
-
-  const handleAddBlock = useCallback(
-    (type: LibraryPageBlockType) => {
-      if (!meta.layout) {
-        return;
-      }
-
-      const currentBlocks = meta.layout.blocks;
-
-      const newBlocks = [...currentBlocks, { type }] as LibraryPageBlock[];
-
-      const newMeta = {
-        ...meta,
-        layout: {
-          ...meta.layout,
-          blocks: newBlocks,
-        },
-      };
-
-      setMeta(newMeta);
-    },
-    [store, meta],
-  );
-
-  const handleRemoveBlock = useCallback(
-    (type: LibraryPageBlockType) => {
-      if (!meta.layout) {
-        return;
-      }
-
-      const currentBlocks = meta.layout.blocks;
-
-      const newBlocks = currentBlocks.filter(
-        (block) => block.type !== type,
-      ) as LibraryPageBlock[];
-
-      const newMeta = {
-        ...meta,
-        layout: {
-          ...meta.layout,
-          blocks: newBlocks,
-        },
-      };
-
-      setMeta(newMeta);
-    },
-    [store, meta],
-  );
-
   useLibraryBlockEvent("library:reorder-block", ({ activeId, overId }) => {
     handleReorder(activeId, overId);
   });
 
+  const handleAddBlock = useCallback(
+    (type: LibraryPageBlockType) => {
+      addBlock(type);
+    },
+    [addBlock],
+  );
   useLibraryBlockEvent("library:add-block", ({ type }) => {
     handleAddBlock(type);
   });
 
+  const handleRemoveBlock = useCallback(
+    (type: LibraryPageBlockType) => {
+      removeBlock(type);
+    },
+    [removeBlock],
+  );
   useLibraryBlockEvent("library:remove-block", ({ type }) => {
     handleRemoveBlock(type);
   });

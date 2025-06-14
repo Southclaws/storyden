@@ -7,19 +7,15 @@ import { nodeUpdateChildrenPropertySchema } from "@/api/openapi-client/nodes";
 import { PropertyType } from "@/api/openapi-schema";
 import { Input } from "@/components/ui/input";
 import * as Menu from "@/components/ui/menu";
-import {
-  LibraryPageBlockTypeTable,
-  LibraryPageBlockTypeTableColumn,
-} from "@/lib/library/metadata";
 
 import { useLibraryPageContext } from "../../../Context";
 import { useWatch } from "../../../store";
-import { getDefaultBlockConfig } from "../column";
+import { useTableBlock } from "../useTableBlock";
 
 export function AddPropertyMenu({ children }: PropsWithChildren) {
   const { currentNode, store } = useLibraryPageContext();
   const [name, setName] = useState<string>("");
-  const { setMeta } = store.getState();
+  const { addChildProperty } = store.getState();
 
   // Menu opening logic. We circumvent the default behaviour here because we
   // want to keep the menu open during the creation of a new property then close
@@ -27,32 +23,9 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
   const [open, setOpen] = useState(false);
   const ref = useClickAway<HTMLDivElement>(() => setOpen(false));
 
-  const currentMetadata = useWatch((s) => s.draft.meta);
   const currentChildPropertySchema = useWatch(
     (s) => s.draft.child_property_schema,
   );
-
-  const currentTableBlockIndex = currentMetadata.layout?.blocks.findIndex(
-    (b) => b.type === "table",
-  );
-  if (!currentTableBlockIndex) {
-    console.warn(
-      "attempting to render a ColumnMenu without a table block in the form metadata",
-    );
-    return null;
-  }
-
-  const currentTableBlock = currentMetadata.layout?.blocks[
-    currentTableBlockIndex
-  ] as LibraryPageBlockTypeTable;
-
-  if (currentTableBlock.config === undefined) {
-    currentTableBlock.config = getDefaultBlockConfig(
-      currentChildPropertySchema,
-    );
-  }
-
-  const currentBlocks = [...(currentMetadata.layout?.blocks || [])];
 
   function handleColumnNameChange(event: React.ChangeEvent<HTMLInputElement>) {
     setName(event.target.value);
@@ -91,33 +64,7 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
       return false;
     }
 
-    const newColumn: LibraryPageBlockTypeTableColumn = {
-      fid: newProperty.fid,
-      hidden: false,
-    };
-
-    const nextBlocks = currentBlocks.map((block) => {
-      if (block.type === "table") {
-        return {
-          ...block,
-          config: {
-            ...block.config,
-            columns: [...(block.config?.columns ?? []), newColumn],
-          },
-        };
-      }
-      return block;
-    });
-
-    const updatedMeta = {
-      ...currentMetadata,
-      layout: {
-        ...currentMetadata.layout,
-        blocks: nextBlocks,
-      },
-    };
-
-    setMeta(updatedMeta);
+    addChildProperty(newProperty);
 
     setName("");
 

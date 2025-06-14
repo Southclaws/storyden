@@ -64,62 +64,29 @@ export function LibraryPagePropertiesBlock() {
 
 function LibraryPagePropertiesBlockEditable() {
   const { store } = useLibraryPageContext();
-  const { setProperties } = store.getState();
+  const {
+    addProperty,
+    removePropertyByName,
+
+    setPropertyName,
+    setPropertyValue,
+  } = store.getState();
   const current = useWatch((s) => s.draft.properties);
 
-  async function handleAddProperty() {
-    const existingNames = new Set(current.map((f) => f.name));
-    let newName = "Field 1";
-    let counter = 1;
-    while (existingNames.has(newName)) {
-      newName = `Field ${counter++}`;
-    }
-
-    const next = [
-      ...current,
-      {
-        fid: uniqueId("new_field_"),
-        name: newName,
-        type: PropertyType.text, // TODO: Add actual UI for types
-        sort: "5",
-        value: "",
-      },
-    ];
-
-    setProperties(next);
+  function handleAddProperty() {
+    addProperty("Field", PropertyType.text);
   }
 
-  async function handleRemoveProperty(name: PropertyName) {
-    const next = current.filter((f) => f.name !== name);
-    setProperties(next);
+  function handleRemoveProperty(name: PropertyName) {
+    removePropertyByName(name);
   }
 
   function handlePropertyNameChange(name: PropertyName, newName: string) {
-    const next = current.map((f) => {
-      if (f.name === name) {
-        return {
-          ...f,
-          name: newName,
-        };
-      }
-
-      return f;
-    });
-    setProperties(next);
+    setPropertyName(name, newName);
   }
 
   function handlePropertyValueChange(name: PropertyName, value: string) {
-    const next = current.map((f) => {
-      if (f.name === name) {
-        return {
-          ...f,
-          value: value,
-        };
-      }
-
-      return f;
-    });
-    setProperties(next);
+    setPropertyValue(name, value);
   }
 
   return (

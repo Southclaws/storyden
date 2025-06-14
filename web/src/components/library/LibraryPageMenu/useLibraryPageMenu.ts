@@ -16,8 +16,12 @@ export type Props = {
 
 export function useLibraryPageMenu(props: Props) {
   const account = useSession();
-  const { deleteNode, updateNode, updateNodeVisibility, revalidate } =
-    useLibraryMutation(props.node);
+  const {
+    deleteNode,
+    updateNodeVisibility,
+    updateNodeChildVisibility,
+    revalidate,
+  } = useLibraryMutation(props.node);
 
   const {
     isConfirming: isConfirmingDelete,
@@ -41,9 +45,7 @@ export function useLibraryPageMenu(props: Props) {
   async function handleToggleChildrenVisibility() {
     await handle(
       async () => {
-        await updateNode(props.node.slug, {
-          hide_child_tree: !isChildrenHidden,
-        });
+        await updateNodeChildVisibility(props.node.slug, !isChildrenHidden);
       },
       {
         promiseToast: {

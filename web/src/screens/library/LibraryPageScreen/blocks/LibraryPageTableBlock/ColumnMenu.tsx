@@ -18,7 +18,7 @@ type Props = {
 
 export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
   const { store, currentNode } = useLibraryPageContext();
-  const { setMeta } = store.getState();
+  const { setChildPropertyHiddenState } = store.getState();
 
   const currentMetadata = useWatch((s) => s.draft.meta);
   const currentChildPropertySchema = useWatch(
@@ -68,38 +68,7 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
   }
 
   function handleColumnHide() {
-    const nextBlocks =
-      currentMetadata.layout?.blocks.map((block) => {
-        if (block.type === "table") {
-          const nextColumns =
-            columnConfig.columns.map((col) => {
-              if (col.fid === column.fid) {
-                return { ...col, hidden: true };
-              }
-              return col;
-            }) ?? [];
-
-          const nextTable = {
-            ...block,
-            config: {
-              ...block.config,
-              columns: nextColumns,
-            } as LibraryPageBlockTypeTable["config"],
-          };
-
-          return nextTable;
-        }
-
-        return block;
-      }) ?? [];
-
-    setMeta({
-      ...currentMetadata,
-      layout: {
-        ...currentMetadata.layout,
-        blocks: nextBlocks,
-      },
-    });
+    setChildPropertyHiddenState(column.fid, !column.hidden);
   }
 
   return (
