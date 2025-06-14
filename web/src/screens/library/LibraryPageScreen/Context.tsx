@@ -7,14 +7,13 @@ import {
   useEffect,
   useRef,
 } from "react";
-import { useSWRConfig } from "swr";
 
 import { NodeMutableProps, NodeWithChildren } from "src/api/openapi-schema";
 
 import { nodeUpdate } from "@/api/openapi-client/nodes";
+import { deriveMutationFromDifference } from "@/lib/library/diff";
 import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
-import { deriveMutationFromDifference } from "@/lib/library/mutators";
 
 import { createNodeStore } from "./store";
 

@@ -1,4 +1,3 @@
-import { dequal } from "dequal";
 import { produce } from "immer";
 import { uniqueId } from "lodash";
 
@@ -9,30 +8,6 @@ import {
 } from "@/api/openapi-schema";
 
 import { NodeMetadata } from "./metadata";
-
-export const deriveMutationFromDifference = (
-  draft: NodeWithChildren,
-  changes: Partial<NodeWithChildren>,
-) => {
-  const mutation: NodeMutableProps = {};
-
-  (Object.keys(changes) as (keyof typeof changes)[]).forEach((key) => {
-    const draftValue = draft[key];
-    const updatedValue = changes[key];
-    if (!updatedValue) {
-      return;
-    }
-
-    const changed = !dequal(draftValue, updatedValue);
-    if (!changed) {
-      return;
-    }
-
-    mutation[key] = updatedValue;
-  });
-
-  return mutation;
-};
 
 export const applyNodeChanges = produce(
   (draft: NodeWithChildren, changes: NodeMutableProps) => {
