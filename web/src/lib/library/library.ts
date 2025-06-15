@@ -47,6 +47,7 @@ import {
 export type CreateNodeArgs = {
   initialName?: string;
   parentID?: string;
+  parentSlug?: string;
 };
 
 export type CoverImageArgs =
@@ -79,7 +80,11 @@ export function useLibraryMutation(node?: Node) {
   const router = useRouter();
   const libraryPath = useLibraryPath();
 
-  const createNode = async ({ initialName, parentID }: CreateNodeArgs) => {
+  const createNode = async ({
+    initialName,
+    parentID,
+    parentSlug,
+  }: CreateNodeArgs) => {
     if (!session) return;
 
     // NOTE: This is a stopgap until the API deals with initial empty states in
@@ -123,7 +128,8 @@ export function useLibraryMutation(node?: Node) {
 
     await mutate(nodeListPrivateKeyFn, mutator, { revalidate: false });
 
-    const created = await nodeCreate({ name: name, parent: parentID });
+    const parent = parentID ?? parentSlug;
+    const created = await nodeCreate({ name: name, parent });
     const newPath = joinLibraryPath(libraryPath, created.slug);
 
     router.push(`/l/${newPath}?edit=true`);
