@@ -9,7 +9,7 @@ import { LibraryPageControls } from "./LibraryPageControls";
 import { LibraryPageBlocks } from "./blocks/LibraryPageBlocks";
 
 export function LibraryPageScreen(props: Props) {
-  const { data, error } = useNodeGet(props.node.slug, undefined, {
+  const { data, error } = useNodeGet(props.node.id, undefined, {
     swr: { fallbackData: props.node },
   });
   if (!data) {
