@@ -9,7 +9,8 @@ import {
   Visibility,
 } from "@/api/openapi-schema";
 
-type KeyType = ReturnType<typeof getNodeGetKey>;
+type NodeKey = ReturnType<typeof getNodeGetKey>;
+type NodeListKey = ReturnType<typeof getNodeListKey>;
 
 // for revalidating all node list queries (published and private)
 const nodeListKey = getNodeListKey();
@@ -26,7 +27,7 @@ export const nodeListPrivateKeyFn = (key: Arguments) => {
 };
 
 export function buildNodeListKey(params?: NodeListParams) {
-  const nodeListKeyFn = (key: Arguments): key is KeyType => {
+  const nodeListKeyFn = (key: Arguments): key is NodeListKey => {
     if (!key) return false;
 
     const path = key[0] as string;
@@ -50,7 +51,7 @@ export function buildNodeKey(slug: Identifier, params?: NodeGetParams) {
   const nodeKey = getNodeGetKey(slug, params);
   const nodeKeyPath = nodeKey[0];
 
-  const nodeKeyFn = (key: Arguments): key is KeyType => {
+  const nodeKeyFn = (key: Arguments): key is NodeKey => {
     if (!key) return false;
 
     const path = key[0] as string;
