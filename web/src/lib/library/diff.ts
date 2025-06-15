@@ -10,7 +10,16 @@ function projectNodeToMutableProps(node: NodeWithChildren): NodeMutableProps {
     tags: node.tags.map((t) => t.name),
     primary_image_asset_id: node.primary_image?.id,
     url: node.link?.url,
-    properties: node.properties,
+    properties: node.properties.map((p) => {
+      const fid = p.fid.startsWith("new_field") ? undefined : p.fid;
+
+      return {
+        fid: fid,
+        name: p.name,
+        value: p.value,
+        type: p.type,
+      };
+    }),
     hide_child_tree: node.children.length === 0,
     meta: node.meta,
   };
