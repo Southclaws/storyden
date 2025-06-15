@@ -122,6 +122,7 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <DndContext
+      id="sd-dnd"
       sensors={sensors}
       collisionDetection={pointerWithin}
       // onDragOver={onDragOver}
