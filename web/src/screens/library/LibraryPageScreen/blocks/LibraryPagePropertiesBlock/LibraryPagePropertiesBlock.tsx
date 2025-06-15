@@ -1,6 +1,4 @@
-import { uniqueId } from "lodash/fp";
 import { ChangeEvent } from "react";
-import { Controller } from "react-hook-form";
 
 import { PropertyName, PropertyType } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";

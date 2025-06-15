@@ -11,14 +11,14 @@ import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
 
 export function useLibraryPageTagsBlockEditing() {
-  const { store, currentNode } = useLibraryPageContext();
+  const { nodeID, store } = useLibraryPageContext();
   const { setTags } = store.getState();
   const tags = useWatch((s) => s.draft.tags);
   const content = useWatch((s) => s.draft.content);
 
   const isSuggestEnabled = useCapability(InstanceCapability.gen_ai);
 
-  const { suggestTags } = useLibraryMutation(currentNode);
+  const { suggestTags } = useLibraryMutation();
   const ref = useRef<CombotagsHandle>(null);
   const [loadingTags, setLoadingTags] = useState(false);
 
@@ -44,7 +44,7 @@ export function useLibraryPageTagsBlockEditing() {
         }
 
         setLoadingTags(true);
-        const tags = await suggestTags(currentNode.id, content);
+        const tags = await suggestTags(nodeID, content);
 
         if (!tags) {
           throw new Error(

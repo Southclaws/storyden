@@ -1,26 +1,32 @@
 import { dequal } from "dequal";
 import { debounce } from "lodash";
-import { parseAsBoolean, useQueryState } from "nuqs";
 import {
   PropsWithChildren,
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useRef,
+  useState,
 } from "react";
 
-import { NodeMutableProps, NodeWithChildren } from "src/api/openapi-schema";
+import {
+  Identifier,
+  NodeMutableProps,
+  NodeWithChildren,
+} from "src/api/openapi-schema";
 
 import { nodeUpdate } from "@/api/openapi-client/nodes";
-import { deriveMutationFromDifference } from "@/lib/library/diff";
 import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
 
 import { createNodeStore } from "./store";
 
 type LibraryPageContext = {
+  nodeID: Identifier;
   currentNode: WithMetadata<NodeWithChildren>;
   store: ReturnType<typeof createNodeStore>;
+  saving: boolean;
 };
 
 type NodeStoreAPI = ReturnType<typeof createNodeStore>;
@@ -46,21 +52,15 @@ export function LibraryPageProvider({
   node,
   children,
 }: PropsWithChildren<Props>) {
-  const nodeWithMeta = hydrateNode(node);
+  const [saving, setSaving] = useState(false);
+  const nodeWithMeta = useMemo(() => hydrateNode(node), [node]);
   const { revalidate } = useLibraryMutation(node);
-
-  // NOTE: Copied from useEditState - cannot call here though, not in context.
-  const [editing] = useQueryState("edit", {
-    ...parseAsBoolean,
-    defaultValue: false,
-    clearOnDefault: true,
-  });
 
   const storeRef = useRef<NodeStoreAPI | null>(null);
   if (storeRef.current === null) {
     storeRef.current = createNodeStore({
+      original: nodeWithMeta,
       draft: nodeWithMeta,
-      draftEvents: [],
     });
   }
 
@@ -71,8 +71,19 @@ export function LibraryPageProvider({
       return;
     }
 
+    const { original, draft } = storeRef.current.getState();
+
+    const equalToOriginal = dequal(original, nodeWithMeta);
+    const equalToDraft = dequal(draft, nodeWithMeta);
+
     storeRef.current.setState((state) => {
-      state.draft = nodeWithMeta;
+      if (!equalToOriginal) {
+        state.original = nodeWithMeta;
+      }
+
+      if (!equalToDraft) {
+        state.draft = nodeWithMeta;
+      }
     });
   }, [nodeWithMeta]);
 
@@ -82,22 +93,22 @@ export function LibraryPageProvider({
         return;
       }
 
-      const current = storeRef.current.getInitialState().draft;
-      const updated = storeRef.current.getState().draft;
-      const patch = deriveMutationFromDifference(current, updated);
-      console.log("experimental patch:", patch);
+      const state = storeRef.current.getState();
 
-      storeRef.current.getState().commit(async (patch: NodeMutableProps) => {
-        console.log("Saving patch:", patch);
+      state.commit(async (patch: NodeMutableProps) => {
+        setSaving(() => true);
 
         const updated = await nodeUpdate(node.id, patch);
         await revalidate(updated);
 
-        const slugChanged = updated.slug !== current.slug;
+        const slugChanged = updated.slug !== state.original.slug;
         if (slugChanged) {
-          const query = editing ? "?edit=true" : "";
-          window.history.replaceState(null, "", `/l/${updated.slug}${query}`);
+          window.history.replaceState(null, "", `/l/${updated.slug}?edit=true`);
         }
+
+        setTimeout(() => {
+          setSaving(() => false);
+        }, 500);
 
         return updated;
       });
@@ -121,8 +132,10 @@ export function LibraryPageProvider({
   return (
     <Context.Provider
       value={{
+        nodeID: node.id,
         currentNode: nodeWithMeta,
         store: storeRef.current,
+        saving,
       }}
     >
       {children}

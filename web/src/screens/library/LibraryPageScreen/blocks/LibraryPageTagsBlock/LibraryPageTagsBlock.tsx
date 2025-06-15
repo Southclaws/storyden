@@ -10,13 +10,15 @@ import { useLibraryPageTagsBlockEditing } from "./useLibraryPageTagsBlock";
 
 export function LibraryPageTagsBlock() {
   const { editing } = useEditState();
-  const { currentNode } = useLibraryPageContext();
+  const { store } = useLibraryPageContext();
 
   if (editing) {
     return <LibraryPageTagsBlockEditing />;
   }
 
-  return <TagBadgeList tags={currentNode.tags} />;
+  const { tags } = store.getState().draft;
+
+  return <TagBadgeList tags={tags} />;
 }
 
 export function LibraryPageTagsBlockEditing() {

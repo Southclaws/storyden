@@ -1,5 +1,3 @@
-import { useStore } from "zustand";
-
 import { Breadcrumbs } from "@/components/library/Breadcrumbs";
 import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
 import { CancelAction } from "@/components/site/Action/Cancel";
@@ -42,7 +40,7 @@ export function LibraryPageControls() {
 }
 
 function EditControls() {
-  const { editing, handleToggleEditMode } = useEditState();
+  const { editing, saving, handleToggleEditMode } = useEditState();
 
   if (!editing) {
     return (
@@ -54,7 +52,12 @@ function EditControls() {
 
   return (
     <>
-      <CancelAction type="button" onClick={handleToggleEditMode}>
+      <CancelAction
+        type="button"
+        loading={saving}
+        disabled={saving}
+        onClick={handleToggleEditMode}
+      >
         View
       </CancelAction>
     </>

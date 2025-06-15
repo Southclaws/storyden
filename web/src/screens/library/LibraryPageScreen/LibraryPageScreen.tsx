@@ -1,5 +1,7 @@
 "use client";
 
+import { memo } from "react";
+
 import { useNodeGet } from "@/api/openapi-client/nodes";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { LStack } from "@/styled-system/jsx";
@@ -10,7 +12,10 @@ import { LibraryPageBlocks } from "./blocks/LibraryPageBlocks";
 
 export function LibraryPageScreen(props: Props) {
   const { data, error } = useNodeGet(props.node.id, undefined, {
-    swr: { fallbackData: props.node },
+    swr: {
+      fallbackData: props.node,
+      revalidateOnFocus: false,
+    },
   });
   if (!data) {
     return <UnreadyBanner error={error} />;
@@ -23,13 +28,14 @@ export function LibraryPageScreen(props: Props) {
   return <LibraryPageForm node={data} />;
 }
 
-function LibraryPageForm(props: Props) {
+const LibraryPageForm = memo((props: Props) => {
   return (
     <LibraryPageProvider node={props.node}>
       <LibraryPage />
     </LibraryPageProvider>
   );
-}
+});
+LibraryPageForm.displayName = "LibraryPageForm";
 
 export function LibraryPage() {
   return (

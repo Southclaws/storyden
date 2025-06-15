@@ -29,15 +29,16 @@ export function useLibraryPageContentBlock() {
   return {
     handleResetGeneratedContent,
     generatedContent,
+    content,
   };
 }
 
 export function LibraryPageContentBlock() {
-  const { store, currentNode } = useLibraryPageContext();
+  const { nodeID, store } = useLibraryPageContext();
   const { setContent } = store.getState();
   const { editing } = useEditState();
-  const { handleAssetUpload } = useAssets(currentNode);
-  const { generatedContent } = useLibraryPageContentBlock();
+  const { handleAssetUpload } = useAssets(nodeID);
+  const { content, generatedContent } = useLibraryPageContentBlock();
 
   function handleChange(value: string) {
     setContent(value);
@@ -48,7 +49,7 @@ export function LibraryPageContentBlock() {
       onChange={handleChange}
       disabled={!editing}
       onAssetUpload={handleAssetUpload}
-      initialValue={currentNode.content}
+      initialValue={content}
       value={generatedContent}
     />
   );

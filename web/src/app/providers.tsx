@@ -15,17 +15,10 @@ export function Providers({ children }: PropsWithChildren) {
   return (
     <AuthProvider>
       <SWRConfig
-        value={
-          {
-            // keepPreviousData: true,
-            // TEMPORARY
-            // revalidateOnFocus: false,
-            // revalidateIfStale: false,
-            // revalidateOnMount: false,
-            // revalidateOnReconnect: false,
-            // provider: provider,
-          }
-        }
+        value={{
+          keepPreviousData: true,
+          // provider: provider,
+        }}
       >
         <DndProvider>
           <Toaster />

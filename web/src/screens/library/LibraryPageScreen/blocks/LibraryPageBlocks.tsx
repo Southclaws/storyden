@@ -128,7 +128,7 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
     id: block.type,
     data: {
       type: "block",
-      node: currentNode,
+      node: currentNode, // TODO: Change this to only pass the node ID.
       block: block.type,
     } as DragItemNodeBlock,
   });

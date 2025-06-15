@@ -10,10 +10,9 @@ import * as Menu from "@/components/ui/menu";
 
 import { useLibraryPageContext } from "../../../Context";
 import { useWatch } from "../../../store";
-import { useTableBlock } from "../useTableBlock";
 
 export function AddPropertyMenu({ children }: PropsWithChildren) {
-  const { currentNode, store } = useLibraryPageContext();
+  const { nodeID, store } = useLibraryPageContext();
   const [name, setName] = useState<string>("");
   const { addChildProperty } = store.getState();
 
@@ -48,7 +47,7 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
 
     const newSchema = await handle(async () => {
       return await nodeUpdateChildrenPropertySchema(
-        currentNode.id,
+        nodeID,
         updatedChildPropertySchema,
       );
     });

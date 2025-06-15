@@ -8,19 +8,19 @@ import { useEditState } from "../../useEditState";
 
 export function useLibraryPageAssetsBlock() {
   const { editing } = useEditState();
-  const { currentNode } = useLibraryPageContext();
+  const { nodeID } = useLibraryPageContext();
 
   const assets = useWatch((s) => s.draft.assets);
 
   const isEmpty = assets.length === 0;
   const shouldShow = editing || !isEmpty;
 
-  const { revalidate, addAsset, removeAsset } = useLibraryMutation(currentNode);
+  const { revalidate, addAsset, removeAsset } = useLibraryMutation();
 
   async function handleUpload(a: Asset) {
     await handle(
       async () => {
-        await addAsset(currentNode.id, a);
+        await addAsset(nodeID, a);
       },
       {
         promiseToast: {
@@ -35,7 +35,7 @@ export function useLibraryPageAssetsBlock() {
   async function handleRemove(a: Asset) {
     await handle(
       async () => {
-        await removeAsset(currentNode.id, a.id);
+        await removeAsset(nodeID, a.id);
       },
       {
         promiseToast: {

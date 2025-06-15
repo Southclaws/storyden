@@ -1,5 +1,6 @@
 import { parseAsBoolean, useQueryState } from "nuqs";
 
+import { useLibraryPageContext } from "./Context";
 import { useLibraryPagePermissions } from "./permissions";
 
 export function useEditState() {
@@ -8,6 +9,8 @@ export function useEditState() {
     defaultValue: false,
     clearOnDefault: true,
   });
+
+  const { saving } = useLibraryPageContext();
 
   const { isAllowedToEdit } = useLibraryPagePermissions();
 
@@ -23,6 +26,7 @@ export function useEditState() {
 
   return {
     editing,
+    saving,
     setEditing,
     handleToggleEditMode,
   };

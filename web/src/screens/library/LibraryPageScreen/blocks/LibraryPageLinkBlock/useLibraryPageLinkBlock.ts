@@ -13,24 +13,25 @@ import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
 
 export function useLibraryPageLinkBlock() {
-  const { currentNode, store } = useLibraryPageContext();
+  const { nodeID, store } = useLibraryPageContext();
   const { setLink, setName, setTags } = store.getState();
   const tags = useWatch((s) => s.draft.tags);
+  const link = useWatch((s) => s.draft.link);
 
-  const defaultLinkURL = currentNode.link?.url || "";
+  const defaultLinkURL = link?.url || "";
   const [inputValue, setInputValue] = useState(defaultLinkURL);
   const [resolvedLink, setResolvedLink] = useState<
     LinkReference | null | undefined
   >(null);
   const [isImporting, setIsImporting] = useState(false);
 
-  const { revalidate, importFromLink } = useLibraryMutation(currentNode);
+  const { revalidate, importFromLink } = useLibraryMutation();
 
   async function handleImportFromLink(link: LinkReference) {
     await handle(
       async () => {
         const { title_suggestion, tag_suggestions, content_suggestion } =
-          await importFromLink(currentNode.id, link.url);
+          await importFromLink(nodeID, link.url);
 
         // TODO: Expose this from suggestion hooks
         // setGeneratedTitle(title_suggestion);

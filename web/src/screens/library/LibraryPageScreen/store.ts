@@ -17,6 +17,7 @@ import {
   PropertySchemaList,
   PropertyType,
 } from "@/api/openapi-schema";
+import { deriveMutationFromDifference } from "@/lib/library/diff";
 import { CoverImageArgs } from "@/lib/library/library";
 import {
   DefaultLayout,
@@ -35,8 +36,8 @@ type NodeDraftEvent = {
 };
 
 export type State = {
+  original: WithMetadata<NodeWithChildren>;
   draft: WithMetadata<NodeWithChildren>;
-  draftEvents: NodeDraftEvent[];
 };
 
 export type Actions = {
@@ -82,18 +83,14 @@ export const createNodeStore = (initState: State) => {
         set((state) => {
           const newState = applyNodeChanges(state.draft, data);
           Object.assign(state.draft, newState);
-
-          state.draftEvents.push({ type: "patch", data });
         });
 
       const commit = async (
         callback: (draft: NodeMutableProps) => Promise<NodeWithChildrenAllOf>,
       ) => {
-        const { draftEvents } = get();
-
-        const patch = draftEvents.reduce<NodeMutableProps>((acc, e) => {
-          return { ...acc, ...e.data };
-        }, {});
+        const current = get().original;
+        const draft = get().draft;
+        const patch = deriveMutationFromDifference(current, draft);
 
         const changes = Object.keys(patch).length;
 
@@ -102,13 +99,13 @@ export const createNodeStore = (initState: State) => {
           return;
         }
 
-        console.debug(`applying commit: ${changes} changes`);
+        console.debug(`applying commit: ${changes} changes`, patch);
 
         const updated = await callback(patch);
 
         set(() => ({
+          original: updated,
           draft: updated,
-          draftEvents: [],
         }));
       };
 
@@ -136,12 +133,6 @@ export const createNodeStore = (initState: State) => {
                 ...state.draft.meta,
                 coverImage: null,
               };
-              state.draftEvents.push({
-                type: "patch",
-                data: {
-                  primary_image_asset_id: coverConfig.asset.id,
-                },
-              });
             });
           } else {
             set((state) => {
@@ -150,12 +141,6 @@ export const createNodeStore = (initState: State) => {
                 ...state.draft.meta,
                 coverImage: coverConfig.config,
               };
-              state.draftEvents.push({
-                type: "patch",
-                data: {
-                  primary_image_asset_id: coverConfig.asset.id,
-                },
-              });
             });
           }
         },
@@ -167,19 +152,12 @@ export const createNodeStore = (initState: State) => {
               ...state.draft.meta,
               coverImage: null,
             };
-            state.draftEvents.push({
-              type: "patch",
-              data: {
-                primary_image_asset_id: undefined,
-              },
-            });
           });
         },
 
         setLink: (link: LinkReference) => {
           set((state) => {
             state.draft.link = link;
-            state.draftEvents.push({ type: "patch", data: { url: link.url } });
           });
         },
 
@@ -193,22 +171,6 @@ export const createNodeStore = (initState: State) => {
           value?: string,
         ) => {
           set((state) => {
-            state.draftEvents.push({
-              type: "patch",
-              data: {
-                properties: [
-                  ...state.draft.properties,
-                  {
-                    fid: uniqueId("new_field_"),
-                    name,
-                    type,
-                    sort: "5",
-                    value: value ?? "",
-                  },
-                ],
-              },
-            });
-
             const existingNames = new Set(
               state.draft.properties.map((f) => f.name),
             );
@@ -230,15 +192,6 @@ export const createNodeStore = (initState: State) => {
 
         removePropertyByName: (name: PropertyName) => {
           set((state) => {
-            state.draftEvents.push({
-              type: "patch",
-              data: {
-                properties: state.draft.properties.filter(
-                  (p) => p.name !== name,
-                ),
-              },
-            });
-
             state.draft.properties = state.draft.properties.filter(
               (f) => f.name !== name,
             );
@@ -247,13 +200,6 @@ export const createNodeStore = (initState: State) => {
 
         removePropertyByID: (id: Identifier) => {
           set((state) => {
-            state.draftEvents.push({
-              type: "patch",
-              data: {
-                properties: state.draft.properties.filter((p) => p.fid !== id),
-              },
-            });
-
             state.draft.properties = state.draft.properties.filter(
               (f) => f.fid !== id,
             );
@@ -262,18 +208,6 @@ export const createNodeStore = (initState: State) => {
 
         setPropertyName: (name: PropertyName, newName: PropertyName) => {
           set((state) => {
-            state.draftEvents.push({
-              type: "patch",
-              data: {
-                properties: state.draft.properties.map((p) => {
-                  if (p.name === name) {
-                    return { ...p, name: newName };
-                  }
-                  return p;
-                }),
-              },
-            });
-
             const target = state.draft.properties.find((f) => f.name === name);
             if (target) {
               target.name = newName;
@@ -283,18 +217,6 @@ export const createNodeStore = (initState: State) => {
 
         setPropertyValue: (name: PropertyName, value: string) => {
           set((state) => {
-            state.draftEvents.push({
-              type: "patch",
-              data: {
-                properties: state.draft.properties.map((p) => {
-                  if (p.name === name) {
-                    return { ...p, value: value };
-                  }
-                  return p;
-                }),
-              },
-            });
-
             const target = state.draft.properties.find((f) => f.name === name);
             if (target) {
               target.value = value;
@@ -378,31 +300,6 @@ export const createNodeStore = (initState: State) => {
                 }
               }
             }
-
-            state.draftEvents.push({
-              type: "patch",
-              data: {
-                meta: {
-                  ...state.draft.meta,
-                  blocks: blocks.map((b) => {
-                    if (b.type !== "table") return b;
-
-                    return {
-                      ...b,
-                      config: {
-                        ...b.config,
-                        columns: b.config?.columns.map((col) => {
-                          if (col.fid === fid) {
-                            return { ...col, hidden };
-                          }
-                          return col;
-                        }),
-                      },
-                    };
-                  }),
-                },
-              },
-            });
           });
         },
 
@@ -436,14 +333,13 @@ export const createNodeStore = (initState: State) => {
         addBlock: (type: LibraryPageBlockType) => {
           set((state) => {
             const layout = (state.draft.meta.layout ??= DefaultLayout);
-            const blocks = layout.blocks;
 
             // check if the block already exists, if it does, return
-            if (blocks.some((b) => b.type === type)) {
+            if (layout.blocks.some((b) => b.type === type)) {
               return;
             }
 
-            blocks.push({ type });
+            layout.blocks.push({ type });
           });
         },
 

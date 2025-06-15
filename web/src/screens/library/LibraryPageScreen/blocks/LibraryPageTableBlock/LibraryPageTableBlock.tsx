@@ -26,8 +26,10 @@ import {
 } from "./column";
 
 export function LibraryPageTableBlock() {
-  const { currentNode } = useLibraryPageContext();
+  const { nodeID } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
+
+  const hideChildTree = useWatch((s) => s.draft.child_property_schema);
 
   // format the sort property as "name" or "-name" for asc/desc
   const childrenSort =
@@ -37,7 +39,7 @@ export function LibraryPageTableBlock() {
         : `-${sort.property}`
       : undefined;
 
-  const { data, error } = useNodeListChildren(currentNode.id, {
+  const { data, error } = useNodeListChildren(nodeID, {
     children_sort: childrenSort,
   });
 
@@ -56,7 +58,7 @@ export function LibraryPageTableBlock() {
     return null;
   }
 
-  if (!currentNode.hide_child_tree) {
+  if (!hideChildTree) {
     return null;
   }
 
@@ -155,7 +157,7 @@ export function LibraryPageTableBlock() {
           <SortableContext items={nodes}>
             {nodes.map((child) => {
               const columns = mergeFieldsAndProperties(
-                currentNode.child_property_schema,
+                currentChildPropertySchema,
                 child,
                 block,
               );
@@ -193,11 +195,7 @@ export function LibraryPageTableBlock() {
         >
           <Table.Row>
             <Table.Cell colSpan={columns.length} display="flex">
-              <CreatePageAction
-                variant="ghost"
-                size="xs"
-                parentSlug={currentNode.id}
-              />
+              <CreatePageAction variant="ghost" size="xs" parentSlug={nodeID} />
             </Table.Cell>
           </Table.Row>
         </Table.Foot>

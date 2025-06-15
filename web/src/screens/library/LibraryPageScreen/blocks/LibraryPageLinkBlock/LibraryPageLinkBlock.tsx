@@ -8,26 +8,27 @@ import { Input } from "@/components/ui/input";
 import { LinkButton } from "@/components/ui/link-button";
 import { HStack, LStack, WStack } from "@/styled-system/jsx";
 
-import { useLibraryPageContext } from "../../Context";
+import { useWatch } from "../../store";
 import { useEditState } from "../../useEditState";
 
 import { useLibraryPageLinkBlock } from "./useLibraryPageLinkBlock";
 
 export function LibraryPageLinkBlock() {
   const { editing } = useEditState();
-  const { currentNode } = useLibraryPageContext();
+
+  const link = useWatch((s) => s.draft.link);
 
   if (editing) {
     return <LibraryPageLinkBlockEditing />;
   }
 
-  if (!currentNode.link?.url) {
+  if (!link?.url) {
     return null;
   }
 
   return (
-    <LinkButton href={currentNode.link.url} size="xs" variant="subtle">
-      {currentNode.link?.domain}
+    <LinkButton href={link.url} size="xs" variant="subtle">
+      {link?.domain}
     </LinkButton>
   );
 }
