@@ -5401,7 +5401,7 @@ components:
 
     Property:
       type: object
-      required: [fid, name, type, sort]
+      required: [fid, name, type, sort, value]
       properties:
         fid: { $ref: "#/components/schemas/Identifier" }
         name: { $ref: "#/components/schemas/PropertyName" }

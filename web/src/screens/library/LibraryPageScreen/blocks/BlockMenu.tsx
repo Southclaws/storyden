@@ -1,23 +1,21 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 
-import { NodeWithChildren } from "@/api/openapi-schema";
 import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { MoreIcon } from "@/components/ui/icons/More";
 import * as Menu from "@/components/ui/menu";
 import { useEmitLibraryBlockEvent } from "@/lib/library/events";
-import { LibraryPageBlock, LibraryPageBlockName, WithMetadata } from "@/lib/library/metadata";
+import { LibraryPageBlock, LibraryPageBlockName } from "@/lib/library/metadata";
 import { styled } from "@/styled-system/jsx";
 
 import { CreateBlockMenu } from "./CreateBlockMenu";
 
 type Props = {
-  node: WithMetadata<NodeWithChildren>;
   block: LibraryPageBlock;
 };
 
-export function BlockMenu({ node, block }: Props & ButtonProps) {
+export function BlockMenu({ block }: Props & ButtonProps) {
   const emit = useEmitLibraryBlockEvent();
 
   function handleSelect(value: MenuSelectionDetails) {
@@ -31,12 +29,23 @@ export function BlockMenu({ node, block }: Props & ButtonProps) {
   }
 
   return (
-    <Menu.Root lazyMount onSelect={handleSelect} positioning={{
-      placement: "right-start",
-      gutter: 0
-    }}>
+    <Menu.Root
+      lazyMount
+      onSelect={handleSelect}
+      positioning={{
+        placement: "right-start",
+        gutter: 0,
+      }}
+    >
       <Menu.Trigger asChild>
-        <IconButton variant="ghost" size="xs" minWidth="5" width="5" height="5" padding="0">
+        <IconButton
+          variant="ghost"
+          size="xs"
+          minWidth="5"
+          width="5"
+          height="5"
+          padding="0"
+        >
           <MoreIcon width="3" />
         </IconButton>
       </Menu.Trigger>

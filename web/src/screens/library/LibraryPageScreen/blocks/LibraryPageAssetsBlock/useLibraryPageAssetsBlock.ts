@@ -3,22 +3,24 @@ import { Asset } from "@/api/openapi-schema";
 import { useLibraryMutation } from "@/lib/library/library";
 
 import { useLibraryPageContext } from "../../Context";
+import { useWatch } from "../../store";
 import { useEditState } from "../../useEditState";
 
 export function useLibraryPageAssetsBlock() {
   const { editing } = useEditState();
-  const { node } = useLibraryPageContext();
+  const { nodeID } = useLibraryPageContext();
 
-  const { assets } = node;
+  const assets = useWatch((s) => s.draft.assets);
+
   const isEmpty = assets.length === 0;
   const shouldShow = editing || !isEmpty;
 
-  const { revalidate, addAsset, removeAsset } = useLibraryMutation(node);
+  const { revalidate, addAsset, removeAsset } = useLibraryMutation();
 
   async function handleUpload(a: Asset) {
     await handle(
       async () => {
-        await addAsset(node.slug, a);
+        await addAsset(nodeID, a);
       },
       {
         promiseToast: {
@@ -33,7 +35,7 @@ export function useLibraryPageAssetsBlock() {
   async function handleRemove(a: Asset) {
     await handle(
       async () => {
-        await removeAsset(node.slug, a.id);
+        await removeAsset(nodeID, a.id);
       },
       {
         promiseToast: {
