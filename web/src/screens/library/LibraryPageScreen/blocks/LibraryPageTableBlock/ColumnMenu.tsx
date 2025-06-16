@@ -1,16 +1,13 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
-import { EyeIcon, FilterIcon } from "lucide-react";
+import { EyeIcon } from "lucide-react";
 import { PropsWithChildren } from "react";
 
-import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { Input } from "@/components/ui/input";
 import * as Menu from "@/components/ui/menu";
-import { LibraryPageBlockTypeTable } from "@/lib/library/metadata";
 
 import { useLibraryPageContext } from "../../Context";
-import { useWatch } from "../../store";
 
-import { ColumnDefinition, getDefaultBlockConfig } from "./column";
+import { ColumnDefinition } from "./column";
 
 type Props = {
   column: ColumnDefinition;
@@ -18,29 +15,8 @@ type Props = {
 
 export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
   const { store } = useLibraryPageContext();
-  const { setChildPropertyHiddenState } = store.getState();
-
-  const currentMetadata = useWatch((s) => s.draft.meta);
-  const currentChildPropertySchema = useWatch(
-    (s) => s.draft.child_property_schema,
-  );
-
-  const currentTableBlockIndex = currentMetadata.layout?.blocks.findIndex(
-    (b) => b.type === "table",
-  );
-  if (!currentTableBlockIndex) {
-    console.warn(
-      "attempting to render a ColumnMenu without a table block in the form metadata",
-    );
-    return null;
-  }
-  const currentTableBlock = currentMetadata.layout?.blocks[
-    currentTableBlockIndex
-  ] as LibraryPageBlockTypeTable;
-
-  const columnConfig =
-    currentTableBlock.config ??
-    getDefaultBlockConfig(currentChildPropertySchema);
+  const { setChildPropertyHiddenState, setChildPropertyName } =
+    store.getState();
 
   function handleSelect(value: MenuSelectionDetails) {
     switch (value.value) {
@@ -52,19 +28,7 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
   }
 
   function handleColumnNameChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const nextChildPropertySchema = currentChildPropertySchema.map((ps) => {
-      if (ps.fid === column.fid) {
-        return {
-          ...ps,
-          name: event.target.value,
-        };
-      }
-
-      return ps;
-    });
-
-    // setChildPropertySchema(nextChildPropertySchema);
-    // form.setValue("childPropertySchema", nextChildPropertySchema);
+    setChildPropertyName(column.fid, event.target.value);
   }
 
   function handleColumnHide() {
@@ -78,21 +42,31 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
       <Portal>
         <Menu.Positioner>
           <Menu.Content minW="36">
-            {/* TODO: Add property schema mutations to store */}
-            {/* {!column.fixed && (
+            {!column.fixed && (
               <Menu.ItemGroup pl="2" py="2">
                 <Input
                   size="sm"
                   value={column.name}
                   onChange={handleColumnNameChange}
+                  // Override Ark.Menu hooking events
+                  onKeyDown={(e) => {
+                    // Stop arrow keys, space, etc. from bubbling to the menu
+                    e.stopPropagation();
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  onFocus={(e) => {
+                    e.stopPropagation();
+                  }}
                 />
               </Menu.ItemGroup>
-            )} */}
+            )}
 
             <Menu.ItemGroup>
               <Menu.Item value="hide-show">
                 <EyeIcon />
-                &nbsp;Hide
+                &nbsp;Hide column
               </Menu.Item>
 
               {/* {!column.fixed && (
@@ -102,10 +76,11 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
                 </Menu.Item>
               )} */}
 
-              <Menu.Item value="filter">
+              {/* TODO: Filtering on child API */}
+              {/* <Menu.Item value="filter">
                 <FilterIcon />
                 &nbsp;Filter...
-              </Menu.Item>
+              </Menu.Item> */}
             </Menu.ItemGroup>
           </Menu.Content>
         </Menu.Positioner>

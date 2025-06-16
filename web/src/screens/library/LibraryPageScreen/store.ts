@@ -272,10 +272,11 @@ export const createNodeStore = (initState: State) => {
 
         setChildPropertyName: (fid: Identifier, newName: PropertyName) => {
           set((state) => {
-            for (const p of state.draft.child_property_schema) {
-              if (p.fid === fid) {
-                p.name = newName;
-              }
+            const target = state.draft.child_property_schema.find(
+              (f) => f.fid === fid,
+            );
+            if (target) {
+              target.name = newName;
             }
           });
         },

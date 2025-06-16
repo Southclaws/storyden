@@ -118,6 +118,7 @@ export function LibraryPageTableBlock() {
                       alignItems="center"
                       justifyContent="space-between"
                       gap="1"
+                      textWrap="nowrap"
                       flexWrap="nowrap"
                       fontWeight="semibold"
                     >
