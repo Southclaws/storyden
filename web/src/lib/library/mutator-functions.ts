@@ -44,11 +44,7 @@ export const nodeMutator = (
   return (previous) => {
     if (!previous) return;
 
-    console.log("nodeMutator", updated);
-
     const node = mergeWith(previous, updated, (target, source) => {
-      console.log("mergeWith", target, source);
-
       // If the target is an array, we want to replace it with the source value.
       if (Array.isArray(target)) {
         return source;

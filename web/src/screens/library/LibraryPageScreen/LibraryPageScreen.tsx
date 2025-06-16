@@ -1,17 +1,26 @@
 "use client";
 
+import { last } from "lodash";
+import { useParams } from "next/navigation";
 import { memo } from "react";
 
 import { useNodeGet } from "@/api/openapi-client/nodes";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { LStack } from "@/styled-system/jsx";
 
+import { Params } from "../library-path";
+
 import { LibraryPageProvider, Props } from "./Context";
 import { LibraryPageControls } from "./LibraryPageControls";
 import { LibraryPageBlocks } from "./blocks/LibraryPageBlocks";
 
 export function LibraryPageScreen(props: Props) {
-  const { data, error } = useNodeGet(props.node.id, undefined, {
+  const { slug } = useParams<Params>();
+
+  // NOTE: Will fail if slug changes during edit mode.
+  const targetSlug = last(slug) ?? props.node.slug;
+
+  const { data, error } = useNodeGet(targetSlug, undefined, {
     swr: {
       fallbackData: props.node,
       revalidateOnFocus: false,

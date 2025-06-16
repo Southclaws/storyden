@@ -6,15 +6,12 @@ import { createStore } from "zustand/vanilla";
 
 import {
   Identifier,
-  Link,
   LinkReference,
   NodeMutableProps,
   NodeWithChildren,
   NodeWithChildrenAllOf,
-  PropertyMutationList,
   PropertyName,
   PropertySchema,
-  PropertySchemaList,
   PropertyType,
 } from "@/api/openapi-schema";
 import { deriveMutationFromDifference } from "@/lib/library/diff";
@@ -23,17 +20,12 @@ import {
   DefaultLayout,
   LibraryPageBlock,
   LibraryPageBlockType,
-  NodeMetadata,
+  LibraryPageBlockTypeTable,
   WithMetadata,
 } from "@/lib/library/metadata";
 import { applyNodeChanges } from "@/lib/library/mutators";
 
 import { useLibraryPageContext } from "./Context";
-
-type NodeDraftEvent = {
-  type: "patch";
-  data: NodeMutableProps;
-};
 
 export type State = {
   original: WithMetadata<NodeWithChildren>;
@@ -68,6 +60,7 @@ export type Actions = {
   moveBlock: (type: LibraryPageBlockType, newIndex: number) => void;
   addBlock: (type: LibraryPageBlockType) => void;
   removeBlock: (type: LibraryPageBlockType) => void;
+  overwriteBlock: (type: LibraryPageBlock) => void;
 
   commit: (
     callback: (draft: NodeMutableProps) => Promise<NodeWithChildrenAllOf>,
@@ -75,6 +68,8 @@ export type Actions = {
 };
 
 export type Store = State & Actions;
+
+export type NodeStoreAPI = ReturnType<typeof createNodeStore>;
 
 export const createNodeStore = (initState: State) => {
   return createStore<Store>()(
@@ -297,6 +292,7 @@ export const createNodeStore = (initState: State) => {
               for (const col of block.config.columns) {
                 if (col.fid === fid) {
                   col.hidden = hidden;
+                  return;
                 }
               }
             }
@@ -359,6 +355,21 @@ export const createNodeStore = (initState: State) => {
             }
 
             blocks.splice(index, 1);
+          });
+        },
+
+        overwriteBlock: (block: LibraryPageBlock) => {
+          set((state) => {
+            const layout = (state.draft.meta.layout ??= DefaultLayout);
+            const blocks = layout.blocks;
+
+            // check if the block exists, if not, do nothing.
+            const index = blocks.findIndex((b) => b.type === block.type);
+            if (index === -1) {
+              return;
+            }
+
+            blocks[index] = block;
           });
         },
 

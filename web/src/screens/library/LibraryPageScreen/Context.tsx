@@ -20,16 +20,14 @@ import { nodeUpdate } from "@/api/openapi-client/nodes";
 import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
 
-import { createNodeStore } from "./store";
+import { NodeStoreAPI, createNodeStore } from "./store";
 
 type LibraryPageContext = {
   nodeID: Identifier;
   currentNode: WithMetadata<NodeWithChildren>;
-  store: ReturnType<typeof createNodeStore>;
+  store: NodeStoreAPI;
   saving: boolean;
 };
-
-type NodeStoreAPI = ReturnType<typeof createNodeStore>;
 
 const Context = createContext<LibraryPageContext | null>(null);
 
