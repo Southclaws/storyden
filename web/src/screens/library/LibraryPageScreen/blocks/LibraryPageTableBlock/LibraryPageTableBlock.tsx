@@ -24,6 +24,7 @@ import {
   mergeFieldsAndProperties,
   mergeFieldsAndPropertySchema,
 } from "./column";
+import { useTableBlock } from "./useTableBlock";
 
 export function LibraryPageTableBlock() {
   const { nodeID } = useLibraryPageContext();
@@ -43,7 +44,7 @@ export function LibraryPageTableBlock() {
     children_sort: childrenSort,
   });
 
-  const currentMeta = useWatch((s) => s.draft.meta);
+  const block = useTableBlock();
   const currentChildPropertySchema = useWatch(
     (s) => s.draft.child_property_schema,
   );
@@ -61,8 +62,6 @@ export function LibraryPageTableBlock() {
   if (!hideChildTree) {
     return null;
   }
-
-  const block = currentMeta.layout?.blocks.find((b) => b.type === "table");
 
   if (!block) {
     console.warn(
