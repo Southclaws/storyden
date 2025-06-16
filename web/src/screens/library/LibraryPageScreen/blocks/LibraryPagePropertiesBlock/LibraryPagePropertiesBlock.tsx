@@ -74,49 +74,39 @@ function LibraryPagePropertiesBlockEditable() {
     addProperty("Field", PropertyType.text);
   }
 
-  function handleRemoveProperty(name: PropertyName) {
+  const handleRemoveProperty = (name: PropertyName) => () => {
     removePropertyByName(name);
-  }
+  };
 
-  function handlePropertyNameChange(name: PropertyName, newName: string) {
-    setPropertyName(name, newName);
-  }
+  const handlePropertyNameChange =
+    (name: PropertyName) => (e: ChangeEvent<HTMLInputElement>) => {
+      setPropertyName(name, e.target.value);
+    };
 
-  function handlePropertyValueChange(name: PropertyName, value: string) {
-    setPropertyValue(name, value);
-  }
+  const handlePropertyValueChange =
+    (name: PropertyName) => (e: ChangeEvent<HTMLInputElement>) => {
+      setPropertyValue(name, e.target.value);
+    };
 
   return (
     <LStack w="64">
       {current.length > 0 && (
         <styled.dl display="table" borderCollapse="collapse">
           {current.map((p) => {
-            function handleRemove() {
-              handleRemoveProperty(p.name);
-            }
-
-            function handleNameChange(e: ChangeEvent<HTMLInputElement>) {
-              handlePropertyNameChange(p.name, e.target.value);
-            }
-
-            function handleValueChange(e: ChangeEvent<HTMLInputElement>) {
-              handlePropertyValueChange(p.name, e.target.value);
-            }
-
             return (
               <HStack key={p.fid} display="table-row">
                 <styled.dt display="table-cell" p="1" color="fg.muted">
                   <Input
                     variant="ghost"
                     defaultValue={p.name}
-                    onChange={handleNameChange}
+                    onChange={handlePropertyNameChange(p.name)}
                   />
                 </styled.dt>
                 <styled.dd display="table-cell" p="1">
                   <Input
                     variant="ghost"
                     defaultValue={p.value}
-                    onChange={handleValueChange}
+                    onChange={handlePropertyValueChange(p.name)}
                   />
                 </styled.dd>
 
@@ -126,7 +116,7 @@ function LibraryPagePropertiesBlockEditable() {
                     variant="ghost"
                     color="fg.destructive"
                     size="sm"
-                    onClick={handleRemove}
+                    onClick={handleRemoveProperty(p.name)}
                   >
                     <DeleteIcon />
                   </IconButton>
