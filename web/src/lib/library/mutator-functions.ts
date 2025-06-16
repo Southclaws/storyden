@@ -41,15 +41,25 @@ export const nodeListMutator = (
 export const nodeMutator = (
   updated: NodeWithChildren,
 ): MutatorCallback<NodeGetOKResponse> => {
-  return (data) => {
-    if (!data) return;
+  return (previous) => {
+    if (!previous) return;
 
-    const node = mergeWith(data, updated, (objValue, srcValue) => {
-      if (Array.isArray(objValue)) {
-        return srcValue;
+    console.log("nodeMutator", updated);
+
+    const node = mergeWith(previous, updated, (target, source) => {
+      console.log("mergeWith", target, source);
+
+      // If the target is an array, we want to replace it with the source value.
+      if (Array.isArray(target)) {
+        return source;
       }
 
-      return srcValue;
+      // If source is undefined, we want to keep the existing target value.
+      if (source === undefined) {
+        return target;
+      }
+
+      return source;
     });
 
     return node;
