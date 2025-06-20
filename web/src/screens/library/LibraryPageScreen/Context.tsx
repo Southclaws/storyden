@@ -10,13 +10,13 @@ import {
   useState,
 } from "react";
 
-import {
-  Identifier,
-  NodeMutableProps,
-  NodeWithChildren,
-} from "src/api/openapi-schema";
+import { Identifier, NodeWithChildren } from "src/api/openapi-schema";
 
-import { nodeUpdate } from "@/api/openapi-client/nodes";
+import {
+  nodeUpdate,
+  nodeUpdateChildrenPropertySchema,
+} from "@/api/openapi-client/nodes";
+import { MutationSet } from "@/lib/library/diff";
 import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
 
@@ -93,10 +93,17 @@ export function LibraryPageProvider({
 
       const state = storeRef.current.getState();
 
-      state.commit(async (patch: NodeMutableProps) => {
+      state.commit(async (mutation: MutationSet) => {
         setSaving(() => true);
 
-        const updated = await nodeUpdate(node.id, patch);
+        if (mutation.childPropertySchemaMutation) {
+          await nodeUpdateChildrenPropertySchema(
+            node.id,
+            mutation.childPropertySchemaMutation,
+          );
+        }
+
+        const updated = await nodeUpdate(node.id, mutation.nodeMutation);
         await revalidate(updated);
 
         const slugChanged = updated.slug !== state.original.slug;

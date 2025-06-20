@@ -1,6 +1,12 @@
 import { dequal } from "dequal";
+import { omit } from "lodash";
 
-import { NodeMutableProps, NodeWithChildren } from "@/api/openapi-schema";
+import {
+  NodeMutableProps,
+  NodeWithChildren,
+  PropertySchemaList,
+  PropertySchemaMutableProps,
+} from "@/api/openapi-schema";
 
 function projectNodeToMutableProps(node: NodeWithChildren): NodeMutableProps {
   return {
@@ -25,10 +31,16 @@ function projectNodeToMutableProps(node: NodeWithChildren): NodeMutableProps {
   };
 }
 
+export type MutationSet = {
+  clean: boolean;
+  nodeMutation: NodeMutableProps;
+  childPropertySchemaMutation?: PropertySchemaMutableProps[];
+};
+
 export const deriveMutationFromDifference = (
   current: NodeWithChildren,
   updated: NodeWithChildren,
-) => {
+): MutationSet => {
   const mutation: NodeMutableProps = {};
 
   const draft = projectNodeToMutableProps(current);
@@ -49,5 +61,37 @@ export const deriveMutationFromDifference = (
     Object.assign(mutation, { [key]: updatedValue });
   });
 
-  return mutation;
+  // Diff the child property schema
+  const childPropertySchema = diffPropertySchemas(
+    current.child_property_schema,
+    updated.child_property_schema,
+  );
+
+  const nodeMutations = Object.keys(mutation).length;
+
+  // Determine if this mutation even does anything.
+  const clean = nodeMutations === 0 && !childPropertySchema;
+
+  return {
+    clean,
+    nodeMutation: mutation,
+    childPropertySchemaMutation: childPropertySchema,
+  };
 };
+
+function diffPropertySchemas(
+  a: PropertySchemaList,
+  b: PropertySchemaList,
+): PropertySchemaMutableProps[] | undefined {
+  if (dequal(a, b)) {
+    return undefined;
+  }
+
+  return b.map((p) => {
+    if (p.fid.startsWith("new_field")) {
+      return omit(p, "fid") as PropertySchemaMutableProps;
+    }
+
+    return p;
+  });
+}

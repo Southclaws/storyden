@@ -14,13 +14,12 @@ import {
   PropertySchema,
   PropertyType,
 } from "@/api/openapi-schema";
-import { deriveMutationFromDifference } from "@/lib/library/diff";
+import { MutationSet, deriveMutationFromDifference } from "@/lib/library/diff";
 import { CoverImageArgs } from "@/lib/library/library";
 import {
   DefaultLayout,
   LibraryPageBlock,
   LibraryPageBlockType,
-  LibraryPageBlockTypeTable,
   WithMetadata,
 } from "@/lib/library/metadata";
 import { applyNodeChanges } from "@/lib/library/mutators";
@@ -63,7 +62,7 @@ export type Actions = {
   overwriteBlock: (type: LibraryPageBlock) => void;
 
   commit: (
-    callback: (draft: NodeMutableProps) => Promise<NodeWithChildrenAllOf>,
+    callback: (draft: MutationSet) => Promise<NodeWithChildrenAllOf>,
   ) => Promise<void>;
 };
 
@@ -81,22 +80,20 @@ export const createNodeStore = (initState: State) => {
         });
 
       const commit = async (
-        callback: (draft: NodeMutableProps) => Promise<NodeWithChildrenAllOf>,
+        callback: (draft: MutationSet) => Promise<NodeWithChildrenAllOf>,
       ) => {
         const current = get().original;
         const draft = get().draft;
-        const patch = deriveMutationFromDifference(current, draft);
+        const mutation = deriveMutationFromDifference(current, draft);
 
-        const changes = Object.keys(patch).length;
-
-        if (changes === 0) {
+        if (mutation.clean) {
           console.debug("skipping commit: no changes");
           return;
         }
 
-        console.debug(`applying commit: ${changes} changes`, patch);
+        console.debug(`applying commit: `, mutation);
 
-        const updated = await callback(patch);
+        const updated = await callback(mutation);
 
         set(() => ({
           original: updated,
