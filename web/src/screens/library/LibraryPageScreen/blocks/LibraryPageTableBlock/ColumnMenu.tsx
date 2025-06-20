@@ -2,6 +2,7 @@ import { MenuSelectionDetails, Portal } from "@ark-ui/react";
 import { EyeIcon } from "lucide-react";
 import { PropsWithChildren } from "react";
 
+import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { Input } from "@/components/ui/input";
 import * as Menu from "@/components/ui/menu";
 
@@ -15,13 +16,20 @@ type Props = {
 
 export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
   const { store } = useLibraryPageContext();
-  const { setChildPropertyHiddenState, setChildPropertyName } =
-    store.getState();
+  const {
+    setChildPropertyHiddenState,
+    setChildPropertyName,
+    removeChildPropertyByID,
+  } = store.getState();
 
   function handleSelect(value: MenuSelectionDetails) {
     switch (value.value) {
       case "hide-show": {
         handleColumnHide();
+        break;
+      }
+      case "delete": {
+        handlePropertyDelete();
         break;
       }
     }
@@ -33,6 +41,10 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
 
   function handleColumnHide() {
     setChildPropertyHiddenState(column.fid, !column.hidden);
+  }
+
+  function handlePropertyDelete() {
+    removeChildPropertyByID(column.fid);
   }
 
   return (
@@ -69,12 +81,12 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
                 &nbsp;Hide column
               </Menu.Item>
 
-              {/* {!column.fixed && (
+              {!column.fixed && (
                 <Menu.Item value="delete">
                   <DeleteIcon />
                   &nbsp;Delete
                 </Menu.Item>
-              )} */}
+              )}
 
               {/* TODO: Filtering on child API */}
               {/* <Menu.Item value="filter">
