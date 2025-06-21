@@ -62,29 +62,6 @@ export function LibraryPageProvider({
     });
   }
 
-  // Handle external changes to the original node state. This happens if another
-  // source triggers a mutation+revalidation via SWR and the initial must update
-  useEffect(() => {
-    if (!storeRef.current) {
-      return;
-    }
-
-    const { original, draft } = storeRef.current.getState();
-
-    const equalToOriginal = dequal(original, nodeWithMeta);
-    const equalToDraft = dequal(draft, nodeWithMeta);
-
-    storeRef.current.setState((state) => {
-      if (!equalToOriginal) {
-        state.original = nodeWithMeta;
-      }
-
-      if (!equalToDraft) {
-        state.draft = nodeWithMeta;
-      }
-    });
-  }, [nodeWithMeta]);
-
   const saveDraft = useRef(
     debounce(() => {
       if (!storeRef.current) {
@@ -133,6 +110,33 @@ export function LibraryPageProvider({
 
     return unsub;
   }, [saveDraft]);
+
+  // Handle external changes to the original node state. This happens if another
+  // source triggers a mutation+revalidation via SWR and the initial must update
+  // the store state. This hook must run after the store subscription is set up.
+  useEffect(() => {
+    if (!storeRef.current) {
+      return;
+    }
+
+    const { original, draft } = storeRef.current.getState();
+
+    // We compare the un-hydrated node for original comparison, because the
+    // nodeWithMeta object is potentially mutated by the hydration function to
+    // set up default values for new nodes. This includes the page's layout.
+    const equalToOriginal = dequal(original, node);
+    const equalToDraft = dequal(draft, nodeWithMeta);
+
+    storeRef.current.setState((state) => {
+      if (!equalToOriginal) {
+        state.original = node;
+      }
+
+      if (!equalToDraft) {
+        state.draft = nodeWithMeta;
+      }
+    });
+  }, [node, nodeWithMeta]);
 
   return (
     <Context.Provider
