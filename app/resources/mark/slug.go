@@ -2,6 +2,7 @@ package mark
 
 import (
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/gosimple/slug"
 )
@@ -20,7 +21,7 @@ func (s Slug) String() string {
 
 func NewSlug(s string) (*Slug, error) {
 	if !slug.IsSlug(s) {
-		return nil, ErrInvalidSlug
+		return nil, fault.Wrap(ErrInvalidSlug, fmsg.WithDesc("invalid slug", "The specified slug is not valid, it must be a URL-friendly string without spaces."))
 	}
 
 	return &Slug{

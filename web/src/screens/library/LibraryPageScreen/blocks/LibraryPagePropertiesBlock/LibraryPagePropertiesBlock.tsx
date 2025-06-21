@@ -1,6 +1,4 @@
-import { uniqueId } from "lodash/fp";
 import { ChangeEvent } from "react";
-import { Controller } from "react-hook-form";
 
 import { PropertyName, PropertyType } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
@@ -10,12 +8,12 @@ import { Input } from "@/components/ui/input";
 import { Center, HStack, LStack, styled } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
-import { Form } from "../../form";
+import { useWatch } from "../../store";
 import { useEditState } from "../../useEditState";
 
 export function LibraryPagePropertiesBlock() {
   const { editing } = useEditState();
-  const { node } = useLibraryPageContext();
+  const properties = useWatch((s) => s.draft.properties);
 
   if (editing) {
     return <LibraryPagePropertiesBlockEditable />;
@@ -23,7 +21,7 @@ export function LibraryPagePropertiesBlock() {
 
   return (
     <styled.dl display="table" borderCollapse="collapse">
-      {node.properties.map((p) => {
+      {properties.map((p) => {
         return (
           <HStack key={p.name} display="table-row">
             <styled.dt
@@ -63,127 +61,80 @@ export function LibraryPagePropertiesBlock() {
 }
 
 function LibraryPagePropertiesBlockEditable() {
-  const { node, form } = useLibraryPageContext();
+  const { store } = useLibraryPageContext();
+  const {
+    addProperty,
+    removePropertyByName,
+    setPropertyName,
+    setPropertyValue,
+  } = store.getState();
+  const current = useWatch((s) => s.draft.properties);
+
+  function handleAddProperty() {
+    addProperty("Field", PropertyType.text);
+  }
+
+  const handleRemoveProperty = (name: PropertyName) => () => {
+    removePropertyByName(name);
+  };
+
+  const handlePropertyNameChange =
+    (name: PropertyName) => (e: ChangeEvent<HTMLInputElement>) => {
+      setPropertyName(name, e.target.value);
+    };
+
+  const handlePropertyValueChange =
+    (name: PropertyName) => (e: ChangeEvent<HTMLInputElement>) => {
+      setPropertyValue(name, e.target.value);
+    };
+
   return (
-    <Controller<Form>
-      control={form.control}
-      name="properties"
-      render={({ field, fieldState, formState }) => {
-        const fieldValue = field.value as Form["properties"];
-        const initialValue = formState.defaultValues?.[
-          "properties"
-        ] as Form["properties"];
-        const current = fieldValue ?? initialValue ?? [];
+    <LStack w="64">
+      {current.length > 0 && (
+        <styled.dl display="table" borderCollapse="collapse">
+          {current.map((p) => {
+            return (
+              <HStack key={p.fid} display="table-row">
+                <styled.dt display="table-cell" p="1" color="fg.muted">
+                  <Input
+                    variant="ghost"
+                    defaultValue={p.name}
+                    onChange={handlePropertyNameChange(p.name)}
+                  />
+                </styled.dt>
+                <styled.dd display="table-cell" p="1">
+                  <Input
+                    variant="ghost"
+                    defaultValue={p.value}
+                    onChange={handlePropertyValueChange(p.name)}
+                  />
+                </styled.dd>
 
-        async function handleAddProperty() {
-          const existingNames = new Set(current.map((f) => f.name));
-          let newName = "Field 1";
-          let counter = 1;
-          while (existingNames.has(newName)) {
-            newName = `Field ${counter++}`;
-          }
-
-          field.onChange([
-            ...current,
-            {
-              fid: uniqueId("new_field_"),
-              name: newName,
-              type: PropertyType.text, // TODO: Add actual UI for types
-              sort: "5",
-              value: "",
-            },
-          ]);
-        }
-
-        async function handleRemoveProperty(name: PropertyName) {
-          const next = current.filter((f) => f.name !== name);
-          field.onChange(next);
-        }
-
-        function handlePropertyNameChange(name: PropertyName, newName: string) {
-          const next = current.map((f) => {
-            if (f.name === name) {
-              f.name = newName;
-            }
-
-            return f;
-          });
-          field.onChange(next);
-        }
-
-        function handlePropertyValueChange(name: PropertyName, value: string) {
-          const next = current.map((f) => {
-            if (f.name === name) {
-              f.value = value;
-            }
-
-            return f;
-          });
-          field.onChange(next);
-        }
-
-        return (
-          <LStack w="64">
-            {current.length > 0 && (
-              <styled.dl display="table" borderCollapse="collapse">
-                {current.map((p) => {
-                  function handleRemove() {
-                    handleRemoveProperty(p.name);
-                  }
-
-                  function handleNameChange(e: ChangeEvent<HTMLInputElement>) {
-                    handlePropertyNameChange(p.name, e.target.value);
-                  }
-
-                  function handleValueChange(e: ChangeEvent<HTMLInputElement>) {
-                    handlePropertyValueChange(p.name, e.target.value);
-                  }
-
-                  return (
-                    <HStack key={p.fid} display="table-row">
-                      <styled.dt display="table-cell" p="1" color="fg.muted">
-                        <Input
-                          variant="ghost"
-                          defaultValue={p.name}
-                          onChange={handleNameChange}
-                        />
-                      </styled.dt>
-                      <styled.dd display="table-cell" p="1">
-                        <Input
-                          variant="ghost"
-                          defaultValue={p.value}
-                          onChange={handleValueChange}
-                        />
-                      </styled.dd>
-
-                      <Center>
-                        <IconButton
-                          type="button"
-                          variant="ghost"
-                          color="fg.destructive"
-                          size="sm"
-                          onClick={handleRemove}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
-                      </Center>
-                    </HStack>
-                  );
-                })}
-              </styled.dl>
-            )}
-            <Button
-              type="button"
-              w="full"
-              size="xs"
-              variant="subtle"
-              onClick={handleAddProperty}
-            >
-              Add Property
-            </Button>
-          </LStack>
-        );
-      }}
-    />
+                <Center>
+                  <IconButton
+                    type="button"
+                    variant="ghost"
+                    color="fg.destructive"
+                    size="sm"
+                    onClick={handleRemoveProperty(p.name)}
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Center>
+              </HStack>
+            );
+          })}
+        </styled.dl>
+      )}
+      <Button
+        type="button"
+        w="full"
+        size="xs"
+        variant="subtle"
+        onClick={handleAddProperty}
+      >
+        Add Property
+      </Button>
+    </LStack>
   );
 }

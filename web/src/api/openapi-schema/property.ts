@@ -17,5 +17,5 @@ export interface Property {
   name: PropertyName;
   sort: string;
   type: PropertyType;
-  value?: PropertyValue;
+  value: PropertyValue;
 }

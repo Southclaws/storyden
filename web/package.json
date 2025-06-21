@@ -41,7 +41,9 @@
     "dequal": "^2.0.3",
     "emoji-picker-react": "^4.12.0",
     "framer-motion": "^11.11.4",
+    "immer": "^10.1.1",
     "js-cookie": "^3.0.5",
+    "just-diff": "^6.0.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.511.0",
     "mime-db": "^1.53.0",
@@ -65,7 +67,8 @@
     "usehooks-ts": "^3.1.0",
     "vaul": "^1.0.0",
     "xid-ts": "^1.1.4",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@pandacss/dev": "^0.53.5",

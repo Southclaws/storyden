@@ -67,6 +67,11 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 			return *link_ref.Map(&in)
 		})
 
+		metadata := c.Metadata
+		if metadata == nil {
+			metadata = make(map[string]any)
+		}
+
 		n := &Node{
 			Mark:          NewMark(c.ID, c.Slug),
 			CreatedAt:     c.CreatedAt,
@@ -88,7 +93,7 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 			Nodes:      nodes,
 			Visibility: visibility,
 			SortKey:    c.Sort,
-			Metadata:   c.Metadata,
+			Metadata:   metadata,
 		}
 
 		if ps != nil {

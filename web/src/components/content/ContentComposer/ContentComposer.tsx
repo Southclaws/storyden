@@ -22,7 +22,7 @@ import {
   TextQuoteIcon,
 } from "@/components/ui/icons/Typography";
 import * as Menu from "@/components/ui/menu";
-import { css } from "@/styled-system/css";
+import { css, cx } from "@/styled-system/css";
 import { LStack, styled } from "@/styled-system/jsx";
 import { button } from "@/styled-system/recipes";
 
@@ -39,11 +39,10 @@ export function ContentComposer(props: ContentComposerProps) {
     <LStack
       id={`rich-text-editor-${uniqueID}`}
       containerType="inline-size"
-      className="typography"
+      className={cx("typography", props.className)}
       // NOTE: Relative positioning is for the floating menu to work.
       position="relative"
       w="full"
-      h="full"
       gap="1"
       onDragOver={(e) => e.preventDefault()}
     >

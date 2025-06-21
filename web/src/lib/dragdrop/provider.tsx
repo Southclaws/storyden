@@ -23,7 +23,7 @@ import { LibraryPageBlockType } from "../library/metadata";
 
 export type DragItemNodeBlock = {
   type: "block";
-  node: NodeWithChildren;
+  node: NodeWithChildren; // TODO: Change this to only rely on the node ID.
   block: LibraryPageBlockType;
 };
 
@@ -122,6 +122,7 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <DndContext
+      id="sd-dnd"
       sensors={sensors}
       collisionDetection={pointerWithin}
       // onDragOver={onDragOver}
