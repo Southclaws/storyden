@@ -95,7 +95,7 @@ export function LibraryPageProvider({
 
           return updated;
         } catch (error) {
-          throw error;
+          throw new Error("patch failed", { cause: error });
         } finally {
           setTimeout(() => {
             setSaving(() => false);

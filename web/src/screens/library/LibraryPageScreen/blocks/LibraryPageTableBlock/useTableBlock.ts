@@ -34,7 +34,6 @@ export function useTableBlock(): LibraryPageBlockTypeTable {
         type: "table",
         config: defaultBlockConfig,
       });
-    } else {
     }
   }, [block]);
 
