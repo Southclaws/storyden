@@ -25,7 +25,6 @@ export function useTableBlock(): LibraryPageBlockTypeTable {
   // If the block config is empty, set it to the default state using schema.
   // If the columns contain any fields that do not exist on the schema, fix it.
   useEffect(() => {
-    console.log("useTableBlock effect", { block });
     if (block?.config === undefined) {
       const defaultBlockConfig = getDefaultBlockConfig(
         currentChildPropertySchema,
