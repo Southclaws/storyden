@@ -1,7 +1,10 @@
+import { InputEvent, useState } from "react";
+
 import { Breadcrumbs } from "@/components/library/Breadcrumbs";
 import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { EditAction } from "@/components/site/Action/Edit";
+import { isSlugReady, processMarkInput } from "@/lib/mark/mark";
 import { HStack, WStack } from "@/styled-system/jsx";
 
 import { useLibraryPath } from "../useLibraryPath";
@@ -11,7 +14,7 @@ import { useLibraryPagePermissions } from "./permissions";
 import { useWatch } from "./store";
 import { useEditState } from "./useEditState";
 
-export function LibraryPageControls() {
+function useLibraryPageControls() {
   const libraryPath = useLibraryPath();
   const { store } = useLibraryPageContext();
   const { draft, setSlug } = store.getState();
@@ -22,6 +25,41 @@ export function LibraryPageControls() {
   const { isAllowedToEdit } = useLibraryPagePermissions();
   const { editing } = useEditState();
 
+  const [isSlugInvalid, setSlugInvalid] = useState(true);
+
+  function handleSlugChange(event: InputEvent<HTMLInputElement>) {
+    const raw = event.currentTarget.value;
+    const slug = processMarkInput(raw);
+    const invalid = isSlugReady(slug);
+    setSlug(slug);
+    setSlugInvalid(invalid);
+  }
+
+  return {
+    libraryPath,
+    draft,
+    slug,
+    isSlugInvalid,
+    visibility,
+    setSlug,
+    isAllowedToEdit,
+    editing,
+    handleSlugChange,
+  };
+}
+
+export function LibraryPageControls() {
+  const {
+    libraryPath,
+    draft,
+    slug,
+    visibility,
+    isSlugInvalid,
+    isAllowedToEdit,
+    editing,
+    handleSlugChange,
+  } = useLibraryPageControls();
+
   return (
     <WStack alignItems="start">
       <Breadcrumbs
@@ -29,7 +67,9 @@ export function LibraryPageControls() {
         visibility={visibility}
         create={editing ? "edit" : "show"}
         defaultValue={slug}
-        onChange={(slug) => setSlug(slug.currentTarget.value)}
+        value={slug}
+        invalid={!isSlugInvalid}
+        onChange={handleSlugChange}
       />
       <HStack>
         {isAllowedToEdit && <EditControls />}

@@ -8,6 +8,8 @@ import {
   PropertySchemaMutableProps,
 } from "@/api/openapi-schema";
 
+import { isSlugReady } from "../mark/mark";
+
 function projectNodeToMutableProps(node: NodeWithChildren): NodeMutableProps {
   return {
     name: node.name,
@@ -56,6 +58,16 @@ export const deriveMutationFromDifference = (
     const changed = !dequal(draftValue, updatedValue);
     if (!changed) {
       return;
+    }
+
+    // Field specific transformations and skipping logic.
+
+    switch (key) {
+      case "slug":
+        if (!isSlugReady(updatedValue as string)) {
+          // Slugs must be valid to be added to patch, see mark.ts for details.
+          return;
+        }
     }
 
     Object.assign(mutation, { [key]: updatedValue });
