@@ -4,6 +4,7 @@ import { immer } from "zustand/middleware/immer";
 import { useStoreWithEqualityFn } from "zustand/traditional";
 import { createStore } from "zustand/vanilla";
 
+import { handle } from "@/api/client";
 import {
   Identifier,
   LinkReference,
@@ -93,12 +94,21 @@ export const createNodeStore = (initState: State) => {
 
         console.debug(`applying commit: `, mutation);
 
-        const updated = await callback(mutation);
+        const updated = await handle(
+          async () => {
+            return await callback(mutation);
+          },
+          {
+            errorToast: true,
+          },
+        );
 
-        set(() => ({
-          original: updated,
-          draft: updated,
-        }));
+        if (updated) {
+          set(() => ({
+            original: updated,
+            draft: updated,
+          }));
+        }
       };
 
       return {
