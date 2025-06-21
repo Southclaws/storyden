@@ -1,12 +1,17 @@
-import { MenuSelectionDetails, Portal } from "@ark-ui/react";
+import {
+  MenuOpenChangeDetails,
+  MenuSelectionDetails,
+  Portal,
+} from "@ark-ui/react";
 import { EyeIcon } from "lucide-react";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useState } from "react";
 
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { Input } from "@/components/ui/input";
 import * as Menu from "@/components/ui/menu";
 
 import { useLibraryPageContext } from "../../Context";
+import { useEditState } from "../../useEditState";
 
 import { ColumnDefinition } from "./column";
 
@@ -21,6 +26,18 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
     setChildPropertyName,
     removeChildPropertyByID,
   } = store.getState();
+  const { editing } = useEditState();
+  const [open, setOpen] = useState(false);
+
+  function handleOpenChange(open: MenuOpenChangeDetails) {
+    // TODO: When not editing, we still need to show some kind of menu for stuff
+    // like filtering etc for non-editor members. For now, show nothing.
+    if (!editing) {
+      return;
+    }
+
+    setOpen(open.open);
+  }
 
   function handleSelect(value: MenuSelectionDetails) {
     switch (value.value) {
@@ -48,7 +65,13 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
   }
 
   return (
-    <Menu.Root lazyMount onSelect={handleSelect} size="xs">
+    <Menu.Root
+      lazyMount
+      open={open}
+      onOpenChange={handleOpenChange}
+      onSelect={handleSelect}
+      size="xs"
+    >
       <Menu.Trigger asChild>{children}</Menu.Trigger>
 
       <Portal>

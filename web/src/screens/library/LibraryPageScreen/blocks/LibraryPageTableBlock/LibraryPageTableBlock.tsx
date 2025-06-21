@@ -12,10 +12,11 @@ import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { MenuIcon } from "@/components/ui/icons/Menu";
 import * as Table from "@/components/ui/table";
-import { Box, Center } from "@/styled-system/jsx";
+import { Box, Center, HStack } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
+import { useEditState } from "../../useEditState";
 
 import { AddPropertyMenu } from "./AddPropertyMenu/AddPropertyMenu";
 import { ColumnMenu } from "./ColumnMenu";
@@ -29,6 +30,7 @@ import { useTableBlock } from "./useTableBlock";
 export function LibraryPageTableBlock() {
   const { nodeID } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
+  const { editing } = useEditState();
 
   const hideChildTree = useWatch((s) => s.draft.child_property_schema);
 
@@ -110,47 +112,52 @@ export function LibraryPageTableBlock() {
                   }}
                   p="0"
                 >
-                  <ColumnMenu column={property}>
-                    <Box
-                      p="2"
-                      display="inline-flex"
-                      w="full"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      gap="1"
-                      textWrap="nowrap"
-                      flexWrap="nowrap"
-                      fontWeight="semibold"
-                    >
-                      {property.name}
-                      <IconButton
-                        type="button"
-                        variant="ghost"
-                        size="xs"
-                        onClick={handleClickSortAction}
+                  <HStack minW="0" w="full" pr="1">
+                    <ColumnMenu column={property}>
+                      <Box
+                        p="2"
+                        display="inline-flex"
+                        minW="0"
+                        flexGrow="1"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        gap="1"
+                        textWrap="nowrap"
+                        flexWrap="nowrap"
+                        fontWeight="semibold"
                       >
-                        <SortIndicator order={sortState} />
-                      </IconButton>
-                    </Box>
-                  </ColumnMenu>
+                        {property.name}
+                      </Box>
+                    </ColumnMenu>
+                    <IconButton
+                      type="button"
+                      variant="ghost"
+                      size="xs"
+                      onClick={handleClickSortAction}
+                    >
+                      <SortIndicator order={sortState} />
+                    </IconButton>
+                  </HStack>
                 </Table.Header>
               );
             })}
 
-            <Table.Header width="0">
-              <Center>
-                <AddPropertyMenu>
-                  <IconButton size="xs" variant="ghost">
-                    <AddIcon />
-                  </IconButton>
-                </AddPropertyMenu>
-                <PropertyListMenu>
-                  <IconButton size="xs" variant="ghost">
-                    <MenuIcon />
-                  </IconButton>
-                </PropertyListMenu>
-              </Center>
-            </Table.Header>
+            {editing && (
+              <Table.Header width="0">
+                <Center>
+                  <AddPropertyMenu>
+                    <IconButton size="xs" variant="ghost">
+                      <AddIcon />
+                    </IconButton>
+                  </AddPropertyMenu>
+                  <PropertyListMenu>
+                    <IconButton size="xs" variant="ghost">
+                      <MenuIcon />
+                    </IconButton>
+                  </PropertyListMenu>
+                </Center>
+              </Table.Header>
+            )}
           </Table.Row>
         </Table.Head>
         <Table.Body>
