@@ -71,28 +71,36 @@ export function LibraryPageProvider({
       const state = storeRef.current.getState();
 
       state.commit(async (mutation: MutationSet) => {
-        setSaving(() => true);
+        try {
+          setSaving(() => true);
 
-        if (mutation.childPropertySchemaMutation) {
-          await nodeUpdateChildrenPropertySchema(
-            node.id,
-            mutation.childPropertySchemaMutation,
-          );
+          if (mutation.childPropertySchemaMutation) {
+            await nodeUpdateChildrenPropertySchema(
+              node.id,
+              mutation.childPropertySchemaMutation,
+            );
+          }
+
+          const updated = await nodeUpdate(node.id, mutation.nodeMutation);
+          await revalidate(updated);
+
+          const slugChanged = updated.slug !== state.original.slug;
+          if (slugChanged) {
+            window.history.replaceState(
+              null,
+              "",
+              `/l/${updated.slug}?edit=true`,
+            );
+          }
+
+          return updated;
+        } catch (error) {
+          throw error;
+        } finally {
+          setTimeout(() => {
+            setSaving(() => false);
+          }, 500);
         }
-
-        const updated = await nodeUpdate(node.id, mutation.nodeMutation);
-        await revalidate(updated);
-
-        const slugChanged = updated.slug !== state.original.slug;
-        if (slugChanged) {
-          window.history.replaceState(null, "", `/l/${updated.slug}?edit=true`);
-        }
-
-        setTimeout(() => {
-          setSaving(() => false);
-        }, 500);
-
-        return updated;
       });
     }, 500),
   ).current;
