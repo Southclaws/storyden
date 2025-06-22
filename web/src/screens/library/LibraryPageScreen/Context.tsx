@@ -126,6 +126,13 @@ export function LibraryPageProvider({
     return unsub;
   }, [saveDraft]);
 
+  // Cancel the saveDraft debounce when the component unmounts.
+  useEffect(() => {
+    return () => {
+      saveDraft.cancel();
+    };
+  }, []);
+
   // Handle external changes to the original node state. This happens if another
   // source triggers a mutation+revalidation via SWR and the initial must update
   // the store state. This hook must run after the store subscription is set up.
