@@ -10,26 +10,23 @@ export function useEditState() {
     clearOnDefault: true,
   });
 
-  const { node, form, defaultFormValues } = useLibraryPageContext();
+  const { saving } = useLibraryPageContext();
 
-  const { isAllowedToEdit } = useLibraryPagePermissions(node);
+  const { isAllowedToEdit } = useLibraryPagePermissions();
 
   function handleToggleEditMode() {
     if (editing) {
       setEditing(false);
-
-      form.reset(defaultFormValues);
     } else {
       if (!isAllowedToEdit) return;
 
       setEditing(true);
-
-      form.reset(defaultFormValues);
     }
   }
 
   return {
     editing,
+    saving,
     setEditing,
     handleToggleEditMode,
   };

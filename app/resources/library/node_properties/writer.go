@@ -6,6 +6,8 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -316,6 +318,10 @@ func (w *SchemaWriter) doSchemaUpdates(ctx context.Context, currentSchema *ent.P
 				SetType(s.Type.String()).
 				Exec(ctx)
 			if err != nil {
+				if ent.IsConstraintError(err) {
+					err = fault.Wrap(err, ftag.With(ftag.AlreadyExists), fmsg.WithDesc("constraint error",
+						"A property with this name already exists."))
+				}
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 		}
@@ -331,6 +337,10 @@ func (w *SchemaWriter) doSchemaUpdates(ctx context.Context, currentSchema *ent.P
 				SetSchemaID(currentSchema.ID).
 				Exec(ctx)
 			if err != nil {
+				if ent.IsConstraintError(err) {
+					err = fault.Wrap(err, ftag.With(ftag.AlreadyExists), fmsg.WithDesc("constraint error",
+						"A property with this name already exists."))
+				}
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 		}

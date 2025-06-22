@@ -1,6 +1,5 @@
 import slugify from "@sindresorhus/slugify";
-import { dequal } from "dequal/lite";
-import { omit, uniqueId } from "lodash";
+import { uniqueId } from "lodash";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
@@ -9,7 +8,6 @@ import { Xid } from "xid-ts";
 import { linkCreate } from "@/api/openapi-client/links";
 import {
   getNodeGetKey,
-  getNodeListKey,
   nodeAddAsset,
   nodeCreate,
   nodeDelete,
@@ -27,13 +25,8 @@ import {
   Node,
   NodeGetOKResponse,
   NodeListOKResponse,
-  NodeMutableProps,
   NodeUpdatePositionBody,
   NodeWithChildren,
-  Property,
-  PropertyMutation,
-  PropertyType,
-  TagReference,
   Visibility,
 } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
@@ -43,10 +36,17 @@ import {
 } from "@/screens/library/library-path";
 import { useLibraryPath } from "@/screens/library/useLibraryPath";
 
-import { CoverImage, NodeMetadata } from "./metadata";
+import { CoverImage } from "./metadata";
+import { nodeListMutator, nodeMutator } from "./mutator-functions";
+import {
+  buildNodeKey,
+  buildNodeListKey,
+  nodeListPrivateKeyFn,
+} from "./mutator-keys";
 
 export type CreateNodeArgs = {
   initialName?: string;
+  parentID?: string;
   parentSlug?: string;
 };
 
@@ -80,35 +80,11 @@ export function useLibraryMutation(node?: Node) {
   const router = useRouter();
   const libraryPath = useLibraryPath();
 
-  // for revalidating all node list queries (published and private)
-  const nodeListKey = getNodeListKey();
-  const nodeListAllKeyFn = (key: Arguments) => {
-    return (
-      Array.isArray(key) &&
-      key[0].startsWith(nodeListKey) &&
-      // Don't pass for /nodes/<slug> keys
-      // NOTE: This may be buggy for cases with query params...
-      !key[0].startsWith(nodeListKey + "/")
-    );
-  };
-  // for revalidating only private node list queries
-  const nodeListPrivateKey = getNodeListKey({
-    // NOTE: The order here matters.
-    visibility: [Visibility.draft, Visibility.review, Visibility.unlisted],
-  });
-  const nodeListPrivateKeyFn = (key: Arguments) => {
-    return dequal(key, nodeListPrivateKey);
-  };
-
-  // For revalidating one specific node.
-  const nodeKey = node && getNodeGetKey(node.slug);
-  const nodeKeyFn =
-    node &&
-    ((key: Arguments) => {
-      return Array.isArray(key) && key[0].startsWith(nodeKey);
-    });
-
-  const createNode = async ({ initialName, parentSlug }: CreateNodeArgs) => {
+  const createNode = async ({
+    initialName,
+    parentID,
+    parentSlug,
+  }: CreateNodeArgs) => {
     if (!session) return;
 
     // NOTE: This is a stopgap until the API deals with initial empty states in
@@ -152,120 +128,11 @@ export function useLibraryMutation(node?: Node) {
 
     await mutate(nodeListPrivateKeyFn, mutator, { revalidate: false });
 
-    const created = await nodeCreate({ name: name, parent: parentSlug });
+    const parent = parentID ?? parentSlug;
+    const created = await nodeCreate({ name: name, parent });
     const newPath = joinLibraryPath(libraryPath, created.slug);
 
     router.push(`/l/${newPath}?edit=true`);
-  };
-
-  const updateNode = async (
-    slug: string,
-    newNode: NodeMutableProps,
-    cover?: CoverImageArgs,
-  ) => {
-    // if moving from hidden children to displayed children, the actual data is
-    // not present in the swr cache, so we need to trigger a full revalidation.
-    const nonOptimisticMutation =
-      newNode.hide_child_tree == false && node?.hide_child_tree === true;
-
-    const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
-      if (!data) return;
-
-      const nodeProps = omit(newNode, "parent");
-
-      const withProperties = {
-        properties:
-          newNode.properties?.map((p: PropertyMutation) => {
-            return {
-              fid: p.fid ?? uniqueId("new_field_"),
-              sort: p.sort ?? "",
-              type: p.type ?? PropertyType.text,
-              ...p,
-            } satisfies Property;
-          }) ?? data.properties,
-      };
-
-      const withNewCover = cover?.asset && mergePrimaryImageAsset(data, cover);
-
-      const withTags = {
-        tags:
-          newNode.tags?.map(
-            (t) =>
-              ({
-                name: t,
-                colour: "white",
-                item_count: 1,
-              }) satisfies TagReference,
-          ) ?? [],
-      };
-
-      const withHiddenChildren = {
-        children: newNode.hide_child_tree ? [] : data.children,
-      };
-
-      const updated = {
-        ...data,
-        ...nodeProps,
-        ...withProperties,
-        ...withNewCover,
-        ...withTags,
-        ...withHiddenChildren,
-      } satisfies NodeWithChildren;
-
-      return updated;
-    };
-
-    const listMutator: MutatorCallback<NodeListOKResponse> = (data) => {
-      if (!data || !data.nodes) return;
-
-      const newNodes = data.nodes.map((n) => {
-        if (n.slug === slug) {
-          const updated = nodeMutator(n);
-          return { ...n, ...updated };
-        }
-
-        return n;
-      });
-
-      return {
-        ...data,
-        nodes: newNodes,
-      };
-    };
-
-    const slugChanged = newNode.slug !== undefined && newNode.slug !== slug;
-
-    await mutate(nodeListAllKeyFn, listMutator, { revalidate: false });
-    await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
-
-    const newMeta = {
-      ...node?.meta,
-      ...newNode.meta,
-      ...(cover && !cover.isReplacement
-        ? { coverImage: cover.config }
-        : undefined),
-    };
-    await nodeUpdate(slug, {
-      ...newNode,
-      primary_image_asset_id: cover?.asset.id,
-      // NOTE: We don't have access to the original node's meta, so we have to
-      // fully replace it. Right now no other features use metadata, but this
-      // will need to be fixed eventually. Probably by either calling the API
-      // within this hook to fetch the latest version of the node and spreading.
-      meta: newMeta,
-    });
-
-    // Handle slug changes properly by redirecting to the new path.
-    if (slugChanged && newNode.slug /* Needed for TS narrowing */) {
-      const newPath = replaceLibraryPath(libraryPath, slug, newNode.slug);
-      router.push(newPath);
-    }
-
-    if (nonOptimisticMutation) {
-      await revalidate();
-    }
-
-    return slugChanged;
   };
 
   const suggestTags = async (slug: string, content: string) => {
@@ -288,7 +155,7 @@ export function useLibraryMutation(node?: Node) {
     return content;
   };
 
-  const importFromLink = async (slug: string, url: string) => {
+  const importFromLink = async (id: string, url: string) => {
     const { title, description } = await linkCreate({ url });
 
     return {
@@ -296,29 +163,6 @@ export function useLibraryMutation(node?: Node) {
       tag_suggestions: [], // TODO
       content_suggestion: description, // TODO: Generate summary from content
     };
-  };
-
-  const removeNodeCoverImage = async (slug: string) => {
-    const nodeKey = getNodeGetKey(slug);
-    const nodeKeyFn = (key: Arguments) => {
-      return Array.isArray(key) && key[0].startsWith(nodeKey);
-    };
-
-    const mutator: MutatorCallback<NodeGetOKResponse> = (data) => {
-      if (!data) return;
-
-      const newNode = { ...data, primary_image: undefined };
-
-      return newNode;
-    };
-
-    await mutate(nodeKeyFn, mutator, { revalidate: false });
-
-    await nodeUpdate(slug, {
-      primary_image_asset_id: null,
-      // NOTE: We don't have access to the original node's meta, so we can't
-      // remove the old cover config, but it doesn't really matter.
-    });
   };
 
   const updateNodeVisibility = async (slug: string, visibility: Visibility) => {
@@ -353,12 +197,61 @@ export function useLibraryMutation(node?: Node) {
       };
     };
 
-    await mutate(nodeListAllKeyFn, mutator, { revalidate: false });
+    const keyFn = buildNodeListKey();
+
+    await mutate(keyFn, mutator, { revalidate: false });
 
     await nodeUpdateVisibility(slug, { visibility });
   };
 
-  const addAsset = async (slug: string, asset: Asset) => {
+  const updateNodeChildVisibility = async (
+    slug: string,
+    hideChildTree: boolean,
+  ) => {
+    const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
+      if (!data) return;
+
+      const updated = {
+        ...data,
+        hide_child_tree: hideChildTree,
+      } satisfies NodeWithChildren;
+
+      return updated;
+    };
+
+    const nodeListMutator: MutatorCallback<NodeListOKResponse> = (data) => {
+      if (!data) return;
+
+      const newNodes = data.nodes.map((node) => {
+        if (node.slug === slug) {
+          const newNode = { ...node, hide_child_tree: hideChildTree };
+          return newNode;
+        }
+        return node;
+      });
+
+      return {
+        ...data,
+        nodes: newNodes,
+      };
+    };
+
+    const listKeyFn = buildNodeListKey();
+    await mutate(listKeyFn, nodeListMutator, { revalidate: false });
+
+    const nodeKeyFn = buildNodeKey(slug);
+    await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
+
+    const updated = await nodeUpdate(slug, {
+      hide_child_tree: hideChildTree,
+    });
+
+    revalidate();
+
+    return updated;
+  };
+
+  const addAsset = async (id: string, asset: Asset) => {
     const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
       if (!data) return;
 
@@ -372,14 +265,14 @@ export function useLibraryMutation(node?: Node) {
       return updated;
     };
 
-    const nodeKey = getNodeGetKey(slug);
+    const nodeKey = getNodeGetKey(id);
     const nodeKeyFn = (key: Arguments) => {
       return Array.isArray(key) && key[0].startsWith(nodeKey);
     };
 
     await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
 
-    await nodeAddAsset(slug, asset.id);
+    await nodeAddAsset(id, asset.id);
   };
 
   const removeAsset = async (slug: string, assetID: AssetID) => {
@@ -418,7 +311,8 @@ export function useLibraryMutation(node?: Node) {
       };
     };
 
-    await mutate(nodeListAllKeyFn, mutator, { revalidate: false });
+    const listKeyFn = buildNodeListKey();
+    await mutate(listKeyFn, mutator, { revalidate: false });
 
     await nodeDelete(slug, { target_node: newParent });
 
@@ -450,7 +344,8 @@ export function useLibraryMutation(node?: Node) {
       return { ...prevData, nodes: newNodes };
     };
 
-    await mutate(nodeListAllKeyFn, mutator, { revalidate: false });
+    const listKeyFn = buildNodeListKey();
+    await mutate(listKeyFn, mutator, { revalidate: false });
 
     const params: NodeUpdatePositionBody = (() => {
       switch (dropPosition) {
@@ -476,48 +371,35 @@ export function useLibraryMutation(node?: Node) {
     await nodeUpdatePosition(draggingNodeId, params);
   };
 
-  const revalidate = async (data?: MutatorCallback<NodeListOKResponse>) => {
-    await mutate(nodeListAllKeyFn, data);
+  const revalidate = async (updated?: NodeWithChildren) => {
+    const listKeyFn = buildNodeListKey();
+    await mutate<NodeListOKResponse>(
+      listKeyFn,
+      updated ? nodeListMutator(updated) : undefined,
+    );
+
     if (node) {
-      await mutate(nodeKeyFn);
+      const nodeKeyFn = buildNodeKey(updated?.slug ?? node.slug);
+      await mutate<NodeGetOKResponse>(
+        nodeKeyFn,
+        updated ? nodeMutator(updated) : undefined,
+      );
     }
   };
 
   return {
     createNode,
-    updateNode,
     suggestTitle,
     suggestSummary,
     suggestTags,
     importFromLink,
-    removeNodeCoverImage,
     updateNodeVisibility,
+    updateNodeChildVisibility,
     addAsset,
     removeAsset,
     deleteNode,
     moveNode,
     revalidate,
-  };
-}
-
-// Used purely for optimistic mutation where the asset is swapped out.
-function mergePrimaryImageAsset(
-  oldNode: Node,
-  coverConfig: CoverImageArgs,
-): Pick<Node, "primary_image" | "meta"> {
-  // If replacing the asset, we don't want to keep the old parent.
-  if (coverConfig.isReplacement) {
-    return {
-      primary_image: coverConfig.asset,
-      meta: { ...oldNode.meta, coverImage: null },
-    };
-  }
-
-  const parentAsset = oldNode.primary_image?.parent ?? oldNode.primary_image;
-
-  return {
-    primary_image: { ...coverConfig.asset, parent: parentAsset },
-    meta: { ...oldNode.meta, coverImage: coverConfig.config },
   };
 }
 

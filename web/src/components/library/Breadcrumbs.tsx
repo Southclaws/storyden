@@ -19,6 +19,7 @@ type Props = {
   visibility?: Visibility;
   create: "hide" | "show" | "edit";
   value?: string;
+  invalid?: boolean;
   defaultValue?: string;
   onChange?: FormEventHandler<HTMLInputElement>;
 };
@@ -29,6 +30,7 @@ export const Breadcrumbs_ = (
     visibility,
     create,
     value,
+    invalid,
     defaultValue,
     onChange,
     ...rest
@@ -122,6 +124,7 @@ export const Breadcrumbs_ = (
             placeholder="URL slug"
             defaultValue={defaultValue}
             value={value}
+            {...(invalid ? { "aria-invalid": "true" } : {})}
             onChange={onChange}
             {...rest}
           />

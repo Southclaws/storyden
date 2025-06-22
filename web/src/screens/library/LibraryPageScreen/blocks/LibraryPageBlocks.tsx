@@ -5,9 +5,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { useCallback } from "react";
-import { FixedCropperRef } from "react-advanced-cropper";
 
-import { NodeWithChildren } from "@/api/openapi-schema";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
 import { useLibraryBlockEvent } from "@/lib/library/events";
@@ -15,6 +13,7 @@ import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
 import { Box, HStack, VStack } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../Context";
+import { useWatch } from "../store";
 import { useEditState } from "../useEditState";
 
 import { BlockMenu } from "./BlockMenu";
@@ -27,118 +26,45 @@ import { LibraryPageTableBlock } from "./LibraryPageTableBlock/LibraryPageTableB
 import { LibraryPageTagsBlock } from "./LibraryPageTagsBlock/LibraryPageTagsBlock";
 import { LibraryPageTitleBlock } from "./LibraryPageTitleBlock/LibraryPageTitleBlock";
 
-type Props = {
-  cropperRef: React.RefObject<FixedCropperRef | null>;
-};
-
-export function LibraryPageBlocks({ cropperRef }: Props) {
-  const { node, form } = useLibraryPageContext();
+export function LibraryPageBlocks() {
+  const { store } = useLibraryPageContext();
+  const { moveBlock, addBlock, removeBlock } = store.getState();
   const { editing } = useEditState();
 
-  const meta = form.watch("meta", node.meta);
+  const meta = useWatch((s) => s.draft.meta);
 
   const handleReorder = useCallback(
     (activeId: LibraryPageBlockType, overId: LibraryPageBlockType) => {
       if (!meta.layout) {
-        return;
+        throw new Error("No layout found in metadata");
       }
 
-      const currentBlocks = meta.layout.blocks;
+      const index = meta.layout.blocks.findIndex((b) => b.type === overId);
 
-      const reOrderBlocks = () => {
-        const activeIndex = currentBlocks.findIndex((b) => b.type === activeId);
-        const overIndex = currentBlocks.findIndex((b) => b.type === overId);
-
-        if (
-          activeIndex === -1 ||
-          overIndex === -1 ||
-          activeIndex === overIndex
-        ) {
-          return currentBlocks;
-        }
-
-        const newBlocks = [...currentBlocks];
-        const [movedBlock] = newBlocks.splice(activeIndex, 1);
-        if (!movedBlock) {
-          return newBlocks;
-        }
-
-        newBlocks.splice(overIndex, 0, movedBlock);
-
-        return newBlocks;
-      };
-
-      const newBlocks = reOrderBlocks();
-
-      const newMeta = {
-        ...meta,
-        layout: {
-          ...meta.layout,
-          blocks: newBlocks,
-        },
-      };
-
-      form.setValue("meta", newMeta);
+      moveBlock(activeId, index);
     },
-    [form, meta],
+    [moveBlock, meta],
   );
-
-  const handleAddBlock = useCallback(
-    (type: LibraryPageBlockType) => {
-      if (!meta.layout) {
-        return;
-      }
-
-      const currentBlocks = meta.layout.blocks;
-
-      const newBlocks = [...currentBlocks, { type }] as LibraryPageBlock[];
-
-      const newMeta = {
-        ...meta,
-        layout: {
-          ...meta.layout,
-          blocks: newBlocks,
-        },
-      };
-
-      form.setValue("meta", newMeta);
-    },
-    [form, meta],
-  );
-
-  const handleRemoveBlock = useCallback(
-    (type: LibraryPageBlockType) => {
-      if (!meta.layout) {
-        return;
-      }
-
-      const currentBlocks = meta.layout.blocks;
-
-      const newBlocks = currentBlocks.filter(
-        (block) => block.type !== type,
-      ) as LibraryPageBlock[];
-
-      const newMeta = {
-        ...meta,
-        layout: {
-          ...meta.layout,
-          blocks: newBlocks,
-        },
-      };
-
-      form.setValue("meta", newMeta);
-    },
-    [form, meta],
-  );
-
   useLibraryBlockEvent("library:reorder-block", ({ activeId, overId }) => {
     handleReorder(activeId, overId);
   });
 
+  const handleAddBlock = useCallback(
+    (type: LibraryPageBlockType) => {
+      addBlock(type);
+    },
+    [addBlock],
+  );
   useLibraryBlockEvent("library:add-block", ({ type }) => {
     handleAddBlock(type);
   });
 
+  const handleRemoveBlock = useCallback(
+    (type: LibraryPageBlockType) => {
+      removeBlock(type);
+    },
+    [removeBlock],
+  );
   useLibraryBlockEvent("library:remove-block", ({ type }) => {
     handleRemoveBlock(type);
   });
@@ -153,14 +79,7 @@ export function LibraryPageBlocks({ cropperRef }: Props) {
     return (
       <SortableContext items={blockIds} strategy={verticalListSortingStrategy}>
         {editStateBlocks.map((block) => {
-          return (
-            <LibraryPageBlockEditable
-              key={block.type}
-              cropperRef={cropperRef}
-              block={block}
-              node={node}
-            />
-          );
+          return <LibraryPageBlockEditable key={block.type} block={block} />;
         })}
       </SortableContext>
     );
@@ -169,25 +88,16 @@ export function LibraryPageBlocks({ cropperRef }: Props) {
   return (
     <>
       {blocks.map((block) => {
-        return (
-          <LibraryPageBlockRender
-            key={block.type}
-            cropperRef={cropperRef}
-            block={block}
-          />
-        );
+        return <LibraryPageBlockRender key={block.type} block={block} />;
       })}
     </>
   );
 }
 
-function LibraryPageBlockRender({
-  cropperRef,
-  block,
-}: Props & { block: LibraryPageBlock }) {
+function LibraryPageBlockRender({ block }: { block: LibraryPageBlock }) {
   switch (block.type) {
     case "cover":
-      return <LibraryPageCoverBlock ref={cropperRef} />;
+      return <LibraryPageCoverBlock />;
     case "assets":
       return <LibraryPageAssetsBlock />;
     case "title":
@@ -205,11 +115,8 @@ function LibraryPageBlockRender({
   }
 }
 
-function LibraryPageBlockEditable({
-  cropperRef,
-  block,
-  node,
-}: Props & { block: LibraryPageBlock; node: NodeWithChildren }) {
+function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
+  const { initialNode } = useLibraryPageContext();
   const {
     attributes,
     listeners,
@@ -221,7 +128,7 @@ function LibraryPageBlockEditable({
     id: block.type,
     data: {
       type: "block",
-      node: node,
+      node: initialNode, // TODO: Change this to only pass the node ID.
       block: block.type,
     } as DragItemNodeBlock,
   });
@@ -272,11 +179,11 @@ function LibraryPageBlockEditable({
           gap="1"
         >
           <DragHandleIcon width="4" />
-          <BlockMenu node={node} block={block} />
+          <BlockMenu block={block} />
         </VStack>
       </VStack>
       <Box w="full" minW="0">
-        <LibraryPageBlockRender cropperRef={cropperRef} block={block} />
+        <LibraryPageBlockRender block={block} />
       </Box>
     </HStack>
   );

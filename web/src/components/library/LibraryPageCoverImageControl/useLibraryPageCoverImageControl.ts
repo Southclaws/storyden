@@ -1,45 +1,22 @@
-import { handle } from "@/api/client";
-import { Asset, Node } from "@/api/openapi-schema";
-import { useLibraryMutation } from "@/lib/library/library";
+import { Asset } from "@/api/openapi-schema";
+import { useLibraryPageContext } from "@/screens/library/LibraryPageScreen/Context";
+import { useWatch } from "@/screens/library/LibraryPageScreen/store";
 
-export type Props = {
-  node: Node;
-};
+export function useLibraryPageCoverImageControl() {
+  const { store } = useLibraryPageContext();
+  const { setPrimaryImage, removePrimaryImage } = store.getState();
 
-export function useLibraryPageCoverImageControl(props: Props) {
-  const { updateNode, removeNodeCoverImage, revalidate } = useLibraryMutation(
-    props.node,
-  );
-
-  const hasCoverImage = Boolean(props.node.primary_image);
+  const hasCoverImage = useWatch((s) => s.draft.primary_image);
 
   async function handleUploadCoverImage(asset: Asset) {
-    await handle(
-      async () => {
-        await updateNode(
-          props.node.slug,
-          {},
-          {
-            asset,
-            isReplacement: true,
-          },
-        );
-      },
-      {
-        cleanup: async () => await revalidate(),
-      },
-    );
+    setPrimaryImage({
+      asset,
+      isReplacement: true,
+    });
   }
 
   async function handleRemoveCoverImage() {
-    await handle(
-      async () => {
-        await removeNodeCoverImage(props.node.slug);
-      },
-      {
-        cleanup: async () => await revalidate(),
-      },
-    );
+    removePrimaryImage();
   }
 
   return {

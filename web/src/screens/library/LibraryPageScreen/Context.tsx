@@ -1,17 +1,37 @@
-import { zodResolver } from "@hookform/resolvers/zod";
-import { PropsWithChildren, createContext, useContext, useMemo } from "react";
-import { FormProvider, UseFormReturn, useForm } from "react-hook-form";
+import { dequal } from "dequal";
+import { debounce } from "lodash";
+import {
+  PropsWithChildren,
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
-import { NodeWithChildren, PropertyType } from "src/api/openapi-schema";
+import {
+  Identifier,
+  NodeListResult,
+  NodeWithChildren,
+} from "src/api/openapi-schema";
 
+import {
+  nodeUpdate,
+  nodeUpdateChildrenPropertySchema,
+} from "@/api/openapi-client/nodes";
+import { MutationSet } from "@/lib/library/diff";
+import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
 
-import { Form, FormSchema } from "./form";
+import { NodeStoreAPI, createNodeStore } from "./store";
 
 type LibraryPageContext = {
-  node: WithMetadata<NodeWithChildren>;
-  form: UseFormReturn<Form>;
-  defaultFormValues: Form;
+  nodeID: Identifier;
+  initialNode: WithMetadata<NodeWithChildren>;
+  initialChildren?: NodeListResult;
+  store: NodeStoreAPI;
+  saving: boolean;
 };
 
 const Context = createContext<LibraryPageContext | null>(null);
@@ -29,52 +49,128 @@ export function useLibraryPageContext() {
 
 export type Props = {
   node: NodeWithChildren;
+  childNodes?: NodeListResult;
 };
 
 export function LibraryPageProvider({
   node,
+  childNodes,
   children,
 }: PropsWithChildren<Props>) {
-  const nodeWithMeta = hydrateNode(node);
+  const [saving, setSaving] = useState(false);
+  const nodeWithMeta = useMemo(() => hydrateNode(node), [node]);
+  const { revalidate } = useLibraryMutation(node);
 
-  const defaultFormValues = useMemo<Form>(
-    () =>
-      ({
-        name: nodeWithMeta.name,
-        slug: nodeWithMeta.slug,
-        properties: nodeWithMeta.properties.map((p, i) => ({
-          fid: p.fid,
-          name: p.name ?? `Field ${i}`,
-          type: p.type ?? PropertyType.text,
-          sort: p.sort,
-          value: p.value ?? "",
-        })),
-        childPropertySchema: nodeWithMeta.child_property_schema,
-        tags: nodeWithMeta.tags.map((t) => t.name),
-        link: nodeWithMeta.link?.url,
-        content: nodeWithMeta.content,
-        meta: nodeWithMeta.meta,
-      }) satisfies Form,
-    [nodeWithMeta],
-  );
+  const storeRef = useRef<NodeStoreAPI | null>(null);
+  if (storeRef.current === null) {
+    storeRef.current = createNodeStore({
+      original: nodeWithMeta,
+      draft: nodeWithMeta,
+    });
+  }
 
-  const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: defaultFormValues,
-  });
+  const saveDraft = useRef(
+    debounce(() => {
+      if (!storeRef.current) {
+        return;
+      }
+
+      const state = storeRef.current.getState();
+
+      state.commit(async (mutation: MutationSet) => {
+        try {
+          setSaving(() => true);
+
+          if (mutation.childPropertySchemaMutation) {
+            await nodeUpdateChildrenPropertySchema(
+              node.id,
+              mutation.childPropertySchemaMutation,
+            );
+          }
+
+          const updated = await nodeUpdate(node.id, mutation.nodeMutation);
+          await revalidate(updated);
+
+          const slugChanged = updated.slug !== state.original.slug;
+          if (slugChanged) {
+            window.history.replaceState(
+              null,
+              "",
+              `/l/${updated.slug}?edit=true`,
+            );
+          }
+
+          return updated;
+        } catch (error) {
+          throw new Error("patch failed", { cause: error });
+        } finally {
+          setTimeout(() => {
+            setSaving(() => false);
+          }, 500);
+        }
+      });
+    }, 500),
+  ).current;
+
+  useEffect(() => {
+    if (!storeRef.current) {
+      return;
+    }
+
+    const unsub = storeRef.current.subscribe((state, prev) => {
+      if (!dequal(state.draft, prev.draft)) {
+        saveDraft();
+      }
+    });
+
+    return unsub;
+  }, [saveDraft]);
+
+  // Cancel the saveDraft debounce when the component unmounts.
+  useEffect(() => {
+    return () => {
+      saveDraft.cancel();
+    };
+  }, []);
+
+  // Handle external changes to the original node state. This happens if another
+  // source triggers a mutation+revalidation via SWR and the initial must update
+  // the store state. This hook must run after the store subscription is set up.
+  useEffect(() => {
+    if (!storeRef.current) {
+      return;
+    }
+
+    const { original, draft } = storeRef.current.getState();
+
+    // We compare the un-hydrated node for original comparison, because the
+    // nodeWithMeta object is potentially mutated by the hydration function to
+    // set up default values for new nodes. This includes the page's layout.
+    const equalToOriginal = dequal(original, node);
+    const equalToDraft = dequal(draft, nodeWithMeta);
+
+    storeRef.current.setState((state) => {
+      if (!equalToOriginal) {
+        state.original = node;
+      }
+
+      if (!equalToDraft) {
+        state.draft = nodeWithMeta;
+      }
+    });
+  }, [node, nodeWithMeta]);
 
   return (
     <Context.Provider
       value={{
-        node: nodeWithMeta,
-        form,
-        defaultFormValues,
+        nodeID: node.id,
+        initialNode: nodeWithMeta,
+        initialChildren: childNodes,
+        store: storeRef.current,
+        saving,
       }}
     >
-      <FormProvider {...form}>
-        {/*  */}
-        {children}
-      </FormProvider>
+      {children}
     </Context.Provider>
   );
 }

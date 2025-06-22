@@ -1,46 +1,42 @@
-import { MenuSelectionDetails, Portal } from "@ark-ui/react";
-import { EyeIcon, FilterIcon } from "lucide-react";
-import { PropsWithChildren } from "react";
+import {
+  MenuOpenChangeDetails,
+  MenuSelectionDetails,
+  Portal,
+} from "@ark-ui/react";
+import { EyeIcon } from "lucide-react";
+import { PropsWithChildren, useState } from "react";
 
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { Input } from "@/components/ui/input";
 import * as Menu from "@/components/ui/menu";
-import { LibraryPageBlockTypeTable } from "@/lib/library/metadata";
 
 import { useLibraryPageContext } from "../../Context";
+import { useEditState } from "../../useEditState";
 
-import { ColumnDefinition, getDefaultBlockConfig } from "./column";
+import { ColumnDefinition } from "./column";
 
 type Props = {
   column: ColumnDefinition;
 };
 
 export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
-  const { node, form } = useLibraryPageContext();
+  const { store } = useLibraryPageContext();
+  const {
+    setChildPropertyHiddenState,
+    setChildPropertyName,
+    removeChildPropertyByID,
+  } = store.getState();
+  const { editing } = useEditState();
+  const [open, setOpen] = useState(false);
 
-  const currentMetadata = form.watch("meta", node.meta);
-  const currentChildPropertySchema = form.watch(
-    "childPropertySchema",
-    node.child_property_schema,
-  );
+  function handleOpenChange(open: MenuOpenChangeDetails) {
+    // TODO: When not editing, we still need to show some kind of menu for stuff
+    // like filtering etc for non-editor members. For now, show nothing.
+    if (!editing) {
+      return;
+    }
 
-  const currentTableBlockIndex = currentMetadata.layout?.blocks.findIndex(
-    (b) => b.type === "table",
-  );
-  if (!currentTableBlockIndex) {
-    console.warn(
-      "attempting to render a ColumnMenu without a table block in the form metadata",
-    );
-    return null;
-  }
-  const currentTableBlock = currentMetadata.layout?.blocks[
-    currentTableBlockIndex
-  ] as LibraryPageBlockTypeTable;
-
-  if (currentTableBlock.config === undefined) {
-    currentTableBlock.config = getDefaultBlockConfig(
-      currentChildPropertySchema,
-    );
+    setOpen(open.open);
   }
 
   function handleSelect(value: MenuSelectionDetails) {
@@ -49,55 +45,33 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
         handleColumnHide();
         break;
       }
+      case "delete": {
+        handlePropertyDelete();
+        break;
+      }
     }
   }
 
   function handleColumnNameChange(event: React.ChangeEvent<HTMLInputElement>) {
-    const nextChildPropertySchema = currentChildPropertySchema.map((ps) => {
-      if (ps.fid === column.fid) {
-        return {
-          ...ps,
-          name: event.target.value,
-        };
-      }
-
-      return ps;
-    });
-
-    form.setValue("childPropertySchema", nextChildPropertySchema);
+    setChildPropertyName(column.fid, event.target.value);
   }
 
   function handleColumnHide() {
-    const nextBlocks =
-      currentMetadata.layout?.blocks.map((block) => {
-        if (block.type === "table") {
-          const nextColumns =
-            currentTableBlock.config?.columns.map((col) => {
-              if (col.fid === column.fid) {
-                return { ...col, hidden: true };
-              }
-              return col;
-            }) ?? [];
+    setChildPropertyHiddenState(column.fid, !column.hidden);
+  }
 
-          const nextTable = {
-            ...block,
-            config: {
-              ...block.config,
-              columns: nextColumns,
-            } as LibraryPageBlockTypeTable["config"],
-          };
-
-          return nextTable;
-        }
-
-        return block;
-      }) ?? [];
-
-    form.setValue("meta.layout.blocks", nextBlocks);
+  function handlePropertyDelete() {
+    removeChildPropertyByID(column.fid);
   }
 
   return (
-    <Menu.Root lazyMount onSelect={handleSelect} size="xs">
+    <Menu.Root
+      lazyMount
+      open={open}
+      onOpenChange={handleOpenChange}
+      onSelect={handleSelect}
+      size="xs"
+    >
       <Menu.Trigger asChild>{children}</Menu.Trigger>
 
       <Portal>
@@ -109,6 +83,17 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
                   size="sm"
                   value={column.name}
                   onChange={handleColumnNameChange}
+                  // Override Ark.Menu hooking events
+                  onKeyDown={(e) => {
+                    // Stop arrow keys, space, etc. from bubbling to the menu
+                    e.stopPropagation();
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                  }}
+                  onFocus={(e) => {
+                    e.stopPropagation();
+                  }}
                 />
               </Menu.ItemGroup>
             )}
@@ -116,7 +101,7 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
             <Menu.ItemGroup>
               <Menu.Item value="hide-show">
                 <EyeIcon />
-                &nbsp;Hide
+                &nbsp;Hide column
               </Menu.Item>
 
               {!column.fixed && (
@@ -126,10 +111,11 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
                 </Menu.Item>
               )}
 
-              <Menu.Item value="filter">
+              {/* TODO: Filtering on child API */}
+              {/* <Menu.Item value="filter">
                 <FilterIcon />
                 &nbsp;Filter...
-              </Menu.Item>
+              </Menu.Item> */}
             </Menu.ItemGroup>
           </Menu.Content>
         </Menu.Positioner>

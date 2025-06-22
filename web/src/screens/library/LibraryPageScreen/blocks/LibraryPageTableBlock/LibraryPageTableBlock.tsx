@@ -9,20 +9,30 @@ import {
 } from "@/components/site/SortIndicator";
 import { Unready } from "@/components/site/Unready";
 import { IconButton } from "@/components/ui/icon-button";
+import { AddIcon } from "@/components/ui/icons/Add";
+import { MenuIcon } from "@/components/ui/icons/Menu";
 import * as Table from "@/components/ui/table";
-import { Box } from "@/styled-system/jsx";
+import { Box, Center, HStack } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
+import { useWatch } from "../../store";
+import { useEditState } from "../../useEditState";
 
+import { AddPropertyMenu } from "./AddPropertyMenu/AddPropertyMenu";
 import { ColumnMenu } from "./ColumnMenu";
+import { PropertyListMenu } from "./PropertyListMenu/PropertyListMenu";
 import {
   mergeFieldsAndProperties,
   mergeFieldsAndPropertySchema,
 } from "./column";
+import { useTableBlock } from "./useTableBlock";
 
 export function LibraryPageTableBlock() {
-  const { node, form } = useLibraryPageContext();
+  const { nodeID, initialChildren } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
+  const { editing } = useEditState();
+
+  const hideChildTree = useWatch((s) => s.draft.hide_child_tree);
 
   // format the sort property as "name" or "-name" for asc/desc
   const childrenSort =
@@ -32,9 +42,22 @@ export function LibraryPageTableBlock() {
         : `-${sort.property}`
       : undefined;
 
-  const { data, error } = useNodeListChildren(node.slug, {
-    children_sort: childrenSort,
-  });
+  const { data, error } = useNodeListChildren(
+    nodeID,
+    {
+      children_sort: childrenSort,
+    },
+    {
+      swr: {
+        fallbackData: initialChildren,
+      },
+    },
+  );
+
+  const block = useTableBlock();
+  const currentChildPropertySchema = useWatch(
+    (s) => s.draft.child_property_schema,
+  );
 
   if (!data) {
     return <Unready error={error} />;
@@ -46,17 +69,9 @@ export function LibraryPageTableBlock() {
     return null;
   }
 
-  if (!node.hide_child_tree) {
+  if (!hideChildTree) {
     return null;
   }
-
-  const currentMeta = form.watch("meta");
-  const currentChildPropertySchema = form.watch(
-    "childPropertySchema",
-    node.child_property_schema,
-  );
-
-  const block = currentMeta.layout?.blocks.find((b) => b.type === "table");
 
   if (!block) {
     console.warn(
@@ -105,47 +120,59 @@ export function LibraryPageTableBlock() {
                   }}
                   p="0"
                 >
-                  <ColumnMenu column={property}>
-                    <Box
-                      p="2"
-                      display="inline-flex"
-                      w="full"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      gap="1"
-                      flexWrap="nowrap"
-                      fontWeight="semibold"
-                    >
-                      {property.name}
-                      <IconButton
-                        type="button"
-                        variant="ghost"
-                        size="xs"
-                        onClick={handleClickSortAction}
+                  <HStack minW="0" w="full" pr="1">
+                    <ColumnMenu column={property}>
+                      <Box
+                        p="2"
+                        display="inline-flex"
+                        minW="0"
+                        flexGrow="1"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        gap="1"
+                        textWrap="nowrap"
+                        flexWrap="nowrap"
+                        fontWeight="semibold"
                       >
-                        <SortIndicator order={sortState} />
-                      </IconButton>
-                    </Box>
-                  </ColumnMenu>
+                        {property.name}
+                      </Box>
+                    </ColumnMenu>
+                    <IconButton
+                      type="button"
+                      variant="ghost"
+                      size="xs"
+                      onClick={handleClickSortAction}
+                    >
+                      <SortIndicator order={sortState} />
+                    </IconButton>
+                  </HStack>
                 </Table.Header>
               );
             })}
 
-            {/* NOTE: Not available until we move edit mode to immediate mutations */}
-            {/* <Table.Header p="1">
-              <AddPropertyMenu>
-                <IconButton size="xs" variant="ghost">
-                  <AddIcon />
-                </IconButton>
-              </AddPropertyMenu>
-            </Table.Header> */}
+            {editing && (
+              <Table.Header width="0">
+                <Center>
+                  <AddPropertyMenu>
+                    <IconButton size="xs" variant="ghost">
+                      <AddIcon />
+                    </IconButton>
+                  </AddPropertyMenu>
+                  <PropertyListMenu>
+                    <IconButton size="xs" variant="ghost">
+                      <MenuIcon />
+                    </IconButton>
+                  </PropertyListMenu>
+                </Center>
+              </Table.Header>
+            )}
           </Table.Row>
         </Table.Head>
         <Table.Body>
           <SortableContext items={nodes}>
             {nodes.map((child) => {
               const columns = mergeFieldsAndProperties(
-                node.child_property_schema,
+                currentChildPropertySchema,
                 child,
                 block,
               );
@@ -183,11 +210,7 @@ export function LibraryPageTableBlock() {
         >
           <Table.Row>
             <Table.Cell colSpan={columns.length} display="flex">
-              <CreatePageAction
-                variant="ghost"
-                size="xs"
-                parentSlug={node.slug}
-              />
+              <CreatePageAction variant="ghost" size="xs" parentSlug={nodeID} />
             </Table.Cell>
           </Table.Row>
         </Table.Foot>

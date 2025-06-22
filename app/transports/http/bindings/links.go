@@ -8,6 +8,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
@@ -46,7 +47,10 @@ func (i *Links) LinkCreate(ctx context.Context, request openapi.LinkCreateReques
 
 	link, err := i.fetcher.Fetch(ctx, *u, fetcher.Options{})
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fctx.With(ctx),
+			fmsg.WithDesc("failed to fetch link",
+				"The URL could not be fetched. It may be invalid or the server may be unreachable.",
+			), ftag.With(ftag.InvalidArgument))
 	}
 
 	return openapi.LinkCreate200JSONResponse{
