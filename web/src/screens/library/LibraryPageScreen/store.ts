@@ -370,16 +370,19 @@ export const createNodeStore = (initState: State) => {
 
         overwriteBlock: (block: LibraryPageBlock) => {
           set((state) => {
-            const layout = (state.draft.meta.layout ??= DefaultLayout);
-            const blocks = layout.blocks;
+            if (state.draft.meta.layout === undefined) {
+              state.draft.meta.layout = DefaultLayout;
+            }
 
             // check if the block exists, if not, do nothing.
-            const index = blocks.findIndex((b) => b.type === block.type);
+            const index = state.draft.meta.layout.blocks.findIndex(
+              (b) => b.type === block.type,
+            );
             if (index === -1) {
               return;
             }
 
-            blocks[index] = block;
+            state.draft.meta.layout.blocks[index] = block;
           });
         },
 
