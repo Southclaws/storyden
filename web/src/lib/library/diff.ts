@@ -28,7 +28,7 @@ function projectNodeToMutableProps(node: NodeWithChildren): NodeMutableProps {
         type: p.type,
       };
     }),
-    hide_child_tree: node.children.length === 0,
+    hide_child_tree: node.hide_child_tree,
     meta: node.meta,
   };
 }
