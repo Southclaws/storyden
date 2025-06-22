@@ -52,11 +52,22 @@ export const deriveMutationFromDifference = (
     const draftValue = draft[key];
     const updatedValue = changes[key];
     if (updatedValue === undefined || updatedValue === null) {
+      console.debug(
+        "Skipping mutation for",
+        key,
+        "because it is undefined or null",
+      );
       return;
     }
 
     const changed = !dequal(draftValue, updatedValue);
     if (!changed) {
+      console.debug(
+        "Skipping mutation for",
+        key,
+        "because it has not changed",
+        { old: draftValue, new: updatedValue },
+      );
       return;
     }
 
@@ -66,6 +77,7 @@ export const deriveMutationFromDifference = (
       case "slug":
         if (!isSlugReady(updatedValue as string)) {
           // Slugs must be valid to be added to patch, see mark.ts for details.
+          console.debug("Skipping mutation for 'slug' because it is not ready");
           return;
         }
     }
