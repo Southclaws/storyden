@@ -116,7 +116,7 @@ function LibraryPageBlockRender({ block }: { block: LibraryPageBlock }) {
 }
 
 function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
-  const { currentNode } = useLibraryPageContext();
+  const { initialNode } = useLibraryPageContext();
   const {
     attributes,
     listeners,
@@ -128,7 +128,7 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
     id: block.type,
     data: {
       type: "block",
-      node: currentNode, // TODO: Change this to only pass the node ID.
+      node: initialNode, // TODO: Change this to only pass the node ID.
       block: block.type,
     } as DragItemNodeBlock,
   });

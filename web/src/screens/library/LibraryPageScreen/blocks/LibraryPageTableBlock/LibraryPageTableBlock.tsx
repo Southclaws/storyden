@@ -28,7 +28,7 @@ import {
 import { useTableBlock } from "./useTableBlock";
 
 export function LibraryPageTableBlock() {
-  const { nodeID } = useLibraryPageContext();
+  const { nodeID, initialChildren } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
   const { editing } = useEditState();
 
@@ -42,9 +42,17 @@ export function LibraryPageTableBlock() {
         : `-${sort.property}`
       : undefined;
 
-  const { data, error } = useNodeListChildren(nodeID, {
-    children_sort: childrenSort,
-  });
+  const { data, error } = useNodeListChildren(
+    nodeID,
+    {
+      children_sort: childrenSort,
+    },
+    {
+      swr: {
+        fallbackData: initialChildren,
+      },
+    },
+  );
 
   const block = useTableBlock();
   const currentChildPropertySchema = useWatch(

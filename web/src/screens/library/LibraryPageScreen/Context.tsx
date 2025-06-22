@@ -10,7 +10,11 @@ import {
   useState,
 } from "react";
 
-import { Identifier, NodeWithChildren } from "src/api/openapi-schema";
+import {
+  Identifier,
+  NodeListResult,
+  NodeWithChildren,
+} from "src/api/openapi-schema";
 
 import {
   nodeUpdate,
@@ -24,7 +28,8 @@ import { NodeStoreAPI, createNodeStore } from "./store";
 
 type LibraryPageContext = {
   nodeID: Identifier;
-  currentNode: WithMetadata<NodeWithChildren>;
+  initialNode: WithMetadata<NodeWithChildren>;
+  initialChildren?: NodeListResult;
   store: NodeStoreAPI;
   saving: boolean;
 };
@@ -44,10 +49,12 @@ export function useLibraryPageContext() {
 
 export type Props = {
   node: NodeWithChildren;
+  childNodes?: NodeListResult;
 };
 
 export function LibraryPageProvider({
   node,
+  childNodes,
   children,
 }: PropsWithChildren<Props>) {
   const [saving, setSaving] = useState(false);
@@ -150,7 +157,8 @@ export function LibraryPageProvider({
     <Context.Provider
       value={{
         nodeID: node.id,
-        currentNode: nodeWithMeta,
+        initialNode: nodeWithMeta,
+        initialChildren: childNodes,
         store: storeRef.current,
         saving,
       }}

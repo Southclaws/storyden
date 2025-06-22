@@ -1,8 +1,13 @@
 import { Metadata } from "next";
 
-import { nodeGet } from "@/api/openapi-server/nodes";
+import { NodeListResult, NodeWithChildren } from "@/api/openapi-schema";
+import { nodeGet, nodeListChildren } from "@/api/openapi-server/nodes";
 import { getTargetSlug } from "@/components/library/utils";
 import { WEB_ADDRESS } from "@/config";
+import {
+  LibraryPageBlockTypeTable,
+  parseNodeMetadata,
+} from "@/lib/library/metadata";
 import { getSettings } from "@/lib/settings/settings-server";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
 import { Params, ParamsSchema } from "@/screens/library/library-path";
@@ -29,7 +34,12 @@ export default async function Page(props: Props) {
     },
   });
 
-  return <LibraryPageScreen node={data} />;
+  // NOTE: A waterfall request which can probably be avoided by fetching the
+  // subtree. However subtrees do not currently support property filtering or
+  // sorting so this may need a new API endpoint or a parameter for nodeGet.
+  const children = await maybeGetChildren(data);
+
+  return <LibraryPageScreen node={data} childNodes={children} />;
 }
 
 export async function generateMetadata(props: Props) {
@@ -62,4 +72,22 @@ export async function generateMetadata(props: Props) {
       description: "The page you are looking for does not exist.",
     };
   }
+}
+
+async function maybeGetChildren(
+  node: NodeWithChildren,
+): Promise<NodeListResult | undefined> {
+  if (!node.hide_child_tree) {
+    return;
+  }
+
+  const table = parseNodeMetadata(node.meta).layout?.blocks.find(
+    (b): b is LibraryPageBlockTypeTable => b.type === "table",
+  );
+  if (!table) {
+    return;
+  }
+
+  const { data } = await nodeListChildren(node.slug);
+  return data;
 }
