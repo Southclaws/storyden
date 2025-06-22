@@ -51,7 +51,7 @@ export const deriveMutationFromDifference = (
   (Object.keys(changes) as (keyof NodeMutableProps)[]).forEach((key) => {
     const draftValue = draft[key];
     const updatedValue = changes[key];
-    if (!updatedValue) {
+    if (updatedValue === undefined || updatedValue === null) {
       return;
     }
 
