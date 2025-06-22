@@ -54,6 +54,7 @@ export const applyNodeChanges = produce(
           );
 
         case "hide_child_tree":
+          draft.hide_child_tree = changes[key];
           draft.children = changes[key] ? [] : draft.children;
           return;
 
