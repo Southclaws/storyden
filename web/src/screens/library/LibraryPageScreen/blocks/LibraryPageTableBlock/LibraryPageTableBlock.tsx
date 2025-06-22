@@ -32,7 +32,7 @@ export function LibraryPageTableBlock() {
   const { sort, handleSort } = useSortIndicator();
   const { editing } = useEditState();
 
-  const hideChildTree = useWatch((s) => s.draft.child_property_schema);
+  const hideChildTree = useWatch((s) => s.draft.hide_child_tree);
 
   // format the sort property as "name" or "-name" for asc/desc
   const childrenSort =
