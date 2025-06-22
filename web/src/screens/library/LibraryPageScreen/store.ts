@@ -250,6 +250,8 @@ export const createNodeStore = (initState: State) => {
 
               block.config.columns.push(newColumn);
             }
+
+            state.draft.child_property_schema.push(newProperty);
           });
         },
 
