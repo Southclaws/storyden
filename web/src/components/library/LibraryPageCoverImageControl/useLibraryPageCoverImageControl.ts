@@ -1,12 +1,12 @@
 import { Asset } from "@/api/openapi-schema";
 import { useLibraryPageContext } from "@/screens/library/LibraryPageScreen/Context";
+import { useWatch } from "@/screens/library/LibraryPageScreen/store";
 
 export function useLibraryPageCoverImageControl() {
   const { store } = useLibraryPageContext();
-  const node = store.getState().draft;
   const { setPrimaryImage, removePrimaryImage } = store.getState();
 
-  const hasCoverImage = Boolean(node.primary_image);
+  const hasCoverImage = useWatch((s) => s.draft.primary_image);
 
   async function handleUploadCoverImage(asset: Asset) {
     setPrimaryImage({
