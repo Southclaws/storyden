@@ -1,7 +1,7 @@
 "use client";
 
 import { debounce } from "lodash";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { handle } from "@/api/client";
@@ -76,6 +76,13 @@ export function useLibraryPageLinkBlock() {
       });
     }, 500),
   ).current;
+
+  // Cleanup debounced function on component unmount
+  useEffect(() => {
+    return () => {
+      debouncedAttemptResolve.cancel();
+    };
+  }, [debouncedAttemptResolve]);
 
   const handleInputValueChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
