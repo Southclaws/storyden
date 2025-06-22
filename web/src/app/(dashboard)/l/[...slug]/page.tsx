@@ -77,6 +77,11 @@ export async function generateMetadata(props: Props) {
 async function maybeGetChildren(
   node: NodeWithChildren,
 ): Promise<NodeListResult | undefined> {
+  // NOTE: This is confusingly inverted, the reason is, this flag dictates that
+  // the children of this node are hidden in the *sidebar* (technically speaking
+  // hidden in the tree traversal API) but not in the *page* view. So when this
+  // is false, the nodes are displayed in the sidebar and not in the page, and
+  // thus are not fetched alongside the node when rendering the node's page.
   if (!node.hide_child_tree) {
     return;
   }
