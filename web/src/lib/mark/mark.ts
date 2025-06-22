@@ -28,6 +28,7 @@ export function processMarkInput(raw: string): string {
 
 export function isSlugReady(slug: string): boolean {
   const hasNoTrailingDash = !trailingDashRegex.test(slug);
-  const isValid = validSlugRegex.test(slug);
-  return isValid && hasNoTrailingDash;
+  const matches = validSlugRegex.test(slug);
+  const isValid = matches && hasNoTrailingDash;
+  return isValid;
 }

@@ -30,9 +30,9 @@ function useLibraryPageControls() {
   function handleSlugChange(event: InputEvent<HTMLInputElement>) {
     const raw = event.currentTarget.value;
     const slug = processMarkInput(raw);
-    const invalid = isSlugReady(slug);
+    const valid = isSlugReady(slug);
     setSlug(slug);
-    setSlugInvalid(invalid);
+    setSlugInvalid(!valid);
   }
 
   return {
@@ -68,7 +68,7 @@ export function LibraryPageControls() {
         create={editing ? "edit" : "show"}
         defaultValue={slug}
         value={slug}
-        invalid={!isSlugInvalid}
+        invalid={isSlugInvalid}
         onChange={handleSlugChange}
       />
       <HStack>
