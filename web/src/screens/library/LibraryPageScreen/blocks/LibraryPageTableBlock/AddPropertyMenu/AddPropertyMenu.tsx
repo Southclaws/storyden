@@ -45,21 +45,17 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
       },
     ];
 
-    const newSchema = await handle(async () => {
-      return await nodeUpdateChildrenPropertySchema(
-        nodeID,
-        updatedChildPropertySchema,
-      );
-    });
+    const newSchema = await nodeUpdateChildrenPropertySchema(
+      nodeID,
+      updatedChildPropertySchema,
+    );
     if (!newSchema) {
-      console.error("Failed to update child property schema");
-      return false;
+      throw new Error("Failed to update page properties");
     }
 
     const newProperty = newSchema.properties.find((p) => p.name === trimmed);
     if (!newProperty) {
-      console.error("New property not found in updated schema");
-      return false;
+      throw new Error("New property not found in updated schema");
     }
 
     addChildProperty(newProperty);
@@ -71,10 +67,12 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
 
   async function handleSelect(value: MenuSelectionDetails) {
     if (value.value === "create") {
-      const close = await handleSave();
-      if (close) {
-        setOpen(() => false);
-      }
+      await handle(async () => {
+        const close = await handleSave();
+        if (close) {
+          setOpen(() => false);
+        }
+      });
     }
   }
 
