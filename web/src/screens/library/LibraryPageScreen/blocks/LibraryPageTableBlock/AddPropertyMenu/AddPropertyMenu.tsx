@@ -10,11 +10,13 @@ import * as Menu from "@/components/ui/menu";
 
 import { useLibraryPageContext } from "../../../Context";
 import { useWatch } from "../../../store";
+import { useTableBlock } from "../useTableBlock";
 
 export function AddPropertyMenu({ children }: PropsWithChildren) {
   const { nodeID, store } = useLibraryPageContext();
   const [name, setName] = useState<string>("");
   const { addChildProperty } = store.getState();
+  const tableBlock = useTableBlock();
 
   // Menu opening logic. We circumvent the default behaviour here because we
   // want to keep the menu open during the creation of a new property then close
@@ -34,6 +36,20 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
     const trimmed = name.trim();
     if (trimmed === "") {
       return false;
+    }
+
+    const exists = currentChildPropertySchema.find((p) => p.name === trimmed);
+    if (exists) {
+      const column = tableBlock.config?.columns.find(
+        (c) => c.fid === exists.fid,
+      );
+      if (column?.hidden) {
+        throw new Error(
+          `Property "${trimmed}" already exists but is hidden in the table. Open the table menu to toggle the column's visibility.`,
+        );
+      } else {
+        throw new Error(`Property "${trimmed}" already exists.`);
+      }
     }
 
     const updatedChildPropertySchema = [
