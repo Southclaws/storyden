@@ -3,18 +3,23 @@ package tools
 import (
 	"context"
 	"encoding/json"
+	"net/url"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/generative"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
 	"github.com/Southclaws/storyden/app/services/library/node_property_schema"
@@ -70,6 +75,8 @@ func newNodeTools(
 	handler.tools = []server.ServerTool{
 		{Tool: nodeTreeTool, Handler: handler.nodeTree},
 		{Tool: nodeGetTool, Handler: handler.nodeGet},
+		{Tool: nodeCreateTool, Handler: handler.nodeCreate},
+		{Tool: nodeSearchTool, Handler: handler.nodeSearch},
 	}
 
 	return handler
@@ -142,4 +149,119 @@ func mapNodes(nodes []*library.Node) []map[string]any {
 
 func mapTag(t *tag_ref.Tag) string {
 	return t.Name.String()
+}
+
+var nodeCreateTool = mcp.NewTool("createNode",
+	mcp.WithDescription("Create a new node in the library"),
+	mcp.WithString("name", mcp.Required()),
+	mcp.WithString("content"),
+	mcp.WithString("url"),
+	mcp.WithString("slug"),
+	mcp.WithString("parent"),
+)
+
+func (t *nodeTools) nodeCreate(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	name, err := request.RequireString("name")
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	content := request.GetString("content", "")
+	urlStr := request.GetString("url", "")
+	slugStr := request.GetString("slug", "")
+	parentStr := request.GetString("parent", "")
+
+	var richContent opt.Optional[datagraph.Content]
+	if content != "" {
+		rc, err := datagraph.NewRichText(content)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		richContent = opt.New(rc)
+	}
+
+	var urlParsed opt.Optional[url.URL]
+	if urlStr != "" {
+		u, err := url.Parse(urlStr)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		urlParsed = opt.New(*u)
+	}
+
+	var slug opt.Optional[mark.Slug]
+	if slugStr != "" {
+		s, err := mark.NewSlug(slugStr)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		slug = opt.New(*s)
+	}
+
+	var parent opt.Optional[library.QueryKey]
+	if parentStr != "" {
+		parent = opt.New(library.QueryKey{mark.NewQueryKey(parentStr)})
+	}
+
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	node, err := t.nodeMutator.Create(ctx,
+		accountID,
+		name,
+		node_mutate.Partial{
+			Slug:    slug,
+			Content: richContent,
+			URL:     urlParsed,
+			Parent:  parent,
+		},
+	)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	obj := mapNode(node)
+	b, err := json.Marshal(obj)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return mcp.NewToolResultText(string(b)), nil
+}
+
+var nodeSearchTool = mcp.NewTool("searchNodes",
+	mcp.WithDescription("Search for nodes in the library"),
+	mcp.WithString("query"),
+	mcp.WithString("author"),
+	mcp.WithNumber("depth"),
+)
+
+func (t *nodeTools) nodeSearch(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	author := request.GetString("author", "")
+	depth := request.GetInt("depth", -1)
+
+	opts := []node_traversal.Filter{}
+
+	if author != "" {
+		opts = append(opts, node_traversal.WithRootOwner(author))
+	}
+
+	if depth != -1 {
+		opts = append(opts, node_traversal.WithDepth(uint(depth)))
+	}
+
+	nodes, err := t.ntr.Subtree(ctx, opt.NewEmpty[library.NodeID](), true, opts...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	obj := mapNodes(nodes)
+	b, err := json.Marshal(obj)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return mcp.NewToolResultText(string(b)), nil
 }
