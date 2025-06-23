@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/generative"
@@ -26,6 +27,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/library/node_read"
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
+	"github.com/Southclaws/storyden/app/services/search/searcher"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 )
 
@@ -43,6 +45,7 @@ type nodeTools struct {
 	npos          *nodetree.Position
 	ntr           node_traversal.Repository
 	schemaUpdater *node_property_schema.Updater
+	searcher      searcher.Searcher
 }
 
 func newNodeTools(
@@ -57,6 +60,7 @@ func newNodeTools(
 	npos *nodetree.Position,
 	ntr node_traversal.Repository,
 	schemaUpdater *node_property_schema.Updater,
+	searcher searcher.Searcher,
 ) *nodeTools {
 	handler := &nodeTools{
 		accountQuery:  accountQuery,
@@ -70,6 +74,7 @@ func newNodeTools(
 		npos:          npos,
 		ntr:           ntr,
 		schemaUpdater: schemaUpdater,
+		searcher:      searcher,
 	}
 
 	handler.tools = []server.ServerTool{
@@ -232,36 +237,50 @@ func (t *nodeTools) nodeCreate(ctx context.Context, request mcp.CallToolRequest)
 }
 
 var nodeSearchTool = mcp.NewTool("searchNodes",
-	mcp.WithDescription("Search for nodes in the library"),
-	mcp.WithString("query"),
-	mcp.WithString("author"),
-	mcp.WithNumber("depth"),
+	mcp.WithDescription("Search for nodes in the library."),
+	mcp.WithString("query", mcp.Required()),
 )
 
 func (t *nodeTools) nodeSearch(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	author := request.GetString("author", "")
-	depth := request.GetInt("depth", -1)
-
-	opts := []node_traversal.Filter{}
-
-	if author != "" {
-		opts = append(opts, node_traversal.WithRootOwner(author))
-	}
-
-	if depth != -1 {
-		opts = append(opts, node_traversal.WithDepth(uint(depth)))
-	}
-
-	nodes, err := t.ntr.Subtree(ctx, opt.NewEmpty[library.NodeID](), true, opts...)
+	query, err := request.RequireString("query")
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	obj := mapNodes(nodes)
+	pp := pagination.NewPageParams(1, 50)
+
+	opts := searcher.Options{
+		Kinds: opt.New([]datagraph.Kind{datagraph.KindNode}),
+	}
+
+	result, err := t.searcher.Search(ctx, query, pp, opts)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	obj := mapDatagraphItems(result.Items)
 	b, err := json.Marshal(obj)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return mcp.NewToolResultText(string(b)), nil
+}
+
+func mapDatagraphItems(items datagraph.ItemList) []map[string]any {
+	return dt.Map(items, mapDatagraphItem)
+}
+
+func mapDatagraphItem(item datagraph.Item) map[string]any {
+	base := map[string]any{
+		"slug":        item.GetSlug(),
+		"name":        item.GetName(),
+		"description": item.GetDesc(),
+	}
+
+	if content := item.GetContent(); content.Plaintext() != "" {
+		base["content"] = content.Plaintext()
+	}
+
+	return base
 }
