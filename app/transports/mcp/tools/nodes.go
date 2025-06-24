@@ -158,11 +158,11 @@ func mapTag(t *tag_ref.Tag) string {
 
 var nodeCreateTool = mcp.NewTool("createNode",
 	mcp.WithDescription("Create a new node in the library"),
-	mcp.WithString("name", mcp.Required()),
-	mcp.WithString("content"),
-	mcp.WithString("url"),
-	mcp.WithString("slug"),
-	mcp.WithString("parent"),
+	mcp.WithString("name", mcp.Required(), mcp.Description("The name of the node.")),
+	mcp.WithString("content", mcp.Description("The content of the node in HTML format.")),
+	mcp.WithString("url", mcp.Description("If this node is about a topic referred to on an external website, you can provide a URL to that website here.")),
+	mcp.WithString("slug", mcp.Description("The unique slug within Storyden for this node. If you leave this empty, a slug will be generated for you.")),
+	mcp.WithString("parent", mcp.Description("Only include the parent if you already have a parent slug available from a node search. If not, this field must be left empty, otherwise the createNode tool will fail catastrophically and everyone will be very sad.")),
 )
 
 func (t *nodeTools) nodeCreate(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
