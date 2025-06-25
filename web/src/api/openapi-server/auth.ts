@@ -8,6 +8,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import type {
+  AccessKeyCreateBody,
+  AccessKeyCreateOKResponse,
+  AccessKeyListOKResponse,
+  AccessKeyListParams,
   AuthEmailBody,
   AuthEmailPasswordBody,
   AuthEmailPasswordResetBody,
@@ -21,6 +25,7 @@ import type {
   AuthPasswordUpdateBody,
   AuthProviderListOKResponse,
   AuthSuccessOKResponse,
+  NoContentResponse,
   OAuthProviderCallbackBody,
   PhoneRequestCodeBody,
   PhoneRequestCodeParams,
@@ -628,6 +633,102 @@ export const phoneSubmitCode = async (
       method: "PUT",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(phoneSubmitCodeBody),
+    },
+  );
+};
+
+/**
+ * List all access keys for the authenticated account or all access keys
+that have been issued for the entire instance if and only if the request
+parameters specify all keys and the requesting account is an admin.
+
+ */
+export type accessKeyListResponse = {
+  data: AccessKeyListOKResponse;
+  status: number;
+};
+
+export const getAccessKeyListUrl = (params?: AccessKeyListParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/auth/access-keys?${normalizedParams.toString()}`
+    : `/auth/access-keys`;
+};
+
+export const accessKeyList = async (
+  params?: AccessKeyListParams,
+  options?: RequestInit,
+): Promise<accessKeyListResponse> => {
+  return fetcher<Promise<accessKeyListResponse>>(getAccessKeyListUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+/**
+ * Create a new access key for the authenticated account. Access keys are
+used to authenticate API requests on behalf of the account in a more
+granular and service-friendly way than a session cookie.
+
+Access keys share the same roles and permissions as the owning account
+and only provide a way to use an `Authorization` header as an way of
+interacting with the Storyden API.
+
+Access keys also allow an expiry date to be set to limit how long a key
+can be used to authenticate against the API.
+
+ */
+export type accessKeyCreateResponse = {
+  data: AccessKeyCreateOKResponse;
+  status: number;
+};
+
+export const getAccessKeyCreateUrl = () => {
+  return `/auth/access-keys`;
+};
+
+export const accessKeyCreate = async (
+  accessKeyCreateBody: AccessKeyCreateBody,
+  options?: RequestInit,
+): Promise<accessKeyCreateResponse> => {
+  return fetcher<Promise<accessKeyCreateResponse>>(getAccessKeyCreateUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(accessKeyCreateBody),
+  });
+};
+
+/**
+ * Revoke an access key. This will immediately invalidate the key and it
+will no longer be usable for authentication.
+
+ */
+export type accessKeyDeleteResponse = {
+  data: NoContentResponse;
+  status: number;
+};
+
+export const getAccessKeyDeleteUrl = (accessKeyId: string) => {
+  return `/auth/access-keys/${accessKeyId}`;
+};
+
+export const accessKeyDelete = async (
+  accessKeyId: string,
+  options?: RequestInit,
+): Promise<accessKeyDeleteResponse> => {
+  return fetcher<Promise<accessKeyDeleteResponse>>(
+    getAccessKeyDeleteUrl(accessKeyId),
+    {
+      ...options,
+      method: "DELETE",
     },
   );
 };

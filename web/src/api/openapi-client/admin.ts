@@ -7,17 +7,21 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { Arguments, Key } from "swr";
+import useSwr from "swr";
+import type { Arguments, Key, SWRConfiguration } from "swr";
 import useSWRMutation from "swr/mutation";
 import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
   AccountGetOKResponse,
+  AdminAccessKeyListOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
   BadRequestResponse,
+  ForbiddenResponse,
   InternalServerErrorResponse,
+  NoContentResponse,
   NotFoundResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
@@ -192,6 +196,110 @@ export const useAdminAccountBanRemove = <
   const swrKey =
     swrOptions?.swrKey ?? getAdminAccountBanRemoveMutationKey(accountHandle);
   const swrFn = getAdminAccountBanRemoveMutationFetcher(accountHandle);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List all access keys for the entire instance. This is only available to
+admin accounts and is used to manage access keys from other accounts.
+
+ */
+export const adminAccessKeyList = () => {
+  return fetcher<AdminAccessKeyListOKResponse>({
+    url: `/admin/access-keys`,
+    method: "GET",
+  });
+};
+
+export const getAdminAccessKeyListKey = () => [`/admin/access-keys`] as const;
+
+export type AdminAccessKeyListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof adminAccessKeyList>>
+>;
+export type AdminAccessKeyListQueryError =
+  | BadRequestResponse
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useAdminAccessKeyList = <
+  TError = BadRequestResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<
+    Awaited<ReturnType<typeof adminAccessKeyList>>,
+    TError
+  > & { swrKey?: Key; enabled?: boolean };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAdminAccessKeyListKey() : null));
+  const swrFn = () => adminAccessKeyList();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Revoke an access key. This will immediately invalidate the key and it
+will no longer be usable for authentication.
+
+ */
+export const adminAccessKeyDelete = (accessKeyId: string) => {
+  return fetcher<NoContentResponse>({
+    url: `/admin/access-keys/${accessKeyId}`,
+    method: "DELETE",
+  });
+};
+
+export const getAdminAccessKeyDeleteMutationFetcher = (accessKeyId: string) => {
+  return (_: Key, __: { arg: Arguments }): Promise<NoContentResponse> => {
+    return adminAccessKeyDelete(accessKeyId);
+  };
+};
+export const getAdminAccessKeyDeleteMutationKey = (accessKeyId: string) =>
+  [`/admin/access-keys/${accessKeyId}`] as const;
+
+export type AdminAccessKeyDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof adminAccessKeyDelete>>
+>;
+export type AdminAccessKeyDeleteMutationError =
+  | BadRequestResponse
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useAdminAccessKeyDelete = <
+  TError = BadRequestResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(
+  accessKeyId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof adminAccessKeyDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof adminAccessKeyDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAdminAccessKeyDeleteMutationKey(accessKeyId);
+  const swrFn = getAdminAccessKeyDeleteMutationFetcher(accessKeyId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

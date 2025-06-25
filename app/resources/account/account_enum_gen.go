@@ -7,6 +7,61 @@ import (
 	"fmt"
 )
 
+type AccountKind struct {
+	v accountKindEnum
+}
+
+var (
+	AccountKindHuman = AccountKind{accountKindHuman}
+	AccountKindBot   = AccountKind{accountKindBot}
+)
+
+func (r AccountKind) Format(f fmt.State, verb rune) {
+	switch verb {
+	case 's':
+		fmt.Fprint(f, r.v)
+	case 'q':
+		fmt.Fprintf(f, "%q", r.String())
+	default:
+		fmt.Fprint(f, r.v)
+	}
+}
+func (r AccountKind) String() string {
+	return string(r.v)
+}
+func (r AccountKind) MarshalText() ([]byte, error) {
+	return []byte(r.v), nil
+}
+func (r *AccountKind) UnmarshalText(__iNpUt__ []byte) error {
+	s, err := NewAccountKind(string(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func (r AccountKind) Value() (driver.Value, error) {
+	return r.v, nil
+}
+func (r *AccountKind) Scan(__iNpUt__ any) error {
+	s, err := NewAccountKind(fmt.Sprint(__iNpUt__))
+	if err != nil {
+		return err
+	}
+	*r = s
+	return nil
+}
+func NewAccountKind(__iNpUt__ string) (AccountKind, error) {
+	switch __iNpUt__ {
+	case string(accountKindHuman):
+		return AccountKindHuman, nil
+	case string(accountKindBot):
+		return AccountKindBot, nil
+	default:
+		return AccountKind{}, fmt.Errorf("invalid value for type 'AccountKind': '%s'", __iNpUt__)
+	}
+}
+
 type VerifiedStatus struct {
 	v verifiedStatusEnum
 }

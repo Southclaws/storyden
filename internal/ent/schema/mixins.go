@@ -64,6 +64,16 @@ func (DeletedAt) Fields() []ent.Field {
 	}
 }
 
+type ExpiresAt struct{ mixin.Schema }
+
+func (ExpiresAt) Fields() []ent.Field {
+	return []ent.Field{
+		field.Time("expires_at").
+			Optional().
+			Nillable(),
+	}
+}
+
 type IndexedAt struct{ mixin.Schema }
 
 func (IndexedAt) Fields() []ent.Field {

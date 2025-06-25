@@ -15,6 +15,7 @@ erDiagram
         string handle
         string name
         string bio
+        accountDOTKind kind
         bool admin
         LBRACKRBRACKschemaDOTExternalLink links
         mapLBRACKstringRBRACKinterface {} metadata
@@ -47,6 +48,7 @@ erDiagram
     Authentication {
         xidDOTID id
         timeDOTTime created_at
+        timeDOTTime expires_at
         string service
         string token_type
         string identifier

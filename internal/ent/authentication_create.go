@@ -39,6 +39,20 @@ func (ac *AuthenticationCreate) SetNillableCreatedAt(t *time.Time) *Authenticati
 	return ac
 }
 
+// SetExpiresAt sets the "expires_at" field.
+func (ac *AuthenticationCreate) SetExpiresAt(t time.Time) *AuthenticationCreate {
+	ac.mutation.SetExpiresAt(t)
+	return ac
+}
+
+// SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
+func (ac *AuthenticationCreate) SetNillableExpiresAt(t *time.Time) *AuthenticationCreate {
+	if t != nil {
+		ac.SetExpiresAt(*t)
+	}
+	return ac
+}
+
 // SetService sets the "service" field.
 func (ac *AuthenticationCreate) SetService(s string) *AuthenticationCreate {
 	ac.mutation.SetService(s)
@@ -242,6 +256,10 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 		_spec.SetField(authentication.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
+	if value, ok := ac.mutation.ExpiresAt(); ok {
+		_spec.SetField(authentication.FieldExpiresAt, field.TypeTime, value)
+		_node.ExpiresAt = &value
+	}
 	if value, ok := ac.mutation.Service(); ok {
 		_spec.SetField(authentication.FieldService, field.TypeString, value)
 		_node.Service = value
@@ -334,6 +352,24 @@ type (
 		*sql.UpdateSet
 	}
 )
+
+// SetExpiresAt sets the "expires_at" field.
+func (u *AuthenticationUpsert) SetExpiresAt(v time.Time) *AuthenticationUpsert {
+	u.Set(authentication.FieldExpiresAt, v)
+	return u
+}
+
+// UpdateExpiresAt sets the "expires_at" field to the value that was provided on create.
+func (u *AuthenticationUpsert) UpdateExpiresAt() *AuthenticationUpsert {
+	u.SetExcluded(authentication.FieldExpiresAt)
+	return u
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (u *AuthenticationUpsert) ClearExpiresAt() *AuthenticationUpsert {
+	u.SetNull(authentication.FieldExpiresAt)
+	return u
+}
 
 // SetService sets the "service" field.
 func (u *AuthenticationUpsert) SetService(v string) *AuthenticationUpsert {
@@ -480,6 +516,27 @@ func (u *AuthenticationUpsertOne) Update(set func(*AuthenticationUpsert)) *Authe
 		set(&AuthenticationUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (u *AuthenticationUpsertOne) SetExpiresAt(v time.Time) *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetExpiresAt(v)
+	})
+}
+
+// UpdateExpiresAt sets the "expires_at" field to the value that was provided on create.
+func (u *AuthenticationUpsertOne) UpdateExpiresAt() *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateExpiresAt()
+	})
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (u *AuthenticationUpsertOne) ClearExpiresAt() *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.ClearExpiresAt()
+	})
 }
 
 // SetService sets the "service" field.
@@ -810,6 +867,27 @@ func (u *AuthenticationUpsertBulk) Update(set func(*AuthenticationUpsert)) *Auth
 		set(&AuthenticationUpsert{UpdateSet: update})
 	}))
 	return u
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (u *AuthenticationUpsertBulk) SetExpiresAt(v time.Time) *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetExpiresAt(v)
+	})
+}
+
+// UpdateExpiresAt sets the "expires_at" field to the value that was provided on create.
+func (u *AuthenticationUpsertBulk) UpdateExpiresAt() *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateExpiresAt()
+	})
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (u *AuthenticationUpsertBulk) ClearExpiresAt() *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.ClearExpiresAt()
+	})
 }
 
 // SetService sets the "service" field.

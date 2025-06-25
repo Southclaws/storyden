@@ -27,6 +27,11 @@ func MapAccount(a *ent.Account) (*Account, error) {
 		return nil, err
 	}
 
+	kind, err := NewAccountKind(string(a.Kind))
+	if err != nil {
+		return nil, err
+	}
+
 	links, err := dt.MapErr(a.Links, MapExternalLink)
 	if err != nil {
 		return nil, fault.Wrap(err)
@@ -68,6 +73,7 @@ func MapAccount(a *ent.Account) (*Account, error) {
 		Handle:         a.Handle,
 		Name:           a.Name,
 		Bio:            bio,
+		Kind:           kind,
 		Admin:          roles.Permissions().HasAll(rbac.PermissionAdministrator),
 		Roles:          roles,
 		Auths:          auths,

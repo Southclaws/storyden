@@ -22,13 +22,15 @@ type Authentication struct {
 	ID xid.ID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
+	// ExpiresAt holds the value of the "expires_at" field.
+	ExpiresAt *time.Time `json:"expires_at,omitempty"`
 	// The authentication service name, such as GitHub, Twitter, Discord, etc. Or, 'password' for password auth and 'api_token' for token auth
 	Service string `json:"service,omitempty"`
 	// The type of secret/token used by the service to secure the authentication record.
 	TokenType string `json:"token_type,omitempty"`
 	// The identifier, usually a user/account ID on some OAuth service or API token name.
 	Identifier string `json:"identifier,omitempty"`
-	// The actual authentication token/password/key/etc. If OAuth, it'll be the access_token value, if it's a password, a hash and if it's an api_token type then the API token string.
+	// The actual authentication token/password/key/etc. If OAuth, it'll be the access_token value, if it's a password or API key, a hash.
 	Token string `json:"-"`
 	// A human-readable name for the authentication method. For WebAuthn, this may be the device OS or nickname.
 	Name *string `json:"name,omitempty"`
@@ -71,7 +73,7 @@ func (*Authentication) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case authentication.FieldService, authentication.FieldTokenType, authentication.FieldIdentifier, authentication.FieldToken, authentication.FieldName:
 			values[i] = new(sql.NullString)
-		case authentication.FieldCreatedAt:
+		case authentication.FieldCreatedAt, authentication.FieldExpiresAt:
 			values[i] = new(sql.NullTime)
 		case authentication.FieldID, authentication.FieldAccountAuthentication:
 			values[i] = new(xid.ID)
@@ -101,6 +103,13 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
 				a.CreatedAt = value.Time
+			}
+		case authentication.FieldExpiresAt:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field expires_at", values[i])
+			} else if value.Valid {
+				a.ExpiresAt = new(time.Time)
+				*a.ExpiresAt = value.Time
 			}
 		case authentication.FieldService:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -190,6 +199,11 @@ func (a *Authentication) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
 	builder.WriteString("created_at=")
 	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := a.ExpiresAt; v != nil {
+		builder.WriteString("expires_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("service=")
 	builder.WriteString(a.Service)

@@ -3,6 +3,7 @@
 package account
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -29,6 +30,8 @@ const (
 	FieldName = "name"
 	// FieldBio holds the string denoting the bio field in the database.
 	FieldBio = "bio"
+	// FieldKind holds the string denoting the kind field in the database.
+	FieldKind = "kind"
 	// FieldAdmin holds the string denoting the admin field in the database.
 	FieldAdmin = "admin"
 	// FieldLinks holds the string denoting the links field in the database.
@@ -236,6 +239,7 @@ var Columns = []string{
 	FieldHandle,
 	FieldName,
 	FieldBio,
+	FieldKind,
 	FieldAdmin,
 	FieldLinks,
 	FieldMetadata,
@@ -280,6 +284,32 @@ var (
 	IDValidator func(string) error
 )
 
+// Kind defines the type for the "kind" enum field.
+type Kind string
+
+// KindHuman is the default value of the Kind enum.
+const DefaultKind = KindHuman
+
+// Kind values.
+const (
+	KindHuman Kind = "human"
+	KindBot   Kind = "bot"
+)
+
+func (k Kind) String() string {
+	return string(k)
+}
+
+// KindValidator is a validator for the "kind" field enum values. It is called by the builders before save.
+func KindValidator(k Kind) error {
+	switch k {
+	case KindHuman, KindBot:
+		return nil
+	default:
+		return fmt.Errorf("account: invalid enum value for kind field: %q", k)
+	}
+}
+
 // OrderOption defines the ordering options for the Account queries.
 type OrderOption func(*sql.Selector)
 
@@ -321,6 +351,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByBio orders the results by the bio field.
 func ByBio(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldBio, opts...).ToFunc()
+}
+
+// ByKind orders the results by the kind field.
+func ByKind(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldKind, opts...).ToFunc()
 }
 
 // ByAdmin orders the results by the admin field.

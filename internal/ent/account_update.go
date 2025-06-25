@@ -144,6 +144,20 @@ func (au *AccountUpdate) ClearBio() *AccountUpdate {
 	return au
 }
 
+// SetKind sets the "kind" field.
+func (au *AccountUpdate) SetKind(a account.Kind) *AccountUpdate {
+	au.mutation.SetKind(a)
+	return au
+}
+
+// SetNillableKind sets the "kind" field if the given value is not nil.
+func (au *AccountUpdate) SetNillableKind(a *account.Kind) *AccountUpdate {
+	if a != nil {
+		au.SetKind(*a)
+	}
+	return au
+}
+
 // SetAdmin sets the "admin" field.
 func (au *AccountUpdate) SetAdmin(b bool) *AccountUpdate {
 	au.mutation.SetAdmin(b)
@@ -992,6 +1006,11 @@ func (au *AccountUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Account.name": %w`, err)}
 		}
 	}
+	if v, ok := au.mutation.Kind(); ok {
+		if err := account.KindValidator(v); err != nil {
+			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Account.kind": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -1039,6 +1058,9 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if au.mutation.BioCleared() {
 		_spec.ClearField(account.FieldBio, field.TypeString)
+	}
+	if value, ok := au.mutation.Kind(); ok {
+		_spec.SetField(account.FieldKind, field.TypeEnum, value)
 	}
 	if value, ok := au.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
@@ -2126,6 +2148,20 @@ func (auo *AccountUpdateOne) ClearBio() *AccountUpdateOne {
 	return auo
 }
 
+// SetKind sets the "kind" field.
+func (auo *AccountUpdateOne) SetKind(a account.Kind) *AccountUpdateOne {
+	auo.mutation.SetKind(a)
+	return auo
+}
+
+// SetNillableKind sets the "kind" field if the given value is not nil.
+func (auo *AccountUpdateOne) SetNillableKind(a *account.Kind) *AccountUpdateOne {
+	if a != nil {
+		auo.SetKind(*a)
+	}
+	return auo
+}
+
 // SetAdmin sets the "admin" field.
 func (auo *AccountUpdateOne) SetAdmin(b bool) *AccountUpdateOne {
 	auo.mutation.SetAdmin(b)
@@ -2987,6 +3023,11 @@ func (auo *AccountUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Account.name": %w`, err)}
 		}
 	}
+	if v, ok := auo.mutation.Kind(); ok {
+		if err := account.KindValidator(v); err != nil {
+			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Account.kind": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -3051,6 +3092,9 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 	}
 	if auo.mutation.BioCleared() {
 		_spec.ClearField(account.FieldBio, field.TypeString)
+	}
+	if value, ok := auo.mutation.Kind(); ok {
+		_spec.SetField(account.FieldKind, field.TypeEnum, value)
 	}
 	if value, ok := auo.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)

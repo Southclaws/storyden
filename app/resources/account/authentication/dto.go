@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/Southclaws/fault"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
@@ -11,11 +12,14 @@ import (
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
+var ErrExpired = fault.New("authentication expired", ftag.With(ftag.PermissionDenied))
+
 type ID = xid.ID
 
 type Authentication struct {
 	ID         ID
 	Created    time.Time
+	Expires    opt.Optional[time.Time]
 	Account    account.Account
 	Service    Service
 	Type       TokenType
@@ -23,6 +27,25 @@ type Authentication struct {
 	Token      string
 	Name       opt.Optional[string]
 	Metadata   interface{}
+}
+
+func (a Authentication) IsExpired() bool {
+	exp, ok := a.Expires.Get()
+	if !ok {
+		return false
+	}
+	return exp.Before(time.Now())
+}
+
+func (a Authentication) CheckExpired() error {
+	exp, ok := a.Expires.Get()
+	if !ok {
+		return nil
+	}
+	if exp.After(time.Now()) {
+		return nil
+	}
+	return fault.Wrap(ErrExpired)
 }
 
 func FromModel(m *ent.Authentication) (*Authentication, error) {
@@ -49,6 +72,7 @@ func FromModel(m *ent.Authentication) (*Authentication, error) {
 	return &Authentication{
 		ID:         ID(m.ID),
 		Created:    m.CreatedAt,
+		Expires:    opt.NewPtr(m.ExpiresAt),
 		Account:    *acc,
 		Service:    service,
 		Type:       tokenType,

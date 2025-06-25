@@ -125,6 +125,20 @@ func (ac *AccountCreate) SetNillableBio(s *string) *AccountCreate {
 	return ac
 }
 
+// SetKind sets the "kind" field.
+func (ac *AccountCreate) SetKind(a account.Kind) *AccountCreate {
+	ac.mutation.SetKind(a)
+	return ac
+}
+
+// SetNillableKind sets the "kind" field if the given value is not nil.
+func (ac *AccountCreate) SetNillableKind(a *account.Kind) *AccountCreate {
+	if a != nil {
+		ac.SetKind(*a)
+	}
+	return ac
+}
+
 // SetAdmin sets the "admin" field.
 func (ac *AccountCreate) SetAdmin(b bool) *AccountCreate {
 	ac.mutation.SetAdmin(b)
@@ -527,6 +541,10 @@ func (ac *AccountCreate) defaults() {
 		v := account.DefaultUpdatedAt()
 		ac.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := ac.mutation.Kind(); !ok {
+		v := account.DefaultKind
+		ac.mutation.SetKind(v)
+	}
 	if _, ok := ac.mutation.Admin(); !ok {
 		v := account.DefaultAdmin
 		ac.mutation.SetAdmin(v)
@@ -559,6 +577,14 @@ func (ac *AccountCreate) check() error {
 	if v, ok := ac.mutation.Name(); ok {
 		if err := account.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Account.name": %w`, err)}
+		}
+	}
+	if _, ok := ac.mutation.Kind(); !ok {
+		return &ValidationError{Name: "kind", err: errors.New(`ent: missing required field "Account.kind"`)}
+	}
+	if v, ok := ac.mutation.Kind(); ok {
+		if err := account.KindValidator(v); err != nil {
+			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Account.kind": %w`, err)}
 		}
 	}
 	if _, ok := ac.mutation.Admin(); !ok {
@@ -632,6 +658,10 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	if value, ok := ac.mutation.Bio(); ok {
 		_spec.SetField(account.FieldBio, field.TypeString, value)
 		_node.Bio = value
+	}
+	if value, ok := ac.mutation.Kind(); ok {
+		_spec.SetField(account.FieldKind, field.TypeEnum, value)
+		_node.Kind = value
 	}
 	if value, ok := ac.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
@@ -1131,6 +1161,18 @@ func (u *AccountUpsert) ClearBio() *AccountUpsert {
 	return u
 }
 
+// SetKind sets the "kind" field.
+func (u *AccountUpsert) SetKind(v account.Kind) *AccountUpsert {
+	u.Set(account.FieldKind, v)
+	return u
+}
+
+// UpdateKind sets the "kind" field to the value that was provided on create.
+func (u *AccountUpsert) UpdateKind() *AccountUpsert {
+	u.SetExcluded(account.FieldKind)
+	return u
+}
+
 // SetAdmin sets the "admin" field.
 func (u *AccountUpsert) SetAdmin(v bool) *AccountUpsert {
 	u.Set(account.FieldAdmin, v)
@@ -1350,6 +1392,20 @@ func (u *AccountUpsertOne) UpdateBio() *AccountUpsertOne {
 func (u *AccountUpsertOne) ClearBio() *AccountUpsertOne {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearBio()
+	})
+}
+
+// SetKind sets the "kind" field.
+func (u *AccountUpsertOne) SetKind(v account.Kind) *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetKind(v)
+	})
+}
+
+// UpdateKind sets the "kind" field to the value that was provided on create.
+func (u *AccountUpsertOne) UpdateKind() *AccountUpsertOne {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateKind()
 	})
 }
 
@@ -1750,6 +1806,20 @@ func (u *AccountUpsertBulk) UpdateBio() *AccountUpsertBulk {
 func (u *AccountUpsertBulk) ClearBio() *AccountUpsertBulk {
 	return u.Update(func(s *AccountUpsert) {
 		s.ClearBio()
+	})
+}
+
+// SetKind sets the "kind" field.
+func (u *AccountUpsertBulk) SetKind(v account.Kind) *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.SetKind(v)
+	})
+}
+
+// UpdateKind sets the "kind" field to the value that was provided on create.
+func (u *AccountUpsertBulk) UpdateKind() *AccountUpsertBulk {
+	return u.Update(func(s *AccountUpsert) {
+		s.UpdateKind()
 	})
 }
 

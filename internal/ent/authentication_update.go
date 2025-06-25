@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -27,6 +28,26 @@ type AuthenticationUpdate struct {
 // Where appends a list predicates to the AuthenticationUpdate builder.
 func (au *AuthenticationUpdate) Where(ps ...predicate.Authentication) *AuthenticationUpdate {
 	au.mutation.Where(ps...)
+	return au
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (au *AuthenticationUpdate) SetExpiresAt(t time.Time) *AuthenticationUpdate {
+	au.mutation.SetExpiresAt(t)
+	return au
+}
+
+// SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
+func (au *AuthenticationUpdate) SetNillableExpiresAt(t *time.Time) *AuthenticationUpdate {
+	if t != nil {
+		au.SetExpiresAt(*t)
+	}
+	return au
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (au *AuthenticationUpdate) ClearExpiresAt() *AuthenticationUpdate {
+	au.mutation.ClearExpiresAt()
 	return au
 }
 
@@ -222,6 +243,12 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 			}
 		}
 	}
+	if value, ok := au.mutation.ExpiresAt(); ok {
+		_spec.SetField(authentication.FieldExpiresAt, field.TypeTime, value)
+	}
+	if au.mutation.ExpiresAtCleared() {
+		_spec.ClearField(authentication.FieldExpiresAt, field.TypeTime)
+	}
 	if value, ok := au.mutation.Service(); ok {
 		_spec.SetField(authentication.FieldService, field.TypeString, value)
 	}
@@ -295,6 +322,26 @@ type AuthenticationUpdateOne struct {
 	hooks     []Hook
 	mutation  *AuthenticationMutation
 	modifiers []func(*sql.UpdateBuilder)
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (auo *AuthenticationUpdateOne) SetExpiresAt(t time.Time) *AuthenticationUpdateOne {
+	auo.mutation.SetExpiresAt(t)
+	return auo
+}
+
+// SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
+func (auo *AuthenticationUpdateOne) SetNillableExpiresAt(t *time.Time) *AuthenticationUpdateOne {
+	if t != nil {
+		auo.SetExpiresAt(*t)
+	}
+	return auo
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (auo *AuthenticationUpdateOne) ClearExpiresAt() *AuthenticationUpdateOne {
+	auo.mutation.ClearExpiresAt()
+	return auo
 }
 
 // SetService sets the "service" field.
@@ -518,6 +565,12 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := auo.mutation.ExpiresAt(); ok {
+		_spec.SetField(authentication.FieldExpiresAt, field.TypeTime, value)
+	}
+	if auo.mutation.ExpiresAtCleared() {
+		_spec.ClearField(authentication.FieldExpiresAt, field.TypeTime)
 	}
 	if value, ok := auo.mutation.Service(); ok {
 		_spec.SetField(authentication.FieldService, field.TypeString, value)

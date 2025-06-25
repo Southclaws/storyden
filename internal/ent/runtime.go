@@ -70,7 +70,7 @@ func init() {
 	// account.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	account.NameValidator = accountDescName.Validators[0].(func(string) error)
 	// accountDescAdmin is the schema descriptor for admin field.
-	accountDescAdmin := accountFields[3].Descriptor()
+	accountDescAdmin := accountFields[4].Descriptor()
 	// account.DefaultAdmin holds the default value on creation for the admin field.
 	account.DefaultAdmin = accountDescAdmin.Default.(bool)
 	// accountDescID is the schema descriptor for id field.

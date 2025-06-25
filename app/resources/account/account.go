@@ -25,6 +25,7 @@ type Account struct {
 	Handle         string
 	Name           string
 	Bio            datagraph.Content
+	Kind           AccountKind
 	Admin          bool
 	Followers      int
 	Following      int
