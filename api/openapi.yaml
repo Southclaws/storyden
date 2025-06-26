@@ -3832,6 +3832,8 @@ components:
         - "READ_COLLECTION"
         - "MANAGE_COLLECTIONS"
         - "COLLECTION_SUBMIT"
+        # Personal access keys for automation/MCP
+        - "USE_PERSONAL_ACCESS_KEYS"
         # Administrative (Settings, bans, etc)
         - "MANAGE_SETTINGS"
         - "MANAGE_SUSPENSIONS"

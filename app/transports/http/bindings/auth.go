@@ -92,6 +92,18 @@ func (a *Authentication) AuthProviderLogout(ctx context.Context, request openapi
 	}, nil
 }
 
+func (a *Authentication) AccessKeyList(ctx context.Context, request openapi.AccessKeyListRequestObject) (openapi.AccessKeyListResponseObject, error) {
+	return nil, nil
+}
+
+func (a *Authentication) AccessKeyCreate(ctx context.Context, request openapi.AccessKeyCreateRequestObject) (openapi.AccessKeyCreateResponseObject, error) {
+	return nil, nil
+}
+
+func (a *Authentication) AccessKeyDelete(ctx context.Context, request openapi.AccessKeyDeleteRequestObject) (openapi.AccessKeyDeleteResponseObject, error) {
+	return nil, nil
+}
+
 func serialiseAuthProvider(p auth_svc.Provider) (openapi.AuthProvider, error) {
 	if op, ok := p.(auth_svc.OAuthProvider); ok {
 		link, err := op.Link("/")

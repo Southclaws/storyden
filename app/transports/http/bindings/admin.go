@@ -135,6 +135,14 @@ func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.Admin
 	}, nil
 }
 
+func (i *Admin) AdminAccessKeyList(ctx context.Context, request openapi.AdminAccessKeyListRequestObject) (openapi.AdminAccessKeyListResponseObject, error) {
+	return nil, nil
+}
+
+func (i *Admin) AdminAccessKeyDelete(ctx context.Context, request openapi.AdminAccessKeyDeleteRequestObject) (openapi.AdminAccessKeyDeleteResponseObject, error) {
+	return nil, nil
+}
+
 func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 	return openapi.AdminSettingsProps{
 		AccentColour:       in.AccentColour.OrZero(),
