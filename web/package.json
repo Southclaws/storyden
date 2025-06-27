@@ -97,5 +97,11 @@
   },
   "resolutions": {
     "@types/react": "19.1.5"
+  },
+  "nextBundleAnalysis": {
+    "budget": 512000,
+    "budgetPercentIncreaseRed": 20,
+    "minimumChangeThreshold": 0,
+    "showDetails": true
   }
 }
