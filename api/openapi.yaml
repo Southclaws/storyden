@@ -4241,8 +4241,10 @@ components:
       type: object
       allOf:
         - $ref: "#/components/schemas/CommonProperties"
-        - $ref: "#/components/schemas/AccessKeyInitialProps"
-        - $ref: "#/components/schemas/ProfileReference"
+        - $ref: "#/components/schemas/AccessKeyProps"
+        - required: [created_by]
+          properties:
+            created_by: { $ref: "#/components/schemas/ProfileReference" }
 
     AccessKeyIssued:
       description: |

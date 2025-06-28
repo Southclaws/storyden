@@ -13,6 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
@@ -202,14 +203,12 @@ func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 
 func serialiseOwnedAccessKey(in *authentication.Authentication) openapi.OwnedAccessKey {
 	return openapi.OwnedAccessKey{
+		Id:        in.ID.String(),
 		CreatedAt: in.Account.CreatedAt,
 		ExpiresAt: in.Expires.Ptr(),
-		Handle:    in.Account.Handle,
-		Id:        in.ID.String(),
-		Joined:    in.Account.CreatedAt,
+		Enabled:   !in.Disabled,
 		Name:      in.Name.Or("Unnamed"),
-		Roles:     serialiseHeldRoleList(in.Account.Roles),
-		Suspended: in.Account.DeletedAt.Ptr(),
+		CreatedBy: serialiseProfileReference(*profile.ProfileFromAccount(&in.Account)),
 	}
 }
 

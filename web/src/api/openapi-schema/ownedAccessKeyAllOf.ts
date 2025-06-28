@@ -7,16 +7,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: rolling
  */
-import type { AccessKeyProps } from "./accessKeyProps";
-import type { CommonProperties } from "./commonProperties";
-import type { OwnedAccessKeyAllOf } from "./ownedAccessKeyAllOf";
+import type { ProfileReference } from "./profileReference";
 
-/**
- * An owned access key is a key that has been already issued to an account,
-it is used specifically for administrator listing of all access keys
-where it's necessary to include the account that created the key.
-
- */
-export type OwnedAccessKey = CommonProperties &
-  AccessKeyProps &
-  OwnedAccessKeyAllOf;
+export type OwnedAccessKeyAllOf = {
+  created_by: ProfileReference;
+};

@@ -43,6 +43,7 @@ import { badge } from "@/recipes/badge";
 import { button } from "@/recipes/button";
 import { colorPicker } from "@/recipes/color-picker";
 import { combobox } from "@/recipes/combobox";
+import { datePicker } from "@/recipes/date-picker";
 import { fileUpload } from "@/recipes/file-upload";
 import { headingInput } from "@/recipes/heading-input";
 import { input } from "@/recipes/input";
@@ -325,6 +326,7 @@ export default defineConfig({
         richCard: richCard,
       },
       slotRecipes: {
+        datePicker: datePicker,
         select: select,
         colorPicker: colorPicker,
         combobox: combobox,

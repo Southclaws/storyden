@@ -1,24 +1,55 @@
 "use client";
 
+import type { Assign } from "@ark-ui/react";
 import { Clipboard } from "@ark-ui/react/clipboard";
-import type { ComponentProps } from "react";
-import { styled } from "styled-system/jsx";
-import { clipboard } from "styled-system/recipes";
+import { type ClipboardVariantProps, clipboard } from "styled-system/recipes";
+import type { ComponentProps, HTMLStyledProps } from "styled-system/types";
 
 import { createStyleContext } from "@/utils/create-style-context";
 
 const { withProvider, withContext } = createStyleContext(clipboard);
 
-export const Root = withProvider(styled(Clipboard.Root), "root");
-export const Control = withContext(styled(Clipboard.Control), "control");
-export const Indicator = withContext(styled(Clipboard.Indicator), "indicator");
-export const Input = withContext(styled(Clipboard.Input), "input");
-export const Label = withContext(styled(Clipboard.Label), "label");
-export const Trigger = withContext(styled(Clipboard.Trigger), "trigger");
+export type RootProviderProps = ComponentProps<typeof RootProvider>;
+export const RootProvider = withProvider<
+  HTMLDivElement,
+  Assign<
+    Assign<HTMLStyledProps<"div">, Clipboard.RootProviderBaseProps>,
+    ClipboardVariantProps
+  >
+>(Clipboard.RootProvider, "root");
 
-export interface RootProps extends ComponentProps<typeof Root> {}
-export interface ControlProps extends ComponentProps<typeof Control> {}
-export interface IndicatorProps extends ComponentProps<typeof Indicator> {}
-export interface InputProps extends ComponentProps<typeof Input> {}
-export interface LabelProps extends ComponentProps<typeof Label> {}
-export interface TriggerProps extends ComponentProps<typeof Trigger> {}
+export type RootProps = ComponentProps<typeof Root>;
+export const Root = withProvider<
+  HTMLDivElement,
+  Assign<
+    Assign<HTMLStyledProps<"div">, Clipboard.RootBaseProps>,
+    ClipboardVariantProps
+  >
+>(Clipboard.Root, "root");
+
+export const Control = withContext<
+  HTMLDivElement,
+  Assign<HTMLStyledProps<"div">, Clipboard.ControlBaseProps>
+>(Clipboard.Control, "control");
+
+export const Indicator = withContext<
+  HTMLDivElement,
+  Assign<HTMLStyledProps<"div">, Clipboard.IndicatorBaseProps>
+>(Clipboard.Indicator, "indicator");
+
+export const Input = withContext<
+  HTMLInputElement,
+  Assign<HTMLStyledProps<"input">, Clipboard.InputBaseProps>
+>(Clipboard.Input, "input");
+
+export const Label = withContext<
+  HTMLLabelElement,
+  Assign<HTMLStyledProps<"label">, Clipboard.LabelBaseProps>
+>(Clipboard.Label, "label");
+
+export const Trigger = withContext<
+  HTMLButtonElement,
+  Assign<HTMLStyledProps<"button">, Clipboard.TriggerBaseProps>
+>(Clipboard.Trigger, "trigger");
+
+export { ClipboardContext as Context } from "@ark-ui/react/clipboard";

@@ -118,7 +118,7 @@ func TestAccessKeyCRUD(t *testing.T) {
 				ak1 := findOwnedAccessKey(t, list1.JSON200.Keys, ak.JSON200.Id)
 				a.Equal(ak.JSON200.Id, ak1.Id)
 				a.Equal(ak.JSON200.Name, ak1.Name)
-				a.Equal(member.Handle, ak1.Handle)
+				a.Equal(member.Handle, ak1.CreatedBy.Handle)
 			})
 
 			t.Run("admin_revoke", func(t *testing.T) {

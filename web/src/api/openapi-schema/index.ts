@@ -323,6 +323,7 @@ export * from "./oAuthCallback";
 export * from "./oAuthProviderCallbackBody";
 export * from "./onboardingStatus";
 export * from "./ownedAccessKey";
+export * from "./ownedAccessKeyAllOf";
 export * from "./ownedAccessKeyList";
 export * from "./ownedAccessKeyListResult";
 export * from "./paginatedReplyList";
