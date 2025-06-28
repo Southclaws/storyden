@@ -8,10 +8,13 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/account/email"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	auth_svc "github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
@@ -25,6 +28,7 @@ import (
 type Authentication struct {
 	cj                            *session_cookie.Jar
 	si                            *session.Issuer
+	session                       *session.Provider
 	settings                      *settings.SettingsRepository
 	passwordAuthProvider          *password.Provider
 	emailVerificationAuthProvider *email_only.Provider
@@ -32,11 +36,13 @@ type Authentication struct {
 	emailRepo                     *email.Repository
 	authManager                   *auth_svc.Manager
 	emailVerifier                 *email_verify.Verifier
+	access_key                    *access_key.Repository
 }
 
 func NewAuthentication(
 	cj *session_cookie.Jar,
 	si *session.Issuer,
+	session *session.Provider,
 	settings *settings.SettingsRepository,
 	passwordAuthProvider *password.Provider,
 	emailVerificationAuthProvider *email_only.Provider,
@@ -44,10 +50,12 @@ func NewAuthentication(
 	emailRepo *email.Repository,
 	authManager *auth_svc.Manager,
 	emailVerifier *email_verify.Verifier,
+	access_key *access_key.Repository,
 ) Authentication {
 	return Authentication{
 		cj:                            cj,
 		si:                            si,
+		session:                       session,
 		settings:                      settings,
 		passwordAuthProvider:          passwordAuthProvider,
 		emailVerificationAuthProvider: emailVerificationAuthProvider,
@@ -55,6 +63,7 @@ func NewAuthentication(
 		emailRepo:                     emailRepo,
 		authManager:                   authManager,
 		emailVerifier:                 emailVerifier,
+		access_key:                    access_key,
 	}
 }
 
@@ -92,6 +101,72 @@ func (a *Authentication) AuthProviderLogout(ctx context.Context, request openapi
 	}, nil
 }
 
+func (a *Authentication) AccessKeyList(ctx context.Context, request openapi.AccessKeyListRequestObject) (openapi.AccessKeyListResponseObject, error) {
+	acc, err := a.session.Account(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionUsePersonalAccessKeys); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	list, err := a.access_key.List(ctx, acc.ID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccessKeyList200JSONResponse{
+		AccessKeyListOKJSONResponse: openapi.AccessKeyListOKJSONResponse{
+			Keys: serialiseAccessKeyList(list),
+		},
+	}, nil
+}
+
+func (a *Authentication) AccessKeyCreate(ctx context.Context, request openapi.AccessKeyCreateRequestObject) (openapi.AccessKeyCreateResponseObject, error) {
+	acc, err := a.session.Account(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionUsePersonalAccessKeys); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	aks, err := a.access_key.Create(ctx, acc.ID, access_key.AccessKeyKindPersonal, request.Body.Name, opt.NewPtr(request.Body.ExpiresAt))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccessKeyCreate200JSONResponse{
+		AccessKeyCreateOKJSONResponse: openapi.AccessKeyCreateOKJSONResponse(openapi.AccessKeyIssued{
+			Id:        openapi.Identifier(aks.AuthID.String()),
+			CreatedAt: aks.CreatedAt,
+			ExpiresAt: aks.Expires.Ptr(),
+			Name:      aks.Name,
+			Secret:    aks.String(),
+		}),
+	}, nil
+}
+
+func (a *Authentication) AccessKeyDelete(ctx context.Context, request openapi.AccessKeyDeleteRequestObject) (openapi.AccessKeyDeleteResponseObject, error) {
+	acc, err := a.session.Account(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionUsePersonalAccessKeys); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, err = a.access_key.Revoke(ctx, acc.ID, deserialiseID(request.AccessKeyId))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccessKeyDelete204Response{}, nil
+}
+
 func serialiseAuthProvider(p auth_svc.Provider) (openapi.AuthProvider, error) {
 	if op, ok := p.(auth_svc.OAuthProvider); ok {
 		link, err := op.Link("/")
@@ -117,4 +192,18 @@ func deserialiseAuthMode(in openapi.AuthMode) (authentication.Mode, error) {
 		return authentication.Mode{}, fault.Wrap(err, ftag.With(ftag.InvalidArgument))
 	}
 	return mode, nil
+}
+
+func serialiseAccessKey(k *authentication.Authentication) openapi.AccessKey {
+	return openapi.AccessKey{
+		Id:        k.ID.String(),
+		CreatedAt: k.Created,
+		ExpiresAt: k.Expires.Ptr(),
+		Enabled:   !k.Disabled,
+		Name:      k.Name.Or("Unnamed key"),
+	}
+}
+
+func serialiseAccessKeyList(list []*authentication.Authentication) []openapi.AccessKey {
+	return dt.Map(list, serialiseAccessKey)
 }

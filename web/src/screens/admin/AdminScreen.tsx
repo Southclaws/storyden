@@ -6,6 +6,7 @@ import { useEffect } from "react";
 
 import * as Tabs from "@/components/ui/tabs";
 
+import { AccessKeySettingsScreen } from "./AccessKeySettingsScreen";
 import { AuthenticationSettingsScreen } from "./AuthenticationSettingsScreen";
 import { BrandSettingsScreen } from "./BrandSettingsScreen";
 
@@ -43,6 +44,7 @@ export function AdminScreen() {
       <Tabs.List>
         <Tabs.Trigger value="brand">Brand</Tabs.Trigger>
         <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
+        <Tabs.Trigger value="access_keys">Access keys</Tabs.Trigger>
         <Tabs.Indicator />
       </Tabs.List>
 
@@ -52,6 +54,10 @@ export function AdminScreen() {
 
       <Tabs.Content value="authentication">
         <AuthenticationSettingsScreen />
+      </Tabs.Content>
+
+      <Tabs.Content value="access_keys">
+        <AccessKeySettingsScreen />
       </Tabs.Content>
     </Tabs.Root>
   );

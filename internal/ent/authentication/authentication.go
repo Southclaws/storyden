@@ -17,6 +17,8 @@ const (
 	FieldID = "id"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// FieldExpiresAt holds the string denoting the expires_at field in the database.
+	FieldExpiresAt = "expires_at"
 	// FieldService holds the string denoting the service field in the database.
 	FieldService = "service"
 	// FieldTokenType holds the string denoting the token_type field in the database.
@@ -27,6 +29,8 @@ const (
 	FieldToken = "token"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldDisabled holds the string denoting the disabled field in the database.
+	FieldDisabled = "disabled"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
 	// FieldAccountAuthentication holds the string denoting the account_authentication field in the database.
@@ -48,11 +52,13 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
+	FieldExpiresAt,
 	FieldService,
 	FieldTokenType,
 	FieldIdentifier,
 	FieldToken,
 	FieldName,
+	FieldDisabled,
 	FieldMetadata,
 	FieldAccountAuthentication,
 }
@@ -76,6 +82,8 @@ var (
 	TokenTypeValidator func(string) error
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	TokenValidator func(string) error
+	// DefaultDisabled holds the default value on creation for the "disabled" field.
+	DefaultDisabled bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -93,6 +101,11 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByExpiresAt orders the results by the expires_at field.
+func ByExpiresAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldExpiresAt, opts...).ToFunc()
 }
 
 // ByService orders the results by the service field.
@@ -118,6 +131,11 @@ func ByToken(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByDisabled orders the results by the disabled field.
+func ByDisabled(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDisabled, opts...).ToFunc()
 }
 
 // ByAccountAuthentication orders the results by the account_authentication field.

@@ -13,7 +13,7 @@ type Authentication struct {
 }
 
 func (Authentication) Mixin() []ent.Mixin {
-	return []ent.Mixin{Identifier{}, CreatedAt{}}
+	return []ent.Mixin{Identifier{}, CreatedAt{}, ExpiresAt{}}
 }
 
 func (Authentication) Fields() []ent.Field {
@@ -32,12 +32,16 @@ func (Authentication) Fields() []ent.Field {
 		field.String("token").
 			NotEmpty().
 			Sensitive().
-			Comment("The actual authentication token/password/key/etc. If OAuth, it'll be the access_token value, if it's a password, a hash and if it's an api_token type then the API token string."),
+			Comment("The actual authentication token/password/key/etc. If OAuth, it'll be the access_token value, if it's a password or API key, a hash."),
 
 		field.String("name").
 			Optional().
 			Nillable().
 			Comment("A human-readable name for the authentication method. For WebAuthn, this may be the device OS or nickname."),
+
+		field.Bool("disabled").
+			Default(false).
+			Comment("Whether the authentication method is disabled. This is useful for revoking access without deleting the record."),
 
 		field.JSON("metadata", map[string]interface{}{}).
 			Optional().

@@ -105,6 +105,12 @@ export const PermissionDetails: Record<Permission, PermissionDetail> = {
     name: "Submit to collections",
     description: "Submit items for review to other members' collections.",
   },
+  [Permission.USE_PERSONAL_ACCESS_KEYS]: {
+    value: Permission.USE_PERSONAL_ACCESS_KEYS,
+    name: "Use personal access keys",
+    description:
+      "Use personal access keys to authenticate with the Storyden API and MCP server.",
+  },
   [Permission.MANAGE_SETTINGS]: {
     value: Permission.MANAGE_SETTINGS,
     name: "Manage settings",

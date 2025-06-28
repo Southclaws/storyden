@@ -486,6 +486,26 @@ func BioContainsFold(v string) predicate.Account {
 	return predicate.Account(sql.FieldContainsFold(FieldBio, v))
 }
 
+// KindEQ applies the EQ predicate on the "kind" field.
+func KindEQ(v Kind) predicate.Account {
+	return predicate.Account(sql.FieldEQ(FieldKind, v))
+}
+
+// KindNEQ applies the NEQ predicate on the "kind" field.
+func KindNEQ(v Kind) predicate.Account {
+	return predicate.Account(sql.FieldNEQ(FieldKind, v))
+}
+
+// KindIn applies the In predicate on the "kind" field.
+func KindIn(vs ...Kind) predicate.Account {
+	return predicate.Account(sql.FieldIn(FieldKind, vs...))
+}
+
+// KindNotIn applies the NotIn predicate on the "kind" field.
+func KindNotIn(vs ...Kind) predicate.Account {
+	return predicate.Account(sql.FieldNotIn(FieldKind, vs...))
+}
+
 // AdminEQ applies the EQ predicate on the "admin" field.
 func AdminEQ(v bool) predicate.Account {
 	return predicate.Account(sql.FieldEQ(FieldAdmin, v))

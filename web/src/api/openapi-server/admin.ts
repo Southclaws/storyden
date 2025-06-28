@@ -9,8 +9,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type {
   AccountGetOKResponse,
+  AdminAccessKeyListOKResponse,
   AdminSettingsUpdateBody,
   AdminSettingsUpdateOKResponse,
+  NoContentResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
 
@@ -88,6 +90,59 @@ export const adminAccountBanRemove = async (
 ): Promise<adminAccountBanRemoveResponse> => {
   return fetcher<Promise<adminAccountBanRemoveResponse>>(
     getAdminAccountBanRemoveUrl(accountHandle),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+};
+
+/**
+ * List all access keys for the entire instance. This is only available to
+admin accounts and is used to manage access keys from other accounts.
+
+ */
+export type adminAccessKeyListResponse = {
+  data: AdminAccessKeyListOKResponse;
+  status: number;
+};
+
+export const getAdminAccessKeyListUrl = () => {
+  return `/admin/access-keys`;
+};
+
+export const adminAccessKeyList = async (
+  options?: RequestInit,
+): Promise<adminAccessKeyListResponse> => {
+  return fetcher<Promise<adminAccessKeyListResponse>>(
+    getAdminAccessKeyListUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+};
+
+/**
+ * Revoke an access key. This will immediately invalidate the key and it
+will no longer be usable for authentication.
+
+ */
+export type adminAccessKeyDeleteResponse = {
+  data: NoContentResponse;
+  status: number;
+};
+
+export const getAdminAccessKeyDeleteUrl = (accessKeyId: string) => {
+  return `/admin/access-keys/${accessKeyId}`;
+};
+
+export const adminAccessKeyDelete = async (
+  accessKeyId: string,
+  options?: RequestInit,
+): Promise<adminAccessKeyDeleteResponse> => {
+  return fetcher<Promise<adminAccessKeyDeleteResponse>>(
+    getAdminAccessKeyDeleteUrl(accessKeyId),
     {
       ...options,
       method: "DELETE",

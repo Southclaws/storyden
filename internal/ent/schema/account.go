@@ -26,6 +26,12 @@ func (Account) Fields() []ent.Field {
 		field.String("handle").Unique().NotEmpty(),
 		field.String("name").NotEmpty(),
 		field.String("bio").Optional(),
+		field.Enum("kind").
+			Values("human", "bot").
+			Default("human").
+			Annotations(
+				entsql.Default("human"),
+			),
 		field.Bool("admin").Default(false),
 		field.JSON("links", []ExternalLink{}).Optional(),
 		field.JSON("metadata", map[string]any{}).Optional(),

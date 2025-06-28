@@ -97,6 +97,7 @@ type AccountMutation struct {
 	handle                         *string
 	name                           *string
 	bio                            *string
+	kind                           *account.Kind
 	admin                          *bool
 	links                          *[]schema.ExternalLink
 	appendlinks                    []schema.ExternalLink
@@ -562,6 +563,42 @@ func (m *AccountMutation) BioCleared() bool {
 func (m *AccountMutation) ResetBio() {
 	m.bio = nil
 	delete(m.clearedFields, account.FieldBio)
+}
+
+// SetKind sets the "kind" field.
+func (m *AccountMutation) SetKind(a account.Kind) {
+	m.kind = &a
+}
+
+// Kind returns the value of the "kind" field in the mutation.
+func (m *AccountMutation) Kind() (r account.Kind, exists bool) {
+	v := m.kind
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKind returns the old "kind" field's value of the Account entity.
+// If the Account object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AccountMutation) OldKind(ctx context.Context) (v account.Kind, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKind is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKind requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKind: %w", err)
+	}
+	return oldValue.Kind, nil
+}
+
+// ResetKind resets all changes to the "kind" field.
+func (m *AccountMutation) ResetKind() {
+	m.kind = nil
 }
 
 // SetAdmin sets the "admin" field.
@@ -1904,7 +1941,7 @@ func (m *AccountMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AccountMutation) Fields() []string {
-	fields := make([]string, 0, 11)
+	fields := make([]string, 0, 12)
 	if m.created_at != nil {
 		fields = append(fields, account.FieldCreatedAt)
 	}
@@ -1925,6 +1962,9 @@ func (m *AccountMutation) Fields() []string {
 	}
 	if m.bio != nil {
 		fields = append(fields, account.FieldBio)
+	}
+	if m.kind != nil {
+		fields = append(fields, account.FieldKind)
 	}
 	if m.admin != nil {
 		fields = append(fields, account.FieldAdmin)
@@ -1960,6 +2000,8 @@ func (m *AccountMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case account.FieldBio:
 		return m.Bio()
+	case account.FieldKind:
+		return m.Kind()
 	case account.FieldAdmin:
 		return m.Admin()
 	case account.FieldLinks:
@@ -1991,6 +2033,8 @@ func (m *AccountMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldName(ctx)
 	case account.FieldBio:
 		return m.OldBio(ctx)
+	case account.FieldKind:
+		return m.OldKind(ctx)
 	case account.FieldAdmin:
 		return m.OldAdmin(ctx)
 	case account.FieldLinks:
@@ -2056,6 +2100,13 @@ func (m *AccountMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBio(v)
+		return nil
+	case account.FieldKind:
+		v, ok := value.(account.Kind)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKind(v)
 		return nil
 	case account.FieldAdmin:
 		v, ok := value.(bool)
@@ -2193,6 +2244,9 @@ func (m *AccountMutation) ResetField(name string) error {
 		return nil
 	case account.FieldBio:
 		m.ResetBio()
+		return nil
+	case account.FieldKind:
+		m.ResetKind()
 		return nil
 	case account.FieldAdmin:
 		m.ResetAdmin()
@@ -5325,11 +5379,13 @@ type AuthenticationMutation struct {
 	typ            string
 	id             *xid.ID
 	created_at     *time.Time
+	expires_at     *time.Time
 	service        *string
 	token_type     *string
 	identifier     *string
 	token          *string
 	name           *string
+	disabled       *bool
 	metadata       *map[string]interface{}
 	clearedFields  map[string]struct{}
 	account        *xid.ID
@@ -5477,6 +5533,55 @@ func (m *AuthenticationMutation) OldCreatedAt(ctx context.Context) (v time.Time,
 // ResetCreatedAt resets all changes to the "created_at" field.
 func (m *AuthenticationMutation) ResetCreatedAt() {
 	m.created_at = nil
+}
+
+// SetExpiresAt sets the "expires_at" field.
+func (m *AuthenticationMutation) SetExpiresAt(t time.Time) {
+	m.expires_at = &t
+}
+
+// ExpiresAt returns the value of the "expires_at" field in the mutation.
+func (m *AuthenticationMutation) ExpiresAt() (r time.Time, exists bool) {
+	v := m.expires_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldExpiresAt returns the old "expires_at" field's value of the Authentication entity.
+// If the Authentication object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AuthenticationMutation) OldExpiresAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldExpiresAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldExpiresAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldExpiresAt: %w", err)
+	}
+	return oldValue.ExpiresAt, nil
+}
+
+// ClearExpiresAt clears the value of the "expires_at" field.
+func (m *AuthenticationMutation) ClearExpiresAt() {
+	m.expires_at = nil
+	m.clearedFields[authentication.FieldExpiresAt] = struct{}{}
+}
+
+// ExpiresAtCleared returns if the "expires_at" field was cleared in this mutation.
+func (m *AuthenticationMutation) ExpiresAtCleared() bool {
+	_, ok := m.clearedFields[authentication.FieldExpiresAt]
+	return ok
+}
+
+// ResetExpiresAt resets all changes to the "expires_at" field.
+func (m *AuthenticationMutation) ResetExpiresAt() {
+	m.expires_at = nil
+	delete(m.clearedFields, authentication.FieldExpiresAt)
 }
 
 // SetService sets the "service" field.
@@ -5672,6 +5777,42 @@ func (m *AuthenticationMutation) ResetName() {
 	delete(m.clearedFields, authentication.FieldName)
 }
 
+// SetDisabled sets the "disabled" field.
+func (m *AuthenticationMutation) SetDisabled(b bool) {
+	m.disabled = &b
+}
+
+// Disabled returns the value of the "disabled" field in the mutation.
+func (m *AuthenticationMutation) Disabled() (r bool, exists bool) {
+	v := m.disabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDisabled returns the old "disabled" field's value of the Authentication entity.
+// If the Authentication object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AuthenticationMutation) OldDisabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDisabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDisabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDisabled: %w", err)
+	}
+	return oldValue.Disabled, nil
+}
+
+// ResetDisabled resets all changes to the "disabled" field.
+func (m *AuthenticationMutation) ResetDisabled() {
+	m.disabled = nil
+}
+
 // SetMetadata sets the "metadata" field.
 func (m *AuthenticationMutation) SetMetadata(value map[string]interface{}) {
 	m.metadata = &value
@@ -5831,9 +5972,12 @@ func (m *AuthenticationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AuthenticationMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, authentication.FieldCreatedAt)
+	}
+	if m.expires_at != nil {
+		fields = append(fields, authentication.FieldExpiresAt)
 	}
 	if m.service != nil {
 		fields = append(fields, authentication.FieldService)
@@ -5849,6 +5993,9 @@ func (m *AuthenticationMutation) Fields() []string {
 	}
 	if m.name != nil {
 		fields = append(fields, authentication.FieldName)
+	}
+	if m.disabled != nil {
+		fields = append(fields, authentication.FieldDisabled)
 	}
 	if m.metadata != nil {
 		fields = append(fields, authentication.FieldMetadata)
@@ -5866,6 +6013,8 @@ func (m *AuthenticationMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case authentication.FieldCreatedAt:
 		return m.CreatedAt()
+	case authentication.FieldExpiresAt:
+		return m.ExpiresAt()
 	case authentication.FieldService:
 		return m.Service()
 	case authentication.FieldTokenType:
@@ -5876,6 +6025,8 @@ func (m *AuthenticationMutation) Field(name string) (ent.Value, bool) {
 		return m.Token()
 	case authentication.FieldName:
 		return m.Name()
+	case authentication.FieldDisabled:
+		return m.Disabled()
 	case authentication.FieldMetadata:
 		return m.Metadata()
 	case authentication.FieldAccountAuthentication:
@@ -5891,6 +6042,8 @@ func (m *AuthenticationMutation) OldField(ctx context.Context, name string) (ent
 	switch name {
 	case authentication.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
+	case authentication.FieldExpiresAt:
+		return m.OldExpiresAt(ctx)
 	case authentication.FieldService:
 		return m.OldService(ctx)
 	case authentication.FieldTokenType:
@@ -5901,6 +6054,8 @@ func (m *AuthenticationMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldToken(ctx)
 	case authentication.FieldName:
 		return m.OldName(ctx)
+	case authentication.FieldDisabled:
+		return m.OldDisabled(ctx)
 	case authentication.FieldMetadata:
 		return m.OldMetadata(ctx)
 	case authentication.FieldAccountAuthentication:
@@ -5920,6 +6075,13 @@ func (m *AuthenticationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
+		return nil
+	case authentication.FieldExpiresAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetExpiresAt(v)
 		return nil
 	case authentication.FieldService:
 		v, ok := value.(string)
@@ -5955,6 +6117,13 @@ func (m *AuthenticationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case authentication.FieldDisabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDisabled(v)
 		return nil
 	case authentication.FieldMetadata:
 		v, ok := value.(map[string]interface{})
@@ -6000,6 +6169,9 @@ func (m *AuthenticationMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *AuthenticationMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(authentication.FieldExpiresAt) {
+		fields = append(fields, authentication.FieldExpiresAt)
+	}
 	if m.FieldCleared(authentication.FieldName) {
 		fields = append(fields, authentication.FieldName)
 	}
@@ -6020,6 +6192,9 @@ func (m *AuthenticationMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *AuthenticationMutation) ClearField(name string) error {
 	switch name {
+	case authentication.FieldExpiresAt:
+		m.ClearExpiresAt()
+		return nil
 	case authentication.FieldName:
 		m.ClearName()
 		return nil
@@ -6037,6 +6212,9 @@ func (m *AuthenticationMutation) ResetField(name string) error {
 	case authentication.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
+	case authentication.FieldExpiresAt:
+		m.ResetExpiresAt()
+		return nil
 	case authentication.FieldService:
 		m.ResetService()
 		return nil
@@ -6051,6 +6229,9 @@ func (m *AuthenticationMutation) ResetField(name string) error {
 		return nil
 	case authentication.FieldName:
 		m.ResetName()
+		return nil
+	case authentication.FieldDisabled:
+		m.ResetDisabled()
 		return nil
 	case authentication.FieldMetadata:
 		m.ResetMetadata()

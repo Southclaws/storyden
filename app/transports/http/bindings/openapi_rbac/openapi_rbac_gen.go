@@ -14,6 +14,8 @@ type OperationPermissions interface {
 	AdminSettingsUpdate() (bool, *rbac.Permission)
 	AdminAccountBanCreate() (bool, *rbac.Permission)
 	AdminAccountBanRemove() (bool, *rbac.Permission)
+	AdminAccessKeyList() (bool, *rbac.Permission)
+	AdminAccessKeyDelete() (bool, *rbac.Permission)
 	RoleCreate() (bool, *rbac.Permission)
 	RoleList() (bool, *rbac.Permission)
 	RoleGet() (bool, *rbac.Permission)
@@ -38,6 +40,9 @@ type OperationPermissions interface {
 	WebAuthnMakeAssertion() (bool, *rbac.Permission)
 	PhoneRequestCode() (bool, *rbac.Permission)
 	PhoneSubmitCode() (bool, *rbac.Permission)
+	AccessKeyList() (bool, *rbac.Permission)
+	AccessKeyCreate() (bool, *rbac.Permission)
+	AccessKeyDelete() (bool, *rbac.Permission)
 	AuthProviderLogout() (bool, *rbac.Permission)
 	AccountGet() (bool, *rbac.Permission)
 	AccountUpdate() (bool, *rbac.Permission)
@@ -150,6 +155,10 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AdminAccountBanCreate()
 	case "AdminAccountBanRemove":
 		return optable.AdminAccountBanRemove()
+	case "AdminAccessKeyList":
+		return optable.AdminAccessKeyList()
+	case "AdminAccessKeyDelete":
+		return optable.AdminAccessKeyDelete()
 	case "RoleCreate":
 		return optable.RoleCreate()
 	case "RoleList":
@@ -198,6 +207,12 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.PhoneRequestCode()
 	case "PhoneSubmitCode":
 		return optable.PhoneSubmitCode()
+	case "AccessKeyList":
+		return optable.AccessKeyList()
+	case "AccessKeyCreate":
+		return optable.AccessKeyCreate()
+	case "AccessKeyDelete":
+		return optable.AccessKeyDelete()
 	case "AuthProviderLogout":
 		return optable.AuthProviderLogout()
 	case "AccountGet":

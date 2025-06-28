@@ -1,0 +1,82 @@
+---
+title: Access Keys
+description: API authentication using access keys
+---
+
+Access keys provide secure API authentication for Storyden. They allow programmatic access to almost all API endpoints.
+
+Keys are provided as `Authorization` header bearer tokens that authenticate API requests. Each key inherits the permissions of the user who created it and provides a secure alternative to session-based authentication for scripts, applications, and integrations.
+
+## Permissions Required
+
+Not every member can create access keys. Administrators must first grant the `USE_PERSONAL_ACCESS_KEYS` permission via a role before a member can create access keys for their account. Members with the `ADMINISTRATOR` permission inherit the access key usage permission automatically.
+
+## Creating Access Keys
+
+### Via Web Interface
+
+1. Navigate to your account settings
+2. Click on "Access Keys"
+3. Click "New" to create a new key
+4. Provide a descriptive name (e.g., "Discord Bot", "n8n Agent")
+5. Optionally set an expiry date
+6. Copy the generated secret - **this is the only time you'll see it**
+
+### Key Properties
+
+- **Name**: Descriptive identifier for the key
+- **Secret**: The authentication token (shown only once, never stored by Storyden's code)
+- **Expiry**: Optional expiration date
+- **Enabled**: Whether the key is active or revoked
+
+## Using Access Keys
+
+Include your access key in API requests using the Authorization header:
+
+```bash
+curl -H "Authorization: Bearer your_access_key_here" \
+  https://your-storyden-instance.com/api/threads
+```
+
+<Callout type="info">
+  A small number of API operations cannot be invoked with an access key. This
+  includes the `AccessKeyCreate` (`POST /api/auth/access-keys`) operation which
+  means access keys cannot be used to create more access keys.
+</Callout>
+
+## Managing Access Keys
+
+### Member Management
+
+Members with the `USE_PERSONAL_ACCESS_KEYS` permission can:
+
+- Create new access keys for their own account
+- View their own keys (name, creation date, expiry, enabled status)
+- Revoke their own keys
+
+### Admin Management
+
+Administrators can:
+
+- View all access keys across the instance
+- See which user created each key
+- Revoke any access key
+
+## Security Best Practices
+
+### Key Management
+
+- Use descriptive names to identify key purposes
+- Set expiry dates for temporary access
+- Revoke unused keys immediately
+
+### Integration Security
+
+- Store keys securely (environment variables, secret managers)
+- Never commit keys to version control
+- Use different keys for different applications
+- Rotate keys periodically
+
+## Advanced
+
+If you require more advanced security features such as OIDC, federated identity, SAML, etc. Please reach out or [open an issue](https://github.com/Southclaws/storyden/issues/new).

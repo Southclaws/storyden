@@ -18,6 +18,7 @@ var (
 		{Name: "handle", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "bio", Type: field.TypeString, Nullable: true},
+		{Name: "kind", Type: field.TypeEnum, Enums: []string{"human", "bot"}, Default: "human"},
 		{Name: "admin", Type: field.TypeBool, Default: false},
 		{Name: "links", Type: field.TypeJSON, Nullable: true},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
@@ -31,7 +32,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "accounts_invitations_invited",
-				Columns:    []*schema.Column{AccountsColumns[11]},
+				Columns:    []*schema.Column{AccountsColumns[12]},
 				RefColumns: []*schema.Column{InvitationsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -154,11 +155,13 @@ var (
 	AuthenticationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
 		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "expires_at", Type: field.TypeTime, Nullable: true},
 		{Name: "service", Type: field.TypeString},
 		{Name: "token_type", Type: field.TypeString},
 		{Name: "identifier", Type: field.TypeString},
 		{Name: "token", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString, Nullable: true},
+		{Name: "disabled", Type: field.TypeBool, Default: false},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_authentication", Type: field.TypeString, Size: 20},
 	}
@@ -170,7 +173,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "authentications_accounts_authentication",
-				Columns:    []*schema.Column{AuthenticationsColumns[8]},
+				Columns:    []*schema.Column{AuthenticationsColumns[10]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -179,12 +182,12 @@ var (
 			{
 				Name:    "authentication_service_identifier_account_authentication",
 				Unique:  true,
-				Columns: []*schema.Column{AuthenticationsColumns[2], AuthenticationsColumns[4], AuthenticationsColumns[8]},
+				Columns: []*schema.Column{AuthenticationsColumns[3], AuthenticationsColumns[5], AuthenticationsColumns[10]},
 			},
 			{
 				Name:    "authentication_token_type_identifier_account_authentication",
 				Unique:  true,
-				Columns: []*schema.Column{AuthenticationsColumns[3], AuthenticationsColumns[4], AuthenticationsColumns[8]},
+				Columns: []*schema.Column{AuthenticationsColumns[4], AuthenticationsColumns[5], AuthenticationsColumns[10]},
 			},
 		},
 	}

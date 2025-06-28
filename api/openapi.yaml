@@ -36,8 +36,11 @@ servers:
       path and any requests outside of the base path will not be covered by the
       API specification and will be used for experimental features and plugins.
 
+# All endpoints are by default accessible via a browser session cookie or an API
+# key for either human accounts or bot accounts unless explicitly specified.
 security:
   - browser: []
+  - access_key: []
 
 x-types:
   cache_response_headers: &cache_response_headers
@@ -268,6 +271,33 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountGetOK" }
 
+  /admin/access-keys:
+    get:
+      operationId: AdminAccessKeyList
+      description: |
+        List all access keys for the entire instance. This is only available to
+        admin accounts and is used to manage access keys from other accounts.
+      tags: [admin]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/AdminAccessKeyListOK" }
+
+  /admin/access-keys/{access_key_id}:
+    delete:
+      operationId: AdminAccessKeyDelete
+      description: |
+        Revoke an access key. This will immediately invalidate the key and it
+        will no longer be usable for authentication.
+      tags: [admin]
+      parameters: [{ $ref: "#/components/parameters/AccessKeyIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
   #
   #                 888
   #                 888
@@ -390,6 +420,7 @@ paths:
         Given the requesting account does not have a password authentication,
         add a password authentication method to it with the given password.
       tags: [auth]
+      security: [browser: []]
       requestBody: { $ref: "#/components/requestBodies/AuthPasswordCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -402,6 +433,7 @@ paths:
         Given the requesting account has a password authentication, update the
         password on file.
       tags: [auth]
+      security: [browser: []]
       requestBody: { $ref: "#/components/requestBodies/AuthPasswordUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -628,11 +660,63 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "200": { $ref: "#/components/responses/AuthSuccessOK" }
 
+  /auth/access-keys:
+    get:
+      operationId: AccessKeyList
+      description: |
+        List all access keys for the authenticated account or all access keys
+        that have been issued for the entire instance if and only if the request
+        parameters specify all keys and the requesting account is an admin.
+      tags: [auth]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/AccessKeyListOK" }
+
+    post:
+      operationId: AccessKeyCreate
+      description: |
+        Create a new access key for the authenticated account. Access keys are
+        used to authenticate API requests on behalf of the account in a more
+        granular and service-friendly way than a session cookie.
+
+        Access keys share the same roles and permissions as the owning account
+        and only provide a way to use an `Authorization` header as an way of
+        interacting with the Storyden API.
+
+        Access keys also allow an expiry date to be set to limit how long a key
+        can be used to authenticate against the API.
+      tags: [auth]
+      security: [browser: []]
+      requestBody: { $ref: "#/components/requestBodies/AccessKeyCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/AccessKeyCreateOK" }
+
+  /auth/access-keys/{access_key_id}:
+    delete:
+      operationId: AccessKeyDelete
+      description: |
+        Revoke an access key. This will immediately invalidate the key and it
+        will no longer be usable for authentication.
+      tags: [auth]
+      parameters: [{ $ref: "#/components/parameters/AccessKeyIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
   /auth/logout:
     get:
       operationId: AuthProviderLogout
       description: Remove cookies from requesting client.
       tags: [auth]
+      security: [browser: []]
+
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -2118,6 +2202,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    AccessKeyIDParam:
+      description: Access key ID.
+      in: path
+      name: access_key_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     AccountIDParam:
       description: Account ID.
       name: account_id
@@ -2543,6 +2635,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/PhoneSubmitCodeProps" }
 
+    AccessKeyCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/AccessKeyInitialProps" }
+
     AccountUpdate:
       content:
         application/json:
@@ -2721,6 +2818,10 @@ components:
       description: Not found
     Unauthorised:
       description: Unauthorized
+    Forbidden:
+      description: Forbidden
+    NoContent:
+      description: No content
     InternalServerError:
       description: Internal Server Error
       content:
@@ -2806,6 +2907,27 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/CredentialRequestOptions"
+
+    AccessKeyCreateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccessKeyIssued"
+
+    AdminAccessKeyListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/OwnedAccessKeyListResult"
+
+    AccessKeyListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccessKeyListResult"
 
     AccountGetOK:
       description: OK
@@ -3697,6 +3819,8 @@ components:
         - "READ_COLLECTION"
         - "MANAGE_COLLECTIONS"
         - "COLLECTION_SUBMIT"
+        # Personal access keys for automation/MCP
+        - "USE_PERSONAL_ACCESS_KEYS"
         # Administrative (Settings, bans, etc)
         - "MANAGE_SETTINGS"
         - "MANAGE_SUSPENSIONS"
@@ -4103,6 +4227,97 @@ components:
       properties:
         code:
           type: string
+
+    AccessKey:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/AccessKeyProps"
+
+    OwnedAccessKey:
+      description: |
+        An owned access key is a key that has been already issued to an account,
+        it is used specifically for administrator listing of all access keys
+        where it's necessary to include the account that created the key.
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/AccessKeyProps"
+        - required: [created_by]
+          properties:
+            created_by: { $ref: "#/components/schemas/ProfileReference" }
+
+    AccessKeyIssued:
+      description: |
+        An access key issued to an account, this is the full access key object
+        including the secret. This is only exposed upon creation of the key and
+        the secret value is never stored. The caller that receives this object
+        is responsible for securely storing the secret value for later use.
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/AccessKey"
+        - $ref: "#/components/schemas/AccessKeySecret"
+
+    AccessKeyProps:
+      type: object
+      required: [name, enabled]
+      properties:
+        name:
+          description: The name of the access key.
+          type: string
+        enabled:
+          type: boolean
+        expires_at:
+          type: string
+          format: date-time
+          description: When the access key expires, if null, it never expires.
+
+    AccessKeyInitialProps:
+      type: object
+      required: [name]
+      properties:
+        name:
+          description: The name of the access key.
+          type: string
+        expires_at:
+          type: string
+          format: date-time
+          description: When the access key expires, if null, it never expires.
+
+    AccessKeySecret:
+      type: object
+      required: [secret]
+      properties:
+        secret:
+          description: |
+            The secret key used to authenticate with the API.
+
+            Keys are prefixed with a kind identifier, "sdpak" refers to a 
+            Storyden Personal Access Key and "sdbak" refers to a Storyden
+            Bot Access Key. The two kinds are not interchangeable however they
+            do not have behavioural differences and is merely a visual cue.
+          type: string
+          example: "sdpak_a1b2c3d4cfc00d429ba841f9425c62f82341381b"
+
+    AccessKeyList:
+      type: array
+      items: { $ref: "#/components/schemas/AccessKey" }
+
+    AccessKeyListResult:
+      type: object
+      required: [keys]
+      properties:
+        keys: { $ref: "#/components/schemas/AccessKeyList" }
+
+    OwnedAccessKeyList:
+      type: array
+      items: { $ref: "#/components/schemas/OwnedAccessKey" }
+
+    OwnedAccessKeyListResult:
+      type: object
+      required: [keys]
+      properties:
+        keys: { $ref: "#/components/schemas/OwnedAccessKeyList" }
 
     #
     #        d8888                                            888
@@ -5913,6 +6128,9 @@ components:
       type: apiKey
       in: cookie
       name: storyden-session
+    access_key:
+      type: http
+      scheme: bearer
     webauthn:
       type: apiKey
       in: cookie

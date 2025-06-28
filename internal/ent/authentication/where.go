@@ -61,6 +61,11 @@ func CreatedAt(v time.Time) predicate.Authentication {
 	return predicate.Authentication(sql.FieldEQ(FieldCreatedAt, v))
 }
 
+// ExpiresAt applies equality check predicate on the "expires_at" field. It's identical to ExpiresAtEQ.
+func ExpiresAt(v time.Time) predicate.Authentication {
+	return predicate.Authentication(sql.FieldEQ(FieldExpiresAt, v))
+}
+
 // Service applies equality check predicate on the "service" field. It's identical to ServiceEQ.
 func Service(v string) predicate.Authentication {
 	return predicate.Authentication(sql.FieldEQ(FieldService, v))
@@ -84,6 +89,11 @@ func Token(v string) predicate.Authentication {
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Authentication {
 	return predicate.Authentication(sql.FieldEQ(FieldName, v))
+}
+
+// Disabled applies equality check predicate on the "disabled" field. It's identical to DisabledEQ.
+func Disabled(v bool) predicate.Authentication {
+	return predicate.Authentication(sql.FieldEQ(FieldDisabled, v))
 }
 
 // AccountAuthentication applies equality check predicate on the "account_authentication" field. It's identical to AccountAuthenticationEQ.
@@ -129,6 +139,56 @@ func CreatedAtLT(v time.Time) predicate.Authentication {
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Authentication {
 	return predicate.Authentication(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// ExpiresAtEQ applies the EQ predicate on the "expires_at" field.
+func ExpiresAtEQ(v time.Time) predicate.Authentication {
+	return predicate.Authentication(sql.FieldEQ(FieldExpiresAt, v))
+}
+
+// ExpiresAtNEQ applies the NEQ predicate on the "expires_at" field.
+func ExpiresAtNEQ(v time.Time) predicate.Authentication {
+	return predicate.Authentication(sql.FieldNEQ(FieldExpiresAt, v))
+}
+
+// ExpiresAtIn applies the In predicate on the "expires_at" field.
+func ExpiresAtIn(vs ...time.Time) predicate.Authentication {
+	return predicate.Authentication(sql.FieldIn(FieldExpiresAt, vs...))
+}
+
+// ExpiresAtNotIn applies the NotIn predicate on the "expires_at" field.
+func ExpiresAtNotIn(vs ...time.Time) predicate.Authentication {
+	return predicate.Authentication(sql.FieldNotIn(FieldExpiresAt, vs...))
+}
+
+// ExpiresAtGT applies the GT predicate on the "expires_at" field.
+func ExpiresAtGT(v time.Time) predicate.Authentication {
+	return predicate.Authentication(sql.FieldGT(FieldExpiresAt, v))
+}
+
+// ExpiresAtGTE applies the GTE predicate on the "expires_at" field.
+func ExpiresAtGTE(v time.Time) predicate.Authentication {
+	return predicate.Authentication(sql.FieldGTE(FieldExpiresAt, v))
+}
+
+// ExpiresAtLT applies the LT predicate on the "expires_at" field.
+func ExpiresAtLT(v time.Time) predicate.Authentication {
+	return predicate.Authentication(sql.FieldLT(FieldExpiresAt, v))
+}
+
+// ExpiresAtLTE applies the LTE predicate on the "expires_at" field.
+func ExpiresAtLTE(v time.Time) predicate.Authentication {
+	return predicate.Authentication(sql.FieldLTE(FieldExpiresAt, v))
+}
+
+// ExpiresAtIsNil applies the IsNil predicate on the "expires_at" field.
+func ExpiresAtIsNil() predicate.Authentication {
+	return predicate.Authentication(sql.FieldIsNull(FieldExpiresAt))
+}
+
+// ExpiresAtNotNil applies the NotNil predicate on the "expires_at" field.
+func ExpiresAtNotNil() predicate.Authentication {
+	return predicate.Authentication(sql.FieldNotNull(FieldExpiresAt))
 }
 
 // ServiceEQ applies the EQ predicate on the "service" field.
@@ -464,6 +524,16 @@ func NameEqualFold(v string) predicate.Authentication {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Authentication {
 	return predicate.Authentication(sql.FieldContainsFold(FieldName, v))
+}
+
+// DisabledEQ applies the EQ predicate on the "disabled" field.
+func DisabledEQ(v bool) predicate.Authentication {
+	return predicate.Authentication(sql.FieldEQ(FieldDisabled, v))
+}
+
+// DisabledNEQ applies the NEQ predicate on the "disabled" field.
+func DisabledNEQ(v bool) predicate.Authentication {
+	return predicate.Authentication(sql.FieldNEQ(FieldDisabled, v))
 }
 
 // MetadataIsNil applies the IsNil predicate on the "metadata" field.

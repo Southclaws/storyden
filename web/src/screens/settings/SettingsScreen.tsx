@@ -4,9 +4,13 @@ import { TabsValueChangeDetails } from "@ark-ui/react";
 import { useQueryState } from "nuqs";
 import { useEffect } from "react";
 
+import { Permission } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
 import * as Tabs from "@/components/ui/tabs";
 import { Settings } from "@/lib/settings/settings";
+import { hasPermission } from "@/utils/permissions";
 
+import { MemberAccessKeysSettingsScreen } from "./MemberAccessKeysSettingsScreen";
 import { MemberAuthenticationSettingsScreen } from "./MemberAuthenticationSettingsScreen";
 import { MemberEmailSettingsScreen } from "./MemberEmailSettingsScreen";
 
@@ -17,6 +21,7 @@ type Props = {
 };
 
 export function SettingsScreen({ initialSettings }: Props) {
+  const session = useSession();
   const [tab, setTab] = useQueryState("tab", {
     defaultValue: DEFAULT_TAB,
   });
@@ -37,6 +42,11 @@ export function SettingsScreen({ initialSettings }: Props) {
 
   const emailEnabled = initialSettings.capabilities.includes("email_client");
 
+  const accessKeysEnabled = hasPermission(
+    session,
+    Permission.USE_PERSONAL_ACCESS_KEYS,
+  );
+
   return (
     <Tabs.Root
       width="full"
@@ -48,6 +58,9 @@ export function SettingsScreen({ initialSettings }: Props) {
       <Tabs.List>
         <Tabs.Trigger value="authentication">Authentication</Tabs.Trigger>
         {emailEnabled && <Tabs.Trigger value="email">Email</Tabs.Trigger>}
+        {accessKeysEnabled && (
+          <Tabs.Trigger value="access_keys">Access keys</Tabs.Trigger>
+        )}
         <Tabs.Indicator />
       </Tabs.List>
 
@@ -58,6 +71,12 @@ export function SettingsScreen({ initialSettings }: Props) {
       {emailEnabled && (
         <Tabs.Content value="email">
           <MemberEmailSettingsScreen />
+        </Tabs.Content>
+      )}
+
+      {accessKeysEnabled && (
+        <Tabs.Content value="access_keys">
+          <MemberAccessKeysSettingsScreen />
         </Tabs.Content>
       )}
     </Tabs.Root>

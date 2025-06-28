@@ -46,6 +46,14 @@ func (m *Mapping) AdminAccountBanCreate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageSuspensions
 }
 
+func (m *Mapping) AdminAccessKeyList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
+func (m *Mapping) AdminAccessKeyDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionAdministrator
+}
+
 func (m *Mapping) AdminAccountBanRemove() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageSuspensions
 }
@@ -144,6 +152,18 @@ func (m *Mapping) PhoneRequestCode() (bool, *rbac.Permission) {
 
 func (m *Mapping) PhoneSubmitCode() (bool, *rbac.Permission) {
 	return false, nil // Public
+}
+
+func (m *Mapping) AccessKeyList() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUsePersonalAccessKeys
+}
+
+func (m *Mapping) AccessKeyCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUsePersonalAccessKeys
+}
+
+func (m *Mapping) AccessKeyDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionUsePersonalAccessKeys
 }
 
 func (m *Mapping) AuthProviderLogout() (bool, *rbac.Permission) {

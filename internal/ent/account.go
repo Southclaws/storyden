@@ -35,6 +35,8 @@ type Account struct {
 	Name string `json:"name,omitempty"`
 	// Bio holds the value of the "bio" field.
 	Bio string `json:"bio,omitempty"`
+	// Kind holds the value of the "kind" field.
+	Kind account.Kind `json:"kind,omitempty"`
 	// Admin holds the value of the "admin" field.
 	Admin bool `json:"admin,omitempty"`
 	// Links holds the value of the "links" field.
@@ -300,7 +302,7 @@ func (*Account) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case account.FieldAdmin:
 			values[i] = new(sql.NullBool)
-		case account.FieldHandle, account.FieldName, account.FieldBio:
+		case account.FieldHandle, account.FieldName, account.FieldBio, account.FieldKind:
 			values[i] = new(sql.NullString)
 		case account.FieldCreatedAt, account.FieldUpdatedAt, account.FieldDeletedAt, account.FieldIndexedAt:
 			values[i] = new(sql.NullTime)
@@ -370,6 +372,12 @@ func (a *Account) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field bio", values[i])
 			} else if value.Valid {
 				a.Bio = value.String
+			}
+		case account.FieldKind:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field kind", values[i])
+			} else if value.Valid {
+				a.Kind = account.Kind(value.String)
 			}
 		case account.FieldAdmin:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -565,6 +573,9 @@ func (a *Account) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("bio=")
 	builder.WriteString(a.Bio)
+	builder.WriteString(", ")
+	builder.WriteString("kind=")
+	builder.WriteString(fmt.Sprintf("%v", a.Kind))
 	builder.WriteString(", ")
 	builder.WriteString("admin=")
 	builder.WriteString(fmt.Sprintf("%v", a.Admin))

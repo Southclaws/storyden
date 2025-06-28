@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
@@ -10,7 +11,10 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
+	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -23,10 +27,24 @@ type Admin struct {
 	accountQuery *account_querier.Querier
 	as           account_suspension.Service
 	sr           *settings.SettingsRepository
+	sp           *session.Provider
+	akr          *access_key.Repository
 }
 
-func NewAdmin(accountQuery *account_querier.Querier, as account_suspension.Service, sr *settings.SettingsRepository) Admin {
-	return Admin{accountQuery, as, sr}
+func NewAdmin(
+	accountQuery *account_querier.Querier,
+	as account_suspension.Service,
+	sr *settings.SettingsRepository,
+	sp *session.Provider,
+	akr *access_key.Repository,
+) Admin {
+	return Admin{
+		accountQuery: accountQuery,
+		as:           as,
+		sr:           sr,
+		sp:           sp,
+		akr:          akr,
+	}
 }
 
 func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSettingsUpdateRequestObject) (openapi.AdminSettingsUpdateResponseObject, error) {
@@ -135,6 +153,43 @@ func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.Admin
 	}, nil
 }
 
+func (i *Admin) AdminAccessKeyList(ctx context.Context, request openapi.AdminAccessKeyListRequestObject) (openapi.AdminAccessKeyListResponseObject, error) {
+	acc, err := i.sp.Account(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	list, err := i.akr.ListAllAsAdmin(ctx)
+
+	return openapi.AdminAccessKeyList200JSONResponse{
+		AdminAccessKeyListOKJSONResponse: openapi.AdminAccessKeyListOKJSONResponse{
+			Keys: serialiseOwnedAccessKeyList(list),
+		},
+	}, nil
+}
+
+func (i *Admin) AdminAccessKeyDelete(ctx context.Context, request openapi.AdminAccessKeyDeleteRequestObject) (openapi.AdminAccessKeyDeleteResponseObject, error) {
+	acc, err := i.sp.Account(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, err = i.akr.RevokeAsAdmin(ctx, deserialiseID(request.AccessKeyId))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.NoContentResponse{}, nil
+}
+
 func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 	return openapi.AdminSettingsProps{
 		AccentColour:       in.AccentColour.OrZero(),
@@ -144,4 +199,19 @@ func serialiseSettings(in *settings.Settings) openapi.AdminSettingsProps {
 		AuthenticationMode: openapi.AuthMode(in.AuthenticationMode.Or(authentication.ModeHandle).String()),
 		Metadata:           (*openapi.Metadata)(in.Metadata.Ptr()),
 	}
+}
+
+func serialiseOwnedAccessKey(in *authentication.Authentication) openapi.OwnedAccessKey {
+	return openapi.OwnedAccessKey{
+		Id:        in.ID.String(),
+		CreatedAt: in.Account.CreatedAt,
+		ExpiresAt: in.Expires.Ptr(),
+		Enabled:   !in.Disabled,
+		Name:      in.Name.Or("Unnamed"),
+		CreatedBy: serialiseProfileReference(*profile.ProfileFromAccount(&in.Account)),
+	}
+}
+
+func serialiseOwnedAccessKeyList(in []*authentication.Authentication) openapi.OwnedAccessKeyList {
+	return dt.Map(in, serialiseOwnedAccessKey)
 }

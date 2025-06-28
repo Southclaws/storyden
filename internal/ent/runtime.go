@@ -70,7 +70,7 @@ func init() {
 	// account.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	account.NameValidator = accountDescName.Validators[0].(func(string) error)
 	// accountDescAdmin is the schema descriptor for admin field.
-	accountDescAdmin := accountFields[3].Descriptor()
+	accountDescAdmin := accountFields[4].Descriptor()
 	// account.DefaultAdmin holds the default value on creation for the admin field.
 	account.DefaultAdmin = accountDescAdmin.Default.(bool)
 	// accountDescID is the schema descriptor for id field.
@@ -217,6 +217,10 @@ func init() {
 	authenticationDescToken := authenticationFields[3].Descriptor()
 	// authentication.TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	authentication.TokenValidator = authenticationDescToken.Validators[0].(func(string) error)
+	// authenticationDescDisabled is the schema descriptor for disabled field.
+	authenticationDescDisabled := authenticationFields[5].Descriptor()
+	// authentication.DefaultDisabled holds the default value on creation for the disabled field.
+	authentication.DefaultDisabled = authenticationDescDisabled.Default.(bool)
 	// authenticationDescID is the schema descriptor for id field.
 	authenticationDescID := authenticationMixinFields0[0].Descriptor()
 	// authentication.DefaultID holds the default value on creation for the id field.

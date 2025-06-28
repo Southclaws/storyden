@@ -8,12 +8,15 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: rolling
  */
 import useSwr from "swr";
-import type { Key, SWRConfiguration } from "swr";
+import type { Arguments, Key, SWRConfiguration } from "swr";
 import useSWRMutation from "swr/mutation";
 import type { SWRMutationConfiguration } from "swr/mutation";
 
 import { fetcher } from "../client";
 import type {
+  AccessKeyCreateBody,
+  AccessKeyCreateOKResponse,
+  AccessKeyListOKResponse,
   AuthEmailBody,
   AuthEmailPasswordBody,
   AuthEmailPasswordResetBody,
@@ -28,7 +31,9 @@ import type {
   AuthProviderListOKResponse,
   AuthSuccessOKResponse,
   BadRequestResponse,
+  ForbiddenResponse,
   InternalServerErrorResponse,
+  NoContentResponse,
   NotFoundResponse,
   OAuthProviderCallbackBody,
   PhoneRequestCodeBody,
@@ -1190,6 +1195,174 @@ export const usePhoneSubmitCode = <
   const swrKey =
     swrOptions?.swrKey ?? getPhoneSubmitCodeMutationKey(accountHandle);
   const swrFn = getPhoneSubmitCodeMutationFetcher(accountHandle);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * List all access keys for the authenticated account or all access keys
+that have been issued for the entire instance if and only if the request
+parameters specify all keys and the requesting account is an admin.
+
+ */
+export const accessKeyList = () => {
+  return fetcher<AccessKeyListOKResponse>({
+    url: `/auth/access-keys`,
+    method: "GET",
+  });
+};
+
+export const getAccessKeyListKey = () => [`/auth/access-keys`] as const;
+
+export type AccessKeyListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof accessKeyList>>
+>;
+export type AccessKeyListQueryError =
+  | BadRequestResponse
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useAccessKeyList = <
+  TError = BadRequestResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof accessKeyList>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false;
+  const swrKey =
+    swrOptions?.swrKey ?? (() => (isEnabled ? getAccessKeyListKey() : null));
+  const swrFn = () => accessKeyList();
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Create a new access key for the authenticated account. Access keys are
+used to authenticate API requests on behalf of the account in a more
+granular and service-friendly way than a session cookie.
+
+Access keys share the same roles and permissions as the owning account
+and only provide a way to use an `Authorization` header as an way of
+interacting with the Storyden API.
+
+Access keys also allow an expiry date to be set to limit how long a key
+can be used to authenticate against the API.
+
+ */
+export const accessKeyCreate = (accessKeyCreateBody: AccessKeyCreateBody) => {
+  return fetcher<AccessKeyCreateOKResponse>({
+    url: `/auth/access-keys`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: accessKeyCreateBody,
+  });
+};
+
+export const getAccessKeyCreateMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: AccessKeyCreateBody },
+  ): Promise<AccessKeyCreateOKResponse> => {
+    return accessKeyCreate(arg);
+  };
+};
+export const getAccessKeyCreateMutationKey = () =>
+  [`/auth/access-keys`] as const;
+
+export type AccessKeyCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accessKeyCreate>>
+>;
+export type AccessKeyCreateMutationError =
+  | BadRequestResponse
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useAccessKeyCreate = <
+  TError = BadRequestResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof accessKeyCreate>>,
+    TError,
+    Key,
+    AccessKeyCreateBody,
+    Awaited<ReturnType<typeof accessKeyCreate>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getAccessKeyCreateMutationKey();
+  const swrFn = getAccessKeyCreateMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Revoke an access key. This will immediately invalidate the key and it
+will no longer be usable for authentication.
+
+ */
+export const accessKeyDelete = (accessKeyId: string) => {
+  return fetcher<NoContentResponse>({
+    url: `/auth/access-keys/${accessKeyId}`,
+    method: "DELETE",
+  });
+};
+
+export const getAccessKeyDeleteMutationFetcher = (accessKeyId: string) => {
+  return (_: Key, __: { arg: Arguments }): Promise<NoContentResponse> => {
+    return accessKeyDelete(accessKeyId);
+  };
+};
+export const getAccessKeyDeleteMutationKey = (accessKeyId: string) =>
+  [`/auth/access-keys/${accessKeyId}`] as const;
+
+export type AccessKeyDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof accessKeyDelete>>
+>;
+export type AccessKeyDeleteMutationError =
+  | BadRequestResponse
+  | ForbiddenResponse
+  | InternalServerErrorResponse;
+
+export const useAccessKeyDelete = <
+  TError = BadRequestResponse | ForbiddenResponse | InternalServerErrorResponse,
+>(
+  accessKeyId: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof accessKeyDelete>>,
+      TError,
+      Key,
+      Arguments,
+      Awaited<ReturnType<typeof accessKeyDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getAccessKeyDeleteMutationKey(accessKeyId);
+  const swrFn = getAccessKeyDeleteMutationFetcher(accessKeyId);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
