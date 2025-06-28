@@ -688,6 +688,7 @@ paths:
         Access keys also allow an expiry date to be set to limit how long a key
         can be used to authenticate against the API.
       tags: [auth]
+      security: [browser: []]
       requestBody: { $ref: "#/components/requestBodies/AccessKeyCreate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }

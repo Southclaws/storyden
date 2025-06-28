@@ -140,6 +140,22 @@ func TestAccessKeyAuth(t *testing.T) {
 				)(t, http.StatusForbidden)
 			})
 
+			t.Run("access_keys_cannot_create_more_access_keys", func(t *testing.T) {
+				// Create an access key
+				ak := tests.AssertRequest(
+					cl.AccessKeyCreateWithResponse(root, openapi.AccessKeyInitialProps{
+						Name: "test-browser-protection",
+					}, memberSession),
+				)(t, http.StatusOK)
+
+				// Try to use that access key to create another access key.
+				tests.AssertRequest(
+					cl.AccessKeyCreateWithResponse(root, openapi.AccessKeyInitialProps{
+						Name: "my child...",
+					}, createAccessKeyAuth(ak.JSON200.Secret)),
+				)(t, http.StatusForbidden)
+			})
+
 			t.Run("access_key_expiry", func(t *testing.T) {
 				// Note: This test would require creating an expired key or mocking time
 				// For now, we'll test that a valid key works and note the limitation
