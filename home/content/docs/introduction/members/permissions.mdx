@@ -5,27 +5,28 @@ description: Storyden provides a set of permissions for granular access control 
 
 Permissions are how members are granted access to certain features. They are assigned to [Roles](/docs/introduction/members/roles), which are then assigned to [Members](/docs/introduction/members). This allows for granular access control and the ability to group members together.
 
-| Name                             | ID                       | Description                                                                                          |
-| -------------------------------- | ------------------------ | ---------------------------------------------------------------------------------------------------- |
-| **Create post**                  | `CREATE_POST`            | Members can create posts.                                                                            |
-| **Read published threads**       | `READ_PUBLISHED_THREADS` | Members can read published threads.                                                                  |
-| **Create reactions**             | `CREATE_REACTION`        | React to posts.                                                                                      |
-| **Manage posts**                 | `MANAGE_POSTS`           | Manage posts, such as delete, pin and move.                                                          |
-| **Manage categories**            | `MANAGE_CATEGORIES`      | Create and edit categories.                                                                          |
-| **Create invitations**           | `CREATE_INVITATION`      | Create invitations for new members.                                                                  |
-| **Read published library pages** | `READ_PUBLISHED_LIBRARY` | Access published items in the library.                                                               |
-| **Manage library**               | `MANAGE_LIBRARY`         | Manage items in the library, such as publish new pages, accept or reject submissions and edit pages. |
-| **Submit to library**            | `SUBMIT_LIBRARY_NODE`    | Submit new pages to the library.                                                                     |
-| **Upload assets**                | `UPLOAD_ASSET`           | Upload images and media to posts, pages and any other areas that accept media.                       |
-| **Manage events**                | `MANAGE_EVENTS`          | Create, edit and remove events as well as change event hosts.                                        |
-| **Access member list**           | `LIST_PROFILES`          | Access the full list of registered members.                                                          |
-| **Access profiles**              | `READ_PROFILE`           | Access any registered member's profiles.                                                             |
-| **Create collections**           | `CREATE_COLLECTION`      | Create and manage their own collections.                                                             |
-| **Access published collections** | `LIST_COLLECTIONS`       | Access the full list of published collections from other members.                                    |
-| **Read any collection**          | `READ_COLLECTION`        | Read any published collection from any other member.                                                 |
-| **Manage collections**           | `MANAGE_COLLECTIONS`     | Delete, rename or move collections owned by other members.                                           |
-| **Submit to collections**        | `COLLECTION_SUBMIT`      | Submit items for review to other members' collections.                                               |
-| **Manage settings**              | `MANAGE_SETTINGS`        | Manage the administrative settings for the Storyden installation.                                    |
-| **Manage suspensions**           | `MANAGE_SUSPENSIONS`     | Suspend or reinstate members from the community.                                                     |
-| **Manage roles**                 | `MANAGE_ROLES`           | Create, edit and delete roles as well as assign and remove roles of other members.                   |
-| **Administrator**                | `ADMINISTRATOR`          | Full administrative access. Use with caution!                                                        |
+| Name                             | ID                         | Description                                                                                          |
+| -------------------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Create post**                  | `CREATE_POST`              | Members can create posts.                                                                            |
+| **Read published threads**       | `READ_PUBLISHED_THREADS`   | Members can read published threads.                                                                  |
+| **Create reactions**             | `CREATE_REACTION`          | React to posts.                                                                                      |
+| **Manage posts**                 | `MANAGE_POSTS`             | Manage posts, such as delete, pin and move.                                                          |
+| **Manage categories**            | `MANAGE_CATEGORIES`        | Create and edit categories.                                                                          |
+| **Create invitations**           | `CREATE_INVITATION`        | Create invitations for new members.                                                                  |
+| **Read published library pages** | `READ_PUBLISHED_LIBRARY`   | Access published items in the library.                                                               |
+| **Manage library**               | `MANAGE_LIBRARY`           | Manage items in the library, such as publish new pages, accept or reject submissions and edit pages. |
+| **Submit to library**            | `SUBMIT_LIBRARY_NODE`      | Submit new pages to the library.                                                                     |
+| **Upload assets**                | `UPLOAD_ASSET`             | Upload images and media to posts, pages and any other areas that accept media.                       |
+| **Manage events**                | `MANAGE_EVENTS`            | Create, edit and remove events as well as change event hosts.                                        |
+| **Access member list**           | `LIST_PROFILES`            | Access the full list of registered members.                                                          |
+| **Access profiles**              | `READ_PROFILE`             | Access any registered member's profiles.                                                             |
+| **Create collections**           | `CREATE_COLLECTION`        | Create and manage their own collections.                                                             |
+| **Access published collections** | `LIST_COLLECTIONS`         | Access the full list of published collections from other members.                                    |
+| **Read any collection**          | `READ_COLLECTION`          | Read any published collection from any other member.                                                 |
+| **Manage collections**           | `MANAGE_COLLECTIONS`       | Delete, rename or move collections owned by other members.                                           |
+| **Submit to collections**        | `COLLECTION_SUBMIT`        | Submit items for review to other members' collections.                                               |
+| **Use personal access keys**     | `USE_PERSONAL_ACCESS_KEYS` | Use personal access keys to authenticate with the Storyden API and MCP server.                       |
+| **Manage settings**              | `MANAGE_SETTINGS`          | Manage the administrative settings for the Storyden installation.                                    |
+| **Manage suspensions**           | `MANAGE_SUSPENSIONS`       | Suspend or reinstate members from the community.                                                     |
+| **Manage roles**                 | `MANAGE_ROLES`             | Create, edit and delete roles as well as assign and remove roles of other members.                   |
+| **Administrator**                | `ADMINISTRATOR`            | Full administrative access. Use with caution!                                                        |
