@@ -29,6 +29,8 @@ const (
 	FieldToken = "token"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldDisabled holds the string denoting the disabled field in the database.
+	FieldDisabled = "disabled"
 	// FieldMetadata holds the string denoting the metadata field in the database.
 	FieldMetadata = "metadata"
 	// FieldAccountAuthentication holds the string denoting the account_authentication field in the database.
@@ -56,6 +58,7 @@ var Columns = []string{
 	FieldIdentifier,
 	FieldToken,
 	FieldName,
+	FieldDisabled,
 	FieldMetadata,
 	FieldAccountAuthentication,
 }
@@ -79,6 +82,8 @@ var (
 	TokenTypeValidator func(string) error
 	// TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	TokenValidator func(string) error
+	// DefaultDisabled holds the default value on creation for the "disabled" field.
+	DefaultDisabled bool
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() xid.ID
 	// IDValidator is a validator for the "id" field. It is called by the builders before save.
@@ -126,6 +131,11 @@ func ByToken(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByDisabled orders the results by the disabled field.
+func ByDisabled(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDisabled, opts...).ToFunc()
 }
 
 // ByAccountAuthentication orders the results by the account_authentication field.

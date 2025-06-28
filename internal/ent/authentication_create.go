@@ -91,6 +91,20 @@ func (ac *AuthenticationCreate) SetNillableName(s *string) *AuthenticationCreate
 	return ac
 }
 
+// SetDisabled sets the "disabled" field.
+func (ac *AuthenticationCreate) SetDisabled(b bool) *AuthenticationCreate {
+	ac.mutation.SetDisabled(b)
+	return ac
+}
+
+// SetNillableDisabled sets the "disabled" field if the given value is not nil.
+func (ac *AuthenticationCreate) SetNillableDisabled(b *bool) *AuthenticationCreate {
+	if b != nil {
+		ac.SetDisabled(*b)
+	}
+	return ac
+}
+
 // SetMetadata sets the "metadata" field.
 func (ac *AuthenticationCreate) SetMetadata(m map[string]interface{}) *AuthenticationCreate {
 	ac.mutation.SetMetadata(m)
@@ -167,6 +181,10 @@ func (ac *AuthenticationCreate) defaults() {
 		v := authentication.DefaultCreatedAt()
 		ac.mutation.SetCreatedAt(v)
 	}
+	if _, ok := ac.mutation.Disabled(); !ok {
+		v := authentication.DefaultDisabled
+		ac.mutation.SetDisabled(v)
+	}
 	if _, ok := ac.mutation.ID(); !ok {
 		v := authentication.DefaultID()
 		ac.mutation.SetID(v)
@@ -204,6 +222,9 @@ func (ac *AuthenticationCreate) check() error {
 		if err := authentication.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "Authentication.token": %w`, err)}
 		}
+	}
+	if _, ok := ac.mutation.Disabled(); !ok {
+		return &ValidationError{Name: "disabled", err: errors.New(`ent: missing required field "Authentication.disabled"`)}
 	}
 	if _, ok := ac.mutation.AccountAuthentication(); !ok {
 		return &ValidationError{Name: "account_authentication", err: errors.New(`ent: missing required field "Authentication.account_authentication"`)}
@@ -279,6 +300,10 @@ func (ac *AuthenticationCreate) createSpec() (*Authentication, *sqlgraph.CreateS
 	if value, ok := ac.mutation.Name(); ok {
 		_spec.SetField(authentication.FieldName, field.TypeString, value)
 		_node.Name = &value
+	}
+	if value, ok := ac.mutation.Disabled(); ok {
+		_spec.SetField(authentication.FieldDisabled, field.TypeBool, value)
+		_node.Disabled = value
 	}
 	if value, ok := ac.mutation.Metadata(); ok {
 		_spec.SetField(authentication.FieldMetadata, field.TypeJSON, value)
@@ -434,6 +459,18 @@ func (u *AuthenticationUpsert) UpdateName() *AuthenticationUpsert {
 // ClearName clears the value of the "name" field.
 func (u *AuthenticationUpsert) ClearName() *AuthenticationUpsert {
 	u.SetNull(authentication.FieldName)
+	return u
+}
+
+// SetDisabled sets the "disabled" field.
+func (u *AuthenticationUpsert) SetDisabled(v bool) *AuthenticationUpsert {
+	u.Set(authentication.FieldDisabled, v)
+	return u
+}
+
+// UpdateDisabled sets the "disabled" field to the value that was provided on create.
+func (u *AuthenticationUpsert) UpdateDisabled() *AuthenticationUpsert {
+	u.SetExcluded(authentication.FieldDisabled)
 	return u
 }
 
@@ -613,6 +650,20 @@ func (u *AuthenticationUpsertOne) UpdateName() *AuthenticationUpsertOne {
 func (u *AuthenticationUpsertOne) ClearName() *AuthenticationUpsertOne {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.ClearName()
+	})
+}
+
+// SetDisabled sets the "disabled" field.
+func (u *AuthenticationUpsertOne) SetDisabled(v bool) *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetDisabled(v)
+	})
+}
+
+// UpdateDisabled sets the "disabled" field to the value that was provided on create.
+func (u *AuthenticationUpsertOne) UpdateDisabled() *AuthenticationUpsertOne {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateDisabled()
 	})
 }
 
@@ -964,6 +1015,20 @@ func (u *AuthenticationUpsertBulk) UpdateName() *AuthenticationUpsertBulk {
 func (u *AuthenticationUpsertBulk) ClearName() *AuthenticationUpsertBulk {
 	return u.Update(func(s *AuthenticationUpsert) {
 		s.ClearName()
+	})
+}
+
+// SetDisabled sets the "disabled" field.
+func (u *AuthenticationUpsertBulk) SetDisabled(v bool) *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.SetDisabled(v)
+	})
+}
+
+// UpdateDisabled sets the "disabled" field to the value that was provided on create.
+func (u *AuthenticationUpsertBulk) UpdateDisabled() *AuthenticationUpsertBulk {
+	return u.Update(func(s *AuthenticationUpsert) {
+		s.UpdateDisabled()
 	})
 }
 

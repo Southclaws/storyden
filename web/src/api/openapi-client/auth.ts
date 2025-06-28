@@ -17,7 +17,6 @@ import type {
   AccessKeyCreateBody,
   AccessKeyCreateOKResponse,
   AccessKeyListOKResponse,
-  AccessKeyListParams,
   AuthEmailBody,
   AuthEmailPasswordBody,
   AuthEmailPasswordResetBody,
@@ -1210,16 +1209,14 @@ that have been issued for the entire instance if and only if the request
 parameters specify all keys and the requesting account is an admin.
 
  */
-export const accessKeyList = (params?: AccessKeyListParams) => {
+export const accessKeyList = () => {
   return fetcher<AccessKeyListOKResponse>({
     url: `/auth/access-keys`,
     method: "GET",
-    params,
   });
 };
 
-export const getAccessKeyListKey = (params?: AccessKeyListParams) =>
-  [`/auth/access-keys`, ...(params ? [params] : [])] as const;
+export const getAccessKeyListKey = () => [`/auth/access-keys`] as const;
 
 export type AccessKeyListQueryResult = NonNullable<
   Awaited<ReturnType<typeof accessKeyList>>
@@ -1231,22 +1228,18 @@ export type AccessKeyListQueryError =
 
 export const useAccessKeyList = <
   TError = BadRequestResponse | ForbiddenResponse | InternalServerErrorResponse,
->(
-  params?: AccessKeyListParams,
-  options?: {
-    swr?: SWRConfiguration<
-      Awaited<ReturnType<typeof accessKeyList>>,
-      TError
-    > & { swrKey?: Key; enabled?: boolean };
-  },
-) => {
+>(options?: {
+  swr?: SWRConfiguration<Awaited<ReturnType<typeof accessKeyList>>, TError> & {
+    swrKey?: Key;
+    enabled?: boolean;
+  };
+}) => {
   const { swr: swrOptions } = options ?? {};
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
-    swrOptions?.swrKey ??
-    (() => (isEnabled ? getAccessKeyListKey(params) : null));
-  const swrFn = () => accessKeyList(params);
+    swrOptions?.swrKey ?? (() => (isEnabled ? getAccessKeyListKey() : null));
+  const swrFn = () => accessKeyList();
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

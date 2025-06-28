@@ -9,6 +9,7 @@ const (
 	serviceEmailVerify serviceEnum = "email_verify" // Email + verification code
 	servicePhoneVerify serviceEnum = "phone_verify" // Phone number + verification code
 	serviceWebAuthn    serviceEnum = "webauthn"     // WebAuthn/Passkey
+	serviceAccessKey   serviceEnum = "access_key"   // API access key
 
 	// OAuth services
 	serviceOAuthGoogle  serviceEnum = "oauth_google"  // Google

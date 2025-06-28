@@ -11,7 +11,6 @@ import type {
   AccessKeyCreateBody,
   AccessKeyCreateOKResponse,
   AccessKeyListOKResponse,
-  AccessKeyListParams,
   AuthEmailBody,
   AuthEmailPasswordBody,
   AuthEmailPasswordResetBody,
@@ -648,25 +647,14 @@ export type accessKeyListResponse = {
   status: number;
 };
 
-export const getAccessKeyListUrl = (params?: AccessKeyListParams) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : value.toString());
-    }
-  });
-
-  return normalizedParams.size
-    ? `/auth/access-keys?${normalizedParams.toString()}`
-    : `/auth/access-keys`;
+export const getAccessKeyListUrl = () => {
+  return `/auth/access-keys`;
 };
 
 export const accessKeyList = async (
-  params?: AccessKeyListParams,
   options?: RequestInit,
 ): Promise<accessKeyListResponse> => {
-  return fetcher<Promise<accessKeyListResponse>>(getAccessKeyListUrl(params), {
+  return fetcher<Promise<accessKeyListResponse>>(getAccessKeyListUrl(), {
     ...options,
     method: "GET",
   });

@@ -9,6 +9,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 
 export interface AccessKeyProps {
+  enabled: boolean;
   /** When the access key expires, if null, it never expires. */
   expires_at?: string;
   /** The name of the access key. */

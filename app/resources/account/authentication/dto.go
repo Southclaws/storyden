@@ -26,6 +26,7 @@ type Authentication struct {
 	Identifier string
 	Token      string
 	Name       opt.Optional[string]
+	Disabled   bool
 	Metadata   interface{}
 }
 
@@ -79,6 +80,7 @@ func FromModel(m *ent.Authentication) (*Authentication, error) {
 		Identifier: m.Identifier,
 		Token:      m.Token,
 		Name:       opt.NewPtr(m.Name),
+		Disabled:   m.Disabled,
 		Metadata:   m.Metadata,
 	}, nil
 }

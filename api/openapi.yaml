@@ -668,8 +668,6 @@ paths:
         that have been issued for the entire instance if and only if the request
         parameters specify all keys and the requesting account is an admin.
       tags: [auth]
-      parameters:
-        - $ref: "#/components/parameters/AccessKeyListAllQueryParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -716,6 +714,8 @@ paths:
       operationId: AuthProviderLogout
       description: Remove cookies from requesting client.
       tags: [auth]
+      security: [browser: []]
+
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -2208,20 +2208,6 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
-
-    AccessKeyListAllQueryParam:
-      name: all
-      in: query
-      description: |
-        If set to `true`, the request will return all access keys for the
-        entire instance. If not set, only the access keys for the authenticated
-        account will be returned.
-
-        If the requesting account does not hold the "ADMINISTRATOR" role and
-        this is set to `true`, the request will fail with a 403 Forbidden.
-      schema:
-        type: boolean
-        default: false
 
     AccountIDParam:
       description: Account ID.
@@ -4271,11 +4257,13 @@ components:
 
     AccessKeyProps:
       type: object
-      required: [name]
+      required: [name, enabled]
       properties:
         name:
           description: The name of the access key.
           type: string
+        enabled:
+          type: boolean
         expires_at:
           type: string
           format: date-time

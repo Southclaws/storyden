@@ -84,7 +84,7 @@ func TestAccessKeyToken_Validate(t *testing.T) {
 		validatedToken, err := token.Validate(pak.AccessKeyRecord)
 		require.NoError(t, err)
 		assert.NotNil(t, validatedToken)
-		assert.Equal(t, pak.ID, validatedToken.GetID())
+		assert.Equal(t, pak.KeyID, validatedToken.GetID())
 		assert.Equal(t, pak.Kind, validatedToken.GetKind())
 	})
 
@@ -96,7 +96,7 @@ func TestAccessKeyToken_Validate(t *testing.T) {
 
 		// Create a malformed key string with wrong secret
 		wrongSecret := access_key.NewAccessKeySecret()
-		wrongKeyString := pak.Kind.String() + "_" + string(pak.ID) + string(wrongSecret)
+		wrongKeyString := pak.Kind.String() + "_" + string(pak.KeyID) + string(wrongSecret)
 
 		// Parse the token from the wrong string
 		token, err := access_key.ParseAccessKeyToken(wrongKeyString)
@@ -148,7 +148,7 @@ func TestAccessKeyToken_Validate(t *testing.T) {
 		validatedToken, err := token.Validate(futurePak.AccessKeyRecord)
 		require.NoError(t, err)
 		assert.NotNil(t, validatedToken)
-		assert.Equal(t, futurePak.ID, validatedToken.GetID())
+		assert.Equal(t, futurePak.KeyID, validatedToken.GetID())
 	})
 
 	t.Run("bot_key_valid_secret", func(t *testing.T) {
@@ -168,7 +168,7 @@ func TestAccessKeyToken_Validate(t *testing.T) {
 		validatedToken, err := token.Validate(bak.AccessKeyRecord)
 		require.NoError(t, err)
 		assert.NotNil(t, validatedToken)
-		assert.Equal(t, bak.ID, validatedToken.GetID())
+		assert.Equal(t, bak.KeyID, validatedToken.GetID())
 		assert.Equal(t, access_key.AccessKeyKindBot, validatedToken.GetKind())
 	})
 
@@ -180,7 +180,7 @@ func TestAccessKeyToken_Validate(t *testing.T) {
 
 		// Create a malformed key string with wrong secret
 		wrongSecret := access_key.NewAccessKeySecret()
-		wrongKeyString := bak.Kind.String() + "_" + string(bak.ID) + string(wrongSecret)
+		wrongKeyString := bak.Kind.String() + "_" + string(bak.KeyID) + string(wrongSecret)
 
 		// Parse the token from the wrong string
 		token, err := access_key.ParseAccessKeyToken(wrongKeyString)
@@ -210,7 +210,7 @@ func TestAccessKeyToken_Validate(t *testing.T) {
 		validatedToken, err := token.Validate(noExpiryPak.AccessKeyRecord)
 		require.NoError(t, err)
 		assert.NotNil(t, validatedToken)
-		assert.Equal(t, noExpiryPak.ID, validatedToken.GetID())
+		assert.Equal(t, noExpiryPak.KeyID, validatedToken.GetID())
 	})
 
 	t.Run("far_future_expiry", func(t *testing.T) {
@@ -231,7 +231,7 @@ func TestAccessKeyToken_Validate(t *testing.T) {
 		validatedToken, err := token.Validate(farFuturePak.AccessKeyRecord)
 		require.NoError(t, err)
 		assert.NotNil(t, validatedToken)
-		assert.Equal(t, farFuturePak.ID, validatedToken.GetID())
+		assert.Equal(t, farFuturePak.KeyID, validatedToken.GetID())
 	})
 
 	t.Run("edge_case_just_expired", func(t *testing.T) {
@@ -270,7 +270,7 @@ func TestAccessKeyRecordFromAuthenticationRecord(t *testing.T) {
 		record, err := access_key.AccessKeyRecordFromAuthenticationRecord(auth)
 		require.NoError(t, err)
 		assert.Equal(t, access_key.AccessKeyKindPersonal, record.Kind)
-		assert.Equal(t, access_key.AccessKeyID(pak.ID), record.ID)
+		assert.Equal(t, access_key.AccessKeyID(pak.KeyID), record.KeyID)
 
 		header := pak.String()
 		akt, err := access_key.ParseAccessKeyToken(header)
@@ -278,7 +278,7 @@ func TestAccessKeyRecordFromAuthenticationRecord(t *testing.T) {
 
 		vakt, err := akt.Validate(*record)
 		require.NoError(t, err)
-		assert.Equal(t, pak.ID, vakt.AccessKeyToken.GetID())
+		assert.Equal(t, pak.KeyID, vakt.AccessKeyToken.GetID())
 	})
 
 	t.Run("mismatched_identifier", func(t *testing.T) {

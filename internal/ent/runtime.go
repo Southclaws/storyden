@@ -217,6 +217,10 @@ func init() {
 	authenticationDescToken := authenticationFields[3].Descriptor()
 	// authentication.TokenValidator is a validator for the "token" field. It is called by the builders before save.
 	authentication.TokenValidator = authenticationDescToken.Validators[0].(func(string) error)
+	// authenticationDescDisabled is the schema descriptor for disabled field.
+	authenticationDescDisabled := authenticationFields[5].Descriptor()
+	// authentication.DefaultDisabled holds the default value on creation for the disabled field.
+	authentication.DefaultDisabled = authenticationDescDisabled.Default.(bool)
 	// authenticationDescID is the schema descriptor for id field.
 	authenticationDescID := authenticationMixinFields0[0].Descriptor()
 	// authentication.DefaultID holds the default value on creation for the id field.

@@ -91,6 +91,11 @@ func Name(v string) predicate.Authentication {
 	return predicate.Authentication(sql.FieldEQ(FieldName, v))
 }
 
+// Disabled applies equality check predicate on the "disabled" field. It's identical to DisabledEQ.
+func Disabled(v bool) predicate.Authentication {
+	return predicate.Authentication(sql.FieldEQ(FieldDisabled, v))
+}
+
 // AccountAuthentication applies equality check predicate on the "account_authentication" field. It's identical to AccountAuthenticationEQ.
 func AccountAuthentication(v xid.ID) predicate.Authentication {
 	return predicate.Authentication(sql.FieldEQ(FieldAccountAuthentication, v))
@@ -519,6 +524,16 @@ func NameEqualFold(v string) predicate.Authentication {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Authentication {
 	return predicate.Authentication(sql.FieldContainsFold(FieldName, v))
+}
+
+// DisabledEQ applies the EQ predicate on the "disabled" field.
+func DisabledEQ(v bool) predicate.Authentication {
+	return predicate.Authentication(sql.FieldEQ(FieldDisabled, v))
+}
+
+// DisabledNEQ applies the NEQ predicate on the "disabled" field.
+func DisabledNEQ(v bool) predicate.Authentication {
+	return predicate.Authentication(sql.FieldNEQ(FieldDisabled, v))
 }
 
 // MetadataIsNil applies the IsNil predicate on the "metadata" field.

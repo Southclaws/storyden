@@ -34,6 +34,8 @@ type Authentication struct {
 	Token string `json:"-"`
 	// A human-readable name for the authentication method. For WebAuthn, this may be the device OS or nickname.
 	Name *string `json:"name,omitempty"`
+	// Whether the authentication method is disabled. This is useful for revoking access without deleting the record.
+	Disabled bool `json:"disabled,omitempty"`
 	// Any necessary metadata specific to the authentication method.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// AccountAuthentication holds the value of the "account_authentication" field.
@@ -71,6 +73,8 @@ func (*Authentication) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case authentication.FieldMetadata:
 			values[i] = new([]byte)
+		case authentication.FieldDisabled:
+			values[i] = new(sql.NullBool)
 		case authentication.FieldService, authentication.FieldTokenType, authentication.FieldIdentifier, authentication.FieldToken, authentication.FieldName:
 			values[i] = new(sql.NullString)
 		case authentication.FieldCreatedAt, authentication.FieldExpiresAt:
@@ -141,6 +145,12 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.Name = new(string)
 				*a.Name = value.String
+			}
+		case authentication.FieldDisabled:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field disabled", values[i])
+			} else if value.Valid {
+				a.Disabled = value.Bool
 			}
 		case authentication.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -220,6 +230,9 @@ func (a *Authentication) String() string {
 		builder.WriteString("name=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	builder.WriteString("disabled=")
+	builder.WriteString(fmt.Sprintf("%v", a.Disabled))
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", a.Metadata))

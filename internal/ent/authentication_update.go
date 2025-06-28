@@ -127,6 +127,20 @@ func (au *AuthenticationUpdate) ClearName() *AuthenticationUpdate {
 	return au
 }
 
+// SetDisabled sets the "disabled" field.
+func (au *AuthenticationUpdate) SetDisabled(b bool) *AuthenticationUpdate {
+	au.mutation.SetDisabled(b)
+	return au
+}
+
+// SetNillableDisabled sets the "disabled" field if the given value is not nil.
+func (au *AuthenticationUpdate) SetNillableDisabled(b *bool) *AuthenticationUpdate {
+	if b != nil {
+		au.SetDisabled(*b)
+	}
+	return au
+}
+
 // SetMetadata sets the "metadata" field.
 func (au *AuthenticationUpdate) SetMetadata(m map[string]interface{}) *AuthenticationUpdate {
 	au.mutation.SetMetadata(m)
@@ -266,6 +280,9 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if au.mutation.NameCleared() {
 		_spec.ClearField(authentication.FieldName, field.TypeString)
+	}
+	if value, ok := au.mutation.Disabled(); ok {
+		_spec.SetField(authentication.FieldDisabled, field.TypeBool, value)
 	}
 	if value, ok := au.mutation.Metadata(); ok {
 		_spec.SetField(authentication.FieldMetadata, field.TypeJSON, value)
@@ -417,6 +434,20 @@ func (auo *AuthenticationUpdateOne) SetNillableName(s *string) *AuthenticationUp
 // ClearName clears the value of the "name" field.
 func (auo *AuthenticationUpdateOne) ClearName() *AuthenticationUpdateOne {
 	auo.mutation.ClearName()
+	return auo
+}
+
+// SetDisabled sets the "disabled" field.
+func (auo *AuthenticationUpdateOne) SetDisabled(b bool) *AuthenticationUpdateOne {
+	auo.mutation.SetDisabled(b)
+	return auo
+}
+
+// SetNillableDisabled sets the "disabled" field if the given value is not nil.
+func (auo *AuthenticationUpdateOne) SetNillableDisabled(b *bool) *AuthenticationUpdateOne {
+	if b != nil {
+		auo.SetDisabled(*b)
+	}
 	return auo
 }
 
@@ -589,6 +620,9 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 	}
 	if auo.mutation.NameCleared() {
 		_spec.ClearField(authentication.FieldName, field.TypeString)
+	}
+	if value, ok := auo.mutation.Disabled(); ok {
+		_spec.SetField(authentication.FieldDisabled, field.TypeBool, value)
 	}
 	if value, ok := auo.mutation.Metadata(); ok {
 		_spec.SetField(authentication.FieldMetadata, field.TypeJSON, value)

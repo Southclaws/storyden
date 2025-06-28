@@ -5385,6 +5385,7 @@ type AuthenticationMutation struct {
 	identifier     *string
 	token          *string
 	name           *string
+	disabled       *bool
 	metadata       *map[string]interface{}
 	clearedFields  map[string]struct{}
 	account        *xid.ID
@@ -5776,6 +5777,42 @@ func (m *AuthenticationMutation) ResetName() {
 	delete(m.clearedFields, authentication.FieldName)
 }
 
+// SetDisabled sets the "disabled" field.
+func (m *AuthenticationMutation) SetDisabled(b bool) {
+	m.disabled = &b
+}
+
+// Disabled returns the value of the "disabled" field in the mutation.
+func (m *AuthenticationMutation) Disabled() (r bool, exists bool) {
+	v := m.disabled
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDisabled returns the old "disabled" field's value of the Authentication entity.
+// If the Authentication object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AuthenticationMutation) OldDisabled(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDisabled is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDisabled requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDisabled: %w", err)
+	}
+	return oldValue.Disabled, nil
+}
+
+// ResetDisabled resets all changes to the "disabled" field.
+func (m *AuthenticationMutation) ResetDisabled() {
+	m.disabled = nil
+}
+
 // SetMetadata sets the "metadata" field.
 func (m *AuthenticationMutation) SetMetadata(value map[string]interface{}) {
 	m.metadata = &value
@@ -5935,7 +5972,7 @@ func (m *AuthenticationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AuthenticationMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, authentication.FieldCreatedAt)
 	}
@@ -5956,6 +5993,9 @@ func (m *AuthenticationMutation) Fields() []string {
 	}
 	if m.name != nil {
 		fields = append(fields, authentication.FieldName)
+	}
+	if m.disabled != nil {
+		fields = append(fields, authentication.FieldDisabled)
 	}
 	if m.metadata != nil {
 		fields = append(fields, authentication.FieldMetadata)
@@ -5985,6 +6025,8 @@ func (m *AuthenticationMutation) Field(name string) (ent.Value, bool) {
 		return m.Token()
 	case authentication.FieldName:
 		return m.Name()
+	case authentication.FieldDisabled:
+		return m.Disabled()
 	case authentication.FieldMetadata:
 		return m.Metadata()
 	case authentication.FieldAccountAuthentication:
@@ -6012,6 +6054,8 @@ func (m *AuthenticationMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldToken(ctx)
 	case authentication.FieldName:
 		return m.OldName(ctx)
+	case authentication.FieldDisabled:
+		return m.OldDisabled(ctx)
 	case authentication.FieldMetadata:
 		return m.OldMetadata(ctx)
 	case authentication.FieldAccountAuthentication:
@@ -6073,6 +6117,13 @@ func (m *AuthenticationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case authentication.FieldDisabled:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDisabled(v)
 		return nil
 	case authentication.FieldMetadata:
 		v, ok := value.(map[string]interface{})
@@ -6178,6 +6229,9 @@ func (m *AuthenticationMutation) ResetField(name string) error {
 		return nil
 	case authentication.FieldName:
 		m.ResetName()
+		return nil
+	case authentication.FieldDisabled:
+		m.ResetDisabled()
 		return nil
 	case authentication.FieldMetadata:
 		m.ResetMetadata()

@@ -39,6 +39,10 @@ func (Authentication) Fields() []ent.Field {
 			Nillable().
 			Comment("A human-readable name for the authentication method. For WebAuthn, this may be the device OS or nickname."),
 
+		field.Bool("disabled").
+			Default(false).
+			Comment("Whether the authentication method is disabled. This is useful for revoking access without deleting the record."),
+
 		field.JSON("metadata", map[string]interface{}{}).
 			Optional().
 			Comment("Any necessary metadata specific to the authentication method."),

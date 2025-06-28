@@ -161,6 +161,7 @@ var (
 		{Name: "identifier", Type: field.TypeString},
 		{Name: "token", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString, Nullable: true},
+		{Name: "disabled", Type: field.TypeBool, Default: false},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
 		{Name: "account_authentication", Type: field.TypeString, Size: 20},
 	}
@@ -172,7 +173,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "authentications_accounts_authentication",
-				Columns:    []*schema.Column{AuthenticationsColumns[9]},
+				Columns:    []*schema.Column{AuthenticationsColumns[10]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -181,12 +182,12 @@ var (
 			{
 				Name:    "authentication_service_identifier_account_authentication",
 				Unique:  true,
-				Columns: []*schema.Column{AuthenticationsColumns[3], AuthenticationsColumns[5], AuthenticationsColumns[9]},
+				Columns: []*schema.Column{AuthenticationsColumns[3], AuthenticationsColumns[5], AuthenticationsColumns[10]},
 			},
 			{
 				Name:    "authentication_token_type_identifier_account_authentication",
 				Unique:  true,
-				Columns: []*schema.Column{AuthenticationsColumns[4], AuthenticationsColumns[5], AuthenticationsColumns[9]},
+				Columns: []*schema.Column{AuthenticationsColumns[4], AuthenticationsColumns[5], AuthenticationsColumns[10]},
 			},
 		},
 	}

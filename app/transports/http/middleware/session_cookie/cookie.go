@@ -71,26 +71,58 @@ func (j *Jar) Destroy() *http.Cookie {
 	return j.createWithValue("", time.Now())
 }
 
-// WithSession checks the request for a session and drops it into a context.
-func (j *Jar) WithSession(r *http.Request) context.Context {
+// withSession checks the request for a session via either a cookie (for browser
+// requests) or a bearer token access key (for API requests).
+func (j *Jar) withSession(r *http.Request) context.Context {
+	if ctx, ok := j.tryFromCookie(r); ok {
+		return ctx
+	}
+
+	if ctx, ok := j.tryFromHeader(r); ok {
+		return ctx
+	}
+
+	return r.Context()
+}
+
+func (j *Jar) tryFromCookie(r *http.Request) (context.Context, bool) {
 	cookie, err := r.Cookie(secureCookieName)
 	if err != nil {
-		return r.Context()
+		return r.Context(), false
 	}
 
-	ctx, err := j.validator.Validate(r.Context(), cookie.Value)
+	ctx, err := j.validator.ValidateSessionToken(r.Context(), cookie.Value)
 	if err != nil {
-		return r.Context()
+		return r.Context(), false
 	}
 
-	return ctx
+	return ctx, true
+}
+
+func (j *Jar) tryFromHeader(r *http.Request) (context.Context, bool) {
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		return r.Context(), false
+	}
+
+	// The header should be in the format "Bearer <token>".
+	if len(authHeader) < 7 || authHeader[:7] != "Bearer " {
+		return r.Context(), false
+	}
+
+	ctx, err := j.validator.ValidateAccessKeyToken(r.Context(), authHeader[7:])
+	if err != nil {
+		return r.Context(), false
+	}
+
+	return ctx, true
 }
 
 // WithAuth simply pulls out the session from the cookie and propagates it.
 func (j *Jar) WithAuth() func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ctx := j.WithSession(r)
+			ctx := j.withSession(r)
 
 			next.ServeHTTP(w, r.WithContext(ctx))
 		})

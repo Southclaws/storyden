@@ -19,6 +19,7 @@ var (
 	errInvalidAccessKey               = fault.New("invalid access key")
 	errMalformedStoredAccessKeyRecord = fault.New("malformed stored access key record")
 	errRejectedAccessKey              = fault.New("access key rejected")
+	errRevoked                        = fault.New("access key revoked")
 )
 
 const (
@@ -57,6 +58,10 @@ type AccessKeyToken struct {
 	secret AccessKeySecret
 }
 
+func (k *AccessKeyToken) GetAuthenticationRecordIdentifier() string {
+	return fmt.Sprintf("%s_%s", k.kind, k.id)
+}
+
 func (t *AccessKeyToken) GetKind() AccessKeyKind {
 	return t.kind
 }
@@ -77,24 +82,28 @@ type AccessKeyHash string
 
 // Represents the actual stored key with its hash, no secret.
 type AccessKeyRecord struct {
-	Kind    AccessKeyKind
-	ID      AccessKeyID
-	Hash    AccessKeyHash
-	Expires opt.Optional[time.Time]
+	Kind      AccessKeyKind
+	AuthID    authentication.ID
+	KeyID     AccessKeyID
+	Hash      AccessKeyHash
+	CreatedAt time.Time
+	Expires   opt.Optional[time.Time]
+	Disabled  bool
 }
 
 func (r *AccessKeyRecord) GetAuthenticationRecordIdentifier() string {
-	return fmt.Sprintf("%s_%s", r.Kind, r.ID)
+	return fmt.Sprintf("%s_%s", r.Kind, r.KeyID)
 }
 
 // Expose this to the member who created the access key once, do not store.
 type AccessKeyRecordWithSecret struct {
 	AccessKeyRecord
+	Name   string
 	secret AccessKeySecret
 }
 
 func (a AccessKeyRecordWithSecret) String() string {
-	return fmt.Sprintf("%s_%s%s", a.Kind, a.ID, a.secret)
+	return fmt.Sprintf("%s_%s%s", a.Kind, a.KeyID, a.secret)
 }
 
 func newAccessKey(kind AccessKeyKind, expiry opt.Optional[time.Time]) AccessKeyRecordWithSecret {
@@ -106,10 +115,11 @@ func newAccessKey(kind AccessKeyKind, expiry opt.Optional[time.Time]) AccessKeyR
 
 	return AccessKeyRecordWithSecret{
 		AccessKeyRecord: AccessKeyRecord{
-			Kind:    kind,
-			ID:      NewAccessKeyID(),
-			Hash:    AccessKeyHash(hash),
-			Expires: expiry,
+			Kind:      kind,
+			KeyID:     NewAccessKeyID(),
+			Hash:      AccessKeyHash(hash),
+			CreatedAt: time.Now(),
+			Expires:   expiry,
 		},
 		secret: secret,
 	}
@@ -123,14 +133,20 @@ func NewBotAccessKey(expiry opt.Optional[time.Time]) AccessKeyRecordWithSecret {
 	return newAccessKey(AccessKeyKindBot, expiry)
 }
 
-func ParseAccessKeyToken(s string) (*AccessKeyToken, error) {
-	if len(s) < prefixLength+identifierLength+secretLength {
-		return nil, fault.Wrap(errInvalidAccessKey, fmsg.With("incorrect length"), ftag.With(ftag.InvalidArgument))
+// AccessKeyIdentifier represents the first 2 parts of an access key:
+// "sdpak_12345678afbe"
+type AccessKeyIdentifier struct {
+	kind AccessKeyKind
+	id   AccessKeyID
+}
+
+func ParseAccessKeyIdentifier(s string) (*AccessKeyIdentifier, error) {
+	if len(s) < prefixLength+identifierLength {
+		return nil, fault.Wrap(errInvalidAccessKey, fmsg.With("incorrect identifier length"), ftag.With(ftag.InvalidArgument))
 	}
 
 	rawkind := s[:kindLength]
 	rawid := s[prefixLength : prefixLength+identifierLength]
-	rawsecret := s[prefixLength+identifierLength:]
 
 	kind, err := NewAccessKeyKind(rawkind)
 	if err != nil {
@@ -141,18 +157,37 @@ func ParseAccessKeyToken(s string) (*AccessKeyToken, error) {
 		return nil, fault.Wrap(errInvalidAccessKey, fmsg.With("invalid identifier format"), ftag.With(ftag.InvalidArgument))
 	}
 
+	return &AccessKeyIdentifier{
+		kind: kind,
+		id:   AccessKeyID(rawid),
+	}, nil
+}
+
+func ParseAccessKeyToken(s string) (*AccessKeyToken, error) {
+	if len(s) < prefixLength+identifierLength+secretLength {
+		return nil, fault.Wrap(errInvalidAccessKey, fmsg.With("incorrect token length"), ftag.With(ftag.InvalidArgument))
+	}
+
+	aki, err := ParseAccessKeyIdentifier(s)
+	if err != nil {
+		return nil, err
+	}
+
+	rawsecret := s[prefixLength+identifierLength:]
+
 	if !isValidRandomString(rawsecret) {
 		return nil, fault.Wrap(errInvalidAccessKey, fmsg.With("invalid secret format"), ftag.With(ftag.InvalidArgument))
 	}
 
 	return &AccessKeyToken{
-		kind:   kind,
-		id:     AccessKeyID(rawid),
+		kind:   aki.kind,
+		id:     aki.id,
 		secret: AccessKeySecret(rawsecret),
 	}, nil
 }
 
 func (k *AccessKeyToken) Validate(r AccessKeyRecord) (*ValidatedAccessKeyToken, error) {
+	// Perform the hash even if disabled or expired to prevent timing attacks.
 	ok, _, err := argon2id.CheckHash(string(k.secret), string(r.Hash))
 	if err != nil {
 		return nil, err
@@ -172,24 +207,31 @@ func (k *AccessKeyToken) Validate(r AccessKeyRecord) (*ValidatedAccessKeyToken, 
 		}
 	}
 
+	if r.Disabled {
+		return nil, fault.Wrap(errRevoked, ftag.With(ftag.PermissionDenied))
+	}
+
 	return &ValidatedAccessKeyToken{
 		AccessKeyToken: *k,
 	}, nil
 }
 
 func AccessKeyRecordFromAuthenticationRecord(a authentication.Authentication) (*AccessKeyRecord, error) {
-	kind, err := NewAccessKeyKind(a.Identifier[:kindLength])
+	aki, err := ParseAccessKeyIdentifier(a.Identifier)
 	if err != nil {
 		return nil, err
 	}
 
-	identifier := a.Identifier[prefixLength : prefixLength+identifierLength]
 	hash := a.Token
 
 	return &AccessKeyRecord{
-		Kind: kind,
-		ID:   AccessKeyID(identifier),
-		Hash: AccessKeyHash(hash),
+		Kind:      aki.kind,
+		AuthID:    a.ID,
+		KeyID:     AccessKeyID(aki.id),
+		Hash:      AccessKeyHash(hash),
+		CreatedAt: a.Created,
+		Expires:   a.Expires,
+		Disabled:  a.Disabled,
 	}, nil
 }
 
