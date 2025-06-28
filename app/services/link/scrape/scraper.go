@@ -7,6 +7,8 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
 
@@ -32,6 +34,13 @@ func New() Scraper {
 }
 
 func (s *webScraper) Scrape(ctx context.Context, addr url.URL) (*WebContent, error) {
+	if addr.Scheme != "http" && addr.Scheme != "https" {
+		return nil, fault.New("invalid URL scheme",
+			fctx.With(ctx),
+			ftag.With(ftag.InvalidArgument),
+			fmsg.WithDesc("unsupported URL scheme", "Only HTTP and HTTPS URLs are supported."))
+	}
+
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, addr.String(), nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
