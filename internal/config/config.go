@@ -295,6 +295,14 @@ type Config struct {
 	// -
 
 	/*
+	   Enables the Model Context Provider server, accessible via SSE at `/mcp`.
+
+	   This is used to integrate Storyden into agentic workflow engines and other language model tooling.
+
+	   See [the documentation](https://storyden.org/docs/introduction/mcp) for more information.
+	*/
+	MCPEnabled bool `default:"false" envconfig:"MCP_ENABLED"`
+	/*
 	   The provider for language model features.
 
 	   `openai` is currently the only supported provider.

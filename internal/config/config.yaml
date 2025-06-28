@@ -427,6 +427,17 @@
   description: |-
     Configuration for optional AI features. These can be useful for organising large amounts of library pages and threads, but it can also provide other features such as recommendations and ask-based conversational searching.
   fields:
+    - env: "MCP_ENABLED"
+      name: MCPEnabled
+      type: bool
+      default: false
+      description: |-
+        Enables the Model Context Provider server, accessible via SSE at `/mcp`.
+
+        This is used to integrate Storyden into agentic workflow engines and other language model tooling.
+
+        See [the documentation](https://storyden.org/docs/introduction/mcp) for more information.
+
     - env: "LANGUAGE_MODEL_PROVIDER"
       name: LanguageModelProvider
       type: string
