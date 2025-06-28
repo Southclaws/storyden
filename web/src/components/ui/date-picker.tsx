@@ -14,6 +14,7 @@ import { Button } from "./button";
 import { IconButton } from "./icon-button";
 import { CalendarIcon } from "./icons/Calendar";
 import { ChevronLeftIcon, ChevronRightIcon } from "./icons/Chevron";
+import { Input as UIInput } from "./input";
 
 const { withProvider, withContext } = createStyleContext(datePicker);
 
@@ -160,7 +161,7 @@ export const DatePicker = (props: ArkDatePicker.RootBaseProps) => {
     >
       <Control>
         <Input index={0} asChild>
-          <Input />
+          <UIInput />
         </Input>
         <Trigger asChild>
           <IconButton
