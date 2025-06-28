@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"context"
+	"log/slog"
 	"net/http"
 
 	"github.com/mark3labs/mcp-go/server"
@@ -17,7 +18,13 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 )
 
-func New(ctx context.Context, cfg config.Config, settings *settings.SettingsRepository, allTools tools.All) (*server.SSEServer, error) {
+func New(
+	ctx context.Context,
+	logger *slog.Logger,
+	cfg config.Config,
+	settings *settings.SettingsRepository,
+	allTools tools.All,
+) (*server.SSEServer, error) {
 	set, err := settings.Get(ctx)
 	if err != nil {
 		return nil, err
@@ -82,7 +89,28 @@ func withStrictAuthMCP() func(next http.Handler) http.Handler {
 				return
 			}
 
-			next.ServeHTTP(w, r)
+			withFlusher, ok := GetFlusher(w)
+			if !ok {
+				w.WriteHeader(http.StatusInternalServerError)
+				_, _ = w.Write([]byte("Failed to get flusher for MCP server"))
+				return
+			}
+
+			next.ServeHTTP(withFlusher, r)
 		})
+	}
+}
+
+func GetFlusher(w http.ResponseWriter) (http.ResponseWriter, bool) {
+	for {
+		if _, ok := w.(http.Flusher); ok {
+			return w, true
+		}
+		// Try to unwrap
+		if unwrapper, ok := w.(interface{ Unwrap() http.ResponseWriter }); ok {
+			w = unwrapper.Unwrap()
+		} else {
+			return nil, false
+		}
 	}
 }
