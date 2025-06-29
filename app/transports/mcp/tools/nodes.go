@@ -35,6 +35,7 @@ import (
 type nodeTools struct {
 	tools []server.ServerTool
 
+	session       *session.Provider
 	accountQuery  *account_querier.Querier
 	nodeMutator   *node_mutate.Manager
 	tagger        *autotagger.Tagger
@@ -50,6 +51,7 @@ type nodeTools struct {
 }
 
 func newNodeTools(
+	session *session.Provider,
 	accountQuery *account_querier.Querier,
 	nodeMutator *node_mutate.Manager,
 	tagger *autotagger.Tagger,
@@ -64,6 +66,7 @@ func newNodeTools(
 	searcher searcher.Searcher,
 ) *nodeTools {
 	handler := &nodeTools{
+		session:       session,
 		accountQuery:  accountQuery,
 		nodeMutator:   nodeMutator,
 		tagger:        tagger,
@@ -82,6 +85,7 @@ func newNodeTools(
 		{Tool: libraryPageTreeTool, Handler: handler.libraryPageTree},
 		{Tool: libraryPageGetTool, Handler: handler.libraryPageGet},
 		{Tool: libraryPageCreateTool, Handler: handler.libraryPageCreate},
+		{Tool: libraryPageUpdateTool, Handler: handler.libraryPageUpdate},
 		{Tool: libraryPageSearchTool, Handler: handler.libraryPageSearch},
 	}
 
@@ -93,7 +97,14 @@ var libraryPageTreeTool = mcp.NewTool("getLibraryPageTree",
 )
 
 func (t *nodeTools) libraryPageTree(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	opts := []node_traversal.Filter{}
+	account, err := t.session.Account(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	opts := []node_traversal.Filter{
+		node_traversal.WithVisibility(opt.New(*account), visibility.VisibilityDraft, visibility.VisibilityPublished),
+	}
 
 	depth := request.GetInt("depth", -1)
 	if depth != -1 {
@@ -105,7 +116,7 @@ func (t *nodeTools) libraryPageTree(ctx context.Context, request mcp.CallToolReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	obj := mapNodes(tree)
+	obj := mapNodeTree(tree)
 	b, err := json.Marshal(obj)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -151,6 +162,25 @@ func mapNode(n *library.Node) map[string]any {
 
 func mapNodes(nodes []*library.Node) []map[string]any {
 	return dt.Map(nodes, mapNode)
+}
+
+func mapNodeTreeItem(n *library.Node) map[string]any {
+	i := map[string]any{
+		"slug":        n.Mark.Slug(),
+		"name":        n.Name,
+		"description": n.Description,
+		"tags":        dt.Map(n.Tags, mapTag),
+	}
+
+	if v, ok := n.Parent.Get(); ok {
+		i["parent"] = v.Mark.Slug()
+	}
+
+	return i
+}
+
+func mapNodeTree(nodes []*library.Node) []map[string]any {
+	return dt.Map(nodes, mapNodeTreeItem)
 }
 
 func mapTag(t *tag_ref.Tag) string {
@@ -238,6 +268,76 @@ func (t *nodeTools) libraryPageCreate(ctx context.Context, request mcp.CallToolR
 			Visibility: vis,
 		},
 	)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	obj := mapNode(node)
+	b, err := json.Marshal(obj)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return mcp.NewToolResultText(string(b)), nil
+}
+
+var libraryPageUpdateTool = mcp.NewTool("updateLibraryPage",
+	mcp.WithDescription("Update an existing page in the library"),
+	mcp.WithString("slug", mcp.Required(), mcp.Description("The slug of the page to update")),
+	mcp.WithString("name", mcp.Description("The new name of the page")),
+	mcp.WithString("content", mcp.Description("The new content of the page in HTML format")),
+	mcp.WithString("visibility", mcp.Description("New visibility of the page: published or draft")),
+	mcp.WithString("url", mcp.Description("If this page is about a topic referred to on an external website, use this to reference that website")),
+	mcp.WithString("parent", mcp.Description("New parent page slug. Leave empty to move to root level")),
+)
+
+func (t *nodeTools) libraryPageUpdate(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	slug, err := request.RequireString("slug")
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	name := request.GetString("name", "")
+	content := request.GetString("content", "")
+	visibilityStr := request.GetString("visibility", "")
+	urlStr := request.GetString("url", "")
+	parentStr := request.GetString("parent", "")
+
+	partial := node_mutate.Partial{}
+
+	if name != "" {
+		partial.Name = opt.New(name)
+	}
+
+	if content != "" {
+		richContent, err := datagraph.NewRichText(content)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		partial.Content = opt.New(richContent)
+	}
+
+	if visibilityStr != "" {
+		vis, err := visibility.NewVisibility(visibilityStr)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		partial.Visibility = opt.New(vis)
+	}
+
+	if urlStr != "" {
+		u, err := url.Parse(urlStr)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		partial.URL = opt.New(*u)
+	}
+
+	if parentStr != "" {
+		partial.Parent = opt.New(library.QueryKey{mark.NewQueryKey(parentStr)})
+	}
+
+	node, err := t.nodeMutator.Update(ctx, library.NewKey(slug), partial)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
