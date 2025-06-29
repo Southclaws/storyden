@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/generative"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
@@ -144,6 +145,7 @@ func mapNode(n *library.Node) map[string]any {
 		"name":        n.Name,
 		"description": n.Description,
 		"tags":        dt.Map(n.Tags, mapTag),
+		"child_pages": mapNodes(n.Nodes),
 	}
 }
 
@@ -161,6 +163,7 @@ var libraryPageCreateTool = mcp.NewTool("createLibraryPage",
 	mcp.WithString("slug", mcp.Description("The unique slug within Storyden for this page. If you leave this empty, a slug will be generated for you.")),
 	mcp.WithString("content", mcp.Description("The content of the page in HTML format.")),
 	mcp.WithString("parent", mcp.Description("Only include the parent if you already have a parent slug available from a page search. If not, this field must be left empty, otherwise the createNode tool will fail catastrophically and everyone will be very sad.")),
+	mcp.WithString("visibility", mcp.Description("Visibility of the page. published or draft, defaults to published")),
 	mcp.WithString("url", mcp.Description("If this page is about a topic referred to on an external website, use this to reference that website.")),
 )
 
@@ -174,6 +177,7 @@ func (t *nodeTools) libraryPageCreate(ctx context.Context, request mcp.CallToolR
 	urlStr := request.GetString("url", "")
 	slugStr := request.GetString("slug", "")
 	parentStr := request.GetString("parent", "")
+	visibilityStr := request.GetString("visibility", "published")
 
 	var richContent opt.Optional[datagraph.Content]
 	if content != "" {
@@ -207,6 +211,17 @@ func (t *nodeTools) libraryPageCreate(ctx context.Context, request mcp.CallToolR
 		parent = opt.New(library.QueryKey{mark.NewQueryKey(parentStr)})
 	}
 
+	var vis opt.Optional[visibility.Visibility]
+	if visibilityStr != "" {
+		v, err := visibility.NewVisibility(visibilityStr)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
+		}
+		vis = opt.New(v)
+	} else {
+		vis = opt.New(visibility.VisibilityPublished)
+	}
+
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -216,10 +231,11 @@ func (t *nodeTools) libraryPageCreate(ctx context.Context, request mcp.CallToolR
 		accountID,
 		name,
 		node_mutate.Partial{
-			Slug:    slug,
-			Content: richContent,
-			URL:     urlParsed,
-			Parent:  parent,
+			Slug:       slug,
+			Content:    richContent,
+			URL:        urlParsed,
+			Parent:     parent,
+			Visibility: vis,
 		},
 	)
 	if err != nil {
