@@ -557,6 +557,19 @@ Storyden does not currently support `amqps://` (secure) URLs, but this will be a
 
 Configuration for optional AI features. These can be useful for organising large amounts of library pages and threads, but it can also provide other features such as recommendations and ask-based conversational searching.
 
+### `MCP_ENABLED`
+
+<table>
+<tr><td>type</td><td>boolean (`true` or `false`, case sensitive)</td></tr>
+<tr><td>default</td><td>`false`</td></tr>
+</table>
+
+Enables the Model Context Provider server, accessible via SSE at `/mcp`.
+
+This is used to integrate Storyden into agentic workflow engines and other language model tooling.
+
+See [the documentation](https://storyden.org/docs/introduction/mcp) for more information.
+
 ### `LANGUAGE_MODEL_PROVIDER`
 
 <table>

@@ -6,9 +6,11 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"time"
 
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/internal/boot_time"
 	"github.com/Southclaws/storyden/internal/config"
 )
 
@@ -29,6 +31,7 @@ func NewServer(lc fx.Lifecycle, logger *slog.Logger, cfg config.Config, router *
 				// the app reaches this point, its considered a successful boot!
 
 				logger.Info("storyden http server starting",
+					slog.String("boot_time", time.Since(boot_time.StartedAt).String()),
 					slog.String("address", cfg.ListenAddr),
 					slog.String("api_address", cfg.PublicAPIAddress.String()),
 					slog.String("web_address", cfg.PublicWebAddress.String()),

@@ -1,0 +1,76 @@
+---
+title: MCP (Model Context Protocol)
+description: Storyden comes with an MCP server built in! The only limit is your imagination! (and your AI usage credits...)
+---
+
+<Callout type="warn">
+  Storyden's built-in MCP server is a work in progress, experiment with care.
+  But have fun!
+</Callout>
+
+The Storyden MCP server provides a set of tools for agents to create, edit and organise content. Storyden currently uses the [Server Side Events transport aka Streamable HTTP](https://modelcontextprotocol.io/docs/concepts/transports#streamable-http). This may change with time as MCP is currently a quickly changing specification.
+
+You can enable the MCP server by setting the `MCP_ENABLED` environment variable to `true` and restarting the server process. [More information here](/docs/operation/configuration).
+
+Once enabled, your server will mount a new HTTP route at `/mcp` including an SSE endpoint at `/mcp/sse`.
+
+<Callout type="info">
+  MCP exists outside of the Storyden API specification and thus is not covered
+  by the specification contract. This is partly because OpenAPI is not a great
+  language for describing JSON-RPC streaming APIs and also because the actual
+  tools, resources and prompts exposed by MCP servers do not really need to be
+  stable and covered by any API guarantees as their intended consumers (language
+  model agents) discover and execute tools on an ad-hoc basis. This may change
+  if MCP clients start to introduce cachine and some form of schema validation.
+  Until then, Storyden's MCP will remain as a *sibling* route to `/api` and not
+  a *child* route.
+</Callout>
+
+## Tools
+
+Below is a list of the tools provided by Storyden's MCP server. This list may fall out of date as we develop and experiment with new tools.
+
+In the future, when the MCP implementation settles, we will move this to a dedicated tool documentation page generated from the code itself so it's always up to date.
+
+| Tool                 | Description                                                                                        |
+| -------------------- | -------------------------------------------------------------------------------------------------- |
+| `createLibraryPage`  | Create a new page in the library                                                                   |
+| `createLink`         | Create or update a link in the shared bookmarks list and return its OpenGraph metadata             |
+| `createThread`       | Create a new discussion thread in the forum                                                        |
+| `getLibraryPage`     | Get a specific page from the library                                                               |
+| `getLibraryPageTree` | Get the full tree of pages in the library                                                          |
+| `getThread`          | Get a specific thread with its posts and replies                                                   |
+| `listCategories`     | List all thread categories with their names and descriptions                                       |
+| `listTags`           | Get a list of all tags on the site or search for tags by name using the optional 'query' argument. |
+| `listThreads`        | List and search discussion threads                                                                 |
+| `replyToThread`      | Add a reply to an existing thread                                                                  |
+| `searchLibraryPages` | Search for pages in the library.                                                                   |
+| `updateLibraryPage`  | Update an existing page in the library                                                             |
+| `updateThread`       | Update an existing thread                                                                          |
+
+## Authentication
+
+The Storyden MCP server requires authentication for any request. Requests require an `Authorization` header with an [Access Key](/docs/operation/access-keys) as a bearer token. See the Access Keys documentation for more information.
+
+Once you have created an access key, you can use it in your favourite MCP client (Raycast, Claude, n8n, etc.) as a bearer token for the agent to make requests to Storyden.
+
+All tool calls are performed against the same permissions as the account that created the access key. If you don't have permission to edit library pages, your agent won't either.
+
+## Use cases
+
+MCP is a powerful connector that can almost seamlessly allow agents to interact with third party systems and even integrate them together.
+
+During development of the MCP server, we experimented with n8n.io and a Discord bot to allow members of our community to archive all the useful links they share in our Discord chat. The agent could:
+
+- Use the `createLink` tool to get more information about a link that was shared
+- Decide if this link would be a good candidate to store in our Storyden instance by using `getLibraryPageTree`, `listTags` and `searchLibraryPages` to get an understanding of the kind of content we like to bookmark for our community.
+- If it determines the link shared has a place in our community bookmark directory, it may use the library page tree to determine which page to create the new page under.
+- Using the `createLibraryPage` with the URL the member shared and the metadata from `createLink`, it created pages in the most relevant places.
+
+This allows our members to share cool stuff in Discord without leaving to open our Storyden site, go through a page creation flow by manually adding the link, writing a description about why they shared this link. It's all done automatically. With some human moderation to balance things out.
+
+Directories like this with human curators can really utilise the power of agents to automate the boring parts like organising, tagging and setting up pages.
+
+Other use cases for communities that use the web discussion features exist too, in future you will be able to trigger agent workflows either in n8n or in Storyden's native MRKL agent to moderate content, reply to questions, tag relevant members to help, organise threads and perform other tasks.
+
+We're just starting to explore what's possible now. The goal is to provide a rich set of simple composable tools and see what the community does with them!

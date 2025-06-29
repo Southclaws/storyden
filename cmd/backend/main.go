@@ -16,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources"
 	"github.com/Southclaws/storyden/app/services"
 	transport "github.com/Southclaws/storyden/app/transports"
+	"github.com/Southclaws/storyden/internal/boot_time"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/infrastructure"
 )
@@ -60,6 +61,8 @@ func Start(ctx context.Context) {
 }
 
 func main() {
+	boot_time.StartedAt = time.Now()
+
 	godotenv.Load()
 
 	ctx, cf := signal.NotifyContext(context.Background(), os.Interrupt)
