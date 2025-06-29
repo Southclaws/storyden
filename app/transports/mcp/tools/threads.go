@@ -14,13 +14,11 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
-	"github.com/rs/xid"
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
-	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -358,7 +356,6 @@ var threadReplyTool = mcp.NewTool("replyToThread",
 	mcp.WithDescription("Add a reply to an existing thread"),
 	mcp.WithString("slug", mcp.Required(), mcp.Description("The thread slug to reply to")),
 	mcp.WithString("body", mcp.Required(), mcp.Description("The reply content in HTML format")),
-	mcp.WithString("reply_to", mcp.Description("Optional post ID to reply to a specific post within the thread")),
 )
 
 func (t *threadTools) threadReply(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
@@ -371,8 +368,6 @@ func (t *threadTools) threadReply(ctx context.Context, request mcp.CallToolReque
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	replyTo := request.GetString("reply_to", "")
 
 	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
@@ -389,16 +384,8 @@ func (t *threadTools) threadReply(ctx context.Context, request mcp.CallToolReque
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	var replyToPostID opt.Optional[post.ID]
-	if replyTo != "" {
-		if replyToID, err := xid.FromString(replyTo); err == nil {
-			replyToPostID = opt.New(post.ID(replyToID))
-		}
-	}
-
 	reply, err := t.reply_svc.Create(ctx, accountID, postID, reply_service.Partial{
 		Content: opt.New(richContent),
-		ReplyTo: replyToPostID,
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
