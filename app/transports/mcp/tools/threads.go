@@ -93,7 +93,7 @@ func (t *threadTools) threadCreate(ctx context.Context, request mcp.CallToolRequ
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	visibilityStr := request.GetString("visibility", "public")
+	visibilityStr := request.GetString("visibility", "published")
 	urlStr := request.GetString("url", "")
 	tagsStr := request.GetString("tags", "")
 	var tags []string
@@ -281,7 +281,7 @@ var threadUpdateTool = mcp.NewTool("updateThread",
 	mcp.WithString("slug", mcp.Required(), mcp.Description("The thread slug to update")),
 	mcp.WithString("title", mcp.Description("New title for the thread")),
 	mcp.WithString("body", mcp.Description("New content for the thread in HTML format")),
-	mcp.WithString("visibility", mcp.Description("New visibility: public, unlisted, or private")),
+	mcp.WithString("visibility", mcp.Description("New visibility: published or draft")),
 	mcp.WithString("tags", mcp.Description("New comma-separated tags for the thread")),
 )
 
