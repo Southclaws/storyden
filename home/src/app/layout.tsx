@@ -2,7 +2,7 @@ import { RootProvider } from "fumadocs-ui/provider";
 import "fumadocs-ui/style.css";
 import type { ReactNode } from "react";
 
-import { joie, worksans, hedvig, intelone } from "@/fonts";
+import { joie, worksans, hedvig, intelone, gorton } from "@/fonts";
 import "./globals.css";
 
 import Script from "next/script";
@@ -17,7 +17,8 @@ export default function Layout({ children }: { children: ReactNode }) {
         joie.variable,
         worksans.variable,
         hedvig.variable,
-        intelone.variable
+        intelone.variable,
+        gorton.variable
       )}
       suppressHydrationWarning
     >

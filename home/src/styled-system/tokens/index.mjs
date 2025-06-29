@@ -711,6 +711,10 @@ const tokens = {
     "value": "var(--font-intelone)",
     "variable": "var(--fonts-intelone)"
   },
+  "fonts.gorton": {
+    "value": "var(--font-gorton)",
+    "variable": "var(--fonts-gorton)"
+  },
   "colors.current": {
     "value": "currentColor",
     "variable": "var(--colors-current)"
