@@ -78,20 +78,20 @@ func newNodeTools(
 	}
 
 	handler.tools = []server.ServerTool{
-		{Tool: nodeTreeTool, Handler: handler.nodeTree},
-		{Tool: nodeGetTool, Handler: handler.nodeGet},
-		{Tool: nodeCreateTool, Handler: handler.nodeCreate},
-		{Tool: nodeSearchTool, Handler: handler.nodeSearch},
+		{Tool: libraryPageTreeTool, Handler: handler.libraryPageTree},
+		{Tool: libraryPageGetTool, Handler: handler.libraryPageGet},
+		{Tool: libraryPageCreateTool, Handler: handler.libraryPageCreate},
+		{Tool: libraryPageSearchTool, Handler: handler.libraryPageSearch},
 	}
 
 	return handler
 }
 
-var nodeTreeTool = mcp.NewTool("getNodeTree",
-	mcp.WithDescription("Get the full tree of nodes in the library"),
+var libraryPageTreeTool = mcp.NewTool("getLibraryPageTree",
+	mcp.WithDescription("Get the full tree of pages in the library"),
 )
 
-func (t *nodeTools) nodeTree(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (t *nodeTools) libraryPageTree(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	opts := []node_traversal.Filter{}
 
 	depth := request.GetInt("depth", -1)
@@ -113,13 +113,13 @@ func (t *nodeTools) nodeTree(ctx context.Context, request mcp.CallToolRequest) (
 	return mcp.NewToolResultText(string(b)), nil
 }
 
-var nodeGetTool = mcp.NewTool("getNode",
-	mcp.WithDescription("Get a specific node from the library"),
-	mcp.WithString("node_slug", mcp.Required()),
+var libraryPageGetTool = mcp.NewTool("getLibraryPage",
+	mcp.WithDescription("Get a specific page from the library"),
+	mcp.WithString("slug", mcp.Required()),
 )
 
-func (t *nodeTools) nodeGet(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	slug, err := request.RequireString("node_slug")
+func (t *nodeTools) libraryPageGet(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+	slug, err := request.RequireString("slug")
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -140,7 +140,6 @@ func (t *nodeTools) nodeGet(ctx context.Context, request mcp.CallToolRequest) (*
 
 func mapNode(n *library.Node) map[string]any {
 	return map[string]any{
-		"id":          n.Mark.ID(),
 		"slug":        n.Mark.Slug(),
 		"name":        n.Name,
 		"description": n.Description,
@@ -156,16 +155,16 @@ func mapTag(t *tag_ref.Tag) string {
 	return t.Name.String()
 }
 
-var nodeCreateTool = mcp.NewTool("createNode",
-	mcp.WithDescription("Create a new node in the library"),
-	mcp.WithString("name", mcp.Required(), mcp.Description("The name of the node.")),
-	mcp.WithString("content", mcp.Description("The content of the node in HTML format.")),
-	mcp.WithString("url", mcp.Description("If this node is about a topic referred to on an external website, you can provide a URL to that website here.")),
-	mcp.WithString("slug", mcp.Description("The unique slug within Storyden for this node. If you leave this empty, a slug will be generated for you.")),
-	mcp.WithString("parent", mcp.Description("Only include the parent if you already have a parent slug available from a node search. If not, this field must be left empty, otherwise the createNode tool will fail catastrophically and everyone will be very sad.")),
+var libraryPageCreateTool = mcp.NewTool("createLibraryPage",
+	mcp.WithDescription("Create a new page in the library"),
+	mcp.WithString("name", mcp.Required(), mcp.Description("The name of the page.")),
+	mcp.WithString("slug", mcp.Description("The unique slug within Storyden for this page. If you leave this empty, a slug will be generated for you.")),
+	mcp.WithString("content", mcp.Description("The content of the page in HTML format.")),
+	mcp.WithString("parent", mcp.Description("Only include the parent if you already have a parent slug available from a page search. If not, this field must be left empty, otherwise the createNode tool will fail catastrophically and everyone will be very sad.")),
+	mcp.WithString("url", mcp.Description("If this page is about a topic referred to on an external website, use this to reference that website.")),
 )
 
-func (t *nodeTools) nodeCreate(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (t *nodeTools) libraryPageCreate(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	name, err := request.RequireString("name")
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -236,12 +235,12 @@ func (t *nodeTools) nodeCreate(ctx context.Context, request mcp.CallToolRequest)
 	return mcp.NewToolResultText(string(b)), nil
 }
 
-var nodeSearchTool = mcp.NewTool("searchNodes",
-	mcp.WithDescription("Search for nodes in the library."),
+var libraryPageSearchTool = mcp.NewTool("searchLibraryPages",
+	mcp.WithDescription("Search for pages in the library."),
 	mcp.WithString("query", mcp.Required()),
 )
 
-func (t *nodeTools) nodeSearch(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
+func (t *nodeTools) libraryPageSearch(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
 	query, err := request.RequireString("query")
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
