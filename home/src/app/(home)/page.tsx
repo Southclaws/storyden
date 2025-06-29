@@ -1,5 +1,6 @@
 import {
   Box,
+  Center,
   Flex,
   Grid,
   GridItem,
@@ -19,6 +20,7 @@ import {
   SparkleIcon,
   SparklesIcon,
 } from "lucide-react";
+import { gorton } from "@/fonts";
 
 function Hero() {
   return (
@@ -560,6 +562,189 @@ function AIDemo() {
           <span>auto-place</span>
         </HStack>
       </HStack>
+    </VStack>
+  );
+}
+
+const cellStyle = { border: "1px solid currentColor", padding: "4px" };
+
+function Milspec() {
+  return (
+    <VStack
+      bgColor="Mono.ink"
+      py="16"
+      px="16"
+      gap="16"
+      fontFamily="gorton"
+      letterSpacing="widest"
+    >
+      <styled.table
+        w="full"
+        maxW="breakpoint-md"
+        borderColor="Shades.newspaper"
+        borderStyle="solid"
+        borderWidth="thin"
+        color="Shades.newspaper"
+        fontSize="xs"
+      >
+        <tbody>
+          <styled.tr>
+            <td colSpan={6}>
+              <styled.p
+                aria-hidden
+                fontFamily="gorton"
+                fontSize="2xs"
+                textAlign="end"
+                p="2"
+              >
+                CHART 1 of 2
+              </styled.p>
+            </td>
+          </styled.tr>
+
+          <styled.tr>
+            <td colSpan={6}>
+              <Center w="full" py="8">
+                <styled.h2 fontFamily="gorton" fontSize="lg" textAlign="center">
+                  STORYDEN&nbsp;HUMAN&nbsp;COMPUTER
+                  <br />
+                  KNOWLEDGE&nbsp;SYSTEM
+                </styled.h2>
+              </Center>
+            </td>
+          </styled.tr>
+
+          <styled.tr>
+            <td colSpan={6}>
+              <Center w="full">
+                <Image
+                  src="/landing/SD2000-SEMDEX-HUMAN-COMPUTER-KNOWLEDGE-SYSTEM.png"
+                  width="920"
+                  height="569"
+                  alt=""
+                />
+              </Center>
+            </td>
+          </styled.tr>
+
+          <styled.tr>
+            <td style={cellStyle} colSpan={2}>
+              LINES OF CODE
+            </td>
+            <td style={cellStyle}>124,592</td>
+            <td style={cellStyle} rowSpan={3} colSpan={2}>
+              SUPPORTED
+              <br />
+              OPERATING
+              <br />
+              SYSTEMS
+            </td>
+            <td style={cellStyle} rowSpan={3} colSpan={2}>
+              WINDOWS
+              <br />
+              MACOS
+              <br />
+              LINUX
+            </td>
+          </styled.tr>
+
+          <styled.tr>
+            <td style={cellStyle} colSpan={2}>
+              GIT COMMITS
+            </td>
+            <td style={cellStyle}>2,392</td>
+          </styled.tr>
+
+          <styled.tr>
+            <td style={cellStyle} colSpan={2}>
+              API ENDPOINTS
+            </td>
+            <td style={cellStyle}>89</td>
+          </styled.tr>
+
+          <styled.tr>
+            <td style={cellStyle} colSpan={2}>
+              CONTRIBUTORS
+            </td>
+            <td style={cellStyle}>4</td>
+            <td style={cellStyle} colSpan={2}>
+              MIN MEMORY
+            </td>
+            <td style={cellStyle}>100 MB</td>
+          </styled.tr>
+
+          <styled.tr>
+            <td style={cellStyle} colSpan={2}>
+              GITHUB STARS
+            </td>
+            <td style={cellStyle}>128</td>
+            <td style={cellStyle} colSpan={2}>
+              MIN CORES
+            </td>
+            <td style={cellStyle}>1 CPU</td>
+          </styled.tr>
+        </tbody>
+      </styled.table>
+
+      <styled.table
+        w="full"
+        maxW="breakpoint-md"
+        borderColor="Shades.newspaper"
+        borderStyle="solid"
+        borderWidth="thin"
+        color="Shades.newspaper"
+        fontSize="xs"
+      >
+        <tbody>
+          <styled.tr>
+            <td colSpan={5}>
+              <styled.p
+                aria-hidden
+                fontFamily="gorton"
+                fontSize="2xs"
+                textAlign="end"
+                p="2"
+              >
+                CHART 2 of 2
+              </styled.p>
+            </td>
+          </styled.tr>
+
+          <styled.tr>
+            <td colSpan={5}>
+              <Center w="full" p="4">
+                <styled.h2 fontFamily="gorton" fontSize="lg" textAlign="center">
+                  Up&nbsp;and&nbsp;running&nbsp;before
+                  <wbr />
+                  your&nbsp;coffee&nbsp;gets&nbsp;cold
+                </styled.h2>
+              </Center>
+            </td>
+          </styled.tr>
+
+          <styled.tr>
+            <td colSpan={5}>
+              <Center p="4">
+                <pre>docker run -p 8000:8000 ghcr.io/southclaws/storyden</pre>
+              </Center>
+            </td>
+          </styled.tr>
+
+          <styled.tr>
+            <styled.td style={cellStyle} colSpan={2}>
+              <styled.p p="2" textAlign="center">
+                PLEASE SEE SUPPLIED MANUAL FOR OPERATION INSTRUCTIONS
+              </styled.p>
+            </styled.td>
+            <styled.td style={cellStyle} colSpan={3} textWrap="balance">
+              <styled.p p="2" textAlign="center">
+                OPEN SOURCE SOFTWARE RELEASED TO THE PUBLIC UNDER THE MIT
+                LICENSE
+              </styled.p>
+            </styled.td>
+          </styled.tr>
+        </tbody>
+      </styled.table>
     </VStack>
   );
 }
@@ -1235,6 +1420,7 @@ export default function Home() {
       <Hero />
       <Screenshot />
       <CollectiveMemory />
+      <Milspec />
       {/* <Story /> */}
       {/* <Why />
       <Features />

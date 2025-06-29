@@ -58,3 +58,12 @@ export const intelone = localFont({
   preload: true,
   variable: "--font-intelone",
 });
+
+// prettier-ignore
+export const gorton = localFont({
+  src: [
+    { path: "./static/Gorton-Normal-120.otf", weight: "400" },
+  ],
+  preload: true,
+  variable: "--font-gorton",
+});

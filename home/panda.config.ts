@@ -10,6 +10,7 @@ const tokens = defineTokens({
     worksans: { value: "var(--font-worksans)" },
     hedvig: { value: "var(--font-hedvig)" },
     intelone: { value: "var(--font-intelone)" },
+    gorton: { value: "var(--font-gorton)" },
   },
   colors: {
     Mono: {
