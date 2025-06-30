@@ -628,7 +628,7 @@ function AIDemo() {
           gap="1"
         >
           <SparklesIcon width="16" />
-          <span>auto-place</span>
+          <span>auto-organise</span>
         </HStack>
       </HStack>
     </VStack>
