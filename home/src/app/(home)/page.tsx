@@ -11,7 +11,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
-import { cx } from "@/styled-system/css";
+import { css, cx } from "@/styled-system/css";
 import { linkButton } from "@/styled-system/patterns";
 import { Globe } from "./Globe";
 import {
@@ -21,6 +21,8 @@ import {
   SparklesIcon,
 } from "lucide-react";
 import { gorton } from "@/fonts";
+import { Starfield } from "@/components/Starfield";
+import { token } from "@/styled-system/tokens";
 
 function Hero() {
   return (
@@ -142,88 +144,149 @@ function Screenshot() {
 
 function CollectiveMemory() {
   return (
-    <VStack
+    <Grid
+      maxW="screen"
       bgColor="Mono.slush"
-      py="32"
-      px={{
-        base: "4",
-        sm: "8",
-        md: "12",
-        lg: "32",
-        xl: "48",
-      }}
-      gap="16"
+      gridTemplateRows="1fr"
+      gridTemplateColumns="1fr"
     >
-      <header>
-        <h1>
-          Collective memory.
-          <br />
-          Without the noise.
-        </h1>
-      </header>
-
-      <Grid
-        maxW={{
-          base: "auto",
-          xl: "1200px",
-        }}
-        id="collective-memory__grid"
-        w="full"
-        gap="4"
-        gridTemplateRows={{ base: "1fr 1fr" }}
-        gridTemplateColumns={{ base: "1fr 1fr 1fr" }}
+      <GridItem
+        maxW="screen"
+        containerType="inline-size"
+        id="collective-memory-starfield"
+        gridRow="1"
+        gridColumn="1"
       >
-        <GridItem
-          bgColor="#F6F6F6"
-          borderRadius="xl"
-          boxShadow="sm"
-          gridColumn={{ sm: "1/3" }}
-          display="flex"
-          p="4"
+        <Starfield
+          particleColors={[
+            token("colors.Mono.ink"),
+            token("colors.Shades.iron"),
+            token("colors.Shades.newspaper"),
+            token("colors.Shades.slate"),
+            token("colors.Shades.stone"),
+            token("colors.Primary.moonlit"),
+          ]}
+          particleCount={500}
+          particleSpread={10}
+          speed={0.01}
+          particleBaseSize={100}
+          moveParticlesOnHover={true}
+          alphaParticles={false}
+          disableRotation={false}
+          className={css({
+            // zIndex: "2",
+            width: "full",
+            height: "full",
+          })}
+        />
+      </GridItem>
+
+      <GridItem gridRow="1" gridColumn="1">
+        <VStack
+          py={{
+            base: "8",
+            md: "16",
+          }}
+          // px={{
+          //   base: "4",
+          //   sm: "8",
+          //   md: "12",
+          //   lg: "32",
+          //   xl: "48",
+          // }}
+          gap={{ base: "8", md: "16", lg: "16" }}
         >
-          <VStack
-            h="full"
-            alignItems="start"
-            flexGrow="3"
-            // justifyContent="space-between"
+          <header>
+            <h1>
+              Collective memory.
+              <br />
+              Without the noise.
+            </h1>
+          </header>
+
+          <Grid
+            maxW={{
+              base: "auto",
+              xl: "1200px",
+            }}
+            id="collective-memory__grid"
+            w="full"
             gap="4"
+            px={{
+              base: "8",
+              sm: "32",
+              // lg: "auto",
+            }}
+            gridTemplateRows={{ base: "1fr", lg: "1fr 1fr" }}
+            gridTemplateColumns={{ base: "1fr", lg: "1fr 1fr 1fr" }}
           >
-            <h2>Communities deserve permanence.</h2>
+            <GridItem
+              id="grid-1"
+              gridColumn={{ base: "1/2", lg: "1/3" }}
+              gridRow={{ base: "1/2" }}
+              bgColor="#F6F6F6"
+              borderRadius="xl"
+              boxShadow="sm"
+              display="flex"
+              p="4"
+            >
+              <VStack
+                h="full"
+                alignItems="start"
+                flexGrow="3"
+                // justifyContent="space-between"
+                gap="4"
+              >
+                <h2>Communities deserve permanence.</h2>
 
-            <VStack h="full" justify="center">
-              <styled.p>
-                In a web of fleeting <strong>feeds</strong> and forgotten
-                threads, Storyden makes <strong>what matters</strong> stay
-                discoverable, readable, and shareable. <strong>Forever</strong>.
-              </styled.p>
-              <p>~</p>
-              <p>
-                Own your <strong>data</strong>. Run your own Reddit, your own
-                Pinterest, your own Hacker News, your own{" "}
-                <strong>corner</strong> of the web.
-              </p>
-            </VStack>
-          </VStack>
+                <VStack h="full" justify="center">
+                  <styled.p>
+                    In a web of fleeting <strong>feeds</strong> and forgotten
+                    threads, Storyden makes <strong>what matters</strong> stay
+                    discoverable, readable, and shareable.{" "}
+                    <strong>Forever</strong>.
+                  </styled.p>
+                  <p>~</p>
+                  <p>
+                    Own your <strong>data</strong>. Run your own Reddit, your
+                    own Pinterest, your own Hacker News, your own{" "}
+                    <strong>corner</strong> of the web.
+                  </p>
+                </VStack>
+              </VStack>
 
-          <Box flexGrow="1" h="full" w="1/3" aspectRatio="1" borderRadius="lg">
-            <Globe w="full" />
-          </Box>
-        </GridItem>
-        <GridItem
-          position="relative"
-          bgColor="#F6F6F6"
-          borderRadius="xl"
-          boxShadow="sm"
-          backgroundImage="linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(245, 245, 245, 0.62) 63%, rgba(245, 245, 245, 1) 86%), url('/square-tree-smol.png')"
-          backgroundSize="cover"
-          backgroundPosition="top"
-          overflowClipMargin="unset"
-          display="flex"
-          flexDir="column"
-          justifyContent="space-between"
-          overflow="hidden"
-        >
-          {/* <Image
+              <Box
+                flexGrow="1"
+                h="full"
+                w="1/3"
+                aspectRatio="1"
+                borderRadius="lg"
+                display={{
+                  base: "none",
+                  lg: "block",
+                }}
+              >
+                <Globe w="full" aria-hidden />
+              </Box>
+            </GridItem>
+            <GridItem
+              id="grid-2"
+              gridColumn={{ base: "1/2", lg: "1/3", xl: "1/2" }}
+              gridRow={{ base: "2/3" }}
+              position="relative"
+              bgColor="#F6F6F6"
+              borderRadius="xl"
+              boxShadow="sm"
+              backgroundImage="linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(245, 245, 245, 0.62) 63%, rgba(245, 245, 245, 1) 86%), url('/square-tree-smol.png')"
+              backgroundSize="cover"
+              backgroundPosition="top"
+              overflowClipMargin="unset"
+              display="flex"
+              flexDir="column"
+              justifyContent="space-between"
+              overflow="hidden"
+            >
+              {/* <Image
             className={css({
               position: "absolute",
               top: "0",
@@ -241,89 +304,95 @@ function CollectiveMemory() {
             height="1024"
             alt=""
           /> */}
-          <Box p="4">
-            <styled.h2
-              color="Mono.slush"
-              textShadow="4px 5px 8px rgba(0,0,0,1)"
+              <Box p="4">
+                <styled.h2
+                  color="Mono.slush"
+                  textShadow="4px 5px 8px rgba(0,0,0,1)"
+                >
+                  Knowledge gardens, not content farms.
+                </styled.h2>
+              </Box>
+
+              <Box height={{ base: "12" }} />
+
+              <styled.p
+                backgroundColor="white/20"
+                backdropBlur="sm"
+                backdropFilter="auto"
+                // background="linear-gradient(180deg, rgba(1, 1, 1, 0.1) 25%, rgba(240, 240, 240, 1) 100%)"
+                borderBottomRadius="md"
+                p="6"
+                textWrap="pretty"
+              >
+                From fan <strong>clubs</strong> to research groups, digital
+                zines to esports <strong>teams</strong>. For anyone who cares
+                about ideas and the <strong>people</strong> behind them.
+              </styled.p>
+            </GridItem>
+            <GridItem
+              id="grid-3"
+              gridColumn={{ base: "1/2", lg: "1/3", xl: "2/3" }}
+              gridRow={{ base: "3/4", lg: "3/4", xl: "2/3" }}
+              bgColor="#F6F6F6"
+              borderRadius="xl"
+              boxShadow="sm"
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              p="6"
+              gap="2"
             >
-              Knowledge gardens, not content farms.
-            </styled.h2>
-          </Box>
+              <Box p="4">
+                <Image
+                  src="/accessibility.png"
+                  width="120"
+                  height="120"
+                  alt="The accessibility icon"
+                />
+              </Box>
+              <styled.p textWrap="pretty">
+                Optimised for <strong>humans</strong>, ready for the web{" "}
+                <strong>renaissance</strong>. A stable foundation for the future
+                decades of internet citizens and the <strong>networks</strong>{" "}
+                they build.
+              </styled.p>
+            </GridItem>
+            <GridItem
+              id="grid-4"
+              gridColumn={{ base: "1/2", lg: "3/4" }}
+              gridRow={{ base: "4/6", lg: "1/4", xl: "1/3" }}
+              bgColor="#F6F6F6"
+              borderRadius="xl"
+              boxShadow="sm"
+              p="4"
+              display="flex"
+              flexDir="column"
+              gap="4"
+              // Maybe?
+              // transform="perspective(1500px) rotateX(2deg) rotateY(-2deg)"
+            >
+              <Box>
+                <h2>Extensible simplicity.</h2>
 
-          <Box height={{ base: "12" }} />
+                <p>
+                  Storyden gives you the core tools of a forum, wiki and
+                  curation platform.
+                </p>
+              </Box>
 
-          <styled.p
-            backgroundColor="white/20"
-            backdropBlur="sm"
-            backdropFilter="auto"
-            // background="linear-gradient(180deg, rgba(1, 1, 1, 0.1) 25%, rgba(240, 240, 240, 1) 100%)"
-            borderBottomRadius="md"
-            p="6"
-            textWrap="pretty"
-          >
-            From fan <strong>clubs</strong> to research groups, digital zines to
-            esports <strong>teams</strong>. For anyone who cares about ideas and
-            the <strong>people</strong> behind them.
-          </styled.p>
-        </GridItem>
-        <GridItem
-          bgColor="#F6F6F6"
-          borderRadius="xl"
-          boxShadow="sm"
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          p="6"
-          gap="2"
-        >
-          <Box p="4">
-            <Image
-              src="/accessibility.png"
-              width="120"
-              height="120"
-              alt="The accessibility icon"
-            />
-          </Box>
-          <styled.p textWrap="pretty">
-            Optimised for <strong>humans</strong>, ready for the web{" "}
-            <strong>renaissance</strong>. A stable foundation for the future
-            decades of internet citizens and the <strong>networks</strong> they
-            build.
-          </styled.p>
-        </GridItem>
-        <GridItem
-          bgColor="#F6F6F6"
-          borderRadius="xl"
-          boxShadow="sm"
-          gridColumn={{ sm: "3/4" }}
-          gridRow={{ sm: "1/3" }}
-          p="4"
-          display="flex"
-          flexDir="column"
-          gap="4"
-          // Maybe?
-          // transform="perspective(1500px) rotateX(2deg) rotateY(-2deg)"
-        >
-          <Box>
-            <h2>Extensible simplicity.</h2>
-
-            <p>
-              Storyden gives you the core tools of a forum, wiki and curation
-              platform.
-            </p>
-          </Box>
-
-          <VStack h="full" justify="space-between" alignItems="start">
-            <styled.h3 color="Shades.iron/80">Discuss.</styled.h3>
-            <ThreadDemo />
-            <styled.h3 color="Shades.iron/80">Curate.</styled.h3>
-            <LibraryDemo />
-            <styled.h3 color="Shades.iron/80">Effortlessly.</styled.h3>
-            <AIDemo />
-          </VStack>
-        </GridItem>
-      </Grid>
-    </VStack>
+              <VStack h="full" justify="space-between" alignItems="start">
+                <styled.h3 color="Shades.iron/80">Discuss.</styled.h3>
+                <ThreadDemo />
+                <styled.h3 color="Shades.iron/80">Curate.</styled.h3>
+                <LibraryDemo />
+                <styled.h3 color="Shades.iron/80">Effortlessly.</styled.h3>
+                <AIDemo />
+              </VStack>
+            </GridItem>
+          </Grid>
+        </VStack>
+      </GridItem>
+    </Grid>
   );
 }
 
@@ -360,13 +429,13 @@ function ThreadDemo() {
       <HStack w="full" alignItems="center" justify="space-between">
         <HStack alignItems="center" gap="1">
           <Image src="/landing/avatar.png" width="24" height="24" alt="" />
-          <styled.p color="gray.500">
+          <styled.div color="gray.500">
             <HStack gap="1">
               <span>@southclaws</span>
               <span>•</span>
               <span>1h ago</span>
             </HStack>
-          </styled.p>
+          </styled.div>
         </HStack>
 
         <Box _hover={{ bgColor: "black/5" }} borderRadius="sm" p="1">
@@ -511,7 +580,7 @@ function AIDemo() {
 
         <HStack w="full">
           <styled.input
-            value="https://www.typewolf.com/"
+            defaultValue="https://www.typewolf.com/"
             w="full"
             minW="0"
             maxW="full"
@@ -722,7 +791,12 @@ function Milspec() {
             </td>
           </styled.tr>
 
-          <styled.tr>
+          <styled.tr
+            display={{
+              base: "none", // Don't show docker run command on mobile
+              md: "table-row",
+            }}
+          >
             <td colSpan={5}>
               <Center p="4">
                 <pre>docker run -p 8000:8000 ghcr.io/southclaws/storyden</pre>
@@ -732,15 +806,22 @@ function Milspec() {
 
           <styled.tr>
             <styled.td style={cellStyle} colSpan={2}>
-              <styled.p p="2" textAlign="center">
-                PLEASE SEE SUPPLIED MANUAL FOR OPERATION INSTRUCTIONS
-              </styled.p>
+              <Link href="/docs/introduction">
+                <styled.p p="2" textAlign="center">
+                  PLEASE SEE SUPPLIED MANUAL FOR OPERATION INSTRUCTIONS
+                </styled.p>
+              </Link>
             </styled.td>
             <styled.td style={cellStyle} colSpan={3} textWrap="balance">
-              <styled.p p="2" textAlign="center">
-                OPEN SOURCE SOFTWARE RELEASED TO THE PUBLIC UNDER THE MIT
-                LICENSE
-              </styled.p>
+              <Link
+                href="https://github.com/Southclaws/storyden"
+                target="_blank"
+              >
+                <styled.p p="2" textAlign="center">
+                  OPEN SOURCE SOFTWARE RELEASED TO THE PUBLIC UNDER THE MIT
+                  LICENSE
+                </styled.p>
+              </Link>
             </styled.td>
           </styled.tr>
         </tbody>
