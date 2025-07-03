@@ -24,6 +24,7 @@ import { gorton } from "@/fonts";
 import { Starfield } from "@/components/Starfield";
 import { token } from "@/styled-system/tokens";
 import { StorydenComputer } from "@/components/StorydenComputer";
+import { CssProperties } from "@/styled-system/types";
 
 function Hero() {
   return (
@@ -638,6 +639,15 @@ function AIDemo() {
 
 const cellStyle = { border: "1px solid currentColor", padding: "4px" };
 
+const cellFonts = css({
+  fontSize: {
+    base: "2xs",
+    sm: "xs",
+    md: "sm",
+    lg: "md",
+  },
+});
+
 function Milspec() {
   return (
     <VStack
@@ -703,7 +713,7 @@ function Milspec() {
             </td>
           </styled.tr>
 
-          <styled.tr>
+          <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
               LINES OF CODE
             </td>
@@ -724,21 +734,21 @@ function Milspec() {
             </td>
           </styled.tr>
 
-          <styled.tr>
+          <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
               GIT COMMITS
             </td>
             <td style={cellStyle}>2,392</td>
           </styled.tr>
 
-          <styled.tr>
+          <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
               API ENDPOINTS
             </td>
             <td style={cellStyle}>89</td>
           </styled.tr>
 
-          <styled.tr>
+          <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
               CONTRIBUTORS
             </td>
@@ -749,7 +759,7 @@ function Milspec() {
             <td style={cellStyle}>100 MB</td>
           </styled.tr>
 
-          <styled.tr>
+          <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
               GITHUB STARS
             </td>
