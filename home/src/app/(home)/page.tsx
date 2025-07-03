@@ -642,9 +642,22 @@ function Milspec() {
   return (
     <VStack
       bgColor="Mono.ink"
-      py="16"
-      px="16"
-      gap="16"
+      py={{
+        base: "4",
+        sm: "12",
+        md: "16",
+        lg: "20",
+      }}
+      px={{
+        base: "4",
+        sm: "8",
+        md: "12",
+        lg: "16",
+      }}
+      gap={{
+        base: "4",
+        md: "8",
+      }}
       fontFamily="gorton"
       letterSpacing="widest"
     >
