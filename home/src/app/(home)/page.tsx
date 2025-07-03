@@ -1492,9 +1492,9 @@ function CTA() {
 export default function Home() {
   return (
     <Box>
-      {/* <Hero />
+      <Hero />
       <Screenshot />
-      <CollectiveMemory /> */}
+      <CollectiveMemory />
       <Milspec />
       {/* <Story /> */}
       {/* <Why />
