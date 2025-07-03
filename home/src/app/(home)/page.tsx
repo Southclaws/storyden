@@ -23,6 +23,7 @@ import {
 import { gorton } from "@/fonts";
 import { Starfield } from "@/components/Starfield";
 import { token } from "@/styled-system/tokens";
+import { StorydenComputer } from "@/components/StorydenComputer";
 
 function Hero() {
   return (
@@ -649,7 +650,7 @@ function Milspec() {
     >
       <styled.table
         w="full"
-        maxW="breakpoint-md"
+        maxW="breakpoint-lg"
         borderColor="Shades.newspaper"
         borderStyle="solid"
         borderWidth="thin"
@@ -685,14 +686,7 @@ function Milspec() {
 
           <styled.tr>
             <td colSpan={6}>
-              <Center w="full">
-                <Image
-                  src="/landing/SD2000-SEMDEX-HUMAN-COMPUTER-KNOWLEDGE-SYSTEM.png"
-                  width="920"
-                  height="569"
-                  alt=""
-                />
-              </Center>
+              <StorydenComputer />
             </td>
           </styled.tr>
 
@@ -757,7 +751,7 @@ function Milspec() {
 
       <styled.table
         w="full"
-        maxW="breakpoint-md"
+        maxW="breakpoint-lg"
         borderColor="Shades.newspaper"
         borderStyle="solid"
         borderWidth="thin"
@@ -1498,9 +1492,9 @@ function CTA() {
 export default function Home() {
   return (
     <Box>
-      <Hero />
+      {/* <Hero />
       <Screenshot />
-      <CollectiveMemory />
+      <CollectiveMemory /> */}
       <Milspec />
       {/* <Story /> */}
       {/* <Why />
