@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@fumadocs/mdx-remote": "^1.3.2",
+    "@uidotdev/usehooks": "^2.4.1",
     "autoprefixer": "^10.4.21",
     "cobe": "^0.6.3",
     "date-fns": "^4.1.0",

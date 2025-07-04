@@ -15,6 +15,7 @@ import { css, cx } from "@/styled-system/css";
 import { linkButton } from "@/styled-system/patterns";
 import { Globe } from "./Globe";
 import {
+  CopyIcon,
   EllipsisIcon,
   PlusIcon,
   SparkleIcon,
@@ -25,6 +26,7 @@ import { Starfield } from "@/components/Starfield";
 import { token } from "@/styled-system/tokens";
 import { StorydenComputer } from "@/components/StorydenComputer";
 import { CssProperties } from "@/styled-system/types";
+import { DockerCopyButton } from "@/components/DockerCopyButton";
 
 function Hero() {
   return (
@@ -816,7 +818,7 @@ function Milspec() {
           >
             <td colSpan={5}>
               <Center p="4">
-                <pre>docker run -p 8000:8000 ghcr.io/southclaws/storyden</pre>
+                <DockerCopyButton />
               </Center>
             </td>
           </styled.tr>
