@@ -27,7 +27,7 @@ const labelCopy: Record<label, { n: number; h: string; p: ReactElement }> = {
     h: "SQLITE OR POSTGRESQL",
     p: (
       <>
-        <p>Production-ready no matter which is your favourite.</p>
+        <p>Production-ready whichever you choose.</p>
       </>
     ),
   },
@@ -36,7 +36,7 @@ const labelCopy: Record<label, { n: number; h: string; p: ReactElement }> = {
     h: "FILESYSTEM OR S3",
     p: (
       <>
-        <p>Store your files on the filesystem or use S3 for scalability.</p>
+        <p>Keep it simple or make it scalable.</p>
       </>
     ),
   },
@@ -45,7 +45,17 @@ const labelCopy: Record<label, { n: number; h: string; p: ReactElement }> = {
     h: "STATE OF THE ART SECURITY",
     p: (
       <>
-        <p>Built with security in mind, protecting your data and users.</p>
+        <p>
+          This ain't no PHP spaghetti.
+          <br />
+          <strong
+            aria-hidden="true" /* don't announce this joke, it probably wouldn't make sense or would sound weird to a blind user */
+          >
+            '); DROP TABLE accounts;
+          </strong>
+          <br />
+          We do things properly.
+        </p>
       </>
     ),
   },
@@ -54,7 +64,10 @@ const labelCopy: Record<label, { n: number; h: string; p: ReactElement }> = {
     h: "CONTAINERISED",
     p: (
       <>
-        <p>Easily deployable in a containerized environment.</p>
+        <p>
+          No thousand line bash install scripts. Throw on your VPS, Fly.io or if
+          you're feeling over-engineery, Kubernetes!
+        </p>
       </>
     ),
   },
@@ -63,7 +76,7 @@ const labelCopy: Record<label, { n: number; h: string; p: ReactElement }> = {
     h: "HEADLESS OPTION",
     p: (
       <>
-        <p>Run Storyden in headless mode for backend services.</p>
+        <p>Despise our design? Build your own frontend WordPress style.</p>
       </>
     ),
   },
@@ -72,7 +85,10 @@ const labelCopy: Record<label, { n: number; h: string; p: ReactElement }> = {
     h: "OPENAPI SPEC",
     p: (
       <>
-        <p>Fully documented API with OpenAPI specification.</p>
+        <p>
+          Fully documented API with a hand-crafted (with love) OpenAPI
+          specification.
+        </p>
       </>
     ),
   },
@@ -350,10 +366,11 @@ const Label = forwardRef<
 >(({ children, onClick }, ref) => (
   <Box ref={ref} onClick={onClick} p={{ base: "0.5", sm: "1" }}>
     {/* TODO: Use a Button for semantics */}
-    <styled.p
+    <styled.button
       fontFamily="gorton"
       textAlign="center"
       color="Shades.newspaper"
+      cursor="pointer"
       fontSize={{
         base: "2xs",
         sm: "xs",
@@ -362,7 +379,7 @@ const Label = forwardRef<
       width="min"
     >
       {children}
-    </styled.p>
+    </styled.button>
   </Box>
 ));
 
@@ -421,6 +438,7 @@ function Modal({ label, onClick }: { label: label; onClick: () => void }) {
                     md: "lg",
                     lg: "xl",
                   }}
+                  textWrap="balance"
                 >
                   {labelCopy[label].p}
                 </styled.p>
