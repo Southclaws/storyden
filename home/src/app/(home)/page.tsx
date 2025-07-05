@@ -1,6 +1,6 @@
 import {
   Box,
-  Divider,
+  Center,
   Flex,
   Grid,
   GridItem,
@@ -13,6 +13,20 @@ import Link from "next/link";
 
 import { css, cx } from "@/styled-system/css";
 import { linkButton } from "@/styled-system/patterns";
+import { Globe } from "./Globe";
+import {
+  CopyIcon,
+  EllipsisIcon,
+  PlusIcon,
+  SparkleIcon,
+  SparklesIcon,
+} from "lucide-react";
+import { gorton } from "@/fonts";
+import { Starfield } from "@/components/Starfield";
+import { token } from "@/styled-system/tokens";
+import { StorydenComputer } from "@/components/StorydenComputer";
+import { CssProperties } from "@/styled-system/types";
+import { DockerCopyButton } from "@/components/DockerCopyButton";
 
 function Hero() {
   return (
@@ -64,6 +78,7 @@ function Hero() {
             <Link
               className={linkButton({
                 backgroundColor: "white",
+                boxShadow: "xl",
               })}
               href="/docs/introduction"
             >
@@ -77,6 +92,7 @@ function Hero() {
                   backdropBlur: "lg",
                   backdropFilter: "auto",
                   backgroundColor: "rgba(98, 98, 98, 0.5)",
+                  boxShadow: "xl",
                   color: "white",
                   _hover: {
                     color: "black",
@@ -97,14 +113,21 @@ function Hero() {
 
 function Screenshot() {
   return (
-    <Box maxW="100vw" w="full" bgColor="black">
+    <Box
+      maxW="100vw"
+      w="full"
+      maxH={{
+        base: "30vh",
+        sm: "40vh",
+        md: "50vh",
+        lg: "70vh",
+      }}
+      overflowY="hidden"
+      bgColor="black"
+    >
       <VStack
         position="relative"
         zIndex="20"
-        top={{
-          base: "-16",
-          xl: "-32",
-        }}
         w="full"
         paddingX={{
           base: "4",
@@ -119,6 +142,7 @@ function Screenshot() {
             srcSet="2025_app_screenshot_viewport.png"
           />
           <source media="(min-width: 768px)" srcSet="2025_app_screenshot.png" />
+          <source media="(min-width: 768px)" srcSet="2025_app_screenshot.png" />
           <img
             src="2025_app_screenshot.png"
             alt=""
@@ -129,6 +153,709 @@ function Screenshot() {
         </picture>
       </VStack>
     </Box>
+  );
+}
+
+function CollectiveMemory() {
+  return (
+    <Grid
+      maxW="screen"
+      bgColor="Mono.slush"
+      gridTemplateRows="1fr"
+      gridTemplateColumns="1fr"
+    >
+      <GridItem
+        maxW="screen"
+        containerType="inline-size"
+        id="collective-memory-starfield"
+        gridRow="1"
+        gridColumn="1"
+      >
+        <Starfield
+          particleColors={[
+            token("colors.Mono.ink"),
+            token("colors.Shades.iron"),
+            token("colors.Shades.newspaper"),
+            token("colors.Shades.slate"),
+            token("colors.Shades.stone"),
+            token("colors.Primary.moonlit"),
+          ]}
+          particleCount={500}
+          particleSpread={5}
+          speed={0.01}
+          particleBaseSize={100}
+          alphaParticles={true}
+          disableRotation={false}
+          className={css({
+            // zIndex: "2",
+            width: "full",
+            height: "full",
+          })}
+        />
+      </GridItem>
+
+      <GridItem gridRow="1" gridColumn="1">
+        <VStack
+          py={{
+            base: "8",
+            md: "16",
+          }}
+          // px={{
+          //   base: "4",
+          //   sm: "8",
+          //   md: "12",
+          //   lg: "32",
+          //   xl: "48",
+          // }}
+          gap={{ base: "8", md: "16", lg: "16" }}
+        >
+          <header>
+            <h1>
+              Collective memory.
+              <br />
+              Without the noise.
+            </h1>
+          </header>
+
+          <Grid
+            maxW={{
+              base: "auto",
+              xl: "1200px",
+            }}
+            id="collective-memory__grid"
+            w="full"
+            gap="4"
+            px={{
+              base: "4",
+              sm: "8",
+              md: "32",
+            }}
+            gridTemplateRows={{ base: "1fr", lg: "1fr 1fr" }}
+            gridTemplateColumns={{ base: "1fr", lg: "1fr 1fr 1fr" }}
+          >
+            <GridItem
+              id="grid-1"
+              gridColumn={{ base: "1/2", lg: "1/3" }}
+              gridRow={{ base: "1/2" }}
+              bgColor="#F6F6F6"
+              borderRadius="xl"
+              boxShadow="sm"
+              display="flex"
+              p="4"
+            >
+              <VStack
+                h="full"
+                alignItems="start"
+                flexGrow="3"
+                // justifyContent="space-between"
+                gap="4"
+              >
+                <h2>Communities deserve permanence.</h2>
+
+                <VStack h="full" justify="center">
+                  <styled.p>
+                    In a web of fleeting <strong>feeds</strong> and forgotten
+                    threads, Storyden makes <strong>what matters</strong> stay
+                    discoverable, readable, and shareable.{" "}
+                    <strong>Forever</strong>.
+                  </styled.p>
+                  <p>~</p>
+                  <p>
+                    Own your <strong>data</strong>. Run your own Reddit, your
+                    own Pinterest, your own Hacker News, your own{" "}
+                    <strong>corner</strong> of the web.
+                  </p>
+                </VStack>
+              </VStack>
+
+              <Box
+                flexGrow="1"
+                h="full"
+                w="1/3"
+                aspectRatio="1"
+                borderRadius="lg"
+                display={{
+                  base: "none",
+                  lg: "block",
+                }}
+              >
+                <Globe w="full" aria-hidden />
+              </Box>
+            </GridItem>
+            <GridItem
+              id="grid-2"
+              gridColumn={{ base: "1/2", lg: "1/3", xl: "1/2" }}
+              gridRow={{ base: "2/3" }}
+              position="relative"
+              bgColor="#F6F6F6"
+              borderRadius="xl"
+              boxShadow="sm"
+              backgroundImage="linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(245, 245, 245, 0.62) 63%, rgba(245, 245, 245, 1) 86%), url('/square-tree-smol.png')"
+              backgroundSize="cover"
+              backgroundPosition="top"
+              overflowClipMargin="unset"
+              display="flex"
+              flexDir="column"
+              justifyContent="space-between"
+              overflow="hidden"
+            >
+              {/* <Image
+            className={css({
+              position: "absolute",
+              top: "0",
+              left: "0",
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              borderTopRadius: "md",
+              borderBottomRadius: "2xl",
+              background:
+                "linear-gradient(180deg, rgba(1, 1, 1, 0.1) 25%, rgba(240, 240, 240, 1) 100%)",
+            })}
+            src="/square-tree-smol.png"
+            width="1024"
+            height="1024"
+            alt=""
+          /> */}
+              <Box p="4">
+                <styled.h2
+                  color="Mono.slush"
+                  textShadow="4px 5px 8px rgba(0,0,0,1)"
+                >
+                  Knowledge gardens, not content farms.
+                </styled.h2>
+              </Box>
+
+              <Box height={{ base: "12" }} />
+
+              <styled.p
+                backgroundColor="white/20"
+                backdropBlur="sm"
+                backdropFilter="auto"
+                // background="linear-gradient(180deg, rgba(1, 1, 1, 0.1) 25%, rgba(240, 240, 240, 1) 100%)"
+                borderBottomRadius="md"
+                p="6"
+                textWrap="pretty"
+              >
+                From fan <strong>clubs</strong> to research groups, digital
+                zines to esports <strong>teams</strong>. For anyone who cares
+                about ideas and the <strong>people</strong> behind them.
+              </styled.p>
+            </GridItem>
+            <GridItem
+              id="grid-3"
+              gridColumn={{ base: "1/2", lg: "1/3", xl: "2/3" }}
+              gridRow={{ base: "3/4", lg: "3/4", xl: "2/3" }}
+              bgColor="#F6F6F6"
+              borderRadius="xl"
+              boxShadow="sm"
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              p="6"
+              gap="2"
+            >
+              <Box p="4">
+                <Image
+                  src="/accessibility.png"
+                  width="120"
+                  height="120"
+                  alt="The accessibility icon"
+                />
+              </Box>
+              <styled.p textWrap="pretty">
+                Optimised for <strong>humans</strong>, ready for the web{" "}
+                <strong>renaissance</strong>. A stable foundation for the future
+                decades of internet citizens and the <strong>networks</strong>{" "}
+                they build.
+              </styled.p>
+            </GridItem>
+            <GridItem
+              id="grid-4"
+              gridColumn={{ base: "1/2", lg: "3/4" }}
+              gridRow={{ base: "4/6", lg: "1/4", xl: "1/3" }}
+              bgColor="#F6F6F6"
+              borderRadius="xl"
+              boxShadow="sm"
+              p="4"
+              display="flex"
+              flexDir="column"
+              gap="4"
+              // Maybe?
+              // transform="perspective(1500px) rotateX(2deg) rotateY(-2deg)"
+            >
+              <Box>
+                <h2>Extensible simplicity.</h2>
+
+                <p>
+                  Storyden gives you the core tools of a forum, wiki and
+                  curation platform.
+                </p>
+              </Box>
+
+              <VStack h="full" justify="space-between" alignItems="start">
+                <styled.h3 color="Shades.iron/80">Discuss.</styled.h3>
+                <ThreadDemo />
+                <styled.h3 color="Shades.iron/80">Curate.</styled.h3>
+                <LibraryDemo />
+                <styled.h3 color="Shades.iron/80">Effortlessly.</styled.h3>
+                <AIDemo />
+              </VStack>
+            </GridItem>
+          </Grid>
+        </VStack>
+      </GridItem>
+    </Grid>
+  );
+}
+
+function ThreadDemo() {
+  return (
+    <VStack
+      bgColor="white"
+      borderRadius="md"
+      boxShadow="md"
+      width="full"
+      height="min"
+      p="2"
+      fontFamily="worksans"
+      alignItems="start"
+      justify="space-between"
+      // transform="perspective(2500px) rotateX(-10deg) rotateY(10deg)"
+    >
+      <VStack gap="1" alignItems="start">
+        <styled.p fontWeight="semibold" lineClamp="1">
+          The Hardest Working Font in Manhattan
+        </styled.p>
+        <styled.p lineClamp="2" color="black/70">
+          For the typograhy nerds, I thought this was really cool, check it out:{" "}
+          <styled.a
+            textOverflow="ellipsis"
+            wordBreak="break-all"
+            href="https://aresluna.org/the-hardest-working-font-in-manhattan"
+          >
+            https://aresluna.org/the-hardest-working-font-in-manhattan
+          </styled.a>
+        </styled.p>
+      </VStack>
+
+      <HStack w="full" alignItems="center" justify="space-between">
+        <HStack alignItems="center" gap="1">
+          <Image src="/landing/avatar.png" width="24" height="24" alt="" />
+          <styled.div color="gray.500">
+            <HStack gap="1">
+              <span>@southclaws</span>
+              <span>•</span>
+              <span>1h ago</span>
+            </HStack>
+          </styled.div>
+        </HStack>
+
+        <Box _hover={{ bgColor: "black/5" }} borderRadius="sm" p="1">
+          <EllipsisIcon width="16" height="16" />
+        </Box>
+      </HStack>
+    </VStack>
+  );
+}
+
+function LibraryDemo() {
+  return (
+    <VStack
+      bgColor="white"
+      borderRadius="md"
+      boxShadow="md"
+      width="full"
+      height="min"
+      p="2"
+      fontFamily="worksans"
+      alignItems="start"
+      justify="space-between"
+      // transform="perspective(2500px) rotateX(-10deg) rotateY(10deg)"
+    >
+      <VStack gap="1" alignItems="start">
+        <HStack w="full" justify="space-between" alignItems="center">
+          <styled.p fontWeight="semibold">Design Resources</styled.p>
+          <styled.span
+            bgColor="black/10"
+            borderRadius="md"
+            px="2"
+            fontSize="sm"
+          >
+            67 items
+          </styled.span>
+        </HStack>
+        <styled.p lineClamp="2" color="black/70">
+          A curated list by our members of the best resources for design skills.
+          Contribute your own best finds!
+        </styled.p>
+      </VStack>
+
+      <HStack w="full" alignItems="center" justify="space-between">
+        <HStack alignItems="center" gap="1">
+          <Box
+            bgColor="green.700"
+            color="green.400"
+            borderRadius="md"
+            px="1"
+            fontSize="sm"
+          >
+            <span>design</span>
+          </Box>
+          <Box
+            bgColor="blue.600"
+            color="blue.200"
+            borderRadius="md"
+            px="1"
+            fontSize="sm"
+          >
+            <span>list</span>
+          </Box>
+          <Box
+            bgColor="pink.600"
+            color="pink.200"
+            borderRadius="md"
+            px="1"
+            fontSize="sm"
+          >
+            <span>career</span>
+          </Box>
+          <Box
+            bgColor="teal.600"
+            color="teal.200"
+            borderRadius="md"
+            px="1"
+            fontSize="sm"
+          >
+            <span>resources</span>
+          </Box>
+        </HStack>
+
+        <Box _hover={{ bgColor: "black/5" }} borderRadius="sm" p="1">
+          <EllipsisIcon width="16" height="16" />
+        </Box>
+      </HStack>
+    </VStack>
+  );
+}
+
+function AIDemo() {
+  return (
+    <VStack
+      bgColor="white"
+      borderRadius="md"
+      boxShadow="md"
+      width="full"
+      height="min"
+      p="2"
+      fontFamily="worksans"
+      alignItems="start"
+      justify="space-between"
+      // transform="perspective(2500px) rotateX(-10deg) rotateY(10deg)"
+      cursor="default"
+      userSelect="none"
+    >
+      <VStack w="full" gap="2" alignItems="start">
+        <HStack w="full" alignItems="center">
+          {/* <styled.p
+            fontWeight="semibold"
+            display="inline-flex"
+            alignItems="center"
+            gap="1"
+          >
+            <span>New page </span>
+            
+          </styled.p>
+          <styled.span
+            bgColor="black/10"
+            borderRadius="md"
+            px="1"
+            fontSize="sm"
+          >
+            source: URL
+          </styled.span> */}
+
+          <styled.span
+            fontWeight="semibold"
+            display="inline-flex"
+            alignItems="center"
+            gap="1"
+            bgColor="black/80"
+            color="white/90"
+            borderRadius="md"
+            pr="2"
+            pl="1"
+          >
+            <PlusIcon width="16" />
+            New page
+          </styled.span>
+        </HStack>
+
+        <HStack w="full">
+          <styled.input
+            defaultValue="https://www.typewolf.com/"
+            w="full"
+            minW="0"
+            maxW="full"
+            bgColor="white/90"
+            borderWidth="thin"
+            borderStyle="solid"
+            borderColor="black/10"
+            borderRadius="md"
+            _active={{
+              outline: "none",
+            }}
+            _focus={{
+              outline: "none",
+            }}
+            px="2"
+          />
+        </HStack>
+
+        <styled.p lineClamp="1">
+          <styled.span fontWeight="medium">Title: </styled.span>
+          <styled.span fontStyle="italic">
+            What’s Trending in Type · Typewolf
+          </styled.span>
+        </styled.p>
+      </VStack>
+
+      <HStack w="full" alignItems="center" gap="2">
+        <HStack
+          bgColor="black/10"
+          color="Mono.ink/80"
+          borderRadius="md"
+          px="1"
+          fontSize="sm"
+          gap="1"
+        >
+          <SparklesIcon width="16" />
+          <span>auto-tag</span>
+        </HStack>
+        <HStack
+          bgColor="black/10"
+          color="Mono.ink/80"
+          borderRadius="md"
+          px="1"
+          fontSize="sm"
+          gap="1"
+        >
+          <SparklesIcon width="16" />
+          <span>auto-organise</span>
+        </HStack>
+      </HStack>
+    </VStack>
+  );
+}
+
+const cellStyle = { border: "1px solid currentColor", padding: "4px" };
+
+const cellFonts = css({
+  fontSize: {
+    base: "2xs",
+    sm: "xs",
+    md: "sm",
+    lg: "md",
+  },
+});
+
+async function Milspec() {
+  const stats = await getStats();
+  return (
+    <VStack
+      bgColor="Mono.ink"
+      py={{
+        base: "4",
+        sm: "12",
+        md: "16",
+        lg: "20",
+      }}
+      px={{
+        base: "4",
+        sm: "8",
+        md: "12",
+        lg: "16",
+      }}
+      gap={{
+        base: "4",
+        md: "8",
+      }}
+      fontFamily="gorton"
+      letterSpacing="widest"
+    >
+      <styled.table
+        w="full"
+        maxW="breakpoint-lg"
+        borderColor="Shades.newspaper"
+        borderStyle="solid"
+        borderWidth="thin"
+        color="Shades.newspaper"
+        fontSize="xs"
+      >
+        <tbody>
+          <styled.tr>
+            <td colSpan={6}>
+              <styled.p
+                aria-hidden
+                fontFamily="gorton"
+                fontSize="2xs"
+                textAlign="end"
+                p="2"
+              >
+                CHART 1 of 2
+              </styled.p>
+            </td>
+          </styled.tr>
+
+          <styled.tr>
+            <td colSpan={6}>
+              <Center w="full" py="8">
+                <styled.h2 fontFamily="gorton" fontSize="lg" textAlign="center">
+                  STORYDEN&nbsp;HUMAN&nbsp;COMPUTER
+                  <br />
+                  KNOWLEDGE&nbsp;SYSTEM
+                </styled.h2>
+              </Center>
+            </td>
+          </styled.tr>
+
+          <styled.tr>
+            <td colSpan={6}>
+              <StorydenComputer />
+            </td>
+          </styled.tr>
+
+          <styled.tr className={cellFonts}>
+            <td style={cellStyle} colSpan={2}>
+              GITHUB STARS
+            </td>
+            <td style={cellStyle}>{stats.stars}</td>
+            <td style={cellStyle} rowSpan={3} colSpan={2}>
+              SUPPORTED
+              <br />
+              OPERATING
+              <br />
+              SYSTEMS
+            </td>
+            <td style={cellStyle} rowSpan={3} colSpan={2}>
+              WINDOWS
+              <br />
+              MACOS
+              <br />
+              LINUX
+            </td>
+          </styled.tr>
+
+          <styled.tr className={cellFonts}>
+            <td style={cellStyle} colSpan={2}>
+              GIT COMMITS
+            </td>
+            <td style={cellStyle}>{stats.commits}</td>
+          </styled.tr>
+
+          <styled.tr className={cellFonts}>
+            <td style={cellStyle} colSpan={2}>
+              API ENDPOINTS
+            </td>
+            <td style={cellStyle}>89</td>
+          </styled.tr>
+
+          <styled.tr className={cellFonts}>
+            <td style={cellStyle} colSpan={2}>
+              CONTRIBUTORS
+            </td>
+            <td style={cellStyle}>{stats.contributors}</td>
+            <td style={cellStyle} colSpan={2}>
+              MIN MEMORY
+            </td>
+            <td style={cellStyle}>100 MB</td>
+          </styled.tr>
+
+          <styled.tr className={cellFonts}>
+            <td style={cellStyle} colSpan={2}>
+              LINES OF CODE
+            </td>
+            <td style={cellStyle}>{stats.loc}</td>
+            <td style={cellStyle} colSpan={2}>
+              MIN CORES
+            </td>
+            <td style={cellStyle}>1 CPU</td>
+          </styled.tr>
+        </tbody>
+      </styled.table>
+
+      <styled.table
+        w="full"
+        maxW="breakpoint-lg"
+        borderColor="Shades.newspaper"
+        borderStyle="solid"
+        borderWidth="thin"
+        color="Shades.newspaper"
+        fontSize="xs"
+      >
+        <tbody>
+          <styled.tr>
+            <td colSpan={5}>
+              <styled.p
+                aria-hidden
+                fontFamily="gorton"
+                fontSize="2xs"
+                textAlign="end"
+                p="2"
+              >
+                CHART 2 of 2
+              </styled.p>
+            </td>
+          </styled.tr>
+
+          <styled.tr>
+            <td colSpan={5}>
+              <Center w="full" pt="4" pb="8">
+                <styled.h2 fontFamily="gorton" fontSize="lg" textAlign="center">
+                  Up&nbsp;and&nbsp;running&nbsp;before
+                  <wbr />
+                  your&nbsp;coffee&nbsp;gets&nbsp;cold
+                </styled.h2>
+              </Center>
+            </td>
+          </styled.tr>
+
+          <styled.tr
+            display={{
+              base: "none", // Don't show docker run command on mobile
+              md: "table-row",
+            }}
+          >
+            <td colSpan={5}>
+              <Center pb="8">
+                <DockerCopyButton />
+              </Center>
+            </td>
+          </styled.tr>
+
+          <styled.tr>
+            <styled.td style={cellStyle} colSpan={2}>
+              <Link href="/docs/introduction">
+                <styled.p p="2" textAlign="center">
+                  PLEASE SEE SUPPLIED MANUAL FOR OPERATION INSTRUCTIONS
+                </styled.p>
+              </Link>
+            </styled.td>
+            <styled.td style={cellStyle} colSpan={3} textWrap="balance">
+              <Link
+                href="https://github.com/Southclaws/storyden"
+                target="_blank"
+              >
+                <styled.p p="2" textAlign="center">
+                  OPEN SOURCE SOFTWARE RELEASED TO THE PUBLIC UNDER THE MIT
+                  LICENSE
+                </styled.p>
+              </Link>
+            </styled.td>
+          </styled.tr>
+        </tbody>
+      </styled.table>
+    </VStack>
   );
 }
 
@@ -797,18 +1524,68 @@ function CTA() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
   return (
     <Box>
       <Hero />
       <Screenshot />
+      <CollectiveMemory />
+      <Milspec />
       {/* <Story /> */}
-      <Why />
-      <Features />
-      <ForCommunityLeaders />
-      <ForDevops />
-      <ForYou />
-      <CTA />
+      {/* <Why /> */}
+      {/* <Features /> */}
+      {/* <ForCommunityLeaders /> */}
+      {/* <ForDevops /> */}
+      {/* <ForYou /> */}
+      {/* <CTA /> */}
     </Box>
   );
+}
+
+async function getStats() {
+  const defaults = {
+    // 2025-07-05
+    stars: 125,
+    commits: 2365,
+    contributors: 7,
+    loc: 267885, // tokei --output json | jq .Total.code
+    apis: 126, // rg operationId ./api/openapi.yaml  -c
+  };
+  try {
+    const REPO = "Southclaws/storyden";
+
+    const headers = {
+      Accept: "application/vnd.github+json",
+      // Uncomment below and add a token if you hit rate limits:
+      // Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+    };
+
+    const [repoRes, contributorsRes, commitsRes] = await Promise.all([
+      fetch(`https://api.github.com/repos/${REPO}`, { headers }),
+      fetch(`https://api.github.com/repos/${REPO}/contributors?per_page=100`, {
+        headers,
+      }),
+      fetch(`https://api.github.com/repos/${REPO}/commits?per_page=1`, {
+        headers,
+      }),
+    ]);
+
+    if (!repoRes.ok || !contributorsRes.ok || !commitsRes.ok) {
+      return defaults;
+    }
+
+    const repoData = await repoRes.json();
+    const contributors = await contributorsRes.json();
+
+    return {
+      ...defaults,
+      stars: repoData.stargazers_count,
+      commits:
+        parseInt(repoData?.open_issues_count) +
+        contributors.reduce((acc: number, c: any) => acc + c.contributions, 0), // fallback, or:
+      contributors: contributors.length,
+    };
+  } catch {
+    return defaults;
+  }
 }

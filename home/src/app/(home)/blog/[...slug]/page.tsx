@@ -68,8 +68,21 @@ export async function generateMetadata(props: {
   const page = blog.getPage(params.slug);
   if (!page) notFound();
 
+  const { slug = [] } = params;
+
+  if (!page) notFound();
+
+  const image = ["/blog-og", ...slug, "image.png"].join("/");
+
   return {
     title: page.data.title,
     description: page.data.description,
+    openGraph: {
+      images: image,
+    },
+    twitter: {
+      card: "summary_large_image",
+      images: image,
+    },
   };
 }

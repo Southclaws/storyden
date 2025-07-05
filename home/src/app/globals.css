@@ -9,15 +9,15 @@
 
 @supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
   .story__text-overlay {
-    background-color: rgba(8, 8, 8, 0.4);
+    background-color: rgba(8, 8, 8, 0.6);
   }
 }
 
-/* @supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
   .story__text-overlay {
-    background-color: rgba(48, 48, 48, 0.1);
+    backdrop-filter: blur(4px);
   }
-} */
+}
 
 body {
   text-transform: initial;
