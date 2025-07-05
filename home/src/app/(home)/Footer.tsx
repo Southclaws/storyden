@@ -1,17 +1,18 @@
 import { Divider, HStack, VStack, styled } from "@/styled-system/jsx";
+import { token } from "@/styled-system/tokens";
 import Image from "next/image";
 
 export function Footer() {
   return (
     <VStack
-      bgColor="hsla(140, 16%, 88%, 1)"
+      bgColor="Shades.newspaper"
       px={{ base: 6, md: 12, lg: 24, xl: 48, "2xl": 80 }}
       py={{ base: 8, lg: 12 }}
       gap={4}
       flex="1"
     >
       <HStack gap={[2, 3, 4]}>
-        <VStack alignItems="end" fontSize="sm" color="hsla(265, 56%, 42%, 1)">
+        <VStack alignItems="end" fontSize="sm" color="Primary.moonlit">
           <styled.a href="https://discord.gg/XF6ZBGF9XF">
             <HStack>
               <styled.p>Discord</styled.p>
@@ -28,7 +29,7 @@ export function Footer() {
 
           <styled.a href="https://twitter.com/Southclaws">
             <HStack>
-              <styled.p>Twitter</styled.p>
+              <styled.p>X</styled.p>
               <Twitter width="1.2em" />
             </HStack>
           </styled.a>
@@ -39,8 +40,8 @@ export function Footer() {
         <Image
           src="/brand/fullmark_ink_horizontal.png"
           alt="The Storyden logomark and wordmark"
-          width={150}
-          height={50}
+          width={150 * 1.5}
+          height={35 * 1.5}
         />
       </HStack>
 
@@ -58,7 +59,7 @@ function Discord(props: any) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 127.14 96.36"
-      fill="hsla(265, 56%, 42%, 1)"
+      fill={token("colors.Primary.moonlit")}
       {...props}
     >
       <g data-name="\u56FE\u5C42 2">
@@ -78,7 +79,7 @@ function Twitter(props: any) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 248 204"
-      fill="hsla(265, 56%, 42%, 1)"
+      fill={token("colors.Primary.moonlit")}
       style={{
         enableBackground: "new 0 0 248 204",
       }}
@@ -94,7 +95,7 @@ function GitHub(props: any) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 98 96"
-      fill="hsla(265, 56%, 42%, 1)"
+      fill={token("colors.Primary.moonlit")}
       {...props}
     >
       <path

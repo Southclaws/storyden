@@ -78,6 +78,7 @@ function Hero() {
             <Link
               className={linkButton({
                 backgroundColor: "white",
+                boxShadow: "xl",
               })}
               href="/docs/introduction"
             >
@@ -91,6 +92,7 @@ function Hero() {
                   backdropBlur: "lg",
                   backdropFilter: "auto",
                   backgroundColor: "rgba(98, 98, 98, 0.5)",
+                  boxShadow: "xl",
                   color: "white",
                   _hover: {
                     color: "black",
@@ -111,14 +113,21 @@ function Hero() {
 
 function Screenshot() {
   return (
-    <Box maxW="100vw" w="full" bgColor="black">
+    <Box
+      maxW="100vw"
+      w="full"
+      maxH={{
+        base: "30vh",
+        sm: "40vh",
+        md: "50vh",
+        lg: "70vh",
+      }}
+      overflowY="hidden"
+      bgColor="black"
+    >
       <VStack
         position="relative"
         zIndex="20"
-        top={{
-          base: "-16",
-          xl: "-32",
-        }}
         w="full"
         paddingX={{
           base: "4",
@@ -132,6 +141,7 @@ function Screenshot() {
             media="(max-width: 768px)"
             srcSet="2025_app_screenshot_viewport.png"
           />
+          <source media="(min-width: 768px)" srcSet="2025_app_screenshot.png" />
           <source media="(min-width: 768px)" srcSet="2025_app_screenshot.png" />
           <img
             src="2025_app_screenshot.png"
@@ -171,11 +181,10 @@ function CollectiveMemory() {
             token("colors.Primary.moonlit"),
           ]}
           particleCount={500}
-          particleSpread={10}
+          particleSpread={5}
           speed={0.01}
           particleBaseSize={100}
-          moveParticlesOnHover={true}
-          alphaParticles={false}
+          alphaParticles={true}
           disableRotation={false}
           className={css({
             // zIndex: "2",
@@ -217,9 +226,9 @@ function CollectiveMemory() {
             w="full"
             gap="4"
             px={{
-              base: "8",
-              sm: "32",
-              // lg: "auto",
+              base: "4",
+              sm: "8",
+              md: "32",
             }}
             gridTemplateRows={{ base: "1fr", lg: "1fr 1fr" }}
             gridTemplateColumns={{ base: "1fr", lg: "1fr 1fr 1fr" }}
@@ -800,7 +809,7 @@ function Milspec() {
 
           <styled.tr>
             <td colSpan={5}>
-              <Center w="full" p="4">
+              <Center w="full" pt="4" pb="8">
                 <styled.h2 fontFamily="gorton" fontSize="lg" textAlign="center">
                   Up&nbsp;and&nbsp;running&nbsp;before
                   <wbr />
@@ -817,7 +826,7 @@ function Milspec() {
             }}
           >
             <td colSpan={5}>
-              <Center p="4">
+              <Center pb="8">
                 <DockerCopyButton />
               </Center>
             </td>
@@ -1522,12 +1531,12 @@ export default function Home() {
       <CollectiveMemory />
       <Milspec />
       {/* <Story /> */}
-      {/* <Why />
-      <Features />
-      <ForCommunityLeaders />
-      <ForDevops />
-      <ForYou />
-      <CTA /> */}
+      {/* <Why /> */}
+      {/* <Features /> */}
+      {/* <ForCommunityLeaders /> */}
+      {/* <ForDevops /> */}
+      {/* <ForYou /> */}
+      {/* <CTA /> */}
     </Box>
   );
 }

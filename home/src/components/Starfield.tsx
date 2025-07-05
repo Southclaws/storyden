@@ -3,8 +3,6 @@
 import { useEffect, useRef } from "react";
 import { Renderer, Camera, Geometry, Program, Mesh } from "ogl";
 
-// import "./Particles.css";
-
 const defaultColors = ["#ffffff", "#ffffff", "#ffffff"];
 
 const hexToRgb = (hex: string) => {
@@ -101,7 +99,6 @@ export const Starfield = ({
   particleSpread = 10,
   speed = 0.1,
   particleColors,
-  moveParticlesOnHover = false,
   particleHoverFactor = 1,
   alphaParticles = false,
   particleBaseSize = 100,
@@ -128,9 +125,10 @@ export const Starfield = ({
     const resize = () => {
       const width = container.clientWidth;
       const height = container.clientHeight;
-      console.log("resize", width, height);
       renderer.setSize(width, height);
-      camera.perspective({ aspect: gl.canvas.width / gl.canvas.height });
+      camera.perspective({
+        aspect: gl.canvas.width / gl.canvas.height,
+      });
     };
     window.addEventListener("resize", resize, false);
     resize();
@@ -141,10 +139,6 @@ export const Starfield = ({
       const y = -(((e.clientY - rect.top) / rect.height) * 2 - 1);
       mouseRef.current = { x, y };
     };
-
-    if (moveParticlesOnHover) {
-      container.addEventListener("mousemove", handleMouseMove);
-    }
 
     const count = particleCount;
     const positions = new Float32Array(count * 3);
@@ -207,14 +201,6 @@ export const Starfield = ({
 
       program.uniforms.uTime.value = elapsed * 0.001;
 
-      if (moveParticlesOnHover) {
-        particles.position.x = -mouseRef.current.x * particleHoverFactor;
-        particles.position.y = -mouseRef.current.y * particleHoverFactor;
-      } else {
-        particles.position.x = 0;
-        particles.position.y = 0;
-      }
-
       if (!disableRotation) {
         particles.rotation.x = Math.sin(elapsed * 0.0002) * 0.1;
         particles.rotation.y = Math.cos(elapsed * 0.0005) * 0.15;
@@ -228,9 +214,7 @@ export const Starfield = ({
 
     return () => {
       window.removeEventListener("resize", resize);
-      if (moveParticlesOnHover) {
-        container.removeEventListener("mousemove", handleMouseMove);
-      }
+
       cancelAnimationFrame(animationFrameId);
       if (container.contains(gl.canvas)) {
         container.removeChild(gl.canvas);
@@ -241,7 +225,6 @@ export const Starfield = ({
     particleCount,
     particleSpread,
     speed,
-    moveParticlesOnHover,
     particleHoverFactor,
     alphaParticles,
     particleBaseSize,
