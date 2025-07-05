@@ -659,7 +659,8 @@ const cellFonts = css({
   },
 });
 
-function Milspec() {
+async function Milspec() {
+  const stats = await getStats();
   return (
     <VStack
       bgColor="Mono.ink"
@@ -726,9 +727,9 @@ function Milspec() {
 
           <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
-              LINES OF CODE
+              GITHUB STARS
             </td>
-            <td style={cellStyle}>124,592</td>
+            <td style={cellStyle}>{stats.stars}</td>
             <td style={cellStyle} rowSpan={3} colSpan={2}>
               SUPPORTED
               <br />
@@ -749,7 +750,7 @@ function Milspec() {
             <td style={cellStyle} colSpan={2}>
               GIT COMMITS
             </td>
-            <td style={cellStyle}>2,392</td>
+            <td style={cellStyle}>{stats.commits}</td>
           </styled.tr>
 
           <styled.tr className={cellFonts}>
@@ -763,7 +764,7 @@ function Milspec() {
             <td style={cellStyle} colSpan={2}>
               CONTRIBUTORS
             </td>
-            <td style={cellStyle}>4</td>
+            <td style={cellStyle}>{stats.contributors}</td>
             <td style={cellStyle} colSpan={2}>
               MIN MEMORY
             </td>
@@ -772,9 +773,9 @@ function Milspec() {
 
           <styled.tr className={cellFonts}>
             <td style={cellStyle} colSpan={2}>
-              GITHUB STARS
+              LINES OF CODE
             </td>
-            <td style={cellStyle}>128</td>
+            <td style={cellStyle}>{stats.loc}</td>
             <td style={cellStyle} colSpan={2}>
               MIN CORES
             </td>
@@ -1523,7 +1524,7 @@ function CTA() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
   return (
     <Box>
       <Hero />
@@ -1539,4 +1540,52 @@ export default function Home() {
       {/* <CTA /> */}
     </Box>
   );
+}
+
+async function getStats() {
+  const defaults = {
+    // 2025-07-05
+    stars: 125,
+    commits: 2365,
+    contributors: 7,
+    loc: 267885, // tokei --output json | jq .Total.code
+    apis: 126, // rg operationId ./api/openapi.yaml  -c
+  };
+  try {
+    const REPO = "Southclaws/storyden";
+
+    const headers = {
+      Accept: "application/vnd.github+json",
+      // Uncomment below and add a token if you hit rate limits:
+      // Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
+    };
+
+    const [repoRes, contributorsRes, commitsRes] = await Promise.all([
+      fetch(`https://api.github.com/repos/${REPO}`, { headers }),
+      fetch(`https://api.github.com/repos/${REPO}/contributors?per_page=100`, {
+        headers,
+      }),
+      fetch(`https://api.github.com/repos/${REPO}/commits?per_page=1`, {
+        headers,
+      }),
+    ]);
+
+    if (!repoRes.ok || !contributorsRes.ok || !commitsRes.ok) {
+      return defaults;
+    }
+
+    const repoData = await repoRes.json();
+    const contributors = await contributorsRes.json();
+
+    return {
+      ...defaults,
+      stars: repoData.stargazers_count,
+      commits:
+        parseInt(repoData?.open_issues_count) +
+        contributors.reduce((acc: number, c: any) => acc + c.contributions, 0), // fallback, or:
+      contributors: contributors.length,
+    };
+  } catch {
+    return defaults;
+  }
 }
