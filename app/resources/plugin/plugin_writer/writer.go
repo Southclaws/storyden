@@ -33,7 +33,7 @@ func New(
 
 func (w *Writer) Add(ctx context.Context, acc account.AccountID, pl *plugin.Loaded) (*plugin.Available, error) {
 	// TODO: Validate name before using.
-	p := filepath.Join(plugin.PluginDirectory, pl.Metadata.Name)
+	p := filepath.Join(plugin.PluginDirectory, pl.Metadata.Name.String())
 
 	b := pl.Binary
 
