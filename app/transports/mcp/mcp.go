@@ -11,9 +11,6 @@ func Build() fx.Option {
 		// Provide all the tools to the MCP server.
 		tools.Build(),
 
-		// Build the MCP server.
-		fx.Provide(New),
-
 		// Mount the MCP server into the HTTP mux.
 		fx.Invoke(MountMCP),
 	)

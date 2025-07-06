@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/mark3labs/mcp-go/server"
+	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -18,41 +19,16 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/httpserver"
 )
 
-func New(
+func MountMCP(
+	lc fx.Lifecycle,
 	ctx context.Context,
 	logger *slog.Logger,
 	cfg config.Config,
+
 	settings *settings.SettingsRepository,
 	allTools tools.All,
-) (*server.SSEServer, error) {
-	set, err := settings.Get(ctx)
-	if err != nil {
-		return nil, err
-	}
 
-	s := server.NewMCPServer(
-		set.Title.Or("Storyden"),
-		"rolling", // NOTE: Worth providing versioning yet?
-		server.WithToolCapabilities(true),
-		server.WithRecovery(),
-		server.WithLogging(),
-	)
-
-	s.AddTools(allTools...)
-
-	// MCP is mounted on the root `/mcp` path, not under `/api`.
-	sse := server.NewSSEServer(s,
-		server.WithSSEEndpoint("/mcp/sse"),
-		server.WithMessageEndpoint("/mcp/message"),
-	)
-
-	return sse, nil
-}
-
-func MountMCP(
-	cfg config.Config,
 	mux *http.ServeMux,
-	s *server.SSEServer,
 
 	// NOTE: This is duplicated from the OpenAPI router because there's an issue
 	// in the OpenAPI codegen that makes mounting it on a sub-router difficult.
@@ -66,16 +42,41 @@ func MountMCP(
 		return
 	}
 
-	applied := httpserver.Apply(s,
-		co.WithCORS(),
-		lo.WithLogger(),
-		cj.WithAuth(),
-		rl.WithRequestSizeLimiter(),
-		rl.WithRateLimit(),
-		withStrictAuthMCP(),
-	)
+	lc.Append(fx.StartHook(func() error {
+		set, err := settings.Get(ctx)
+		if err != nil {
+			return err
+		}
 
-	mux.Handle("/mcp/", applied)
+		s := server.NewMCPServer(
+			set.Title.Or("Storyden"),
+			"rolling", // NOTE: Worth providing versioning yet?
+			server.WithToolCapabilities(true),
+			server.WithRecovery(),
+			server.WithLogging(),
+		)
+
+		s.AddTools(allTools...)
+
+		// MCP is mounted on the root `/mcp` path, not under `/api`.
+		sse := server.NewSSEServer(s,
+			server.WithSSEEndpoint("/mcp/sse"),
+			server.WithMessageEndpoint("/mcp/message"),
+		)
+
+		applied := httpserver.Apply(sse,
+			co.WithCORS(),
+			lo.WithLogger(),
+			cj.WithAuth(),
+			rl.WithRequestSizeLimiter(),
+			rl.WithRateLimit(),
+			withStrictAuthMCP(),
+		)
+
+		mux.Handle("/mcp/", applied)
+
+		return nil
+	}))
 }
 
 // middleware for MCP-specific authentication checks. MCP is fully behind auth
