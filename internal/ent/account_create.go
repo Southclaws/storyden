@@ -25,6 +25,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -206,6 +207,21 @@ func (ac *AccountCreate) AddSessions(s ...*Session) *AccountCreate {
 		ids[i] = s[i].ID
 	}
 	return ac.AddSessionIDs(ids...)
+}
+
+// AddPluginIDs adds the "plugins" edge to the Plugin entity by IDs.
+func (ac *AccountCreate) AddPluginIDs(ids ...xid.ID) *AccountCreate {
+	ac.mutation.AddPluginIDs(ids...)
+	return ac
+}
+
+// AddPlugins adds the "plugins" edges to the Plugin entity.
+func (ac *AccountCreate) AddPlugins(p ...*Plugin) *AccountCreate {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return ac.AddPluginIDs(ids...)
 }
 
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
@@ -684,6 +700,22 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.PluginsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

@@ -82,6 +82,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
 	github.com/shirou/gopsutil/v4 v4.25.6
+	github.com/tetratelabs/wazero v1.9.0
 	github.com/twilio/twilio-go v1.26.5
 	github.com/weaviate/weaviate v1.32.0
 	github.com/weaviate/weaviate-go-client/v5 v5.3.0
@@ -173,7 +174,6 @@ require (
 	github.com/spf13/cobra v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
-	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
