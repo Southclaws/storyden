@@ -6,32 +6,40 @@ import (
 	"context"
 	"encoding/json"
 	"io"
+	"log/slog"
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/puzpuzpuz/xsync/v4"
 	"github.com/tetratelabs/wazero"
+
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 )
 
 type Runner interface {
 	RunOnce(ctx context.Context, bin []byte, command any) ([]byte, error)
+	NewSession(ctx context.Context, bin []byte) *pluginSession
 }
 
-func New(ctx context.Context) Runner {
-	return newWazeroRunner(ctx)
+func New(ctx context.Context, logger *slog.Logger) Runner {
+	return newWazeroRunner(ctx, logger)
 }
 
 type wazeroRunner struct {
-	runtime wazero.Runtime
+	logger   *slog.Logger
+	runtime  wazero.Runtime
+	sessions *xsync.Map[string, *pluginSession]
 }
 
-func newWazeroRunner(ctx context.Context) Runner {
+func newWazeroRunner(ctx context.Context, logger *slog.Logger) Runner {
 	r := wazero.NewRuntimeWithConfig(ctx, wazero.NewRuntimeConfigInterpreter())
 
 	wasi_snapshot_preview1.MustInstantiate(ctx, r)
 
 	return &wazeroRunner{
-		runtime: r,
+		logger:   logger,
+		runtime:  r,
+		sessions: xsync.NewMap[string, *pluginSession](),
 	}
 }
 

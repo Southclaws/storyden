@@ -18,8 +18,11 @@ type Manifest struct {
 	Capabilities []*Capability  `json:"capabilities"`
 }
 
-func (m *Manifest) UnmarshalJSON(data []byte) error {
+func (final *Manifest) UnmarshalJSON(data []byte) error {
 	var errs []error
+
+	type rawManifest Manifest
+	var m rawManifest
 
 	if err := json.Unmarshal(data, &m); err != nil {
 		return fmt.Errorf("failed to unmarshal plugin manifest: %w", err)
@@ -40,6 +43,8 @@ func (m *Manifest) UnmarshalJSON(data []byte) error {
 	if len(errs) > 0 {
 		return fmt.Errorf("plugin manifest validation failed: %v", errors.Join(errs...))
 	}
+
+	*final = Manifest(m)
 
 	return nil
 }
