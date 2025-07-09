@@ -1,40 +1,53 @@
 "use client";
 
-import { Box, BoxProps, Center } from "@/styled-system/jsx";
+import { BoxProps, Center } from "@/styled-system/jsx";
 import createGlobe from "cobe";
-import { useRef, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const SIZE = 250;
+// An initial size for most laptop screens. Flashes but is below the fold so meh
+const INITIAL_SIZE = 125;
 
 export function Globe(props: BoxProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const sizeRef = useRef(SIZE);
+
+  // Used for constraining the <canvas> to the exact size of its parent as well
+  // as locking its aspect ratio to the shortest edge. Not used for the actual
+  // canvas API sizing, just the DOM context sizing.
+  const [containerSize, setContainerSize] = useState<number>(INITIAL_SIZE);
 
   function handleResize() {
-    if (!containerRef.current) {
-      return;
-    }
-
-    const { clientWidth, clientHeight } = containerRef.current;
-
-    sizeRef.current = Math.min(clientWidth, clientHeight);
-  }
-
-  useEffect(() => {
-    let phi = 0;
-
     if (!canvasRef.current || !containerRef.current) {
       return;
     }
 
+    const dprScale = window.devicePixelRatio ?? 1;
+
+    const { clientWidth, clientHeight } = containerRef.current;
+
+    const constrainedSize = Math.min(clientWidth, clientHeight);
+
+    setContainerSize(constrainedSize);
+
+    // Use the device pixel ratio to make it crispy.
+    canvasRef.current.width = constrainedSize * dprScale;
+    canvasRef.current.height = constrainedSize * dprScale;
+  }
+
+  let phi = 0;
+
+  useEffect(() => {
+    if (!canvasRef.current || !containerRef.current) {
+      return;
+    }
+
+    // Calculate initial size for canvasRef values.
     handleResize();
-    const size = sizeRef.current;
 
     const globe = createGlobe(canvasRef.current, {
       devicePixelRatio: 2,
-      width: size * 2,
-      height: size * 2,
+      width: canvasRef.current.width,
+      height: canvasRef.current.height,
       phi: 0,
       theta: 0.18,
       dark: 0,
@@ -48,30 +61,40 @@ export function Globe(props: BoxProps) {
       opacity: 0.92,
       markers: [],
       onRender: (state) => {
-        // Called on every animation frame.
-        // `state` will be an empty object, return updated params.
+        if (!canvasRef.current) {
+          return;
+        }
+
+        // Rotate slowly.
         state.phi = phi;
         phi += 0.001;
-        state.width = sizeRef.current * 2;
-        state.height = sizeRef.current * 2;
+
+        // Update width/height to reflect actual canvas size.
+        state.width = canvasRef.current.width;
+        state.height = canvasRef.current.height;
       },
     });
 
-    window.addEventListener("resize", handleResize);
+    const resizeObserver = new ResizeObserver(() => {
+      handleResize();
+      globe.resize();
+    });
+
+    resizeObserver.observe(containerRef.current);
 
     return () => {
       globe.destroy();
-      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
     };
   }, []);
 
   return (
-    <Center ref={containerRef} {...props}>
+    <Center ref={containerRef} w="full" h="full" {...props}>
       <canvas
         ref={canvasRef}
         style={{
-          width: SIZE,
-          height: SIZE,
+          width: containerSize,
+          height: containerSize,
           maxWidth: "100%",
           aspectRatio: 1,
         }}

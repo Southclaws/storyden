@@ -241,46 +241,49 @@ function CollectiveMemory() {
               borderRadius="xl"
               boxShadow="sm"
               display="flex"
-              p="4"
             >
-              <VStack
-                h="full"
-                alignItems="start"
-                flexGrow="3"
-                // justifyContent="space-between"
-                gap="4"
-              >
-                <h2>Communities deserve permanence.</h2>
+              <HStack>
+                <VStack alignItems="start" flexGrow="3" gap="1">
+                  <HStack pt="4" pl="4">
+                    <h2>Communities deserve permanence.</h2>
+                  </HStack>
 
-                <VStack h="full" justify="center">
-                  <styled.p>
-                    In a web of fleeting <strong>feeds</strong> and forgotten
-                    threads, Storyden makes <strong>what matters</strong> stay
-                    discoverable, readable, and shareable.{" "}
-                    <strong>Forever</strong>.
-                  </styled.p>
-                  <p>~</p>
-                  <p>
-                    Own your <strong>data</strong>. Run your own Reddit, your
-                    own Pinterest, your own Hacker News, your own{" "}
-                    <strong>corner</strong> of the web.
-                  </p>
+                  <VStack
+                    pl="4"
+                    pb="4"
+                    pr={{ base: "4", xl: "0" }}
+                    h="full"
+                    justify="center"
+                    gap="1"
+                  >
+                    <styled.p>
+                      In a web of fleeting <strong>feeds</strong> and forgotten
+                      threads, Storyden makes <strong>what matters</strong> stay
+                      discoverable, readable, and shareable.{" "}
+                      <strong>Forever</strong>.
+                    </styled.p>
+                    {/* <p>~</p> */}
+                    <p>
+                      Own your <strong>data</strong>. Run your own Reddit, your
+                      own Pinterest, your own Hacker News, your own{" "}
+                      <strong>corner</strong> of the web.
+                    </p>
+                  </VStack>
                 </VStack>
-              </VStack>
 
-              <Box
-                flexGrow="1"
-                h="full"
-                w="1/3"
-                aspectRatio="1"
-                borderRadius="lg"
-                display={{
-                  base: "none",
-                  lg: "block",
-                }}
-              >
-                <Globe w="full" aria-hidden />
-              </Box>
+                <Box
+                  flexGrow="1"
+                  h="full"
+                  w={{ base: "1/5", xl: "1/3" }}
+                  aspectRatio="1"
+                  display={{
+                    base: "none",
+                    xl: "block",
+                  }}
+                >
+                  <Globe w="full" aria-hidden />
+                </Box>
+              </HStack>
             </GridItem>
             <GridItem
               id="grid-2"
@@ -352,10 +355,10 @@ function CollectiveMemory() {
               display="flex"
               flexDirection="column"
               alignItems="center"
-              p="6"
+              p="4"
               gap="2"
             >
-              <Box p="4">
+              <Box p={{ base: "0", sm: "2", lg: "4" }}>
                 <Image
                   src="/accessibility.png"
                   width="120"
