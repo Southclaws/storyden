@@ -1,4 +1,4 @@
-name: Build all-in-one image
+name: Build fullstack image
 
 on:
   push:
