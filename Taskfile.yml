@@ -4,42 +4,78 @@ dotenv:
   - .env
 
 vars:
-  VERSION:
-    sh: git describe --always --tags
-  DOCKER_IMAGE_TAG: "storyden:{{.VERSION}}"
+  NEXT_VERSION:
+    sh: go run ./version.go
+
+  CURRENT_VERSION:
+    sh: git describe --tags --abbrev=0
 
 tasks:
-  default:
-    deps: [backend]
-    cmds:
-      - ./backend.exe
-    sources:
-      - cmd/**/*.go
-      - internal/**/*.go
-      - app/**/*.go
+  version:
+    desc: >
+      Yields the next version number for a new release. Will update all relevant
+      files with the new version number. These files include:
+        - openapi.yaml specification
+        - package.json for the frontend
+        - version.go for the backend
+      Due to the fact generated files also contain the version, this will also
+      trigger the codegen task to regenerate all of the related files.
 
-  production:
-    cmds:
-      - ./backend.exe
+      Example: v1.25.1
 
-  backend:
-    cmds:
-      - go build -o backend.exe -ldflags="-X 'github.com/Southclaws/storyden/internal/config.Version={{.VERSION}}'" ./cmd/backend
-  backend:test:
-    cmds:
-      - go test ./...
+    prompt:
+      - "Current version: {{.CURRENT_VERSION}} Next version: {{.NEXT_VERSION}} | Write new version to relevant files?"
 
-  # -
-  # Docker
-  # -
+    preconditions:
+      # Must be on main branch
+      - sh: '[ "$(git symbolic-ref --short HEAD)" = "main" ]'
+        msg: "Release must be done from the 'main' branch"
 
-  backend:image:build:
-    cmds:
-      - docker build -t {{.DOCKER_IMAGE_TAG}} .
+      # Working directory must be clean (no staged or unstaged changes)
+      - sh: '[ -z "$(git status --porcelain)" ]'
+        msg: "Working directory must be clean (no uncommitted changes)"
 
-  backend:image:run:
     cmds:
-      - docker run {{.DOCKER_IMAGE_TAG}}
+      - go run ./version.go -w
+      - task generate
+
+  release:post:
+    desc: >
+      After a tagged release, we write a version number again to the relevant
+      files to indicate they are canary builds. This happens after the actual
+      commit and tag have been created with the "next" version number and is 
+      there to ensure commits that land on `main` *after* a tagged release are
+      still identifiable as canary builds.
+
+      Example: 1.25.1-canary
+
+      Canary version numbers are NOT used as git tags. They are only used in
+      files to indicate the current commit or running version is not stable.
+    cmds:
+      - go run ./version.go -w -c
+      - git add .
+      - git commit -m "Post-release {{.CURRENT_VERSION}}"
+
+  release:
+    desc: >
+      Creates a new release by committing the changes made by the `version` task
+      and tagging the commit with the new version number. This does not however
+      push the changes or create the GitHub release resource itself. You must
+      do that separately as well as write a user-oriented change log for it.
+    deps: [version]
+    cmds:
+      - git add .
+      - git commit -m "Release {{.NEXT_VERSION}}"
+      - git tag {{.NEXT_VERSION}}
+      - task release:post
+
+  release:undo:
+    desc: >
+      Undoes the last release by deleting the last tag and resetting the working
+      directory to the state before the release commit.
+    cmds:
+      - git reset --hard HEAD~1
+      - git tag -d {{.CURRENT_VERSION}}
 
   # -
   # Code generation
@@ -65,6 +101,7 @@ tasks:
   generate:openapi:docs:
     dir: home
     cmds: [yarn openapi]
+
   # -
   # Database
   # -
@@ -72,7 +109,3 @@ tasks:
   seed:
     cmds:
       - go run ./cmd/seed
-
-  db:ui:
-    cmds:
-      - atlas schema inspect -d {{.DATABASE_URL}} -w
