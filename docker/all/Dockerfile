@@ -7,13 +7,19 @@ FROM golang:1.24-alpine AS api-builder
 WORKDIR /server
 
 COPY go.mod go.sum ./
-RUN go mod download
+
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=bind,source=go.sum,target=go.sum \
+    --mount=type=bind,source=go.mod,target=go.mod \
+    go mod download
 
 COPY ./app ./app
 COPY ./cmd ./cmd
 COPY ./internal ./internal
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o storyden-api ./cmd/backend
+RUN --mount=type=cache,target=/go/pkg/mod/ \
+    --mount=type=cache,target="/root/.cache/go-build" \
+    CGO_ENABLED=0 GOOS=linux go build -o /server/storyden-api ./cmd/backend
 
 FROM node:22.16.0-alpine AS base
 
@@ -27,7 +33,9 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /storyden
 
 COPY ./web/package.json ./web/yarn.lock* ./web/.yarnrc.yml ./
-RUN corepack enable && yarn install --immutable --network-timeout 1000000
+RUN --mount=type=cache,target=/root/.yarn \
+    corepack enable && \
+    YARN_CACHE_FOLDER=/root/.yarn yarn install --immutable --network-timeout 1000000
 
 #
 # BUILDER LAYER
@@ -38,13 +46,14 @@ WORKDIR /storyden
 COPY --from=deps /storyden/node_modules ./node_modules
 COPY ./web .
 
-ENV NEXT_TELEMETRY_DISABLED 1
-ENV NEXT_BUILD_STANDALONE true
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_BUILD_STANDALONE=true
 
 # NOTE: A regular Next.js build will attempt to do static generation for every
 # page. But we don't want to constantly be adding force-dynamic to every page so
 # this ensures no SSG runs during the Docker build.
-RUN corepack enable && yarn next build --experimental-build-mode=compile
+RUN --mount=type=cache,target=.next/cache \
+    corepack enable && yarn next build --experimental-build-mode=compile
 
 #
 # RUNTIME IMAGE
@@ -53,11 +62,13 @@ RUN corepack enable && yarn next build --experimental-build-mode=compile
 FROM base AS runner
 WORKDIR /storyden
 
-ENV NODE_ENV production
+ENV NODE_ENV=production
 
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN addgroup --system --gid 1001 storyden && adduser --system --uid 1001 storyden && chown storyden:storyden /storyden
+RUN addgroup --system --gid 1001 storyden && \
+    adduser --system --uid 1001 storyden && \
+    chown storyden:storyden /storyden
 USER storyden
 
 COPY --from=builder /storyden/public ./public
@@ -70,14 +81,14 @@ COPY --from=builder --chown=storyden:storyden /storyden/.next/static ./.next/sta
 
 EXPOSE 8000
 
-ENV PORT 3000
-ENV HOSTNAME "0.0.0.0"
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
 
 VOLUME [ "/storyden/data" ]
 
 # Instruct the API process to run the Next.js server and proxy requests to it.
-ENV RUN_FRONTEND "server.js"
-ENV PROXY_FRONTEND_ADDRESS "http://localhost:3000"
+ENV RUN_FRONTEND="server.js"
+ENV PROXY_FRONTEND_ADDRESS="http://localhost:3000"
 
 # The fullstack image uses the backend as a proxy for the frontend, this means
 # that the address for both are the same. Change via -e if deployed publicly.
