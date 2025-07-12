@@ -21,12 +21,13 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           flavor: |
-            latest=auto
+            latest=false
             suffix=-${{ env.IMAGE_KIND }},onlatest=false
           tags: |
-            type=sha
-            type=edge,branch=main
-            type=raw,value={{date 'YYYY-MM-DD-HH-mm'}},enable={{is_default_branch}}
+            type=sha,suffix=-${{ env.IMAGE_KIND }}
+            type=edge,branch=main,suffix=-${{ env.IMAGE_KIND }}
+            type=semver,branch=main,suffix=-${{ env.IMAGE_KIND }}
+            type=semver,pattern={{version}},branch=main,enable=${{ startsWith(github.ref, 'refs/tags/') }},suffix=-${{ env.IMAGE_KIND }}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
       - name: Set up QEMU
