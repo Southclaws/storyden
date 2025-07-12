@@ -9,7 +9,8 @@ import { VStack } from "@/styled-system/jsx";
 
 import { CategoryIndexScreen } from "../category/CategoryIndexScreen";
 
-import { LibraryFeedScreen } from "./LibraryFeedScreen";
+import { FeedContext } from "./FeedContext";
+import { LibraryFeedScreen } from "./LibraryFeedScreen/LibraryFeedScreen";
 import { ThreadFeedScreen } from "./ThreadFeedScreen/ThreadFeedScreen";
 
 export type PageProps = {
@@ -24,15 +25,17 @@ export type Props = PageProps & {
 export function FeedScreen({ page, initialSession, initialSettings }: Props) {
   return (
     <VStack>
-      <FeedConfig
+      <FeedContext
         initialSession={initialSession}
         initialSettings={initialSettings}
-      />
-      <FeedScreenContent
-        initialSession={initialSession}
-        initialSettings={initialSettings}
-        page={page}
-      />
+      >
+        <FeedConfig />
+        <FeedScreenContent
+          initialSession={initialSession}
+          initialSettings={initialSettings}
+          page={page}
+        />
+      </FeedContext>
     </VStack>
   );
 }

@@ -32,6 +32,7 @@ export const combobox = defineSlotRecipe({
       display: "flex",
       flexDirection: "column",
       zIndex: "dropdown",
+      height: "fit-content",
       _hidden: {
         display: "none",
       },
@@ -83,6 +84,23 @@ export const combobox = defineSlotRecipe({
   },
   variants: {
     size: {
+      xs: {
+        content: { p: "0.5", gap: "1", borderRadius: "sm" },
+        item: { textStyle: "xs", px: "2", height: "6", borderRadius: "xs" },
+        itemIndicator: {
+          "& :where(svg)": {
+            width: "4",
+            height: "4",
+            textStyle: "sm",
+          },
+        },
+        itemGroupLabel: {
+          px: "2",
+          py: "1.5",
+        },
+        label: { textStyle: "xs" },
+        trigger: { right: "2.5" },
+      },
       sm: {
         content: { p: "0.5", gap: "1" },
         item: { textStyle: "sm", px: "2", height: "9" },
