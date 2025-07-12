@@ -101,15 +101,15 @@ func patchFile(path, pattern, replacement string) error {
 
 func writeVersion(v version) error {
 	if err := patchFile(packageJsonPath, `"version":\s*".+?"`, fmt.Sprintf(`"version": "%s"`, v.String())); err != nil {
-		return fmt.Errorf("failed to update openapi.yaml version: %w", err)
-	}
-
-	if err := patchFile(openapiPath, `version:\s*".+?"`, fmt.Sprintf(`version: "%s"`, v.String())); err != nil {
 		return fmt.Errorf("failed to update package.json version: %w", err)
 	}
 
+	if err := patchFile(openapiPath, `version:\s*".+?"`, fmt.Sprintf(`version: "%s"`, v.String())); err != nil {
+		return fmt.Errorf("failed to update openapi.yaml version: %w", err)
+	}
+
 	if err := patchFile(apiVersionPath, `Version\s*=\s*".+?"`, fmt.Sprintf(`Version = "%s"`, v.String())); err != nil {
-		return fmt.Errorf("failed to update internal/config/version.go: %w", err)
+		return fmt.Errorf("failed to update version.go: %w", err)
 	}
 
 	return nil
