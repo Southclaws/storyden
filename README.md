@@ -37,6 +37,22 @@ docker run -p 8000:8000 ghcr.io/southclaws/storyden
 
 ![A screenshot of a Storyden instance](home/public/2025_app_screenshot_viewport.png)
 
+## Releases and versions
+
+Storyden releases tagged versions using a simple version number which applies to the product _as a whole_ not the API surface. For this reason, we do not use "semantic versioning" and breaking API changes are avoided as much as possible. Sometimes breaking changes may occur but these will always be documented and called out in release notes as well as in a separate list of just breaking changes.
+
+```
+  v1.25.8
+   │ │  │
+   │ │  └── Release: increments for every release in the year.
+   │ └───── Year: releases happen frequently so we use a year marker for simplicity
+   └─────── Major: will always be 1
+```
+
+This format was chosen for compatibility with package/app registries and developer expectations, but it does not follow semantic versioning, it's more of a "build number" similar to how video games are versioned.
+
+Outside of a release commit/image, version numbers inside files and the API will be suffixed with `-canary` to indicate you're off a stable release.
+
 ## What can it do
 
 > https://www.storyden.org/docs/introduction/what-is-storyden
