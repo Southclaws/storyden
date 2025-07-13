@@ -18,9 +18,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/tag"
 )
 
 type Querier struct {
@@ -34,9 +36,11 @@ func New(db *ent.Client, raw *sqlx.DB, aq *account_querier.Querier) *Querier {
 }
 
 type options struct {
-	sortChildrenBy    *ChildSortRule
-	visibilityRules   bool
-	requestingAccount *account.AccountID
+	sortChildrenBy       *ChildSortRule
+	searchChildrenBy     opt.Optional[string]
+	filterChildrenByTags opt.Optional[[]tag_ref.Name]
+	visibilityRules      bool
+	requestingAccount    *account.AccountID
 }
 
 type Option func(*options)
@@ -53,6 +57,18 @@ func WithVisibilityRulesApplied(accountID *account.AccountID) Option {
 func WithSortChildrenBy(field ChildSortRule) Option {
 	return func(o *options) {
 		o.sortChildrenBy = &field
+	}
+}
+
+func WithSearchChildren(q string) Option {
+	return func(o *options) {
+		o.searchChildrenBy = opt.New(q)
+	}
+}
+
+func WithFilterChildrenByTags(tags ...tag_ref.Name) Option {
+	return func(o *options) {
+		o.filterChildrenByTags = opt.New(tags)
 	}
 }
 
@@ -227,15 +243,49 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 }
 
 func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagination.Parameters, opts ...Option) (*pagination.Result[*library.Node], error) {
-	query := q.db.Node.Query()
-
-	query.Where(qk.Predicate())
-
 	o := &options{}
 	for _, opt := range opts {
 		opt(o)
 	}
 
+	// We need to resolve the parent ID first, as the child query is too complex
+	// to use the qk predicate on.
+	parentID, err := q.db.Node.Query().Where(qk.Predicate()).OnlyID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	query := q.db.Node.Query().Where(node.ParentNodeID(parentID))
+
+	// Load all relevant edges
+	query.
+		WithOwner(func(aq *ent.AccountQuery) {
+			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+		}).
+		WithPrimaryImage(func(aq *ent.AssetQuery) {
+			aq.WithParent()
+		}).
+		WithAssets().
+		WithLink(func(lq *ent.LinkQuery) {
+			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+		}).
+		WithTags().
+		WithProperties().
+		WithPropertySchema(func(psq *ent.PropertySchemaQuery) {
+			psq.WithFields()
+		})
+
+	// Apply filters
+	o.filterChildrenByTags.Call(func(tags []tag_ref.Name) {
+		tagNames := dt.Map(tags, func(t tag_ref.Name) string { return t.String() })
+		query.Where(node.HasTagsWith(tag.NameIn(tagNames...)))
+	})
+
+	o.searchChildrenBy.Call(func(q string) {
+		query.Where(node.NameContainsFold(q))
+	})
+
+	// Apply visibility rules
 	requestingAccount, err := q.getRequestingAccount(ctx, o)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -271,42 +321,36 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 
 	applyVisibilityRulesPredicate(query)
 
-	query.WithNodes(func(cq *ent.NodeQuery) {
-		applyVisibilityRulesPredicate(cq)
+	// Apple child-sort rules
+	if o.sortChildrenBy != nil {
+		order := o.sortChildrenBy.OrderClause()
+		if o.sortChildrenBy.Fixed {
+			switch o.sortChildrenBy.Field {
+			case "name":
+				query.Order(node.ByName(order))
+			case "description":
+				query.Order(node.ByDescription(order))
+			case "link":
+				query.Order(node.ByLinkField("url", order))
+			}
+		} else {
+			query.Order(node.BySort(order))
+		}
+	}
 
-		cq.
-			WithOwner(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			}).
-			WithPrimaryImage(func(aq *ent.AssetQuery) {
-				aq.WithParent()
-			}).
-			WithAssets().
-			WithLink(func(lq *ent.LinkQuery) {
-				lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
-			}).
-			WithTags().
-			WithProperties().
-			WithPropertySchema(func(psq *ent.PropertySchemaQuery) {
-				psq.WithFields()
-			}).
-			Order(node.BySort(sql.OrderAsc()))
-	})
-
-	col, err := query.Only(ctx)
+	nodes, err := query.All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	propSchema := library.PropertySchemaQueryRows{}
-	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, col.ID.String())
+	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, parentID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	nodes := col.Edges.Nodes
-
-	if o.sortChildrenBy != nil && len(nodes) > 0 {
+	// For non-fixed field sorting predicate, apply the property value sorting.
+	if o.sortChildrenBy != nil && !o.sortChildrenBy.Fixed && len(nodes) > 0 {
 		// override with the func param, todo: refactor? idk
 		o.sortChildrenBy.Page = pp
 

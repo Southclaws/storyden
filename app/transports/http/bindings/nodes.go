@@ -236,11 +236,23 @@ func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObjec
 
 func (c *Nodes) NodeListChildren(ctx context.Context, request openapi.NodeListChildrenRequestObject) (openapi.NodeListChildrenResponseObject, error) {
 	pp := deserialisePageParams(request.Params.Page, 100)
-	sortChildrenBy := opt.NewPtrMap(request.Params.ChildrenSort, func(cs string) node_querier.ChildSortRule {
-		return node_querier.NewChildSortRule(cs, pp)
-	})
 
-	r, err := c.nodeReader.ListChildren(ctx, deserialiseNodeMark(request.NodeSlug), pp, sortChildrenBy)
+	opts := []node_querier.Option{}
+
+	if request.Params.ChildrenSort != nil {
+		opts = append(opts, node_querier.WithSortChildrenBy(node_querier.NewChildSortRule(*request.Params.ChildrenSort, pp)))
+	}
+
+	if request.Params.Q != nil {
+		opts = append(opts, node_querier.WithSearchChildren(*request.Params.Q))
+	}
+
+	if request.Params.Tags != nil {
+		tags := dt.Map(*request.Params.Tags, deserialiseTagName)
+		opts = append(opts, node_querier.WithFilterChildrenByTags(tags...))
+	}
+
+	r, err := c.nodeReader.ListChildren(ctx, deserialiseNodeMark(request.NodeSlug), pp, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
