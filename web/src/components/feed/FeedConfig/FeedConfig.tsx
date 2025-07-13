@@ -1,128 +1,20 @@
 "use client";
 
-import {
-  ListCollection,
-  SelectValueChangeDetails,
-  createListCollection,
-} from "@ark-ui/react";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
-import { useQueryState } from "nuqs";
-import { Controller, ControllerProps, useForm } from "react-hook-form";
-import { z } from "zod";
+import { SelectValueChangeDetails, createListCollection } from "@ark-ui/react";
+import { useState } from "react";
 
-import { handle } from "@/api/client";
-import { Account, Permission } from "@/api/openapi-schema";
-import { useSession } from "@/auth";
+import { Node } from "@/api/openapi-schema";
+import { LibraryPageSelect } from "@/components/library/LibraryPageSelect";
+import { CancelAction } from "@/components/site/Action/Cancel";
 import { EditAction } from "@/components/site/Action/Edit";
-import { SaveAction } from "@/components/site/Action/Save";
-import {
-  Editing,
-  EditingSchema,
-} from "@/components/site/SiteContextPane/useSiteContextPane";
-import { Unready } from "@/components/site/Unready";
 import { CategoryIcon } from "@/components/ui/icons/Category";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { SelectIcon } from "@/components/ui/icons/Select";
 import * as Select from "@/components/ui/select";
-import {
-  FeedLayoutConfigSchema,
-  FeedSourceConfigSchema,
-} from "@/lib/settings/feed";
-import { useSettingsMutation } from "@/lib/settings/mutation";
-import { Settings } from "@/lib/settings/settings";
-import { useSettings } from "@/lib/settings/settings-client";
+import { useFeedContext } from "@/screens/feed/FeedContext";
 import { HStack, styled } from "@/styled-system/jsx";
-import { hasPermission } from "@/utils/permissions";
-
-import { refreshFeed } from "../../../lib/feed/refresh";
-
-type Props = {
-  initialSession?: Account;
-  initialSettings: Settings;
-};
-
-export const FormSchema = z.object({
-  layout: FeedLayoutConfigSchema,
-  source: FeedSourceConfigSchema,
-});
-export type Form = z.infer<typeof FormSchema>;
-
-export function useFeedConfig({ initialSession, initialSettings }: Props) {
-  const router = useRouter();
-  const session = useSession(initialSession);
-  const [editing, setEditing] = useQueryState<null | Editing>("editing", {
-    defaultValue: null,
-    clearOnDefault: true,
-    parse: EditingSchema.parse,
-  });
-
-  const { updateSettings, revalidate } = useSettingsMutation(initialSettings);
-
-  const { ready, error, settings } = useSettings(initialSettings);
-
-  const form = useForm<Form>({
-    resolver: zodResolver(FormSchema),
-    defaultValues: settings?.metadata.feed,
-  });
-
-  if (!ready) {
-    return {
-      ready: false as const,
-      error,
-    };
-  }
-
-  const isEditingEnabled = hasPermission(session, Permission.MANAGE_SETTINGS);
-  const isEditing = editing === "feed";
-  const source = settings.metadata.feed.source.type;
-
-  function handleSetEditing() {
-    setEditing("feed");
-  }
-
-  const handleSave = form.handleSubmit(async (data) => {
-    await handle(
-      async () => {
-        await updateSettings({
-          metadata: {
-            feed: data,
-          },
-        });
-
-        setEditing(null);
-
-        await refreshFeed();
-        router.refresh();
-      },
-      {
-        promiseToast: {
-          loading: "Updating feed configuration...",
-          success: "Updated!",
-        },
-        cleanup: async () => {
-          await revalidate();
-        },
-      },
-    );
-  });
-
-  return {
-    ready: true as const,
-    form,
-    data: {
-      isEditingEnabled,
-      isEditing,
-      source,
-    },
-    handlers: {
-      handleSetEditing,
-      handleSave,
-    },
-  };
-}
 
 const sources = [
   {
@@ -142,13 +34,9 @@ const sources = [
   },
 ];
 
-export function FeedConfig(props: Props) {
-  const { ready, error, form, data, handlers } = useFeedConfig(props);
-  if (!ready) {
-    return <Unready error={error} />;
-  }
-
-  const { isEditingEnabled, isEditing, source } = data;
+export function FeedConfig() {
+  const { isEditingEnabled, isEditing, feed, updateFeed, handleToggleEditing } =
+    useFeedContext();
 
   if (!isEditingEnabled) {
     return null;
@@ -156,55 +44,55 @@ export function FeedConfig(props: Props) {
 
   const collection = createListCollection({ items: sources });
 
+  async function handleHomepageNodeChange(node: Node | undefined) {
+    await updateFeed({
+      layout: {
+        type: "list",
+      },
+      source: {
+        type: "library",
+        node: node?.id,
+      },
+    });
+  }
+
+  async function handleSourceTypeChange({ value }: SelectValueChangeDetails) {
+    if (value.length === 0) {
+      return;
+    }
+
+    const feedSourceType = value[0] as typeof feed.source.type;
+
+    await updateFeed({
+      layout: {
+        type: "list",
+      },
+      source: {
+        type: feedSourceType,
+      },
+    });
+  }
+
   return (
     <HStack w="full" justify="end">
       {isEditing ? (
         <>
-          <SelectField
-            collection={collection}
-            defaultValue={source}
-            control={form.control}
-            name="source.type"
-          />
+          {feed.source.type === "library" && (
+            <>
+              <LibraryPageSelect
+                onChange={handleHomepageNodeChange}
+                value={feed.source.node}
+              />
+            </>
+          )}
 
-          <SaveAction onClick={handlers.handleSave}>Save feed</SaveAction>
-        </>
-      ) : (
-        <EditAction onClick={handlers.handleSetEditing}>
-          Configure feed
-        </EditAction>
-      )}
-    </HStack>
-  );
-}
-
-function SelectField<T = any>({
-  collection,
-  defaultValue,
-  ...props
-}: Omit<ControllerProps<Form>, "render"> & {
-  collection: ListCollection<T>;
-  defaultValue: string;
-}) {
-  return (
-    <Controller
-      {...props}
-      render={({ field, formState, fieldState }) => {
-        function handleChange({ value }: SelectValueChangeDetails) {
-          const [v] = value;
-          if (!v) return;
-
-          field.onChange(v);
-        }
-
-        return (
           <Select.Root
             w="fit"
             size="xs"
-            defaultValue={[defaultValue]}
             collection={collection}
+            defaultValue={[feed.source.type]}
             positioning={{ sameWidth: false }}
-            onValueChange={handleChange}
+            onValueChange={handleSourceTypeChange}
           >
             <Select.Control>
               <Select.Trigger>
@@ -230,8 +118,12 @@ function SelectField<T = any>({
               </Select.Content>
             </Select.Positioner>
           </Select.Root>
-        );
-      }}
-    />
+
+          <CancelAction onClick={handleToggleEditing}>Done</CancelAction>
+        </>
+      ) : (
+        <EditAction onClick={handleToggleEditing}>Configure feed</EditAction>
+      )}
+    </HStack>
   );
 }

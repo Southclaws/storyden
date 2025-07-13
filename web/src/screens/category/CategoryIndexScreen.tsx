@@ -6,7 +6,7 @@ import { CategoryCardList } from "@/components/category/CategoryCardList/Categor
 import { Unready } from "@/components/site/Unready";
 
 export type Props = {
-  initialCategoryList: CategoryListOKResponse;
+  initialCategoryList?: CategoryListOKResponse;
 };
 
 export function useCategoryIndexScreen({ initialCategoryList }: Props) {

@@ -138,6 +138,7 @@ export const combobox = /* @__PURE__ */ Object.assign(comboboxFn, {
   variantKeys: comboboxVariantKeys,
   variantMap: {
   "size": [
+    "xs",
     "sm",
     "md",
     "lg"

@@ -2,7 +2,6 @@
 
 import { Unready } from "src/components/site/Unready";
 
-import { useSession } from "@/auth";
 import { FeedEmptyState } from "@/components/feed/FeedEmptyState";
 import { QuickShare } from "@/components/feed/QuickShare/QuickShare";
 import { ThreadReferenceCard } from "@/components/post/ThreadCard";
@@ -10,15 +9,17 @@ import { PaginationControls } from "@/components/site/PaginationControls/Paginat
 import { LStack, VStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
+import { useFeedContext } from "../FeedContext";
+
 import { Props, useThreadFeedScreen } from "./useThreadFeedScreen";
 
 export function ThreadFeedScreen({
-  initialSession,
   initialPage,
   initialPageData,
   category,
 }: Props) {
-  const session = useSession(initialSession);
+  const { session } = useFeedContext();
+
   return (
     <LStack>
       <QuickShare initialSession={session} initialCategory={category} />
