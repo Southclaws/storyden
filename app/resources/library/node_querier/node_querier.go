@@ -321,7 +321,8 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 
 	applyVisibilityRulesPredicate(query)
 
-	// Apple child-sort rules
+	// Apply child-sort rules if present, otherwise fall back to sort by the
+	// lexorank sort key field in ascending order.
 	if o.sortChildrenBy != nil {
 		order := o.sortChildrenBy.OrderClause()
 		if o.sortChildrenBy.Fixed {
@@ -334,8 +335,17 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 				query.Order(node.ByLinkField("url", order))
 			}
 		} else {
+			// This is vastly simpler due to the post-query sorting with no
+			// pagination. If we did perform pagination for this API (and we
+			// might have to in future) then this would require performing the
+			// actual property query first with pagination parameters and then
+			// using the output of that query to pull a fixed set of nodes.
+			// I do not envy my future self or contributor who will do that.
+			// For now, fall back to sorting by the lexorank sort key field.
 			query.Order(node.BySort(order))
 		}
+	} else {
+		query.Order(node.BySort(sql.OrderAsc()))
 	}
 
 	nodes, err := query.All(ctx)
