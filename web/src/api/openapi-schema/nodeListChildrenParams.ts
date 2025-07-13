@@ -9,6 +9,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type { NodeChildrenSortParamParameter } from "./nodeChildrenSortParamParameter";
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
+import type { SearchQueryParameter } from "./searchQueryParameter";
+import type { TagNameListQueryParamParameter } from "./tagNameListQueryParamParameter";
 
 export type NodeListChildrenParams = {
   /**
@@ -20,4 +22,12 @@ export type NodeListChildrenParams = {
    * Pagination query parameters.
    */
   page?: PaginationQueryParameter;
+  /**
+   * Search query string.
+   */
+  q?: SearchQueryParameter;
+  /**
+   * Tags to filter by.
+   */
+  tags?: TagNameListQueryParamParameter;
 };

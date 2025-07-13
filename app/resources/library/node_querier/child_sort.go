@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strings"
 
+	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
@@ -17,7 +18,15 @@ type ChildSortRule struct {
 	Dir   string
 	Field string
 	Page  pagination.Parameters
+	Fixed bool // true means the field is a schema field not a property
 	raw   string
+}
+
+func (s ChildSortRule) OrderClause() sql.OrderTermOption {
+	if s.Dir == "asc" {
+		return sql.OrderAsc()
+	}
+	return sql.OrderDesc()
 }
 
 func NewChildSortRule(raw string, pp pagination.Parameters) ChildSortRule {
@@ -28,15 +37,20 @@ func NewChildSortRule(raw string, pp pagination.Parameters) ChildSortRule {
 		field = raw[1:]
 	}
 
-	switch raw {
-	default:
-		return ChildSortRule{
-			Dir:   dir,
-			Field: field,
-			raw:   raw,
-			Page:  pp,
-		}
+	csr := ChildSortRule{
+		Dir:   dir,
+		Field: field,
+		raw:   raw,
+		Page:  pp,
 	}
+
+	switch field {
+	// NOTE: The same as `MappableNodeField` in web codebase.
+	case "name", "link", "description":
+		csr.Fixed = true
+	}
+
+	return csr
 }
 
 const querySortedByPropertyValue_sqlite = `

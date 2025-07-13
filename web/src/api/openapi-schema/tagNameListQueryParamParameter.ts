@@ -7,8 +7,9 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.25.1-canary
  */
-import type { TagNameList } from "./tagNameList";
+import type { TagName } from "./tagName";
 
-export interface TagSuggestions {
-  tag_suggestions?: TagNameList;
-}
+/**
+ * Tags to filter by.
+ */
+export type TagNameListQueryParamParameter = TagName[];

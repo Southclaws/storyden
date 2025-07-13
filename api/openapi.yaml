@@ -1775,6 +1775,8 @@ paths:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/NodeChildrenSortParam"
         - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/SearchQuery"
+        - $ref: "#/components/parameters/TagNameListQueryParam"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -2425,6 +2427,13 @@ components:
       required: true
       schema:
         type: string
+
+    TagNameListQueryParam:
+      description: Tags to filter by.
+      name: tags
+      in: query
+      required: false
+      schema: { $ref: "#/components/schemas/TagNameList" }
 
     CollectionMarkParam:
       description: |
@@ -3626,18 +3635,6 @@ components:
       type: string
       description: The title of a thread.
       example: Hello world!
-
-    TitleSuggestion:
-      type: object
-      description: A suggested title for a thread.
-      properties:
-        title_suggestion: { $ref: "#/components/schemas/ThreadTitle" }
-
-    ContentSuggestion:
-      type: object
-      description: A suggested body content.
-      properties:
-        content_suggestion: { $ref: "#/components/schemas/PostContent" }
 
     PostContent:
       description: |
@@ -4874,11 +4871,6 @@ components:
       required: [tags]
       properties:
         tags: { $ref: "#/components/schemas/TagReferenceList" }
-
-    TagSuggestions:
-      type: object
-      properties:
-        tag_suggestions: { $ref: "#/components/schemas/TagNameList" }
 
     #
     # 8888888b.                   888
