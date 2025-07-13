@@ -1,9 +1,12 @@
 import { useDisclosure } from "src/utils/useDisclosure";
 
+import { Permission } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
 import { ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { CreateIcon } from "@/components/ui/icons/Create";
 import { Item } from "@/components/ui/menu";
+import { hasPermission } from "@/utils/permissions";
 
 import { CategoryCreateModal } from "./CategoryCreateModal";
 
@@ -21,7 +24,12 @@ export function CategoryCreateTrigger({
   hideLabel,
   ...props
 }: Props) {
+  const session = useSession();
   const { onOpen, isOpen, onClose } = useDisclosure();
+
+  if (!hasPermission(session, Permission.MANAGE_CATEGORIES)) {
+    return null;
+  }
 
   return (
     <>

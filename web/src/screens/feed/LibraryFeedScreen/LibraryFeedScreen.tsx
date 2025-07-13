@@ -4,7 +4,7 @@ import { Unready } from "src/components/site/Unready";
 
 import { useNodeGet, useNodeList } from "@/api/openapi-client/nodes";
 import { NodeListResult } from "@/api/openapi-schema";
-import { NodeCardGrid } from "@/components/library/NodeCardList";
+import { NodeCardGrid, NodeCardRows } from "@/components/library/NodeCardList";
 import { EmptyState } from "@/components/site/EmptyState";
 import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
@@ -49,6 +49,7 @@ function LibraryFeedNode({ initialData, nodeID }: Props & { nodeID: string }) {
 }
 
 function LibraryFeedRoot({ initialData }: Props) {
+  const { feed } = useSettingsContext();
   const { data, error } = useNodeList(
     {
       //
@@ -65,5 +66,15 @@ function LibraryFeedRoot({ initialData }: Props) {
     return <EmptyState />;
   }
 
-  return <NodeCardGrid libraryPath={[]} nodes={data.nodes} context="library" />;
+  switch (feed.layout.type) {
+    case "grid":
+      return (
+        <NodeCardGrid libraryPath={[]} nodes={data.nodes} context="library" />
+      );
+
+    case "list":
+      return (
+        <NodeCardRows libraryPath={[]} nodes={data.nodes} context="library" />
+      );
+  }
 }

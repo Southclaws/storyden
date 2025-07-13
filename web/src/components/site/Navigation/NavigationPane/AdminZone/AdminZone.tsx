@@ -14,6 +14,8 @@ import { CategoryIcon } from "@/components/ui/icons/Category";
 import { CheckIcon } from "@/components/ui/icons/Check";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { EditIcon } from "@/components/ui/icons/Edit";
+import { LayoutGridIcon } from "@/components/ui/icons/LayoutGrid";
+import { LayoutListIcon } from "@/components/ui/icons/LayoutList";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { SelectIcon } from "@/components/ui/icons/Select";
 import * as Select from "@/components/ui/select";
@@ -123,6 +125,19 @@ const sources = [
   },
 ];
 
+const layouts = [
+  {
+    label: "List",
+    value: "list" as const,
+    icon: <LayoutListIcon width="4" />,
+  },
+  {
+    label: "Grid",
+    value: "grid" as const,
+    icon: <LayoutGridIcon width="4" />,
+  },
+];
+
 export function FeedConfig() {
   const { isEditingEnabled, isEditing, feed, updateFeed, handleToggleEditing } =
     useSettingsContext();
@@ -131,7 +146,12 @@ export function FeedConfig() {
     return null;
   }
 
-  const collection = createListCollection({ items: sources });
+  const sourceCollection = createListCollection({ items: sources });
+  const layoutCollection = createListCollection({ items: layouts });
+
+  const canUpdateLayout =
+    feed.source.type === "categories" ||
+    (feed.source.type === "library" && feed.source.node === undefined);
 
   async function handleSourceTypeChange({ value }: SelectValueChangeDetails) {
     if (value.length === 0) {
@@ -141,12 +161,25 @@ export function FeedConfig() {
     const feedSourceType = value[0] as typeof feed.source.type;
 
     await updateFeed({
-      layout: {
-        type: "list",
-      },
+      layout: feed.layout,
       source: {
         type: feedSourceType,
       },
+    });
+  }
+
+  async function handleLayoutTypeChange({ value }: SelectValueChangeDetails) {
+    if (value.length === 0) {
+      return;
+    }
+
+    const feedLayoutType = value[0] as typeof feed.layout.type;
+
+    await updateFeed({
+      layout: {
+        type: feedLayoutType,
+      },
+      source: feed.source,
     });
   }
 
@@ -154,7 +187,7 @@ export function FeedConfig() {
     <LStack>
       <Select.Root
         size="xs"
-        collection={collection}
+        collection={sourceCollection}
         defaultValue={[feed.source.type]}
         positioning={{ sameWidth: false }}
         onValueChange={handleSourceTypeChange}
@@ -171,7 +204,7 @@ export function FeedConfig() {
         </WStack>
         <Select.Control>
           <Select.Trigger>
-            <Select.ValueText placeholder="Select a Source" />
+            <Select.ValueText placeholder="Select a source" />
             <SelectIcon />
           </Select.Trigger>
         </Select.Control>
@@ -193,6 +226,47 @@ export function FeedConfig() {
           </Select.Content>
         </Select.Positioner>
       </Select.Root>
+
+      {canUpdateLayout && (
+        <Select.Root
+          size="xs"
+          collection={layoutCollection}
+          defaultValue={[feed.layout.type]}
+          positioning={{ sameWidth: false }}
+          onValueChange={handleLayoutTypeChange}
+        >
+          <WStack alignItems="center">
+            <Select.Label>Layout</Select.Label>
+
+            {/* <InfoTip title="Choose a layout">
+            List views work best for discussions, grid views work best for directories and curated content.
+          </InfoTip> */}
+          </WStack>
+          <Select.Control>
+            <Select.Trigger>
+              <Select.ValueText placeholder="Select a layout" />
+              <SelectIcon />
+            </Select.Trigger>
+          </Select.Control>
+          <Select.Positioner>
+            <Select.Content>
+              {layouts.map((item) => (
+                <Select.Item key={item.value} item={item}>
+                  <Select.ItemText mr="2">
+                    <HStack gap="1">
+                      <styled.span w="4">{item.icon}</styled.span>
+                      <styled.span>{item.label}</styled.span>
+                    </HStack>
+                  </Select.ItemText>
+                  <Select.ItemIndicator>
+                    <CheckIcon />
+                  </Select.ItemIndicator>
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select.Positioner>
+        </Select.Root>
+      )}
 
       <SourceConfig />
     </LStack>
@@ -219,9 +293,7 @@ function SourceLibraryConfig() {
 
   async function handleHomepageNodeChange(node: Node | undefined) {
     await updateFeed({
-      layout: {
-        type: "list",
-      },
+      layout: feed.layout,
       source: {
         type: "library",
         node: node?.id,
