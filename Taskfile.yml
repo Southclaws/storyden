@@ -53,6 +53,7 @@ tasks:
       files to indicate the current commit or running version is not stable.
     cmds:
       - go run ./version.go -w -c
+      - task generate
       - git add .
       - git commit -m "Post-release {{.CURRENT_VERSION}}"
 
