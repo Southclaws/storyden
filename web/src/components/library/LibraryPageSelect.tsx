@@ -15,7 +15,10 @@ import { CheckIcon } from "@/components/ui/icons/Check";
 import { ChevronUpDownIcon } from "@/components/ui/icons/Chevron";
 import { Input } from "@/components/ui/input";
 
-type Props = Omit<Combobox.RootProps, "onChange" | "value" | "collection"> & {
+type Props = Omit<
+  Combobox.RootProps,
+  "onChange" | "defaultValue" | "value" | "collection"
+> & {
   defaultValue?: string;
   value?: string;
   onChange: (node: Node | undefined) => void;
@@ -71,6 +74,8 @@ export function LibraryPageSelect({
     onChange(selectedNode);
   }
 
+  console.log("LibraryPageSelect value", value);
+
   return (
     <Combobox.Root
       {...rest}
@@ -79,7 +84,7 @@ export function LibraryPageSelect({
       onInputValueChange={handleInputChange}
       onOpenChange={handleOpenChange}
       onValueChange={handleChange}
-      value={value ? [value] : undefined}
+      value={value ? [value] : []}
       size="xs"
     >
       <Combobox.Control>

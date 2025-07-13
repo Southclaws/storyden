@@ -6,10 +6,9 @@ import { FeedEmptyState } from "@/components/feed/FeedEmptyState";
 import { QuickShare } from "@/components/feed/QuickShare/QuickShare";
 import { ThreadReferenceCard } from "@/components/post/ThreadCard";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
+import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
 import { LStack, VStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
-
-import { useFeedContext } from "../FeedContext";
 
 import { Props, useThreadFeedScreen } from "./useThreadFeedScreen";
 
@@ -18,7 +17,7 @@ export function ThreadFeedScreen({
   initialPageData,
   category,
 }: Props) {
-  const { session } = useFeedContext();
+  const { session } = useSettingsContext();
 
   return (
     <LStack>

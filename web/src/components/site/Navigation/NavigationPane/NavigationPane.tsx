@@ -6,6 +6,8 @@ import { Floating } from "@/styled-system/patterns";
 import { Unready } from "../../Unready";
 import { ContentNavigationList } from "../ContentNavigationList/ContentNavigationList";
 
+import { AdminZone } from "./AdminZone/AdminZone";
+
 export async function NavigationPane() {
   try {
     const { data: initialNodeList } = await nodeList({
@@ -18,10 +20,12 @@ export async function NavigationPane() {
       <styled.header
         display="flex"
         height="full"
-        justifyContent="end"
+        alignItems="end"
+        flexDirection="column"
         borderRadius="md"
         className={Floating()}
       >
+        <AdminZone />
         <Box id="desktop-nav-box" w="full" height="full" p="2">
           <ContentNavigationList
             initialNodeList={initialNodeList}

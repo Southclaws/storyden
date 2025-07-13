@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { useQueryState } from "nuqs";
 import { PropsWithChildren, createContext, useContext } from "react";
 
@@ -16,7 +17,7 @@ import { Settings } from "@/lib/settings/settings";
 import { useSettings } from "@/lib/settings/settings-client";
 import { hasPermission } from "@/utils/permissions";
 
-type FeedContextProps = {
+type SettingsContextProps = {
   session: Account | undefined;
   feed: FeedConfig;
   isEditingEnabled: boolean;
@@ -25,19 +26,19 @@ type FeedContextProps = {
   updateFeed: (c: FeedConfig) => Promise<void>;
 };
 
-const context = createContext<FeedContextProps | null>(null);
+const context = createContext<SettingsContextProps | null>(null);
 
-export function useFeedContext(): FeedContextProps {
+export function useSettingsContext(): SettingsContextProps {
   const value = useContext(context);
   if (!value) {
     throw new Error(
-      "useFeedContext must be used within a FeedContext provider",
+      "useSettingsContext must be used within a SettingsContext provider",
     );
   }
   return value;
 }
 
-export function FeedContext({
+export function SettingsContext({
   initialSession,
   initialSettings,
   children,

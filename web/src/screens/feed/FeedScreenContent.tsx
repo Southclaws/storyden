@@ -5,10 +5,10 @@ import {
   NodeListResult,
   ThreadListResult,
 } from "@/api/openapi-schema";
+import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
 
 import { CategoryIndexScreen } from "../category/CategoryIndexScreen";
 
-import { useFeedContext } from "./FeedContext";
 import { LibraryFeedScreen } from "./LibraryFeedScreen/LibraryFeedScreen";
 import { ThreadFeedScreen } from "./ThreadFeedScreen/ThreadFeedScreen";
 
@@ -24,7 +24,7 @@ type Props = {
 };
 
 export function FeedScreenContent({ initialData }: Props) {
-  const { feed } = useFeedContext();
+  const { feed } = useSettingsContext();
 
   switch (feed.source.type) {
     case "threads":

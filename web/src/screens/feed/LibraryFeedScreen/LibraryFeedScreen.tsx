@@ -6,16 +6,15 @@ import { useNodeGet, useNodeList } from "@/api/openapi-client/nodes";
 import { NodeListResult } from "@/api/openapi-schema";
 import { NodeCardGrid } from "@/components/library/NodeCardList";
 import { EmptyState } from "@/components/site/EmptyState";
+import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
 import { LibraryPageScreen } from "@/screens/library/LibraryPageScreen/LibraryPageScreen";
-
-import { useFeedContext } from "../FeedContext";
 
 export type Props = {
   initialData?: NodeListResult;
 };
 
 export function LibraryFeedScreen({ initialData }: Props) {
-  const { feed } = useFeedContext();
+  const { feed } = useSettingsContext();
   if (feed.source.type !== "library") {
     return null;
   }
