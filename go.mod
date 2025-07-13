@@ -56,10 +56,13 @@ require (
 	github.com/golang-cz/devslog v0.0.13
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/go-github/v72 v72.0.0
+	github.com/google/go-github/v73 v73.0.0
 	github.com/iancoleman/strcase v0.3.0
+	github.com/invopop/jsonschema v0.13.0
 	github.com/jackc/pgx/v5 v5.7.5
 	github.com/jmoiron/sqlx v1.4.0
 	github.com/klippa-app/go-pdfium v1.14.1
+	github.com/mark3labs/mcp-go v0.32.0
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/mazznoer/colorgrad v0.10.0
 	github.com/mazznoer/csscolorparser v0.1.6
@@ -74,6 +77,7 @@ require (
 	github.com/pb33f/libopenapi v0.21.12
 	github.com/philippgille/chromem-go v0.7.0
 	github.com/pinecone-io/go-pinecone/v3 v3.1.0
+	github.com/pinecone-io/go-pinecone/v4 v4.1.0
 	github.com/puzpuzpuz/xsync/v4 v4.1.0
 	github.com/redis/rueidis v1.0.60
 	github.com/rs/cors v1.11.1
@@ -142,13 +146,11 @@ require (
 	github.com/huandu/xstrings v1.5.0 // indirect
 	github.com/imdario/mergo v0.3.16 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/invopop/jsonschema v0.13.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.2 // indirect
 	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056 // indirect
 	github.com/jolestar/go-commons-pool/v2 v2.1.2 // indirect
 	github.com/lithammer/shortuuid/v3 v3.0.7 // indirect
 	github.com/lufia/plan9stats v0.0.0-20250317134145-8bc96cf8fc35 // indirect
-	github.com/mark3labs/mcp-go v0.32.0 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/minio/crc64nvme v1.0.1 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
