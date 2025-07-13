@@ -4,6 +4,7 @@ import {
   ComboboxValueChangeDetails,
   createListCollection,
 } from "@ark-ui/react";
+import { map } from "lodash/fp";
 import { useState } from "react";
 
 import { useNodeList } from "@/api/openapi-client/nodes";
@@ -24,33 +25,51 @@ type Props = Omit<
   onChange: (node: Node | undefined) => void;
 };
 
-export function LibraryPageSelect({
-  defaultValue,
-  value,
-  onChange,
-  ...rest
-}: Props) {
+export function LibraryPageSelect(props: Props) {
   const { data, error } = useNodeList({
     visibility: ["published"],
   });
-
-  const initialCollection = createListCollection({
-    items: data?.nodes ?? [],
-    groupBy: (item, index) => item.parent?.id ?? "",
-    itemToValue: (item) => item.id,
-    itemToString: (item) => item.name,
-  });
-  const [collection, setCollection] = useState(initialCollection);
-
   if (!data) {
     return <Unready error={error} />;
   }
+
+  return <LibraryPageSelectCombobox nodes={data.nodes} {...props} />;
+}
+
+type Item = {
+  label: string;
+  value: string;
+};
+
+function toItem(node: Node): Item {
+  return {
+    label: node.name,
+    value: node.id,
+  };
+}
+
+const toItems = map(toItem);
+
+function LibraryPageSelectCombobox({
+  defaultValue,
+  value,
+  onChange,
+  nodes,
+  ...rest
+}: Props & { nodes: Node[] }) {
+  const initialCollection = createListCollection({
+    items: toItems(nodes),
+  });
+
+  console.log("LibraryPageSelectCombobox", initialCollection);
+
+  const [collection, setCollection] = useState(initialCollection);
 
   const handleInputChange = ({
     inputValue,
   }: Combobox.InputValueChangeDetails) => {
     const filtered = initialCollection.items.filter((item) =>
-      item.name.toLowerCase().includes(inputValue.toLowerCase()),
+      item.label.toLowerCase().includes(inputValue.toLowerCase()),
     );
 
     setCollection(
@@ -69,12 +88,10 @@ export function LibraryPageSelect({
       return;
     }
 
-    const selectedNode = collection.items.find((item) => item.id === value[0]);
+    const selectedNode = nodes.find((item) => item.id === value[0]);
 
     onChange(selectedNode);
   }
-
-  console.log("LibraryPageSelect value", value);
 
   return (
     <Combobox.Root
@@ -101,7 +118,7 @@ export function LibraryPageSelect({
         <Combobox.Content>
           <Combobox.ItemGroup>
             <Combobox.Item key="unset" item="unset">
-              <Combobox.ItemText>Unset</Combobox.ItemText>
+              <Combobox.ItemText>All root level pages</Combobox.ItemText>
               <Combobox.ItemIndicator>
                 <CheckIcon />
               </Combobox.ItemIndicator>
@@ -109,8 +126,8 @@ export function LibraryPageSelect({
           </Combobox.ItemGroup>
           <Combobox.ItemGroup>
             {collection.items.map((item) => (
-              <Combobox.Item key={item.id} item={item}>
-                <Combobox.ItemText>{item.name}</Combobox.ItemText>
+              <Combobox.Item key={item.value} item={item}>
+                <Combobox.ItemText>{item.label}</Combobox.ItemText>
                 <Combobox.ItemIndicator>
                   <CheckIcon />
                 </Combobox.ItemIndicator>
