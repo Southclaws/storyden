@@ -2,12 +2,11 @@
 
 import { CategoryListOKResponse, NodeListResult } from "@/api/openapi-schema";
 import { CategoryList } from "@/components/category/CategoryList/CategoryList";
-import { Divider, LStack, WStack, styled } from "@/styled-system/jsx";
+import { LStack, styled } from "@/styled-system/jsx";
 
 import { CollectionsAnchor } from "../Anchors/Collections";
 import { LinksAnchor } from "../Anchors/Link";
 import { MembersAnchor } from "../Anchors/Members";
-import { RolesAnchor } from "../Anchors/Roles";
 import { LibraryNavigationTree } from "../LibraryNavigationTree/LibraryNavigationTree";
 import { useNavigation } from "../useNavigation";
 

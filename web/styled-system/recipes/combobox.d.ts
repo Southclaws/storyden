@@ -6,7 +6,7 @@ interface ComboboxVariant {
   /**
  * @default "md"
  */
-size: "sm" | "md" | "lg"
+size: "xs" | "sm" | "md" | "lg"
 }
 
 type ComboboxVariantMap = {

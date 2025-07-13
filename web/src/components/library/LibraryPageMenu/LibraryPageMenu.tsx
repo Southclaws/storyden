@@ -21,6 +21,7 @@ export function LibraryPageMenu({
     deleteEnabled,
     isChildrenHidden,
     isConfirmingDelete,
+    isManager,
     handlers,
   } = useLibraryPageMenu({
     node,
@@ -80,11 +81,13 @@ export function LibraryPageMenu({
                 </Menu.Item>
               ))}
 
-              <Menu.Item value="toggle-hide-in-tree">
-                {isChildrenHidden
-                  ? "Show children in tree"
-                  : "Hide children in tree"}
-              </Menu.Item>
+              {isManager && (
+                <Menu.Item value="toggle-hide-in-tree">
+                  {isChildrenHidden
+                    ? "Show children in tree"
+                    : "Hide children in tree"}
+                </Menu.Item>
+              )}
 
               {deleteEnabled &&
                 (isConfirmingDelete ? (

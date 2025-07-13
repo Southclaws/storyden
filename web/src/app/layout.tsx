@@ -4,6 +4,8 @@ import { PropsWithChildren } from "react";
 import { getColourAsHex } from "src/utils/colour";
 
 import { inter, interDisplay } from "@/app/fonts";
+import { getServerSession } from "@/auth/server-session";
+import { SettingsContext } from "@/components/site/SettingsContext/SettingsContext";
 import { serverEnvironment } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";
 import { getIconURL } from "@/utils/icon";
@@ -15,6 +17,9 @@ import { Providers } from "./providers";
 const { API_ADDRESS, WEB_ADDRESS } = serverEnvironment();
 
 export default async function RootLayout({ children }: PropsWithChildren) {
+  const session = await getServerSession();
+  const settings = await getSettings();
+
   return (
     <html lang="en" className={`${inter.variable} ${interDisplay.variable}`}>
       <head>
@@ -40,7 +45,9 @@ export default async function RootLayout({ children }: PropsWithChildren) {
       </head>
 
       <body>
-        <Providers>{children}</Providers>
+        <SettingsContext initialSession={session} initialSettings={settings}>
+          <Providers>{children}</Providers>
+        </SettingsContext>
       </body>
     </html>
   );

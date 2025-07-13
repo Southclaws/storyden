@@ -4,16 +4,16 @@ import { useThreadList } from "@/api/openapi-client/threads";
 import { Account, Category, ThreadListResult } from "@/api/openapi-schema";
 
 export type Props = {
-  initialSession?: Account;
-  initialPage: number;
+  initialPage?: number;
   initialPageData?: ThreadListResult;
   category?: Category;
 };
 
 export function useThreadFeedScreen(props: Props) {
+  const initialPage = props.initialPage ?? 1;
   const { data, error } = useThreadList(
     {
-      page: props.initialPage.toString(),
+      page: initialPage.toString(),
       categories: props.category ? [props.category.slug] : [],
     },
     {
@@ -29,7 +29,7 @@ export function useThreadFeedScreen(props: Props) {
     };
   }
 
-  const showPaginationTop = data?.next_page && props.initialPage > 1;
+  const showPaginationTop = data?.next_page && initialPage > 1;
 
   return {
     ready: true as const,

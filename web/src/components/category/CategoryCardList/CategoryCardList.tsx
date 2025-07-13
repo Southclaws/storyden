@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Category } from "@/api/openapi-schema";
 import { Heading } from "@/components/ui/heading";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
-import { CardGrid } from "@/components/ui/rich-card";
+import { CardGrid, CardRows } from "@/components/ui/rich-card";
 import { categoryColourCSS } from "@/lib/category/colours";
 import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
@@ -15,7 +15,7 @@ export type Props = {
   categories: Category[];
 };
 
-export function CategoryCardList({ categories }: Props) {
+export function CategoryCardGrid({ categories }: Props) {
   return (
     <LStack>
       <WStack>
@@ -29,6 +29,24 @@ export function CategoryCardList({ categories }: Props) {
           <CategoryCard key={c.id} {...c} />
         ))}
       </CardGrid>
+    </LStack>
+  );
+}
+
+export function CategoryCardList({ categories }: Props) {
+  return (
+    <LStack>
+      <WStack>
+        <Heading>Discussion categories</Heading>
+
+        <CategoryCreateTrigger />
+      </WStack>
+
+      <CardRows>
+        {categories.map((c) => (
+          <CategoryCard key={c.id} {...c} />
+        ))}
+      </CardRows>
     </LStack>
   );
 }

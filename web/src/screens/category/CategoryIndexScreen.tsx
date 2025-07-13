@@ -2,11 +2,15 @@
 
 import { useCategoryList } from "@/api/openapi-client/categories";
 import { CategoryListOKResponse } from "@/api/openapi-schema";
-import { CategoryCardList } from "@/components/category/CategoryCardList/CategoryCardList";
+import {
+  CategoryCardGrid,
+  CategoryCardList,
+} from "@/components/category/CategoryCardList/CategoryCardList";
+import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
 import { Unready } from "@/components/site/Unready";
 
 export type Props = {
-  initialCategoryList: CategoryListOKResponse;
+  initialCategoryList?: CategoryListOKResponse;
 };
 
 export function useCategoryIndexScreen({ initialCategoryList }: Props) {
@@ -29,6 +33,7 @@ export function useCategoryIndexScreen({ initialCategoryList }: Props) {
 }
 
 export function CategoryIndexScreen(props: Props) {
+  const { feed } = useSettingsContext();
   const { ready, data, error } = useCategoryIndexScreen(props);
   if (!ready) {
     return <Unready error={error} />;
@@ -36,5 +41,11 @@ export function CategoryIndexScreen(props: Props) {
 
   const { categories } = data;
 
-  return <CategoryCardList categories={categories} />;
+  switch (feed.layout.type) {
+    case "grid":
+      return <CategoryCardGrid categories={categories} />;
+
+    case "list":
+      return <CategoryCardList categories={categories} />;
+  }
 }

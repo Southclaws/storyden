@@ -2,15 +2,10 @@ import { Account } from "@/api/openapi-schema";
 import { categoryList } from "@/api/openapi-server/categories";
 import { nodeList } from "@/api/openapi-server/nodes";
 import { threadList } from "@/api/openapi-server/threads";
-import { FeedConfig } from "@/components/feed/FeedConfig/FeedConfig";
-import { UnreadyBanner } from "@/components/site/Unready";
-import { Settings } from "@/lib/settings/settings";
+import { FrontendConfiguration, Settings } from "@/lib/settings/settings";
 import { VStack } from "@/styled-system/jsx";
 
-import { CategoryIndexScreen } from "../category/CategoryIndexScreen";
-
-import { LibraryFeedScreen } from "./LibraryFeedScreen";
-import { ThreadFeedScreen } from "./ThreadFeedScreen/ThreadFeedScreen";
+import { FeedScreenContent, InitialData } from "./FeedScreenContent";
 
 export type PageProps = {
   initialSession?: Account;
@@ -21,84 +16,53 @@ export type Props = PageProps & {
   initialSettings: Settings;
 };
 
-export function FeedScreen({ page, initialSession, initialSettings }: Props) {
+// NOTE: The FeedScreen (index page) is server hydrated on first load, but the
+// admin may configure different sources/layouts which is post-hydration and
+// client side. In this case, there is no server side hydrated data available.
+// Not a problem just worth pointing out here.
+export async function FeedScreen({ page, initialSettings }: Props) {
+  const feedConfig = initialSettings.metadata.feed;
+  const initialData = await getInitialFeedData(feedConfig, page);
+
   return (
     <VStack>
-      <FeedConfig
-        initialSession={initialSession}
-        initialSettings={initialSettings}
-      />
-      <FeedScreenContent
-        initialSession={initialSession}
-        initialSettings={initialSettings}
-        page={page}
-      />
+      <FeedScreenContent initialData={initialData} />
     </VStack>
   );
 }
 
-async function FeedScreenContent({
-  initialSession,
-  page,
-  initialSettings,
-}: Props) {
-  const feedConfig = initialSettings.metadata.feed;
-
+async function getInitialFeedData(
+  feedConfig: FrontendConfiguration["feed"],
+  page?: number,
+): Promise<InitialData> {
   switch (feedConfig.source.type) {
     case "threads":
-      return (
-        <ThreadFeedScreenContent initialSession={initialSession} page={page} />
-      );
+      return {
+        page: page ?? 1,
+        threads: (
+          await threadList(
+            {
+              page: page?.toString(),
+            },
+            {
+              cache: "no-store",
+              next: {
+                tags: ["feed"],
+                revalidate: 0,
+              },
+            },
+          )
+        ).data,
+      };
 
     case "library":
-      return <LibraryFeedScreenContent />;
+      return {
+        library: (await nodeList()).data,
+      };
 
     case "categories":
-      return <CategoryFeedScreenContent />;
-  }
-}
-
-async function ThreadFeedScreenContent({ initialSession, page }: PageProps) {
-  try {
-    const threads = await threadList(
-      {
-        page: page.toString(),
-      },
-      {
-        cache: "no-store",
-        next: {
-          tags: ["feed"],
-          revalidate: 0,
-        },
-      },
-    );
-
-    return (
-      <ThreadFeedScreen
-        initialSession={initialSession}
-        initialPage={page}
-        initialPageData={threads.data}
-      />
-    );
-  } catch (e) {
-    return <UnreadyBanner error={e} />;
-  }
-}
-
-async function LibraryFeedScreenContent() {
-  try {
-    const nodes = await nodeList();
-    return <LibraryFeedScreen initialData={nodes.data} />;
-  } catch (e) {
-    return <UnreadyBanner error={e} />;
-  }
-}
-
-async function CategoryFeedScreenContent() {
-  try {
-    const categories = await categoryList();
-    return <CategoryIndexScreen initialCategoryList={categories.data} />;
-  } catch (e) {
-    return <UnreadyBanner error={e} />;
+      return {
+        categories: (await categoryList()).data,
+      };
   }
 }

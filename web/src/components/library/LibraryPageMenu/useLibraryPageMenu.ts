@@ -117,6 +117,7 @@ export function useLibraryPageMenu(props: Props) {
     deleteEnabled,
     isConfirmingDelete,
     isChildrenHidden,
+    isManager,
     handlers: {
       handleCancelDelete,
       handleSelect,

@@ -16,6 +16,7 @@ export const FeedSourceConfigSchema = z.union([
   }),
   z.object({
     type: z.literal("library"),
+    node: z.string().optional(),
   }),
   z.object({
     type: z.literal("categories"),
