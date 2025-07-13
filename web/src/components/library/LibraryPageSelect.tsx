@@ -61,8 +61,6 @@ function LibraryPageSelectCombobox({
     items: toItems(nodes),
   });
 
-  console.log("LibraryPageSelectCombobox", initialCollection);
-
   const [collection, setCollection] = useState(initialCollection);
 
   const handleInputChange = ({
