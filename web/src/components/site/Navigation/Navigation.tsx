@@ -2,6 +2,7 @@ import React, { PropsWithChildren } from "react";
 
 import { Box } from "@/styled-system/jsx";
 
+import { CommandPalette } from "../CommandPalette/CommandPalette";
 import { Onboarding } from "../Onboarding/Onboarding";
 
 import styles from "./navigation.module.css";
@@ -62,6 +63,8 @@ export async function Navigation({
           <MobileCommandBar />
         </Box>
       </Box>
+
+      <CommandPalette />
     </Box>
   );
 }
