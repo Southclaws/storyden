@@ -9,7 +9,7 @@ import { styled } from "@/styled-system/jsx";
 
 type Direction = "asc" | "desc" | "none";
 
-type SortState = {
+export type SortState = {
   property: string;
   order: Direction;
 };
