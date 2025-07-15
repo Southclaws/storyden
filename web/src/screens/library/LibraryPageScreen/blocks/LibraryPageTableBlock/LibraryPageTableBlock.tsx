@@ -1,13 +1,16 @@
 import { SortableContext } from "@dnd-kit/sortable";
+import { dequal } from "dequal";
 import Link from "next/link";
+import { useQueryState } from "nuqs";
 
-import { useNodeListChildren } from "@/api/openapi-client/nodes";
+import { TagReference } from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
 import {
   SortIndicator,
   useSortIndicator,
 } from "@/components/site/SortIndicator";
 import { Unready } from "@/components/site/Unready";
+import { TagBadgeList } from "@/components/tag/TagBadgeList";
 import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { MenuIcon } from "@/components/ui/icons/Menu";
@@ -25,12 +28,26 @@ import {
   mergeFieldsAndProperties,
   mergeFieldsAndPropertySchema,
 } from "./column";
+import { useChildrenWithTags } from "./useChildrenWithTags";
 import { useTableBlock } from "./useTableBlock";
 
 export function LibraryPageTableBlock() {
   const { nodeID, initialChildren } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
   const { editing } = useEditState();
+
+  const [tagFilters, setTagFilters] = useQueryState<string[]>("tag", {
+    defaultValue: [],
+    clearOnDefault: true,
+    // This ensures the query params are removed entirely when tags are empty.
+    eq: dequal,
+    parse: (value) => {
+      if (value === null || value === undefined) {
+        return [];
+      }
+      return value.split(",").filter((v) => v.trim() !== "");
+    },
+  });
 
   const hideChildTree = useWatch((s) => s.draft.hide_child_tree);
 
@@ -42,16 +59,11 @@ export function LibraryPageTableBlock() {
         : `-${sort.property}`
       : undefined;
 
-  const { data, error } = useNodeListChildren(
+  const { data, error, tags } = useChildrenWithTags(
     nodeID,
-    {
-      children_sort: childrenSort,
-    },
-    {
-      swr: {
-        fallbackData: initialChildren,
-      },
-    },
+    initialChildren,
+    childrenSort,
+    tagFilters,
   );
 
   const block = useTableBlock();
@@ -85,8 +97,29 @@ export function LibraryPageTableBlock() {
     block,
   );
 
+  async function handleTagFilter(tag: TagReference) {
+    const present = tagFilters.includes(tag.name);
+    if (present) {
+      setTagFilters((prev) => prev.filter((t) => t !== tag.name));
+    } else {
+      setTagFilters((prev) => [...prev, tag.name]);
+    }
+  }
+
+  // NOTE: We use `undefined` when the tag list is empty to cause the tag list
+  // to render all tags as "highlighted" (not muted) so it's clearer.
+  const highlightedTags = tagFilters.length > 0 ? tagFilters : undefined;
+
   return (
     <Box w="full" overflowX="scroll">
+      <Box>
+        <TagBadgeList
+          tags={tags}
+          type="button"
+          onClick={handleTagFilter}
+          highlightedTags={highlightedTags}
+        />
+      </Box>
       <Table.Root size="sm" variant="dense" borderStyle="none" minW="0">
         <Table.Head>
           <Table.Row position="relative">
