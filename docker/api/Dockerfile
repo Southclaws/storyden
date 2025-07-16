@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
 # RUNTIME IMAGE
 #
 
-FROM alpine:3.20
+FROM alpine:3.22
 
 WORKDIR /storyden
 
