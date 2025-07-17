@@ -11116,7 +11116,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vaul@npm:^1.0.0":
+"vaul@npm:^1.1.2":
   version: 1.1.2
   resolution: "vaul@npm:1.1.2"
   dependencies:
@@ -11232,7 +11232,7 @@ __metadata:
     typescript: "npm:^5.8.3"
     unified: "npm:^11.0.5"
     usehooks-ts: "npm:^3.1.1"
-    vaul: "npm:^1.0.0"
+    vaul: "npm:^1.1.2"
     xid-ts: "npm:^1.1.4"
     zod: "npm:^3.25.76"
     zustand: "npm:^5.0.6"
