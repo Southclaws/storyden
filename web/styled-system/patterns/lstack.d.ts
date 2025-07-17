@@ -9,7 +9,6 @@ export interface LstackProperties {
    
 }
 
-
 interface LstackStyles extends LstackProperties, DistributiveOmit<SystemStyleObject, keyof LstackProperties > {}
 
 interface LstackPatternFn {
@@ -19,7 +18,5 @@ interface LstackPatternFn {
 
 /**
  * A VStack with full width aligned left.
-
-
  */
 export declare const lstack: LstackPatternFn;

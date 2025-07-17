@@ -14,6 +14,10 @@ const nextConfig = {
       fullUrl: true,
     },
   },
+  experimental: {
+    devtoolNewPanelUI: true,
+    devtoolSegmentExplorer: true,
+  },
 };
 
 module.exports = nextConfig;

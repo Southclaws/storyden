@@ -1,13 +1,10 @@
+import { LikeAction } from "@/components/site/Action/Like";
 import { Box } from "@/styled-system/jsx";
 
 import { Props, useLikeButton } from "./useLikeButton";
-import { LikeAction } from "@/components/site/Action/Like";
 
 export function LikeButton(props: Props) {
-
-  const { handleClick } = useLikeButton(
-    {thread: props.thread},
-  );
+  const { handleClick } = useLikeButton({ thread: props.thread });
 
   return (
     <Box>

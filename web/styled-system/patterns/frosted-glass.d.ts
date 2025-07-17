@@ -9,7 +9,6 @@ export interface FrostedGlassProperties {
    
 }
 
-
 interface FrostedGlassStyles extends FrostedGlassProperties, DistributiveOmit<SystemStyleObject, keyof FrostedGlassProperties > {}
 
 interface FrostedGlassPatternFn {
@@ -19,7 +18,5 @@ interface FrostedGlassPatternFn {
 
 /**
  * A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the navigation overlays and menus.
-
-
  */
 export declare const FrostedGlass: FrostedGlassPatternFn;

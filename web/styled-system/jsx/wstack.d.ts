@@ -8,7 +8,5 @@ export interface WstackProps extends WstackProperties, DistributiveOmit<HTMLStyl
 
 /**
  * A HStack with full width and spaced children.
-
-
  */
 export declare const WStack: FunctionComponent<WstackProps>

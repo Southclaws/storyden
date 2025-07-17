@@ -8,7 +8,5 @@ export interface FrostedGlassProps extends FrostedGlassProperties, DistributiveO
 
 /**
  * A frosted glass effect for overlays, modals, menus, etc. This is most prominently used on the navigation overlays and menus.
-
-
  */
 export declare const FrostedGlass: FunctionComponent<FrostedGlassProps>

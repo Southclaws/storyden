@@ -11,11 +11,12 @@ import { HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
 import { ThreadMenu } from "../thread/ThreadMenu/ThreadMenu";
-import { LikeButton } from "./LikeButton/LikeButton";
 import {
   DiscussionIcon,
   DiscussionParticipatingIcon,
 } from "../ui/icons/Discussion";
+
+import { LikeButton } from "./LikeButton/LikeButton";
 
 type Props = {
   thread: ThreadReference;

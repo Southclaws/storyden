@@ -2,6 +2,7 @@ import { dequal } from "dequal";
 import { uniqueId } from "lodash/fp";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 
+import { likePostAdd, likePostRemove } from "@/api/openapi-client/likes";
 import {
   getThreadListKey,
   threadCreate,
@@ -16,7 +17,6 @@ import {
   ThreadListParams,
   ThreadReference,
 } from "@/api/openapi-schema";
-import { likePostAdd, likePostRemove } from "@/api/openapi-client/likes";
 
 export function useFeedMutations(session?: Account, params?: ThreadListParams) {
   const { mutate } = useSWRConfig();
@@ -156,7 +156,7 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
         ...data,
         threads: newThreads,
       };
-    }
+    };
 
     await mutate(threadListKeyFilterFn, mutator, {
       revalidate: false,
@@ -186,7 +186,7 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
         ...data,
         threads: newThreads,
       };
-    }
+    };
 
     await mutate(threadListKeyFilterFn, mutator, {
       revalidate: false,
