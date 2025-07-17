@@ -87,15 +87,15 @@
     "@typescript-eslint/parser": "^8.37.0",
     "eslint": "^9.31.0",
     "eslint-config-next": "15.4.1",
-    "orval": "7.2.0",
+    "orval": "7.10.0",
     "prettier": "^3.6.2",
     "typescript": "^5.8.3"
   },
-  "packageManager": "yarn@4.9.1",
+  "packageManager": "yarn@4.9.2",
   "engines": {
     "node": "22.x"
   },
   "resolutions": {
-    "@types/react": "19.1.5"
+    "@types/react": "19.1.8"
   }
 }
