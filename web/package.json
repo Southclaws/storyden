@@ -85,7 +85,7 @@
     "@types/react-avatar-editor": "^13.0.3",
     "@typescript-eslint/eslint-plugin": "^8.37.0",
     "@typescript-eslint/parser": "^8.37.0",
-    "eslint": "^8.57.1",
+    "eslint": "^9.31.0",
     "eslint-config-next": "15.4.1",
     "orval": "7.2.0",
     "prettier": "^3.6.2",
