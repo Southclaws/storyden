@@ -3032,7 +3032,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-avatar-editor@npm:^13.0.3":
+"@types/react-avatar-editor@npm:^13.0.4":
   version: 13.0.4
   resolution: "@types/react-avatar-editor@npm:13.0.4"
   dependencies:
@@ -9671,7 +9671,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-advanced-cropper@npm:^0.20.0":
+"react-advanced-cropper@npm:^0.20.1":
   version: 0.20.1
   resolution: "react-advanced-cropper@npm:0.20.1"
   dependencies:
@@ -11193,7 +11193,7 @@ __metadata:
     "@types/mime-db": "npm:^1.43.6"
     "@types/node": "npm:^22.16.4"
     "@types/react": "npm:19.1.8"
-    "@types/react-avatar-editor": "npm:^13.0.3"
+    "@types/react-avatar-editor": "npm:^13.0.4"
     "@typescript-eslint/eslint-plugin": "npm:^8.37.0"
     "@typescript-eslint/parser": "npm:^8.37.0"
     "@uidotdev/usehooks": "npm:^2.4.1"
@@ -11218,7 +11218,7 @@ __metadata:
     polished: "npm:^4.3.1"
     prettier: "npm:^3.6.2"
     react: "npm:19.1.0"
-    react-advanced-cropper: "npm:^0.20.0"
+    react-advanced-cropper: "npm:^0.20.1"
     react-avatar-editor: "npm:^13.0.2"
     react-contenteditable: "npm:^3.3.7"
     react-dom: "npm:19.1.0"
