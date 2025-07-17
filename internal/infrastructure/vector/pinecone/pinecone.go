@@ -6,7 +6,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/pinecone-io/go-pinecone/v3/pinecone"
+	"github.com/pinecone-io/go-pinecone/v4/pinecone"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/config"

@@ -6,7 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/pinecone-io/go-pinecone/v3/pinecone"
+	"github.com/pinecone-io/go-pinecone/v4/pinecone"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 )
