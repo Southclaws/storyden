@@ -10363,13 +10363,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonner@npm:^1.5.0":
-  version: 1.7.4
-  resolution: "sonner@npm:1.7.4"
+"sonner@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "sonner@npm:2.0.6"
   peerDependencies:
     react: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
     react-dom: ^18.0.0 || ^19.0.0 || ^19.0.0-rc
-  checksum: 10c0/2856a43c1afaacec5ca74c7f6bb8eb439edf1fdadb045bd201590f809e6e9b711eabcf7d1e8f3448cf414e1333d97e3e16372a989011a3190f20952947b1f60a
+  checksum: 10c0/df6ab28ebc53d612ea9caa3b9ac2d12b7b15b619750c5bcf6c4e064a720cb24b383fd5ce074f5fe5183115c69d7f505226649cf157e25e954447ec4ed8749291
   languageName: node
   linkType: hard
 
@@ -11226,7 +11226,7 @@ __metadata:
     react-markdown: "npm:^9.1.0"
     remark-parse: "npm:^11.0.0"
     server-only: "npm:^0.0.1"
-    sonner: "npm:^1.5.0"
+    sonner: "npm:^2.0.6"
     swr: "npm:^2.3.4"
     ts-pattern: "npm:^5.7.1"
     typescript: "npm:^5.8.3"
