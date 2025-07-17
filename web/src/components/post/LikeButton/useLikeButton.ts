@@ -4,7 +4,7 @@ import { handle } from "@/api/client";
 import { useFeedMutations } from "@/lib/feed/mutation";
 
 export type Props = {
- thread: PostReference;
+  thread: PostReference;
 };
 
 export function useLikeButton({ thread }: Props) {
@@ -26,10 +26,10 @@ export function useLikeButton({ thread }: Props) {
         },
       },
     );
-  }
+  };
 
- return {
-   ready: true as const,
-   handleClick,
- };
+  return {
+    ready: true as const,
+    handleClick,
+  };
 }

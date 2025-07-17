@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { useCategoryList } from "src/api/openapi-client/categories";
@@ -63,7 +63,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       const { id } = await threadCreate(payload);
       router.push(`/new?id=${id}`);
     }
-  }
+  };
 
   const publish = async ({ title, body, category, tags, url }: FormShape) => {
     if (title.length < 1) {
@@ -105,13 +105,14 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       {
         promiseToast: {
           loading: "Saving draft...",
-          success: "Draft saved!"
+          success: "Draft saved!",
         },
         cleanup: async () => {
           setIsSavingDraft(false);
-        }
-      }
-  ));
+        },
+      },
+    ),
+  );
 
   const handlePublish = form.handleSubmit((data) =>
     handle(
@@ -122,13 +123,14 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       {
         promiseToast: {
           loading: "Publishing post...",
-          success: "Post published!"
+          success: "Post published!",
         },
         cleanup: async () => {
           setIsPublishing(false);
-        }
-      }
-  ));
+        },
+      },
+    ),
+  );
 
   const handleAssetUpload = async () => {
     await handle(
@@ -140,12 +142,12 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       {
         promiseToast: {
           loading: "Saving draft...",
-          success: "Draft saved!"
+          success: "Draft saved!",
         },
         cleanup: async () => {
           setIsSavingDraft(false);
-        }
-      }
+        },
+      },
     );
   };
 
@@ -159,12 +161,12 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       {
         promiseToast: {
           loading: "Saving draft...",
-          success: "Draft saved!"
+          success: "Draft saved!",
         },
         cleanup: async () => {
           setIsSavingDraft(false);
-        }
-      }
+        },
+      },
     );
   };
 
@@ -176,14 +178,14 @@ export function useComposeForm({ initialDraft, editing }: Props) {
     form,
     state: {
       isPublishing,
-      isSavingDraft
+      isSavingDraft,
     },
     handlers: {
       handleSaveDraft,
       handlePublish,
       handleAssetDelete,
       handleAssetUpload,
-      handleBack
-    }
+      handleBack,
+    },
   };
 }
