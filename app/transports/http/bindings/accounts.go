@@ -28,6 +28,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/config"
 )
 
 type Accounts struct {
@@ -40,9 +41,11 @@ type Accounts struct {
 	accountEmail  *account_email.Manager
 	roleAssign    *role_assign.Assignment
 	roleBadge     *role_badge.Writer
+	webAddress    url.URL
 }
 
 func NewAccounts(
+	cfg config.Config,
 	profile_cache *profile_cache.Cache,
 	avatarService avatar.Service,
 	authManager *authentication.Manager,
@@ -63,6 +66,7 @@ func NewAccounts(
 		accountEmail:  accountEmail,
 		roleAssign:    roleAssign,
 		roleBadge:     roleBadge,
+		webAddress:    cfg.PublicWebAddress,
 	}
 }
 
@@ -161,12 +165,12 @@ func (i *Accounts) AccountAuthProviderList(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	available, err := dt.MapErr(providers, serialiseAuthProvider)
+	available, err := dt.MapErr(providers, serialiseAuthProvider(buildRedirectURL(i.webAddress)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	active, err := dt.MapErr(authmethods, serialiseAuthMethod)
+	active, err := dt.MapErr(authmethods, serialiseAuthMethod(i.webAddress))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -205,12 +209,12 @@ func (i *Accounts) AccountAuthMethodDelete(ctx context.Context, request openapi.
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	available, err := dt.MapErr(providers, serialiseAuthProvider)
+	available, err := dt.MapErr(providers, serialiseAuthProvider(buildRedirectURL(i.webAddress)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	active, err := dt.MapErr(authmethods, serialiseAuthMethod)
+	active, err := dt.MapErr(authmethods, serialiseAuthMethod(i.webAddress))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -400,17 +404,19 @@ func (h *Accounts) AccountRoleRemoveBadge(ctx context.Context, request openapi.A
 	}, nil
 }
 
-func serialiseAuthMethod(in *account_auth.AuthMethod) (openapi.AccountAuthMethod, error) {
-	p, err := serialiseAuthProvider(in.Provider)
-	if err != nil {
-		return openapi.AccountAuthMethod{}, fault.Wrap(err)
-	}
+func serialiseAuthMethod(webAddress url.URL) func(in *account_auth.AuthMethod) (openapi.AccountAuthMethod, error) {
+	return func(in *account_auth.AuthMethod) (openapi.AccountAuthMethod, error) {
+		p, err := serialiseAuthProvider(buildRedirectURL(webAddress))(in.Provider)
+		if err != nil {
+			return openapi.AccountAuthMethod{}, fault.Wrap(err)
+		}
 
-	return openapi.AccountAuthMethod{
-		Id:         in.Instance.ID.String(),
-		CreatedAt:  in.Instance.Created,
-		Name:       in.Instance.Name.Or("Unknown"),
-		Identifier: in.Instance.Identifier,
-		Provider:   p,
-	}, nil
+		return openapi.AccountAuthMethod{
+			Id:         in.Instance.ID.String(),
+			CreatedAt:  in.Instance.Created,
+			Name:       in.Instance.Name.Or("Unknown"),
+			Identifier: in.Instance.Identifier,
+			Provider:   p,
+		}, nil
+	}
 }
