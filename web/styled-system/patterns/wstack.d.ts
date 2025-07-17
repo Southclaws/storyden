@@ -9,7 +9,6 @@ export interface WstackProperties {
    
 }
 
-
 interface WstackStyles extends WstackProperties, DistributiveOmit<SystemStyleObject, keyof WstackProperties > {}
 
 interface WstackPatternFn {
@@ -19,7 +18,5 @@ interface WstackPatternFn {
 
 /**
  * A HStack with full width and spaced children.
-
-
  */
 export declare const wstack: WstackPatternFn;

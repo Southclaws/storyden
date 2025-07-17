@@ -9,7 +9,6 @@ export interface MenuItemColorPaletteProperties {
    
 }
 
-
 interface MenuItemColorPaletteStyles extends MenuItemColorPaletteProperties, DistributiveOmit<SystemStyleObject, keyof MenuItemColorPaletteProperties > {}
 
 interface MenuItemColorPalettePatternFn {
@@ -19,7 +18,5 @@ interface MenuItemColorPalettePatternFn {
 
 /**
  * A color palette for menu items.
-
-
  */
 export declare const menuItemColorPalette: MenuItemColorPalettePatternFn;

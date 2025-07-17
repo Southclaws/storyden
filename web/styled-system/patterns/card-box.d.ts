@@ -10,7 +10,6 @@ export interface CardBoxProperties {
 	display?: SystemProperties["display"]
 }
 
-
 interface CardBoxStyles extends CardBoxProperties, DistributiveOmit<SystemStyleObject, keyof CardBoxProperties > {}
 
 interface CardBoxPatternFn {
@@ -20,7 +19,5 @@ interface CardBoxPatternFn {
 
 /**
  * A card component that can be used to display content in a container with a border and a shadow.
-
-
  */
 export declare const CardBox: CardBoxPatternFn;

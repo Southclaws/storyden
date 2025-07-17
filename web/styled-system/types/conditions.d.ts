@@ -34,7 +34,7 @@ export interface Conditions {
 	"_focusWithin": string
 	/** `&:is(:focus-visible, [data-focus-visible])` */
 	"_focusVisible": string
-	/** `&:is(:disabled, [disabled], [data-disabled])` */
+	/** `&:is(:disabled, [disabled], [data-disabled], [aria-disabled=true])` */
 	"_disabled": string
 	/** `&:is(:active, [data-active])` */
 	"_active": string
@@ -42,7 +42,7 @@ export interface Conditions {
 	"_visited": string
 	/** `&:target` */
 	"_target": string
-	/** `&:is(:read-only, [data-read-only])` */
+	/** `&:is(:read-only, [data-read-only], [aria-readonly=true])` */
 	"_readOnly": string
 	/** `&:read-write` */
 	"_readWrite": string
@@ -102,7 +102,7 @@ export interface Conditions {
 	"_peerFocusWithin": string
 	/** `.peer:is(:focus-visible, [data-focus-visible]) ~ &` */
 	"_peerFocusVisible": string
-	/** `.peer:is(:disabled, [disabled], [data-disabled]) ~ &` */
+	/** `.peer:is(:disabled, [disabled], [data-disabled], [aria-disabled=true]) ~ &` */
 	"_peerDisabled": string
 	/** `.peer:is(:checked, [data-checked], [aria-checked=true], [data-state="checked"]) ~ &` */
 	"_peerChecked": string
@@ -122,13 +122,13 @@ export interface Conditions {
 	"_groupFocusWithin": string
 	/** `.group:is(:focus-visible, [data-focus-visible]) &` */
 	"_groupFocusVisible": string
-	/** `.group:is(:disabled, [disabled], [data-disabled]) &` */
+	/** `.group:is(:disabled, [disabled], [data-disabled], [aria-disabled=true]) &` */
 	"_groupDisabled": string
 	/** `.group:is(:checked, [data-checked], [aria-checked=true], [data-state="checked"]) &` */
 	"_groupChecked": string
 	/** `.group:is([aria-expanded=true], [data-expanded], [data-state="expanded"]) &` */
 	"_groupExpanded": string
-	/** `.group:is(:invalid, [data-invalid]) &` */
+	/** `.group:is(:invalid, [data-invalid], [aria-invalid=true]) &` */
 	"_groupInvalid": string
 	/** `&:is(:required, [data-required], [aria-required=true])` */
 	"_required": string

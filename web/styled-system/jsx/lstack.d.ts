@@ -8,7 +8,5 @@ export interface LstackProps extends LstackProperties, DistributiveOmit<HTMLStyl
 
 /**
  * A VStack with full width aligned left.
-
-
  */
 export declare const LStack: FunctionComponent<LstackProps>

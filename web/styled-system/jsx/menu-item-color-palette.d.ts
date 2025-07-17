@@ -8,7 +8,5 @@ export interface MenuItemColorPaletteProps extends MenuItemColorPalettePropertie
 
 /**
  * A color palette for menu items.
-
-
  */
 export declare const MenuItemColorPalette: FunctionComponent<MenuItemColorPaletteProps>
