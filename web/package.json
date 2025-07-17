@@ -40,7 +40,7 @@
     "date-fns": "^4.1.0",
     "dequal": "^2.0.3",
     "emoji-picker-react": "^4.13.2",
-    "framer-motion": "^11.18.2",
+    "framer-motion": "^12.23.6",
     "immer": "^10.1.1",
     "js-cookie": "^3.0.5",
     "just-diff": "^6.0.2",
