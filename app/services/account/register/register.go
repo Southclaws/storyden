@@ -188,7 +188,7 @@ func (s *Registrar) GetOrCreateViaEmail(
 
 		_, err = s.authRepo.Create(ctx, emailOwner.ID, service, authentication.TokenTypeOAuth, identifier, token, nil, authentication.WithName(authName))
 		if err != nil {
-			return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for account"), fctx.With(ctx))
+			return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for existing email"), fctx.With(ctx))
 		}
 
 		logger.Info("get or create: no auth record, email already points to existing account, linking new auth method to existing account")
@@ -287,7 +287,7 @@ func (s *Registrar) GetOrCreateViaHandle(
 		if sessionAccount, ok := session.Get(); ok {
 			_, err = s.authRepo.Create(ctx, sessionAccount.ID, service, authentication.TokenTypeOAuth, identifier, token, nil, authentication.WithName(authName))
 			if err != nil {
-				return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for account"), fctx.With(ctx))
+				return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for existing already logged-in account with same handle"), fctx.With(ctx))
 			}
 
 			return &sessionAccount, nil
@@ -309,7 +309,7 @@ func (s *Registrar) GetOrCreateViaHandle(
 			// already using on Storyden. Link the auth method and return acc.
 			_, err = s.authRepo.Create(ctx, sessionAccount.ID, service, authentication.TokenTypeOAuth, identifier, token, nil, authentication.WithName(authName))
 			if err != nil {
-				return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for account"), fctx.With(ctx))
+				return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for existing already logged-in account"), fctx.With(ctx))
 			}
 
 			return &sessionAccount, nil
@@ -341,7 +341,7 @@ func (s *Registrar) CreateWithRandomHandle(
 
 	_, err = s.authRepo.Create(ctx, newAccount.ID, service, authentication.TokenTypeOAuth, identifier, token, nil, authentication.WithName(authName))
 	if err != nil {
-		return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for account"), fctx.With(ctx))
+		return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for brand new account with random handle"), fctx.With(ctx))
 	}
 
 	return newAccount, nil
@@ -364,7 +364,7 @@ func (s *Registrar) CreateWithHandle(
 
 	_, err = s.authRepo.Create(ctx, newAccount.ID, service, authentication.TokenTypeOAuth, identifier, token, nil, authentication.WithName(authName))
 	if err != nil {
-		return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for account"), fctx.With(ctx))
+		return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for brand new account"), fctx.With(ctx))
 	}
 
 	return newAccount, nil
