@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 	"fmt"
+	"net/url"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -19,10 +20,12 @@ import (
 	auth_svc "github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/email_only"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/config"
 )
 
 type Authentication struct {
@@ -37,9 +40,11 @@ type Authentication struct {
 	authManager                   *auth_svc.Manager
 	emailVerifier                 *email_verify.Verifier
 	access_key                    *access_key.Repository
+	webAddress                    url.URL
 }
 
 func NewAuthentication(
+	cfg config.Config,
 	cj *session_cookie.Jar,
 	si *session.Issuer,
 	session *session.Provider,
@@ -64,6 +69,7 @@ func NewAuthentication(
 		authManager:                   authManager,
 		emailVerifier:                 emailVerifier,
 		access_key:                    access_key,
+		webAddress:                    cfg.PublicWebAddress,
 	}
 }
 
@@ -78,7 +84,7 @@ func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.A
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	list, err := dt.MapErr(providers, serialiseAuthProvider)
+	list, err := dt.MapErr(providers, serialiseAuthProvider(buildRedirectURL(o.webAddress)))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -167,23 +173,33 @@ func (a *Authentication) AccessKeyDelete(ctx context.Context, request openapi.Ac
 	return openapi.AccessKeyDelete204Response{}, nil
 }
 
-func serialiseAuthProvider(p auth_svc.Provider) (openapi.AuthProvider, error) {
-	if op, ok := p.(auth_svc.OAuthProvider); ok {
-		link, err := op.Link("/")
-		if err != nil {
-			return openapi.AuthProvider{}, fault.Wrap(err)
+func buildRedirectURL(webAddress url.URL) func(s authentication.Service) url.URL {
+	return func(s authentication.Service) url.URL {
+		return oauth.Redirect(webAddress, s)
+	}
+}
+
+func serialiseAuthProvider(redirectFn func(authentication.Service) url.URL) func(p auth_svc.Provider) (openapi.AuthProvider, error) {
+	return func(p auth_svc.Provider) (openapi.AuthProvider, error) {
+		if op, ok := p.(auth_svc.OAuthProvider); ok {
+			uri := redirectFn(p.Service())
+
+			link, err := op.Link(uri.String())
+			if err != nil {
+				return openapi.AuthProvider{}, fault.Wrap(err)
+			}
+			return openapi.AuthProvider{
+				Provider: p.Service().String(),
+				Name:     fmt.Sprintf("%v", p.Service()),
+				Link:     &link,
+			}, nil
 		}
+
 		return openapi.AuthProvider{
 			Provider: p.Service().String(),
 			Name:     fmt.Sprintf("%v", p.Service()),
-			Link:     &link,
 		}, nil
 	}
-
-	return openapi.AuthProvider{
-		Provider: p.Service().String(),
-		Name:     fmt.Sprintf("%v", p.Service()),
-	}, nil
 }
 
 func deserialiseAuthMode(in openapi.AuthMode) (authentication.Mode, error) {
