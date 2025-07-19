@@ -75,7 +75,7 @@ require (
 	github.com/openai/openai-go v1.11.0
 	github.com/pb33f/libopenapi v0.23.0
 	github.com/philippgille/chromem-go v0.7.0
-	github.com/pinecone-io/go-pinecone/v4 v4.1.0
+	github.com/pinecone-io/go-pinecone/v4 v4.1.1
 	github.com/puzpuzpuz/xsync/v4 v4.1.0
 	github.com/redis/rueidis v1.0.63
 	github.com/rs/cors v1.11.1
@@ -89,7 +89,7 @@ require (
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.37.0
 	go.opentelemetry.io/otel/sdk v1.37.0
 	go.opentelemetry.io/otel/trace v1.37.0
-	golang.org/x/exp v0.0.0-20250717185816-542afb5b7346
+	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
 	golang.org/x/sync v0.16.0
 	google.golang.org/api v0.242.0
 )
