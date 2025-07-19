@@ -31,7 +31,7 @@ type Partial struct {
 	Meta      opt.Optional[map[string]any]
 }
 
-func (u *Updater) Update(ctx context.Context, id account.AccountID, params Partial) (*account.Account, error) {
+func (u *Updater) Update(ctx context.Context, id account.AccountID, params Partial) (*account.AccountWithEdges, error) {
 	opts := []account_writer.Mutation{}
 
 	if v, ok := params.Handle.Get(); ok {

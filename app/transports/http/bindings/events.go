@@ -18,7 +18,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/event/participation"
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/post/category"
-	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/services/event/event_management"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -192,7 +191,7 @@ func serialiseEventTimeRange(in event_ref.TimeRange) openapi.EventTimeRange {
 
 func serialiseParticipantPtr(in *participation.EventParticipant) openapi.EventParticipant {
 	return openapi.EventParticipant{
-		Profile: serialiseProfileReferencePtr(profile.ProfileFromAccount(&in.Account)),
+		Profile: serialiseProfileReferencePtr(&in.Account),
 		Role:    openapi.EventParticipantRole(in.Role.String()),
 		Status:  openapi.EventParticipationStatus(in.Status.String()),
 	}
@@ -280,8 +279,4 @@ func serialiseLocation(in location.Location) openapi.EventLocation {
 	}
 
 	return l
-}
-
-func deserialiseEventMark(in string) event_ref.QueryKey {
-	return event_ref.QueryKey{deserialiseMark(in)}
 }

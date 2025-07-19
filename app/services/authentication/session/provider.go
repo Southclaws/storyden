@@ -19,7 +19,7 @@ func New(querier *account_querier.Querier) *Provider {
 	return &Provider{querier: querier}
 }
 
-func (s *Provider) Account(ctx context.Context) (*account.Account, error) {
+func (s *Provider) Account(ctx context.Context) (*account.AccountWithEdges, error) {
 	id, err := GetAccountID(ctx)
 	if err != nil {
 		return nil, err
@@ -33,15 +33,15 @@ func (s *Provider) Account(ctx context.Context) (*account.Account, error) {
 	return acc, nil
 }
 
-func (s *Provider) AccountMaybe(ctx context.Context) opt.Optional[account.Account] {
+func (s *Provider) AccountMaybe(ctx context.Context) opt.Optional[account.AccountWithEdges] {
 	id, err := GetAccountID(ctx)
 	if err != nil {
-		return opt.NewEmpty[account.Account]()
+		return opt.NewEmpty[account.AccountWithEdges]()
 	}
 
 	acc, err := s.querier.GetByID(ctx, id)
 	if err != nil {
-		return opt.NewEmpty[account.Account]()
+		return opt.NewEmpty[account.AccountWithEdges]()
 	}
 
 	return opt.New(*acc)

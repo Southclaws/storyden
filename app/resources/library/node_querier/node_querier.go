@@ -408,7 +408,7 @@ func (q *Querier) Probe(ctx context.Context, id library.NodeID) (*library.Node, 
 	return r, nil
 }
 
-func (q *Querier) getRequestingAccount(ctx context.Context, o *options) (opt.Optional[account.Account], error) {
+func (q *Querier) getRequestingAccount(ctx context.Context, o *options) (opt.Optional[account.AccountWithEdges], error) {
 	if !o.visibilityRules {
 		return nil, nil
 	}

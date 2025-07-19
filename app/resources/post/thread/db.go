@@ -518,12 +518,7 @@ func (d *database) Get(ctx context.Context, threadID post.ID, pageParams paginat
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	accounts, err := dt.MapErr(accountEdges, account.MapAccount)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	accountLookup = account.Accounts(accounts).Map()
+	accountLookup = account.NewAccountLookup(accountEdges)
 
 	// Join all data together
 

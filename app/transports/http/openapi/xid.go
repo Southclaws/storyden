@@ -11,7 +11,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	model "github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -55,7 +55,7 @@ func IdentifierFrom(id xid.ID) *Identifier {
 // ID will resolve the Unique value to an account's ID using a repository. Since
 // this is used a lot as most of the system supports using IDs and handles
 // interchangably, the repository this uses should make heavy use of caching.
-func ResolveHandle(ctx context.Context, r *account_querier.Querier, u AccountHandle) (account.AccountID, error) {
+func ResolveHandle(ctx context.Context, r *profile_querier.Querier, u AccountHandle) (account.AccountID, error) {
 	if id, err := xid.FromString(string(u)); err == nil {
 		a, err := r.GetByID(ctx, account.AccountID(id))
 		if err != nil {
@@ -83,7 +83,7 @@ func ResolveHandle(ctx context.Context, r *account_querier.Querier, u AccountHan
 	return account.AccountID(a.ID), nil
 }
 
-func OptionalID(ctx context.Context, r *account_querier.Querier, u *AccountHandle) (opt.Optional[account.AccountID], error) {
+func OptionalID(ctx context.Context, r *profile_querier.Querier, u *AccountHandle) (opt.Optional[account.AccountID], error) {
 	if u == nil {
 		return opt.NewEmpty[account.AccountID](), nil
 	}

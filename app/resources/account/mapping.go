@@ -2,7 +2,6 @@ package account
 
 import (
 	"net/mail"
-	"net/url"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -10,18 +9,10 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/ent/schema"
 )
 
-func MapAccount(a *ent.Account) (*Account, error) {
-	rolesEdge := a.Edges.AccountRoles
-
-	auths := dt.Map(a.Edges.Authentication, func(a *ent.Authentication) string {
-		return a.Service
-	})
-
+func MapRef(a *ent.Account) (*Account, error) {
 	bio, err := datagraph.NewRichText(a.Bio)
 	if err != nil {
 		return nil, err
@@ -32,10 +23,34 @@ func MapAccount(a *ent.Account) (*Account, error) {
 		return nil, err
 	}
 
-	links, err := dt.MapErr(a.Links, MapExternalLink)
+	return &Account{
+		ID:        AccountID(a.ID),
+		CreatedAt: a.CreatedAt,
+		UpdatedAt: a.UpdatedAt,
+
+		Handle:   a.Handle,
+		Name:     a.Name,
+		Bio:      bio,
+		Kind:     kind,
+		Admin:    a.Admin, // TODO: should this be derived from roles?
+		Metadata: a.Metadata,
+
+		DeletedAt: opt.NewPtr(a.DeletedAt),
+		IndexedAt: opt.NewPtr(a.IndexedAt),
+	}, nil
+}
+
+func MapAccount(a *ent.Account) (*AccountWithEdges, error) {
+	ref, err := MapRef(a)
 	if err != nil {
-		return nil, fault.Wrap(err)
+		return nil, err
 	}
+
+	rolesEdge := a.Edges.AccountRoles
+
+	auths := dt.Map(a.Edges.Authentication, func(a *ent.Authentication) string {
+		return a.Service
+	})
 
 	roles, err := held.MapList(rolesEdge, a.Admin)
 	if err != nil {
@@ -57,7 +72,7 @@ func MapAccount(a *ent.Account) (*Account, error) {
 			return Account{}, err
 		}
 
-		ib, err := MapAccount(c)
+		ib, err := MapRef(c)
 		if err != nil {
 			return Account{}, err
 		}
@@ -68,37 +83,13 @@ func MapAccount(a *ent.Account) (*Account, error) {
 		return nil, err
 	}
 
-	return &Account{
-		ID:             AccountID(a.ID),
-		Handle:         a.Handle,
-		Name:           a.Name,
-		Bio:            bio,
-		Kind:           kind,
-		Admin:          roles.Permissions().HasAll(rbac.PermissionAdministrator),
+	return &AccountWithEdges{
+		Account:        *ref,
 		Roles:          roles,
 		Auths:          auths,
 		EmailAddresses: emails,
 		VerifiedStatus: verifiedStatus,
-		ExternalLinks:  links,
 		InvitedBy:      invitedBy,
-		Metadata:       a.Metadata,
-
-		CreatedAt: a.CreatedAt,
-		UpdatedAt: a.UpdatedAt,
-		DeletedAt: opt.NewPtr(a.DeletedAt),
-		IndexedAt: opt.NewPtr(a.IndexedAt),
-	}, nil
-}
-
-func MapExternalLink(e schema.ExternalLink) (ExternalLink, error) {
-	u, err := url.Parse(e.URL)
-	if err != nil {
-		return ExternalLink{}, err
-	}
-
-	return ExternalLink{
-		Text: e.Text,
-		URL:  *u,
 	}, nil
 }
 

@@ -17,19 +17,15 @@ import type { MemberJoinedDate } from "./memberJoinedDate";
 import type { MemberSuspendedDate } from "./memberSuspendedDate";
 import type { Metadata } from "./metadata";
 import type { NotificationCount } from "./notificationCount";
-import type { ProfileExternalLinkList } from "./profileExternalLinkList";
 import type { ProfileReference } from "./profileReference";
-import type { TagReferenceList } from "./tagReferenceList";
 
 export interface AccountCommonProps {
   admin: boolean;
   bio: AccountBio;
   email_addresses: AccountEmailAddressList;
   handle: AccountHandle;
-  interests?: TagReferenceList;
   invited_by?: ProfileReference;
   joined: MemberJoinedDate;
-  links: ProfileExternalLinkList;
   meta: Metadata;
   name: AccountName;
   notifications?: NotificationCount;

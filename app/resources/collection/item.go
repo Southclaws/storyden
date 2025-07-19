@@ -18,7 +18,7 @@ import (
 type CollectionItem struct {
 	Added          time.Time
 	MembershipType MembershipType
-	Author         profile.Public
+	Author         profile.Ref
 	Item           datagraph.Item
 	RelevanceScore opt.Optional[float64]
 }
@@ -75,7 +75,7 @@ func MapPost(n *ent.CollectionPost) (*CollectionItem, error) {
 		return nil, err
 	}
 
-	pro, err := profile.ProfileFromModel(accEdge)
+	pro, err := profile.MapRef(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -106,7 +106,7 @@ func MapNode(n *ent.CollectionNode) (*CollectionItem, error) {
 		return nil, err
 	}
 
-	pro, err := profile.ProfileFromModel(accEdge)
+	pro, err := profile.MapRef(accEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

@@ -85,7 +85,7 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 		r = r[:len(r)-1]
 	}
 
-	profiles, err := dt.MapErr(r, profile.ProfileFromModel)
+	profiles, err := dt.MapErr(r, profile.Map)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

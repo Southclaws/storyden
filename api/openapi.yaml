@@ -3629,7 +3629,7 @@ components:
         suspended: { $ref: "#/components/schemas/MemberSuspendedDate" }
         handle: { $ref: "#/components/schemas/AccountHandle" }
         name: { $ref: "#/components/schemas/AccountName" }
-        roles: { $ref: "#/components/schemas/AccountRoleList" }
+        # roles: { $ref: "#/components/schemas/AccountRoleList" }
 
     ThreadTitle:
       type: string
@@ -4341,7 +4341,6 @@ components:
           name,
           roles,
           bio,
-          links,
           meta,
           verified_status,
           email_addresses,
@@ -4358,10 +4357,6 @@ components:
           $ref: "#/components/schemas/AccountRoleList"
         bio:
           $ref: "#/components/schemas/AccountBio"
-        interests:
-          $ref: "#/components/schemas/TagReferenceList"
-        links:
-          $ref: "#/components/schemas/ProfileExternalLinkList"
         meta:
           $ref: "#/components/schemas/Metadata"
         verified_status:

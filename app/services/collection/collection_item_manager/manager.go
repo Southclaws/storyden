@@ -95,7 +95,7 @@ func (m *Manager) authoriseSubmission(ctx context.Context, qk collection.QueryKe
 		return collection.MembershipType{}, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return collection_auth.CheckCollectionItemMutationPermissions(ctx, *acc, *citem)
+	return collection_auth.CheckCollectionItemMutationPermissions(ctx, acc.Account, *citem)
 }
 
 func (m *Manager) authoriseDirectUpdate(ctx context.Context, qk collection.QueryKey) error {

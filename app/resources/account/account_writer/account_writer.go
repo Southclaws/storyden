@@ -29,37 +29,37 @@ func New(db *ent.Client, accountQuerier *account_querier.Querier) *Writer {
 }
 
 type (
-	Option   func(*account.Account)
+	Option   func(*ent.AccountMutation)
 	Mutation func(u *ent.AccountUpdateOne)
 )
 
 func WithID(id account.AccountID) Option {
-	return func(a *account.Account) {
-		a.ID = account.AccountID(id)
+	return func(a *ent.AccountMutation) {
+		a.SetID(xid.ID(id))
 	}
 }
 
 func WithAdmin(admin bool) Option {
-	return func(a *account.Account) {
-		a.Admin = admin
+	return func(a *ent.AccountMutation) {
+		a.SetAdmin(admin)
 	}
 }
 
 func WithName(name string) Option {
-	return func(a *account.Account) {
-		a.Name = name
+	return func(a *ent.AccountMutation) {
+		a.SetName(name)
 	}
 }
 
 func WithBio(v datagraph.Content) Option {
-	return func(a *account.Account) {
-		a.Bio = v
+	return func(a *ent.AccountMutation) {
+		a.SetBio(v.HTML())
 	}
 }
 
 func WithInvitedBy(id xid.ID) Option {
-	return func(a *account.Account) {
-		a.InvitedByID = &id
+	return func(a *ent.AccountMutation) {
+		a.SetInvitedByID(id)
 	}
 }
 
@@ -120,29 +120,18 @@ func SetDeleted(t opt.Optional[time.Time]) Mutation {
 	}
 }
 
-func (d *Writer) Create(ctx context.Context, handle string, opts ...Option) (*account.Account, error) {
-	withrequired := account.Account{
-		Handle: handle,
-		Name:   handle, // default display name is just the handle
-	}
+func (d *Writer) Create(ctx context.Context, handle string, opts ...Option) (*account.AccountWithEdges, error) {
+	create := d.db.Account.Create()
+	mutate := create.Mutation()
+
+	mutate.SetHandle(handle)
+	mutate.SetName(handle) // default display name is just the handle
 
 	for _, v := range opts {
-		v(&withrequired)
+		v(mutate)
 	}
 
-	create := d.db.Account.Create()
-
-	if !xid.ID(withrequired.ID).IsNil() {
-		create.SetID(xid.ID(withrequired.ID))
-	}
-
-	a, err := create.
-		SetHandle(withrequired.Handle).
-		SetName(withrequired.Name).
-		SetBio(withrequired.Bio.HTML()).
-		SetAdmin(withrequired.Admin).
-		SetNillableInvitedByID(withrequired.InvitedByID).
-		Save(ctx)
+	a, err := create.Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
@@ -154,7 +143,7 @@ func (d *Writer) Create(ctx context.Context, handle string, opts ...Option) (*ac
 	return d.accountQuerier.GetByID(ctx, account.AccountID(a.ID))
 }
 
-func (d *Writer) Update(ctx context.Context, id account.AccountID, opts ...Mutation) (*account.Account, error) {
+func (d *Writer) Update(ctx context.Context, id account.AccountID, opts ...Mutation) (*account.AccountWithEdges, error) {
 	update := d.db.Account.UpdateOneID(xid.ID(id))
 
 	for _, fn := range opts {

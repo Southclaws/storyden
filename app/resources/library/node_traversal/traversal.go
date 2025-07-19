@@ -16,7 +16,7 @@ type Repository interface {
 
 type filters struct {
 	rootAccountHandleFilter *string
-	requestingAccount       opt.Optional[account.Account]
+	requestingAccount       opt.Optional[account.AccountWithEdges]
 	visibility              []visibility.Visibility
 	depth                   *uint
 }
@@ -38,7 +38,7 @@ func WithRootOwner(v string) Filter {
 // against the requesting account (if any) to ensure that visibility rules are
 // implemented correctly. Owners can view their own drafts, library managers can
 // view all review items, etc.
-func WithVisibility(acc opt.Optional[account.Account], v ...visibility.Visibility) Filter {
+func WithVisibility(acc opt.Optional[account.AccountWithEdges], v ...visibility.Visibility) Filter {
 	return func(f *filters) {
 		f.requestingAccount = acc
 		f.visibility = v

@@ -1,4 +1,4 @@
-package account_querier
+package profile_querier
 
 import (
 	"context"
@@ -9,6 +9,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 	account_ent "github.com/Southclaws/storyden/internal/ent/account"
 )
@@ -21,7 +22,7 @@ func New(db *ent.Client) *Querier {
 	return &Querier{db: db}
 }
 
-func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.AccountWithEdges, error) {
+func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*profile.Public, error) {
 	q := d.db.Account.
 		Query().
 		Where(account_ent.ID(xid.ID(id))).
@@ -44,7 +45,12 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	acc, err := account.MapAccount(result)
+	acc, err := profile.Map(result)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err = queryFollows(ctx, result, acc)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -52,19 +58,12 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 	return acc, nil
 }
 
-func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.AccountWithEdges, bool, error) {
+func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*profile.Public, bool, error) {
 	q := d.db.Account.
 		Query().
 		Where(account_ent.Handle(handle)).
-		WithTags().
-		WithEmails().
-		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
-		WithInvitedBy(func(iq *ent.InvitationQuery) {
-			iq.WithCreator(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
-		}).
-		WithAuthentication()
+		WithAuthentication().
+		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
 
 	result, err := q.Only(ctx)
 	if err != nil {
@@ -75,10 +74,45 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.A
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	acc, err := account.MapAccount(result)
+	// threads, posts, err := d.getPostCounts(ctx, account.ID)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	acc, err := profile.Map(result)
+	if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	// u.ThreadCount = threads
+	// u.PostCount = posts
+
+	acc, err = queryFollows(ctx, result, acc)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return acc, true, nil
+}
+
+func queryFollows(ctx context.Context, a *ent.Account, acc *profile.Public) (*profile.Public, error) {
+	following, err := a.QueryFollowing().Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	followers, err := a.QueryFollowedBy().Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	likes, err := a.QueryPosts().QueryLikes().Count(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc.Followers = followers
+	acc.Following = following
+	acc.LikeScore = likes
+
+	return acc, nil
 }

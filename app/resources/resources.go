@@ -47,6 +47,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_writer"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
 	"github.com/Southclaws/storyden/app/resources/question"
 	"github.com/Southclaws/storyden/app/resources/settings"
@@ -96,6 +97,7 @@ func Build() fx.Option {
 			link_querier.New,
 			link_writer.New,
 			profile_search.New,
+			profile_querier.New,
 			profile_cache.New,
 			follow_writer.New,
 			follow_querier.New,
