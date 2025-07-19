@@ -7,13 +7,12 @@ import (
 	"github.com/Southclaws/fault/fctx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
-	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -22,7 +21,7 @@ type indexerConsumer struct {
 	threadRepo   thread.Repository
 	replyRepo    reply.Repository
 	nodeQuerier  *node_querier.Querier
-	accountQuery *account_querier.Querier
+	profileQuery *profile_querier.Querier
 
 	qnode   pubsub.Topic[mq.IndexNode]
 	qthread pubsub.Topic[mq.IndexThread]
@@ -35,7 +34,7 @@ func newIndexConsumer(
 	threadRepo thread.Repository,
 	replyRepo reply.Repository,
 	nodeQuerier *node_querier.Querier,
-	accountQuery *account_querier.Querier,
+	profileQuery *profile_querier.Querier,
 
 	qnode pubsub.Topic[mq.IndexNode],
 	qthread pubsub.Topic[mq.IndexThread],
@@ -48,7 +47,7 @@ func newIndexConsumer(
 		threadRepo:   threadRepo,
 		replyRepo:    replyRepo,
 		nodeQuerier:  nodeQuerier,
-		accountQuery: accountQuery,
+		profileQuery: profileQuery,
 		qnode:        qnode,
 
 		qthread: qthread,
@@ -68,11 +67,11 @@ func (i *indexerConsumer) indexReply(ctx context.Context, id post.ID) error {
 }
 
 func (i *indexerConsumer) indexProfile(ctx context.Context, id account.AccountID) error {
-	p, err := i.accountQuery.GetByID(ctx, id)
+	p, err := i.profileQuery.GetByID(ctx, id)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = i.indexer.Index(ctx, profile.ProfileFromAccount(p))
+	_, err = i.indexer.Index(ctx, p)
 	return err
 }

@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 )
 
-func CheckCollectionMutationPermissions(ctx context.Context, acc account.Account, col collection.Collection) error {
+func CheckCollectionMutationPermissions(ctx context.Context, acc account.AccountWithEdges, col collection.Collection) error {
 	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
 		if acc.ID != col.Owner.ID {
 			return fault.Wrap(rbac.ErrPermissions,

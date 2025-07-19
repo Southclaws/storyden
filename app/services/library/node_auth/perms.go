@@ -12,7 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 )
 
-func AuthoriseNodeMutation(ctx context.Context, acc *account.Account, n *library.Node) error {
+func AuthoriseNodeMutation(ctx context.Context, acc *account.AccountWithEdges, n *library.Node) error {
 	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
 		ownsNode := n.Owner.ID == acc.ID
 
@@ -31,7 +31,7 @@ func AuthoriseNodeMutation(ctx context.Context, acc *account.Account, n *library
 	return nil
 }
 
-func AuthoriseNodeParentChildMutation(ctx context.Context, acc *account.Account, cnode, pnode *library.Node) error {
+func AuthoriseNodeParentChildMutation(ctx context.Context, acc *account.AccountWithEdges, cnode, pnode *library.Node) error {
 	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
 		ownsChild := cnode.Owner.ID == acc.ID
 		ownsParent := pnode.Owner.ID == acc.ID

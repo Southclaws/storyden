@@ -56,7 +56,7 @@ func split(mutations ...Mutation) (adds, removes []xid.ID, admin opt.Optional[bo
 	return
 }
 
-func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountID, roles ...Mutation) (*account.Account, error) {
+func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountID, roles ...Mutation) (*account.AccountWithEdges, error) {
 	update := w.db.Account.UpdateOneID(xid.ID(accountID))
 	mutation := update.Mutation()
 

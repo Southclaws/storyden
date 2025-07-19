@@ -81,7 +81,7 @@ func (m *Manager) Update(ctx context.Context, mk event_ref.QueryKey, change Chan
 
 	notifications, err := func() ([]notificationTarget, error) {
 		if change.AccountID == session {
-			return m.updateSelf(ctx, acc, mk, evt, change)
+			return m.updateSelf(ctx, &acc.Account, mk, evt, change)
 		} else {
 			return m.updateGuest(ctx, acc, mk, evt, change)
 		}

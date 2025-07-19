@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/invitation"
 	"github.com/Southclaws/storyden/app/resources/account/invitation/invitation_querier"
 	"github.com/Southclaws/storyden/app/resources/account/invitation/invitation_writer"
-	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -159,7 +158,7 @@ func serialiseInvitationPtr(inv *invitation.Invitation) openapi.Invitation {
 		CreatedAt: inv.CreatedAt,
 		UpdatedAt: inv.UpdatedAt,
 		DeletedAt: inv.DeletedAt.Ptr(),
-		Creator:   serialiseProfileReference(*profile.ProfileFromAccount(&inv.Creator)),
+		Creator:   serialiseProfileReferenceFromAccount(inv.Creator),
 		Message:   inv.Message.Ptr(),
 	}
 }

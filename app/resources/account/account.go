@@ -12,6 +12,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 var errSuspended = fault.Wrap(fault.New("suspended"), ftag.With(ftag.PermissionDenied))
@@ -21,38 +22,39 @@ type AccountID xid.ID
 func (u AccountID) String() string { return xid.ID(u).String() }
 
 type Account struct {
-	ID             AccountID
-	Handle         string
-	Name           string
-	Bio            datagraph.Content
-	Kind           AccountKind
-	Admin          bool
-	Followers      int
-	Following      int
-	LikeScore      int
+	ID        AccountID
+	CreatedAt time.Time
+	UpdatedAt time.Time
+
+	Handle   string
+	Name     string
+	Bio      datagraph.Content
+	Kind     AccountKind
+	Admin    bool
+	Metadata map[string]any
+
+	DeletedAt opt.Optional[time.Time]
+	IndexedAt opt.Optional[time.Time]
+}
+
+type AccountWithEdges struct {
+	Account
 	Roles          held.Roles
 	Auths          []string
 	EmailAddresses []*EmailAddress
 	VerifiedStatus VerifiedStatus
-	ExternalLinks  []ExternalLink
-	Metadata       map[string]any
-
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt opt.Optional[time.Time]
-	IndexedAt opt.Optional[time.Time]
-
-	InvitedByID *xid.ID
-	InvitedBy   opt.Optional[Account]
+	InvitedBy      opt.Optional[Account]
 }
 
 type Accounts []*Account
 
-func (a Accounts) Map() Lookup {
-	return lo.KeyBy(a, func(a *Account) xid.ID { return xid.ID(a.ID) })
-}
+type Lookup map[xid.ID]*ent.Account
 
-type Lookup map[xid.ID]*Account
+func NewAccountLookup(in []*ent.Account) Lookup {
+	return lo.KeyBy(in, func(a *ent.Account) xid.ID {
+		return a.ID
+	})
+}
 
 type ExternalLink struct {
 	Text string

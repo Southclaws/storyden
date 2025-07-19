@@ -49,7 +49,7 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 	return nil
 }
 
-func (s *service) authoriseThreadDelete(ctx context.Context, acc *account.Account, thr *thread.Thread) error {
+func (s *service) authoriseThreadDelete(ctx context.Context, acc *account.AccountWithEdges, thr *thread.Thread) error {
 	return acc.Roles.Permissions().Authorise(ctx, func() error {
 		if thr.Author.ID != acc.ID {
 			return fault.Wrap(rbac.ErrPermissions,

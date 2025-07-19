@@ -23,7 +23,7 @@ func New(db *ent.Client) *Writer {
 	return &Writer{db: db}
 }
 
-func (w *Writer) Update(ctx context.Context, accountID account.AccountID, roleID role.RoleID, badge bool) (*account.Account, error) {
+func (w *Writer) Update(ctx context.Context, accountID account.AccountID, roleID role.RoleID, badge bool) (*account.AccountWithEdges, error) {
 	predicate := []predicate.AccountRoles{
 		accountroles.AccountIDEQ(xid.ID(accountID)),
 		accountroles.RoleIDEQ(xid.ID(roleID)),

@@ -121,5 +121,5 @@ func (p *Provider) FinishLogin(ctx context.Context,
 		return nil, nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return cred, acc, nil
+	return cred, &acc.Account, nil
 }

@@ -97,7 +97,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 	return thr, nil
 }
 
-func authoriseThreadUpdate(ctx context.Context, acc *account.Account, thr *thread.Thread) error {
+func authoriseThreadUpdate(ctx context.Context, acc *account.AccountWithEdges, thr *thread.Thread) error {
 	return acc.Roles.Permissions().Authorise(ctx, func() error {
 		if thr.Author.ID != acc.ID {
 			return fault.Wrap(rbac.ErrPermissions,

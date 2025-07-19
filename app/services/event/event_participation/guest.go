@@ -21,7 +21,7 @@ import (
 
 var ErrNotHost = fault.New("not a host", ftag.With(ftag.PermissionDenied))
 
-func (m *Manager) updateGuest(ctx context.Context, acc *account.Account, mk event_ref.QueryKey, evt *event.Event, change Change) ([]notificationTarget, error) {
+func (m *Manager) updateGuest(ctx context.Context, acc *account.AccountWithEdges, mk event_ref.QueryKey, evt *event.Event, change Change) ([]notificationTarget, error) {
 	// Grab all hosts
 	hosts := dt.Filter(evt.Participants, func(p *participation.EventParticipant) bool { return p.Role == participation.RoleHost })
 

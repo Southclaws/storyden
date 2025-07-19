@@ -161,17 +161,18 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 	}
 
 	// TODO: Clean this mess up.
-	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (account.Account, error) {
+
+	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (account.AccountWithEdges, error) {
 		a, err := c.accountQuery.GetByID(ctx, aid)
 		if err != nil {
-			return account.Account{}, err
+			return account.AccountWithEdges{}, err
 		}
 
 		return *a, nil
 	})
 	if err != nil {
 		if ftag.Get(err) == ftag.NotFound {
-			acc = opt.NewEmpty[account.Account]()
+			acc = opt.NewEmpty[account.AccountWithEdges]()
 		} else {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
@@ -728,14 +729,6 @@ func serialisePropertySchemaList(in library.PropertySchema) openapi.PropertySche
 	}
 
 	return dt.Map(in.Fields, serialisePropertySchema)
-}
-
-func serialisePropertySchemaListOpt(in opt.Optional[library.PropertySchema]) openapi.PropertySchemaList {
-	pt, ok := in.Get()
-	if !ok {
-		return openapi.PropertySchemaList{}
-	}
-	return serialisePropertySchemaList(pt)
 }
 
 func deserialisePropertySchemaMutation(in openapi.PropertySchemaMutableProps) (*node_properties.SchemaFieldMutation, error) {
