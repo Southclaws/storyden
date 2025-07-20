@@ -44,6 +44,7 @@ require (
 	github.com/alitto/pond/v2 v2.5.0
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/cixtor/readability v1.0.0
+	github.com/coreos/go-oidc/v3 v3.14.1
 	github.com/dave/jennifer v1.7.1
 	github.com/dboslee/lru v0.0.1
 	github.com/dgraph-io/ristretto/v2 v2.2.0
@@ -116,6 +117,7 @@ require (
 	github.com/ebitengine/purego v0.8.4 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
+	github.com/go-jose/go-jose/v4 v4.0.5 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect

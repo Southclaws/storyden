@@ -191,6 +191,14 @@ type Config struct {
 	DiscordClientID string `envconfig:"OAUTH_DISCORD_CLIENT_ID"`
 	// The client secret for the Discord OAuth2 application.
 	DiscordClientSecret string `envconfig:"OAUTH_DISCORD_CLIENT_SECRET"`
+	// Enable Keycloak OIDC authentication.
+	KeycloakEnabled bool `envconfig:"OAUTH_KEYCLOAK_ENABLED"`
+	// The client ID for the Keycloak OAuth2 application.
+	KeycloakClientID string `envconfig:"OAUTH_KEYCLOAK_CLIENT_ID"`
+	// The client secret for the Keycloak OAuth2 application.
+	KeycloakClientSecret string `envconfig:"OAUTH_KEYCLOAK_CLIENT_SECRET"`
+	// The issuer/discovery URL for the Keycloak realm (e.g. https://auth.example.com/realms/YourRealm).
+	KeycloakIssuerURL url.URL `envconfig:"OAUTH_KEYCLOAK_ISSUER_URL"`
 
 	// -
 	// SMS
