@@ -89,18 +89,14 @@ func (q *Querier) Get(ctx context.Context, name tag_ref.Name) (*tag.Tag, error) 
 				ent_post.DeletedAtIsNil(),
 			)
 			pq.WithCategory()
-			pq.WithAuthor(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			pq.WithAuthor()
 		}).
 		WithNodes(func(nq *ent.NodeQuery) {
 			nq.Where(
 				ent_node.VisibilityEQ(ent_node.VisibilityPublished),
 				ent_node.DeletedAtIsNil(),
 			)
-			nq.WithOwner(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			nq.WithOwner()
 			nq.WithPrimaryImage()
 		}).
 		First(ctx)

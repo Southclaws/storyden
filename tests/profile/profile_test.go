@@ -190,5 +190,5 @@ func newAccount(t *testing.T, ctx context.Context, cl *openapi.ClientWithRespons
 	r.NoError(err)
 	r.NotNil(acc)
 
-	return *acc
+	return acc.Account
 }

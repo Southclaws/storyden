@@ -30,7 +30,7 @@ type Querier struct {
 func (q *Querier) Get(ctx context.Context, reactID ReactID) (*React, error) {
 	r, err := q.db.React.Query().
 		Where(react.ID(xid.ID(reactID))).
-		WithAccount(func(aq *ent.AccountQuery) { aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }) }).
+		WithAccount().
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
@@ -46,7 +46,7 @@ func (q *Querier) Lookup(ctx context.Context, accountID account.AccountID, postI
 			react.PostID(xid.ID(postID)),
 			react.Emoji(e),
 		).
-		WithAccount(func(aq *ent.AccountQuery) { aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }) }).
+		WithAccount().
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))

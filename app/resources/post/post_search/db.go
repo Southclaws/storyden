@@ -32,13 +32,9 @@ func (d *database) Search(ctx context.Context, params pagination.Parameters, fil
 	q := d.db.Post.
 		Query().
 		Where(predicate).
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAuthor().
 		WithReacts(func(rq *ent.ReactQuery) {
-			rq.WithAccount(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			}).Order(react.ByCreatedAt())
+			rq.WithAccount().Order(react.ByCreatedAt())
 		}).
 		WithTags().
 		WithRoot().
@@ -87,13 +83,9 @@ func (d *database) GetMany(ctx context.Context, ids ...post.ID) ([]*post.Post, e
 		Where(
 			ent_post.IDIn(rawids...),
 		).
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAuthor().
 		WithReacts(func(rq *ent.ReactQuery) {
-			rq.WithAccount(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			}).Order(react.ByCreatedAt())
+			rq.WithAccount().Order(react.ByCreatedAt())
 		}).
 		WithTags().
 		WithRoot().

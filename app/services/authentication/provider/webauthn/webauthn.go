@@ -142,5 +142,5 @@ func (p *Provider) add(ctx context.Context, accountID account.AccountID, credent
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return acc, nil
+	return &acc.Account, nil
 }

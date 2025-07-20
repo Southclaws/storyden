@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_assign"
 	"github.com/Southclaws/storyden/app/resources/account/role/role_badge"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/account/account_auth"
 	"github.com/Southclaws/storyden/app/services/account/account_email"
@@ -36,6 +37,7 @@ type Accounts struct {
 	avatarService avatar.Service
 	authManager   *authentication.Manager
 	accountQuery  *account_querier.Querier
+	profileQuery  *profile_querier.Querier
 	accountUpdate account_update.Updater
 	accountAuth   *account_auth.Manager
 	accountEmail  *account_email.Manager
@@ -50,6 +52,7 @@ func NewAccounts(
 	avatarService avatar.Service,
 	authManager *authentication.Manager,
 	accountQuery *account_querier.Querier,
+	profileQuery *profile_querier.Querier,
 	accountUpdate account_update.Updater,
 	accountAuth *account_auth.Manager,
 	accountEmail *account_email.Manager,
@@ -61,6 +64,7 @@ func NewAccounts(
 		avatarService: avatarService,
 		authManager:   authManager,
 		accountQuery:  accountQuery,
+		profileQuery:  profileQuery,
 		accountUpdate: accountUpdate,
 		accountAuth:   accountAuth,
 		accountEmail:  accountEmail,
@@ -228,7 +232,7 @@ func (i *Accounts) AccountAuthMethodDelete(ctx context.Context, request openapi.
 }
 
 func (i *Accounts) AccountGetAvatar(ctx context.Context, request openapi.AccountGetAvatarRequestObject) (openapi.AccountGetAvatarResponseObject, error) {
-	id, err := openapi.ResolveHandle(ctx, i.accountQuery, request.AccountHandle)
+	id, err := openapi.ResolveHandle(ctx, i.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

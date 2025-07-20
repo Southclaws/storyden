@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { ProfileReference } from "@/api/openapi-schema";
+import { AccountRoleList, ProfileReference } from "@/api/openapi-schema";
 import { WEB_ADDRESS } from "@/config";
 import { css } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
@@ -15,7 +15,8 @@ export type Props = {
   profile: ProfileReference;
   size?: "xs" | "sm" | "md" | "lg";
   name?: "hidden" | "handle" | "full-horizontal" | "full-vertical";
-  roles?: "hidden" | "badge" | "all";
+  showRoles?: "hidden" | "badge" | "all";
+  roles?: AccountRoleList;
   avatar?: "hidden" | "visible";
 
   // NOTE: If you don't need either of these, just render a <MemberIdent />.
@@ -32,7 +33,8 @@ export function MemberBadge({
   size = "md",
   name = "hidden",
   avatar = "visible",
-  roles = "hidden",
+  showRoles = "hidden",
+  roles,
   as = "menu",
 }: Props) {
   const permalink = `${WEB_ADDRESS}/m/${profile.handle}`;
@@ -45,6 +47,7 @@ export function MemberBadge({
             profile={profile}
             size={size}
             name={name}
+            showRoles={showRoles}
             roles={roles}
             avatar={avatar}
           />
@@ -59,6 +62,7 @@ export function MemberBadge({
         profile={profile}
         size={size}
         name={name}
+        showRoles={showRoles}
         roles={roles}
         avatar={avatar}
       />

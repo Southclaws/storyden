@@ -30,7 +30,7 @@ type Result struct {
 	TotalPages  int
 	CurrentPage int
 	NextPage    opt.Optional[int]
-	Profiles    []*profile.Public
+	Profiles    []*profile.Ref
 }
 
 func (q *Querier) GetFollowers(ctx context.Context, id account.AccountID, page, size int) (*Result, error) {
@@ -45,9 +45,7 @@ func (q *Querier) GetFollowers(ctx context.Context, id account.AccountID, page, 
 		Limit(size + 1).
 		Offset(page * size).
 		Order(ent.Desc(accountfollow.FieldCreatedAt)).
-		WithFollower(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithFollower().
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -58,8 +56,8 @@ func (q *Querier) GetFollowers(ctx context.Context, id account.AccountID, page, 
 		r = r[:len(r)-1]
 	}
 
-	profiles, err := dt.MapErr(r, func(in *ent.AccountFollow) (*profile.Public, error) {
-		return profile.ProfileFromModel(in.Edges.Follower)
+	profiles, err := dt.MapErr(r, func(in *ent.AccountFollow) (*profile.Ref, error) {
+		return profile.MapRef(in.Edges.Follower)
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -87,9 +85,7 @@ func (q *Querier) GetFollowing(ctx context.Context, id account.AccountID, page, 
 		Limit(size + 1).
 		Offset(page * size).
 		Order(ent.Desc(accountfollow.FieldCreatedAt)).
-		WithFollowing(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithFollowing().
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -100,8 +96,8 @@ func (q *Querier) GetFollowing(ctx context.Context, id account.AccountID, page, 
 		r = r[:len(r)-1]
 	}
 
-	profiles, err := dt.MapErr(r, func(in *ent.AccountFollow) (*profile.Public, error) {
-		return profile.ProfileFromModel(in.Edges.Following)
+	profiles, err := dt.MapErr(r, func(in *ent.AccountFollow) (*profile.Ref, error) {
+		return profile.MapRef(in.Edges.Following)
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

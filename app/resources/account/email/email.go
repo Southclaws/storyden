@@ -98,8 +98,6 @@ func (r *Repository) LookupCode(ctx context.Context, emailAddress mail.Address, 
 				email_ent.VerificationCode(code),
 			),
 		).
-		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
-		WithTags().
 		WithEmails().
 		WithAuthentication()
 
@@ -112,7 +110,7 @@ func (r *Repository) LookupCode(ctx context.Context, emailAddress mail.Address, 
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	acc, err := account.MapAccount(result)
+	acc, err := account.MapRef(result)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -147,14 +145,14 @@ func (r *Repository) lookupEmail(ctx context.Context, emailAddress mail.Address)
 	return result, true, nil
 }
 
-func (r *Repository) LookupAccount(ctx context.Context, emailAddress mail.Address) (*account.Account, bool, error) {
+func (r *Repository) LookupAccount(ctx context.Context, emailAddress mail.Address) (*account.AccountWithEdges, bool, error) {
 	q := r.db.Account.
 		Query().
 		Where(account_ent.HasEmailsWith(email_ent.EmailAddress(emailAddress.Address))).
-		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
-		WithTags().
 		WithEmails().
-		WithAuthentication()
+		WithAuthentication().
+		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
+		WithTags()
 
 	result, err := q.Only(ctx)
 	if err != nil {

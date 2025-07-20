@@ -12,10 +12,11 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account/account_querier"
+	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_search"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/profile/following"
@@ -26,7 +27,7 @@ import (
 
 type Profiles struct {
 	apiAddress    url.URL
-	accountQuery  *account_querier.Querier
+	profileQuery  *profile_querier.Querier
 	profile_cache *profile_cache.Cache
 	ps            profile_search.Repository
 	followQuerier *follow_querier.Querier
@@ -35,7 +36,7 @@ type Profiles struct {
 
 func NewProfiles(
 	cfg config.Config,
-	accountQuery *account_querier.Querier,
+	profileQuery *profile_querier.Querier,
 	profile_cache *profile_cache.Cache,
 	ps profile_search.Repository,
 	followQuerier *follow_querier.Querier,
@@ -43,7 +44,7 @@ func NewProfiles(
 ) Profiles {
 	return Profiles{
 		apiAddress:    cfg.PublicWebAddress,
-		accountQuery:  accountQuery,
+		profileQuery:  profileQuery,
 		profile_cache: profile_cache,
 		ps:            ps,
 		followQuerier: followQuerier,
@@ -95,7 +96,7 @@ func (p *Profiles) ProfileList(ctx context.Context, request openapi.ProfileListR
 }
 
 func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetRequestObject) (openapi.ProfileGetResponseObject, error) {
-	id, err := openapi.ResolveHandle(ctx, p.accountQuery, request.AccountHandle)
+	id, err := openapi.ResolveHandle(ctx, p.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -108,12 +109,10 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		}, nil
 	}
 
-	acc, err := p.accountQuery.GetByID(ctx, id)
+	pro, err := p.profileQuery.GetByID(ctx, id)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
-
-	pro := profile.ProfileFromAccount(acc)
 
 	return openapi.ProfileGet200JSONResponse{
 		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
@@ -127,7 +126,7 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 }
 
 func (p *Profiles) ProfileFollowersGet(ctx context.Context, request openapi.ProfileFollowersGetRequestObject) (openapi.ProfileFollowersGetResponseObject, error) {
-	targetID, err := openapi.ResolveHandle(ctx, p.accountQuery, request.AccountHandle)
+	targetID, err := openapi.ResolveHandle(ctx, p.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -167,7 +166,7 @@ func (p *Profiles) ProfileFollowersGet(ctx context.Context, request openapi.Prof
 }
 
 func (p *Profiles) ProfileFollowingGet(ctx context.Context, request openapi.ProfileFollowingGetRequestObject) (openapi.ProfileFollowingGetResponseObject, error) {
-	targetID, err := openapi.ResolveHandle(ctx, p.accountQuery, request.AccountHandle)
+	targetID, err := openapi.ResolveHandle(ctx, p.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -212,7 +211,7 @@ func (p *Profiles) ProfileFollowersAdd(ctx context.Context, request openapi.Prof
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	targetID, err := openapi.ResolveHandle(ctx, p.accountQuery, request.AccountHandle)
+	targetID, err := openapi.ResolveHandle(ctx, p.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -231,7 +230,7 @@ func (p *Profiles) ProfileFollowersRemove(ctx context.Context, request openapi.P
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	targetID, err := openapi.ResolveHandle(ctx, p.accountQuery, request.AccountHandle)
+	targetID, err := openapi.ResolveHandle(ctx, p.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -245,7 +244,7 @@ func (p *Profiles) ProfileFollowersRemove(ctx context.Context, request openapi.P
 }
 
 func serialiseProfile(in *profile.Public) openapi.PublicProfile {
-	invitedBy := opt.Map(in.InvitedBy, func(ib profile.Public) openapi.ProfileReference {
+	invitedBy := opt.Map(in.InvitedBy, func(ib profile.Ref) openapi.ProfileReference {
 		return serialiseProfileReference(ib)
 	})
 
@@ -266,4 +265,28 @@ func serialiseProfile(in *profile.Public) openapi.PublicProfile {
 		InvitedBy: invitedBy.Ptr(),
 		Meta:      in.Metadata,
 	}
+}
+
+func serialiseProfileReference(a profile.Ref) openapi.ProfileReference {
+	return openapi.ProfileReference{
+		Id:        *openapi.IdentifierFrom(xid.ID(a.ID)),
+		Joined:    a.Created,
+		Suspended: a.Deleted.Ptr(),
+		Handle:    (openapi.AccountHandle)(a.Handle),
+		Name:      a.Name,
+	}
+}
+
+func serialiseProfileReferenceFromAccount(a account.Account) openapi.ProfileReference {
+	return openapi.ProfileReference{
+		Id:        *openapi.IdentifierFrom(xid.ID(a.ID)),
+		Joined:    a.CreatedAt,
+		Suspended: a.DeletedAt.Ptr(),
+		Handle:    (openapi.AccountHandle)(a.Handle),
+		Name:      a.Name,
+	}
+}
+
+func serialiseProfileReferencePtr(a *profile.Ref) openapi.ProfileReference {
+	return serialiseProfileReference(*a)
 }

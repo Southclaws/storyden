@@ -32,9 +32,7 @@ func New(db *ent.Client, postSearcher post_search.Repository) *Querier {
 func (n *Querier) ListNotifications(ctx context.Context, accountID account.AccountID) (notification.Notifications, error) {
 	r, err := n.db.Notification.Query().
 		Where(entnotification.HasOwnerWith(entaccount.ID(xid.ID(accountID)))).
-		WithSource(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithSource().
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

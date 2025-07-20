@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_role "github.com/Southclaws/storyden/internal/ent/role"
 )
 
 type Writer struct {
@@ -64,6 +65,10 @@ func (w *Writer) Create(ctx context.Context, name string, colour string, perms r
 }
 
 func (w *Writer) Update(ctx context.Context, id role.RoleID, opts ...Mutation) (*role.Role, error) {
+	if id == role.DefaultRoleEveryoneID {
+		return w.updateDefaultRole(ctx, opts...)
+	}
+
 	update := w.db.Role.UpdateOneID(xid.ID(id))
 	mutation := update.Mutation()
 
@@ -82,6 +87,52 @@ func (w *Writer) Update(ctx context.Context, id role.RoleID, opts ...Mutation) (
 	}
 
 	return rl, nil
+}
+
+func (w *Writer) updateDefaultRole(ctx context.Context, opts ...Mutation) (*role.Role, error) {
+	rl, found, err := w.lookupRole(ctx, role.DefaultRoleEveryoneID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if !found {
+		create := w.db.Role.Create()
+		mutate := create.Mutation()
+		for _, opt := range opts {
+			opt(mutate)
+		}
+
+		r, err := create.Save(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		return role.Map(r)
+	}
+
+	update := rl.Update()
+	mutate := update.Mutation()
+	for _, opt := range opts {
+		opt(mutate)
+	}
+
+	r, err := update.Save(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return role.Map(r)
+}
+
+func (w *Writer) lookupRole(ctx context.Context, id role.RoleID) (*ent.Role, bool, error) {
+	r, err := w.db.Role.Query().Where(ent_role.ID(xid.ID(id))).Only(ctx)
+	if ent.IsNotFound(err) {
+		return nil, false, nil
+	} else if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return r, true, nil
 }
 
 func (w *Writer) Delete(ctx context.Context, id role.RoleID) error {

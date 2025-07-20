@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
@@ -25,6 +25,7 @@ var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.Pe
 
 type Admin struct {
 	accountQuery *account_querier.Querier
+	profileQuery *profile_querier.Querier
 	as           account_suspension.Service
 	sr           *settings.SettingsRepository
 	sp           *session.Provider
@@ -33,6 +34,7 @@ type Admin struct {
 
 func NewAdmin(
 	accountQuery *account_querier.Querier,
+	profileQuery *profile_querier.Querier,
 	as account_suspension.Service,
 	sr *settings.SettingsRepository,
 	sp *session.Provider,
@@ -40,6 +42,7 @@ func NewAdmin(
 ) Admin {
 	return Admin{
 		accountQuery: accountQuery,
+		profileQuery: profileQuery,
 		as:           as,
 		sr:           sr,
 		sp:           sp,
@@ -90,7 +93,7 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 }
 
 func (i *Admin) AdminAccountBanCreate(ctx context.Context, request openapi.AdminAccountBanCreateRequestObject) (openapi.AdminAccountBanCreateResponseObject, error) {
-	id, err := openapi.ResolveHandle(ctx, i.accountQuery, request.AccountHandle)
+	id, err := openapi.ResolveHandle(ctx, i.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -122,7 +125,7 @@ func (i *Admin) AdminAccountBanCreate(ctx context.Context, request openapi.Admin
 }
 
 func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.AdminAccountBanRemoveRequestObject) (openapi.AdminAccountBanRemoveResponseObject, error) {
-	id, err := openapi.ResolveHandle(ctx, i.accountQuery, request.AccountHandle)
+	id, err := openapi.ResolveHandle(ctx, i.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -208,7 +211,7 @@ func serialiseOwnedAccessKey(in *authentication.Authentication) openapi.OwnedAcc
 		ExpiresAt: in.Expires.Ptr(),
 		Enabled:   !in.Disabled,
 		Name:      in.Name.Or("Unnamed"),
-		CreatedBy: serialiseProfileReference(*profile.ProfileFromAccount(&in.Account)),
+		CreatedBy: serialiseProfileReferenceFromAccount(in.Account),
 	}
 }
 

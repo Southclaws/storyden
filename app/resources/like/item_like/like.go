@@ -7,7 +7,7 @@ import (
 
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -15,11 +15,11 @@ import (
 type Like struct {
 	ID      xid.ID
 	Created time.Time
-	Owner   account.Account
+	Owner   profile.Ref
 }
 
 func Map(in *ent.LikePost) (*Like, error) {
-	owner, err := account.MapAccount(in.Edges.Account)
+	owner, err := profile.MapRef(in.Edges.Account)
 	if err != nil {
 		return nil, err
 	}

@@ -11,30 +11,44 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
-
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
-type Public struct {
-	ID      account.AccountID
-	Created time.Time
-	Updated time.Time
-	Deleted opt.Optional[time.Time]
+type Ref struct {
+	ID       account.AccountID
+	Created  time.Time
+	Updated  time.Time
+	Deleted  opt.Optional[time.Time]
+	Handle   string
+	Name     string
+	Bio      datagraph.Content
+	Admin    bool
+	Metadata map[string]any
+}
 
-	Handle        string
-	Name          string
-	Bio           datagraph.Content
-	Admin         bool
+func MapRef(a *ent.Account) (*Ref, error) {
+	return &Ref{
+		ID:      account.AccountID(a.ID),
+		Created: a.CreatedAt,
+		Updated: a.UpdatedAt,
+		Deleted: opt.NewPtr(a.DeletedAt),
+		Handle:  a.Handle,
+		Name:    a.Name,
+	}, nil
+}
+
+type Public struct {
+	Ref
+
 	Followers     int
 	Following     int
 	LikeScore     int
 	Roles         held.Roles
 	Interests     []*tag_ref.Tag
 	ExternalLinks []account.ExternalLink
-	InvitedBy     opt.Optional[Public]
-	Metadata      map[string]any
+	InvitedBy     opt.Optional[Ref]
 }
 
 func (p *Public) GetID() xid.ID                 { return xid.ID(p.ID) }
@@ -48,15 +62,23 @@ func (p *Public) GetAssets() []*asset.Asset     { return []*asset.Asset{} }
 func (p *Public) GetCreated() time.Time         { return p.Created }
 func (p *Public) GetUpdated() time.Time         { return p.Updated }
 
-func ProfileFromModel(a *ent.Account) (*Public, error) {
-	rolesEdge := a.Edges.AccountRoles
+func Map(a *ent.Account) (*Public, error) {
+	rolesEdge, err := a.Edges.AccountRolesOrErr()
+	if err != nil {
+		return nil, err
+	}
+
+	tagsEdge, err := a.Edges.TagsOrErr()
+	if err != nil {
+		return nil, err
+	}
 
 	roles, err := held.MapList(rolesEdge, a.Admin)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
 
-	interests := dt.Map(a.Edges.Tags, tag_ref.Map(nil))
+	interests := dt.Map(tagsEdge, tag_ref.Map(nil))
 
 	bio, err := datagraph.NewRichText(a.Bio)
 	if err != nil {
@@ -65,57 +87,46 @@ func ProfileFromModel(a *ent.Account) (*Public, error) {
 
 	invitedByEdge := opt.NewPtr(a.Edges.InvitedBy)
 
-	invitedBy, err := opt.MapErr(invitedByEdge, func(i ent.Invitation) (Public, error) {
+	invitedBy, err := opt.MapErr(invitedByEdge, func(i ent.Invitation) (Ref, error) {
 		c, err := i.Edges.CreatorOrErr()
 		if err != nil {
-			return Public{}, err
+			return Ref{}, err
 		}
 
-		ib, err := account.MapAccount(c)
+		p, err := MapRef(c)
 		if err != nil {
-			return Public{}, err
+			return Ref{}, err
 		}
 
-		return *ProfileFromAccount(ib), nil
+		return *p, nil
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return &Public{
-		ID:        account.AccountID(a.ID),
-		Created:   a.CreatedAt,
-		Updated:   a.UpdatedAt,
-		Deleted:   opt.NewPtr(a.DeletedAt),
-		Handle:    a.Handle,
-		Name:      a.Name,
-		Bio:       bio,
-		Roles:     roles,
-		Interests: interests,
-		InvitedBy: invitedBy,
-		Metadata:  a.Metadata,
-	}, nil
-}
-
-func ProfileFromAccount(a *account.Account) *Public {
-	return &Public{
-		ID:            a.ID,
-		Created:       a.CreatedAt,
-		Updated:       a.UpdatedAt,
-		Deleted:       a.DeletedAt,
-		Handle:        a.Handle,
-		Name:          a.Name,
-		Bio:           a.Bio,
-		Admin:         a.Admin,
-		Followers:     a.Followers,
-		Following:     a.Following,
-		LikeScore:     a.LikeScore,
-		Roles:         a.Roles,
-		Interests:     nil,
-		ExternalLinks: a.ExternalLinks,
-		InvitedBy: opt.Map(a.InvitedBy, func(a account.Account) Public {
-			return *ProfileFromAccount(&a)
-		}),
-		Metadata: a.Metadata,
+	links, err := dt.MapErr(a.Links, account.MapExternalLink)
+	if err != nil {
+		return nil, fault.Wrap(err)
 	}
+
+	return &Public{
+		Ref: Ref{
+			ID:       account.AccountID(a.ID),
+			Created:  a.CreatedAt,
+			Updated:  a.UpdatedAt,
+			Deleted:  opt.NewPtr(a.DeletedAt),
+			Handle:   a.Handle,
+			Name:     a.Name,
+			Bio:      bio,
+			Metadata: a.Metadata,
+		},
+		Followers: 0, // TODO: Hydrate here
+		Following: 0, // TODO: Hydrate here
+		LikeScore: 0, // TODO: Hydrate here
+
+		Roles:         roles,
+		Interests:     interests,
+		InvitedBy:     invitedBy,
+		ExternalLinks: links,
+	}, nil
 }

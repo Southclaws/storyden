@@ -3629,7 +3629,6 @@ components:
         suspended: { $ref: "#/components/schemas/MemberSuspendedDate" }
         handle: { $ref: "#/components/schemas/AccountHandle" }
         name: { $ref: "#/components/schemas/AccountName" }
-        roles: { $ref: "#/components/schemas/AccountRoleList" }
 
     ThreadTitle:
       type: string
@@ -4358,8 +4357,6 @@ components:
           $ref: "#/components/schemas/AccountRoleList"
         bio:
           $ref: "#/components/schemas/AccountBio"
-        interests:
-          $ref: "#/components/schemas/TagReferenceList"
         links:
           $ref: "#/components/schemas/ProfileExternalLinkList"
         meta:

@@ -6,6 +6,8 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role"
@@ -14,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/role/role_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 type Roles struct {
@@ -42,6 +45,9 @@ func (h *Roles) RoleCreate(ctx context.Context, request openapi.RoleCreateReques
 
 	role, err := h.roleWriter.Create(ctx, request.Body.Name, request.Body.Colour, perms)
 	if err != nil {
+		if ent.IsConstraintError(err) {
+			err = fault.Wrap(err, fmsg.WithDesc("unique", "A role with that name already exists"), ftag.With(ftag.AlreadyExists))
+		}
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 

@@ -32,7 +32,7 @@ func WithAccount(ctx context.Context, aw *account_writer.Writer, template accoun
 	}
 
 	ctx = session.WithAccountID(ctx, acc.ID)
-	return ctx, acc
+	return ctx, &acc.Account
 }
 
 func WithSessionFromHeader(t *testing.T, ctx context.Context, header http.Header) openapi.RequestEditorFn {

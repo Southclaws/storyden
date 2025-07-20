@@ -7,6 +7,7 @@ import (
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -15,7 +16,7 @@ type ReactID xid.ID
 type React struct {
 	ID     ReactID
 	Emoji  string
-	Author account.Account
+	Author profile.Ref
 	target xid.ID
 }
 
@@ -33,7 +34,7 @@ func Map(in *ent.React) (*React, error) {
 		return nil, err
 	}
 
-	acc, err := account.MapAccount(accountEdge)
+	acc, err := profile.MapRef(accountEdge)
 	if err != nil {
 		return nil, err
 	}
@@ -53,10 +54,15 @@ func Mapper(am account.Lookup) func(in *ent.React) (*React, error) {
 	return func(in *ent.React) (*React, error) {
 		acc := am[xid.ID(in.AccountID)]
 
+		pro, err := profile.MapRef(acc)
+		if err != nil {
+			return nil, err
+		}
+
 		return &React{
 			ID:     ReactID(in.ID),
 			Emoji:  in.Emoji,
-			Author: *acc,
+			Author: *pro,
 			target: xid.ID(in.PostID),
 		}, nil
 	}

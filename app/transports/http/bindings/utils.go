@@ -18,15 +18,13 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
-	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
-func serialiseAccount(acc *account.Account) openapi.Account {
+func serialiseAccount(acc *account.AccountWithEdges) openapi.Account {
 	invitedBy := opt.Map(acc.InvitedBy, func(ib account.Account) openapi.ProfileReference {
-		pro := profile.ProfileFromAccount(&ib)
-		return serialiseProfileReference(*pro)
+		return serialiseProfileReferenceFromAccount(ib)
 	})
 
 	return openapi.Account{
@@ -36,8 +34,8 @@ func serialiseAccount(acc *account.Account) openapi.Account {
 		Handle:         acc.Handle,
 		Name:           acc.Name,
 		Bio:            acc.Bio.HTML(),
-		Links:          serialiseExternalLinks(acc.ExternalLinks),
 		Meta:           acc.Metadata,
+		Links:          serialiseExternalLinks(acc.ExternalLinks),
 		CreatedAt:      acc.CreatedAt,
 		UpdatedAt:      acc.UpdatedAt,
 		DeletedAt:      acc.DeletedAt.Ptr(),
@@ -201,21 +199,6 @@ func deserialisePostID(s string) post.ID {
 	return post.ID(openapi.ParseID(s))
 }
 
-func serialiseProfileReference(a profile.Public) openapi.ProfileReference {
-	return openapi.ProfileReference{
-		Id:        *openapi.IdentifierFrom(xid.ID(a.ID)),
-		Joined:    a.Created,
-		Suspended: a.Deleted.Ptr(),
-		Handle:    (openapi.AccountHandle)(a.Handle),
-		Name:      a.Name,
-		Roles:     serialiseHeldRoleList(a.Roles),
-	}
-}
-
-func serialiseProfileReferencePtr(a *profile.Public) openapi.ProfileReference {
-	return serialiseProfileReference(*a)
-}
-
 func serialiseCategory(c *category.Category) openapi.Category {
 	return openapi.Category{
 		Id:          *openapi.IdentifierFrom(xid.ID(c.ID)),
@@ -271,10 +254,6 @@ func deserialiseVisibilityList(in []openapi.Visibility) ([]visibility.Visibility
 
 func deserialiseMark(s string) mark.Queryable {
 	return mark.NewQueryKey(s)
-}
-
-func deserialiseFloat(in float32) float64 {
-	return float64(in)
 }
 
 func deserialiseOptionalFloat(in *float32) opt.Optional[float64] {

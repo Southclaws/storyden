@@ -9,7 +9,6 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
-	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/services/react_manager"
 	"github.com/Southclaws/storyden/app/services/thread_mark"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -52,11 +51,10 @@ func (h *Reacts) PostReactRemove(ctx context.Context, request openapi.PostReactR
 }
 
 func serialiseReact(r *reaction.React) openapi.React {
-	pro := profile.ProfileFromAccount(&r.Author)
 	return openapi.React{
 		Id:     xid.ID(r.ID).String(),
 		Emoji:  r.Emoji,
-		Author: serialiseProfileReference(*pro),
+		Author: serialiseProfileReference(r.Author),
 	}
 }
 

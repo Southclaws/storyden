@@ -107,9 +107,7 @@ func (d *database) GetCategories(ctx context.Context, admin bool) ([]*Category, 
 					post.DeletedAtIsNil(),
 					post.VisibilityEQ(post.VisibilityPublished),
 				).
-				WithAuthor(func(aq *ent.AccountQuery) {
-					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-				}).
+				WithAuthor().
 				Limit(5).
 				Order(ent.Desc(post.FieldUpdatedAt))
 		}).

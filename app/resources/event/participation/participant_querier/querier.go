@@ -23,9 +23,7 @@ func New(db *ent.Client) *Querier {
 func (w *Querier) Lookup(ctx context.Context, mk event_ref.QueryKey, accountID account.AccountID) (*participation.EventParticipant, bool, error) {
 	ep, err := w.db.EventParticipant.Query().
 		Where(mk.ParticipantPredicate()).
-		WithAccount(func(aq *ent.AccountQuery) {
-			aq.WithRoles()
-		}).
+		WithAccount().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {

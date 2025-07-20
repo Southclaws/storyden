@@ -66,7 +66,7 @@ func Map(m *ent.Post) (*Thread, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := profile.ProfileFromModel(m.Edges.Author)
+	pro, err := profile.MapRef(m.Edges.Author)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -123,12 +123,15 @@ func Mapper(
 			return nil, fault.Wrap(err)
 		}
 
-		var pro *profile.Public
+		var pro *profile.Ref
 		authorEdge := am[m.AccountPosts]
 		if authorEdge != nil {
-			pro = profile.ProfileFromAccount(authorEdge)
+			pro, err = profile.MapRef(authorEdge)
+			if err != nil {
+				return nil, fault.Wrap(err)
+			}
 		} else {
-			pro, err = profile.ProfileFromModel(m.Edges.Author)
+			pro, err = profile.MapRef(m.Edges.Author)
 			if err != nil {
 				return nil, fault.Wrap(err)
 			}

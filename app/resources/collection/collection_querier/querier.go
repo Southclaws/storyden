@@ -76,9 +76,7 @@ func (d *Querier) List(ctx context.Context, filters ...Option) ([]*collection.Co
 
 	q := d.db.Collection.
 		Query().
-		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithOwner().
 		WithCollectionPosts().
 		WithCollectionNodes()
 
@@ -103,9 +101,7 @@ func (d *Querier) Get(ctx context.Context, qk collection.QueryKey, filters ...It
 	filters = append(filters, func(pcq *ent.CollectionPostQuery, ncq *ent.CollectionNodeQuery) {
 		if pcq != nil {
 			pcq.WithPost(func(pq *ent.PostQuery) {
-				pq.WithAuthor(func(aq *ent.AccountQuery) {
-					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-				})
+				pq.WithAuthor()
 				pq.WithCategory()
 				pq.WithTags()
 				pq.WithRoot()
@@ -114,9 +110,7 @@ func (d *Querier) Get(ctx context.Context, qk collection.QueryKey, filters ...It
 
 		if ncq != nil {
 			ncq.WithNode(func(nq *ent.NodeQuery) {
-				nq.WithOwner(func(aq *ent.AccountQuery) {
-					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-				})
+				nq.WithOwner()
 				nq.WithAssets()
 				nq.WithTags()
 			})
@@ -126,9 +120,7 @@ func (d *Querier) Get(ctx context.Context, qk collection.QueryKey, filters ...It
 	col, err := d.db.Collection.
 		Query().
 		Where(qk.Predicate()).
-		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithOwner().
 		WithCollectionPosts(func(pq *ent.CollectionPostQuery) {
 			for _, fn := range filters {
 				fn(pq, nil)
@@ -151,9 +143,7 @@ func (d *Querier) Probe(ctx context.Context, qk collection.QueryKey) (*collectio
 	col, err := d.db.Collection.
 		Query().
 		Where(qk.Predicate()).
-		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithOwner().
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

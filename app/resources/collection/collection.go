@@ -20,7 +20,7 @@ type Collection struct {
 	IndexedAt opt.Optional[time.Time]
 
 	Name        string
-	Owner       profile.Public
+	Owner       profile.Ref
 	Description opt.Optional[string]
 	Cover       opt.Optional[asset.Asset]
 
@@ -44,7 +44,7 @@ func Map(queriedItems []xid.ID) func(c *ent.Collection) (*Collection, error) {
 
 		nodesEdge := c.Edges.CollectionNodes
 
-		pro, err := profile.ProfileFromModel(accEdge)
+		pro, err := profile.MapRef(accEdge)
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}

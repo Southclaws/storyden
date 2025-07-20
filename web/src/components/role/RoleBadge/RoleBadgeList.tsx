@@ -22,7 +22,7 @@ export function RoleBadgeList({ roles, onlyBadgeRole, limit }: Props) {
   const limited = filtered.slice(0, limit);
 
   return (
-    <HStack flexWrap="wrap">
+    <HStack flexWrap="wrap" py="1">
       {limited.map((r) => (
         <RoleBadge key={r.id} role={r} />
       ))}

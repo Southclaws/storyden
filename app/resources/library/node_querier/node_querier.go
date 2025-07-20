@@ -164,9 +164,7 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 	}
 
 	query.
-		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithOwner().
 		WithPrimaryImage(func(aq *ent.AssetQuery) {
 			aq.WithParent()
 		}).
@@ -177,9 +175,7 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		WithParent(func(cq *ent.NodeQuery) {
 			cq.
 				WithAssets().
-				WithOwner(func(aq *ent.AccountQuery) {
-					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-				})
+				WithOwner()
 		}).
 		WithTags().
 		WithProperties().
@@ -194,9 +190,7 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 
 		cq.
 			WithAssets().
-			WithOwner(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			}).
+			WithOwner().
 			WithProperties().
 			Order(node.BySort(sql.OrderAsc()))
 	})
@@ -259,9 +253,7 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 
 	// Load all relevant edges
 	query.
-		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithOwner().
 		WithPrimaryImage(func(aq *ent.AssetQuery) {
 			aq.WithParent()
 		}).
@@ -391,9 +383,7 @@ func (q *Querier) Probe(ctx context.Context, id library.NodeID) (*library.Node, 
 	query := q.db.Node.
 		Query().
 		Where(node.ID(xid.ID(id))).
-		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		})
+		WithOwner()
 
 	col, err := query.Only(ctx)
 	if err != nil {
@@ -408,7 +398,7 @@ func (q *Querier) Probe(ctx context.Context, id library.NodeID) (*library.Node, 
 	return r, nil
 }
 
-func (q *Querier) getRequestingAccount(ctx context.Context, o *options) (opt.Optional[account.Account], error) {
+func (q *Querier) getRequestingAccount(ctx context.Context, o *options) (opt.Optional[account.AccountWithEdges], error) {
 	if !o.visibilityRules {
 		return nil, nil
 	}

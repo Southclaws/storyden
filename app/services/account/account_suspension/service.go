@@ -16,8 +16,8 @@ import (
 )
 
 type Service interface {
-	Suspend(ctx context.Context, id account.AccountID) (*account.Account, error)
-	Reinstate(ctx context.Context, id account.AccountID) (*account.Account, error)
+	Suspend(ctx context.Context, id account.AccountID) (*account.AccountWithEdges, error)
+	Reinstate(ctx context.Context, id account.AccountID) (*account.AccountWithEdges, error)
 }
 
 func Build() fx.Option {
@@ -44,7 +44,7 @@ func New(
 	}
 }
 
-func (s *service) Suspend(ctx context.Context, id account.AccountID) (*account.Account, error) {
+func (s *service) Suspend(ctx context.Context, id account.AccountID) (*account.AccountWithEdges, error) {
 	acc, err := s.account_writer.Update(ctx, id, account_writer.SetDeleted(opt.New(time.Now())))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -53,7 +53,7 @@ func (s *service) Suspend(ctx context.Context, id account.AccountID) (*account.A
 	return acc, nil
 }
 
-func (s *service) Reinstate(ctx context.Context, id account.AccountID) (*account.Account, error) {
+func (s *service) Reinstate(ctx context.Context, id account.AccountID) (*account.AccountWithEdges, error) {
 	acc, err := s.account_writer.Update(ctx, id, account_writer.SetDeleted(opt.NewEmpty[time.Time]()))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

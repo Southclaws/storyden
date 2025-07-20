@@ -1,4 +1,4 @@
-import { ProfileReference } from "@/api/openapi-schema";
+import { AccountRoleList, ProfileReference } from "@/api/openapi-schema";
 import { RoleBadgeList } from "@/components/role/RoleBadge/RoleBadgeList";
 import { Flex, HStack, styled } from "@/styled-system/jsx";
 
@@ -8,7 +8,8 @@ export type Props = {
   profile: ProfileReference;
   size?: "xs" | "sm" | "md" | "lg";
   name?: "hidden" | "handle" | "full-horizontal" | "full-vertical";
-  roles?: "hidden" | "badge" | "all";
+  showRoles?: "hidden" | "badge" | "all";
+  roles?: AccountRoleList;
   avatar?: "hidden" | "visible";
 };
 
@@ -17,7 +18,8 @@ export function MemberIdent({
   size,
   name = "hidden",
   avatar = "visible",
-  roles = "hidden",
+  showRoles = "hidden",
+  roles,
 }: Props) {
   return (
     <HStack
@@ -28,7 +30,13 @@ export function MemberIdent({
       gap={size === "lg" ? "2" : "1"}
     >
       {avatar === "visible" && <MemberAvatar profile={profile} size={size} />}
-      <MemberName profile={profile} size={size} name={name} roles={roles} />
+      <MemberName
+        profile={profile}
+        size={size}
+        name={name}
+        showRoles={showRoles}
+        roles={roles}
+      />
     </HStack>
   );
 }
@@ -37,7 +45,8 @@ export function MemberName({
   profile,
   size,
   name = "hidden",
-  roles = "hidden",
+  showRoles = "hidden",
+  roles,
 }: Props) {
   switch (name) {
     case "full-horizontal":
@@ -67,7 +76,7 @@ export function MemberName({
           >
             @{profile.handle}
           </styled.p>
-          <Roles profile={profile} roles={roles} />
+          <Roles profile={profile} showRoles={showRoles} roles={roles} />
         </Flex>
       );
 
@@ -95,10 +104,14 @@ export function MemberName({
             fontWeight="normal"
             textWrap="nowrap"
             color="fg.subtle"
+            lineHeight="tight"
+            // NOTE: Handles are always lowercase so our x-height upper bound is
+            // quite low so we can get away with a tighter line height.
+            mt={size === "lg" ? "-1" : "0"}
           >
             @{profile.handle}
           </styled.p>
-          <Roles profile={profile} roles={roles} />
+          <Roles profile={profile} showRoles={showRoles} roles={roles} />
         </Flex>
       );
 
@@ -113,7 +126,7 @@ export function MemberName({
           >
             @{profile.handle}
           </styled.p>
-          <Roles profile={profile} roles={roles} />
+          <Roles profile={profile} showRoles={showRoles} roles={roles} />
         </HStack>
       );
 
@@ -122,12 +135,17 @@ export function MemberName({
   }
 }
 
-function Roles({ profile, roles }: Pick<Props, "profile" | "roles">) {
-  if (roles === "hidden") {
+function Roles({
+  showRoles,
+  roles,
+}: Pick<Props, "profile" | "showRoles" | "roles">) {
+  if (!showRoles) {
     return null;
   }
 
-  return (
-    <RoleBadgeList roles={profile.roles} onlyBadgeRole={roles === "badge"} />
-  );
+  if (showRoles === "hidden" || !roles) {
+    return null;
+  }
+
+  return <RoleBadgeList roles={roles} onlyBadgeRole={showRoles === "badge"} />;
 }

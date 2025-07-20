@@ -65,7 +65,15 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 	}
 
 	q := d.db.Account.Query().
+		WithTags().
+		WithEmails().
 		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
+		WithInvitedBy(func(iq *ent.InvitationQuery) {
+			iq.WithCreator(func(aq *ent.AccountQuery) {
+				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
+			})
+		}).
+		WithAuthentication().
 		Limit(size + 1).
 		Offset(page * size).
 		Order(ent.Desc(account.FieldCreatedAt))
@@ -85,7 +93,7 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 		r = r[:len(r)-1]
 	}
 
-	profiles, err := dt.MapErr(r, profile.ProfileFromModel)
+	profiles, err := dt.MapErr(r, profile.Map)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
