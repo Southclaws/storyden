@@ -34,6 +34,15 @@ func New(
 
 	proxy := httputil.NewSingleHostReverseProxy(&cfg.FrontendProxy)
 
+	proxy.ErrorHandler = func(w http.ResponseWriter, r *http.Request, err error) {
+		logger.Error("frontend proxy error",
+			slog.String("url", r.URL.String()),
+			slog.String("method", r.Method),
+			slog.String("remote_addr", r.RemoteAddr),
+			slog.String("error", err.Error()),
+		)
+	}
+
 	return &Provider{
 		handler: handler(proxy),
 	}
