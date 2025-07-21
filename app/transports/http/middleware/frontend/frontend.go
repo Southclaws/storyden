@@ -1,6 +1,7 @@
 package frontend
 
 import (
+	"errors"
 	"log/slog"
 	"net/http"
 	"net/http/httputil"
@@ -28,6 +29,22 @@ func New(
 
 	handler := func(p *httputil.ReverseProxy) func(http.ResponseWriter, *http.Request) {
 		return func(w http.ResponseWriter, r *http.Request) {
+			defer func() {
+				if err, ok := recover().(error); ok && err != nil {
+					if errors.Is(err, http.ErrAbortHandler) {
+						return
+					}
+
+					logger.Error("frontend proxy panic",
+						slog.String("url", r.URL.String()),
+						slog.String("method", r.Method),
+						slog.String("remote_addr", r.RemoteAddr),
+						slog.Any("error", err),
+					)
+					return
+				}
+			}()
+
 			p.ServeHTTP(w, r)
 		}
 	}
@@ -41,6 +58,7 @@ func New(
 			slog.String("remote_addr", r.RemoteAddr),
 			slog.String("error", err.Error()),
 		)
+		w.WriteHeader(http.StatusBadGateway)
 	}
 
 	return &Provider{
