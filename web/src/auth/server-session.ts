@@ -17,7 +17,7 @@ export async function getServerSession() {
   } catch (e) {
     if (e instanceof RequestError) {
       if (e.status === 401 || e.status === 403) {
-        console.debug("user not authenticated or authorised:", e);
+        // console.debug("user not authenticated or authorised:", e);
         return;
       }
     }
