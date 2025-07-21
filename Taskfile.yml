@@ -110,3 +110,52 @@ tasks:
   seed:
     cmds:
       - go run ./cmd/seed
+
+  # -
+  # Container images
+  # -
+
+  image:docker:
+    deps: [image:docker:build:all, image:docker:build:api]
+
+  image:podman:
+    deps: [image:podman:build:all, image:podman:build:api]
+
+  image:docker:build:all:
+    desc: >
+      Builds the Docker image for the backend service. The image will be tagged
+      with the current version number.
+    cmds:
+      - docker buildx build
+        --platform linux/amd64,linux/arm64
+        -t storyden
+        -f docker/all/Dockerfile .
+
+  image:docker:build:api:
+    desc: >
+      Builds the Docker image for the backend service. The image will be tagged
+      with the current version number.
+    cmds:
+      - docker buildx build
+        --platform linux/amd64,linux/arm64
+        -t storyden:api
+        -f docker/all/Dockerfile .
+
+  image:podman:build:all:
+    desc: >
+      Builds the Docker image for the backend service. The image will be tagged
+      with the current version number.
+    cmds:
+      - podman buildx build
+        -t storyden
+        -f docker/all/Dockerfile .
+
+  image:podman:build:api:
+    desc: >
+      Builds the Docker image for the backend service. The image will be tagged
+      with the current version number.
+    cmds:
+      - podman buildx build
+        --platform linux/amd64,linux/arm64
+        -t storyden:api
+        -f docker/all/Dockerfile .
