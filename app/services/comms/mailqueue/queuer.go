@@ -11,7 +11,6 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/comms/mailtemplate"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -60,8 +59,6 @@ func Build() fx.Option {
 
 				go func() {
 					for msg := range channel {
-						ctx = session.GetSessionFromMessage(ctx, msg)
-
 						if err := q.sender.Send(ctx, msg.Payload.Message); err != nil {
 							logger.Error("failed to send email", slog.String("error", err.Error()))
 						}

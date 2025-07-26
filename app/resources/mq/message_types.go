@@ -71,9 +71,11 @@ type Notification struct {
 	Event    notification.Event
 	Item     *datagraph.Ref
 	TargetID account.AccountID
+	SourceID opt.Optional[account.AccountID]
 }
 
 type Mention struct {
+	By     account.AccountID
 	Source datagraph.Ref
 	Item   datagraph.Ref
 }

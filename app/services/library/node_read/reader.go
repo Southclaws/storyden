@@ -14,22 +14,19 @@ import (
 )
 
 type HydratedQuerier struct {
-	session    *session.Provider
 	nodereader *node_querier.Querier
 }
 
 func New(
-	session *session.Provider,
 	nodereader *node_querier.Querier,
 ) *HydratedQuerier {
 	return &HydratedQuerier{
-		session:    session,
 		nodereader: nodereader,
 	}
 }
 
 func (q *HydratedQuerier) GetBySlug(ctx context.Context, qk library.QueryKey, sortChildrenBy opt.Optional[node_querier.ChildSortRule]) (*library.Node, error) {
-	session := q.session.AccountMaybe(ctx)
+	session := session.GetOptAccount(ctx)
 
 	opts := []node_querier.Option{}
 
@@ -52,7 +49,7 @@ func (q *HydratedQuerier) GetBySlug(ctx context.Context, qk library.QueryKey, so
 }
 
 func (q *HydratedQuerier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagination.Parameters, opts ...node_querier.Option) (*pagination.Result[*library.Node], error) {
-	session := q.session.AccountMaybe(ctx)
+	session := session.GetOptAccount(ctx)
 
 	if s, ok := session.Get(); ok {
 		opts = append(opts, node_querier.WithVisibilityRulesApplied(&s.ID))

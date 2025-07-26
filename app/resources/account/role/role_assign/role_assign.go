@@ -3,6 +3,7 @@ package role_assign
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
@@ -60,6 +61,12 @@ func split(mutations ...Mutation) (adds, removes []xid.ID, admin opt.Optional[bo
 func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountID, roles ...Mutation) (*account.AccountWithEdges, error) {
 	update := w.db.Account.UpdateOneID(xid.ID(accountID))
 	mutation := update.Mutation()
+
+	// NOTE: We filter out the Everyone role from mutations, it cannot be added
+	// or removed, instead it's automatically included for all role queries.
+	roles = dt.Filter(roles, func(m Mutation) bool {
+		return m.id != role.DefaultRoleEveryoneID
+	})
 
 	adds, removes, admin := split(roles...)
 

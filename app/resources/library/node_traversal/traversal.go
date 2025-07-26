@@ -16,9 +16,10 @@ type Repository interface {
 
 type filters struct {
 	rootAccountHandleFilter *string
-	requestingAccount       opt.Optional[account.AccountWithEdges]
-	visibility              []visibility.Visibility
-	depth                   *uint
+	// NOTE: This should really just be the roles list, not a full account obj.
+	requestingAccount opt.Optional[account.AccountWithEdges]
+	visibility        []visibility.Visibility
+	depth             *uint
 }
 
 type Filter func(*filters)

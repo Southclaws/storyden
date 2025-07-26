@@ -93,9 +93,9 @@ func statusFromErrorKind(k ftag.Kind) int {
 	case ftag.AlreadyExists:
 		return http.StatusConflict
 	case ftag.PermissionDenied:
-		return http.StatusUnauthorized
-	case ftag.Unauthenticated:
 		return http.StatusForbidden
+	case ftag.Unauthenticated:
+		return http.StatusUnauthorized
 	default:
 		return http.StatusInternalServerError
 	}

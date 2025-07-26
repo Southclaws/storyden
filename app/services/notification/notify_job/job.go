@@ -7,7 +7,6 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -28,9 +27,7 @@ func runNotifyConsumer(
 
 		go func() {
 			for msg := range channel {
-				ctx = session.GetSessionFromMessage(ctx, msg)
-
-				if err := ic.notify(ctx, msg.Payload.TargetID, msg.Payload.Event, msg.Payload.Item); err != nil {
+				if err := ic.notify(ctx, msg.Payload.TargetID, msg.Payload.SourceID, msg.Payload.Event, msg.Payload.Item); err != nil {
 					logger.Error("failed to notify", slog.String("error", err.Error()))
 				}
 

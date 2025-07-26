@@ -20,7 +20,7 @@ func New(logger *slog.Logger, q pubsub.Topic[mq.Mention]) *Mentioner {
 	return &Mentioner{logger: logger, q: q}
 }
 
-func (n *Mentioner) Send(ctx context.Context, source datagraph.Ref, items ...*datagraph.Ref) {
+func (n *Mentioner) Send(ctx context.Context, by account.AccountID, source datagraph.Ref, items ...*datagraph.Ref) {
 	sender, err := session.GetAccountID(ctx)
 	if err != nil {
 		n.logger.Warn("cannot send notification without source session", slog.String("error", err.Error()))
@@ -34,6 +34,7 @@ func (n *Mentioner) Send(ctx context.Context, source datagraph.Ref, items ...*da
 		}
 
 		n.q.PublishAndForget(ctx, mq.Mention{
+			By:     by,
 			Source: source,
 			Item:   *i,
 		})

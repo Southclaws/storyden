@@ -28,7 +28,6 @@ type Admin struct {
 	profileQuery *profile_querier.Querier
 	as           account_suspension.Service
 	sr           *settings.SettingsRepository
-	sp           *session.Provider
 	akr          *access_key.Repository
 }
 
@@ -37,7 +36,6 @@ func NewAdmin(
 	profileQuery *profile_querier.Querier,
 	as account_suspension.Service,
 	sr *settings.SettingsRepository,
-	sp *session.Provider,
 	akr *access_key.Repository,
 ) Admin {
 	return Admin{
@@ -45,7 +43,6 @@ func NewAdmin(
 		profileQuery: profileQuery,
 		as:           as,
 		sr:           sr,
-		sp:           sp,
 		akr:          akr,
 	}
 }
@@ -157,16 +154,14 @@ func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.Admin
 }
 
 func (i *Admin) AdminAccessKeyList(ctx context.Context, request openapi.AdminAccessKeyListRequestObject) (openapi.AdminAccessKeyListResponseObject, error) {
-	acc, err := i.sp.Account(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	list, err := i.akr.ListAllAsAdmin(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return openapi.AdminAccessKeyList200JSONResponse{
 		AdminAccessKeyListOKJSONResponse: openapi.AdminAccessKeyListOKJSONResponse{
@@ -176,16 +171,11 @@ func (i *Admin) AdminAccessKeyList(ctx context.Context, request openapi.AdminAcc
 }
 
 func (i *Admin) AdminAccessKeyDelete(ctx context.Context, request openapi.AdminAccessKeyDeleteRequestObject) (openapi.AdminAccessKeyDeleteResponseObject, error) {
-	acc, err := i.sp.Account(ctx)
-	if err != nil {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	_, err = i.akr.RevokeAsAdmin(ctx, deserialiseID(request.AccessKeyId))
+	_, err := i.akr.RevokeAsAdmin(ctx, deserialiseID(request.AccessKeyId))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

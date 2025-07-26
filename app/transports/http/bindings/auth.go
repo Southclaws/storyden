@@ -31,7 +31,6 @@ import (
 type Authentication struct {
 	cj                            *session_cookie.Jar
 	si                            *session.Issuer
-	session                       *session.Provider
 	settings                      *settings.SettingsRepository
 	passwordAuthProvider          *password.Provider
 	emailVerificationAuthProvider *email_only.Provider
@@ -47,7 +46,6 @@ func NewAuthentication(
 	cfg config.Config,
 	cj *session_cookie.Jar,
 	si *session.Issuer,
-	session *session.Provider,
 	settings *settings.SettingsRepository,
 	passwordAuthProvider *password.Provider,
 	emailVerificationAuthProvider *email_only.Provider,
@@ -60,7 +58,6 @@ func NewAuthentication(
 	return Authentication{
 		cj:                            cj,
 		si:                            si,
-		session:                       session,
 		settings:                      settings,
 		passwordAuthProvider:          passwordAuthProvider,
 		emailVerificationAuthProvider: emailVerificationAuthProvider,
@@ -108,16 +105,16 @@ func (a *Authentication) AuthProviderLogout(ctx context.Context, request openapi
 }
 
 func (a *Authentication) AccessKeyList(ctx context.Context, request openapi.AccessKeyListRequestObject) (openapi.AccessKeyListResponseObject, error) {
-	acc, err := a.session.Account(ctx)
+	if err := session.Authorise(ctx, nil, rbac.PermissionUsePersonalAccessKeys); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	accID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionUsePersonalAccessKeys); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	list, err := a.access_key.List(ctx, acc.ID)
+	list, err := a.access_key.List(ctx, accID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -130,16 +127,16 @@ func (a *Authentication) AccessKeyList(ctx context.Context, request openapi.Acce
 }
 
 func (a *Authentication) AccessKeyCreate(ctx context.Context, request openapi.AccessKeyCreateRequestObject) (openapi.AccessKeyCreateResponseObject, error) {
-	acc, err := a.session.Account(ctx)
+	if err := session.Authorise(ctx, nil, rbac.PermissionUsePersonalAccessKeys); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	accID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionUsePersonalAccessKeys); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	aks, err := a.access_key.Create(ctx, acc.ID, access_key.AccessKeyKindPersonal, request.Body.Name, opt.NewPtr(request.Body.ExpiresAt))
+	aks, err := a.access_key.Create(ctx, accID, access_key.AccessKeyKindPersonal, request.Body.Name, opt.NewPtr(request.Body.ExpiresAt))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -156,16 +153,16 @@ func (a *Authentication) AccessKeyCreate(ctx context.Context, request openapi.Ac
 }
 
 func (a *Authentication) AccessKeyDelete(ctx context.Context, request openapi.AccessKeyDeleteRequestObject) (openapi.AccessKeyDeleteResponseObject, error) {
-	acc, err := a.session.Account(ctx)
+	if err := session.Authorise(ctx, nil, rbac.PermissionUsePersonalAccessKeys); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	accID, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionUsePersonalAccessKeys); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	_, err = a.access_key.Revoke(ctx, acc.ID, deserialiseID(request.AccessKeyId))
+	_, err = a.access_key.Revoke(ctx, accID, deserialiseID(request.AccessKeyId))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

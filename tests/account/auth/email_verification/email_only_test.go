@@ -13,7 +13,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -46,7 +45,7 @@ func TestEmailOnlyAuth(t *testing.T) {
 				tests.Ok(t, err, signup)
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
-				ctx1 := session.WithAccountID(root, accountID)
+				ctx1 := e2e.WithAccountID(root, accountID)
 				session := sh.WithSession(ctx1)
 
 				// Get own account, currently unverified
@@ -101,7 +100,7 @@ func TestEmailOnlyAuth(t *testing.T) {
 				tests.Ok(t, err, signup)
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
-				ctx1 := session.WithAccountID(root, accountID)
+				ctx1 := e2e.WithAccountID(root, accountID)
 				session := sh.WithSession(ctx1)
 
 				// Get own account, currently unverified
@@ -111,7 +110,7 @@ func TestEmailOnlyAuth(t *testing.T) {
 
 				incorrectCode := "999999" // one day, this test will fail...
 				verify, err := cl.AuthEmailVerifyWithResponse(root, openapi.AuthEmailVerifyJSONRequestBody{Email: address, Code: incorrectCode}, session)
-				tests.Status(t, err, verify, http.StatusForbidden)
+				tests.Status(t, err, verify, http.StatusUnauthorized)
 
 				// Get own account, still not verified
 				verified, err := cl.AccountGetWithResponse(root, session)

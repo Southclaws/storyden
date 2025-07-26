@@ -45,7 +45,7 @@ func TestAccessKeyCRUD(t *testing.T) {
 					cl.AccessKeyCreateWithResponse(root, openapi.AccessKeyInitialProps{
 						Name: "test",
 					}),
-				)(t, http.StatusForbidden)
+				)(t, http.StatusUnauthorized)
 			})
 
 			t.Run("no_permissions", func(t *testing.T) {

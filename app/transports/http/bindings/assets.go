@@ -7,11 +7,14 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/asset/asset_download"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
 
@@ -43,6 +46,15 @@ func (i *Assets) AssetGet(ctx context.Context, request openapi.AssetGetRequestOb
 }
 
 func (i *Assets) AssetUpload(ctx context.Context, request openapi.AssetUploadRequestObject) (openapi.AssetUploadResponseObject, error) {
+	// NOTE: This op doesn't run the authorisation validator for some reason.
+	if !session.GetOptAccountID(ctx).Ok() {
+		return nil, fault.Wrap(fault.New("session required for upload", fctx.With(ctx)), fctx.With(ctx), ftag.With(ftag.Unauthenticated))
+	}
+
+	if err := session.Authorise(ctx, nil, rbac.PermissionUploadAsset); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.PermissionDenied))
+	}
+
 	name := opt.NewPtr(request.Params.Filename)
 
 	// NOTE: Should we enforce a filename for upload? If none is available, the

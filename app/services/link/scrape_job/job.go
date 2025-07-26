@@ -8,7 +8,6 @@ import (
 
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -29,8 +28,6 @@ func runScrapeConsumer(
 
 		go func() {
 			for msg := range channel {
-				ctx = session.GetSessionFromMessage(ctx, msg)
-
 				if err := ic.scrapeLink(ctx, msg.Payload.URL, opt.NewPtr(msg.Payload.Item)); err != nil {
 					logger.Error("failed to scrape link", slog.String("error", err.Error()))
 				}

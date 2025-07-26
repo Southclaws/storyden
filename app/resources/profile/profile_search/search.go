@@ -93,7 +93,12 @@ func (d *database) Search(ctx context.Context, page int, size int, filters ...Fi
 		r = r[:len(r)-1]
 	}
 
-	profiles, err := dt.MapErr(r, profile.Map)
+	// hr, err := d.roleQuerier.ListFor(ctx, result)
+	// if err != nil {
+	// 	return nil, fault.Wrap(err, fctx.With(ctx))
+	// }
+
+	profiles, err := dt.MapErr(r, profile.Map(nil))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

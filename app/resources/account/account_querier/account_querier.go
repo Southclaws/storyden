@@ -9,16 +9,18 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/internal/ent"
 	account_ent "github.com/Southclaws/storyden/internal/ent/account"
 )
 
 type Querier struct {
-	db *ent.Client
+	db          *ent.Client
+	roleQuerier *role_querier.Querier
 }
 
-func New(db *ent.Client) *Querier {
-	return &Querier{db: db}
+func New(db *ent.Client, roleQuerier *role_querier.Querier) *Querier {
+	return &Querier{db: db, roleQuerier: roleQuerier}
 }
 
 func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.AccountWithEdges, error) {
@@ -27,7 +29,6 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 		Where(account_ent.ID(xid.ID(id))).
 		WithTags().
 		WithEmails().
-		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		WithInvitedBy(func(iq *ent.InvitationQuery) {
 			iq.WithCreator(func(aq *ent.AccountQuery) {
 				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
@@ -44,7 +45,12 @@ func (d *Querier) GetByID(ctx context.Context, id account.AccountID) (*account.A
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	acc, err := account.MapAccount(result)
+	hr, err := d.roleQuerier.ListFor(ctx, result)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err := account.MapAccount(hr)(result)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -58,7 +64,6 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.A
 		Where(account_ent.Handle(handle)).
 		WithTags().
 		WithEmails().
-		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
 		WithInvitedBy(func(iq *ent.InvitationQuery) {
 			iq.WithCreator(func(aq *ent.AccountQuery) {
 				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
@@ -75,7 +80,12 @@ func (d *Querier) LookupByHandle(ctx context.Context, handle string) (*account.A
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	acc, err := account.MapAccount(result)
+	hr, err := d.roleQuerier.ListFor(ctx, result)
+	if err != nil {
+		return nil, false, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err := account.MapAccount(hr)(result)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}

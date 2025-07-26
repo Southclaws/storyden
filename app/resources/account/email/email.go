@@ -163,7 +163,10 @@ func (r *Repository) LookupAccount(ctx context.Context, emailAddress mail.Addres
 		return nil, false, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	acc, err := account.MapAccount(result)
+	acc, err := account.MapAccount(
+		// NOTE: Roles lookup not currently required by callers of this API.
+		nil,
+	)(result)
 	if err != nil {
 		return nil, false, fault.Wrap(err, fctx.With(ctx))
 	}

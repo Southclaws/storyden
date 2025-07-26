@@ -30,6 +30,12 @@ func (a Roles) Len() int           { return len(a) }
 func (a Roles) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a Roles) Less(i, j int) bool { return a[i].SortKey < a[j].SortKey }
 
+func (r Roles) Roles() role.Roles {
+	return dt.Map(r, func(r *Role) *role.Role {
+		return &r.Role
+	})
+}
+
 func (r Roles) Permissions() rbac.Permissions {
 	set := map[rbac.Permission]bool{}
 
@@ -45,7 +51,12 @@ func (r Roles) Permissions() rbac.Permissions {
 }
 
 func Map(in *ent.AccountRoles) (*Role, error) {
-	r, err := role.Map(in.Edges.Role)
+	roleEdge, err := in.Edges.RoleOrErr()
+	if err != nil {
+		return nil, err
+	}
+
+	r, err := role.Map(roleEdge)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +76,6 @@ func MapList(in []*ent.AccountRoles, admin bool) (Roles, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	mapped = append(mapped, &Role{Role: role.DefaultRoleEveryone, Default: true})
 	if admin {
 		mapped = append(mapped, &Role{Role: role.DefaultRoleAdmin, Default: true})
 	}

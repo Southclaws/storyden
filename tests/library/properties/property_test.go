@@ -136,7 +136,7 @@ func TestNodesProperty(t *testing.T) {
 					},
 				})
 				r.NoError(err)
-				a.Equal(403, update.StatusCode())
+				a.Equal(401, update.StatusCode())
 			})
 
 			t.Run("fail_no_permission", func(t *testing.T) {
@@ -152,7 +152,7 @@ func TestNodesProperty(t *testing.T) {
 					},
 				}, randomUser)
 				r.NoError(err)
-				a.Equal(401, update.StatusCode())
+				a.Equal(403, update.StatusCode())
 			})
 
 			t.Run("fail_missing_new_property_type", func(t *testing.T) {

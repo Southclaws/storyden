@@ -31,7 +31,7 @@ var DefaultRoleEveryone = Role{
 		rbac.PermissionReadCollection,
 		rbac.PermissionCollectionSubmit,
 	),
-	SortKey: 0,
+	SortKey: -1, // Always sorts first
 }
 
 var DefaultRoleAdmin = Role{

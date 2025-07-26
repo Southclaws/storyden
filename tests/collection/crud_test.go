@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -38,12 +37,12 @@ func TestCollectionCRUD(t *testing.T) {
 			handle1 := xid.New().String()
 			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle1, "password"})
 			tests.Ok(t, err, acc1)
-			session1 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))))
+			session1 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))))
 
 			handle2 := xid.New().String()
 			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{handle2, "password"})
 			tests.Ok(t, err, acc2)
-			session2 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))))
+			session2 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))))
 
 			cat1, err := cl.CategoryCreateWithResponse(adminCtx, openapi.CategoryInitialProps{
 				Admin:       false,
@@ -59,7 +58,7 @@ func TestCollectionCRUD(t *testing.T) {
 				col, err := cl.CollectionCreateWithResponse(root, openapi.CollectionCreateJSONRequestBody{
 					Name: "c1",
 				})
-				tests.Status(t, err, col, http.StatusForbidden)
+				tests.Status(t, err, col, http.StatusUnauthorized)
 			})
 
 			t.Run("create", func(t *testing.T) {
@@ -129,13 +128,13 @@ func TestCollectionCRUD(t *testing.T) {
 					Description: opt.New("new desc").Ptr(),
 					Name:        opt.New("new name").Ptr(),
 				}, session2)
-				tests.Status(t, err, updateUnauthorised, http.StatusUnauthorized)
+				tests.Status(t, err, updateUnauthorised, http.StatusForbidden)
 
 				updateUnauthenticated, err := cl.CollectionUpdateWithResponse(root, id, openapi.CollectionUpdateJSONRequestBody{
 					Description: opt.New("new desc").Ptr(),
 					Name:        opt.New("new name").Ptr(),
 				})
-				tests.Status(t, err, updateUnauthenticated, http.StatusForbidden)
+				tests.Status(t, err, updateUnauthenticated, http.StatusUnauthorized)
 			})
 
 			t.Run("delete", func(t *testing.T) {

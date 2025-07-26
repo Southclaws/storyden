@@ -12,23 +12,19 @@ import (
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_writer"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/collection/collection_auth"
 )
 
 type Manager struct {
-	session    *session.Provider
 	colQuerier *collection_querier.Querier
 	colWriter  *collection_writer.Writer
 }
 
 func New(
-	session *session.Provider,
 	colQuerier *collection_querier.Querier,
 	colWriter *collection_writer.Writer,
 ) *Manager {
 	return &Manager{
-		session:    session,
 		colQuerier: colQuerier,
 		colWriter:  colWriter,
 	}
@@ -94,10 +90,5 @@ func (m *Manager) authoriseDirectUpdate(ctx context.Context, qk collection.Query
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	acc, err := m.session.Account(ctx)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return collection_auth.CheckCollectionMutationPermissions(ctx, *acc, *col)
+	return collection_auth.CheckCollectionMutationPermissions(ctx, *col)
 }

@@ -10,7 +10,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/account/notification/notify_writer"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
 type notifyConsumer struct {
@@ -25,9 +24,12 @@ func newNotifyConsumer(
 	}
 }
 
-func (s *notifyConsumer) notify(ctx context.Context, targetID account.AccountID, event notification.Event, item *datagraph.Ref) error {
-	sourceID := session.GetOptAccountID(ctx)
-
+func (s *notifyConsumer) notify(ctx context.Context,
+	targetID account.AccountID,
+	sourceID opt.Optional[account.AccountID],
+	event notification.Event,
+	item *datagraph.Ref,
+) error {
 	itemref := opt.Map(opt.NewPtr(item), func(i datagraph.Ref) datagraph.ItemRef {
 		return &i
 	})

@@ -243,11 +243,11 @@ func (m *Mapping) NotificationUpdate() (bool, *rbac.Permission) {
 }
 
 func (m *Mapping) ProfileList() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionListProfiles
+	return false, &rbac.PermissionListProfiles
 }
 
 func (m *Mapping) ProfileGet() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionReadProfile
+	return false, &rbac.PermissionReadProfile
 }
 
 func (m *Mapping) ProfileFollowersGet() (bool, *rbac.Permission) {
@@ -295,11 +295,11 @@ func (m *Mapping) ThreadCreate() (bool, *rbac.Permission) {
 }
 
 func (m *Mapping) ThreadList() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionReadPublishedThreads
+	return false, &rbac.PermissionReadPublishedThreads
 }
 
 func (m *Mapping) ThreadGet() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionReadPublishedThreads
+	return false, &rbac.PermissionReadPublishedThreads
 }
 
 func (m *Mapping) ThreadUpdate() (bool, *rbac.Permission) {
@@ -363,11 +363,11 @@ func (m *Mapping) CollectionCreate() (bool, *rbac.Permission) {
 }
 
 func (m *Mapping) CollectionList() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionListCollections
+	return false, &rbac.PermissionListCollections
 }
 
 func (m *Mapping) CollectionGet() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionReadCollection
+	return false, &rbac.PermissionReadCollection
 }
 
 func (m *Mapping) CollectionUpdate() (bool, *rbac.Permission) {
@@ -399,15 +399,15 @@ func (m *Mapping) NodeCreate() (bool, *rbac.Permission) {
 }
 
 func (m *Mapping) NodeList() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionReadPublishedLibrary
+	return false, &rbac.PermissionReadPublishedLibrary
 }
 
 func (m *Mapping) NodeGet() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionReadPublishedLibrary
+	return false, &rbac.PermissionReadPublishedLibrary
 }
 
 func (m *Mapping) NodeListChildren() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionReadPublishedLibrary
+	return false, &rbac.PermissionReadPublishedLibrary
 }
 
 func (m *Mapping) NodeUpdate() (bool, *rbac.Permission) {

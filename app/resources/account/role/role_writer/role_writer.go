@@ -98,6 +98,12 @@ func (w *Writer) updateDefaultRole(ctx context.Context, opts ...Mutation) (*role
 	if !found {
 		create := w.db.Role.Create()
 		mutate := create.Mutation()
+
+		// The default Member role has a hard-coded ID.
+		mutate.SetID(xid.ID(role.DefaultRoleEveryoneID))
+		mutate.SetName("Member")
+		mutate.SetSortKey(-1)
+
 		for _, opt := range opts {
 			opt(mutate)
 		}

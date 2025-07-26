@@ -30,7 +30,6 @@ var (
 
 type Registrar struct {
 	logger         *slog.Logger
-	session        *session.Provider
 	accountWriter  *account_writer.Writer
 	accountQuerier *account_querier.Querier
 	emailRepo      *email.Repository
@@ -41,7 +40,6 @@ type Registrar struct {
 
 func New(
 	logger *slog.Logger,
-	session *session.Provider,
 	writer *account_writer.Writer,
 	accountQuerier *account_querier.Querier,
 	emailRepo *email.Repository,
@@ -51,7 +49,6 @@ func New(
 ) *Registrar {
 	return &Registrar{
 		logger:         logger,
-		session:        session,
 		accountWriter:  writer,
 		accountQuerier: accountQuerier,
 		emailRepo:      emailRepo,
@@ -105,7 +102,7 @@ func (s *Registrar) GetOrCreateViaEmail(
 
 	// A session will be present if the user is attempting to link an account
 	// to their Storyden account, rather than registering or logging in.
-	session := s.session.AccountMaybe(ctx)
+	session := session.GetOptAccount(ctx)
 
 	authmethod, authMethodExists, err := s.authRepo.LookupByIdentifier(ctx, service, identifier)
 	if err != nil {
@@ -231,7 +228,7 @@ func (s *Registrar) GetOrCreateViaHandle(
 ) (*account.Account, error) {
 	// A session will be present if the user is attempting to link an account
 	// to their Storyden account, rather than registering or logging in.
-	session := s.session.AccountMaybe(ctx)
+	session := session.GetOptAccount(ctx)
 
 	authmethod, authMethodExists, err := s.authRepo.LookupByIdentifier(ctx, service, identifier)
 	if err != nil {
@@ -290,7 +287,7 @@ func (s *Registrar) GetOrCreateViaHandle(
 				return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for existing already logged-in account with same handle"), fctx.With(ctx))
 			}
 
-			return &sessionAccount.Account, nil
+			return &sessionAccount, nil
 		}
 
 		logger.Info("get or create: no auth record, handle already points to existing account, creating new account with random handle")
@@ -312,7 +309,7 @@ func (s *Registrar) GetOrCreateViaHandle(
 				return nil, fault.Wrap(err, fmsg.With("failed to create new auth method for existing already logged-in account"), fctx.With(ctx))
 			}
 
-			return &sessionAccount.Account, nil
+			return &sessionAccount, nil
 		}
 
 		return s.CreateWithHandle(ctx, service, authName, identifier, token, name, handle)

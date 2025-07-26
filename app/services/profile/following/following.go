@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_writer"
@@ -26,7 +27,7 @@ func (f *FollowManager) Follow(ctx context.Context, follower, following account.
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	f.notifier.Send(ctx, following, notification.EventFollow, nil)
+	f.notifier.Send(ctx, following, opt.New(follower), notification.EventFollow, nil)
 
 	return nil
 }

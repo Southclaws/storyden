@@ -27,7 +27,7 @@ const (
 	prefixLength     = 6                                              // sdpak_ or sdbak_
 	identifierLength = 12                                             // random identifier
 	secretLength     = 32                                             // random secret
-	accessKeyLength  = prefixLength + identifierLength + secretLength // 46 characters
+	AccessKeyLength  = prefixLength + identifierLength + secretLength // 46 characters
 )
 
 //go:generate go run github.com/Southclaws/enumerator

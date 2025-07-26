@@ -22,6 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -79,8 +80,12 @@ func NewNodes(
 }
 
 func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateRequestObject) (openapi.NodeCreateResponseObject, error) {
-	session, err := session.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := session.Authorise(ctx, nil, rbac.PermissionManageLibrary, rbac.PermissionSubmitLibraryNode); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -122,7 +127,7 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 	primaryImage := opt.Map(opt.NewPtr(request.Body.PrimaryImageAssetId), deserialiseAssetID)
 
 	node, err := c.nodeMutator.Create(ctx,
-		session,
+		accountID,
 		request.Body.Name,
 		node_mutate.Partial{
 			Slug:         slug,

@@ -35,7 +35,6 @@ import (
 type nodeTools struct {
 	tools []server.ServerTool
 
-	session       *session.Provider
 	accountQuery  *account_querier.Querier
 	nodeMutator   *node_mutate.Manager
 	tagger        *autotagger.Tagger
@@ -51,7 +50,6 @@ type nodeTools struct {
 }
 
 func newNodeTools(
-	session *session.Provider,
 	accountQuery *account_querier.Querier,
 	nodeMutator *node_mutate.Manager,
 	tagger *autotagger.Tagger,
@@ -66,7 +64,6 @@ func newNodeTools(
 	searcher searcher.Searcher,
 ) *nodeTools {
 	handler := &nodeTools{
-		session:       session,
 		accountQuery:  accountQuery,
 		nodeMutator:   nodeMutator,
 		tagger:        tagger,
@@ -97,13 +94,18 @@ var libraryPageTreeTool = mcp.NewTool("getLibraryPageTree",
 )
 
 func (t *nodeTools) libraryPageTree(ctx context.Context, request mcp.CallToolRequest) (*mcp.CallToolResult, error) {
-	account, err := t.session.Account(ctx)
+	account, err := session.GetAccount(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	acc, err := t.accountQuery.GetByID(ctx, account.ID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	opts := []node_traversal.Filter{
-		node_traversal.WithVisibility(opt.New(*account), visibility.VisibilityDraft, visibility.VisibilityPublished),
+		node_traversal.WithVisibility(opt.New(*acc), visibility.VisibilityDraft, visibility.VisibilityPublished),
 	}
 
 	depth := request.GetInt("depth", -1)

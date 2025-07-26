@@ -77,12 +77,12 @@ func TestAccessKeyAuth(t *testing.T) {
 				// First test with no authentication to ensure it fails
 				tests.AssertRequest(
 					cl.AccountGetWithResponse(root),
-				)(t, http.StatusForbidden)
+				)(t, http.StatusUnauthorized)
 
 				// Now test with the revoked key - should also fail
 				tests.AssertRequest(
 					cl.AccountGetWithResponse(root, keySession),
-				)(t, http.StatusForbidden)
+				)(t, http.StatusUnauthorized)
 			})
 
 			t.Run("access_key_authentication", func(t *testing.T) {
@@ -119,7 +119,7 @@ func TestAccessKeyAuth(t *testing.T) {
 				for _, token := range invalidTokens {
 					tests.AssertRequest(
 						cl.AccountGetWithResponse(root, createAccessKeyAuth(token)),
-					)(t, http.StatusForbidden)
+					)(t, http.StatusUnauthorized)
 				}
 			})
 
@@ -163,7 +163,9 @@ func TestAccessKeyAuth(t *testing.T) {
 
 				now := time.Now().Add(-24 * time.Hour) // 24 hours ago, simulating an expired key
 
-				// Create an access key with no expiry (should work indefinitely)
+				// Create an access key that expired yesterday
+				// NOTE: We should actually prevent creating keys with expiry
+				// dates in the past. But this is kinda a lazy hack for above.
 				ak := tests.AssertRequest(
 					cl.AccessKeyCreateWithResponse(root, openapi.AccessKeyInitialProps{
 						Name:      "test-no-expiry",
@@ -174,7 +176,7 @@ func TestAccessKeyAuth(t *testing.T) {
 				// Verify the key works for authentication
 				tests.AssertRequest(
 					cl.AccountGetWithResponse(root, createAccessKeyAuth(ak.JSON200.Secret)),
-				)(t, http.StatusForbidden)
+				)(t, http.StatusUnauthorized)
 			})
 		}))
 	}))
