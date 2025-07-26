@@ -99,7 +99,7 @@ func ValidatorErrorHandler() func(c echo.Context, err *echo.HTTPError) error {
 			msg := "An unexpected error occurred."
 			switch kind {
 			case ftag.PermissionDenied:
-				msg = "You do not hold the necessary permissions to access that."
+				msg = "You don’t have access to this right now."
 			case ftag.Unauthenticated:
 				msg = "The request did not contain any authentication information, please check to make sure you are logged in."
 			}
