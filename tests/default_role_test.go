@@ -1,4 +1,4 @@
-package role_test
+package tests
 
 import (
 	"bytes"
@@ -15,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
-	"github.com/Southclaws/storyden/tests"
 )
 
 // NOTE: The generated client takes an optional final parameter list of "request
@@ -42,7 +41,7 @@ func TestGuestRolePermissions(t *testing.T) {
 			adminCtx, admin := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			adminSession := sh.WithSession(adminCtx)
 
-			cat := tests.AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+			cat := AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 				Name: "TestGuestRolePermissions" + uuid.NewString(),
 			}, adminSession))(t, http.StatusOK)
 
@@ -57,24 +56,24 @@ func TestGuestRolePermissions(t *testing.T) {
 				openapi.RoleUpdateJSONRequestBody{
 					Permissions: &openapi.PermissionList{},
 				}, adminSession)
-			tests.Ok(t, err, edit)
+			Ok(t, err, edit)
 
 			t.Run("guest_cannot_create_post", func(t *testing.T) {
 				// PermissionCreatePost
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{}),
 				)(t, http.StatusUnauthorized)
 			})
 
 			t.Run("guest_cannot_read_published_threads", func(t *testing.T) {
 				// PermissionReadPublishedThreads
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("guest_cannot_create_reaction", func(t *testing.T) {
-				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      "guest_cannot_create_reaction" + uuid.NewString(),
 					Body:       "<body>This is a test thread.</body>",
 					Visibility: openapi.Published,
@@ -82,7 +81,7 @@ func TestGuestRolePermissions(t *testing.T) {
 				}, adminSession))(t, http.StatusOK)
 
 				// PermissionCreateReaction
-				tests.AssertRequest(
+				AssertRequest(
 					cl.PostReactAddWithResponse(root, thread.JSON200.Slug, openapi.PostReactAddJSONRequestBody{
 						Emoji: "👍",
 					}),
@@ -90,23 +89,23 @@ func TestGuestRolePermissions(t *testing.T) {
 			})
 
 			t.Run("guest_cannot_read_published_library", func(t *testing.T) {
-				node := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 					Name:       "guest_cannot_read_published_library" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,
 				}, adminSession))(t, http.StatusOK)
 				// PermissionReadPublishedLibrary
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeListWithResponse(root, &openapi.NodeListParams{}),
 				)(t, http.StatusForbidden)
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeGetWithResponse(root, node.JSON200.Slug, &openapi.NodeGetParams{}),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("guest_cannot_create_node", func(t *testing.T) {
 				// PermissionSubmitLibraryNode
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 						Name:       "guest_cannot_create_node" + uuid.NewString(),
 						Content:    &content,
@@ -117,7 +116,7 @@ func TestGuestRolePermissions(t *testing.T) {
 
 			t.Run("guest_cannot_upload_asset", func(t *testing.T) {
 				// PermissionUploadAsset
-				tests.AssertRequest(
+				AssertRequest(
 					cl.AssetUploadWithBodyWithResponse(root, &openapi.AssetUploadParams{
 						ContentLength: 69,
 					}, "application/whatever", bytes.NewBuffer([]byte("test"))),
@@ -126,21 +125,21 @@ func TestGuestRolePermissions(t *testing.T) {
 
 			t.Run("guest_cannot_list_profiles", func(t *testing.T) {
 				// PermissionListProfiles
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ProfileListWithResponse(root, &openapi.ProfileListParams{}),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("guest_cannot_read_profile", func(t *testing.T) {
 				// PermissionReadProfile
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ProfileGetWithResponse(root, admin.Handle),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("guest_cannot_create_collection", func(t *testing.T) {
 				// PermissionCreateCollection
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionCreateWithResponse(root, openapi.CollectionInitialProps{
 						Name: "guest_cannot_create_collection" + uuid.NewString(),
 					}),
@@ -149,54 +148,54 @@ func TestGuestRolePermissions(t *testing.T) {
 
 			t.Run("guest_cannot_list_collections", func(t *testing.T) {
 				// PermissionListCollections
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionListWithResponse(root, &openapi.CollectionListParams{}),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("guest_cannot_read_collection", func(t *testing.T) {
-				col := tests.AssertRequest(
+				col := AssertRequest(
 					cl.CollectionCreateWithResponse(root, openapi.CollectionInitialProps{
 						Name: "guest_cannot_read_collection" + uuid.NewString(),
 					}, adminSession),
 				)(t, http.StatusOK)
 
 				// PermissionReadCollection
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionGetWithResponse(root, col.JSON200.Slug),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("guest_cannot_create_collection_item", func(t *testing.T) {
-				col := tests.AssertRequest(
+				col := AssertRequest(
 					cl.CollectionCreateWithResponse(root, openapi.CollectionInitialProps{
 						Name: "guest_cannot_create_collection_item" + uuid.NewString(),
 					}, adminSession),
 				)(t, http.StatusOK)
 
-				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      "guest_cannot_create_collection_item",
 					Body:       "<body>This is a test thread.</body>",
 					Visibility: openapi.Published,
 					Category:   cat.JSON200.Id,
 				}, adminSession))(t, http.StatusOK)
 
-				node := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 					Name:       "guest_cannot_create_collection_item" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,
 				}, adminSession))(t, http.StatusOK)
 
 				// PermissionCollectionSubmit
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionAddPostWithResponse(root, col.JSON200.Slug, thread.JSON200.Id),
 				)(t, http.StatusUnauthorized)
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionAddNodeWithResponse(root, col.JSON200.Slug, node.JSON200.Id),
 				)(t, http.StatusUnauthorized)
 			})
 
-			tests.AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
+			AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
 				role.DefaultRoleGuestID.String(),
 				adminSession),
 			)(t, http.StatusOK)
@@ -216,7 +215,7 @@ func TestGuestRoleWithPermissions(t *testing.T) {
 			adminCtx, admin := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			adminSession := sh.WithSession(adminCtx)
 
-			cat := tests.AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+			cat := AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 				Name: "TestGuestRoleWithPermissions" + uuid.NewString(),
 			}, adminSession))(t, http.StatusOK)
 
@@ -237,10 +236,10 @@ func TestGuestRoleWithPermissions(t *testing.T) {
 						"READ_COLLECTION",
 					},
 				}, adminSession)
-			tests.Ok(t, err, edit)
+			Ok(t, err, edit)
 
 			t.Run("guest_can_read_published_threads", func(t *testing.T) {
-				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      "guest_can_read_published_threads" + uuid.NewString(),
 					Body:       "<body>This is a test thread.</body>",
 					Visibility: openapi.Published,
@@ -248,66 +247,66 @@ func TestGuestRoleWithPermissions(t *testing.T) {
 				}, adminSession))(t, http.StatusOK)
 
 				// PermissionReadPublishedThreads
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}),
 				)(t, http.StatusOK)
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ThreadGetWithResponse(root, thread.JSON200.Slug, &openapi.ThreadGetParams{}),
 				)(t, http.StatusOK)
 			})
 
 			t.Run("guest_can_read_published_library", func(t *testing.T) {
-				node := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 					Name:       "guest_can_read_published_library" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,
 				}, adminSession))(t, http.StatusOK)
 
 				// PermissionReadPublishedLibrary
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeListWithResponse(root, &openapi.NodeListParams{}),
 				)(t, http.StatusOK)
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeGetWithResponse(root, node.JSON200.Slug, &openapi.NodeGetParams{}),
 				)(t, http.StatusOK)
 			})
 
 			t.Run("guest_can_list_profiles", func(t *testing.T) {
 				// PermissionListProfiles
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ProfileListWithResponse(root, &openapi.ProfileListParams{}),
 				)(t, http.StatusOK)
 			})
 
 			t.Run("guest_can_read_profile", func(t *testing.T) {
 				// PermissionReadProfile
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ProfileGetWithResponse(root, admin.Handle),
 				)(t, http.StatusOK)
 			})
 
 			t.Run("guest_can_list_collections", func(t *testing.T) {
 				// PermissionListCollections
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionListWithResponse(root, &openapi.CollectionListParams{}),
 				)(t, http.StatusOK)
 			})
 
 			t.Run("guest_can_read_collection", func(t *testing.T) {
-				col := tests.AssertRequest(
+				col := AssertRequest(
 					cl.CollectionCreateWithResponse(root, openapi.CollectionInitialProps{
 						Name: "guest_can_read_collection" + uuid.NewString(),
 					}, adminSession),
 				)(t, http.StatusOK)
 
 				// PermissionReadCollection
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionGetWithResponse(root, col.JSON200.Slug),
 				)(t, http.StatusOK)
 			})
 
 			// Clean up by deleting the guest role customization
-			tests.AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
+			AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
 				role.DefaultRoleGuestID.String(),
 				adminSession),
 			)(t, http.StatusOK)
@@ -327,7 +326,7 @@ func TestMemberRolePermissions(t *testing.T) {
 			adminCtx, admin := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			adminSession := sh.WithSession(adminCtx)
 
-			cat := tests.AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+			cat := AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 				Name: "TestMemberRolePermissions" + uuid.NewString(),
 			}, adminSession))(t, http.StatusOK)
 
@@ -345,24 +344,24 @@ func TestMemberRolePermissions(t *testing.T) {
 				openapi.RoleUpdateJSONRequestBody{
 					Permissions: &openapi.PermissionList{},
 				}, adminSession)
-			tests.Ok(t, err, edit)
+			Ok(t, err, edit)
 
 			t.Run("member_cannot_create_post", func(t *testing.T) {
 				// PermissionCreatePost
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{}, member1Session),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("member_cannot_read_published_threads", func(t *testing.T) {
 				// PermissionReadPublishedThreads
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}, member1Session),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("member_cannot_create_reaction", func(t *testing.T) {
-				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      "member_cannot_create_reaction" + uuid.NewString(),
 					Body:       "<body>This is a test thread.</body>",
 					Visibility: openapi.Published,
@@ -370,7 +369,7 @@ func TestMemberRolePermissions(t *testing.T) {
 				}, adminSession))(t, http.StatusOK)
 
 				// PermissionCreateReaction
-				tests.AssertRequest(
+				AssertRequest(
 					cl.PostReactAddWithResponse(root, thread.JSON200.Slug, openapi.PostReactAddJSONRequestBody{
 						Emoji: "👍",
 					}, member1Session),
@@ -378,23 +377,23 @@ func TestMemberRolePermissions(t *testing.T) {
 			})
 
 			t.Run("member_cannot_read_published_library", func(t *testing.T) {
-				node := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 					Name:       "member_cannot_read_published_library" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,
 				}, adminSession))(t, http.StatusOK)
 				// PermissionReadPublishedLibrary
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeListWithResponse(root, &openapi.NodeListParams{}, member1Session),
 				)(t, http.StatusForbidden)
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeGetWithResponse(root, node.JSON200.Slug, &openapi.NodeGetParams{}, member1Session),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("member_cannot_create_node", func(t *testing.T) {
 				// PermissionSubmitLibraryNode
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 						Name:       "member_cannot_create_node" + uuid.NewString(),
 						Content:    &content,
@@ -405,7 +404,7 @@ func TestMemberRolePermissions(t *testing.T) {
 
 			t.Run("member_cannot_upload_asset", func(t *testing.T) {
 				// PermissionUploadAsset
-				tests.AssertRequest(
+				AssertRequest(
 					cl.AssetUploadWithBodyWithResponse(root,
 						&openapi.AssetUploadParams{
 							ContentLength: 69,
@@ -418,21 +417,21 @@ func TestMemberRolePermissions(t *testing.T) {
 
 			t.Run("member_cannot_list_profiles", func(t *testing.T) {
 				// PermissionListProfiles
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ProfileListWithResponse(root, &openapi.ProfileListParams{}, member1Session),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("member_cannot_read_profile", func(t *testing.T) {
 				// PermissionReadProfile
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ProfileGetWithResponse(root, admin.Handle, member1Session),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("member_cannot_create_collection", func(t *testing.T) {
 				// PermissionCreateCollection
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionCreateWithResponse(root, openapi.CollectionInitialProps{
 						Name: "member_cannot_create_collection" + uuid.NewString(),
 					}, member1Session),
@@ -441,54 +440,54 @@ func TestMemberRolePermissions(t *testing.T) {
 
 			t.Run("member_cannot_list_collections", func(t *testing.T) {
 				// PermissionListCollections
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionListWithResponse(root, &openapi.CollectionListParams{}, member1Session),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("member_cannot_read_collection", func(t *testing.T) {
-				col := tests.AssertRequest(
+				col := AssertRequest(
 					cl.CollectionCreateWithResponse(root, openapi.CollectionInitialProps{
 						Name: "member_cannot_read_collection" + uuid.NewString(),
 					}, adminSession),
 				)(t, http.StatusOK)
 
 				// PermissionReadCollection
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionGetWithResponse(root, col.JSON200.Slug, member1Session),
 				)(t, http.StatusForbidden)
 			})
 
 			t.Run("member_cannot_create_collection_item", func(t *testing.T) {
-				col := tests.AssertRequest(
+				col := AssertRequest(
 					cl.CollectionCreateWithResponse(root, openapi.CollectionInitialProps{
 						Name: "member_cannot_create_collection_item" + uuid.NewString(),
 					}, adminSession),
 				)(t, http.StatusOK)
 
-				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				thread := AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      "member_cannot_create_collection_item",
 					Body:       "<body>This is a test thread.</body>",
 					Visibility: openapi.Published,
 					Category:   cat.JSON200.Id,
 				}, adminSession))(t, http.StatusOK)
 
-				node := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 					Name:       "member_cannot_create_collection_item" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,
 				}, adminSession))(t, http.StatusOK)
 
 				// PermissionCollectionSubmit
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionAddPostWithResponse(root, col.JSON200.Slug, thread.JSON200.Id, member1Session),
 				)(t, http.StatusForbidden)
-				tests.AssertRequest(
+				AssertRequest(
 					cl.CollectionAddNodeWithResponse(root, col.JSON200.Slug, node.JSON200.Id, member1Session),
 				)(t, http.StatusForbidden)
 			})
 
-			tests.AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
+			AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
 				role.DefaultRoleMemberID.String(),
 				adminSession),
 			)(t, http.StatusOK)
@@ -508,11 +507,11 @@ func TestGuestVsMemberAccess(t *testing.T) {
 			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			adminSession := sh.WithSession(adminCtx)
 
-			cat := tests.AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+			cat := AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 				Name: "TestMemberRolePermissions" + uuid.NewString(),
 			}, adminSession))(t, http.StatusOK)
 
-			tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+			AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 				Title:      "guest_cannot_create_reaction" + uuid.NewString(),
 				Body:       "<body>This is a test thread.</body>",
 				Visibility: openapi.Published,
@@ -528,7 +527,7 @@ func TestGuestVsMemberAccess(t *testing.T) {
 			member1Session := sh.WithSession(memberCtx)
 
 			// Set explicit permissions for Guest
-			tests.AssertRequest(cl.RoleUpdateWithResponse(adminCtx,
+			AssertRequest(cl.RoleUpdateWithResponse(adminCtx,
 				role.DefaultRoleGuestID.String(),
 				openapi.RoleUpdateJSONRequestBody{
 					Permissions: &openapi.PermissionList{
@@ -537,7 +536,7 @@ func TestGuestVsMemberAccess(t *testing.T) {
 				}, adminSession))(t, http.StatusOK)
 
 			// Set explicit permissions for Member
-			tests.AssertRequest(cl.RoleUpdateWithResponse(adminCtx,
+			AssertRequest(cl.RoleUpdateWithResponse(adminCtx,
 				role.DefaultRoleMemberID.String(),
 				openapi.RoleUpdateJSONRequestBody{
 					Permissions: &openapi.PermissionList{
@@ -546,7 +545,7 @@ func TestGuestVsMemberAccess(t *testing.T) {
 				}, adminSession))(t, http.StatusOK)
 
 			t.Run("read_published_library", func(t *testing.T) {
-				node := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+				node := AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
 					Name:       "read_published_library" + uuid.NewString(),
 					Content:    &content,
 					Visibility: &published,
@@ -555,32 +554,37 @@ func TestGuestVsMemberAccess(t *testing.T) {
 				// Guest can read threads, but not library
 
 				// PermissionReadPublishedThreads
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}),
 				)(t, http.StatusOK)
 				// PermissionReadPublishedLibrary
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeListWithResponse(root, &openapi.NodeListParams{}),
 				)(t, http.StatusForbidden)
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeGetWithResponse(root, node.JSON200.Slug, &openapi.NodeGetParams{}),
 				)(t, http.StatusForbidden)
 
 				// Member can read both
 
-				tests.AssertRequest(
+				AssertRequest(
 					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}, member1Session),
 				)(t, http.StatusForbidden)
 				// PermissionReadPublishedLibrary
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeListWithResponse(root, &openapi.NodeListParams{}, member1Session),
 				)(t, http.StatusOK)
-				tests.AssertRequest(
+				AssertRequest(
 					cl.NodeGetWithResponse(root, node.JSON200.Slug, &openapi.NodeGetParams{}, member1Session),
 				)(t, http.StatusOK)
 			})
 
-			tests.AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
+			AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
+				role.DefaultRoleGuestID.String(),
+				adminSession),
+			)(t, http.StatusOK)
+
+			AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
 				role.DefaultRoleMemberID.String(),
 				adminSession),
 			)(t, http.StatusOK)
@@ -601,7 +605,7 @@ func TestCannotGrantWritePermissionsToGuest(t *testing.T) {
 			adminSession := sh.WithSession(adminCtx)
 
 			// Set explicit permissions for Guest
-			tests.AssertRequest(cl.RoleUpdateWithResponse(adminCtx,
+			AssertRequest(cl.RoleUpdateWithResponse(adminCtx,
 				role.DefaultRoleGuestID.String(),
 				openapi.RoleUpdateJSONRequestBody{
 					Permissions: &openapi.PermissionList{
