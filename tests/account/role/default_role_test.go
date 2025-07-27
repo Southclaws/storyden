@@ -39,7 +39,7 @@ func TestGuestRolePermissions(t *testing.T) {
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
-			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			adminCtx, admin := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			adminSession := sh.WithSession(adminCtx)
 
 			cat := tests.AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
@@ -51,8 +51,9 @@ func TestGuestRolePermissions(t *testing.T) {
 			review := openapi.Review
 			content := "<body>This is a test node.</body>"
 
+			// Remove all permissions from the guest role to test restrictions
 			edit, err := cl.RoleUpdateWithResponse(adminCtx,
-				role.DefaultRoleEveryoneID.String(),
+				role.DefaultRoleGuestID.String(),
 				openapi.RoleUpdateJSONRequestBody{
 					Permissions: &openapi.PermissionList{},
 				}, adminSession)
@@ -133,7 +134,7 @@ func TestGuestRolePermissions(t *testing.T) {
 			t.Run("guest_cannot_read_profile", func(t *testing.T) {
 				// PermissionReadProfile
 				tests.AssertRequest(
-					cl.ProfileGetWithResponse(root, seed.Account_001_Odin.Handle),
+					cl.ProfileGetWithResponse(root, admin.Handle),
 				)(t, http.StatusForbidden)
 			})
 
@@ -196,7 +197,118 @@ func TestGuestRolePermissions(t *testing.T) {
 			})
 
 			tests.AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
-				role.DefaultRoleEveryoneID.String(),
+				role.DefaultRoleGuestID.String(),
+				adminSession),
+			)(t, http.StatusOK)
+		}))
+	}))
+}
+
+func TestGuestRoleWithPermissions(t *testing.T) {
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			adminCtx, admin := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			adminSession := sh.WithSession(adminCtx)
+
+			cat := tests.AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+				Name: "TestGuestRoleWithPermissions" + uuid.NewString(),
+			}, adminSession))(t, http.StatusOK)
+
+			// Helper values for pointers
+			published := openapi.Published
+			content := "<body>This is a test node.</body>"
+
+			// Grant read permissions to guest role
+			edit, err := cl.RoleUpdateWithResponse(adminCtx,
+				role.DefaultRoleGuestID.String(),
+				openapi.RoleUpdateJSONRequestBody{
+					Permissions: &openapi.PermissionList{
+						"READ_PUBLISHED_THREADS",
+						"READ_PUBLISHED_LIBRARY",
+						"LIST_PROFILES",
+						"READ_PROFILE",
+						"LIST_COLLECTIONS",
+						"READ_COLLECTION",
+					},
+				}, adminSession)
+			tests.Ok(t, err, edit)
+
+			t.Run("guest_can_read_published_threads", func(t *testing.T) {
+				thread := tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					Title:      "guest_can_read_published_threads" + uuid.NewString(),
+					Body:       "<body>This is a test thread.</body>",
+					Visibility: openapi.Published,
+					Category:   cat.JSON200.Id,
+				}, adminSession))(t, http.StatusOK)
+
+				// PermissionReadPublishedThreads
+				tests.AssertRequest(
+					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}),
+				)(t, http.StatusOK)
+				tests.AssertRequest(
+					cl.ThreadGetWithResponse(root, thread.JSON200.Slug, &openapi.ThreadGetParams{}),
+				)(t, http.StatusOK)
+			})
+
+			t.Run("guest_can_read_published_library", func(t *testing.T) {
+				node := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					Name:       "guest_can_read_published_library" + uuid.NewString(),
+					Content:    &content,
+					Visibility: &published,
+				}, adminSession))(t, http.StatusOK)
+
+				// PermissionReadPublishedLibrary
+				tests.AssertRequest(
+					cl.NodeListWithResponse(root, &openapi.NodeListParams{}),
+				)(t, http.StatusOK)
+				tests.AssertRequest(
+					cl.NodeGetWithResponse(root, node.JSON200.Slug, &openapi.NodeGetParams{}),
+				)(t, http.StatusOK)
+			})
+
+			t.Run("guest_can_list_profiles", func(t *testing.T) {
+				// PermissionListProfiles
+				tests.AssertRequest(
+					cl.ProfileListWithResponse(root, &openapi.ProfileListParams{}),
+				)(t, http.StatusOK)
+			})
+
+			t.Run("guest_can_read_profile", func(t *testing.T) {
+				// PermissionReadProfile
+				tests.AssertRequest(
+					cl.ProfileGetWithResponse(root, admin.Handle),
+				)(t, http.StatusOK)
+			})
+
+			t.Run("guest_can_list_collections", func(t *testing.T) {
+				// PermissionListCollections
+				tests.AssertRequest(
+					cl.CollectionListWithResponse(root, &openapi.CollectionListParams{}),
+				)(t, http.StatusOK)
+			})
+
+			t.Run("guest_can_read_collection", func(t *testing.T) {
+				col := tests.AssertRequest(
+					cl.CollectionCreateWithResponse(root, openapi.CollectionInitialProps{
+						Name: "guest_can_read_collection" + uuid.NewString(),
+					}, adminSession),
+				)(t, http.StatusOK)
+
+				// PermissionReadCollection
+				tests.AssertRequest(
+					cl.CollectionGetWithResponse(root, col.JSON200.Slug),
+				)(t, http.StatusOK)
+			})
+
+			// Clean up by deleting the guest role customization
+			tests.AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
+				role.DefaultRoleGuestID.String(),
 				adminSession),
 			)(t, http.StatusOK)
 		}))
@@ -212,7 +324,7 @@ func TestMemberRolePermissions(t *testing.T) {
 		aw *account_writer.Writer,
 	) {
 		lc.Append(fx.StartHook(func() {
-			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			adminCtx, admin := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			adminSession := sh.WithSession(adminCtx)
 
 			cat := tests.AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
@@ -229,7 +341,7 @@ func TestMemberRolePermissions(t *testing.T) {
 
 			// Remove all permissions from the default member role.
 			edit, err := cl.RoleUpdateWithResponse(adminCtx,
-				role.DefaultRoleEveryoneID.String(),
+				role.DefaultRoleMemberID.String(),
 				openapi.RoleUpdateJSONRequestBody{
 					Permissions: &openapi.PermissionList{},
 				}, adminSession)
@@ -314,7 +426,7 @@ func TestMemberRolePermissions(t *testing.T) {
 			t.Run("member_cannot_read_profile", func(t *testing.T) {
 				// PermissionReadProfile
 				tests.AssertRequest(
-					cl.ProfileGetWithResponse(root, seed.Account_001_Odin.Handle, member1Session),
+					cl.ProfileGetWithResponse(root, admin.Handle, member1Session),
 				)(t, http.StatusForbidden)
 			})
 
@@ -377,9 +489,125 @@ func TestMemberRolePermissions(t *testing.T) {
 			})
 
 			tests.AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
-				role.DefaultRoleEveryoneID.String(),
+				role.DefaultRoleMemberID.String(),
 				adminSession),
 			)(t, http.StatusOK)
+		}))
+	}))
+}
+
+func TestGuestVsMemberAccess(t *testing.T) {
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			adminSession := sh.WithSession(adminCtx)
+
+			cat := tests.AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+				Name: "TestMemberRolePermissions" + uuid.NewString(),
+			}, adminSession))(t, http.StatusOK)
+
+			tests.AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+				Title:      "guest_cannot_create_reaction" + uuid.NewString(),
+				Body:       "<body>This is a test thread.</body>",
+				Visibility: openapi.Published,
+				Category:   cat.JSON200.Id,
+			}, adminSession))(t, http.StatusOK)
+
+			// Helper values for pointers
+			published := openapi.Published
+			// review := openapi.Review
+			content := "<body>This is a test node.</body>"
+
+			memberCtx, _ := e2e.WithAccount(root, aw, seed.Account_004_Loki)
+			member1Session := sh.WithSession(memberCtx)
+
+			// Set explicit permissions for Guest
+			tests.AssertRequest(cl.RoleUpdateWithResponse(adminCtx,
+				role.DefaultRoleGuestID.String(),
+				openapi.RoleUpdateJSONRequestBody{
+					Permissions: &openapi.PermissionList{
+						"READ_PUBLISHED_THREADS",
+					},
+				}, adminSession))(t, http.StatusOK)
+
+			// Set explicit permissions for Member
+			tests.AssertRequest(cl.RoleUpdateWithResponse(adminCtx,
+				role.DefaultRoleMemberID.String(),
+				openapi.RoleUpdateJSONRequestBody{
+					Permissions: &openapi.PermissionList{
+						"READ_PUBLISHED_LIBRARY",
+					},
+				}, adminSession))(t, http.StatusOK)
+
+			t.Run("read_published_library", func(t *testing.T) {
+				node := tests.AssertRequest(cl.NodeCreateWithResponse(root, openapi.NodeInitialProps{
+					Name:       "read_published_library" + uuid.NewString(),
+					Content:    &content,
+					Visibility: &published,
+				}, adminSession))(t, http.StatusOK)
+
+				// Guest can read threads, but not library
+
+				// PermissionReadPublishedThreads
+				tests.AssertRequest(
+					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}),
+				)(t, http.StatusOK)
+				// PermissionReadPublishedLibrary
+				tests.AssertRequest(
+					cl.NodeListWithResponse(root, &openapi.NodeListParams{}),
+				)(t, http.StatusForbidden)
+				tests.AssertRequest(
+					cl.NodeGetWithResponse(root, node.JSON200.Slug, &openapi.NodeGetParams{}),
+				)(t, http.StatusForbidden)
+
+				// Member can read both
+
+				tests.AssertRequest(
+					cl.ThreadListWithResponse(root, &openapi.ThreadListParams{}, member1Session),
+				)(t, http.StatusForbidden)
+				// PermissionReadPublishedLibrary
+				tests.AssertRequest(
+					cl.NodeListWithResponse(root, &openapi.NodeListParams{}, member1Session),
+				)(t, http.StatusOK)
+				tests.AssertRequest(
+					cl.NodeGetWithResponse(root, node.JSON200.Slug, &openapi.NodeGetParams{}, member1Session),
+				)(t, http.StatusOK)
+			})
+
+			tests.AssertRequest(cl.RoleDeleteWithResponse(adminCtx,
+				role.DefaultRoleMemberID.String(),
+				adminSession),
+			)(t, http.StatusOK)
+		}))
+	}))
+}
+
+func TestCannotGrantWritePermissionsToGuest(t *testing.T) {
+	integration.Test(t, nil, e2e.Setup(), fx.Invoke(func(
+		lc fx.Lifecycle,
+		root context.Context,
+		cl *openapi.ClientWithResponses,
+		sh *e2e.SessionHelper,
+		aw *account_writer.Writer,
+	) {
+		lc.Append(fx.StartHook(func() {
+			adminCtx, _ := e2e.WithAccount(root, aw, seed.Account_001_Odin)
+			adminSession := sh.WithSession(adminCtx)
+
+			// Set explicit permissions for Guest
+			tests.AssertRequest(cl.RoleUpdateWithResponse(adminCtx,
+				role.DefaultRoleGuestID.String(),
+				openapi.RoleUpdateJSONRequestBody{
+					Permissions: &openapi.PermissionList{
+						openapi.CREATEPOST,
+					},
+				}, adminSession))(t, http.StatusBadRequest)
 		}))
 	}))
 }

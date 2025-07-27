@@ -70,11 +70,29 @@ export function useRoleEditScreen({ role, onSave }: Props) {
     );
   }
 
+  async function handleReset() {
+    await handle(
+      async () => {
+        await roleDelete(role.id);
+      },
+      {
+        promiseToast: {
+          loading: "Resetting...",
+          success: "Reset to defaults!",
+        },
+        async cleanup() {
+          await revalidate();
+        },
+      },
+    );
+  }
+
   return {
     form,
     handlers: {
       handleSave,
       handleDelete,
+      handleReset,
     },
   };
 }

@@ -129,6 +129,7 @@ func serialiseRole(in role.Role) openapi.Role {
 		Name:        in.Name,
 		Colour:      in.Colour,
 		Permissions: serialisePermissionList(in.Permissions),
+		CreatedAt:   in.CreatedAt,
 	}
 }
 
@@ -151,6 +152,7 @@ func serialiseHeldRole(in held.Role) openapi.AccountRole {
 		Permissions: serialisePermissionList(in.Permissions),
 		Badge:       in.Badge,
 		Default:     in.Default,
+		CreatedAt:   in.CreatedAt,
 	}
 }
 

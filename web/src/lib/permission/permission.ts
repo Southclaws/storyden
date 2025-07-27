@@ -136,3 +136,9 @@ export const PermissionDetails: Record<Permission, PermissionDetail> = {
 };
 
 export const PermissionList = Object.values(PermissionDetails);
+
+export function buildPermissionList(
+  ...permissionNames: Permission[]
+): PermissionDetail[] {
+  return permissionNames.map((name) => PermissionDetails[name]).filter(Boolean);
+}

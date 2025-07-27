@@ -66,7 +66,7 @@ func TestRoles(t *testing.T) {
 				tests.Ok(t, err, guest1Get)
 
 				r.Len(guest1Get.JSON200.Roles, 2, "1 default roles, 1 new role")
-				role1 := findRole(guest1Get.JSON200.Roles, "00000000000000000010")
+				role1 := findRole(guest1Get.JSON200.Roles, "000000000000000000m0")
 				r.NotNil(role1, "default role not found")
 				a.Equal("green", role1.Colour)
 				a.Equal([]openapi.Permission{

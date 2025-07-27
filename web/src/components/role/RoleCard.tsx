@@ -1,7 +1,10 @@
 import { Role } from "@/api/openapi-schema";
 import { Heading } from "@/components/ui/heading";
+import { isDefaultRole, isStoredDefaultRole } from "@/lib/role/defaults";
 import { css } from "@/styled-system/css";
 import { CardBox, WStack } from "@/styled-system/jsx";
+
+import { Badge } from "../ui/badge";
 
 import { PermissionSummary } from "./PermissionList";
 import { RoleEditModalTrigger } from "./RoleEdit/RoleEditModal";
@@ -14,6 +17,9 @@ type Props = {
 
 export function RoleCard({ role, editable }: Props) {
   const cssVars = badgeColourCSS(role.colour);
+
+  const isDefault = isDefaultRole(role);
+  const isCustomDefault = isStoredDefaultRole(role);
 
   return (
     <CardBox
@@ -32,7 +38,18 @@ export function RoleCard({ role, editable }: Props) {
         {editable && <RoleEditModalTrigger role={role} />}
       </WStack>
 
-      <PermissionSummary permissions={role.permissions} />
+      <WStack>
+        <PermissionSummary permissions={role.permissions} />
+        {isDefault && (
+          <>
+            {isCustomDefault ? (
+              <Badge size="sm">Default + Custom</Badge>
+            ) : (
+              <Badge size="sm">Default</Badge>
+            )}
+          </>
+        )}
+      </WStack>
     </CardBox>
   );
 }

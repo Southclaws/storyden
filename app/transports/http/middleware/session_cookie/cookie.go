@@ -119,7 +119,7 @@ func (j *Jar) tryFromHeader(r *http.Request) (context.Context, bool) {
 }
 
 func (j *Jar) withDefaultRoles(r *http.Request) context.Context {
-	ctx, err := j.validator.WithDefaultRoles(r.Context())
+	ctx, err := j.validator.WithUnauthenticatedRoles(r.Context())
 	if err != nil {
 		// TODO: Handle this somehow - needs logging but if this fails then
 		// we can't do anything, the request would have no roles and thus fail.

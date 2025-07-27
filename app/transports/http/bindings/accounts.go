@@ -289,7 +289,7 @@ func (h *Accounts) AccountRemoveRole(ctx context.Context, request openapi.Accoun
 			return nil, fault.Wrap(ErrSelfAdminRoleChange, fctx.With(ctx))
 		}
 	}
-	if roleID == role.DefaultRoleEveryoneID {
+	if roleID == role.DefaultRoleMemberID {
 		return nil, fault.Wrap(ErrEveryoneRole, fctx.With(ctx))
 	}
 
@@ -326,7 +326,7 @@ func (h *Accounts) AccountAddRole(ctx context.Context, request openapi.AccountAd
 			return nil, fault.Wrap(ErrSelfAdminRoleChange, fctx.With(ctx))
 		}
 	}
-	if roleID == role.DefaultRoleEveryoneID {
+	if roleID == role.DefaultRoleMemberID {
 		return nil, fault.Wrap(ErrEveryoneRole, fctx.With(ctx))
 	}
 

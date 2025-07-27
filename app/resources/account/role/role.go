@@ -2,6 +2,7 @@ package role
 
 import (
 	"sort"
+	"time"
 
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -22,6 +23,7 @@ type Role struct {
 	Colour      string
 	Permissions rbac.Permissions
 	SortKey     float64
+	CreatedAt   time.Time
 }
 
 type Roles []*Role
@@ -55,6 +57,7 @@ func Map(r *ent.Role) (*Role, error) {
 		Name:        r.Name,
 		Colour:      r.Colour,
 		Permissions: *perms,
+		CreatedAt:   r.CreatedAt,
 	}, nil
 }
 

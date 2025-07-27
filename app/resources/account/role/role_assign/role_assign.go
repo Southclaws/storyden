@@ -65,7 +65,7 @@ func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountI
 	// NOTE: We filter out the Everyone role from mutations, it cannot be added
 	// or removed, instead it's automatically included for all role queries.
 	roles = dt.Filter(roles, func(m Mutation) bool {
-		return m.id != role.DefaultRoleEveryoneID
+		return m.id != role.DefaultRoleMemberID
 	})
 
 	adds, removes, admin := split(roles...)

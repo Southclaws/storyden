@@ -1,5 +1,7 @@
 "use client";
 
+import { PropsWithChildren } from "react";
+
 import { Button, ButtonProps } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
@@ -15,7 +17,11 @@ export type Props = ButtonProps & {
   onDelete: () => Promise<void>;
 };
 
-export function DeleteWithConfirmationButton({ onDelete, ...props }: Props) {
+export function DeleteWithConfirmationButton({
+  onDelete,
+  children,
+  ...props
+}: PropsWithChildren<Props>) {
   const { isConfirming, handleConfirmAction, handleCancelAction } =
     useConfirmation(onDelete);
 
@@ -62,7 +68,7 @@ export function DeleteWithConfirmationButton({ onDelete, ...props }: Props) {
       onClick={handleConfirmAction}
     >
       <HStack gap="1">
-        <DeleteIcon /> Delete
+        <DeleteIcon /> {children ?? "Delete"}
       </HStack>
     </Button>
   );

@@ -99,11 +99,11 @@ func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (con
 	return WithAccessKey(ctx, ar.Account, acc.Roles.Roles()), nil
 }
 
-func (v *Validator) WithDefaultRoles(ctx context.Context) (context.Context, error) {
-	r, err := v.roleQuerier.GetDefaultRole(ctx)
+func (v *Validator) WithUnauthenticatedRoles(ctx context.Context) (context.Context, error) {
+	guestRole, err := v.roleQuerier.GetGuestRole(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithGuest(ctx, role.Roles{r}), nil
+	return WithGuest(ctx, role.Roles{guestRole}), nil
 }
