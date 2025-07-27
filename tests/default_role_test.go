@@ -508,7 +508,7 @@ func TestGuestVsMemberAccess(t *testing.T) {
 			adminSession := sh.WithSession(adminCtx)
 
 			cat := AssertRequest(cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
-				Name: "TestMemberRolePermissions" + uuid.NewString(),
+				Name: "TestGuestVsMemberAccess" + uuid.NewString(),
 			}, adminSession))(t, http.StatusOK)
 
 			AssertRequest(cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
