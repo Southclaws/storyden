@@ -251,55 +251,6 @@ export function useLibraryMutation(node?: Node) {
     return updated;
   };
 
-  const addAsset = async (id: string, asset: Asset) => {
-    const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
-      if (!data) return;
-
-      // bug data.assets is not iterable
-      const assets = [...data.assets, asset];
-
-      const updated = {
-        ...data,
-        assets,
-      } satisfies NodeWithChildren;
-
-      return updated;
-    };
-
-    const nodeKey = getNodeGetKey(id);
-    const nodeKeyFn = (key: Arguments) => {
-      return Array.isArray(key) && key[0].startsWith(nodeKey);
-    };
-
-    await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
-
-    await nodeAddAsset(id, asset.id);
-  };
-
-  const removeAsset = async (slug: string, assetID: AssetID) => {
-    const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
-      if (!data) return;
-
-      const assets = data.assets.filter((a) => a.id !== assetID);
-
-      const updated = {
-        ...data,
-        assets,
-      } satisfies NodeWithChildren;
-
-      return updated;
-    };
-
-    const nodeKey = getNodeGetKey(slug);
-    const nodeKeyFn = (key: Arguments) => {
-      return Array.isArray(key) && key[0].startsWith(nodeKey);
-    };
-
-    await mutate(nodeKeyFn, nodeMutator, { revalidate: false });
-
-    await nodeRemoveAsset(slug, assetID);
-  };
-
   const deleteNode = async (slug: string, newParent?: string) => {
     const mutator: MutatorCallback<NodeListOKResponse> = (data) => {
       if (!data) return;
@@ -396,8 +347,6 @@ export function useLibraryMutation(node?: Node) {
     importFromLink,
     updateNodeVisibility,
     updateNodeChildVisibility,
-    addAsset,
-    removeAsset,
     deleteNode,
     moveNode,
     revalidate,

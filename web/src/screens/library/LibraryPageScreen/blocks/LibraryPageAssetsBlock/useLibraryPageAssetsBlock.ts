@@ -1,4 +1,5 @@
 import { handle } from "@/api/client";
+import { nodeAddAsset, nodeRemoveAsset } from "@/api/openapi-client/nodes";
 import { Asset } from "@/api/openapi-schema";
 import { useLibraryMutation } from "@/lib/library/library";
 
@@ -8,24 +9,27 @@ import { useEditState } from "../../useEditState";
 
 export function useLibraryPageAssetsBlock() {
   const { editing } = useEditState();
-  const { nodeID } = useLibraryPageContext();
+  const { nodeID, store } = useLibraryPageContext();
+
+  const { addAsset, removeAsset } = store.getState();
 
   const assets = useWatch((s) => s.draft.assets);
 
   const isEmpty = assets.length === 0;
   const shouldShow = editing || !isEmpty;
 
-  const { revalidate, addAsset, removeAsset } = useLibraryMutation();
+  const { revalidate } = useLibraryMutation();
 
   async function handleUpload(a: Asset) {
     await handle(
       async () => {
-        await addAsset(nodeID, a);
+        await nodeAddAsset(nodeID, a.id);
+        addAsset(a);
       },
       {
         promiseToast: {
           loading: "Uploading...",
-          success: "New media added",
+          success: "Added new media",
         },
         cleanup: async () => await revalidate(),
       },
@@ -35,7 +39,8 @@ export function useLibraryPageAssetsBlock() {
   async function handleRemove(a: Asset) {
     await handle(
       async () => {
-        await removeAsset(nodeID, a.id);
+        await nodeRemoveAsset(nodeID, a.id);
+        removeAsset(a);
       },
       {
         promiseToast: {

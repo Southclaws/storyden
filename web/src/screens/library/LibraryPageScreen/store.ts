@@ -6,6 +6,7 @@ import { createStore } from "zustand/vanilla";
 
 import { handle } from "@/api/client";
 import {
+  Asset,
   Identifier,
   LinkReference,
   NodeMutableProps,
@@ -43,6 +44,8 @@ export type Actions = {
   setPrimaryImage(args: CoverImageArgs): void;
   removePrimaryImage(): void;
   setLink: (link: LinkReference) => void;
+  addAsset: (asset: Asset) => void;
+  removeAsset: (asset: Asset) => void;
 
   // Properties
   addProperty: (name: PropertyName, type: PropertyType, value?: string) => void;
@@ -165,6 +168,20 @@ export const createNodeStore = (initState: State) => {
         setLink: (link: LinkReference) => {
           set((state) => {
             state.draft.link = link;
+          });
+        },
+
+        addAsset: (asset: Asset) => {
+          set((state) => {
+            state.draft.assets.push(asset);
+          });
+        },
+
+        removeAsset: (asset: Asset) => {
+          set((state) => {
+            state.draft.assets = state.draft.assets.filter(
+              (a) => a.id !== asset.id,
+            );
           });
         },
 
