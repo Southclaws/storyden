@@ -10,6 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { AssetIDs } from "./assetIDs";
 import type { AssetSourceList } from "./assetSourceList";
 import type { Metadata } from "./metadata";
+import type { NodeDescription } from "./nodeDescription";
 import type { NodeName } from "./nodeName";
 import type { NullableIdentifier } from "./nullableIdentifier";
 import type { PostContent } from "./postContent";
@@ -26,6 +27,7 @@ export interface NodeMutableProps {
   asset_ids?: AssetIDs;
   asset_sources?: AssetSourceList;
   content?: PostContent;
+  description?: NodeDescription;
   hide_child_tree?: boolean;
   meta?: Metadata;
   name?: NodeName;

@@ -2,22 +2,30 @@ import { dequal } from "dequal";
 import { omit } from "lodash";
 
 import {
+  Identifier,
   NodeMutableProps,
   NodeWithChildren,
   PropertySchemaList,
   PropertySchemaMutableProps,
 } from "@/api/openapi-schema";
 
+import { isValidLinkLike, normalizeLink } from "../link/validation";
 import { isSlugReady } from "../mark/mark";
 
-function projectNodeToMutableProps(node: NodeWithChildren): NodeMutableProps {
+type NodeMutablePropsWithChildren = NodeMutableProps &
+  Pick<NodeWithChildren, "children">;
+
+function projectNodeToMutableProps(
+  node: NodeWithChildren,
+): NodeMutablePropsWithChildren {
   return {
     name: node.name,
     slug: node.slug,
     content: node.content,
     tags: node.tags.map((t) => t.name),
     primary_image_asset_id: node.primary_image?.id,
-    url: node.link?.url,
+    url: normalizeLink(node.link?.url),
+    description: node.description,
     properties: node.properties.map((p) => {
       const fid = p.fid.startsWith("new_field") ? undefined : p.fid;
 
@@ -30,6 +38,7 @@ function projectNodeToMutableProps(node: NodeWithChildren): NodeMutableProps {
     }),
     hide_child_tree: node.hide_child_tree,
     meta: node.meta,
+    children: node.children,
   };
 }
 
@@ -37,6 +46,7 @@ export type MutationSet = {
   clean: boolean;
   nodeMutation: NodeMutableProps;
   childPropertySchemaMutation?: PropertySchemaMutableProps[];
+  childMutation: Record<Identifier, NodeMutableProps[]>;
 };
 
 export const deriveMutationFromDifference = (
@@ -44,18 +54,28 @@ export const deriveMutationFromDifference = (
   updated: NodeWithChildren,
 ): MutationSet => {
   const mutation: NodeMutableProps = {};
+  const childMutation: Record<Identifier, NodeMutableProps[]> = {};
 
   const draft = projectNodeToMutableProps(current);
   const changes = projectNodeToMutableProps(updated);
 
-  (Object.keys(changes) as (keyof NodeMutableProps)[]).forEach((key) => {
+  const keys = Object.keys(changes) as (keyof NodeMutablePropsWithChildren)[];
+
+  console.debug(
+    "deriveMutationFromDifference",
+    current.id,
+    "keys",
+    keys,
+    "changes",
+    changes,
+  );
+
+  keys.forEach((key) => {
     const draftValue = draft[key];
     const updatedValue = changes[key];
     if (updatedValue === undefined || updatedValue === null) {
       console.debug(
-        "Skipping mutation for",
-        key,
-        "because it is undefined or null",
+        `Skipping mutation for '${key}' "because it is undefined or null`,
       );
       return;
     }
@@ -63,10 +83,11 @@ export const deriveMutationFromDifference = (
     const changed = !dequal(draftValue, updatedValue);
     if (!changed) {
       console.debug(
-        "Skipping mutation for",
-        key,
-        "because it has not changed",
-        { old: draftValue, new: updatedValue },
+        `Skipping mutation for '${key}' because it has not changed`,
+        {
+          old: draftValue,
+          new: updatedValue,
+        },
       );
       return;
     }
@@ -74,12 +95,60 @@ export const deriveMutationFromDifference = (
     // Field specific transformations and skipping logic.
 
     switch (key) {
-      case "slug":
+      case "slug": {
         if (!isSlugReady(updatedValue as string)) {
           // Slugs must be valid to be added to patch, see mark.ts for details.
           console.debug("Skipping mutation for 'slug' because it is not ready");
           return;
         }
+        break;
+      }
+      case "url": {
+        if (!isValidLinkLike(updatedValue as string)) {
+          console.debug(
+            "Skipping mutation for 'url' because it is not valid",
+            updatedValue,
+          );
+          return;
+        }
+        break;
+      }
+      case "children": {
+        const updatedChildren = updatedValue as NodeWithChildren["children"];
+        if (updatedChildren.length === 0) {
+          console.debug("Skipping mutation for 'children' because it is empty");
+          return;
+        }
+
+        // If children have changed we need to create a mutation for each child.
+        updatedChildren.forEach((child) => {
+          const childDraft = draft.children.find(
+            (c) => c.id === child.id,
+          ) as NodeWithChildren;
+
+          if (!childDraft) {
+            console.warn("Child draft not found for", child.id);
+            return;
+          }
+
+          // Safe recursion: children do not contain a full tree of descendants.
+          const childChanges = deriveMutationFromDifference(childDraft, child);
+          console.debug("child deriveMutationFromDifference:", childChanges);
+          if (childChanges.clean) {
+            return;
+          }
+
+          console.debug(
+            "Adding child mutation for",
+            child.id,
+            childChanges.nodeMutation,
+          );
+
+          (childMutation[child.id] ??= []).push(childChanges.nodeMutation);
+        });
+
+        return;
+      }
     }
 
     Object.assign(mutation, { [key]: updatedValue });
@@ -94,12 +163,16 @@ export const deriveMutationFromDifference = (
   const nodeMutations = Object.keys(mutation).length;
 
   // Determine if this mutation even does anything.
-  const clean = nodeMutations === 0 && !childPropertySchema;
+  const clean =
+    nodeMutations === 0 &&
+    !childPropertySchema &&
+    !Object.keys(childMutation).length;
 
   return {
     clean,
     nodeMutation: mutation,
     childPropertySchemaMutation: childPropertySchema,
+    childMutation: childMutation,
   };
 };
 

@@ -255,6 +255,7 @@ export function useLibraryMutation(node?: Node) {
     const nodeMutator: MutatorCallback<NodeGetOKResponse> = (data) => {
       if (!data) return;
 
+      // bug data.assets is not iterable
       const assets = [...data.assets, asset];
 
       const updated = {

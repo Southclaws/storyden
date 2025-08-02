@@ -27,6 +27,10 @@ export const applyNodeChanges = produce(
           draft[key] = changes[key];
           return;
 
+        case "description":
+          draft[key] = changes[key];
+          return;
+
         case "content":
           draft.content = changes[key];
           return;

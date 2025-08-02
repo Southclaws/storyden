@@ -1,7 +1,9 @@
 import { SortableContext } from "@dnd-kit/sortable";
 import Link from "next/link";
+import { ChangeEvent } from "react";
 
 import { useNodeListChildren } from "@/api/openapi-client/nodes";
+import { Identifier } from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
 import {
   SortIndicator,
@@ -12,7 +14,8 @@ import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { MenuIcon } from "@/components/ui/icons/Menu";
 import * as Table from "@/components/ui/table";
-import { Box, Center, HStack } from "@/styled-system/jsx";
+import { isValidLinkLike } from "@/lib/link/validation";
+import { Box, Center, HStack, styled } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
@@ -22,15 +25,19 @@ import { AddPropertyMenu } from "./AddPropertyMenu/AddPropertyMenu";
 import { ColumnMenu } from "./ColumnMenu";
 import { PropertyListMenu } from "./PropertyListMenu/PropertyListMenu";
 import {
+  ColumnValue,
+  MappableNodeField,
   mergeFieldsAndProperties,
   mergeFieldsAndPropertySchema,
 } from "./column";
 import { useTableBlock } from "./useTableBlock";
 
 export function LibraryPageTableBlock() {
-  const { nodeID, initialChildren } = useLibraryPageContext();
+  const { nodeID, initialChildren, store } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
   const { editing } = useEditState();
+
+  const { setChildPropertyValue } = store.getState();
 
   const hideChildTree = useWatch((s) => s.draft.hide_child_tree);
 
@@ -84,6 +91,15 @@ export function LibraryPageTableBlock() {
     currentChildPropertySchema,
     block,
   );
+
+  function handleChildFieldValueChange(
+    nodeID: Identifier,
+    fid: MappableNodeField,
+    value: string,
+  ) {
+    console.log("Child field value changed:", nodeID, fid, value);
+    setChildPropertyValue(nodeID, fid, value);
+  }
 
   return (
     <Box w="full" overflowX="scroll">
@@ -180,6 +196,21 @@ export function LibraryPageTableBlock() {
               return (
                 <Table.Row key={child.id} className="group">
                   {columns.map((column) => {
+                    function handleCellChange(
+                      v: ChangeEvent<HTMLInputElement>,
+                    ) {
+                      handleChildFieldValueChange(
+                        child.id,
+                        column.fid as MappableNodeField,
+                        v.target.value,
+                      );
+                    }
+
+                    // NOTE: Does not work because this is uncontrolled at the
+                    // moment. Making it controlled would be a bit of a pain.
+                    // But it's here and ready in case we ever actually do that.
+                    const isValid = checkValidColumnValue(column);
+
                     return (
                       <Table.Cell
                         key={column.fid}
@@ -189,8 +220,17 @@ export function LibraryPageTableBlock() {
                         // _groupHover={{
                         //   bg: "bg.muted",
                         // }}
+                        _hover={{ bg: "bg.subtle" }}
                       >
-                        {column.href ? (
+                        {editing ? (
+                          <styled.input
+                            defaultValue={column.value}
+                            onChange={handleCellChange}
+                            _focusVisible={{
+                              outline: "none",
+                            }}
+                          />
+                        ) : column.href ? (
                           <Link href={column.href}>{column.value}</Link>
                         ) : (
                           <>{column.value}</>
@@ -217,4 +257,16 @@ export function LibraryPageTableBlock() {
       </Table.Root>
     </Box>
   );
+}
+
+function checkValidColumnValue(column: ColumnValue) {
+  if (column.fid === "fixed:link") {
+    if (!column.value) {
+      return true;
+    }
+
+    return isValidLinkLike(column.value);
+  }
+
+  return true;
 }
