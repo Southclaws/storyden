@@ -11,7 +11,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -41,7 +40,7 @@ func TestAccountAdmin(t *testing.T) {
 			r.NoError(err)
 			r.Equal(http.StatusOK, admin.StatusCode())
 			adminID := account.AccountID(utils.Must(xid.FromString(admin.JSON200.Id)))
-			adminSession := sh.WithSession(session.WithAccountID(root, adminID))
+			adminSession := sh.WithSession(e2e.WithAccountID(root, adminID))
 
 			accountWrite.Update(root, adminID, account_writer.SetAdmin(true))
 
@@ -49,20 +48,20 @@ func TestAccountAdmin(t *testing.T) {
 			r.NoError(err)
 			r.Equal(http.StatusOK, victim.StatusCode())
 			victimID := account.AccountID(utils.Must(xid.FromString(victim.JSON200.Id)))
-			victimSession := sh.WithSession(session.WithAccountID(root, victimID))
+			victimSession := sh.WithSession(e2e.WithAccountID(root, victimID))
 
 			random, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{Identifier: randomHandle, Token: "password"})
 			r.NoError(err)
 			r.Equal(http.StatusOK, random.StatusCode())
 			randomID := account.AccountID(utils.Must(xid.FromString(random.JSON200.Id)))
-			randomSession := sh.WithSession(session.WithAccountID(root, randomID))
+			randomSession := sh.WithSession(e2e.WithAccountID(root, randomID))
 
 			// Try to suspend the account without being logged in - fails
 
 			suspend1, err := cl.AdminAccountBanCreateWithResponse(root, victim.JSON200.Id)
 			r.NoError(err)
 			r.NotNil(suspend1)
-			r.Equal(http.StatusForbidden, suspend1.StatusCode())
+			r.Equal(http.StatusUnauthorized, suspend1.StatusCode())
 
 			// Try to suspend the account as a non-admin - fails
 
@@ -84,14 +83,14 @@ func TestAccountAdmin(t *testing.T) {
 			}, victimSession)
 			r.NoError(err)
 			r.NotNil(victimsigni1)
-			r.Equal(http.StatusUnauthorized, victimsigni1.StatusCode())
+			r.Equal(http.StatusForbidden, victimsigni1.StatusCode())
 
 			// Try to reinstate the account without being logged in - fails
 
 			reinstate1, err := cl.AdminAccountBanRemoveWithResponse(root, victim.JSON200.Id)
 			r.NoError(err)
 			r.NotNil(reinstate1)
-			r.Equal(http.StatusForbidden, reinstate1.StatusCode())
+			r.Equal(http.StatusUnauthorized, reinstate1.StatusCode())
 
 			// Try to reinstate the account as a non-admin - fails
 

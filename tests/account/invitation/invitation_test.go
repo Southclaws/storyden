@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	authSession "github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -61,7 +60,7 @@ func TestAccountInvitations(t *testing.T) {
 				tests.Ok(t, err, inviteeResponse)
 				id := account.AccountID(utils.Must(xid.FromString(inviteeResponse.JSON200.Id)))
 
-				invitee, err := cl.AccountGetWithResponse(root, sh.WithSession(authSession.WithAccountID(root, id)))
+				invitee, err := cl.AccountGetWithResponse(root, sh.WithSession(e2e.WithAccountID(root, id)))
 				tests.Ok(t, err, invitee)
 				r.NotNil(invitee.JSON200.InvitedBy)
 				a.Equal(inviter.ID.String(), invitee.JSON200.InvitedBy.Id)
@@ -83,7 +82,7 @@ func TestAccountInvitations(t *testing.T) {
 				tests.Ok(t, err, inviteeResponse)
 				id := account.AccountID(utils.Must(xid.FromString(inviteeResponse.JSON200.Id)))
 
-				invitee, err := cl.AccountGetWithResponse(root, sh.WithSession(authSession.WithAccountID(root, id)))
+				invitee, err := cl.AccountGetWithResponse(root, sh.WithSession(e2e.WithAccountID(root, id)))
 				tests.Ok(t, err, invitee)
 				r.NotNil(invitee.JSON200.InvitedBy)
 				a.Equal(inviter.ID.String(), invitee.JSON200.InvitedBy.Id)

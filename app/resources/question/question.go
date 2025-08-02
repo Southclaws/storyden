@@ -4,8 +4,8 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
-	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -14,7 +14,7 @@ type Question struct {
 	Slug   string
 	Query  string
 	Result datagraph.Content
-	Author opt.Optional[account.Account]
+	Author opt.Optional[profile.Ref]
 }
 
 func Map(in *ent.Question) (*Question, error) {
@@ -25,10 +25,10 @@ func Map(in *ent.Question) (*Question, error) {
 		return nil, err
 	}
 
-	author, err := opt.MapErr(authorEdge, func(a ent.Account) (account.Account, error) {
-		acc, err := account.MapAccount(&a)
+	author, err := opt.MapErr(authorEdge, func(a ent.Account) (profile.Ref, error) {
+		acc, err := profile.MapRef(&a)
 		if err != nil {
-			return account.Account{}, err
+			return profile.Ref{}, err
 		}
 		return *acc, nil
 	})

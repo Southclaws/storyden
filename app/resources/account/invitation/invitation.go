@@ -24,7 +24,7 @@ func Map(in *ent.Invitation) (*Invitation, error) {
 		return nil, err
 	}
 
-	acc, err := account.MapAccount(creatorEdge)
+	acc, err := account.MapRef(creatorEdge)
 	if err != nil {
 		return nil, err
 	}

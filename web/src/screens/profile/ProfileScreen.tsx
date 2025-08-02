@@ -9,6 +9,7 @@ import { MemberAvatar } from "@/components/member/MemberBadge/MemberAvatar";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { MemberOptionsMenu } from "@/components/member/MemberOptions/MemberOptionsMenu";
 import { ProfileContent } from "@/components/profile/ProfileContent/ProfileContent";
+import { RoleBadgeList } from "@/components/role/RoleBadge/RoleBadgeList";
 import { EditAction } from "@/components/site/Action/Edit";
 import { MoreAction } from "@/components/site/Action/More";
 import { SaveAction } from "@/components/site/Action/Save";
@@ -56,21 +57,28 @@ export function ProfileScreen(props: Props) {
                   size="lg"
                   editable={isEditing}
                 />
-                <LStack gap="0">
-                  <Input
-                    maxW={{ base: "full", sm: "64" }}
-                    size="sm"
-                    borderBottomRadius="none"
-                    fontWeight="bold"
-                    {...form.register("name")}
-                  />
-                  <Input
-                    maxW={{ base: "full", sm: "64" }}
-                    size="sm"
-                    borderTop="none"
-                    borderTopRadius="none"
-                    {...form.register("handle")}
-                  />
+                <LStack gap="1">
+                  <LStack gap="0">
+                    <Input
+                      maxW={{ base: "full", sm: "64" }}
+                      size="sm"
+                      height="7"
+                      px="2"
+                      borderBottomRadius="none"
+                      fontWeight="bold"
+                      {...form.register("name")}
+                    />
+                    <Input
+                      maxW={{ base: "full", sm: "64" }}
+                      size="sm"
+                      height="7"
+                      px="2"
+                      borderTop="none"
+                      borderTopRadius="none"
+                      {...form.register("handle")}
+                    />
+                  </LStack>
+                  <RoleBadgeList roles={profile.roles} />
                 </LStack>
               </HStack>
             ) : (
@@ -78,7 +86,8 @@ export function ProfileScreen(props: Props) {
                 profile={profile}
                 size="lg"
                 name="full-vertical"
-                roles="all"
+                showRoles="all"
+                roles={profile.roles}
               />
             )}
 

@@ -113,7 +113,7 @@ func (b *Provider) AddPassword(ctx context.Context, aid account.AccountID, passw
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return acc, nil
+	return &acc.Account, nil
 }
 
 func (b *Provider) UpdatePassword(ctx context.Context, aid account.AccountID, oldpassword, newpassword string) (*account.Account, error) {

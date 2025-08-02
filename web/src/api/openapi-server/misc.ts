@@ -92,6 +92,9 @@ export const getDocs = async (
 /**
  * Get the basic forum installation info such as title, description, etc.
 
+This is a fully public endpoint as it drives the ability to render stuff
+like OpenGraph metadata, favicon, titles, descriptions, for crawlers.
+
  */
 export type getInfoResponse = {
   data: GetInfoOKResponse;

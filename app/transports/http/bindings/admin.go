@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
@@ -25,24 +25,24 @@ var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.Pe
 
 type Admin struct {
 	accountQuery *account_querier.Querier
+	profileQuery *profile_querier.Querier
 	as           account_suspension.Service
 	sr           *settings.SettingsRepository
-	sp           *session.Provider
 	akr          *access_key.Repository
 }
 
 func NewAdmin(
 	accountQuery *account_querier.Querier,
+	profileQuery *profile_querier.Querier,
 	as account_suspension.Service,
 	sr *settings.SettingsRepository,
-	sp *session.Provider,
 	akr *access_key.Repository,
 ) Admin {
 	return Admin{
 		accountQuery: accountQuery,
+		profileQuery: profileQuery,
 		as:           as,
 		sr:           sr,
-		sp:           sp,
 		akr:          akr,
 	}
 }
@@ -90,7 +90,7 @@ func (a *Admin) AdminSettingsUpdate(ctx context.Context, request openapi.AdminSe
 }
 
 func (i *Admin) AdminAccountBanCreate(ctx context.Context, request openapi.AdminAccountBanCreateRequestObject) (openapi.AdminAccountBanCreateResponseObject, error) {
-	id, err := openapi.ResolveHandle(ctx, i.accountQuery, request.AccountHandle)
+	id, err := openapi.ResolveHandle(ctx, i.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -122,7 +122,7 @@ func (i *Admin) AdminAccountBanCreate(ctx context.Context, request openapi.Admin
 }
 
 func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.AdminAccountBanRemoveRequestObject) (openapi.AdminAccountBanRemoveResponseObject, error) {
-	id, err := openapi.ResolveHandle(ctx, i.accountQuery, request.AccountHandle)
+	id, err := openapi.ResolveHandle(ctx, i.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -154,16 +154,14 @@ func (i *Admin) AdminAccountBanRemove(ctx context.Context, request openapi.Admin
 }
 
 func (i *Admin) AdminAccessKeyList(ctx context.Context, request openapi.AdminAccessKeyListRequestObject) (openapi.AdminAccessKeyListResponseObject, error) {
-	acc, err := i.sp.Account(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
 	list, err := i.akr.ListAllAsAdmin(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return openapi.AdminAccessKeyList200JSONResponse{
 		AdminAccessKeyListOKJSONResponse: openapi.AdminAccessKeyListOKJSONResponse{
@@ -173,16 +171,11 @@ func (i *Admin) AdminAccessKeyList(ctx context.Context, request openapi.AdminAcc
 }
 
 func (i *Admin) AdminAccessKeyDelete(ctx context.Context, request openapi.AdminAccessKeyDeleteRequestObject) (openapi.AdminAccessKeyDeleteResponseObject, error) {
-	acc, err := i.sp.Account(ctx)
-	if err != nil {
+	if err := session.Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := acc.Roles.Permissions().Authorise(ctx, nil, rbac.PermissionAdministrator); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	_, err = i.akr.RevokeAsAdmin(ctx, deserialiseID(request.AccessKeyId))
+	_, err := i.akr.RevokeAsAdmin(ctx, deserialiseID(request.AccessKeyId))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -208,7 +201,7 @@ func serialiseOwnedAccessKey(in *authentication.Authentication) openapi.OwnedAcc
 		ExpiresAt: in.Expires.Ptr(),
 		Enabled:   !in.Disabled,
 		Name:      in.Name.Or("Unnamed"),
-		CreatedBy: serialiseProfileReference(*profile.ProfileFromAccount(&in.Account)),
+		CreatedBy: serialiseProfileReferenceFromAccount(in.Account),
 	}
 }
 

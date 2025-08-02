@@ -15,7 +15,7 @@ type Notification struct {
 	ID     xid.ID
 	Event  Event
 	Item   datagraph.Item
-	Source opt.Optional[profile.Public]
+	Source opt.Optional[profile.Ref]
 	Time   time.Time
 	Read   bool
 }
@@ -30,7 +30,7 @@ type NotificationRef struct {
 	ID      xid.ID
 	Event   Event
 	ItemRef opt.Optional[datagraph.Ref]
-	Source  opt.Optional[profile.Public]
+	Source  opt.Optional[profile.Ref]
 	Time    time.Time
 	Read    bool
 }
@@ -40,10 +40,10 @@ type NotificationRefs []*NotificationRef
 func Map(r *ent.Notification) (*NotificationRef, error) {
 	sourceEdge := opt.NewPtr(r.Edges.Source)
 
-	source, err := opt.MapErr(sourceEdge, func(a ent.Account) (profile.Public, error) {
-		p, err := profile.ProfileFromModel(&a)
+	source, err := opt.MapErr(sourceEdge, func(a ent.Account) (profile.Ref, error) {
+		p, err := profile.MapRef(&a)
 		if err != nil {
-			return profile.Public{}, err
+			return profile.Ref{}, err
 		}
 		return *p, err
 	})

@@ -6,9 +6,11 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
+	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/getkin/kin-openapi/openapi3filter"
 	"github.com/labstack/echo/v4"
 	echomiddleware "github.com/oapi-codegen/echo-middleware"
+	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -24,17 +26,32 @@ func newAuthorisation(aq *account_querier.Querier) *Authorisation {
 	return &Authorisation{accountQuery: aq}
 }
 
-func (i *Authorisation) validator(ctx context.Context, ai *openapi3filter.AuthenticationInput) error {
-	securityScheme, err := session.GetSecurityScheme(ai.RequestValidationInput.Request.Context())
+func (i *Authorisation) validator(oapictx context.Context, ai *openapi3filter.AuthenticationInput) error {
+	op := ai.RequestValidationInput.Route.Operation.OperationID
+	ctx := ai.RequestValidationInput.Request.Context()
+
+	requestSecurityScheme, err := session.GetSecurityScheme(ctx)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if securityScheme != ai.SecuritySchemeName {
-		return fault.New("mismatched security scheme")
+	allowedSecuritySchemes := ai.RequestValidationInput.Route.Operation.Security
+
+	// If the route defines a set of security schemes, ensure the one used by
+	// the request exists in the list. If not, reject the request entirely. A
+	// quirk of the OpenAPI runtime is it calls this validator for every scheme
+	// defined in the spec, so this function gets called multiple times which is
+	// not amazing for performance but... whatadayagonnado? Early exit at least.
+	if allowedSecuritySchemes != nil {
+		matchSecurityScheme := lo.ContainsBy(*allowedSecuritySchemes, func(sr openapi3.SecurityRequirement) bool {
+			return lo.HasKey(sr, requestSecurityScheme)
+		})
+		if !matchSecurityScheme {
+			return fault.New("invalid security scheme for operation", fctx.With(ctx), ftag.With(ftag.PermissionDenied))
+		}
 	}
 
-	sessionRequired, perm := GetPermissionForOperation(ai.RequestValidationInput.Route.Operation.OperationID)
+	sessionRequired, perm := GetPermissionForOperation(op)
 	if perm == nil {
 		// No specific permission required, just need a session.
 		return nil
@@ -53,28 +70,23 @@ func (i *Authorisation) validator(ctx context.Context, ai *openapi3filter.Authen
 		}
 	}
 
-	c := ctx.Value(echomiddleware.EchoContextKey).(echo.Context)
+	c := oapictx.Value(echomiddleware.EchoContextKey).(echo.Context)
 
-	// first check if the middleware injected an account ID, if not, fail.
-	aid, err := session.GetAccountID(c.Request().Context())
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Unauthenticated))
+	// If the request was by an account, reject any requests if suspended. Yes
+	// they can log out to *view* content (if default/guest permissions allow)
+	// but this is an easy way to apply suspension logic to all operations.
+	acc, ok := session.GetOptAccount(c.Request().Context()).Get()
+	if ok {
+		if err := acc.RejectSuspended(); err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+	} else if sessionRequired {
+		// If the operation requires a session but no account is present, then
+		// reject with an Unauthenticated error which maps to 401 Unauthorized.
+		return fault.New("session required for operation", fctx.With(ctx), ftag.With(ftag.Unauthenticated))
 	}
 
-	// Then look up the account.
-	// TODO: Cache this.
-	a, err := i.accountQuery.GetByID(ctx, aid)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	// Reject any requests from suspended accounts.
-	if err := a.RejectSuspended(); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
-	isAllowed := a.Roles.Permissions().HasAny(*perm, rbac.PermissionAdministrator)
-	if !isAllowed {
+	if err := session.Authorise(ctx, nil, *perm, rbac.PermissionAdministrator); err != nil {
 		return fault.New("required role not held", fctx.With(ctx), ftag.With(ftag.PermissionDenied))
 	}
 

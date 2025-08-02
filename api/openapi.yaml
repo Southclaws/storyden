@@ -120,7 +120,7 @@ paths:
       description: |
         The version number includes the date and time of the release build as
         well as a short representation of the Git commit hash.
-      security: []
+      security: [] # TODO: Maybe remove from public access?
       tags: [misc]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -139,7 +139,7 @@ paths:
         This endpoint returns the OpenAPI specification for the Storyden API in
         JSON format. This is useful for clients that want to dynamically load
         the API specification for documentation or code generation.
-      security: []
+      security: [] # TODO: Remove this from default public access, add a perm.
       tags: [misc]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -158,7 +158,7 @@ paths:
         This endpoint returns the OpenAPI documentation for the Storyden API in
         an interactive HTML format. This is useful for developers who want to
         explore the API and test endpoints without writing code.
-      security: []
+      security: [] # TODO: Remove this from default public access, add a perm.
       tags: [misc]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -174,6 +174,9 @@ paths:
       operationId: GetInfo
       description: |
         Get the basic forum installation info such as title, description, etc.
+
+        This is a fully public endpoint as it drives the ability to render stuff
+        like OpenGraph metadata, favicon, titles, descriptions, for crawlers.
       security: []
       tags: [misc]
       responses:
@@ -324,7 +327,6 @@ paths:
       operationId: RoleList
       description: List all roles and their permissions.
       tags: [roles]
-      security: []
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/RoleListOK" }
@@ -381,7 +383,6 @@ paths:
         ways to authenticate, from simple passwords to OAuth and WebAuthn. This
         endpoint tells a client which auth capabilities are enabled.
       tags: [auth]
-      security: []
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
@@ -392,7 +393,6 @@ paths:
       operationId: AuthPasswordSignup
       description: Register a new account with a username and password.
       tags: [auth]
-      security: []
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
       responses:
@@ -405,7 +405,6 @@ paths:
       operationId: AuthPasswordSignin
       description: Sign in to an existing account with a username and password.
       tags: [auth]
-      security: []
       requestBody: { $ref: "#/components/requestBodies/AuthPassword" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -448,7 +447,6 @@ paths:
         Complete a password-reset flow using a token that was provided to the
         member via a reset request operation such as `AuthEmailPasswordReset`.
       tags: [auth]
-      security: []
       requestBody: { $ref: "#/components/requestBodies/AuthPasswordReset" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -461,7 +459,6 @@ paths:
       operationId: AuthEmailPasswordSignup
       description: Register a new account with a email and password.
       tags: [auth]
-      security: []
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/AuthEmailPassword" }
       responses:
@@ -474,7 +471,6 @@ paths:
       operationId: AuthEmailPasswordSignin
       description: Sign in to an existing account with a email and password.
       tags: [auth]
-      security: []
       requestBody: { $ref: "#/components/requestBodies/AuthEmailPassword" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -488,7 +484,6 @@ paths:
       description: |
         Request password reset email to be sent to the specified email address.
       tags: [auth]
-      security: []
       requestBody: { $ref: "#/components/requestBodies/AuthEmailPasswordReset" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -520,7 +515,6 @@ paths:
         Given that this is an unauthenticated endpoint that triggers an email to
         be sent to any public address, it MUST be heavily rate limited.
       tags: [auth]
-      security: []
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/AuthEmail" }
       responses:
@@ -539,7 +533,6 @@ paths:
         email+password is the preferred method, a cookie is returned on success
         but if magic links are preferred, the endpoint will start the code flow.
       tags: [auth]
-      security: []
       requestBody: { $ref: "#/components/requestBodies/AuthEmail" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -554,7 +547,6 @@ paths:
         Verify an email address using a token that was emailed to one of the
         account's email addresses either set via sign up or added later.
       tags: [auth]
-      security: []
       requestBody: { $ref: "#/components/requestBodies/AuthEmailVerify" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -567,7 +559,6 @@ paths:
       operationId: OAuthProviderCallback
       description: OAuth2 callback.
       tags: [auth]
-      security: []
       parameters: [$ref: "#/components/parameters/OAuthProvider"]
       requestBody: { $ref: "#/components/requestBodies/OAuthProviderCallback" }
       responses:
@@ -582,7 +573,6 @@ paths:
       description: |
         Start the WebAuthn registration process by requesting a credential.
       tags: [auth]
-      security: []
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -607,7 +597,6 @@ paths:
       operationId: WebAuthnGetAssertion
       description: Start the WebAuthn assertion for an existing account.
       tags: [auth]
-      security: []
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -637,7 +626,6 @@ paths:
         a one-time code to the provided phone number which must then be sent to
         the other phone endpoint to verify the number and validate the account.
       tags: [auth]
-      security: []
       parameters: [$ref: "#/components/parameters/InvitationIDQueryParam"]
       requestBody: { $ref: "#/components/requestBodies/PhoneRequestCode" }
       responses:
@@ -652,7 +640,6 @@ paths:
         Complete the phone number authentication flow by submitting the one-time
         code that was sent to the user's phone.
       tags: [auth]
-      security: []
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       requestBody: { $ref: "#/components/requestBodies/PhoneSubmitCode" }
       responses:
@@ -831,7 +818,6 @@ paths:
       operationId: AccountGetAvatar
       description: Get an avatar for the specified account.
       tags: [accounts]
-      security: []
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1031,7 +1017,6 @@ paths:
       operationId: ProfileList
       description: Query and search profiles.
       tags: [profiles]
-      security: []
       parameters:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
@@ -1046,7 +1031,6 @@ paths:
       operationId: ProfileGet
       description: Get a public profile by ID.
       tags: [profiles]
-      security: []
       parameters: [$ref: "#/components/parameters/AccountHandleParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1060,7 +1044,6 @@ paths:
       operationId: ProfileFollowersGet
       description: Get the followers and following details for a profile.
       tags: [profiles]
-      security: []
       parameters:
         - $ref: "#/components/parameters/PaginationQuery"
         - $ref: "#/components/parameters/AccountHandleParam"
@@ -1095,7 +1078,6 @@ paths:
       operationId: ProfileFollowingGet
       description: Get the profiles that this account is following.
       tags: [profiles]
-      security: []
       parameters:
         - $ref: "#/components/parameters/PaginationQuery"
         - $ref: "#/components/parameters/AccountHandleParam"
@@ -1134,7 +1116,6 @@ paths:
     get:
       operationId: CategoryList
       description: Get a list of all categories on the site.
-      security: []
       tags: [categories]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1142,7 +1123,6 @@ paths:
     patch:
       operationId: CategoryUpdateOrder
       description: Update the sort order of categories.
-      security: []
       tags: [categories]
       requestBody: { $ref: "#/components/requestBodies/CategoryUpdateOrder" }
       responses:
@@ -1181,7 +1161,6 @@ paths:
       operationId: TagList
       description: Get a list of all tags on the site.
       tags: [tags]
-      security: []
       parameters: [$ref: "#/components/parameters/SearchQuery"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1225,7 +1204,6 @@ paths:
       operationId: ThreadList
       description: Get a list of all threads.
       tags: [threads]
-      security: []
       parameters:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
@@ -1258,7 +1236,6 @@ paths:
       description: |
         Get information about a thread such as its title, author, when it was
         created as well as a list of the posts within the thread.
-      security: []
       tags: [threads]
       parameters:
         - $ref: "#/components/parameters/ThreadMarkParam"
@@ -1411,7 +1388,6 @@ paths:
       operationId: AssetGet
       description: Download an asset by its ID.
       tags: [assets]
-      security: []
       parameters: [$ref: "#/components/parameters/AssetPathParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1512,7 +1488,6 @@ paths:
       operationId: CollectionList
       description: List all collections using the filtering options.
       tags: [collections]
-      security: []
       parameters:
         - { $ref: "#/components/parameters/AccountHandleQueryParam" }
         - { $ref: "#/components/parameters/CollectionHasItemQueryParam" }
@@ -1529,7 +1504,6 @@ paths:
         response will depend on which account is making the request and if the
         target collection is public, private, owned or not owned by the account.
       tags: [collections]
-      security: []
       parameters: [$ref: "#/components/parameters/CollectionMarkParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -1646,7 +1620,6 @@ paths:
       description: |
         List nodes using the given filters. Can be used to get a full tree.
       tags: [nodes]
-      security: []
       parameters:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
@@ -1673,7 +1646,6 @@ paths:
       operationId: NodeGet
       description: Get a node by its URL slug.
       tags: [nodes]
-      security: []
       parameters:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/NodeChildrenSortParam"
@@ -1770,7 +1742,6 @@ paths:
         parameters. This can be used for rendering the child nodes of the given
         node as an interactive table where properties can be used as columns.
       tags: [nodes]
-      security: []
       parameters:
         - $ref: "#/components/parameters/NodeSlugParam"
         - $ref: "#/components/parameters/NodeChildrenSortParam"
@@ -1966,7 +1937,6 @@ paths:
       operationId: LinkList
       description: List all links using the filtering options.
       tags: [links]
-      security: []
       parameters:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
@@ -1982,7 +1952,6 @@ paths:
         Get the details for a specific link. Such as where it's been posted,
         which resources it's linked to and how many times it's been opened.
       tags: [links]
-      security: []
       parameters: [{ $ref: "#/components/parameters/LinkSlugParam" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -2048,7 +2017,6 @@ paths:
       operationId: EventList
       description: List all events using the filtering options.
       tags: [events]
-      security: []
       parameters:
         - $ref: "#/components/parameters/SearchQuery"
         - $ref: "#/components/parameters/PaginationQuery"
@@ -2073,7 +2041,6 @@ paths:
       operationId: EventGet
       description: Get an event by its ID.
       tags: [events]
-      security: []
       parameters: [$ref: "#/components/parameters/EventMarkParam"]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
@@ -3629,7 +3596,6 @@ components:
         suspended: { $ref: "#/components/schemas/MemberSuspendedDate" }
         handle: { $ref: "#/components/schemas/AccountHandle" }
         name: { $ref: "#/components/schemas/AccountName" }
-        roles: { $ref: "#/components/schemas/AccountRoleList" }
 
     ThreadTitle:
       type: string
@@ -4358,8 +4324,6 @@ components:
           $ref: "#/components/schemas/AccountRoleList"
         bio:
           $ref: "#/components/schemas/AccountBio"
-        interests:
-          $ref: "#/components/schemas/TagReferenceList"
         links:
           $ref: "#/components/schemas/ProfileExternalLinkList"
         meta:

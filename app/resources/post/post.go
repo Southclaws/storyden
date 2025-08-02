@@ -34,7 +34,7 @@ type Post struct {
 	Title       string
 	Slug        string
 	Content     datagraph.Content
-	Author      profile.Public
+	Author      profile.Ref
 	Likes       like.Status
 	Collections collection_item_status.Status
 	Reacts      []*reaction.React
@@ -73,7 +73,7 @@ func Map(in *ent.Post) (*Post, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := profile.ProfileFromModel(authorEdge)
+	pro, err := profile.MapRef(authorEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}

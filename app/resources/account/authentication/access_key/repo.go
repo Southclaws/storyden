@@ -69,11 +69,7 @@ func (r *Repository) List(ctx context.Context, accountID account.AccountID) ([]*
 			ent_auth.Service(authentication.ServiceAccessKey.String()),
 			ent_auth.TokenType(authentication.TokenTypePasswordHash.String()),
 		).
-		WithAccount(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) {
-				arq.WithRole()
-			})
-		}).
+		WithAccount().
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -93,11 +89,7 @@ func (r *Repository) ListAllAsAdmin(ctx context.Context) ([]*authentication.Auth
 			ent_auth.Service(authentication.ServiceAccessKey.String()),
 			ent_auth.TokenType(authentication.TokenTypePasswordHash.String()),
 		).
-		WithAccount(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) {
-				arq.WithRole()
-			})
-		}).
+		WithAccount().
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -120,11 +112,7 @@ func (r *Repository) LookupByToken(ctx context.Context, token *AccessKeyToken) (
 			ent_auth.TokenType(authentication.TokenTypePasswordHash.String()),
 			ent_auth.Identifier(identifier),
 		).
-		WithAccount(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) {
-				arq.WithRole()
-			})
-		}).
+		WithAccount().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -195,11 +183,7 @@ func (r *Repository) getByID(ctx context.Context, id xid.ID) (*authentication.Au
 			ent_auth.TokenType(authentication.TokenTypePasswordHash.String()),
 			ent_auth.ID(id),
 		).
-		WithAccount(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) {
-				arq.WithRole()
-			})
-		}).
+		WithAccount().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {

@@ -20,22 +20,18 @@ import (
 
 type Hydrator struct {
 	querier *collection_querier.Querier
-	session *session.Provider
 }
 
 func New(
 	querier *collection_querier.Querier,
-	session *session.Provider,
 ) *Hydrator {
 	return &Hydrator{
 		querier: querier,
-		session: session,
 	}
 }
 
 func (r *Hydrator) GetCollection(ctx context.Context, qk collection.QueryKey) (*collection.CollectionWithItems, error) {
-	session := r.session.AccountMaybe(ctx)
-	acc := session.OrZero()
+	acc := session.GetOptAccount(ctx).OrZero()
 
 	col, err := r.querier.Get(ctx, qk)
 	if err != nil {
@@ -43,7 +39,7 @@ func (r *Hydrator) GetCollection(ctx context.Context, qk collection.QueryKey) (*
 	}
 
 	// The owner and admins can always read the unlisted collection items
-	canReadUnlisted := acc.Roles.Permissions().HasAny(rbac.PermissionAdministrator) || acc.ID == col.Owner.ID
+	canReadUnlisted := session.GetRoles(ctx).Permissions().HasAny(rbac.PermissionAdministrator) || acc.ID == col.Owner.ID
 
 	col.Items = dt.Filter(col.Items, func(i *collection.CollectionItem) bool {
 		if canReadUnlisted {

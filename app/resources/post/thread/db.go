@@ -112,9 +112,7 @@ func (d *database) Create(
 	p, err = d.db.Post.
 		Query().
 		Where(ent_post.IDEQ(p.ID)).
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAuthor().
 		WithCategory().
 		WithTags().
 		WithAssets().
@@ -150,9 +148,7 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 	p, err := d.db.Post.
 		Query().
 		Where(ent_post.IDEQ(xid.ID(id))).
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAuthor().
 		WithCategory().
 		WithTags().
 		WithAssets().
@@ -226,16 +222,12 @@ func (d *database) List(
 
 	query.
 		WithCategory().
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAuthor().
 		WithAssets(func(aq *ent.AssetQuery) {
 			aq.Order(ent_asset.ByUpdatedAt(), ent_asset.ByCreatedAt())
 		}).
 		WithCollections(func(cq *ent.CollectionQuery) {
-			cq.WithOwner(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			}).Order(collection.ByUpdatedAt(), collection.ByCreatedAt())
+			cq.WithOwner().Order(collection.ByUpdatedAt(), collection.ByCreatedAt())
 		}).
 		WithLink(func(lq *ent.LinkQuery) {
 			lq.WithFaviconImage().WithPrimaryImage()
@@ -518,12 +510,7 @@ func (d *database) Get(ctx context.Context, threadID post.ID, pageParams paginat
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	accounts, err := dt.MapErr(accountEdges, account.MapAccount)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	accountLookup = account.Accounts(accounts).Map()
+	accountLookup = account.NewAccountLookup(accountEdges)
 
 	// Join all data together
 

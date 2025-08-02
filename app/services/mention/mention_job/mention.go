@@ -3,6 +3,7 @@ package mention_job
 import (
 	"context"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -21,10 +22,10 @@ func newMentionConsumer(
 	}
 }
 
-func (s *mentionConsumer) mention(ctx context.Context, source datagraph.Ref, item datagraph.Ref) error {
+func (s *mentionConsumer) mention(ctx context.Context, by account.AccountID, source datagraph.Ref, item datagraph.Ref) error {
 	switch item.Kind {
 	case datagraph.KindProfile:
-		s.notifySender.Send(ctx, account.AccountID(item.ID), notification.EventProfileMention, &source)
+		s.notifySender.Send(ctx, account.AccountID(item.ID), opt.New(by), notification.EventProfileMention, &source)
 
 		// TODO: Store mention in db
 	}

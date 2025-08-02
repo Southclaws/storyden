@@ -2,7 +2,6 @@
 
 import { CreatePageAction } from "@/components/library/CreatePage";
 import { LibraryPageTree } from "@/components/library/LibraryPageTree/LibraryPageTree";
-import { Unready } from "@/components/site/Unready";
 import { LibraryIcon } from "@/components/ui/icons/Library";
 import { HStack, LStack } from "@/styled-system/jsx";
 
@@ -12,10 +11,10 @@ import { NavigationHeader } from "../ContentNavigationList/NavigationHeader";
 import { Props, useLibraryNavigationTree } from "./useLibraryNavigationTree";
 
 export function LibraryNavigationTree(props: Props) {
-  const { ready, error, data, canManageLibrary } =
-    useLibraryNavigationTree(props);
+  const { ready, data, canManageLibrary } = useLibraryNavigationTree(props);
   if (!ready) {
-    return <Unready error={error} />;
+    // TODO: Render a small version of <Unready /> that's more suitable for this
+    return null;
   }
 
   const { currentNode } = props;

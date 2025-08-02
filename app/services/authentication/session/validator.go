@@ -5,21 +5,45 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
+	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/Southclaws/storyden/app/resources/account/role/role_querier"
 	"github.com/Southclaws/storyden/app/resources/account/token"
 )
 
 type Validator struct {
-	tokenRepo token.Repository
-	akRepo    *access_key.Repository
+	tokenRepo      token.Repository
+	accountQuerier *account_querier.Querier
+	roleQuerier    *role_querier.Querier
+	akRepo         *access_key.Repository
 }
 
-func NewValidator(tokenRepo token.Repository, akRepo *access_key.Repository) *Validator {
+func NewValidator(tokenRepo token.Repository, accountQuerier *account_querier.Querier, roleQuerier *role_querier.Querier, akRepo *access_key.Repository) *Validator {
 	return &Validator{
-		tokenRepo: tokenRepo,
-		akRepo:    akRepo,
+		tokenRepo:      tokenRepo,
+		accountQuerier: accountQuerier,
+		roleQuerier:    roleQuerier,
+		akRepo:         akRepo,
 	}
 }
+
+// func (v *Validator) ValidateSession(ctx context.Context, raw string) (context.Context, error) {
+// 	var err error
+// 	if len(raw) == 20 /* xid.encodedLen */ {
+// 		ctx, err = v.ValidateSessionToken(ctx, raw)
+// 	} else if len(raw) == access_key.AccessKeyLength {
+// 		ctx, err = v.ValidateAccessKeyToken(ctx, raw)
+// 	}
+// 	if err != nil {
+// 		return nil, fault.Wrap(err, fctx.With(ctx))
+// 	}
+
+// 	// Hydrate the context with role information
+
+// 	return ctx, nil
+// }
 
 func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (context.Context, error) {
 	t, err := token.FromString(raw)
@@ -32,7 +56,13 @@ func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (conte
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithAccountID(ctx, tv.AccountID), nil
+	// TODO: Cache-backed repository for accounts.
+	acc, err := v.accountQuerier.GetByID(ctx, tv.AccountID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return WithAccount(ctx, acc.Account, acc.Roles.Roles()), nil
 }
 
 func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (context.Context, error) {
@@ -60,5 +90,20 @@ func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (con
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithAccessKey(ctx, ar.Account.ID), nil
+	// TODO: Cache-backed repository for accounts.
+	acc, err := v.accountQuerier.GetByID(ctx, ar.Account.ID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return WithAccessKey(ctx, ar.Account, acc.Roles.Roles()), nil
+}
+
+func (v *Validator) WithUnauthenticatedRoles(ctx context.Context) (context.Context, error) {
+	guestRole, err := v.roleQuerier.GetGuestRole(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return WithGuest(ctx, role.Roles{guestRole}), nil
 }

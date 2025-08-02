@@ -12,7 +12,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -37,7 +36,7 @@ func TestFollows(t *testing.T) {
 
 				acc1 := newAccount(t, root, cl, ar, "acc1")
 				acc2 := newAccount(t, root, cl, ar, "acc2")
-				acc1session := sh.WithSession(session.WithAccountID(root, acc1.ID))
+				acc1session := sh.WithSession(e2e.WithAccountID(root, acc1.ID))
 
 				// Follow acc2 from acc1
 				f1, err := cl.ProfileFollowersAddWithResponse(root, acc2.Handle, acc1session)
@@ -86,8 +85,8 @@ func TestFollows(t *testing.T) {
 
 				acc1 := newAccount(t, root, cl, ar, "acc1")
 				acc2 := newAccount(t, root, cl, ar, "acc2")
-				acc1session := sh.WithSession(session.WithAccountID(root, acc1.ID))
-				acc2session := sh.WithSession(session.WithAccountID(root, acc2.ID))
+				acc1session := sh.WithSession(e2e.WithAccountID(root, acc1.ID))
+				acc2session := sh.WithSession(e2e.WithAccountID(root, acc2.ID))
 
 				// Follow acc2 from acc1
 				f1, err := cl.ProfileFollowersAddWithResponse(root, acc2.Handle, acc1session)
@@ -130,7 +129,7 @@ func TestFollows(t *testing.T) {
 
 				acc1 := newAccount(t, root, cl, ar, "acc1")
 				acc2 := newAccount(t, root, cl, ar, "acc2")
-				acc1session := sh.WithSession(session.WithAccountID(root, acc1.ID))
+				acc1session := sh.WithSession(e2e.WithAccountID(root, acc1.ID))
 
 				// Follow acc2 from acc1
 				f1, err := cl.ProfileFollowersAddWithResponse(root, acc2.Handle, acc1session)
@@ -186,5 +185,5 @@ func newAccount(t *testing.T, ctx context.Context, cl *openapi.ClientWithRespons
 	r.NoError(err)
 	r.NotNil(acc)
 
-	return *acc
+	return acc.Account
 }

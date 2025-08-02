@@ -1,15 +1,17 @@
 package participation
 
 import (
-	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/samber/lo"
+
+	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/profile"
+	"github.com/Southclaws/storyden/internal/ent"
 )
 
 type EventParticipant struct {
 	Role    Role
 	Status  Status
-	Account account.Account
+	Account profile.Ref
 }
 
 type EventParticipants []*EventParticipant
@@ -37,7 +39,7 @@ func Map(in *ent.EventParticipant) (*EventParticipant, error) {
 		return nil, err
 	}
 
-	acc, err := account.MapAccount(accountEdge)
+	acc, err := profile.MapRef(accountEdge)
 	if err != nil {
 		return nil, err
 	}

@@ -165,23 +165,17 @@ func (d *Repository) UpdateItems(ctx context.Context, qk collection.QueryKey, op
 func (d *Repository) ProbeItem(ctx context.Context, qk collection.QueryKey, itemID xid.ID) (*collection.CollectionItemStatus, error) {
 	r, err := d.db.Collection.Query().
 		Where(qk.Predicate()).
-		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithOwner().
 		WithCollectionPosts(func(cnq *ent.CollectionPostQuery) {
 			cnq.Where(collectionpost.PostID(itemID)).
 				WithPost(func(pq *ent.PostQuery) {
-					pq.WithAuthor(func(aq *ent.AccountQuery) {
-						aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-					})
+					pq.WithAuthor()
 				})
 		}).
 		WithCollectionNodes(func(cnq *ent.CollectionNodeQuery) {
 			cnq.Where(collectionnode.NodeID(itemID)).
 				WithNode(func(nq *ent.NodeQuery) {
-					nq.WithOwner(func(aq *ent.AccountQuery) {
-						aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-					})
+					nq.WithOwner()
 				})
 		}).
 		Only(ctx)

@@ -83,18 +83,31 @@ func ValidatorErrorHandler() func(c echo.Context, err *echo.HTTPError) error {
 		// These occur when there's an authentication problem.
 		sr := &openapi3filter.SecurityRequirementsError{}
 		if errors.As(err, &sr) {
-			// For some reason, OpenAPI stores the resulting validation
-			// error as an array. It's always 1 element long (for now) so
-			// just grab the first element if it's there for the err value.
+			// For some reason, OpenAPI stores the validation error as an array.
 			wrapped := err
 			if len(sr.Errors) == 1 {
 				wrapped = sr.Errors[0]
 			}
 
+			var kind ftag.Kind
+			for _, e := range sr.Errors {
+				if kind = ftag.Get(e); kind != ftag.Internal {
+					break
+				}
+			}
+
+			msg := "An unexpected error occurred."
+			switch kind {
+			case ftag.PermissionDenied:
+				msg = "You don’t have access to this right now."
+			case ftag.Unauthenticated:
+				msg = "The request did not contain any authentication information, please check to make sure you are logged in."
+			}
+
 			return fault.Wrap(wrapped,
 				fctx.With(ctx),
-				ftag.With(ftag.Unauthenticated),
-				fmsg.WithDesc(sr.Error(), "The request did not contain any authentication information, please check to make sure you are logged in."),
+				ftag.With(kind),
+				fmsg.WithDesc(sr.Error(), msg),
 			)
 		}
 

@@ -26,7 +26,7 @@ type Reply struct {
 	RootPostID      post.ID
 	RootThreadMark  string
 	RootThreadTitle string
-	RootAuthor      profile.Public
+	RootAuthor      profile.Ref
 	Slug            string // The root slug with the post ID as a #fragment
 	ReplyTo         opt.Optional[post.ID]
 }
@@ -72,7 +72,7 @@ func Map(m *ent.Post) (*Reply, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	pro, err := profile.ProfileFromModel(authorEdge)
+	pro, err := profile.MapRef(authorEdge)
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
@@ -108,7 +108,10 @@ func Mapper(
 ) func(m *ent.Post) (*Reply, error) {
 	return func(m *ent.Post) (*Reply, error) {
 		authorEdge := am[m.AccountPosts]
-		pro := profile.ProfileFromAccount(authorEdge)
+		pro, err := profile.MapRef(authorEdge)
+		if err != nil {
+			return nil, fault.Wrap(err)
+		}
 
 		content, err := datagraph.NewRichText(m.Body)
 		if err != nil {
@@ -147,7 +150,7 @@ func Mapper(
 
 			slug := fmt.Sprintf("%s#%s", rootThreadMark, m.ID)
 
-			rootAuthor, err := profile.ProfileFromModel(m.Edges.Root.Edges.Author)
+			rootAuthor, err := profile.MapRef(m.Edges.Root.Edges.Author)
 			if err != nil {
 				return nil, fault.Wrap(err)
 			}

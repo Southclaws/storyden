@@ -12,7 +12,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -47,7 +46,7 @@ func TestUsernamePasswordAuth(t *testing.T) {
 				a.NotEmpty(signin.HTTPResponse.Header.Get("Set-Cookie"))
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
-				ctx1 := session.WithAccountID(root, accountID)
+				ctx1 := e2e.WithAccountID(root, accountID)
 				session := sh.WithSession(ctx1)
 
 				// Get own account
@@ -88,7 +87,7 @@ func TestUsernamePasswordAuth(t *testing.T) {
 				id1, err := xid.FromString(a1.JSON200.Id)
 				r.NoError(err)
 
-				ctx1 := session.WithAccountID(root, account.AccountID(id1))
+				ctx1 := e2e.WithAccountID(root, account.AccountID(id1))
 
 				// Get the new account
 				get1, err := cl.AccountGetWithResponse(root, sh.WithSession(ctx1))
@@ -113,7 +112,7 @@ func TestUsernamePasswordAuth(t *testing.T) {
 				})
 				r.NoError(err)
 				r.NotNil(signin1)
-				r.Equal(http.StatusForbidden, signin1.StatusCode())
+				r.Equal(http.StatusUnauthorized, signin1.StatusCode())
 
 				// Log in to the new account with the new password - succeeds
 				signin2, err := cl.AuthPasswordSigninWithResponse(root, openapi.AuthPair{
@@ -241,7 +240,7 @@ func TestUsernamePasswordAuthMultiMethod(t *testing.T) {
 					Identifier: handle,
 					Token:      password,
 				})
-				tests.Status(t, err, signin2, http.StatusForbidden)
+				tests.Status(t, err, signin2, http.StatusUnauthorized)
 
 				// New password succeeds
 				signin3, err := cl.AuthPasswordSigninWithResponse(root, openapi.AuthPasswordSigninJSONRequestBody{

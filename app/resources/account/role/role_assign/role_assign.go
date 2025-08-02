@@ -3,23 +3,25 @@ package role_assign
 import (
 	"context"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
+	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role"
 	"github.com/Southclaws/storyden/internal/ent"
-	account_ent "github.com/Southclaws/storyden/internal/ent/account"
 )
 
 type Assignment struct {
-	db *ent.Client
+	db             *ent.Client
+	accountQuerier *account_querier.Querier
 }
 
-func New(db *ent.Client) *Assignment {
-	return &Assignment{db: db}
+func New(db *ent.Client, accountQuerier *account_querier.Querier) *Assignment {
+	return &Assignment{db: db, accountQuerier: accountQuerier}
 }
 
 type Mutation struct {
@@ -56,9 +58,15 @@ func split(mutations ...Mutation) (adds, removes []xid.ID, admin opt.Optional[bo
 	return
 }
 
-func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountID, roles ...Mutation) (*account.Account, error) {
+func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountID, roles ...Mutation) (*account.AccountWithEdges, error) {
 	update := w.db.Account.UpdateOneID(xid.ID(accountID))
 	mutation := update.Mutation()
+
+	// NOTE: We filter out the Everyone role from mutations, it cannot be added
+	// or removed, instead it's automatically included for all role queries.
+	roles = dt.Filter(roles, func(m Mutation) bool {
+		return m.id != role.DefaultRoleMemberID
+	})
 
 	adds, removes, admin := split(roles...)
 
@@ -74,19 +82,5 @@ func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountI
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	r, err := w.db.Account.
-		Query().
-		Where(account_ent.ID(xid.ID(accountID))).
-		WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).
-		Only(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	acc, err := account.MapAccount(r)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	return acc, nil
+	return w.accountQuerier.GetByID(ctx, accountID)
 }

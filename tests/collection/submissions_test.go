@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/Southclaws/storyden/internal/integration/e2e"
@@ -37,15 +36,15 @@ func TestCollectionSubmissions(t *testing.T) {
 
 			acc1, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{xid.New().String(), "password"})
 			tests.Ok(t, err, acc1)
-			session1 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))))
+			session1 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc1.JSON200.Id)))))
 
 			acc2, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{xid.New().String(), "password"})
 			tests.Ok(t, err, acc2)
-			session2 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))))
+			session2 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc2.JSON200.Id)))))
 
 			acc3, err := cl.AuthPasswordSignupWithResponse(root, nil, openapi.AuthPair{xid.New().String(), "password"})
 			tests.Ok(t, err, acc3)
-			session3 := sh.WithSession(session.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc3.JSON200.Id)))))
+			session3 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc3.JSON200.Id)))))
 
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 				Admin:       false,

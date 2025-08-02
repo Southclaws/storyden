@@ -37,7 +37,10 @@ func (d *Writer) Create(ctx context.Context, creator account.AccountID, message 
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	result.Edges.Creator = result.QueryCreator().WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }).OnlyX(ctx)
+	result.Edges.Creator, err = result.QueryCreator().Only(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
 
 	inv, err := invitation.Map(result)
 	if err != nil {

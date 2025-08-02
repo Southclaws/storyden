@@ -3,18 +3,20 @@ package role
 import (
 	"math"
 
+	"github.com/rs/xid"
+
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/internal/utils"
-	"github.com/rs/xid"
 )
 
 var (
-	DefaultRoleEveryoneID = RoleID(utils.Must(xid.FromString("00000000000000000010")))
-	DefaultRoleAdminID    = RoleID(utils.Must(xid.FromString("00000000000000000020")))
+	DefaultRoleGuestID  = RoleID(utils.Must(xid.FromString("0000000000000000000g")))
+	DefaultRoleMemberID = RoleID(utils.Must(xid.FromString("000000000000000000m0")))
+	DefaultRoleAdminID  = RoleID(utils.Must(xid.FromString("00000000000000000a00")))
 )
 
-var DefaultRoleEveryone = Role{
-	ID:     DefaultRoleEveryoneID,
+var DefaultRoleMember = Role{
+	ID:     DefaultRoleMemberID,
 	Name:   "Member",
 	Colour: "green",
 	Permissions: rbac.NewList(
@@ -31,7 +33,22 @@ var DefaultRoleEveryone = Role{
 		rbac.PermissionReadCollection,
 		rbac.PermissionCollectionSubmit,
 	),
-	SortKey: 0,
+	SortKey: -1, // Always sorts first
+}
+
+var DefaultRoleGuest = Role{
+	ID:     DefaultRoleGuestID,
+	Name:   "Guest",
+	Colour: "gray",
+	Permissions: rbac.NewList(
+		rbac.PermissionReadPublishedThreads,
+		rbac.PermissionReadPublishedLibrary,
+		rbac.PermissionListProfiles,
+		rbac.PermissionReadProfile,
+		rbac.PermissionListCollections,
+		rbac.PermissionReadCollection,
+	),
+	SortKey: -2, // Sorts before member role
 }
 
 var DefaultRoleAdmin = Role{

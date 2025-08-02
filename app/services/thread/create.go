@@ -75,7 +75,7 @@ func (s *service) Create(ctx context.Context,
 
 	s.fetcher.HydrateContentURLs(ctx, thr)
 
-	s.mentioner.Send(ctx, *datagraph.NewRef(thr), thr.Content.References()...)
+	s.mentioner.Send(ctx, authorID, *datagraph.NewRef(thr), thr.Content.References()...)
 
 	return thr, nil
 }

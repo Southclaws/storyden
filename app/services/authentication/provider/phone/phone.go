@@ -228,5 +228,5 @@ func (p *Provider) Login(ctx context.Context, handle string, onetimecode string)
 		)
 	}
 
-	return acc, nil
+	return &acc.Account, nil
 }

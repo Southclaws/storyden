@@ -10,7 +10,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/token"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 )
@@ -31,8 +30,14 @@ func WithAccount(ctx context.Context, aw *account_writer.Writer, template accoun
 		panic(err)
 	}
 
-	ctx = session.WithAccountID(ctx, acc.ID)
-	return ctx, acc
+	ctx = WithAccountID(ctx, acc.ID)
+	return ctx, &acc.Account
+}
+
+var contextKey = struct{}{}
+
+func WithAccountID(ctx context.Context, id account.AccountID) context.Context {
+	return context.WithValue(ctx, contextKey, id)
 }
 
 func WithSessionFromHeader(t *testing.T, ctx context.Context, header http.Header) openapi.RequestEditorFn {
@@ -64,12 +69,9 @@ func newSessionHelper(
 }
 
 func (h *SessionHelper) WithSession(ctx context.Context) openapi.RequestEditorFn {
-	accountID, err := session.GetAccountID(ctx)
-	if err != nil {
-		panic(err)
-	}
+	accountID := ctx.Value(contextKey).(account.AccountID)
 
-	t, err := h.tr.Issue(ctx, accountID)
+	t, err := h.tr.Issue(context.Background(), accountID)
 	if err != nil {
 		panic(err)
 	}

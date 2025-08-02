@@ -11,11 +11,17 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/rbac"
+	"github.com/Southclaws/storyden/app/services/authentication/session"
 )
 
-func CheckCollectionMutationPermissions(ctx context.Context, acc account.Account, col collection.Collection) error {
-	if err := acc.Roles.Permissions().Authorise(ctx, func() error {
-		if acc.ID != col.Owner.ID {
+func CheckCollectionMutationPermissions(ctx context.Context, col collection.Collection) error {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := session.Authorise(ctx, func() error {
+		if accountID != col.Owner.ID {
 			return fault.Wrap(rbac.ErrPermissions,
 				fctx.With(ctx),
 				fmsg.WithDesc("not owner", "You are not the owner of the collection and do not have the Manage Collections permission."),

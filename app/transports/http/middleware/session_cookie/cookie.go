@@ -82,7 +82,7 @@ func (j *Jar) withSession(r *http.Request) context.Context {
 		return ctx
 	}
 
-	return r.Context()
+	return j.withDefaultRoles(r)
 }
 
 func (j *Jar) tryFromCookie(r *http.Request) (context.Context, bool) {
@@ -116,6 +116,17 @@ func (j *Jar) tryFromHeader(r *http.Request) (context.Context, bool) {
 	}
 
 	return ctx, true
+}
+
+func (j *Jar) withDefaultRoles(r *http.Request) context.Context {
+	ctx, err := j.validator.WithUnauthenticatedRoles(r.Context())
+	if err != nil {
+		// TODO: Handle this somehow - needs logging but if this fails then
+		// we can't do anything, the request would have no roles and thus fail.
+		return r.Context()
+	}
+
+	return ctx
 }
 
 // WithAuth simply pulls out the session from the cookie and propagates it.

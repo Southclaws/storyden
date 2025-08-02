@@ -139,7 +139,7 @@ func TestNodesErrors(t *testing.T) {
 			update403, err := cl.NodeUpdateWithResponse(ctx, "nonexistent", openapi.NodeMutableProps{})
 			r.NoError(err)
 			r.NotNil(update403)
-			a.Equal(http.StatusForbidden, update403.StatusCode())
+			a.Equal(http.StatusUnauthorized, update403.StatusCode())
 
 			update404, err := cl.NodeUpdateWithResponse(ctx, "nonexistent", openapi.NodeMutableProps{}, sh.WithSession(ctx))
 			r.NoError(err)

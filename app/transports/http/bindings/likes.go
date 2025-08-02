@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/like/like_querier"
 	"github.com/Southclaws/storyden/app/resources/like/profile_like"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/like/post_liker"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -21,7 +20,7 @@ import (
 
 type Likes struct {
 	likeQuerier *like_querier.LikeQuerier
-	postLiker  *post_liker.PostLiker
+	postLiker   *post_liker.PostLiker
 }
 
 func NewLikes(
@@ -30,7 +29,7 @@ func NewLikes(
 ) Likes {
 	return Likes{
 		likeQuerier: likeQuerier,
-		postLiker:  postLiker,
+		postLiker:   postLiker,
 	}
 }
 
@@ -124,12 +123,10 @@ func (h *Likes) LikeProfileGet(ctx context.Context, request openapi.LikeProfileG
 }
 
 func serialiseItemLike(like *item_like.Like) openapi.ItemLike {
-	pro := profile.ProfileFromAccount(&like.Owner)
-
 	return openapi.ItemLike{
 		Id:        like.ID.String(),
 		CreatedAt: like.Created,
-		Owner:     serialiseProfileReference(*pro),
+		Owner:     serialiseProfileReference(like.Owner),
 	}
 }
 

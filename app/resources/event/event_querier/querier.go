@@ -39,12 +39,12 @@ func (q *Querier) Get(ctx context.Context, mark event_ref.QueryKey) (*event.Even
 	query.Where(mark.Predicate())
 
 	query.WithParticipants(func(epq *ent.EventParticipantQuery) {
-		epq.WithAccount(func(aq *ent.AccountQuery) { aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }) })
+		epq.WithAccount()
 	})
 	query.WithPrimaryImage()
 	query.WithThread(func(pq *ent.PostQuery) {
 		pq.WithCategory()
-		pq.WithAuthor(func(aq *ent.AccountQuery) { aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() }) })
+		pq.WithAuthor()
 		pq.WithPosts()
 		pq.WithReacts()
 	})

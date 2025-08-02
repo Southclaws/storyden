@@ -44,7 +44,7 @@ type Node struct {
 	Content         opt.Optional[datagraph.Content]
 	Description     opt.Optional[string]
 	PrimaryImage    opt.Optional[asset.Asset]
-	Owner           profile.Public
+	Owner           profile.Ref
 	Parent          opt.Optional[Node]
 	Properties      opt.Optional[PropertyTable]
 	ChildProperties opt.Optional[PropertySchema]

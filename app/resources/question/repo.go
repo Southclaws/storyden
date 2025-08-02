@@ -54,11 +54,7 @@ func (r *Repository) Store(ctx context.Context,
 
 	q, err := r.db.Question.Query().
 		Where(question.ID(res.ID)).
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) {
-				arq.WithRole()
-			})
-		}).
+		WithAuthor().
 		Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -70,11 +66,7 @@ func (r *Repository) Store(ctx context.Context,
 func (r *Repository) Get(ctx context.Context, id xid.ID) (*Question, error) {
 	q, err := r.db.Question.Query().
 		Where(question.ID(id)).
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) {
-				arq.WithRole()
-			})
-		}).
+		WithAuthor().
 		Only(ctx)
 	if err != nil {
 		return nil, err
@@ -88,11 +80,7 @@ func (r *Repository) GetByQuerySlug(ctx context.Context, query string) (*Questio
 
 	q, err := r.db.Question.Query().
 		Where(question.Slug(slug)).
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) {
-				arq.WithRole()
-			})
-		}).
+		WithAuthor().
 		Only(ctx)
 	if err != nil {
 		return nil, err

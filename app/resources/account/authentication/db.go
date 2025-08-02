@@ -58,9 +58,7 @@ func (d *database) Create(ctx context.Context,
 	r, err = d.db.Authentication.
 		Query().
 		Where(authentication.ID(r.ID)).
-		WithAccount(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAccount().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -80,9 +78,7 @@ func (d *database) LookupByIdentifier(ctx context.Context, service Service, iden
 			authentication.IdentifierEQ(identifier),
 			authentication.ServiceEQ(service.String()),
 		).
-		WithAccount(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAccount().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -108,9 +104,7 @@ func (d *database) LookupByTokenType(ctx context.Context, accountID account.Acco
 			authentication.TokenTypeEQ(tokenType.String()),
 			authentication.IdentifierEQ(identifier),
 		).
-		WithAccount(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAccount().
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {
@@ -132,9 +126,7 @@ func (d *database) GetAuthMethods(ctx context.Context, id account.AccountID) ([]
 	r, err := d.db.Authentication.
 		Query().
 		Where(authentication.HasAccountWith(model_account.IDEQ(xid.ID(id)))).
-		WithAccount(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAccount().
 		All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
@@ -165,9 +157,7 @@ func (d *database) Update(ctx context.Context, id ID, opts ...Option) (*Authenti
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	r, err = d.db.Authentication.Query().Where(authentication.ID(r.ID)).WithAccount(func(aq *ent.AccountQuery) {
-		aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-	}).Only(ctx)
+	r, err = d.db.Authentication.Query().Where(authentication.ID(r.ID)).WithAccount().Only(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

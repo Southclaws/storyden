@@ -9,7 +9,10 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/Southclaws/storyden/app/resources/account/role/held"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_account_role "github.com/Southclaws/storyden/internal/ent/accountroles"
+	ent_role "github.com/Southclaws/storyden/internal/ent/role"
 )
 
 type Querier struct {
@@ -35,7 +38,10 @@ func (q *Querier) Get(ctx context.Context, id role.RoleID) (*role.Role, error) {
 }
 
 func (q *Querier) List(ctx context.Context) (role.Roles, error) {
-	roles, err := q.db.Role.Query().All(ctx)
+	roles, err := q.db.Role.Query().Where(ent_role.IDNotIn(
+		xid.ID(role.DefaultRoleGuestID),
+		xid.ID(role.DefaultRoleMemberID),
+	)).All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -45,9 +51,127 @@ func (q *Querier) List(ctx context.Context) (role.Roles, error) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	mapped = append(mapped, &role.DefaultRoleAdmin, &role.DefaultRoleEveryone)
+	defaultRole, err := q.GetMemberRole(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	guestRole, err := q.GetGuestRole(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	mapped = append(mapped, defaultRole, guestRole)
 
 	sort.Sort(mapped)
 
 	return mapped, nil
+}
+
+func (q *Querier) ListFor(ctx context.Context, account *ent.Account) (held.Roles, error) {
+	roles, err := q.db.AccountRoles.
+		Query().
+		Where(
+			ent_account_role.AccountID(account.ID),
+			ent_account_role.HasRoleWith(ent_role.IDNotIn(
+				xid.ID(role.DefaultRoleGuestID),
+				xid.ID(role.DefaultRoleMemberID),
+			)),
+		).
+		WithRole(func(rq *ent.RoleQuery) {
+			rq.Order(ent.Asc(ent_role.FieldSortKey))
+		}).
+		Order(ent.Asc(ent_account_role.FieldCreatedAt)).
+		All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	mapped, err := held.MapList(roles, account.Admin)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	_, memberRole, err := q.lookupDefaultRoles(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	var list held.Roles
+
+	// If the default member role has not been modified (aka not added to the DB
+	// with custom permissions) we add the default manually.
+	if memberRole != nil {
+		defaultRole, err := role.Map(memberRole)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		mapped = append(mapped, &held.Role{
+			Role:     *defaultRole,
+			Assigned: account.CreatedAt,
+			Badge:    false,
+			Default:  true,
+		})
+	} else {
+		mapped = append(mapped, &held.Role{
+			Role: role.DefaultRoleMember,
+		})
+	}
+
+	// TODO: Implement sorting on API - currently it's pointless.
+	// sort.Sort(mapped)
+	// Add custom roles after defaults. Because of sorting not done yet.
+	list = append(list, mapped...)
+
+	return list, nil
+}
+
+func (q *Querier) GetMemberRole(ctx context.Context) (*role.Role, error) {
+	_, memberRole, err := q.lookupDefaultRoles(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if memberRole == nil {
+		return &role.DefaultRoleMember, nil
+	}
+
+	return role.Map(memberRole)
+}
+
+func (q *Querier) GetGuestRole(ctx context.Context) (*role.Role, error) {
+	guestRole, _, err := q.lookupDefaultRoles(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if guestRole == nil {
+		return &role.DefaultRoleGuest, nil
+	}
+
+	return role.Map(guestRole)
+}
+
+func (q *Querier) lookupDefaultRoles(ctx context.Context) (*ent.Role, *ent.Role, error) {
+	roles, err := q.db.Role.Query().Where(ent_role.IDIn(
+		xid.ID(role.DefaultRoleGuestID),
+		xid.ID(role.DefaultRoleMemberID),
+	)).All(ctx)
+	if err != nil {
+		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	var guestRole *ent.Role
+	var memberRole *ent.Role
+
+	for _, r := range roles {
+		if r.ID == xid.ID(role.DefaultRoleGuestID) {
+			guestRole = r
+		} else if r.ID == xid.ID(role.DefaultRoleMemberID) {
+			memberRole = r
+		}
+	}
+
+	return guestRole, memberRole, nil
 }

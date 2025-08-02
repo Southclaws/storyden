@@ -10,7 +10,7 @@ import { EditAction } from "@/components/site/Action/Edit";
 import { ModalDrawer } from "@/components/site/Modaldrawer/Modaldrawer";
 import { IconButton } from "@/components/ui/icon-button";
 import { CreateIcon } from "@/components/ui/icons/Create";
-import { isDefaultRole } from "@/lib/role/defaults";
+import { isDefaultRole, isEditableDefaultRole } from "@/lib/role/defaults";
 import { UseDisclosureProps, useDisclosure } from "@/utils/useDisclosure";
 
 import { RoleEditScreen } from "./RoleEditScreen";
@@ -38,14 +38,16 @@ export function RoleEditModalTrigger({ role }: Props) {
   const disclosure = useDisclosure();
 
   const isDefault = isDefaultRole(role);
+  const isEditable = isEditableDefaultRole(role);
+  const cannotEdit = isDefault && !isEditable;
 
-  const titleLabel = isDefault ? "You cannot edit a default role" : "Edit role";
+  const titleLabel = cannotEdit ? "You cannot edit this role" : "Edit role";
 
   return (
     <>
       <EditAction
         size="xs"
-        disabled={isDefault}
+        disabled={cannotEdit}
         title={titleLabel}
         onClick={disclosure.onOpen}
       />

@@ -12,23 +12,21 @@ import (
 	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/collection/collection_auth"
 )
 
 type Manager struct {
-	session    *session.Provider
 	colQuerier *collection_querier.Querier
 	repo       *collection_item.Repository
 }
 
 func New(
-	session *session.Provider,
 	colQuerier *collection_querier.Querier,
 	repo *collection_item.Repository,
 ) *Manager {
 	return &Manager{
-		session:    session,
 		colQuerier: colQuerier,
 		repo:       repo,
 	}
@@ -85,7 +83,7 @@ func (m *Manager) NodeRemove(ctx context.Context, qk collection.QueryKey, id lib
 }
 
 func (m *Manager) authoriseSubmission(ctx context.Context, qk collection.QueryKey, iid xid.ID) (collection.MembershipType, error) {
-	acc, err := m.session.Account(ctx)
+	acc, err := session.GetAccount(ctx)
 	if err != nil {
 		return collection.MembershipType{}, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -95,19 +93,25 @@ func (m *Manager) authoriseSubmission(ctx context.Context, qk collection.QueryKe
 		return collection.MembershipType{}, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return collection_auth.CheckCollectionItemMutationPermissions(ctx, *acc, *citem)
+	mt, err := collection_auth.CheckCollectionItemMutationPermissions(ctx, acc, *citem)
+	if err != nil {
+		return collection.MembershipType{}, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if mt == collection.MembershipTypeSubmissionReview {
+		if err := session.Authorise(ctx, nil, rbac.PermissionCollectionSubmit); err != nil {
+			return collection.MembershipType{}, fault.Wrap(err, fctx.With(ctx))
+		}
+	}
+
+	return mt, nil
 }
 
 func (m *Manager) authoriseDirectUpdate(ctx context.Context, qk collection.QueryKey) error {
-	acc, err := m.session.Account(ctx)
-	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
-
 	col, err := m.colQuerier.Probe(ctx, qk)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return collection_auth.CheckCollectionMutationPermissions(ctx, *acc, *col)
+	return collection_auth.CheckCollectionMutationPermissions(ctx, *col)
 }

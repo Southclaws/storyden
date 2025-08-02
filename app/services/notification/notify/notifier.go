@@ -3,6 +3,7 @@ package notify
 import (
 	"context"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -18,10 +19,11 @@ func New(q pubsub.Topic[mq.Notification]) *Notifier {
 	return &Notifier{q: q}
 }
 
-func (n *Notifier) Send(ctx context.Context, targetID account.AccountID, event notification.Event, item *datagraph.Ref) {
+func (n *Notifier) Send(ctx context.Context, targetID account.AccountID, sourceID opt.Optional[account.AccountID], event notification.Event, item *datagraph.Ref) {
 	n.q.PublishAndForget(ctx, mq.Notification{
 		Event:    event,
 		Item:     item,
 		TargetID: targetID,
+		SourceID: sourceID,
 	})
 }

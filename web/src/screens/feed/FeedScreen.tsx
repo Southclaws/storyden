@@ -35,34 +35,42 @@ async function getInitialFeedData(
   feedConfig: FrontendConfiguration["feed"],
   page?: number,
 ): Promise<InitialData> {
-  switch (feedConfig.source.type) {
-    case "threads":
-      return {
-        page: page ?? 1,
-        threads: (
-          await threadList(
-            {
-              page: page?.toString(),
-            },
-            {
-              cache: "no-store",
-              next: {
-                tags: ["feed"],
-                revalidate: 0,
+  try {
+    switch (feedConfig.source.type) {
+      case "threads":
+        return {
+          page: page ?? 1,
+          threads: (
+            await threadList(
+              {
+                page: page?.toString(),
               },
-            },
-          )
-        ).data,
-      };
+              {
+                cache: "no-store",
+                next: {
+                  tags: ["feed"],
+                  revalidate: 0,
+                },
+              },
+            )
+          ).data,
+        };
 
-    case "library":
-      return {
-        library: (await nodeList()).data,
-      };
+      case "library":
+        return {
+          library: (await nodeList()).data,
+        };
 
-    case "categories":
-      return {
-        categories: (await categoryList()).data,
-      };
+      case "categories":
+        return {
+          categories: (await categoryList()).data,
+        };
+    }
+  } catch (error) {
+    // NOTE: Fall back without erroring here, frontend will not be hydrated but
+    // it can try the requests again just in case it was a momentary issue. If
+    // that fails, we get the standard error handling flow on the frontend. It
+    // does mean SSR requests that fail will get a confusing experience but meh.
+    return {};
   }
 }

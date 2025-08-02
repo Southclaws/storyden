@@ -37,9 +37,7 @@ func New(db *ent.Client, raw *sqlx.DB) Repository {
 func (d *database) Root(ctx context.Context, fs ...Filter) ([]*library.Node, error) {
 	query := d.db.Node.Query().
 		Where(node.ParentNodeIDIsNil()).
-		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithOwner().
 		WithAssets().
 		Order(node.ByParentNodeID(), node.BySort())
 
@@ -192,9 +190,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 	ids := dt.Map(filtered, func(n subtreeRow) xid.ID { return n.NodeId })
 	nodeRecords, err := d.db.Node.Query().
 		Where(node.IDIn(ids...)).
-		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithOwner().
 		WithPrimaryImage(func(aq *ent.AssetQuery) {
 			aq.WithParent()
 		}).
@@ -205,9 +201,7 @@ func (d *database) Subtree(ctx context.Context, id opt.Optional[library.NodeID],
 		WithParent(func(cq *ent.NodeQuery) {
 			cq.
 				WithAssets().
-				WithOwner(func(aq *ent.AccountQuery) {
-					aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-				})
+				WithOwner()
 		}).All(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))

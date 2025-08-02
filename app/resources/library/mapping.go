@@ -22,7 +22,7 @@ func MapNode(isRoot bool, ps *PropertySchemaTable) func(c *ent.Node) (*Node, err
 			return nil, fault.Wrap(err)
 		}
 
-		pro, err := profile.ProfileFromModel(accEdge)
+		pro, err := profile.MapRef(accEdge)
 		if err != nil {
 			return nil, fault.Wrap(err)
 		}

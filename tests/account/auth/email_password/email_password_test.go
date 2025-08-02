@@ -14,7 +14,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -54,7 +53,7 @@ func TestEmailPasswordAuth(t *testing.T) {
 				a.NotEmpty(signin.HTTPResponse.Header.Get("Set-Cookie"))
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
-				ctx1 := session.WithAccountID(root, accountID)
+				ctx1 := e2e.WithAccountID(root, accountID)
 				session := sh.WithSession(ctx1)
 
 				// Get own account, currently unverified
@@ -102,7 +101,7 @@ func TestEmailPasswordAuth(t *testing.T) {
 				tests.Ok(t, err, signup)
 
 				accountID := account.AccountID(openapi.GetAccountID(signup.JSON200.Id))
-				ctx1 := session.WithAccountID(root, accountID)
+				ctx1 := e2e.WithAccountID(root, accountID)
 				session := sh.WithSession(ctx1)
 
 				// Get code from email, verify account

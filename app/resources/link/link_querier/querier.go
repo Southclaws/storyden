@@ -58,16 +58,12 @@ func (d *LinkQuerier) Get(ctx context.Context, slug string) (*link.Link, error) 
 		WithPrimaryImage().
 		WithFaviconImage().
 		WithPosts(func(pq *ent.PostQuery) {
-			pq.WithAuthor(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			pq.WithAuthor()
 			pq.WithCategory()
 			pq.WithRoot()
 		}).
 		WithNodes(func(nq *ent.NodeQuery) {
-			nq.WithOwner(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			nq.WithOwner()
 		})
 
 	r, err := query.First(ctx)

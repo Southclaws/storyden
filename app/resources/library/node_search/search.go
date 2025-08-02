@@ -81,13 +81,9 @@ func (s *service) Search(ctx context.Context, params pagination.Parameters, opts
 
 	query := s.db.Node.Query().
 		Where(predicate).
-		WithOwner(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithOwner().
 		WithNodes(func(cq *ent.NodeQuery) {
-			cq.WithOwner(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			cq.WithOwner()
 		}).
 		WithPrimaryImage().
 		Order(node.ByUpdatedAt(sql.OrderDesc()), node.ByCreatedAt(sql.OrderDesc())).

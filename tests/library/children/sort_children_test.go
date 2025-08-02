@@ -317,7 +317,7 @@ func TestNodeSorting(t *testing.T) {
 					cl.NodeUpdatePositionWithResponse(root, n1.Slug, openapi.NodeUpdatePositionJSONRequestBody{
 						After: &n2.Id,
 					}, memberSession),
-				)(t, http.StatusUnauthorized)
+				)(t, http.StatusForbidden)
 			})
 
 			t.Run("unauthenticated", func(t *testing.T) {
@@ -331,7 +331,7 @@ func TestNodeSorting(t *testing.T) {
 					cl.NodeUpdatePositionWithResponse(root, n1.Slug, openapi.NodeUpdatePositionJSONRequestBody{
 						After: &n2.Id,
 					}),
-				)(t, http.StatusForbidden)
+				)(t, http.StatusUnauthorized)
 			})
 		}))
 	}))

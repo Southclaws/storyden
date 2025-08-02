@@ -66,13 +66,9 @@ func (d *database) Create(
 
 	p, err = d.db.Post.Query().
 		Where(ent_post.IDEQ(p.ID)).
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAuthor().
 		WithRoot(func(pq *ent.PostQuery) {
-			pq.WithAuthor(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			pq.WithAuthor()
 		}).
 		WithAssets().
 		Only(ctx)
@@ -99,13 +95,9 @@ func (d *database) Get(ctx context.Context, id post.ID) (*Reply, error) {
 	p, err := d.db.Post.
 		Query().
 		Where(ent_post.IDEQ(xid.ID(id))).
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAuthor().
 		WithRoot(func(pq *ent.PostQuery) {
-			pq.WithAuthor(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			pq.WithAuthor()
 		}).
 		WithAssets(func(aq *ent.AssetQuery) {
 			aq.Order(asset.ByUpdatedAt(), asset.ByCreatedAt())
@@ -139,13 +131,9 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Rep
 	p, err := d.db.Post.
 		Query().
 		Where(ent_post.IDEQ(xid.ID(id))).
-		WithAuthor(func(aq *ent.AccountQuery) {
-			aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-		}).
+		WithAuthor().
 		WithRoot(func(pq *ent.PostQuery) {
-			pq.WithAuthor(func(aq *ent.AccountQuery) {
-				aq.WithAccountRoles(func(arq *ent.AccountRolesQuery) { arq.WithRole() })
-			})
+			pq.WithAuthor()
 		}).
 		WithAssets().
 		Only(ctx)

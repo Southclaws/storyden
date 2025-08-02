@@ -22,6 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
 	"github.com/Southclaws/storyden/app/resources/mark"
+	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -79,8 +80,12 @@ func NewNodes(
 }
 
 func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateRequestObject) (openapi.NodeCreateResponseObject, error) {
-	session, err := session.GetAccountID(ctx)
+	accountID, err := session.GetAccountID(ctx)
 	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if err := session.Authorise(ctx, nil, rbac.PermissionManageLibrary, rbac.PermissionSubmitLibraryNode); err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -122,7 +127,7 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 	primaryImage := opt.Map(opt.NewPtr(request.Body.PrimaryImageAssetId), deserialiseAssetID)
 
 	node, err := c.nodeMutator.Create(ctx,
-		session,
+		accountID,
 		request.Body.Name,
 		node_mutate.Partial{
 			Slug:         slug,
@@ -161,17 +166,18 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 	}
 
 	// TODO: Clean this mess up.
-	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (account.Account, error) {
+
+	acc, err := opt.MapErr(session.GetOptAccountID(ctx), func(aid account.AccountID) (account.AccountWithEdges, error) {
 		a, err := c.accountQuery.GetByID(ctx, aid)
 		if err != nil {
-			return account.Account{}, err
+			return account.AccountWithEdges{}, err
 		}
 
 		return *a, nil
 	})
 	if err != nil {
 		if ftag.Get(err) == ftag.NotFound {
-			acc = opt.NewEmpty[account.Account]()
+			acc = opt.NewEmpty[account.AccountWithEdges]()
 		} else {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
@@ -728,14 +734,6 @@ func serialisePropertySchemaList(in library.PropertySchema) openapi.PropertySche
 	}
 
 	return dt.Map(in.Fields, serialisePropertySchema)
-}
-
-func serialisePropertySchemaListOpt(in opt.Optional[library.PropertySchema]) openapi.PropertySchemaList {
-	pt, ok := in.Get()
-	if !ok {
-		return openapi.PropertySchemaList{}
-	}
-	return serialisePropertySchemaList(pt)
 }
 
 func deserialisePropertySchemaMutation(in openapi.PropertySchemaMutableProps) (*node_properties.SchemaFieldMutation, error) {

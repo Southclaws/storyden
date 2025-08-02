@@ -6,8 +6,18 @@ import { FormLabel } from "@/components/ui/FormLabel";
 import { Button } from "@/components/ui/button";
 import { CardGroupSelect } from "@/components/ui/form/CardGroupSelect";
 import { Input } from "@/components/ui/input";
-import { PermissionList } from "@/lib/permission/permission";
-import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
+import {
+  PermissionList,
+  buildPermissionList,
+} from "@/lib/permission/permission";
+import {
+  isDefaultRole,
+  isEditableDefaultRole,
+  isGuestRole,
+  isStoredDefaultRole,
+  readPermissions,
+} from "@/lib/role/defaults";
+import { LStack, WStack, styled } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 
 import { Props, useRoleEditScreen } from "./useRoleEdit";
@@ -15,8 +25,15 @@ import { Props, useRoleEditScreen } from "./useRoleEdit";
 export function RoleEditScreen(props: Props) {
   const {
     form,
-    handlers: { handleSave, handleDelete },
+    handlers: { handleSave, handleDelete, handleReset },
   } = useRoleEditScreen(props);
+
+  const permissionList = isGuestRole(props.role)
+    ? buildPermissionList(...readPermissions)
+    : PermissionList;
+
+  const isStored = isStoredDefaultRole(props.role);
+  const isDefault = isDefaultRole(props.role);
 
   return (
     <styled.form
@@ -43,7 +60,7 @@ export function RoleEditScreen(props: Props) {
           <CardGroupSelect
             control={form.control}
             name="permissions"
-            items={PermissionList.map((p) => ({
+            items={permissionList.map((p) => ({
               value: p.value,
               label: p.name,
               description: p.description,
@@ -54,11 +71,25 @@ export function RoleEditScreen(props: Props) {
       </LStack>
 
       <WStack>
-        <DeleteWithConfirmationButton
-          type="button"
-          flexGrow="1"
-          onDelete={handleDelete}
-        />
+        {isDefault ? (
+          <>
+            {isStored ? (
+              <DeleteWithConfirmationButton
+                type="button"
+                flexGrow="1"
+                onDelete={handleReset}
+              >
+                Reset
+              </DeleteWithConfirmationButton>
+            ) : null}
+          </>
+        ) : (
+          <DeleteWithConfirmationButton
+            type="button"
+            flexGrow="1"
+            onDelete={handleDelete}
+          />
+        )}
         <Button
           flexGrow="1"
           variant="outline"

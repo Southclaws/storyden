@@ -66,10 +66,17 @@ func TestRoles(t *testing.T) {
 				tests.Ok(t, err, guest1Get)
 
 				r.Len(guest1Get.JSON200.Roles, 2, "1 default roles, 1 new role")
-				role1 := guest1Get.JSON200.Roles[0] // custom roles are always first, default roles always last
-				a.Equal(role.JSON200.Id, role1.Id)
-				a.Equal(role.JSON200.Colour, role1.Colour)
-				a.Equal(role.JSON200.Permissions, role1.Permissions)
+				role1 := findRole(guest1Get.JSON200.Roles, "000000000000000000m0")
+				r.NotNil(role1, "default role not found")
+				a.Equal("green", role1.Colour)
+				a.Equal([]openapi.Permission{
+					"CREATE_POST", "READ_PUBLISHED_THREADS", "CREATE_REACTION", "READ_PUBLISHED_LIBRARY", "SUBMIT_LIBRARY_NODE", "UPLOAD_ASSET", "LIST_PROFILES", "READ_PROFILE", "CREATE_COLLECTION", "LIST_COLLECTIONS", "READ_COLLECTION", "COLLECTION_SUBMIT",
+				}, role1.Permissions)
+				role2 := findRole(guest1Get.JSON200.Roles, role.JSON200.Id)
+				r.NotNil(role2, "new role not found")
+				a.Equal(role.JSON200.Id, role2.Id)
+				a.Equal(role.JSON200.Colour, role2.Colour)
+				a.Equal(role.JSON200.Permissions, role2.Permissions)
 
 				// guest1 can now create categories
 				cat, err := cl.CategoryCreateWithResponse(guestCtx, openapi.CategoryCreateJSONRequestBody{Name: xid.New().String(), Description: "d", Colour: "c"}, guest1Session)
@@ -106,7 +113,7 @@ func TestRoles(t *testing.T) {
 				cat, err := cl.CategoryCreateWithResponse(guestCtx, openapi.CategoryCreateJSONRequestBody{Name: xid.New().String(), Description: "d", Colour: "c"}, guest1Session)
 				tests.Ok(t, err, cat)
 				page, err := cl.NodeCreateWithResponse(guestCtx, openapi.NodeCreateJSONRequestBody{Name: xid.New().String(), Visibility: &vis}, guest1Session)
-				tests.Status(t, err, page, http.StatusUnauthorized)
+				tests.Status(t, err, page, http.StatusForbidden)
 
 				// Rename, re-colour and remove category permissions
 				newName := "test-role-" + xid.New().String()
@@ -200,10 +207,10 @@ func TestRoleBadges(t *testing.T) {
 				t.Parallel()
 
 				guest1Set, err := cl.AccountRoleSetBadgeWithResponse(guestCtx, admin.Handle, role1ID, guest1Session)
-				tests.Status(t, err, guest1Set, http.StatusUnauthorized)
+				tests.Status(t, err, guest1Set, http.StatusForbidden)
 
 				guest1Remove, err := cl.AccountRoleRemoveBadgeWithResponse(guestCtx, admin.Handle, role1ID, guest1Session)
-				tests.Status(t, err, guest1Remove, http.StatusUnauthorized)
+				tests.Status(t, err, guest1Remove, http.StatusForbidden)
 			})
 
 			t.Run("role_manager_can_set_other_member_badges", func(t *testing.T) {
@@ -217,4 +224,13 @@ func TestRoleBadges(t *testing.T) {
 			})
 		}))
 	}))
+}
+
+func findRole(roles []openapi.AccountRole, id string) *openapi.AccountRole {
+	for _, role := range roles {
+		if role.Id == id {
+			return &role
+		}
+	}
+	return nil
 }

@@ -30,7 +30,6 @@ var (
 
 type Registrar struct {
 	logger         *slog.Logger
-	session        *session.Provider
 	accountWriter  *account_writer.Writer
 	accountQuerier *account_querier.Querier
 	emailRepo      *email.Repository
@@ -41,7 +40,6 @@ type Registrar struct {
 
 func New(
 	logger *slog.Logger,
-	session *session.Provider,
 	writer *account_writer.Writer,
 	accountQuerier *account_querier.Querier,
 	emailRepo *email.Repository,
@@ -51,7 +49,6 @@ func New(
 ) *Registrar {
 	return &Registrar{
 		logger:         logger,
-		session:        session,
 		accountWriter:  writer,
 		accountQuerier: accountQuerier,
 		emailRepo:      emailRepo,
@@ -80,7 +77,7 @@ func (s *Registrar) Create(ctx context.Context, handle opt.Optional[string], opt
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return acc, nil
+	return &acc.Account, nil
 }
 
 // GetOrCreateViaEmail is intended to be used for just OAuth2 providers. It will
@@ -105,7 +102,7 @@ func (s *Registrar) GetOrCreateViaEmail(
 
 	// A session will be present if the user is attempting to link an account
 	// to their Storyden account, rather than registering or logging in.
-	session := s.session.AccountMaybe(ctx)
+	session := session.GetOptAccount(ctx)
 
 	authmethod, authMethodExists, err := s.authRepo.LookupByIdentifier(ctx, service, identifier)
 	if err != nil {
@@ -162,7 +159,7 @@ func (s *Registrar) GetOrCreateViaEmail(
 
 		logger.Info("get or create: account already exists")
 
-		return emailOwner, nil
+		return &emailOwner.Account, nil
 
 	case authMethodExists && !emailExists:
 		// Member has already registered with this authentication method but
@@ -171,14 +168,14 @@ func (s *Registrar) GetOrCreateViaEmail(
 		// are enabled at a later date, such as with OAuth providers.
 		// Link the email address to the account and send a verification.
 
-		err = s.linkAndVerifyEmail(ctx, emailOwner, email)
+		err = s.linkAndVerifyEmail(ctx, emailOwner.ID, email)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
 		logger.Info("get or create: auth method exists, email not recorded, linking new email to existing account")
 
-		return emailOwner, nil
+		return &emailOwner.Account, nil
 
 	case !authMethodExists && emailExists:
 		// Member has already registered with this email address, perhaps on
@@ -193,18 +190,18 @@ func (s *Registrar) GetOrCreateViaEmail(
 
 		logger.Info("get or create: no auth record, email already points to existing account, linking new auth method to existing account")
 
-		return emailOwner, nil
+		return &emailOwner.Account, nil
 
 	case !authMethodExists && !emailExists:
 		// Nothing exists for this member yet, create a new account.
 
-		emailOwner, err = s.CreateWithHandle(ctx, service, authName, identifier, token, name, handle)
+		newAccount, err := s.CreateWithHandle(ctx, service, authName, identifier, token, name, handle)
 		if err != nil {
 			return nil, fault.Wrap(err, fmsg.With("failed to create new account"), fctx.With(ctx))
 		}
 
 		if !isVerified {
-			err = s.linkAndVerifyEmail(ctx, emailOwner, email)
+			err = s.linkAndVerifyEmail(ctx, newAccount.ID, email)
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
@@ -212,7 +209,7 @@ func (s *Registrar) GetOrCreateViaEmail(
 
 		logger.Info("get or create: no auth record, no email record, creating new account and verifying email")
 
-		return emailOwner, nil
+		return newAccount, nil
 
 	default:
 		// switch block covers all cases.
@@ -231,7 +228,7 @@ func (s *Registrar) GetOrCreateViaHandle(
 ) (*account.Account, error) {
 	// A session will be present if the user is attempting to link an account
 	// to their Storyden account, rather than registering or logging in.
-	session := s.session.AccountMaybe(ctx)
+	session := session.GetOptAccount(ctx)
 
 	authmethod, authMethodExists, err := s.authRepo.LookupByIdentifier(ctx, service, identifier)
 	if err != nil {
@@ -270,7 +267,7 @@ func (s *Registrar) GetOrCreateViaHandle(
 
 		logger.Info("get or create: account already exists with handle")
 
-		return handleOwner, nil
+		return &handleOwner.Account, nil
 
 	case authMethodExists && !handleExists:
 		// Member has already registered with this authentication method but
@@ -278,7 +275,7 @@ func (s *Registrar) GetOrCreateViaHandle(
 
 		logger.Info("get or create: auth method exists, but account handle changed")
 
-		return handleOwner, nil
+		return &handleOwner.Account, nil
 
 	case !authMethodExists && handleExists:
 		// Member has already registered with this handle, we can only verify
@@ -370,13 +367,13 @@ func (s *Registrar) CreateWithHandle(
 	return newAccount, nil
 }
 
-func (s *Registrar) linkAndVerifyEmail(ctx context.Context, acc *account.Account, email mail.Address) error {
+func (s *Registrar) linkAndVerifyEmail(ctx context.Context, accID account.AccountID, email mail.Address) error {
 	code, err := otp.Generate()
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = s.emailVerify.BeginEmailVerification(ctx, acc.ID, email, code)
+	_, err = s.emailVerify.BeginEmailVerification(ctx, accID, email, code)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
