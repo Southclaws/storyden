@@ -29,6 +29,7 @@ type Partial struct {
 	Name         opt.Optional[string]
 	Slug         opt.Optional[mark.Slug]
 	URL          opt.Optional[url.URL]
+	Description  opt.Optional[string]
 	PrimaryImage deletable.Value[asset.AssetID]
 	Content      opt.Optional[datagraph.Content]
 	Parent       opt.Optional[library.QueryKey]

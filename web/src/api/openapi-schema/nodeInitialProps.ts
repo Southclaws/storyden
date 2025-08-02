@@ -11,6 +11,7 @@ import type { AssetIDs } from "./assetIDs";
 import type { AssetSourceList } from "./assetSourceList";
 import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
+import type { NodeDescription } from "./nodeDescription";
 import type { NodeName } from "./nodeName";
 import type { PostContent } from "./postContent";
 import type { PropertyMutationList } from "./propertyMutationList";
@@ -23,6 +24,7 @@ export interface NodeInitialProps {
   asset_ids?: AssetIDs;
   asset_sources?: AssetSourceList;
   content?: PostContent;
+  description?: NodeDescription;
   hide_child_tree?: boolean;
   meta?: Metadata;
   name: NodeName;

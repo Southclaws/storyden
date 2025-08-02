@@ -30,6 +30,7 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 	// Apply all primitive options. These are just basic partial updates.
 	p.Name.Call(func(value string) { opts = append(opts, node_writer.WithName(value)) })
 	p.Slug.Call(func(value mark.Slug) { opts = append(opts, node_writer.WithSlug(value.String())) })
+	p.Description.Call(func(value string) { opts = append(opts, node_writer.WithDescription(value)) })
 	p.PrimaryImage.Call(func(value xid.ID) {
 		opts = append(opts, node_writer.WithPrimaryImage(value))
 	}, func() {

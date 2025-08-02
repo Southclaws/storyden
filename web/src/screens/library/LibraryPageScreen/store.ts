@@ -54,6 +54,11 @@ export type Actions = {
   addChildProperty(p: PropertySchema): void;
   removeChildPropertyByID: (id: Identifier) => void;
   setChildPropertyName: (name: PropertyName, newName: PropertyName) => void;
+  setChildPropertyValue: (
+    nodeID: Identifier,
+    fid: string,
+    value: string,
+  ) => void;
   setChildPropertyHiddenState: (fid: string, hidden: boolean) => void;
 
   // Layout blocks
@@ -286,6 +291,71 @@ export const createNodeStore = (initState: State) => {
             );
             if (target) {
               target.name = newName;
+            }
+          });
+        },
+
+        setChildPropertyValue: (
+          nodeID: Identifier,
+          fid: string,
+          value: string,
+        ) => {
+          set((state) => {
+            const isFixed = fid.startsWith("fixed:");
+            const target = state.draft.children.find((f) => f.id === nodeID);
+            if (!target) {
+              console.warn(
+                "Attempting to set property on non-existing child node",
+                {
+                  nodeID,
+                  fid,
+                  value,
+                },
+              );
+              return;
+            }
+
+            console.debug("Setting child property value", {
+              nodeID,
+              fid,
+              value,
+              isFixed,
+            });
+
+            if (isFixed) {
+              switch (fid) {
+                case "fixed:name": {
+                  target.name = value;
+                  break;
+                }
+                case "fixed:description": {
+                  target.description = value;
+                  break;
+                }
+                case "fixed:link": {
+                  // NOTE: The actual value here is only worried about the URL.
+                  // see diff.ts projectNodeToMutableProps for why. Since this
+                  // is a mutation only, the other fields don't matter.
+                  target.link = {
+                    url: value,
+                  } as LinkReference;
+                  break;
+                }
+              }
+            } else {
+              const prop = target.properties.find((p) => p.fid === fid);
+              if (!prop) {
+                console.warn(
+                  "Attempting to set value on non-existing property",
+                  {
+                    nodeID,
+                    fid,
+                    value,
+                  },
+                );
+                return;
+              }
+              prop.value = value;
             }
           });
         },

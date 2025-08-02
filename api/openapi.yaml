@@ -5473,6 +5473,7 @@ components:
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         asset_sources: { $ref: "#/components/schemas/AssetSourceList" }
         url: { $ref: "#/components/schemas/URL" }
+        description: { $ref: "#/components/schemas/NodeDescription" }
         primary_image_asset_id: { $ref: "#/components/schemas/AssetID" }
         content: { $ref: "#/components/schemas/PostContent" }
         parent: { $ref: "#/components/schemas/NodeSlug" }
@@ -5493,6 +5494,7 @@ components:
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         asset_sources: { $ref: "#/components/schemas/AssetSourceList" }
         url: { $ref: "#/components/schemas/URL" }
+        description: { $ref: "#/components/schemas/NodeDescription" }
         primary_image_asset_id:
           { $ref: "#/components/schemas/NullableIdentifier" }
         content: { $ref: "#/components/schemas/PostContent" }

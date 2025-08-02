@@ -1,5 +1,5 @@
 import { dequal } from "dequal";
-import { debounce } from "lodash";
+import { debounce, entries, toPairs } from "lodash";
 import {
   PropsWithChildren,
   createContext,
@@ -85,6 +85,25 @@ export function LibraryPageProvider({
             await nodeUpdateChildrenPropertySchema(
               node.id,
               mutation.childPropertySchemaMutation,
+            );
+          }
+
+          if (mutation.childMutation) {
+            const collapsed = Object.fromEntries(
+              Object.entries(mutation.childMutation).map(([id, changes]) => [
+                id,
+                changes.at(-1)!,
+              ]),
+            );
+
+            const operations = entries(collapsed);
+
+            console.log("Updating child nodes", operations);
+
+            await Promise.all(
+              operations.map(([childNodeID, child]) =>
+                nodeUpdate(childNodeID, child),
+              ),
             );
           }
 
