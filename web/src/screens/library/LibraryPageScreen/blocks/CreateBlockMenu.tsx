@@ -1,15 +1,28 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
+import { PositioningOptions } from "@zag-js/popper";
 import { keyBy } from "lodash";
 
 import { AddIcon } from "@/components/ui/icons/Add";
 import * as Menu from "@/components/ui/menu";
+import { BlockIcon } from "@/lib/library/blockIcons";
 import { allBlockTypes } from "@/lib/library/blockTypes";
 import { useEmitLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockName } from "@/lib/library/metadata";
 
 import { useWatch } from "../store";
 
-export function CreateBlockMenu() {
+export function CreateBlockMenu({
+  trigger = (
+    <Menu.Item value="add">
+      <AddIcon />
+      &nbsp;Add Block
+    </Menu.Item>
+  ),
+  positioning = undefined,
+}: {
+  trigger?: React.ReactElement;
+  positioning?: PositioningOptions;
+}) {
   const emit = useEmitLibraryBlockEvent();
 
   const currentMetadata = useWatch((s) => s.draft.meta);
@@ -25,13 +38,8 @@ export function CreateBlockMenu() {
   const blockList = allBlockTypes.filter((b) => !existingBlocks[b]);
 
   return (
-    <Menu.Root lazyMount onSelect={handleSelect}>
-      <Menu.TriggerItem asChild>
-        <Menu.Item value="add">
-          <AddIcon />
-          &nbsp;Add Block
-        </Menu.Item>
-      </Menu.TriggerItem>
+    <Menu.Root lazyMount onSelect={handleSelect} positioning={positioning}>
+      <Menu.Trigger asChild>{trigger}</Menu.Trigger>
 
       <Portal>
         <Menu.Positioner>
@@ -39,6 +47,8 @@ export function CreateBlockMenu() {
             {blockList.map((block) => {
               return (
                 <Menu.Item key={block} value={block}>
+                  <BlockIcon blockType={block} />
+                  &nbsp;
                   {LibraryPageBlockName[block]}
                 </Menu.Item>
               );

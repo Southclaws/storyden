@@ -8,7 +8,9 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useCallback, useEffect, useState } from "react";
 
+import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
+import { AddIcon } from "@/components/ui/icons/Add";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import * as Tooltip from "@/components/ui/tooltip";
 import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
@@ -22,6 +24,7 @@ import { useWatch } from "../store";
 import { useEditState } from "../useEditState";
 
 import { BlockMenu } from "./BlockMenu";
+import { CreateBlockMenu } from "./CreateBlockMenu";
 import { LibraryPageAssetsBlock } from "./LibraryPageAssetsBlock/LibraryPageAssetsBlock";
 import { LibraryPageContentBlock } from "./LibraryPageContentBlock/LibraryPageContentBlock";
 import { LibraryPageCoverBlock } from "./LibraryPageCoverBlock/LibraryPageCoverBlock";
@@ -82,11 +85,28 @@ export function LibraryPageBlocks() {
     const editStateBlocks = meta.layout?.blocks ?? [];
 
     return (
-      <SortableContext items={blockIds} strategy={verticalListSortingStrategy}>
-        {editStateBlocks.map((block) => {
-          return <LibraryPageBlockEditable key={block.type} block={block} />;
-        })}
-      </SortableContext>
+      <>
+        <SortableContext
+          items={blockIds}
+          strategy={verticalListSortingStrategy}
+        >
+          {editStateBlocks.map((block) => {
+            return <LibraryPageBlockEditable key={block.type} block={block} />;
+          })}
+        </SortableContext>
+
+        <CreateBlockMenu
+          trigger={
+            <Button variant="outline" size="xs" w="full">
+              <AddIcon />
+              &nbsp;Add Block
+            </Button>
+          }
+          positioning={{
+            placement: "bottom",
+          }}
+        />
+      </>
     );
   }
 
