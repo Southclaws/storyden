@@ -44,7 +44,7 @@ LibraryPageForm.displayName = "LibraryPageForm";
 
 export function LibraryPage() {
   return (
-    <LStack h="full" gap="3" pl="3" alignItems="start">
+    <LStack h="full" gap="3" alignItems="start">
       <LibraryPageControls />
       <LibraryPageBlocks />
     </LStack>

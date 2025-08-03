@@ -16,8 +16,8 @@
   --grid-row-padding-outer: var(--spacing-5);
   --grid-row-padding-inner: var(--spacing-3);
 
-  --grid-col-padding-outer: var(--spacing-5);
-  --grid-col-padding-inner: var(--spacing-3);
+  --grid-col-padding-outer: var(--spacing-8);
+  --grid-col-padding-inner: var(--spacing-8);
   --grid-col-padding-inner-right: 0px;
 
   min-height: 100dvh;
@@ -78,7 +78,7 @@
 
 @media screen and (min-width: 1280px) {
   .navgrid {
-    --grid-col-padding-inner-right: var(--spacing-3);
+    --grid-col-padding-inner-right: var(--spacing-8);
     --navgrid-right-bar-display: block;
   }
 }
