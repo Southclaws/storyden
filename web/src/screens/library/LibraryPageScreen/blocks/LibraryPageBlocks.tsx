@@ -6,7 +6,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { IconButton } from "@/components/ui/icon-button";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
@@ -15,6 +15,7 @@ import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
 import { useLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
 import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
+import { useMouseDistance } from "@/utils/useMouseDistance";
 
 import { useLibraryPageContext } from "../Context";
 import { useWatch } from "../store";
@@ -144,6 +145,28 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
     setOpen((prev) => !prev);
   }
 
+  const { elementRef, distanceRef } = useMouseDistance<HTMLDivElement>();
+  useEffect(() => {
+    const timer = setInterval(
+      () => {
+        if (!isOpen) return;
+
+        const el = elementRef.current;
+        if (!el) return;
+
+        const distance = distanceRef.current;
+        // NOTE: Massive hack... distance might be wrong on different screens.
+        if (distance.d > 45) {
+          setOpen(false);
+        }
+      },
+
+      100,
+    );
+
+    return () => clearInterval(timer);
+  }, [isOpen, setOpen]);
+
   // Check if we're dragging anything at all, to hide the tooltip.
   const { active } = useDndContext();
   const isDraggingAnything = active !== null;
@@ -162,6 +185,7 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
   return (
     <HStack
       id={`block-${block.type}_container`}
+      ref={elementRef}
       className="group"
       style={dragStyle}
       w="full"
