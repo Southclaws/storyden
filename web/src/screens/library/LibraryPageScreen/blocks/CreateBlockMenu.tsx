@@ -26,12 +26,12 @@ export function CreateBlockMenu() {
 
   return (
     <Menu.Root lazyMount onSelect={handleSelect}>
-      <Menu.Trigger asChild>
+      <Menu.TriggerItem asChild>
         <Menu.Item value="add">
           <AddIcon />
           &nbsp;Add Block
         </Menu.Item>
-      </Menu.Trigger>
+      </Menu.TriggerItem>
 
       <Portal>
         <Menu.Positioner>
