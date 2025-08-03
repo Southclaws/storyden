@@ -6,11 +6,18 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { useCallback } from "react";
 
+import { IconButton } from "@/components/ui/icon-button";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
+import { MenuIcon } from "@/components/ui/icons/Menu";
 import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
 import { useLibraryBlockEvent } from "@/lib/library/events";
-import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
-import { Box, HStack, VStack } from "@/styled-system/jsx";
+import {
+  LibraryPageBlock,
+  LibraryPageBlockName,
+  LibraryPageBlockType,
+} from "@/lib/library/metadata";
+import { Box, HStack, VStack, WStack, styled } from "@/styled-system/jsx";
+import { token } from "@/styled-system/tokens";
 
 import { useLibraryPageContext } from "../Context";
 import { useWatch } from "../store";
@@ -147,44 +154,30 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
   };
 
   return (
-    <HStack
+    <VStack
       className="group"
       style={dragStyle}
       ref={setNodeRef}
-      w="var(--width-adjusted)"
-      ml="-5"
-      gap="0"
+      w="full"
+      gap="1"
+      outlineWidth="thin"
+      outlineColor="accent.300"
+      outlineStyle="dashed"
+      outlineOffset="1"
+      borderRadius="sm"
     >
-      <VStack
-        {...attributes}
-        {...listeners}
-        style={dragHandleStyle}
-        w="5"
-        pr="1"
-        alignItems="start"
-        height="full"
-        position="relative"
-      >
-        <VStack
-          position="absolute"
-          w="full"
-          color="fg.subtle"
-          borderRadius="sm"
-          visibility="hidden"
-          _groupHover={{
-            bgColor: "bg.muted",
-            visibility: "visible",
-          }}
-          title={block.type}
-          gap="1"
-        >
-          <DragHandleIcon width="4" />
-          <BlockMenu block={block} />
-        </VStack>
-      </VStack>
+      <WStack>
+        <HStack {...attributes} {...listeners} style={dragHandleStyle} gap="1">
+          <DragHandleIcon h="4" w="4" color="fg.subtle" />
+          <styled.p fontWeight="medium" color="fg.subtle">
+            {LibraryPageBlockName[block.type]}
+          </styled.p>
+        </HStack>
+        <BlockMenu block={block} />
+      </WStack>
       <Box w="full" minW="0">
         <LibraryPageBlockRender block={block} />
       </Box>
-    </HStack>
+    </VStack>
   );
 }
