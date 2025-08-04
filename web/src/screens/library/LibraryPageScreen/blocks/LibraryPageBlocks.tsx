@@ -223,7 +223,8 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
         id={`block-${block.type}_gutter-container`}
         ref={setNodeRef}
         w="6"
-        left="-7"
+        left={{ base: "0", md: "-7" }}
+        top={{ base: "-7", md: "0" }}
         alignItems="start"
         height="full"
         position="absolute"
@@ -234,13 +235,16 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
           {...listeners}
           {...attributes}
           w="full"
-          h="full"
+          h={{ base: "6", md: "full" }}
+          bgColor="bg.muted/50"
           color="fg.subtle"
           borderRadius="sm"
           visibility="hidden"
           _groupHover={{
             visibility: "visible",
           }}
+          // Hide on mobile: Not happy with the mobile experience of this yet.
+          display={{ base: "none", md: "flex" }}
         >
           <Tooltip.Root
             openDelay={0}
@@ -258,7 +262,10 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
                   <IconButton
                     style={dragHandleStyle}
                     id={`block-${block.type}_gutter-drag-handle-button`}
-                    variant="ghost"
+                    variant={{
+                      base: "subtle",
+                      md: "ghost",
+                    }}
                     size="xs"
                     minWidth="5"
                     width="5"
@@ -314,7 +321,7 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
           borderRadius: "sm",
           outlineColor: "bg.muted/50",
           outlineStyle: "solid",
-          outlineWidth: "thick",
+          outlineWidth: "medium",
         }}
       >
         <LibraryPageBlockRender block={block} />
