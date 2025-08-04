@@ -6,7 +6,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { IconButton } from "@/components/ui/icon-button";
@@ -177,34 +177,25 @@ function LibraryPageBlockEditable({
     setOpen((prev) => !prev);
   }
 
-  // Closing the menu is actually really awkward since there's a nested menu and
-  // they don't share the same DOM - so click-away doesn't do what you expect,
-  // hovering off the menu's parent hides the parent but keeps the menu. This is
-  // a usability hack to make it feel a bit nicer by allowing the menu to close
-  // when the cursor moves away from it. This is not a perfect solution but it's
-  // good enough for now. It wouldn't work on mobile but luckily we just hide
-  // these menus and the entire gutter on mobile anyway in favour of tap-hold.
-  const { elementRef, distanceRef } = useMouseDistance<HTMLDivElement>();
+  // Manually handle click-away behaviour - the default menu behaviour has been
+  // overridden by making it a controlled component in order to allow for the
+  // drag handle to be used as a menu open trigger.
+  const elementRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const timer = setInterval(
-      () => {
-        if (!isOpen) return;
+    if (!isOpen) return;
 
-        const el = elementRef.current;
-        if (!el) return;
+    function handleClickAway(event: MouseEvent) {
+      if (
+        elementRef.current &&
+        !elementRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    }
 
-        const distance = distanceRef.current;
-        // NOTE: Massive hack... distance might be wrong on different screens.
-        if (distance.d > 75) {
-          setOpen(false);
-        }
-      },
-
-      100,
-    );
-
-    return () => clearInterval(timer);
-  }, [isOpen, setOpen]);
+    document.addEventListener("click", handleClickAway);
+    return () => document.removeEventListener("click", handleClickAway);
+  }, [isOpen]);
 
   // Check if we're dragging anything at all, to hide the tooltip.
   const { active } = useDndContext();
@@ -224,7 +215,6 @@ function LibraryPageBlockEditable({
   return (
     <HStack
       id={`block-${block.type}_container`}
-      ref={elementRef}
       className="group"
       style={dragStyle}
       w="full"
@@ -246,6 +236,7 @@ function LibraryPageBlockEditable({
           id={`block-${block.type}_gutter-drag-handle`}
           {...listeners}
           {...attributes}
+          ref={elementRef}
           w="full"
           h={{ base: "6", md: "full" }}
           bgColor="bg.muted/50"
