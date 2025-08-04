@@ -12,7 +12,6 @@ import { CreateBlockMenu } from "./CreateBlockMenu";
 
 type Props = {
   open?: boolean;
-  setOpen?: (open: boolean) => void;
   block: LibraryPageBlock;
 };
 

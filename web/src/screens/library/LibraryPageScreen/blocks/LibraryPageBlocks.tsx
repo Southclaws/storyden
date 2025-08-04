@@ -165,6 +165,13 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
     setOpen((prev) => !prev);
   }
 
+  // Closing the menu is actually really awkward since there's a nested menu and
+  // they don't share the same DOM - so click-away doesn't do what you expect,
+  // hovering off the menu's parent hides the parent but keeps the menu. This is
+  // a usability hack to make it feel a bit nicer by allowing the menu to close
+  // when the cursor moves away from it. This is not a perfect solution but it's
+  // good enough for now. It wouldn't work on mobile but luckily we just hide
+  // these menus and the entire gutter on mobile anyway in favour of tap-hold.
   const { elementRef, distanceRef } = useMouseDistance<HTMLDivElement>();
   useEffect(() => {
     const timer = setInterval(
@@ -292,7 +299,7 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
             height="6"
             pointerEvents="none"
           >
-            <BlockMenu block={block} open={isOpen} setOpen={setOpen}>
+            <BlockMenu block={block} open={isOpen}>
               <Box position="absolute" width="6" height="6" />
             </BlockMenu>
           </Box>
