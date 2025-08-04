@@ -8,7 +8,7 @@ export type LibraryBlockEvents = {
     activeId: LibraryPageBlockType;
     overId: LibraryPageBlockType;
   };
-  "library:add-block": { type: LibraryPageBlockType };
+  "library:add-block": { type: LibraryPageBlockType; index?: number };
   "library:remove-block": { type: LibraryPageBlockType };
 };
 

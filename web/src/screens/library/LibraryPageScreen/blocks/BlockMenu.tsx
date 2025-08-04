@@ -1,9 +1,8 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
+import { PropsWithChildren } from "react";
 
 import { ButtonProps } from "@/components/ui/button";
-import { IconButton } from "@/components/ui/icon-button";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
-import { MoreIcon } from "@/components/ui/icons/More";
 import * as Menu from "@/components/ui/menu";
 import { useEmitLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockName } from "@/lib/library/metadata";
@@ -12,10 +11,14 @@ import { styled } from "@/styled-system/jsx";
 import { CreateBlockMenu } from "./CreateBlockMenu";
 
 type Props = {
+  open?: boolean;
   block: LibraryPageBlock;
+  index: number;
 };
 
-export function BlockMenu({ block }: Props & ButtonProps) {
+type AllProps = PropsWithChildren<Props & ButtonProps>;
+
+export function BlockMenu({ children, open, block, index }: AllProps) {
   const emit = useEmitLibraryBlockEvent();
 
   function handleSelect(value: MenuSelectionDetails) {
@@ -30,6 +33,7 @@ export function BlockMenu({ block }: Props & ButtonProps) {
 
   return (
     <Menu.Root
+      open={open}
       lazyMount
       onSelect={handleSelect}
       positioning={{
@@ -38,16 +42,8 @@ export function BlockMenu({ block }: Props & ButtonProps) {
       }}
     >
       <Menu.Trigger asChild>
-        <IconButton
-          variant="ghost"
-          size="xs"
-          minWidth="5"
-          width="5"
-          height="5"
-          padding="0"
-        >
-          <MoreIcon width="3" />
-        </IconButton>
+        {/*  */}
+        {children}
       </Menu.Trigger>
 
       <Portal>
@@ -68,7 +64,7 @@ export function BlockMenu({ block }: Props & ButtonProps) {
                 <DeleteIcon />
                 &nbsp;Delete
               </Menu.Item>
-              <CreateBlockMenu />
+              <CreateBlockMenu index={index} />
             </Menu.ItemGroup>
           </Menu.Content>
         </Menu.Positioner>

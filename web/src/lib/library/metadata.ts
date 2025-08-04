@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { Metadata, Node, NodeWithChildren } from "@/api/openapi-schema";
+import { Metadata, Node, NodeWithChildren, React } from "@/api/openapi-schema";
 
 export const CoverImageSchema = z.object({
   top: z.number(),

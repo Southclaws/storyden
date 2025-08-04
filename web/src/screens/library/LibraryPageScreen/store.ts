@@ -66,7 +66,7 @@ export type Actions = {
 
   // Layout blocks
   moveBlock: (type: LibraryPageBlockType, newIndex: number) => void;
-  addBlock: (type: LibraryPageBlockType) => void;
+  addBlock: (type: LibraryPageBlockType, index?: number) => void;
   removeBlock: (type: LibraryPageBlockType) => void;
   overwriteBlock: (type: LibraryPageBlock) => void;
 
@@ -423,7 +423,7 @@ export const createNodeStore = (initState: State) => {
           });
         },
 
-        addBlock: (type: LibraryPageBlockType) => {
+        addBlock: (type: LibraryPageBlockType, index?: number) => {
           set((state) => {
             const layout = (state.draft.meta.layout ??= DefaultLayout);
 
@@ -432,7 +432,11 @@ export const createNodeStore = (initState: State) => {
               return;
             }
 
-            layout.blocks.push({ type });
+            if (index === undefined || index > layout.blocks.length) {
+              layout.blocks.push({ type });
+            } else {
+              layout.blocks.splice(index + 1, 0, { type });
+            }
           });
         },
 

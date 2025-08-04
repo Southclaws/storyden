@@ -1,22 +1,30 @@
+import { Portal } from "@ark-ui/react";
+import { useDndContext } from "@dnd-kit/core";
 import {
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
+import { Button } from "@/components/ui/button";
+import { IconButton } from "@/components/ui/icon-button";
+import { AddIcon } from "@/components/ui/icons/Add";
 import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
+import * as Tooltip from "@/components/ui/tooltip";
 import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
 import { useLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
-import { Box, HStack, VStack } from "@/styled-system/jsx";
+import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
+import { useMouseDistance } from "@/utils/useMouseDistance";
 
 import { useLibraryPageContext } from "../Context";
 import { useWatch } from "../store";
 import { useEditState } from "../useEditState";
 
 import { BlockMenu } from "./BlockMenu";
+import { CreateBlockMenu } from "./CreateBlockMenu";
 import { LibraryPageAssetsBlock } from "./LibraryPageAssetsBlock/LibraryPageAssetsBlock";
 import { LibraryPageContentBlock } from "./LibraryPageContentBlock/LibraryPageContentBlock";
 import { LibraryPageCoverBlock } from "./LibraryPageCoverBlock/LibraryPageCoverBlock";
@@ -50,13 +58,13 @@ export function LibraryPageBlocks() {
   });
 
   const handleAddBlock = useCallback(
-    (type: LibraryPageBlockType) => {
-      addBlock(type);
+    (type: LibraryPageBlockType, index?: number) => {
+      addBlock(type, index);
     },
     [addBlock],
   );
-  useLibraryBlockEvent("library:add-block", ({ type }) => {
-    handleAddBlock(type);
+  useLibraryBlockEvent("library:add-block", ({ type, index }) => {
+    handleAddBlock(type, index);
   });
 
   const handleRemoveBlock = useCallback(
@@ -77,11 +85,34 @@ export function LibraryPageBlocks() {
     const editStateBlocks = meta.layout?.blocks ?? [];
 
     return (
-      <SortableContext items={blockIds} strategy={verticalListSortingStrategy}>
-        {editStateBlocks.map((block) => {
-          return <LibraryPageBlockEditable key={block.type} block={block} />;
-        })}
-      </SortableContext>
+      <>
+        <SortableContext
+          items={blockIds}
+          strategy={verticalListSortingStrategy}
+        >
+          {editStateBlocks.map((block, index) => {
+            return (
+              <LibraryPageBlockEditable
+                key={block.type}
+                block={block}
+                index={index}
+              />
+            );
+          })}
+        </SortableContext>
+
+        <CreateBlockMenu
+          trigger={
+            <Button variant="outline" size="xs" w="full">
+              <AddIcon />
+              &nbsp;Add Block
+            </Button>
+          }
+          positioning={{
+            placement: "bottom",
+          }}
+        />
+      </>
     );
   }
 
@@ -115,7 +146,13 @@ function LibraryPageBlockRender({ block }: { block: LibraryPageBlock }) {
   }
 }
 
-function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
+function LibraryPageBlockEditable({
+  block,
+  index,
+}: {
+  block: LibraryPageBlock;
+  index: number;
+}) {
   const { initialNode } = useLibraryPageContext();
   const {
     attributes,
@@ -133,13 +170,42 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
     } as DragItemNodeBlock,
   });
 
+  // Manage the menu state manually due to the complexity of the menu trigger
+  // also being a drag handle for the block.
+  const [isOpen, setOpen] = useState(false);
+  function handleMenuToggle() {
+    setOpen((prev) => !prev);
+  }
+
+  // Manually handle click-away behaviour - the default menu behaviour has been
+  // overridden by making it a controlled component in order to allow for the
+  // drag handle to be used as a menu open trigger.
+  const elementRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handleClickAway(event: MouseEvent) {
+      if (
+        elementRef.current &&
+        !elementRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("click", handleClickAway);
+    return () => document.removeEventListener("click", handleClickAway);
+  }, [isOpen]);
+
+  // Check if we're dragging anything at all, to hide the tooltip.
+  const { active } = useDndContext();
+  const isDraggingAnything = active !== null;
+
   const dragStyle = {
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging ? 0.5 : 1,
-    maxWidth: "var(--width-adjusted)",
     flexShrink: 0,
-    "--width-adjusted": "calc(100% + var(--spacing-5))",
   };
 
   const dragHandleStyle = {
@@ -148,41 +214,119 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
 
   return (
     <HStack
+      id={`block-${block.type}_container`}
       className="group"
       style={dragStyle}
-      ref={setNodeRef}
-      w="var(--width-adjusted)"
-      ml="-5"
+      w="full"
       gap="0"
+      position="relative"
     >
       <VStack
-        {...attributes}
-        {...listeners}
-        style={dragHandleStyle}
-        w="5"
-        pr="1"
+        id={`block-${block.type}_gutter-container`}
+        ref={setNodeRef}
+        w="6"
+        left={{ base: "0", md: "-7" }}
+        top={{ base: "-7", md: "0" }}
         alignItems="start"
         height="full"
-        position="relative"
+        position="absolute"
+        p="0"
       >
         <VStack
-          position="absolute"
+          id={`block-${block.type}_gutter-drag-handle`}
+          {...listeners}
+          {...attributes}
+          ref={elementRef}
           w="full"
+          h={{ base: "6", md: "full" }}
+          bgColor="bg.muted/50"
           color="fg.subtle"
           borderRadius="sm"
           visibility="hidden"
           _groupHover={{
-            bgColor: "bg.muted",
             visibility: "visible",
           }}
-          title={block.type}
-          gap="1"
+          // Hide on mobile: Not happy with the mobile experience of this yet.
+          display={{ base: "none", md: "flex" }}
         >
-          <DragHandleIcon width="4" />
-          <BlockMenu block={block} />
+          <Tooltip.Root
+            openDelay={0}
+            closeDelay={0}
+            disabled={isDraggingAnything}
+            positioning={{
+              slide: true,
+              gutter: 4,
+              placement: "bottom-start",
+            }}
+          >
+            <Tooltip.Trigger asChild>
+              <Box position="relative">
+                <Box style={dragHandleStyle}>
+                  <IconButton
+                    style={dragHandleStyle}
+                    id={`block-${block.type}_gutter-drag-handle-button`}
+                    variant={{
+                      base: "subtle",
+                      md: "ghost",
+                    }}
+                    size="xs"
+                    minWidth="5"
+                    width="5"
+                    height="5"
+                    padding="0"
+                    color="fg.muted"
+                    onClick={handleMenuToggle}
+                  >
+                    <DragHandleIcon width="4" />
+                  </IconButton>
+                </Box>
+              </Box>
+            </Tooltip.Trigger>
+            <Portal>
+              <Tooltip.Positioner>
+                <Tooltip.Arrow>
+                  <Tooltip.ArrowTip />
+                </Tooltip.Arrow>
+
+                <Tooltip.Content p="1" borderRadius="sm">
+                  <p>
+                    <styled.span fontWeight="semibold">Click</styled.span>&nbsp;
+                    <styled.span fontWeight="normal">to open menu</styled.span>
+                  </p>
+                  <p>
+                    <styled.span fontWeight="semibold">Drag</styled.span>&nbsp;
+                    <styled.span fontWeight="normal">to move</styled.span>
+                  </p>
+                </Tooltip.Content>
+              </Tooltip.Positioner>
+            </Portal>
+          </Tooltip.Root>
+
+          <Box
+            position="absolute"
+            top="0"
+            width="6"
+            height="6"
+            pointerEvents="none"
+          >
+            <BlockMenu block={block} open={isOpen} index={index}>
+              <Box position="absolute" width="6" height="6" />
+            </BlockMenu>
+          </Box>
         </VStack>
       </VStack>
-      <Box w="full" minW="0">
+      <Box
+        id={`block-${block.type}_content`}
+        w="full"
+        minW="0"
+        _groupHover={{
+          bgColor: "bg.muted/50",
+          borderRadius: "sm",
+          outlineColor: "bg.muted/50",
+          outlineStyle: "solid",
+          outlineWidth: "medium",
+        }}
+      >
         <LibraryPageBlockRender block={block} />
       </Box>
     </HStack>
