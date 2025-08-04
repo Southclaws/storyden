@@ -58,13 +58,13 @@ export function LibraryPageBlocks() {
   });
 
   const handleAddBlock = useCallback(
-    (type: LibraryPageBlockType) => {
-      addBlock(type);
+    (type: LibraryPageBlockType, index?: number) => {
+      addBlock(type, index);
     },
     [addBlock],
   );
-  useLibraryBlockEvent("library:add-block", ({ type }) => {
-    handleAddBlock(type);
+  useLibraryBlockEvent("library:add-block", ({ type, index }) => {
+    handleAddBlock(type, index);
   });
 
   const handleRemoveBlock = useCallback(
@@ -90,8 +90,14 @@ export function LibraryPageBlocks() {
           items={blockIds}
           strategy={verticalListSortingStrategy}
         >
-          {editStateBlocks.map((block) => {
-            return <LibraryPageBlockEditable key={block.type} block={block} />;
+          {editStateBlocks.map((block, index) => {
+            return (
+              <LibraryPageBlockEditable
+                key={block.type}
+                block={block}
+                index={index}
+              />
+            );
           })}
         </SortableContext>
 
@@ -140,7 +146,13 @@ function LibraryPageBlockRender({ block }: { block: LibraryPageBlock }) {
   }
 }
 
-function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
+function LibraryPageBlockEditable({
+  block,
+  index,
+}: {
+  block: LibraryPageBlock;
+  index: number;
+}) {
   const { initialNode } = useLibraryPageContext();
   const {
     attributes,
@@ -183,7 +195,7 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
 
         const distance = distanceRef.current;
         // NOTE: Massive hack... distance might be wrong on different screens.
-        if (distance.d > 45) {
+        if (distance.d > 75) {
           setOpen(false);
         }
       },
@@ -306,7 +318,7 @@ function LibraryPageBlockEditable({ block }: { block: LibraryPageBlock }) {
             height="6"
             pointerEvents="none"
           >
-            <BlockMenu block={block} open={isOpen}>
+            <BlockMenu block={block} open={isOpen} index={index}>
               <Box position="absolute" width="6" height="6" />
             </BlockMenu>
           </Box>

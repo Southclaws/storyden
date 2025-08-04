@@ -13,11 +13,12 @@ import { CreateBlockMenu } from "./CreateBlockMenu";
 type Props = {
   open?: boolean;
   block: LibraryPageBlock;
+  index: number;
 };
 
 type AllProps = PropsWithChildren<Props & ButtonProps>;
 
-export function BlockMenu({ children, open, block }: AllProps) {
+export function BlockMenu({ children, open, block, index }: AllProps) {
   const emit = useEmitLibraryBlockEvent();
 
   function handleSelect(value: MenuSelectionDetails) {
@@ -63,7 +64,7 @@ export function BlockMenu({ children, open, block }: AllProps) {
                 <DeleteIcon />
                 &nbsp;Delete
               </Menu.Item>
-              <CreateBlockMenu />
+              <CreateBlockMenu index={index} />
             </Menu.ItemGroup>
           </Menu.Content>
         </Menu.Positioner>

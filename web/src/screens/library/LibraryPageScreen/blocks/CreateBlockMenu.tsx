@@ -19,9 +19,11 @@ export function CreateBlockMenu({
     </Menu.Item>
   ),
   positioning = undefined,
+  index = undefined,
 }: {
   trigger?: React.ReactElement;
   positioning?: PositioningOptions;
+  index?: number;
 }) {
   const emit = useEmitLibraryBlockEvent();
 
@@ -30,6 +32,7 @@ export function CreateBlockMenu({
   function handleSelect(value: MenuSelectionDetails) {
     emit("library:add-block", {
       type: value.value as LibraryPageBlock["type"],
+      index: index ? index : undefined,
     });
   }
 
