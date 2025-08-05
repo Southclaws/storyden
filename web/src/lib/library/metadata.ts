@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { Metadata, Node, NodeWithChildren, React } from "@/api/openapi-schema";
+import { Metadata, Node, NodeWithChildren } from "@/api/openapi-schema";
 
 export const CoverImageSchema = z.object({
   top: z.number(),
@@ -63,8 +63,22 @@ export type LibraryPageBlockTypeContent = z.infer<
   typeof LibraryPageBlockTypeContentSchema
 >;
 
+export const LibraryPageBlockTypeAssetsLayoutSchema = z.enum(["strip", "grid"]);
+export type LibraryPageBlockTypeAssetsLayout = z.infer<
+  typeof LibraryPageBlockTypeAssetsLayoutSchema
+>;
+
+export const LibraryPageBlockTypeAssetsConfigSchema = z.object({
+  layout: LibraryPageBlockTypeAssetsLayoutSchema,
+  gridSize: z.number().optional(),
+});
+export type LibraryPageBlockTypeAssetsConfig = z.infer<
+  typeof LibraryPageBlockTypeAssetsConfigSchema
+>;
+
 export const LibraryPageBlockTypeAssetsSchema = z.object({
   type: z.literal(LibraryPageBlockTypeSchema.Enum.assets),
+  config: LibraryPageBlockTypeAssetsConfigSchema.optional(),
 });
 export type LibraryPageBlockTypeAssets = z.infer<
   typeof LibraryPageBlockTypeAssetsSchema

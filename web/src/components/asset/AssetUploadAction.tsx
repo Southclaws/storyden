@@ -108,7 +108,7 @@ export function AssetUploadAction({
       onFileReject={handleFileReject}
       {...fileUploadProps}
     >
-      <FileUpload.Trigger w="min" asChild>
+      <FileUpload.Trigger asChild>
         {children || (
           <Button
             type="button"
