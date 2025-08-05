@@ -52,6 +52,12 @@ func Build() fx.Option {
 			}
 
 			lc.Append(fx.StartHook(func(_ context.Context) error {
+				// Only start the mail queue if we have an email sender configured
+				if sender == nil {
+					logger.Info("no email provider configured, mail queue will not process messages")
+					return nil
+				}
+
 				channel, err := queue.Subscribe(ctx)
 				if err != nil {
 					return err
@@ -76,6 +82,11 @@ func Build() fx.Option {
 }
 
 func (q *Queuer) Queue(ctx context.Context, address mail.Address, name string, subject string, intros []string, actions []mailtemplate.Action) error {
+	// Check if email sending is available
+	if q.sender == nil {
+		return fault.New("email sending is not available - no email provider configured")
+	}
+
 	err := q.limiter.Check(ctx, address.Address, 1)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
