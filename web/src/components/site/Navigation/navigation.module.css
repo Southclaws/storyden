@@ -105,9 +105,10 @@
       minmax(var(--grid-col-padding-inner), 1fr)
       minmax(0, var(--sizes-breakpoint-lg))
       minmax(var(--grid-col-padding-inner-right), 1fr)
-      /* only difference to the 1280 width version, this makes sure the title
-      section is centered between the search bar and the profile area. */
-      auto
+      /* Use a constrained width instead of auto to prevent overflow issues
+      with the register button on tablet screens. This provides enough space
+      for the auth buttons while maintaining proper centering. */
+      12rem
       var(--grid-col-padding-outer);
 
     grid-template-areas:
