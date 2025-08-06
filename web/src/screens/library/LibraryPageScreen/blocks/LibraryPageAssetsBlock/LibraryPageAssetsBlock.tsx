@@ -55,6 +55,7 @@ export function LibraryPageAssetsBlock() {
               >
                 <AssetThumbnail
                   className={css({
+                    objectFit: "cover",
                     width: "var(--thumbnail-size)",
                     height: "var(--thumbnail-size)",
                     minWidth: "var(--thumbnail-size)",

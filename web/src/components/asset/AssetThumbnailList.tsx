@@ -1,5 +1,6 @@
 import { Asset } from "@/api/openapi-schema";
 import { AssetThumbnail } from "@/components/asset/AssetThumbnail";
+import { css } from "@/styled-system/css";
 import { Box, HStack } from "@/styled-system/jsx";
 
 export type Props = {
@@ -31,11 +32,15 @@ export function AssetThumbnailList({ assets }: Props) {
             scrollSnapStop="always"
           >
             <AssetThumbnail
+              className={css({
+                objectFit: "cover",
+                width: "20",
+                height: "20",
+                minWidth: "20",
+              })}
               asset={a}
               set={assets}
               setIndex={i}
-              width={120}
-              height={120}
             />
           </Box>
         ))}
