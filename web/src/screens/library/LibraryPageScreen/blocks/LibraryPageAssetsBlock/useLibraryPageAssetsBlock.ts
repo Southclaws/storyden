@@ -6,12 +6,14 @@ import { useLibraryMutation } from "@/lib/library/library";
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
 import { useEditState } from "../../useEditState";
+import { useBlock } from "../useBlock";
 
 export function useLibraryPageAssetsBlock() {
   const { editing } = useEditState();
   const { nodeID, store } = useLibraryPageContext();
+  const block = useBlock("assets");
 
-  const { addAsset, removeAsset } = store.getState();
+  const { addAsset, removeAsset, overwriteBlock } = store.getState();
 
   const assets = useWatch((s) => s.draft.assets);
 
@@ -19,6 +21,12 @@ export function useLibraryPageAssetsBlock() {
   const shouldShow = editing || !isEmpty;
 
   const { revalidate } = useLibraryMutation();
+
+  if (block === undefined) {
+    throw new Error(
+      "useLibraryPageAssetsBlock called without an Assets block.",
+    );
+  }
 
   async function handleUpload(a: Asset) {
     await handle(
@@ -52,11 +60,23 @@ export function useLibraryPageAssetsBlock() {
     );
   }
 
+  const handleChangeSize = (size: number) => {
+    overwriteBlock({
+      type: "assets",
+      config: {
+        layout: block.config?.layout ?? "grid",
+        gridSize: size,
+      },
+    });
+  };
+
   return {
     editing,
     shouldShow,
     assets,
+    config: block.config,
     handleUpload,
     handleRemove,
+    handleChangeSize,
   };
 }
