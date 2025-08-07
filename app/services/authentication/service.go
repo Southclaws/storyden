@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/discord"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/github"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/google"
+	"github.com/Southclaws/storyden/app/services/authentication/provider/oauth/keycloak"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/password/password_reset"
 	"github.com/Southclaws/storyden/app/services/authentication/provider/phone"
@@ -41,6 +42,7 @@ func Build() fx.Option {
 			google.New,
 			github.New,
 			discord.New,
+			keycloak.New,
 			phone.New,
 		),
 		fx.Provide(email_verify.New),
@@ -59,6 +61,7 @@ func New(
 	gg *google.Provider,
 	gh *github.Provider,
 	dp *discord.Provider,
+	kc *keycloak.Provider,
 	pp *phone.Provider,
 ) *Manager {
 	providers := []Provider{
@@ -68,6 +71,7 @@ func New(
 		gg,
 		gh,
 		dp,
+		kc,
 		pp,
 	}
 

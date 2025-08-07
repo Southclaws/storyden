@@ -15,6 +15,7 @@ const (
 	serviceOAuthGoogle  serviceEnum = "oauth_google"  // Google
 	serviceOAuthGitHub  serviceEnum = "oauth_github"  // GitHub
 	serviceOAuthDiscord serviceEnum = "oauth_discord" // Discord
+	serviceOAuthKeycloak serviceEnum = "oauth_keycloak" // Keycloak
 )
 
 type tokenTypeEnum string

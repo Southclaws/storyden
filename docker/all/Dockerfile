@@ -50,7 +50,7 @@ ENV NEXT_BUILD_STANDALONE=true
 # NOTE: A regular Next.js build will attempt to do static generation for every
 # page. But we don't want to constantly be adding force-dynamic to every page so
 # this ensures no SSG runs during the Docker build.
-RUN --mount=type=cache,target=.next/cache \
+RUN --mount=type=cache,target=/storyden/.next/cache \
     corepack enable && yarn next build --experimental-build-mode=compile
 
 #

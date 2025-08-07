@@ -278,6 +278,31 @@
       description: |-
         The client secret for the Discord OAuth2 application.
 
+    # Keycloak OIDC provider (uses discovery)
+    - env: OAUTH_KEYCLOAK_ENABLED
+      name: KeycloakEnabled
+      type: bool
+      description: |-
+        Enable Keycloak OIDC authentication.
+
+    - env: OAUTH_KEYCLOAK_CLIENT_ID
+      name: KeycloakClientID
+      type: string
+      description: |-
+        The client ID for the Keycloak OAuth2 application.
+
+    - env: OAUTH_KEYCLOAK_CLIENT_SECRET
+      name: KeycloakClientSecret
+      type: string
+      description: |-
+        The client secret for the Keycloak OAuth2 application.
+
+    - env: OAUTH_KEYCLOAK_ISSUER_URL
+      name: KeycloakIssuerURL
+      type: net/url.URL
+      description: |-
+        The issuer/discovery URL for the Keycloak realm (e.g. https://auth.example.com/realms/YourRealm).
+
 - section: SMS
   description: |-
     SMS sending configuration. This must be enabled in order to support SMS-based authentication.
