@@ -7,20 +7,18 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/queue"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
 )
 
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			queue.New[mq.IndexThread],
-			queue.New[mq.DeleteThread],
+		// queue.New[mq.EventThreadCreated],
+		// queue.New[mq.DeleteThread],
 		),
 		fx.Invoke(newSemdexer),
 	)
@@ -40,10 +38,9 @@ type semdexer struct {
 	db            *ent.Client
 	threadQuerier thread.Repository
 	threadWriter  thread.Repository
-	indexQueue    pubsub.Topic[mq.IndexThread]
-	deleteQueue   pubsub.Topic[mq.DeleteThread]
 	semdexMutator semdex.Mutator
 	semdexQuerier semdex.Querier
+	bus           *event.Bus
 }
 
 func newSemdexer(
@@ -55,75 +52,74 @@ func newSemdexer(
 	db *ent.Client,
 	threadQuerier thread.Repository,
 	threadWriter thread.Repository,
-	indexQueue pubsub.Topic[mq.IndexThread],
-	deleteQueue pubsub.Topic[mq.DeleteThread],
 	semdexMutator semdex.Mutator,
 	semdexQuerier semdex.Querier,
+	bus *event.Bus,
 ) {
 	if cfg.SemdexProvider == "" {
 		return
 	}
 
-	re := semdexer{
-		logger:        logger,
-		db:            db,
-		threadQuerier: threadQuerier,
-		threadWriter:  threadQuerier,
-		indexQueue:    indexQueue,
-		deleteQueue:   deleteQueue,
-		semdexMutator: semdexMutator,
-		semdexQuerier: semdexQuerier,
-	}
+	// re := semdexer{
+	// 	logger:        logger,
+	// 	db:            db,
+	// 	threadQuerier: threadQuerier,
+	// 	threadWriter:  threadQuerier,
+	// 	// indexQueue:    indexQueue,
+	// 	// deleteQueue:   deleteQueue,
+	// 	semdexMutator: semdexMutator,
+	// 	semdexQuerier: semdexQuerier,
+	// }
 
-	lc.Append(fx.StartHook(func(_ context.Context) error {
-		sub, err := indexQueue.Subscribe(ctx)
-		if err != nil {
-			return err
-		}
+	// lc.Append(fx.StartHook(func(_ context.Context) error {
+	// 	sub, err := indexQueue.Subscribe(ctx)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-		go func() {
-			for msg := range sub {
-				if err := re.indexThread(ctx, msg.Payload.ID); err != nil {
-					logger.Error("failed to index thread",
-						slog.String("error", err.Error()),
-						slog.String("post_id", msg.Payload.ID.String()),
-					)
-				}
+	// 	go func() {
+	// 		for msg := range sub {
+	// 			if err := re.indexThread(ctx, msg.Payload.ID); err != nil {
+	// 				logger.Error("failed to index thread",
+	// 					slog.String("error", err.Error()),
+	// 					slog.String("post_id", msg.Payload.ID.String()),
+	// 				)
+	// 			}
 
-				msg.Ack()
-			}
-		}()
+	// 			msg.Ack()
+	// 		}
+	// 	}()
 
-		return nil
-	}))
+	// 	return nil
+	// }))
 
-	lc.Append(fx.StartHook(func(_ context.Context) error {
-		sub, err := deleteQueue.Subscribe(ctx)
-		if err != nil {
-			return err
-		}
+	// lc.Append(fx.StartHook(func(_ context.Context) error {
+	// 	sub, err := deleteQueue.Subscribe(ctx)
+	// 	if err != nil {
+	// 		return err
+	// 	}
 
-		go func() {
-			for msg := range sub {
-				if err := re.deindexThread(ctx, msg.Payload.ID); err != nil {
-					logger.Error("failed to deindex post", slog.String("error", err.Error()))
-				}
+	// 	go func() {
+	// 		for msg := range sub {
+	// 			if err := re.deindexThread(ctx, msg.Payload.ID); err != nil {
+	// 				logger.Error("failed to deindex post", slog.String("error", err.Error()))
+	// 			}
 
-				msg.Ack()
-			}
-		}()
+	// 			msg.Ack()
+	// 		}
+	// 	}()
 
-		return nil
-	}))
+	// 	return nil
+	// }))
 
-	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		// err := re.reindex(hctx, DefaultReindexThreshold, DefaultReindexChunk)
-		// if err != nil {
-		// 	return err
-		// }
+	// lc.Append(fx.StartHook(func(hctx context.Context) error {
+	// 	// err := re.reindex(hctx, DefaultReindexThreshold, DefaultReindexChunk)
+	// 	// if err != nil {
+	// 	// 	return err
+	// 	// }
 
-		go re.schedule(ctx, DefaultReindexSchedule, DefaultReindexThreshold, DefaultReindexChunk)
+	// 	go re.schedule(ctx, DefaultReindexSchedule, DefaultReindexThreshold, DefaultReindexChunk)
 
-		return nil
-	}))
+	// 	return nil
+	// }))
 }

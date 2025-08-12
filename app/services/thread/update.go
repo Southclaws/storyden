@@ -17,7 +17,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
-	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 )
@@ -84,15 +83,9 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if thr.Visibility == visibility.VisibilityPublished {
-		s.indexQueue.PublishAndForget(ctx, mq.IndexThread{
-			ID: thr.ID,
-		})
-	} else {
-		s.deleteQueue.PublishAndForget(ctx, mq.DeleteThread{
-			ID: thr.ID,
-		})
-	}
+	s.bus.Publish(ctx, &mq.EventThreadUpdated{
+		ID: thr.ID,
+	})
 
 	return thr, nil
 }

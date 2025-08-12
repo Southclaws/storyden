@@ -16,7 +16,6 @@ func runIndexConsumer(
 	logger *slog.Logger,
 
 	qnode pubsub.Topic[mq.IndexNode],
-	qthread pubsub.Topic[mq.IndexThread],
 	qreply pubsub.Topic[mq.IndexReply],
 	qprofile pubsub.Topic[mq.IndexProfile],
 

@@ -23,9 +23,8 @@ type indexerConsumer struct {
 	nodeQuerier  *node_querier.Querier
 	profileQuery *profile_querier.Querier
 
-	qnode   pubsub.Topic[mq.IndexNode]
-	qthread pubsub.Topic[mq.IndexThread]
-	qreply  pubsub.Topic[mq.IndexReply]
+	qnode  pubsub.Topic[mq.IndexNode]
+	qreply pubsub.Topic[mq.IndexReply]
 
 	indexer semdex.Mutator
 }
@@ -37,7 +36,6 @@ func newIndexConsumer(
 	profileQuery *profile_querier.Querier,
 
 	qnode pubsub.Topic[mq.IndexNode],
-	qthread pubsub.Topic[mq.IndexThread],
 	qreply pubsub.Topic[mq.IndexReply],
 	qprofile pubsub.Topic[mq.IndexProfile],
 
@@ -50,7 +48,6 @@ func newIndexConsumer(
 		profileQuery: profileQuery,
 		qnode:        qnode,
 
-		qthread: qthread,
 		qreply:  qreply,
 		indexer: indexer,
 	}

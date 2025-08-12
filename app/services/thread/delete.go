@@ -42,7 +42,7 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to delete thread"))
 	}
 
-	s.deleteQueue.PublishAndForget(ctx, mq.DeleteThread{
+	s.bus.Publish(ctx, &mq.EventThreadDeleted{
 		ID: thr.ID,
 	})
 
