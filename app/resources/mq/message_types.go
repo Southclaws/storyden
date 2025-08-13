@@ -16,6 +16,10 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 )
 
+// -
+// Thread events and commands
+// -
+
 type EventThreadPublished struct {
 	ID post.ID
 }
@@ -31,6 +35,18 @@ type EventThreadUpdated struct {
 type EventThreadDeleted struct {
 	ID post.ID
 }
+
+type CommandThreadIndex struct {
+	ID post.ID
+}
+
+type CommandThreadDeindex struct {
+	ID post.ID
+}
+
+// -
+// Library node events and commands
+// -
 
 type IndexNode struct {
 	ID library.NodeID

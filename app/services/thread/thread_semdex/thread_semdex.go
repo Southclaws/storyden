@@ -7,6 +7,7 @@ import (
 
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
@@ -16,10 +17,6 @@ import (
 
 func Build() fx.Option {
 	return fx.Options(
-		fx.Provide(
-		// queue.New[mq.EventThreadCreated],
-		// queue.New[mq.DeleteThread],
-		),
 		fx.Invoke(newSemdexer),
 	)
 }
@@ -60,66 +57,68 @@ func newSemdexer(
 		return
 	}
 
-	// re := semdexer{
-	// 	logger:        logger,
-	// 	db:            db,
-	// 	threadQuerier: threadQuerier,
-	// 	threadWriter:  threadQuerier,
-	// 	// indexQueue:    indexQueue,
-	// 	// deleteQueue:   deleteQueue,
-	// 	semdexMutator: semdexMutator,
-	// 	semdexQuerier: semdexQuerier,
-	// }
+	re := semdexer{
+		logger:        logger,
+		db:            db,
+		threadQuerier: threadQuerier,
+		threadWriter:  threadWriter,
+		semdexMutator: semdexMutator,
+		semdexQuerier: semdexQuerier,
+		bus:           bus,
+	}
 
-	// lc.Append(fx.StartHook(func(_ context.Context) error {
-	// 	sub, err := indexQueue.Subscribe(ctx)
-	// 	if err != nil {
-	// 		return err
-	// 	}
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		_, err := event.Subscribe(hctx, bus, "thread_semdex", func(ctx context.Context, evt *mq.EventThreadPublished) error {
+			return bus.SendCommand(ctx, &mq.CommandThreadIndex{ID: evt.ID})
+		})
+		if err != nil {
+			return err
+		}
 
-	// 	go func() {
-	// 		for msg := range sub {
-	// 			if err := re.indexThread(ctx, msg.Payload.ID); err != nil {
-	// 				logger.Error("failed to index thread",
-	// 					slog.String("error", err.Error()),
-	// 					slog.String("post_id", msg.Payload.ID.String()),
-	// 				)
-	// 			}
+		_, err = event.Subscribe(hctx, bus, "thread_semdex", func(ctx context.Context, evt *mq.EventThreadUpdated) error {
+			return bus.SendCommand(ctx, &mq.CommandThreadIndex{ID: evt.ID})
+		})
+		if err != nil {
+			return err
+		}
 
-	// 			msg.Ack()
-	// 		}
-	// 	}()
+		_, err = event.Subscribe(hctx, bus, "thread_semdex", func(ctx context.Context, evt *mq.EventThreadUnpublished) error {
+			return bus.SendCommand(ctx, &mq.CommandThreadDeindex{ID: evt.ID})
+		})
+		if err != nil {
+			return err
+		}
 
-	// 	return nil
-	// }))
+		_, err = event.Subscribe(hctx, bus, "thread_semdex", func(ctx context.Context, evt *mq.EventThreadDeleted) error {
+			return bus.SendCommand(ctx, &mq.CommandThreadDeindex{ID: evt.ID})
+		})
+		if err != nil {
+			return err
+		}
 
-	// lc.Append(fx.StartHook(func(_ context.Context) error {
-	// 	sub, err := deleteQueue.Subscribe(ctx)
-	// 	if err != nil {
-	// 		return err
-	// 	}
+		return nil
+	}))
 
-	// 	go func() {
-	// 		for msg := range sub {
-	// 			if err := re.deindexThread(ctx, msg.Payload.ID); err != nil {
-	// 				logger.Error("failed to deindex post", slog.String("error", err.Error()))
-	// 			}
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		_, err := event.SubscribeCommand(hctx, bus, "thread_semdex", func(ctx context.Context, cmd *mq.CommandThreadIndex) error {
+			return re.indexThread(ctx, cmd.ID)
+		})
+		if err != nil {
+			return err
+		}
 
-	// 			msg.Ack()
-	// 		}
-	// 	}()
+		_, err = event.SubscribeCommand(hctx, bus, "thread_semdex", func(ctx context.Context, cmd *mq.CommandThreadDeindex) error {
+			return re.deindexThread(ctx, cmd.ID)
+		})
+		if err != nil {
+			return err
+		}
 
-	// 	return nil
-	// }))
+		return nil
+	}))
 
-	// lc.Append(fx.StartHook(func(hctx context.Context) error {
-	// 	// err := re.reindex(hctx, DefaultReindexThreshold, DefaultReindexChunk)
-	// 	// if err != nil {
-	// 	// 	return err
-	// 	// }
-
-	// 	go re.schedule(ctx, DefaultReindexSchedule, DefaultReindexThreshold, DefaultReindexChunk)
-
-	// 	return nil
-	// }))
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		go re.schedule(ctx, DefaultReindexSchedule, DefaultReindexThreshold, DefaultReindexChunk)
+		return nil
+	}))
 }
