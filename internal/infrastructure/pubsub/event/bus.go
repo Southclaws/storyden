@@ -215,7 +215,10 @@ func (s *Subscription) Close() {
 		return
 	}
 
-	s.messageHandler.Stop()
+	if s.messageHandler != nil {
+		s.messageHandler.Stop()
+	}
+
 	s.closed = true
 
 	s.bus.mu.Lock()
