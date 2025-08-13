@@ -39,12 +39,13 @@ type Bus struct {
 func New(
 	lc fx.Lifecycle,
 	l *slog.Logger,
+	ctx context.Context,
 	cfg config.Config,
 	pub message.Publisher,
 	sub message.Subscriber,
 	eventTypes ...any,
 ) (*Bus, error) {
-	logger := watermill.NewSlogLogger(l)
+	logger := watermill.NewSlogLogger(l.With("component", "watermill"))
 
 	router, err := message.NewRouter(message.RouterConfig{
 		CloseTimeout: time.Second * 30,
@@ -86,8 +87,13 @@ func New(
 			return params.EventName, nil
 		},
 		SubscriberConstructor: func(params cqrs.EventProcessorSubscriberConstructorParams) (message.Subscriber, error) {
+			// NOTE: When we're using AMQP as the broker, because the fanout
+			// logic requires separate subscribers per queue, we need to do
+			// some additional setup to ensure that the subscriber is unique
+			// to each consumer. This is how we get events properly fanned out
+			// to subscribers of the same event. Internally this creates a new
+			// subscriber for each event+service key and AMQP handles delivery.
 			if cfg.QueueType == "amqp" {
-
 				apsc := amqp.NewDurablePubSubConfig(cfg.AmqpURL, amqp.GenerateQueueNameTopicNameWithSuffix(params.HandlerName))
 				subscriber, err := amqp.NewSubscriber(apsc, logger)
 				if err != nil {
@@ -117,13 +123,36 @@ func New(
 		return nil, fault.Wrap(err)
 	}
 
-	lc.Append(fx.StartHook(func(ctx context.Context) {
+	lc.Append(fx.StartHook(func() {
 		go func() {
-			err := router.Run(ctx)
-			if err != nil {
-				panic(err)
+			for {
+				select {
+				case <-ctx.Done():
+					return
+
+				default:
+					err := router.Run(ctx)
+					if err != nil {
+						l.Error("message router stopped unexpectedly",
+							slog.String("error", err.Error()),
+						)
+					}
+
+					l.Warn("restarting message router in 5 seconds")
+
+					time.Sleep(5 * time.Second)
+				}
 			}
 		}()
+	}))
+
+	lc.Append(fx.StopHook(func(ctx context.Context) error {
+		if err := router.Close(); err != nil {
+			return err
+		}
+
+		l.Info("message router stopped successfully")
+		return nil
 	}))
 
 	return &Bus{

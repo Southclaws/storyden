@@ -23,7 +23,7 @@ func Build() fx.Option {
 				return nil, err
 			}
 
-			bus, err := New(lc, l, cfg, pub, sub)
+			bus, err := New(lc, l, ctx, cfg, pub, sub)
 			if err != nil {
 				return nil, err
 			}
