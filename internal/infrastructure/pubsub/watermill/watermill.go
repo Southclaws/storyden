@@ -6,7 +6,6 @@ import (
 	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
-	"github.com/google/uuid"
 
 	"github.com/Southclaws/storyden/internal/config"
 )
@@ -28,11 +27,7 @@ func NewWatermillQueue(cfg config.Config, l *slog.Logger) (message.Subscriber, m
 	case "amqp":
 		l.Debug("using amqp pubsub")
 
-		// Use PubSub config for fan-out behavior (not Queue config which creates competing consumers)
-		// Each subscriber gets a unique queue name for fan-out
-		// Use a random suffix to ensure unique queue names per subscriber
-		instanceSuffix := uuid.New().String()[:8] // Short unique suffix
-		apsc := amqp.NewDurablePubSubConfig(cfg.AmqpURL, amqp.GenerateQueueNameTopicNameWithSuffix(instanceSuffix))
+		apsc := amqp.NewDurablePubSubConfig(cfg.AmqpURL, amqp.GenerateExchangeNameTopicName)
 
 		publisher, err := amqp.NewPublisher(apsc, logger)
 		if err != nil {
