@@ -67,9 +67,11 @@ func (s *service) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))
 	}
 
-	s.bus.Publish(ctx, &mq.EventThreadCreated{
-		ID: thr.ID,
-	})
+	if status == visibility.VisibilityPublished {
+		s.bus.Publish(ctx, &mq.EventThreadPublished{
+			ID: thr.ID,
+		})
+	}
 
 	// TODO: Do this using event consumer.
 	s.fetcher.HydrateContentURLs(ctx, thr)

@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 )
@@ -47,6 +48,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	oldVisibility := thr.Visibility
 	opts := partial.Opts()
 
 	if tags, ok := partial.Tags.Get(); ok {
@@ -83,9 +85,23 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	// Always emit a general update event
 	s.bus.Publish(ctx, &mq.EventThreadUpdated{
 		ID: thr.ID,
 	})
+
+	// Emit visibility-specific events when visibility changes
+	if oldVisibility != thr.Visibility {
+		if thr.Visibility == visibility.VisibilityPublished {
+			s.bus.Publish(ctx, &mq.EventThreadPublished{
+				ID: thr.ID,
+			})
+		} else {
+			s.bus.Publish(ctx, &mq.EventThreadUnpublished{
+				ID: thr.ID,
+			})
+		}
+	}
 
 	return thr, nil
 }

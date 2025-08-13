@@ -16,7 +16,11 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 )
 
-type EventThreadCreated struct {
+type EventThreadPublished struct {
+	ID post.ID
+}
+
+type EventThreadUnpublished struct {
 	ID post.ID
 }
 
@@ -90,12 +94,4 @@ type ReactToPost struct {
 
 type CreateEvent struct {
 	ID event_ref.EventID
-}
-
-type IndexThread struct {
-	ID post.ID
-}
-
-type DeindexThread struct {
-	ID post.ID
 }
