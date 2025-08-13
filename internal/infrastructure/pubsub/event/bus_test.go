@@ -2,7 +2,6 @@ package event_test
 
 import (
 	"context"
-	"log/slog"
 	"testing"
 
 	"go.uber.org/fx"
@@ -16,8 +15,8 @@ import (
 
 func TestEventBus_SingleSubscriber(t *testing.T) {
 	integration.Test(t, &config.Config{
-		QueueType: "amqp",
-		AmqpURL:   "amqp://guest:guest@localhost:5672/",
+		// QueueType: "amqp",
+		AmqpURL: "amqp://guest:guest@localhost:5672/",
 	}, fx.Invoke(func(
 		lc fx.Lifecycle,
 		ctx context.Context,
@@ -54,9 +53,8 @@ func TestEventBus_SingleSubscriber(t *testing.T) {
 
 func TestEventBus_MultipleSubscribers(t *testing.T) {
 	integration.Test(t, &config.Config{
-		LogLevel:  slog.LevelDebug,
-		QueueType: "amqp",
-		AmqpURL:   "amqp://guest:guest@localhost:5672/",
+		// QueueType: "amqp",
+		AmqpURL: "amqp://guest:guest@localhost:5672/",
 	}, fx.Invoke(func(
 		lc fx.Lifecycle,
 		ctx context.Context,

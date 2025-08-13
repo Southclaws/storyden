@@ -93,6 +93,8 @@ func New(
 			// to each consumer. This is how we get events properly fanned out
 			// to subscribers of the same event. Internally this creates a new
 			// subscriber for each event+service key and AMQP handles delivery.
+			// NOTE 2: This is durable and needs to be optionally durable based
+			// on parameters passed to Subscribe. But that's really awkward...
 			if cfg.QueueType == "amqp" {
 				apsc := amqp.NewDurablePubSubConfig(cfg.AmqpURL, amqp.GenerateQueueNameTopicNameWithSuffix(params.HandlerName))
 				subscriber, err := amqp.NewSubscriber(apsc, logger)
