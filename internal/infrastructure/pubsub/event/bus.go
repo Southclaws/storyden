@@ -232,8 +232,7 @@ type (
 )
 
 func Subscribe[T any](ctx context.Context, bus *Bus, handlerName string, handler HandlerFunc[T]) (*Subscription, error) {
-	var zero T
-	topic := queuename.FromValue(zero)
+	topic := queuename.FromT[T]()
 	handlerID := fmt.Sprintf("%s_%s", topic, handlerName)
 
 	bus.mu.Lock()
