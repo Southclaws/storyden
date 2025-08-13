@@ -286,6 +286,10 @@ func SubscribeCommand[T any](ctx context.Context, bus *Bus, handlerName string, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := bus.router.RunHandlers(ctx); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	sub := &Subscription{
 		bus:       bus,
 		handlerID: handlerID,
