@@ -33,8 +33,10 @@ type Bus struct {
 	commandProcessor *cqrs.CommandProcessor
 
 	mu            sync.RWMutex
-	subscriptions map[string]*Subscription
+	subscriptions map[subscriptionKey]*Subscription
 }
+
+type subscriptionKey string
 
 func New(
 	lc fx.Lifecycle,
@@ -96,7 +98,9 @@ func New(
 			// NOTE 2: This is durable and needs to be optionally durable based
 			// on parameters passed to Subscribe. But that's really awkward...
 			if cfg.QueueType == "amqp" {
-				apsc := amqp.NewDurablePubSubConfig(cfg.AmqpURL, amqp.GenerateQueueNameTopicNameWithSuffix(params.HandlerName))
+				apsc := amqp.NewDurablePubSubConfig(cfg.AmqpURL, func(topic string) string {
+					return topic + "." + params.HandlerName
+				})
 				subscriber, err := amqp.NewSubscriber(apsc, logger)
 				if err != nil {
 					return nil, err
@@ -167,7 +171,7 @@ func New(
 		commandBus:       commandBus,
 		eventProcessor:   eventProcessor,
 		commandProcessor: commandProcessor,
-		subscriptions:    make(map[string]*Subscription),
+		subscriptions:    make(map[subscriptionKey]*Subscription),
 	}, nil
 }
 
@@ -200,7 +204,7 @@ func (b *Bus) SendCommand(ctx context.Context, command any) error {
 
 type Subscription struct {
 	bus            *Bus
-	handlerID      string
+	subkey         subscriptionKey
 	topic          string
 	closed         bool
 	mu             sync.Mutex
@@ -222,7 +226,7 @@ func (s *Subscription) Close() {
 	s.closed = true
 
 	s.bus.mu.Lock()
-	delete(s.bus.subscriptions, s.handlerID)
+	delete(s.bus.subscriptions, s.subkey)
 	s.bus.mu.Unlock()
 }
 
@@ -234,10 +238,11 @@ type (
 func Subscribe[T any](ctx context.Context, bus *Bus, handlerName string, handler HandlerFunc[T]) (*Subscription, error) {
 	topic := queuename.FromT[T]()
 	handlerID := fmt.Sprintf("%s_%s", topic, handlerName)
+	subkey := subscriptionKey(handlerName)
 
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
-	if _, exists := bus.subscriptions[handlerID]; exists {
+	if _, exists := bus.subscriptions[subkey]; exists {
 		return nil, fmt.Errorf("subscription already exists: %s", handlerID)
 	}
 
@@ -257,12 +262,12 @@ func Subscribe[T any](ctx context.Context, bus *Bus, handlerName string, handler
 
 	sub := &Subscription{
 		bus:            bus,
-		handlerID:      handlerID,
+		subkey:         subkey,
 		topic:          topic,
 		messageHandler: messageHandler,
 	}
 
-	bus.subscriptions[handlerID] = sub
+	bus.subscriptions[subkey] = sub
 
 	return sub, nil
 }
@@ -271,10 +276,11 @@ func SubscribeCommand[T any](ctx context.Context, bus *Bus, handlerName string, 
 	var zero T
 	topic := queuename.FromValue(zero)
 	handlerID := fmt.Sprintf("%s_%s", topic, handlerName)
+	subkey := subscriptionKey(handlerName)
 
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
-	if _, exists := bus.subscriptions[handlerID]; exists {
+	if _, exists := bus.subscriptions[subkey]; exists {
 		return nil, fmt.Errorf("subscription already exists: %s", handlerID)
 	}
 
@@ -291,12 +297,12 @@ func SubscribeCommand[T any](ctx context.Context, bus *Bus, handlerName string, 
 	}
 
 	sub := &Subscription{
-		bus:       bus,
-		handlerID: handlerID,
-		topic:     topic,
+		bus:    bus,
+		subkey: subkey,
+		topic:  topic,
 	}
 
-	bus.subscriptions[handlerID] = sub
+	bus.subscriptions[subkey] = sub
 
 	return sub, nil
 }

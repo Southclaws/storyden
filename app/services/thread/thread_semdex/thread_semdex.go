@@ -68,28 +68,28 @@ func newSemdexer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := event.Subscribe(hctx, bus, "thread_semdex", func(ctx context.Context, evt *mq.EventThreadPublished) error {
+		_, err := event.Subscribe(hctx, bus, "thread_semdex.index_published", func(ctx context.Context, evt *mq.EventThreadPublished) error {
 			return bus.SendCommand(ctx, &mq.CommandThreadIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = event.Subscribe(hctx, bus, "thread_semdex", func(ctx context.Context, evt *mq.EventThreadUpdated) error {
+		_, err = event.Subscribe(hctx, bus, "thread_semdex.update_indexed", func(ctx context.Context, evt *mq.EventThreadUpdated) error {
 			return bus.SendCommand(ctx, &mq.CommandThreadIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = event.Subscribe(hctx, bus, "thread_semdex", func(ctx context.Context, evt *mq.EventThreadUnpublished) error {
+		_, err = event.Subscribe(hctx, bus, "thread_semdex.remove_unpublished", func(ctx context.Context, evt *mq.EventThreadUnpublished) error {
 			return bus.SendCommand(ctx, &mq.CommandThreadDeindex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = event.Subscribe(hctx, bus, "thread_semdex", func(ctx context.Context, evt *mq.EventThreadDeleted) error {
+		_, err = event.Subscribe(hctx, bus, "thread_semdex.remove_deleted", func(ctx context.Context, evt *mq.EventThreadDeleted) error {
 			return bus.SendCommand(ctx, &mq.CommandThreadDeindex{ID: evt.ID})
 		})
 		if err != nil {
@@ -100,14 +100,14 @@ func newSemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := event.SubscribeCommand(hctx, bus, "thread_semdex", func(ctx context.Context, cmd *mq.CommandThreadIndex) error {
+		_, err := event.SubscribeCommand(hctx, bus, "thread_semdex.index", func(ctx context.Context, cmd *mq.CommandThreadIndex) error {
 			return re.indexThread(ctx, cmd.ID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = event.SubscribeCommand(hctx, bus, "thread_semdex", func(ctx context.Context, cmd *mq.CommandThreadDeindex) error {
+		_, err = event.SubscribeCommand(hctx, bus, "thread_semdex.deindex", func(ctx context.Context, cmd *mq.CommandThreadDeindex) error {
 			return re.deindexThread(ctx, cmd.ID)
 		})
 		if err != nil {
