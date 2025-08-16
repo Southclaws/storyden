@@ -59,6 +59,10 @@ type EventPostUnliked struct {
 	PostID post.ID
 }
 
+type EventPostReacted struct {
+	PostID post.ID
+}
+
 type CommandThreadIndex struct {
 	ID post.ID
 }
@@ -151,15 +155,10 @@ type CommandScrapeLink struct {
 	Item *datagraph.Ref
 }
 
-
 type Mention struct {
 	By     account.AccountID
 	Source datagraph.Ref
 	Item   datagraph.Ref
-}
-
-type ReactToPost struct {
-	PostID post.ID
 }
 
 type CreateEvent struct {
