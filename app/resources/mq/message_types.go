@@ -81,7 +81,19 @@ type DeleteNode struct {
 	ID library.NodeID
 }
 
-type IndexProfile struct {
+// -
+// Account and profile events and commands
+// -
+
+type EventAccountCreated struct {
+	ID account.AccountID
+}
+
+type EventAccountUpdated struct {
+	ID account.AccountID
+}
+
+type CommandProfileIndex struct {
 	ID account.AccountID
 }
 
