@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"os"
 	"sync"
 	"time"
 
@@ -131,25 +132,16 @@ func New(
 
 	lc.Append(fx.StartHook(func() {
 		go func() {
-			for {
-				select {
-				case <-ctx.Done():
-					return
-
-				default:
-					err := router.Run(ctx)
-					if err != nil {
-						l.Error("message router stopped unexpectedly",
-							slog.String("error", err.Error()),
-						)
-					}
-
-					l.Warn("restarting message router in 5 seconds")
-
-					time.Sleep(5 * time.Second)
-				}
+			err := router.Run(ctx)
+			if err != nil {
+				l.Error("message router stopped unexpectedly",
+					slog.String("error", err.Error()),
+				)
+				os.Exit(0x12)
 			}
 		}()
+
+		<-router.Running()
 	}))
 
 	lc.Append(fx.StopHook(func(ctx context.Context) error {
@@ -237,13 +229,12 @@ type (
 
 func Subscribe[T any](ctx context.Context, bus *Bus, handlerName string, handler HandlerFunc[T]) (*Subscription, error) {
 	topic := queuename.FromT[T]()
-	handlerID := fmt.Sprintf("%s_%s", topic, handlerName)
 	subkey := subscriptionKey(handlerName)
 
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
 	if _, exists := bus.subscriptions[subkey]; exists {
-		return nil, fmt.Errorf("subscription already exists: %s", handlerID)
+		return nil, fmt.Errorf("subscription already exists: %s", subkey)
 	}
 
 	cqrsHandler := cqrs.NewEventHandler(handlerName, func(ctx context.Context, event *T) error {
@@ -275,13 +266,12 @@ func Subscribe[T any](ctx context.Context, bus *Bus, handlerName string, handler
 func SubscribeCommand[T any](ctx context.Context, bus *Bus, handlerName string, handler CommandHandlerFunc[T]) (*Subscription, error) {
 	var zero T
 	topic := queuename.FromValue(zero)
-	handlerID := fmt.Sprintf("%s_%s", topic, handlerName)
 	subkey := subscriptionKey(handlerName)
 
 	bus.mu.Lock()
 	defer bus.mu.Unlock()
 	if _, exists := bus.subscriptions[subkey]; exists {
-		return nil, fmt.Errorf("subscription already exists: %s", handlerID)
+		return nil, fmt.Errorf("subscription already exists: %s", subkey)
 	}
 
 	cqrsHandler := cqrs.NewCommandHandler(handlerName, func(ctx context.Context, command *T) error {
