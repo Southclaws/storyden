@@ -138,6 +138,10 @@ type CommandSendNotification struct {
 	SourceID opt.Optional[account.AccountID]
 }
 
+type CommandSendEmail struct {
+	Message mailer.Message
+}
+
 // -
 // Scraping commands
 // -
@@ -147,9 +151,6 @@ type CommandScrapeLink struct {
 	Item *datagraph.Ref
 }
 
-type Email struct {
-	Message mailer.Message
-}
 
 type Mention struct {
 	By     account.AccountID
