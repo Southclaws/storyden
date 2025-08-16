@@ -4,11 +4,9 @@ import (
 	"net/url"
 
 	"github.com/Southclaws/opt"
-	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
-	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/event/event_ref"
 	"github.com/Southclaws/storyden/app/resources/library"
@@ -97,17 +95,11 @@ type CommandProfileIndex struct {
 	ID account.AccountID
 }
 
-type DownloadAsset struct {
-	URL             string
-	ContentFillRule opt.Optional[asset.ContentFillCommand]
-}
+// -
+// Scraping commands
+// -
 
-type AnalyseAsset struct {
-	AssetID         xid.ID
-	ContentFillRule opt.Optional[asset.ContentFillCommand]
-}
-
-type ScrapeLink struct {
+type CommandScrapeLink struct {
 	URL  url.URL
 	Item *datagraph.Ref
 }

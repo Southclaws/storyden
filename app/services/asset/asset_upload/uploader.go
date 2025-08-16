@@ -13,10 +13,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
-	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/mime"
 )
 
@@ -25,7 +23,6 @@ type Uploader struct {
 	nodewriter *node_writer.Writer
 	assets     *asset_writer.Writer
 	objects    object.Storer
-	queue      pubsub.Topic[mq.AnalyseAsset]
 }
 
 func New(
@@ -34,14 +31,12 @@ func New(
 	nodewriter *node_writer.Writer,
 	assets *asset_writer.Writer,
 	objects object.Storer,
-	queue pubsub.Topic[mq.AnalyseAsset],
 ) *Uploader {
 	return &Uploader{
 		logger:     logger,
 		nodewriter: nodewriter,
 		assets:     assets,
 		objects:    objects,
-		queue:      queue,
 	}
 }
 

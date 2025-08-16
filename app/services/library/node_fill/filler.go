@@ -3,10 +3,8 @@ package node_fill
 import (
 	"context"
 
-	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/Southclaws/opt"
 	"github.com/gosimple/slug"
 	"github.com/rs/xid"
 
@@ -27,18 +25,15 @@ var errFillRuleNotAvailale = fault.New("fill rule not available")
 type Filler struct {
 	nodeWriter *node_writer.Writer
 	indexQueue pubsub.Topic[mq.IndexNode]
-	assetQueue pubsub.Topic[mq.DownloadAsset]
 }
 
 func New(
 	nodeWriter *node_writer.Writer,
 	indexQueue pubsub.Topic[mq.IndexNode],
-	assetQueue pubsub.Topic[mq.DownloadAsset],
 ) *Filler {
 	return &Filler{
 		nodeWriter: nodeWriter,
 		indexQueue: indexQueue,
-		assetQueue: assetQueue,
 	}
 }
 
@@ -78,20 +73,19 @@ func (f *Filler) FillContentFromLink(ctx context.Context, link *link_ref.LinkRef
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 
-		err = f.assetQueue.Publish(ctx, dt.Map(wc.Content.Media(), func(u string) mq.DownloadAsset {
-			return mq.DownloadAsset{
-				URL: u,
-				ContentFillRule: opt.New(asset.ContentFillCommand{
-					TargetNodeID: opt.New(n.GetID()),
-					FillRule:     asset.ContentFillRuleAppend,
-				}),
-			}
-		})...)
-		if err != nil {
-			return fault.Wrap(err, fctx.With(ctx))
-		}
-
 		// TODO: Decide what to do here, code is still useful.
+		// err = f.assetQueue.Publish(ctx, dt.Map(wc.Content.Media(), func(u string) mq.DownloadAsset {
+		// 	return mq.DownloadAsset{
+		// 		URL: u,
+		// 		ContentFillRule: opt.New(asset.ContentFillCommand{
+		// 			TargetNodeID: opt.New(n.GetID()),
+		// 			FillRule:     asset.ContentFillRuleAppend,
+		// 		}),
+		// 	}
+		// })...)
+		// if err != nil {
+		// 	return fault.Wrap(err, fctx.With(ctx))
+		// }
 		// err = f.autoFillQueue.Publish(ctx, mq.AutoFillNode{
 		// 	ID:      library.NodeID(n.Mark.ID()),
 		// 	AutoTag: true,

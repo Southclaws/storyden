@@ -22,7 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 	"github.com/Southclaws/storyden/app/services/library/node_fill"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
 )
 
 var errEmptyLink = fault.New("empty link")
@@ -34,7 +34,7 @@ type Fetcher struct {
 	lr       *link_writer.LinkWriter
 	sc       scrape.Scraper
 	nodeFill *node_fill.Filler
-	queue    pubsub.Topic[mq.ScrapeLink]
+	bus      *event.Bus
 }
 
 func New(
@@ -44,7 +44,7 @@ func New(
 	lr *link_writer.LinkWriter,
 	sc scrape.Scraper,
 	nodeFill *node_fill.Filler,
-	queue pubsub.Topic[mq.ScrapeLink],
+	bus *event.Bus,
 ) *Fetcher {
 	return &Fetcher{
 		logger:   logger,
@@ -53,7 +53,7 @@ func New(
 		lr:       lr,
 		sc:       sc,
 		nodeFill: nodeFill,
-		queue:    queue,
+		bus:      bus,
 	}
 }
 
@@ -71,7 +71,7 @@ func (s *Fetcher) Fetch(ctx context.Context, u url.URL, opts Options) (*link_ref
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	if len(r.Links) > 0 {
-		s.queue.PublishAndForget(ctx, mq.ScrapeLink{URL: u})
+		s.bus.SendCommand(ctx, &mq.CommandScrapeLink{URL: u})
 		return r.Links[0], nil
 	}
 
@@ -111,7 +111,7 @@ func (s *Fetcher) HydrateContentURLs(ctx context.Context, item datagraph.Item) {
 // QueueForItem queues a scrape request for a URL that is linked to an item.
 // When the scrape job is done, the scraped link will be related to the item.
 func (s *Fetcher) QueueForItem(ctx context.Context, u url.URL, item datagraph.Item) error {
-	s.queue.PublishAndForget(ctx, mq.ScrapeLink{
+	s.bus.SendCommand(ctx, &mq.CommandScrapeLink{
 		URL:  u,
 		Item: datagraph.NewRef(item),
 	})

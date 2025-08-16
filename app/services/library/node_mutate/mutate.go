@@ -44,20 +44,19 @@ type Partial struct {
 }
 
 type Manager struct {
-	accountQuery      *account_querier.Querier
-	nodeQuerier       *node_querier.Querier
-	nodeWriter        *node_writer.Writer
-	schemaWriter      *node_properties.SchemaWriter
-	propWriter        *node_properties.Writer
-	tagWriter         *tag_writer.Writer
-	titler            generative.Titler
-	tagger            *autotagger.Tagger
-	nc                *node_children.Writer
-	fetcher           *fetcher.Fetcher
-	summariser        generative.Summariser
-	indexQueue        pubsub.Topic[mq.IndexNode]
-	deleteQueue       pubsub.Topic[mq.DeleteNode]
-	assetAnalyseQueue pubsub.Topic[mq.AnalyseAsset]
+	accountQuery *account_querier.Querier
+	nodeQuerier  *node_querier.Querier
+	nodeWriter   *node_writer.Writer
+	schemaWriter *node_properties.SchemaWriter
+	propWriter   *node_properties.Writer
+	tagWriter    *tag_writer.Writer
+	titler       generative.Titler
+	tagger       *autotagger.Tagger
+	nc           *node_children.Writer
+	fetcher      *fetcher.Fetcher
+	summariser   generative.Summariser
+	indexQueue   pubsub.Topic[mq.IndexNode]
+	deleteQueue  pubsub.Topic[mq.DeleteNode]
 }
 
 func New(
@@ -74,22 +73,20 @@ func New(
 	summariser generative.Summariser,
 	indexQueue pubsub.Topic[mq.IndexNode],
 	deleteQueue pubsub.Topic[mq.DeleteNode],
-	assetAnalyseQueue pubsub.Topic[mq.AnalyseAsset],
 ) *Manager {
 	return &Manager{
-		accountQuery:      accountQuery,
-		nodeQuerier:       nodeQuerier,
-		nodeWriter:        nodeWriter,
-		schemaWriter:      schemaWriter,
-		propWriter:        propWriter,
-		tagWriter:         tagWriter,
-		titler:            titler,
-		tagger:            tagger,
-		nc:                nc,
-		fetcher:           fetcher,
-		summariser:        summariser,
-		indexQueue:        indexQueue,
-		deleteQueue:       deleteQueue,
-		assetAnalyseQueue: assetAnalyseQueue,
+		accountQuery: accountQuery,
+		nodeQuerier:  nodeQuerier,
+		nodeWriter:   nodeWriter,
+		schemaWriter: schemaWriter,
+		propWriter:   propWriter,
+		tagWriter:    tagWriter,
+		titler:       titler,
+		tagger:       tagger,
+		nc:           nc,
+		fetcher:      fetcher,
+		summariser:   summariser,
+		indexQueue:   indexQueue,
+		deleteQueue:  deleteQueue,
 	}
 }
