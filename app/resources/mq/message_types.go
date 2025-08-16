@@ -63,6 +63,12 @@ type EventPostReacted struct {
 	PostID post.ID
 }
 
+type EventMemberMentioned struct {
+	By     account.AccountID
+	Source datagraph.Ref
+	Item   datagraph.Ref
+}
+
 type CommandThreadIndex struct {
 	ID post.ID
 }
@@ -155,11 +161,6 @@ type CommandScrapeLink struct {
 	Item *datagraph.Ref
 }
 
-type Mention struct {
-	By     account.AccountID
-	Source datagraph.Ref
-	Item   datagraph.Ref
-}
 
 type CreateEvent struct {
 	ID event_ref.EventID

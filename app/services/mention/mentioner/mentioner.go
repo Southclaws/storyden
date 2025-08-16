@@ -8,16 +8,16 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
 )
 
 type Mentioner struct {
 	logger *slog.Logger
-	q      pubsub.Topic[mq.Mention]
+	bus    *event.Bus
 }
 
-func New(logger *slog.Logger, q pubsub.Topic[mq.Mention]) *Mentioner {
-	return &Mentioner{logger: logger, q: q}
+func New(logger *slog.Logger, bus *event.Bus) *Mentioner {
+	return &Mentioner{logger: logger, bus: bus}
 }
 
 func (n *Mentioner) Send(ctx context.Context, by account.AccountID, source datagraph.Ref, items ...*datagraph.Ref) {
@@ -33,7 +33,7 @@ func (n *Mentioner) Send(ctx context.Context, by account.AccountID, source datag
 			continue
 		}
 
-		n.q.PublishAndForget(ctx, mq.Mention{
+		n.bus.Publish(ctx, &mq.EventMemberMentioned{
 			By:     by,
 			Source: source,
 			Item:   *i,
