@@ -10,12 +10,17 @@ import (
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
 func (i *semdexer) indexThread(ctx context.Context, id post.ID) error {
 	p, err := i.threadQuerier.Get(ctx, id, pagination.Parameters{}, nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	if p.Visibility != visibility.VisibilityPublished {
+		return nil
 	}
 
 	updates, err := i.semdexMutator.Index(ctx, p)

@@ -7,34 +7,25 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
 )
 
 func runMentionConsumer(
 	ctx context.Context,
 	lc fx.Lifecycle,
 	logger *slog.Logger,
-
-	queue pubsub.Topic[mq.Mention],
-
+	bus *event.Bus,
 	ic *mentionConsumer,
 ) {
-	lc.Append(fx.StartHook(func(_ context.Context) error {
-		channel, err := queue.Subscribe(ctx)
-		if err != nil {
-			panic(err)
-		}
-
-		go func() {
-			for msg := range channel {
-				if err := ic.mention(ctx, msg.Payload.By, msg.Payload.Source, msg.Payload.Item); err != nil {
-					logger.Error("failed to record mention", slog.String("error", err.Error()))
-				}
-
-				msg.Ack()
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		_, err := event.Subscribe(hctx, bus, "mention_job.notify_mentions", func(ctx context.Context, evt *mq.EventMemberMentioned) error {
+			if err := ic.mention(ctx, evt.By, evt.Source, evt.Item); err != nil {
+				logger.Error("failed to record mention", slog.String("error", err.Error()))
+				return err
 			}
-		}()
+			return nil
+		})
 
-		return nil
+		return err
 	}))
 }

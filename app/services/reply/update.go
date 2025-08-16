@@ -54,8 +54,9 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.indexQueue.PublishAndForget(ctx, mq.IndexReply{
-		ID: p.ID,
+	s.bus.Publish(ctx, &mq.EventThreadReplyUpdated{
+		ThreadID: p.RootPostID,
+		ReplyID:  p.ID,
 	})
 
 	s.fetcher.HydrateContentURLs(ctx, p)

@@ -25,16 +25,16 @@ func NewWatermillQueue(cfg config.Config, l *slog.Logger) (message.Subscriber, m
 		return pubsub, pubsub, nil
 
 	case "amqp":
-		l.Debug("using amqp queue")
+		l.Debug("using amqp pubsub")
 
-		aqc := amqp.NewDurableQueueConfig(cfg.AmqpURL)
+		apsc := amqp.NewDurablePubSubConfig(cfg.AmqpURL, amqp.GenerateExchangeNameTopicName)
 
-		publisher, err := amqp.NewPublisher(aqc, logger)
+		publisher, err := amqp.NewPublisher(apsc, logger)
 		if err != nil {
 			return nil, nil, err
 		}
 
-		subscriber, err := amqp.NewSubscriber(aqc, logger)
+		subscriber, err := amqp.NewSubscriber(apsc, logger)
 		if err != nil {
 			return nil, nil, err
 		}

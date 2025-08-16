@@ -38,7 +38,7 @@ type Accounts struct {
 	authManager   *authentication.Manager
 	accountQuery  *account_querier.Querier
 	profileQuery  *profile_querier.Querier
-	accountUpdate account_update.Updater
+	accountUpdate *account_update.Updater
 	accountAuth   *account_auth.Manager
 	accountEmail  *account_email.Manager
 	roleAssign    *role_assign.Assignment
@@ -53,7 +53,7 @@ func NewAccounts(
 	authManager *authentication.Manager,
 	accountQuery *account_querier.Querier,
 	profileQuery *profile_querier.Querier,
-	accountUpdate account_update.Updater,
+	accountUpdate *account_update.Updater,
 	accountAuth *account_auth.Manager,
 	accountEmail *account_email.Manager,
 	roleAssign *role_assign.Assignment,

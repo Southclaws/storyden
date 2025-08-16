@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/category"
@@ -27,7 +26,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/thread/thread_semdex"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
 )
 
 type Service interface {
@@ -94,8 +93,7 @@ type service struct {
 	tagWriter    *tag_writer.Writer
 	fetcher      *fetcher.Fetcher
 	recommender  semdex.Recommender
-	indexQueue   pubsub.Topic[mq.IndexThread]
-	deleteQueue  pubsub.Topic[mq.DeleteThread]
+	bus          *event.Bus
 	mentioner    *mentioner.Mentioner
 	cpm          *content_policy.Manager
 }
@@ -108,8 +106,7 @@ func New(
 	tagWriter *tag_writer.Writer,
 	fetcher *fetcher.Fetcher,
 	recommender semdex.Recommender,
-	indexQueue pubsub.Topic[mq.IndexThread],
-	deleteQueue pubsub.Topic[mq.DeleteThread],
+	bus *event.Bus,
 	mentioner *mentioner.Mentioner,
 	cpm *content_policy.Manager,
 ) Service {
@@ -121,8 +118,7 @@ func New(
 		tagWriter:    tagWriter,
 		fetcher:      fetcher,
 		recommender:  recommender,
-		indexQueue:   indexQueue,
-		deleteQueue:  deleteQueue,
+		bus:          bus,
 		mentioner:    mentioner,
 		cpm:          cpm,
 	}

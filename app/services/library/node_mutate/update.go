@@ -34,6 +34,8 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	oldVisibility := n.Visibility
+
 	pre, err := s.preMutation(ctx, p, opt.NewPtr(n))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -53,16 +55,30 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 		n.Properties = opt.New(*updatedProperties)
 	}
 
-	if n.Visibility == visibility.VisibilityPublished {
-		s.indexQueue.PublishAndForget(ctx, mq.IndexNode{
-			ID: library.NodeID(n.Mark.ID()),
-		})
-	} else {
-		if err := s.deleteQueue.Publish(ctx, mq.DeleteNode{
-			ID: library.NodeID(n.GetID()),
-		}); err != nil {
-			// failing to publish the deletion message is worthy of an error.
-			return nil, fault.Wrap(err, fctx.With(ctx))
+	// Emit update event
+	s.bus.Publish(ctx, &mq.EventNodeUpdated{
+		ID: library.NodeID(n.Mark.ID()),
+	})
+
+	// Emit visibility transition events
+	if oldVisibility != n.Visibility {
+		switch n.Visibility {
+		case visibility.VisibilityPublished:
+			s.bus.Publish(ctx, &mq.EventNodePublished{
+				ID: library.NodeID(n.Mark.ID()),
+			})
+
+		case visibility.VisibilityReview:
+			s.bus.Publish(ctx, &mq.EventNodeSubmittedForReview{
+				ID: library.NodeID(n.Mark.ID()),
+			})
+
+		case visibility.VisibilityUnlisted, visibility.VisibilityDraft:
+			if oldVisibility == visibility.VisibilityPublished {
+				s.bus.Publish(ctx, &mq.EventNodeUnpublished{
+					ID: library.NodeID(n.Mark.ID()),
+				})
+			}
 		}
 	}
 
