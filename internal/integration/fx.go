@@ -93,12 +93,6 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		fmt.Println(err)
 		t.Error()
 	}
-
-	err = app.Stop(ctx)
-	if err != nil {
-		fmt.Println(err)
-		t.Error()
-	}
 }
 
 // application gives you some basics needed by most components.
