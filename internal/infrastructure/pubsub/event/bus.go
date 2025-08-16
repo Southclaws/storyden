@@ -2,7 +2,6 @@ package event
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -167,20 +166,30 @@ func New(
 	}, nil
 }
 
-func (b *Bus) Publish(ctx context.Context, events ...any) error {
-	var errs []error
+// Publish publishes an event and does not provide error handling semantics.
+// Most simple events can use this where a failure to publish isn't critical.
+func (b *Bus) Publish(ctx context.Context, event any) {
+	if err := b.eventBus.Publish(ctx, event); err != nil {
+		b.logger.Error("failed to publish event",
+			slog.String("event_type", fmt.Sprintf("%T", event)),
+			slog.String("error", err.Error()),
+		)
+	}
+}
 
-	for _, event := range events {
-		if err := b.eventBus.Publish(ctx, event); err != nil {
-			b.logger.Error("failed to publish event",
-				slog.String("event_type", fmt.Sprintf("%T", event)),
-				slog.String("error", err.Error()),
-			)
-			errs = append(errs, err)
-		}
+// MustPublish is for when publishing is a critical requirement and errors must
+// prevent further procedures, for things like sending emails, etc.
+func (b *Bus) MustPublish(ctx context.Context, event any) error {
+	if err := b.eventBus.Publish(ctx, event); err != nil {
+		b.logger.Error("failed to publish event",
+			slog.String("event_type", fmt.Sprintf("%T", event)),
+			slog.String("error", err.Error()),
+		)
+
+		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return errors.Join(errs...)
+	return nil
 }
 
 func (b *Bus) SendCommand(ctx context.Context, command any) error {

@@ -38,7 +38,7 @@ func TestEventBus_SingleSubscriber(t *testing.T) {
 			})
 			r.NoError(err)
 
-			err = bus.Publish(ctx, EventTest{
+			err = bus.MustPublish(ctx, EventTest{
 				Value: "Hello, World!",
 			})
 			r.NoError(err)
@@ -81,7 +81,7 @@ func TestEventBus_MultipleSubscribers(t *testing.T) {
 			})
 			r.NoError(err)
 
-			err = bus.Publish(ctx, MultiEventTest{
+			err = bus.MustPublish(ctx, MultiEventTest{
 				Value: "Hello, World!",
 			})
 			r.NoError(err)
@@ -96,7 +96,7 @@ func TestEventBus_MultipleSubscribers(t *testing.T) {
 
 			sub1.Close()
 
-			err = bus.Publish(ctx, MultiEventTest{
+			err = bus.MustPublish(ctx, MultiEventTest{
 				Value: "Message for only sub2",
 			})
 			r.NoError(err)
@@ -106,7 +106,7 @@ func TestEventBus_MultipleSubscribers(t *testing.T) {
 
 			sub2.Close()
 
-			err = bus.Publish(ctx, MultiEventTest{
+			err = bus.MustPublish(ctx, MultiEventTest{
 				Value: "No more subscribers. No-op.",
 			})
 			r.NoError(err)
