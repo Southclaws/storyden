@@ -51,6 +51,14 @@ type EventThreadReplyUpdated struct {
 	ReplyID  post.ID
 }
 
+type EventPostLiked struct {
+	PostID post.ID
+}
+
+type EventPostUnliked struct {
+	PostID post.ID
+}
+
 type CommandThreadIndex struct {
 	ID post.ID
 }
@@ -103,7 +111,6 @@ type CommandNodeDeindex struct {
 	ID library.NodeID
 }
 
-
 // -
 // Account and profile events and commands
 // -
@@ -127,14 +134,6 @@ type CommandProfileIndex struct {
 type CommandScrapeLink struct {
 	URL  url.URL
 	Item *datagraph.Ref
-}
-
-type LikePost struct {
-	PostID post.ID
-}
-
-type UnlikePost struct {
-	PostID post.ID
 }
 
 type Email struct {
