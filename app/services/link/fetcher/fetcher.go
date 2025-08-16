@@ -20,7 +20,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
-	"github.com/Southclaws/storyden/app/services/library/node_fill"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
 )
@@ -33,7 +32,6 @@ type Fetcher struct {
 	lq       *link_querier.LinkQuerier
 	lr       *link_writer.LinkWriter
 	sc       scrape.Scraper
-	nodeFill *node_fill.Filler
 	bus      *event.Bus
 }
 
@@ -43,7 +41,6 @@ func New(
 	lq *link_querier.LinkQuerier,
 	lr *link_writer.LinkWriter,
 	sc scrape.Scraper,
-	nodeFill *node_fill.Filler,
 	bus *event.Bus,
 ) *Fetcher {
 	return &Fetcher{
@@ -52,7 +49,6 @@ func New(
 		lq:       lq,
 		lr:       lr,
 		sc:       sc,
-		nodeFill: nodeFill,
 		bus:      bus,
 	}
 }
@@ -75,15 +71,9 @@ func (s *Fetcher) Fetch(ctx context.Context, u url.URL, opts Options) (*link_ref
 		return r.Links[0], nil
 	}
 
-	lr, wc, err := s.ScrapeAndStore(ctx, u)
+	lr, _, err := s.ScrapeAndStore(ctx, u)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if cfr, ok := opts.ContentFill.Get(); ok {
-		if err := s.nodeFill.FillContentFromLink(ctx, lr, wc, cfr); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
 	}
 
 	return lr, nil

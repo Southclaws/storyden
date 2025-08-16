@@ -71,13 +71,38 @@ type CommandReplyDeindex struct {
 // Library node events and commands
 // -
 
-type IndexNode struct {
+type EventNodeCreated struct {
 	ID library.NodeID
 }
 
-type DeleteNode struct {
+type EventNodeUpdated struct {
 	ID library.NodeID
 }
+
+type EventNodeDeleted struct {
+	ID library.NodeID
+}
+
+type EventNodePublished struct {
+	ID library.NodeID
+}
+
+type EventNodeSubmittedForReview struct {
+	ID library.NodeID
+}
+
+type EventNodeUnpublished struct {
+	ID library.NodeID
+}
+
+type CommandNodeIndex struct {
+	ID library.NodeID
+}
+
+type CommandNodeDeindex struct {
+	ID library.NodeID
+}
+
 
 // -
 // Account and profile events and commands

@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -177,6 +178,12 @@ func (b *Bus) Publish(ctx context.Context, event any) {
 	}
 }
 
+func (b *Bus) PublishMany(ctx context.Context, events ...any) {
+	for _, e := range events {
+		b.Publish(ctx, e)
+	}
+}
+
 // MustPublish is for when publishing is a critical requirement and errors must
 // prevent further procedures, for things like sending emails, etc.
 func (b *Bus) MustPublish(ctx context.Context, event any) error {
@@ -190,6 +197,22 @@ func (b *Bus) MustPublish(ctx context.Context, event any) error {
 	}
 
 	return nil
+}
+
+func (b *Bus) MustPublishMany(ctx context.Context, events ...any) error {
+	var errs []error
+	for _, event := range events {
+		if err := b.eventBus.Publish(ctx, event); err != nil {
+			b.logger.Error("failed to publish event",
+				slog.String("event_type", fmt.Sprintf("%T", event)),
+				slog.String("error", err.Error()),
+			)
+
+			errs = append(errs, err)
+		}
+	}
+
+	return errors.Join(errs...)
 }
 
 func (b *Bus) SendCommand(ctx context.Context, command any) error {

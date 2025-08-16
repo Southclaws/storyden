@@ -16,16 +16,11 @@ import (
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/queue"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
 )
 
 func Build() fx.Option {
 	return fx.Options(
-		fx.Provide(
-			queue.New[mq.IndexNode],
-			queue.New[mq.DeleteNode],
-		),
 		fx.Invoke(newSemdexer),
 	)
 }
@@ -47,8 +42,7 @@ type semdexer struct {
 	nodeWriter  *node_writer.Writer
 	nodeUpdater *node_mutate.Manager
 
-	indexQueue  pubsub.Topic[mq.IndexNode]
-	deleteQueue pubsub.Topic[mq.DeleteNode]
+	bus *event.Bus
 
 	semdexMutator semdex.Mutator
 	semdexQuerier semdex.Querier
@@ -67,8 +61,7 @@ func newSemdexer(
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	nodeUpdater *node_mutate.Manager,
-	indexQueue pubsub.Topic[mq.IndexNode],
-	deleteQueue pubsub.Topic[mq.DeleteNode],
+	bus *event.Bus,
 	semdexMutator semdex.Mutator,
 	semdexQuerier semdex.Querier,
 
@@ -85,8 +78,7 @@ func newSemdexer(
 		nodeQuerier:   nodeQuerier,
 		nodeWriter:    nodeWriter,
 		nodeUpdater:   nodeUpdater,
-		indexQueue:    indexQueue,
-		deleteQueue:   deleteQueue,
+		bus:           bus,
 		semdexMutator: semdexMutator,
 		semdexQuerier: semdexQuerier,
 
@@ -105,40 +97,45 @@ func newSemdexer(
 		return nil
 	}))
 
-	lc.Append(fx.StartHook(func(_ context.Context) error {
-		sub, err := indexQueue.Subscribe(ctx)
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		_, err := event.Subscribe(hctx, bus, "node_semdex.published", func(ctx context.Context, evt *mq.EventNodePublished) error {
+			return bus.SendCommand(ctx, &mq.CommandNodeIndex{ID: evt.ID})
+		})
 		if err != nil {
 			return err
 		}
 
-		go func() {
-			for msg := range sub {
-				if err := re.index(ctx, msg.Payload.ID); err != nil {
-					logger.Error("failed to index node", slog.String("error", err.Error()))
-				}
+		_, err = event.Subscribe(hctx, bus, "node_semdex.unpublished", func(ctx context.Context, evt *mq.EventNodeUnpublished) error {
+			return bus.SendCommand(ctx, &mq.CommandNodeDeindex{ID: evt.ID})
+		})
+		if err != nil {
+			return err
+		}
 
-				msg.Ack()
-			}
-		}()
+		_, err = event.Subscribe(hctx, bus, "node_semdex.deleted", func(ctx context.Context, evt *mq.EventNodeDeleted) error {
+			return bus.SendCommand(ctx, &mq.CommandNodeDeindex{ID: evt.ID})
+		})
+		if err != nil {
+			return err
+		}
 
 		return nil
 	}))
 
-	lc.Append(fx.StartHook(func(_ context.Context) error {
-		sub, err := deleteQueue.Subscribe(ctx)
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		_, err := event.SubscribeCommand(hctx, bus, "node_semdex.index", func(ctx context.Context, cmd *mq.CommandNodeIndex) error {
+			return re.index(ctx, cmd.ID)
+		})
 		if err != nil {
 			return err
 		}
 
-		go func() {
-			for msg := range sub {
-				if err := re.deindex(ctx, msg.Payload.ID); err != nil {
-					logger.Error("failed to index node", slog.String("error", err.Error()))
-				}
-
-				msg.Ack()
-			}
-		}()
+		_, err = event.SubscribeCommand(hctx, bus, "node_semdex.deindex", func(ctx context.Context, cmd *mq.CommandNodeDeindex) error {
+			return re.deindex(ctx, cmd.ID)
+		})
+		if err != nil {
+			return err
+		}
 
 		return nil
 	}))

@@ -60,10 +60,14 @@ func (s *Manager) Create(ctx context.Context,
 		}
 	}
 
+	s.bus.Publish(ctx, &mq.EventNodeCreated{
+		ID: library.NodeID(n.Mark.ID()),
+	})
+
 	if p.Visibility.OrZero() == visibility.VisibilityPublished {
-		if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: library.NodeID(n.Mark.ID())}); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
+		s.bus.Publish(ctx, &mq.EventNodePublished{
+			ID: library.NodeID(n.Mark.ID()),
+		})
 	}
 
 	s.fetcher.HydrateContentURLs(ctx, n)

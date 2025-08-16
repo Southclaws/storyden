@@ -16,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
@@ -26,7 +26,7 @@ type Controller struct {
 	nodeQuerier  *node_querier.Querier
 	nodeWriter   *node_writer.Writer
 	nc           *node_children.Writer
-	indexQueue   pubsub.Topic[mq.IndexNode]
+	bus          *event.Bus
 }
 
 func New(
@@ -34,14 +34,14 @@ func New(
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	nc *node_children.Writer,
-	indexQueue pubsub.Topic[mq.IndexNode],
+	bus *event.Bus,
 ) *Controller {
 	return &Controller{
 		accountQuery: accountQuery,
 		nodeQuerier:  nodeQuerier,
 		nodeWriter:   nodeWriter,
 		nc:           nc,
-		indexQueue:   indexQueue,
+		bus:          bus,
 	}
 }
 
@@ -70,14 +70,31 @@ func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	oldVisibility := n.Visibility
+
 	n, err = m.nodeWriter.Update(ctx, qk, node_writer.WithVisibility(vis))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if vis == visibility.VisibilityPublished {
-		if err := m.indexQueue.Publish(ctx, mq.IndexNode{ID: library.NodeID(n.Mark.ID())}); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
+	// Emit visibility transition events
+	// NOTE: If this changes, remove the node_visibility service and consolidate
+	if oldVisibility != vis {
+		switch vis {
+		case visibility.VisibilityPublished:
+			m.bus.Publish(ctx, &mq.EventNodePublished{
+				ID: library.NodeID(n.Mark.ID()),
+			})
+		case visibility.VisibilityReview:
+			m.bus.Publish(ctx, &mq.EventNodeSubmittedForReview{
+				ID: library.NodeID(n.Mark.ID()),
+			})
+		case visibility.VisibilityUnlisted, visibility.VisibilityDraft:
+			if oldVisibility == visibility.VisibilityPublished {
+				m.bus.Publish(ctx, &mq.EventNodeUnpublished{
+					ID: library.NodeID(n.Mark.ID()),
+				})
+			}
 		}
 	}
 

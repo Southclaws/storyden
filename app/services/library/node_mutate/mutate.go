@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -22,7 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 	"github.com/Southclaws/storyden/internal/deletable"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
 )
 
 type Partial struct {
@@ -55,8 +54,7 @@ type Manager struct {
 	nc           *node_children.Writer
 	fetcher      *fetcher.Fetcher
 	summariser   generative.Summariser
-	indexQueue   pubsub.Topic[mq.IndexNode]
-	deleteQueue  pubsub.Topic[mq.DeleteNode]
+	bus          *event.Bus
 }
 
 func New(
@@ -71,8 +69,7 @@ func New(
 	nc *node_children.Writer,
 	fetcher *fetcher.Fetcher,
 	summariser generative.Summariser,
-	indexQueue pubsub.Topic[mq.IndexNode],
-	deleteQueue pubsub.Topic[mq.DeleteNode],
+	bus *event.Bus,
 ) *Manager {
 	return &Manager{
 		accountQuery: accountQuery,
@@ -86,7 +83,6 @@ func New(
 		nc:           nc,
 		fetcher:      fetcher,
 		summariser:   summariser,
-		indexQueue:   indexQueue,
-		deleteQueue:  deleteQueue,
+		bus:          bus,
 	}
 }

@@ -54,7 +54,7 @@ func (s *Manager) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.deleteQueue.PublishAndForget(ctx, mq.DeleteNode{
+	s.bus.Publish(ctx, &mq.EventNodeDeleted{
 		ID: library.NodeID(n.GetID()),
 	})
 
