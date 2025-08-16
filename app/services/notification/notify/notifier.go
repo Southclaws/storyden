@@ -8,19 +8,19 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
 )
 
 type Notifier struct {
-	q pubsub.Topic[mq.Notification]
+	bus *event.Bus
 }
 
-func New(q pubsub.Topic[mq.Notification]) *Notifier {
-	return &Notifier{q: q}
+func New(bus *event.Bus) *Notifier {
+	return &Notifier{bus: bus}
 }
 
 func (n *Notifier) Send(ctx context.Context, targetID account.AccountID, sourceID opt.Optional[account.AccountID], event notification.Event, item *datagraph.Ref) {
-	n.q.PublishAndForget(ctx, mq.Notification{
+	n.bus.SendCommand(ctx, &mq.CommandSendNotification{
 		Event:    event,
 		Item:     item,
 		TargetID: targetID,

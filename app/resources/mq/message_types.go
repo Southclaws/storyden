@@ -128,6 +128,17 @@ type CommandProfileIndex struct {
 }
 
 // -
+// Notifications
+// -
+
+type CommandSendNotification struct {
+	Event    notification.Event
+	Item     *datagraph.Ref
+	TargetID account.AccountID
+	SourceID opt.Optional[account.AccountID]
+}
+
+// -
 // Scraping commands
 // -
 
@@ -138,13 +149,6 @@ type CommandScrapeLink struct {
 
 type Email struct {
 	Message mailer.Message
-}
-
-type Notification struct {
-	Event    notification.Event
-	Item     *datagraph.Ref
-	TargetID account.AccountID
-	SourceID opt.Optional[account.AccountID]
 }
 
 type Mention struct {
