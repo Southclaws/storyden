@@ -6,12 +6,8 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
-	"github.com/Southclaws/opt"
-	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/account/notification"
-	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
@@ -36,16 +32,14 @@ func (s *service) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create reply post in thread"))
 	}
 
-	s.indexQueue.PublishAndForget(ctx, mq.IndexReply{
-		ID: p.ID,
+	s.bus.Publish(ctx, &mq.EventThreadReplyCreated{
+		ThreadID:       p.RootPostID,
+		ReplyID:        p.ID,
+		ThreadAuthorID: p.RootAuthor.ID,
+		ReplyAuthorID:  authorID,
 	})
 
 	s.fetcher.HydrateContentURLs(ctx, p)
-
-	s.notifier.Send(ctx, p.RootAuthor.ID, opt.New(authorID), notification.EventThreadReply, &datagraph.Ref{
-		ID:   xid.ID(p.RootPostID),
-		Kind: datagraph.KindPost,
-	})
 
 	return p, nil
 }

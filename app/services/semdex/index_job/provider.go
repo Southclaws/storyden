@@ -10,7 +10,6 @@ import (
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(
-			queue.New[mq.IndexReply],
 			queue.New[mq.IndexProfile],
 		),
 

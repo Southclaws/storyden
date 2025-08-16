@@ -36,11 +36,36 @@ type EventThreadDeleted struct {
 	ID post.ID
 }
 
+type EventThreadReplyCreated struct {
+	ThreadID       post.ID
+	ReplyID        post.ID
+	ThreadAuthorID account.AccountID
+	ReplyAuthorID  account.AccountID
+}
+
+type EventThreadReplyDeleted struct {
+	ThreadID post.ID
+	ReplyID  post.ID
+}
+
+type EventThreadReplyUpdated struct {
+	ThreadID post.ID
+	ReplyID  post.ID
+}
+
 type CommandThreadIndex struct {
 	ID post.ID
 }
 
 type CommandThreadDeindex struct {
+	ID post.ID
+}
+
+type CommandReplyIndex struct {
+	ID post.ID
+}
+
+type CommandReplyDeindex struct {
 	ID post.ID
 }
 
@@ -54,10 +79,6 @@ type IndexNode struct {
 
 type DeleteNode struct {
 	ID library.NodeID
-}
-
-type IndexReply struct {
-	ID post.ID
 }
 
 type IndexProfile struct {

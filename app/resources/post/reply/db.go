@@ -88,7 +88,7 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return Map(p)
+	return d.Get(ctx, post.ID(p.ID))
 }
 
 func (d *database) Get(ctx context.Context, id post.ID) (*Reply, error) {
