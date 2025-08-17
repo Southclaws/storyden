@@ -7,17 +7,17 @@ import (
 	"github.com/Southclaws/storyden/app/resources/like/like_writer"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type PostLiker struct {
 	likeWriter *like_writer.LikeWriter
-	bus        *event.Bus
+	bus        *pubsub.Bus
 }
 
 func New(
 	likeWriter *like_writer.LikeWriter,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 ) *PostLiker {
 	return &PostLiker{
 		likeWriter: likeWriter,

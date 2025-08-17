@@ -26,7 +26,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/app/services/thread/thread_semdex"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Service interface {
@@ -93,7 +93,7 @@ type service struct {
 	tagWriter    *tag_writer.Writer
 	fetcher      *fetcher.Fetcher
 	recommender  semdex.Recommender
-	bus          *event.Bus
+	bus          *pubsub.Bus
 	mentioner    *mentioner.Mentioner
 	cpm          *content_policy.Manager
 }
@@ -106,7 +106,7 @@ func New(
 	tagWriter *tag_writer.Writer,
 	fetcher *fetcher.Fetcher,
 	recommender semdex.Recommender,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 	mentioner *mentioner.Mentioner,
 	cpm *content_policy.Manager,
 ) Service {

@@ -16,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 func Build() fx.Option {
@@ -42,7 +42,7 @@ type semdexer struct {
 	nodeWriter  *node_writer.Writer
 	nodeUpdater *node_mutate.Manager
 
-	bus *event.Bus
+	bus *pubsub.Bus
 
 	semdexMutator semdex.Mutator
 	semdexQuerier semdex.Querier
@@ -61,7 +61,7 @@ func newSemdexer(
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	nodeUpdater *node_mutate.Manager,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 	semdexMutator semdex.Mutator,
 	semdexQuerier semdex.Querier,
 
@@ -98,21 +98,21 @@ func newSemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := event.Subscribe(hctx, bus, "node_semdex.published", func(ctx context.Context, evt *mq.EventNodePublished) error {
+		_, err := pubsub.Subscribe(hctx, bus, "node_semdex.published", func(ctx context.Context, evt *mq.EventNodePublished) error {
 			return bus.SendCommand(ctx, &mq.CommandNodeIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = event.Subscribe(hctx, bus, "node_semdex.unpublished", func(ctx context.Context, evt *mq.EventNodeUnpublished) error {
+		_, err = pubsub.Subscribe(hctx, bus, "node_semdex.unpublished", func(ctx context.Context, evt *mq.EventNodeUnpublished) error {
 			return bus.SendCommand(ctx, &mq.CommandNodeDeindex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = event.Subscribe(hctx, bus, "node_semdex.deleted", func(ctx context.Context, evt *mq.EventNodeDeleted) error {
+		_, err = pubsub.Subscribe(hctx, bus, "node_semdex.deleted", func(ctx context.Context, evt *mq.EventNodeDeleted) error {
 			return bus.SendCommand(ctx, &mq.CommandNodeDeindex{ID: evt.ID})
 		})
 		if err != nil {
@@ -123,14 +123,14 @@ func newSemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := event.SubscribeCommand(hctx, bus, "node_semdex.index", func(ctx context.Context, cmd *mq.CommandNodeIndex) error {
+		_, err := pubsub.SubscribeCommand(hctx, bus, "node_semdex.index", func(ctx context.Context, cmd *mq.CommandNodeIndex) error {
 			return re.index(ctx, cmd.ID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = event.SubscribeCommand(hctx, bus, "node_semdex.deindex", func(ctx context.Context, cmd *mq.CommandNodeDeindex) error {
+		_, err = pubsub.SubscribeCommand(hctx, bus, "node_semdex.deindex", func(ctx context.Context, cmd *mq.CommandNodeDeindex) error {
 			return re.deindex(ctx, cmd.ID)
 		})
 		if err != nil {

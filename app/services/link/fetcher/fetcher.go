@@ -21,7 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 var errEmptyLink = fault.New("empty link")
@@ -32,7 +32,7 @@ type Fetcher struct {
 	lq       *link_querier.LinkQuerier
 	lr       *link_writer.LinkWriter
 	sc       scrape.Scraper
-	bus      *event.Bus
+	bus      *pubsub.Bus
 }
 
 func New(
@@ -41,7 +41,7 @@ func New(
 	lq *link_querier.LinkQuerier,
 	lr *link_writer.LinkWriter,
 	sc scrape.Scraper,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 ) *Fetcher {
 	return &Fetcher{
 		logger:   logger,

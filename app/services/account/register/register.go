@@ -21,7 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/onboarding"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/otp"
 )
 
@@ -38,7 +38,7 @@ type Registrar struct {
 	emailVerify    *email_verify.Verifier
 	authRepo       authentication.Repository
 	onboarding     onboarding.Service
-	bus            *event.Bus
+	bus            *pubsub.Bus
 }
 
 func New(
@@ -49,7 +49,7 @@ func New(
 	emailVerify *email_verify.Verifier,
 	authRepo authentication.Repository,
 	onboarding onboarding.Service,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 ) *Registrar {
 	return &Registrar{
 		logger:         logger,

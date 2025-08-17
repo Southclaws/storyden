@@ -16,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 var errNotAuthorised = fault.Wrap(fault.New("not authorised"), ftag.With(ftag.PermissionDenied))
@@ -26,7 +26,7 @@ type Controller struct {
 	nodeQuerier  *node_querier.Querier
 	nodeWriter   *node_writer.Writer
 	nc           *node_children.Writer
-	bus          *event.Bus
+	bus          *pubsub.Bus
 }
 
 func New(
@@ -34,7 +34,7 @@ func New(
 	nodeQuerier *node_querier.Querier,
 	nodeWriter *node_writer.Writer,
 	nc *node_children.Writer,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 ) *Controller {
 	return &Controller{
 		accountQuery: accountQuery,

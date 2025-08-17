@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/comms/mailtemplate"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/infrastructure/rate"
 )
 
@@ -26,7 +26,7 @@ var (
 type Queuer struct {
 	templates *mailtemplate.Builder
 	limiter   rate.Limiter
-	bus       *event.Bus
+	bus       *pubsub.Bus
 	sender    mailer.Sender
 }
 
@@ -39,7 +39,7 @@ func Build() fx.Option {
 
 			templates *mailtemplate.Builder,
 			ratelimit *rate.LimiterFactory,
-			bus *event.Bus,
+			bus *pubsub.Bus,
 			sender mailer.Sender,
 		) *Queuer {
 			q := &Queuer{
@@ -50,7 +50,7 @@ func Build() fx.Option {
 			}
 
 			lc.Append(fx.StartHook(func(hctx context.Context) error {
-				_, err := event.SubscribeCommand(hctx, bus, "mailqueue.send_email", func(ctx context.Context, cmd *mq.CommandSendEmail) error {
+				_, err := pubsub.SubscribeCommand(hctx, bus, "mailqueue.send_email", func(ctx context.Context, cmd *mq.CommandSendEmail) error {
 					if err := sender.Send(ctx, cmd.Message); err != nil {
 						logger.Error("failed to send email", slog.String("error", err.Error()))
 						return err

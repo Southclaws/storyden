@@ -11,18 +11,18 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/notification/notify"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 func Build() fx.Option {
 	return fx.Invoke(func(
 		ctx context.Context,
 		lc fx.Lifecycle,
-		bus *event.Bus,
+		bus *pubsub.Bus,
 		notifier *notify.Notifier,
 	) {
 		consumer := func(hctx context.Context) error {
-			_, err := event.Subscribe(hctx, bus, "reply_notify.reply_created", func(ctx context.Context, evt *mq.EventThreadReplyCreated) error {
+			_, err := pubsub.Subscribe(hctx, bus, "reply_notify.reply_created", func(ctx context.Context, evt *mq.EventThreadReplyCreated) error {
 				notifier.Send(ctx,
 					evt.ThreadAuthorID,
 					opt.New(evt.ReplyAuthorID),

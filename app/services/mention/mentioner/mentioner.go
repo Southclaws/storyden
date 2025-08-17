@@ -8,15 +8,15 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Mentioner struct {
 	logger *slog.Logger
-	bus    *event.Bus
+	bus    *pubsub.Bus
 }
 
-func New(logger *slog.Logger, bus *event.Bus) *Mentioner {
+func New(logger *slog.Logger, bus *pubsub.Bus) *Mentioner {
 	return &Mentioner{logger: logger, bus: bus}
 }
 

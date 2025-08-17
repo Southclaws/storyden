@@ -14,7 +14,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 func Build() fx.Option {
@@ -28,7 +28,7 @@ type semdexer struct {
 	replyQuerier  reply.Repository
 	replyWriter   reply.Repository
 	semdexMutator semdex.Mutator
-	bus           *event.Bus
+	bus           *pubsub.Bus
 }
 
 func newReplySemdexer(
@@ -39,7 +39,7 @@ func newReplySemdexer(
 	replyQuerier reply.Repository,
 	replyWriter reply.Repository,
 	semdexMutator semdex.Mutator,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 ) {
 	if cfg.SemdexProvider == "" {
 		return
@@ -54,21 +54,21 @@ func newReplySemdexer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := event.Subscribe(hctx, bus, "reply_semdex.index_created", func(ctx context.Context, evt *mq.EventThreadReplyCreated) error {
+		_, err := pubsub.Subscribe(hctx, bus, "reply_semdex.index_created", func(ctx context.Context, evt *mq.EventThreadReplyCreated) error {
 			return bus.SendCommand(ctx, &mq.CommandReplyIndex{ID: evt.ReplyID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = event.Subscribe(hctx, bus, "reply_semdex.index_updated", func(ctx context.Context, evt *mq.EventThreadReplyUpdated) error {
+		_, err = pubsub.Subscribe(hctx, bus, "reply_semdex.index_updated", func(ctx context.Context, evt *mq.EventThreadReplyUpdated) error {
 			return bus.SendCommand(ctx, &mq.CommandReplyIndex{ID: evt.ReplyID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = event.Subscribe(hctx, bus, "reply_semdex.deindex_deleted", func(ctx context.Context, evt *mq.EventThreadReplyDeleted) error {
+		_, err = pubsub.Subscribe(hctx, bus, "reply_semdex.deindex_deleted", func(ctx context.Context, evt *mq.EventThreadReplyDeleted) error {
 			return bus.SendCommand(ctx, &mq.CommandReplyDeindex{ID: evt.ReplyID})
 		})
 		if err != nil {
@@ -79,14 +79,14 @@ func newReplySemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := event.SubscribeCommand(hctx, bus, "reply_semdex.index", func(ctx context.Context, cmd *mq.CommandReplyIndex) error {
+		_, err := pubsub.SubscribeCommand(hctx, bus, "reply_semdex.index", func(ctx context.Context, cmd *mq.CommandReplyIndex) error {
 			return re.indexReply(ctx, cmd.ID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = event.SubscribeCommand(hctx, bus, "reply_semdex.deindex", func(ctx context.Context, cmd *mq.CommandReplyDeindex) error {
+		_, err = pubsub.SubscribeCommand(hctx, bus, "reply_semdex.deindex", func(ctx context.Context, cmd *mq.CommandReplyDeindex) error {
 			return re.deindexReply(ctx, cmd.ID)
 		})
 		if err != nil {

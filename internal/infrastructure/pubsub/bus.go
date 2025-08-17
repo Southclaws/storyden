@@ -1,4 +1,4 @@
-package event
+package pubsub
 
 import (
 	"context"
@@ -39,14 +39,13 @@ type Bus struct {
 
 type subscriptionKey string
 
-func New(
+func newBus(
 	lc fx.Lifecycle,
 	l *slog.Logger,
 	ctx context.Context,
 	cfg config.Config,
 	pub message.Publisher,
 	sub message.Subscriber,
-	eventTypes ...any,
 ) (*Bus, error) {
 	logger := watermill.NewSlogLogger(l.With("component", "watermill"))
 

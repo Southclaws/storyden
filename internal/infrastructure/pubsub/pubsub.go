@@ -1,7 +1,10 @@
-package watermill
+package pubsub
 
 import (
+	"context"
 	"log/slog"
+
+	"go.uber.org/fx"
 
 	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
@@ -11,7 +14,30 @@ import (
 	"github.com/Southclaws/storyden/internal/config"
 )
 
-func NewWatermillQueue(cfg config.Config, l *slog.Logger) (message.Subscriber, message.Publisher, error) {
+func Build() fx.Option {
+	return fx.Options(
+		fx.Provide(func(
+			lc fx.Lifecycle,
+			ctx context.Context,
+			cfg config.Config,
+			l *slog.Logger,
+		) (*Bus, error) {
+			sub, pub, err := newWatermillPubsub(cfg, l)
+			if err != nil {
+				return nil, err
+			}
+
+			bus, err := newBus(lc, l, ctx, cfg, pub, sub)
+			if err != nil {
+				return nil, err
+			}
+
+			return bus, nil
+		}),
+	)
+}
+
+func newWatermillPubsub(cfg config.Config, l *slog.Logger) (message.Subscriber, message.Publisher, error) {
 	logger := watermill.NewSlogLogger(l)
 
 	switch cfg.QueueType {

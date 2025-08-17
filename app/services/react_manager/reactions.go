@@ -12,21 +12,21 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Reactor struct {
 	accountQuerier *account_querier.Querier
 	reactWriter    *reaction.Writer
 	reactReader    *reaction.Querier
-	bus            *event.Bus
+	bus            *pubsub.Bus
 }
 
 func New(
 	accountQuerier *account_querier.Querier,
 	reactWriter *reaction.Writer,
 	reactReader *reaction.Querier,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 ) *Reactor {
 	return &Reactor{
 		accountQuerier: accountQuerier,

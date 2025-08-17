@@ -21,7 +21,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 	"github.com/Southclaws/storyden/internal/deletable"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Partial struct {
@@ -54,7 +54,7 @@ type Manager struct {
 	nc           *node_children.Writer
 	fetcher      *fetcher.Fetcher
 	summariser   generative.Summariser
-	bus          *event.Bus
+	bus          *pubsub.Bus
 }
 
 func New(
@@ -69,7 +69,7 @@ func New(
 	nc *node_children.Writer,
 	fetcher *fetcher.Fetcher,
 	summariser generative.Summariser,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 ) *Manager {
 	return &Manager{
 		accountQuery: accountQuery,

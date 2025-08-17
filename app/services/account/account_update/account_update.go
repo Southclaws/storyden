@@ -11,18 +11,18 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 // TODO: Should be named profile updater tbh, is not account-specific.
 type Updater struct {
 	writer *account_writer.Writer
-	bus    *event.Bus
+	bus    *pubsub.Bus
 }
 
 func New(
 	writer *account_writer.Writer,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 ) *Updater {
 	return &Updater{
 		writer: writer,

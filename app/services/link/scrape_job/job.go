@@ -20,7 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 func Build() fx.Option {
@@ -37,7 +37,7 @@ func runScrapeConsumer(
 	ctx context.Context,
 	lc fx.Lifecycle,
 	logger *slog.Logger,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 	fetcher *fetcher.Fetcher,
 	posts *post_writer.PostWriter,
 	nodeWriter *node_writer.Writer,
@@ -49,7 +49,7 @@ func runScrapeConsumer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := event.SubscribeCommand(hctx, bus, "scrape_job.scrape", func(ctx context.Context, cmd *mq.CommandScrapeLink) error {
+		_, err := pubsub.SubscribeCommand(hctx, bus, "scrape_job.scrape", func(ctx context.Context, cmd *mq.CommandScrapeLink) error {
 			return ic.scrapeLink(ctx, cmd.URL, opt.NewPtr(cmd.Item))
 		})
 		if err != nil {

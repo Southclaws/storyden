@@ -1,4 +1,4 @@
-package event_test
+package pubsub_test
 
 import (
 	"context"
@@ -6,11 +6,12 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
-	"github.com/Southclaws/storyden/internal/integration"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/Southclaws/storyden/internal/config"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/internal/integration"
 )
 
 func TestEventBus_SingleSubscriber(t *testing.T) {
@@ -20,7 +21,7 @@ func TestEventBus_SingleSubscriber(t *testing.T) {
 	}, fx.Invoke(func(
 		lc fx.Lifecycle,
 		ctx context.Context,
-		bus *event.Bus,
+		bus *pubsub.Bus,
 	) {
 		lc.Append(fx.StartHook(func(ctx context.Context) {
 			r := require.New(t)
@@ -32,7 +33,7 @@ func TestEventBus_SingleSubscriber(t *testing.T) {
 
 			recv := make(chan EventTest)
 
-			sub, err := event.Subscribe(ctx, bus, "test_service", func(ctx context.Context, event *EventTest) error {
+			sub, err := pubsub.Subscribe(ctx, bus, "test_service", func(ctx context.Context, event *EventTest) error {
 				recv <- *event
 				return nil
 			})
@@ -58,7 +59,7 @@ func TestEventBus_MultipleSubscribers(t *testing.T) {
 	}, fx.Invoke(func(
 		lc fx.Lifecycle,
 		ctx context.Context,
-		bus *event.Bus,
+		bus *pubsub.Bus,
 	) {
 		lc.Append(fx.StartHook(func(ctx context.Context) {
 			r := require.New(t)
@@ -70,12 +71,12 @@ func TestEventBus_MultipleSubscribers(t *testing.T) {
 
 			recv := make(chan MultiEventTest)
 
-			sub1, err := event.Subscribe(ctx, bus, "test_service_one", func(ctx context.Context, event *MultiEventTest) error {
+			sub1, err := pubsub.Subscribe(ctx, bus, "test_service_one", func(ctx context.Context, event *MultiEventTest) error {
 				recv <- *event
 				return nil
 			})
 			r.NoError(err)
-			sub2, err := event.Subscribe(ctx, bus, "test_service_two", func(ctx context.Context, event *MultiEventTest) error {
+			sub2, err := pubsub.Subscribe(ctx, bus, "test_service_two", func(ctx context.Context, event *MultiEventTest) error {
 				recv <- *event
 				return nil
 			})

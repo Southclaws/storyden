@@ -28,7 +28,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/thread"
-	eventbus "github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 var errNotAuthorised = fault.New("not authorised")
@@ -40,7 +40,7 @@ type Manager struct {
 	partWriter   *participant_writer.Writer
 
 	threadWriter thread.Service
-	bus          *eventbus.Bus
+	bus          *pubsub.Bus
 }
 
 func New(
@@ -49,7 +49,7 @@ func New(
 	writer *event_writer.Writer,
 	partWriter *participant_writer.Writer,
 	threadWriter thread.Service,
-	bus *eventbus.Bus,
+	bus *pubsub.Bus,
 ) *Manager {
 	return &Manager{
 		accountQuery: accountQuery,

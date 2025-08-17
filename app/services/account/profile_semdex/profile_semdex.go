@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 func Build() fx.Option {
@@ -26,7 +26,7 @@ type semdexer struct {
 	logger        *slog.Logger
 	profileQuery  *profile_querier.Querier
 	semdexMutator semdex.Mutator
-	bus           *event.Bus
+	bus           *pubsub.Bus
 }
 
 func newProfileSemdexer(
@@ -36,7 +36,7 @@ func newProfileSemdexer(
 	logger *slog.Logger,
 	profileQuery *profile_querier.Querier,
 	semdexMutator semdex.Mutator,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 ) {
 	if cfg.SemdexProvider == "" {
 		return
@@ -50,14 +50,14 @@ func newProfileSemdexer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := event.Subscribe(hctx, bus, "profile_semdex.index_created", func(ctx context.Context, evt *mq.EventAccountCreated) error {
+		_, err := pubsub.Subscribe(hctx, bus, "profile_semdex.index_created", func(ctx context.Context, evt *mq.EventAccountCreated) error {
 			return bus.SendCommand(ctx, &mq.CommandProfileIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = event.Subscribe(hctx, bus, "profile_semdex.index_updated", func(ctx context.Context, evt *mq.EventAccountUpdated) error {
+		_, err = pubsub.Subscribe(hctx, bus, "profile_semdex.index_updated", func(ctx context.Context, evt *mq.EventAccountUpdated) error {
 			return bus.SendCommand(ctx, &mq.CommandProfileIndex{ID: evt.ID})
 		})
 		if err != nil {
@@ -68,7 +68,7 @@ func newProfileSemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := event.SubscribeCommand(hctx, bus, "profile_semdex.index", func(ctx context.Context, cmd *mq.CommandProfileIndex) error {
+		_, err := pubsub.SubscribeCommand(hctx, bus, "profile_semdex.index", func(ctx context.Context, cmd *mq.CommandProfileIndex) error {
 			return s.indexProfile(ctx, cmd.ID)
 		})
 		if err != nil {

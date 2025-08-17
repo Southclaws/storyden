@@ -16,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/moderation/content_policy"
 	"github.com/Southclaws/storyden/app/services/reply/reply_notify"
 	"github.com/Southclaws/storyden/app/services/reply/reply_semdex"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Service interface {
@@ -58,7 +58,7 @@ type service struct {
 	accountQuery *account_querier.Querier
 	post_repo    reply.Repository
 	fetcher      *fetcher.Fetcher
-	bus          *event.Bus
+	bus          *pubsub.Bus
 	cpm          *content_policy.Manager
 }
 
@@ -66,7 +66,7 @@ func New(
 	accountQuery *account_querier.Querier,
 	post_repo reply.Repository,
 	fetcher *fetcher.Fetcher,
-	bus *event.Bus,
+	bus *pubsub.Bus,
 	cpm *content_policy.Manager,
 ) Service {
 	return &service{

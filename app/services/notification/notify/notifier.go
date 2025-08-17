@@ -8,14 +8,14 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/mq"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Notifier struct {
-	bus *event.Bus
+	bus *pubsub.Bus
 }
 
-func New(bus *event.Bus) *Notifier {
+func New(bus *pubsub.Bus) *Notifier {
 	return &Notifier{bus: bus}
 }
 
