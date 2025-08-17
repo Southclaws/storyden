@@ -2,29 +2,70 @@ package pubsub
 
 import (
 	"context"
+	"log/slog"
 
-	"github.com/Southclaws/opt"
-	"github.com/rs/xid"
+	"go.uber.org/fx"
+
+	"github.com/ThreeDotsLabs/watermill"
+	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
+	"github.com/ThreeDotsLabs/watermill/message"
+	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
+
+	"github.com/Southclaws/storyden/internal/config"
 )
 
-type Message[T any] struct {
-	ID      string
-	Payload T
-	Ack     func() bool
-	Nack    func() bool
-	ActorID opt.Optional[xid.ID]
+func Build() fx.Option {
+	return fx.Options(
+		fx.Provide(func(
+			lc fx.Lifecycle,
+			ctx context.Context,
+			cfg config.Config,
+			l *slog.Logger,
+		) (*Bus, error) {
+			sub, pub, err := newWatermillPubsub(cfg, l)
+			if err != nil {
+				return nil, err
+			}
+
+			bus, err := newBus(lc, l, ctx, cfg, pub, sub)
+			if err != nil {
+				return nil, err
+			}
+
+			return bus, nil
+		}),
+	)
 }
 
-type Topic[T any] interface {
-	Subscriber[T]
-	Publisher[T]
-}
+func newWatermillPubsub(cfg config.Config, l *slog.Logger) (message.Subscriber, message.Publisher, error) {
+	logger := watermill.NewSlogLogger(l)
 
-type Subscriber[T any] interface {
-	Subscribe(ctx context.Context) (<-chan *Message[T], error)
-}
+	switch cfg.QueueType {
+	default:
+		l.Debug("using channel queue")
 
-type Publisher[T any] interface {
-	Publish(ctx context.Context, messages ...T) error
-	PublishAndForget(ctx context.Context, messages ...T)
+		pubsub := gochannel.NewGoChannel(
+			gochannel.Config{},
+			logger,
+		)
+
+		return pubsub, pubsub, nil
+
+	case "amqp":
+		l.Debug("using amqp pubsub")
+
+		apsc := amqp.NewDurablePubSubConfig(cfg.AmqpURL, amqp.GenerateExchangeNameTopicName)
+
+		publisher, err := amqp.NewPublisher(apsc, logger)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		subscriber, err := amqp.NewSubscriber(apsc, logger)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		return subscriber, publisher, nil
+	}
 }

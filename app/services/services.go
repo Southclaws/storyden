@@ -3,6 +3,7 @@ package services
 import (
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/storyden/app/services/account"
 	"github.com/Southclaws/storyden/app/services/account/account_auth"
 	"github.com/Southclaws/storyden/app/services/account/account_email"
 	"github.com/Southclaws/storyden/app/services/account/account_suspension"
@@ -28,7 +29,6 @@ import (
 	"github.com/Southclaws/storyden/app/services/react_manager"
 	"github.com/Southclaws/storyden/app/services/reply"
 	"github.com/Southclaws/storyden/app/services/search"
-	"github.com/Southclaws/storyden/app/services/semdex/index_job"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
@@ -39,6 +39,7 @@ import (
 func Build() fx.Option {
 	return fx.Options(
 		fx.Provide(register.New),
+		account.Build(),
 		branding.Build(),
 		onboarding.Build(),
 		account_suspension.Build(),
@@ -60,7 +61,6 @@ func Build() fx.Option {
 		mention_job.Build(),
 		generative.Build(),
 		semdexer.Build(),
-		index_job.Build(),
 		event.Build(),
 		moderation.Build(),
 		fx.Provide(avatar_gen.New),

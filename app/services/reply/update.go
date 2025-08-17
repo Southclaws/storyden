@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/rbac"
@@ -54,11 +54,11 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.indexQueue.PublishAndForget(ctx, mq.IndexReply{
-		ID: p.ID,
+	s.bus.Publish(ctx, &message.EventThreadReplyUpdated{
+		ThreadID: p.RootPostID,
+		ReplyID:  p.ID,
 	})
 
-	s.fetcher.HydrateContentURLs(ctx, p)
 
 	return p, nil
 }

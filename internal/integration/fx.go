@@ -87,13 +87,12 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 
 	o = append(o, fx.Provide(func() config.Config { return defaultConfig }))
 
-	err := fx.New(o...).Start(ctx)
+	app := fx.New(o...)
+	err := app.Start(ctx)
 	if err != nil {
 		fmt.Println(err)
-		t.Error()
+		t.Error(err)
 	}
-
-	return
 }
 
 // application gives you some basics needed by most components.

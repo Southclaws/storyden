@@ -14,7 +14,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -44,20 +43,18 @@ type Partial struct {
 }
 
 type Manager struct {
-	accountQuery      *account_querier.Querier
-	nodeQuerier       *node_querier.Querier
-	nodeWriter        *node_writer.Writer
-	schemaWriter      *node_properties.SchemaWriter
-	propWriter        *node_properties.Writer
-	tagWriter         *tag_writer.Writer
-	titler            generative.Titler
-	tagger            *autotagger.Tagger
-	nc                *node_children.Writer
-	fetcher           *fetcher.Fetcher
-	summariser        generative.Summariser
-	indexQueue        pubsub.Topic[mq.IndexNode]
-	deleteQueue       pubsub.Topic[mq.DeleteNode]
-	assetAnalyseQueue pubsub.Topic[mq.AnalyseAsset]
+	accountQuery *account_querier.Querier
+	nodeQuerier  *node_querier.Querier
+	nodeWriter   *node_writer.Writer
+	schemaWriter *node_properties.SchemaWriter
+	propWriter   *node_properties.Writer
+	tagWriter    *tag_writer.Writer
+	titler       generative.Titler
+	tagger       *autotagger.Tagger
+	nc           *node_children.Writer
+	fetcher      *fetcher.Fetcher
+	summariser   generative.Summariser
+	bus          *pubsub.Bus
 }
 
 func New(
@@ -72,24 +69,20 @@ func New(
 	nc *node_children.Writer,
 	fetcher *fetcher.Fetcher,
 	summariser generative.Summariser,
-	indexQueue pubsub.Topic[mq.IndexNode],
-	deleteQueue pubsub.Topic[mq.DeleteNode],
-	assetAnalyseQueue pubsub.Topic[mq.AnalyseAsset],
+	bus *pubsub.Bus,
 ) *Manager {
 	return &Manager{
-		accountQuery:      accountQuery,
-		nodeQuerier:       nodeQuerier,
-		nodeWriter:        nodeWriter,
-		schemaWriter:      schemaWriter,
-		propWriter:        propWriter,
-		tagWriter:         tagWriter,
-		titler:            titler,
-		tagger:            tagger,
-		nc:                nc,
-		fetcher:           fetcher,
-		summariser:        summariser,
-		indexQueue:        indexQueue,
-		deleteQueue:       deleteQueue,
-		assetAnalyseQueue: assetAnalyseQueue,
+		accountQuery: accountQuery,
+		nodeQuerier:  nodeQuerier,
+		nodeWriter:   nodeWriter,
+		schemaWriter: schemaWriter,
+		propWriter:   propWriter,
+		tagWriter:    tagWriter,
+		titler:       titler,
+		tagger:       tagger,
+		nc:           nc,
+		fetcher:      fetcher,
+		summariser:   summariser,
+		bus:          bus,
 	}
 }

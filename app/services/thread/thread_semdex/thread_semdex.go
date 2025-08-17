@@ -7,21 +7,16 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/queue"
 )
 
 func Build() fx.Option {
 	return fx.Options(
-		fx.Provide(
-			queue.New[mq.IndexThread],
-			queue.New[mq.DeleteThread],
-		),
 		fx.Invoke(newSemdexer),
 	)
 }
@@ -40,10 +35,9 @@ type semdexer struct {
 	db            *ent.Client
 	threadQuerier thread.Repository
 	threadWriter  thread.Repository
-	indexQueue    pubsub.Topic[mq.IndexThread]
-	deleteQueue   pubsub.Topic[mq.DeleteThread]
 	semdexMutator semdex.Mutator
 	semdexQuerier semdex.Querier
+	bus           *pubsub.Bus
 }
 
 func newSemdexer(
@@ -55,10 +49,9 @@ func newSemdexer(
 	db *ent.Client,
 	threadQuerier thread.Repository,
 	threadWriter thread.Repository,
-	indexQueue pubsub.Topic[mq.IndexThread],
-	deleteQueue pubsub.Topic[mq.DeleteThread],
 	semdexMutator semdex.Mutator,
 	semdexQuerier semdex.Querier,
+	bus *pubsub.Bus,
 ) {
 	if cfg.SemdexProvider == "" {
 		return
@@ -68,62 +61,64 @@ func newSemdexer(
 		logger:        logger,
 		db:            db,
 		threadQuerier: threadQuerier,
-		threadWriter:  threadQuerier,
-		indexQueue:    indexQueue,
-		deleteQueue:   deleteQueue,
+		threadWriter:  threadWriter,
 		semdexMutator: semdexMutator,
 		semdexQuerier: semdexQuerier,
+		bus:           bus,
 	}
 
-	lc.Append(fx.StartHook(func(_ context.Context) error {
-		sub, err := indexQueue.Subscribe(ctx)
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		_, err := pubsub.Subscribe(hctx, bus, "thread_semdex.index_published", func(ctx context.Context, evt *message.EventThreadPublished) error {
+			return bus.SendCommand(ctx, &message.CommandThreadIndex{ID: evt.ID})
+		})
 		if err != nil {
 			return err
 		}
 
-		go func() {
-			for msg := range sub {
-				if err := re.indexThread(ctx, msg.Payload.ID); err != nil {
-					logger.Error("failed to index thread",
-						slog.String("error", err.Error()),
-						slog.String("post_id", msg.Payload.ID.String()),
-					)
-				}
-
-				msg.Ack()
-			}
-		}()
-
-		return nil
-	}))
-
-	lc.Append(fx.StartHook(func(_ context.Context) error {
-		sub, err := deleteQueue.Subscribe(ctx)
+		_, err = pubsub.Subscribe(hctx, bus, "thread_semdex.update_indexed", func(ctx context.Context, evt *message.EventThreadUpdated) error {
+			return bus.SendCommand(ctx, &message.CommandThreadIndex{ID: evt.ID})
+		})
 		if err != nil {
 			return err
 		}
 
-		go func() {
-			for msg := range sub {
-				if err := re.deindexThread(ctx, msg.Payload.ID); err != nil {
-					logger.Error("failed to deindex post", slog.String("error", err.Error()))
-				}
+		_, err = pubsub.Subscribe(hctx, bus, "thread_semdex.remove_unpublished", func(ctx context.Context, evt *message.EventThreadUnpublished) error {
+			return bus.SendCommand(ctx, &message.CommandThreadDeindex{ID: evt.ID})
+		})
+		if err != nil {
+			return err
+		}
 
-				msg.Ack()
-			}
-		}()
+		_, err = pubsub.Subscribe(hctx, bus, "thread_semdex.remove_deleted", func(ctx context.Context, evt *message.EventThreadDeleted) error {
+			return bus.SendCommand(ctx, &message.CommandThreadDeindex{ID: evt.ID})
+		})
+		if err != nil {
+			return err
+		}
 
 		return nil
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		// err := re.reindex(hctx, DefaultReindexThreshold, DefaultReindexChunk)
-		// if err != nil {
-		// 	return err
-		// }
+		_, err := pubsub.SubscribeCommand(hctx, bus, "thread_semdex.index", func(ctx context.Context, cmd *message.CommandThreadIndex) error {
+			return re.indexThread(ctx, cmd.ID)
+		})
+		if err != nil {
+			return err
+		}
 
+		_, err = pubsub.SubscribeCommand(hctx, bus, "thread_semdex.deindex", func(ctx context.Context, cmd *message.CommandThreadDeindex) error {
+			return re.deindexThread(ctx, cmd.ID)
+		})
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}))
+
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
 		go re.schedule(ctx, DefaultReindexSchedule, DefaultReindexThreshold, DefaultReindexChunk)
-
 		return nil
 	}))
 }

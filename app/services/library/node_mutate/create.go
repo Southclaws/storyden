@@ -11,7 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 )
@@ -60,13 +60,16 @@ func (s *Manager) Create(ctx context.Context,
 		}
 	}
 
+	s.bus.Publish(ctx, &message.EventNodeCreated{
+		ID: library.NodeID(n.Mark.ID()),
+	})
+
 	if p.Visibility.OrZero() == visibility.VisibilityPublished {
-		if err := s.indexQueue.Publish(ctx, mq.IndexNode{ID: library.NodeID(n.Mark.ID())}); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
+		s.bus.Publish(ctx, &message.EventNodePublished{
+			ID: library.NodeID(n.Mark.ID()),
+		})
 	}
 
-	s.fetcher.HydrateContentURLs(ctx, n)
 
 	return n, nil
 }

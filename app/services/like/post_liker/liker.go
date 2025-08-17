@@ -3,30 +3,25 @@ package post_liker
 import (
 	"context"
 
-	"github.com/Southclaws/fault"
-	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/like/like_writer"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type PostLiker struct {
-	likeWriter  *like_writer.LikeWriter
-	likeQueue   pubsub.Topic[mq.LikePost]
-	unlikeQueue pubsub.Topic[mq.UnlikePost]
+	likeWriter *like_writer.LikeWriter
+	bus        *pubsub.Bus
 }
 
 func New(
 	likeWriter *like_writer.LikeWriter,
-	likeQueue pubsub.Topic[mq.LikePost],
-	unlikeQueue pubsub.Topic[mq.UnlikePost],
+	bus *pubsub.Bus,
 ) *PostLiker {
 	return &PostLiker{
-		likeWriter:  likeWriter,
-		likeQueue:   likeQueue,
-		unlikeQueue: unlikeQueue,
+		likeWriter: likeWriter,
+		bus:        bus,
 	}
 }
 
@@ -36,9 +31,9 @@ func (l *PostLiker) AddPostLike(ctx context.Context, accountID account.AccountID
 		return err
 	}
 
-	if err = l.likeQueue.Publish(ctx, mq.LikePost{PostID: postID}); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
+	l.bus.Publish(ctx, &message.EventPostLiked{
+		PostID: postID,
+	})
 
 	return nil
 }
@@ -49,9 +44,9 @@ func (l *PostLiker) RemovePostLike(ctx context.Context, accountID account.Accoun
 		return err
 	}
 
-	if err = l.unlikeQueue.Publish(ctx, mq.UnlikePost{PostID: postID}); err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
-	}
+	l.bus.Publish(ctx, &message.EventPostUnliked{
+		PostID: postID,
+	})
 
 	return nil
 }

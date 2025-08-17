@@ -11,7 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -67,14 +67,14 @@ func (s *service) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))
 	}
 
-	if partial.Visibility.OrZero() == visibility.VisibilityPublished {
-		s.indexQueue.PublishAndForget(ctx, mq.IndexThread{
+	if status == visibility.VisibilityPublished {
+		s.bus.Publish(ctx, &message.EventThreadPublished{
 			ID: thr.ID,
 		})
 	}
 
-	s.fetcher.HydrateContentURLs(ctx, thr)
 
+	// TODO: Do this using event consumer.
 	s.mentioner.Send(ctx, authorID, *datagraph.NewRef(thr), thr.Content.References()...)
 
 	return thr, nil

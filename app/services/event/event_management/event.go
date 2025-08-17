@@ -22,7 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/event/participation"
 	"github.com/Southclaws/storyden/app/resources/event/participation/participant_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -40,7 +40,7 @@ type Manager struct {
 	partWriter   *participant_writer.Writer
 
 	threadWriter thread.Service
-	queue        pubsub.Topic[mq.CreateEvent]
+	bus          *pubsub.Bus
 }
 
 func New(
@@ -49,7 +49,7 @@ func New(
 	writer *event_writer.Writer,
 	partWriter *participant_writer.Writer,
 	threadWriter thread.Service,
-	queue pubsub.Topic[mq.CreateEvent],
+	bus *pubsub.Bus,
 ) *Manager {
 	return &Manager{
 		accountQuery: accountQuery,
@@ -57,7 +57,7 @@ func New(
 		writer:       writer,
 		partWriter:   partWriter,
 		threadWriter: threadWriter,
-		queue:        queue,
+		bus:          bus,
 	}
 }
 
@@ -135,8 +135,12 @@ func (m *Manager) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	m.bus.Publish(ctx, &message.EventActivityCreated{
+		ID: evt.ID,
+	})
+
 	if vis == visibility.VisibilityPublished {
-		m.queue.PublishAndForget(ctx, mq.CreateEvent{
+		m.bus.Publish(ctx, &message.EventActivityPublished{
 			ID: evt.ID,
 		})
 	}
@@ -187,9 +191,13 @@ func (m *Manager) Update(ctx context.Context, mk event_ref.QueryKey, partial Par
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to update event"))
 	}
 
+	m.bus.Publish(ctx, &message.EventActivityUpdated{
+		ID: evt.ID,
+	})
+
 	if vis, ok := partial.Visibility.Get(); ok && vis == visibility.VisibilityPublished {
 		if current.Visibility != evt.Visibility {
-			m.queue.PublishAndForget(ctx, mq.CreateEvent{
+			m.bus.Publish(ctx, &message.EventActivityPublished{
 				ID: evt.ID,
 			})
 		}
@@ -223,5 +231,14 @@ func (m *Manager) Delete(ctx context.Context, mk event_ref.QueryKey, partial Par
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return m.writer.Delete(ctx, mk)
+	evt, err := m.writer.Delete(ctx, mk)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	m.bus.Publish(ctx, &message.EventActivityDeleted{
+		ID: evt.ID,
+	})
+
+	return evt, nil
 }

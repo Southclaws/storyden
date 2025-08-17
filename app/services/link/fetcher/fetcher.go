@@ -18,9 +18,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
-	"github.com/Southclaws/storyden/app/services/library/node_fill"
 	"github.com/Southclaws/storyden/app/services/link/scrape"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -33,8 +32,7 @@ type Fetcher struct {
 	lq       *link_querier.LinkQuerier
 	lr       *link_writer.LinkWriter
 	sc       scrape.Scraper
-	nodeFill *node_fill.Filler
-	queue    pubsub.Topic[mq.ScrapeLink]
+	bus      *pubsub.Bus
 }
 
 func New(
@@ -43,8 +41,7 @@ func New(
 	lq *link_querier.LinkQuerier,
 	lr *link_writer.LinkWriter,
 	sc scrape.Scraper,
-	nodeFill *node_fill.Filler,
-	queue pubsub.Topic[mq.ScrapeLink],
+	bus *pubsub.Bus,
 ) *Fetcher {
 	return &Fetcher{
 		logger:   logger,
@@ -52,8 +49,7 @@ func New(
 		lq:       lq,
 		lr:       lr,
 		sc:       sc,
-		nodeFill: nodeFill,
-		queue:    queue,
+		bus:      bus,
 	}
 }
 
@@ -71,19 +67,15 @@ func (s *Fetcher) Fetch(ctx context.Context, u url.URL, opts Options) (*link_ref
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	if len(r.Links) > 0 {
-		s.queue.PublishAndForget(ctx, mq.ScrapeLink{URL: u})
+		if err := s.bus.SendCommand(ctx, &message.CommandScrapeLink{URL: u}); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 		return r.Links[0], nil
 	}
 
-	lr, wc, err := s.ScrapeAndStore(ctx, u)
+	lr, _, err := s.ScrapeAndStore(ctx, u)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	if cfr, ok := opts.ContentFill.Get(); ok {
-		if err := s.nodeFill.FillContentFromLink(ctx, lr, wc, cfr); err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
-		}
 	}
 
 	return lr, nil
@@ -101,20 +93,22 @@ func (s *Fetcher) HydrateContentURLs(ctx context.Context, item datagraph.Item) {
 			continue
 		}
 
-		err = s.QueueForItem(ctx, *parsed, item)
+		err = s.queueForItem(ctx, *parsed, item)
 		if err != nil {
 			continue
 		}
 	}
 }
 
-// QueueForItem queues a scrape request for a URL that is linked to an item.
+// queueForItem queues a scrape request for a URL that is linked to an item.
 // When the scrape job is done, the scraped link will be related to the item.
-func (s *Fetcher) QueueForItem(ctx context.Context, u url.URL, item datagraph.Item) error {
-	s.queue.PublishAndForget(ctx, mq.ScrapeLink{
+func (s *Fetcher) queueForItem(ctx context.Context, u url.URL, item datagraph.Item) error {
+	if err := s.bus.SendCommand(ctx, &message.CommandScrapeLink{
 		URL:  u,
 		Item: datagraph.NewRef(item),
-	})
+	}); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return nil
 }

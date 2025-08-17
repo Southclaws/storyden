@@ -12,7 +12,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/library"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_node "github.com/Southclaws/storyden/internal/ent/node"
 )
@@ -61,25 +61,20 @@ func (r *semdexer) reindex(ctx context.Context, reindexThreshold time.Duration, 
 		slog.Int("deleted", len(deleted)),
 	)
 
-	toIndex := dt.Map(updated, func(id xid.ID) mq.IndexNode {
-		return mq.IndexNode{ID: library.NodeID(id)}
+	toIndex := dt.Map(updated, func(id xid.ID) any {
+		return message.CommandNodeIndex{ID: library.NodeID(id)}
 	})
-	toDelete := dt.Map(deleted, func(id xid.ID) mq.DeleteNode {
-		return mq.DeleteNode{ID: library.NodeID(id)}
+	toDelete := dt.Map(deleted, func(id xid.ID) any {
+		return message.CommandNodeDeindex{ID: library.NodeID(id)}
 	})
 
-	if err := r.indexQueue.Publish(ctx, toIndex...); err != nil {
+	if err := r.bus.MustPublishMany(ctx, toIndex...); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	if err := r.deleteQueue.Publish(ctx, toDelete...); err != nil {
+	if err := r.bus.MustPublishMany(ctx, toDelete...); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
 	return nil
-}
-
-func diff(targets []xid.ID, indexed []xid.ID) []xid.ID {
-	_, ids := lo.Difference(indexed, targets)
-	return ids
 }

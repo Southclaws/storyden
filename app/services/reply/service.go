@@ -10,12 +10,12 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/mq"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/moderation/content_policy"
-	"github.com/Southclaws/storyden/app/services/notification/notify"
+	"github.com/Southclaws/storyden/app/services/reply/reply_notify"
+	"github.com/Southclaws/storyden/app/services/reply/reply_semdex"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -47,15 +47,18 @@ func (p Partial) Opts() (opts []reply.Option) {
 }
 
 func Build() fx.Option {
-	return fx.Provide(New)
+	return fx.Options(
+		fx.Provide(New),
+		reply_semdex.Build(),
+		reply_notify.Build(),
+	)
 }
 
 type service struct {
 	accountQuery *account_querier.Querier
 	post_repo    reply.Repository
 	fetcher      *fetcher.Fetcher
-	indexQueue   pubsub.Topic[mq.IndexReply]
-	notifier     *notify.Notifier
+	bus          *pubsub.Bus
 	cpm          *content_policy.Manager
 }
 
@@ -63,16 +66,14 @@ func New(
 	accountQuery *account_querier.Querier,
 	post_repo reply.Repository,
 	fetcher *fetcher.Fetcher,
-	indexQueue pubsub.Topic[mq.IndexReply],
-	notifier *notify.Notifier,
+	bus *pubsub.Bus,
 	cpm *content_policy.Manager,
 ) Service {
 	return &service{
 		accountQuery: accountQuery,
 		post_repo:    post_repo,
 		fetcher:      fetcher,
-		indexQueue:   indexQueue,
-		notifier:     notifier,
+		bus:          bus,
 		cpm:          cpm,
 	}
 }

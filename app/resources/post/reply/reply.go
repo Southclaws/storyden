@@ -84,6 +84,11 @@ func Map(m *ent.Post) (*Reply, error) {
 
 	replyTo := replyTo(m)
 
+	rootAuthor, err := profile.MapRef(m.Edges.Root.Edges.Author)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Reply{
 		Post: post.Post{
 			ID: post.ID(m.ID),
@@ -97,7 +102,8 @@ func Map(m *ent.Post) (*Reply, error) {
 			UpdatedAt: m.UpdatedAt,
 			DeletedAt: opt.NewPtr(m.DeletedAt),
 		},
-		ReplyTo: replyTo,
+		ReplyTo:    replyTo,
+		RootAuthor: *rootAuthor,
 	}, nil
 }
 

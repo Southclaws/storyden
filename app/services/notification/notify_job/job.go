@@ -6,7 +6,7 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -14,27 +14,18 @@ func runNotifyConsumer(
 	ctx context.Context,
 	lc fx.Lifecycle,
 	logger *slog.Logger,
-
-	queue pubsub.Topic[mq.Notification],
-
+	bus *pubsub.Bus,
 	ic *notifyConsumer,
 ) {
-	lc.Append(fx.StartHook(func(_ context.Context) error {
-		channel, err := queue.Subscribe(ctx)
-		if err != nil {
-			panic(err)
-		}
-
-		go func() {
-			for msg := range channel {
-				if err := ic.notify(ctx, msg.Payload.TargetID, msg.Payload.SourceID, msg.Payload.Event, msg.Payload.Item); err != nil {
-					logger.Error("failed to notify", slog.String("error", err.Error()))
-				}
-
-				msg.Ack()
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		_, err := pubsub.SubscribeCommand(hctx, bus, "notify_job.send_notification", func(ctx context.Context, cmd *message.CommandSendNotification) error {
+			if err := ic.notify(ctx, cmd.TargetID, cmd.SourceID, cmd.Event, cmd.Item); err != nil {
+				logger.Error("failed to notify", slog.String("error", err.Error()))
+				return err
 			}
-		}()
+			return nil
+		})
 
-		return nil
+		return err
 	}))
 }

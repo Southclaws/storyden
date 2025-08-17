@@ -129,6 +129,7 @@ require (
 	github.com/go-openapi/validate v0.24.0 // indirect
 	github.com/go-webauthn/x v0.1.23 // indirect
 	github.com/goccy/go-json v0.10.5 // indirect
+	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/go-tpm v0.9.5 // indirect
@@ -165,6 +166,7 @@ require (
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
+	github.com/sony/gobreaker v1.0.0 // indirect
 	github.com/speakeasy-api/jsonpath v0.6.2 // indirect
 	github.com/speakeasy-api/openapi-overlay v0.10.3 // indirect
 	github.com/spf13/cast v1.7.1 // indirect
