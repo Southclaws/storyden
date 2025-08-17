@@ -7,7 +7,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
 
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -45,7 +45,7 @@ func (s *service) Delete(ctx context.Context, postID post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &mq.EventThreadReplyDeleted{
+	s.bus.Publish(ctx, &message.EventThreadReplyDeleted{
 		ThreadID: p.RootPostID,
 		ReplyID:  p.ID,
 	})

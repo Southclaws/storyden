@@ -10,7 +10,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/comms/mailtemplate"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
@@ -50,7 +50,7 @@ func Build() fx.Option {
 			}
 
 			lc.Append(fx.StartHook(func(hctx context.Context) error {
-				_, err := pubsub.SubscribeCommand(hctx, bus, "mailqueue.send_email", func(ctx context.Context, cmd *mq.CommandSendEmail) error {
+				_, err := pubsub.SubscribeCommand(hctx, bus, "mailqueue.send_email", func(ctx context.Context, cmd *message.CommandSendEmail) error {
 					if err := sender.Send(ctx, cmd.Message); err != nil {
 						logger.Error("failed to send email", slog.String("error", err.Error()))
 						return err
@@ -77,13 +77,13 @@ func (q *Queuer) Queue(ctx context.Context, address mail.Address, name string, s
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	message, err := mailer.NewMessage(address, name, subject, *content)
+	msg, err := mailer.NewMessage(address, name, subject, *content)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	q.bus.SendCommand(ctx, &mq.CommandSendEmail{
-		Message: *message,
+	q.bus.SendCommand(ctx, &message.CommandSendEmail{
+		Message: *msg,
 	})
 
 	return nil

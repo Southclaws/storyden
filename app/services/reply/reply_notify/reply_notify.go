@@ -9,7 +9,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/notification/notify"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -22,7 +22,7 @@ func Build() fx.Option {
 		notifier *notify.Notifier,
 	) {
 		consumer := func(hctx context.Context) error {
-			_, err := pubsub.Subscribe(hctx, bus, "reply_notify.reply_created", func(ctx context.Context, evt *mq.EventThreadReplyCreated) error {
+			_, err := pubsub.Subscribe(hctx, bus, "reply_notify.reply_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
 				notifier.Send(ctx,
 					evt.ThreadAuthorID,
 					opt.New(evt.ReplyAuthorID),

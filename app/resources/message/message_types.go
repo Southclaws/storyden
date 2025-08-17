@@ -1,4 +1,4 @@
-package mq
+package message
 
 import (
 	"net/url"

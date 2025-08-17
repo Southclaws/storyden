@@ -9,7 +9,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
@@ -50,15 +50,15 @@ func newProfileSemdexer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.Subscribe(hctx, bus, "profile_semdex.index_created", func(ctx context.Context, evt *mq.EventAccountCreated) error {
-			return bus.SendCommand(ctx, &mq.CommandProfileIndex{ID: evt.ID})
+		_, err := pubsub.Subscribe(hctx, bus, "profile_semdex.index_created", func(ctx context.Context, evt *message.EventAccountCreated) error {
+			return bus.SendCommand(ctx, &message.CommandProfileIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "profile_semdex.index_updated", func(ctx context.Context, evt *mq.EventAccountUpdated) error {
-			return bus.SendCommand(ctx, &mq.CommandProfileIndex{ID: evt.ID})
+		_, err = pubsub.Subscribe(hctx, bus, "profile_semdex.index_updated", func(ctx context.Context, evt *message.EventAccountUpdated) error {
+			return bus.SendCommand(ctx, &message.CommandProfileIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
@@ -68,7 +68,7 @@ func newProfileSemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.SubscribeCommand(hctx, bus, "profile_semdex.index", func(ctx context.Context, cmd *mq.CommandProfileIndex) error {
+		_, err := pubsub.SubscribeCommand(hctx, bus, "profile_semdex.index", func(ctx context.Context, cmd *message.CommandProfileIndex) error {
 			return s.indexProfile(ctx, cmd.ID)
 		})
 		if err != nil {

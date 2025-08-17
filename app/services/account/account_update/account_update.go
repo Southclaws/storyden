@@ -10,7 +10,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -66,7 +66,7 @@ func (u *Updater) Update(ctx context.Context, id account.AccountID, params Parti
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	u.bus.Publish(ctx, &mq.EventAccountUpdated{
+	u.bus.Publish(ctx, &message.EventAccountUpdated{
 		ID: id,
 	})
 

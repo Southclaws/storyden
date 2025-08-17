@@ -22,7 +22,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/event/participation"
 	"github.com/Southclaws/storyden/app/resources/event/participation/participant_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -135,12 +135,12 @@ func (m *Manager) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	m.bus.Publish(ctx, &mq.EventActivityCreated{
+	m.bus.Publish(ctx, &message.EventActivityCreated{
 		ID: evt.ID,
 	})
 
 	if vis == visibility.VisibilityPublished {
-		m.bus.Publish(ctx, &mq.EventActivityPublished{
+		m.bus.Publish(ctx, &message.EventActivityPublished{
 			ID: evt.ID,
 		})
 	}
@@ -191,13 +191,13 @@ func (m *Manager) Update(ctx context.Context, mk event_ref.QueryKey, partial Par
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to update event"))
 	}
 
-	m.bus.Publish(ctx, &mq.EventActivityUpdated{
+	m.bus.Publish(ctx, &message.EventActivityUpdated{
 		ID: evt.ID,
 	})
 
 	if vis, ok := partial.Visibility.Get(); ok && vis == visibility.VisibilityPublished {
 		if current.Visibility != evt.Visibility {
-			m.bus.Publish(ctx, &mq.EventActivityPublished{
+			m.bus.Publish(ctx, &message.EventActivityPublished{
 				ID: evt.ID,
 			})
 		}
@@ -236,7 +236,7 @@ func (m *Manager) Delete(ctx context.Context, mk event_ref.QueryKey, partial Par
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	m.bus.Publish(ctx, &mq.EventActivityDeleted{
+	m.bus.Publish(ctx, &message.EventActivityDeleted{
 		ID: evt.ID,
 	})
 

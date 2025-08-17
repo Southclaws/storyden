@@ -9,7 +9,7 @@ import (
 	"github.com/rs/xid"
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/services/semdex"
@@ -54,22 +54,22 @@ func newReplySemdexer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.Subscribe(hctx, bus, "reply_semdex.index_created", func(ctx context.Context, evt *mq.EventThreadReplyCreated) error {
-			return bus.SendCommand(ctx, &mq.CommandReplyIndex{ID: evt.ReplyID})
+		_, err := pubsub.Subscribe(hctx, bus, "reply_semdex.index_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
+			return bus.SendCommand(ctx, &message.CommandReplyIndex{ID: evt.ReplyID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "reply_semdex.index_updated", func(ctx context.Context, evt *mq.EventThreadReplyUpdated) error {
-			return bus.SendCommand(ctx, &mq.CommandReplyIndex{ID: evt.ReplyID})
+		_, err = pubsub.Subscribe(hctx, bus, "reply_semdex.index_updated", func(ctx context.Context, evt *message.EventThreadReplyUpdated) error {
+			return bus.SendCommand(ctx, &message.CommandReplyIndex{ID: evt.ReplyID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "reply_semdex.deindex_deleted", func(ctx context.Context, evt *mq.EventThreadReplyDeleted) error {
-			return bus.SendCommand(ctx, &mq.CommandReplyDeindex{ID: evt.ReplyID})
+		_, err = pubsub.Subscribe(hctx, bus, "reply_semdex.deindex_deleted", func(ctx context.Context, evt *message.EventThreadReplyDeleted) error {
+			return bus.SendCommand(ctx, &message.CommandReplyDeindex{ID: evt.ReplyID})
 		})
 		if err != nil {
 			return err
@@ -79,14 +79,14 @@ func newReplySemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.SubscribeCommand(hctx, bus, "reply_semdex.index", func(ctx context.Context, cmd *mq.CommandReplyIndex) error {
+		_, err := pubsub.SubscribeCommand(hctx, bus, "reply_semdex.index", func(ctx context.Context, cmd *message.CommandReplyIndex) error {
 			return re.indexReply(ctx, cmd.ID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.SubscribeCommand(hctx, bus, "reply_semdex.deindex", func(ctx context.Context, cmd *mq.CommandReplyDeindex) error {
+		_, err = pubsub.SubscribeCommand(hctx, bus, "reply_semdex.deindex", func(ctx context.Context, cmd *message.CommandReplyDeindex) error {
 			return re.deindexReply(ctx, cmd.ID)
 		})
 		if err != nil {

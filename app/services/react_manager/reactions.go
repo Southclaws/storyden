@@ -8,7 +8,7 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -47,7 +47,7 @@ func (s *Reactor) Add(ctx context.Context, postID post.ID, emoji string) (*react
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &mq.EventPostReacted{PostID: postID})
+	s.bus.Publish(ctx, &message.EventPostReacted{PostID: postID})
 
 	return r, nil
 }

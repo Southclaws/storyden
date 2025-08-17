@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/library"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_auth"
@@ -56,7 +56,7 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 	}
 
 	// Emit update event
-	s.bus.Publish(ctx, &mq.EventNodeUpdated{
+	s.bus.Publish(ctx, &message.EventNodeUpdated{
 		ID: library.NodeID(n.Mark.ID()),
 	})
 
@@ -64,18 +64,18 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 	if oldVisibility != n.Visibility {
 		switch n.Visibility {
 		case visibility.VisibilityPublished:
-			s.bus.Publish(ctx, &mq.EventNodePublished{
+			s.bus.Publish(ctx, &message.EventNodePublished{
 				ID: library.NodeID(n.Mark.ID()),
 			})
 
 		case visibility.VisibilityReview:
-			s.bus.Publish(ctx, &mq.EventNodeSubmittedForReview{
+			s.bus.Publish(ctx, &message.EventNodeSubmittedForReview{
 				ID: library.NodeID(n.Mark.ID()),
 			})
 
 		case visibility.VisibilityUnlisted, visibility.VisibilityDraft:
 			if oldVisibility == visibility.VisibilityPublished {
-				s.bus.Publish(ctx, &mq.EventNodeUnpublished{
+				s.bus.Publish(ctx, &message.EventNodeUnpublished{
 					ID: library.NodeID(n.Mark.ID()),
 				})
 			}

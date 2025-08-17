@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 )
@@ -32,7 +32,7 @@ func (s *service) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create reply post in thread"))
 	}
 
-	s.bus.Publish(ctx, &mq.EventThreadReplyCreated{
+	s.bus.Publish(ctx, &message.EventThreadReplyCreated{
 		ThreadID:       p.RootPostID,
 		ReplyID:        p.ID,
 		ThreadAuthorID: p.RootAuthor.ID,

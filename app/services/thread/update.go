@@ -11,7 +11,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -86,18 +86,18 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 	}
 
 	// Always emit a general update event
-	s.bus.Publish(ctx, &mq.EventThreadUpdated{
+	s.bus.Publish(ctx, &message.EventThreadUpdated{
 		ID: thr.ID,
 	})
 
 	// Emit visibility-specific events when visibility changes
 	if oldVisibility != thr.Visibility {
 		if thr.Visibility == visibility.VisibilityPublished {
-			s.bus.Publish(ctx, &mq.EventThreadPublished{
+			s.bus.Publish(ctx, &message.EventThreadPublished{
 				ID: thr.ID,
 			})
 		} else {
-			s.bus.Publish(ctx, &mq.EventThreadUnpublished{
+			s.bus.Publish(ctx, &message.EventThreadUnpublished{
 				ID: thr.ID,
 			})
 		}

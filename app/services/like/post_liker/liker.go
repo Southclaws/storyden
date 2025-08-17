@@ -5,7 +5,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/like/like_writer"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -31,7 +31,7 @@ func (l *PostLiker) AddPostLike(ctx context.Context, accountID account.AccountID
 		return err
 	}
 
-	l.bus.Publish(ctx, &mq.EventPostLiked{
+	l.bus.Publish(ctx, &message.EventPostLiked{
 		PostID: postID,
 	})
 
@@ -44,7 +44,7 @@ func (l *PostLiker) RemovePostLike(ctx context.Context, accountID account.Accoun
 		return err
 	}
 
-	l.bus.Publish(ctx, &mq.EventPostUnliked{
+	l.bus.Publish(ctx, &message.EventPostUnliked{
 		PostID: postID,
 	})
 

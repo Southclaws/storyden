@@ -17,7 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/onboarding"
@@ -82,7 +82,7 @@ func (s *Registrar) Create(ctx context.Context, handle opt.Optional[string], opt
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &mq.EventAccountCreated{
+	s.bus.Publish(ctx, &message.EventAccountCreated{
 		ID: acc.Account.ID,
 	})
 

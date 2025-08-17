@@ -16,7 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
@@ -49,7 +49,7 @@ func runScrapeConsumer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.SubscribeCommand(hctx, bus, "scrape_job.scrape", func(ctx context.Context, cmd *mq.CommandScrapeLink) error {
+		_, err := pubsub.SubscribeCommand(hctx, bus, "scrape_job.scrape", func(ctx context.Context, cmd *message.CommandScrapeLink) error {
 			return ic.scrapeLink(ctx, cmd.URL, opt.NewPtr(cmd.Item))
 		})
 		if err != nil {

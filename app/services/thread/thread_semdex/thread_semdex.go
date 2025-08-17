@@ -7,7 +7,7 @@ import (
 
 	"go.uber.org/fx"
 
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
@@ -68,29 +68,29 @@ func newSemdexer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.Subscribe(hctx, bus, "thread_semdex.index_published", func(ctx context.Context, evt *mq.EventThreadPublished) error {
-			return bus.SendCommand(ctx, &mq.CommandThreadIndex{ID: evt.ID})
+		_, err := pubsub.Subscribe(hctx, bus, "thread_semdex.index_published", func(ctx context.Context, evt *message.EventThreadPublished) error {
+			return bus.SendCommand(ctx, &message.CommandThreadIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "thread_semdex.update_indexed", func(ctx context.Context, evt *mq.EventThreadUpdated) error {
-			return bus.SendCommand(ctx, &mq.CommandThreadIndex{ID: evt.ID})
+		_, err = pubsub.Subscribe(hctx, bus, "thread_semdex.update_indexed", func(ctx context.Context, evt *message.EventThreadUpdated) error {
+			return bus.SendCommand(ctx, &message.CommandThreadIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "thread_semdex.remove_unpublished", func(ctx context.Context, evt *mq.EventThreadUnpublished) error {
-			return bus.SendCommand(ctx, &mq.CommandThreadDeindex{ID: evt.ID})
+		_, err = pubsub.Subscribe(hctx, bus, "thread_semdex.remove_unpublished", func(ctx context.Context, evt *message.EventThreadUnpublished) error {
+			return bus.SendCommand(ctx, &message.CommandThreadDeindex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "thread_semdex.remove_deleted", func(ctx context.Context, evt *mq.EventThreadDeleted) error {
-			return bus.SendCommand(ctx, &mq.CommandThreadDeindex{ID: evt.ID})
+		_, err = pubsub.Subscribe(hctx, bus, "thread_semdex.remove_deleted", func(ctx context.Context, evt *message.EventThreadDeleted) error {
+			return bus.SendCommand(ctx, &message.CommandThreadDeindex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
@@ -100,14 +100,14 @@ func newSemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.SubscribeCommand(hctx, bus, "thread_semdex.index", func(ctx context.Context, cmd *mq.CommandThreadIndex) error {
+		_, err := pubsub.SubscribeCommand(hctx, bus, "thread_semdex.index", func(ctx context.Context, cmd *message.CommandThreadIndex) error {
 			return re.indexThread(ctx, cmd.ID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.SubscribeCommand(hctx, bus, "thread_semdex.deindex", func(ctx context.Context, cmd *mq.CommandThreadDeindex) error {
+		_, err = pubsub.SubscribeCommand(hctx, bus, "thread_semdex.deindex", func(ctx context.Context, cmd *message.CommandThreadDeindex) error {
 			return re.deindexThread(ctx, cmd.ID)
 		})
 		if err != nil {

@@ -12,7 +12,7 @@ import (
 	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/library"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_node "github.com/Southclaws/storyden/internal/ent/node"
 )
@@ -62,10 +62,10 @@ func (r *semdexer) reindex(ctx context.Context, reindexThreshold time.Duration, 
 	)
 
 	toIndex := dt.Map(updated, func(id xid.ID) any {
-		return mq.CommandNodeIndex{ID: library.NodeID(id)}
+		return message.CommandNodeIndex{ID: library.NodeID(id)}
 	})
 	toDelete := dt.Map(deleted, func(id xid.ID) any {
-		return mq.CommandNodeDeindex{ID: library.NodeID(id)}
+		return message.CommandNodeDeindex{ID: library.NodeID(id)}
 	})
 
 	if err := r.bus.MustPublishMany(ctx, toIndex...); err != nil {

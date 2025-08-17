@@ -12,7 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -82,16 +82,16 @@ func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, 
 	if oldVisibility != vis {
 		switch vis {
 		case visibility.VisibilityPublished:
-			m.bus.Publish(ctx, &mq.EventNodePublished{
+			m.bus.Publish(ctx, &message.EventNodePublished{
 				ID: library.NodeID(n.Mark.ID()),
 			})
 		case visibility.VisibilityReview:
-			m.bus.Publish(ctx, &mq.EventNodeSubmittedForReview{
+			m.bus.Publish(ctx, &message.EventNodeSubmittedForReview{
 				ID: library.NodeID(n.Mark.ID()),
 			})
 		case visibility.VisibilityUnlisted, visibility.VisibilityDraft:
 			if oldVisibility == visibility.VisibilityPublished {
-				m.bus.Publish(ctx, &mq.EventNodeUnpublished{
+				m.bus.Publish(ctx, &message.EventNodeUnpublished{
 					ID: library.NodeID(n.Mark.ID()),
 				})
 			}

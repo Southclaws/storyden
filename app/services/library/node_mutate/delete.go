@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/opt"
 
 	"github.com/Southclaws/storyden/app/resources/library"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_auth"
 )
@@ -54,7 +54,7 @@ func (s *Manager) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &mq.EventNodeDeleted{
+	s.bus.Publish(ctx, &message.EventNodeDeleted{
 		ID: library.NodeID(n.GetID()),
 	})
 

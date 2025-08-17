@@ -9,7 +9,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
 	"github.com/Southclaws/storyden/app/services/library/node_mutate"
 	"github.com/Southclaws/storyden/app/services/semdex"
@@ -98,22 +98,22 @@ func newSemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.Subscribe(hctx, bus, "node_semdex.published", func(ctx context.Context, evt *mq.EventNodePublished) error {
-			return bus.SendCommand(ctx, &mq.CommandNodeIndex{ID: evt.ID})
+		_, err := pubsub.Subscribe(hctx, bus, "node_semdex.published", func(ctx context.Context, evt *message.EventNodePublished) error {
+			return bus.SendCommand(ctx, &message.CommandNodeIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "node_semdex.unpublished", func(ctx context.Context, evt *mq.EventNodeUnpublished) error {
-			return bus.SendCommand(ctx, &mq.CommandNodeDeindex{ID: evt.ID})
+		_, err = pubsub.Subscribe(hctx, bus, "node_semdex.unpublished", func(ctx context.Context, evt *message.EventNodeUnpublished) error {
+			return bus.SendCommand(ctx, &message.CommandNodeDeindex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(hctx, bus, "node_semdex.deleted", func(ctx context.Context, evt *mq.EventNodeDeleted) error {
-			return bus.SendCommand(ctx, &mq.CommandNodeDeindex{ID: evt.ID})
+		_, err = pubsub.Subscribe(hctx, bus, "node_semdex.deleted", func(ctx context.Context, evt *message.EventNodeDeleted) error {
+			return bus.SendCommand(ctx, &message.CommandNodeDeindex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
@@ -123,14 +123,14 @@ func newSemdexer(
 	}))
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.SubscribeCommand(hctx, bus, "node_semdex.index", func(ctx context.Context, cmd *mq.CommandNodeIndex) error {
+		_, err := pubsub.SubscribeCommand(hctx, bus, "node_semdex.index", func(ctx context.Context, cmd *message.CommandNodeIndex) error {
 			return re.index(ctx, cmd.ID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.SubscribeCommand(hctx, bus, "node_semdex.deindex", func(ctx context.Context, cmd *mq.CommandNodeDeindex) error {
+		_, err = pubsub.SubscribeCommand(hctx, bus, "node_semdex.deindex", func(ctx context.Context, cmd *message.CommandNodeDeindex) error {
 			return re.deindex(ctx, cmd.ID)
 		})
 		if err != nil {

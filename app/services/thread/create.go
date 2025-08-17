@@ -11,7 +11,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/mq"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -68,7 +68,7 @@ func (s *service) Create(ctx context.Context,
 	}
 
 	if status == visibility.VisibilityPublished {
-		s.bus.Publish(ctx, &mq.EventThreadPublished{
+		s.bus.Publish(ctx, &message.EventThreadPublished{
 			ID: thr.ID,
 		})
 	}
