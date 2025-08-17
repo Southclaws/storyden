@@ -161,7 +161,22 @@ type CommandScrapeLink struct {
 	Item *datagraph.Ref
 }
 
+// -
+// Scheduled event events
+// -
 
-type CreateEvent struct {
+type EventActivityCreated struct {
+	ID event_ref.EventID
+}
+
+type EventActivityUpdated struct {
+	ID event_ref.EventID
+}
+
+type EventActivityDeleted struct {
+	ID event_ref.EventID
+}
+
+type EventActivityPublished struct {
 	ID event_ref.EventID
 }

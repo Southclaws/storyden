@@ -28,7 +28,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/thread"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	eventbus "github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
 )
 
 var errNotAuthorised = fault.New("not authorised")
@@ -40,7 +40,7 @@ type Manager struct {
 	partWriter   *participant_writer.Writer
 
 	threadWriter thread.Service
-	queue        pubsub.Topic[mq.CreateEvent]
+	bus          *eventbus.Bus
 }
 
 func New(
@@ -49,7 +49,7 @@ func New(
 	writer *event_writer.Writer,
 	partWriter *participant_writer.Writer,
 	threadWriter thread.Service,
-	queue pubsub.Topic[mq.CreateEvent],
+	bus *eventbus.Bus,
 ) *Manager {
 	return &Manager{
 		accountQuery: accountQuery,
@@ -57,7 +57,7 @@ func New(
 		writer:       writer,
 		partWriter:   partWriter,
 		threadWriter: threadWriter,
-		queue:        queue,
+		bus:          bus,
 	}
 }
 
@@ -135,8 +135,12 @@ func (m *Manager) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	m.bus.Publish(ctx, &mq.EventActivityCreated{
+		ID: evt.ID,
+	})
+
 	if vis == visibility.VisibilityPublished {
-		m.queue.PublishAndForget(ctx, mq.CreateEvent{
+		m.bus.Publish(ctx, &mq.EventActivityPublished{
 			ID: evt.ID,
 		})
 	}
@@ -187,9 +191,13 @@ func (m *Manager) Update(ctx context.Context, mk event_ref.QueryKey, partial Par
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to update event"))
 	}
 
+	m.bus.Publish(ctx, &mq.EventActivityUpdated{
+		ID: evt.ID,
+	})
+
 	if vis, ok := partial.Visibility.Get(); ok && vis == visibility.VisibilityPublished {
 		if current.Visibility != evt.Visibility {
-			m.queue.PublishAndForget(ctx, mq.CreateEvent{
+			m.bus.Publish(ctx, &mq.EventActivityPublished{
 				ID: evt.ID,
 			})
 		}
@@ -223,5 +231,14 @@ func (m *Manager) Delete(ctx context.Context, mk event_ref.QueryKey, partial Par
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return m.writer.Delete(ctx, mk)
+	evt, err := m.writer.Delete(ctx, mk)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	m.bus.Publish(ctx, &mq.EventActivityDeleted{
+		ID: evt.ID,
+	})
+
+	return evt, nil
 }
