@@ -82,9 +82,11 @@ func (q *Queuer) Queue(ctx context.Context, address mail.Address, name string, s
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	q.bus.SendCommand(ctx, &message.CommandSendEmail{
+	if err := q.bus.SendCommand(ctx, &message.CommandSendEmail{
 		Message: *msg,
-	})
+	}); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return nil
 }

@@ -67,7 +67,9 @@ func (s *Fetcher) Fetch(ctx context.Context, u url.URL, opts Options) (*link_ref
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	if len(r.Links) > 0 {
-		s.bus.SendCommand(ctx, &message.CommandScrapeLink{URL: u})
+		if err := s.bus.SendCommand(ctx, &message.CommandScrapeLink{URL: u}); err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
 		return r.Links[0], nil
 	}
 
@@ -101,10 +103,12 @@ func (s *Fetcher) HydrateContentURLs(ctx context.Context, item datagraph.Item) {
 // QueueForItem queues a scrape request for a URL that is linked to an item.
 // When the scrape job is done, the scraped link will be related to the item.
 func (s *Fetcher) QueueForItem(ctx context.Context, u url.URL, item datagraph.Item) error {
-	s.bus.SendCommand(ctx, &message.CommandScrapeLink{
+	if err := s.bus.SendCommand(ctx, &message.CommandScrapeLink{
 		URL:  u,
 		Item: datagraph.NewRef(item),
-	})
+	}); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
 
 	return nil
 }

@@ -23,7 +23,7 @@ func Build() fx.Option {
 	) {
 		consumer := func(hctx context.Context) error {
 			_, err := pubsub.Subscribe(hctx, bus, "reply_notify.reply_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
-				notifier.Send(ctx,
+				return notifier.Send(ctx,
 					evt.ThreadAuthorID,
 					opt.New(evt.ReplyAuthorID),
 					notification.EventThreadReply,
@@ -32,7 +32,6 @@ func Build() fx.Option {
 						Kind: datagraph.KindPost,
 					},
 				)
-				return nil
 			})
 			return err
 		}
