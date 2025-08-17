@@ -73,7 +73,7 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 				ID: library.NodeID(n.Mark.ID()),
 			})
 
-		case visibility.VisibilityUnlisted, visibility.VisibilityDraft:
+		case visibility.VisibilityUnlisted, visibility.VisibilityDraft, visibility.VisibilityReview:
 			if oldVisibility == visibility.VisibilityPublished {
 				s.bus.Publish(ctx, &message.EventNodeUnpublished{
 					ID: library.NodeID(n.Mark.ID()),
