@@ -91,7 +91,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 	err := app.Start(ctx)
 	if err != nil {
 		fmt.Println(err)
-		t.Error()
+		t.Error(err)
 	}
 }
 
