@@ -82,7 +82,6 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 		}
 	}
 
-	s.fetcher.HydrateContentURLs(ctx, n)
 
 	return n, nil
 }

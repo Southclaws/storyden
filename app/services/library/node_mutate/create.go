@@ -70,7 +70,6 @@ func (s *Manager) Create(ctx context.Context,
 		})
 	}
 
-	s.fetcher.HydrateContentURLs(ctx, n)
 
 	return n, nil
 }

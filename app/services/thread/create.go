@@ -73,8 +73,6 @@ func (s *service) Create(ctx context.Context,
 		})
 	}
 
-	// TODO: Do this using event consumer.
-	s.fetcher.HydrateContentURLs(ctx, thr)
 
 	// TODO: Do this using event consumer.
 	s.mentioner.Send(ctx, authorID, *datagraph.NewRef(thr), thr.Content.References()...)

@@ -39,7 +39,6 @@ func (s *service) Create(
 		ReplyAuthorID:  authorID,
 	})
 
-	s.fetcher.HydrateContentURLs(ctx, p)
 
 	return p, nil
 }

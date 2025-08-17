@@ -59,7 +59,6 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		ReplyID:  p.ID,
 	})
 
-	s.fetcher.HydrateContentURLs(ctx, p)
 
 	return p, nil
 }

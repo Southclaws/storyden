@@ -93,16 +93,16 @@ func (s *Fetcher) HydrateContentURLs(ctx context.Context, item datagraph.Item) {
 			continue
 		}
 
-		err = s.QueueForItem(ctx, *parsed, item)
+		err = s.queueForItem(ctx, *parsed, item)
 		if err != nil {
 			continue
 		}
 	}
 }
 
-// QueueForItem queues a scrape request for a URL that is linked to an item.
+// queueForItem queues a scrape request for a URL that is linked to an item.
 // When the scrape job is done, the scraped link will be related to the item.
-func (s *Fetcher) QueueForItem(ctx context.Context, u url.URL, item datagraph.Item) error {
+func (s *Fetcher) queueForItem(ctx context.Context, u url.URL, item datagraph.Item) error {
 	if err := s.bus.SendCommand(ctx, &message.CommandScrapeLink{
 		URL:  u,
 		Item: datagraph.NewRef(item),
