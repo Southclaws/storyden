@@ -3,6 +3,7 @@ package watermill
 import (
 	"log/slog"
 
+	"github.com/ThreeDotsLabs/watermill"
 	"github.com/ThreeDotsLabs/watermill-amqp/v3/pkg/amqp"
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
@@ -11,7 +12,7 @@ import (
 )
 
 func NewWatermillQueue(cfg config.Config, l *slog.Logger) (message.Subscriber, message.Publisher, error) {
-	logger := &logAdapter{l}
+	logger := watermill.NewSlogLogger(l)
 
 	switch cfg.QueueType {
 	default:

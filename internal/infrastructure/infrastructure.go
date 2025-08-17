@@ -15,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/object"
 	"github.com/Southclaws/storyden/internal/infrastructure/pdf"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/event"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/queue"
 	"github.com/Southclaws/storyden/internal/infrastructure/rate"
 	"github.com/Southclaws/storyden/internal/infrastructure/sms"
 	"github.com/Southclaws/storyden/internal/infrastructure/vector/pinecone"
@@ -39,7 +38,6 @@ func Build() fx.Option {
 		pinecone.Build(),
 		fx.Provide(ai.New),
 		jwt.Build(),
-		queue.Build(),
 		event.Build(),
 		fx.Provide(pdf.New),
 	)

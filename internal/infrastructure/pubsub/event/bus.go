@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"reflect"
 	"sync"
 	"time"
 
@@ -19,7 +20,6 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/internal/config"
-	"github.com/Southclaws/storyden/internal/infrastructure/pubsub/queuename"
 )
 
 type Bus struct {
@@ -61,7 +61,7 @@ func New(
 
 	marshaler := cqrs.JSONMarshaler{
 		GenerateName: func(v interface{}) string {
-			return queuename.FromValue(v)
+			return topicFromValue(v)
 		},
 	}
 
@@ -260,7 +260,7 @@ type (
 )
 
 func Subscribe[T any](ctx context.Context, bus *Bus, handlerName string, handler HandlerFunc[T]) (*Subscription, error) {
-	topic := queuename.FromT[T]()
+	topic := topicFromT[T]()
 	subkey := subscriptionKey(handlerName)
 
 	bus.mu.Lock()
@@ -297,7 +297,7 @@ func Subscribe[T any](ctx context.Context, bus *Bus, handlerName string, handler
 
 func SubscribeCommand[T any](ctx context.Context, bus *Bus, handlerName string, handler CommandHandlerFunc[T]) (*Subscription, error) {
 	var zero T
-	topic := queuename.FromValue(zero)
+	topic := topicFromValue(zero)
 	subkey := subscriptionKey(handlerName)
 
 	bus.mu.Lock()
@@ -327,4 +327,29 @@ func SubscribeCommand[T any](ctx context.Context, bus *Bus, handlerName string, 
 	bus.subscriptions[subkey] = sub
 
 	return sub, nil
+}
+
+func topicFromValue(zero any) string {
+	t := reflect.TypeOf(zero)
+
+	if t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
+
+	to := t.String()
+
+	return to
+}
+
+func topicFromT[T any]() string {
+	var zero T
+	t := reflect.TypeOf(zero)
+
+	if t.Kind() == reflect.Pointer {
+		t = t.Elem()
+	}
+
+	to := t.String()
+
+	return to
 }
