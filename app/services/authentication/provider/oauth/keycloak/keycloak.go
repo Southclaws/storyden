@@ -43,10 +43,21 @@ func New(
 	register *register.Registrar,
 	ed endec.EncrypterDecrypter,
 ) (*Provider, error) {
-	if cfg.KeycloakEnabled && ed == nil {
+	if !cfg.KeycloakEnabled {
+		return &Provider{
+			config: oauth.Configuration{
+				Enabled:      cfg.KeycloakEnabled,
+				ClientID:     cfg.KeycloakClientID,
+				ClientSecret: cfg.KeycloakClientSecret,
+			},
+		}, nil
+	}
+
+	if ed == nil {
 		return nil, fault.New("JWT provider must be enabled by setting JWT_SECRET for Keycloak OAuth provider")
 	}
 	ctx := context.Background()
+
 	issuer, err := oidc.NewProvider(ctx, cfg.KeycloakIssuerURL.String())
 	if err != nil {
 		return nil, fault.Wrap(err)
