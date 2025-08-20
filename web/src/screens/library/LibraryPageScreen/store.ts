@@ -265,7 +265,7 @@ export const createNodeStore = (initState: State) => {
               // config might not be defined yet, it should be in all cases, but
               // typescript is unsure (so am i) so just to be safe, set default.
               if (!block.config) {
-                block.config = { columns: [] };
+                block.config = { layout: "table", columns: [] };
               } else if (!block.config.columns) {
                 block.config.columns = [];
               }

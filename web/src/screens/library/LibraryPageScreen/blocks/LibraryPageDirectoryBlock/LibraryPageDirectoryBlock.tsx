@@ -3,7 +3,11 @@ import Link from "next/link";
 import { ChangeEvent } from "react";
 
 import { useNodeListChildren } from "@/api/openapi-client/nodes";
-import { Identifier } from "@/api/openapi-schema";
+import {
+  Identifier,
+  NodeWithChildren,
+  PropertySchemaList,
+} from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
 import {
   SortIndicator,
@@ -15,7 +19,14 @@ import { AddIcon } from "@/components/ui/icons/Add";
 import { MenuIcon } from "@/components/ui/icons/Menu";
 import * as Table from "@/components/ui/table";
 import { isValidLinkLike } from "@/lib/link/validation";
-import { Box, Center, HStack, styled } from "@/styled-system/jsx";
+import {
+  Box,
+  Center,
+  Grid,
+  GridItem,
+  HStack,
+  styled,
+} from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
@@ -32,14 +43,18 @@ import {
 } from "./column";
 import { useDirectoryBlock } from "./useDirectoryBlock";
 
+type LibraryPageDirectoryBlockTableProps = {
+  nodes: NodeWithChildren[];
+  block: ReturnType<typeof useDirectoryBlock>;
+  currentChildPropertySchema: PropertySchemaList;
+};
+
 export function LibraryPageDirectoryBlock() {
   const { nodeID, initialChildren, store } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
   const { editing } = useEditState();
 
   const { setChildPropertyValue } = store.getState();
-
-  const hideChildTree = useWatch((s) => s.draft.hide_child_tree);
 
   // format the sort property as "name" or "-name" for asc/desc
   const childrenSort =
@@ -82,6 +97,36 @@ export function LibraryPageDirectoryBlock() {
     );
     return null;
   }
+
+  // Get layout from config, default to table
+  const layout = block.config?.layout ?? "table";
+
+  // Switch between different layout views
+  switch (layout) {
+    case "grid":
+      return <LibraryPageDirectoryBlockGrid nodes={nodes} />;
+    case "table":
+    default:
+      return (
+        <LibraryPageDirectoryBlockTable
+          nodes={nodes}
+          block={block}
+          currentChildPropertySchema={currentChildPropertySchema}
+        />
+      );
+  }
+}
+
+function LibraryPageDirectoryBlockTable({
+  nodes,
+  block,
+  currentChildPropertySchema,
+}: LibraryPageDirectoryBlockTableProps) {
+  const { nodeID, store } = useLibraryPageContext();
+  const { sort, handleSort } = useSortIndicator();
+  const { editing } = useEditState();
+
+  const { setChildPropertyValue } = store.getState();
 
   const columns = mergeFieldsAndPropertySchema(
     currentChildPropertySchema,
@@ -251,6 +296,40 @@ export function LibraryPageDirectoryBlock() {
           </Table.Row>
         </Table.Foot>
       </Table.Root>
+    </Box>
+  );
+}
+
+function LibraryPageDirectoryBlockGrid({
+  nodes,
+}: {
+  nodes: NodeWithChildren[];
+}) {
+  return (
+    <Box w="full">
+      <Grid gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))" gap="2">
+        {nodes.map((node) => (
+          <GridItem
+            key={node.id}
+            p="4"
+            borderRadius="md"
+            borderColor="border.subtle"
+            bg="bg.subtle"
+            _hover={{ bg: "bg.muted" }}
+          >
+            <Link href={`/l/${node.slug}`}>
+              <styled.div fontWeight="semibold" mb="2">
+                {node.name}
+              </styled.div>
+              {node.description && (
+                <styled.div fontSize="sm" color="fg.muted" lineClamp={3}>
+                  {node.description}
+                </styled.div>
+              )}
+            </Link>
+          </GridItem>
+        ))}
+      </Grid>
     </Box>
   );
 }

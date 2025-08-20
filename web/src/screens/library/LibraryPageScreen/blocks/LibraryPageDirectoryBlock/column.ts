@@ -11,6 +11,7 @@ import {
 import {
   LibraryPageBlockTypeDirectory,
   LibraryPageBlockTypeDirectoryConfig,
+  LibraryPageBlockTypeDirectoryLayout,
 } from "@/lib/library/metadata";
 
 export type ColumnDefinitionCommon = {
@@ -52,6 +53,7 @@ export const MappableNodeFields: Array<MappableNodeField> = [
 ];
 
 export type ProcessedConfig = {
+  layout: LibraryPageBlockTypeDirectoryLayout;
   columns: Array<ColumnDefinition>;
 };
 
@@ -79,6 +81,7 @@ export function getDefaultBlockConfig(ps: PropertySchemaList): ProcessedConfig {
   const columns: ColumnDefinition[] = [...fixedCols, ...propCols];
 
   return {
+    layout: "table",
     columns,
   };
 }
