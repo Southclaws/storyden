@@ -30,9 +30,9 @@ import {
   mergeFieldsAndProperties,
   mergeFieldsAndPropertySchema,
 } from "./column";
-import { useTableBlock } from "./useTableBlock";
+import { useDirectoryBlock } from "./useDirectoryBlock";
 
-export function LibraryPageTableBlock() {
+export function LibraryPageDirectoryBlock() {
   const { nodeID, initialChildren, store } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
   const { editing } = useEditState();
@@ -61,7 +61,7 @@ export function LibraryPageTableBlock() {
     },
   );
 
-  const block = useTableBlock();
+  const block = useDirectoryBlock();
   const currentChildPropertySchema = useWatch(
     (s) => s.draft.child_property_schema,
   );
@@ -76,13 +76,9 @@ export function LibraryPageTableBlock() {
     return null;
   }
 
-  if (!hideChildTree) {
-    return null;
-  }
-
   if (!block) {
     console.warn(
-      "attempting to render a LibraryPageTableBlock without a block in the form metadata",
+      "attempting to render a LibraryPageDirectoryBlock without a block in the form metadata",
     );
     return null;
   }

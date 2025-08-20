@@ -9,8 +9,8 @@ import {
   PropertyValue,
 } from "@/api/openapi-schema";
 import {
-  LibraryPageBlockTypeTable,
-  LibraryPageBlockTypeTableConfig,
+  LibraryPageBlockTypeDirectory,
+  LibraryPageBlockTypeDirectoryConfig,
 } from "@/lib/library/metadata";
 
 export type ColumnDefinitionCommon = {
@@ -85,7 +85,7 @@ export function getDefaultBlockConfig(ps: PropertySchemaList): ProcessedConfig {
 
 export function processBlockConfig(
   ps: PropertySchemaList,
-  config: LibraryPageBlockTypeTableConfig,
+  config: LibraryPageBlockTypeDirectoryConfig,
   showHidden = false,
 ): ProcessedConfig {
   const schemaMap = keyBy(ps, "fid");
@@ -132,7 +132,7 @@ export function processBlockConfig(
 
 export function mergeFieldsAndPropertySchema(
   ps: PropertySchemaList,
-  block: LibraryPageBlockTypeTable,
+  block: LibraryPageBlockTypeDirectory,
   showHidden = false,
 ): ColumnDefinition[] {
   const config =
@@ -146,7 +146,7 @@ export function mergeFieldsAndPropertySchema(
 export function mergeFieldsAndProperties(
   schema: PropertySchemaList,
   node: NodeWithChildren,
-  block: LibraryPageBlockTypeTable,
+  block: LibraryPageBlockTypeDirectory,
 ): ColumnValue[] {
   const config =
     block.config === undefined

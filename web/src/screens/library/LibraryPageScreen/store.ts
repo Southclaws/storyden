@@ -260,7 +260,7 @@ export const createNodeStore = (initState: State) => {
             const layout = (state.draft.meta.layout ??= DefaultLayout);
 
             for (const block of layout.blocks) {
-              if (block.type !== "table") continue;
+              if (block.type !== "directory") continue;
 
               // config might not be defined yet, it should be in all cases, but
               // typescript is unsure (so am i) so just to be safe, set default.
@@ -283,7 +283,7 @@ export const createNodeStore = (initState: State) => {
             if (!layout) return;
 
             for (const block of layout.blocks) {
-              if (block.type !== "table") continue;
+              if (block.type !== "directory") continue;
               if (!block.config?.columns) continue;
 
               const columns = block.config.columns;
@@ -383,7 +383,7 @@ export const createNodeStore = (initState: State) => {
             const blocks = layout.blocks;
 
             for (const block of blocks) {
-              if (block.type !== "table") continue;
+              if (block.type !== "directory") continue;
               if (!block.config?.columns) continue;
 
               for (const col of block.config.columns) {

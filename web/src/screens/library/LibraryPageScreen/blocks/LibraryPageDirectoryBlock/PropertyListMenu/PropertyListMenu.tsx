@@ -8,13 +8,13 @@ import * as Menu from "@/components/ui/menu";
 import { useLibraryPageContext } from "../../../Context";
 import { useWatch } from "../../../store";
 import { mergeFieldsAndPropertySchema } from "../column";
-import { useTableBlock } from "../useTableBlock";
+import { useDirectoryBlock } from "../useDirectoryBlock";
 
 export function PropertyListMenu({ children }: PropsWithChildren) {
   const { store } = useLibraryPageContext();
   const { setChildPropertyHiddenState } = store.getState();
 
-  const currentTableBlock = useTableBlock();
+  const currentDirectoryBlock = useDirectoryBlock();
   const currentChildPropertySchema = useWatch(
     (s) => s.draft.child_property_schema,
   );
@@ -23,7 +23,7 @@ export function PropertyListMenu({ children }: PropsWithChildren) {
     const fid = value.value;
 
     const hidden =
-      currentTableBlock.config?.columns?.find((c) => c.fid === fid)?.hidden ??
+      currentDirectoryBlock.config?.columns?.find((c) => c.fid === fid)?.hidden ??
       true;
 
     setChildPropertyHiddenState(fid, !hidden);
@@ -31,7 +31,7 @@ export function PropertyListMenu({ children }: PropsWithChildren) {
 
   const columns = mergeFieldsAndPropertySchema(
     currentChildPropertySchema,
-    currentTableBlock,
+    currentDirectoryBlock,
     true,
   );
 
