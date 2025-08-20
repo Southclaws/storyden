@@ -55,15 +55,12 @@ func (s *SMTP) Send(
 	ctx context.Context,
 	msg Message,
 ) error {
-	s.logger.Info("sending SMTP email",
+	s.logger.Info("sending live email",
 		slog.String("email", msg.Address.Address),
 		slog.String("name", msg.Name),
 		slog.String("subject", msg.Subject),
-		slog.String("host", s.host),
-		slog.Int("port", s.port),
 	)
 
-	// Build the email message
 	from := s.fromAddress
 	if s.fromName != "" {
 		from = fmt.Sprintf("%s <%s>", s.fromName, s.fromAddress)
@@ -74,7 +71,6 @@ func (s *SMTP) Send(
 		to = fmt.Sprintf("%s <%s>", msg.Name, msg.Address.Address)
 	}
 
-	// Determine which content to send (prefer HTML over plain text)
 	var body string
 	var contentType string
 	if msg.Content.HTML != "" {
@@ -85,7 +81,6 @@ func (s *SMTP) Send(
 		contentType = "text/plain; charset=UTF-8"
 	}
 
-	// Build the message
 	message := []string{
 		fmt.Sprintf("From: %s", from),
 		fmt.Sprintf("To: %s", to),
@@ -97,17 +92,14 @@ func (s *SMTP) Send(
 
 	messageBytes := []byte(strings.Join(message, "\r\n"))
 
-	// Connect to the SMTP server
 	addr := fmt.Sprintf("%s:%d", s.host, s.port)
-	
+
 	if s.useTLS {
-		// Use TLS connection
 		err := s.sendWithTLS(addr, messageBytes, msg.Address.Address)
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 	} else {
-		// Use plain connection
 		err := s.sendPlain(addr, messageBytes, msg.Address.Address)
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
@@ -118,13 +110,11 @@ func (s *SMTP) Send(
 }
 
 func (s *SMTP) sendWithTLS(addr string, messageBytes []byte, toAddr string) error {
-	// Set up authentication if credentials are provided
 	var auth smtp.Auth
 	if s.username != "" && s.password != "" {
 		auth = smtp.PlainAuth("", s.username, s.password, s.host)
 	}
 
-	// Connect to the server with TLS
 	tlsConfig := &tls.Config{
 		ServerName: s.host,
 	}
@@ -141,14 +131,12 @@ func (s *SMTP) sendWithTLS(addr string, messageBytes []byte, toAddr string) erro
 	}
 	defer client.Quit()
 
-	// Authenticate if needed
 	if auth != nil {
 		if err := client.Auth(auth); err != nil {
 			return fmt.Errorf("authentication failed: %w", err)
 		}
 	}
 
-	// Set the sender and recipient
 	if err := client.Mail(s.fromAddress); err != nil {
 		return fmt.Errorf("failed to set sender: %w", err)
 	}
@@ -157,7 +145,6 @@ func (s *SMTP) sendWithTLS(addr string, messageBytes []byte, toAddr string) erro
 		return fmt.Errorf("failed to set recipient: %w", err)
 	}
 
-	// Send the message
 	writer, err := client.Data()
 	if err != nil {
 		return fmt.Errorf("failed to get data writer: %w", err)
@@ -172,12 +159,10 @@ func (s *SMTP) sendWithTLS(addr string, messageBytes []byte, toAddr string) erro
 }
 
 func (s *SMTP) sendPlain(addr string, messageBytes []byte, toAddr string) error {
-	// Set up authentication if credentials are provided
 	var auth smtp.Auth
 	if s.username != "" && s.password != "" {
 		auth = smtp.PlainAuth("", s.username, s.password, s.host)
 	}
 
-	// Use the standard SendMail function for plain connections
 	return smtp.SendMail(addr, auth, s.fromAddress, []string{toAddr}, messageBytes)
 }
