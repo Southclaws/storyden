@@ -67,6 +67,10 @@ func Build() fx.Option {
 }
 
 func (q *Queuer) Queue(ctx context.Context, address mail.Address, name string, subject string, intros []string, actions []mailtemplate.Action) error {
+	if q.sender == nil {
+		return fault.New("email sending is not enabled")
+	}
+
 	err := q.limiter.Check(ctx, address.Address, 1)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
