@@ -1,7 +1,7 @@
 import {
   GalleryThumbnailsIcon,
   ImagesIcon,
-  Table2Icon,
+  LayersIcon,
   TablePropertiesIcon,
   TagsIcon,
   TextIcon,
@@ -22,7 +22,7 @@ export const LibraryPageBlockIcon: Record<
   content: TextIcon,
   assets: ImagesIcon,
   properties: TablePropertiesIcon,
-  table: Table2Icon,
+  directory: LayersIcon,
   tags: TagsIcon,
 };
 

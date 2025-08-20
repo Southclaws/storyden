@@ -28,9 +28,9 @@ import { CreateBlockMenu } from "./CreateBlockMenu";
 import { LibraryPageAssetsBlock } from "./LibraryPageAssetsBlock/LibraryPageAssetsBlock";
 import { LibraryPageContentBlock } from "./LibraryPageContentBlock/LibraryPageContentBlock";
 import { LibraryPageCoverBlock } from "./LibraryPageCoverBlock/LibraryPageCoverBlock";
+import { LibraryPageDirectoryBlock } from "./LibraryPageDirectoryBlock/LibraryPageDirectoryBlock";
 import { LibraryPageLinkBlock } from "./LibraryPageLinkBlock/LibraryPageLinkBlock";
 import { LibraryPagePropertiesBlock } from "./LibraryPagePropertiesBlock/LibraryPagePropertiesBlock";
-import { LibraryPageTableBlock } from "./LibraryPageTableBlock/LibraryPageTableBlock";
 import { LibraryPageTagsBlock } from "./LibraryPageTagsBlock/LibraryPageTagsBlock";
 import { LibraryPageTitleBlock } from "./LibraryPageTitleBlock/LibraryPageTitleBlock";
 
@@ -139,8 +139,8 @@ function LibraryPageBlockRender({ block }: { block: LibraryPageBlock }) {
       return <LibraryPageLinkBlock />;
     case "properties":
       return <LibraryPagePropertiesBlock />;
-    case "table":
-      return <LibraryPageTableBlock />;
+    case "directory":
+      return <LibraryPageDirectoryBlock />;
     case "content":
       return <LibraryPageContentBlock />;
   }
