@@ -315,18 +315,7 @@ function LibraryPageBlockEditable({
           </Box>
         </VStack>
       </VStack>
-      <Box
-        id={`block-${block.type}_content`}
-        w="full"
-        minW="0"
-        _groupHover={{
-          bgColor: "bg.muted/50",
-          borderRadius: "sm",
-          outlineColor: "bg.muted/50",
-          outlineStyle: "solid",
-          outlineWidth: "medium",
-        }}
-      >
+      <Box id={`block-${block.type}_content`} w="full" minW="0">
         <LibraryPageBlockRender block={block} />
       </Box>
     </HStack>
