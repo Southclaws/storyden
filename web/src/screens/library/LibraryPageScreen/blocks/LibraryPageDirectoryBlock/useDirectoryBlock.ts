@@ -8,7 +8,7 @@ import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
 import { useBlock } from "../useBlock";
 
-import { getDefaultBlockConfig } from "./column";
+import { MappableNodeFields, getDefaultBlockConfig } from "./column";
 
 export function useDirectoryBlock(): LibraryPageBlockTypeDirectory {
   const { store } = useLibraryPageContext();
@@ -63,7 +63,15 @@ export function useDirectoryBlock(): LibraryPageBlockTypeDirectory {
             hidden: false,
           }));
 
+        const fixedFields = MappableNodeFields.filter(
+          (fixed) => columnFieldsByKey[`fixed:${fixed}`] === undefined,
+        ).map((fixed) => ({
+          fid: `fixed:${fixed}`,
+          hidden: true,
+        }));
+
         const updatedColumnConfig = [
+          ...fixedFields,
           ...filteredRemovedColumns,
           ...filteredAddedColumns,
         ];

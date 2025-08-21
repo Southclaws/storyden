@@ -28,7 +28,6 @@ import {
   GridItem,
   HStack,
   LStack,
-  VStack,
   WStack,
   styled,
 } from "@/styled-system/jsx";
@@ -58,10 +57,7 @@ type LibraryPageDirectoryBlockTableProps = {
 
 export function LibraryPageDirectoryBlock() {
   const { nodeID, initialChildren, store } = useLibraryPageContext();
-  const { sort, handleSort } = useSortIndicator();
-  const { editing } = useEditState();
-
-  const { setChildPropertyValue } = store.getState();
+  const { sort } = useSortIndicator();
 
   // format the sort property as "name" or "-name" for asc/desc
   const childrenSort =
@@ -130,6 +126,12 @@ export function LibraryPageDirectoryBlock() {
   }
 }
 
+// NOTE: Primary image field is always filtered out for table views.
+// TODO: Design a nice way to display this without destroying the layout?
+function isAlwaysFilteredForTableViews(c: { fid: string }) {
+  return c.fid !== "fixed:primary_image";
+}
+
 function LibraryPageDirectoryBlockTable({
   nodes,
   block,
@@ -144,7 +146,7 @@ function LibraryPageDirectoryBlockTable({
   const columns = mergeFieldsAndPropertySchema(
     currentChildPropertySchema,
     block,
-  );
+  ).filter(isAlwaysFilteredForTableViews);
 
   function handleChildFieldValueChange(
     nodeID: Identifier,
@@ -245,7 +247,7 @@ function LibraryPageDirectoryBlockTable({
                 currentChildPropertySchema,
                 child,
                 block,
-              );
+              ).filter(isAlwaysFilteredForTableViews);
 
               return (
                 <Table.Row key={child.id} className="group">
@@ -339,6 +341,10 @@ function LibraryPageDirectoryBlockGrid({
     (c) => !c._fixedFieldName,
   );
 
+  const coverImageHiddenState =
+    block.config?.columns.find((c) => c.fid === "fixed:primary_image")
+      ?.hidden ?? false;
+
   function handleChildFieldValueChange(
     nodeID: Identifier,
     fid: MappableNodeField,
@@ -396,18 +402,23 @@ function LibraryPageDirectoryBlockGrid({
               gap="2"
               pb="1"
             >
-              {node.primary_image ? (
-                <styled.img
-                  src={getAssetURL(node.primary_image.path)}
-                  objectFit="cover"
-                  w="full"
-                  h="32"
-                />
+              {!coverImageHiddenState ? (
+                node.primary_image ? (
+                  <styled.img
+                    src={getAssetURL(node.primary_image.path)}
+                    objectFit="cover"
+                    w="full"
+                    h="32"
+                  />
+                ) : (
+                  <Center h="32">
+                    <EmptyIcon />
+                  </Center>
+                )
               ) : (
-                <Center h="32">
-                  <EmptyIcon />
-                </Center>
+                <Box />
               )}
+
               <LStack gap="0" px="2">
                 {editing ? (
                   <styled.input
