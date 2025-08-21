@@ -4,17 +4,26 @@ import { PropsWithChildren } from "react";
 import { HideIcon } from "@/components/ui/icons/HideIcon";
 import { ShowIcon } from "@/components/ui/icons/ShowIcon";
 import * as Menu from "@/components/ui/menu";
+import { BlockIcon } from "@/lib/library/blockIcons";
+import { HStack } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../../Context";
 import { useWatch } from "../../../store";
 import { mergeFieldsAndPropertySchema } from "../column";
-import { useTableBlock } from "../useTableBlock";
+import { useDirectoryBlock } from "../useDirectoryBlock";
 
-export function PropertyListMenu({ children }: PropsWithChildren) {
+type Props = {
+  hideFixedFields?: boolean;
+};
+
+export function PropertyListMenu({
+  children,
+  hideFixedFields = false,
+}: PropsWithChildren<Props>) {
   const { store } = useLibraryPageContext();
   const { setChildPropertyHiddenState } = store.getState();
 
-  const currentTableBlock = useTableBlock();
+  const currentDirectoryBlock = useDirectoryBlock();
   const currentChildPropertySchema = useWatch(
     (s) => s.draft.child_property_schema,
   );
@@ -23,17 +32,28 @@ export function PropertyListMenu({ children }: PropsWithChildren) {
     const fid = value.value;
 
     const hidden =
-      currentTableBlock.config?.columns?.find((c) => c.fid === fid)?.hidden ??
-      true;
+      currentDirectoryBlock.config?.columns?.find((c) => c.fid === fid)
+        ?.hidden ?? true;
 
     setChildPropertyHiddenState(fid, !hidden);
   }
 
   const columns = mergeFieldsAndPropertySchema(
     currentChildPropertySchema,
-    currentTableBlock,
+    currentDirectoryBlock,
     true,
-  );
+  )
+    .filter((c) => (hideFixedFields ? !c._fixedFieldName : true))
+    // NOTE: Primary image is handled separately. It's only present in the grid
+    // view mode. Plus, while it's *technically* a "field", to a user it's not
+    // really a field, it's a separate feature of a page unrelated to properties.
+    .filter((c) => c.fid !== "fixed:primary_image");
+
+  const supportsCoverImage = currentDirectoryBlock.config?.layout === "grid";
+  const coverImageHiddenState =
+    currentDirectoryBlock.config?.columns.find(
+      (c) => c.fid === "fixed:primary_image",
+    )?.hidden ?? false;
 
   return (
     <Menu.Root
@@ -50,6 +70,22 @@ export function PropertyListMenu({ children }: PropsWithChildren) {
       <Portal>
         <Menu.Positioner>
           <Menu.Content minW="36">
+            {supportsCoverImage && (
+              <Menu.ItemGroup pl="2" py="1">
+                <Menu.ItemGroupLabel>Options</Menu.ItemGroupLabel>
+                <Menu.Item value="fixed:primary_image">
+                  <HStack w="full">
+                    <HStack w="full" gap="1" textWrap="nowrap">
+                      <BlockIcon blockType="cover" />
+                      <span>Cover image</span>
+                    </HStack>
+
+                    {coverImageHiddenState ? <HideIcon /> : <ShowIcon />}
+                  </HStack>
+                </Menu.Item>
+              </Menu.ItemGroup>
+            )}
+
             <Menu.ItemGroup pl="2" py="1">
               <Menu.ItemGroupLabel>Properties</Menu.ItemGroupLabel>
 

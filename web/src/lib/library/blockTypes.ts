@@ -1,14 +1,6 @@
-export type BlockType =
-  | "title"
-  | "cover"
-  | "content"
-  | "properties"
-  | "tags"
-  | "assets"
-  | "link"
-  | "table";
+import { LibraryPageBlockType } from "./metadata";
 
-export const allBlockTypes: BlockType[] = [
+export const allBlockTypes: LibraryPageBlockType[] = [
   "title",
   "cover",
   "content",
@@ -16,5 +8,5 @@ export const allBlockTypes: BlockType[] = [
   "tags",
   "assets",
   "link",
-  "table",
+  "directory",
 ];

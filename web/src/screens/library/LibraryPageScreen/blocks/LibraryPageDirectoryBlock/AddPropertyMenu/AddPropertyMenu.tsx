@@ -10,13 +10,13 @@ import * as Menu from "@/components/ui/menu";
 
 import { useLibraryPageContext } from "../../../Context";
 import { useWatch } from "../../../store";
-import { useTableBlock } from "../useTableBlock";
+import { useDirectoryBlock } from "../useDirectoryBlock";
 
 export function AddPropertyMenu({ children }: PropsWithChildren) {
   const { nodeID, store } = useLibraryPageContext();
   const [name, setName] = useState<string>("");
   const { addChildProperty } = store.getState();
-  const tableBlock = useTableBlock();
+  const directoryBlock = useDirectoryBlock();
 
   // Menu opening logic. We circumvent the default behaviour here because we
   // want to keep the menu open during the creation of a new property then close
@@ -40,12 +40,12 @@ export function AddPropertyMenu({ children }: PropsWithChildren) {
 
     const exists = currentChildPropertySchema.find((p) => p.name === trimmed);
     if (exists) {
-      const column = tableBlock.config?.columns.find(
+      const column = directoryBlock.config?.columns.find(
         (c) => c.fid === exists.fid,
       );
       if (column?.hidden) {
         throw new Error(
-          `Property "${trimmed}" already exists but is hidden in the table. Open the table menu to toggle the column's visibility.`,
+          `Property "${trimmed}" already exists but is hidden in the directory. Open the directory menu to toggle the column's visibility.`,
         );
       } else {
         throw new Error(`Property "${trimmed}" already exists.`);
