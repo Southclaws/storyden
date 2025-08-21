@@ -10,7 +10,14 @@ import { useWatch } from "../../../store";
 import { mergeFieldsAndPropertySchema } from "../column";
 import { useDirectoryBlock } from "../useDirectoryBlock";
 
-export function PropertyListMenu({ children }: PropsWithChildren) {
+type Props = {
+  hideFixedFields?: boolean;
+};
+
+export function PropertyListMenu({
+  children,
+  hideFixedFields = false,
+}: PropsWithChildren<Props>) {
   const { store } = useLibraryPageContext();
   const { setChildPropertyHiddenState } = store.getState();
 
@@ -23,8 +30,8 @@ export function PropertyListMenu({ children }: PropsWithChildren) {
     const fid = value.value;
 
     const hidden =
-      currentDirectoryBlock.config?.columns?.find((c) => c.fid === fid)?.hidden ??
-      true;
+      currentDirectoryBlock.config?.columns?.find((c) => c.fid === fid)
+        ?.hidden ?? true;
 
     setChildPropertyHiddenState(fid, !hidden);
   }
@@ -33,7 +40,7 @@ export function PropertyListMenu({ children }: PropsWithChildren) {
     currentChildPropertySchema,
     currentDirectoryBlock,
     true,
-  );
+  ).filter((c) => (hideFixedFields ? !c._fixedFieldName : true));
 
   return (
     <Menu.Root
