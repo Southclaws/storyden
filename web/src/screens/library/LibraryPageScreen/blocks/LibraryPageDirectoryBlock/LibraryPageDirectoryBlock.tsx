@@ -17,6 +17,7 @@ import {
 import { Unready } from "@/components/site/Unready";
 import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
+import { EmptyIcon } from "@/components/ui/icons/Empty";
 import { MenuIcon } from "@/components/ui/icons/Menu";
 import * as Table from "@/components/ui/table";
 import { isValidLinkLike } from "@/lib/link/validation";
@@ -32,6 +33,7 @@ import {
   styled,
 } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
+import { getAssetURL } from "@/utils/asset";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
@@ -331,6 +333,10 @@ function LibraryPageDirectoryBlockGrid({
   const columns = mergeFieldsAndPropertySchema(
     currentChildPropertySchema,
     block,
+  ).filter(
+    // We don't show fixed fields in the grid view. They are laid
+    // out by the component itself and can be toggled on or off.
+    (c) => !c._fixedFieldName,
   );
 
   function handleChildFieldValueChange(
@@ -381,27 +387,41 @@ function LibraryPageDirectoryBlockGrid({
           return (
             <GridItem
               key={node.id}
-              p="2"
               borderRadius="md"
-              bg="bg.subtle"
+              bg="bg.muted"
               display="flex"
               flexDirection="column"
               justifyContent="space-between"
+              overflow="hidden"
               gap="2"
+              pb="1"
             >
-              <LStack gap="0">
+              {node.primary_image ? (
+                <styled.img
+                  src={getAssetURL(node.primary_image.path)}
+                  objectFit="cover"
+                  w="full"
+                  h="32"
+                />
+              ) : (
+                <Center h="32">
+                  <EmptyIcon />
+                </Center>
+              )}
+              <LStack gap="0" px="2">
                 {editing ? (
                   <styled.input
                     w="full"
                     fontWeight="semibold"
                     defaultValue={node.name}
-                    onChange={(event) =>
+                    onChange={(event) => {
+                      console.log(event);
                       handleChildFieldValueChange(
                         node.id,
-                        "name",
+                        "fixed:name" as MappableNodeField,
                         event.target.value,
-                      )
-                    }
+                      );
+                    }}
                     _focusVisible={{
                       outline: "none",
                     }}
@@ -429,7 +449,7 @@ function LibraryPageDirectoryBlockGrid({
                     onChange={(event) =>
                       handleChildFieldValueChange(
                         node.id,
-                        "description",
+                        "fixed:description" as MappableNodeField,
                         event.target.value,
                       )
                     }
@@ -452,98 +472,94 @@ function LibraryPageDirectoryBlockGrid({
                 )}
               </LStack>
 
-              <styled.dl className={lstack()} gap="0">
-                {columns.map((property) => {
-                  if (property._fixedFieldName) {
-                    // We don't show fixed fields in the grid view. They are laid
-                    // out by the component itself and can be toggled on or off.
-                    return null;
-                  }
+              {columns.length > 0 && (
+                <styled.dl className={lstack()} gap="0" px="2" pb="2">
+                  {columns.map((property) => {
+                    const column = valueTable[property.fid];
+                    if (!column) {
+                      console.warn(
+                        `unable to find property ${property.fid} in value table`,
+                        valueTable,
+                      );
+                      return null;
+                    }
 
-                  const column = valueTable[property.fid];
-                  if (!column) {
-                    console.warn(
-                      `unable to find property ${property.fid} in value table`,
-                      valueTable,
-                    );
-                    return null;
-                  }
+                    const isSortingBy = sort?.property === property.name;
+                    const isSortingAsc = sort?.order === "asc";
+                    const isSortingDesc = sort?.order === "desc";
+                    const isSorting =
+                      isSortingBy && (isSortingAsc || isSortingDesc);
+                    const sortState = isSorting
+                      ? isSortingAsc
+                        ? "asc"
+                        : "desc"
+                      : "none";
 
-                  const isSortingBy = sort?.property === property.name;
-                  const isSortingAsc = sort?.order === "asc";
-                  const isSortingDesc = sort?.order === "desc";
-                  const isSorting =
-                    isSortingBy && (isSortingAsc || isSortingDesc);
-                  const sortState = isSorting
-                    ? isSortingAsc
-                      ? "asc"
-                      : "desc"
-                    : "none";
+                    function handleClickSortAction() {
+                      handleSort(property.name);
+                    }
 
-                  function handleClickSortAction() {
-                    handleSort(property.name);
-                  }
+                    const handleCellChange = (
+                      v: ChangeEvent<HTMLInputElement>,
+                    ) => {
+                      handleChildFieldValueChange(
+                        node.id,
+                        column.fid as MappableNodeField,
+                        v.target.value,
+                      );
+                    };
 
-                  const handleCellChange = (
-                    v: ChangeEvent<HTMLInputElement>,
-                  ) => {
-                    handleChildFieldValueChange(
-                      node.id,
-                      column.fid as MappableNodeField,
-                      v.target.value,
-                    );
-                  };
-
-                  return (
-                    <HStack
-                      w="full"
-                      key={property.fid}
-                      cursor="pointer"
-                      {...(isSorting && {
-                        "data-active": "",
-                      })}
-                      p="0"
-                    >
-                      <HStack w="full" pr="1">
-                        <ColumnMenu column={property}>
-                          <styled.dt
-                            display="inline-flex"
-                            minW="0"
-                            flexGrow="1"
-                            alignItems="center"
-                            justifyContent="space-between"
-                            gap="1"
-                            textWrap="nowrap"
-                            flexWrap="nowrap"
-                            color="fg.subtle"
-                          >
-                            {property.name}
-                          </styled.dt>
-                        </ColumnMenu>
-
-                        <styled.dd>
-                          {editing ? (
-                            <styled.input
-                              w="full"
+                    return (
+                      <HStack
+                        w="full"
+                        key={property.fid}
+                        cursor="pointer"
+                        {...(isSorting && {
+                          "data-active": "",
+                        })}
+                        p="0"
+                      >
+                        <HStack w="full" pr="1">
+                          <ColumnMenu column={property}>
+                            <styled.dt
+                              display="inline-flex"
                               minW="0"
-                              textAlign="right"
-                              defaultValue={column.value}
-                              onChange={handleCellChange}
-                              _focusVisible={{
-                                outline: "none",
-                              }}
-                            />
-                          ) : column.href ? (
-                            <Link href={column.href}>{column.value}</Link>
-                          ) : (
-                            <>{column.value}</>
-                          )}
-                        </styled.dd>
+                              flexGrow="1"
+                              alignItems="center"
+                              justifyContent="space-between"
+                              gap="1"
+                              textWrap="nowrap"
+                              flexWrap="nowrap"
+                              color="fg.subtle"
+                            >
+                              {property.name}
+                            </styled.dt>
+                          </ColumnMenu>
+
+                          <styled.dd>
+                            {editing ? (
+                              <styled.input
+                                w="full"
+                                minW="0"
+                                textAlign="right"
+                                defaultValue={column.value}
+                                onChange={handleCellChange}
+                                _focusVisible={{
+                                  outline: "none",
+                                }}
+                              />
+                            ) : column.href ? (
+                              <Link href={column.href}>{column.value}</Link>
+                            ) : (
+                              <>{column.value}</>
+                            )}
+                          </styled.dd>
+                        </HStack>
                       </HStack>
-                    </HStack>
-                  );
-                })}
-              </styled.dl>
+                    );
+                  })}
+                </styled.dl>
+              )}
             </GridItem>
           );
         })}
