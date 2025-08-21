@@ -42,7 +42,7 @@ export type ColumnValue = {
 };
 
 export type MappableNodeField = Extract<
-  "name" | "link" | "description",
+  "name" | "link" | "description" | "primary_image",
   keyof NodeWithChildren
 >;
 
@@ -50,6 +50,7 @@ export const MappableNodeFields: Array<MappableNodeField> = [
   "name",
   "link",
   "description",
+  "primary_image",
 ];
 
 export type ProcessedConfig = {
@@ -180,6 +181,16 @@ export function mergeFieldsAndProperties(
             fid: column.fid,
             value: node.name ?? "",
             href: `/l/${node.slug}`,
+          },
+        ];
+      }
+
+      if (column._fixedFieldName === "primary_image") {
+        return [
+          ...prev,
+          {
+            fid: column.fid,
+            value: node.primary_image?.path ?? "",
           },
         ];
       }

@@ -17,8 +17,6 @@ export function LibraryPageDirectoryBlockMenuItems() {
   return (
     <>
       <LayoutMenu />
-
-      <Menu.Item value="placeholder">Placeholder menu item</Menu.Item>
     </>
   );
 }
