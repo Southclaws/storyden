@@ -64,6 +64,7 @@ type Bindings struct {
 	Spec
 	Info
 	Admin
+	Plugins
 	Roles
 	Authentication
 	WebAuthn
@@ -96,6 +97,7 @@ func bindingsProviders() fx.Option {
 		NewSpec,
 		NewInfo,
 		NewAdmin,
+		NewPlugins,
 		NewRoles,
 		NewAuthentication,
 		NewWebAuthn,
