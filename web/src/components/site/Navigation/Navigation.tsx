@@ -44,8 +44,7 @@ export async function Navigation({
         zIndex="docked"
         top="0"
         left="0"
-        height="dvh"
-        className={styles["navgrid"]}
+        className={`${styles["navgrid"]} ${styles["navigation__fixed"]}`}
         pointerEvents="none"
       >
         <DesktopCommandBar />
