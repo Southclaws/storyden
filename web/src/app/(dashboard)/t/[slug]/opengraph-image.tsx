@@ -4,6 +4,7 @@ import { threadGet } from "@/api/openapi-server/threads";
 import { interBold, interRegular } from "@/app/fonts/og";
 import { getSettings } from "@/lib/settings/settings-server";
 import { getAssetURL } from "@/utils/asset";
+import { getBannerURL } from "@/utils/icon";
 
 import { Props } from "./page";
 
@@ -21,6 +22,7 @@ export default async function Image({ params }: Props) {
   const { accent_colour } = await getSettings();
 
   const image = data.link?.primary_image ?? data.assets[0];
+  const fallbackImage = getBannerURL();
 
   return new ImageResponse(
     (
@@ -48,7 +50,16 @@ export default async function Image({ params }: Props) {
             }}
           />
         ) : (
-          <div></div>
+          // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text
+          <img
+            src={fallbackImage}
+            width="100%"
+            height="100%"
+            style={{
+              objectPosition: "center",
+              objectFit: "cover",
+            }}
+          />
         )}
 
         <div
