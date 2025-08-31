@@ -100,11 +100,13 @@ export function TagBadge({
 
     return (
       <styled.button
+        type="button"
         className={cx(tagBadgeStyles, highlightStyles)}
         style={styles}
         title={`include ${tag.name} in filter`}
         onClick={onClick}
         cursor="pointer"
+        aria-pressed={!!highlighted}
       >
         {render}
       </styled.button>
