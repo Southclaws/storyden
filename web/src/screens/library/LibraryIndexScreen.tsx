@@ -10,7 +10,7 @@ import { VStack } from "@/styled-system/jsx";
 import { Props, useLibraryIndexScreen } from "./useLibraryIndexScreen";
 
 export function LibraryIndexScreen(props: Props) {
-  const { ready, data, empty, error } = useLibraryIndexScreen(props);
+  const { ready, data, error } = useLibraryIndexScreen(props);
 
   if (!ready) return <Unready error={error} />;
 

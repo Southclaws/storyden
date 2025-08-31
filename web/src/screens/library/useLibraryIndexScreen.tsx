@@ -1,11 +1,9 @@
-import { useLinkList } from "src/api/openapi-client/links";
 import { useNodeList } from "src/api/openapi-client/nodes";
-import { LinkListOKResponse, NodeListOKResponse } from "src/api/openapi-schema";
+import { NodeListOKResponse } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
 export type Props = {
   nodes: NodeListOKResponse;
-  links: LinkListOKResponse;
 };
 
 export function useLibraryIndexScreen(props: Props) {
@@ -23,27 +21,14 @@ export function useLibraryIndexScreen(props: Props) {
     },
   );
 
-  const {
-    data: links,
-    mutate: mutateLinks,
-    error: errorLinks,
-  } = useLinkList(
-    {},
-    {
-      swr: {
-        fallbackData: props.links,
-      },
-    },
-  );
-
-  if (!nodes || !links) {
+  if (!nodes) {
     return {
       ready: false as const,
-      error: errorNodes || errorLinks,
+      error: errorNodes,
     };
   }
 
-  const empty = nodes.nodes.length === 0 && links.results === 0;
+  const empty = nodes.nodes.length === 0;
 
   return {
     ready: true as const,
@@ -52,10 +37,6 @@ export function useLibraryIndexScreen(props: Props) {
       nodes: {
         data: nodes,
         mutate: mutateNodes,
-      },
-      links: {
-        data: links,
-        mutate: mutateLinks,
       },
     },
     mutate: {
