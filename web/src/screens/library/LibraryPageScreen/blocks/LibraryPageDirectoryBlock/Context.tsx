@@ -2,10 +2,14 @@ import { debounce } from "lodash/fp";
 import { useQueryState } from "nuqs";
 import { PropsWithChildren, createContext, useContext } from "react";
 
-export const LibraryPageDirectoryBlockContext = createContext({
-  searchQuery: "",
-  handleSearch: (_: string) => {},
-});
+type DirectoryBlockContextValue = {
+  searchQuery: string;
+  handleSearch: (q: string) => void;
+};
+
+export const LibraryPageDirectoryBlockContext = createContext<
+  DirectoryBlockContextValue | undefined
+>(undefined);
 
 export function useDirectoryBlockContext() {
   const v = useContext(LibraryPageDirectoryBlockContext);
