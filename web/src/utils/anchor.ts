@@ -13,6 +13,11 @@ export function linkDisabledProps(
           e.preventDefault();
           e.stopPropagation();
         },
+        onAuxClick: (e: MouseEvent<HTMLAnchorElement>) => {
+          e.preventDefault();
+          e.stopPropagation();
+        },
+        prefetch: false,
         style: {
           pointerEvents: "inherit",
           // Cascade the default cursor (e.g. caret for text) in children.
