@@ -81,7 +81,13 @@ body {
   color: var(--colors-fg-default);
   font-family: var(--fonts-body);
   font-style: normal;
+}
 
+html {
+  overflow-x: clip;
+}
+
+body {
   /*
     Fixes a weird Chrome bug where a overflow-x: scroll container's child div
     somehow bubbles up to the viewport and sets the total width to the scroll
