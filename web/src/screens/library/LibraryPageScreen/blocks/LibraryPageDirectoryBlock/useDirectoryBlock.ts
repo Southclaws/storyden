@@ -88,7 +88,7 @@ export function useDirectoryBlock(): LibraryPageBlockTypeDirectory {
         overwriteBlock({
           type: "directory",
           config: {
-            layout: "table",
+            layout: block.config.layout,
             columns: updatedColumnConfig,
           },
         });
