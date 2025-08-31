@@ -259,6 +259,14 @@ func (c *Nodes) NodeListChildren(ctx context.Context, request openapi.NodeListCh
 		opts = append(opts, node_querier.WithFilterChildrenByTags(tags...))
 	}
 
+	// NOTE: Visibility rules are automatically applied by the node_read.HydratedQuerier
+	// service layer. This ensures that non-published nodes are not visible to 
+	// unauthorized users, addressing issue #450. The rules are the same as those
+	// applied by other node endpoints:
+	// - Published nodes are visible to everyone
+	// - Draft/Unlisted nodes are only visible to their owners  
+	// - Review nodes are visible to admins/library managers + owners
+	// - Unauthenticated users only see published nodes
 	r, err := c.nodeReader.ListChildren(ctx, deserialiseNodeMark(request.NodeSlug), pp, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
