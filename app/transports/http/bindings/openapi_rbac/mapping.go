@@ -471,7 +471,7 @@ func (m *Mapping) LinkCreate() (bool, *rbac.Permission) {
 }
 
 func (m *Mapping) LinkList() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionReadPublishedLibrary
+	return false, &rbac.PermissionReadPublishedLibrary
 }
 
 func (m *Mapping) LinkGet() (bool, *rbac.Permission) {
