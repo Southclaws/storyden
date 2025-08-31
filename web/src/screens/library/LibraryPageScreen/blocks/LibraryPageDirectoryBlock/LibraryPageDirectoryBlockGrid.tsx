@@ -203,7 +203,6 @@ export function LibraryPageDirectoryBlockGrid({
                         fontWeight="semibold"
                         defaultValue={node.name}
                         onChange={(event) => {
-                          console.log(event);
                           handleChildFieldValueChange(
                             node.id,
                             "fixed:name" as MappableNodeField,
