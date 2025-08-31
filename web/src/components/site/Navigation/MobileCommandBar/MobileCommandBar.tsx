@@ -35,7 +35,7 @@ export function MobileCommandBar() {
             {account ? (
               <AccountMenu account={account} size="sm" />
             ) : (
-              <SiteIcon borderRadius="md" w="6" />
+              <SiteIcon borderRadius="md" w="8" h="8" />
             )}
             <Search />
             <CloseAction onClick={onClose} size="sm" />
@@ -45,9 +45,9 @@ export function MobileCommandBar() {
             {account ? (
               <AccountMenu account={account} size="sm" />
             ) : (
-              <SiteIcon borderRadius="md" w="6" />
+              <SiteIcon borderRadius="md" w="8" h="8" />
             )}
-            <HomeAnchor hideLabel />
+            <HomeAnchor hideLabel size="sm" />
             {account ? <ComposeAnchor hideLabel size="sm" /> : <LoginAnchor />}
             <LibraryAnchor hideLabel size="sm" />
             <ExpandTrigger onClick={onExpand} />
