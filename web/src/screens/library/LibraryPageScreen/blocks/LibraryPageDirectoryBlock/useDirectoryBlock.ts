@@ -100,13 +100,6 @@ export function useDirectoryBlock(): LibraryPageBlockTypeDirectory {
     };
   }, [block]);
 
-  if (block === undefined) {
-    return {
-      type: "directory",
-      config: defaultConfig,
-    };
-  }
-
   if (block.config === undefined) {
     return {
       ...block,
