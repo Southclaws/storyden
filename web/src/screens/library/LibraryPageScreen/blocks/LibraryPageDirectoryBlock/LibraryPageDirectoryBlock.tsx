@@ -32,6 +32,7 @@ import {
   styled,
 } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
+import { linkDisabledProps } from "@/utils/anchor";
 import { getAssetURL } from "@/utils/asset";
 
 import { useLibraryPageContext } from "../../Context";
@@ -226,7 +227,11 @@ function LibraryPageDirectoryBlockTable({
               <Table.Header width="0">
                 <Center>
                   <AddPropertyMenu>
-                    <IconButton size="xs" variant="ghost">
+                    <IconButton
+                      size="xs"
+                      variant="ghost"
+                      title="Add a new property."
+                    >
                       <AddIcon />
                     </IconButton>
                   </AddPropertyMenu>
@@ -379,7 +384,7 @@ function LibraryPageDirectoryBlockGrid({
           p="1"
         >
           <AddPropertyMenu>
-            <IconButton size="xs" variant="ghost">
+            <IconButton size="xs" variant="ghost" title="Add a new property.">
               <AddIcon />
             </IconButton>
           </AddPropertyMenu>
@@ -405,9 +410,17 @@ function LibraryPageDirectoryBlockGrid({
 
           const valueTable = keyBy(columnValues, "fid");
 
+          // When the cover image is displayed and the node has no primary image
+          // and the name column is hidden, show the node name as a placeholder.
+          const coverImagePlaceholder =
+            node.primary_image === undefined &&
+            !coverImageHiddenState &&
+            nameColumnHiddenState;
+
           return (
             <GridItem
               key={node.id}
+              position="relative"
               borderRadius="md"
               bg="bg.muted"
               display="flex"
@@ -415,21 +428,36 @@ function LibraryPageDirectoryBlockGrid({
               justifyContent="space-between"
               overflow="hidden"
               gap="2"
+              // If no other fields are displayed, but the cover image is then
+              // treat the card as a "full bleed" and remove the bottom padding.
               pb={fullBleedCover ? "0" : "1"}
             >
               {!coverImageHiddenState ? (
-                node.primary_image ? (
-                  <styled.img
-                    src={getAssetURL(node.primary_image.path)}
-                    objectFit="cover"
-                    w="full"
-                    h="32"
-                  />
-                ) : (
-                  <Center h="32">
-                    <EmptyIcon />
-                  </Center>
-                )
+                <Link {...linkDisabledProps(editing)} href={`/l/${node.slug}`}>
+                  {node.primary_image ? (
+                    <styled.img
+                      src={getAssetURL(node.primary_image.path)}
+                      objectFit="cover"
+                      w="full"
+                      h="32"
+                    />
+                  ) : (
+                    <Center h="32" p="2">
+                      {coverImagePlaceholder ? (
+                        <styled.span
+                          textAlign="center"
+                          textWrap="balance"
+                          color="fg.muted"
+                          lineClamp={3}
+                        >
+                          {node.name}
+                        </styled.span>
+                      ) : (
+                        <EmptyIcon />
+                      )}
+                    </Center>
+                  )}
+                </Link>
               ) : (
                 <Box />
               )}
