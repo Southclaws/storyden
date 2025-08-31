@@ -6,15 +6,19 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"strings"
+	"time"
 
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/transports/http/middleware/session_cookie"
 	"github.com/Southclaws/storyden/internal/config"
+	frontendService "github.com/Southclaws/storyden/internal/infrastructure/frontend"
 )
 
 type Provider struct {
-	handler func(http.ResponseWriter, *http.Request)
+	handler  func(http.ResponseWriter, *http.Request)
+	frontend frontendService.Frontend
+	logger   *slog.Logger
 }
 
 func New(
@@ -22,6 +26,7 @@ func New(
 	logger *slog.Logger,
 	mux *http.ServeMux,
 	cj *session_cookie.Jar,
+	fe frontendService.Frontend,
 ) *Provider {
 	if cfg.FrontendProxy.String() == "" {
 		return &Provider{}
@@ -62,7 +67,9 @@ func New(
 	}
 
 	return &Provider{
-		handler: handler(proxy),
+		handler:  handler(proxy),
+		frontend: fe,
+		logger:   logger,
 	}
 }
 
@@ -78,7 +85,26 @@ func (p *Provider) WithFrontendProxy() func(next http.Handler) http.Handler {
 			if strings.HasPrefix(r.URL.Path, "/api") {
 				next.ServeHTTP(w, r)
 			} else {
-				p.handler(w, r)
+				if p.frontend == nil {
+					p.handler(w, r)
+					return
+				}
+
+				// Wait for frontend to be ready before proxying
+				select {
+				case <-p.frontend.Ready():
+					p.handler(w, r)
+
+				case <-time.After(30 * time.Second):
+					p.logger.Error("timeout waiting for frontend to be ready",
+						slog.String("url", r.URL.String()),
+						slog.String("method", r.Method),
+						slog.String("remote_addr", r.RemoteAddr),
+					)
+					w.WriteHeader(http.StatusServiceUnavailable)
+					w.Write([]byte("Frontend service is unavailable"))
+				}
+
 			}
 		})
 	}
