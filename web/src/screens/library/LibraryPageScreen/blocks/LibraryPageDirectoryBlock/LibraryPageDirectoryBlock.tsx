@@ -79,7 +79,7 @@ export function LibraryPageDirectoryBlockContents() {
           onClick={handleTagFilter}
           highlightedTags={highlightedTags}
         />
-        <HStack>
+        <HStack gap="1" alignItems="end" flexWrap="wrap-reverse" justify="end">
           <Input
             variant="ghost"
             placeholder="Search..."
@@ -91,7 +91,7 @@ export function LibraryPageDirectoryBlockContents() {
           />
 
           {editing && (
-            <>
+            <HStack gap="1">
               <AddPropertyMenu>
                 <IconButton
                   size="xs"
@@ -107,7 +107,7 @@ export function LibraryPageDirectoryBlockContents() {
                   <MenuIcon />
                 </IconButton>
               </PropertyListMenu>
-            </>
+            </HStack>
           )}
         </HStack>
       </WStack>
