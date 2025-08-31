@@ -17,7 +17,6 @@ import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
 import { useLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
 import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
-import { useMouseDistance } from "@/utils/useMouseDistance";
 
 import { useLibraryPageContext } from "../Context";
 import { useWatch } from "../store";

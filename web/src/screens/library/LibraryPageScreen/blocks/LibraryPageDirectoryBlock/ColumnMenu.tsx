@@ -3,10 +3,10 @@ import {
   MenuSelectionDetails,
   Portal,
 } from "@ark-ui/react";
-import { EyeIcon } from "lucide-react";
 import { PropsWithChildren, useState } from "react";
 
 import { DeleteIcon } from "@/components/ui/icons/Delete";
+import { HideIcon } from "@/components/ui/icons/HideIcon";
 import { Input } from "@/components/ui/input";
 import * as Menu from "@/components/ui/menu";
 
@@ -100,7 +100,7 @@ export function ColumnMenu({ column, children }: PropsWithChildren<Props>) {
 
             <Menu.ItemGroup>
               <Menu.Item value="hide-show">
-                <EyeIcon />
+                <HideIcon />
                 &nbsp;Hide column
               </Menu.Item>
 

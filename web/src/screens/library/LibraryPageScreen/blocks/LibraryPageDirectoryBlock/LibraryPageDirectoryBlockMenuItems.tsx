@@ -1,7 +1,8 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
-import { LayoutIcon, Table2Icon } from "lucide-react";
 
+import { LayoutIcon } from "@/components/ui/icons/Layout";
 import { LayoutGridIcon } from "@/components/ui/icons/LayoutGrid";
+import { LayoutTableIcon } from "@/components/ui/icons/LayoutTable";
 import * as Menu from "@/components/ui/menu";
 import {
   LibraryPageBlockTypeDirectoryConfig,
@@ -9,7 +10,6 @@ import {
 } from "@/lib/library/metadata";
 
 import { useLibraryPageContext } from "../../Context";
-import { useBlock } from "../useBlock";
 
 import { useDirectoryBlock } from "./useDirectoryBlock";
 
@@ -55,7 +55,7 @@ function LayoutMenu() {
         <Menu.Positioner>
           <Menu.Content minW="36">
             <Menu.Item value="table">
-              <Table2Icon />
+              <LayoutTableIcon />
               &nbsp;Table
             </Menu.Item>
             <Menu.Item value="grid">
