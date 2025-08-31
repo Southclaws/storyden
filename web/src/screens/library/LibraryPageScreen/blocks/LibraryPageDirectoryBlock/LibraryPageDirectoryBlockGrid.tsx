@@ -7,11 +7,13 @@ import {
   NodeWithChildren,
   PropertySchemaList,
 } from "@/api/openapi-schema";
+import { EmptyState } from "@/components/site/EmptyState";
 import { useSortIndicator } from "@/components/site/SortIndicator";
 import { IconButton } from "@/components/ui/icon-button";
 import { AddIcon } from "@/components/ui/icons/Add";
 import { EmptyIcon } from "@/components/ui/icons/Empty";
 import { MenuIcon } from "@/components/ui/icons/Menu";
+import { Input } from "@/components/ui/input";
 import {
   Box,
   Center,
@@ -31,6 +33,7 @@ import { useEditState } from "../../useEditState";
 
 import { AddPropertyMenu } from "./AddPropertyMenu/AddPropertyMenu";
 import { ColumnMenu } from "./ColumnMenu";
+import { useDirectoryBlockContext } from "./Context";
 import { PropertyListMenu } from "./PropertyListMenu/PropertyListMenu";
 import {
   MappableNodeField,
@@ -53,6 +56,7 @@ export function LibraryPageDirectoryBlockGrid({
   const { store } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
   const { editing } = useEditState();
+  const { handleSearch } = useDirectoryBlockContext();
 
   const { setChildPropertyValue } = store.getState();
 
@@ -93,28 +97,37 @@ export function LibraryPageDirectoryBlockGrid({
     setChildPropertyValue(nodeID, fid, value);
   }
 
+  function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
+    handleSearch(event.target.value);
+  }
+
   return (
     <LStack w="full" gap="2">
-      {editing && (
-        <WStack
-          justifyContent="end"
-          bgColor="bg.subtle"
-          borderRadius="sm"
-          p="1"
-        >
-          <AddPropertyMenu>
-            <IconButton size="xs" variant="ghost" title="Add a new property.">
-              <AddIcon />
-            </IconButton>
-          </AddPropertyMenu>
+      <WStack justifyContent="end" bgColor="bg.subtle" borderRadius="sm" p="1">
+        <Input
+          variant="ghost"
+          placeholder="Search..."
+          size="xs"
+          onChange={handleSearchChange}
+        />
 
-          <PropertyListMenu>
-            <IconButton size="xs" variant="ghost">
-              <MenuIcon />
-            </IconButton>
-          </PropertyListMenu>
-        </WStack>
-      )}
+        {editing && (
+          <>
+            <AddPropertyMenu>
+              <IconButton size="xs" variant="ghost" title="Add a new property.">
+                <AddIcon />
+              </IconButton>
+            </AddPropertyMenu>
+
+            <PropertyListMenu>
+              <IconButton size="xs" variant="ghost">
+                <MenuIcon />
+              </IconButton>
+            </PropertyListMenu>
+          </>
+        )}
+      </WStack>
+
       <Grid
         w="full"
         gap="2"
@@ -377,6 +390,14 @@ export function LibraryPageDirectoryBlockGrid({
           );
         })}
       </Grid>
+
+      {nodes.length === 0 && (
+        <Center w="full">
+          <EmptyState hideContributionLabel>
+            There are no pages here.
+          </EmptyState>
+        </Center>
+      )}
     </LStack>
   );
 }

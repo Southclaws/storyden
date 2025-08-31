@@ -1,17 +1,32 @@
 import { useNodeListChildren } from "@/api/openapi-client/nodes";
+import { EmptyState } from "@/components/site/EmptyState";
 import { useSortIndicator } from "@/components/site/SortIndicator";
 import { Unready } from "@/components/site/Unready";
+import { Center } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
 
+import {
+  LibraryPageDirectoryBlockContextProvider,
+  useDirectoryBlockContext,
+} from "./Context";
 import { LibraryPageDirectoryBlockGrid } from "./LibraryPageDirectoryBlockGrid";
 import { LibraryPageDirectoryBlockTable } from "./LibraryPageDirectoryBlockTable";
 import { useDirectoryBlock } from "./useDirectoryBlock";
 
 export function LibraryPageDirectoryBlock() {
-  const { nodeID, initialChildren, store } = useLibraryPageContext();
+  return (
+    <LibraryPageDirectoryBlockContextProvider>
+      <LibraryPageDirectoryBlockContents />
+    </LibraryPageDirectoryBlockContextProvider>
+  );
+}
+
+export function LibraryPageDirectoryBlockContents() {
+  const { nodeID, initialChildren } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
+  const { searchQuery } = useDirectoryBlockContext();
 
   // format the sort property as "name" or "-name" for asc/desc
   const childrenSort =
@@ -25,6 +40,7 @@ export function LibraryPageDirectoryBlock() {
     nodeID,
     {
       children_sort: childrenSort,
+      q: searchQuery || undefined,
     },
     {
       swr: {
@@ -42,15 +58,9 @@ export function LibraryPageDirectoryBlock() {
     return <Unready error={error} />;
   }
 
-  const nodes = data.nodes;
-
-  if (nodes.length === 0) {
-    return null;
-  }
-
   if (!block) {
     console.warn(
-      "attempting to render a LibraryPageDirectoryBlock without a block in the form metadata",
+      "attempting to render a LibraryPageDirectoryBlock without a block in the page metadata",
     );
     return null;
   }
@@ -63,21 +73,24 @@ export function LibraryPageDirectoryBlock() {
     case "grid":
       return (
         <LibraryPageDirectoryBlockGrid
-          nodes={nodes}
+          nodes={data.nodes}
           block={block}
           currentChildPropertySchema={currentChildPropertySchema}
         />
       );
+
     case "table":
-    default:
       return (
         <LibraryPageDirectoryBlockTable
-          nodes={nodes}
+          nodes={data.nodes}
           block={block}
           currentChildPropertySchema={currentChildPropertySchema}
           sort={sort}
           handleSort={handleSort}
         />
       );
+
+    default:
+      return <Unready error={new Error(`Unknown layout type: "${layout}"`)} />;
   }
 }
