@@ -11,3 +11,11 @@ node_modules/
 
 __debug_bin*
 data.db*
+
+# gotta ignore the literal filename of the backend build for agents because
+# they don't use .exe file extension so it's tough to catch-all for binaries.
+# these files are basically just the contents of ./cmd/
+backend
+clean
+migrate
+seed
