@@ -13,18 +13,21 @@ import (
 
 type Frontend interface {
 	Run(ctx context.Context, path string)
+	Ready() <-chan struct{}
 }
 
 func Build() fx.Option {
-	return fx.Invoke(func(lc fx.Lifecycle, logger *slog.Logger, cfg config.Config) {
+	return fx.Provide(func(lc fx.Lifecycle, logger *slog.Logger, cfg config.Config) Frontend {
 		if cfg.RunFrontend == "" {
-			return
+			return nil
 		}
 
-		var fe Frontend = &NextjsProcess{logger: logger}
+		fe := &NextjsProcess{logger: logger}
 
 		lc.Append(fx.StartHook(func(ctx context.Context) {
 			go fe.Run(ctx, cfg.RunFrontend)
 		}))
+
+		return fe
 	})
 }
