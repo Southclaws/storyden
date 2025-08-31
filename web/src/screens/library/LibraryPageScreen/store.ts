@@ -257,7 +257,8 @@ export const createNodeStore = (initState: State) => {
               hidden: false,
             };
 
-            const layout = (state.draft.meta.layout ??= DefaultLayout);
+            const layout = (state.draft.meta.layout ??=
+              structuredClone(DefaultLayout));
 
             for (const block of layout.blocks) {
               if (block.type !== "directory") continue;
