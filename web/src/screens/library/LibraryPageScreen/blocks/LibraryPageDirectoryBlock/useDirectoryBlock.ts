@@ -2,30 +2,32 @@ import { dequal } from "dequal";
 import { keyBy } from "lodash";
 import { useEffect } from "react";
 
-import { LibraryPageBlockTypeTable } from "@/lib/library/metadata";
+import { LibraryPageBlockTypeDirectory } from "@/lib/library/metadata";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
 import { useBlock } from "../useBlock";
 
-import { getDefaultBlockConfig } from "./column";
+import { MappableNodeFields, getDefaultBlockConfig } from "./column";
 
-export function useTableBlock(): LibraryPageBlockTypeTable {
+export function useDirectoryBlock(): LibraryPageBlockTypeDirectory {
   const { store } = useLibraryPageContext();
-  const block = useBlock("table");
+  const block = useBlock("directory");
   const currentChildPropertySchema = useWatch(
     (s) => s.draft.child_property_schema,
   );
 
   if (block === undefined) {
-    throw new Error("useTableBlock rendered in a page without a Table block.");
+    throw new Error(
+      "useDirectoryBlock rendered in a page without a Directory block.",
+    );
   }
 
   const { overwriteBlock } = store.getState();
 
   const defaultConfig = getDefaultBlockConfig(currentChildPropertySchema);
 
-  // Self-heal table block config:
+  // Self-heal directory block config:
   // If the block config is empty, set it to the default state using schema.
   // If the columns contain any fields that do not exist on the schema, fix it.
   useEffect(() => {
@@ -36,12 +38,12 @@ export function useTableBlock(): LibraryPageBlockTypeTable {
         );
 
         console.debug(
-          "Table block config is undefined, setting to default",
+          "Directory block config is undefined, setting to default",
           defaultBlockConfig,
         );
 
         overwriteBlock({
-          type: "table",
+          type: "directory",
           config: defaultBlockConfig,
         });
       } else {
@@ -61,7 +63,15 @@ export function useTableBlock(): LibraryPageBlockTypeTable {
             hidden: false,
           }));
 
+        const fixedFields = MappableNodeFields.filter(
+          (fixed) => columnFieldsByKey[`fixed:${fixed}`] === undefined,
+        ).map((fixed) => ({
+          fid: `fixed:${fixed}`,
+          hidden: true,
+        }));
+
         const updatedColumnConfig = [
+          ...fixedFields,
           ...filteredRemovedColumns,
           ...filteredAddedColumns,
         ];
@@ -71,13 +81,14 @@ export function useTableBlock(): LibraryPageBlockTypeTable {
         }
 
         console.debug(
-          "Table block config mismatches schema, setting to new config",
+          "Directory block config mismatches schema, setting to new config",
           updatedColumnConfig,
         );
 
         overwriteBlock({
-          type: "table",
+          type: "directory",
           config: {
+            layout: block.config.layout,
             columns: updatedColumnConfig,
           },
         });
@@ -88,13 +99,6 @@ export function useTableBlock(): LibraryPageBlockTypeTable {
       clearTimeout(timeout);
     };
   }, [block]);
-
-  if (block === undefined) {
-    return {
-      type: "table",
-      config: defaultConfig,
-    };
-  }
 
   if (block.config === undefined) {
     return {

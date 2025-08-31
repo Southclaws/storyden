@@ -5,7 +5,7 @@ import { nodeGet, nodeListChildren } from "@/api/openapi-server/nodes";
 import { getTargetSlug } from "@/components/library/utils";
 import { WEB_ADDRESS } from "@/config";
 import {
-  LibraryPageBlockTypeTable,
+  LibraryPageBlockTypeDirectory,
   parseNodeMetadata,
 } from "@/lib/library/metadata";
 import { getSettings } from "@/lib/settings/settings-server";
@@ -86,10 +86,10 @@ async function maybeGetChildren(
     return;
   }
 
-  const table = parseNodeMetadata(node.meta).layout?.blocks.find(
-    (b): b is LibraryPageBlockTypeTable => b.type === "table",
+  const directory = parseNodeMetadata(node.meta).layout?.blocks.find(
+    (b): b is LibraryPageBlockTypeDirectory => b.type === "directory",
   );
-  if (!table) {
+  if (!directory) {
     return;
   }
 

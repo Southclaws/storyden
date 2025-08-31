@@ -9,8 +9,9 @@ import {
   PropertyValue,
 } from "@/api/openapi-schema";
 import {
-  LibraryPageBlockTypeTable,
-  LibraryPageBlockTypeTableConfig,
+  LibraryPageBlockTypeDirectory,
+  LibraryPageBlockTypeDirectoryConfig,
+  LibraryPageBlockTypeDirectoryLayout,
 } from "@/lib/library/metadata";
 
 export type ColumnDefinitionCommon = {
@@ -41,7 +42,7 @@ export type ColumnValue = {
 };
 
 export type MappableNodeField = Extract<
-  "name" | "link" | "description",
+  "name" | "link" | "description" | "primary_image",
   keyof NodeWithChildren
 >;
 
@@ -49,9 +50,11 @@ export const MappableNodeFields: Array<MappableNodeField> = [
   "name",
   "link",
   "description",
+  "primary_image",
 ];
 
 export type ProcessedConfig = {
+  layout: LibraryPageBlockTypeDirectoryLayout;
   columns: Array<ColumnDefinition>;
 };
 
@@ -79,13 +82,14 @@ export function getDefaultBlockConfig(ps: PropertySchemaList): ProcessedConfig {
   const columns: ColumnDefinition[] = [...fixedCols, ...propCols];
 
   return {
+    layout: "table",
     columns,
   };
 }
 
 export function processBlockConfig(
   ps: PropertySchemaList,
-  config: LibraryPageBlockTypeTableConfig,
+  config: LibraryPageBlockTypeDirectoryConfig,
   showHidden = false,
 ): ProcessedConfig {
   const schemaMap = keyBy(ps, "fid");
@@ -132,7 +136,7 @@ export function processBlockConfig(
 
 export function mergeFieldsAndPropertySchema(
   ps: PropertySchemaList,
-  block: LibraryPageBlockTypeTable,
+  block: LibraryPageBlockTypeDirectory,
   showHidden = false,
 ): ColumnDefinition[] {
   const config =
@@ -146,7 +150,7 @@ export function mergeFieldsAndPropertySchema(
 export function mergeFieldsAndProperties(
   schema: PropertySchemaList,
   node: NodeWithChildren,
-  block: LibraryPageBlockTypeTable,
+  block: LibraryPageBlockTypeDirectory,
 ): ColumnValue[] {
   const config =
     block.config === undefined
@@ -177,6 +181,16 @@ export function mergeFieldsAndProperties(
             fid: column.fid,
             value: node.name ?? "",
             href: `/l/${node.slug}`,
+          },
+        ];
+      }
+
+      if (column._fixedFieldName === "primary_image") {
+        return [
+          ...prev,
+          {
+            fid: column.fid,
+            value: node.primary_image?.path ?? "",
           },
         ];
       }

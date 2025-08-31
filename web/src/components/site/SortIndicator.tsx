@@ -5,7 +5,7 @@ import {
   ChevronUpDownIcon,
   ChevronUpIcon,
 } from "@/components/ui/icons/Chevron";
-import { Box, styled } from "@/styled-system/jsx";
+import { styled } from "@/styled-system/jsx";
 
 type Direction = "asc" | "desc" | "none";
 
@@ -14,9 +14,11 @@ type SortState = {
   order: Direction;
 };
 
-type Props = {
+export type SortIndicatorProps = {
   order: Direction;
 };
+
+export type UseSortIndicator = ReturnType<typeof useSortIndicator>;
 
 export function useSortIndicator() {
   const [sort, setSort] = useState<SortState | null>(null);
@@ -40,7 +42,7 @@ export function useSortIndicator() {
   };
 }
 
-export function SortIndicator({ order }: Props) {
+export function SortIndicator({ order }: SortIndicatorProps) {
   const label =
     order === "none"
       ? "No sort"

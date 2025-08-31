@@ -14,6 +14,7 @@ import { useWatch } from "../store";
 
 import { CreateBlockMenu } from "./CreateBlockMenu";
 import { LibraryPageAssetsBlockMenuItems } from "./LibraryPageAssetsBlock/LibraryPageAssetsBlockMenuItems";
+import { LibraryPageDirectoryBlockMenuItems } from "./LibraryPageDirectoryBlock/LibraryPageDirectoryBlockMenuItems";
 
 type Props = {
   open?: boolean;
@@ -91,6 +92,9 @@ function BlockConfigMenu({ block }: Props) {
   switch (block.type) {
     case "assets": {
       return <LibraryPageAssetsBlockMenuItems />;
+    }
+    case "directory": {
+      return <LibraryPageDirectoryBlockMenuItems />;
     }
     default:
       return null;

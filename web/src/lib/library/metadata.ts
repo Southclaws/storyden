@@ -15,7 +15,7 @@ export const LibraryPageBlockName: Record<LibraryPageBlockType, string> = {
   content: "Rich text content",
   assets: "Gallery",
   properties: "Page properties",
-  table: "Child page table",
+  directory: "Directory",
   tags: "Tag list",
 };
 
@@ -26,7 +26,7 @@ export const LibraryPageBlockTypeSchema = z.enum([
   "content",
   "assets",
   "properties",
-  "table",
+  "directory",
   "tags",
 ]);
 export type LibraryPageBlockType = z.infer<typeof LibraryPageBlockTypeSchema>;
@@ -91,27 +91,36 @@ export type LibraryPageBlockTypeProperties = z.infer<
   typeof LibraryPageBlockTypePropertiesSchema
 >;
 
-export const LibraryPageBlockTypeTableColumnSchema = z.object({
+export const LibraryPageBlockTypeDirectoryLayoutSchema = z.enum([
+  "table",
+  "grid",
+]);
+export type LibraryPageBlockTypeDirectoryLayout = z.infer<
+  typeof LibraryPageBlockTypeDirectoryLayoutSchema
+>;
+
+export const LibraryPageBlockTypeDirectoryColumnSchema = z.object({
   fid: z.string(),
-  hidden: z.boolean(),
+  hidden: z.boolean().default(false),
 });
-export type LibraryPageBlockTypeTableColumn = z.infer<
-  typeof LibraryPageBlockTypeTableColumnSchema
+export type LibraryPageBlockTypeDirectoryColumn = z.infer<
+  typeof LibraryPageBlockTypeDirectoryColumnSchema
 >;
 
-export const LibraryPageBlockTypeTableConfigSchema = z.object({
-  columns: z.array(LibraryPageBlockTypeTableColumnSchema),
+export const LibraryPageBlockTypeDirectoryConfigSchema = z.object({
+  layout: LibraryPageBlockTypeDirectoryLayoutSchema,
+  columns: z.array(LibraryPageBlockTypeDirectoryColumnSchema),
 });
-export type LibraryPageBlockTypeTableConfig = z.infer<
-  typeof LibraryPageBlockTypeTableConfigSchema
+export type LibraryPageBlockTypeDirectoryConfig = z.infer<
+  typeof LibraryPageBlockTypeDirectoryConfigSchema
 >;
 
-export const LibraryPageBlockTypeTableSchema = z.object({
-  type: z.literal(LibraryPageBlockTypeSchema.Enum.table),
-  config: LibraryPageBlockTypeTableConfigSchema.optional(),
+export const LibraryPageBlockTypeDirectorySchema = z.object({
+  type: z.literal(LibraryPageBlockTypeSchema.Enum.directory),
+  config: LibraryPageBlockTypeDirectoryConfigSchema.optional(),
 });
-export type LibraryPageBlockTypeTable = z.infer<
-  typeof LibraryPageBlockTypeTableSchema
+export type LibraryPageBlockTypeDirectory = z.infer<
+  typeof LibraryPageBlockTypeDirectorySchema
 >;
 
 export const LibraryPageBlockTypeTagsSchema = z.object({
@@ -132,7 +141,7 @@ export const LibraryPageBlockSchema = z.union([
   LibraryPageBlockTypeContentSchema,
   LibraryPageBlockTypeAssetsSchema,
   LibraryPageBlockTypePropertiesSchema,
-  LibraryPageBlockTypeTableSchema,
+  LibraryPageBlockTypeDirectorySchema,
   LibraryPageBlockTypeTagsSchema,
 ]);
 export type LibraryPageBlock = z.infer<typeof LibraryPageBlockSchema>;
@@ -157,7 +166,7 @@ export const DefaultLayout: NodeLayout = {
     { type: "tags" as const },
     { type: "link" as const },
     { type: "properties" as const },
-    { type: "table" as const },
+    { type: "directory" as const },
   ],
 };
 

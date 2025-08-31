@@ -3,9 +3,9 @@ import {
   Portal,
   SliderValueChangeDetails,
 } from "@ark-ui/react";
-import { LayoutIcon, RulerDimensionLineIcon } from "lucide-react";
 
 import { AssetUploadAction } from "@/components/asset/AssetUploadAction";
+import { LayoutIcon } from "@/components/ui/icons/Layout";
 import { MediaAddIcon } from "@/components/ui/icons/Media";
 import { SizeIcon } from "@/components/ui/icons/Size";
 import * as Menu from "@/components/ui/menu";

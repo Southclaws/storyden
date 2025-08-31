@@ -17,7 +17,6 @@ import { DragItemNodeBlock } from "@/lib/dragdrop/provider";
 import { useLibraryBlockEvent } from "@/lib/library/events";
 import { LibraryPageBlock, LibraryPageBlockType } from "@/lib/library/metadata";
 import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
-import { useMouseDistance } from "@/utils/useMouseDistance";
 
 import { useLibraryPageContext } from "../Context";
 import { useWatch } from "../store";
@@ -28,9 +27,9 @@ import { CreateBlockMenu } from "./CreateBlockMenu";
 import { LibraryPageAssetsBlock } from "./LibraryPageAssetsBlock/LibraryPageAssetsBlock";
 import { LibraryPageContentBlock } from "./LibraryPageContentBlock/LibraryPageContentBlock";
 import { LibraryPageCoverBlock } from "./LibraryPageCoverBlock/LibraryPageCoverBlock";
+import { LibraryPageDirectoryBlock } from "./LibraryPageDirectoryBlock/LibraryPageDirectoryBlock";
 import { LibraryPageLinkBlock } from "./LibraryPageLinkBlock/LibraryPageLinkBlock";
 import { LibraryPagePropertiesBlock } from "./LibraryPagePropertiesBlock/LibraryPagePropertiesBlock";
-import { LibraryPageTableBlock } from "./LibraryPageTableBlock/LibraryPageTableBlock";
 import { LibraryPageTagsBlock } from "./LibraryPageTagsBlock/LibraryPageTagsBlock";
 import { LibraryPageTitleBlock } from "./LibraryPageTitleBlock/LibraryPageTitleBlock";
 
@@ -139,8 +138,8 @@ function LibraryPageBlockRender({ block }: { block: LibraryPageBlock }) {
       return <LibraryPageLinkBlock />;
     case "properties":
       return <LibraryPagePropertiesBlock />;
-    case "table":
-      return <LibraryPageTableBlock />;
+    case "directory":
+      return <LibraryPageDirectoryBlock />;
     case "content":
       return <LibraryPageContentBlock />;
   }
@@ -315,18 +314,7 @@ function LibraryPageBlockEditable({
           </Box>
         </VStack>
       </VStack>
-      <Box
-        id={`block-${block.type}_content`}
-        w="full"
-        minW="0"
-        _groupHover={{
-          bgColor: "bg.muted/50",
-          borderRadius: "sm",
-          outlineColor: "bg.muted/50",
-          outlineStyle: "solid",
-          outlineWidth: "medium",
-        }}
-      >
+      <Box id={`block-${block.type}_content`} w="full" minW="0">
         <LibraryPageBlockRender block={block} />
       </Box>
     </HStack>

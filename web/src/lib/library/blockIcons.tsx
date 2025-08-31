@@ -1,14 +1,13 @@
 import {
-  GalleryThumbnailsIcon,
-  ImagesIcon,
-  Table2Icon,
-  TablePropertiesIcon,
-  TagsIcon,
-  TextIcon,
-  TypeIcon,
-} from "lucide-react";
-
-import { LinkIcon } from "@/components/ui/icons/Link";
+  AssetsBlockIcon,
+  ContentBlockIcon,
+  CoverBlockIcon,
+  DirectoryBlockIcon,
+  LinkBlockIcon,
+  PropertiesBlockIcon,
+  TagsBlockIcon,
+  TitleBlockIcon,
+} from "@/components/ui/icons/Blocks";
 
 import { LibraryPageBlockType } from "./metadata";
 
@@ -16,14 +15,14 @@ export const LibraryPageBlockIcon: Record<
   LibraryPageBlockType,
   React.ComponentType
 > = {
-  title: TypeIcon,
-  cover: GalleryThumbnailsIcon,
-  link: LinkIcon,
-  content: TextIcon,
-  assets: ImagesIcon,
-  properties: TablePropertiesIcon,
-  table: Table2Icon,
-  tags: TagsIcon,
+  title: TitleBlockIcon,
+  cover: CoverBlockIcon,
+  link: LinkBlockIcon,
+  content: ContentBlockIcon,
+  assets: AssetsBlockIcon,
+  properties: PropertiesBlockIcon,
+  directory: DirectoryBlockIcon,
+  tags: TagsBlockIcon,
 };
 
 export function BlockIcon({ blockType }: { blockType: LibraryPageBlockType }) {
