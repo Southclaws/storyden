@@ -64,7 +64,6 @@ export function LibraryPageDirectoryBlockTable({
     fid: MappableNodeField,
     value: string,
   ) {
-    console.log("Child field value changed:", nodeID, fid, value);
     setChildPropertyValue(nodeID, fid, value);
   }
 
