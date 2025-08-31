@@ -8,10 +8,23 @@ import { badge } from "@/styled-system/recipes";
 
 import { BadgeProps } from "../ui/badge";
 
-export type Props = BadgeProps & {
-  tag: TagReference;
-  showItemCount?: boolean;
-};
+type TagBadgeProps =
+  | {
+      type?: "link";
+      onClick?: never;
+      highlighted?: never;
+    }
+  | {
+      type: "button";
+      onClick: () => void;
+      highlighted?: boolean;
+    };
+
+export type Props = BadgeProps &
+  TagBadgeProps & {
+    tag: TagReference;
+    showItemCount?: boolean;
+  };
 
 // tags are always lowercase, which means most ascenders and descenders are
 // slightly mis-aligned to the optical center of the badge.
@@ -23,7 +36,14 @@ const badgeStyles = css({
   color: "colorPalette.text",
 });
 
-export function TagBadge({ tag, showItemCount, ...props }: Props) {
+export function TagBadge({
+  type,
+  onClick,
+  highlighted,
+  tag,
+  showItemCount,
+  ...props
+}: Props) {
   const cssVars = badgeColourCSS(tag.colour);
 
   const styles = {
@@ -35,19 +55,8 @@ export function TagBadge({ tag, showItemCount, ...props }: Props) {
 
   const titleLabel = `${tag.item_count} items tagged with ${tag.name}`;
 
-  return (
-    <Link
-      className={cx(
-        badge({
-          size: "sm",
-          ...props,
-        }),
-        badgeStyles,
-      )}
-      style={styles}
-      title={titleLabel}
-      href={`/tags/${tag.name}`}
-    >
+  const render = (
+    <>
       {showItemCount && (
         <styled.span
           borderRightStyle="solid"
@@ -65,6 +74,51 @@ export function TagBadge({ tag, showItemCount, ...props }: Props) {
       >
         {tag.name}
       </styled.span>
+    </>
+  );
+
+  const tagBadgeStyles = cx(
+    badge({
+      size: "sm",
+      ...props,
+    }),
+    badgeStyles,
+  );
+
+  if (type === "button") {
+    const shouldShowHighlightStyles = highlighted !== undefined;
+
+    const highlightStyles = shouldShowHighlightStyles
+      ? highlighted
+        ? css({
+            opacity: "full",
+          })
+        : css({
+            opacity: "5",
+          })
+      : undefined;
+
+    return (
+      <styled.button
+        className={cx(tagBadgeStyles, highlightStyles)}
+        style={styles}
+        title={`include ${tag.name} in filter`}
+        onClick={onClick}
+        cursor="pointer"
+      >
+        {render}
+      </styled.button>
+    );
+  }
+
+  return (
+    <Link
+      className={tagBadgeStyles}
+      style={styles}
+      title={titleLabel}
+      href={`/tags/${tag.name}`}
+    >
+      {render}
     </Link>
   );
 }
