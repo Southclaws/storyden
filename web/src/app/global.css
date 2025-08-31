@@ -93,7 +93,8 @@ body {
     somehow bubbles up to the viewport and sets the total width to the scroll
     container + the navigation grid padding. Very strange but this hack fixes.
   */
-  overflow-x: hidden;
+  overflow-x: clip;
+  overflow-y: clip;
 }
 
 .content-viewer {
