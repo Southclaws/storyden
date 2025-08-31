@@ -11,6 +11,7 @@ import {
 
 import { useLibraryPageContext } from "../../Context";
 
+import { getDefaultBlockConfig } from "./column";
 import { useDirectoryBlock } from "./useDirectoryBlock";
 
 export function LibraryPageDirectoryBlockMenuItems() {
@@ -31,8 +32,12 @@ function LayoutMenu() {
   const { overwriteBlock } = store.getState();
 
   const handleSelect = ({ value }: MenuSelectionDetails) => {
+    const config = block.config ?? {
+      columns: [],
+    };
+
     const newBlockConfig = {
-      ...block.config!, // TODO: Do something more clever?
+      ...config,
       layout: value as LibraryPageBlockTypeDirectoryLayout,
     } satisfies LibraryPageBlockTypeDirectoryConfig;
 
