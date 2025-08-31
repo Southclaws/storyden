@@ -332,18 +332,33 @@ function LibraryPageDirectoryBlockGrid({
 
   const { setChildPropertyValue } = store.getState();
 
-  const columns = mergeFieldsAndPropertySchema(
+  const fullSchema = mergeFieldsAndPropertySchema(
     currentChildPropertySchema,
     block,
-  ).filter(
+  );
+
+  const columns = fullSchema.filter(
     // We don't show fixed fields in the grid view. They are laid
     // out by the component itself and can be toggled on or off.
     (c) => !c._fixedFieldName,
   );
 
+  const nameColumn = fullSchema.find((c) => c.fid === "fixed:name");
+  const nameColumnHiddenState = nameColumn?.hidden ?? true;
+  const linkColumn = fullSchema.find((c) => c.fid === "fixed:link");
+  const linkColumnHiddenState = linkColumn?.hidden ?? true;
+  const descColumn = fullSchema.find((c) => c.fid === "fixed:description");
+  const descColumnHiddenState = descColumn?.hidden ?? true;
+
   const coverImageHiddenState =
     block.config?.columns.find((c) => c.fid === "fixed:primary_image")
       ?.hidden ?? false;
+
+  const fullBleedCover =
+    coverImageHiddenState === false &&
+    nameColumnHiddenState === true &&
+    linkColumnHiddenState === true &&
+    descColumnHiddenState === true;
 
   function handleChildFieldValueChange(
     nodeID: Identifier,
@@ -369,7 +384,7 @@ function LibraryPageDirectoryBlockGrid({
             </IconButton>
           </AddPropertyMenu>
 
-          <PropertyListMenu hideFixedFields>
+          <PropertyListMenu>
             <IconButton size="xs" variant="ghost">
               <MenuIcon />
             </IconButton>
@@ -400,7 +415,7 @@ function LibraryPageDirectoryBlockGrid({
               justifyContent="space-between"
               overflow="hidden"
               gap="2"
-              pb="1"
+              pb={fullBleedCover ? "0" : "1"}
             >
               {!coverImageHiddenState ? (
                 node.primary_image ? (
@@ -419,69 +434,109 @@ function LibraryPageDirectoryBlockGrid({
                 <Box />
               )}
 
-              <LStack gap="0" px="2">
-                {editing ? (
-                  <styled.input
-                    w="full"
-                    fontWeight="semibold"
-                    defaultValue={node.name}
-                    onChange={(event) => {
-                      console.log(event);
-                      handleChildFieldValueChange(
-                        node.id,
-                        "fixed:name" as MappableNodeField,
-                        event.target.value,
-                      );
-                    }}
-                    _focusVisible={{
-                      outline: "none",
-                    }}
-                  />
-                ) : (
-                  <Link href={`/l/${node.slug}`}>
-                    <styled.div
-                      fontWeight="semibold"
-                      lineClamp="1"
-                      textOverflow="ellipsis"
-                      wordBreak="break-all"
-                    >
-                      {node.name}
-                    </styled.div>
-                  </Link>
-                )}
-                {editing ? (
-                  <styled.input
-                    w="full"
-                    placeholder="Description..."
-                    _placeholder={{
-                      color: "fg.subtle",
-                    }}
-                    defaultValue={node.description}
-                    onChange={(event) =>
-                      handleChildFieldValueChange(
-                        node.id,
-                        "fixed:description" as MappableNodeField,
-                        event.target.value,
+              {fullBleedCover ? null : (
+                <LStack gap="0" px="2">
+                  {!nameColumnHiddenState &&
+                    (editing ? (
+                      <styled.input
+                        w="full"
+                        fontWeight="semibold"
+                        defaultValue={node.name}
+                        onChange={(event) => {
+                          console.log(event);
+                          handleChildFieldValueChange(
+                            node.id,
+                            "fixed:name" as MappableNodeField,
+                            event.target.value,
+                          );
+                        }}
+                        _focusVisible={{
+                          outline: "none",
+                        }}
+                      />
+                    ) : (
+                      <Link href={`/l/${node.slug}`}>
+                        <styled.div
+                          fontWeight="semibold"
+                          lineClamp="1"
+                          textOverflow="ellipsis"
+                          wordBreak="break-all"
+                        >
+                          {node.name}
+                        </styled.div>
+                      </Link>
+                    ))}
+
+                  {!descColumnHiddenState &&
+                    (editing ? (
+                      <styled.input
+                        w="full"
+                        placeholder="Description..."
+                        _placeholder={{
+                          color: "fg.subtle",
+                        }}
+                        defaultValue={node.description}
+                        onChange={(event) =>
+                          handleChildFieldValueChange(
+                            node.id,
+                            "fixed:description" as MappableNodeField,
+                            event.target.value,
+                          )
+                        }
+                        _focusVisible={{
+                          outline: "none",
+                        }}
+                      />
+                    ) : (
+                      node.description && (
+                        <styled.div
+                          fontSize="sm"
+                          color="fg.muted"
+                          lineClamp="1"
+                          textOverflow="ellipsis"
+                          wordBreak="break-all"
+                        >
+                          {node.description}
+                        </styled.div>
                       )
-                    }
-                    _focusVisible={{
-                      outline: "none",
-                    }}
-                  />
-                ) : (
-                  node.description && (
-                    <styled.div
-                      fontSize="sm"
-                      color="fg.muted"
-                      lineClamp="1"
-                      textOverflow="ellipsis"
-                      wordBreak="break-all"
-                    >
-                      {node.description}
-                    </styled.div>
-                  )
-                )}
-              </LStack>
+                    ))}
+
+                  {!linkColumnHiddenState &&
+                    (editing ? (
+                      <styled.input
+                        w="full"
+                        placeholder="Link..."
+                        _placeholder={{
+                          color: "fg.subtle",
+                        }}
+                        defaultValue={node.link?.url}
+                        onChange={(event) =>
+                          handleChildFieldValueChange(
+                            node.id,
+                            "fixed:link" as MappableNodeField,
+                            event.target.value,
+                          )
+                        }
+                        _focusVisible={{
+                          outline: "none",
+                        }}
+                      />
+                    ) : (
+                      node.link && (
+                        <styled.a
+                          fontSize="sm"
+                          color="fg.muted"
+                          lineClamp="1"
+                          textOverflow="ellipsis"
+                          wordBreak="break-all"
+                          href={node.link.url}
+                        >
+                          {node.link.title || node.link.url}
+                        </styled.a>
+                      )
+                    ))}
+                </LStack>
+              )}
 
               {columns.length > 0 && (
                 <styled.dl className={lstack()} gap="0" px="2" pb="2">
