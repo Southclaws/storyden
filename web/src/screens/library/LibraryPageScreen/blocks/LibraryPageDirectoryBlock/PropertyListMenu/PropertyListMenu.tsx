@@ -69,7 +69,7 @@ export function PropertyListMenu({
 
       <Portal>
         <Menu.Positioner>
-          <Menu.Content minW="36">
+          <Menu.Content minW="36" maxW="max">
             {supportsCoverImage && (
               <Menu.ItemGroup pl="2" py="1">
                 <Menu.ItemGroupLabel>Options</Menu.ItemGroupLabel>
