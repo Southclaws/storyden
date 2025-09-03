@@ -42,10 +42,12 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
       px="2"
       justifyContent="space-between"
       borderRadius="md"
-      bgColor={selected ? "gray.a2" : undefined}
+      bgColor={selected ? "bg.selected" : undefined}
       _hover={{
-        backgroundColor: "gray.a2",
+        backgroundColor: "bg.emphasized",
+        color: "fg.emphasized",
       }}
+      color={selected ? "fg.selected" : "fg.subtle"}
       cursor={isDragging ? "grabbing" : undefined}
     >
       <Anchor

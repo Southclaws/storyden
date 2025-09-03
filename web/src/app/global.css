@@ -55,9 +55,6 @@
     calc(var(--global-font-size-h6) / 4) + 4vw,
     var(--global-font-size-h6)
   );
-
-  /* TODO: https://github.com/cschroeter/park-ui/issues/312 */
-  color-scheme: light;
 }
 
 @supports (font-size: 1cqi) {

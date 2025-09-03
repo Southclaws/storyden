@@ -19,7 +19,7 @@ export type TreeViewVariantProps = {
 
 export interface TreeViewRecipe {
   __type: TreeViewVariantProps
-  (props?: TreeViewVariantProps): Pretty<Record<"root" | "label" | "tree" | "item" | "itemIndicator" | "itemText" | "branch" | "branchControl" | "branchTrigger" | "branchContent" | "branchText" | "branchIndicator" | "branchIndentGuide" | "root" | "label" | "tree" | "item" | "itemIndicator" | "itemText" | "branch" | "branchControl" | "branchTrigger" | "branchContent" | "branchText" | "branchIndicator", string>>
+  (props?: TreeViewVariantProps): Pretty<Record<"root" | "label" | "tree" | "item" | "itemIndicator" | "itemText" | "branch" | "branchControl" | "branchTrigger" | "branchContent" | "branchText" | "branchIndicator", string>>
   raw: (props?: TreeViewVariantProps) => TreeViewVariantProps
   variantMap: TreeViewVariantMap
   variantKeys: Array<keyof TreeViewVariant>

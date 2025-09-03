@@ -19,7 +19,7 @@ export type ComboboxVariantProps = {
 
 export interface ComboboxRecipe {
   __type: ComboboxVariantProps
-  (props?: ComboboxVariantProps): Pretty<Record<"root" | "clearTrigger" | "content" | "control" | "input" | "item" | "itemGroup" | "itemGroupLabel" | "itemIndicator" | "itemText" | "label" | "list" | "positioner" | "trigger" | "root" | "clearTrigger" | "content" | "control" | "input" | "item" | "itemGroup" | "itemGroupLabel" | "itemIndicator" | "itemText" | "label" | "list" | "positioner" | "trigger", string>>
+  (props?: ComboboxVariantProps): Pretty<Record<"root" | "clearTrigger" | "content" | "control" | "input" | "item" | "itemGroup" | "itemGroupLabel" | "itemIndicator" | "itemText" | "label" | "list" | "positioner" | "trigger", string>>
   raw: (props?: ComboboxVariantProps) => ComboboxVariantProps
   variantMap: ComboboxVariantMap
   variantKeys: Array<keyof ComboboxVariant>

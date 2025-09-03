@@ -31,9 +31,9 @@ export type Props = BadgeProps &
 const OPTICAL_ALIGNMENT_ADJUSTMENT = 0.5;
 
 const badgeStyles = css({
-  bgColor: "colorPalette",
-  borderColor: "colorPalette.muted",
-  color: "colorPalette.text",
+  bgColor: "colorPalette.bg",
+  borderColor: "colorPalette.border",
+  color: "colorPalette.fg",
 });
 
 export function TagBadge({
@@ -129,9 +129,9 @@ function badgeColourCSS(c: string) {
   const { bg, bo, fg } = badgeColours(c);
 
   return {
-    "--colors-color-palette-text": fg,
-    "--colors-color-palette-muted": bo,
-    "--colors-color-palette": bg,
+    "--colors-color-palette-fg": fg,
+    "--colors-color-palette-border": bo,
+    "--colors-color-palette-bg": bg,
   } as React.CSSProperties;
 }
 

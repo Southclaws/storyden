@@ -150,6 +150,8 @@ You must first edit the source of truth and generate the code.
 
 Run `task generate` to regenerate everything.
 
+**Note**: Panda CSS changes (design tokens, recipes, patterns) in `web/panda.config.ts` do NOT require running `task generate`. Panda CSS generates its output automatically.
+
 ## Environment Configuration
 
 The application uses environment variables for configuration. The following file contains all configuration parameters: `./internal/config/config.yaml`

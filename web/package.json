@@ -11,6 +11,7 @@
     "openapi": "orval"
   },
   "dependencies": {
+    "@ark-ui/anatomy": "^3.5.0",
     "@ark-ui/react": "5.16.1",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
@@ -72,8 +73,8 @@
   },
   "devDependencies": {
     "@pandacss/dev": "^0.54.0",
+    "@pandacss/studio": "^1.2.0",
     "@pandacss/types": "^0.54.0",
-    "@park-ui/panda-preset": "^0.43.1",
     "@simplewebauthn/types": "^10.0.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/chroma-js": "^3.1.1",

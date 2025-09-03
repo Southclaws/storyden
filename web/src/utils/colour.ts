@@ -22,8 +22,8 @@ export const flatClampL: [number, number] = [98.7, 51.8];
 export const flatClampC: [number, number] = [2, 45];
 export const flatContrast = 1.241;
 
-export const darkClampL: [number, number] = [65, 20];
-export const darkClampC: [number, number] = [10, 14];
+export const darkClampL: [number, number] = [35, 20];
+export const darkClampC: [number, number] = [8, 0.5];
 export const darkContrast = 1.33;
 
 export function getColourVariants(colour: string): Record<string, string> {

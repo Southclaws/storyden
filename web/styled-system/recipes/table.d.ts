@@ -6,7 +6,7 @@ interface TableVariant {
   /**
  * @default "plain"
  */
-variant: "outline" | "dense" | "plain"
+variant: "dense" | "plain"
 /**
  * @default "md"
  */
@@ -23,7 +23,7 @@ export type TableVariantProps = {
 
 export interface TableRecipe {
   __type: TableVariantProps
-  (props?: TableVariantProps): Pretty<Record<"root" | "body" | "cell" | "footer" | "head" | "header" | "row" | "caption" | "root" | "body" | "cell" | "footer" | "head" | "header" | "row" | "caption", string>>
+  (props?: TableVariantProps): Pretty<Record<"root" | "body" | "cell" | "footer" | "head" | "header" | "row" | "caption", string>>
   raw: (props?: TableVariantProps) => TableVariantProps
   variantMap: TableVariantMap
   variantKeys: Array<keyof TableVariant>

@@ -27,8 +27,8 @@ export function CategorySelect() {
         render={() => (
           <styled.select
             w="max"
-            backgroundColor="whiteAlpha.600"
-            borderColor="blackAlpha.50"
+            backgroundColor="white.a6"
+            borderColor="black.a6"
             borderRadius="lg"
             boxShadow="xs"
             py="1"

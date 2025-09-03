@@ -92,7 +92,7 @@ function LoginToReply() {
       w="full"
       p="8"
       borderRadius="xl"
-      bgColor="blackAlpha.50"
+      bgColor="border.muted"
       justifyContent="center"
     >
       <DiscussionIcon width="4" />

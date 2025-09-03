@@ -16,7 +16,7 @@ export type ColorPickerVariantProps = {
 
 export interface ColorPickerRecipe {
   __type: ColorPickerVariantProps
-  (props?: ColorPickerVariantProps): Pretty<Record<"root" | "label" | "control" | "trigger" | "positioner" | "content" | "area" | "areaThumb" | "valueText" | "areaBackground" | "channelSlider" | "channelSliderLabel" | "channelSliderTrack" | "channelSliderThumb" | "channelSliderValueText" | "channelInput" | "transparencyGrid" | "swatchGroup" | "swatchTrigger" | "swatchIndicator" | "swatch" | "eyeDropperTrigger" | "formatTrigger" | "formatSelect" | "view" | "root" | "label" | "control" | "trigger" | "positioner" | "content" | "area" | "areaThumb" | "valueText" | "areaBackground" | "channelSlider" | "channelSliderLabel" | "channelSliderTrack" | "channelSliderThumb" | "channelSliderValueText" | "channelInput" | "transparencyGrid" | "swatchGroup" | "swatchTrigger" | "swatchIndicator" | "swatch" | "eyeDropperTrigger" | "formatTrigger" | "formatSelect" | "view", string>>
+  (props?: ColorPickerVariantProps): Pretty<Record<"root" | "label" | "control" | "trigger" | "positioner" | "content" | "area" | "areaThumb" | "valueText" | "areaBackground" | "channelSlider" | "channelSliderLabel" | "channelSliderTrack" | "channelSliderThumb" | "channelSliderValueText" | "channelInput" | "transparencyGrid" | "swatchGroup" | "swatchTrigger" | "swatchIndicator" | "swatch" | "eyeDropperTrigger" | "formatTrigger" | "formatSelect" | "view", string>>
   raw: (props?: ColorPickerVariantProps) => ColorPickerVariantProps
   variantMap: ColorPickerVariantMap
   variantKeys: Array<keyof ColorPickerVariant>

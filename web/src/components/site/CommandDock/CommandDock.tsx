@@ -57,7 +57,7 @@ export function CommandDock({
           borderRadius="xl"
           borderWidth="thin"
           borderStyle="solid"
-          borderColor="blackAlpha.50"
+          borderColor="border.muted"
           pointerEvents="auto"
         >
           {isOpen && render()}

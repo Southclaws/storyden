@@ -25,7 +25,7 @@ export function NavigationHeader({
   return (
     <WStack>
       <Link className={linkStyles} href={href}>
-        <styled.h1 fontSize="xs" fontWeight="medium" color="fg.subtle">
+        <styled.h1 fontSize="xs" fontWeight="medium">
           {children}
         </styled.h1>
       </Link>

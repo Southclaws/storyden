@@ -156,7 +156,7 @@ export interface UtilityValues {
 	transitionDuration: Tokens["durations"];
 	transition: "all" | "common" | "background" | "colors" | "opacity" | "shadow" | "transform";
 	animation: Tokens["animations"];
-	animationName: "shimmer" | "fade-in" | "fade-out" | "slide-in" | "slide-out" | "slide-in-left" | "slide-out-left" | "slide-in-right" | "slide-out-right" | "collapse-in" | "collapse-out" | "fadeIn" | "fadeOut" | "skeleton-pulse" | "spin";
+	animationName: "shimmer";
 	animationTimingFunction: Tokens["easings"];
 	animationDuration: Tokens["durations"];
 	animationDelay: Tokens["durations"];
@@ -205,7 +205,7 @@ export interface UtilityValues {
 	strokeWidth: Tokens["borderWidths"];
 	srOnly: boolean;
 	debug: boolean;
-	colorPalette: "current" | "black" | "white" | "transparent" | "gray" | "gray.light" | "gray.dark" | "amber" | "blue" | "bronze" | "brown" | "crimson" | "cyan" | "gold" | "grass" | "green" | "indigo" | "iris" | "jade" | "lime" | "mauve" | "mint" | "neutral" | "neutral.light" | "neutral.dark" | "olive" | "orange" | "pink" | "plum" | "purple" | "red" | "red.light" | "red.dark" | "ruby" | "sage" | "sand" | "sky" | "slate" | "teal" | "tomato" | "violet" | "yellow" | "accent" | "accent.text" | "accent.dark" | "accent.dark.text" | "whiteAlpha" | "blackAlpha" | "bg" | "fg" | "border" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV";
+	colorPalette: "current" | "black" | "white" | "amber" | "amber.light" | "amber.dark" | "blue" | "blue.light" | "blue.dark" | "green" | "green.light" | "green.dark" | "orange" | "orange.light" | "orange.dark" | "pink" | "pink.light" | "pink.dark" | "red" | "red.light" | "red.dark" | "slate" | "slate.light" | "slate.dark" | "tomato" | "tomato.light" | "tomato.dark" | "gray" | "gray.light" | "gray.dark" | "neutral" | "neutral.light" | "neutral.dark" | "transparent" | "accent" | "accent.light" | "accent.light.text" | "accent.dark" | "accent.dark.text" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV" | "bg" | "fg" | "border" | "visibility" | "visibility.published.bg" | "visibility.published" | "visibility.published.fg" | "visibility.published.border" | "visibility.draft.bg" | "visibility.draft" | "visibility.draft.fg" | "visibility.draft.border" | "visibility.review.bg" | "visibility.review" | "visibility.review.fg" | "visibility.review.border" | "visibility.unlisted.bg" | "visibility.unlisted" | "visibility.unlisted.fg" | "visibility.unlisted.border";
 	textStyle: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl";
 }
 

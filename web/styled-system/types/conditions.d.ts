@@ -26,7 +26,7 @@ export interface Conditions {
 	"_containerMedium": string
 	/** `@container (min-width: 1000px)` */
 	"_containerLarge": string
-	/** `@media (hover: hover) and (pointer: fine) &:is(:hover, [data-hover])` */
+	/** `&:is(:hover, [data-hover])` */
 	"_hover": string
 	/** `&:is(:focus, [data-focus])` */
 	"_focus": string
@@ -134,7 +134,7 @@ export interface Conditions {
 	"_required": string
 	/** `&:is(:valid, [data-valid])` */
 	"_valid": string
-	/** `&:is([aria-invalid])` */
+	/** `&:is(:invalid, [data-invalid], [aria-invalid=true])` */
 	"_invalid": string
 	/** `&:autofill` */
 	"_autofill": string
@@ -150,7 +150,7 @@ export interface Conditions {
 	"_selected": string
 	/** `&:is([aria-grabbed=true], [data-grabbed])` */
 	"_grabbed": string
-	/** `&:is([data-state="under-value"])` */
+	/** `&[data-state=under-value]` */
 	"_underValue": string
 	/** `&[data-state=over-value]` */
 	"_overValue": string
@@ -190,7 +190,7 @@ export interface Conditions {
 	"_portrait": string
 	/** `.dark &` */
 	"_dark": string
-	/** `:root &, .light &` */
+	/** `.light &` */
 	"_light": string
 	/** `@media (prefers-color-scheme: dark)` */
 	"_osDark": string
@@ -220,10 +220,6 @@ export interface Conditions {
 	"_icon": string
 	/** `@starting-style` */
 	"_starting": string
-	/** `&:is([data-state="off"])` */
-	"_off": string
-	/** `&:is([data-state="on"])` */
-	"_on": string
 	/** `@media screen and (min-width: 40rem)` */
 	"sm": string
 	/** `@media screen and (min-width: 40rem) and (max-width: 47.9975rem)` */

@@ -32,10 +32,11 @@ export const button = defineRecipe({
     variant: {
       solid: {
         background: "colorPalette.default",
-        color: "colorPalette.fg",
+        color: "bg.default",
         colorPalette: "accent",
         _hover: {
-          background: "colorPalette.emphasized",
+          background: "colorPalette.default/80",
+          color: "bg.default",
         },
         _focusVisible: {
           outline: "2px solid",
@@ -55,10 +56,11 @@ export const button = defineRecipe({
       outline: {
         borderWidth: "1px",
         borderColor: "colorPalette.a7",
-        color: "colorPalette.text",
+        color: "fg.subtle",
         colorPalette: "gray",
         _hover: {
-          background: "colorPalette.a2",
+          background: "colorPalette.subtle",
+          color: "colorPalette.default",
         },
         _disabled: {
           borderColor: "border.disabled",
@@ -80,19 +82,20 @@ export const button = defineRecipe({
           borderColor: "accent.default",
           color: "accent.fg",
           _hover: {
-            background: "accent.emphasized",
-            borderColor: "accent.emphasized",
+            background: "accent.default/80",
+            borderColor: "accent.default/80",
           },
         },
       },
       ghost: {
-        color: "colorPalette.text",
-        colorPalette: "gray",
+        color: "fg.subtle",
+        colorPalette: "accent",
         _hover: {
-          background: "colorPalette.a3",
+          background: "colorPalette.subtle",
+          color: "fg.default",
         },
         _selected: {
-          background: "colorPalette.a3",
+          background: "colorPalette.muted",
         },
         _disabled: {
           color: "fg.disabled",
@@ -122,13 +125,14 @@ export const button = defineRecipe({
         minW: "0!",
       },
       subtle: {
-        colorPalette: "gray",
-        background: "colorPalette.4/80",
-        color: "fg.default",
+        colorPalette: "accent",
+        background: "bg.muted",
+        color: "fg.subtle",
         backdropBlur: "sm",
         backdropFilter: "auto",
         _hover: {
-          background: "colorPalette.6",
+          background: "colorPalette.subtle",
+          color: "fg.default",
         },
         _focusVisible: {
           outline: "2px solid",

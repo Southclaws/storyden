@@ -80,7 +80,7 @@ export function Checklist({ onboardingStatus, onFinish }: Props) {
           <styled.p>
             <LinkButton
               size="xs"
-              color="blue.5"
+              colorPalette="accent"
               href="https://www.storyden.org/docs"
             >
               Visit the docs

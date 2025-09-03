@@ -14,9 +14,9 @@ export function RoleBadge({ role }: Props) {
     <Badge
       size="sm"
       style={cssVars}
-      bgColor="colorPalette"
-      borderColor="colorPalette.muted"
-      color="colorPalette.text"
+      bgColor="colorPalette.bg"
+      borderColor="colorPalette.border"
+      color="colorPalette.fg"
     >
       {role.name}
     </Badge>

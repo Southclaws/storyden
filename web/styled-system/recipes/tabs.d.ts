@@ -23,7 +23,7 @@ export type TabsVariantProps = {
 
 export interface TabsRecipe {
   __type: TabsVariantProps
-  (props?: TabsVariantProps): Pretty<Record<"root" | "list" | "trigger" | "content" | "indicator" | "root" | "list" | "trigger" | "content" | "indicator", string>>
+  (props?: TabsVariantProps): Pretty<Record<"root" | "list" | "trigger" | "content" | "indicator", string>>
   raw: (props?: TabsVariantProps) => TabsVariantProps
   variantMap: TabsVariantMap
   variantKeys: Array<keyof TabsVariant>

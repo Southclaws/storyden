@@ -19,7 +19,7 @@ export type RadioGroupVariantProps = {
 
 export interface RadioGroupRecipe {
   __type: RadioGroupVariantProps
-  (props?: RadioGroupVariantProps): Pretty<Record<"root" | "label" | "item" | "itemText" | "itemControl" | "indicator" | "root" | "label" | "item" | "itemText" | "itemControl" | "indicator", string>>
+  (props?: RadioGroupVariantProps): Pretty<Record<"root" | "label" | "item" | "itemText" | "itemControl" | "indicator", string>>
   raw: (props?: RadioGroupVariantProps) => RadioGroupVariantProps
   variantMap: RadioGroupVariantMap
   variantKeys: Array<keyof RadioGroupVariant>

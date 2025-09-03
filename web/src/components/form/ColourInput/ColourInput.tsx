@@ -26,7 +26,7 @@ export function ColourInput(props: Props) {
       style={styles}
       borderWidth="thin"
       borderStyle="solid"
-      borderColor="blackAlpha.100"
+      borderColor="border.muted"
       borderRadius="lg"
       p="4"
     >

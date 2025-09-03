@@ -2,9 +2,9 @@ import { getPatternStyles, patternFns } from '../helpers.mjs';
 import { css } from '../css/index.mjs';
 
 const menuItemColorPaletteConfig = {
-transform(props28) {
+transform(props15) {
   return {
-    colorPalette: props28["colorPalette"],
+    colorPalette: props15["colorPalette"],
     background: "colorPalette.4",
     color: "colorPalette.9",
     _hover: {

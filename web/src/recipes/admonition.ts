@@ -8,7 +8,7 @@ export const admonition = defineRecipe({
     flexGrow: "0",
     gap: "2",
     justifyContent: "space-between",
-    borderColor: "blackAlpha.50",
+    borderColor: "border.muted",
     borderRadius: "lg",
     borderWidth: "1px",
     outline: 0,
@@ -22,7 +22,7 @@ export const admonition = defineRecipe({
   variants: {
     kind: {
       neutral: {
-        backgroundColor: "whiteAlpha.600",
+        backgroundColor: "white.a6",
       },
       success: {
         backgroundColor: "green.100",

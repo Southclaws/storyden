@@ -347,7 +347,10 @@ function TreeNode({
         borderRadius: "sm",
         colorPalette: branchColourPalette,
         borderWidth: node.visibility === Visibility.published ? "none" : "thin",
-        borderColor: "colorPalette.8",
+        borderColor:
+          node.visibility === Visibility.published
+            ? "transparent"
+            : "colorPalette.6",
         borderStyle:
           node.visibility === Visibility.published ? "solid" : "dashed",
       });
@@ -358,13 +361,13 @@ function TreeNode({
         colorPalette: branchColourPalette,
         outlineWidth: "thin",
         outlineStyle: "dashed",
-        outlineColor: "colorPalette.8",
+        outlineColor: "colorPalette.6",
         outlineOffset: "-0.5",
       })
     : "";
 
   const highlightStyles = css({
-    background: isHighlighted ? "gray.a2" : undefined,
+    background: isHighlighted ? "bg.selected" : undefined,
   });
 
   return (

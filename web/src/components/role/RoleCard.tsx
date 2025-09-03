@@ -24,7 +24,7 @@ export function RoleCard({ role, editable }: Props) {
   return (
     <CardBox
       className={css({
-        borderColor: "colorPalette.text",
+        borderColor: "colorPalette.fg",
       })}
       style={{
         ...cssVars,
