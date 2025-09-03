@@ -10,11 +10,14 @@ type HeadingInputVariantMap = {
   [key in keyof HeadingInputVariant]: Array<HeadingInputVariant[key]>
 }
 
+
+
 export type HeadingInputVariantProps = {
   [key in keyof HeadingInputVariant]?: ConditionalValue<HeadingInputVariant[key]> | undefined
 }
 
 export interface HeadingInputRecipe {
+  
   __type: HeadingInputVariantProps
   (props?: HeadingInputVariantProps): string
   raw: (props?: HeadingInputVariantProps) => HeadingInputVariantProps

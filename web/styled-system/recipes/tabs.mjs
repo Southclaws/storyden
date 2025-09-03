@@ -193,6 +193,7 @@ export const tabs = /* @__PURE__ */ Object.assign(tabsFn, {
   __recipe__: false,
   __name__: 'tabs',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: tabsVariantKeys,
   variantMap: {
   "variant": [

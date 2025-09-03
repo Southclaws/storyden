@@ -79,6 +79,7 @@ export const combobox = /* @__PURE__ */ Object.assign(comboboxFn, {
   __recipe__: false,
   __name__: 'combobox',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: comboboxVariantKeys,
   variantMap: {
   "size": [

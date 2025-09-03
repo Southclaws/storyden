@@ -17,13 +17,16 @@ type TableVariantMap = {
   [key in keyof TableVariant]: Array<TableVariant[key]>
 }
 
+type TableSlot = "root" | "body" | "cell" | "footer" | "head" | "header" | "row" | "caption"
+
 export type TableVariantProps = {
   [key in keyof TableVariant]?: ConditionalValue<TableVariant[key]> | undefined
 }
 
 export interface TableRecipe {
+  __slot: TableSlot
   __type: TableVariantProps
-  (props?: TableVariantProps): Pretty<Record<"root" | "body" | "cell" | "footer" | "head" | "header" | "row" | "caption", string>>
+  (props?: TableVariantProps): Pretty<Record<TableSlot, string>>
   raw: (props?: TableVariantProps) => TableVariantProps
   variantMap: TableVariantMap
   variantKeys: Array<keyof TableVariant>

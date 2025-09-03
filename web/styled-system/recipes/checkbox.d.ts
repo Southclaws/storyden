@@ -13,13 +13,16 @@ type CheckboxVariantMap = {
   [key in keyof CheckboxVariant]: Array<CheckboxVariant[key]>
 }
 
+type CheckboxSlot = "root" | "label" | "control" | "indicator" | "group"
+
 export type CheckboxVariantProps = {
   [key in keyof CheckboxVariant]?: ConditionalValue<CheckboxVariant[key]> | undefined
 }
 
 export interface CheckboxRecipe {
+  __slot: CheckboxSlot
   __type: CheckboxVariantProps
-  (props?: CheckboxVariantProps): Pretty<Record<"root" | "label" | "control" | "indicator" | "group", string>>
+  (props?: CheckboxVariantProps): Pretty<Record<CheckboxSlot, string>>
   raw: (props?: CheckboxVariantProps) => CheckboxVariantProps
   variantMap: CheckboxVariantMap
   variantKeys: Array<keyof CheckboxVariant>

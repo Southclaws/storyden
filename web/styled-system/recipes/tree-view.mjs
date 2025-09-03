@@ -71,6 +71,7 @@ export const treeView = /* @__PURE__ */ Object.assign(treeViewFn, {
   __recipe__: false,
   __name__: 'treeView',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: treeViewVariantKeys,
   variantMap: {
   "variant": [

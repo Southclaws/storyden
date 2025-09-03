@@ -39,6 +39,7 @@ export const pinInput = /* @__PURE__ */ Object.assign(pinInputFn, {
   __recipe__: false,
   __name__: 'pinInput',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: pinInputVariantKeys,
   variantMap: {
   "size": [

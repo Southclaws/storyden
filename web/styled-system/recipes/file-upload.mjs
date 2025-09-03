@@ -63,6 +63,7 @@ export const fileUpload = /* @__PURE__ */ Object.assign(fileUploadFn, {
   __recipe__: false,
   __name__: 'fileUpload',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: fileUploadVariantKeys,
   variantMap: {},
   splitVariantProps(props) {

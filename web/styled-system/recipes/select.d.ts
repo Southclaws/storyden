@@ -17,13 +17,16 @@ type SelectVariantMap = {
   [key in keyof SelectVariant]: Array<SelectVariant[key]>
 }
 
+type SelectSlot = "label" | "positioner" | "trigger" | "indicator" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "list" | "content" | "root" | "control" | "valueText"
+
 export type SelectVariantProps = {
   [key in keyof SelectVariant]?: ConditionalValue<SelectVariant[key]> | undefined
 }
 
 export interface SelectRecipe {
+  __slot: SelectSlot
   __type: SelectVariantProps
-  (props?: SelectVariantProps): Pretty<Record<"label" | "positioner" | "trigger" | "indicator" | "clearTrigger" | "item" | "itemText" | "itemIndicator" | "itemGroup" | "itemGroupLabel" | "list" | "content" | "root" | "control" | "valueText", string>>
+  (props?: SelectVariantProps): Pretty<Record<SelectSlot, string>>
   raw: (props?: SelectVariantProps) => SelectVariantProps
   variantMap: SelectVariantMap
   variantKeys: Array<keyof SelectVariant>

@@ -11,11 +11,14 @@ type TextVariantMap = {
   [key in keyof TextVariant]: Array<TextVariant[key]>
 }
 
+
+
 export type TextVariantProps = {
   [key in keyof TextVariant]?: ConditionalValue<TextVariant[key]> | undefined
 }
 
 export interface TextRecipe {
+  
   __type: TextVariantProps
   (props?: TextVariantProps): string
   raw: (props?: TextVariantProps) => TextVariantProps

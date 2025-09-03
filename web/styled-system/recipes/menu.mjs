@@ -79,6 +79,7 @@ export const menu = /* @__PURE__ */ Object.assign(menuFn, {
   __recipe__: false,
   __name__: 'menu',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: menuVariantKeys,
   variantMap: {
   "size": [

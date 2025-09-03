@@ -10,13 +10,16 @@ type TooltipVariantMap = {
   [key in keyof TooltipVariant]: Array<TooltipVariant[key]>
 }
 
+type TooltipSlot = "trigger" | "arrow" | "arrowTip" | "positioner" | "content"
+
 export type TooltipVariantProps = {
   [key in keyof TooltipVariant]?: ConditionalValue<TooltipVariant[key]> | undefined
 }
 
 export interface TooltipRecipe {
+  __slot: TooltipSlot
   __type: TooltipVariantProps
-  (props?: TooltipVariantProps): Pretty<Record<"trigger" | "arrow" | "arrowTip" | "positioner" | "content", string>>
+  (props?: TooltipVariantProps): Pretty<Record<TooltipSlot, string>>
   raw: (props?: TooltipVariantProps) => TooltipVariantProps
   variantMap: TooltipVariantMap
   variantKeys: Array<keyof TooltipVariant>

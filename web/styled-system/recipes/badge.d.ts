@@ -17,11 +17,14 @@ type BadgeVariantMap = {
   [key in keyof BadgeVariant]: Array<BadgeVariant[key]>
 }
 
+
+
 export type BadgeVariantProps = {
   [key in keyof BadgeVariant]?: ConditionalValue<BadgeVariant[key]> | undefined
 }
 
 export interface BadgeRecipe {
+  
   __type: BadgeVariantProps
   (props?: BadgeVariantProps): string
   raw: (props?: BadgeVariantProps) => BadgeVariantProps

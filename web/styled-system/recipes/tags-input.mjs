@@ -63,6 +63,7 @@ export const tagsInput = /* @__PURE__ */ Object.assign(tagsInputFn, {
   __recipe__: false,
   __name__: 'tagsInput',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: tagsInputVariantKeys,
   variantMap: {
   "size": [

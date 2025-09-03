@@ -10,13 +10,16 @@ type AlertVariantMap = {
   [key in keyof AlertVariant]: Array<AlertVariant[key]>
 }
 
+type AlertSlot = "root" | "content" | "description" | "icon" | "title"
+
 export type AlertVariantProps = {
   [key in keyof AlertVariant]?: ConditionalValue<AlertVariant[key]> | undefined
 }
 
 export interface AlertRecipe {
+  __slot: AlertSlot
   __type: AlertVariantProps
-  (props?: AlertVariantProps): Pretty<Record<"root" | "content" | "description" | "icon" | "title", string>>
+  (props?: AlertVariantProps): Pretty<Record<AlertSlot, string>>
   raw: (props?: AlertVariantProps) => AlertVariantProps
   variantMap: AlertVariantMap
   variantKeys: Array<keyof AlertVariant>

@@ -10,11 +10,14 @@ type AdmonitionVariantMap = {
   [key in keyof AdmonitionVariant]: Array<AdmonitionVariant[key]>
 }
 
+
+
 export type AdmonitionVariantProps = {
   [key in keyof AdmonitionVariant]?: ConditionalValue<AdmonitionVariant[key]> | undefined
 }
 
 export interface AdmonitionRecipe {
+  
   __type: AdmonitionVariantProps
   (props?: AdmonitionVariantProps): string
   raw: (props?: AdmonitionVariantProps) => AdmonitionVariantProps

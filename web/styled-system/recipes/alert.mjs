@@ -39,6 +39,7 @@ export const alert = /* @__PURE__ */ Object.assign(alertFn, {
   __recipe__: false,
   __name__: 'alert',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: alertVariantKeys,
   variantMap: {},
   splitVariantProps(props) {

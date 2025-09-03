@@ -13,13 +13,16 @@ type RichCardVariantMap = {
   [key in keyof RichCardVariant]: Array<RichCardVariant[key]>
 }
 
+type RichCardSlot = "container" | "root" | "headerContainer" | "menuContainer" | "titleContainer" | "contentContainer" | "mediaContainer" | "footerContainer" | "mediaBackdropContainer" | "mediaBackdrop" | "textArea" | "text" | "media" | "mediaMissing"
+
 export type RichCardVariantProps = {
   [key in keyof RichCardVariant]?: ConditionalValue<RichCardVariant[key]> | undefined
 }
 
 export interface RichCardRecipe {
+  __slot: RichCardSlot
   __type: RichCardVariantProps
-  (props?: RichCardVariantProps): Pretty<Record<"container" | "root" | "headerContainer" | "menuContainer" | "titleContainer" | "contentContainer" | "mediaContainer" | "footerContainer" | "mediaBackdropContainer" | "mediaBackdrop" | "textArea" | "text" | "media" | "mediaMissing", string>>
+  (props?: RichCardVariantProps): Pretty<Record<RichCardSlot, string>>
   raw: (props?: RichCardVariantProps) => RichCardVariantProps
   variantMap: RichCardVariantMap
   variantKeys: Array<keyof RichCardVariant>

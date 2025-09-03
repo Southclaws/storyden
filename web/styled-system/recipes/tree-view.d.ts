@@ -13,13 +13,16 @@ type TreeViewVariantMap = {
   [key in keyof TreeViewVariant]: Array<TreeViewVariant[key]>
 }
 
+type TreeViewSlot = "root" | "label" | "tree" | "item" | "itemIndicator" | "itemText" | "branch" | "branchControl" | "branchTrigger" | "branchContent" | "branchText" | "branchIndicator"
+
 export type TreeViewVariantProps = {
   [key in keyof TreeViewVariant]?: ConditionalValue<TreeViewVariant[key]> | undefined
 }
 
 export interface TreeViewRecipe {
+  __slot: TreeViewSlot
   __type: TreeViewVariantProps
-  (props?: TreeViewVariantProps): Pretty<Record<"root" | "label" | "tree" | "item" | "itemIndicator" | "itemText" | "branch" | "branchControl" | "branchTrigger" | "branchContent" | "branchText" | "branchIndicator", string>>
+  (props?: TreeViewVariantProps): Pretty<Record<TreeViewSlot, string>>
   raw: (props?: TreeViewVariantProps) => TreeViewVariantProps
   variantMap: TreeViewVariantMap
   variantKeys: Array<keyof TreeViewVariant>

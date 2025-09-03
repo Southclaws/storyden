@@ -59,6 +59,7 @@ export const popover = /* @__PURE__ */ Object.assign(popoverFn, {
   __recipe__: false,
   __name__: 'popover',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: popoverVariantKeys,
   variantMap: {},
   splitVariantProps(props) {

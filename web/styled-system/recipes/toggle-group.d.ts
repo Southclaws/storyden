@@ -17,13 +17,16 @@ type ToggleGroupVariantMap = {
   [key in keyof ToggleGroupVariant]: Array<ToggleGroupVariant[key]>
 }
 
+type ToggleGroupSlot = "root" | "item"
+
 export type ToggleGroupVariantProps = {
   [key in keyof ToggleGroupVariant]?: ConditionalValue<ToggleGroupVariant[key]> | undefined
 }
 
 export interface ToggleGroupRecipe {
+  __slot: ToggleGroupSlot
   __type: ToggleGroupVariantProps
-  (props?: ToggleGroupVariantProps): Pretty<Record<"root" | "item", string>>
+  (props?: ToggleGroupVariantProps): Pretty<Record<ToggleGroupSlot, string>>
   raw: (props?: ToggleGroupVariantProps) => ToggleGroupVariantProps
   variantMap: ToggleGroupVariantMap
   variantKeys: Array<keyof ToggleGroupVariant>

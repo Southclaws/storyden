@@ -47,6 +47,7 @@ export const radioGroup = /* @__PURE__ */ Object.assign(radioGroupFn, {
   __recipe__: false,
   __name__: 'radioGroup',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: radioGroupVariantKeys,
   variantMap: {
   "size": [

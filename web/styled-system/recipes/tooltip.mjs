@@ -39,6 +39,7 @@ export const tooltip = /* @__PURE__ */ Object.assign(tooltipFn, {
   __recipe__: false,
   __name__: 'tooltip',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: tooltipVariantKeys,
   variantMap: {},
   splitVariantProps(props) {

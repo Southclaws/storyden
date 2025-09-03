@@ -59,6 +59,7 @@ export const slider = /* @__PURE__ */ Object.assign(sliderFn, {
   __recipe__: false,
   __name__: 'slider',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: sliderVariantKeys,
   variantMap: {
   "size": [

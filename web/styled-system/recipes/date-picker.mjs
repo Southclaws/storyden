@@ -115,6 +115,7 @@ export const datePicker = /* @__PURE__ */ Object.assign(datePickerFn, {
   __recipe__: false,
   __name__: 'datePicker',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: datePickerVariantKeys,
   variantMap: {},
   splitVariantProps(props) {

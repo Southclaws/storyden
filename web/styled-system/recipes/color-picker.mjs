@@ -119,6 +119,7 @@ export const colorPicker = /* @__PURE__ */ Object.assign(colorPickerFn, {
   __recipe__: false,
   __name__: 'colorPicker',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: colorPickerVariantKeys,
   variantMap: {},
   splitVariantProps(props) {

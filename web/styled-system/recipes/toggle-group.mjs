@@ -33,6 +33,7 @@ export const toggleGroup = /* @__PURE__ */ Object.assign(toggleGroupFn, {
   __recipe__: false,
   __name__: 'toggleGroup',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: toggleGroupVariantKeys,
   variantMap: {
   "variant": [

@@ -68,7 +68,7 @@ export interface Conditions {
 	"_firstLetter": string
 	/** `&::first-line` */
 	"_firstLine": string
-	/** `&::marker` */
+	/** `&:is(::marker, ::-webkit-details-marker)` */
 	"_marker": string
 	/** `&::selection` */
 	"_selection": string
@@ -202,9 +202,9 @@ export interface Conditions {
 	"_lessContrast": string
 	/** `@media (prefers-contrast: more)` */
 	"_moreContrast": string
-	/** `[dir=ltr] &` */
+	/** `:where([dir=ltr], :dir(ltr)) &` */
 	"_ltr": string
-	/** `[dir=rtl] &` */
+	/** `:where([dir=rtl], :dir(rtl)) &` */
 	"_rtl": string
 	/** `&::-webkit-scrollbar` */
 	"_scrollbar": string
@@ -220,6 +220,10 @@ export interface Conditions {
 	"_icon": string
 	/** `@starting-style` */
 	"_starting": string
+	/** `@media (scripting: none)` */
+	"_noscript": string
+	/** `@media (inverted-colors: inverted)` */
+	"_invertedColors": string
 	/** `@media screen and (min-width: 40rem)` */
 	"sm": string
 	/** `@media screen and (min-width: 40rem) and (max-width: 47.9975rem)` */

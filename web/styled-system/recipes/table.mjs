@@ -57,6 +57,7 @@ export const table = /* @__PURE__ */ Object.assign(tableFn, {
   __recipe__: false,
   __name__: 'table',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: tableVariantKeys,
   variantMap: {
   "variant": [

@@ -85,6 +85,7 @@ export const select = /* @__PURE__ */ Object.assign(selectFn, {
   __recipe__: false,
   __name__: 'select',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: selectVariantKeys,
   variantMap: {
   "variant": [

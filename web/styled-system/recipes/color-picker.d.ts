@@ -10,13 +10,16 @@ type ColorPickerVariantMap = {
   [key in keyof ColorPickerVariant]: Array<ColorPickerVariant[key]>
 }
 
+type ColorPickerSlot = "root" | "label" | "control" | "trigger" | "positioner" | "content" | "area" | "areaThumb" | "valueText" | "areaBackground" | "channelSlider" | "channelSliderLabel" | "channelSliderTrack" | "channelSliderThumb" | "channelSliderValueText" | "channelInput" | "transparencyGrid" | "swatchGroup" | "swatchTrigger" | "swatchIndicator" | "swatch" | "eyeDropperTrigger" | "formatTrigger" | "formatSelect" | "view"
+
 export type ColorPickerVariantProps = {
   [key in keyof ColorPickerVariant]?: ConditionalValue<ColorPickerVariant[key]> | undefined
 }
 
 export interface ColorPickerRecipe {
+  __slot: ColorPickerSlot
   __type: ColorPickerVariantProps
-  (props?: ColorPickerVariantProps): Pretty<Record<"root" | "label" | "control" | "trigger" | "positioner" | "content" | "area" | "areaThumb" | "valueText" | "areaBackground" | "channelSlider" | "channelSliderLabel" | "channelSliderTrack" | "channelSliderThumb" | "channelSliderValueText" | "channelInput" | "transparencyGrid" | "swatchGroup" | "swatchTrigger" | "swatchIndicator" | "swatch" | "eyeDropperTrigger" | "formatTrigger" | "formatSelect" | "view", string>>
+  (props?: ColorPickerVariantProps): Pretty<Record<ColorPickerSlot, string>>
   raw: (props?: ColorPickerVariantProps) => ColorPickerVariantProps
   variantMap: ColorPickerVariantMap
   variantKeys: Array<keyof ColorPickerVariant>
