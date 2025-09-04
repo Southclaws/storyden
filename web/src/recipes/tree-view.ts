@@ -46,7 +46,6 @@ export const treeView = defineSlotRecipe({
       },
       "&[data-depth='1'] > [data-part='branch-text'] ": {
         fontWeight: "medium",
-        // color: "fg.muted",
       },
       _hover: {
         background: "bg.emphasized",
