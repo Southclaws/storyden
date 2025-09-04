@@ -56,136 +56,166 @@ const tokens = defineTokens.colors({
 });
 const semanticTokens = defineSemanticTokens.colors({
   "1": {
-    value: { _light: "{colors.green.light.1}", _dark: "{colors.green.dark.1}" },
+    value: {
+      _osLight: "{colors.green.light.1}",
+      _osDark: "{colors.green.dark.1}",
+    },
   },
   "2": {
-    value: { _light: "{colors.green.light.2}", _dark: "{colors.green.dark.2}" },
+    value: {
+      _osLight: "{colors.green.light.2}",
+      _osDark: "{colors.green.dark.2}",
+    },
   },
   "3": {
-    value: { _light: "{colors.green.light.3}", _dark: "{colors.green.dark.3}" },
+    value: {
+      _osLight: "{colors.green.light.3}",
+      _osDark: "{colors.green.dark.3}",
+    },
   },
   "4": {
-    value: { _light: "{colors.green.light.4}", _dark: "{colors.green.dark.4}" },
+    value: {
+      _osLight: "{colors.green.light.4}",
+      _osDark: "{colors.green.dark.4}",
+    },
   },
   "5": {
-    value: { _light: "{colors.green.light.5}", _dark: "{colors.green.dark.5}" },
+    value: {
+      _osLight: "{colors.green.light.5}",
+      _osDark: "{colors.green.dark.5}",
+    },
   },
   "6": {
-    value: { _light: "{colors.green.light.6}", _dark: "{colors.green.dark.6}" },
+    value: {
+      _osLight: "{colors.green.light.6}",
+      _osDark: "{colors.green.dark.6}",
+    },
   },
   "7": {
-    value: { _light: "{colors.green.light.7}", _dark: "{colors.green.dark.7}" },
+    value: {
+      _osLight: "{colors.green.light.7}",
+      _osDark: "{colors.green.dark.7}",
+    },
   },
   "8": {
-    value: { _light: "{colors.green.light.8}", _dark: "{colors.green.dark.8}" },
+    value: {
+      _osLight: "{colors.green.light.8}",
+      _osDark: "{colors.green.dark.8}",
+    },
   },
   "9": {
-    value: { _light: "{colors.green.light.9}", _dark: "{colors.green.dark.9}" },
+    value: {
+      _osLight: "{colors.green.light.9}",
+      _osDark: "{colors.green.dark.9}",
+    },
   },
   "10": {
     value: {
-      _light: "{colors.green.light.10}",
-      _dark: "{colors.green.dark.10}",
+      _osLight: "{colors.green.light.10}",
+      _osDark: "{colors.green.dark.10}",
     },
   },
   "11": {
     value: {
-      _light: "{colors.green.light.11}",
-      _dark: "{colors.green.dark.11}",
+      _osLight: "{colors.green.light.11}",
+      _osDark: "{colors.green.dark.11}",
     },
   },
   "12": {
     value: {
-      _light: "{colors.green.light.12}",
-      _dark: "{colors.green.dark.12}",
+      _osLight: "{colors.green.light.12}",
+      _osDark: "{colors.green.dark.12}",
     },
   },
   a1: {
     value: {
-      _light: "{colors.green.light.a1}",
-      _dark: "{colors.green.dark.a1}",
+      _osLight: "{colors.green.light.a1}",
+      _osDark: "{colors.green.dark.a1}",
     },
   },
   a2: {
     value: {
-      _light: "{colors.green.light.a2}",
-      _dark: "{colors.green.dark.a2}",
+      _osLight: "{colors.green.light.a2}",
+      _osDark: "{colors.green.dark.a2}",
     },
   },
   a3: {
     value: {
-      _light: "{colors.green.light.a3}",
-      _dark: "{colors.green.dark.a3}",
+      _osLight: "{colors.green.light.a3}",
+      _osDark: "{colors.green.dark.a3}",
     },
   },
   a4: {
     value: {
-      _light: "{colors.green.light.a4}",
-      _dark: "{colors.green.dark.a4}",
+      _osLight: "{colors.green.light.a4}",
+      _osDark: "{colors.green.dark.a4}",
     },
   },
   a5: {
     value: {
-      _light: "{colors.green.light.a5}",
-      _dark: "{colors.green.dark.a5}",
+      _osLight: "{colors.green.light.a5}",
+      _osDark: "{colors.green.dark.a5}",
     },
   },
   a6: {
     value: {
-      _light: "{colors.green.light.a6}",
-      _dark: "{colors.green.dark.a6}",
+      _osLight: "{colors.green.light.a6}",
+      _osDark: "{colors.green.dark.a6}",
     },
   },
   a7: {
     value: {
-      _light: "{colors.green.light.a7}",
-      _dark: "{colors.green.dark.a7}",
+      _osLight: "{colors.green.light.a7}",
+      _osDark: "{colors.green.dark.a7}",
     },
   },
   a8: {
     value: {
-      _light: "{colors.green.light.a8}",
-      _dark: "{colors.green.dark.a8}",
+      _osLight: "{colors.green.light.a8}",
+      _osDark: "{colors.green.dark.a8}",
     },
   },
   a9: {
     value: {
-      _light: "{colors.green.light.a9}",
-      _dark: "{colors.green.dark.a9}",
+      _osLight: "{colors.green.light.a9}",
+      _osDark: "{colors.green.dark.a9}",
     },
   },
   a10: {
     value: {
-      _light: "{colors.green.light.a10}",
-      _dark: "{colors.green.dark.a10}",
+      _osLight: "{colors.green.light.a10}",
+      _osDark: "{colors.green.dark.a10}",
     },
   },
   a11: {
     value: {
-      _light: "{colors.green.light.a11}",
-      _dark: "{colors.green.dark.a11}",
+      _osLight: "{colors.green.light.a11}",
+      _osDark: "{colors.green.dark.a11}",
     },
   },
   a12: {
     value: {
-      _light: "{colors.green.light.a12}",
-      _dark: "{colors.green.dark.a12}",
+      _osLight: "{colors.green.light.a12}",
+      _osDark: "{colors.green.dark.a12}",
     },
   },
   default: {
-    value: { _light: "{colors.green.light.9}", _dark: "{colors.green.dark.9}" },
+    value: {
+      _osLight: "{colors.green.light.9}",
+      _osDark: "{colors.green.dark.9}",
+    },
   },
   emphasized: {
     value: {
-      _light: "{colors.green.light.10}",
-      _dark: "{colors.green.dark.10}",
+      _osLight: "{colors.green.light.10}",
+      _osDark: "{colors.green.dark.10}",
     },
   },
-  fg: { value: { _light: "white", _dark: "white" } },
+  fg: { value: { _osLight: "white", _osDark: "white" } },
   text: {
     value: {
-      _light: "{colors.green.light.a11}",
-      _dark: "{colors.green.dark.a11}",
+      _osLight: "{colors.green.light.a11}",
+      _osDark: "{colors.green.dark.a11}",
     },
   },
 });
