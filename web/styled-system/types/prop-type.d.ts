@@ -57,6 +57,11 @@ export interface UtilityValues {
 	outlineColor: Tokens["colors"];
 	outline: Tokens["borders"];
 	outlineOffset: Tokens["spacing"];
+	focusRing: "outside" | "inside" | "mixed" | "none";
+	focusVisibleRing: "outside" | "inside" | "mixed" | "none";
+	focusRingColor: Tokens["colors"];
+	focusRingOffset: Tokens["spacing"];
+	focusRingWidth: Tokens["borderWidths"];
 	divideX: Tokens["borderWidths"];
 	divideY: Tokens["borderWidths"];
 	divideColor: Tokens["colors"];
@@ -72,6 +77,7 @@ export interface UtilityValues {
 	minBlockSize: "auto" | Tokens["sizes"] | "svh" | "lvh" | "dvh" | "screen" | "1/2" | "1/3" | "2/3" | "1/4" | "2/4" | "3/4" | "1/5" | "2/5" | "3/5" | "4/5" | "1/6" | "2/6" | "3/6" | "4/6" | "5/6";
 	maxHeight: "auto" | Tokens["sizes"] | "svh" | "lvh" | "dvh" | "screen" | "1/2" | "1/3" | "2/3" | "1/4" | "2/4" | "3/4" | "1/5" | "2/5" | "3/5" | "4/5" | "1/6" | "2/6" | "3/6" | "4/6" | "5/6";
 	maxBlockSize: "auto" | Tokens["sizes"] | "svh" | "lvh" | "dvh" | "screen" | "1/2" | "1/3" | "2/3" | "1/4" | "2/4" | "3/4" | "1/5" | "2/5" | "3/5" | "4/5" | "1/6" | "2/6" | "3/6" | "4/6" | "5/6";
+	boxSize: "auto" | Tokens["sizes"] | "1/2" | "1/3" | "2/3" | "1/4" | "2/4" | "3/4" | "1/5" | "2/5" | "3/5" | "4/5" | "1/6" | "2/6" | "3/6" | "4/6" | "5/6" | "1/12" | "2/12" | "3/12" | "4/12" | "5/12" | "6/12" | "7/12" | "8/12" | "9/12" | "10/12" | "11/12" | "screen";
 	color: Tokens["colors"];
 	fontFamily: Tokens["fonts"];
 	fontSize: Tokens["fontSizes"];
@@ -89,6 +95,7 @@ export interface UtilityValues {
 	background: Tokens["colors"];
 	backgroundColor: Tokens["colors"];
 	backgroundGradient: "to-t" | "to-tr" | "to-r" | "to-br" | "to-b" | "to-bl" | "to-l" | "to-tl";
+	backgroundLinear: "to-t" | "to-tr" | "to-r" | "to-br" | "to-b" | "to-bl" | "to-l" | "to-tl";
 	textGradient: "to-t" | "to-tr" | "to-r" | "to-br" | "to-b" | "to-bl" | "to-l" | "to-tl";
 	gradientFrom: Tokens["colors"];
 	gradientTo: Tokens["colors"];
@@ -156,7 +163,7 @@ export interface UtilityValues {
 	transitionDuration: Tokens["durations"];
 	transition: "all" | "common" | "background" | "colors" | "opacity" | "shadow" | "transform";
 	animation: Tokens["animations"];
-	animationName: "shimmer" | "fade-in" | "fade-out" | "slide-in" | "slide-out" | "slide-in-left" | "slide-out-left" | "slide-in-right" | "slide-out-right" | "collapse-in" | "collapse-out" | "fadeIn" | "fadeOut" | "skeleton-pulse" | "spin";
+	animationName: "shimmer";
 	animationTimingFunction: Tokens["easings"];
 	animationDuration: Tokens["durations"];
 	animationDelay: Tokens["durations"];
@@ -205,7 +212,7 @@ export interface UtilityValues {
 	strokeWidth: Tokens["borderWidths"];
 	srOnly: boolean;
 	debug: boolean;
-	colorPalette: "current" | "black" | "white" | "transparent" | "gray" | "gray.light" | "gray.dark" | "amber" | "blue" | "bronze" | "brown" | "crimson" | "cyan" | "gold" | "grass" | "green" | "indigo" | "iris" | "jade" | "lime" | "mauve" | "mint" | "neutral" | "neutral.light" | "neutral.dark" | "olive" | "orange" | "pink" | "plum" | "purple" | "red" | "red.light" | "red.dark" | "ruby" | "sage" | "sand" | "sky" | "slate" | "teal" | "tomato" | "violet" | "yellow" | "accent" | "accent.text" | "accent.dark" | "accent.dark.text" | "whiteAlpha" | "blackAlpha" | "bg" | "fg" | "border" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV";
+	colorPalette: "current" | "black" | "white" | "amber" | "amber.light" | "amber.dark" | "blue" | "blue.light" | "blue.dark" | "green" | "green.light" | "green.dark" | "orange" | "orange.light" | "orange.dark" | "pink" | "pink.light" | "pink.dark" | "red" | "red.light" | "red.dark" | "slate" | "slate.light" | "slate.dark" | "tomato" | "tomato.light" | "tomato.dark" | "gray" | "gray.light" | "gray.dark" | "neutral" | "neutral.light" | "neutral.dark" | "transparent" | "accent" | "accent.light" | "accent.light.text" | "accent.dark" | "accent.dark.text" | "conicGradient" | "cardBackgroundGradient" | "backgroundGradientH" | "backgroundGradientV" | "bg" | "fg" | "border" | "visibility" | "visibility.published.bg" | "visibility.published" | "visibility.published.fg" | "visibility.published.border" | "visibility.draft.bg" | "visibility.draft" | "visibility.draft.fg" | "visibility.draft.border" | "visibility.review.bg" | "visibility.review" | "visibility.review.fg" | "visibility.review.border" | "visibility.unlisted.bg" | "visibility.unlisted" | "visibility.unlisted.fg" | "visibility.unlisted.border";
 	textStyle: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl" | "6xl" | "7xl";
 }
 

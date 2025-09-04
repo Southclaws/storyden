@@ -30,7 +30,7 @@ export function DeleteWithConfirmationButton({
       <HStack
         className={cx(
           button(props),
-          menuItemColorPalette({ colorPalette: "red" }),
+          menuItemColorPalette({ colorPalette: "tomato" }),
         )}
         px="0"
         w="full"
@@ -38,7 +38,7 @@ export function DeleteWithConfirmationButton({
       >
         <Button
           type="button"
-          className={menuItemColorPalette({ colorPalette: "red" })}
+          className={menuItemColorPalette({ colorPalette: "tomato" })}
           pl="20"
           w="full"
           title="Confirm delete"

@@ -77,12 +77,21 @@ export const Breadcrumbs_ = (
               variant="subtle"
               flexShrink="0"
               minW="min"
+              colorPalette={
+                visibility === "draft"
+                  ? "visibility.draft"
+                  : visibility === "review"
+                    ? "visibility.review"
+                    : visibility === "unlisted"
+                      ? "visibility.unlisted"
+                      : "visibility.published"
+              }
               borderColor={
                 isCurrent && visibility === "published"
                   ? "white"
-                  : visibility === "draft"
-                    ? "accent"
-                    : "blue.8"
+                  : isCurrent
+                    ? "colorPalette.6"
+                    : "border.default"
               }
               borderStyle={
                 isCurrent && visibility !== "published" ? "dashed" : "none"

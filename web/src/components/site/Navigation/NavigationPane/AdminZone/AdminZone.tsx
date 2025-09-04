@@ -50,11 +50,11 @@ export function AdminZone() {
       pl="3"
       pr="2"
       py="1"
-      bgColor="orange.4/50"
+      bgColor="bg.warning"
       borderTopRadius="md"
     >
       <HStack w="full" fontSize="xs" justify="space-between">
-        <HStack gap="1">
+        <HStack gap="1" color="fg.warning">
           <AdminIcon w="4" />
           <AnimatePresence mode="wait">
             <MotionSpan

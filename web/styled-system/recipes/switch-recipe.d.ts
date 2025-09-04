@@ -13,13 +13,16 @@ type SwitchRecipeVariantMap = {
   [key in keyof SwitchRecipeVariant]: Array<SwitchRecipeVariant[key]>
 }
 
+type SwitchRecipeSlot = "root" | "label" | "control" | "thumb"
+
 export type SwitchRecipeVariantProps = {
   [key in keyof SwitchRecipeVariant]?: ConditionalValue<SwitchRecipeVariant[key]> | undefined
 }
 
 export interface SwitchRecipeRecipe {
+  __slot: SwitchRecipeSlot
   __type: SwitchRecipeVariantProps
-  (props?: SwitchRecipeVariantProps): Pretty<Record<"root" | "label" | "control" | "thumb", string>>
+  (props?: SwitchRecipeVariantProps): Pretty<Record<SwitchRecipeSlot, string>>
   raw: (props?: SwitchRecipeVariantProps) => SwitchRecipeVariantProps
   variantMap: SwitchRecipeVariantMap
   variantKeys: Array<keyof SwitchRecipeVariant>

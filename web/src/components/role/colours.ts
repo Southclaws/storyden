@@ -4,9 +4,9 @@ export function badgeColourCSS(c: string) {
   const { bg, bo, fg } = badgeColours(c);
 
   return {
-    "--colors-color-palette-text": fg,
-    "--colors-color-palette-muted": bo,
-    "--colors-color-palette": bg,
+    "--colors-color-palette-fg": fg,
+    "--colors-color-palette-border": bo,
+    "--colors-color-palette-bg": bg,
   } as React.CSSProperties;
 }
 

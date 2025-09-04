@@ -187,7 +187,7 @@ function ShowMore({
       <styled.a
         fontSize="sm"
         cursor="pointer"
-        color="blue.10"
+        color="fg.accent"
         _hover={{
           textDecoration: "underline",
         }}

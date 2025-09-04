@@ -13,11 +13,14 @@ type TypographyHeadingVariantMap = {
   [key in keyof TypographyHeadingVariant]: Array<TypographyHeadingVariant[key]>
 }
 
+
+
 export type TypographyHeadingVariantProps = {
   [key in keyof TypographyHeadingVariant]?: ConditionalValue<TypographyHeadingVariant[key]> | undefined
 }
 
 export interface TypographyHeadingRecipe {
+  
   __type: TypographyHeadingVariantProps
   (props?: TypographyHeadingVariantProps): string
   raw: (props?: TypographyHeadingVariantProps) => TypographyHeadingVariantProps

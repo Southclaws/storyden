@@ -162,11 +162,7 @@ export const DefaultLayout: NodeLayout = {
     { type: "cover" as const },
     { type: "title" as const },
     { type: "content" as const },
-    { type: "assets" as const },
-    { type: "tags" as const },
     { type: "link" as const },
-    { type: "properties" as const },
-    { type: "directory" as const },
   ],
 };
 

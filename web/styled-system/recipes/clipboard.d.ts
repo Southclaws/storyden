@@ -10,13 +10,16 @@ type ClipboardVariantMap = {
   [key in keyof ClipboardVariant]: Array<ClipboardVariant[key]>
 }
 
+type ClipboardSlot = "root" | "control" | "trigger" | "indicator" | "input" | "label"
+
 export type ClipboardVariantProps = {
   [key in keyof ClipboardVariant]?: ConditionalValue<ClipboardVariant[key]> | undefined
 }
 
 export interface ClipboardRecipe {
+  __slot: ClipboardSlot
   __type: ClipboardVariantProps
-  (props?: ClipboardVariantProps): Pretty<Record<"root" | "control" | "trigger" | "indicator" | "input" | "label", string>>
+  (props?: ClipboardVariantProps): Pretty<Record<ClipboardSlot, string>>
   raw: (props?: ClipboardVariantProps) => ClipboardVariantProps
   variantMap: ClipboardVariantMap
   variantKeys: Array<keyof ClipboardVariant>

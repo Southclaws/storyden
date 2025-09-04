@@ -43,6 +43,7 @@ export const clipboard = /* @__PURE__ */ Object.assign(clipboardFn, {
   __recipe__: false,
   __name__: 'clipboard',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: clipboardVariantKeys,
   variantMap: {},
   splitVariantProps(props) {

@@ -39,6 +39,7 @@ export const switchRecipe = /* @__PURE__ */ Object.assign(switchRecipeFn, {
   __recipe__: false,
   __name__: 'switchRecipe',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: switchRecipeVariantKeys,
   variantMap: {
   "size": [

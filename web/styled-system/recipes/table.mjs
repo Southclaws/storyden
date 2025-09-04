@@ -39,38 +39,6 @@ const tableSlotNames = [
   [
     "caption",
     "table__caption"
-  ],
-  [
-    "root",
-    "table__root"
-  ],
-  [
-    "body",
-    "table__body"
-  ],
-  [
-    "cell",
-    "table__cell"
-  ],
-  [
-    "footer",
-    "table__footer"
-  ],
-  [
-    "head",
-    "table__head"
-  ],
-  [
-    "header",
-    "table__header"
-  ],
-  [
-    "row",
-    "table__row"
-  ],
-  [
-    "caption",
-    "table__caption"
   ]
 ]
 const tableSlotFns = /* @__PURE__ */ tableSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, tableDefaultVariants, getSlotCompoundVariant(tableCompoundVariants, slotName))])
@@ -89,10 +57,10 @@ export const table = /* @__PURE__ */ Object.assign(tableFn, {
   __recipe__: false,
   __name__: 'table',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: tableVariantKeys,
   variantMap: {
   "variant": [
-    "outline",
     "dense",
     "plain"
   ],

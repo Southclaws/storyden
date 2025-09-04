@@ -10,13 +10,16 @@ type FileUploadVariantMap = {
   [key in keyof FileUploadVariant]: Array<FileUploadVariant[key]>
 }
 
+type FileUploadSlot = "root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger"
+
 export type FileUploadVariantProps = {
   [key in keyof FileUploadVariant]?: ConditionalValue<FileUploadVariant[key]> | undefined
 }
 
 export interface FileUploadRecipe {
+  __slot: FileUploadSlot
   __type: FileUploadVariantProps
-  (props?: FileUploadVariantProps): Pretty<Record<"root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger" | "root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger", string>>
+  (props?: FileUploadVariantProps): Pretty<Record<FileUploadSlot, string>>
   raw: (props?: FileUploadVariantProps) => FileUploadVariantProps
   variantMap: FileUploadVariantMap
   variantKeys: Array<keyof FileUploadVariant>

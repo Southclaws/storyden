@@ -33,7 +33,7 @@ export function NotificationsTrigger({
           position="absolute"
           top="1"
           right="1"
-          bgColor="red.8"
+          bgColor="fg.destructive/60"
           borderRadius="full"
           w="2"
           h="2"

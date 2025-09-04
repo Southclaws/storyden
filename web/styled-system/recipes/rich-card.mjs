@@ -79,6 +79,7 @@ export const richCard = /* @__PURE__ */ Object.assign(richCardFn, {
   __recipe__: false,
   __name__: 'richCard',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: richCardVariantKeys,
   variantMap: {
   "shape": [

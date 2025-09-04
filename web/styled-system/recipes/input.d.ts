@@ -17,11 +17,14 @@ type InputVariantMap = {
   [key in keyof InputVariant]: Array<InputVariant[key]>
 }
 
+
+
 export type InputVariantProps = {
   [key in keyof InputVariant]?: ConditionalValue<InputVariant[key]> | undefined
 }
 
 export interface InputRecipe {
+  
   __type: InputVariantProps
   (props?: InputVariantProps): string
   raw: (props?: InputVariantProps) => InputVariantProps

@@ -84,7 +84,7 @@ export function AssetThumbnail({
           position="absolute"
           top="1"
           right="1"
-          colorPalette="red"
+          colorPalette="tomato"
           variant="subtle"
           size="xs"
           w="5"

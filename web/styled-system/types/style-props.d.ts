@@ -6992,6 +6992,9 @@ bgBlendMode?: ConditionalValue<WithEscapeHatch<CssProperties["backgroundBlendMod
    */
 bgSize?: ConditionalValue<WithEscapeHatch<CssProperties["backgroundSize"]>>
  bgGradient?: ConditionalValue<WithEscapeHatch<UtilityValues["backgroundGradient"] | CssVars>>
+ bgLinear?: ConditionalValue<WithEscapeHatch<UtilityValues["backgroundLinear"] | CssVars>>
+ bgRadial?: ConditionalValue<WithEscapeHatch<string | number>>
+ bgConic?: ConditionalValue<WithEscapeHatch<string | number>>
  /**
    * The **`border-radius`** CSS property rounds the corners of an element's outer border edge. You can set a single radius to make circular corners, or two radii to make elliptical corners.
    *
@@ -7359,13 +7362,23 @@ scrollPaddingX?: ConditionalValue<WithEscapeHatch<UtilityValues["scrollPaddingIn
  hideBelow?: ConditionalValue<WithEscapeHatch<UtilityValues["hideBelow"] | CssVars>>
  spaceX?: ConditionalValue<WithEscapeHatch<UtilityValues["spaceX"] | CssVars>>
  spaceY?: ConditionalValue<WithEscapeHatch<UtilityValues["spaceY"] | CssVars>>
+ focusRing?: ConditionalValue<WithEscapeHatch<UtilityValues["focusRing"] | CssVars>>
+ focusVisibleRing?: ConditionalValue<WithEscapeHatch<UtilityValues["focusVisibleRing"] | CssVars>>
+ focusRingColor?: ConditionalValue<WithEscapeHatch<UtilityValues["focusRingColor"] | CssVars>>
+ focusRingOffset?: ConditionalValue<WithEscapeHatch<UtilityValues["focusRingOffset"] | CssVars>>
+ focusRingWidth?: ConditionalValue<WithEscapeHatch<UtilityValues["focusRingWidth"] | CssVars>>
+ focusRingStyle?: ConditionalValue<WithEscapeHatch<string | number>>
  divideX?: ConditionalValue<WithEscapeHatch<UtilityValues["divideX"] | CssVars>>
  divideY?: ConditionalValue<WithEscapeHatch<UtilityValues["divideY"] | CssVars>>
  divideColor?: ConditionalValue<WithEscapeHatch<UtilityValues["divideColor"] | CssVars>>
  divideStyle?: ConditionalValue<WithEscapeHatch<string | number>>
+ boxSize?: ConditionalValue<WithEscapeHatch<UtilityValues["boxSize"] | CssVars>>
  fontSmoothing?: ConditionalValue<WithEscapeHatch<UtilityValues["fontSmoothing"] | CssVars>>
  truncate?: ConditionalValue<WithEscapeHatch<UtilityValues["truncate"] | CssVars>>
  backgroundGradient?: ConditionalValue<WithEscapeHatch<UtilityValues["backgroundGradient"] | CssVars>>
+ backgroundLinear?: ConditionalValue<WithEscapeHatch<UtilityValues["backgroundLinear"] | CssVars>>
+ backgroundRadial?: ConditionalValue<WithEscapeHatch<string | number>>
+ backgroundConic?: ConditionalValue<WithEscapeHatch<string | number>>
  textGradient?: ConditionalValue<WithEscapeHatch<UtilityValues["textGradient"] | CssVars>>
  gradientFromPosition?: ConditionalValue<WithEscapeHatch<string | number>>
  gradientToPosition?: ConditionalValue<WithEscapeHatch<string | number>>

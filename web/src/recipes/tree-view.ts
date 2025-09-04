@@ -29,7 +29,7 @@ export const treeView = defineSlotRecipe({
     branchControl: {
       alignItems: "center",
       borderRadius: "l2",
-      color: "fg.muted",
+      color: "fg.subtle",
       display: "flex",
       fontWeight: "medium",
       gap: "1",
@@ -46,11 +46,14 @@ export const treeView = defineSlotRecipe({
       },
       "&[data-depth='1'] > [data-part='branch-text'] ": {
         fontWeight: "medium",
-        color: "fg.muted",
       },
       _hover: {
-        background: "gray.a2",
-        color: "fg.default",
+        background: "bg.emphasized",
+        color: "fg.emphasized",
+      },
+      _selected: {
+        backgroundColor: "bg.selected",
+        color: "fg.selected",
       },
     },
     branchIndicator: {
@@ -91,15 +94,15 @@ export const treeView = defineSlotRecipe({
         },
       },
       _hover: {
-        background: "gray.a2",
-        color: "fg.default",
+        backgroundColor: "bg.emphasized",
+        color: "fg.emphasized",
       },
       _selected: {
-        background: "accent.a2",
-        color: "accent.text",
+        backgroundColor: "bg.selected",
+        color: "fg.selected",
         _hover: {
-          background: "accent.a2",
-          color: "accent.text",
+          backgroundColor: "bg.emphasized",
+          color: "fg.emphasized",
         },
         _before: {
           content: '""',

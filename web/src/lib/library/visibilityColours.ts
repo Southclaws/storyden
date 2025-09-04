@@ -1,15 +1,16 @@
 import { Visibility } from "@/api/openapi-schema";
 import { ColorPalette } from "@/styled-system/tokens";
+import { UtilityValues } from "@/styled-system/types/prop-type";
 
-export function visibilityColour(v: Visibility): ColorPalette {
+export function visibilityColour(v: Visibility): UtilityValues["colorPalette"] {
   switch (v) {
     case Visibility.published:
-      return "bg";
+      return "visibility.published";
     case Visibility.review:
-      return "blue";
+      return "visibility.review";
     case Visibility.draft:
-      return "green";
+      return "visibility.draft";
     case Visibility.unlisted:
-      return "pink";
+      return "visibility.unlisted";
   }
 }

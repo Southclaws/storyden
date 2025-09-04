@@ -15,7 +15,7 @@ export function LinkView({ link, asset }: Props) {
       display="flex"
       w="full"
       borderRadius="xl"
-      bgColor="accent.100"
+      bgColor="bg.subtle"
       overflow="hidden"
       height="24"
       shadow="sm"

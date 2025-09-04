@@ -17,11 +17,14 @@ type ButtonVariantMap = {
   [key in keyof ButtonVariant]: Array<ButtonVariant[key]>
 }
 
+
+
 export type ButtonVariantProps = {
   [key in keyof ButtonVariant]?: ConditionalValue<ButtonVariant[key]> | undefined
 }
 
 export interface ButtonRecipe {
+  
   __type: ButtonVariantProps
   (props?: ButtonVariantProps): string
   raw: (props?: ButtonVariantProps) => ButtonVariantProps

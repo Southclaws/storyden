@@ -43,6 +43,7 @@ export const checkbox = /* @__PURE__ */ Object.assign(checkboxFn, {
   __recipe__: false,
   __name__: 'checkbox',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: checkboxVariantKeys,
   variantMap: {
   "size": [

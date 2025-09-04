@@ -17,13 +17,16 @@ type TabsVariantMap = {
   [key in keyof TabsVariant]: Array<TabsVariant[key]>
 }
 
+type TabsSlot = "root" | "list" | "trigger" | "content" | "indicator"
+
 export type TabsVariantProps = {
   [key in keyof TabsVariant]?: TabsVariant[key] | undefined
 }
 
 export interface TabsRecipe {
+  __slot: TabsSlot
   __type: TabsVariantProps
-  (props?: TabsVariantProps): Pretty<Record<"root" | "list" | "trigger" | "content" | "indicator" | "root" | "list" | "trigger" | "content" | "indicator", string>>
+  (props?: TabsVariantProps): Pretty<Record<TabsSlot, string>>
   raw: (props?: TabsVariantProps) => TabsVariantProps
   variantMap: TabsVariantMap
   variantKeys: Array<keyof TabsVariant>

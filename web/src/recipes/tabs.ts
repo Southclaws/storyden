@@ -79,8 +79,8 @@ export const tabs = defineSlotRecipe({
           borderWidth: "1px",
           px: "1",
           backgroundColor: {
-            _light: "gray.a2",
-            _dark: "bg.canvas",
+            _osLight: "gray.a2",
+            _osDark: "bg.canvas",
           },
           _horizontal: {
             alignItems: "center",
@@ -92,8 +92,8 @@ export const tabs = defineSlotRecipe({
         },
         indicator: {
           backgroundColor: {
-            _light: "bg.default",
-            _dark: "bg.subtle",
+            _osLight: "bg.default",
+            _osDark: "bg.subtle",
           },
 
           boxShadow: "xs",

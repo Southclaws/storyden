@@ -59,7 +59,7 @@ export function MemberList({ profiles }: Props) {
                 <LStack gap="1" alignItems="end">
                   <Timestamp created={profile.createdAt} large />
                   {isBanned && (
-                    <styled.p color="tomato.10">
+                    <styled.p color="fg.destructive">
                       banned <Timestamp created={profile.deletedAt!} large />
                     </styled.p>
                   )}

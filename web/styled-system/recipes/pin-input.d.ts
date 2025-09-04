@@ -13,13 +13,16 @@ type PinInputVariantMap = {
   [key in keyof PinInputVariant]: Array<PinInputVariant[key]>
 }
 
+type PinInputSlot = "root" | "label" | "input" | "control"
+
 export type PinInputVariantProps = {
   [key in keyof PinInputVariant]?: ConditionalValue<PinInputVariant[key]> | undefined
 }
 
 export interface PinInputRecipe {
+  __slot: PinInputSlot
   __type: PinInputVariantProps
-  (props?: PinInputVariantProps): Pretty<Record<"root" | "label" | "input" | "control", string>>
+  (props?: PinInputVariantProps): Pretty<Record<PinInputSlot, string>>
   raw: (props?: PinInputVariantProps) => PinInputVariantProps
   variantMap: PinInputVariantMap
   variantKeys: Array<keyof PinInputVariant>

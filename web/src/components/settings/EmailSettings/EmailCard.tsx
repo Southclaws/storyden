@@ -51,15 +51,15 @@ export function EmailCard({ email }: Props) {
           <Heading size="sm">{email.email_address}</Heading>
           {email.verified ? (
             <Badge
-              borderColor="green.6"
-              backgroundColor="green.5"
-              color="green.11"
+              borderColor="border.success"
+              backgroundColor="bg.success"
+              color="fg.success"
             >
               Verified
             </Badge>
           ) : (
             <Link href="/auth/verify/email?returnURL=/settings">
-              <Badge borderColor="red.6" backgroundColor="red.5" color="red.11">
+              <Badge borderColor="border.error" backgroundColor="bg.error" color="fg.error">
                 Verify this email
               </Badge>
             </Link>

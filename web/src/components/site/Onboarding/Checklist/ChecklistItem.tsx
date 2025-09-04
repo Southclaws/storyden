@@ -29,7 +29,7 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
       w="full"
       maxW="prose"
       borderRadius="2xl"
-      bgColor={complete ? "green.3" : "gray.2"}
+      bgColor={complete ? "bg.success" : "bg.subtle"}
     >
       <HStack w="full" gap="2">
         <Box>
@@ -44,8 +44,8 @@ export function ChecklistItem(props: PropsWithChildren<CardProps>) {
               <CheckCircleIcon
                 width="8"
                 height="8"
-                color="green.10"
-                fill="green.5"
+                color="fg.success"
+                fill="bg.success"
               />
             ) : (
               <styled.p fontWeight="bold">{props.step}</styled.p>

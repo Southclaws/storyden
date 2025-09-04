@@ -29,7 +29,7 @@ export const badge = defineRecipe({
         borderWidth: "1px",
         color: "fg.default",
         "& svg": {
-          color: "fg.muted",
+          color: "fg.subtle",
         },
       },
       outline: {

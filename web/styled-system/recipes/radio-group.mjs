@@ -30,30 +30,6 @@ const radioGroupSlotNames = [
   [
     "indicator",
     "radioGroup__indicator"
-  ],
-  [
-    "root",
-    "radioGroup__root"
-  ],
-  [
-    "label",
-    "radioGroup__label"
-  ],
-  [
-    "item",
-    "radioGroup__item"
-  ],
-  [
-    "itemText",
-    "radioGroup__itemText"
-  ],
-  [
-    "itemControl",
-    "radioGroup__itemControl"
-  ],
-  [
-    "indicator",
-    "radioGroup__indicator"
   ]
 ]
 const radioGroupSlotFns = /* @__PURE__ */ radioGroupSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, radioGroupDefaultVariants, getSlotCompoundVariant(radioGroupCompoundVariants, slotName))])
@@ -71,6 +47,7 @@ export const radioGroup = /* @__PURE__ */ Object.assign(radioGroupFn, {
   __recipe__: false,
   __name__: 'radioGroup',
   raw: (props) => props,
+  classNameMap: {},
   variantKeys: radioGroupVariantKeys,
   variantMap: {
   "size": [

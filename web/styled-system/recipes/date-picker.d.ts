@@ -10,13 +10,16 @@ type DatePickerVariantMap = {
   [key in keyof DatePickerVariant]: Array<DatePickerVariant[key]>
 }
 
+type DatePickerSlot = "root" | "label" | "clearTrigger" | "content" | "control" | "input" | "monthSelect" | "nextTrigger" | "positioner" | "prevTrigger" | "rangeText" | "table" | "tableBody" | "tableCell" | "tableCellTrigger" | "tableHead" | "tableHeader" | "tableRow" | "trigger" | "viewTrigger" | "viewControl" | "yearSelect" | "presetTrigger" | "view"
+
 export type DatePickerVariantProps = {
   [key in keyof DatePickerVariant]?: ConditionalValue<DatePickerVariant[key]> | undefined
 }
 
 export interface DatePickerRecipe {
+  __slot: DatePickerSlot
   __type: DatePickerVariantProps
-  (props?: DatePickerVariantProps): Pretty<Record<"root" | "label" | "clearTrigger" | "content" | "control" | "input" | "monthSelect" | "nextTrigger" | "positioner" | "prevTrigger" | "rangeText" | "table" | "tableBody" | "tableCell" | "tableCellTrigger" | "tableHead" | "tableHeader" | "tableRow" | "trigger" | "viewTrigger" | "viewControl" | "yearSelect" | "presetTrigger" | "view" | "root" | "label" | "clearTrigger" | "content" | "control" | "input" | "monthSelect" | "nextTrigger" | "positioner" | "prevTrigger" | "rangeText" | "table" | "tableBody" | "tableCell" | "tableCellTrigger" | "tableHead" | "tableHeader" | "tableRow" | "trigger" | "viewTrigger" | "viewControl" | "yearSelect" | "presetTrigger" | "view", string>>
+  (props?: DatePickerVariantProps): Pretty<Record<DatePickerSlot, string>>
   raw: (props?: DatePickerVariantProps) => DatePickerVariantProps
   variantMap: DatePickerVariantMap
   variantKeys: Array<keyof DatePickerVariant>

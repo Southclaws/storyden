@@ -8,8 +8,11 @@ function styledFn(Dynamic, configOrCva = {}, options = {}) {
   const cvaFn = configOrCva.__cva__ || configOrCva.__recipe__ ? configOrCva : cva(configOrCva)
 
   const forwardFn = options.shouldForwardProp || defaultShouldForwardProp
-  const shouldForwardProp = (prop) => forwardFn(prop, cvaFn.variantKeys)
-
+  const shouldForwardProp = (prop) => {
+    if (options.forwardProps?.includes(prop)) return true
+    return forwardFn(prop, cvaFn.variantKeys)
+  }
+  
   const defaultProps = Object.assign(
     options.dataAttr && configOrCva.__name__ ? { 'data-recipe': configOrCva.__name__ } : {},
     options.defaultProps,
@@ -20,7 +23,7 @@ function styledFn(Dynamic, configOrCva = {}, options = {}) {
   const __base__ = Dynamic.__base__ || Dynamic
 
   const StyledComponent = /* @__PURE__ */ forwardRef(function StyledComponent(props, ref) {
-    const { as: Element = __base__, children, ...restProps } = props
+    const { as: Element = __base__, unstyled, children, ...restProps } = props
 
     const combinedProps = useMemo(() => Object.assign({}, defaultProps, restProps), [restProps])
 
@@ -40,7 +43,13 @@ function styledFn(Dynamic, configOrCva = {}, options = {}) {
       return cx(css(cvaStyles, propStyles, cssStyles), combinedProps.className)
     }
 
-    const classes = configOrCva.__recipe__ ? recipeClass : cvaClass
+    const classes = () => {
+      if (unstyled) {
+        const { css: cssStyles, ...propStyles } = styleProps
+        return cx(css(propStyles, cssStyles), combinedProps.className)
+      }
+      return configOrCva.__recipe__ ? recipeClass() : cvaClass()
+    }
 
     return createElement(Element, {
       ref,
