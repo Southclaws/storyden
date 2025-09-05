@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/infrastructure/vector/pinecone"
 	"github.com/Southclaws/storyden/internal/infrastructure/weaviate"
 	"github.com/Southclaws/storyden/internal/infrastructure/webauthn"
+	"github.com/Southclaws/storyden/internal/infrastructure/wrun"
 )
 
 func Build() fx.Option {
@@ -40,5 +41,6 @@ func Build() fx.Option {
 		jwt.Build(),
 		pubsub.Build(),
 		fx.Provide(pdf.New),
+		fx.Provide(wrun.New),
 	)
 }

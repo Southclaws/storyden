@@ -25,6 +25,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/question"
@@ -235,6 +236,21 @@ func (au *AccountUpdate) AddSessions(s ...*Session) *AccountUpdate {
 		ids[i] = s[i].ID
 	}
 	return au.AddSessionIDs(ids...)
+}
+
+// AddPluginIDs adds the "plugins" edge to the Plugin entity by IDs.
+func (au *AccountUpdate) AddPluginIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.AddPluginIDs(ids...)
+	return au
+}
+
+// AddPlugins adds the "plugins" edges to the Plugin entity.
+func (au *AccountUpdate) AddPlugins(p ...*Plugin) *AccountUpdate {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return au.AddPluginIDs(ids...)
 }
 
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
@@ -551,6 +567,27 @@ func (au *AccountUpdate) RemoveSessions(s ...*Session) *AccountUpdate {
 		ids[i] = s[i].ID
 	}
 	return au.RemoveSessionIDs(ids...)
+}
+
+// ClearPlugins clears all "plugins" edges to the Plugin entity.
+func (au *AccountUpdate) ClearPlugins() *AccountUpdate {
+	au.mutation.ClearPlugins()
+	return au
+}
+
+// RemovePluginIDs removes the "plugins" edge to Plugin entities by IDs.
+func (au *AccountUpdate) RemovePluginIDs(ids ...xid.ID) *AccountUpdate {
+	au.mutation.RemovePluginIDs(ids...)
+	return au
+}
+
+// RemovePlugins removes "plugins" edges to Plugin entities.
+func (au *AccountUpdate) RemovePlugins(p ...*Plugin) *AccountUpdate {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return au.RemovePluginIDs(ids...)
 }
 
 // ClearEmails clears all "emails" edges to the Email entity.
@@ -1120,6 +1157,51 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.PluginsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedPluginsIDs(); len(nodes) > 0 && !au.mutation.PluginsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.PluginsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -2241,6 +2323,21 @@ func (auo *AccountUpdateOne) AddSessions(s ...*Session) *AccountUpdateOne {
 	return auo.AddSessionIDs(ids...)
 }
 
+// AddPluginIDs adds the "plugins" edge to the Plugin entity by IDs.
+func (auo *AccountUpdateOne) AddPluginIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.AddPluginIDs(ids...)
+	return auo
+}
+
+// AddPlugins adds the "plugins" edges to the Plugin entity.
+func (auo *AccountUpdateOne) AddPlugins(p ...*Plugin) *AccountUpdateOne {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return auo.AddPluginIDs(ids...)
+}
+
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
 func (auo *AccountUpdateOne) AddEmailIDs(ids ...xid.ID) *AccountUpdateOne {
 	auo.mutation.AddEmailIDs(ids...)
@@ -2555,6 +2652,27 @@ func (auo *AccountUpdateOne) RemoveSessions(s ...*Session) *AccountUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return auo.RemoveSessionIDs(ids...)
+}
+
+// ClearPlugins clears all "plugins" edges to the Plugin entity.
+func (auo *AccountUpdateOne) ClearPlugins() *AccountUpdateOne {
+	auo.mutation.ClearPlugins()
+	return auo
+}
+
+// RemovePluginIDs removes the "plugins" edge to Plugin entities by IDs.
+func (auo *AccountUpdateOne) RemovePluginIDs(ids ...xid.ID) *AccountUpdateOne {
+	auo.mutation.RemovePluginIDs(ids...)
+	return auo
+}
+
+// RemovePlugins removes "plugins" edges to Plugin entities.
+func (auo *AccountUpdateOne) RemovePlugins(p ...*Plugin) *AccountUpdateOne {
+	ids := make([]xid.ID, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return auo.RemovePluginIDs(ids...)
 }
 
 // ClearEmails clears all "emails" edges to the Email entity.
@@ -3154,6 +3272,51 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.PluginsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedPluginsIDs(); len(nodes) > 0 && !auo.mutation.PluginsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.PluginsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
