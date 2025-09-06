@@ -158,9 +158,19 @@ export function useLibraryMutation(node?: Node) {
   const importFromLink = async (id: string, url: string) => {
     const { title, description } = await linkCreate({ url });
 
+    // TODO: Check capabilities before running AI tools.
+
+    // Generate AI-powered suggestions if content is available
+    const [tag_suggestions, title_suggestion] = description
+      ? await Promise.all([
+          suggestTags(id, description),
+          suggestTitle(id, description),
+        ])
+      : [[], title];
+
     return {
-      title_suggestion: title,
-      tag_suggestions: [], // TODO
+      title_suggestion,
+      tag_suggestions,
       content_suggestion: description, // TODO: Generate summary from content
     };
   };
