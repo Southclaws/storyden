@@ -1,8 +1,7 @@
-import slugify from "@sindresorhus/slugify";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { handle } from "@/api/client";
-import { InstanceCapability, NodeWithChildren } from "@/api/openapi-schema";
+import { InstanceCapability } from "@/api/openapi-schema";
 import { useLibraryMutation } from "@/lib/library/library";
 import { useCapability } from "@/lib/settings/capabilities";
 
@@ -14,12 +13,11 @@ export function useLibraryPageTitleBlock() {
   const { draft, setName } = store.getState();
 
   const { suggestTitle } = useLibraryMutation(draft);
-  const [value, setValue] = useState<string | undefined>(undefined);
   const [isLoading, setLoading] = useState(false);
   const isTitleSuggestEnabled = useCapability(InstanceCapability.gen_ai);
 
   const defaultValue = store.getInitialState().draft.name;
-  const name = useWatch((s) => s.draft.name);
+  const value = useWatch((s) => s.draft.name);
   const content = useWatch((s) => s.draft.content);
 
   // TODO: Figure out an isDirty approach
@@ -30,10 +28,6 @@ export function useLibraryPageTitleBlock() {
   //     form.setValue("slug", autoSlug);
   //   }
   // }, [form, name]);
-
-  function handleReset() {
-    setValue(undefined);
-  }
 
   async function handleSuggest() {
     if (!isTitleSuggestEnabled) {
@@ -54,7 +48,6 @@ export function useLibraryPageTitleBlock() {
         }
 
         setName(title);
-        setValue(title);
       },
       {
         cleanup: async () => setLoading(false),
@@ -71,7 +64,6 @@ export function useLibraryPageTitleBlock() {
     isTitleSuggestEnabled,
     value,
     isLoading,
-    handleReset,
     handleSuggest,
     handleChange,
   };

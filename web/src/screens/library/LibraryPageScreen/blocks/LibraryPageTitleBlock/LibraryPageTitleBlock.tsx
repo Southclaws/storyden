@@ -30,14 +30,12 @@ function LibraryPageTitleBlockEditing() {
     isTitleSuggestEnabled,
     value,
     isLoading,
-    handleReset,
     handleSuggest,
     handleChange,
   } = useLibraryPageTitleBlock();
 
   function handleChangeAndReset(value: string) {
     handleChange(value);
-    handleReset();
   }
 
   return (
