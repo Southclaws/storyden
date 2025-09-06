@@ -22,6 +22,15 @@ export function useLibraryPageTitleBlock() {
   const name = useWatch((s) => s.draft.name);
   const content = useWatch((s) => s.draft.content);
 
+  // Sync the contenteditable value when the store name changes externally
+  // This allows external updates (like from link import) to properly update the UI
+  useEffect(() => {
+    // Update value when store name changes and we haven't set a local override
+    if (value === undefined || (name !== defaultValue && name !== value)) {
+      setValue(name);
+    }
+  }, [name, value, defaultValue]);
+
   // TODO: Figure out an isDirty approach
   // Update the slug with a slugified version of the name if it's not dirty.
   // useEffect(() => {

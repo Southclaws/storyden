@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { dequal } from "dequal";
+import { useEffect, useRef, useState } from "react";
 
 import { handle } from "@/api/client";
 import { tagList } from "@/api/openapi-client/tags";
@@ -21,8 +22,18 @@ export function useLibraryPageTagsBlockEditing() {
   const { suggestTags } = useLibraryMutation();
   const ref = useRef<CombotagsHandle>(null);
   const [loadingTags, setLoadingTags] = useState(false);
+  const [key, setKey] = useState(0); // Force re-render when tags change externally
 
   const currentTags = tags.map((t) => t.name);
+
+  // Force re-render of Combotags when tags change externally (like from link import)
+  const initialTags = useRef(currentTags);
+  useEffect(() => {
+    if (!dequal(initialTags.current, currentTags)) {
+      initialTags.current = currentTags;
+      setKey(prev => prev + 1);
+    }
+  }, [currentTags]);
 
   async function handleQuery(q: string): Promise<TagNameList> {
     const tags =
@@ -68,6 +79,7 @@ export function useLibraryPageTagsBlockEditing() {
 
   return {
     ref,
+    key, // Used to force re-render of Combotags component
     currentTags,
     isSuggestEnabled,
     loadingTags,

@@ -43,9 +43,59 @@ function HeadingInputWithRef(
   useImperativeHandle(ref, () => internalRef.current as any);
 
   useEffect(() => {
-    if (internalRef.current && value !== undefined) {
-      if (internalRef.current.textContent !== value) {
-        internalRef.current.textContent = value.toString();
+    const element = internalRef.current;
+    if (element && value !== undefined) {
+      const currentText = element.textContent || '';
+      const newValue = value.toString();
+      
+      // Only update if content differs and element is not focused
+      // This prevents cursor jumping during user input
+      if (currentText !== newValue && document.activeElement !== element) {
+        // Save current selection/cursor position
+        const selection = window.getSelection();
+        const range = selection && selection.rangeCount > 0 ? selection.getRangeAt(0) : null;
+        const isSelectionInElement = range && element.contains(range.commonAncestorContainer);
+        
+        // Calculate cursor position relative to text length
+        let cursorPosition = 0;
+        if (isSelectionInElement && range) {
+          const preCaretRange = range.cloneRange();
+          preCaretRange.selectNodeContents(element);
+          preCaretRange.setEnd(range.endContainer, range.endOffset);
+          cursorPosition = preCaretRange.toString().length;
+        }
+        
+        // Update content
+        element.textContent = newValue;
+        
+        // Restore cursor position if element was previously focused
+        if (isSelectionInElement && cursorPosition <= newValue.length) {
+          const newRange = document.createRange();
+          const walker = document.createTreeWalker(
+            element,
+            NodeFilter.SHOW_TEXT,
+            null
+          );
+          
+          let currentPos = 0;
+          let textNode = walker.nextNode();
+          
+          while (textNode && currentPos + textNode.textContent!.length < cursorPosition) {
+            currentPos += textNode.textContent!.length;
+            textNode = walker.nextNode();
+          }
+          
+          if (textNode) {
+            const offset = cursorPosition - currentPos;
+            newRange.setStart(textNode, Math.min(offset, textNode.textContent!.length));
+            newRange.setEnd(textNode, Math.min(offset, textNode.textContent!.length));
+            
+            if (selection) {
+              selection.removeAllRanges();
+              selection.addRange(newRange);
+            }
+          }
+        }
       }
     }
   }, [value]);
@@ -77,10 +127,31 @@ function HeadingInputWithRef(
     e.preventDefault();
 
     const text = e.clipboardData.getData("text/plain");
-
     const stripped = text.replace(/(\r\n|\n|\r)/gm, " ");
 
-    document.execCommand("insertText", false, stripped);
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+      
+      const textNode = document.createTextNode(stripped);
+      range.insertNode(textNode);
+      
+      // Move cursor to end of inserted text
+      range.setStartAfter(textNode);
+      range.setEndAfter(textNode);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      
+      // Trigger input event for React to detect the change
+      const inputEvent = new InputEvent('input', {
+        bubbles: true,
+        cancelable: true,
+        inputType: 'insertText',
+        data: stripped
+      });
+      e.currentTarget.dispatchEvent(inputEvent);
+    }
   }, []);
 
   return (
