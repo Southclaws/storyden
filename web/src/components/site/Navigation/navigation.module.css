@@ -20,6 +20,7 @@
   --grid-col-padding-inner: var(--spacing-8);
   --grid-col-padding-inner-right: 0px;
 
+  min-height: 100vh;
   min-height: 100dvh;
 }
 
@@ -268,6 +269,28 @@
   /* Hide the context pane when the screen is at "tablet" size */
   .rightbar {
     display: none;
+  }
+}
+
+.navigation__fixed {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* iOS Safari specific fix */
+@supports (-webkit-touch-callout: none) {
+  .navigation__fixed {
+    height: 100vh;
+    /* Avoid using dvh on iOS Safari due to layout issues */
+    top: env(safe-area-inset-top, 0px);
+  }
+  
+  /* Additional fix for iOS devices to prevent navigation offset */
+  @media screen and (max-width: 768px) {
+    .navigation__fixed {
+      /* Force use of viewport height instead of dynamic viewport height on mobile iOS */
+      height: 100vh !important;
+    }
   }
 }
 
