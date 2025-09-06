@@ -24,6 +24,7 @@ export function LibraryPageTagsBlock() {
 export function LibraryPageTagsBlockEditing() {
   const {
     ref,
+    key,
     currentTags,
     isSuggestEnabled,
     loadingTags,
@@ -35,6 +36,7 @@ export function LibraryPageTagsBlockEditing() {
   return (
     <HStack w="full" gap="1" alignItems="start">
       <Combotags
+        key={key}
         ref={ref}
         initialValue={currentTags}
         onQuery={handleQuery}
