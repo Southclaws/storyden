@@ -15,7 +15,11 @@ export const blog = defineCollections({
   dir: "content/blog",
   async: true,
   schema: frontmatterSchema.extend({
-    date: z.iso.date(),
+    // vercel builds differently for some dumb unknown (the usual)
+    // so hack this to accept both types and transform... thanks vercel.
+    date: z
+      .union([z.string(), z.date()])
+      .transform((val) => (val instanceof Date ? val : new Date(val))),
   }),
 });
 
