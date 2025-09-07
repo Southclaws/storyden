@@ -1,3 +1,4 @@
+import { RSSButtons } from "@/components/RSSButtons";
 import { blog } from "@/lib/source";
 import { css } from "@/styled-system/css";
 import {
@@ -5,6 +6,7 @@ import {
   Center,
   Grid,
   GridItem,
+  HStack,
   styled,
   VStack,
 } from "@/styled-system/jsx";
@@ -92,11 +94,16 @@ export default function Page() {
         </GridItem>
       </Grid>
 
-      <VStack maxW="prose" px="2">
+      <HStack justifyContent="center" py="4">
+        <RSSButtons />
+      </HStack>
+
+      <VStack maxW="breakpoint-lg" px="2">
         <Grid
           gridTemplateColumns={{
             base: "1fr",
             md: "1fr 1fr",
+            lg: "1fr 1fr 1fr",
           }}
           gridAutoRows="1fr"
         >
