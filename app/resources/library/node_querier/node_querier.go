@@ -170,7 +170,11 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		}).
 		WithAssets().
 		WithLink(func(lq *ent.LinkQuery) {
-			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+			lq.
+				WithAssets().
+				WithFaviconImage().
+				WithPrimaryImage().
+				Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		WithParent(func(cq *ent.NodeQuery) {
 			cq.
@@ -259,7 +263,10 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 		}).
 		WithAssets().
 		WithLink(func(lq *ent.LinkQuery) {
-			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
+			lq.WithAssets().
+				WithFaviconImage().
+				WithPrimaryImage().
+				Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
 		WithTags().
 		WithProperties().

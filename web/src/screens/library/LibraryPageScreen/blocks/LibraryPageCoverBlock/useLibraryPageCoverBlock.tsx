@@ -3,9 +3,13 @@ import { FixedCropperRef } from "react-advanced-cropper";
 
 import { handle } from "@/api/client";
 import { assetUpload } from "@/api/openapi-client/assets";
+import { Asset } from "@/api/openapi-schema";
 import { CoverImage } from "@/lib/library/metadata";
+import { getAssetURL } from "@/utils/asset";
 
 import { useLibraryPageContext } from "../../Context";
+
+import { useLibraryCoverEvent } from "./events";
 
 export const CROP_STENCIL_WIDTH = 1536;
 export const CROP_STENCIL_HEIGHT = 384;
@@ -15,6 +19,106 @@ export function useLibraryPageCoverBlock() {
   const { draft, setPrimaryImage } = store.getState();
 
   const cropperRef = useRef<FixedCropperRef>(null);
+
+  // Listen for external cover image updates
+  useLibraryCoverEvent("library-cover:update-from-asset", (asset: Asset) => {
+    handleSetCoverFromAsset(asset);
+  });
+
+  async function handleSetCoverFromAsset(asset: Asset) {
+    await handle(
+      async () => {
+        const assetURL = getAssetURL(asset.path);
+        if (!assetURL) {
+          throw new Error("Asset URL could not be generated");
+        }
+
+        const response = await fetch(assetURL);
+        if (!response.ok) {
+          throw new Error("Failed to download asset");
+        }
+
+        const blob = await response.blob();
+
+        const img = new Image();
+        const imageLoaded = new Promise<void>((resolve, reject) => {
+          img.onload = () => resolve();
+          img.onerror = () => reject(new Error("Failed to load image"));
+        });
+
+        img.src = URL.createObjectURL(blob);
+        await imageLoaded;
+
+        const aspectRatio = CROP_STENCIL_WIDTH / CROP_STENCIL_HEIGHT;
+        const imageAspectRatio = img.width / img.height;
+
+        let cropX = 0;
+        let cropY = 0;
+        let cropWidth = img.width;
+        let cropHeight = img.height;
+
+        if (imageAspectRatio > aspectRatio) {
+          cropWidth = img.height * aspectRatio;
+          cropX = (img.width - cropWidth) / 2;
+        } else {
+          cropHeight = img.width / aspectRatio;
+          cropY = (img.height - cropHeight) / 2;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = CROP_STENCIL_WIDTH;
+        canvas.height = CROP_STENCIL_HEIGHT;
+        const ctx = canvas.getContext("2d");
+
+        if (!ctx) {
+          throw new Error("Failed to get canvas context");
+        }
+
+        ctx.drawImage(
+          img,
+          cropX,
+          cropY,
+          cropWidth,
+          cropHeight,
+          0,
+          0,
+          CROP_STENCIL_WIDTH,
+          CROP_STENCIL_HEIGHT,
+        );
+
+        const croppedBlob = await new Promise<Blob>((resolve, reject) => {
+          canvas.toBlob((blob) => {
+            if (blob == null) {
+              reject(new Error("Failed to create blob from canvas"));
+              return;
+            }
+            resolve(blob);
+          });
+        });
+
+        const croppedAsset = await assetUpload(croppedBlob, {
+          filename: "auto-cropped-cover",
+          parent_asset_id: asset.id,
+        });
+
+        const coordinates: CoverImage = {
+          left: cropX / img.width,
+          top: cropY / img.height,
+        };
+
+        setPrimaryImage({
+          isReplacement: false,
+          config: coordinates,
+          asset: croppedAsset,
+        });
+
+        URL.revokeObjectURL(img.src);
+      },
+      {
+        errorToast: true,
+      },
+    );
+  }
 
   async function uploadCroppedImageState() {
     if (!cropperRef.current) {

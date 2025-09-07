@@ -22,6 +22,7 @@ export type Props = {
 
 export type CombotagsHandle = {
   append: (tags: string[]) => void;
+  setValue: (tags: string[]) => void;
 };
 
 // Combotags provides a mix of a tags input and a combobox where the tags input
@@ -56,8 +57,13 @@ export const Combotags = forwardRef<CombotagsHandle, Props>((props, ref) => {
       tagsInputRef.current.setValue(newValue);
     }
 
+    function setValue(tags: string[]) {
+      tagsInputRef.current.setValue(tags);
+    }
+
     return {
       append,
+      setValue,
     };
   });
 

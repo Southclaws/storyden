@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { handle } from "@/api/client";
 import { tagList } from "@/api/openapi-client/tags";
@@ -23,6 +23,12 @@ export function useLibraryPageTagsBlockEditing() {
   const [loadingTags, setLoadingTags] = useState(false);
 
   const currentTags = tags.map((t) => t.name);
+
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.setValue(currentTags);
+    }
+  }, [currentTags]);
 
   async function handleQuery(q: string): Promise<TagNameList> {
     const tags =

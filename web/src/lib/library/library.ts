@@ -2,31 +2,28 @@ import slugify from "@sindresorhus/slugify";
 import { uniqueId } from "lodash";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Arguments, MutatorCallback, useSWRConfig } from "swr";
+import { MutatorCallback, useSWRConfig } from "swr";
 import { Xid } from "xid-ts";
 
 import { linkCreate } from "@/api/openapi-client/links";
 import {
-  getNodeGetKey,
-  nodeAddAsset,
   nodeCreate,
   nodeDelete,
   nodeGenerateContent,
   nodeGenerateTags,
   nodeGenerateTitle,
-  nodeRemoveAsset,
   nodeUpdate,
   nodeUpdatePosition,
   nodeUpdateVisibility,
 } from "@/api/openapi-client/nodes";
 import {
   Asset,
-  AssetID,
   Node,
   NodeGetOKResponse,
   NodeListOKResponse,
   NodeUpdatePositionBody,
   NodeWithChildren,
+  TagNameList,
   Visibility,
 } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
@@ -35,6 +32,8 @@ import {
   replaceLibraryPath,
 } from "@/screens/library/library-path";
 import { useLibraryPath } from "@/screens/library/useLibraryPath";
+
+import { useCapability } from "../settings/capabilities";
 
 import { CoverImage } from "./metadata";
 import { nodeListMutator, nodeMutator } from "./mutator-functions";
@@ -76,6 +75,7 @@ export type CoverImageArgs =
 // TODO: Remove slug params from API calls and use the node object instead.
 export function useLibraryMutation(node?: Node) {
   const session = useSession();
+  const genaiAvailable = useCapability("gen_ai");
   const { mutate } = useSWRConfig();
   const router = useRouter();
   const libraryPath = useLibraryPath();
@@ -156,12 +156,28 @@ export function useLibraryMutation(node?: Node) {
   };
 
   const importFromLink = async (id: string, url: string) => {
-    const { title, description } = await linkCreate({ url });
+    const { title, description, primary_image } = await linkCreate({ url });
+
+    if (genaiAvailable && description) {
+      const [tag_suggestions, title_suggestion, content_suggestion] =
+        await Promise.all([
+          suggestTags(id, description),
+          suggestTitle(id, description),
+          suggestSummary(id, description),
+        ]);
+      return {
+        title_suggestion,
+        tag_suggestions,
+        content_suggestion,
+        primary_image,
+      };
+    }
 
     return {
       title_suggestion: title,
-      tag_suggestions: [], // TODO
-      content_suggestion: description, // TODO: Generate summary from content
+      tag_suggestions: [] as string[],
+      content_suggestion: description,
+      primary_image,
     };
   };
 
