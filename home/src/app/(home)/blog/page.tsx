@@ -31,9 +31,7 @@ const logoImageStyles = css({
 
 export default function Page() {
   const posts = [...blog.getPages()].sort(
-    (a, b) =>
-      new Date(b.data.date ?? b.file.name).getTime() -
-      new Date(a.data.date ?? a.file.name).getTime()
+    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
   );
 
   return (
@@ -102,32 +100,34 @@ export default function Page() {
           }}
           gridAutoRows="1fr"
         >
-          {posts.map((post) => (
-            <Card key={post.url}>
-              <VStack
-                height="full"
-                alignItems="start"
-                justifyContent="space-between"
-                display="flex"
-              >
-                <VStack alignItems="start" gap="1">
-                  <a href={post.url}>
-                    <styled.h2 fontSize="lg">{post.data.title}</styled.h2>
-                  </a>
-                  <styled.p lineClamp="2">{post.data.description}</styled.p>
-                </VStack>
+          {posts.map((post) => {
+            const date = formatDate(post.data.date, "yyyy-MM-dd");
+            const postedAt = formatDistanceToNow(post.data.date, {
+              addSuffix: true,
+            });
 
-                <styled.time
-                  color="slate.500"
-                  title={formatDate(post.data.date!, "yyyy-MM-dd")}
+            return (
+              <Card key={post.url}>
+                <VStack
+                  height="full"
+                  alignItems="start"
+                  justifyContent="space-between"
+                  display="flex"
                 >
-                  {formatDistanceToNow(post.data.date!, {
-                    addSuffix: true,
-                  })}
-                </styled.time>
-              </VStack>
-            </Card>
-          ))}
+                  <VStack alignItems="start" gap="1">
+                    <a href={post.url}>
+                      <styled.h2 fontSize="lg">{post.data.title}</styled.h2>
+                    </a>
+                    <styled.p lineClamp="2">{post.data.description}</styled.p>
+                  </VStack>
+
+                  <styled.time color="slate.500" title={date}>
+                    {postedAt}
+                  </styled.time>
+                </VStack>
+              </Card>
+            );
+          })}
         </Grid>
       </VStack>
     </VStack>
