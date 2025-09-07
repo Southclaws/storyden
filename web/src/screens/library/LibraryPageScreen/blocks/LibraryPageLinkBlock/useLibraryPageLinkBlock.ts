@@ -14,7 +14,7 @@ import { useWatch } from "../../store";
 
 export function useLibraryPageLinkBlock() {
   const { nodeID, store } = useLibraryPageContext();
-  const { setLink, setName, setTags } = store.getState();
+  const { setLink, setName, setTags, setContent } = store.getState();
   const tags = useWatch((s) => s.draft.tags);
   const link = useWatch((s) => s.draft.link);
 
@@ -33,16 +33,17 @@ export function useLibraryPageLinkBlock() {
         const { title_suggestion, tag_suggestions, content_suggestion } =
           await importFromLink(nodeID, link.url);
 
-        // TODO: Expose this from suggestion hooks
-        // setGeneratedTitle(title_suggestion);
-        // setGeneratedContent(content_suggestion);
-
         if (title_suggestion) {
           setName(title_suggestion);
         }
 
-        setTags([...tags.map((t) => t.name), ...tag_suggestions]);
-        // form.setValue("content", content_suggestion);
+        if (tag_suggestions.length > 0) {
+          setTags([...tags.map((t) => t.name), ...tag_suggestions]);
+        }
+
+        if (content_suggestion) {
+          setContent(content_suggestion);
+        }
       },
       {
         cleanup: async () => await revalidate(),
