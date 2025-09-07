@@ -4558,6 +4558,7 @@ __metadata:
     fumadocs-ui: "npm:15.7.10"
     lodash: "npm:^4.17.21"
     lucide-react: "npm:^0.542.0"
+    marked: "npm:^16.2.1"
     mermaid: "npm:^11.11.0"
     next: "npm:15.5.2"
     ogl: "npm:^1.0.11"
@@ -5063,6 +5064,15 @@ __metadata:
   bin:
     marked: bin/marked.js
   checksum: 10c0/d532db4955c1f2ac6efc65a644725e9e12e7944cb6af40c7148baecfd3b3c2f3564229b3daf12d2125635466448fb9b367ce52357be3aea0273e3d152efdbdcf
+  languageName: node
+  linkType: hard
+
+"marked@npm:^16.2.1":
+  version: 16.2.1
+  resolution: "marked@npm:16.2.1"
+  bin:
+    marked: bin/marked.js
+  checksum: 10c0/0f4a259c8a7884a14830f06b4b44c0e5fab27924102f2713606e0627c8473d130ab9070900a40c18b0e8d39ba2f31194ce6931999ba4c7bd3b6240f6cfe9cbb3
   languageName: node
   linkType: hard
 
