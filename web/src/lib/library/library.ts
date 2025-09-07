@@ -2,26 +2,22 @@ import slugify from "@sindresorhus/slugify";
 import { uniqueId } from "lodash";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Arguments, MutatorCallback, useSWRConfig } from "swr";
+import { MutatorCallback, useSWRConfig } from "swr";
 import { Xid } from "xid-ts";
 
 import { linkCreate } from "@/api/openapi-client/links";
 import {
-  getNodeGetKey,
-  nodeAddAsset,
   nodeCreate,
   nodeDelete,
   nodeGenerateContent,
   nodeGenerateTags,
   nodeGenerateTitle,
-  nodeRemoveAsset,
   nodeUpdate,
   nodeUpdatePosition,
   nodeUpdateVisibility,
 } from "@/api/openapi-client/nodes";
 import {
   Asset,
-  AssetID,
   Node,
   NodeGetOKResponse,
   NodeListOKResponse,

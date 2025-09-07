@@ -51,7 +51,16 @@ export function useLibraryPageLinkBlock() {
         }
 
         if (tag_suggestions.length > 0) {
-          setTags([...tags.map((t) => t.name), ...tag_suggestions]);
+          const existingNames = tags.map((t) => t.name);
+          const newTags = [...existingNames];
+
+          for (const suggestion of tag_suggestions) {
+            if (!existingNames.includes(suggestion)) {
+              newTags.push(suggestion);
+            }
+          }
+
+          setTags(newTags);
         }
 
         // NOTE: Only apply AI suggestion if the content is empty to avoid
