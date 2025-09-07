@@ -1,8 +1,8 @@
-import {readdir} from "fs/promises";
-import {filter, flow, map} from "lodash/fp";
-import {MetadataRoute} from "next";
+import { readdir } from "fs/promises";
+import { filter, flow, map } from "lodash/fp";
+import { MetadataRoute } from "next";
 
-import {Dirent} from "fs";
+import { Dirent } from "fs";
 import path from "path";
 
 const BLOG_PATH = `content/blog/`;
@@ -40,13 +40,13 @@ const stripIndex = filter<string>((v) => !v.endsWith("index"));
 
 const onlyFiles = filter<Dirent>((v) => v.isFile());
 
-const toFilePath = map<Dirent, string>((v) => path.join(v.path, v.name));
+const toFilePath = map<Dirent, string>((v) => path.join(v.parentPath, v.name));
 
 const stripLeading = map<string, string>((v) => v.replaceAll(DOCS_PATH, ""));
 
 const removeExtension = map<string, string>((v) => v.replaceAll(".mdx", ""));
 
-const toSitemapItem = ({sub, changeFrequency, priority}: ItemSettings) =>
+const toSitemapItem = ({ sub, changeFrequency, priority }: ItemSettings) =>
   map<string, SitemapFile>((v) => ({
     url: [base, sub, v].join("/"),
     lastModified,

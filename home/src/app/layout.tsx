@@ -87,10 +87,22 @@ export const metadata: Metadata = {
       },
     ],
   },
+
   twitter: {
     creator: "@Southclaws",
     site: "@Southclaws",
     card: "summary_large_image",
+  },
+
+  alternates: {
+    types: {
+      "application/rss+xml": [
+        {
+          title: "Storyden Blog",
+          url: "https://www.storyden.org/rss.xml",
+        },
+      ],
+    },
   },
 };
 
