@@ -29,7 +29,7 @@ export function useLibraryPageLinkBlock() {
   const [inputValue, setInputValue] = useState(defaultLinkURL);
   const [resolvedLink, setResolvedLink] = useState<
     LinkReference | null | undefined
-  >(null);
+  >(link);
   const [isImporting, setIsImporting] = useState(false);
 
   const { revalidate, importFromLink } = useLibraryMutation();

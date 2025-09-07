@@ -5,8 +5,7 @@ import { InfoTip } from "@/components/site/InfoTip";
 import { Unready } from "@/components/site/Unready";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { LinkButton } from "@/components/ui/link-button";
-import { HStack, LStack, WStack } from "@/styled-system/jsx";
+import { Center, HStack, LStack, WStack } from "@/styled-system/jsx";
 
 import { useWatch } from "../../store";
 import { useEditState } from "../../useEditState";
@@ -26,11 +25,7 @@ export function LibraryPageLinkBlock() {
     return null;
   }
 
-  return (
-    <LinkButton href={link.url} size="xs" variant="subtle">
-      {link?.domain}
-    </LinkButton>
-  );
+  return <LinkCard link={link} />;
 }
 
 function LibraryPageLinkBlockEditing() {
@@ -69,7 +64,11 @@ function LibraryPageLinkBlockEditing() {
 
       {match(data.resolvedLink)
         .with(null, () => null)
-        .with(undefined, () => <Unready />)
+        .with(undefined, () => (
+          <Center w="full" h="24">
+            <Unready />
+          </Center>
+        ))
         .otherwise((link) => (
           <LinkCard link={link} />
         ))}
