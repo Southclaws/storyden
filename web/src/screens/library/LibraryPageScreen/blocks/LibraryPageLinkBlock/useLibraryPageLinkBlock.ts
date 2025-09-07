@@ -7,16 +7,20 @@ import { toast } from "sonner";
 import { handle } from "@/api/client";
 import { linkCreate } from "@/api/openapi-client/links";
 import { LinkReference } from "@/api/openapi-schema";
+import { isContentEmpty } from "@/lib/content/content";
 import { useLibraryMutation } from "@/lib/library/library";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
+import { useEmitLibraryContentEvent } from "../LibraryPageContentBlock/events";
 
 export function useLibraryPageLinkBlock() {
   const { nodeID, store } = useLibraryPageContext();
-  const { setLink, setName, setTags, setContent } = store.getState();
+  const { setLink, setName, setTags } = store.getState();
   const tags = useWatch((s) => s.draft.tags);
   const link = useWatch((s) => s.draft.link);
+  const content = useWatch((s) => s.draft.content);
+  const emitContentEvent = useEmitLibraryContentEvent();
 
   const defaultLinkURL = link?.url || "";
   const [inputValue, setInputValue] = useState(defaultLinkURL);
@@ -26,6 +30,8 @@ export function useLibraryPageLinkBlock() {
   const [isImporting, setIsImporting] = useState(false);
 
   const { revalidate, importFromLink } = useLibraryMutation();
+
+  const isEmpty = isContentEmpty(content);
 
   async function handleImportFromLink(link: LinkReference) {
     await handle(
@@ -41,8 +47,14 @@ export function useLibraryPageLinkBlock() {
           setTags([...tags.map((t) => t.name), ...tag_suggestions]);
         }
 
-        if (content_suggestion) {
-          setContent(content_suggestion);
+        // NOTE: Only apply AI suggestion if the content is empty to avoid
+        // overwriting member-written content.
+        // TODO: Implement a better UI/UX for this using a kind of AI-proposal.
+        if (content_suggestion && isEmpty) {
+          emitContentEvent(
+            "library-content:update-generated",
+            content_suggestion,
+          );
         }
       },
       {
