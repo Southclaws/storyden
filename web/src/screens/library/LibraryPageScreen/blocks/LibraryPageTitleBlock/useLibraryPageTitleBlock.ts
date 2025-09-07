@@ -1,5 +1,4 @@
-import slugify from "@sindresorhus/slugify";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 import { handle } from "@/api/client";
 import { InstanceCapability } from "@/api/openapi-schema";
@@ -19,36 +18,7 @@ export function useLibraryPageTitleBlock() {
 
   const defaultValue = store.getInitialState().draft.name;
   const value = useWatch((s) => s.draft.name);
-  const slug = useWatch((s) => s.draft.slug);
   const content = useWatch((s) => s.draft.content);
-
-  // Track the previous title to detect if slug should be auto-updated
-  const previousTitleRef = useRef(value);
-
-  // Auto-update slug when title changes, but only if slug appears to be auto-generated
-  useEffect(() => {
-    const currentTitle = value || "";
-    const previousTitle = previousTitleRef.current || "";
-
-    if (currentTitle !== previousTitle && currentTitle.trim()) {
-      const shouldUpdateSlug =
-        // Slug is empty
-        !slug ||
-        // Slug contains "untitled" (auto-generated)
-        slug.includes("untitled") ||
-        // Slug matches the slugified version of the previous title (not user-customized)
-        slug === slugify(previousTitle);
-
-      if (shouldUpdateSlug) {
-        const newSlug = slugify(currentTitle);
-        if (newSlug !== slug) {
-          setSlug(newSlug);
-        }
-      }
-    }
-
-    previousTitleRef.current = currentTitle;
-  }, [value, slug, setSlug]);
 
   async function handleSuggest() {
     if (!isTitleSuggestEnabled) {
