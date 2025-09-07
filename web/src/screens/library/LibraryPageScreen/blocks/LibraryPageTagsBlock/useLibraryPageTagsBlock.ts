@@ -1,4 +1,3 @@
-import { dequal } from "dequal";
 import { useEffect, useRef, useState } from "react";
 
 import { handle } from "@/api/client";
@@ -22,16 +21,12 @@ export function useLibraryPageTagsBlockEditing() {
   const { suggestTags } = useLibraryMutation();
   const ref = useRef<CombotagsHandle>(null);
   const [loadingTags, setLoadingTags] = useState(false);
-  const [key, setKey] = useState(0); // Force re-render when tags change externally
 
   const currentTags = tags.map((t) => t.name);
 
-  // Force re-render of Combotags when tags change externally (like from link import)
-  const initialTags = useRef(currentTags);
   useEffect(() => {
-    if (!dequal(initialTags.current, currentTags)) {
-      initialTags.current = currentTags;
-      setKey(prev => prev + 1);
+    if (ref.current) {
+      ref.current.setValue(currentTags);
     }
   }, [currentTags]);
 
@@ -79,7 +74,6 @@ export function useLibraryPageTagsBlockEditing() {
 
   return {
     ref,
-    key, // Used to force re-render of Combotags component
     currentTags,
     isSuggestEnabled,
     loadingTags,
