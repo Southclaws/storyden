@@ -23,6 +23,7 @@ import {
   NodeListOKResponse,
   NodeUpdatePositionBody,
   NodeWithChildren,
+  TagNameList,
   Visibility,
 } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
@@ -157,16 +158,13 @@ export function useLibraryMutation(node?: Node) {
   const importFromLink = async (id: string, url: string) => {
     const { title, description, primary_image } = await linkCreate({ url });
 
-    if (genaiAvailable) {
+    if (genaiAvailable && description) {
       const [tag_suggestions, title_suggestion, content_suggestion] =
-        description
-          ? await Promise.all([
-              suggestTags(id, description),
-              suggestTitle(id, description),
-              suggestSummary(id, description),
-            ])
-          : [[], title];
-
+        await Promise.all([
+          suggestTags(id, description),
+          suggestTitle(id, description),
+          suggestSummary(id, description),
+        ]);
       return {
         title_suggestion,
         tag_suggestions,
