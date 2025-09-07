@@ -21,6 +21,7 @@ export function useLibraryPageLinkBlock() {
   const tags = useWatch((s) => s.draft.tags);
   const link = useWatch((s) => s.draft.link);
   const content = useWatch((s) => s.draft.content);
+  const primaryImage = useWatch((s) => s.draft.primary_image);
   const emitContentEvent = useEmitLibraryContentEvent();
   const emitCoverEvent = useEmitLibraryCoverEvent();
 
@@ -73,8 +74,8 @@ export function useLibraryPageLinkBlock() {
           );
         }
 
-        // Set cover image from imported opengraph image
-        if (primary_image) {
+        // Set cover image from imported opengraph image if it doesn't have one.
+        if (primary_image && primaryImage === undefined) {
           emitCoverEvent("library-cover:update-from-asset", primary_image);
         }
       },
