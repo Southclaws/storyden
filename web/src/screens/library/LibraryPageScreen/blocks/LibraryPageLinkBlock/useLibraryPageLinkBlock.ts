@@ -13,6 +13,7 @@ import { useLibraryMutation } from "@/lib/library/library";
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
 import { useEmitLibraryContentEvent } from "../LibraryPageContentBlock/events";
+import { useEmitLibraryCoverEvent } from "../LibraryPageCoverBlock/events";
 
 export function useLibraryPageLinkBlock() {
   const { nodeID, store } = useLibraryPageContext();
@@ -21,6 +22,7 @@ export function useLibraryPageLinkBlock() {
   const link = useWatch((s) => s.draft.link);
   const content = useWatch((s) => s.draft.content);
   const emitContentEvent = useEmitLibraryContentEvent();
+  const emitCoverEvent = useEmitLibraryCoverEvent();
 
   const defaultLinkURL = link?.url || "";
   const [inputValue, setInputValue] = useState(defaultLinkURL);
@@ -36,9 +38,14 @@ export function useLibraryPageLinkBlock() {
   async function handleImportFromLink(link: LinkReference) {
     await handle(
       async () => {
-        const { title_suggestion, tag_suggestions, content_suggestion } =
-          await importFromLink(nodeID, link.url);
+        const {
+          title_suggestion,
+          tag_suggestions,
+          content_suggestion,
+          primary_image,
+        } = await importFromLink(nodeID, link.url);
 
+        // TODO: Is this actually useful?
         if (title_suggestion) {
           setName(title_suggestion);
         }
@@ -55,6 +62,11 @@ export function useLibraryPageLinkBlock() {
             "library-content:update-generated",
             content_suggestion,
           );
+        }
+
+        // Set cover image from imported opengraph image
+        if (primary_image) {
+          emitCoverEvent("library-cover:update-from-asset", primary_image);
         }
       },
       {

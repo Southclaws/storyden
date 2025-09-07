@@ -161,10 +161,6 @@ export function useLibraryMutation(node?: Node) {
   const importFromLink = async (id: string, url: string) => {
     const { title, description, primary_image } = await linkCreate({ url });
 
-    if (primary_image) {
-      // TODO: Add the asset to the node - write into the cropper canvas.
-    }
-
     if (genaiAvailable) {
       const [tag_suggestions, title_suggestion, content_suggestion] =
         description
@@ -179,6 +175,7 @@ export function useLibraryMutation(node?: Node) {
         title_suggestion,
         tag_suggestions,
         content_suggestion,
+        primary_image,
       };
     }
 
@@ -186,6 +183,7 @@ export function useLibraryMutation(node?: Node) {
       title_suggestion: title,
       tag_suggestions: [] as string[],
       content_suggestion: description,
+      primary_image,
     };
   };
 
