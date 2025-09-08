@@ -34,13 +34,13 @@ const containerStyles = css({
 const backdropStyles = css({
   backdropBlur: "sm",
   backdropGrayscale: "0.8",
-  backdropBrightness: "0.1",
+  backdropBrightness: "0.3",
   backdropFilter: "auto",
 });
 
 const backdropImageStyles = css({
   blur: "3xl",
-  opacity: "2",
+  opacity: "8",
   brightness: "0.5",
   filter: "auto",
 });
