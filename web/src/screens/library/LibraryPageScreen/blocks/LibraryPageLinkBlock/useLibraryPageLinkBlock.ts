@@ -17,7 +17,7 @@ import { useEmitLibraryCoverEvent } from "../LibraryPageCoverBlock/events";
 
 export function useLibraryPageLinkBlock() {
   const { nodeID, store } = useLibraryPageContext();
-  const { setLink, setName, setTags } = store.getState();
+  const { setLink, removeLink, setName, setTags } = store.getState();
   const tags = useWatch((s) => s.draft.tags);
   const link = useWatch((s) => s.draft.link);
   const content = useWatch((s) => s.draft.content);
@@ -88,7 +88,8 @@ export function useLibraryPageLinkBlock() {
   const debouncedAttemptResolve = useRef(
     debounce(async (s: string) => {
       if (s === "") {
-        setResolvedLink(null);
+        setResolvedLink(undefined);
+        removeLink();
         return;
       }
 
@@ -97,14 +98,14 @@ export function useLibraryPageLinkBlock() {
         u = new URL(s);
       } catch (_) {
         // do nothing for invalid URL.
-        setResolvedLink(null);
+        setResolvedLink(undefined);
         return;
       }
 
       const url = u.toString();
 
       await handle(async () => {
-        setResolvedLink(undefined);
+        setResolvedLink(null);
         const link = await linkCreate({ url });
         setResolvedLink(link);
         setLink(link);
@@ -121,7 +122,7 @@ export function useLibraryPageLinkBlock() {
 
   const handleInputValueChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      const value = event.target.value;
+      const value = event.target.value.trim();
       setInputValue(value);
       debouncedAttemptResolve(value);
     },

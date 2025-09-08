@@ -44,6 +44,7 @@ export type Actions = {
   setPrimaryImage(args: CoverImageArgs): void;
   removePrimaryImage(): void;
   setLink: (link: LinkReference) => void;
+  removeLink: () => void;
   addAsset: (asset: Asset) => void;
   removeAsset: (asset: Asset) => void;
 
@@ -168,6 +169,11 @@ export const createNodeStore = (initState: State) => {
         setLink: (link: LinkReference) => {
           set((state) => {
             state.draft.link = link;
+          });
+        },
+        removeLink: () => {
+          set((state) => {
+            state.draft.link = undefined;
           });
         },
 
