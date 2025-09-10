@@ -184,6 +184,7 @@
 
         - unset (default) for no email sending. Email sending is not a requirement for a production deployment.
         - `sendgrid` for SendGrid based email sending.
+        - `resend` for Resend based email sending.
         - `mock` for logging emails to the console. Only useful for Storyden developers and testing.
 
     - env: "SENDGRID_FROM_NAME"
@@ -207,6 +208,28 @@
         The API key for the SendGrid account. This is required for sending emails via SendGrid.
 
         This is typically a long string of characters that you can generate in the SendGrid dashboard.
+
+    - env: "RESEND_FROM_NAME"
+      name: ResendFromName
+      type: string
+      description: |-
+        The name that will be used as the sender name for emails sent via Resend.
+
+        This is typically the name of your community or organisation.
+    - env: "RESEND_FROM_ADDRESS"
+      name: ResendFromAddress
+      type: string
+      description: |-
+        The email address that will be used as the sender address for emails sent via Resend.
+
+        This is typically a no-reply address, such as `no-reply@<your-domain>`.
+    - env: "RESEND_API_KEY"
+      name: ResendAPIKey
+      type: string
+      description: |-
+        The API key for the Resend account. This is required for sending emails via Resend.
+
+        This is typically a long string of characters that you can generate in the Resend dashboard.
 
 - section: Authentication
   description: |-

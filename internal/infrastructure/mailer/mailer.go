@@ -32,6 +32,9 @@ func newMailer(logger *slog.Logger, cfg config.Config) (Sender, error) {
 	case "sendgrid":
 		return newSendgridMailer(logger, cfg)
 
+	case "resend":
+		return newResendMailer(logger, cfg)
+
 	case "mock":
 		return &Mock{}, nil
 

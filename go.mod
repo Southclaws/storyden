@@ -167,6 +167,7 @@ require (
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
+	github.com/resend/resend-go/v2 v2.23.0 // indirect
 	github.com/sendgrid/rest v2.6.9+incompatible // indirect
 	github.com/sony/gobreaker v1.0.0 // indirect
 	github.com/speakeasy-api/jsonpath v0.6.2 // indirect

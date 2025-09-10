@@ -230,6 +230,7 @@ Either:
 
 - unset (default) for no email sending. Email sending is not a requirement for a production deployment.
 - `sendgrid` for SendGrid based email sending.
+- `resend` for Resend based email sending.
 - `mock` for logging emails to the console. Only useful for Storyden developers and testing.
 
 ### `SENDGRID_FROM_NAME`
@@ -264,6 +265,39 @@ This is typically a no-reply address, such as `no-reply@<your-domain>`.
 The API key for the SendGrid account. This is required for sending emails via SendGrid.
 
 This is typically a long string of characters that you can generate in the SendGrid dashboard.
+
+### `RESEND_FROM_NAME`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The name that will be used as the sender name for emails sent via Resend.
+
+This is typically the name of your community or organisation.
+
+### `RESEND_FROM_ADDRESS`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The email address that will be used as the sender address for emails sent via Resend.
+
+This is typically a no-reply address, such as `no-reply@<your-domain>`.
+
+### `RESEND_API_KEY`
+
+<table>
+<tr><td>type</td><td>`string`</td></tr>
+<tr><td>default</td><td>none</td></tr>
+</table>
+
+The API key for the Resend account. This is required for sending emails via Resend.
+
+This is typically a long string of characters that you can generate in the Resend dashboard.
 
 ## Authentication
 
