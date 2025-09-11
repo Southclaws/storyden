@@ -40,7 +40,7 @@ export function LibraryPageDirectoryBlockTable({
 }: Props) {
   const { nodeID, store } = useLibraryPageContext();
   const { editing } = useEditState();
-  const { sort, handleSort } = useDirectoryBlockContext();
+  const { sort, handleSort, handleMutateChildren } = useDirectoryBlockContext();
 
   const { setChildPropertyValue } = store.getState();
 
@@ -55,6 +55,10 @@ export function LibraryPageDirectoryBlockTable({
     value: string,
   ) {
     setChildPropertyValue(nodeID, fid, value);
+  }
+
+  function handleCreatePageComplete() {
+    handleMutateChildren();
   }
 
   return (
@@ -189,7 +193,13 @@ export function LibraryPageDirectoryBlockTable({
         >
           <Table.Row>
             <Table.Cell colSpan={columns.length} display="flex">
-              <CreatePageAction variant="ghost" size="xs" parentSlug={nodeID} />
+              <CreatePageAction
+                variant="ghost"
+                size="xs"
+                parentSlug={nodeID}
+                disableRedirect
+                onComplete={handleCreatePageComplete}
+              />
             </Table.Cell>
           </Table.Row>
         </Table.Foot>

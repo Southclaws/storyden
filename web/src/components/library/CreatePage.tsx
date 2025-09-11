@@ -8,26 +8,37 @@ import { useLibraryMutation } from "@/lib/library/library";
 type Props = ButtonProps & {
   parentSlug?: string;
   hideLabel?: boolean;
+  disableRedirect?: boolean;
+  onComplete?: () => void;
 };
 
 export const CreatePageID = "create-page";
 export const CreatePageLabel = "Create";
 export const CreatePageIcon = <CreateIcon />;
 
-export function CreatePageAction({ parentSlug, hideLabel, ...props }: Props) {
+export function CreatePageAction({
+  parentSlug,
+  hideLabel,
+  disableRedirect,
+  onComplete,
+  ...props
+}: Props) {
   const { createNode, revalidate } = useLibraryMutation();
 
   async function handleCreate() {
     await handle(
       async () => {
-        await createNode({ parentSlug });
+        await createNode({ parentSlug, disableRedirect });
       },
       {
         promiseToast: {
           loading: "Creating page...",
           success: "Page created!",
         },
-        cleanup: async () => revalidate(),
+        cleanup: async () => {
+          await revalidate();
+          onComplete?.();
+        },
       },
     );
   }

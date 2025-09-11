@@ -47,6 +47,7 @@ export type CreateNodeArgs = {
   initialName?: string;
   parentID?: string;
   parentSlug?: string;
+  disableRedirect?: boolean;
 };
 
 export type CoverImageArgs =
@@ -84,6 +85,7 @@ export function useLibraryMutation(node?: Node) {
     initialName,
     parentID,
     parentSlug,
+    disableRedirect,
   }: CreateNodeArgs) => {
     if (!session) return;
 
@@ -96,14 +98,15 @@ export function useLibraryMutation(node?: Node) {
     // however, the way that marks work is XID-format strings are assumed to be
     // node IDs not slugs. So we need to prefix the random name to prevent this.
     //
-    const name = initialName ?? `untitled-${new Xid().toString()}`;
+    const name = initialName ?? `untitled`;
+    const slug = `name-${new Xid().toString()}`;
 
     const initial: NodeWithChildren = {
       id: "optimistic_node_" + uniqueId(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       name,
-      slug: slugify(name),
+      slug: slugify(slug),
       description: "",
       owner: session,
       properties: [],
@@ -130,9 +133,11 @@ export function useLibraryMutation(node?: Node) {
 
     const parent = parentID ?? parentSlug;
     const created = await nodeCreate({ name: name, parent });
-    const newPath = joinLibraryPath(libraryPath, created.slug);
 
-    router.push(`/l/${newPath}?edit=true`);
+    if (!disableRedirect) {
+      const newPath = joinLibraryPath(libraryPath, created.slug);
+      router.push(`/l/${newPath}?edit=true`);
+    }
   };
 
   const suggestTags = async (slug: string, content: string) => {
