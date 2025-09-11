@@ -85,6 +85,12 @@ func WithLink(id xid.ID) Option {
 	}
 }
 
+func WithLinkRemove() Option {
+	return func(pm *ent.NodeMutation) {
+		pm.ClearLink()
+	}
+}
+
 func WithContentLinks(ids ...xid.ID) Option {
 	return func(pm *ent.NodeMutation) {
 		pm.AddContentLinkIDs(ids...)

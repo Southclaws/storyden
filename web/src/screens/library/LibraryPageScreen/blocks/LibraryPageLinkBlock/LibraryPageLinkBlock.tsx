@@ -63,8 +63,8 @@ function LibraryPageLinkBlockEditing() {
       </WStack>
 
       {match(data.resolvedLink)
-        .with(null, () => null)
-        .with(undefined, () => (
+        .with(undefined, () => null)
+        .with(null, () => (
           <Center w="full" h="24">
             <Unready />
           </Center>

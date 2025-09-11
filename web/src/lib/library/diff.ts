@@ -73,10 +73,8 @@ export const deriveMutationFromDifference = (
   keys.forEach((key) => {
     const draftValue = draft[key];
     const updatedValue = changes[key];
-    if (updatedValue === undefined || updatedValue === null) {
-      console.debug(
-        `Skipping mutation for '${key}' "because it is undefined or null`,
-      );
+    if (updatedValue === null) {
+      console.debug(`Skipping mutation for '${key}' because it is null`);
       return;
     }
 
@@ -96,7 +94,11 @@ export const deriveMutationFromDifference = (
 
     switch (key) {
       case "slug": {
-        if (!isSlugReady(updatedValue as string)) {
+        const slugValue = updatedValue as string | undefined;
+        if (slugValue === undefined) {
+          return;
+        }
+        if (!isSlugReady(slugValue)) {
           // Slugs must be valid to be added to patch, see mark.ts for details.
           console.debug("Skipping mutation for 'slug' because it is not ready");
           return;
@@ -104,12 +106,18 @@ export const deriveMutationFromDifference = (
         break;
       }
       case "url": {
-        if (!isValidLinkLike(updatedValue as string)) {
-          console.debug(
-            "Skipping mutation for 'url' because it is not valid",
-            updatedValue,
-          );
+        const urlValue = updatedValue as string | undefined;
+        if (urlValue === undefined) {
+          Object.assign(mutation, { url: null });
           return;
+        } else {
+          if (!isValidLinkLike(urlValue)) {
+            console.debug(
+              "Skipping mutation for 'url' because it is not valid",
+              updatedValue,
+            );
+            return;
+          }
         }
         break;
       }

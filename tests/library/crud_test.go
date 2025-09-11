@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/oapi-codegen/nullable"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
@@ -81,7 +82,7 @@ func TestNodesHappyPath(t *testing.T) {
 				Name:    &name1,
 				Slug:    &slug1,
 				Content: &cont1,
-				Url:     &url1,
+				Url:     nullable.NewNullableWithValue(url1),
 				Meta:    &prop1,
 			}, sh.WithSession(ctx))
 			tests.Ok(t, err, node1update)
@@ -110,6 +111,34 @@ func TestNodesHappyPath(t *testing.T) {
 				a.Nil(node2.JSON200.Content)
 				a.Nil(node2.JSON200.Link)
 				a.Equal(acc.ID.String(), string(node2.JSON200.Owner.Id))
+			})
+
+			t.Run("remove_link", func(t *testing.T) {
+				name3 := "test-node-with-link" + uuid.NewString()
+				slug3 := name3
+				url3 := "https://example.com"
+				node3, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+					Name:       name3,
+					Slug:       &slug3,
+					Url:        &url3,
+					Visibility: &visibility,
+				}, sh.WithSession(ctx))
+				tests.Ok(t, err, node3)
+
+				r.NotNil(node3.JSON200.Link)
+				a.Equal(url3, node3.JSON200.Link.Url)
+
+				node3nolink, err := cl.NodeUpdateWithResponse(ctx, node3.JSON200.Slug, openapi.NodeMutableProps{
+					Url: nullable.NewNullNullable[string](),
+				}, sh.WithSession(ctx))
+				tests.Ok(t, err, node3nolink)
+
+				a.Nil(node3nolink.JSON200.Link)
+
+				node3get, err := cl.NodeGetWithResponse(ctx, node3.JSON200.Slug, &openapi.NodeGetParams{})
+				tests.Ok(t, err, node3get)
+
+				a.Nil(node3get.JSON200.Link)
 			})
 		}))
 	}))

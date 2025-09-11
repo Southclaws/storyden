@@ -134,7 +134,7 @@ func (c *Nodes) NodeCreate(ctx context.Context, request openapi.NodeCreateReques
 			PrimaryImage: deletable.Skip(primaryImage),
 			Content:      richContent,
 			Metadata:     opt.NewPtr((*map[string]any)(request.Body.Meta)),
-			URL:          url,
+			URL:          deletable.Skip(url),
 			Description:  opt.NewPtr(request.Body.Description),
 			AssetsAdd:    opt.NewPtrMap(request.Body.AssetIds, deserialiseAssetIDs),
 			AssetSources: opt.NewPtrMap(request.Body.AssetSources, deserialiseAssetSources),
@@ -260,11 +260,11 @@ func (c *Nodes) NodeListChildren(ctx context.Context, request openapi.NodeListCh
 	}
 
 	// NOTE: Visibility rules are automatically applied by the node_read.HydratedQuerier
-	// service layer. This ensures that non-published nodes are not visible to 
+	// service layer. This ensures that non-published nodes are not visible to
 	// unauthorized users, addressing issue #450. The rules are the same as those
 	// applied by other node endpoints:
 	// - Published nodes are visible to everyone
-	// - Draft/Unlisted nodes are only visible to their owners  
+	// - Draft/Unlisted nodes are only visible to their owners
 	// - Review nodes are visible to admins/library managers + owners
 	// - Unauthenticated users only see published nodes
 	r, err := c.nodeReader.ListChildren(ctx, deserialiseNodeMark(request.NodeSlug), pp, opts...)
@@ -290,7 +290,7 @@ func (c *Nodes) NodeUpdate(ctx context.Context, request openapi.NodeUpdateReques
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
 
-	url, err := opt.MapErr(opt.NewPtr(request.Body.Url), func(s string) (url.URL, error) {
+	url, err := deletable.NewMapErr(request.Body.Url, func(s string) (url.URL, error) {
 		u, err := url.Parse(s)
 		if err != nil {
 			return url.URL{}, err

@@ -66,11 +66,14 @@ func (s *Manager) preMutation(ctx context.Context, p Partial, current opt.Option
 
 	// If there's a URL being applied, fetch it and if it returns new content,
 	// set that as the content to be used for fill rules.
-	if u, ok := p.URL.Get(); ok {
+	linkUrl, removeLinkURL := p.URL.Get()
+	if u, ok := linkUrl.Get(); ok && !removeLinkURL {
 		ln, _, err := s.fetcher.ScrapeAndStore(ctx, u)
 		if err == nil {
 			opts = append(opts, node_writer.WithLink(xid.ID(ln.ID)))
 		}
+	} else if removeLinkURL {
+		opts = append(opts, node_writer.WithLinkRemove())
 	}
 
 	// -

@@ -5493,7 +5493,10 @@ components:
         slug: { $ref: "#/components/schemas/NodeSlug" }
         asset_ids: { $ref: "#/components/schemas/AssetIDs" }
         asset_sources: { $ref: "#/components/schemas/AssetSourceList" }
-        url: { $ref: "#/components/schemas/URL" }
+        url:
+          type: string
+          format: url
+          nullable: true
         description: { $ref: "#/components/schemas/NodeDescription" }
         primary_image_asset_id:
           { $ref: "#/components/schemas/NullableIdentifier" }

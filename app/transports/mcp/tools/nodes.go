@@ -30,6 +30,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
 	"github.com/Southclaws/storyden/app/services/search/searcher"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
+	"github.com/Southclaws/storyden/internal/deletable"
 )
 
 type nodeTools struct {
@@ -220,13 +221,13 @@ func (t *nodeTools) libraryPageCreate(ctx context.Context, request mcp.CallToolR
 		richContent = opt.New(rc)
 	}
 
-	var urlParsed opt.Optional[url.URL]
+	var urlParsed deletable.Value[url.URL]
 	if urlStr != "" {
 		u, err := url.Parse(urlStr)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
-		urlParsed = opt.New(*u)
+		urlParsed = deletable.Skip[url.URL](opt.New(*u))
 	}
 
 	var slug opt.Optional[mark.Slug]
@@ -332,7 +333,7 @@ func (t *nodeTools) libraryPageUpdate(ctx context.Context, request mcp.CallToolR
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 		}
-		partial.URL = opt.New(*u)
+		partial.URL = deletable.Skip(opt.New(*u))
 	}
 
 	if parentStr != "" {
