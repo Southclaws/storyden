@@ -89,7 +89,7 @@ export const bg = {
   opaque: {
     value: {
       _osLight: "{colors.white.a11}",
-      _osDark: "{colors.slate.dark.a2}",
+      _osDark: "{colors.slate.dark.a11}",
     },
   },
 };

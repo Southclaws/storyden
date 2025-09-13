@@ -1344,195 +1344,195 @@ const tokens = {
     "variable": "var(--colors-red-dark-a12)"
   },
   "colors.slate.light.1": {
-    "value": "#fcfcfd",
+    "value": "hsl(240, 20%, 99%)",
     "variable": "var(--colors-slate-light-1)"
   },
   "colors.slate.light.2": {
-    "value": "#f9f9fb",
+    "value": "hsl(240, 20%, 98%)",
     "variable": "var(--colors-slate-light-2)"
   },
   "colors.slate.light.3": {
-    "value": "#f0f0f3",
+    "value": "hsl(240, 11.1%, 94.7%)",
     "variable": "var(--colors-slate-light-3)"
   },
   "colors.slate.light.4": {
-    "value": "#e8e8ec",
+    "value": "hsl(240, 9.5%, 91.8%)",
     "variable": "var(--colors-slate-light-4)"
   },
   "colors.slate.light.5": {
-    "value": "#e0e1e6",
+    "value": "hsl(230, 10.7%, 89%)",
     "variable": "var(--colors-slate-light-5)"
   },
   "colors.slate.light.6": {
-    "value": "#d9d9e0",
+    "value": "hsl(240, 10.1%, 86.5%)",
     "variable": "var(--colors-slate-light-6)"
   },
   "colors.slate.light.7": {
-    "value": "#cdced6",
+    "value": "hsl(233.3, 9.9%, 82.2%)",
     "variable": "var(--colors-slate-light-7)"
   },
   "colors.slate.light.8": {
-    "value": "#b9bbc6",
+    "value": "hsl(230.8, 10.2%, 75.1%)",
     "variable": "var(--colors-slate-light-8)"
   },
   "colors.slate.light.9": {
-    "value": "#8b8d98",
+    "value": "hsl(230.8, 5.9%, 57.1%)",
     "variable": "var(--colors-slate-light-9)"
   },
   "colors.slate.light.10": {
-    "value": "#80838d",
+    "value": "hsl(226.2, 5.4%, 52.7%)",
     "variable": "var(--colors-slate-light-10)"
   },
   "colors.slate.light.11": {
-    "value": "#60646c",
+    "value": "hsl(220, 5.9%, 40%)",
     "variable": "var(--colors-slate-light-11)"
   },
   "colors.slate.light.12": {
-    "value": "#1c2024",
+    "value": "hsl(210, 12.5%, 12.5%)",
     "variable": "var(--colors-slate-light-12)"
   },
   "colors.slate.light.a1": {
-    "value": "#00005503",
+    "value": "hsla(240, 100%, 16.7%, 0)",
     "variable": "var(--colors-slate-light-a1)"
   },
   "colors.slate.light.a2": {
-    "value": "#00005506",
+    "value": "hsla(240, 100%, 16.7%, 0)",
     "variable": "var(--colors-slate-light-a2)"
   },
   "colors.slate.light.a3": {
-    "value": "#0000330f",
+    "value": "hsla(240, 100%, 10%, 0.1)",
     "variable": "var(--colors-slate-light-a3)"
   },
   "colors.slate.light.a4": {
-    "value": "#00002d17",
+    "value": "hsla(240, 100%, 8.8%, 0.1)",
     "variable": "var(--colors-slate-light-a4)"
   },
   "colors.slate.light.a5": {
-    "value": "#0009321f",
+    "value": "hsla(229.2, 100%, 9.8%, 0.1)",
     "variable": "var(--colors-slate-light-a5)"
   },
   "colors.slate.light.a6": {
-    "value": "#00002f26",
+    "value": "hsla(240, 100%, 9.2%, 0.1)",
     "variable": "var(--colors-slate-light-a6)"
   },
   "colors.slate.light.a7": {
-    "value": "#00062e32",
+    "value": "hsla(232.2, 100%, 9%, 0.2)",
     "variable": "var(--colors-slate-light-a7)"
   },
   "colors.slate.light.a8": {
-    "value": "#00083046",
+    "value": "hsla(230, 100%, 9.4%, 0.3)",
     "variable": "var(--colors-slate-light-a8)"
   },
   "colors.slate.light.a9": {
-    "value": "#00051d74",
+    "value": "hsla(229.7, 100%, 5.7%, 0.5)",
     "variable": "var(--colors-slate-light-a9)"
   },
   "colors.slate.light.a10": {
-    "value": "#00071b7f",
+    "value": "hsla(224.4, 100%, 5.3%, 0.5)",
     "variable": "var(--colors-slate-light-a10)"
   },
   "colors.slate.light.a11": {
-    "value": "#0007149f",
+    "value": "hsla(219, 100%, 3.9%, 0.6)",
     "variable": "var(--colors-slate-light-a11)"
   },
   "colors.slate.light.a12": {
-    "value": "#000509e3",
+    "value": "hsla(206.7, 100%, 1.8%, 0.9)",
     "variable": "var(--colors-slate-light-a12)"
   },
   "colors.slate.dark.1": {
-    "value": "#111113",
+    "value": "hsl(240, 5.6%, 7.1%)",
     "variable": "var(--colors-slate-dark-1)"
   },
   "colors.slate.dark.2": {
-    "value": "#18191b",
+    "value": "hsl(220, 5.9%, 10%)",
     "variable": "var(--colors-slate-dark-2)"
   },
   "colors.slate.dark.3": {
-    "value": "#212225",
+    "value": "hsl(225, 5.7%, 13.7%)",
     "variable": "var(--colors-slate-dark-3)"
   },
   "colors.slate.dark.4": {
-    "value": "#272a2d",
+    "value": "hsl(210, 7.1%, 16.5%)",
     "variable": "var(--colors-slate-dark-4)"
   },
   "colors.slate.dark.5": {
-    "value": "#2e3135",
+    "value": "hsl(214.3, 7.1%, 19.4%)",
     "variable": "var(--colors-slate-dark-5)"
   },
   "colors.slate.dark.6": {
-    "value": "#363a3f",
+    "value": "hsl(213.3, 7.7%, 22.9%)",
     "variable": "var(--colors-slate-dark-6)"
   },
   "colors.slate.dark.7": {
-    "value": "#43484e",
+    "value": "hsl(212.7, 7.6%, 28.4%)",
     "variable": "var(--colors-slate-dark-7)"
   },
   "colors.slate.dark.8": {
-    "value": "#5a6169",
+    "value": "hsl(212, 7.7%, 38.2%)",
     "variable": "var(--colors-slate-dark-8)"
   },
   "colors.slate.dark.9": {
-    "value": "#696e77",
+    "value": "hsl(218.6, 6.3%, 43.9%)",
     "variable": "var(--colors-slate-dark-9)"
   },
   "colors.slate.dark.10": {
-    "value": "#777b84",
+    "value": "hsl(221.5, 5.2%, 49.2%)",
     "variable": "var(--colors-slate-dark-10)"
   },
   "colors.slate.dark.11": {
-    "value": "#b0b4ba",
+    "value": "hsl(216, 6.8%, 71%)",
     "variable": "var(--colors-slate-dark-11)"
   },
   "colors.slate.dark.12": {
-    "value": "#edeef0",
+    "value": "hsl(220, 9.1%, 93.5%)",
     "variable": "var(--colors-slate-dark-12)"
   },
   "colors.slate.dark.a1": {
-    "value": "#00000000",
+    "value": "hsla(220, 5.9%, 10%, 0.02)",
     "variable": "var(--colors-slate-dark-a1)"
   },
   "colors.slate.dark.a2": {
-    "value": "#d8f4f609",
+    "value": "hsla(220, 5.9%, 10%, 0.04)",
     "variable": "var(--colors-slate-dark-a2)"
   },
   "colors.slate.dark.a3": {
-    "value": "#ddeaf814",
+    "value": "hsla(220, 5.9%, 10%, 0.08)",
     "variable": "var(--colors-slate-dark-a3)"
   },
   "colors.slate.dark.a4": {
-    "value": "#d3edf81d",
+    "value": "hsla(220, 5.9%, 10%, 0.12)",
     "variable": "var(--colors-slate-dark-a4)"
   },
   "colors.slate.dark.a5": {
-    "value": "#d9edfe25",
+    "value": "hsla(220, 5.9%, 10%, 0.16)",
     "variable": "var(--colors-slate-dark-a5)"
   },
   "colors.slate.dark.a6": {
-    "value": "#d6ebfd30",
+    "value": "hsla(220, 5.9%, 10%, 0.24)",
     "variable": "var(--colors-slate-dark-a6)"
   },
   "colors.slate.dark.a7": {
-    "value": "#d9edff40",
+    "value": "hsla(220, 5.9%, 10%, 0.32)",
     "variable": "var(--colors-slate-dark-a7)"
   },
   "colors.slate.dark.a8": {
-    "value": "#d9edff5d",
+    "value": "hsla(220, 5.9%, 10%, 0.42)",
     "variable": "var(--colors-slate-dark-a8)"
   },
   "colors.slate.dark.a9": {
-    "value": "#dfebfd6d",
+    "value": "hsla(220, 5.9%, 10%, 0.52)",
     "variable": "var(--colors-slate-dark-a9)"
   },
   "colors.slate.dark.a10": {
-    "value": "#e5edfd7b",
+    "value": "hsla(220, 5.9%, 10%, 0.62)",
     "variable": "var(--colors-slate-dark-a10)"
   },
   "colors.slate.dark.a11": {
-    "value": "#f1f7feb5",
+    "value": "hsla(220, 5.9%, 10%, 0.7)",
     "variable": "var(--colors-slate-dark-a11)"
   },
   "colors.slate.dark.a12": {
-    "value": "#fcfdffef",
+    "value": "hsla(220, 5.9%, 10%, 0.9)",
     "variable": "var(--colors-slate-dark-a12)"
   },
   "colors.tomato.light.1": {
