@@ -110,13 +110,13 @@ export async function* importFromURLGenerator({
           await Promise.all([
             nodeGenerateTags(tempSlug, { content: description })
               .then((r) => r.tags)
-              .catch(undefined),
+              .catch(() => undefined),
             nodeGenerateTitle(tempSlug, { content: description })
               .then((r) => r.title)
-              .catch(undefined),
+              .catch(() => undefined),
             nodeGenerateContent(tempSlug, { content: description })
               .then((r) => r.content)
-              .catch(undefined),
+              .catch(() => undefined),
           ]);
 
         if (tag_suggestions?.length) {
