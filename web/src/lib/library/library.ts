@@ -132,7 +132,11 @@ export function useLibraryMutation(node?: Node) {
     await mutate(nodeListPrivateKeyFn, mutator, { revalidate: false });
 
     const parent = parentID ?? parentSlug;
-    const created = await nodeCreate({ name: name, parent });
+    const created = await nodeCreate({
+      name,
+      slug,
+      parent,
+    });
 
     if (!disableRedirect) {
       const newPath = joinLibraryPath(libraryPath, created.slug);
