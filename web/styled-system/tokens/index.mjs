@@ -3080,7 +3080,7 @@ const tokens = {
     "variable": "var(--border-widths-thin)"
   },
   "borderWidths.medium": {
-    "value": "3px",
+    "value": "2px",
     "variable": "var(--border-widths-medium)"
   },
   "borderWidths.thick": {

@@ -33,7 +33,7 @@ export const semanticTokens = defineSemanticTokens({
     none: { value: "0" },
     hairline: { value: "0.5px" },
     thin: { value: "1px" },
-    medium: { value: "3px" },
+    medium: { value: "2px" },
     thick: { value: "3px" },
   },
   sizes: {

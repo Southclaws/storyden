@@ -7,6 +7,7 @@ import {
   Identifier,
   NodeWithChildren,
   PropertySchemaList,
+  Visibility,
 } from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
 import { CreatePageFromURLAction } from "@/components/library/CreatePageFromURL/CreatePageFromURL";
@@ -14,7 +15,9 @@ import { LinkRefButton } from "@/components/library/links/LinkCard";
 import { SortIndicator } from "@/components/site/SortIndicator";
 import { IconButton } from "@/components/ui/icon-button";
 import * as Table from "@/components/ui/table";
+import { visibilityColour } from "@/lib/library/visibilityColours";
 import { isValidLinkLike } from "@/lib/link/validation";
+import { css, cx } from "@/styled-system/css";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 
 import { useLibraryPageContext } from "../../Context";
@@ -139,8 +142,28 @@ export function LibraryPageDirectoryBlockTable({
                 block,
               ).filter(isAlwaysFilteredForTableViews);
 
+              const visCol = visibilityColour(child.visibility);
+
+              const visibilityStyles = css({
+                colorPalette: visCol,
+                boxSizing: "content-box",
+                borderLeftWidth:
+                  child.visibility === Visibility.published ? "none" : "medium",
+                borderLeftColor:
+                  child.visibility === Visibility.published
+                    ? "transparent"
+                    : "colorPalette.border",
+                borderLeftStyle:
+                  child.visibility === Visibility.published
+                    ? "solid"
+                    : "dashed",
+              });
+
               return (
-                <Table.Row key={child.id} className="group">
+                <Table.Row
+                  className={cx("group", visibilityStyles)}
+                  key={child.id}
+                >
                   {columns.map((column) => {
                     function handleCellChange(
                       v: ChangeEvent<HTMLInputElement>,
