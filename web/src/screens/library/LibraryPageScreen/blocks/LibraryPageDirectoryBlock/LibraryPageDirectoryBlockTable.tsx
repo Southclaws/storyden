@@ -175,10 +175,14 @@ export function LibraryPageDirectoryBlockTable({
                               outline: "none",
                             }}
                           />
-                        ) : column.href ? (
-                          <Link href={column.href}>{column.value}</Link>
                         ) : (
-                          <>{column.value}</>
+                          <Box minH="4">
+                            {column.href ? (
+                              <Link href={column.href}>{column.value}</Link>
+                            ) : (
+                              <>{column.value}</>
+                            )}
+                          </Box>
                         )}
                       </Table.Cell>
                     );
@@ -194,25 +198,22 @@ export function LibraryPageDirectoryBlockTable({
           borderBlockColor="border.subtle"
         >
           <Table.Row>
-            <Table.Cell
-              columnSpan="all"
-              colSpan={columns.length}
-              display="flex"
-              gap="2"
-            >
-              <CreatePageAction
-                variant="ghost"
-                size="xs"
-                parentSlug={nodeID}
-                disableRedirect
-                onComplete={handleCreatePageComplete}
-              />
-              <CreatePageFromURLAction
-                variant="ghost"
-                size="xs"
-                parentSlug={nodeID}
-                onComplete={handleCreatePageComplete}
-              />
+            <Table.Cell colSpan={columns.length}>
+              <HStack gap="2">
+                <CreatePageAction
+                  variant="ghost"
+                  size="xs"
+                  parentSlug={nodeID}
+                  disableRedirect
+                  onComplete={handleCreatePageComplete}
+                />
+                <CreatePageFromURLAction
+                  variant="ghost"
+                  size="xs"
+                  parentSlug={nodeID}
+                  onComplete={handleCreatePageComplete}
+                />
+              </HStack>
             </Table.Cell>
           </Table.Row>
         </Table.Foot>
