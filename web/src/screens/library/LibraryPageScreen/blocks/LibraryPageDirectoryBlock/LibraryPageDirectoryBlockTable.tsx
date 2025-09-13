@@ -178,7 +178,13 @@ export function LibraryPageDirectoryBlockTable({
                         ) : (
                           <Box minH="4">
                             {column.href ? (
-                              <Link href={column.href}>{column.value}</Link>
+                              <Link href={column.href}>
+                                {column.value || (
+                                  <styled.em color="fg.muted">
+                                    (untitled page)
+                                  </styled.em>
+                                )}
+                              </Link>
                             ) : (
                               <>{column.value}</>
                             )}
