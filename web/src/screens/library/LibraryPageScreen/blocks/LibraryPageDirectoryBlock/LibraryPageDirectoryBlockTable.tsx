@@ -1,6 +1,7 @@
 import { SortableContext } from "@dnd-kit/sortable";
 import Link from "next/link";
 import { ChangeEvent } from "react";
+import { match } from "ts-pattern";
 
 import {
   Identifier,
@@ -9,6 +10,7 @@ import {
 } from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
 import { CreatePageFromURLAction } from "@/components/library/CreatePageFromURL/CreatePageFromURL";
+import { LinkRefButton } from "@/components/library/links/LinkCard";
 import { SortIndicator } from "@/components/site/SortIndicator";
 import { IconButton } from "@/components/ui/icon-button";
 import * as Table from "@/components/ui/table";
@@ -177,17 +179,29 @@ export function LibraryPageDirectoryBlockTable({
                           />
                         ) : (
                           <Box minH="4">
-                            {column.href ? (
-                              <Link href={column.href}>
-                                {column.value || (
-                                  <styled.em color="fg.muted">
-                                    (untitled page)
-                                  </styled.em>
-                                )}
-                              </Link>
-                            ) : (
-                              <>{column.value}</>
-                            )}
+                            {match(column.fid)
+                              .with("fixed:name", () => (
+                                <Link href={column.href ?? "#"}>
+                                  {column.value || (
+                                    <styled.em color="fg.muted">
+                                      (untitled page)
+                                    </styled.em>
+                                  )}
+                                </Link>
+                              ))
+                              .with("fixed:link", () =>
+                                child.link ? (
+                                  <LinkRefButton
+                                    link={child.link}
+                                    variant="link"
+                                  />
+                                ) : (
+                                  <>{column.value}</>
+                                ),
+                              )
+                              .otherwise(() => (
+                                <>{column.value}</>
+                              ))}
                           </Box>
                         )}
                       </Table.Cell>
