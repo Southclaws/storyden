@@ -99,7 +99,7 @@ export function useLibraryMutation(node?: Node) {
     // node IDs not slugs. So we need to prefix the random name to prevent this.
     //
     const name = initialName ?? `untitled`;
-    const slug = `name-${new Xid().toString()}`;
+    const slug = `${name}-${new Xid().toString()}`;
 
     const initial: NodeWithChildren = {
       id: "optimistic_node_" + uniqueId(),
