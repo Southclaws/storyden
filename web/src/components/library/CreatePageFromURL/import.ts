@@ -73,7 +73,7 @@ export async function* importFromURLGenerator({
       data: baseData,
     };
 
-    let finalData = {
+    const finalData = {
       ...baseData,
       title_suggestion: undefined as string | undefined,
       tag_suggestions: [] as string[],
