@@ -98,15 +98,15 @@ export function useLibraryMutation(node?: Node) {
     // however, the way that marks work is XID-format strings are assumed to be
     // node IDs not slugs. So we need to prefix the random name to prevent this.
     //
-    const name = initialName ?? `untitled`;
-    const slug = `${name}-${new Xid().toString()}`;
+    const name = initialName?.trim() || `untitled`;
+    const slug = slugify(`${name}-${new Xid().toString()}`);
 
     const initial: NodeWithChildren = {
       id: "optimistic_node_" + uniqueId(),
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       name,
-      slug: slugify(slug),
+      slug: slug,
       description: "",
       owner: session,
       properties: [],
