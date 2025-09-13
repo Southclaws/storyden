@@ -25,6 +25,8 @@ import {
   importStateLabel,
 } from "./import";
 
+const POPOVER_CLOSE_DELAY = 3000;
+
 type Props = ButtonProps & {
   parentSlug?: string;
   hideLabel?: boolean;
@@ -108,7 +110,9 @@ export function CreatePageFromURLAction({
 
         if (state.step === "complete" && !state.error) {
           onComplete?.();
-          await new Promise((resolve) => setTimeout(resolve, 3000));
+          await new Promise((resolve) =>
+            setTimeout(resolve, POPOVER_CLOSE_DELAY),
+          );
           popover.setOpen(false);
           resetState();
           break;
@@ -126,7 +130,7 @@ export function CreatePageFromURLAction({
         error: derived,
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await new Promise((resolve) => setTimeout(resolve, POPOVER_CLOSE_DELAY));
       setImportState(null);
     } finally {
       setIsImporting(false);
