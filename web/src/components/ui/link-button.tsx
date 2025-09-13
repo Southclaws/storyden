@@ -46,7 +46,7 @@ export function LinkButton({
         {children}
       </styled.span>
       {isExternal && (
-        <styled.span>
+        <styled.span color="fg.subtle">
           <ArrowTopRightOnSquareIcon />
         </styled.span>
       )}
