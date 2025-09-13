@@ -8,6 +8,7 @@ import {
   PropertySchemaList,
 } from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
+import { CreatePageFromURLAction } from "@/components/library/CreatePageFromURL/CreatePageFromURL";
 import { SortIndicator } from "@/components/site/SortIndicator";
 import { IconButton } from "@/components/ui/icon-button";
 import * as Table from "@/components/ui/table";
@@ -40,7 +41,7 @@ export function LibraryPageDirectoryBlockTable({
 }: Props) {
   const { nodeID, store } = useLibraryPageContext();
   const { editing } = useEditState();
-  const { sort, handleSort } = useDirectoryBlockContext();
+  const { sort, handleSort, handleMutateChildren } = useDirectoryBlockContext();
 
   const { setChildPropertyValue } = store.getState();
 
@@ -55,6 +56,10 @@ export function LibraryPageDirectoryBlockTable({
     value: string,
   ) {
     setChildPropertyValue(nodeID, fid, value);
+  }
+
+  function handleCreatePageComplete() {
+    handleMutateChildren();
   }
 
   return (
@@ -163,16 +168,21 @@ export function LibraryPageDirectoryBlockTable({
                       >
                         {editing ? (
                           <styled.input
+                            w="full"
                             defaultValue={column.value}
                             onChange={handleCellChange}
                             _focusVisible={{
                               outline: "none",
                             }}
                           />
-                        ) : column.href ? (
-                          <Link href={column.href}>{column.value}</Link>
                         ) : (
-                          <>{column.value}</>
+                          <Box minH="4">
+                            {column.href ? (
+                              <Link href={column.href}>{column.value}</Link>
+                            ) : (
+                              <>{column.value}</>
+                            )}
+                          </Box>
                         )}
                       </Table.Cell>
                     );
@@ -188,8 +198,22 @@ export function LibraryPageDirectoryBlockTable({
           borderBlockColor="border.subtle"
         >
           <Table.Row>
-            <Table.Cell colSpan={columns.length} display="flex">
-              <CreatePageAction variant="ghost" size="xs" parentSlug={nodeID} />
+            <Table.Cell colSpan={columns.length}>
+              <HStack gap="2">
+                <CreatePageAction
+                  variant="ghost"
+                  size="xs"
+                  parentSlug={nodeID}
+                  disableRedirect
+                  onComplete={handleCreatePageComplete}
+                />
+                <CreatePageFromURLAction
+                  variant="ghost"
+                  size="xs"
+                  parentSlug={nodeID}
+                  onComplete={handleCreatePageComplete}
+                />
+              </HStack>
             </Table.Cell>
           </Table.Row>
         </Table.Foot>

@@ -2,13 +2,22 @@ import { dequal } from "dequal";
 import { debounce } from "lodash/fp";
 import { useQueryState } from "nuqs";
 import { PropsWithChildren, createContext, useContext } from "react";
+import { mutate } from "swr";
 
-import { TagNameList, TagReference } from "@/api/openapi-schema";
+import { getNodeListChildrenKey } from "@/api/openapi-client/nodes";
+import {
+  NodeListOKResponse,
+  TagNameList,
+  TagReference,
+} from "@/api/openapi-schema";
 import { SortState, useSortIndicator } from "@/components/site/SortIndicator";
+
+import { useLibraryPageContext } from "../../Context";
 
 type DirectoryBlockContextValue = {
   searchQuery: string;
   handleSearch: (q: string) => void;
+  handleMutateChildren: (data?: NodeListOKResponse) => void;
 
   sort: SortState | null;
   handleSort: (property: string) => void;
@@ -16,6 +25,7 @@ type DirectoryBlockContextValue = {
   tagFilters: TagNameList;
   handleTagFilter: (tag: TagReference) => Promise<void>;
   highlightedTags: TagNameList | undefined;
+  childrenSort: string | undefined;
 };
 
 export const LibraryPageDirectoryBlockContext = createContext<
@@ -36,6 +46,8 @@ export function useDirectoryBlockContext() {
 export function LibraryPageDirectoryBlockContextProvider({
   children,
 }: PropsWithChildren) {
+  const { nodeID } = useLibraryPageContext();
+
   const { sort, handleSort } = useSortIndicator();
 
   const [searchQuery, setSearchQuery] = useQueryState("search", {
@@ -72,11 +84,30 @@ export function LibraryPageDirectoryBlockContextProvider({
 
   const handleSearch = debounce(285, setSearchQuery as (q: string) => void);
 
+  // format the sort property as "name" or "-name" for asc/desc
+  const childrenSort =
+    sort !== null
+      ? sort?.order === "asc"
+        ? sort.property
+        : `-${sort.property}`
+      : undefined;
+
+  const key = getNodeListChildrenKey(nodeID, {
+    children_sort: childrenSort,
+    tags: tagFilters,
+    q: searchQuery,
+  });
+
+  function handleMutateChildren(data?: NodeListOKResponse) {
+    mutate<NodeListOKResponse>(key, data);
+  }
+
   return (
     <LibraryPageDirectoryBlockContext.Provider
       value={{
         searchQuery,
         handleSearch,
+        handleMutateChildren,
 
         sort,
         handleSort,
@@ -84,6 +115,7 @@ export function LibraryPageDirectoryBlockContextProvider({
         tagFilters,
         handleTagFilter,
         highlightedTags,
+        childrenSort,
       }}
     >
       {children}

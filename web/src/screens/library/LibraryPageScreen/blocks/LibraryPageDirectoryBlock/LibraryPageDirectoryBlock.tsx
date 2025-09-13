@@ -39,24 +39,14 @@ export function LibraryPageDirectoryBlockContents() {
     highlightedTags,
     searchQuery,
     tagFilters,
+    childrenSort,
   } = useDirectoryBlockContext();
   const { nodeID, initialChildren } = useLibraryPageContext();
+  const { editing } = useEditState();
 
   function handleSearchChange(event: ChangeEvent<HTMLInputElement>) {
     handleSearch(event.target.value);
   }
-
-  const { editing } = useEditState();
-
-  const { sort } = useDirectoryBlockContext();
-
-  // format the sort property as "name" or "-name" for asc/desc
-  const childrenSort =
-    sort !== null
-      ? sort?.order === "asc"
-        ? sort.property
-        : `-${sort.property}`
-      : undefined;
 
   const { data, error, tags } = useChildrenWithTags(
     nodeID,
