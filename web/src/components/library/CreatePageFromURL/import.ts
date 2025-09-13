@@ -167,6 +167,7 @@ export async function* importFromURLGenerator({
       primary_image_asset_id: finalData.primary_image?.id,
       tags: finalData.tag_suggestions,
       content,
+      url,
     });
 
     // Step 6: Complete
