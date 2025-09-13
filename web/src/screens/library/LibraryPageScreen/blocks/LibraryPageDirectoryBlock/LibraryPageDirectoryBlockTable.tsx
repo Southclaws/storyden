@@ -8,6 +8,7 @@ import {
   PropertySchemaList,
 } from "@/api/openapi-schema";
 import { CreatePageAction } from "@/components/library/CreatePage";
+import { CreatePageFromURLAction } from "@/components/library/CreatePageFromURL/CreatePageFromURL";
 import { SortIndicator } from "@/components/site/SortIndicator";
 import { IconButton } from "@/components/ui/icon-button";
 import * as Table from "@/components/ui/table";
@@ -167,6 +168,7 @@ export function LibraryPageDirectoryBlockTable({
                       >
                         {editing ? (
                           <styled.input
+                            w="full"
                             defaultValue={column.value}
                             onChange={handleCellChange}
                             _focusVisible={{
@@ -192,12 +194,23 @@ export function LibraryPageDirectoryBlockTable({
           borderBlockColor="border.subtle"
         >
           <Table.Row>
-            <Table.Cell colSpan={columns.length} display="flex">
+            <Table.Cell
+              columnSpan="all"
+              colSpan={columns.length}
+              display="flex"
+              gap="2"
+            >
               <CreatePageAction
                 variant="ghost"
                 size="xs"
                 parentSlug={nodeID}
                 disableRedirect
+                onComplete={handleCreatePageComplete}
+              />
+              <CreatePageFromURLAction
+                variant="ghost"
+                size="xs"
+                parentSlug={nodeID}
                 onComplete={handleCreatePageComplete}
               />
             </Table.Cell>
