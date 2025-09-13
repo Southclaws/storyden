@@ -29,7 +29,7 @@ export function QuickShare(props: Props) {
   }
 
   return (
-    <CardBox bgColor="bg.subtle">
+    <CardBox bgColor="bg.default">
       <form
         className={lstack({
           gap: "2",
