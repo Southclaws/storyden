@@ -90,7 +90,7 @@
   .navgrid {
     display: grid;
 
-    --grid-col-padding-outer: var(--spacing-8);
+    --grid-col-padding-outer: var(--spacing-4);
 
     grid-template-rows:
       var(--grid-row-padding-outer)
