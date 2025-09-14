@@ -161,6 +161,7 @@ export function Scrolly() {
             >
               <Center className={sectionRightImageContainerStyles}>
                 <Image
+                  priority={true}
                   className={css({
                     // NOTE: Padding because image has drop shadow on bot/right.
                     paddingLeft: "2",
@@ -185,6 +186,7 @@ export function Scrolly() {
             >
               <Center className={sectionRightImageContainerStyles}>
                 <Image
+                  priority={true}
                   className={css({
                     // NOTE: Padding because image has drop shadow on bot/right.
                     paddingLeft: "2",
@@ -209,6 +211,7 @@ export function Scrolly() {
             >
               <Center className={sectionRightImageContainerStyles}>
                 <Image
+                  priority={true}
                   className={css({
                     // NOTE: Padding because image has drop shadow on bot/right.
                     paddingLeft: "2",
