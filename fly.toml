@@ -13,6 +13,7 @@ kill_timeout = 5
   CACHE_PROVIDER          = "redis"
   EMAIL_PROVIDER          = "sendgrid"
   LANGUAGE_MODEL_PROVIDER = "openai"
+  MCP_ENABLED             = "true"
   PINECONE_CLOUD          = "aws"
   PINECONE_DIMENSIONS     = "3072"
   PINECONE_INDEX          = "makeroom"
