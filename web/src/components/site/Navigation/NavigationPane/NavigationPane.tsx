@@ -46,7 +46,7 @@ function NavigationPaneContent({
       className={Floating()}
     >
       <AdminZone />
-      <Box id="desktop-nav-box" w="full" height="full" p="2">
+      <Box id="desktop-nav-box" w="full" height="full" minH="0" p="2">
         <ContentNavigationList
           initialNodeList={initialNodeList}
           initialCategoryList={initialCategoryList}
