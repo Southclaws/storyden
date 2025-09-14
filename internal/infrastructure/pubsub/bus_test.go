@@ -33,7 +33,7 @@ func TestEventBus_SingleSubscriber(t *testing.T) {
 
 			recv := make(chan EventTest)
 
-			sub, err := pubsub.Subscribe(ctx, bus, "test_service", func(ctx context.Context, event *EventTest) error {
+			_, err := pubsub.Subscribe(ctx, bus, "test_service", func(ctx context.Context, event *EventTest) error {
 				recv <- *event
 				return nil
 			})
@@ -46,8 +46,6 @@ func TestEventBus_SingleSubscriber(t *testing.T) {
 
 			received := <-recv
 			a.Equal("Hello, World!", received.Value)
-
-			sub.Close()
 		}))
 	}))
 }
