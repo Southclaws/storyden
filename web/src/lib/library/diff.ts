@@ -121,6 +121,14 @@ export const deriveMutationFromDifference = (
         }
         break;
       }
+      case "primary_image_asset_id": {
+        const primaryImageAssetId = updatedValue as Identifier | undefined;
+        if (primaryImageAssetId === undefined) {
+          Object.assign(mutation, { primary_image_asset_id: null });
+          return;
+        }
+        break;
+      }
       case "children": {
         const updatedChildren = updatedValue as NodeWithChildren["children"];
         if (updatedChildren.length === 0) {

@@ -14,6 +14,7 @@ import { useWatch } from "../store";
 
 import { CreateBlockMenu } from "./CreateBlockMenu";
 import { LibraryPageAssetsBlockMenuItems } from "./LibraryPageAssetsBlock/LibraryPageAssetsBlockMenuItems";
+import { LibraryPageCoverBlockMenuItems } from "./LibraryPageCoverBlock/LibraryPageCoverBlockMenuItems";
 import { LibraryPageDirectoryBlockMenuItems } from "./LibraryPageDirectoryBlock/LibraryPageDirectoryBlockMenuItems";
 import { LibraryPageTitleBlockMenuItems } from "./LibraryPageTitleBlock/LibraryPageTitleBlockMenuItems";
 
@@ -93,6 +94,9 @@ function BlockConfigMenu({ block }: Props) {
   switch (block.type) {
     case "assets": {
       return <LibraryPageAssetsBlockMenuItems />;
+    }
+    case "cover": {
+      return <LibraryPageCoverBlockMenuItems />;
     }
     case "directory": {
       return <LibraryPageDirectoryBlockMenuItems />;
