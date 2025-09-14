@@ -63,8 +63,7 @@ const sectionLeftLayoutStyles = css({
   height: {
     base: "min",
     sm: "1/2",
-    md: "1/3",
-    lg: "dvh",
+    md: "dvh",
   },
   zIndex: zInfo,
 });
@@ -72,7 +71,8 @@ const sectionLeftLayoutStyles = css({
 const sectionLeftTextContainerStyles = css({
   justifyContent: {
     base: "center",
-    md: "start",
+    // md: "start",
+    lg: "center",
   },
   w: "full",
   h: "full",
