@@ -1,6 +1,6 @@
 "use client";
 
-import { css } from "@/styled-system/css";
+import { css, cx } from "@/styled-system/css";
 import { Box, Center, Grid, styled, VStack } from "@/styled-system/jsx";
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
@@ -55,12 +55,31 @@ const sectionLeftLayoutStyles = css({
     base: "left / right",
     md: "left / middle",
   },
-  // gridRow: "top / bottom",
+  alignItems: {
+    base: "start",
+    md: "center",
+  },
+  p: "4",
   height: {
     base: "min",
-    md: "dvh",
+    sm: "1/2",
+    md: "1/3",
+    lg: "dvh",
   },
   zIndex: zInfo,
+});
+
+const sectionLeftTextContainerStyles = css({
+  justifyContent: {
+    base: "center",
+    md: "start",
+  },
+  w: "full",
+  h: "full",
+  p: "4",
+  alignItems: "start",
+  maxW: "lg",
+  textWrap: "balance",
 });
 
 const sectionMoonlitShadowStyles = css({
@@ -98,10 +117,26 @@ const sectionRightLayoutStyles = css({
   bg: "colors.Mono.slush",
 });
 
+const sectionRightLayoutNoscriptStyles = css({
+  zIndex: zHighlight,
+  gridColumn: {
+    base: "left / right",
+    md: "middle / right",
+  },
+  height: "full",
+  top: 0,
+  h: "100vh",
+  bg: "colors.Mono.slush",
+});
+
 const sectionRightImageContainerStyles = css({
   w: "full",
   h: "full",
-  p: "4",
+  p: {
+    base: "4",
+    sm: "32",
+    md: "4",
+  },
   pb: {
     base: "24",
     md: "4",
@@ -237,6 +272,32 @@ export function Scrolly() {
       />
 
       <Box
+        gridRow="1/2"
+        gridColumn="left / right"
+        h="dvh"
+        zIndex={zBack}
+        bgColor="Primary.moonlit"
+        className={sectionRightLayoutNoscriptStyles}
+      >
+        <noscript>
+          <Center className={sectionRightImageContainerStyles}>
+            <Image
+              priority={true}
+              className={css({
+                // NOTE: Padding because image has drop shadow on bot/right.
+                paddingLeft: "2",
+                paddingTop: "2",
+              })}
+              src="/sort-search.png"
+              alt="A screenshot of Storyden's search and ask feature surfacing a member's vague question looking for a specific thread about design books."
+              width={660 * 2}
+              height={432 * 2}
+            />
+          </Center>
+        </noscript>
+      </Box>
+
+      <Box
         gridRow="2/3"
         gridColumn="left / right"
         h="dvh"
@@ -245,12 +306,64 @@ export function Scrolly() {
       />
 
       <Box
+        gridRow="2/3"
+        gridColumn="left / right"
+        h="dvh"
+        zIndex={zBack}
+        bgColor="Primary.forest"
+        className={sectionRightLayoutNoscriptStyles}
+      >
+        <noscript>
+          <Center className={sectionRightImageContainerStyles}>
+            <Image
+              priority={true}
+              className={css({
+                // NOTE: Padding because image has drop shadow on bot/right.
+                paddingLeft: "2",
+                paddingTop: "2",
+              })}
+              src="/organise.png"
+              alt="A graphic showing the flow of a question leading to a directory leading to a specific link to a website."
+              width={660 * 2}
+              height={432 * 2}
+            />
+          </Center>
+        </noscript>
+      </Box>
+
+      <Box
         gridRow="3/4"
         gridColumn="left / right"
         h="dvh"
         zIndex={zBack}
         bgColor="Primary.campfire"
       />
+
+      <Box
+        gridRow="3/4"
+        gridColumn="left / right"
+        h="dvh"
+        zIndex={zBack}
+        bgColor="Primary.campfire"
+        className={sectionRightLayoutNoscriptStyles}
+      >
+        <noscript>
+          <Center className={sectionRightImageContainerStyles}>
+            <Image
+              priority={true}
+              className={css({
+                // NOTE: Padding because image has drop shadow on bot/right.
+                paddingLeft: "2",
+                paddingTop: "2",
+              })}
+              src="/sort-search.png"
+              alt="A screenshot of Storyden's search and ask feature surfacing a member's vague question looking for a specific thread about design books."
+              width={660 * 2}
+              height={432 * 2}
+            />
+          </Center>
+        </noscript>
+      </Box>
 
       <Scrollama
         onStepEnter={onStepEnter}
@@ -261,26 +374,22 @@ export function Scrolly() {
         <Step scrollamaId="smart" id="step-smart" data={0}>
           <Center
             id="step-inner-smart"
-            className={`${sectionLeftLayoutStyles} ${sectionMoonlitShadowStyles}`}
+            className={cx(sectionLeftLayoutStyles, sectionMoonlitShadowStyles)}
             bgColor="Primary.moonlit"
             color="Shades.newspaper"
             gridRow="1/2"
-            alignItems={{
-              base: "start",
-              md: "center",
-            }}
           >
-            <VStack alignItems="start" p="4">
+            <VStack className={sectionLeftTextContainerStyles}>
               <styled.h1 className={sectionHeadingStyles}>
                 Built-in&nbsp;smarts.
                 <br />
                 opt-in&nbsp;brains.
               </styled.h1>
-              <styled.p fontSize="xl" lineHeight="relaxed" textWrap="balance">
+              <p className={sectionParagraphStyles}>
                 Language model integration, at the core.
                 <br />
                 But only if you want it.
-              </styled.p>
+              </p>
             </VStack>
           </Center>
         </Step>
@@ -288,30 +397,21 @@ export function Scrolly() {
         <Step scrollamaId="sort" id="step-sort" data={1}>
           <Center
             id="step-inner-sort"
-            className={`${sectionLeftLayoutStyles} ${sectionForestShadowStyles}`}
+            className={cx(sectionLeftLayoutStyles, sectionForestShadowStyles)}
             bgColor="Primary.forest"
             color="Shades.newspaper"
             gridRow="2/3"
-            alignItems={{
-              base: "start",
-              md: "center",
-            }}
           >
-            <VStack
-              alignItems="flex-start"
-              p="4"
-              maxW="prose"
-              textWrap="balance"
-            >
+            <VStack className={sectionLeftTextContainerStyles}>
               <styled.h1 className={sectionHeadingStyles}>
                 Sort. Search. Ask.
               </styled.h1>
-              <styled.p fontSize="xl" lineHeight="relaxed">
+              <p className={sectionParagraphStyles}>
                 Allow your collective knowledge to grow without losing great
                 ideas to the void of time, banished to the archive.
-              </styled.p>
-              <p>Looking for something?</p>
-              <p>Just ask.</p>
+              </p>
+              <p className={sectionParagraphStyles}>Looking for something?</p>
+              <p className={sectionParagraphStyles}>Just ask.</p>
             </VStack>
           </Center>
         </Step>
@@ -319,21 +419,12 @@ export function Scrolly() {
         <Step scrollamaId="curate" id="step-curate" data={2}>
           <Center
             id="step-inner-curate"
-            className={`${sectionLeftLayoutStyles} ${sectionCampfireShadowStyles}`}
+            className={cx(sectionLeftLayoutStyles, sectionCampfireShadowStyles)}
             bgColor="Primary.campfire"
             color="Primary.moonlit"
             gridRow="3/4"
-            alignItems={{
-              base: "start",
-              md: "center",
-            }}
           >
-            <VStack
-              alignItems="flex-start"
-              p="4"
-              maxW="prose"
-              textWrap="balance"
-            >
+            <VStack className={sectionLeftTextContainerStyles}>
               <styled.h1 className={sectionHeadingStyles}>
                 Curate, effortlessly.
               </styled.h1>
