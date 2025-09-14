@@ -1,12 +1,15 @@
 import Image from "next/image";
 import { FixedCropper, ImageRestriction } from "react-advanced-cropper";
 
-import { LibraryPageCoverImageControl } from "@/components/library/LibraryPageCoverImageControl/LibraryPageCoverImageControl";
+import { AssetUploadAction } from "@/components/asset/AssetUploadAction";
+import { Asset } from "@/api/openapi-schema";
+import { Button } from "@/components/ui/button";
 import { parseNodeMetadata } from "@/lib/library/metadata";
 import { css } from "@/styled-system/css";
-import { Box, HStack } from "@/styled-system/jsx";
+import { Box } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
+import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
 import { useEditState } from "../../useEditState";
 
@@ -52,10 +55,19 @@ export function LibraryPageCoverBlock() {
 }
 
 function LibraryPageCoverBlockEditing() {
+  const { store } = useLibraryPageContext();
+  const { setPrimaryImage } = store.getState();
   const { cropperRef, handleInteractionEnd } = useLibraryPageCoverBlock();
 
   const primary_image = useWatch((s) => s.draft.primary_image);
   const meta = useWatch((s) => s.draft.meta);
+
+  async function handleUploadCoverImage(asset: Asset) {
+    setPrimaryImage({
+      asset,
+      isReplacement: true,
+    });
+  }
 
   // This URL is used for the crop editor, it will always be the original image
   // depending on whether the current primary image has any new versions set.
@@ -69,10 +81,23 @@ function LibraryPageCoverBlockEditing() {
 
   if (!primaryAssetEditingURL) {
     return (
-      <HStack w="full" justify="end">
-        {/* TODO: Make this a floating overlay on top of the cropper, even if it's empty */}
-        <LibraryPageCoverImageControl />
-      </HStack>
+      <AssetUploadAction
+        operation="add"
+        onFinish={handleUploadCoverImage}
+        accept={["image/png", "image/jpeg", "image/gif"]}
+        w="full"
+        size="xs"
+        variant="subtle"
+      >
+        <Button
+          type="button"
+          w="full"
+          size="xs"
+          variant="subtle"
+        >
+          Upload cover image
+        </Button>
+      </AssetUploadAction>
     );
   }
 
