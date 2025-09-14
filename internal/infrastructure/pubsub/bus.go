@@ -57,6 +57,7 @@ func newBus(
 	}
 
 	router.AddMiddleware(middleware.Recoverer)
+	router.AddMiddleware(newSessionContextMiddleware(l))
 
 	marshaler := cqrs.JSONMarshaler{
 		GenerateName: func(v interface{}) string {
@@ -64,7 +65,10 @@ func newBus(
 		},
 	}
 
-	eventBus, err := cqrs.NewEventBusWithConfig(pub, cqrs.EventBusConfig{
+	// Wrap publisher with session context middleware
+	contextPub := publisherContextMiddleware(pub)
+
+	eventBus, err := cqrs.NewEventBusWithConfig(contextPub, cqrs.EventBusConfig{
 		GeneratePublishTopic: func(params cqrs.GenerateEventPublishTopicParams) (string, error) {
 			return params.EventName, nil
 		},
@@ -74,7 +78,7 @@ func newBus(
 		return nil, fault.Wrap(err)
 	}
 
-	commandBus, err := cqrs.NewCommandBusWithConfig(pub, cqrs.CommandBusConfig{
+	commandBus, err := cqrs.NewCommandBusWithConfig(contextPub, cqrs.CommandBusConfig{
 		GeneratePublishTopic: func(params cqrs.CommandBusGeneratePublishTopicParams) (string, error) {
 			return params.CommandName, nil
 		},
