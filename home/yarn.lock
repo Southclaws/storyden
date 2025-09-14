@@ -4200,6 +4200,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+"framer-motion@npm:^12.23.12":
+  version: 12.23.12
+  resolution: "framer-motion@npm:12.23.12"
+  dependencies:
+    motion-dom: "npm:^12.23.12"
+    motion-utils: "npm:^12.23.6"
+    tslib: "npm:^2.4.0"
+  peerDependencies:
+    "@emotion/is-prop-valid": "*"
+    react: ^18.0.0 || ^19.0.0
+    react-dom: ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    "@emotion/is-prop-valid":
+      optional: true
+    react:
+      optional: true
+    react-dom:
+      optional: true
+  checksum: 10c0/40dfb57bf714075c4f6dd0bbe5b84dd11310114474ebf603846ef9b888ed475fa653271c1fd98ec57a6a1d0b781cdf8b3ebcd5e2c6a3620e934b46304ae0fd39
+  languageName: node
+  linkType: hard
+
 "fs-extra@npm:11.2.0":
   version: 11.2.0
   resolution: "fs-extra@npm:11.2.0"
@@ -4552,6 +4574,7 @@ __metadata:
     cobe: "npm:^0.6.4"
     date-fns: "npm:^4.1.0"
     feed: "npm:^5.1.0"
+    framer-motion: "npm:^12.23.12"
     fumadocs-core: "npm:15.7.10"
     fumadocs-mdx: "npm:11.9.0"
     fumadocs-openapi: "npm:9.3.7"
@@ -4565,6 +4588,7 @@ __metadata:
     prettier: "npm:3.5.3"
     react: "npm:^19.1.1"
     react-dom: "npm:^19.1.1"
+    react-scrollama: "npm:^2.4.2"
     shiki: "npm:3.12.2"
     typescript: "npm:^5.9.2"
     zod: "npm:^4.1.5"
@@ -5818,6 +5842,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"motion-dom@npm:^12.23.12":
+  version: 12.23.12
+  resolution: "motion-dom@npm:12.23.12"
+  dependencies:
+    motion-utils: "npm:^12.23.6"
+  checksum: 10c0/1b6a4b86c1aed5b5da7b8a5d1f8310ad169125235bdc1953b8c41cf9f4e2c460ee90bb48ffdae54daecb8db1d7006566ceb5f5c9ccdc82606d548c527cb2631e
+  languageName: node
+  linkType: hard
+
+"motion-utils@npm:^12.23.6":
+  version: 12.23.6
+  resolution: "motion-utils@npm:12.23.6"
+  checksum: 10c0/c058e8ba6423b3baa63e985bcc669877ee7d9579d938f5348b4e60c5ea1b4b33dd7f4877434436a4a5807f3cf00370d3fd4079a6fdd6309c5c87aa62b311a897
+  languageName: node
+  linkType: hard
+
 "ms@npm:^2.1.3":
   version: 2.1.3
   resolution: "ms@npm:2.1.3"
@@ -6324,6 +6364,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-intersection-observer@npm:^9.3.5":
+  version: 9.16.0
+  resolution: "react-intersection-observer@npm:9.16.0"
+  peerDependencies:
+    react: ^17.0.0 || ^18.0.0 || ^19.0.0
+    react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+  checksum: 10c0/2aee5103fb460c6e5a3ab5a4fdc8c69a5215e23699a12d7857f25ba765fed48eacbed94ca835d79edf00c0edcc9c4fbb5bb057a373402d0551718546810e0e48
+  languageName: node
+  linkType: hard
+
 "react-medium-image-zoom@npm:^5.3.0":
   version: 5.3.0
   resolution: "react-medium-image-zoom@npm:5.3.0"
@@ -6385,6 +6438,18 @@ __metadata:
     "@types/react":
       optional: true
   checksum: 10c0/7ad8f6ffd3e2aedf9b3d79f0c9088a9a3d7c5332d80c923427a6d97fe0626fb4cb33a6d9174d19fad57d860be69c96f68497a0619c3a8af0e8a5332e49bdde31
+  languageName: node
+  linkType: hard
+
+"react-scrollama@npm:^2.4.2":
+  version: 2.4.2
+  resolution: "react-scrollama@npm:2.4.2"
+  dependencies:
+    react-intersection-observer: "npm:^9.3.5"
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.2 || ^18.2.0 || ^19.0.0
+    react-dom: ^16.8.0 || ^17.0.2 || ^18.2.0 || ^19.0.0
+  checksum: 10c0/546f87f8ab8882c51ad34f994335f1d37115f4e2efe670c3544969c81df773afabc54a3b32a42ec5ee75500fd88e2a160be16618c816af62351e28c83e73ec2e
   languageName: node
   linkType: hard
 

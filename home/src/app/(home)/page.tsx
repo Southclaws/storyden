@@ -27,6 +27,7 @@ import { token } from "@/styled-system/tokens";
 import { StorydenComputer } from "@/components/StorydenComputer";
 import { CssProperties } from "@/styled-system/types";
 import { DockerCopyButton } from "@/components/DockerCopyButton";
+import { Scrolly } from "@/components/Scrolly";
 
 function Hero() {
   return (
@@ -1541,6 +1542,7 @@ export default async function Home() {
       {/* <ForDevops /> */}
       {/* <ForYou /> */}
       {/* <CTA /> */}
+      <Scrolly />
     </Box>
   );
 }
