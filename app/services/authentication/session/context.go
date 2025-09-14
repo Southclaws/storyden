@@ -55,6 +55,14 @@ func WithGuest(ctx context.Context, roles role.Roles) context.Context {
 	})
 }
 
+func WithInternal(ctx context.Context) context.Context {
+	return context.WithValue(ctx, contextKey, sessionContext{
+		account:        opt.NewEmpty[account.Account](),
+		roles:          role.Roles{},
+		securityScheme: "",
+	})
+}
+
 func Authorise(ctx context.Context, fn func() error, perms ...rbac.Permission) error {
 	value := ctx.Value(contextKey)
 	if value == nil {
