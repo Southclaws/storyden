@@ -6,9 +6,11 @@ import { match } from "ts-pattern";
 import {
   Identifier,
   NodeWithChildren,
+  Permission,
   PropertySchemaList,
   Visibility,
 } from "@/api/openapi-schema";
+import { useSession } from "@/auth";
 import { CreatePageAction } from "@/components/library/CreatePage";
 import { CreatePageFromURLAction } from "@/components/library/CreatePageFromURL/CreatePageFromURL";
 import { LinkRefButton } from "@/components/library/links/LinkCard";
@@ -17,6 +19,7 @@ import { IconButton } from "@/components/ui/icon-button";
 import * as Table from "@/components/ui/table";
 import { visibilityColour } from "@/lib/library/visibilityColours";
 import { isValidLinkLike } from "@/lib/link/validation";
+import { hasPermission } from "@/utils/permissions";
 import { css, cx } from "@/styled-system/css";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 
@@ -47,8 +50,11 @@ export function LibraryPageDirectoryBlockTable({
   const { nodeID, store } = useLibraryPageContext();
   const { editing } = useEditState();
   const { sort, handleSort, handleMutateChildren } = useDirectoryBlockContext();
+  const session = useSession();
 
   const { setChildPropertyValue } = store.getState();
+
+  const canManageLibrary = hasPermission(session, Permission.MANAGE_LIBRARY);
 
   const columns = mergeFieldsAndPropertySchema(
     currentChildPropertySchema,
@@ -235,31 +241,33 @@ export function LibraryPageDirectoryBlockTable({
             })}
           </SortableContext>
         </Table.Body>
-        <Table.Foot
-          borderBottomStyle="solid"
-          borderBottomWidth="thin"
-          borderBlockColor="border.subtle"
-        >
-          <Table.Row>
-            <Table.Cell colSpan={columns.length}>
-              <HStack gap="2">
-                <CreatePageAction
-                  variant="ghost"
-                  size="xs"
-                  parentSlug={nodeID}
-                  disableRedirect
-                  onComplete={handleCreatePageComplete}
-                />
-                <CreatePageFromURLAction
-                  variant="ghost"
-                  size="xs"
-                  parentSlug={nodeID}
-                  onComplete={handleCreatePageComplete}
-                />
-              </HStack>
-            </Table.Cell>
-          </Table.Row>
-        </Table.Foot>
+        {canManageLibrary && (
+          <Table.Foot
+            borderBottomStyle="solid"
+            borderBottomWidth="thin"
+            borderBlockColor="border.subtle"
+          >
+            <Table.Row>
+              <Table.Cell colSpan={columns.length}>
+                <HStack gap="2">
+                  <CreatePageAction
+                    variant="ghost"
+                    size="xs"
+                    parentSlug={nodeID}
+                    disableRedirect
+                    onComplete={handleCreatePageComplete}
+                  />
+                  <CreatePageFromURLAction
+                    variant="ghost"
+                    size="xs"
+                    parentSlug={nodeID}
+                    onComplete={handleCreatePageComplete}
+                  />
+                </HStack>
+              </Table.Cell>
+            </Table.Row>
+          </Table.Foot>
+        )}
       </Table.Root>
     </Box>
   );
