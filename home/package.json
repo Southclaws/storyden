@@ -17,6 +17,7 @@
     "cobe": "^0.6.4",
     "date-fns": "^4.1.0",
     "feed": "^5.1.0",
+    "framer-motion": "^12.23.12",
     "fumadocs-core": "15.7.10",
     "fumadocs-mdx": "11.9.0",
     "fumadocs-openapi": "9.3.7",
@@ -30,6 +31,7 @@
     "prettier": "3.5.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-scrollama": "^2.4.2",
     "shiki": "3.12.2",
     "zod": "^4.1.5"
   },
