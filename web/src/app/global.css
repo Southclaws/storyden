@@ -72,6 +72,14 @@
   }
 }
 
+/* Firefox container query fallback support */
+@supports not (container-type: inline-size) {
+  /* When container queries are not supported, apply fallback styles */
+  .rich-card__container {
+    container-type: normal;
+  }
+}
+
 html,
 body {
   background-color: var(--colors-bg-site);
