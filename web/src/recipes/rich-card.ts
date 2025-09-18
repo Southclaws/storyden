@@ -114,7 +114,7 @@ export const richCard = defineSlotRecipe({
     shape: {
       row: {
         root: {
-          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] auto [media-end] 0.5rem [edge-end]`,
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] minmax(0, 25cqw) [media-end] 0.5rem [edge-end]`,
           gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
         },
 
@@ -185,7 +185,7 @@ export const richCard = defineSlotRecipe({
       },
       responsive: {
         root: {
-          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] auto [media-end] 0.5rem [edge-end]`,
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] minmax(0, 25cqw) [media-end] 0.5rem [edge-end]`,
           gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
           _containerSmall: {
             gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [edge-end]`,
@@ -229,9 +229,11 @@ export const richCard = defineSlotRecipe({
             minHeight: "64",
             marginBottom: "2",
             aspectRatio: "auto",
+            height: "unset",
           },
           aspectRatio: "1.777",
           minHeight: "0",
+          height: "full",
         },
 
         footerContainer: {
