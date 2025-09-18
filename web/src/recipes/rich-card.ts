@@ -22,6 +22,10 @@ export const richCard = defineSlotRecipe({
     container: {
       containerType: "inline-size",
       width: "full",
+      // Firefox fallback: Ensure container queries work consistently
+      "@supports not (container-type: inline-size)": {
+        containerType: "normal",
+      },
     },
     root: {
       "--card-border-radius": "radii.lg",
@@ -191,6 +195,11 @@ export const richCard = defineSlotRecipe({
             gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [edge-end]`,
             gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [media-start] auto [media-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
           },
+          // Firefox fallback: Use media queries instead of container queries
+          "@media (max-width: 35rem)": {
+            gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [edge-end]`,
+            gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [media-start] auto [media-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
+          },
         },
 
         // -
@@ -230,6 +239,14 @@ export const richCard = defineSlotRecipe({
             marginBottom: "2",
             aspectRatio: "auto",
           },
+          // Firefox fallback: Use media queries instead of container queries
+          "@media (max-width: 35rem)": {
+            gridColumn: "content-start / content-end",
+            gridRow: "media-start / media-end",
+            minHeight: "64",
+            marginBottom: "2",
+            aspectRatio: "auto",
+          },
           aspectRatio: "1.777",
           minHeight: "0",
         },
@@ -237,6 +254,10 @@ export const richCard = defineSlotRecipe({
         footerContainer: {
           gridColumn: "content-start / media-end",
           _containerSmall: {
+            gridColumn: "content-start / content-end",
+          },
+          // Firefox fallback: Use media queries instead of container queries
+          "@media (max-width: 35rem)": {
             gridColumn: "content-start / content-end",
           },
           gridRow: "footer-start / footer-end",
@@ -254,6 +275,10 @@ export const richCard = defineSlotRecipe({
 
         media: {
           _containerSmall: {
+            borderRadius: "sm",
+          },
+          // Firefox fallback: Use media queries instead of container queries
+          "@media (max-width: 35rem)": {
             borderRadius: "sm",
           },
         },
@@ -340,6 +365,10 @@ export const richCard = defineSlotRecipe({
           _containerSmall: {
             display: "none",
           },
+          // Firefox fallback: Use media queries instead of container queries
+          "@media (max-width: 35rem)": {
+            display: "none",
+          },
         },
       },
       fill: {
@@ -420,6 +449,10 @@ export const richCard = defineSlotRecipe({
         },
         text: {
           _containerSmall: {
+            display: "none",
+          },
+          // Firefox fallback: Use media queries instead of container queries
+          "@media (max-width: 35rem)": {
             display: "none",
           },
         },
