@@ -89,6 +89,7 @@
     "eslint": "^9.31.0",
     "eslint-config-next": "15.4.1",
     "orval": "7.2.0",
+    "playwright": "^1.55.0",
     "prettier": "^3.6.2",
     "typescript": "^5.8.3"
   },
