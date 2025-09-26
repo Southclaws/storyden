@@ -23,6 +23,7 @@ import {
 import { MutationSet } from "@/lib/library/diff";
 import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
+import { deriveError } from "@/utils/error";
 
 import { NodeStoreAPI, createNodeStore } from "./store";
 
@@ -121,7 +122,7 @@ export function LibraryPageProvider({
 
           return updated;
         } catch (error) {
-          throw new Error("patch failed", { cause: error });
+          throw new Error(deriveError(error), { cause: error });
         } finally {
           setTimeout(() => {
             setSaving(() => false);
