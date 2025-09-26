@@ -114,7 +114,7 @@ export const richCard = defineSlotRecipe({
     shape: {
       row: {
         root: {
-          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] auto [media-end] 0.5rem [edge-end]`,
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] minmax(0, 25cqw) [media-end] 0.5rem [edge-end]`,
           gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
         },
 
@@ -153,7 +153,8 @@ export const richCard = defineSlotRecipe({
           gridColumn: "media-start / edge-end",
           gridRow: "edge-start / edge-end",
 
-          aspectRatio: "1.777",
+          // SEE: comment on aspectRatio in "responsive" variant.
+          // aspectRatio: "1.777",
           minHeight: "0",
         },
 
@@ -185,7 +186,7 @@ export const richCard = defineSlotRecipe({
       },
       responsive: {
         root: {
-          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] auto [media-end] 0.5rem [edge-end]`,
+          gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [media-start] minmax(0, 25cqw) [media-end] 0.5rem [edge-end]`,
           gridTemplateRows: `[edge-start] 0.5rem [header-start] min-content [header-end] 0 [title-start] min-content [title-end] 0 [content-start] 1fr [content-end] 0 [footer-start] min-content [footer-end] 0.5rem [edge-end]`,
           _containerSmall: {
             gridTemplateColumns: `[edge-start] 0.5rem [content-start] 1fr [content-end] 0.5rem [edge-end]`,
@@ -229,9 +230,19 @@ export const richCard = defineSlotRecipe({
             minHeight: "64",
             marginBottom: "2",
             aspectRatio: "auto",
+            height: "unset",
           },
-          aspectRatio: "1.777",
+          // NOTE: A firefox bug prevents us from doing this. Because the grid
+          // track for the media container cannot be auto in Firefox, it must be
+          // a fixed width. If it's a fixed width (25cqw in this case), then the
+          // aspect ratio forces a height to be contributed to the parent's size
+          // calculations which we do not want as it makes the card taller than
+          // the text content. Ultimately, we want the text content to be the
+          // only contribution to the height calculations. It's unclear why the
+          // contain: size does not fix this in Firefox like it does in Chrome.
+          // aspectRatio: "1.777",
           minHeight: "0",
+          height: "full",
         },
 
         footerContainer: {
