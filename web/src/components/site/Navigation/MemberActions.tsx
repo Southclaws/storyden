@@ -20,7 +20,7 @@ type Props = {
 export function MemberActions({ session }: Props) {
   const account = useSession(session);
   return (
-    <HStack w="full" minW="0" gap="2" alignItems="center" justify="end" pr="1">
+    <HStack w="full" gap="2" alignItems="center" justify="end" pr="1">
       {account ? (
         <>
           <ComposeAnchor>Post</ComposeAnchor>
@@ -29,7 +29,7 @@ export function MemberActions({ session }: Props) {
         </>
       ) : (
         <>
-          <RegisterAnchor flexShrink={0} />
+          <RegisterAnchor w="full" />
           <LoginAnchor flexShrink={0} />
         </>
       )}
