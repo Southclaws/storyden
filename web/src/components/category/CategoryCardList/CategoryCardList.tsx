@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { match } from "ts-pattern";
 
 import { Category } from "@/api/openapi-schema";
 import { Heading } from "@/components/ui/heading";
@@ -8,6 +9,7 @@ import { categoryColourCSS } from "@/lib/category/colours";
 import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
 
+import { CategoryBadge } from "../CategoryBadge";
 import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
 import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
 
@@ -16,6 +18,8 @@ export type Props = {
 };
 
 export function CategoryCardGrid({ categories }: Props) {
+  const categoryCount = categories.length;
+
   return (
     <LStack>
       <WStack>
@@ -24,6 +28,38 @@ export function CategoryCardGrid({ categories }: Props) {
         <CategoryCreateTrigger />
       </WStack>
 
+      <LStack>
+        {match(categoryCount)
+          .when(
+            (c) => c === 0,
+            () => (
+              <styled.p color="fg.muted">
+                No categories yet. Create one?
+              </styled.p>
+            ),
+          )
+          .when(
+            (c) => c === 1,
+            () => (
+              <styled.p color="fg.muted">
+                There is {categoryCount} category available to start a
+                discussion.
+              </styled.p>
+            ),
+          )
+          .otherwise(() => (
+            <styled.p color="fg.muted">
+              There are {categoryCount} categories available to start
+              discussions.
+            </styled.p>
+          ))}
+
+        <HStack>
+          {categories.map((c) => (
+            <CategoryBadge category={c} />
+          ))}
+        </HStack>
+      </LStack>
       <CardGrid>
         {categories.map((c) => (
           <CategoryCard key={c.id} {...c} />
@@ -58,7 +94,7 @@ export function CategoryCard(props: Category) {
     <CardBox
       position="relative"
       style={cssProps}
-      borderColor="colorPalette.muted"
+      borderColor="colorPalette.border"
       borderLeftWidth="thick"
       borderLeftStyle="solid"
       display="flex"

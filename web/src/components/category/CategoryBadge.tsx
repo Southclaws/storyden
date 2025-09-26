@@ -23,9 +23,9 @@ export function CategoryBadge({
     <Badge
       size="sm"
       style={cssProps}
-      bgColor="colorPalette"
-      borderColor="colorPalette.muted"
-      color="colorPalette.text"
+      bgColor="colorPalette.bg"
+      borderColor="colorPalette.border"
+      color="colorPalette.fg"
       // as any: expression produces a union that is too complex... (???)
       {...(props as any)}
     >
