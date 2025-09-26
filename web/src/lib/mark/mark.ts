@@ -1,4 +1,4 @@
-const validSlugRegex = /^[a-z0-9\-_]+$/;
+const validSlugRegex = /^[^\s/?#%]+$/;
 const disallowedChars = /[/?#%]/g;
 const spaceRegex = /\s+/g;
 const multiDashRegex = /-+/g;
@@ -17,7 +17,8 @@ const trailingDashRegex = /-+$/;
  *
  * @param raw raw string input to be processed into a slug from an input box.
  * @returns the partially well-formed slug, spaces replaced by hyphens, multiple
- *          hyphens collapsed into one, disallowed characters removed, and converted to lowercase.
+ *          hyphens collapsed into one, disallowed characters removed, and
+ *          converted to lowercase.
  */
 export function processMarkInput(raw: string): string {
   const noSpaces = raw.replace(spaceRegex, "-");
