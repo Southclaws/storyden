@@ -153,7 +153,8 @@ export const richCard = defineSlotRecipe({
           gridColumn: "media-start / edge-end",
           gridRow: "edge-start / edge-end",
 
-          aspectRatio: "1.777",
+          // SEE: comment on aspectRatio in "responsive" variant.
+          // aspectRatio: "1.777",
           minHeight: "0",
         },
 
@@ -231,7 +232,15 @@ export const richCard = defineSlotRecipe({
             aspectRatio: "auto",
             height: "unset",
           },
-          aspectRatio: "1.777",
+          // NOTE: A firefox bug prevents us from doing this. Because the grid
+          // track for the media container cannot be auto in Firefox, it must be
+          // a fixed width. If it's a fixed width (25cqw in this case), then the
+          // aspect ratio forces a height to be contributed to the parent's size
+          // calculations which we do not want as it makes the card taller than
+          // the text content. Ultimately, we want the text content to be the
+          // only contribution to the height calculations. It's unclear why the
+          // contain: size does not fix this in Firefox like it does in Chrome.
+          // aspectRatio: "1.777",
           minHeight: "0",
           height: "full",
         },
