@@ -21,7 +21,7 @@ import { Props, useCategoryList } from "./useCategoryList";
 
 const mapCategories = (isAdmin: boolean) =>
   map((c: Category) => (
-    <CategoryListItem key={c.id} {...c} isAdmin={isAdmin} />
+    <CategoryListItem key={c.id} category={c} isAdmin={isAdmin} />
   ));
 
 export function CategoryList(props: Props) {

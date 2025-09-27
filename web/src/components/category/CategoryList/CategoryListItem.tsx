@@ -8,9 +8,14 @@ import { Anchor } from "src/components/site/Anchor";
 import { css } from "@/styled-system/css";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 
-import { CategoryEdit } from "../CategoryEdit/CategoryEdit";
+import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
 
-export function CategoryListItem(props: Category & { isAdmin: boolean }) {
+type Props = {
+  category: Category;
+  isAdmin: boolean;
+};
+
+export function CategoryListItem({ category, isAdmin }: Props) {
   const {
     attributes,
     listeners,
@@ -18,10 +23,10 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: props.id });
+  } = useSortable({ id: category.id });
   const pathname = usePathname();
 
-  const href = `/d/${props.slug}`;
+  const href = `/d/${category.slug}`;
   const selected = href === pathname;
 
   const style = {
@@ -34,7 +39,7 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
       className="group"
       id="category-list-item"
       style={style}
-      key={props.id}
+      key={category.id}
       ref={setNodeRef}
       w="full"
       height="8"
@@ -67,18 +72,23 @@ export function CategoryListItem(props: Category & { isAdmin: boolean }) {
         {...listeners}
       >
         <styled.h2 role="navigation" w="full" fontWeight="medium" fontSize="xs">
-          {props.name}
+          {category.name}
         </styled.h2>
       </Anchor>
 
-      {props.isAdmin && (
+      {isAdmin && (
         <Box
-          display={{
-            base: "none",
-            _groupHover: "block",
+          // Only show the edit button when hovering over the item.
+          // Why not display: none? Well, the menu anchor must be mounted on the
+          // DOM in order to calculate the position of the menu correctly.
+          // Group-hover is a Panda CSS feature that applies styles to a child
+          // when the parent of className="group" is hovered.
+          opacity={{
+            base: "0",
+            _groupHover: "full",
           }}
         >
-          <CategoryEdit {...props} />
+          <CategoryMenu category={category} />
         </Box>
       )}
     </HStack>
