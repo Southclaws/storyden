@@ -70,8 +70,8 @@ func (d *database) Create(
 
 	// If a category was specified, check if it exists first.
 	if categoryID, ok := mutate.CategoryID(); ok {
-		_, err := d.db.Category.Query().Where(category.ID(xid.ID(categoryID))).Exist(ctx)
-		if err != nil {
+		exists, err := d.db.Category.Query().Where(category.ID(xid.ID(categoryID))).Exist(ctx)
+		if err != nil || !exists {
 			if ent.IsNotFound(err) {
 				return nil, fault.Wrap(err,
 					fctx.With(ctx),
