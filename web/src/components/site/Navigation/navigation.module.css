@@ -127,15 +127,15 @@
   }
 
   .topbar-left {
-    grid-area: 0/1;
+    grid-column: 1/2;
     grid-row: 1/2;
   }
   .topbar-middle {
-    grid-area: 2/3;
+    grid-column: 1/6;
     grid-row: 1/2;
   }
   .topbar-right {
-    grid-area: 4/5;
+    grid-column: 5/6;
     grid-row: 1/2;
   }
 
