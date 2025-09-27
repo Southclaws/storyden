@@ -15,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
@@ -30,13 +29,11 @@ import (
 )
 
 type Service interface {
-	// Create a new thread in the specified category.
+	// Create a new thread with optional category.
 	Create(
 		ctx context.Context,
 		title string,
 		authorID account.AccountID,
-		categoryID category.CategoryID,
-		status visibility.Visibility,
 		meta map[string]any,
 		partial Partial,
 	) (*thread.Thread, error)

@@ -16,6 +16,7 @@ export function ThreadFeedScreen({
   initialPage,
   initialPageData,
   category,
+  paginationBasePath,
 }: Props) {
   const { session } = useSettingsContext();
 
@@ -26,19 +27,15 @@ export function ThreadFeedScreen({
         initialPage={initialPage}
         initialPageData={initialPageData}
         category={category}
+        paginationBasePath={paginationBasePath}
       />
     </LStack>
   );
 }
 
 export function ThreadFeed(props: Props) {
-  const {
-    ready,
-    error,
-
-    showPaginationTop,
-    data,
-  } = useThreadFeedScreen(props);
+  const { ready, error, showPaginationTop, data, handlePageChange } =
+    useThreadFeedScreen(props);
   if (!ready) {
     return <Unready error={error} />;
   }
@@ -55,6 +52,7 @@ export function ThreadFeed(props: Props) {
           currentPage={data.current_page}
           totalPages={data.total_pages}
           pageSize={data.page_size}
+          onClick={handlePageChange}
         />
       )}
       <ol className={lstack()}>
@@ -64,10 +62,11 @@ export function ThreadFeed(props: Props) {
       </ol>
 
       <PaginationControls
-        path="/"
+        path={props.paginationBasePath}
         currentPage={data.current_page}
         totalPages={data.total_pages}
         pageSize={data.page_size}
+        onClick={handlePageChange}
       />
     </VStack>
   );

@@ -5,7 +5,7 @@ import { ThreadReferenceList } from "@/components/post/ThreadReferenceList";
 import { Button } from "@/components/ui/button";
 import { CancelIcon } from "@/components/ui/icons/Cancel";
 import { Input } from "@/components/ui/input";
-import { VStack, styled } from "@/styled-system/jsx";
+import { LStack, styled } from "@/styled-system/jsx";
 
 import { Props, useThreadIndexView } from "./useThreadIndexView";
 
@@ -15,7 +15,7 @@ export function ThreadIndexView(props: Props) {
   if (form.formState.isLoading) return <Unready />;
 
   return (
-    <VStack>
+    <LStack>
       <styled.form
         display="flex"
         w="full"
@@ -63,6 +63,6 @@ export function ThreadIndexView(props: Props) {
       />
 
       <ThreadReferenceList threads={data.threads.threads} />
-    </VStack>
+    </LStack>
   );
 }

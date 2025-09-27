@@ -23,7 +23,7 @@ type Params struct {
 	AccountID     opt.Optional[account.AccountID]
 	Visibility    opt.Optional[[]visibility.Visibility]
 	Tags          opt.Optional[[]xid.ID]
-	Categories    opt.Optional[[]string]
+	Categories    opt.Optional[thread.CategoryFilter]
 }
 
 func (s *service) List(ctx context.Context,
@@ -42,7 +42,7 @@ func (s *service) List(ctx context.Context,
 	opts.UpdatedBefore.Call(func(value time.Time) { q = append(q, thread.HasUpdatedDateBefore(value)) })
 	opts.AccountID.Call(func(a account.AccountID) { q = append(q, thread.HasAuthor(a)) })
 	opts.Tags.Call(func(a []xid.ID) { q = append(q, thread.HasTags(a)) })
-	opts.Categories.Call(func(a []string) { q = append(q, thread.HasCategories(a)) })
+	opts.Categories.Call(func(cf thread.CategoryFilter) { q = append(q, thread.HasCategories(cf)) })
 
 	vq := func() thread.Query {
 		v, ok := opts.Visibility.Get()

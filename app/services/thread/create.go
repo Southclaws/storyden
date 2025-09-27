@@ -12,7 +12,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/message"
-	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -22,8 +21,6 @@ import (
 func (s *service) Create(ctx context.Context,
 	title string,
 	authorID account.AccountID,
-	categoryID category.CategoryID,
-	status visibility.Visibility,
 	meta map[string]any,
 	partial Partial,
 ) (*thread.Thread, error) {
@@ -35,9 +32,15 @@ func (s *service) Create(ctx context.Context,
 
 	opts := partial.Opts()
 	opts = append(opts,
-		thread.WithVisibility(status),
 		thread.WithMeta(meta),
 	)
+
+	// Small hack: default to zero-value of content, which is actually not zero
+	// it's <body></body>. Why? who knows... oh, me, yes I should know. I don't.
+	if !partial.Content.Ok() {
+		c, _ := datagraph.NewRichText("")
+		opts = append(opts, thread.WithContent(c))
+	}
 
 	if u, ok := partial.URL.Get(); ok {
 		ln, err := s.fetcher.Fetch(ctx, u, fetcher.Options{})
@@ -60,19 +63,17 @@ func (s *service) Create(ctx context.Context,
 	thr, err := s.thread_repo.Create(ctx,
 		title,
 		authorID,
-		categoryID,
 		opts...,
 	)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create thread"))
 	}
 
-	if status == visibility.VisibilityPublished {
+	if thr.Visibility == visibility.VisibilityPublished {
 		s.bus.Publish(ctx, &message.EventThreadPublished{
 			ID: thr.ID,
 		})
 	}
-
 
 	// TODO: Do this using event consumer.
 	s.mentioner.Send(ctx, authorID, *datagraph.NewRef(thr), thr.Content.References()...)

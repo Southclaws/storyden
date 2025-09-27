@@ -29,14 +29,20 @@ type Breadcrumb =
     };
 
 export function Breadcrumbs({ thread }: Props) {
-  // This is a list as we may do nested categories in future.
-  const crumbs: Breadcrumb[] = thread
+  const category = thread?.category
     ? [
         {
-          type: "category",
+          type: "category" as const,
           key: thread.category.id,
           category: thread.category,
         },
+      ]
+    : [];
+
+  // This is a list as we may do nested categories in future.
+  const crumbs: Breadcrumb[] = thread
+    ? [
+        ...category,
         {
           type: "thread",
           key: thread.id,

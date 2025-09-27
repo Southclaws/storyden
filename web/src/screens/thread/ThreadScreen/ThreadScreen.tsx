@@ -5,6 +5,7 @@ import { Controller, ControllerProps } from "react-hook-form";
 import { Unready } from "src/components/site/Unready";
 
 import { Thread } from "@/api/openapi-schema";
+import { CategoryBadge } from "@/components/category/CategoryBadge";
 import { Byline } from "@/components/content/Byline";
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
 import { CancelAction } from "@/components/site/Action/Cancel";
@@ -73,14 +74,16 @@ export function ThreadScreen(props: Props) {
         {thread.deletedAt !== undefined && (
           <ThreadDeletedAlert thread={thread} />
         )}
+        <WStack>
+          <Byline
+            href={`#${thread.id}`}
+            author={thread.author}
+            time={new Date(thread.createdAt)}
+            updated={new Date(thread.updatedAt)}
+          />
 
-        <Byline
-          href={`#${thread.id}`}
-          author={thread.author}
-          time={new Date(thread.createdAt)}
-          updated={new Date(thread.updatedAt)}
-        />
-
+          {thread.category && <CategoryBadge category={thread.category} />}
+        </WStack>
         <FormErrorText>{form.formState.errors.root?.message}</FormErrorText>
 
         {isEditing ? (

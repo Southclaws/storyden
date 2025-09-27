@@ -1,20 +1,39 @@
 "use client";
 
+import { parseAsInteger, useQueryState } from "nuqs";
+
 import { useThreadList } from "@/api/openapi-client/threads";
-import { Account, Category, ThreadListResult } from "@/api/openapi-schema";
+import { Category, ThreadListResult } from "@/api/openapi-schema";
 
 export type Props = {
   initialPage?: number;
   initialPageData?: ThreadListResult;
-  category?: Category;
+  category:
+    | undefined // No category specified, no filters applied.
+    | Category // An explicit category.
+    | null; // Explicitly uncategorised.
+  paginationBasePath: string;
 };
 
 export function useThreadFeedScreen(props: Props) {
   const initialPage = props.initialPage ?? 1;
+
+  const [page, setPage] = useQueryState("page", {
+    ...parseAsInteger,
+    defaultValue: props.initialPage ?? 1,
+  });
+
+  function handlePageChange(page: number) {
+    setPage(page);
+  }
+
   const { data, error } = useThreadList(
     {
-      page: initialPage.toString(),
-      categories: props.category ? [props.category.slug] : [],
+      page: page.toString(),
+      categories:
+        props.category === undefined
+          ? []
+          : [props.category === null ? "null" : props.category.slug],
     },
     {
       swr: {
@@ -35,5 +54,6 @@ export function useThreadFeedScreen(props: Props) {
     ready: true as const,
     showPaginationTop,
     data,
+    handlePageChange,
   };
 }

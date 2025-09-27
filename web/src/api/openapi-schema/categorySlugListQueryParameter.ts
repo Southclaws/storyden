@@ -7,20 +7,15 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.25.6-canary
  */
-import type { Identifier } from "./identifier";
-import type { Metadata } from "./metadata";
-import type { PostContent } from "./postContent";
-import type { TagNameList } from "./tagNameList";
-import type { ThreadTitle } from "./threadTitle";
-import type { Url } from "./url";
-import type { Visibility } from "./visibility";
+import type { CategorySlug } from "./categorySlug";
 
-export interface ThreadInitialProps {
-  body?: PostContent;
-  category?: Identifier;
-  meta?: Metadata;
-  tags?: TagNameList;
-  title: ThreadTitle;
-  url?: Url;
-  visibility?: Visibility;
-}
+/**
+ * Category slugs to filter by. Multiple instances of this parameter can be
+used to filter by many categories. If not provided, no filtering will be
+applied and all threads will be returned. If ANY of the provided values
+is set to the exact value of "null" then only uncategorised threads will
+be returned. When filtering for uncategorised threads, all other values
+will be ignored, only the value containing "null" will be considered.
+
+ */
+export type CategorySlugListQueryParameter = CategorySlug[];

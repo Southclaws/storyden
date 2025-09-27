@@ -1218,11 +1218,7 @@ paths:
           required: false
           in: query
           schema: { $ref: "#/components/schemas/TagListIDs" }
-        - name: categories
-          description: Show only results with these categories
-          required: false
-          in: query
-          schema: { $ref: "#/components/schemas/CategorySlugList" }
+        - $ref: "#/components/parameters/CategorySlugListQuery"
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
@@ -2386,6 +2382,20 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/Identifier"
+
+    CategorySlugListQuery:
+      name: categories
+      description: |
+        Category slugs to filter by. Multiple instances of this parameter can be
+        used to filter by many categories. If not provided, no filtering will be
+        applied and all threads will be returned. If ANY of the provided values
+        is set to the exact value of "null" then only uncategorised threads will
+        be returned. When filtering for uncategorised threads, all other values
+        will be ignored, only the value containing "null" will be considered.
+      required: false
+      in: query
+      schema:
+        $ref: "#/components/schemas/CategorySlugList"
 
     TagNameParam:
       description: Tag name.
@@ -4929,11 +4939,7 @@ components:
 
     ThreadInitialProps:
       type: object
-      required:
-        - title
-        - body
-        - category
-        - visibility
+      required: [title]
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         body: { $ref: "#/components/schemas/PostContent" }
@@ -4970,14 +4976,15 @@ components:
       type: object
       required:
         - pinned
+        - visibility
         - tags
         - reply_status
-        - category
         - collections
       properties:
         pinned:
           type: boolean
           description: Whether the thread is pinned in this category.
+        visibility: { $ref: "#/components/schemas/Visibility" }
         reply_status: { $ref: "#/components/schemas/ReplyStatus" }
         category: { $ref: "#/components/schemas/CategoryReference" }
         link: { $ref: "#/components/schemas/LinkReference" }

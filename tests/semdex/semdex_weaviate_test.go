@@ -11,6 +11,7 @@ import (
 
 	_ "github.com/joho/godotenv/autoload"
 
+	"github.com/Southclaws/opt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -72,9 +73,9 @@ func TestSemdexWeaviate(t *testing.T) {
 
 				response, err := cl.ThreadCreateWithResponse(ctx, openapi.ThreadInitialProps{
 					Title:      title,
-					Category:   cat1create.JSON200.Id,
-					Body:       string(b),
-					Visibility: openapi.Published,
+					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+					Body:       opt.New(string(b)).Ptr(),
+					Visibility: opt.New(openapi.Published).Ptr(),
 				}, sh.WithSession(ctx))
 				r.NoError(err)
 				r.Equal(http.StatusOK, response.StatusCode())

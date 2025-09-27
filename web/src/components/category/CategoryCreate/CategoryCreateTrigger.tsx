@@ -1,3 +1,5 @@
+import { Portal } from "@ark-ui/react";
+
 import { useDisclosure } from "src/utils/useDisclosure";
 
 import { Permission } from "@/api/openapi-schema";
@@ -55,14 +57,21 @@ export function CategoryCreateTrigger({
 }
 
 export function CreateCategoryMenuItem({ hideLabel }: Props) {
+  const { onOpen, isOpen, onClose } = useDisclosure();
+
   return (
-    <Item value={CreateCategoryID}>
+    <Item value={CreateCategoryID} onClick={onOpen}>
       {CreateCategoryIcon}
       {!hideLabel && (
         <>
           &nbsp;<span>{CreateCategoryLabel}</span>
         </>
       )}
+
+      <Portal>
+        {/* Portal to avoid nested form triggering. */}
+        <CategoryCreateModal isOpen={isOpen} onClose={onClose} />
+      </Portal>
     </Item>
   );
 }

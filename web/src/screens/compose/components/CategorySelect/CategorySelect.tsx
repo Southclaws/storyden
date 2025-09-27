@@ -19,7 +19,15 @@ const mapCategories = map((c: Category) => (
 export function CategorySelect() {
   const { control, fieldError, categories, error } = useCategorySelect();
 
-  if (!categories) return <Unready error={error} />;
+  // Case 1: Categories failed to load or are still loading.
+  if (categories === undefined) {
+    return <Unready error={error} />;
+  }
+
+  // Case 2: There are zero categories available, do not render.
+  if (categories.length === 0) {
+    return null;
+  }
 
   return (
     <FormControl w="min">

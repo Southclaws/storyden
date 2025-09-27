@@ -16,6 +16,7 @@ import {
   ThreadListOKResponse,
   ThreadListParams,
   ThreadReference,
+  Visibility,
 } from "@/api/openapi-schema";
 
 export function useFeedMutations(session?: Account, params?: ThreadListParams) {
@@ -66,29 +67,31 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
 
       const description =
         new DOMParser()
-          .parseFromString(initial.body, "text/html")
+          .parseFromString(initial.body ?? "<body></body>", "text/html")
           .querySelector("body")?.textContent ?? "";
 
       const newThread = {
         ...initial,
-        category: {
-          id: initial.category,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-          slug: "",
-          admin: false,
-          colour: "colour",
-          description: "",
-          name: "name",
-          sort: 0,
-        },
+        category: initial.category
+          ? {
+              id: initial.category,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              slug: "",
+              admin: false,
+              colour: "colour",
+              description: "",
+              name: "name",
+              sort: 0,
+            }
+          : undefined,
         id: uniqueId("optimistic_thread_id_"),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         slug: uniqueId("optimistic_thread_slug_"),
         author: session,
         description,
-        body: initial.body,
+        body: initial.body ?? "",
         body_links: [],
         assets: [],
         collections: {
@@ -100,6 +103,7 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
         pinned: false,
         reply_status: { replies: 0, replied: 0 },
         tags: [],
+        visibility: Visibility.draft,
         link: preHydratedLink,
       } satisfies ThreadReference;
 

@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -37,7 +36,6 @@ type Repository interface {
 		ctx context.Context,
 		title string,
 		authorID account.AccountID,
-		categoryID category.CategoryID,
 		opts ...Option,
 	) (*Thread, error)
 
@@ -57,6 +55,15 @@ type Repository interface {
 	Get(ctx context.Context, threadID post.ID, pageParams pagination.Parameters, accountID opt.Optional[account.AccountID]) (*Thread, error)
 
 	Delete(ctx context.Context, id post.ID) error
+}
+
+// 3 states:
+// 1. Slugs filled - filter by slugs, ignore other fields.
+// 2. Slugs empty, Uncategorised true - fetch uncategorised threads only.
+// 3. Slugs empty, Uncategorised false - fetch all threads.
+type CategoryFilter struct {
+	Slugs         []string
+	Uncategorised bool
 }
 
 type Option func(*ent.PostMutation)
@@ -172,9 +179,17 @@ func HasTags(ids []xid.ID) Query {
 	}
 }
 
-func HasCategories(ids []string) Query {
+func HasCategories(cf CategoryFilter) Query {
 	return func(q *ent.PostQuery) {
-		q.Where(ent_post.HasCategoryWith(ent_category.SlugIn(ids...)))
+		if len(cf.Slugs) > 0 {
+			q.Where(ent_post.HasCategoryWith(ent_category.SlugIn(cf.Slugs...)))
+		} else {
+			if cf.Uncategorised {
+				q.Where(ent_post.CategoryIDIsNil())
+			} else {
+				// No filter, fetch all threads.
+			}
+		}
 	}
 }
 

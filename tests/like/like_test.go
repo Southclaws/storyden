@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/Southclaws/opt"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -42,9 +43,9 @@ func TestLikeThreads(t *testing.T) {
 			tests.Ok(t, err, cat1create)
 
 			thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-				Body:       "<p>this is a thread</p>",
-				Category:   cat1create.JSON200.Id,
-				Visibility: openapi.Published,
+				Body:       opt.New("<p>this is a thread</p>").Ptr(),
+				Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
 				Title:      "Thread testing",
 			}, adminSession)
 			tests.Ok(t, err, thread1create)
@@ -137,9 +138,9 @@ func TestLikeReplies(t *testing.T) {
 			tests.Ok(t, err, cat1create)
 
 			thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-				Body:       "<p>this is a thread</p>",
-				Category:   cat1create.JSON200.Id,
-				Visibility: openapi.Published,
+				Body:       opt.New("<p>this is a thread</p>").Ptr(),
+				Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
 				Title:      "Thread testing",
 			}, adminSession)
 			tests.Ok(t, err, thread1create)

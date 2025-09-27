@@ -11,6 +11,7 @@ import (
 
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/asset/asset_writer"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
@@ -65,7 +66,7 @@ Storyden is still in development so please give the repository a watch if you're
 `)),
 		},
 		Title:    "Welcome to Storyden!",
-		Category: Category_01_General,
+		Category: opt.New(Category_01_General),
 		Replies: pagination.Result[*reply.Reply]{
 			Items: []*reply.Reply{
 				{
@@ -175,7 +176,7 @@ Storyden is still in development so please give the repository a watch if you're
 	`)),
 		},
 		Title:    "How to contribute",
-		Category: Category_01_General,
+		Category: opt.New(Category_01_General),
 		Replies: pagination.Result[*reply.Reply]{
 			Items: []*reply.Reply{
 				{
@@ -207,7 +208,7 @@ Storyden is still in development so please give the repository a watch if you're
 	Try to break storyden with large amounts of text, hacky strings, etc! GO!`)),
 		},
 		Title:    "The lorem ipsum thread",
-		Category: Category_01_General,
+		Category: opt.New(Category_01_General),
 		Replies: pagination.Result[*reply.Reply]{
 			Items: []*reply.Reply{
 				{
@@ -272,11 +273,11 @@ func threads(tr thread.Repository, pr reply.Repository, rr *reaction.Writer, ar 
 		th, err := tr.Create(ctx,
 			t.Title,
 			t.Author.ID,
-			t.Category.ID,
 			thread.WithID(t.ID),
 			thread.WithContent(t.Content),
 			thread.WithVisibility(visibility.VisibilityPublished),
 			thread.WithAssets(assetIDs),
+			thread.WithCategory(xid.ID(t.Category.OrZero().ID)),
 		)
 		if err != nil {
 			if ent.IsConstraintError(err) {

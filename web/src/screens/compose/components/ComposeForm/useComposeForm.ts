@@ -15,7 +15,7 @@ export type Props = { editing?: string; initialDraft?: Thread };
 export const FormShapeSchema = z.object({
   title: z.string().default(""),
   body: z.string().min(1),
-  category: z.string(),
+  category: z.string().optional(),
   tags: z.string().array().optional(),
   url: z.string().optional(),
 });

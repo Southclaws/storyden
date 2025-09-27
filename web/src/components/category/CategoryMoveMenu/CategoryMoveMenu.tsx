@@ -11,6 +11,11 @@ import { useThreadMutations } from "@/lib/thread/mutation";
 import { HStack } from "@/styled-system/jsx";
 
 import { CategoryBadge } from "../CategoryBadge";
+import {
+  CategoryCreateTrigger,
+  CreateCategoryID,
+  CreateCategoryMenuItem,
+} from "../CategoryCreate/CategoryCreateTrigger";
 
 type Props = {
   thread: ThreadReference;
@@ -20,6 +25,12 @@ export function useCategoryMoveMenu({ thread }: Props) {
   const { revalidate, updateCategory } = useThreadMutations(thread);
 
   async function handleSelect({ value }: MenuSelectionDetails) {
+    // If the user clicked the create category prompt, only present when there
+    // are no categories available, then exit early.
+    if (value === CreateCategoryID) {
+      return;
+    }
+
     await handle(
       async () => {
         await updateCategory(value);
@@ -78,9 +89,22 @@ function LazyLoadedCategoryMoveMenuContent() {
 
   const { categories } = data;
 
+  const hasAnyCategories = categories.length > 0;
+  if (!hasAnyCategories) {
+    return (
+      <Menu.Content minW="48" userSelect="none">
+        <Menu.ItemGroup id="move-no-categories">
+          <Menu.ItemGroupLabel>No categories to move to</Menu.ItemGroupLabel>
+
+          <CreateCategoryMenuItem />
+        </Menu.ItemGroup>
+      </Menu.Content>
+    );
+  }
+
   return (
     <Menu.Content minW="48" userSelect="none">
-      <Menu.ItemGroup id="account">
+      <Menu.ItemGroup id="move">
         <Menu.ItemGroupLabel>Move thread</Menu.ItemGroupLabel>
 
         <Menu.Separator />
