@@ -5907,7 +5907,7 @@ transitionDuration?: ConditionalValue<WithEscapeHatch<UtilityValues["transitionD
    *
    * @see https://developer.mozilla.org/docs/Web/CSS/transition-property
    */
-transitionProperty?: ConditionalValue<WithEscapeHatch<CssProperties["transitionProperty"]>>
+transitionProperty?: ConditionalValue<WithEscapeHatch<UtilityValues["transitionProperty"] | CssVars>>
  /**
    * The **`transition-timing-function`** CSS property sets how intermediate values are calculated for CSS properties being affected by a transition effect.
    *
