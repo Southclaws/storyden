@@ -18,7 +18,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 
-	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -52,7 +51,7 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	status, err := deserialiseThreadStatus(request.Body.Visibility)
+	status, err := opt.MapErr(opt.NewPtr(request.Body.Visibility), deserialiseThreadStatus)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -66,10 +65,14 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 		return dt.Map(tags, deserialiseTagName)
 	})
 
-	richContent, err := datagraph.NewRichText(request.Body.Body)
+	richContent, err := opt.MapErr(opt.NewPtr(request.Body.Body), datagraph.NewRichText)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument))
 	}
+
+	category := opt.NewPtrMap(request.Body.Category, func(cat openapi.Identifier) xid.ID {
+		return openapi.ParseID(cat)
+	})
 
 	url, err := opt.MapErr(opt.NewPtr(request.Body.Url), func(s string) (url.URL, error) {
 		u, err := url.Parse(s)
@@ -85,14 +88,13 @@ func (i *Threads) ThreadCreate(ctx context.Context, request openapi.ThreadCreate
 	thread, err := i.thread_svc.Create(ctx,
 		request.Body.Title,
 		accountID,
-		category.CategoryID(openapi.ParseID(request.Body.Category)),
-		status,
 		meta,
 		thread_service.Partial{
-			Content:    opt.New(richContent),
-			URL:        url,
+			Content:    richContent,
+			Category:   category,
 			Tags:       tags,
-			Visibility: opt.New(status),
+			Visibility: status,
+			URL:        url,
 		},
 	)
 	if err != nil {

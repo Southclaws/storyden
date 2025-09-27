@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -55,16 +56,16 @@ func TestSearchMultipleKinds(t *testing.T) {
 			cold := "<p>this contains none of the words we want</p>"
 
 			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-				Body:       hot,
-				Category:   cat1.JSON200.Id,
-				Visibility: openapi.Published,
+				Body:       opt.New(hot).Ptr(),
+				Category:   opt.New(cat1.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
 				Title:      "thread",
 			}, session1)
 			tests.Ok(t, err, t1)
 			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-				Body:       cold,
-				Category:   cat1.JSON200.Id,
-				Visibility: openapi.Published,
+				Body:       opt.New(cold).Ptr(),
+				Category:   opt.New(cat1.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
 				Title:      "thread",
 			}, session2)
 			tests.Ok(t, err, t2)
@@ -223,16 +224,16 @@ func TestSearchVisibilityRules(t *testing.T) {
 			cold := "<p>this contains the keyword we want but it's not published</p>"
 
 			t1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-				Body:       hot,
-				Category:   cat1.JSON200.Id,
-				Visibility: openapi.Published,
+				Body:       opt.New(hot).Ptr(),
+				Category:   opt.New(cat1.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
 				Title:      "thread",
 			}, session1)
 			tests.Ok(t, err, t1)
 			t2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
-				Body:       cold,
-				Category:   cat1.JSON200.Id,
-				Visibility: openapi.Draft,
+				Body:       opt.New(cold).Ptr(),
+				Category:   opt.New(cat1.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Draft).Ptr(),
 				Title:      "thread",
 			}, session2)
 			tests.Ok(t, err, t2)

@@ -83,7 +83,8 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Meta:        (*openapi.Metadata)(&t.Meta),
 		LastReplyAt: t.LastReplyAt.Ptr(),
 
-		Category:    serialiseCategoryReference(&t.Category),
+		Category:    opt.Map(t.Category, serialiseCategoryReference).Ptr(),
+		Visibility:  serialiseVisibility(t.Visibility),
 		Pinned:      t.Pinned,
 		ReplyStatus: serialiseReplyStatus(t.ReplyStatus),
 		Likes:       serialiseLikeStatus(&t.Likes),
@@ -104,12 +105,13 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Assets:         dt.Map(t.Assets, serialiseAssetPtr),
 		Author:         serialiseProfileReference(t.Author),
 		Body:           serialiseContentHTML(t.Content),
-		Category:       serialiseCategoryReference(&t.Category),
+		Category:       opt.Map(t.Category, serialiseCategoryReference).Ptr(),
 		Likes:          serialiseLikeStatus(&t.Likes),
 		Collections:    serialiseCollectionStatus(t.Collections),
 		CreatedAt:      t.CreatedAt,
 		DeletedAt:      t.DeletedAt.Ptr(),
 		Description:    &t.Short,
+		Visibility:     serialiseVisibility(t.Visibility),
 		Id:             openapi.Identifier(t.ID.String()),
 		Link:           opt.Map(t.WebLink, serialiseLinkRef).Ptr(),
 		Meta:           (*openapi.Metadata)(&t.Meta),
@@ -213,7 +215,7 @@ func serialiseCategory(c *category.Category) openapi.Category {
 	}
 }
 
-func serialiseCategoryReference(c *category.Category) openapi.CategoryReference {
+func serialiseCategoryReference(c category.Category) openapi.CategoryReference {
 	return openapi.CategoryReference{
 		Id:          *openapi.IdentifierFrom(xid.ID(c.ID)),
 		Name:        c.Name,

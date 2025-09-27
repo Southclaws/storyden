@@ -24,13 +24,13 @@ import (
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/internal/ent"
 	ent_account "github.com/Southclaws/storyden/internal/ent/account"
 	ent_asset "github.com/Southclaws/storyden/internal/ent/asset"
+	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
@@ -58,22 +58,8 @@ func (d *database) Create(
 	ctx context.Context,
 	title string,
 	authorID account.AccountID,
-	categoryID category.CategoryID,
 	opts ...Option,
 ) (*Thread, error) {
-	cat, err := d.db.Category.Get(ctx, xid.ID(categoryID))
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return nil, fault.Wrap(err,
-				fctx.With(ctx),
-				ftag.With(ftag.NotFound),
-				fmsg.WithDesc("category not found",
-					"The specified category was not found while creating the thread."))
-		}
-
-		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
-	}
-
 	create := d.db.Post.Create()
 	mutate := create.Mutation()
 	mutate.SetUpdatedAt(time.Now())
@@ -82,11 +68,25 @@ func (d *database) Create(
 		fn(mutate)
 	}
 
+	// If a category was specified, check if it exists first.
+	if categoryID, ok := mutate.CategoryID(); ok {
+		_, err := d.db.Category.Query().Where(category.ID(xid.ID(categoryID))).Exist(ctx)
+		if err != nil {
+			if ent.IsNotFound(err) {
+				return nil, fault.Wrap(err,
+					fctx.With(ctx),
+					ftag.With(ftag.NotFound),
+					fmsg.WithDesc("category not found",
+						"The specified category was not found while creating the thread."))
+			}
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		}
+	}
+
 	mutate.SetTitle(title)
 	mutate.SetFirst(true)
 	mutate.SetAuthorID(xid.ID(authorID))
 	mutate.SetTitle(title)
-	mutate.SetCategoryID(cat.ID)
 
 	p, err := create.Save(ctx)
 	if err != nil {

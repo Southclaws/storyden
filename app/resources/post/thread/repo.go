@@ -13,7 +13,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -37,7 +36,6 @@ type Repository interface {
 		ctx context.Context,
 		title string,
 		authorID account.AccountID,
-		categoryID category.CategoryID,
 		opts ...Option,
 	) (*Thread, error)
 

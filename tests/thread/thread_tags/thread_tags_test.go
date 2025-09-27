@@ -6,6 +6,7 @@ import (
 
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/opt"
 	"github.com/google/uuid"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
@@ -51,8 +52,8 @@ func TestThreadTags(t *testing.T) {
 				tags := []string{t1, t2, t3}
 				create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      un("n1"),
-					Category:   catID,
-					Visibility: openapi.Published,
+					Category:   opt.New(catID).Ptr(),
+					Visibility: opt.New(openapi.Published).Ptr(),
 					Tags:       &tags,
 				}, adminSession)
 				tests.Ok(t, err, create)
@@ -76,8 +77,8 @@ func TestThreadTags(t *testing.T) {
 				n1tags := []string{t1, t2, t3}
 				create1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      un("n1"),
-					Category:   catID,
-					Visibility: openapi.Published,
+					Category:   opt.New(catID).Ptr(),
+					Visibility: opt.New(openapi.Published).Ptr(),
 					Tags:       &n1tags,
 				}, adminSession)
 				tests.Ok(t, err, create1)
@@ -86,8 +87,8 @@ func TestThreadTags(t *testing.T) {
 				n2tags := []string{t2, t3, t4}
 				create2, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      un("n1"),
-					Category:   catID,
-					Visibility: openapi.Published,
+					Category:   opt.New(catID).Ptr(),
+					Visibility: opt.New(openapi.Published).Ptr(),
 					Tags:       &n2tags,
 				}, adminSession)
 				tests.Ok(t, err, create2)
@@ -112,8 +113,8 @@ func TestThreadTags(t *testing.T) {
 				tags := []string{t1, t2}
 				create1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      un("n1"),
-					Category:   catID,
-					Visibility: openapi.Published,
+					Category:   opt.New(catID).Ptr(),
+					Visibility: opt.New(openapi.Published).Ptr(),
 					Tags:       &tags,
 				}, adminSession)
 				tests.Ok(t, err, create1)
@@ -148,8 +149,8 @@ func TestThreadTags(t *testing.T) {
 				tags := []string{t1, t2, t3}
 				create1, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Title:      un("n1"),
-					Category:   catID,
-					Visibility: openapi.Published,
+					Category:   opt.New(catID).Ptr(),
+					Visibility: opt.New(openapi.Published).Ptr(),
 					Tags:       &tags,
 				}, adminSession)
 				tests.Ok(t, err, create1)

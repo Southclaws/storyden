@@ -102,11 +102,11 @@ func (m *Manager) Create(ctx context.Context,
 		ctx,
 		name,
 		accountID,
-		cat,
-		visibility.VisibilityUnlisted,
 		nil,
 		thread.Partial{
-			Content: opt.New(content),
+			Content:    opt.New(content),
+			Category:   opt.New(xid.ID(cat)),
+			Visibility: opt.New(visibility.VisibilityUnlisted),
 		},
 	)
 	if err != nil {

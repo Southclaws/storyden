@@ -11,9 +11,10 @@ import type { CategoryReference } from "./categoryReference";
 import type { LinkReference } from "./linkReference";
 import type { ReplyStatus } from "./replyStatus";
 import type { TagReferenceList } from "./tagReferenceList";
+import type { Visibility } from "./visibility";
 
 export interface ThreadReferenceProps {
-  category: CategoryReference;
+  category?: CategoryReference;
   /** The time of the last reply to the thread. */
   last_reply_at?: string;
   link?: LinkReference;
@@ -21,4 +22,5 @@ export interface ThreadReferenceProps {
   pinned: boolean;
   reply_status: ReplyStatus;
   tags: TagReferenceList;
+  visibility: Visibility;
 }

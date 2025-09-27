@@ -35,7 +35,7 @@ type Thread struct {
 
 	ReplyStatus post.ReplyStatus
 	Replies     pagination.Result[*reply.Reply]
-	Category    category.Category
+	Category    opt.Optional[category.Category]
 	Visibility  visibility.Visibility
 	Tags        tag_ref.Tags
 	Related     datagraph.ItemList
@@ -51,11 +51,9 @@ func (t *Thread) GetCreated() time.Time   { return t.CreatedAt }
 func (t *Thread) GetUpdated() time.Time   { return t.UpdatedAt }
 
 func Map(m *ent.Post) (*Thread, error) {
-	categoryEdge, err := m.Edges.CategoryOrErr()
-	if err != nil {
-		return nil, fault.Wrap(err)
-	}
-	category := category.FromModel(categoryEdge)
+	category := opt.Map(opt.NewPtr(m.Edges.Category), func(in ent.Category) category.Category {
+		return *category.FromModel(&in)
+	})
 
 	link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
 		return *link_ref.Map(&in)
@@ -94,7 +92,7 @@ func Map(m *ent.Post) (*Thread, error) {
 		Pinned:      m.Pinned,
 		LastReplyAt: opt.NewPtr(m.LastReplyAt),
 
-		Category:   *category,
+		Category:   category,
 		Visibility: visibility.NewVisibilityFromEnt(m.Visibility),
 		Tags:       tags,
 	}, nil
@@ -108,11 +106,9 @@ func Mapper(
 	rl reaction.Lookup,
 ) func(m *ent.Post) (*Thread, error) {
 	return func(m *ent.Post) (*Thread, error) {
-		categoryEdge, err := m.Edges.CategoryOrErr()
-		if err != nil {
-			return nil, fault.Wrap(err)
-		}
-		category := category.FromModel(categoryEdge)
+		category := opt.Map(opt.NewPtr(m.Edges.Category), func(in ent.Category) category.Category {
+			return *category.FromModel(&in)
+		})
 
 		link := opt.Map(opt.NewPtr(m.Edges.Link), func(in ent.Link) link_ref.LinkRef {
 			return *link_ref.Map(&in)
@@ -163,7 +159,7 @@ func Mapper(
 			LastReplyAt: opt.NewPtr(m.LastReplyAt),
 
 			ReplyStatus: rs.Status(m.ID),
-			Category:    *category,
+			Category:    category,
 			Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),
 		}, nil
 	}

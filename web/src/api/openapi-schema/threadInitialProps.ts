@@ -16,11 +16,11 @@ import type { Url } from "./url";
 import type { Visibility } from "./visibility";
 
 export interface ThreadInitialProps {
-  body: PostContent;
-  category: Identifier;
+  body?: PostContent;
+  category?: Identifier;
   meta?: Metadata;
   tags?: TagNameList;
   title: ThreadTitle;
   url?: Url;
-  visibility: Visibility;
+  visibility?: Visibility;
 }

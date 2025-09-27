@@ -4929,11 +4929,7 @@ components:
 
     ThreadInitialProps:
       type: object
-      required:
-        - title
-        - body
-        - category
-        - visibility
+      required: [title]
       properties:
         title: { $ref: "#/components/schemas/ThreadTitle" }
         body: { $ref: "#/components/schemas/PostContent" }
@@ -4970,14 +4966,15 @@ components:
       type: object
       required:
         - pinned
+        - visibility
         - tags
         - reply_status
-        - category
         - collections
       properties:
         pinned:
           type: boolean
           description: Whether the thread is pinned in this category.
+        visibility: { $ref: "#/components/schemas/Visibility" }
         reply_status: { $ref: "#/components/schemas/ReplyStatus" }
         category: { $ref: "#/components/schemas/CategoryReference" }
         link: { $ref: "#/components/schemas/LinkReference" }

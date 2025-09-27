@@ -58,9 +58,9 @@ func TestCollectionItems(t *testing.T) {
 			tests.Ok(t, err, cat1)
 
 			threadCreateProps := openapi.ThreadInitialProps{
-				Body:       "<p>this is a thread</p>",
-				Category:   cat1.JSON200.Id,
-				Visibility: openapi.Published,
+				Body:       opt.New("<p>this is a thread</p>").Ptr(),
+				Category:   opt.New(cat1.JSON200.Id).Ptr(),
+				Visibility: opt.New(openapi.Published).Ptr(),
 				Title:      "thread",
 			}
 
