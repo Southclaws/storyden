@@ -23,7 +23,7 @@ export default async function Page({ searchParams }: Props) {
 
     const { data: categories } = await categoryList();
     const { data: threads } = await threadList({
-      page: "1",
+      page: page?.toString() ?? "1",
       // NOTE: The string "null" is a special case that yields all threads that
       // do not have a category. Why a string null and not just null? Because
       // the OpenAPI generators don't play well with query parameters that use
