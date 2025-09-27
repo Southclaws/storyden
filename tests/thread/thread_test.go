@@ -409,6 +409,81 @@ func TestThreads(t *testing.T) {
 					ids := dt.Map(threadList.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
 					a.Contains(ids, threadCreate.JSON200.Id, "published thread should appear in list")
 				}
+
+				{
+					// Verify the thread does not appear in the uncategorised list
+					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+						Categories: &[]string{"null"},
+					})
+					tests.Ok(t, err, threadList)
+					ids := dt.Map(threadList.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
+					a.NotContains(ids, threadCreate.JSON200.Id, "categorised thread should not appear in query for uncategorised threads")
+				}
+			})
+
+			t.Run("uncategorised_threads_in_thread_list", func(t *testing.T) {
+				t.Parallel()
+
+				a := assert.New(t)
+
+				// Verify that queries for uncategorised threads only contain uncategorised threads.
+
+				// Create a category
+				cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
+					Admin:       false,
+					Colour:      "#fe4efd",
+					Description: "categorised threads",
+					Name:        "categorised " + uuid.NewString(),
+				}, session1)
+				tests.Ok(t, err, cat1create)
+
+				// Create 2 threads, one inside the category, one without.
+				categorisedThread, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
+					Visibility: opt.New(openapi.Published).Ptr(),
+					Title:      "Thread without category",
+					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+				}, session1)
+				tests.Ok(t, err, categorisedThread)
+				uncategorisedThread, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
+					Visibility: opt.New(openapi.Published).Ptr(),
+					Title:      "Thread without category",
+				}, session1)
+				tests.Ok(t, err, uncategorisedThread)
+
+				{
+					// Verify the thread appears in the thread list for uncategorized filter
+					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+						Categories: &[]string{"null"},
+					})
+					tests.Ok(t, err, threadList)
+					ids := dt.Map(threadList.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
+					a.Contains(ids, uncategorisedThread.JSON200.Id, "uncategorised thread should appear in list")
+					a.NotContains(ids, categorisedThread.JSON200.Id, "categorised thread should not appear in uncategorised list")
+				}
+
+				{
+					// Verify that both threads appear when category filter is not applied
+
+					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
+					tests.Ok(t, err, threadList)
+					ids := dt.Map(threadList.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
+					a.Contains(ids, uncategorisedThread.JSON200.Id, "uncategorised thread should appear in list")
+					a.Contains(ids, categorisedThread.JSON200.Id, "categorised thread should appear in list")
+				}
+
+				{
+					// Verify that categorised thread appears when filtering by its category
+
+					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
+						Categories: &[]string{cat1create.JSON200.Slug},
+					})
+					tests.Ok(t, err, threadList)
+					ids := dt.Map(threadList.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
+					a.NotContains(ids, uncategorisedThread.JSON200.Id, "uncategorised thread should appear in list")
+					a.Contains(ids, categorisedThread.JSON200.Id, "categorised thread should appear in list")
+				}
 			})
 		}))
 	}))

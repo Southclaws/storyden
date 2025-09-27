@@ -12,12 +12,14 @@ import (
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
+	"github.com/samber/lo"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 
+	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -186,7 +188,7 @@ func (i *Threads) ThreadList(ctx context.Context, request openapi.ThreadListRequ
 		})
 	})
 
-	cats := opt.NewPtr(request.Params.Categories)
+	cats := deserialiseCategorySlugQueryParam(request.Params.Categories)
 
 	page = max(0, page-1)
 	result, err := i.thread_svc.List(ctx, page, pageSize, thread_service.Params{
@@ -259,4 +261,25 @@ func deserialiseThreadStatus(in openapi.Visibility) (visibility.Visibility, erro
 	}
 
 	return s, nil
+}
+
+func deserialiseCategorySlugQueryParam(in *openapi.CategorySlugListQuery) opt.Optional[thread.CategoryFilter] {
+	// Do not filter by any categorise, return all threads.
+	if in == nil {
+		return opt.NewEmpty[thread.CategoryFilter]()
+	}
+
+	// Fetch uncategorised threads only.
+	_, isExplicitlyNull := lo.Find(*in, func(s string) bool { return s == "null" })
+	if isExplicitlyNull {
+		return opt.New(thread.CategoryFilter{
+			Uncategorised: true,
+		})
+	}
+
+	// Filter by these categories.
+	return opt.New(thread.CategoryFilter{
+		Slugs:         *in,
+		Uncategorised: false,
+	})
 }
