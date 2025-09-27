@@ -108,6 +108,7 @@ export * from "./categoryName";
 export * from "./categoryReference";
 export * from "./categorySlug";
 export * from "./categorySlugList";
+export * from "./categorySlugListQueryParameter";
 export * from "./categoryUpdateBody";
 export * from "./categoryUpdateOKResponse";
 export * from "./categoryUpdateOrderBody";

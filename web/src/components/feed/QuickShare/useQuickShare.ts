@@ -12,7 +12,7 @@ import { useFeedMutations } from "@/lib/feed/mutation";
 
 export type Props = {
   initialSession?: Account;
-  initialCategory?: Category;
+  initialCategory?: Category | null;
 };
 
 export const FormSchema = z.object({
@@ -71,7 +71,12 @@ export function useQuickShare({ initialCategory }: Props) {
   }, [postURL]);
 
   const { createThread, revalidate } = useFeedMutations(session, {
-    categories: initialCategory && [initialCategory.slug],
+    categories:
+      initialCategory === undefined
+        ? undefined
+        : initialCategory === null
+          ? ["null"]
+          : [initialCategory.slug],
   });
 
   const handlePost = form.handleSubmit((data: Form) => {

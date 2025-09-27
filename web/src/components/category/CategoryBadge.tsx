@@ -1,12 +1,12 @@
 import Link from "next/link";
 
-import { Category } from "@/api/openapi-schema";
+import { CategoryReference } from "@/api/openapi-schema";
 import { categoryColourCSS } from "@/lib/category/colours";
 
 import { Badge, BadgeProps } from "../ui/badge";
 
 type Props = {
-  category: Category;
+  category: CategoryReference;
   asLink?: boolean;
 };
 

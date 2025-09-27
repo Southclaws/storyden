@@ -32,6 +32,8 @@ export function FeedScreenContent({ initialData }: Props) {
         <ThreadFeedScreen
           initialPage={initialData.page}
           initialPageData={initialData.threads}
+          category={undefined}
+          paginationBasePath="/"
         />
       );
 
@@ -40,7 +42,12 @@ export function FeedScreenContent({ initialData }: Props) {
 
     case "categories":
       return (
-        <CategoryIndexScreen initialCategoryList={initialData.categories} />
+        <CategoryIndexScreen
+          initialCategoryList={initialData.categories}
+          initialThreadList={initialData.threads}
+          initialThreadListPage={initialData.page}
+          paginationBasePath="/"
+        />
       );
   }
 }

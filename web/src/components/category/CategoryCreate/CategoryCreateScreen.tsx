@@ -41,7 +41,7 @@ export function CategoryCreateScreen(props: UseDisclosureProps) {
         </FormControl>
 
         <WStack>
-          <Button flexGrow="1" type="submit" onClick={props.onClose}>
+          <Button flexGrow="1" type="button" onClick={props.onClose}>
             Cancel
           </Button>
           <Button flexGrow="1" type="submit">

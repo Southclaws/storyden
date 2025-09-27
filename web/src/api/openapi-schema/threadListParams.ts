@@ -8,7 +8,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: v1.25.6-canary
  */
 import type { AccountHandle } from "./accountHandle";
-import type { CategorySlugList } from "./categorySlugList";
+import type { CategorySlugListQueryParameter } from "./categorySlugListQueryParameter";
 import type { PaginationQueryParameter } from "./paginationQueryParameter";
 import type { SearchQueryParameter } from "./searchQueryParameter";
 import type { TagListIDs } from "./tagListIDs";
@@ -41,7 +41,13 @@ the necessary permission to view in-review items.
    */
   tags?: TagListIDs;
   /**
-   * Show only results with these categories
-   */
-  categories?: CategorySlugList;
+ * Category slugs to filter by. Multiple instances of this parameter can be
+used to filter by many categories. If not provided, no filtering will be
+applied and all threads will be returned. If ANY of the provided values
+is set to the exact value of "null" then only uncategorised threads will
+be returned. When filtering for uncategorised threads, all other values
+will be ignored, only the value containing "null" will be considered.
+
+ */
+  categories?: CategorySlugListQueryParameter;
 };

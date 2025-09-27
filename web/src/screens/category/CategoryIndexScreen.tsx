@@ -1,7 +1,7 @@
 "use client";
 
 import { useCategoryList } from "@/api/openapi-client/categories";
-import { CategoryListOKResponse } from "@/api/openapi-schema";
+import { CategoryListOKResponse, ThreadListResult } from "@/api/openapi-schema";
 import {
   CategoryCardGrid,
   CategoryCardList,
@@ -11,6 +11,9 @@ import { Unready } from "@/components/site/Unready";
 
 export type Props = {
   initialCategoryList?: CategoryListOKResponse;
+  initialThreadList?: ThreadListResult;
+  initialThreadListPage?: number;
+  paginationBasePath: string;
 };
 
 export function useCategoryIndexScreen({ initialCategoryList }: Props) {
@@ -43,9 +46,23 @@ export function CategoryIndexScreen(props: Props) {
 
   switch (feed.layout.type) {
     case "grid":
-      return <CategoryCardGrid categories={categories} />;
+      return (
+        <CategoryCardGrid
+          categories={categories}
+          initialThreadList={props.initialThreadList}
+          initialThreadListPage={props.initialThreadListPage}
+          paginationBasePath={props.paginationBasePath}
+        />
+      );
 
     case "list":
-      return <CategoryCardList categories={categories} />;
+      return (
+        <CategoryCardList
+          categories={categories}
+          initialThreadList={props.initialThreadList}
+          initialThreadListPage={props.initialThreadListPage}
+          paginationBasePath={props.paginationBasePath}
+        />
+      );
   }
 }

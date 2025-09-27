@@ -37,6 +37,7 @@ export function CategoryScreen(props: ScreenProps) {
         initialPage={props.initialPage}
         initialPageData={props.initialThreadList}
         category={category}
+        paginationBasePath={`/d/${data.category.slug}`}
       />
     </LStack>
   );

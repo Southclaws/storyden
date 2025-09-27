@@ -64,6 +64,22 @@ async function getInitialFeedData(
       case "categories":
         return {
           categories: (await categoryList()).data,
+          page: page ?? 1,
+          threads: (
+            await threadList(
+              {
+                page: page?.toString(),
+                categories: ["null"],
+              },
+              {
+                cache: "no-store",
+                next: {
+                  tags: ["feed"],
+                  revalidate: 0,
+                },
+              },
+            )
+          ).data,
         };
     }
   } catch (error) {
