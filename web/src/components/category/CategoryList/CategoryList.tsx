@@ -474,10 +474,6 @@ function DropIndicator({
   positionInList,
   canManageCategories,
 }: DropIndicatorProps) {
-  if (!canManageCategories) {
-    return null;
-  }
-
   const { setNodeRef } = useDroppable({
     id: `${categoryID}_${direction}`,
     disabled: false,
@@ -488,6 +484,10 @@ function DropIndicator({
       parentID: parentCategoryID ?? null,
     } satisfies DragItemCategoryDivider,
   });
+
+  if (!canManageCategories) {
+    return null;
+  }
 
   const shouldRender =
     direction === "above"

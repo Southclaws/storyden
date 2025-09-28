@@ -71,6 +71,7 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
         <CardRows>
           {category.children.map((c) => (
             <CardBox
+              key={c.id}
               position="relative"
               style={cssProps}
               borderColor="bg.subtle"
