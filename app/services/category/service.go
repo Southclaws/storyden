@@ -15,7 +15,7 @@ import (
 )
 
 type Service interface {
-	Create(ctx context.Context, name string, description string, colour string, admin bool) (*category.Category, error)
+	Create(ctx context.Context, name string, description string, colour string, admin bool, parentID *category.CategoryID) (*category.Category, error)
 	Update(ctx context.Context, slug string, partial Partial) (*category.Category, error)
 	Move(ctx context.Context, slug string, move Move) ([]*category.Category, error)
 }
@@ -55,8 +55,13 @@ func New(
 	}
 }
 
-func (s *service) Create(ctx context.Context, name string, description string, colour string, admin bool) (*category.Category, error) {
-	cat, err := s.category_repo.CreateCategory(ctx, name, description, colour, 0, admin)
+func (s *service) Create(ctx context.Context, name string, description string, colour string, admin bool, parentID *category.CategoryID) (*category.Category, error) {
+	opts := []category.Option{}
+	if parentID != nil {
+		opts = append(opts, category.WithParent(parentID))
+	}
+
+	cat, err := s.category_repo.CreateCategory(ctx, name, description, colour, 0, admin, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

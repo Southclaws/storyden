@@ -11,6 +11,7 @@ import { styled } from "@/styled-system/jsx";
 import { useShare } from "@/utils/client";
 import { hasPermission } from "@/utils/permissions";
 
+import { CategoryCreateMenuItem } from "../CategoryCreate/CategoryCreateMenuItem";
 import { CategoryEditMenuItem } from "../CategoryEdit/CategoryEdit";
 
 type Props = {
@@ -52,6 +53,10 @@ export function useCategoryMenu({ category }: Props) {
         return handleShare();
 
       case "edit":
+        // Handled by item component
+        return;
+
+      case "create-subcategory":
         // Handled by item component
         return;
 
@@ -101,6 +106,7 @@ export function CategoryMenu(props: Props) {
                 <Menu.Separator />
 
                 <Menu.ItemGroup id="manage">
+                  <CategoryCreateMenuItem parentCategory={category} />
                   <CategoryEditMenuItem {...category} />
                   {/* TODO: Implement useConfirmation modal for this */}
                   {/* <Menu.Item value="delete">Delete</Menu.Item> */}

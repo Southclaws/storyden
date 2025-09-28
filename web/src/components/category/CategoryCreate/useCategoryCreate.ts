@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { mutate } from "swr";
 import { z } from "zod";
@@ -18,16 +17,22 @@ export const FormSchema = z.object({
   description: z.string().min(1, "Please enter a short description."),
   colour: z.string().default("#8577ce"),
   admin: z.boolean().default(false),
+  parent: z.string().optional(),
   cover_image_asset_id: z.string().nullable().optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
-export function useCategoryCreate(props: UseDisclosureProps) {
+export interface CategoryCreateProps extends UseDisclosureProps {
+  defaultParent?: string;
+}
+
+export function useCategoryCreate(props: CategoryCreateProps) {
   const { register, handleSubmit, control, setValue } = useForm<Form>({
     resolver: zodResolver(FormSchema),
     defaultValues: {
       colour: "#8577ce",
       admin: false,
+      parent: props.defaultParent,
     },
   });
 

@@ -28,7 +28,13 @@ func NewCategories(
 }
 
 func (c Categories) CategoryCreate(ctx context.Context, request openapi.CategoryCreateRequestObject) (openapi.CategoryCreateResponseObject, error) {
-	cat, err := c.category_svc.Create(ctx, request.Body.Name, request.Body.Description, request.Body.Colour, request.Body.Admin)
+	var parentID *category.CategoryID
+	if request.Body.Parent != nil {
+		pid := category.CategoryID(deserialiseID(*request.Body.Parent))
+		parentID = &pid
+	}
+
+	cat, err := c.category_svc.Create(ctx, request.Body.Name, request.Body.Description, request.Body.Colour, request.Body.Admin, parentID)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

@@ -4747,6 +4747,9 @@ components:
           type: string
         admin:
           type: boolean
+        parent:
+          $ref: "#/components/schemas/Identifier"
+          description: Parent category identifier. Unset indicates a root-level category.
         meta: { $ref: "#/components/schemas/Metadata" }
 
     CategoryMutableProps:
