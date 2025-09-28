@@ -1142,6 +1142,18 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CategoryUpdateOK" }
+    delete:
+      operationId: CategoryDelete
+      description: Delete a category. All posts in this category will be moved to the specified target category.
+      tags: [categories]
+      parameters: [$ref: "#/components/parameters/CategorySlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/CategoryDelete" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/CategoryDeleteOK" }
 
   /categories/{category_slug}/position:
     patch:
@@ -2687,6 +2699,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/CategoryPositionMutableProps" }
 
+    CategoryDelete:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/CategoryDeleteProps" }
+
     ThreadCreate:
       content:
         application/json:
@@ -3051,6 +3068,13 @@ components:
             $ref: "#/components/schemas/Category"
 
     CategoryUpdateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Category"
+
+    CategoryDeleteOK:
       description: OK
       content:
         application/json:
@@ -4771,6 +4795,14 @@ components:
           nullable: true
           description: Optional cover image asset identifier for the category.
         meta: { $ref: "#/components/schemas/Metadata" }
+
+    CategoryDeleteProps:
+      type: object
+      required: [move_to]
+      properties:
+        move_to:
+          $ref: "#/components/schemas/Identifier"
+          description: Category ID to move all posts to before deleting this category.
 
     CategoryName:
       description: A category's user-facing name.

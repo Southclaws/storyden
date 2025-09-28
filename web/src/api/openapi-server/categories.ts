@@ -10,6 +10,8 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   CategoryCreateBody,
   CategoryCreateOKResponse,
+  CategoryDeleteBody,
+  CategoryDeleteOKResponse,
   CategoryGetOKResponse,
   CategoryListOKResponse,
   CategoryUpdateBody,
@@ -112,6 +114,34 @@ export const categoryUpdate = async (
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(categoryUpdateBody),
+    },
+  );
+};
+
+/**
+ * Delete a category. All posts in this category will be moved to the specified target category.
+ */
+export type categoryDeleteResponse = {
+  data: CategoryDeleteOKResponse;
+  status: number;
+};
+
+export const getCategoryDeleteUrl = (categorySlug: string) => {
+  return `/categories/${categorySlug}`;
+};
+
+export const categoryDelete = async (
+  categorySlug: string,
+  categoryDeleteBody: CategoryDeleteBody,
+  options?: RequestInit,
+): Promise<categoryDeleteResponse> => {
+  return fetcher<Promise<categoryDeleteResponse>>(
+    getCategoryDeleteUrl(categorySlug),
+    {
+      ...options,
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(categoryDeleteBody),
     },
   );
 };

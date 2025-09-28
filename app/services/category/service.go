@@ -18,6 +18,7 @@ type Service interface {
 	Create(ctx context.Context, name string, description string, colour string, admin bool, parentID *category.CategoryID) (*category.Category, error)
 	Update(ctx context.Context, slug string, partial Partial) (*category.Category, error)
 	Move(ctx context.Context, slug string, move Move) ([]*category.Category, error)
+	Delete(ctx context.Context, slug string, moveToID category.CategoryID) (*category.Category, error)
 }
 
 type Partial struct {
@@ -141,4 +142,13 @@ func (s *service) Move(ctx context.Context, slug string, move Move) ([]*category
 	}
 
 	return cats, nil
+}
+
+func (s *service) Delete(ctx context.Context, slug string, moveToID category.CategoryID) (*category.Category, error) {
+	cat, err := s.category_repo.DeleteCategory(ctx, slug, moveToID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return cat, nil
 }

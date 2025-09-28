@@ -286,6 +286,10 @@ func (m *Mapping) CategoryUpdate() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageCategories
 }
 
+func (m *Mapping) CategoryDelete() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageCategories
+}
+
 func (m *Mapping) TagList() (bool, *rbac.Permission) {
 	return false, nil
 }

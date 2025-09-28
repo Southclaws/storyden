@@ -17,6 +17,8 @@ import type {
   BadRequestResponse,
   CategoryCreateBody,
   CategoryCreateOKResponse,
+  CategoryDeleteBody,
+  CategoryDeleteOKResponse,
   CategoryGetOKResponse,
   CategoryListOKResponse,
   CategoryUpdateBody,
@@ -229,6 +231,72 @@ export const useCategoryUpdate = <
   const swrKey =
     swrOptions?.swrKey ?? getCategoryUpdateMutationKey(categorySlug);
   const swrFn = getCategoryUpdateMutationFetcher(categorySlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Delete a category. All posts in this category will be moved to the specified target category.
+ */
+export const categoryDelete = (
+  categorySlug: string,
+  categoryDeleteBody: CategoryDeleteBody,
+) => {
+  return fetcher<CategoryDeleteOKResponse>({
+    url: `/categories/${categorySlug}`,
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    data: categoryDeleteBody,
+  });
+};
+
+export const getCategoryDeleteMutationFetcher = (categorySlug: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: CategoryDeleteBody },
+  ): Promise<CategoryDeleteOKResponse> => {
+    return categoryDelete(categorySlug, arg);
+  };
+};
+export const getCategoryDeleteMutationKey = (categorySlug: string) =>
+  [`/categories/${categorySlug}`] as const;
+
+export type CategoryDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof categoryDelete>>
+>;
+export type CategoryDeleteMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useCategoryDelete = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  categorySlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof categoryDelete>>,
+      TError,
+      Key,
+      CategoryDeleteBody,
+      Awaited<ReturnType<typeof categoryDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getCategoryDeleteMutationKey(categorySlug);
+  const swrFn = getCategoryDeleteMutationFetcher(categorySlug);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

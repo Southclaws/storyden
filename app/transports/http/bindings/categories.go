@@ -128,6 +128,19 @@ func (c Categories) CategoryUpdate(ctx context.Context, request openapi.Category
 	}, nil
 }
 
+func (c Categories) CategoryDelete(ctx context.Context, request openapi.CategoryDeleteRequestObject) (openapi.CategoryDeleteResponseObject, error) {
+	moveToID := category.CategoryID(deserialiseID(request.Body.MoveTo))
+
+	cat, err := c.category_svc.Delete(ctx, request.CategorySlug, moveToID)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.CategoryDelete200JSONResponse{
+		CategoryDeleteOKJSONResponse: openapi.CategoryDeleteOKJSONResponse(serialiseCategory(cat)),
+	}, nil
+}
+
 func serialiseCategory(c *category.Category) openapi.Category {
 	var parentID *openapi.NullableIdentifier
 	if c.ParentID != nil {

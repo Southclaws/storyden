@@ -72,6 +72,7 @@ type OperationPermissions interface {
 	CategoryList() (bool, *rbac.Permission)
 	CategoryGet() (bool, *rbac.Permission)
 	CategoryUpdate() (bool, *rbac.Permission)
+	CategoryDelete() (bool, *rbac.Permission)
 	CategoryUpdatePosition() (bool, *rbac.Permission)
 	TagList() (bool, *rbac.Permission)
 	TagGet() (bool, *rbac.Permission)
@@ -272,6 +273,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.CategoryGet()
 	case "CategoryUpdate":
 		return optable.CategoryUpdate()
+	case "CategoryDelete":
+		return optable.CategoryDelete()
 	case "CategoryUpdatePosition":
 		return optable.CategoryUpdatePosition()
 	case "TagList":
