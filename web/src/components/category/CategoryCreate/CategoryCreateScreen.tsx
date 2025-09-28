@@ -1,5 +1,7 @@
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 
+import { AssetUploadEditor } from "@/components/asset/AssetUploadEditor/AssetUploadEditor";
+import { ColourPickerField } from "@/components/ui/ColourPickerField";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/FormControl";
 import { FormHelperText } from "@/components/ui/form/FormHelperText";
@@ -10,7 +12,8 @@ import { VStack, WStack, styled } from "@/styled-system/jsx";
 import { useCategoryCreate } from "./useCategoryCreate";
 
 export function CategoryCreateScreen(props: UseDisclosureProps) {
-  const { register, onSubmit } = useCategoryCreate(props);
+  const { register, onSubmit, control, handleImageUpload } =
+    useCategoryCreate(props);
 
   return (
     <VStack alignItems="start" gap="4">
@@ -38,6 +41,23 @@ export function CategoryCreateScreen(props: UseDisclosureProps) {
           {/* TODO: Make a larger textarea component for this. */}
           <Input {...register("description")} type="text" />
           <FormHelperText>Describe your category</FormHelperText>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Colour</FormLabel>
+          <ColourPickerField control={control} name="colour" />
+          <FormHelperText>The colour for the category</FormHelperText>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Cover Image</FormLabel>
+          <AssetUploadEditor
+            aspectRatio="16 / 9"
+            onUpload={handleImageUpload}
+          />
+          <FormHelperText>
+            Upload a cover image for the category (16:9 aspect ratio)
+          </FormHelperText>
         </FormControl>
 
         <WStack>

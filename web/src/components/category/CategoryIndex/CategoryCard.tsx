@@ -9,6 +9,7 @@ import { categoryColourCSS } from "@/lib/category/colours";
 import { CategoryTree } from "@/lib/category/tree";
 import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
+import { getAssetURL } from "@/utils/asset";
 
 import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
 
@@ -34,75 +35,83 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
       borderLeftStyle="solid"
       display="flex"
       justifyContent="space-between"
-      gap="4"
+      gap="0"
+      p="0"
+      overflow="hidden"
     >
-      <LStack h="full" gap="1" justifyContent="space-between">
-        <LStack h="full" gap="1">
-          <WStack alignItems="start">
-            <Link className={linkOverlay()} href={`/d/${category.slug}`}>
-              <Heading>{category.name}</Heading>
-            </Link>
+      <img src={getAssetURL(category.cover_image?.path)} />
 
-            <CategoryMenu category={category} />
-          </WStack>
+      <LStack p="1">
+        <LStack h="full" gap="1" justifyContent="space-between">
+          <LStack h="full" gap="1">
+            <WStack alignItems="start">
+              <Link className={linkOverlay()} href={`/d/${category.slug}`}>
+                <Heading>{category.name}</Heading>
+              </Link>
 
-          <styled.p color="fg.muted" fontSize="sm">
-            {category.description}
-          </styled.p>
-        </LStack>
+              <CategoryMenu category={category} />
+            </WStack>
 
-        <WStack>
-          <HStack gap="1" color="fg.subtle" fontSize="sm">
-            <DiscussionIcon w="4" />
-            <styled.p>{category.postCount} threads</styled.p>
-            {hasSubcategories && (
-              <HStack gap="1" color="fg.subtle" fontSize="sm">
-                <CategoryIcon w="4" />
-                <styled.p>
-                  {category.children.length} {plural}
-                </styled.p>
-              </HStack>
-            )}
-          </HStack>
-        </WStack>
-      </LStack>
+            <styled.p color="fg.muted" fontSize="sm">
+              {category.description}
+            </styled.p>
+          </LStack>
 
-      {hasSubcategories && showChildren && (
-        <CardRows>
-          {category.children.map((c) => (
-            <CardBox
-              key={c.id}
-              position="relative"
-              style={cssProps}
-              borderColor="bg.subtle"
-              borderWidth="hairline"
-              borderStyle="solid"
-              borderLeftColor="colorPalette.border"
-              borderLeftWidth="thick"
-              borderLeftStyle="solid"
-              display="flex"
-              justifyContent="space-between"
-              gap="4"
-              boxShadow="[none]"
-              px="2"
-              py="1"
-            >
-              <WStack alignItems="start">
-                <HStack gap="1">
-                  <Link className={linkOverlay()} href={`/d/${c.slug}`}>
-                    <Heading fontSize="sm"> {c.name}</Heading>
-                  </Link>
-                  <BulletIcon />
-                  <styled.p lineClamp={1} color="fg.muted" fontSize="sm">
-                    {c.description}
+          <WStack>
+            <HStack gap="1" color="fg.subtle" fontSize="sm">
+              <DiscussionIcon w="4" />
+              <styled.p>{category.postCount} threads</styled.p>
+              {hasSubcategories && (
+                <HStack gap="1" color="fg.subtle" fontSize="sm">
+                  <CategoryIcon w="4" />
+                  <styled.p>
+                    {category.children.length} {plural}
                   </styled.p>
                 </HStack>
-                <CategoryMenu category={c} />
-              </WStack>
-            </CardBox>
-          ))}
-        </CardRows>
-      )}
+              )}
+            </HStack>
+          </WStack>
+        </LStack>
+
+        {hasSubcategories && showChildren && (
+          <CardRows>
+            {category.children.map((c) => (
+              <CardBox
+                key={c.id}
+                position="relative"
+                style={cssProps}
+                borderColor="bg.subtle"
+                borderWidth="hairline"
+                borderStyle="solid"
+                borderLeftColor="colorPalette.border"
+                borderLeftWidth="thick"
+                borderLeftStyle="solid"
+                display="flex"
+                justifyContent="space-between"
+                gap="4"
+                boxShadow="[none]"
+                px="2"
+                py="1"
+              >
+                <WStack alignItems="start">
+                  <HStack gap="1">
+                    <Link className={linkOverlay()} href={`/d/${c.slug}`}>
+                      <Heading textWrap="nowrap" fontSize="sm">
+                        {c.name}
+                      </Heading>
+                    </Link>
+                    <BulletIcon />
+                    <styled.p lineClamp={1} color="fg.muted" fontSize="sm">
+                      {c.description}
+                    </styled.p>
+                  </HStack>
+                  <CategoryMenu category={c} />
+                </WStack>
+              </CardBox>
+            ))}
+          </CardRows>
+        )}
+      </LStack>
     </CardBox>
   );
 }

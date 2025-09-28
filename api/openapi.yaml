@@ -4728,6 +4728,8 @@ components:
         parent:
           $ref: "#/components/schemas/Identifier"
           description: Parent category identifier. Unset indicates a root-level category.
+        cover_image:
+          $ref: "#/components/schemas/Asset"
         children: { $ref: "#/components/schemas/CategoryList" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
@@ -4760,6 +4762,11 @@ components:
           type: string
         admin:
           type: boolean
+        cover_image_asset_id:
+          allOf:
+            - $ref: "#/components/schemas/NullableIdentifier"
+          nullable: true
+          description: Optional cover image asset identifier for the category.
         meta: { $ref: "#/components/schemas/Metadata" }
 
     CategoryName:

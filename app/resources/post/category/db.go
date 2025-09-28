@@ -72,6 +72,16 @@ func WithMeta(v map[string]any) Option {
 	}
 }
 
+func WithCoverImageAssetID(id *xid.ID) Option {
+	return func(cm *ent.CategoryMutation) {
+		if id == nil {
+			cm.ClearCoverImage()
+			return
+		}
+		cm.SetCoverImageAssetID(*id)
+	}
+}
+
 func WithParent(id *CategoryID) Option {
 	return func(cm *ent.CategoryMutation) {
 		if id == nil {
@@ -172,6 +182,9 @@ func (d *Repository) GetCategories(ctx context.Context, admin bool) ([]*Category
 				Limit(5).
 				Order(ent.Desc(post.FieldUpdatedAt))
 		}).
+		WithCoverImage(func(aq *ent.AssetQuery) {
+			aq.WithParent()
+		}).
 		Order(ent.Asc(category.FieldSort)).
 		All(ctx)
 	if err != nil {
@@ -201,6 +214,9 @@ func (d *Repository) Get(ctx context.Context, slug string) (*Category, error) {
 		Query().
 		Where(category.SlugEQ(slug)).
 		WithChildren().
+		WithCoverImage(func(aq *ent.AssetQuery) {
+			aq.WithParent()
+		}).
 		Only(ctx)
 	if err != nil {
 		if ent.IsNotFound(err) {

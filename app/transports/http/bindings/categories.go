@@ -99,13 +99,19 @@ func (c Categories) CategoryUpdatePosition(ctx context.Context, request openapi.
 }
 
 func (c Categories) CategoryUpdate(ctx context.Context, request openapi.CategoryUpdateRequestObject) (openapi.CategoryUpdateResponseObject, error) {
+	coverImageAssetID := deletable.NewMap(request.Body.CoverImageAssetId, func(id openapi.NullableIdentifier) *xid.ID {
+		xidValue := openapi.ParseID(openapi.Identifier(id))
+		return &xidValue
+	})
+
 	cat, err := c.category_svc.Update(ctx, request.CategorySlug, category_svc.Partial{
-		Name:        opt.NewPtr(request.Body.Name),
-		Slug:        opt.NewPtr(request.Body.Slug),
-		Description: opt.NewPtr(request.Body.Description),
-		Colour:      opt.NewPtr(request.Body.Colour),
-		Admin:       opt.NewPtr(request.Body.Admin),
-		Meta:        opt.NewPtr((*map[string]any)(request.Body.Meta)),
+		Name:              opt.NewPtr(request.Body.Name),
+		Slug:              opt.NewPtr(request.Body.Slug),
+		Description:       opt.NewPtr(request.Body.Description),
+		Colour:            opt.NewPtr(request.Body.Colour),
+		Admin:             opt.NewPtr(request.Body.Admin),
+		CoverImageAssetID: coverImageAssetID,
+		Meta:              opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -135,6 +141,7 @@ func serialiseCategory(c *category.Category) openapi.Category {
 		Admin:       c.Admin,
 		Sort:        c.Sort,
 		Parent:      parentID,
+		CoverImage:  opt.Map(c.CoverImage, serialiseAsset).Ptr(),
 		Children:    children,
 		Meta:        (*openapi.Metadata)(&c.Metadata),
 	}
@@ -158,6 +165,7 @@ func serialiseCategoryReference(c category.Category) openapi.CategoryReference {
 		Description: c.Description,
 		Sort:        c.Sort,
 		Parent:      parentID,
+		CoverImage:  opt.Map(c.CoverImage, serialiseAsset).Ptr(),
 		Children:    children,
 		Meta:        (*openapi.Metadata)(&c.Metadata),
 	}

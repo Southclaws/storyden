@@ -1781,6 +1781,22 @@ func (c *CategoryClient) QueryChildren(ca *Category) *CategoryQuery {
 	return query
 }
 
+// QueryCoverImage queries the cover_image edge of a Category.
+func (c *CategoryClient) QueryCoverImage(ca *Category) *AssetQuery {
+	query := (&AssetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, id),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, category.CoverImageTable, category.CoverImageColumn),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *CategoryClient) Hooks() []Hook {
 	return c.hooks.Category

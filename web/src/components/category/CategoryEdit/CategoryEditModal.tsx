@@ -1,5 +1,6 @@
 import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
 
+import { AssetUploadEditor } from "@/components/asset/AssetUploadEditor/AssetUploadEditor";
 import { ColourPickerField } from "@/components/ui/ColourPickerField";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/FormControl";
@@ -30,6 +31,20 @@ export function CategoryEditModal(props: Props) {
         gap="2"
       >
         <VStack w="full">
+          <FormControl>
+            <FormLabel>Cover Image</FormLabel>
+            <AssetUploadEditor
+              aspectRatio="16 / 9"
+              value={form.watch("cover_image") || undefined}
+              onUpload={handlers.handleImageUpload}
+            />
+            <FormFeedback
+              error={form.formState.errors["cover_image"]?.message}
+            >
+              Upload a cover image for the category (16:9 aspect ratio).
+            </FormFeedback>
+          </FormControl>
+
           <FormControl>
             <FormLabel>Name</FormLabel>
             <Input {...form.register("name")} type="text" />

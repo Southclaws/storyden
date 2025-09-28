@@ -6320,31 +6320,33 @@ func (m *AuthenticationMutation) ResetEdge(name string) error {
 // CategoryMutation represents an operation that mutates the Category nodes in the graph.
 type CategoryMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *xid.ID
-	created_at      *time.Time
-	updated_at      *time.Time
-	name            *string
-	slug            *string
-	description     *string
-	colour          *string
-	sort            *int
-	addsort         *int
-	admin           *bool
-	metadata        *map[string]interface{}
-	clearedFields   map[string]struct{}
-	posts           map[xid.ID]struct{}
-	removedposts    map[xid.ID]struct{}
-	clearedposts    bool
-	parent          *xid.ID
-	clearedparent   bool
-	children        map[xid.ID]struct{}
-	removedchildren map[xid.ID]struct{}
-	clearedchildren bool
-	done            bool
-	oldValue        func(context.Context) (*Category, error)
-	predicates      []predicate.Category
+	op                 Op
+	typ                string
+	id                 *xid.ID
+	created_at         *time.Time
+	updated_at         *time.Time
+	name               *string
+	slug               *string
+	description        *string
+	colour             *string
+	sort               *int
+	addsort            *int
+	admin              *bool
+	metadata           *map[string]interface{}
+	clearedFields      map[string]struct{}
+	posts              map[xid.ID]struct{}
+	removedposts       map[xid.ID]struct{}
+	clearedposts       bool
+	parent             *xid.ID
+	clearedparent      bool
+	children           map[xid.ID]struct{}
+	removedchildren    map[xid.ID]struct{}
+	clearedchildren    bool
+	cover_image        *xid.ID
+	clearedcover_image bool
+	done               bool
+	oldValue           func(context.Context) (*Category, error)
+	predicates         []predicate.Category
 }
 
 var _ ent.Mutation = (*CategoryMutation)(nil)
@@ -6808,6 +6810,55 @@ func (m *CategoryMutation) ResetParentCategoryID() {
 	delete(m.clearedFields, category.FieldParentCategoryID)
 }
 
+// SetCoverImageAssetID sets the "cover_image_asset_id" field.
+func (m *CategoryMutation) SetCoverImageAssetID(x xid.ID) {
+	m.cover_image = &x
+}
+
+// CoverImageAssetID returns the value of the "cover_image_asset_id" field in the mutation.
+func (m *CategoryMutation) CoverImageAssetID() (r xid.ID, exists bool) {
+	v := m.cover_image
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCoverImageAssetID returns the old "cover_image_asset_id" field's value of the Category entity.
+// If the Category object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CategoryMutation) OldCoverImageAssetID(ctx context.Context) (v *xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCoverImageAssetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCoverImageAssetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCoverImageAssetID: %w", err)
+	}
+	return oldValue.CoverImageAssetID, nil
+}
+
+// ClearCoverImageAssetID clears the value of the "cover_image_asset_id" field.
+func (m *CategoryMutation) ClearCoverImageAssetID() {
+	m.cover_image = nil
+	m.clearedFields[category.FieldCoverImageAssetID] = struct{}{}
+}
+
+// CoverImageAssetIDCleared returns if the "cover_image_asset_id" field was cleared in this mutation.
+func (m *CategoryMutation) CoverImageAssetIDCleared() bool {
+	_, ok := m.clearedFields[category.FieldCoverImageAssetID]
+	return ok
+}
+
+// ResetCoverImageAssetID resets all changes to the "cover_image_asset_id" field.
+func (m *CategoryMutation) ResetCoverImageAssetID() {
+	m.cover_image = nil
+	delete(m.clearedFields, category.FieldCoverImageAssetID)
+}
+
 // SetMetadata sets the "metadata" field.
 func (m *CategoryMutation) SetMetadata(value map[string]interface{}) {
 	m.metadata = &value
@@ -7005,6 +7056,46 @@ func (m *CategoryMutation) ResetChildren() {
 	m.removedchildren = nil
 }
 
+// SetCoverImageID sets the "cover_image" edge to the Asset entity by id.
+func (m *CategoryMutation) SetCoverImageID(id xid.ID) {
+	m.cover_image = &id
+}
+
+// ClearCoverImage clears the "cover_image" edge to the Asset entity.
+func (m *CategoryMutation) ClearCoverImage() {
+	m.clearedcover_image = true
+	m.clearedFields[category.FieldCoverImageAssetID] = struct{}{}
+}
+
+// CoverImageCleared reports if the "cover_image" edge to the Asset entity was cleared.
+func (m *CategoryMutation) CoverImageCleared() bool {
+	return m.CoverImageAssetIDCleared() || m.clearedcover_image
+}
+
+// CoverImageID returns the "cover_image" edge ID in the mutation.
+func (m *CategoryMutation) CoverImageID() (id xid.ID, exists bool) {
+	if m.cover_image != nil {
+		return *m.cover_image, true
+	}
+	return
+}
+
+// CoverImageIDs returns the "cover_image" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CoverImageID instead. It exists only for internal usage by the builders.
+func (m *CategoryMutation) CoverImageIDs() (ids []xid.ID) {
+	if id := m.cover_image; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCoverImage resets all changes to the "cover_image" edge.
+func (m *CategoryMutation) ResetCoverImage() {
+	m.cover_image = nil
+	m.clearedcover_image = false
+}
+
 // Where appends a list predicates to the CategoryMutation builder.
 func (m *CategoryMutation) Where(ps ...predicate.Category) {
 	m.predicates = append(m.predicates, ps...)
@@ -7039,7 +7130,7 @@ func (m *CategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CategoryMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, category.FieldCreatedAt)
 	}
@@ -7066,6 +7157,9 @@ func (m *CategoryMutation) Fields() []string {
 	}
 	if m.parent != nil {
 		fields = append(fields, category.FieldParentCategoryID)
+	}
+	if m.cover_image != nil {
+		fields = append(fields, category.FieldCoverImageAssetID)
 	}
 	if m.metadata != nil {
 		fields = append(fields, category.FieldMetadata)
@@ -7096,6 +7190,8 @@ func (m *CategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Admin()
 	case category.FieldParentCategoryID:
 		return m.ParentCategoryID()
+	case category.FieldCoverImageAssetID:
+		return m.CoverImageAssetID()
 	case category.FieldMetadata:
 		return m.Metadata()
 	}
@@ -7125,6 +7221,8 @@ func (m *CategoryMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldAdmin(ctx)
 	case category.FieldParentCategoryID:
 		return m.OldParentCategoryID(ctx)
+	case category.FieldCoverImageAssetID:
+		return m.OldCoverImageAssetID(ctx)
 	case category.FieldMetadata:
 		return m.OldMetadata(ctx)
 	}
@@ -7199,6 +7297,13 @@ func (m *CategoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetParentCategoryID(v)
 		return nil
+	case category.FieldCoverImageAssetID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCoverImageAssetID(v)
+		return nil
 	case category.FieldMetadata:
 		v, ok := value.(map[string]interface{})
 		if !ok {
@@ -7254,6 +7359,9 @@ func (m *CategoryMutation) ClearedFields() []string {
 	if m.FieldCleared(category.FieldParentCategoryID) {
 		fields = append(fields, category.FieldParentCategoryID)
 	}
+	if m.FieldCleared(category.FieldCoverImageAssetID) {
+		fields = append(fields, category.FieldCoverImageAssetID)
+	}
 	if m.FieldCleared(category.FieldMetadata) {
 		fields = append(fields, category.FieldMetadata)
 	}
@@ -7273,6 +7381,9 @@ func (m *CategoryMutation) ClearField(name string) error {
 	switch name {
 	case category.FieldParentCategoryID:
 		m.ClearParentCategoryID()
+		return nil
+	case category.FieldCoverImageAssetID:
+		m.ClearCoverImageAssetID()
 		return nil
 	case category.FieldMetadata:
 		m.ClearMetadata()
@@ -7312,6 +7423,9 @@ func (m *CategoryMutation) ResetField(name string) error {
 	case category.FieldParentCategoryID:
 		m.ResetParentCategoryID()
 		return nil
+	case category.FieldCoverImageAssetID:
+		m.ResetCoverImageAssetID()
+		return nil
 	case category.FieldMetadata:
 		m.ResetMetadata()
 		return nil
@@ -7321,7 +7435,7 @@ func (m *CategoryMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CategoryMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.posts != nil {
 		edges = append(edges, category.EdgePosts)
 	}
@@ -7330,6 +7444,9 @@ func (m *CategoryMutation) AddedEdges() []string {
 	}
 	if m.children != nil {
 		edges = append(edges, category.EdgeChildren)
+	}
+	if m.cover_image != nil {
+		edges = append(edges, category.EdgeCoverImage)
 	}
 	return edges
 }
@@ -7354,13 +7471,17 @@ func (m *CategoryMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case category.EdgeCoverImage:
+		if id := m.cover_image; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CategoryMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removedposts != nil {
 		edges = append(edges, category.EdgePosts)
 	}
@@ -7392,7 +7513,7 @@ func (m *CategoryMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CategoryMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.clearedposts {
 		edges = append(edges, category.EdgePosts)
 	}
@@ -7401,6 +7522,9 @@ func (m *CategoryMutation) ClearedEdges() []string {
 	}
 	if m.clearedchildren {
 		edges = append(edges, category.EdgeChildren)
+	}
+	if m.clearedcover_image {
+		edges = append(edges, category.EdgeCoverImage)
 	}
 	return edges
 }
@@ -7415,6 +7539,8 @@ func (m *CategoryMutation) EdgeCleared(name string) bool {
 		return m.clearedparent
 	case category.EdgeChildren:
 		return m.clearedchildren
+	case category.EdgeCoverImage:
+		return m.clearedcover_image
 	}
 	return false
 }
@@ -7425,6 +7551,9 @@ func (m *CategoryMutation) ClearEdge(name string) error {
 	switch name {
 	case category.EdgeParent:
 		m.ClearParent()
+		return nil
+	case category.EdgeCoverImage:
+		m.ClearCoverImage()
 		return nil
 	}
 	return fmt.Errorf("unknown Category unique edge %s", name)
@@ -7442,6 +7571,9 @@ func (m *CategoryMutation) ResetEdge(name string) error {
 		return nil
 	case category.EdgeChildren:
 		m.ResetChildren()
+		return nil
+	case category.EdgeCoverImage:
+		m.ResetCoverImage()
 		return nil
 	}
 	return fmt.Errorf("unknown Category edge %s", name)

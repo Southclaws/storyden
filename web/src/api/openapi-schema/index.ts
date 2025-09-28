@@ -105,6 +105,7 @@ export * from "./categoryList";
 export * from "./categoryListOKResponse";
 export * from "./categoryListResult";
 export * from "./categoryMutableProps";
+export * from "./categoryMutablePropsCoverImageAssetId";
 export * from "./categoryName";
 export * from "./categoryPositionMutableProps";
 export * from "./categoryReference";

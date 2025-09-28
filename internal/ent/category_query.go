@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -21,14 +22,15 @@ import (
 // CategoryQuery is the builder for querying Category entities.
 type CategoryQuery struct {
 	config
-	ctx          *QueryContext
-	order        []category.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.Category
-	withPosts    *PostQuery
-	withParent   *CategoryQuery
-	withChildren *CategoryQuery
-	modifiers    []func(*sql.Selector)
+	ctx            *QueryContext
+	order          []category.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.Category
+	withPosts      *PostQuery
+	withParent     *CategoryQuery
+	withChildren   *CategoryQuery
+	withCoverImage *AssetQuery
+	modifiers      []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -124,6 +126,28 @@ func (cq *CategoryQuery) QueryChildren() *CategoryQuery {
 			sqlgraph.From(category.Table, category.FieldID, selector),
 			sqlgraph.To(category.Table, category.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, category.ChildrenTable, category.ChildrenColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCoverImage chains the current query on the "cover_image" edge.
+func (cq *CategoryQuery) QueryCoverImage() *AssetQuery {
+	query := (&AssetClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, selector),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, category.CoverImageTable, category.CoverImageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -318,14 +342,15 @@ func (cq *CategoryQuery) Clone() *CategoryQuery {
 		return nil
 	}
 	return &CategoryQuery{
-		config:       cq.config,
-		ctx:          cq.ctx.Clone(),
-		order:        append([]category.OrderOption{}, cq.order...),
-		inters:       append([]Interceptor{}, cq.inters...),
-		predicates:   append([]predicate.Category{}, cq.predicates...),
-		withPosts:    cq.withPosts.Clone(),
-		withParent:   cq.withParent.Clone(),
-		withChildren: cq.withChildren.Clone(),
+		config:         cq.config,
+		ctx:            cq.ctx.Clone(),
+		order:          append([]category.OrderOption{}, cq.order...),
+		inters:         append([]Interceptor{}, cq.inters...),
+		predicates:     append([]predicate.Category{}, cq.predicates...),
+		withPosts:      cq.withPosts.Clone(),
+		withParent:     cq.withParent.Clone(),
+		withChildren:   cq.withChildren.Clone(),
+		withCoverImage: cq.withCoverImage.Clone(),
 		// clone intermediate query.
 		sql:       cq.sql.Clone(),
 		path:      cq.path,
@@ -363,6 +388,17 @@ func (cq *CategoryQuery) WithChildren(opts ...func(*CategoryQuery)) *CategoryQue
 		opt(query)
 	}
 	cq.withChildren = query
+	return cq
+}
+
+// WithCoverImage tells the query-builder to eager-load the nodes that are connected to
+// the "cover_image" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CategoryQuery) WithCoverImage(opts ...func(*AssetQuery)) *CategoryQuery {
+	query := (&AssetClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withCoverImage = query
 	return cq
 }
 
@@ -444,10 +480,11 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cat
 	var (
 		nodes       = []*Category{}
 		_spec       = cq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			cq.withPosts != nil,
 			cq.withParent != nil,
 			cq.withChildren != nil,
+			cq.withCoverImage != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -488,6 +525,12 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cat
 		if err := cq.loadChildren(ctx, query, nodes,
 			func(n *Category) { n.Edges.Children = []*Category{} },
 			func(n *Category, e *Category) { n.Edges.Children = append(n.Edges.Children, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withCoverImage; query != nil {
+		if err := cq.loadCoverImage(ctx, query, nodes, nil,
+			func(n *Category, e *Asset) { n.Edges.CoverImage = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -583,6 +626,38 @@ func (cq *CategoryQuery) loadChildren(ctx context.Context, query *CategoryQuery,
 	}
 	return nil
 }
+func (cq *CategoryQuery) loadCoverImage(ctx context.Context, query *AssetQuery, nodes []*Category, init func(*Category), assign func(*Category, *Asset)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Category)
+	for i := range nodes {
+		if nodes[i].CoverImageAssetID == nil {
+			continue
+		}
+		fk := *nodes[i].CoverImageAssetID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(asset.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "cover_image_asset_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (cq *CategoryQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
@@ -614,6 +689,9 @@ func (cq *CategoryQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if cq.withParent != nil {
 			_spec.Node.AddColumnOnce(category.FieldParentCategoryID)
+		}
+		if cq.withCoverImage != nil {
+			_spec.Node.AddColumnOnce(category.FieldCoverImageAssetID)
 		}
 	}
 	if ps := cq.predicates; len(ps) > 0 {

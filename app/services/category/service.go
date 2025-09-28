@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
@@ -20,12 +21,13 @@ type Service interface {
 }
 
 type Partial struct {
-	Name        opt.Optional[string]
-	Slug        opt.Optional[string]
-	Description opt.Optional[string]
-	Colour      opt.Optional[string]
-	Admin       opt.Optional[bool]
-	Meta        opt.Optional[map[string]any]
+	Name                opt.Optional[string]
+	Slug                opt.Optional[string]
+	Description         opt.Optional[string]
+	Colour              opt.Optional[string]
+	Admin               opt.Optional[bool]
+	CoverImageAssetID   deletable.Value[*xid.ID]
+	Meta                opt.Optional[map[string]any]
 }
 
 type Move struct {
@@ -79,6 +81,12 @@ func (s *service) Update(ctx context.Context, slug string, partial Partial) (*ca
 	}
 	if v, ok := partial.Admin.Get(); ok {
 		opts = append(opts, category.WithAdmin(v))
+	}
+	coverImageOpt, shouldDelete := partial.CoverImageAssetID.Get()
+	if shouldDelete {
+		opts = append(opts, category.WithCoverImageAssetID(nil))
+	} else if v, ok := coverImageOpt.Get(); ok {
+		opts = append(opts, category.WithCoverImageAssetID(v))
 	}
 	if v, ok := partial.Meta.Get(); ok {
 		opts = append(opts, category.WithMeta(v))

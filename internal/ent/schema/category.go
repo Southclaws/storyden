@@ -28,6 +28,10 @@ func (Category) Fields() []ent.Field {
 		field.String("parent_category_id").
 			GoType(xid.ID{}).
 			Optional(),
+		field.String("cover_image_asset_id").
+			GoType(xid.ID{}).
+			Optional().
+			Nillable(),
 		field.JSON("metadata", map[string]any{}).
 			Optional().
 			Comment("Arbitrary metadata used by clients to store domain specific information."),
@@ -43,5 +47,8 @@ func (Category) Edges() []ent.Edge {
 			Unique().
 			Field("parent_category_id").
 			Comment("Optional recursive self reference to the parent category."),
+		edge.To("cover_image", Asset.Type).
+			Field("cover_image_asset_id").
+			Unique(),
 	}
 }
