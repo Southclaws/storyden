@@ -70,8 +70,9 @@ type OperationPermissions interface {
 	ProfileFollowingGet() (bool, *rbac.Permission)
 	CategoryCreate() (bool, *rbac.Permission)
 	CategoryList() (bool, *rbac.Permission)
-	CategoryUpdateOrder() (bool, *rbac.Permission)
+	CategoryGet() (bool, *rbac.Permission)
 	CategoryUpdate() (bool, *rbac.Permission)
+	CategoryUpdatePosition() (bool, *rbac.Permission)
 	TagList() (bool, *rbac.Permission)
 	TagGet() (bool, *rbac.Permission)
 	ThreadCreate() (bool, *rbac.Permission)
@@ -267,10 +268,12 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.CategoryCreate()
 	case "CategoryList":
 		return optable.CategoryList()
-	case "CategoryUpdateOrder":
-		return optable.CategoryUpdateOrder()
+	case "CategoryGet":
+		return optable.CategoryGet()
 	case "CategoryUpdate":
 		return optable.CategoryUpdate()
+	case "CategoryUpdatePosition":
+		return optable.CategoryUpdatePosition()
 	case "TagList":
 		return optable.TagList()
 	case "TagGet":

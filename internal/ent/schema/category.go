@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/rs/xid"
 )
 
 // Category holds the schema definition for the Category entity.
@@ -24,6 +25,9 @@ func (Category) Fields() []ent.Field {
 		field.String("colour").Default("#8577ce"),
 		field.Int("sort").Default(-1),
 		field.Bool("admin").Default(false),
+		field.String("parent_category_id").
+			GoType(xid.ID{}).
+			Optional(),
 		field.JSON("metadata", map[string]any{}).
 			Optional().
 			Comment("Arbitrary metadata used by clients to store domain specific information."),
@@ -34,5 +38,10 @@ func (Category) Fields() []ent.Field {
 func (Category) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("posts", Post.Type),
+		edge.To("children", Category.Type).
+			From("parent").
+			Unique().
+			Field("parent_category_id").
+			Comment("Optional recursive self reference to the parent category."),
 	}
 }

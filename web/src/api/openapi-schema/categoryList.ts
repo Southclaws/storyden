@@ -9,6 +9,4 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type { Category } from "./category";
 
-export interface CategoryList {
-  categories: Category[];
-}
+export type CategoryList = Category[];

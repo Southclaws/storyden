@@ -44,6 +44,7 @@ export function FeedScreenContent({ initialData }: Props) {
     case "categories":
       return (
         <CategoryIndexScreen
+          layout={feed.layout.type}
           initialCategoryList={initialData.categories}
           initialThreadList={initialData.threads}
           initialThreadListPage={initialData.page}

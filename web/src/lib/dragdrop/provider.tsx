@@ -1,5 +1,6 @@
 "use client";
 
+import { TreeView as ArkTreeView } from "@ark-ui/react/tree-view";
 import {
   DndContext,
   DragEndEvent,
@@ -12,11 +13,17 @@ import {
   useSensors,
 } from "@dnd-kit/core";
 import { useState } from "react";
-import { toast } from "sonner";
 
 import { handle } from "@/api/client";
-import { Identifier, NodeWithChildren } from "@/api/openapi-schema";
+import { Category, Identifier, NodeWithChildren } from "@/api/openapi-schema";
+import { CategoryBadge } from "@/components/category/CategoryBadge";
+import { BulletIcon } from "@/components/ui/icons/Bullet";
+import { ChevronRightIcon } from "@/components/ui/icons/Chevron";
+import { css, cx } from "@/styled-system/css";
+import { Box, CardBox, styled } from "@/styled-system/jsx";
+import { treeView } from "@/styled-system/recipes";
 
+import { useEmitCategoryEvent } from "../category/events";
 import { useEmitLibraryBlockEvent } from "../library/events";
 import { useLibraryMutation } from "../library/library";
 import { LibraryPageBlockType } from "../library/metadata";
@@ -32,6 +39,20 @@ export type DragItemNode = {
   node: NodeWithChildren;
 };
 
+export type DragItemCategory = {
+  type: "category";
+  categoryID: Identifier;
+  category: Category;
+  hasChildren: boolean;
+};
+
+export type DragItemCategoryDivider = {
+  type: "category-divider";
+  parentID: Identifier | null;
+  siblingCategoryID: Identifier;
+  direction: "above" | "below";
+};
+
 export type DragItemDivider = {
   type: "divider";
   parentID: Identifier | null;
@@ -39,11 +60,17 @@ export type DragItemDivider = {
   direction: "above" | "below";
 };
 
-export type DragItemData = DragItemNode | DragItemDivider | DragItemNodeBlock;
+export type DragItemData =
+  | DragItemNode
+  | DragItemDivider
+  | DragItemNodeBlock
+  | DragItemCategory
+  | DragItemCategoryDivider;
 
 export function DndProvider({ children }: { children: React.ReactNode }) {
   const { moveNode, revalidate } = useLibraryMutation();
   const emitLibraryBlockEvent = useEmitLibraryBlockEvent();
+  const emitCategoryEvent = useEmitCategoryEvent();
   const [activeItem, setActiveItem] = useState<DragItemData | null>(null);
 
   const sensors = useSensors(
@@ -85,6 +112,9 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
     if (activeData.type === "node") {
       const active = activeData as DragItemNode;
       const target = targetData as DragItemData;
+      if (target.type !== "node" && target.type !== "divider") {
+        return;
+      }
 
       const direction = target.type === "divider" ? target.direction : "inside";
       const targetNode =
@@ -118,6 +148,35 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
         overId: target.block,
       });
     }
+
+    if (activeData.type === "category") {
+      const active = activeData as DragItemCategory;
+      const target = targetData as DragItemCategoryDivider | DragItemCategory;
+      if (
+        targetData.type !== "category" &&
+        targetData.type !== "category-divider"
+      ) {
+        return;
+      }
+
+      const direction =
+        target.type === "category-divider" ? target.direction : "inside";
+      const targetCategory =
+        target.type === "category-divider"
+          ? target.siblingCategoryID
+          : target.categoryID;
+      const newParent =
+        target.type === "category-divider"
+          ? target.parentID
+          : target.categoryID;
+
+      emitCategoryEvent("category:reorder-category", {
+        categoryID: active.categoryID,
+        targetCategory,
+        direction,
+        newParent,
+      });
+    }
   };
 
   return (
@@ -132,9 +191,63 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
       {children}
 
       <DragOverlay>
-        {/* TODO: Drag previews for different element types */}
-        {/* <p>{activeItem?.type}</p> */}
+        {activeItem && <DragOverlaySwitch activeItem={activeItem} />}
       </DragOverlay>
     </DndContext>
+  );
+}
+
+type DragOverlaySwitchProps = {
+  activeItem: DragItemData;
+};
+
+function DragOverlaySwitch({ activeItem }: DragOverlaySwitchProps) {
+  switch (activeItem.type) {
+    case "node":
+      return <DragOverlayNavigationNode activeItem={activeItem} />;
+
+    case "category":
+      return <DragOverlayNavigationCategory activeItem={activeItem} />;
+
+    default:
+      return null;
+  }
+}
+
+function DragOverlayNavigationCategory({
+  activeItem,
+}: {
+  activeItem: DragItemCategory;
+}) {
+  const styles = treeView();
+  return (
+    <Box className={cx(styles.branchControl)} opacity="5">
+      <Box className={styles.branchIndicator}>
+        {activeItem?.hasChildren ? <ChevronRightIcon /> : <BulletIcon />}
+      </Box>
+
+      <Box className={styles.branchText}>{activeItem.category.name}</Box>
+    </Box>
+  );
+}
+
+function DragOverlayNavigationNode({
+  activeItem,
+}: {
+  activeItem: DragItemNode;
+}) {
+  const styles = treeView();
+  return (
+    <Box className={cx(styles.branchControl)} opacity="5">
+      <Box className={styles.branchIndicator}>
+        {activeItem?.node.children.length > 0 ? (
+          <ChevronRightIcon />
+        ) : (
+          <BulletIcon />
+        )}
+      </Box>
+
+      <Box className={styles.branchText}>{activeItem.node.name}</Box>
+    </Box>
   );
 }

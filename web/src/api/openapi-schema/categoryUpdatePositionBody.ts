@@ -7,6 +7,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.25.7-canary
  */
-import type { Identifier } from "./identifier";
+import type { CategoryPositionMutableProps } from "./categoryPositionMutableProps";
 
-export type CategoryIdentifierList = Identifier[];
+export type CategoryUpdatePositionBody = CategoryPositionMutableProps;

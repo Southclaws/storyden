@@ -96,6 +96,11 @@ func Admin(v bool) predicate.Category {
 	return predicate.Category(sql.FieldEQ(FieldAdmin, v))
 }
 
+// ParentCategoryID applies equality check predicate on the "parent_category_id" field. It's identical to ParentCategoryIDEQ.
+func ParentCategoryID(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldEQ(FieldParentCategoryID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Category {
 	return predicate.Category(sql.FieldEQ(FieldCreatedAt, v))
@@ -486,6 +491,86 @@ func AdminNEQ(v bool) predicate.Category {
 	return predicate.Category(sql.FieldNEQ(FieldAdmin, v))
 }
 
+// ParentCategoryIDEQ applies the EQ predicate on the "parent_category_id" field.
+func ParentCategoryIDEQ(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldEQ(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDNEQ applies the NEQ predicate on the "parent_category_id" field.
+func ParentCategoryIDNEQ(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldNEQ(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDIn applies the In predicate on the "parent_category_id" field.
+func ParentCategoryIDIn(vs ...xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldIn(FieldParentCategoryID, vs...))
+}
+
+// ParentCategoryIDNotIn applies the NotIn predicate on the "parent_category_id" field.
+func ParentCategoryIDNotIn(vs ...xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldNotIn(FieldParentCategoryID, vs...))
+}
+
+// ParentCategoryIDGT applies the GT predicate on the "parent_category_id" field.
+func ParentCategoryIDGT(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldGT(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDGTE applies the GTE predicate on the "parent_category_id" field.
+func ParentCategoryIDGTE(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldGTE(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDLT applies the LT predicate on the "parent_category_id" field.
+func ParentCategoryIDLT(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldLT(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDLTE applies the LTE predicate on the "parent_category_id" field.
+func ParentCategoryIDLTE(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldLTE(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDContains applies the Contains predicate on the "parent_category_id" field.
+func ParentCategoryIDContains(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldContains(FieldParentCategoryID, vc))
+}
+
+// ParentCategoryIDHasPrefix applies the HasPrefix predicate on the "parent_category_id" field.
+func ParentCategoryIDHasPrefix(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldHasPrefix(FieldParentCategoryID, vc))
+}
+
+// ParentCategoryIDHasSuffix applies the HasSuffix predicate on the "parent_category_id" field.
+func ParentCategoryIDHasSuffix(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldHasSuffix(FieldParentCategoryID, vc))
+}
+
+// ParentCategoryIDIsNil applies the IsNil predicate on the "parent_category_id" field.
+func ParentCategoryIDIsNil() predicate.Category {
+	return predicate.Category(sql.FieldIsNull(FieldParentCategoryID))
+}
+
+// ParentCategoryIDNotNil applies the NotNil predicate on the "parent_category_id" field.
+func ParentCategoryIDNotNil() predicate.Category {
+	return predicate.Category(sql.FieldNotNull(FieldParentCategoryID))
+}
+
+// ParentCategoryIDEqualFold applies the EqualFold predicate on the "parent_category_id" field.
+func ParentCategoryIDEqualFold(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldEqualFold(FieldParentCategoryID, vc))
+}
+
+// ParentCategoryIDContainsFold applies the ContainsFold predicate on the "parent_category_id" field.
+func ParentCategoryIDContainsFold(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldContainsFold(FieldParentCategoryID, vc))
+}
+
 // MetadataIsNil applies the IsNil predicate on the "metadata" field.
 func MetadataIsNil() predicate.Category {
 	return predicate.Category(sql.FieldIsNull(FieldMetadata))
@@ -511,6 +596,52 @@ func HasPosts() predicate.Category {
 func HasPostsWith(preds ...predicate.Post) predicate.Category {
 	return predicate.Category(func(s *sql.Selector) {
 		step := newPostsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasParent applies the HasEdge predicate on the "parent" edge.
+func HasParent() predicate.Category {
+	return predicate.Category(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasParentWith applies the HasEdge predicate on the "parent" edge with a given conditions (other predicates).
+func HasParentWith(preds ...predicate.Category) predicate.Category {
+	return predicate.Category(func(s *sql.Selector) {
+		step := newParentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasChildren applies the HasEdge predicate on the "children" edge.
+func HasChildren() predicate.Category {
+	return predicate.Category(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChildrenTable, ChildrenColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChildrenWith applies the HasEdge predicate on the "children" edge with a given conditions (other predicates).
+func HasChildrenWith(preds ...predicate.Category) predicate.Category {
+	return predicate.Category(func(s *sql.Selector) {
+		step := newChildrenStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

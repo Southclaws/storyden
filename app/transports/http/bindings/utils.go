@@ -15,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -199,33 +198,6 @@ func serialisePostRef(p *post.Post) openapi.PostReference {
 
 func deserialisePostID(s string) post.ID {
 	return post.ID(openapi.ParseID(s))
-}
-
-func serialiseCategory(c *category.Category) openapi.Category {
-	return openapi.Category{
-		Id:          *openapi.IdentifierFrom(xid.ID(c.ID)),
-		Name:        c.Name,
-		Slug:        c.Slug,
-		Colour:      c.Colour,
-		Description: c.Description,
-		PostCount:   c.PostCount,
-		Admin:       c.Admin,
-		Sort:        c.Sort,
-		Meta:        (*openapi.Metadata)(&c.Metadata),
-	}
-}
-
-func serialiseCategoryReference(c category.Category) openapi.CategoryReference {
-	return openapi.CategoryReference{
-		Id:          *openapi.IdentifierFrom(xid.ID(c.ID)),
-		Name:        c.Name,
-		Slug:        c.Slug,
-		Admin:       c.Admin,
-		Colour:      c.Colour,
-		Description: c.Description,
-		Sort:        c.Sort,
-		Meta:        (*openapi.Metadata)(&c.Metadata),
-	}
 }
 
 func deserialiseID(t openapi.Identifier) xid.ID {

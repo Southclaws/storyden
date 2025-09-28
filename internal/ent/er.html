@@ -68,6 +68,7 @@ erDiagram
         string colour
         int sort
         bool admin
+        xidDOTID parent_category_id
         mapLBRACKstringRBRACKinterface {} metadata
     }
     Collection {
@@ -298,6 +299,7 @@ erDiagram
     	Asset |o--o{ Asset : "assets/parent"
     	Asset |o--o{ Event : "event/primary_image"
     	Category |o--o{ Post : "posts/category"
+    	Category |o--o{ Category : "children/parent"
     	Collection }o--o| Asset : "cover_image"
     	Collection }o--o{ Post : "posts/collections"
     	Collection }o--o{ Node : "nodes/collections"

@@ -6320,26 +6320,31 @@ func (m *AuthenticationMutation) ResetEdge(name string) error {
 // CategoryMutation represents an operation that mutates the Category nodes in the graph.
 type CategoryMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *xid.ID
-	created_at    *time.Time
-	updated_at    *time.Time
-	name          *string
-	slug          *string
-	description   *string
-	colour        *string
-	sort          *int
-	addsort       *int
-	admin         *bool
-	metadata      *map[string]interface{}
-	clearedFields map[string]struct{}
-	posts         map[xid.ID]struct{}
-	removedposts  map[xid.ID]struct{}
-	clearedposts  bool
-	done          bool
-	oldValue      func(context.Context) (*Category, error)
-	predicates    []predicate.Category
+	op              Op
+	typ             string
+	id              *xid.ID
+	created_at      *time.Time
+	updated_at      *time.Time
+	name            *string
+	slug            *string
+	description     *string
+	colour          *string
+	sort            *int
+	addsort         *int
+	admin           *bool
+	metadata        *map[string]interface{}
+	clearedFields   map[string]struct{}
+	posts           map[xid.ID]struct{}
+	removedposts    map[xid.ID]struct{}
+	clearedposts    bool
+	parent          *xid.ID
+	clearedparent   bool
+	children        map[xid.ID]struct{}
+	removedchildren map[xid.ID]struct{}
+	clearedchildren bool
+	done            bool
+	oldValue        func(context.Context) (*Category, error)
+	predicates      []predicate.Category
 }
 
 var _ ent.Mutation = (*CategoryMutation)(nil)
@@ -6754,6 +6759,55 @@ func (m *CategoryMutation) ResetAdmin() {
 	m.admin = nil
 }
 
+// SetParentCategoryID sets the "parent_category_id" field.
+func (m *CategoryMutation) SetParentCategoryID(x xid.ID) {
+	m.parent = &x
+}
+
+// ParentCategoryID returns the value of the "parent_category_id" field in the mutation.
+func (m *CategoryMutation) ParentCategoryID() (r xid.ID, exists bool) {
+	v := m.parent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParentCategoryID returns the old "parent_category_id" field's value of the Category entity.
+// If the Category object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CategoryMutation) OldParentCategoryID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParentCategoryID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParentCategoryID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParentCategoryID: %w", err)
+	}
+	return oldValue.ParentCategoryID, nil
+}
+
+// ClearParentCategoryID clears the value of the "parent_category_id" field.
+func (m *CategoryMutation) ClearParentCategoryID() {
+	m.parent = nil
+	m.clearedFields[category.FieldParentCategoryID] = struct{}{}
+}
+
+// ParentCategoryIDCleared returns if the "parent_category_id" field was cleared in this mutation.
+func (m *CategoryMutation) ParentCategoryIDCleared() bool {
+	_, ok := m.clearedFields[category.FieldParentCategoryID]
+	return ok
+}
+
+// ResetParentCategoryID resets all changes to the "parent_category_id" field.
+func (m *CategoryMutation) ResetParentCategoryID() {
+	m.parent = nil
+	delete(m.clearedFields, category.FieldParentCategoryID)
+}
+
 // SetMetadata sets the "metadata" field.
 func (m *CategoryMutation) SetMetadata(value map[string]interface{}) {
 	m.metadata = &value
@@ -6857,6 +6911,100 @@ func (m *CategoryMutation) ResetPosts() {
 	m.removedposts = nil
 }
 
+// SetParentID sets the "parent" edge to the Category entity by id.
+func (m *CategoryMutation) SetParentID(id xid.ID) {
+	m.parent = &id
+}
+
+// ClearParent clears the "parent" edge to the Category entity.
+func (m *CategoryMutation) ClearParent() {
+	m.clearedparent = true
+	m.clearedFields[category.FieldParentCategoryID] = struct{}{}
+}
+
+// ParentCleared reports if the "parent" edge to the Category entity was cleared.
+func (m *CategoryMutation) ParentCleared() bool {
+	return m.ParentCategoryIDCleared() || m.clearedparent
+}
+
+// ParentID returns the "parent" edge ID in the mutation.
+func (m *CategoryMutation) ParentID() (id xid.ID, exists bool) {
+	if m.parent != nil {
+		return *m.parent, true
+	}
+	return
+}
+
+// ParentIDs returns the "parent" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ParentID instead. It exists only for internal usage by the builders.
+func (m *CategoryMutation) ParentIDs() (ids []xid.ID) {
+	if id := m.parent; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetParent resets all changes to the "parent" edge.
+func (m *CategoryMutation) ResetParent() {
+	m.parent = nil
+	m.clearedparent = false
+}
+
+// AddChildIDs adds the "children" edge to the Category entity by ids.
+func (m *CategoryMutation) AddChildIDs(ids ...xid.ID) {
+	if m.children == nil {
+		m.children = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.children[ids[i]] = struct{}{}
+	}
+}
+
+// ClearChildren clears the "children" edge to the Category entity.
+func (m *CategoryMutation) ClearChildren() {
+	m.clearedchildren = true
+}
+
+// ChildrenCleared reports if the "children" edge to the Category entity was cleared.
+func (m *CategoryMutation) ChildrenCleared() bool {
+	return m.clearedchildren
+}
+
+// RemoveChildIDs removes the "children" edge to the Category entity by IDs.
+func (m *CategoryMutation) RemoveChildIDs(ids ...xid.ID) {
+	if m.removedchildren == nil {
+		m.removedchildren = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.children, ids[i])
+		m.removedchildren[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedChildren returns the removed IDs of the "children" edge to the Category entity.
+func (m *CategoryMutation) RemovedChildrenIDs() (ids []xid.ID) {
+	for id := range m.removedchildren {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ChildrenIDs returns the "children" edge IDs in the mutation.
+func (m *CategoryMutation) ChildrenIDs() (ids []xid.ID) {
+	for id := range m.children {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetChildren resets all changes to the "children" edge.
+func (m *CategoryMutation) ResetChildren() {
+	m.children = nil
+	m.clearedchildren = false
+	m.removedchildren = nil
+}
+
 // Where appends a list predicates to the CategoryMutation builder.
 func (m *CategoryMutation) Where(ps ...predicate.Category) {
 	m.predicates = append(m.predicates, ps...)
@@ -6891,7 +7039,7 @@ func (m *CategoryMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CategoryMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, category.FieldCreatedAt)
 	}
@@ -6915,6 +7063,9 @@ func (m *CategoryMutation) Fields() []string {
 	}
 	if m.admin != nil {
 		fields = append(fields, category.FieldAdmin)
+	}
+	if m.parent != nil {
+		fields = append(fields, category.FieldParentCategoryID)
 	}
 	if m.metadata != nil {
 		fields = append(fields, category.FieldMetadata)
@@ -6943,6 +7094,8 @@ func (m *CategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.Sort()
 	case category.FieldAdmin:
 		return m.Admin()
+	case category.FieldParentCategoryID:
+		return m.ParentCategoryID()
 	case category.FieldMetadata:
 		return m.Metadata()
 	}
@@ -6970,6 +7123,8 @@ func (m *CategoryMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldSort(ctx)
 	case category.FieldAdmin:
 		return m.OldAdmin(ctx)
+	case category.FieldParentCategoryID:
+		return m.OldParentCategoryID(ctx)
 	case category.FieldMetadata:
 		return m.OldMetadata(ctx)
 	}
@@ -7037,6 +7192,13 @@ func (m *CategoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetAdmin(v)
 		return nil
+	case category.FieldParentCategoryID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParentCategoryID(v)
+		return nil
 	case category.FieldMetadata:
 		v, ok := value.(map[string]interface{})
 		if !ok {
@@ -7089,6 +7251,9 @@ func (m *CategoryMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *CategoryMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(category.FieldParentCategoryID) {
+		fields = append(fields, category.FieldParentCategoryID)
+	}
 	if m.FieldCleared(category.FieldMetadata) {
 		fields = append(fields, category.FieldMetadata)
 	}
@@ -7106,6 +7271,9 @@ func (m *CategoryMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *CategoryMutation) ClearField(name string) error {
 	switch name {
+	case category.FieldParentCategoryID:
+		m.ClearParentCategoryID()
+		return nil
 	case category.FieldMetadata:
 		m.ClearMetadata()
 		return nil
@@ -7141,6 +7309,9 @@ func (m *CategoryMutation) ResetField(name string) error {
 	case category.FieldAdmin:
 		m.ResetAdmin()
 		return nil
+	case category.FieldParentCategoryID:
+		m.ResetParentCategoryID()
+		return nil
 	case category.FieldMetadata:
 		m.ResetMetadata()
 		return nil
@@ -7150,9 +7321,15 @@ func (m *CategoryMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CategoryMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.posts != nil {
 		edges = append(edges, category.EdgePosts)
+	}
+	if m.parent != nil {
+		edges = append(edges, category.EdgeParent)
+	}
+	if m.children != nil {
+		edges = append(edges, category.EdgeChildren)
 	}
 	return edges
 }
@@ -7167,15 +7344,28 @@ func (m *CategoryMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case category.EdgeParent:
+		if id := m.parent; id != nil {
+			return []ent.Value{*id}
+		}
+	case category.EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.children))
+		for id := range m.children {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CategoryMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.removedposts != nil {
 		edges = append(edges, category.EdgePosts)
+	}
+	if m.removedchildren != nil {
+		edges = append(edges, category.EdgeChildren)
 	}
 	return edges
 }
@@ -7190,15 +7380,27 @@ func (m *CategoryMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case category.EdgeChildren:
+		ids := make([]ent.Value, 0, len(m.removedchildren))
+		for id := range m.removedchildren {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CategoryMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 3)
 	if m.clearedposts {
 		edges = append(edges, category.EdgePosts)
+	}
+	if m.clearedparent {
+		edges = append(edges, category.EdgeParent)
+	}
+	if m.clearedchildren {
+		edges = append(edges, category.EdgeChildren)
 	}
 	return edges
 }
@@ -7209,6 +7411,10 @@ func (m *CategoryMutation) EdgeCleared(name string) bool {
 	switch name {
 	case category.EdgePosts:
 		return m.clearedposts
+	case category.EdgeParent:
+		return m.clearedparent
+	case category.EdgeChildren:
+		return m.clearedchildren
 	}
 	return false
 }
@@ -7217,6 +7423,9 @@ func (m *CategoryMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *CategoryMutation) ClearEdge(name string) error {
 	switch name {
+	case category.EdgeParent:
+		m.ClearParent()
+		return nil
 	}
 	return fmt.Errorf("unknown Category unique edge %s", name)
 }
@@ -7227,6 +7436,12 @@ func (m *CategoryMutation) ResetEdge(name string) error {
 	switch name {
 	case category.EdgePosts:
 		m.ResetPosts()
+		return nil
+	case category.EdgeParent:
+		m.ResetParent()
+		return nil
+	case category.EdgeChildren:
+		m.ResetChildren()
 		return nil
 	}
 	return fmt.Errorf("unknown Category edge %s", name)

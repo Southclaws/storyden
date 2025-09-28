@@ -203,12 +203,21 @@ var (
 		{Name: "sort", Type: field.TypeInt, Default: -1},
 		{Name: "admin", Type: field.TypeBool, Default: false},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
+		{Name: "parent_category_id", Type: field.TypeString, Nullable: true, Size: 20},
 	}
 	// CategoriesTable holds the schema information for the "categories" table.
 	CategoriesTable = &schema.Table{
 		Name:       "categories",
 		Columns:    CategoriesColumns,
 		PrimaryKey: []*schema.Column{CategoriesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "categories_categories_children",
+				Columns:    []*schema.Column{CategoriesColumns[10]},
+				RefColumns: []*schema.Column{CategoriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// CollectionsColumns holds the columns for the "collections" table.
 	CollectionsColumns = []*schema.Column{
@@ -1171,6 +1180,7 @@ func init() {
 	AssetsTable.ForeignKeys[0].RefTable = AccountsTable
 	AssetsTable.ForeignKeys[1].RefTable = AssetsTable
 	AuthenticationsTable.ForeignKeys[0].RefTable = AccountsTable
+	CategoriesTable.ForeignKeys[0].RefTable = CategoriesTable
 	CollectionsTable.ForeignKeys[0].RefTable = AccountsTable
 	CollectionsTable.ForeignKeys[1].RefTable = AssetsTable
 	CollectionNodesTable.ForeignKeys[0].RefTable = CollectionsTable

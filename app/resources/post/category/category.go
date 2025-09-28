@@ -3,6 +3,7 @@ package category
 import (
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -26,6 +27,8 @@ type Category struct {
 	Colour      string
 	Sort        int
 	Admin       bool
+	ParentID    *CategoryID
+	Children    []*Category
 	Recent      []PostMeta
 	PostCount   int
 	Metadata    map[string]any
@@ -54,6 +57,15 @@ func FromModel(c *ent.Category) *Category {
 		}
 	}
 
+	var parentID *CategoryID
+
+	if !c.ParentCategoryID.IsNil() {
+		pid := CategoryID(c.ParentCategoryID)
+		parentID = &pid
+	}
+
+	children := dt.Map(c.Edges.Children, FromModel)
+
 	return &Category{
 		ID:          CategoryID(c.ID),
 		Name:        c.Name,
@@ -62,6 +74,8 @@ func FromModel(c *ent.Category) *Category {
 		Colour:      c.Colour,
 		Sort:        c.Sort,
 		Admin:       c.Admin,
+		ParentID:    parentID,
+		Children:    children,
 		Recent:      recent,
 		Metadata:    c.Metadata,
 	}

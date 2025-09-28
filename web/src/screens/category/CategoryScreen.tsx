@@ -1,13 +1,51 @@
 "use client";
 
+import { useCategoryGet } from "@/api/openapi-client/categories";
+import {
+  CategoryGetOKResponse,
+  Permission,
+  ThreadListOKResponse,
+} from "@/api/openapi-schema";
+import { useSession } from "@/auth";
+import { CategoryLayout } from "@/components/category/CategoryIndex/CategoryCardLayout";
 import { CategoryMenu } from "@/components/category/CategoryMenu/CategoryMenu";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
+import { hasPermission } from "@/utils/permissions";
 
 import { ThreadFeedScreen } from "../feed/ThreadFeedScreen/ThreadFeedScreen";
 
-import { Props, useCategoryScreen } from "./useCategoryScreen";
+export type Props = {
+  initialCategory: CategoryGetOKResponse;
+  initialThreadList: ThreadListOKResponse;
+  slug: string;
+};
+
+export function useCategoryScreen({ initialCategory, slug }: Props) {
+  const session = useSession();
+
+  const { data, error } = useCategoryGet(slug, {
+    swr: { fallbackData: initialCategory },
+  });
+
+  if (!data) {
+    return {
+      ready: false as const,
+      error,
+    };
+  }
+
+  const canEditCategory = hasPermission(session, Permission.MANAGE_CATEGORIES);
+
+  return {
+    ready: true as const,
+    data: {
+      canEditCategory,
+      category: data,
+    },
+  };
+}
 
 type ScreenProps = {
   initialPage: number;
@@ -31,6 +69,13 @@ export function CategoryScreen(props: ScreenProps) {
         </WStack>
 
         <styled.p color="fg.muted">{category.description}</styled.p>
+      </LStack>
+
+      <LStack gap="1">
+        <Heading size="sm" color="fg.muted">
+          Subcategories
+        </Heading>
+        <CategoryLayout layout="grid" categories={category.children ?? []} />
       </LStack>
 
       <ThreadFeedScreen

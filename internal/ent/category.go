@@ -35,6 +35,8 @@ type Category struct {
 	Sort int `json:"sort,omitempty"`
 	// Admin holds the value of the "admin" field.
 	Admin bool `json:"admin,omitempty"`
+	// ParentCategoryID holds the value of the "parent_category_id" field.
+	ParentCategoryID xid.ID `json:"parent_category_id,omitempty"`
 	// Arbitrary metadata used by clients to store domain specific information.
 	Metadata map[string]interface{} `json:"metadata,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -47,9 +49,13 @@ type Category struct {
 type CategoryEdges struct {
 	// Posts holds the value of the posts edge.
 	Posts []*Post `json:"posts,omitempty"`
+	// Optional recursive self reference to the parent category.
+	Parent *Category `json:"parent,omitempty"`
+	// Children holds the value of the children edge.
+	Children []*Category `json:"children,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [3]bool
 }
 
 // PostsOrErr returns the Posts value or an error if the edge
@@ -59,6 +65,26 @@ func (e CategoryEdges) PostsOrErr() ([]*Post, error) {
 		return e.Posts, nil
 	}
 	return nil, &NotLoadedError{edge: "posts"}
+}
+
+// ParentOrErr returns the Parent value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CategoryEdges) ParentOrErr() (*Category, error) {
+	if e.Parent != nil {
+		return e.Parent, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: category.Label}
+	}
+	return nil, &NotLoadedError{edge: "parent"}
+}
+
+// ChildrenOrErr returns the Children value or an error if the edge
+// was not loaded in eager-loading.
+func (e CategoryEdges) ChildrenOrErr() ([]*Category, error) {
+	if e.loadedTypes[2] {
+		return e.Children, nil
+	}
+	return nil, &NotLoadedError{edge: "children"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -76,7 +102,7 @@ func (*Category) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case category.FieldCreatedAt, category.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case category.FieldID:
+		case category.FieldID, category.FieldParentCategoryID:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -147,6 +173,12 @@ func (c *Category) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Admin = value.Bool
 			}
+		case category.FieldParentCategoryID:
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field parent_category_id", values[i])
+			} else if value != nil {
+				c.ParentCategoryID = *value
+			}
 		case category.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field metadata", values[i])
@@ -171,6 +203,16 @@ func (c *Category) Value(name string) (ent.Value, error) {
 // QueryPosts queries the "posts" edge of the Category entity.
 func (c *Category) QueryPosts() *PostQuery {
 	return NewCategoryClient(c.config).QueryPosts(c)
+}
+
+// QueryParent queries the "parent" edge of the Category entity.
+func (c *Category) QueryParent() *CategoryQuery {
+	return NewCategoryClient(c.config).QueryParent(c)
+}
+
+// QueryChildren queries the "children" edge of the Category entity.
+func (c *Category) QueryChildren() *CategoryQuery {
+	return NewCategoryClient(c.config).QueryChildren(c)
 }
 
 // Update returns a builder for updating this Category.
@@ -219,6 +261,9 @@ func (c *Category) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("admin=")
 	builder.WriteString(fmt.Sprintf("%v", c.Admin))
+	builder.WriteString(", ")
+	builder.WriteString("parent_category_id=")
+	builder.WriteString(fmt.Sprintf("%v", c.ParentCategoryID))
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
 	builder.WriteString(fmt.Sprintf("%v", c.Metadata))

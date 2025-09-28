@@ -1120,27 +1120,46 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/CategoryListOK" }
-    patch:
-      operationId: CategoryUpdateOrder
-      description: Update the sort order of categories.
+
+  /categories/{category_slug}:
+    get:
+      operationId: CategoryGet
+      description: Get information about a category.
       tags: [categories]
-      requestBody: { $ref: "#/components/requestBodies/CategoryUpdateOrder" }
+      parameters: [{ $ref: "#/components/parameters/CategorySlugParam" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
-        "200": { $ref: "#/components/responses/CategoryListOK" }
-
-  /categories/{category_id}:
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/CategoryGetOK" }
     patch:
       operationId: CategoryUpdate
       description: Update a category's information.
       tags: [categories]
-      parameters: [$ref: "#/components/parameters/CategoryIDParam"]
+      parameters: [$ref: "#/components/parameters/CategorySlugParam"]
       requestBody: { $ref: "#/components/requestBodies/CategoryUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CategoryUpdateOK" }
+
+  /categories/{category_slug}/position:
+    patch:
+      operationId: CategoryUpdatePosition
+      description: |
+        Update the category's position in the tree. You may change the parent
+        using `parent`, and/or reposition the category among its siblings using
+        either `before` or `after`. Use this operation for drag-and-drop
+        interfaces.
+      tags: [categories]
+      parameters: [$ref: "#/components/parameters/CategorySlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/CategoryUpdatePosition" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/CategoryListOK" }
 
   #
   # 888
@@ -2375,13 +2394,13 @@ components:
       schema:
         type: string
 
-    CategoryIDParam:
-      description: Unique category ID.
-      name: category_id
+    CategorySlugParam:
+      description: Unique category URL slug.
+      name: category_slug
       in: path
       required: true
       schema:
-        $ref: "#/components/schemas/Identifier"
+        type: string
 
     CategorySlugListQuery:
       name: categories
@@ -2658,15 +2677,15 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/CategoryInitialProps" }
 
-    CategoryUpdateOrder:
-      content:
-        application/json:
-          schema: { $ref: "#/components/schemas/CategoryIdentifierList" }
-
     CategoryUpdate:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/CategoryMutableProps" }
+
+    CategoryUpdatePosition:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/CategoryPositionMutableProps" }
 
     ThreadCreate:
       content:
@@ -3024,6 +3043,13 @@ components:
           schema:
             $ref: "#/components/schemas/Category"
 
+    CategoryGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Category"
+
     CategoryUpdateOK:
       description: OK
       content:
@@ -3036,7 +3062,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/CategoryList"
+            $ref: "#/components/schemas/CategoryListResult"
 
     TagListOK:
       description: OK
@@ -4685,7 +4711,7 @@ components:
 
     CategoryCommonProps:
       type: object
-      required: [name, slug, description, colour, sort, admin]
+      required: [name, slug, description, colour, sort, admin, children]
       properties:
         name:
           $ref: "#/components/schemas/CategoryName"
@@ -4699,6 +4725,10 @@ components:
           type: integer
         admin:
           type: boolean
+        parent:
+          $ref: "#/components/schemas/Identifier"
+          description: Parent category identifier. Unset indicates a root-level category.
+        children: { $ref: "#/components/schemas/CategoryList" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
     CategoryInitialProps:
@@ -4754,16 +4784,32 @@ components:
           type: integer
 
     CategoryList:
+      type: array
+      items: { $ref: "#/components/schemas/Category" }
+
+    CategoryListResult:
       type: object
       required: [categories]
       properties:
         categories:
-          type: array
-          items: { $ref: "#/components/schemas/Category" }
+          $ref: "#/components/schemas/CategoryList"
 
-    CategoryIdentifierList:
-      type: array
-      items: { $ref: "#/components/schemas/Identifier" }
+    CategoryPositionMutableProps:
+      type: object
+      description: |
+        Parameters for repositioning a category in the hierarchy. Update the
+        parent using `parent`, and/or reposition among siblings using `before`
+        or `after`. Using both `before` and `after` is not allowed.
+      properties:
+        parent:
+          $ref: "#/components/schemas/NullableIdentifier"
+          description: Optional new parent category identifier. Set to null to move to the root level.
+        before:
+          $ref: "#/components/schemas/Identifier"
+          description: Move this category before the sibling with this identifier.
+        after:
+          $ref: "#/components/schemas/Identifier"
+          description: Move this category after the sibling with this identifier.
 
     #
     # 88888888888
