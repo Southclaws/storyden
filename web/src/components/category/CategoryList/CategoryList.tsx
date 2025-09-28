@@ -84,7 +84,7 @@ export function CategoryListTree({
 }: {
   categories: Category[];
   currentCategorySlug?: string;
-  mutate: KeyedMutator<CategoryList>;
+  mutate: KeyedMutator<CategoryListOKResponse>;
 }) {
   const session = useSession();
 
