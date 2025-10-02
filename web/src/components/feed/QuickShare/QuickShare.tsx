@@ -21,8 +21,6 @@ export function QuickShare(props: Props) {
     handlers,
   } = useQuickShare(props);
 
-  const showCategorySelect = Boolean(!props.initialCategory);
-
   // TODO: Render a prompt to sign up to contribute if not logged in.
   if (!props.initialSession) {
     return null;
@@ -71,7 +69,7 @@ export function QuickShare(props: Props) {
           </Button>
         </Flex>
 
-        {showCategorySelect && (
+        {props.showCategorySelect && (
           <HStack alignItems="center">
             <CategorySelect control={form.control} name="category" />
 

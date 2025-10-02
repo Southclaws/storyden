@@ -1,11 +1,11 @@
 import { FormProvider } from "react-hook-form";
 
+import { CategorySelect } from "@/components/category/CategorySelect/CategorySelect";
 import { TagListField } from "@/components/thread/ThreadTagList";
 import { Button } from "@/components/ui/button";
 import { HStack, WStack, styled } from "@/styled-system/jsx";
 
 import { BodyInput } from "../BodyInput/BodyInput";
-import { CategorySelect } from "../CategorySelect/CategorySelect";
 import { TitleInput } from "../TitleInput/TitleInput";
 
 import { Props, useComposeForm } from "./useComposeForm";
@@ -26,7 +26,7 @@ export function ComposeForm(props: Props) {
       <FormProvider {...form}>
         <WStack>
           <HStack width="full">
-            <CategorySelect />
+            <CategorySelect control={form.control} name="category" />
             <TagListField
               name="tags"
               control={form.control}
