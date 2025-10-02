@@ -15,27 +15,27 @@ import (
 )
 
 func Build() fx.Option {
-	return fx.Invoke(func(
-		ctx context.Context,
-		lc fx.Lifecycle,
-		bus *pubsub.Bus,
-		notifier *notify.Notifier,
-	) {
-		consumer := func(hctx context.Context) error {
-			_, err := pubsub.Subscribe(hctx, bus, "reply_notify.reply_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
-				return notifier.Send(ctx,
-					evt.ThreadAuthorID,
-					opt.New(evt.ReplyAuthorID),
-					notification.EventThreadReply,
-					opt.New(datagraph.Ref{
-						ID:   xid.ID(evt.ThreadID),
-						Kind: datagraph.KindPost,
-					}),
-				)
-			})
-			return err
-		}
+	return fx.Invoke(newReplyNotifier)
+}
 
-		lc.Append(fx.StartHook(consumer))
-	})
+func newReplyNotifier(
+	ctx context.Context,
+	lc fx.Lifecycle,
+	bus *pubsub.Bus,
+	notifier *notify.Notifier,
+) {
+	lc.Append(fx.StartHook(func(hctx context.Context) error {
+		_, err := pubsub.Subscribe(hctx, bus, "reply_notify.reply_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
+			return notifier.Send(ctx,
+				evt.ThreadAuthorID,
+				opt.New(evt.ReplyAuthorID),
+				notification.EventThreadReply,
+				opt.New(datagraph.Ref{
+					ID:   xid.ID(evt.ThreadID),
+					Kind: datagraph.KindPost,
+				}),
+			)
+		})
+		return err
+	}))
 }
