@@ -24,7 +24,7 @@ type Notifications []*Notification
 
 func (a Notifications) Len() int           { return len(a) }
 func (a Notifications) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a Notifications) Less(i, j int) bool { return a[i].Time.Before(a[j].Time) }
+func (a Notifications) Less(i, j int) bool { return a[i].Time.After(a[j].Time) }
 
 type NotificationRef struct {
 	ID      xid.ID
