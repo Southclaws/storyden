@@ -8,16 +8,18 @@ import { handle } from "@/api/client";
 import { linkCreate } from "@/api/openapi-client/links";
 import { Account, Category, LinkReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
+import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCategorySelect";
 import { useFeedMutations } from "@/lib/feed/mutation";
 
 export type Props = {
   initialSession?: Account;
   initialCategory?: Category | null;
+  showCategorySelect: boolean;
 };
 
 export const FormSchema = z.object({
   body: z.string(),
-  category: z.string(),
+  category: z.string().optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -82,10 +84,6 @@ export function useQuickShare({ initialCategory }: Props) {
   const handlePost = form.handleSubmit((data: Form) => {
     handle(
       async () => {
-        if (!data.category) {
-          throw new Error("Category is required.");
-        }
-
         const parsed = new DOMParser().parseFromString(
           bodyContent,
           "text/html",
@@ -109,7 +107,8 @@ export function useQuickShare({ initialCategory }: Props) {
           title: threadTitle,
           body,
           url: postURL ?? undefined,
-          category: data.category,
+          category:
+            data.category === NO_CATEGORY_VALUE ? undefined : data.category,
           visibility: "published" as const,
         };
 

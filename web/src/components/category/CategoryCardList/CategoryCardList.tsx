@@ -179,6 +179,7 @@ function ThreadListSection({
         initialPageData={initialThreadList}
         category={null}
         paginationBasePath={paginationBasePath}
+        showCategorySelect={false}
       />
     </LStack>
   );

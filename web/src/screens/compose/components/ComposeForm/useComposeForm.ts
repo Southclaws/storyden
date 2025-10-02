@@ -4,11 +4,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { useCategoryList } from "src/api/openapi-client/categories";
 import { threadCreate, threadUpdate } from "src/api/openapi-client/threads";
 import { Thread, ThreadInitialProps, Visibility } from "src/api/openapi-schema";
 
 import { handle } from "@/api/client";
+import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCategorySelect";
 
 export type Props = { editing?: string; initialDraft?: Thread };
 
@@ -27,7 +27,6 @@ export function useComposeForm({ initialDraft, editing }: Props) {
   const [isPublishing, setIsPublishing] = useState(false);
   const [isSavingDraft, setIsSavingDraft] = useState(false);
 
-  const { data } = useCategoryList();
   const form = useForm<FormShape>({
     resolver: zodResolver(FormShapeSchema),
     reValidateMode: "onChange",
@@ -38,10 +37,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
           tags: initialDraft.tags.map((t) => t.name),
           url: initialDraft.link?.url,
         }
-      : {
-          // hack: the underlying category list select component can't do this.
-          category: data?.categories[0]?.id,
-        },
+      : {},
   });
 
   const saveDraft = async (data: FormShape) => {
@@ -53,6 +49,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       body: data.body ?? "",
       url: data.url ?? "",
       tags: data.tags ?? [],
+      category: data.category === NO_CATEGORY_VALUE ? undefined : data.category,
 
       visibility: Visibility.draft,
     };
@@ -77,7 +74,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       const { slug } = await threadUpdate(editing, {
         title,
         body,
-        category,
+        category: category === NO_CATEGORY_VALUE ? undefined : category,
         visibility: Visibility.published,
         tags,
         url,
@@ -87,7 +84,7 @@ export function useComposeForm({ initialDraft, editing }: Props) {
       const { slug } = await threadCreate({
         title,
         body,
-        category,
+        category: category === NO_CATEGORY_VALUE ? undefined : category,
         visibility: Visibility.published,
         tags,
         url,

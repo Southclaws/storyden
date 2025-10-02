@@ -34,6 +34,7 @@ export function FeedScreenContent({ initialData }: Props) {
           initialPageData={initialData.threads}
           category={undefined}
           paginationBasePath="/"
+          showCategorySelect={true}
         />
       );
 
