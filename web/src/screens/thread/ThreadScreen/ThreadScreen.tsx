@@ -8,6 +8,7 @@ import { Thread } from "@/api/openapi-schema";
 import { CategoryBadge } from "@/components/category/CategoryBadge";
 import { Byline } from "@/components/content/Byline";
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
+import { LinkCard } from "@/components/library/links/LinkCard";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { SaveAction } from "@/components/site/Action/Save";
 import { PaginationControls } from "@/components/site/PaginationControls/PaginationControls";
@@ -103,6 +104,8 @@ export function ThreadScreen(props: Props) {
         ) : (
           <TagBadgeList tags={thread.tags} />
         )}
+
+        {thread.link && <LinkCard link={thread.link} />}
 
         <ThreadBodyInput
           control={form.control}
