@@ -22,7 +22,7 @@ func New(bus *pubsub.Bus) *Notifier {
 	return &Notifier{bus: bus}
 }
 
-func (n *Notifier) Send(ctx context.Context, targetID account.AccountID, sourceID opt.Optional[account.AccountID], event notification.Event, item *datagraph.Ref) error {
+func (n *Notifier) Send(ctx context.Context, targetID account.AccountID, sourceID opt.Optional[account.AccountID], event notification.Event, item opt.Optional[datagraph.Ref]) error {
 	if err := n.bus.SendCommand(ctx, &message.CommandSendNotification{
 		Event:    event,
 		Item:     item,

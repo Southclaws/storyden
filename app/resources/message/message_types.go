@@ -143,7 +143,7 @@ type CommandProfileIndex struct {
 
 type CommandSendNotification struct {
 	Event    notification.Event
-	Item     *datagraph.Ref
+	Item     opt.Optional[datagraph.Ref]
 	TargetID account.AccountID
 	SourceID opt.Optional[account.AccountID]
 }

@@ -46,6 +46,7 @@ func Build() fx.Option {
 		authentication.Build(),
 		category.Build(),
 		thread.Build(),
+		notify_job.Build(), // Moved before reply.Build() to ensure Notifier is available
 		reply.Build(),
 		post_liker.Build(),
 		react_manager.Build(),
@@ -57,7 +58,6 @@ func Build() fx.Option {
 		library.Build(),
 		comms.Build(),
 		link.Build(),
-		notify_job.Build(),
 		mention_job.Build(),
 		generative.Build(),
 		semdexer.Build(),

@@ -96,7 +96,7 @@ func (m *Manager) Update(ctx context.Context, mk event_ref.QueryKey, change Chan
 	}
 
 	for _, notify := range notifications {
-		m.notifier.Send(ctx, notify.AccountID, opt.New(acc.ID), notify.Event, datagraph.NewRef(evt))
+		m.notifier.Send(ctx, notify.AccountID, opt.New(acc.ID), notify.Event, opt.NewPtr(datagraph.NewRef(evt)))
 	}
 
 	return evt, nil

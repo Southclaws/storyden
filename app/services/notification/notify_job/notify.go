@@ -28,9 +28,9 @@ func (s *notifyConsumer) notify(ctx context.Context,
 	targetID account.AccountID,
 	sourceID opt.Optional[account.AccountID],
 	event notification.Event,
-	item *datagraph.Ref,
+	item opt.Optional[datagraph.Ref],
 ) error {
-	itemref := opt.Map(opt.NewPtr(item), func(i datagraph.Ref) datagraph.ItemRef {
+	itemref := opt.Map(item, func(i datagraph.Ref) datagraph.ItemRef {
 		return &i
 	})
 

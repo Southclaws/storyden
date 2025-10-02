@@ -25,7 +25,7 @@ func newMentionConsumer(
 func (s *mentionConsumer) mention(ctx context.Context, by account.AccountID, source datagraph.Ref, item datagraph.Ref) error {
 	switch item.Kind {
 	case datagraph.KindProfile:
-		s.notifySender.Send(ctx, account.AccountID(item.ID), opt.New(by), notification.EventProfileMention, &source)
+		s.notifySender.Send(ctx, account.AccountID(item.ID), opt.New(by), notification.EventProfileMention, opt.New(source))
 
 		// TODO: Store mention in db
 	}

@@ -27,10 +27,10 @@ func Build() fx.Option {
 					evt.ThreadAuthorID,
 					opt.New(evt.ReplyAuthorID),
 					notification.EventThreadReply,
-					&datagraph.Ref{
+					opt.New(datagraph.Ref{
 						ID:   xid.ID(evt.ThreadID),
 						Kind: datagraph.KindPost,
-					},
+					}),
 				)
 			})
 			return err
