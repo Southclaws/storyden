@@ -102,8 +102,11 @@ func Map(m *ent.Post) (*Reply, error) {
 			UpdatedAt: m.UpdatedAt,
 			DeletedAt: opt.NewPtr(m.DeletedAt),
 		},
-		ReplyTo:    replyTo,
-		RootAuthor: *rootAuthor,
+		ReplyTo:         replyTo,
+		RootAuthor:      *rootAuthor,
+		RootPostID:      post.ID(m.RootPostID),
+		RootThreadMark:  m.Edges.Root.Slug,
+		RootThreadTitle: m.Edges.Root.Title,
 	}, nil
 }
 
