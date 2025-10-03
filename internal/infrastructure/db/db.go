@@ -20,6 +20,7 @@ import (
 	_ "github.com/glebarez/go-sqlite"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"
+	_ "github.com/tursodatabase/libsql-client-go/libsql"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 	"go.uber.org/fx"
@@ -155,6 +156,11 @@ func connect(ctx context.Context, cfg config.Config, driver *sql.DB) (*ent.Clien
 			ent.Driver(entsql.OpenDB(dialect.SQLite, driver)),
 		)
 
+	case "libsql":
+		opts = append(opts,
+			ent.Driver(entsql.OpenDB(dialect.SQLite, driver)),
+		)
+
 	default:
 		panic(fmt.Sprintf("unsupported driver '%s' in ent connect", d))
 	}
@@ -196,6 +202,10 @@ func getDriver(databaseURL string) (string, string, error) {
 		}
 
 		return "sqlite", path, nil
+
+	case "libsql":
+		path := strings.Replace(databaseURL, "libsql://", "file:", 1)
+		return "libsql", path, nil
 
 	default:
 		return "", "", fault.Newf("unsupported scheme: %s", u.Scheme)
