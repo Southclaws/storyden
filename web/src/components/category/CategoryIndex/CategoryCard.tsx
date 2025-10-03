@@ -75,40 +75,44 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
 
         {hasSubcategories && showChildren && (
           <CardRows>
-            {category.children.map((c) => (
-              <CardBox
-                key={c.id}
-                position="relative"
-                style={cssProps}
-                borderColor="bg.subtle"
-                borderWidth="hairline"
-                borderStyle="solid"
-                borderLeftColor="colorPalette.border"
-                borderLeftWidth="thick"
-                borderLeftStyle="solid"
-                display="flex"
-                justifyContent="space-between"
-                gap="4"
-                boxShadow="[none]"
-                px="2"
-                py="1"
-              >
-                <WStack alignItems="start">
-                  <HStack gap="1">
-                    <Link className={linkOverlay()} href={`/d/${c.slug}`}>
-                      <Heading textWrap="nowrap" fontSize="sm">
-                        {c.name}
-                      </Heading>
-                    </Link>
-                    <BulletIcon />
-                    <styled.p lineClamp={1} color="fg.muted" fontSize="sm">
-                      {c.description}
-                    </styled.p>
-                  </HStack>
-                  <CategoryMenu category={c} />
-                </WStack>
-              </CardBox>
-            ))}
+            {category.children.map((c) => {
+              const cssProps = categoryColourCSS(c.colour);
+
+              return (
+                <CardBox
+                  key={c.id}
+                  position="relative"
+                  style={cssProps}
+                  borderColor="bg.subtle"
+                  borderWidth="hairline"
+                  borderStyle="solid"
+                  borderLeftColor="colorPalette.border"
+                  borderLeftWidth="thick"
+                  borderLeftStyle="solid"
+                  display="flex"
+                  justifyContent="space-between"
+                  gap="4"
+                  boxShadow="[none]"
+                  px="2"
+                  py="1"
+                >
+                  <WStack alignItems="start">
+                    <HStack gap="1">
+                      <Link className={linkOverlay()} href={`/d/${c.slug}`}>
+                        <Heading textWrap="nowrap" fontSize="sm">
+                          {c.name}
+                        </Heading>
+                      </Link>
+                      <BulletIcon />
+                      <styled.p lineClamp={1} color="fg.muted" fontSize="sm">
+                        {c.description}
+                      </styled.p>
+                    </HStack>
+                    <CategoryMenu category={c} />
+                  </WStack>
+                </CardBox>
+              );
+            })}
           </CardRows>
         )}
       </LStack>
