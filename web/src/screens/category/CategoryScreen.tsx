@@ -11,7 +11,8 @@ import { CategoryLayout } from "@/components/category/CategoryIndex/CategoryCard
 import { CategoryMenu } from "@/components/category/CategoryMenu/CategoryMenu";
 import { UnreadyBanner } from "@/components/site/Unready";
 import { Heading } from "@/components/ui/heading";
-import { LStack, WStack, styled } from "@/styled-system/jsx";
+import { Box, LStack, WStack, styled } from "@/styled-system/jsx";
+import { getAssetURL } from "@/utils/asset";
 import { hasPermission } from "@/utils/permissions";
 
 import { ThreadFeedScreen } from "../feed/ThreadFeedScreen/ThreadFeedScreen";
@@ -58,9 +59,25 @@ export function CategoryScreen(props: ScreenProps) {
   }
 
   const { category } = data;
+  const coverImageURL = getAssetURL(category.cover_image?.path);
 
   return (
     <LStack>
+      {coverImageURL && (
+        <Box height="64" width="full">
+          <styled.img
+            src={coverImageURL}
+            alt="" // No alt image, decorative
+            aria-hidden="true"
+            width="full"
+            height="full"
+            borderRadius="md"
+            objectFit="cover"
+            objectPosition="center"
+          />
+        </Box>
+      )}
+
       <LStack gap="1">
         <WStack alignItems="start">
           <Heading>{category.name}</Heading>
