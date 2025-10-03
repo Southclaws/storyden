@@ -64,7 +64,7 @@ export function CategoryScreen(props: ScreenProps) {
   return (
     <LStack>
       {coverImageURL && (
-        <Box height="64" width="full">
+        <Box height="auto" width="full">
           <styled.img
             src={coverImageURL}
             alt="" // No alt image, decorative
