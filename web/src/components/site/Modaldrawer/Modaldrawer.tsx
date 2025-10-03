@@ -15,12 +15,15 @@ type Props = {
 
 export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
   const handleOpenChange = (open: boolean) => {
-    if (open) {
-      props.onOpen?.();
-    } else {
-      props.onClose?.();
+    try {
+      if (open) {
+        props.onOpen?.();
+      } else {
+        props.onClose?.();
+      }
+    } finally {
+      props.onOpenChange?.({ open });
     }
-    props.onOpenChange?.({ open });
   };
 
   return (
