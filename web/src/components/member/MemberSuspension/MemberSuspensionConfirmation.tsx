@@ -21,10 +21,7 @@ export function MemberSuspensionConfirmation(props: WithDisclosure<Props>) {
       )}
 
       <HStack w="full">
-        <Button
-          //w="full"
-          flexGrow="1"
-        >
+        <Button type="button" flexGrow="1" onClick={props.onClose}>
           Cancel
         </Button>
 

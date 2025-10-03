@@ -6,12 +6,14 @@ import { Item } from "@/components/ui/menu";
 import { CategoryEditModal } from "./CategoryEditModal";
 
 export function CategoryEditMenuItem(props: Category) {
-  const { onOpen, isOpen, onClose } = useDisclosure();
+  const disclosure = useDisclosure();
 
   return (
-    <Item value="edit" onClick={onOpen}>
-      Edit
-      <CategoryEditModal onClose={onClose} isOpen={isOpen} category={props} />
-    </Item>
+    <>
+      <Item value="edit" onClick={disclosure.onOpen}>
+        Edit
+      </Item>
+      <CategoryEditModal {...disclosure} category={props} />
+    </>
   );
 }
