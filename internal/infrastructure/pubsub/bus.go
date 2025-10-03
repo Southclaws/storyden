@@ -59,6 +59,29 @@ func newBus(
 	router.AddMiddleware(middleware.Recoverer)
 	router.AddMiddleware(newSessionContextMiddleware(l))
 
+	poisonQueue, err := middleware.PoisonQueue(pub, "poison_queue")
+	if err != nil {
+		return nil, fault.Wrap(err)
+	}
+	router.AddMiddleware(poisonQueue)
+
+	retryMiddleware := middleware.Retry{
+		MaxRetries:      cfg.QueueMaxRetries,
+		InitialInterval: cfg.QueueRetryInitialInterval,
+		MaxInterval:     cfg.QueueRetryMaxInterval,
+		Multiplier:      2.0,
+		OnRetryHook: func(retryNum int, delay time.Duration) {
+			log := fmt.Sprintf("a message consumer returned an error: retrying %d/%d after %s/%s",
+				retryNum, cfg.QueueMaxRetries, delay, cfg.QueueRetryMaxInterval,
+			)
+			l.Error(log,
+				slog.Int("retry_num", retryNum),
+				slog.String("delay", delay.String()),
+			)
+		},
+	}
+	router.AddMiddleware(retryMiddleware.Middleware)
+
 	marshaler := cqrs.JSONMarshaler{
 		GenerateName: func(v interface{}) string {
 			return topicFromValue(v)
@@ -132,6 +155,18 @@ func newBus(
 	if err != nil {
 		return nil, fault.Wrap(err)
 	}
+
+	router.AddNoPublisherHandler("poison_queue_logger", "poison_queue", sub, func(msg *message.Message) error {
+		l.Error("poisoned message received after all retries failed",
+			slog.String("message_id", msg.UUID),
+			slog.String("message_type", msg.Metadata.Get("name")),
+			slog.String("reason", msg.Metadata.Get("reason_poisoned")),
+			slog.String("original_topic", msg.Metadata.Get("topic_poisoned")),
+			slog.String("handler", msg.Metadata.Get("handler_poisoned")),
+			slog.String("payload", string(msg.Payload)),
+		)
+		return nil
+	})
 
 	lc.Append(fx.StartHook(func() {
 		go func() {
