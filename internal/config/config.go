@@ -297,6 +297,16 @@ type Config struct {
 	   Storyden does not currently support `amqps://` (secure) URLs, but this will be added soon.
 	*/
 	AmqpURL string `default:"amqp://guest:guest@localhost:5672/" envconfig:"AMQP_URL"`
+	/*
+	   The maximum number of times a failed message will be retried before being moved to the dead letter queue.
+
+	   Messages are retried with exponential backoff starting at 1 second and doubling each time up to a maximum of 1 minute between retries.
+	*/
+	QueueMaxRetries int `default:"5" envconfig:"QUEUE_MAX_RETRIES"`
+	// The initial interval to wait before the first retry attempt.
+	QueueRetryInitialInterval time.Duration `default:"1s" envconfig:"QUEUE_RETRY_INITIAL_INTERVAL"`
+	// The maximum interval to wait between retry attempts. The exponential backoff will not exceed this value.
+	QueueRetryMaxInterval time.Duration `default:"1m" envconfig:"QUEUE_RETRY_MAX_INTERVAL"`
 
 	// -
 	// Artificial intelligence/language models
