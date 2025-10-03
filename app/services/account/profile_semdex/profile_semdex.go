@@ -85,6 +85,10 @@ func (s *semdexer) indexProfile(ctx context.Context, id account.AccountID) error
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if p.GetContent().IsEmpty() {
+		return nil
+	}
+
 	_, err = s.semdexMutator.Index(ctx, p)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
