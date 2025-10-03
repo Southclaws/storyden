@@ -69,7 +69,6 @@ func newBus(
 		MaxRetries:      cfg.QueueMaxRetries,
 		InitialInterval: cfg.QueueRetryInitialInterval,
 		MaxInterval:     cfg.QueueRetryMaxInterval,
-		MaxElapsedTime:  cfg.QueueRetryMaxInterval,
 		Multiplier:      2.0,
 		OnRetryHook: func(retryNum int, delay time.Duration) {
 			log := fmt.Sprintf("a message consumer returned an error: retrying %d/%d after %s/%s",
