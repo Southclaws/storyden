@@ -7,6 +7,10 @@ import { FormControl } from "@/components/ui/form/FormControl";
 import { FormFeedback } from "@/components/ui/form/FormFeedback";
 import { FormLabel } from "@/components/ui/form/FormLabel";
 import { Input } from "@/components/ui/input";
+import {
+  CATEGORY_COVER_HEIGHT,
+  CATEGORY_COVER_WIDTH,
+} from "@/lib/category/cover";
 import { HStack, VStack, styled } from "@/styled-system/jsx";
 
 import { Props, useCategoryEdit } from "./useCategoryEdit";
@@ -34,14 +38,13 @@ export function CategoryEditModal(props: Props) {
           <FormControl>
             <FormLabel>Cover Image</FormLabel>
             <AssetUploadEditor
-              aspectRatio="16 / 9"
+              width={CATEGORY_COVER_WIDTH}
+              height={CATEGORY_COVER_HEIGHT}
               value={form.watch("cover_image") || undefined}
               onUpload={handlers.handleImageUpload}
             />
-            <FormFeedback
-              error={form.formState.errors["cover_image"]?.message}
-            >
-              Upload a cover image for the category (16:9 aspect ratio).
+            <FormFeedback error={form.formState.errors["cover_image"]?.message}>
+              Upload a cover image for the category (4:1 aspect ratio).
             </FormFeedback>
           </FormControl>
 

@@ -8,10 +8,12 @@ import { button } from "@/styled-system/recipes";
 import { Props, useAssetUploadEditor } from "./useAssetUploadEditor";
 
 export interface AssetUploadEditorProps extends Props {
-  aspectRatio?: string;
   width?: number;
   height?: number;
 }
+
+const DEFAULT_WIDTH = 1280;
+const DEFAULT_HEIGHT = 720;
 
 export function AssetUploadEditor(props: AssetUploadEditorProps) {
   const {
@@ -26,20 +28,14 @@ export function AssetUploadEditor(props: AssetUploadEditorProps) {
     file,
   } = useAssetUploadEditor(props);
 
-  const aspectRatio = props.aspectRatio ?? "16 / 9";
-  const width = props.width ?? 400;
-  const height = props.height ?? Math.round(width / (16 / 9));
+  const width = props.width ?? DEFAULT_WIDTH;
+  const height = props.height ?? DEFAULT_HEIGHT;
+  const aspectRatio = `${width} / ${height}`;
 
   return (
     <LStack
       id="asset-upload-editor"
       width="full"
-      style={
-        {
-          "--max-width": `${width}px`,
-        } as any
-      }
-      // maxWidth="var(--max-width)"
       borderColor="border.default"
       borderWidth="thin"
       borderRadius="xl"
@@ -70,8 +66,8 @@ export function AssetUploadEditor(props: AssetUploadEditorProps) {
             height={height}
             style={
               {
-                maxWidth: "100%",
-                maxHeight: "100%",
+                width: "100%",
+                height: "auto",
                 margin: 0,
                 backgroundColor: "transparent",
               } as CSSProperties

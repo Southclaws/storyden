@@ -10,6 +10,10 @@ import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
 import { SelectField } from "@/components/ui/form/SelectField";
 import { Input } from "@/components/ui/input";
+import {
+  CATEGORY_COVER_HEIGHT,
+  CATEGORY_COVER_WIDTH,
+} from "@/lib/category/cover";
 import { VStack, WStack, styled } from "@/styled-system/jsx";
 
 import { CategoryCreateProps, useCategoryCreate } from "./useCategoryCreate";
@@ -51,11 +55,12 @@ export function CategoryCreateScreen(props: CategoryCreateProps) {
         <FormControl>
           <FormLabel>Cover Image</FormLabel>
           <AssetUploadEditor
-            aspectRatio="16 / 9"
+            width={CATEGORY_COVER_WIDTH}
+            height={CATEGORY_COVER_HEIGHT}
             onUpload={handleImageUpload}
           />
           <FormHelperText>
-            Upload a cover image for the category (16:9 aspect ratio)
+            Upload a cover image for the category (4:1 aspect ratio)
           </FormHelperText>
         </FormControl>
 
