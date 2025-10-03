@@ -184,6 +184,7 @@
 
         - unset (default) for no email sending. Email sending is not a requirement for a production deployment.
         - `sendgrid` for SendGrid based email sending.
+        - `smtp` for SMTP-based email sending through any SMTP server.
         - `mock` for logging emails to the console. Only useful for Storyden developers and testing.
 
     - env: "SENDGRID_FROM_NAME"
@@ -207,6 +208,62 @@
         The API key for the SendGrid account. This is required for sending emails via SendGrid.
 
         This is typically a long string of characters that you can generate in the SendGrid dashboard.
+
+    - env: "SMTP_HOST"
+      name: SMTPHost
+      type: string
+      description: |-
+        The hostname of the SMTP server. This is required for sending emails via SMTP.
+
+        This is typically something like `smtp.gmail.com`, `smtp.outlook.com`, or your organization's SMTP server.
+
+    - env: "SMTP_PORT"
+      name: SMTPPort
+      type: int
+      description: |-
+        The port of the SMTP server. This is required for sending emails via SMTP.
+
+        Common values are:
+        - `587` for TLS (recommended)
+        - `465` for SSL
+        - `25` for unencrypted (not recommended for production)
+
+    - env: "SMTP_USERNAME"
+      name: SMTPUsername
+      type: string
+      description: |-
+        The username for SMTP authentication. This is typically your email address.
+
+    - env: "SMTP_PASSWORD"
+      name: SMTPPassword
+      type: string
+      description: |-
+        The password for SMTP authentication. For services like Gmail, this may be an "app password" rather than your regular password.
+
+    - env: "SMTP_FROM_NAME"
+      name: SMTPFromName
+      type: string
+      description: |-
+        The name that will be used as the sender name for emails sent via SMTP.
+
+        This is typically the name of your community or organisation.
+
+    - env: "SMTP_FROM_ADDRESS"
+      name: SMTPFromAddress
+      type: string
+      description: |-
+        The email address that will be used as the sender address for emails sent via SMTP.
+
+        This is typically a no-reply address, such as `no-reply@<your-domain>`.
+
+    - env: "SMTP_USE_TLS"
+      name: SMTPUseTLS
+      type: bool
+      default: "true"
+      description: |-
+        Whether to use TLS/SSL encryption for the SMTP connection. This is highly recommended for production use.
+
+        Set to `false` only if your SMTP server does not support encryption (not recommended).
 
 - section: Authentication
   description: |-
