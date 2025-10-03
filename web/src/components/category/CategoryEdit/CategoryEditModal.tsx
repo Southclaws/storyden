@@ -17,6 +17,7 @@ export function CategoryEditModal(props: Props) {
     <ModalDrawer
       isOpen={props.isOpen}
       onClose={props.onClose}
+      onOpenChange={props.onOpenChange}
       title="Edit category"
     >
       <styled.form
