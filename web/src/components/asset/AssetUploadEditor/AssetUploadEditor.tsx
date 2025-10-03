@@ -58,6 +58,8 @@ export function AssetUploadEditor(props: AssetUploadEditorProps) {
           display="flex"
           alignItems="center"
           justifyContent="center"
+          onPointerDown={(e) => e.stopPropagation()}
+          onTouchStart={(e) => e.stopPropagation()}
         >
           <AvatarEditor
             ref={ref}
