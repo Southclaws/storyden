@@ -5,7 +5,7 @@ import { Identifier } from "@/api/openapi-schema";
 
 export type CategoryEvents = {
   "category:reorder-category": {
-    categoryID: Identifier;
+    categorySlug: string;
     targetCategory: Identifier;
     direction: "above" | "below" | "inside";
     newParent: Identifier | null;

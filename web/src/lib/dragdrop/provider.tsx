@@ -171,7 +171,7 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
           : target.categoryID;
 
       emitCategoryEvent("category:reorder-category", {
-        categoryID: active.categoryID,
+        categorySlug: active.category.slug,
         targetCategory,
         direction,
         newParent,

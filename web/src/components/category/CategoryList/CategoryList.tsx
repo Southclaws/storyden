@@ -10,6 +10,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { CSSProperties, useEffect, useMemo, useRef, useState } from "react";
 import { KeyedMutator } from "swr";
 
+import { handle } from "@/api/client";
 import {
   categoryUpdatePosition,
   useCategoryList as useGetCategoryList,
@@ -117,30 +118,32 @@ export function CategoryListTree({
 
   useCategoryEvent(
     "category:reorder-category",
-    async ({ categoryID, direction, newParent, targetCategory }) => {
-      const params: CategoryUpdatePositionBody = (() => {
-        switch (direction) {
-          case "above":
-            return {
-              before: targetCategory,
-              parent: newParent,
-            };
+    async ({ categorySlug, direction, newParent, targetCategory }) => {
+      await handle(async () => {
+        const params: CategoryUpdatePositionBody = (() => {
+          switch (direction) {
+            case "above":
+              return {
+                before: targetCategory,
+                parent: newParent,
+              };
 
-          case "below":
-            return {
-              after: targetCategory,
-              parent: newParent,
-            };
+            case "below":
+              return {
+                after: targetCategory,
+                parent: newParent,
+              };
 
-          case "inside":
-            return {
-              parent: targetCategory,
-            };
-        }
-      })();
+            case "inside":
+              return {
+                parent: targetCategory,
+              };
+          }
+        })();
 
-      const response = await categoryUpdatePosition(categoryID, params);
-      await mutate(response, { revalidate: false });
+        const response = await categoryUpdatePosition(categorySlug, params);
+        await mutate(response, { revalidate: false });
+      });
     },
   );
 
