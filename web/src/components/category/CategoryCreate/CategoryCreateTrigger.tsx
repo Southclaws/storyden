@@ -51,7 +51,7 @@ export function CategoryCreateTrigger({
         )}
       </IconButton>
 
-      <CategoryCreateModal {...useDisclosureProps} {...props} />
+      <CategoryCreateModal {...useDisclosureProps} defaultParent={parentSlug} />
     </>
   );
 }
