@@ -247,19 +247,27 @@ func (d *Repository) Get(ctx context.Context, slug string) (*Category, error) {
 }
 
 func (d *Repository) UpdateCategory(ctx context.Context, slug string, opts ...Option) (*Category, error) {
-	update := d.db.Category.Update().Where(category.SlugEQ(slug))
+	cat, err := d.db.Category.Query().Where(category.SlugEQ(slug)).Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	update := d.db.Category.UpdateOneID(cat.ID)
 	mutation := update.Mutation()
 
 	for _, fn := range opts {
 		fn(mutation)
 	}
 
-	_, err := update.Save(ctx)
+	updated, err := update.Save(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return d.Get(ctx, slug)
+	return d.Get(ctx, updated.Slug)
 }
 
 func (d *Repository) DeleteCategory(ctx context.Context, slug string, moveto CategoryID) (*Category, error) {
