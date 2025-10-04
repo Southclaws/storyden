@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -29,6 +29,13 @@ function UndoToastContent({
 }: UndoToastContentProps) {
   const [progress, setProgress] = useState(100);
   const [isUndone, setIsUndone] = useState(false);
+  const hasCompletedRef = useRef(false);
+
+  const complete = () => {
+    if (hasCompletedRef.current) return;
+    hasCompletedRef.current = true;
+    onComplete();
+  };
 
   useEffect(() => {
     if (isUndone) return;
@@ -44,7 +51,7 @@ function UndoToastContent({
 
       if (remaining === 0) {
         toast.dismiss(toastId);
-        onComplete();
+        complete();
       } else {
         animationFrameId = requestAnimationFrame(updateProgress);
       }
@@ -53,7 +60,7 @@ function UndoToastContent({
     animationFrameId = requestAnimationFrame(updateProgress);
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [duration, isUndone, onComplete, toastId]);
+  }, [duration, isUndone, toastId]);
 
   const handleUndo = () => {
     setIsUndone(true);
@@ -62,8 +69,8 @@ function UndoToastContent({
   };
 
   const handleClose = () => {
-    setIsUndone(true);
     toast.dismiss(toastId);
+    complete();
   };
 
   return (
@@ -155,4 +162,3 @@ export function showUndoToast({
 
   return toastId;
 }
-
