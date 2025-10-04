@@ -448,6 +448,29 @@
 
         Storyden does not currently support `amqps://` (secure) URLs, but this will be added soon.
 
+    - env: "QUEUE_MAX_RETRIES"
+      name: QueueMaxRetries
+      type: int
+      default: "5"
+      description: |-
+        The maximum number of times a failed message will be retried before being moved to the dead letter queue.
+
+        Messages are retried with exponential backoff starting at 1 second and doubling each time up to a maximum of 1 minute between retries.
+
+    - env: "QUEUE_RETRY_INITIAL_INTERVAL"
+      name: QueueRetryInitialInterval
+      type: time.Duration
+      default: "1s"
+      description: |-
+        The initial interval to wait before the first retry attempt.
+
+    - env: "QUEUE_RETRY_MAX_INTERVAL"
+      name: QueueRetryMaxInterval
+      type: time.Duration
+      default: "1m"
+      description: |-
+        The maximum interval to wait between retry attempts. The exponential backoff will not exceed this value.
+
 - section: Artificial intelligence/language models
   description: |-
     Configuration for optional AI features. These can be useful for organising large amounts of library pages and threads, but it can also provide other features such as recommendations and ask-based conversational searching.
