@@ -26,26 +26,28 @@ export function useAssetUploadEditor(props: Props) {
     tempFile || (props.value ? getAssetURL(props.value.path) : "") || "";
 
   usePinch(
-    ({ offset: [s] }) => {
-      setScale(s);
+    ({ offset: [s], event }) => {
+      setScale(Math.min(Math.max(s, 1), 100));
     },
     {
       target: pinchCaptureRef,
       scaleBounds() {
         return { min: 1, max: 100 };
       },
+      preventDefault: true,
     },
   );
 
   useWheel(
-    ({ offset: [_, dy] }) => {
+    ({ delta: [_, dy], event }) => {
       setScale((prevScale) => {
-        const newScale = prevScale - dy / 1000;
+        const newScale = prevScale - dy / 100;
         return Math.min(Math.max(newScale, 1), 100);
       });
     },
     {
       target: pinchCaptureRef,
+      preventDefault: true,
     },
   );
 
