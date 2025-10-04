@@ -1,10 +1,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { usePathname, useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { handle } from "@/api/client";
-import { categoryDelete, useCategoryList } from "src/api/openapi-client/categories";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
+
+import { handle } from "@/api/client";
+import { categoryGet } from "@/api/openapi-client/categories";
+import { useCategoryMutations } from "@/lib/category/mutation";
 
 const FormSchema = z.object({
   move_to: z.string().min(1, "Please select a category to move posts to."),
@@ -18,7 +21,9 @@ export interface CategoryDeleteProps extends UseDisclosureProps {
 }
 
 export function useCategoryDelete(props: CategoryDeleteProps) {
-  const { mutate } = useCategoryList();
+  const { deleteCategory } = useCategoryMutations();
+  const router = useRouter();
+  const pathname = usePathname();
 
   const form = useForm<FormData>({
     resolver: zodResolver(FormSchema),
@@ -26,12 +31,21 @@ export function useCategoryDelete(props: CategoryDeleteProps) {
 
   const handleDelete = form.handleSubmit(async (data) => {
     handle(async () => {
-      await categoryDelete(props.categorySlug, {
+      await deleteCategory(props.categorySlug, {
         move_to: data.move_to,
       });
 
-      mutate();
       props.onClose?.();
+
+      const isOnCategoryPage = pathname?.includes(`/d/${props.categorySlug}`);
+      if (!isOnCategoryPage) {
+        return;
+      }
+
+      // TODO: It would be nice to redirect to the move_to category page. But
+      // we don't currently have a way to fetch a category by its ID.
+
+      router.push("/d");
     });
   });
 
