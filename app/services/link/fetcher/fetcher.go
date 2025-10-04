@@ -116,7 +116,16 @@ func (s *Fetcher) queueForItem(ctx context.Context, u url.URL, item datagraph.It
 func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.LinkRef, *scrape.WebContent, error) {
 	wc, err := s.sc.Scrape(ctx, u)
 	if err != nil {
-		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+		s.logger.Warn("failed to scrape URL, storing link with basic information only",
+			slog.String("error", err.Error()),
+			slog.String("url", u.String()))
+
+		ln, err := s.lr.Store(ctx, u.String(), "", "", []link_writer.Option{}...)
+		if err != nil {
+			return nil, nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		return ln, nil, nil
 	}
 
 	opts := []link_writer.Option{}
