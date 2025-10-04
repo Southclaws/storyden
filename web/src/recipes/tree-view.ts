@@ -136,6 +136,7 @@ export const treeView = defineSlotRecipe({
       clamped: {
         root: {
           overflowX: "hidden",
+          overflowY: "clip",
         },
         branchText: {
           width: "full",

@@ -96,6 +96,16 @@ func Admin(v bool) predicate.Category {
 	return predicate.Category(sql.FieldEQ(FieldAdmin, v))
 }
 
+// ParentCategoryID applies equality check predicate on the "parent_category_id" field. It's identical to ParentCategoryIDEQ.
+func ParentCategoryID(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldEQ(FieldParentCategoryID, v))
+}
+
+// CoverImageAssetID applies equality check predicate on the "cover_image_asset_id" field. It's identical to CoverImageAssetIDEQ.
+func CoverImageAssetID(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldEQ(FieldCoverImageAssetID, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Category {
 	return predicate.Category(sql.FieldEQ(FieldCreatedAt, v))
@@ -486,6 +496,166 @@ func AdminNEQ(v bool) predicate.Category {
 	return predicate.Category(sql.FieldNEQ(FieldAdmin, v))
 }
 
+// ParentCategoryIDEQ applies the EQ predicate on the "parent_category_id" field.
+func ParentCategoryIDEQ(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldEQ(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDNEQ applies the NEQ predicate on the "parent_category_id" field.
+func ParentCategoryIDNEQ(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldNEQ(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDIn applies the In predicate on the "parent_category_id" field.
+func ParentCategoryIDIn(vs ...xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldIn(FieldParentCategoryID, vs...))
+}
+
+// ParentCategoryIDNotIn applies the NotIn predicate on the "parent_category_id" field.
+func ParentCategoryIDNotIn(vs ...xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldNotIn(FieldParentCategoryID, vs...))
+}
+
+// ParentCategoryIDGT applies the GT predicate on the "parent_category_id" field.
+func ParentCategoryIDGT(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldGT(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDGTE applies the GTE predicate on the "parent_category_id" field.
+func ParentCategoryIDGTE(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldGTE(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDLT applies the LT predicate on the "parent_category_id" field.
+func ParentCategoryIDLT(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldLT(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDLTE applies the LTE predicate on the "parent_category_id" field.
+func ParentCategoryIDLTE(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldLTE(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDContains applies the Contains predicate on the "parent_category_id" field.
+func ParentCategoryIDContains(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldContains(FieldParentCategoryID, vc))
+}
+
+// ParentCategoryIDHasPrefix applies the HasPrefix predicate on the "parent_category_id" field.
+func ParentCategoryIDHasPrefix(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldHasPrefix(FieldParentCategoryID, vc))
+}
+
+// ParentCategoryIDHasSuffix applies the HasSuffix predicate on the "parent_category_id" field.
+func ParentCategoryIDHasSuffix(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldHasSuffix(FieldParentCategoryID, vc))
+}
+
+// ParentCategoryIDIsNil applies the IsNil predicate on the "parent_category_id" field.
+func ParentCategoryIDIsNil() predicate.Category {
+	return predicate.Category(sql.FieldIsNull(FieldParentCategoryID))
+}
+
+// ParentCategoryIDNotNil applies the NotNil predicate on the "parent_category_id" field.
+func ParentCategoryIDNotNil() predicate.Category {
+	return predicate.Category(sql.FieldNotNull(FieldParentCategoryID))
+}
+
+// ParentCategoryIDEqualFold applies the EqualFold predicate on the "parent_category_id" field.
+func ParentCategoryIDEqualFold(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldEqualFold(FieldParentCategoryID, vc))
+}
+
+// ParentCategoryIDContainsFold applies the ContainsFold predicate on the "parent_category_id" field.
+func ParentCategoryIDContainsFold(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldContainsFold(FieldParentCategoryID, vc))
+}
+
+// CoverImageAssetIDEQ applies the EQ predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDEQ(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldEQ(FieldCoverImageAssetID, v))
+}
+
+// CoverImageAssetIDNEQ applies the NEQ predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDNEQ(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldNEQ(FieldCoverImageAssetID, v))
+}
+
+// CoverImageAssetIDIn applies the In predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDIn(vs ...xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldIn(FieldCoverImageAssetID, vs...))
+}
+
+// CoverImageAssetIDNotIn applies the NotIn predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDNotIn(vs ...xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldNotIn(FieldCoverImageAssetID, vs...))
+}
+
+// CoverImageAssetIDGT applies the GT predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDGT(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldGT(FieldCoverImageAssetID, v))
+}
+
+// CoverImageAssetIDGTE applies the GTE predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDGTE(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldGTE(FieldCoverImageAssetID, v))
+}
+
+// CoverImageAssetIDLT applies the LT predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDLT(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldLT(FieldCoverImageAssetID, v))
+}
+
+// CoverImageAssetIDLTE applies the LTE predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDLTE(v xid.ID) predicate.Category {
+	return predicate.Category(sql.FieldLTE(FieldCoverImageAssetID, v))
+}
+
+// CoverImageAssetIDContains applies the Contains predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDContains(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldContains(FieldCoverImageAssetID, vc))
+}
+
+// CoverImageAssetIDHasPrefix applies the HasPrefix predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDHasPrefix(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldHasPrefix(FieldCoverImageAssetID, vc))
+}
+
+// CoverImageAssetIDHasSuffix applies the HasSuffix predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDHasSuffix(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldHasSuffix(FieldCoverImageAssetID, vc))
+}
+
+// CoverImageAssetIDIsNil applies the IsNil predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDIsNil() predicate.Category {
+	return predicate.Category(sql.FieldIsNull(FieldCoverImageAssetID))
+}
+
+// CoverImageAssetIDNotNil applies the NotNil predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDNotNil() predicate.Category {
+	return predicate.Category(sql.FieldNotNull(FieldCoverImageAssetID))
+}
+
+// CoverImageAssetIDEqualFold applies the EqualFold predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDEqualFold(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldEqualFold(FieldCoverImageAssetID, vc))
+}
+
+// CoverImageAssetIDContainsFold applies the ContainsFold predicate on the "cover_image_asset_id" field.
+func CoverImageAssetIDContainsFold(v xid.ID) predicate.Category {
+	vc := v.String()
+	return predicate.Category(sql.FieldContainsFold(FieldCoverImageAssetID, vc))
+}
+
 // MetadataIsNil applies the IsNil predicate on the "metadata" field.
 func MetadataIsNil() predicate.Category {
 	return predicate.Category(sql.FieldIsNull(FieldMetadata))
@@ -511,6 +681,75 @@ func HasPosts() predicate.Category {
 func HasPostsWith(preds ...predicate.Post) predicate.Category {
 	return predicate.Category(func(s *sql.Selector) {
 		step := newPostsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasParent applies the HasEdge predicate on the "parent" edge.
+func HasParent() predicate.Category {
+	return predicate.Category(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasParentWith applies the HasEdge predicate on the "parent" edge with a given conditions (other predicates).
+func HasParentWith(preds ...predicate.Category) predicate.Category {
+	return predicate.Category(func(s *sql.Selector) {
+		step := newParentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasChildren applies the HasEdge predicate on the "children" edge.
+func HasChildren() predicate.Category {
+	return predicate.Category(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChildrenTable, ChildrenColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasChildrenWith applies the HasEdge predicate on the "children" edge with a given conditions (other predicates).
+func HasChildrenWith(preds ...predicate.Category) predicate.Category {
+	return predicate.Category(func(s *sql.Selector) {
+		step := newChildrenStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCoverImage applies the HasEdge predicate on the "cover_image" edge.
+func HasCoverImage() predicate.Category {
+	return predicate.Category(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, CoverImageTable, CoverImageColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCoverImageWith applies the HasEdge predicate on the "cover_image" edge with a given conditions (other predicates).
+func HasCoverImageWith(preds ...predicate.Asset) predicate.Category {
+	return predicate.Category(func(s *sql.Selector) {
+		step := newCoverImageStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

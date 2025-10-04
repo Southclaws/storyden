@@ -1,17 +1,20 @@
 import { ModalDrawer } from "src/components/site/Modaldrawer/Modaldrawer";
-import { UseDisclosureProps } from "src/utils/useDisclosure";
 
-import { CategoryCreateScreen } from "./CategoryCreateScreen";
+import {
+  CategoryCreateProps,
+  CategoryCreateScreen,
+} from "./CategoryCreateScreen";
 
-export function CategoryCreateModal(props: UseDisclosureProps) {
+export function CategoryCreateModal(props: CategoryCreateProps) {
   return (
     <>
       <ModalDrawer
         isOpen={props.isOpen}
         onClose={props.onClose}
+        onOpenChange={props.onOpenChange}
         title="Create category"
       >
-        <CategoryCreateScreen onClose={props.onClose} id={props.id} />
+        <CategoryCreateScreen {...props} />
       </ModalDrawer>
     </>
   );

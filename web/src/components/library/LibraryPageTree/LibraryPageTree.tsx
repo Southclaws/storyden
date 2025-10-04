@@ -250,8 +250,8 @@ function TreeNode({
     } satisfies DragItemNode,
   });
 
-  const dragged = active?.data.current as DragItemNode | undefined;
-  const draggedID = dragged?.node.id;
+  const dragged = active?.data.current as DragItemData | undefined;
+  const draggedID = dragged?.type === "node" ? dragged.node.id : undefined;
 
   const isDescendantOfDraggedNode = draggedID
     ? isDescendant(fullTree, draggedID, node.id)
@@ -274,6 +274,7 @@ function TreeNode({
   const isDraggingOver =
     !isDescendantOfDraggedNode &&
     overItem?.type === "node" &&
+    dragged?.type === "node" &&
     overItem?.node.id === node.id &&
     !isDragging;
 
@@ -524,7 +525,7 @@ function DropIndicator({
           left: 0,
           right: 0,
           height: "3px",
-          background: active ? "var(--colors-bg-disabled)" : "transparent",
+          background: active ? "var(--colors-bg-muted)" : "transparent",
           opacity: active ? 1 : 0,
           transition: "opacity 0.2s",
           pointerEvents: "none",

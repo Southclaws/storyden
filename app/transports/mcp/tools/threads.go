@@ -38,7 +38,7 @@ type threadTools struct {
 	reply_svc       reply_service.Service
 	thread_mark_svc thread_mark.Service
 	accountQuery    *account_querier.Querier
-	category_repo   category.Repository
+	category_repo   *category.Repository
 }
 
 func newThreadTools(
@@ -46,7 +46,7 @@ func newThreadTools(
 	reply_svc reply_service.Service,
 	thread_mark_svc thread_mark.Service,
 	accountQuery *account_querier.Querier,
-	category_repo category.Repository,
+	category_repo *category.Repository,
 ) *threadTools {
 	handler := &threadTools{
 		thread_svc:      thread_svc,

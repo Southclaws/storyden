@@ -1,4 +1,4 @@
-import { categoryList } from "@/api/openapi-server/categories";
+import { categoryGet, categoryList } from "@/api/openapi-server/categories";
 import { threadList } from "@/api/openapi-server/threads";
 import { CategoryScreenContextPane } from "@/screens/category/CategoryScreenContextPane";
 
@@ -8,7 +8,7 @@ export default async function Page(props: {
   const { category } = await props.params;
 
   try {
-    const { data: categoryListData } = await categoryList();
+    const { data: categoryData } = await categoryGet(category);
 
     const { data: threadListData } = await threadList({
       categories: [category],
@@ -17,7 +17,7 @@ export default async function Page(props: {
     return (
       <CategoryScreenContextPane
         slug={category}
-        initialCategoryList={categoryListData}
+        initialCategory={categoryData}
         initialThreadList={threadListData}
       />
     );

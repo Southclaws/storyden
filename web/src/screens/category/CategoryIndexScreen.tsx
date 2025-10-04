@@ -2,14 +2,12 @@
 
 import { useCategoryList } from "@/api/openapi-client/categories";
 import { CategoryListOKResponse, ThreadListResult } from "@/api/openapi-schema";
-import {
-  CategoryCardGrid,
-  CategoryCardList,
-} from "@/components/category/CategoryCardList/CategoryCardList";
-import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
+import { CategoryIndex } from "@/components/category/CategoryIndex/CategoryIndex";
 import { Unready } from "@/components/site/Unready";
+import { buildCategoryTree } from "@/lib/category/tree";
 
 export type Props = {
+  layout: "grid" | "list";
   initialCategoryList?: CategoryListOKResponse;
   initialThreadList?: ThreadListResult;
   initialThreadListPage?: number;
@@ -36,7 +34,6 @@ export function useCategoryIndexScreen({ initialCategoryList }: Props) {
 }
 
 export function CategoryIndexScreen(props: Props) {
-  const { feed } = useSettingsContext();
   const { ready, data, error } = useCategoryIndexScreen(props);
   if (!ready) {
     return <Unready error={error} />;
@@ -44,25 +41,15 @@ export function CategoryIndexScreen(props: Props) {
 
   const { categories } = data;
 
-  switch (feed.layout.type) {
-    case "grid":
-      return (
-        <CategoryCardGrid
-          categories={categories}
-          initialThreadList={props.initialThreadList}
-          initialThreadListPage={props.initialThreadListPage}
-          paginationBasePath={props.paginationBasePath}
-        />
-      );
+  const tree = buildCategoryTree(categories);
 
-    case "list":
-      return (
-        <CategoryCardList
-          categories={categories}
-          initialThreadList={props.initialThreadList}
-          initialThreadListPage={props.initialThreadListPage}
-          paginationBasePath={props.paginationBasePath}
-        />
-      );
-  }
+  return (
+    <CategoryIndex
+      layout={props.layout}
+      categories={tree}
+      initialThreadList={props.initialThreadList}
+      initialThreadListPage={props.initialThreadListPage}
+      paginationBasePath={props.paginationBasePath}
+    />
+  );
 }

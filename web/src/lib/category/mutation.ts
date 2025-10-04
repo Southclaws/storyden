@@ -1,14 +1,35 @@
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 
 import {
+  categoryDelete,
   categoryUpdate,
   getCategoryListKey,
 } from "@/api/openapi-client/categories";
 import {
+  CategoryDeleteBody,
   CategoryListOKResponse,
   CategoryMutableProps,
 } from "@/api/openapi-schema";
 import { categoryListResponse } from "@/api/openapi-server/categories";
+
+function threadsKeyFilter(key: Arguments) {
+  if (!Array.isArray(key)) return false;
+
+  if (key.length === 0) {
+    return false;
+  }
+
+  const path = key[0];
+  if (typeof path !== "string") {
+    return false;
+  }
+
+  if (!path.startsWith("/threads")) {
+    return false;
+  }
+
+  return true;
+}
 
 export function useCategoryMutations() {
   const { mutate } = useSWRConfig();
@@ -52,8 +73,15 @@ export function useCategoryMutations() {
     await categoryUpdate(id, updated);
   };
 
+  const deleteCategory = async (slug: string, body: CategoryDeleteBody) => {
+    await categoryDelete(slug, body);
+    await mutate(keyFilterFn);
+    await mutate(threadsKeyFilter);
+  };
+
   return {
     revalidateList,
     updateCategory,
+    deleteCategory,
   };
 }

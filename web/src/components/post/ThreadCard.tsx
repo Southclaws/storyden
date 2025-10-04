@@ -10,6 +10,7 @@ import { Card } from "@/components/ui/rich-card";
 import { HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
+import { CategoryBadge } from "../category/CategoryBadge";
 import { ThreadMenu } from "../thread/ThreadMenu/ThreadMenu";
 import {
   DiscussionIcon,
@@ -50,6 +51,7 @@ export const ThreadReferenceCard = memo(({ thread }: Props) => {
       controls={
         session && (
           <HStack>
+            {thread.category && <CategoryBadge category={thread.category} />}
             <LikeButton thread={thread} />
             <CollectionMenu account={session} thread={thread} />
             <ThreadMenu thread={thread} />

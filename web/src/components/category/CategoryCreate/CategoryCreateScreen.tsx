@@ -1,16 +1,41 @@
-import { UseDisclosureProps } from "src/utils/useDisclosure";
+import { createListCollection } from "@ark-ui/react";
 
+import { useCategoryList } from "src/api/openapi-client/categories";
+
+import { AssetUploadEditor } from "@/components/asset/AssetUploadEditor/AssetUploadEditor";
+import { ColourPickerField } from "@/components/ui/ColourPickerField";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/FormControl";
 import { FormHelperText } from "@/components/ui/form/FormHelperText";
 import { FormLabel } from "@/components/ui/form/FormLabel";
+import { SelectField } from "@/components/ui/form/SelectField";
 import { Input } from "@/components/ui/input";
+import {
+  CATEGORY_COVER_HEIGHT,
+  CATEGORY_COVER_WIDTH,
+} from "@/lib/category/cover";
 import { VStack, WStack, styled } from "@/styled-system/jsx";
 
-import { useCategoryCreate } from "./useCategoryCreate";
+import { CategoryCreateProps, useCategoryCreate } from "./useCategoryCreate";
 
-export function CategoryCreateScreen(props: UseDisclosureProps) {
-  const { register, onSubmit } = useCategoryCreate(props);
+export type { CategoryCreateProps };
+
+export function CategoryCreateScreen(props: CategoryCreateProps) {
+  const { register, onSubmit, control, handleImageUpload } =
+    useCategoryCreate(props);
+
+  const { data: categoryListResult } = useCategoryList();
+  const categories = categoryListResult?.categories || [];
+
+  const categoryCollection = createListCollection({
+    items: [
+      { label: "No parent (root category)", value: "" },
+      ...categories.map((category) => ({
+        label: category.name,
+        value: category.id,
+      })),
+    ],
+  });
 
   return (
     <VStack alignItems="start" gap="4">
@@ -28,6 +53,18 @@ export function CategoryCreateScreen(props: UseDisclosureProps) {
         onSubmit={onSubmit}
       >
         <FormControl>
+          <FormLabel>Cover Image</FormLabel>
+          <AssetUploadEditor
+            width={CATEGORY_COVER_WIDTH}
+            height={CATEGORY_COVER_HEIGHT}
+            onUpload={handleImageUpload}
+          />
+          <FormHelperText>
+            Upload a cover image for the category (4:1 aspect ratio)
+          </FormHelperText>
+        </FormControl>
+
+        <FormControl>
           <FormLabel>Name</FormLabel>
           <Input {...register("name")} type="text" />
           <FormHelperText>The name for your category</FormHelperText>
@@ -38,6 +75,26 @@ export function CategoryCreateScreen(props: UseDisclosureProps) {
           {/* TODO: Make a larger textarea component for this. */}
           <Input {...register("description")} type="text" />
           <FormHelperText>Describe your category</FormHelperText>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Parent Category</FormLabel>
+          <SelectField
+            name="parent"
+            control={control}
+            collection={categoryCollection}
+            placeholder="Select a parent category"
+          />
+          <FormHelperText>
+            Choose a parent category to create a subcategory, or leave as root
+            category
+          </FormHelperText>
+        </FormControl>
+
+        <FormControl>
+          <FormLabel>Colour</FormLabel>
+          <ColourPickerField control={control} name="colour" />
+          <FormHelperText>The colour for the category</FormHelperText>
         </FormControl>
 
         <WStack>

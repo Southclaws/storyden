@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -21,12 +22,15 @@ import (
 // CategoryQuery is the builder for querying Category entities.
 type CategoryQuery struct {
 	config
-	ctx        *QueryContext
-	order      []category.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Category
-	withPosts  *PostQuery
-	modifiers  []func(*sql.Selector)
+	ctx            *QueryContext
+	order          []category.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.Category
+	withPosts      *PostQuery
+	withParent     *CategoryQuery
+	withChildren   *CategoryQuery
+	withCoverImage *AssetQuery
+	modifiers      []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -78,6 +82,72 @@ func (cq *CategoryQuery) QueryPosts() *PostQuery {
 			sqlgraph.From(category.Table, category.FieldID, selector),
 			sqlgraph.To(post.Table, post.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, category.PostsTable, category.PostsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryParent chains the current query on the "parent" edge.
+func (cq *CategoryQuery) QueryParent() *CategoryQuery {
+	query := (&CategoryClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, selector),
+			sqlgraph.To(category.Table, category.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, category.ParentTable, category.ParentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryChildren chains the current query on the "children" edge.
+func (cq *CategoryQuery) QueryChildren() *CategoryQuery {
+	query := (&CategoryClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, selector),
+			sqlgraph.To(category.Table, category.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, category.ChildrenTable, category.ChildrenColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCoverImage chains the current query on the "cover_image" edge.
+func (cq *CategoryQuery) QueryCoverImage() *AssetQuery {
+	query := (&AssetClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(category.Table, category.FieldID, selector),
+			sqlgraph.To(asset.Table, asset.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, category.CoverImageTable, category.CoverImageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -272,12 +342,15 @@ func (cq *CategoryQuery) Clone() *CategoryQuery {
 		return nil
 	}
 	return &CategoryQuery{
-		config:     cq.config,
-		ctx:        cq.ctx.Clone(),
-		order:      append([]category.OrderOption{}, cq.order...),
-		inters:     append([]Interceptor{}, cq.inters...),
-		predicates: append([]predicate.Category{}, cq.predicates...),
-		withPosts:  cq.withPosts.Clone(),
+		config:         cq.config,
+		ctx:            cq.ctx.Clone(),
+		order:          append([]category.OrderOption{}, cq.order...),
+		inters:         append([]Interceptor{}, cq.inters...),
+		predicates:     append([]predicate.Category{}, cq.predicates...),
+		withPosts:      cq.withPosts.Clone(),
+		withParent:     cq.withParent.Clone(),
+		withChildren:   cq.withChildren.Clone(),
+		withCoverImage: cq.withCoverImage.Clone(),
 		// clone intermediate query.
 		sql:       cq.sql.Clone(),
 		path:      cq.path,
@@ -293,6 +366,39 @@ func (cq *CategoryQuery) WithPosts(opts ...func(*PostQuery)) *CategoryQuery {
 		opt(query)
 	}
 	cq.withPosts = query
+	return cq
+}
+
+// WithParent tells the query-builder to eager-load the nodes that are connected to
+// the "parent" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CategoryQuery) WithParent(opts ...func(*CategoryQuery)) *CategoryQuery {
+	query := (&CategoryClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withParent = query
+	return cq
+}
+
+// WithChildren tells the query-builder to eager-load the nodes that are connected to
+// the "children" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CategoryQuery) WithChildren(opts ...func(*CategoryQuery)) *CategoryQuery {
+	query := (&CategoryClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withChildren = query
+	return cq
+}
+
+// WithCoverImage tells the query-builder to eager-load the nodes that are connected to
+// the "cover_image" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CategoryQuery) WithCoverImage(opts ...func(*AssetQuery)) *CategoryQuery {
+	query := (&AssetClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withCoverImage = query
 	return cq
 }
 
@@ -374,8 +480,11 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cat
 	var (
 		nodes       = []*Category{}
 		_spec       = cq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [4]bool{
 			cq.withPosts != nil,
+			cq.withParent != nil,
+			cq.withChildren != nil,
+			cq.withCoverImage != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -403,6 +512,25 @@ func (cq *CategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cat
 		if err := cq.loadPosts(ctx, query, nodes,
 			func(n *Category) { n.Edges.Posts = []*Post{} },
 			func(n *Category, e *Post) { n.Edges.Posts = append(n.Edges.Posts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withParent; query != nil {
+		if err := cq.loadParent(ctx, query, nodes, nil,
+			func(n *Category, e *Category) { n.Edges.Parent = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withChildren; query != nil {
+		if err := cq.loadChildren(ctx, query, nodes,
+			func(n *Category) { n.Edges.Children = []*Category{} },
+			func(n *Category, e *Category) { n.Edges.Children = append(n.Edges.Children, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withCoverImage; query != nil {
+		if err := cq.loadCoverImage(ctx, query, nodes, nil,
+			func(n *Category, e *Asset) { n.Edges.CoverImage = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -439,6 +567,97 @@ func (cq *CategoryQuery) loadPosts(ctx context.Context, query *PostQuery, nodes 
 	}
 	return nil
 }
+func (cq *CategoryQuery) loadParent(ctx context.Context, query *CategoryQuery, nodes []*Category, init func(*Category), assign func(*Category, *Category)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Category)
+	for i := range nodes {
+		fk := nodes[i].ParentCategoryID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(category.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "parent_category_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (cq *CategoryQuery) loadChildren(ctx context.Context, query *CategoryQuery, nodes []*Category, init func(*Category), assign func(*Category, *Category)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Category)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(category.FieldParentCategoryID)
+	}
+	query.Where(predicate.Category(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(category.ChildrenColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ParentCategoryID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "parent_category_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (cq *CategoryQuery) loadCoverImage(ctx context.Context, query *AssetQuery, nodes []*Category, init func(*Category), assign func(*Category, *Asset)) error {
+	ids := make([]xid.ID, 0, len(nodes))
+	nodeids := make(map[xid.ID][]*Category)
+	for i := range nodes {
+		if nodes[i].CoverImageAssetID == nil {
+			continue
+		}
+		fk := *nodes[i].CoverImageAssetID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(asset.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "cover_image_asset_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (cq *CategoryQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
@@ -467,6 +686,12 @@ func (cq *CategoryQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != category.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if cq.withParent != nil {
+			_spec.Node.AddColumnOnce(category.FieldParentCategoryID)
+		}
+		if cq.withCoverImage != nil {
+			_spec.Node.AddColumnOnce(category.FieldCoverImageAssetID)
 		}
 	}
 	if ps := cq.predicates; len(ps) > 0 {

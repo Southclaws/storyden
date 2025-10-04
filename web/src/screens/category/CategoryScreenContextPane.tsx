@@ -9,7 +9,7 @@ import { css, cva } from "@/styled-system/css";
 import { HStack, LStack } from "@/styled-system/jsx";
 import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
-import { Props, useCategoryScreen } from "./useCategoryScreen";
+import { Props, useCategoryScreen } from "./CategoryScreen";
 
 const valueStyles = cva({
   base: {},

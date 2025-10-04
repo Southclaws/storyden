@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -128,6 +129,46 @@ func (cu *CategoryUpdate) SetNillableAdmin(b *bool) *CategoryUpdate {
 	return cu
 }
 
+// SetParentCategoryID sets the "parent_category_id" field.
+func (cu *CategoryUpdate) SetParentCategoryID(x xid.ID) *CategoryUpdate {
+	cu.mutation.SetParentCategoryID(x)
+	return cu
+}
+
+// SetNillableParentCategoryID sets the "parent_category_id" field if the given value is not nil.
+func (cu *CategoryUpdate) SetNillableParentCategoryID(x *xid.ID) *CategoryUpdate {
+	if x != nil {
+		cu.SetParentCategoryID(*x)
+	}
+	return cu
+}
+
+// ClearParentCategoryID clears the value of the "parent_category_id" field.
+func (cu *CategoryUpdate) ClearParentCategoryID() *CategoryUpdate {
+	cu.mutation.ClearParentCategoryID()
+	return cu
+}
+
+// SetCoverImageAssetID sets the "cover_image_asset_id" field.
+func (cu *CategoryUpdate) SetCoverImageAssetID(x xid.ID) *CategoryUpdate {
+	cu.mutation.SetCoverImageAssetID(x)
+	return cu
+}
+
+// SetNillableCoverImageAssetID sets the "cover_image_asset_id" field if the given value is not nil.
+func (cu *CategoryUpdate) SetNillableCoverImageAssetID(x *xid.ID) *CategoryUpdate {
+	if x != nil {
+		cu.SetCoverImageAssetID(*x)
+	}
+	return cu
+}
+
+// ClearCoverImageAssetID clears the value of the "cover_image_asset_id" field.
+func (cu *CategoryUpdate) ClearCoverImageAssetID() *CategoryUpdate {
+	cu.mutation.ClearCoverImageAssetID()
+	return cu
+}
+
 // SetMetadata sets the "metadata" field.
 func (cu *CategoryUpdate) SetMetadata(m map[string]interface{}) *CategoryUpdate {
 	cu.mutation.SetMetadata(m)
@@ -155,6 +196,59 @@ func (cu *CategoryUpdate) AddPosts(p ...*Post) *CategoryUpdate {
 	return cu.AddPostIDs(ids...)
 }
 
+// SetParentID sets the "parent" edge to the Category entity by ID.
+func (cu *CategoryUpdate) SetParentID(id xid.ID) *CategoryUpdate {
+	cu.mutation.SetParentID(id)
+	return cu
+}
+
+// SetNillableParentID sets the "parent" edge to the Category entity by ID if the given value is not nil.
+func (cu *CategoryUpdate) SetNillableParentID(id *xid.ID) *CategoryUpdate {
+	if id != nil {
+		cu = cu.SetParentID(*id)
+	}
+	return cu
+}
+
+// SetParent sets the "parent" edge to the Category entity.
+func (cu *CategoryUpdate) SetParent(c *Category) *CategoryUpdate {
+	return cu.SetParentID(c.ID)
+}
+
+// AddChildIDs adds the "children" edge to the Category entity by IDs.
+func (cu *CategoryUpdate) AddChildIDs(ids ...xid.ID) *CategoryUpdate {
+	cu.mutation.AddChildIDs(ids...)
+	return cu
+}
+
+// AddChildren adds the "children" edges to the Category entity.
+func (cu *CategoryUpdate) AddChildren(c ...*Category) *CategoryUpdate {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.AddChildIDs(ids...)
+}
+
+// SetCoverImageID sets the "cover_image" edge to the Asset entity by ID.
+func (cu *CategoryUpdate) SetCoverImageID(id xid.ID) *CategoryUpdate {
+	cu.mutation.SetCoverImageID(id)
+	return cu
+}
+
+// SetNillableCoverImageID sets the "cover_image" edge to the Asset entity by ID if the given value is not nil.
+func (cu *CategoryUpdate) SetNillableCoverImageID(id *xid.ID) *CategoryUpdate {
+	if id != nil {
+		cu = cu.SetCoverImageID(*id)
+	}
+	return cu
+}
+
+// SetCoverImage sets the "cover_image" edge to the Asset entity.
+func (cu *CategoryUpdate) SetCoverImage(a *Asset) *CategoryUpdate {
+	return cu.SetCoverImageID(a.ID)
+}
+
 // Mutation returns the CategoryMutation object of the builder.
 func (cu *CategoryUpdate) Mutation() *CategoryMutation {
 	return cu.mutation
@@ -179,6 +273,39 @@ func (cu *CategoryUpdate) RemovePosts(p ...*Post) *CategoryUpdate {
 		ids[i] = p[i].ID
 	}
 	return cu.RemovePostIDs(ids...)
+}
+
+// ClearParent clears the "parent" edge to the Category entity.
+func (cu *CategoryUpdate) ClearParent() *CategoryUpdate {
+	cu.mutation.ClearParent()
+	return cu
+}
+
+// ClearChildren clears all "children" edges to the Category entity.
+func (cu *CategoryUpdate) ClearChildren() *CategoryUpdate {
+	cu.mutation.ClearChildren()
+	return cu
+}
+
+// RemoveChildIDs removes the "children" edge to Category entities by IDs.
+func (cu *CategoryUpdate) RemoveChildIDs(ids ...xid.ID) *CategoryUpdate {
+	cu.mutation.RemoveChildIDs(ids...)
+	return cu
+}
+
+// RemoveChildren removes "children" edges to Category entities.
+func (cu *CategoryUpdate) RemoveChildren(c ...*Category) *CategoryUpdate {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.RemoveChildIDs(ids...)
+}
+
+// ClearCoverImage clears the "cover_image" edge to the Asset entity.
+func (cu *CategoryUpdate) ClearCoverImage() *CategoryUpdate {
+	cu.mutation.ClearCoverImage()
+	return cu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -307,6 +434,109 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cu.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   category.ParentTable,
+			Columns: []string{category.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   category.ParentTable,
+			Columns: []string{category.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.ChildrenTable,
+			Columns: []string{category.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !cu.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.ChildrenTable,
+			Columns: []string{category.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.ChildrenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.ChildrenTable,
+			Columns: []string{category.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.CoverImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   category.CoverImageTable,
+			Columns: []string{category.CoverImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.CoverImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   category.CoverImageTable,
+			Columns: []string{category.CoverImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(cu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -426,6 +656,46 @@ func (cuo *CategoryUpdateOne) SetNillableAdmin(b *bool) *CategoryUpdateOne {
 	return cuo
 }
 
+// SetParentCategoryID sets the "parent_category_id" field.
+func (cuo *CategoryUpdateOne) SetParentCategoryID(x xid.ID) *CategoryUpdateOne {
+	cuo.mutation.SetParentCategoryID(x)
+	return cuo
+}
+
+// SetNillableParentCategoryID sets the "parent_category_id" field if the given value is not nil.
+func (cuo *CategoryUpdateOne) SetNillableParentCategoryID(x *xid.ID) *CategoryUpdateOne {
+	if x != nil {
+		cuo.SetParentCategoryID(*x)
+	}
+	return cuo
+}
+
+// ClearParentCategoryID clears the value of the "parent_category_id" field.
+func (cuo *CategoryUpdateOne) ClearParentCategoryID() *CategoryUpdateOne {
+	cuo.mutation.ClearParentCategoryID()
+	return cuo
+}
+
+// SetCoverImageAssetID sets the "cover_image_asset_id" field.
+func (cuo *CategoryUpdateOne) SetCoverImageAssetID(x xid.ID) *CategoryUpdateOne {
+	cuo.mutation.SetCoverImageAssetID(x)
+	return cuo
+}
+
+// SetNillableCoverImageAssetID sets the "cover_image_asset_id" field if the given value is not nil.
+func (cuo *CategoryUpdateOne) SetNillableCoverImageAssetID(x *xid.ID) *CategoryUpdateOne {
+	if x != nil {
+		cuo.SetCoverImageAssetID(*x)
+	}
+	return cuo
+}
+
+// ClearCoverImageAssetID clears the value of the "cover_image_asset_id" field.
+func (cuo *CategoryUpdateOne) ClearCoverImageAssetID() *CategoryUpdateOne {
+	cuo.mutation.ClearCoverImageAssetID()
+	return cuo
+}
+
 // SetMetadata sets the "metadata" field.
 func (cuo *CategoryUpdateOne) SetMetadata(m map[string]interface{}) *CategoryUpdateOne {
 	cuo.mutation.SetMetadata(m)
@@ -453,6 +723,59 @@ func (cuo *CategoryUpdateOne) AddPosts(p ...*Post) *CategoryUpdateOne {
 	return cuo.AddPostIDs(ids...)
 }
 
+// SetParentID sets the "parent" edge to the Category entity by ID.
+func (cuo *CategoryUpdateOne) SetParentID(id xid.ID) *CategoryUpdateOne {
+	cuo.mutation.SetParentID(id)
+	return cuo
+}
+
+// SetNillableParentID sets the "parent" edge to the Category entity by ID if the given value is not nil.
+func (cuo *CategoryUpdateOne) SetNillableParentID(id *xid.ID) *CategoryUpdateOne {
+	if id != nil {
+		cuo = cuo.SetParentID(*id)
+	}
+	return cuo
+}
+
+// SetParent sets the "parent" edge to the Category entity.
+func (cuo *CategoryUpdateOne) SetParent(c *Category) *CategoryUpdateOne {
+	return cuo.SetParentID(c.ID)
+}
+
+// AddChildIDs adds the "children" edge to the Category entity by IDs.
+func (cuo *CategoryUpdateOne) AddChildIDs(ids ...xid.ID) *CategoryUpdateOne {
+	cuo.mutation.AddChildIDs(ids...)
+	return cuo
+}
+
+// AddChildren adds the "children" edges to the Category entity.
+func (cuo *CategoryUpdateOne) AddChildren(c ...*Category) *CategoryUpdateOne {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.AddChildIDs(ids...)
+}
+
+// SetCoverImageID sets the "cover_image" edge to the Asset entity by ID.
+func (cuo *CategoryUpdateOne) SetCoverImageID(id xid.ID) *CategoryUpdateOne {
+	cuo.mutation.SetCoverImageID(id)
+	return cuo
+}
+
+// SetNillableCoverImageID sets the "cover_image" edge to the Asset entity by ID if the given value is not nil.
+func (cuo *CategoryUpdateOne) SetNillableCoverImageID(id *xid.ID) *CategoryUpdateOne {
+	if id != nil {
+		cuo = cuo.SetCoverImageID(*id)
+	}
+	return cuo
+}
+
+// SetCoverImage sets the "cover_image" edge to the Asset entity.
+func (cuo *CategoryUpdateOne) SetCoverImage(a *Asset) *CategoryUpdateOne {
+	return cuo.SetCoverImageID(a.ID)
+}
+
 // Mutation returns the CategoryMutation object of the builder.
 func (cuo *CategoryUpdateOne) Mutation() *CategoryMutation {
 	return cuo.mutation
@@ -477,6 +800,39 @@ func (cuo *CategoryUpdateOne) RemovePosts(p ...*Post) *CategoryUpdateOne {
 		ids[i] = p[i].ID
 	}
 	return cuo.RemovePostIDs(ids...)
+}
+
+// ClearParent clears the "parent" edge to the Category entity.
+func (cuo *CategoryUpdateOne) ClearParent() *CategoryUpdateOne {
+	cuo.mutation.ClearParent()
+	return cuo
+}
+
+// ClearChildren clears all "children" edges to the Category entity.
+func (cuo *CategoryUpdateOne) ClearChildren() *CategoryUpdateOne {
+	cuo.mutation.ClearChildren()
+	return cuo
+}
+
+// RemoveChildIDs removes the "children" edge to Category entities by IDs.
+func (cuo *CategoryUpdateOne) RemoveChildIDs(ids ...xid.ID) *CategoryUpdateOne {
+	cuo.mutation.RemoveChildIDs(ids...)
+	return cuo
+}
+
+// RemoveChildren removes "children" edges to Category entities.
+func (cuo *CategoryUpdateOne) RemoveChildren(c ...*Category) *CategoryUpdateOne {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.RemoveChildIDs(ids...)
+}
+
+// ClearCoverImage clears the "cover_image" edge to the Asset entity.
+func (cuo *CategoryUpdateOne) ClearCoverImage() *CategoryUpdateOne {
+	cuo.mutation.ClearCoverImage()
+	return cuo
 }
 
 // Where appends a list predicates to the CategoryUpdate builder.
@@ -628,6 +984,109 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   category.ParentTable,
+			Columns: []string{category.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   category.ParentTable,
+			Columns: []string{category.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.ChildrenTable,
+			Columns: []string{category.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !cuo.mutation.ChildrenCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.ChildrenTable,
+			Columns: []string{category.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.ChildrenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.ChildrenTable,
+			Columns: []string{category.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.CoverImageCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   category.CoverImageTable,
+			Columns: []string{category.CoverImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.CoverImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   category.CoverImageTable,
+			Columns: []string{category.CoverImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

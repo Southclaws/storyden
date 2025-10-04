@@ -83,6 +83,7 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
               description: "",
               name: "name",
               sort: 0,
+              children: [],
             }
           : undefined,
         id: uniqueId("optimistic_thread_id_"),
