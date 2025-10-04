@@ -20,7 +20,12 @@ export function ErrorTooltip({ error }: Props) {
   return (
     <Popover.Root>
       <Popover.Trigger asChild>
-        <IconButton type="button" size="xs" variant="ghost">
+        <IconButton
+          type="button"
+          size="xs"
+          variant="ghost"
+          aria-label="Show error details"
+        >
           <WarningIcon color="fg.error" />
         </IconButton>
       </Popover.Trigger>
