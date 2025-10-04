@@ -10,16 +10,17 @@ type Props = {
 };
 
 export function CategoryCreateMenuItem({ parentCategory }: Props) {
-  const { onOpen, isOpen, onClose } = useDisclosure();
+  const useDisclosureProps = useDisclosure();
 
   return (
-    <Item value="create-subcategory" onClick={onOpen}>
-      Create subcategory
+    <>
+      <Item value="create-subcategory" onClick={useDisclosureProps.onOpen}>
+        Create subcategory
+      </Item>
       <CategoryCreateModal
-        onClose={onClose}
-        isOpen={isOpen}
         defaultParent={parentCategory?.id}
+        {...useDisclosureProps}
       />
-    </Item>
+    </>
   );
 }
