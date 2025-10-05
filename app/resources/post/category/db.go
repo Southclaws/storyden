@@ -282,6 +282,9 @@ func (d *Repository) DeleteCategory(ctx context.Context, slug string, moveto Cat
 
 	c, err := tx.Category.Query().Where(category.SlugEQ(slug)).Only(ctx)
 	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
@@ -325,6 +328,9 @@ func (d *Repository) MoveCategory(ctx context.Context, slug string, opts MoveOpt
 
 	cat, err := tx.Category.Query().Where(category.SlugEQ(slug)).Only(ctx)
 	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
