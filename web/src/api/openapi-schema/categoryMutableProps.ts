@@ -13,7 +13,6 @@ import type { CategorySlug } from "./categorySlug";
 import type { Metadata } from "./metadata";
 
 export interface CategoryMutableProps {
-  admin?: boolean;
   colour?: string;
   /**
    * Optional cover image asset identifier for the category.

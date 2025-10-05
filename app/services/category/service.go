@@ -5,6 +5,8 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"go.uber.org/fx"
@@ -14,21 +16,23 @@ import (
 	"github.com/Southclaws/storyden/internal/deletable"
 )
 
+var errInvalidCategoryCreate = fault.New("invalid create args", ftag.With(ftag.InvalidArgument))
+
 type Service interface {
-	Create(ctx context.Context, name string, description string, colour string, admin bool, parentID *category.CategoryID) (*category.Category, error)
+	Create(ctx context.Context, partial Partial) (*category.Category, error)
 	Update(ctx context.Context, slug string, partial Partial) (*category.Category, error)
 	Move(ctx context.Context, slug string, move Move) ([]*category.Category, error)
 	Delete(ctx context.Context, slug string, moveToID category.CategoryID) (*category.Category, error)
 }
 
 type Partial struct {
-	Name                opt.Optional[string]
-	Slug                opt.Optional[string]
-	Description         opt.Optional[string]
-	Colour              opt.Optional[string]
-	Admin               opt.Optional[bool]
-	CoverImageAssetID   deletable.Value[*xid.ID]
-	Meta                opt.Optional[map[string]any]
+	Name              opt.Optional[string]
+	Slug              opt.Optional[string]
+	Description       opt.Optional[string]
+	Colour            opt.Optional[string]
+	Parent            opt.Optional[category.CategoryID]
+	CoverImageAssetID deletable.Value[*xid.ID]
+	Meta              opt.Optional[map[string]any]
 }
 
 type Move struct {
@@ -56,13 +60,43 @@ func New(
 	}
 }
 
-func (s *service) Create(ctx context.Context, name string, description string, colour string, admin bool, parentID *category.CategoryID) (*category.Category, error) {
+func (s *service) Create(ctx context.Context, partial Partial) (*category.Category, error) {
 	opts := []category.Option{}
-	if parentID != nil {
-		opts = append(opts, category.WithParent(parentID))
+
+	if v, ok := partial.Parent.Get(); ok {
+		pid := v
+		opts = append(opts, category.WithParent(&pid))
 	}
 
-	cat, err := s.category_repo.CreateCategory(ctx, name, description, colour, 0, admin, opts...)
+	if v, ok := partial.Slug.Get(); ok {
+		opts = append(opts, category.WithSlug(v))
+	}
+
+	coverImage, _ := partial.CoverImageAssetID.Get()
+	if v, ok := coverImage.Get(); ok {
+		opts = append(opts, category.WithCoverImageAssetID(v))
+	}
+
+	if v, ok := partial.Meta.Get(); ok {
+		opts = append(opts, category.WithMeta(v))
+	}
+
+	name, ok := partial.Name.Get()
+	if !ok {
+		return nil, fault.Wrap(errInvalidCategoryCreate, fctx.With(ctx), fmsg.WithDesc("missing name", "Category name is required."))
+	}
+
+	description, ok := partial.Description.Get()
+	if !ok {
+		return nil, fault.Wrap(errInvalidCategoryCreate, fctx.With(ctx), fmsg.WithDesc("missing description", "Category description is required."))
+	}
+
+	colour, ok := partial.Colour.Get()
+	if !ok {
+		return nil, fault.Wrap(errInvalidCategoryCreate, fctx.With(ctx), fmsg.WithDesc("missing colour", "Category colour is required."))
+	}
+
+	cat, err := s.category_repo.CreateCategory(ctx, name, description, colour, 0, false, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -84,9 +118,6 @@ func (s *service) Update(ctx context.Context, slug string, partial Partial) (*ca
 	}
 	if v, ok := partial.Colour.Get(); ok {
 		opts = append(opts, category.WithColour(v))
-	}
-	if v, ok := partial.Admin.Get(); ok {
-		opts = append(opts, category.WithAdmin(v))
 	}
 	coverImageOpt, shouldDelete := partial.CoverImageAssetID.Get()
 	if shouldDelete {

@@ -28,13 +28,26 @@ func NewCategories(
 }
 
 func (c Categories) CategoryCreate(ctx context.Context, request openapi.CategoryCreateRequestObject) (openapi.CategoryCreateResponseObject, error) {
-	var parentID *category.CategoryID
+	parentID := opt.NewEmpty[category.CategoryID]()
 	if request.Body.Parent != nil {
-		pid := category.CategoryID(deserialiseID(*request.Body.Parent))
-		parentID = &pid
+		parentID = opt.New(category.CategoryID(deserialiseID(*request.Body.Parent)))
 	}
 
-	cat, err := c.category_svc.Create(ctx, request.Body.Name, request.Body.Description, request.Body.Colour, request.Body.Admin, parentID)
+	coverImageAssetID := deletable.Value[*xid.ID]{}
+	if request.Body.CoverImageAssetId != nil {
+		xidValue := openapi.ParseID(*request.Body.CoverImageAssetId)
+		coverImageAssetID = deletable.Skip(opt.New(&xidValue))
+	}
+
+	cat, err := c.category_svc.Create(ctx, category_svc.Partial{
+		Name:              opt.New(request.Body.Name),
+		Slug:              opt.NewPtr(request.Body.Slug),
+		Description:       opt.New(request.Body.Description),
+		Colour:            opt.New(request.Body.Colour),
+		Parent:            parentID,
+		CoverImageAssetID: coverImageAssetID,
+		Meta:              opt.NewPtr((*map[string]any)(request.Body.Meta)),
+	})
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -115,7 +128,6 @@ func (c Categories) CategoryUpdate(ctx context.Context, request openapi.Category
 		Slug:              opt.NewPtr(request.Body.Slug),
 		Description:       opt.NewPtr(request.Body.Description),
 		Colour:            opt.NewPtr(request.Body.Colour),
-		Admin:             opt.NewPtr(request.Body.Admin),
 		CoverImageAssetID: coverImageAssetID,
 		Meta:              opt.NewPtr((*map[string]any)(request.Body.Meta)),
 	})
@@ -157,7 +169,6 @@ func serialiseCategory(c *category.Category) openapi.Category {
 		Colour:      c.Colour,
 		Description: c.Description,
 		PostCount:   c.PostCount,
-		Admin:       c.Admin,
 		Sort:        c.Sort,
 		Parent:      parentID,
 		CoverImage:  opt.Map(c.CoverImage, serialiseAsset).Ptr(),
@@ -179,7 +190,6 @@ func serialiseCategoryReference(c category.Category) openapi.CategoryReference {
 		Id:          *openapi.IdentifierFrom(xid.ID(c.ID)),
 		Name:        c.Name,
 		Slug:        c.Slug,
-		Admin:       c.Admin,
 		Colour:      c.Colour,
 		Description: c.Description,
 		Sort:        c.Sort,

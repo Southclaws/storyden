@@ -4735,7 +4735,7 @@ components:
 
     CategoryCommonProps:
       type: object
-      required: [name, slug, description, colour, sort, admin, children]
+      required: [name, slug, description, colour, sort, children]
       properties:
         name:
           $ref: "#/components/schemas/CategoryName"
@@ -4747,8 +4747,6 @@ components:
           type: string
         sort:
           type: integer
-        admin:
-          type: boolean
         parent:
           $ref: "#/components/schemas/Identifier"
           description: Parent category identifier. Unset indicates a root-level category.
@@ -4759,7 +4757,7 @@ components:
 
     CategoryInitialProps:
       type: object
-      required: [name, description, colour, admin]
+      required: [name, description, colour]
       properties:
         name:
           $ref: "#/components/schemas/CategoryName"
@@ -4769,11 +4767,10 @@ components:
           type: string
         colour:
           type: string
-        admin:
-          type: boolean
         parent:
           $ref: "#/components/schemas/Identifier"
           description: Parent category identifier. Unset indicates a root-level category.
+        cover_image_asset_id: { $ref: "#/components/schemas/Identifier" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
     CategoryMutableProps:
@@ -4787,8 +4784,6 @@ components:
           type: string
         colour:
           type: string
-        admin:
-          type: boolean
         cover_image_asset_id:
           allOf:
             - $ref: "#/components/schemas/NullableIdentifier"

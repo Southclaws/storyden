@@ -39,7 +39,7 @@ func TestReactions(t *testing.T) {
 
 			cat1name := "Category " + uuid.NewString()
 
-			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#fe4efd", Description: "category testing", Name: cat1name}, session1)
+			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#fe4efd", Description: "category testing", Name: cat1name}, session1)
 			tests.Ok(t, err, cat1create)
 
 			t.Run("react to thread", func(t *testing.T) {

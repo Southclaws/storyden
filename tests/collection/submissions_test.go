@@ -47,7 +47,6 @@ func TestCollectionSubmissions(t *testing.T) {
 			session3 := sh.WithSession(e2e.WithAccountID(root, account.AccountID(utils.Must(xid.FromString(acc3.JSON200.Id)))))
 
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
-				Admin:       false,
 				Colour:      "",
 				Description: "cat",
 				Name:        xid.New().String(),

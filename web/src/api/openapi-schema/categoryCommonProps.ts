@@ -15,7 +15,6 @@ import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
 
 export interface CategoryCommonProps {
-  admin: boolean;
   children: CategoryList;
   colour: string;
   cover_image?: Asset;

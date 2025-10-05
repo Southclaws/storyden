@@ -13,8 +13,8 @@ import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
 
 export interface CategoryInitialProps {
-  admin: boolean;
   colour: string;
+  cover_image_asset_id?: Identifier;
   description: string;
   meta?: Metadata;
   name: CategoryName;

@@ -78,7 +78,6 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
               slug: "",
-              admin: false,
               colour: "colour",
               description: "",
               name: "name",

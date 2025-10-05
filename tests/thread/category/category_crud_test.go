@@ -41,7 +41,7 @@ func TestCategoryCRUD(t *testing.T) {
 				a := assert.New(t)
 
 				name := "Category " + uuid.NewString()
-				create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#abc123", Description: "category testing", Name: name}, adminSession)
+				create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#abc123", Description: "category testing", Name: name}, adminSession)
 				tests.Ok(t, err, create)
 				r.NotNil(create.JSON200)
 				r.Equal(name, create.JSON200.Name)
@@ -69,7 +69,7 @@ func TestCategoryCRUD(t *testing.T) {
 				a := assert.New(t)
 
 				name := "Category " + uuid.NewString()
-				create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#def456", Description: "category testing", Name: name}, adminSession)
+				create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#def456", Description: "category testing", Name: name}, adminSession)
 				tests.Ok(t, err, create)
 				r.NotNil(create.JSON200)
 				oldSlug := create.JSON200.Slug
@@ -107,12 +107,12 @@ func TestCategoryCRUD(t *testing.T) {
 				a := assert.New(t)
 
 				originName := "Category " + uuid.NewString()
-				origin, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#123123", Description: "category testing", Name: originName}, adminSession)
+				origin, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#123123", Description: "category testing", Name: originName}, adminSession)
 				tests.Ok(t, err, origin)
 				r.NotNil(origin.JSON200)
 
 				targetName := "Category " + uuid.NewString()
-				target, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#321321", Description: "category testing", Name: targetName}, adminSession)
+				target, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#321321", Description: "category testing", Name: targetName}, adminSession)
 				tests.Ok(t, err, target)
 				r.NotNil(target.JSON200)
 

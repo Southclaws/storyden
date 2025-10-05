@@ -38,17 +38,17 @@ func TestCategoryMovement(t *testing.T) {
 				a := assert.New(t)
 
 				parentName := "Category " + uuid.NewString()
-				parent, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#aaaaaa", Description: "category testing", Name: parentName}, adminSession)
+				parent, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#aaaaaa", Description: "category testing", Name: parentName}, adminSession)
 				tests.Ok(t, err, parent)
 				r.NotNil(parent.JSON200)
 
 				targetParentName := "Category " + uuid.NewString()
-				targetParent, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#bbbbbb", Description: "category testing", Name: targetParentName}, adminSession)
+				targetParent, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#bbbbbb", Description: "category testing", Name: targetParentName}, adminSession)
 				tests.Ok(t, err, targetParent)
 				r.NotNil(targetParent.JSON200)
 
 				childName := "Category " + uuid.NewString()
-				child, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#cccccc", Description: "category testing", Name: childName, Parent: lo.ToPtr(parent.JSON200.Id)}, adminSession)
+				child, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#cccccc", Description: "category testing", Name: childName, Parent: lo.ToPtr(parent.JSON200.Id)}, adminSession)
 				tests.Ok(t, err, child)
 				r.NotNil(child.JSON200)
 
@@ -69,12 +69,12 @@ func TestCategoryMovement(t *testing.T) {
 				a := assert.New(t)
 
 				parentName := "Category " + uuid.NewString()
-				parent, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#aaaa11", Description: "category testing", Name: parentName}, adminSession)
+				parent, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#aaaa11", Description: "category testing", Name: parentName}, adminSession)
 				tests.Ok(t, err, parent)
 				r.NotNil(parent.JSON200)
 
 				childName := "Category " + uuid.NewString()
-				child, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#bbbb22", Description: "category testing", Name: childName, Parent: lo.ToPtr(parent.JSON200.Id)}, adminSession)
+				child, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#bbbb22", Description: "category testing", Name: childName, Parent: lo.ToPtr(parent.JSON200.Id)}, adminSession)
 				tests.Ok(t, err, child)
 				r.NotNil(child.JSON200)
 
@@ -94,17 +94,17 @@ func TestCategoryMovement(t *testing.T) {
 				a := assert.New(t)
 
 				firstName := "Category " + uuid.NewString()
-				first, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#101010", Description: "category testing", Name: firstName}, adminSession)
+				first, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#101010", Description: "category testing", Name: firstName}, adminSession)
 				tests.Ok(t, err, first)
 				r.NotNil(first.JSON200)
 
 				secondName := "Category " + uuid.NewString()
-				second, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#202020", Description: "category testing", Name: secondName}, adminSession)
+				second, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#202020", Description: "category testing", Name: secondName}, adminSession)
 				tests.Ok(t, err, second)
 				r.NotNil(second.JSON200)
 
 				thirdName := "Category " + uuid.NewString()
-				third, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#303030", Description: "category testing", Name: thirdName}, adminSession)
+				third, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#303030", Description: "category testing", Name: thirdName}, adminSession)
 				tests.Ok(t, err, third)
 				r.NotNil(third.JSON200)
 

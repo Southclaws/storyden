@@ -16,9 +16,8 @@ export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name for the category."),
   description: z.string().min(1, "Please enter a short description."),
   colour: z.string().default("#8577ce"),
-  admin: z.boolean().default(false),
   parent: z.string().optional(),
-  cover_image_asset_id: z.string().nullable().optional(),
+  cover_image_asset_id: z.string().optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
@@ -31,7 +30,6 @@ export function useCategoryCreate(props: CategoryCreateProps) {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       colour: "#8577ce",
-      admin: false,
       parent: props.defaultParent,
     },
   });

@@ -18,9 +18,9 @@ export function CategoryDeleteScreen(props: CategoryDeleteProps) {
   const { data: categoryListResult } = useCategoryList();
   const categories = categoryListResult?.categories || [];
 
-  // Filter out the category being deleted and admin categories from the move options
+  // Filter out the category being deleted from the move options
   const availableCategories = categories.filter(
-    (category) => category.slug !== props.categorySlug && !category.admin,
+    (category) => category.slug !== props.categorySlug,
   );
 
   const categoryCollection = createListCollection({
