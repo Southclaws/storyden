@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Box, HStack } from "@/styled-system/jsx";
@@ -30,11 +30,11 @@ function UndoToastContent({
   const [isUndone, setIsUndone] = useState(false);
   const hasCompletedRef = useRef(false);
 
-  const complete = () => {
+  const complete = useCallback(() => {
     if (hasCompletedRef.current) return;
     hasCompletedRef.current = true;
     onComplete();
-  };
+  }, [onComplete]);
 
   useEffect(() => {
     if (isUndone) return;
@@ -59,7 +59,7 @@ function UndoToastContent({
     animationFrameId = requestAnimationFrame(updateProgress);
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [duration, isUndone, toastId]);
+  }, [duration, isUndone, toastId, complete]);
 
   const handleUndo = () => {
     setIsUndone(true);
