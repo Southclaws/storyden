@@ -1,13 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { X } from "lucide-react";
 import { toast } from "sonner";
 
 import { Box, HStack } from "@/styled-system/jsx";
 
 import { Button } from "./button";
-import { IconButton } from "./icon-button";
 
 type UndoToastProps = {
   message: string;
@@ -84,7 +82,7 @@ function UndoToastContent({
     >
       <HStack justify="space-between" alignItems="center" gap="2">
         <span style={{ fontSize: "0.875rem", flex: 1 }}>{message}</span>
-        <HStack gap="1">
+        <HStack gap="2">
           <Button
             size="sm"
             variant="subtle"
@@ -93,14 +91,13 @@ function UndoToastContent({
           >
             {isUndone ? "Cancelled" : "Undo"}
           </Button>
-          <IconButton
+          <Button
             size="sm"
             variant="ghost"
             onClick={handleClose}
-            aria-label="Close"
           >
-            <X size={16} />
-          </IconButton>
+            Delete now
+          </Button>
         </HStack>
       </HStack>
 
