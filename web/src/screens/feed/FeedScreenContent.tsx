@@ -2,6 +2,7 @@
 
 import {
   CategoryList,
+  CategoryListResult,
   NodeListResult,
   ThreadListResult,
 } from "@/api/openapi-schema";
@@ -16,7 +17,7 @@ export type InitialData = {
   threads?: ThreadListResult;
   page?: number;
   library?: NodeListResult;
-  categories?: CategoryList;
+  categories?: CategoryListResult;
 };
 
 type Props = {
@@ -44,6 +45,7 @@ export function FeedScreenContent({ initialData }: Props) {
     case "categories":
       return (
         <CategoryIndexScreen
+          layout={feed.layout.type}
           initialCategoryList={initialData.categories}
           initialThreadList={initialData.threads}
           initialThreadListPage={initialData.page}

@@ -36,6 +36,7 @@ export default async function Page({ searchParams }: Props) {
 
     return (
       <CategoryIndexScreen
+        layout={"list"}
         initialCategoryList={categories}
         initialThreadList={threads}
         initialThreadListPage={page}

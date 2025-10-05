@@ -7,6 +7,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.25.7-canary
  */
-import type { Identifier } from "./identifier";
+import type { NullableIdentifier } from "./nullableIdentifier";
 
-export type CategoryIdentifierList = Identifier[];
+/**
+ * Optional cover image asset identifier for the category.
+ * @nullable
+ */
+export type CategoryMutablePropsCoverImageAssetId = NullableIdentifier | null;

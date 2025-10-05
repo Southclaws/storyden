@@ -9,13 +9,16 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type { CategoryName } from "./categoryName";
 import type { CategorySlug } from "./categorySlug";
+import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
 
 export interface CategoryInitialProps {
-  admin: boolean;
   colour: string;
+  cover_image_asset_id?: Identifier;
   description: string;
   meta?: Metadata;
   name: CategoryName;
+  /** Parent category identifier. Unset indicates a root-level category. */
+  parent?: Identifier;
   slug?: CategorySlug;
 }

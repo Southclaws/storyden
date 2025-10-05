@@ -38,7 +38,7 @@ func TestEventsCRUD(t *testing.T) {
 			adminCtx, adminAcc := e2e.WithAccount(root, aw, seed.Account_001_Odin)
 			adminSession := sh.WithSession(adminCtx)
 
-			cat, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, adminSession)
+			cat, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, adminSession)
 			tests.Ok(t, err, cat)
 			catID := cat.JSON200.Id
 

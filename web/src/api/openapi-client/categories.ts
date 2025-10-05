@@ -17,11 +17,15 @@ import type {
   BadRequestResponse,
   CategoryCreateBody,
   CategoryCreateOKResponse,
+  CategoryDeleteBody,
+  CategoryDeleteOKResponse,
+  CategoryGetOKResponse,
   CategoryListOKResponse,
   CategoryUpdateBody,
   CategoryUpdateOKResponse,
-  CategoryUpdateOrderBody,
+  CategoryUpdatePositionBody,
   InternalServerErrorResponse,
+  NotFoundResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
@@ -122,51 +126,49 @@ export const useCategoryList = <
   };
 };
 /**
- * Update the sort order of categories.
+ * Get information about a category.
  */
-export const categoryUpdateOrder = (
-  categoryUpdateOrderBody: CategoryUpdateOrderBody,
-) => {
-  return fetcher<CategoryListOKResponse>({
-    url: `/categories`,
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    data: categoryUpdateOrderBody,
+export const categoryGet = (categorySlug: string) => {
+  return fetcher<CategoryGetOKResponse>({
+    url: `/categories/${categorySlug}`,
+    method: "GET",
   });
 };
 
-export const getCategoryUpdateOrderMutationFetcher = () => {
-  return (
-    _: Key,
-    { arg }: { arg: CategoryUpdateOrderBody },
-  ): Promise<CategoryListOKResponse> => {
-    return categoryUpdateOrder(arg);
-  };
-};
-export const getCategoryUpdateOrderMutationKey = () => [`/categories`] as const;
+export const getCategoryGetKey = (categorySlug: string) =>
+  [`/categories/${categorySlug}`] as const;
 
-export type CategoryUpdateOrderMutationResult = NonNullable<
-  Awaited<ReturnType<typeof categoryUpdateOrder>>
+export type CategoryGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof categoryGet>>
 >;
-export type CategoryUpdateOrderMutationError = InternalServerErrorResponse;
+export type CategoryGetQueryError =
+  | NotFoundResponse
+  | InternalServerErrorResponse;
 
-export const useCategoryUpdateOrder = <
-  TError = InternalServerErrorResponse,
->(options?: {
-  swr?: SWRMutationConfiguration<
-    Awaited<ReturnType<typeof categoryUpdateOrder>>,
-    TError,
-    Key,
-    CategoryUpdateOrderBody,
-    Awaited<ReturnType<typeof categoryUpdateOrder>>
-  > & { swrKey?: string };
-}) => {
+export const useCategoryGet = <
+  TError = NotFoundResponse | InternalServerErrorResponse,
+>(
+  categorySlug: string,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof categoryGet>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
-  const swrKey = swrOptions?.swrKey ?? getCategoryUpdateOrderMutationKey();
-  const swrFn = getCategoryUpdateOrderMutationFetcher();
+  const isEnabled = swrOptions?.enabled !== false && !!categorySlug;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getCategoryGetKey(categorySlug) : null));
+  const swrFn = () => categoryGet(categorySlug);
 
-  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
 
   return {
     swrKey,
@@ -177,27 +179,27 @@ export const useCategoryUpdateOrder = <
  * Update a category's information.
  */
 export const categoryUpdate = (
-  categoryId: string,
+  categorySlug: string,
   categoryUpdateBody: CategoryUpdateBody,
 ) => {
   return fetcher<CategoryUpdateOKResponse>({
-    url: `/categories/${categoryId}`,
+    url: `/categories/${categorySlug}`,
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     data: categoryUpdateBody,
   });
 };
 
-export const getCategoryUpdateMutationFetcher = (categoryId: string) => {
+export const getCategoryUpdateMutationFetcher = (categorySlug: string) => {
   return (
     _: Key,
     { arg }: { arg: CategoryUpdateBody },
   ): Promise<CategoryUpdateOKResponse> => {
-    return categoryUpdate(categoryId, arg);
+    return categoryUpdate(categorySlug, arg);
   };
 };
-export const getCategoryUpdateMutationKey = (categoryId: string) =>
-  [`/categories/${categoryId}`] as const;
+export const getCategoryUpdateMutationKey = (categorySlug: string) =>
+  [`/categories/${categorySlug}`] as const;
 
 export type CategoryUpdateMutationResult = NonNullable<
   Awaited<ReturnType<typeof categoryUpdate>>
@@ -213,7 +215,7 @@ export const useCategoryUpdate = <
     | UnauthorisedResponse
     | InternalServerErrorResponse,
 >(
-  categoryId: string,
+  categorySlug: string,
   options?: {
     swr?: SWRMutationConfiguration<
       Awaited<ReturnType<typeof categoryUpdate>>,
@@ -226,8 +228,147 @@ export const useCategoryUpdate = <
 ) => {
   const { swr: swrOptions } = options ?? {};
 
-  const swrKey = swrOptions?.swrKey ?? getCategoryUpdateMutationKey(categoryId);
-  const swrFn = getCategoryUpdateMutationFetcher(categoryId);
+  const swrKey =
+    swrOptions?.swrKey ?? getCategoryUpdateMutationKey(categorySlug);
+  const swrFn = getCategoryUpdateMutationFetcher(categorySlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Delete a category. All posts in this category will be moved to the specified target category.
+ */
+export const categoryDelete = (
+  categorySlug: string,
+  categoryDeleteBody: CategoryDeleteBody,
+) => {
+  return fetcher<CategoryDeleteOKResponse>({
+    url: `/categories/${categorySlug}`,
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    data: categoryDeleteBody,
+  });
+};
+
+export const getCategoryDeleteMutationFetcher = (categorySlug: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: CategoryDeleteBody },
+  ): Promise<CategoryDeleteOKResponse> => {
+    return categoryDelete(categorySlug, arg);
+  };
+};
+export const getCategoryDeleteMutationKey = (categorySlug: string) =>
+  [`/categories/${categorySlug}`] as const;
+
+export type CategoryDeleteMutationResult = NonNullable<
+  Awaited<ReturnType<typeof categoryDelete>>
+>;
+export type CategoryDeleteMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useCategoryDelete = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  categorySlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof categoryDelete>>,
+      TError,
+      Key,
+      CategoryDeleteBody,
+      Awaited<ReturnType<typeof categoryDelete>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getCategoryDeleteMutationKey(categorySlug);
+  const swrFn = getCategoryDeleteMutationFetcher(categorySlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the category's position in the tree. You may change the parent
+using `parent`, and/or reposition the category among its siblings using
+either `before` or `after`. Use this operation for drag-and-drop
+interfaces.
+
+ */
+export const categoryUpdatePosition = (
+  categorySlug: string,
+  categoryUpdatePositionBody: CategoryUpdatePositionBody,
+) => {
+  return fetcher<CategoryListOKResponse>({
+    url: `/categories/${categorySlug}/position`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: categoryUpdatePositionBody,
+  });
+};
+
+export const getCategoryUpdatePositionMutationFetcher = (
+  categorySlug: string,
+) => {
+  return (
+    _: Key,
+    { arg }: { arg: CategoryUpdatePositionBody },
+  ): Promise<CategoryListOKResponse> => {
+    return categoryUpdatePosition(categorySlug, arg);
+  };
+};
+export const getCategoryUpdatePositionMutationKey = (categorySlug: string) =>
+  [`/categories/${categorySlug}/position`] as const;
+
+export type CategoryUpdatePositionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof categoryUpdatePosition>>
+>;
+export type CategoryUpdatePositionMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useCategoryUpdatePosition = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  categorySlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof categoryUpdatePosition>>,
+      TError,
+      Key,
+      CategoryUpdatePositionBody,
+      Awaited<ReturnType<typeof categoryUpdatePosition>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getCategoryUpdatePositionMutationKey(categorySlug);
+  const swrFn = getCategoryUpdatePositionMutationFetcher(categorySlug);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 

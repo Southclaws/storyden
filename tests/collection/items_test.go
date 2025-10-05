@@ -50,7 +50,6 @@ func TestCollectionItems(t *testing.T) {
 			tests.Ok(t, err, collection1)
 
 			cat1, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
-				Admin:       false,
 				Colour:      "",
 				Description: "cat",
 				Name:        xid.New().String(),
