@@ -50,7 +50,7 @@ export function useReplyMenu({ thread, reply, onEdit }: Props) {
     await handle(
       async () => {
         await withUndo({
-          message: "Reply deleted",
+          message: "Message deleted",
           duration: 5000,
           action: async () => {
             await deleteReply(reply.id);
