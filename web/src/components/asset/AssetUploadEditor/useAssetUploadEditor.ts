@@ -77,9 +77,8 @@ export function useAssetUploadEditor(props: Props) {
 
   function onFileChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
-
     if (!file) {
-      throw new Error("Unexpected problem: File is missing from uploader.");
+      return;
     }
 
     setTempFile(file);
