@@ -17,7 +17,6 @@ import {
 } from "@/api/openapi-client/categories";
 import {
   Category,
-  type CategoryList,
   CategoryListOKResponse,
   CategoryUpdatePositionBody,
   Identifier,
@@ -45,7 +44,6 @@ import {
 import { css, cx } from "@/styled-system/css";
 import { HStack, LStack } from "@/styled-system/jsx";
 import { treeView } from "@/styled-system/recipes";
-import { token } from "@/styled-system/tokens";
 import { hasPermission } from "@/utils/permissions";
 
 import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
