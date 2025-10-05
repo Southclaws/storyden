@@ -5,6 +5,7 @@ type UndoableAction<T = void> = {
   onUndo?: () => void;
   message: string;
   duration?: number;
+  toastId?: string;
 };
 
 export async function withUndo<T = void>({
@@ -12,6 +13,7 @@ export async function withUndo<T = void>({
   onUndo,
   message,
   duration = 5000,
+  toastId,
 }: UndoableAction<T>): Promise<T | undefined> {
   return new Promise((resolve, reject) => {
     let isUndone = false;
@@ -19,6 +21,7 @@ export async function withUndo<T = void>({
     showUndoToast({
       message,
       duration,
+      toastId,
       onUndo: () => {
         isUndone = true;
         onUndo?.();

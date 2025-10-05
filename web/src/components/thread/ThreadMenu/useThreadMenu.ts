@@ -70,6 +70,7 @@ export function useThreadMenu({
         await withUndo({
           message: "Thread deleted",
           duration: 5000,
+          toastId: `thread-${thread.id}`,
           action: async () => {
             await deleteThread(thread.id);
             router.push("/");

@@ -10,11 +10,12 @@ import { Button } from "./button";
 type UndoToastProps = {
   message: string;
   duration?: number;
+  toastId?: string;
   onUndo: () => void;
   onComplete: () => void;
 };
 
-type UndoToastContentProps = UndoToastProps & {
+type UndoToastContentProps = Omit<UndoToastProps, "toastId"> & {
   toastId: string | number;
 };
 
@@ -127,6 +128,7 @@ function UndoToastContent({
 export function showUndoToast({
   message,
   duration = 5000,
+  toastId: customToastId,
   onUndo,
   onComplete,
 }: UndoToastProps) {
@@ -152,6 +154,7 @@ export function showUndoToast({
       </Box>
     ),
     {
+      id: customToastId,
       duration: Infinity,
       position: "bottom-right",
     },
