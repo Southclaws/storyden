@@ -37,9 +37,10 @@ export function useCategoryEdit(props: Props) {
   const handleSubmit = form.handleSubmit(async (data) => {
     await handle(
       async () => {
+        const { cover_image, ...rest } = data;
         const updateData = {
-          ...data,
-          cover_image_asset_id: data.cover_image?.id || null,
+          ...rest,
+          cover_image_asset_id: cover_image?.id || null,
         };
         await updateCategory(props.category.slug, updateData);
 
