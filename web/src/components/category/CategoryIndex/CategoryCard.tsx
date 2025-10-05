@@ -39,7 +39,11 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
       p="0"
       overflow="hidden"
     >
-      <img src={getAssetURL(category.cover_image?.path)} />
+      <img
+        src={getAssetURL(category.cover_image?.path)}
+        alt="" // No alt image, decorative
+        aria-hidden="true"
+      />
 
       <LStack p="1">
         <LStack h="full" gap="1" justifyContent="space-between">
