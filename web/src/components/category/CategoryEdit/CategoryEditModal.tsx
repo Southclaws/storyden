@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/FormControl";
 import { FormFeedback } from "@/components/ui/form/FormFeedback";
 import { FormLabel } from "@/components/ui/form/FormLabel";
-import { Input } from "@/components/ui/input";
+import { Input, InputPrefix } from "@/components/ui/input";
+import { WEB_ADDRESS } from "@/config";
 import {
   CATEGORY_COVER_HEIGHT,
   CATEGORY_COVER_WIDTH,
@@ -17,6 +18,8 @@ import { Props, useCategoryEdit } from "./useCategoryEdit";
 
 export function CategoryEditModal(props: Props) {
   const { form, handlers } = useCategoryEdit(props);
+
+  const hostname = new URL(WEB_ADDRESS).host;
 
   return (
     <ModalDrawer
@@ -48,13 +51,45 @@ export function CategoryEditModal(props: Props) {
             </FormFeedback>
           </FormControl>
 
-          <FormControl>
-            <FormLabel>Name</FormLabel>
-            <Input {...form.register("name")} type="text" />
-            <FormFeedback error={form.formState.errors["name"]?.message}>
-              The name of the category.
-            </FormFeedback>
-          </FormControl>
+          <HStack w="full" alignItems="start">
+            <FormControl>
+              <FormLabel>Name</FormLabel>
+              <Input {...form.register("name")} type="text" />
+              <FormFeedback error={form.formState.errors["name"]?.message}>
+                The name of the category.
+              </FormFeedback>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel>URL Slug</FormLabel>
+              <HStack gap="0" alignItems="stretch" flex="1">
+                <InputPrefix
+                  display={{
+                    base: "none",
+                    sm: "flex",
+                  }}
+                >
+                  {hostname}/d/
+                </InputPrefix>
+                <Input
+                  {...form.register("slug")}
+                  type="text"
+                  flex="1"
+                  borderTopLeftRadius={{
+                    base: "sm",
+                    sm: "none",
+                  }}
+                  borderBottomLeftRadius={{
+                    base: "sm",
+                    sm: "none",
+                  }}
+                />
+              </HStack>
+              <FormFeedback error={form.formState.errors["slug"]?.message}>
+                The URL path for the category.
+              </FormFeedback>
+            </FormControl>
+          </HStack>
 
           <FormControl>
             <FormLabel>Description</FormLabel>

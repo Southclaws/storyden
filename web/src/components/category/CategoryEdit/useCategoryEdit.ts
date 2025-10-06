@@ -1,4 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -15,6 +16,7 @@ export type Props = {
 
 export const FormSchema = z.object({
   name: z.string().min(1),
+  slug: z.string().min(1),
   description: z.string().min(1),
   colour: z.string().default("#fff"),
   cover_image: z.custom<Asset>().nullable().optional(),
@@ -26,15 +28,21 @@ export function useCategoryEdit(props: Props) {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       name: props.category.name,
+      slug: props.category.slug,
       description: props.category.description,
       colour: props.category.colour,
       cover_image: props.category.cover_image || null,
     },
   });
+  const pathname = usePathname();
+  const router = useRouter();
 
   const { revalidateList, updateCategory } = useCategoryMutations();
 
   const handleSubmit = form.handleSubmit(async (data) => {
+    const originalSlug = props.category.slug;
+    const slugChanged = data.slug !== originalSlug;
+
     await handle(
       async () => {
         const { cover_image, ...rest } = data;
@@ -42,9 +50,15 @@ export function useCategoryEdit(props: Props) {
           ...rest,
           cover_image_asset_id: cover_image?.id || null,
         };
-        await updateCategory(props.category.slug, updateData);
+        await updateCategory(originalSlug, updateData);
 
         props.onClose?.();
+
+        if (slugChanged) {
+          if (pathname.includes(`/d/${originalSlug}`)) {
+            router.replace(`/d/${data.slug}`);
+          }
+        }
       },
       {
         promiseToast: {

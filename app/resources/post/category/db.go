@@ -264,6 +264,10 @@ func (d *Repository) UpdateCategory(ctx context.Context, slug string, opts ...Op
 
 	updated, err := update.Save(ctx)
 	if err != nil {
+		if ent.IsConstraintError(err) {
+			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists),
+				fmsg.WithDesc("category slug already exists", "A category with this slug already exists."))
+		}
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
