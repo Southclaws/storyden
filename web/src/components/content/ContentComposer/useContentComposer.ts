@@ -17,6 +17,7 @@ import { getAssetURL } from "@/utils/asset";
 import { useImageUpload } from "../useImageUpload";
 
 import { ImageExtended } from "./plugins/ImagePlugin";
+import { LinkCard } from "./plugins/LinkCardPlugin";
 
 export type Block = "p" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6";
 
@@ -40,11 +41,23 @@ export function useContentComposer(props: ContentComposerProps) {
   const extensions = [
     StarterKit,
     FocusClasses,
+    LinkCard,
     Link.configure({
       // Disable navigation when clicking links in the editor if it's active.
       openOnClick: props.disabled ? true : false,
     }).extend({
       inclusive: false,
+      parseHTML() {
+        return [
+          {
+            tag: "a[href]:not([data-display])",
+            getAttrs: (dom) => {
+              const href = (dom as HTMLElement).getAttribute("href");
+              return href ? { href } : false;
+            },
+          },
+        ];
+      },
     }),
     ImageExtended.configure({
       allowBase64: false,

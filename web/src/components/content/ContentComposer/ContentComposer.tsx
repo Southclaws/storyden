@@ -29,6 +29,7 @@ import { button } from "@/styled-system/recipes";
 import "./styles.css";
 
 import { LinkButton } from "./LinkButton";
+import { LinkCardButton } from "./LinkCardButton";
 import { FloatingMenu } from "./plugins/MenuPlugin";
 import { ContentComposerProps, useContentComposer } from "./useContentComposer";
 
@@ -155,6 +156,8 @@ export function ContentComposer(props: ContentComposerProps) {
           </Button>
 
           <LinkButton editor={editor} />
+
+          <LinkCardButton editor={editor} />
 
           <Button
             type="button"
