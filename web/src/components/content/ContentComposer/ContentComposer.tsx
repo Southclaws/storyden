@@ -28,6 +28,7 @@ import { button } from "@/styled-system/recipes";
 
 import "./styles.css";
 
+import { LinkButton } from "./LinkButton";
 import { FloatingMenu } from "./plugins/MenuPlugin";
 import { ContentComposerProps, useContentComposer } from "./useContentComposer";
 
@@ -152,6 +153,8 @@ export function ContentComposer(props: ContentComposerProps) {
           >
             <CodeIcon />
           </Button>
+
+          <LinkButton editor={editor} />
 
           <Button
             type="button"

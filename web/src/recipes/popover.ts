@@ -19,7 +19,7 @@ export const popover = defineSlotRecipe({
       flexDirection: "column",
       maxWidth: "sm",
       zIndex: "popover",
-      p: "4",
+      p: "2",
       _open: {
         animation: "fadeIn 0.25s ease-out",
       },
