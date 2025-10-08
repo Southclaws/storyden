@@ -28,6 +28,7 @@ import (
 var (
 	errEmailAlreadyRegistered = fault.New("email already registered")
 	errAccountMismatch        = fault.New("account mismatch")
+	errEmailNotVerified       = fault.New("email not verified")
 )
 
 type Registrar struct {
@@ -185,7 +186,7 @@ func (s *Registrar) GetOrCreateViaEmail(
 		// are enabled at a later date, such as with OAuth providers.
 		// Link the email address to the account and send a verification.
 
-		err = s.linkAndVerifyEmail(ctx, emailOwner.ID, email)
+		err = s.linkAndVerifyEmail(ctx, authmethod.Account.ID, email)
 		if err != nil {
 			return nil, fault.Wrap(err,
 				fctx.With(ctx),
@@ -194,13 +195,20 @@ func (s *Registrar) GetOrCreateViaEmail(
 
 		logger.Info("get or create: auth method exists, email not recorded, linking new email to existing account")
 
-		return &emailOwner.Account, nil
+		return &authmethod.Account, nil
 
 	case !authMethodExists && emailExists:
 		// Member has already registered with this email address, perhaps on
 		// a different auth provider. We know it's the same email assuming
 		// the caller has verified this via OAuth or similar. The email may
 		// have also been added manually via a newsletter list. Link them.
+
+		if !isVerified {
+			return nil, fault.Wrap(errEmailNotVerified,
+				fctx.With(ctx),
+				fmsg.WithDesc("email not verified", "Unable to complete sign-in. Please contact support if this issue persists."),
+			)
+		}
 
 		_, err = s.authRepo.Create(ctx, emailOwner.ID, service, authentication.TokenTypeOAuth, identifier, token, nil, authentication.WithName(authName))
 		if err != nil {
@@ -300,7 +308,7 @@ func (s *Registrar) GetOrCreateViaHandle(
 
 		logger.Info("get or create: auth method exists, but account handle changed")
 
-		return &handleOwner.Account, nil
+		return &authmethod.Account, nil
 
 	case !authMethodExists && handleExists:
 		// Member has already registered with this handle, we can only verify
