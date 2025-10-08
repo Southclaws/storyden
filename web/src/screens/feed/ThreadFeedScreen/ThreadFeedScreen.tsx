@@ -18,8 +18,10 @@ export function ThreadFeedScreen({
   category,
   paginationBasePath,
   showCategorySelect,
+  hideCategoryBadge = false,
 }: Props & {
   showCategorySelect: boolean;
+  hideCategoryBadge?: boolean;
 }) {
   const { session } = useSettingsContext();
 
@@ -35,12 +37,13 @@ export function ThreadFeedScreen({
         initialPageData={initialPageData}
         category={category}
         paginationBasePath={paginationBasePath}
+        hideCategoryBadge={hideCategoryBadge}
       />
     </LStack>
   );
 }
 
-export function ThreadFeed(props: Props) {
+export function ThreadFeed(props: Props & { hideCategoryBadge?: boolean }) {
   const { ready, error, showPaginationTop, data, handlePageChange } =
     useThreadFeedScreen(props);
   if (!ready) {
@@ -64,7 +67,7 @@ export function ThreadFeed(props: Props) {
       )}
       <ol className={lstack()}>
         {data.threads.map((t) => {
-          return <ThreadReferenceCard key={t.slug} thread={t} />;
+          return <ThreadReferenceCard key={t.slug} thread={t} hideCategoryBadge={props.hideCategoryBadge} />;
         })}
       </ol>
 
