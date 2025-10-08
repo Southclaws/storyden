@@ -23,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/account/account_auth"
 	"github.com/Southclaws/storyden/app/services/account/account_email"
+	"github.com/Southclaws/storyden/app/services/account/account_manage"
 	"github.com/Southclaws/storyden/app/services/account/account_update"
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -41,6 +42,7 @@ type Accounts struct {
 	accountUpdate *account_update.Updater
 	accountAuth   *account_auth.Manager
 	accountEmail  *account_email.Manager
+	accountManage *account_manage.Manager
 	roleAssign    *role_assign.Assignment
 	roleBadge     *role_badge.Writer
 	webAddress    url.URL
@@ -56,6 +58,7 @@ func NewAccounts(
 	accountUpdate *account_update.Updater,
 	accountAuth *account_auth.Manager,
 	accountEmail *account_email.Manager,
+	accountManage *account_manage.Manager,
 	roleAssign *role_assign.Assignment,
 	roleBadge *role_badge.Writer,
 ) Accounts {
@@ -68,6 +71,7 @@ func NewAccounts(
 		accountUpdate: accountUpdate,
 		accountAuth:   accountAuth,
 		accountEmail:  accountEmail,
+		accountManage: accountManage,
 		roleAssign:    roleAssign,
 		roleBadge:     roleBadge,
 		webAddress:    cfg.PublicWebAddress,
@@ -88,7 +92,7 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 	if i.profile_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(accountID)) {
 		return openapi.AccountGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: "public, max-age=60, stale-while-revalidate=120",
+				CacheControl: "private, max-age=60, stale-while-revalidate=120",
 			},
 		}, nil
 	}
@@ -102,7 +106,29 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse{
 			Body: serialiseAccount(acc),
 			Headers: openapi.AccountGetOKResponseHeaders{
-				CacheControl: "public, max-age=1",
+				CacheControl: "private, max-age=60",
+				LastModified: acc.UpdatedAt.Format(time.RFC1123),
+			},
+		},
+	}, nil
+}
+
+func (i *Accounts) AccountView(ctx context.Context, request openapi.AccountViewRequestObject) (openapi.AccountViewResponseObject, error) {
+	targetID, err := xid.FromString(request.AccountId)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.InvalidArgument), fmsg.WithDesc("invalid account ID", "The account ID provided is invalid."))
+	}
+
+	acc, err := i.accountManage.GetByID(ctx, account.AccountID(targetID))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return openapi.AccountView200JSONResponse{
+		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse{
+			Body: serialiseAccount(acc),
+			Headers: openapi.AccountGetOKResponseHeaders{
+				CacheControl: "private, no-cache",
 				LastModified: acc.UpdatedAt.Format(time.RFC1123),
 			},
 		},

@@ -745,6 +745,23 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/AccountUpdateOK" }
 
+  /accounts/{account_id}:
+    get:
+      operationId: AccountView
+      description: |
+        Get detailed account information by ID. Requires either the permissions
+        VIEW_ACCOUNTS or ADMINISTRATOR. Users with VIEW_ACCOUNTS can view any
+        account that is not ADMINISTRATOR including those with VIEW_ACCOUNTS.
+        Only members with ADMINISTRATOR can view other ADMINISTRATOR accounts.
+      tags: [accounts]
+      parameters: [{ $ref: "#/components/parameters/AccountIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "200": { $ref: "#/components/responses/AccountGetOK" }
+
   /accounts/self/auth-methods:
     get:
       operationId: AccountAuthProviderList
@@ -3848,6 +3865,7 @@ components:
         - "MANAGE_SETTINGS"
         - "MANAGE_SUSPENSIONS"
         - "MANAGE_ROLES"
+        - "VIEW_ACCOUNTS"
         # Administrator implicitly has all permissions.
         - "ADMINISTRATOR"
 

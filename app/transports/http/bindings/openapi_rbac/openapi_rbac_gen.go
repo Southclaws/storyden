@@ -46,6 +46,7 @@ type OperationPermissions interface {
 	AuthProviderLogout() (bool, *rbac.Permission)
 	AccountGet() (bool, *rbac.Permission)
 	AccountUpdate() (bool, *rbac.Permission)
+	AccountView() (bool, *rbac.Permission)
 	AccountAuthProviderList() (bool, *rbac.Permission)
 	AccountAuthMethodDelete() (bool, *rbac.Permission)
 	AccountEmailAdd() (bool, *rbac.Permission)
@@ -221,6 +222,8 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AccountGet()
 	case "AccountUpdate":
 		return optable.AccountUpdate()
+	case "AccountView":
+		return optable.AccountView()
 	case "AccountAuthProviderList":
 		return optable.AccountAuthProviderList()
 	case "AccountAuthMethodDelete":

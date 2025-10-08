@@ -128,6 +128,12 @@ export const PermissionDetails: Record<Permission, PermissionDetail> = {
     description:
       "Create, edit and delete roles as well as assign and remove roles of other members.",
   },
+  [Permission.VIEW_ACCOUNTS]: {
+    value: Permission.VIEW_ACCOUNTS,
+    name: "View accounts",
+    description:
+      "View detailed account information including email addresses and verification status for non-administrator accounts.",
+  },
   [Permission.ADMINISTRATOR]: {
     value: Permission.ADMINISTRATOR,
     name: "Administrator",

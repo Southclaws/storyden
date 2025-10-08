@@ -12,6 +12,7 @@ import { useSession } from "src/auth";
 
 import { handle } from "@/api/client";
 import { useProfileMutations } from "@/lib/profile/mutation";
+import { hasPermission, hasPermissionOr } from "@/utils/permissions";
 
 export type Props = {
   initialSession?: Account;
@@ -92,6 +93,11 @@ export function useProfileScreen({ initialSession, profile }: Props) {
   });
 
   const isSelf = session?.id === data.id;
+  const canViewAccount = hasPermissionOr(
+    session,
+    () => isSelf,
+    "VIEW_ACCOUNTS",
+  );
 
   return {
     ready: true as const,
@@ -99,6 +105,7 @@ export function useProfileScreen({ initialSession, profile }: Props) {
     state: {
       isEditing,
       isSelf,
+      canViewAccount,
     },
     data: {
       session,

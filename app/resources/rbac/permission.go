@@ -39,6 +39,7 @@ var writePermissions = []Permission{
 	PermissionManageSettings,
 	PermissionManageSuspensions,
 	PermissionManageRoles,
+	PermissionViewAccounts,
 	PermissionAdministrator,
 }
 
