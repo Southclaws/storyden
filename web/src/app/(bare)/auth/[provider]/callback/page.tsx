@@ -8,6 +8,7 @@ import { Unready } from "src/components/site/Unready";
 
 import { handle } from "@/api/client";
 import { OAuthCallback } from "@/api/openapi-schema";
+import { deriveError } from "@/utils/error";
 
 export const dynamic = "force-dynamic";
 
@@ -46,7 +47,8 @@ export default function Page(props: Props) {
       {
         errorToast: false,
         onError: async (e) => {
-          setError(e);
+          console.error("OAuth callback error:", e);
+          setError(deriveError(e));
         },
       },
     );
