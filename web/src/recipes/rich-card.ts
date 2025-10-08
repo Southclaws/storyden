@@ -75,6 +75,7 @@ export const richCard = defineSlotRecipe({
       display: "flex",
       justifyContent: "start",
       width: "full",
+      minWidth: "0",
     },
 
     mediaBackdropContainer: {
