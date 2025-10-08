@@ -136,7 +136,9 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 	}
 	idToken, err := p.verifier.Verify(ctx, rawID)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to verify Keycloak ID token", "Authentication failed. The login token may be invalid or expired. Please try again."))
 	}
 
 	var claims struct {
@@ -146,7 +148,9 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		Name              string `json:"name"`
 	}
 	if err := idToken.Claims(&claims); err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to parse Keycloak token claims", "Unable to read authentication information. Please try again."))
 	}
 
 	handle := strings.ToLower(claims.PreferredUsername)
@@ -157,7 +161,9 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 	name := claims.Name
 	emailAddr, err := mail.ParseAddress(claims.Email)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to parse Keycloak email address", "The email address from Keycloak is invalid. Please check your account settings."))
 	}
 	authName := fmt.Sprintf("Keycloak (%s)", emailAddr.Address)
 
