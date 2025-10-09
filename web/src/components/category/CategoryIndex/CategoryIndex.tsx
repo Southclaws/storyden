@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { match } from "ts-pattern";
 
-import { Category, ThreadListResult } from "@/api/openapi-schema";
+import { ThreadListResult } from "@/api/openapi-schema";
 import { ComposeAnchor } from "@/components/site/Navigation/Anchors/Compose";
 import { Heading } from "@/components/ui/heading";
+import { BulletIcon } from "@/components/ui/icons/Bullet";
+import { CategoryIcon } from "@/components/ui/icons/Category";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { CardGrid, CardRows } from "@/components/ui/rich-card";
 import { categoryColourCSS } from "@/lib/category/colours";
+import { CategoryTree } from "@/lib/category/tree";
 import { ThreadFeedScreen } from "@/screens/feed/ThreadFeedScreen/ThreadFeedScreen";
 import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 import { linkOverlay } from "@/styled-system/patterns";
@@ -15,14 +18,18 @@ import { CategoryBadge } from "../CategoryBadge";
 import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
 import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
 
+import { CategoryCardGrid, CategoryLayout } from "./CategoryCardLayout";
+
 export type Props = {
-  categories: Category[];
+  layout: "grid" | "list";
+  categories: CategoryTree[];
   initialThreadList?: ThreadListResult;
   initialThreadListPage?: number;
   paginationBasePath: string;
 };
 
-export function CategoryCardGrid({
+export function CategoryIndex({
+  layout,
   categories,
   initialThreadList,
   initialThreadListPage,
@@ -71,11 +78,8 @@ export function CategoryCardGrid({
             ))}
           </HStack>
         </LStack>
-        <CardGrid>
-          {categories.map((c) => (
-            <CategoryCard key={c.id} {...c} />
-          ))}
-        </CardGrid>
+
+        <CategoryLayout layout={layout} categories={categories} />
       </LStack>
 
       <ThreadListSection
@@ -84,68 +88,6 @@ export function CategoryCardGrid({
         paginationBasePath={paginationBasePath}
       />
     </LStack>
-  );
-}
-
-export function CategoryCardList({
-  categories,
-  initialThreadList,
-  initialThreadListPage,
-  paginationBasePath,
-}: Props) {
-  return (
-    <LStack gap="8">
-      <LStack>
-        <WStack>
-          <Heading>Discussion categories</Heading>
-
-          <CategoryCreateTrigger />
-        </WStack>
-
-        <CardRows>
-          {categories.map((c) => (
-            <CategoryCard key={c.id} {...c} />
-          ))}
-        </CardRows>
-      </LStack>
-
-      <ThreadListSection
-        initialThreadList={initialThreadList}
-        initialPage={initialThreadListPage}
-        paginationBasePath={paginationBasePath}
-      />
-    </LStack>
-  );
-}
-
-export function CategoryCard(props: Category) {
-  const cssProps = categoryColourCSS(props.colour);
-
-  return (
-    <CardBox
-      position="relative"
-      style={cssProps}
-      borderColor="colorPalette.border"
-      borderLeftWidth="thick"
-      borderLeftStyle="solid"
-      display="flex"
-      justifyContent="space-between"
-    >
-      <WStack alignItems="start">
-        <Link className={linkOverlay()} href={`/d/${props.slug}`}>
-          <Heading>{props.name}</Heading>
-        </Link>
-
-        <CategoryMenu category={props} />
-      </WStack>
-
-      <styled.p color="fg.muted">{props.description}</styled.p>
-
-      <HStack gap="1" color="fg.subtle">
-        <DiscussionIcon w="4" />
-        <styled.p>{props.postCount} threads</styled.p>
-      </HStack>
-    </CardBox>
   );
 }
 

@@ -27,7 +27,7 @@ export function CategoryCreateTrigger({
   ...props
 }: Props) {
   const session = useSession();
-  const { onOpen, isOpen, onClose } = useDisclosure();
+  const useDisclosureProps = useDisclosure();
 
   if (!hasPermission(session, Permission.MANAGE_CATEGORIES)) {
     return null;
@@ -40,7 +40,7 @@ export function CategoryCreateTrigger({
         size="xs"
         variant="ghost"
         px={hideLabel ? "0" : "1"}
-        onClick={onOpen}
+        onClick={useDisclosureProps.onOpen}
         {...props}
       >
         {CreateCategoryIcon}
@@ -51,16 +51,16 @@ export function CategoryCreateTrigger({
         )}
       </IconButton>
 
-      <CategoryCreateModal isOpen={isOpen} onClose={onClose} {...props} />
+      <CategoryCreateModal {...useDisclosureProps} defaultParent={parentSlug} />
     </>
   );
 }
 
 export function CreateCategoryMenuItem({ hideLabel }: Props) {
-  const { onOpen, isOpen, onClose } = useDisclosure();
+  const useDisclosureProps = useDisclosure();
 
   return (
-    <Item value={CreateCategoryID} onClick={onOpen}>
+    <Item value={CreateCategoryID} onClick={useDisclosureProps.onOpen}>
       {CreateCategoryIcon}
       {!hideLabel && (
         <>
@@ -70,7 +70,7 @@ export function CreateCategoryMenuItem({ hideLabel }: Props) {
 
       <Portal>
         {/* Portal to avoid nested form triggering. */}
-        <CategoryCreateModal isOpen={isOpen} onClose={onClose} />
+        <CategoryCreateModal {...useDisclosureProps} />
       </Portal>
     </Item>
   );

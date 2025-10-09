@@ -55,7 +55,6 @@ func TestSemdexWeaviate(t *testing.T) {
 			r.NoError(err)
 
 			cat1create, err := cl.CategoryCreateWithResponse(ctx, openapi.CategoryInitialProps{
-				Admin:       false,
 				Colour:      "#fe4efd",
 				Description: "TestSemdexWeaviate",
 				Name:        uuid.NewString(),

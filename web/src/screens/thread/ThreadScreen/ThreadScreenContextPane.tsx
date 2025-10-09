@@ -11,9 +11,9 @@ import { MembersIcon } from "@/components/ui/icons/Members";
 import { ParticipatingIcon } from "@/components/ui/icons/Participating";
 import { SlugIcon } from "@/components/ui/icons/Slug";
 import * as Table from "@/components/ui/table";
-import { cva } from "@/styled-system/css";
-import { HStack, LStack, styled } from "@/styled-system/jsx";
-import { button } from "@/styled-system/recipes";
+import { css, cva } from "@/styled-system/css";
+import { HStack, LStack } from "@/styled-system/jsx";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
 import { Props, useThreadScreen } from "./useThreadScreen";
 
@@ -81,7 +81,7 @@ export function ThreadScreenContextPane(props: Props) {
   return (
     <LStack gap="1">
       <Heading>{thread.title}</Heading>
-      <styled.p color="fg.muted">{thread.description}</styled.p>
+      <p className={css({ color: "fg.muted" })}>{thread.description}</p>
 
       <Table.Root size="sm" tableLayout="fixed" w="full" overflow="hidden">
         <Table.Body>
@@ -112,18 +112,9 @@ export function ThreadScreenContextPane(props: Props) {
         </Table.Body>
       </Table.Root>
 
-      <styled.p>
-        <styled.a
-          color="fg.muted"
-          className={button({
-            variant: "subtle",
-            size: "xs",
-          })}
-          href="#"
-        >
-          scroll to top
-        </styled.a>
-      </styled.p>
+      <p>
+        <ScrollToTop />
+      </p>
     </LStack>
   );
 }

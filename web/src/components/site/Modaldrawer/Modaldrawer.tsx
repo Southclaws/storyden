@@ -14,16 +14,23 @@ type Props = {
 } & UseDisclosureProps;
 
 export function ModalDrawer({ children, ...props }: PropsWithChildren<Props>) {
-  const onOpenChange = (open: boolean) => {
-    if (open) props.onOpen?.();
-    else props.onClose?.();
+  const handleOpenChange = (open: boolean) => {
+    try {
+      if (open) {
+        props.onOpen?.();
+      } else {
+        props.onClose?.();
+      }
+    } finally {
+      props.onOpenChange?.({ open });
+    }
   };
 
   return (
     <>
       <Drawer.Root
         open={props.isOpen}
-        onOpenChange={onOpenChange}
+        onOpenChange={handleOpenChange}
         // TODO: Scale background only on mobile.
         shouldScaleBackground={false}
         dismissible={props.dismissable}

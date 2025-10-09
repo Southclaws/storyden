@@ -3,6 +3,10 @@ package category
 import (
 	"github.com/rs/xid"
 
+	"github.com/Southclaws/dt"
+	"github.com/Southclaws/opt"
+
+	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -26,6 +30,9 @@ type Category struct {
 	Colour      string
 	Sort        int
 	Admin       bool
+	ParentID    *CategoryID
+	CoverImage  opt.Optional[asset.Asset]
+	Children    []*Category
 	Recent      []PostMeta
 	PostCount   int
 	Metadata    map[string]any
@@ -54,6 +61,19 @@ func FromModel(c *ent.Category) *Category {
 		}
 	}
 
+	var parentID *CategoryID
+
+	if !c.ParentCategoryID.IsNil() {
+		pid := CategoryID(c.ParentCategoryID)
+		parentID = &pid
+	}
+
+	coverImage := opt.Map(opt.NewPtr(c.Edges.CoverImage), func(a ent.Asset) asset.Asset {
+		return *asset.Map(&a)
+	})
+
+	children := dt.Map(c.Edges.Children, FromModel)
+
 	return &Category{
 		ID:          CategoryID(c.ID),
 		Name:        c.Name,
@@ -62,6 +82,9 @@ func FromModel(c *ent.Category) *Category {
 		Colour:      c.Colour,
 		Sort:        c.Sort,
 		Admin:       c.Admin,
+		ParentID:    parentID,
+		CoverImage:  coverImage,
+		Children:    children,
 		Recent:      recent,
 		Metadata:    c.Metadata,
 	}

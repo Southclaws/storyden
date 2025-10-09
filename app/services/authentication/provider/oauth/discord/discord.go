@@ -108,18 +108,22 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		return nil, fault.Wrap(err,
 			fctx.With(ctx),
 			ftag.With(ftag.InvalidArgument),
-			fmsg.WithDesc("failed to exchange code for token", "This login token may have expired, please try again."),
+			fmsg.WithDesc("failed to exchange code for token", "This login token may have expired, please try again from the start."),
 		)
 	}
 
 	client, err := discordgo.New(fmt.Sprintf("Bearer %s", token.AccessToken))
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to create Discord client", "Unable to connect to Discord. Please try again."))
 	}
 
 	u, err := client.User("@me", discordgo.WithContext(ctx))
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to fetch Discord user info", "Unable to retrieve your Discord profile. Please try again."))
 	}
 
 	handle := strings.ToLower(u.Username)
@@ -127,7 +131,9 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 
 	email, err := mail.ParseAddress(u.Email)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to parse Discord email address", "The email address from Discord is invalid. Please check your Discord account settings."))
 	}
 
 	authName := fmt.Sprintf("Discord (@%s)", handle)

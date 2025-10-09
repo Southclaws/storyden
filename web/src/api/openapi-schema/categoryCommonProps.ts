@@ -5,18 +5,24 @@
  * Storyden social API for building community driven platforms.
 The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
 
- * OpenAPI spec version: v1.25.6-canary
+ * OpenAPI spec version: v1.25.7-canary
  */
+import type { Asset } from "./asset";
+import type { CategoryList } from "./categoryList";
 import type { CategoryName } from "./categoryName";
 import type { CategorySlug } from "./categorySlug";
+import type { Identifier } from "./identifier";
 import type { Metadata } from "./metadata";
 
 export interface CategoryCommonProps {
-  admin: boolean;
+  children: CategoryList;
   colour: string;
+  cover_image?: Asset;
   description: string;
   meta?: Metadata;
   name: CategoryName;
+  /** Parent category identifier. Unset indicates a root-level category. */
+  parent?: Identifier;
   slug: CategorySlug;
   sort: number;
 }

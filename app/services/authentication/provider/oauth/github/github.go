@@ -106,7 +106,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		return nil, fault.Wrap(err,
 			fctx.With(ctx),
 			ftag.With(ftag.InvalidArgument),
-			fmsg.WithDesc("failed to exchange code for token", "This login token may have expired, please try again."),
+			fmsg.WithDesc("failed to exchange code for token", "This login token may have expired, please try again from the start."),
 		)
 	}
 
@@ -116,7 +116,9 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 
 	u, _, err := client.Users.Get(ctx, clientID)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to fetch GitHub user profile", "Unable to retrieve your GitHub profile. This might be due to privacy settings."))
 	}
 
 	if u.Login == nil {
@@ -144,7 +146,9 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 
 	email, err := mail.ParseAddress(*u.Email)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to parse GitHub email address", "The email address from GitHub is invalid. Please check your GitHub account settings."))
 	}
 
 	return p.register.GetOrCreateViaEmail(ctx,

@@ -42,7 +42,6 @@ func TestThreads(t *testing.T) {
 			cat1name := "Category " + uuid.NewString()
 
 			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
-				Admin:       false,
 				Colour:      "#fe4efd",
 				Description: "category testing",
 				Name:        cat1name,
@@ -283,7 +282,6 @@ func TestThreads(t *testing.T) {
 
 				catname := "Category " + uuid.NewString()
 				cat, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
-					Admin:       false,
 					Colour:      "#fe4efd",
 					Description: "category testing",
 					Name:        catname,
@@ -430,7 +428,6 @@ func TestThreads(t *testing.T) {
 
 				// Create a category
 				cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
-					Admin:       false,
 					Colour:      "#fe4efd",
 					Description: "categorised threads",
 					Name:        "categorised " + uuid.NewString(),

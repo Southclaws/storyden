@@ -2,7 +2,7 @@ import { z } from "zod";
 
 import { UnreadyBanner } from "src/components/site/Unready";
 
-import { categoryList } from "@/api/openapi-server/categories";
+import { categoryGet, categoryList } from "@/api/openapi-server/categories";
 import { threadList } from "@/api/openapi-server/threads";
 import { CategoryScreen } from "@/screens/category/CategoryScreen";
 
@@ -26,7 +26,7 @@ export default async function Page({ params, searchParams }: Props) {
     const { category: slug } = await params;
     const { page } = QuerySchema.parse(await searchParams);
 
-    const { data: categoryListData } = await categoryList();
+    const { data: categoryData } = await categoryGet(slug);
 
     const { data: threadListData } = await threadList({
       categories: [slug],
@@ -37,7 +37,7 @@ export default async function Page({ params, searchParams }: Props) {
       <CategoryScreen
         initialPage={page ?? 1}
         slug={slug}
-        initialCategoryList={categoryListData}
+        initialCategory={categoryData}
         initialThreadList={threadListData}
       />
     );

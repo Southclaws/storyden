@@ -112,12 +112,16 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 
 	gs, err := ga.NewService(ctx, option.WithTokenSource(oauth2.StaticTokenSource(token)))
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to create Google API service", "Unable to connect to Google. Please try again."))
 	}
 
 	u, err := ga.NewUserinfoV2MeService(gs).Get().Do()
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to fetch Google user info", "Unable to retrieve your Google profile. Please try again."))
 	}
 
 	handle := slug.Make(fmt.Sprintf("%s %s", u.GivenName, petname.Generate(2, "-")))
@@ -126,7 +130,9 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 
 	email, err := mail.ParseAddress(u.Email)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to parse Google email address", "The email address from Google is invalid. Please check your Google account settings."))
 	}
 
 	authName := fmt.Sprintf("Google (%s)", email.Address)
@@ -141,7 +147,9 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 		*email,
 	)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to create or retrieve account", "Unable to complete sign-in. Please try again or contact site administration."))
 	}
 
 	return acc, nil

@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/Southclaws/storyden/internal/ent/asset"
 	"github.com/Southclaws/storyden/internal/ent/category"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/rs/xid"
@@ -121,6 +122,34 @@ func (cc *CategoryCreate) SetNillableAdmin(b *bool) *CategoryCreate {
 	return cc
 }
 
+// SetParentCategoryID sets the "parent_category_id" field.
+func (cc *CategoryCreate) SetParentCategoryID(x xid.ID) *CategoryCreate {
+	cc.mutation.SetParentCategoryID(x)
+	return cc
+}
+
+// SetNillableParentCategoryID sets the "parent_category_id" field if the given value is not nil.
+func (cc *CategoryCreate) SetNillableParentCategoryID(x *xid.ID) *CategoryCreate {
+	if x != nil {
+		cc.SetParentCategoryID(*x)
+	}
+	return cc
+}
+
+// SetCoverImageAssetID sets the "cover_image_asset_id" field.
+func (cc *CategoryCreate) SetCoverImageAssetID(x xid.ID) *CategoryCreate {
+	cc.mutation.SetCoverImageAssetID(x)
+	return cc
+}
+
+// SetNillableCoverImageAssetID sets the "cover_image_asset_id" field if the given value is not nil.
+func (cc *CategoryCreate) SetNillableCoverImageAssetID(x *xid.ID) *CategoryCreate {
+	if x != nil {
+		cc.SetCoverImageAssetID(*x)
+	}
+	return cc
+}
+
 // SetMetadata sets the "metadata" field.
 func (cc *CategoryCreate) SetMetadata(m map[string]interface{}) *CategoryCreate {
 	cc.mutation.SetMetadata(m)
@@ -154,6 +183,59 @@ func (cc *CategoryCreate) AddPosts(p ...*Post) *CategoryCreate {
 		ids[i] = p[i].ID
 	}
 	return cc.AddPostIDs(ids...)
+}
+
+// SetParentID sets the "parent" edge to the Category entity by ID.
+func (cc *CategoryCreate) SetParentID(id xid.ID) *CategoryCreate {
+	cc.mutation.SetParentID(id)
+	return cc
+}
+
+// SetNillableParentID sets the "parent" edge to the Category entity by ID if the given value is not nil.
+func (cc *CategoryCreate) SetNillableParentID(id *xid.ID) *CategoryCreate {
+	if id != nil {
+		cc = cc.SetParentID(*id)
+	}
+	return cc
+}
+
+// SetParent sets the "parent" edge to the Category entity.
+func (cc *CategoryCreate) SetParent(c *Category) *CategoryCreate {
+	return cc.SetParentID(c.ID)
+}
+
+// AddChildIDs adds the "children" edge to the Category entity by IDs.
+func (cc *CategoryCreate) AddChildIDs(ids ...xid.ID) *CategoryCreate {
+	cc.mutation.AddChildIDs(ids...)
+	return cc
+}
+
+// AddChildren adds the "children" edges to the Category entity.
+func (cc *CategoryCreate) AddChildren(c ...*Category) *CategoryCreate {
+	ids := make([]xid.ID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddChildIDs(ids...)
+}
+
+// SetCoverImageID sets the "cover_image" edge to the Asset entity by ID.
+func (cc *CategoryCreate) SetCoverImageID(id xid.ID) *CategoryCreate {
+	cc.mutation.SetCoverImageID(id)
+	return cc
+}
+
+// SetNillableCoverImageID sets the "cover_image" edge to the Asset entity by ID if the given value is not nil.
+func (cc *CategoryCreate) SetNillableCoverImageID(id *xid.ID) *CategoryCreate {
+	if id != nil {
+		cc = cc.SetCoverImageID(*id)
+	}
+	return cc
+}
+
+// SetCoverImage sets the "cover_image" edge to the Asset entity.
+func (cc *CategoryCreate) SetCoverImage(a *Asset) *CategoryCreate {
+	return cc.SetCoverImageID(a.ID)
 }
 
 // Mutation returns the CategoryMutation object of the builder.
@@ -340,6 +422,56 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := cc.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   category.ParentTable,
+			Columns: []string{category.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.ParentCategoryID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.ChildrenIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   category.ChildrenTable,
+			Columns: []string{category.ChildrenColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(category.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.CoverImageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   category.CoverImageTable,
+			Columns: []string{category.CoverImageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.CoverImageAssetID = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -479,6 +611,42 @@ func (u *CategoryUpsert) SetAdmin(v bool) *CategoryUpsert {
 // UpdateAdmin sets the "admin" field to the value that was provided on create.
 func (u *CategoryUpsert) UpdateAdmin() *CategoryUpsert {
 	u.SetExcluded(category.FieldAdmin)
+	return u
+}
+
+// SetParentCategoryID sets the "parent_category_id" field.
+func (u *CategoryUpsert) SetParentCategoryID(v xid.ID) *CategoryUpsert {
+	u.Set(category.FieldParentCategoryID, v)
+	return u
+}
+
+// UpdateParentCategoryID sets the "parent_category_id" field to the value that was provided on create.
+func (u *CategoryUpsert) UpdateParentCategoryID() *CategoryUpsert {
+	u.SetExcluded(category.FieldParentCategoryID)
+	return u
+}
+
+// ClearParentCategoryID clears the value of the "parent_category_id" field.
+func (u *CategoryUpsert) ClearParentCategoryID() *CategoryUpsert {
+	u.SetNull(category.FieldParentCategoryID)
+	return u
+}
+
+// SetCoverImageAssetID sets the "cover_image_asset_id" field.
+func (u *CategoryUpsert) SetCoverImageAssetID(v xid.ID) *CategoryUpsert {
+	u.Set(category.FieldCoverImageAssetID, v)
+	return u
+}
+
+// UpdateCoverImageAssetID sets the "cover_image_asset_id" field to the value that was provided on create.
+func (u *CategoryUpsert) UpdateCoverImageAssetID() *CategoryUpsert {
+	u.SetExcluded(category.FieldCoverImageAssetID)
+	return u
+}
+
+// ClearCoverImageAssetID clears the value of the "cover_image_asset_id" field.
+func (u *CategoryUpsert) ClearCoverImageAssetID() *CategoryUpsert {
+	u.SetNull(category.FieldCoverImageAssetID)
 	return u
 }
 
@@ -653,6 +821,48 @@ func (u *CategoryUpsertOne) SetAdmin(v bool) *CategoryUpsertOne {
 func (u *CategoryUpsertOne) UpdateAdmin() *CategoryUpsertOne {
 	return u.Update(func(s *CategoryUpsert) {
 		s.UpdateAdmin()
+	})
+}
+
+// SetParentCategoryID sets the "parent_category_id" field.
+func (u *CategoryUpsertOne) SetParentCategoryID(v xid.ID) *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetParentCategoryID(v)
+	})
+}
+
+// UpdateParentCategoryID sets the "parent_category_id" field to the value that was provided on create.
+func (u *CategoryUpsertOne) UpdateParentCategoryID() *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateParentCategoryID()
+	})
+}
+
+// ClearParentCategoryID clears the value of the "parent_category_id" field.
+func (u *CategoryUpsertOne) ClearParentCategoryID() *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.ClearParentCategoryID()
+	})
+}
+
+// SetCoverImageAssetID sets the "cover_image_asset_id" field.
+func (u *CategoryUpsertOne) SetCoverImageAssetID(v xid.ID) *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetCoverImageAssetID(v)
+	})
+}
+
+// UpdateCoverImageAssetID sets the "cover_image_asset_id" field to the value that was provided on create.
+func (u *CategoryUpsertOne) UpdateCoverImageAssetID() *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateCoverImageAssetID()
+	})
+}
+
+// ClearCoverImageAssetID clears the value of the "cover_image_asset_id" field.
+func (u *CategoryUpsertOne) ClearCoverImageAssetID() *CategoryUpsertOne {
+	return u.Update(func(s *CategoryUpsert) {
+		s.ClearCoverImageAssetID()
 	})
 }
 
@@ -997,6 +1207,48 @@ func (u *CategoryUpsertBulk) SetAdmin(v bool) *CategoryUpsertBulk {
 func (u *CategoryUpsertBulk) UpdateAdmin() *CategoryUpsertBulk {
 	return u.Update(func(s *CategoryUpsert) {
 		s.UpdateAdmin()
+	})
+}
+
+// SetParentCategoryID sets the "parent_category_id" field.
+func (u *CategoryUpsertBulk) SetParentCategoryID(v xid.ID) *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetParentCategoryID(v)
+	})
+}
+
+// UpdateParentCategoryID sets the "parent_category_id" field to the value that was provided on create.
+func (u *CategoryUpsertBulk) UpdateParentCategoryID() *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateParentCategoryID()
+	})
+}
+
+// ClearParentCategoryID clears the value of the "parent_category_id" field.
+func (u *CategoryUpsertBulk) ClearParentCategoryID() *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.ClearParentCategoryID()
+	})
+}
+
+// SetCoverImageAssetID sets the "cover_image_asset_id" field.
+func (u *CategoryUpsertBulk) SetCoverImageAssetID(v xid.ID) *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.SetCoverImageAssetID(v)
+	})
+}
+
+// UpdateCoverImageAssetID sets the "cover_image_asset_id" field to the value that was provided on create.
+func (u *CategoryUpsertBulk) UpdateCoverImageAssetID() *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.UpdateCoverImageAssetID()
+	})
+}
+
+// ClearCoverImageAssetID clears the value of the "cover_image_asset_id" field.
+func (u *CategoryUpsertBulk) ClearCoverImageAssetID() *CategoryUpsertBulk {
+	return u.Update(func(s *CategoryUpsert) {
+		s.ClearCoverImageAssetID()
 	})
 }
 

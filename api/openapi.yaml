@@ -27,7 +27,7 @@ info:
     a more fixed versioning strategy in the future. Ultimately, the primary way
     Storyden tracks versions is dates, there are no set release tags currently.
   title: storyden
-  version: "v1.25.6-canary"
+  version: "v1.25.7-canary"
 
 servers:
   - url: "/api"
@@ -1120,27 +1120,58 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "200": { $ref: "#/components/responses/CategoryListOK" }
-    patch:
-      operationId: CategoryUpdateOrder
-      description: Update the sort order of categories.
+
+  /categories/{category_slug}:
+    get:
+      operationId: CategoryGet
+      description: Get information about a category.
       tags: [categories]
-      requestBody: { $ref: "#/components/requestBodies/CategoryUpdateOrder" }
+      parameters: [{ $ref: "#/components/parameters/CategorySlugParam" }]
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
-        "200": { $ref: "#/components/responses/CategoryListOK" }
-
-  /categories/{category_id}:
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/CategoryGetOK" }
     patch:
       operationId: CategoryUpdate
       description: Update a category's information.
       tags: [categories]
-      parameters: [$ref: "#/components/parameters/CategoryIDParam"]
+      parameters: [$ref: "#/components/parameters/CategorySlugParam"]
       requestBody: { $ref: "#/components/requestBodies/CategoryUpdate" }
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/CategoryUpdateOK" }
+    delete:
+      operationId: CategoryDelete
+      description: Delete a category. All posts in this category will be moved to the specified target category.
+      tags: [categories]
+      parameters: [$ref: "#/components/parameters/CategorySlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/CategoryDelete" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/CategoryDeleteOK" }
+
+  /categories/{category_slug}/position:
+    patch:
+      operationId: CategoryUpdatePosition
+      description: |
+        Update the category's position in the tree. You may change the parent
+        using `parent`, and/or reposition the category among its siblings using
+        either `before` or `after`. Use this operation for drag-and-drop
+        interfaces.
+      tags: [categories]
+      parameters: [$ref: "#/components/parameters/CategorySlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/CategoryUpdatePosition" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/CategoryListOK" }
 
   #
   # 888
@@ -2375,13 +2406,13 @@ components:
       schema:
         type: string
 
-    CategoryIDParam:
-      description: Unique category ID.
-      name: category_id
+    CategorySlugParam:
+      description: Unique category URL slug.
+      name: category_slug
       in: path
       required: true
       schema:
-        $ref: "#/components/schemas/Identifier"
+        type: string
 
     CategorySlugListQuery:
       name: categories
@@ -2658,15 +2689,20 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/CategoryInitialProps" }
 
-    CategoryUpdateOrder:
-      content:
-        application/json:
-          schema: { $ref: "#/components/schemas/CategoryIdentifierList" }
-
     CategoryUpdate:
       content:
         application/json:
           schema: { $ref: "#/components/schemas/CategoryMutableProps" }
+
+    CategoryUpdatePosition:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/CategoryPositionMutableProps" }
+
+    CategoryDelete:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/CategoryDeleteProps" }
 
     ThreadCreate:
       content:
@@ -3024,7 +3060,21 @@ components:
           schema:
             $ref: "#/components/schemas/Category"
 
+    CategoryGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Category"
+
     CategoryUpdateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Category"
+
+    CategoryDeleteOK:
       description: OK
       content:
         application/json:
@@ -3036,7 +3086,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/CategoryList"
+            $ref: "#/components/schemas/CategoryListResult"
 
     TagListOK:
       description: OK
@@ -4685,7 +4735,7 @@ components:
 
     CategoryCommonProps:
       type: object
-      required: [name, slug, description, colour, sort, admin]
+      required: [name, slug, description, colour, sort, children]
       properties:
         name:
           $ref: "#/components/schemas/CategoryName"
@@ -4697,13 +4747,17 @@ components:
           type: string
         sort:
           type: integer
-        admin:
-          type: boolean
+        parent:
+          $ref: "#/components/schemas/Identifier"
+          description: Parent category identifier. Unset indicates a root-level category.
+        cover_image:
+          $ref: "#/components/schemas/Asset"
+        children: { $ref: "#/components/schemas/CategoryList" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
     CategoryInitialProps:
       type: object
-      required: [name, description, colour, admin]
+      required: [name, description, colour]
       properties:
         name:
           $ref: "#/components/schemas/CategoryName"
@@ -4713,8 +4767,10 @@ components:
           type: string
         colour:
           type: string
-        admin:
-          type: boolean
+        parent:
+          $ref: "#/components/schemas/Identifier"
+          description: Parent category identifier. Unset indicates a root-level category.
+        cover_image_asset_id: { $ref: "#/components/schemas/Identifier" }
         meta: { $ref: "#/components/schemas/Metadata" }
 
     CategoryMutableProps:
@@ -4728,9 +4784,20 @@ components:
           type: string
         colour:
           type: string
-        admin:
-          type: boolean
+        cover_image_asset_id:
+          allOf:
+            - $ref: "#/components/schemas/NullableIdentifier"
+          nullable: true
+          description: Optional cover image asset identifier for the category.
         meta: { $ref: "#/components/schemas/Metadata" }
+
+    CategoryDeleteProps:
+      type: object
+      required: [move_to]
+      properties:
+        move_to:
+          $ref: "#/components/schemas/Identifier"
+          description: Category ID to move all posts to before deleting this category.
 
     CategoryName:
       description: A category's user-facing name.
@@ -4754,16 +4821,32 @@ components:
           type: integer
 
     CategoryList:
+      type: array
+      items: { $ref: "#/components/schemas/Category" }
+
+    CategoryListResult:
       type: object
       required: [categories]
       properties:
         categories:
-          type: array
-          items: { $ref: "#/components/schemas/Category" }
+          $ref: "#/components/schemas/CategoryList"
 
-    CategoryIdentifierList:
-      type: array
-      items: { $ref: "#/components/schemas/Identifier" }
+    CategoryPositionMutableProps:
+      type: object
+      description: |
+        Parameters for repositioning a category in the hierarchy. Update the
+        parent using `parent`, and/or reposition among siblings using `before`
+        or `after`. Using both `before` and `after` is not allowed.
+      properties:
+        parent:
+          $ref: "#/components/schemas/NullableIdentifier"
+          description: Optional new parent category identifier. Set to null to move to the root level.
+        before:
+          $ref: "#/components/schemas/Identifier"
+          description: Move this category before the sibling with this identifier.
+        after:
+          $ref: "#/components/schemas/Identifier"
+          description: Move this category after the sibling with this identifier.
 
     #
     # 88888888888

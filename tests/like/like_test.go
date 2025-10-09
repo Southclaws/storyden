@@ -39,7 +39,7 @@ func TestLikeThreads(t *testing.T) {
 			user1Session := sh.WithSession(user1Ctx)
 			user2Session := sh.WithSession(user2Ctx)
 
-			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, adminSession)
+			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, adminSession)
 			tests.Ok(t, err, cat1create)
 
 			thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
@@ -134,7 +134,7 @@ func TestLikeReplies(t *testing.T) {
 			user1Session := sh.WithSession(user1Ctx)
 			user2Session := sh.WithSession(user2Ctx)
 
-			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Admin: false, Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, adminSession)
+			cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{Colour: "#fe4efd", Description: "category testing", Name: "Category " + uuid.NewString()}, adminSession)
 			tests.Ok(t, err, cat1create)
 
 			thread1create, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{

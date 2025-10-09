@@ -5,7 +5,7 @@
  * Storyden social API for building community driven platforms.
 The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
 
- * OpenAPI spec version: v1.25.6-canary
+ * OpenAPI spec version: v1.25.7-canary
  */
 
 export * from "./aPIError";
@@ -99,19 +99,25 @@ export * from "./categoryAdditional";
 export * from "./categoryCommonProps";
 export * from "./categoryCreateBody";
 export * from "./categoryCreateOKResponse";
-export * from "./categoryIdentifierList";
+export * from "./categoryDeleteBody";
+export * from "./categoryDeleteOKResponse";
+export * from "./categoryDeleteProps";
+export * from "./categoryGetOKResponse";
 export * from "./categoryInitialProps";
 export * from "./categoryList";
 export * from "./categoryListOKResponse";
+export * from "./categoryListResult";
 export * from "./categoryMutableProps";
+export * from "./categoryMutablePropsCoverImageAssetId";
 export * from "./categoryName";
+export * from "./categoryPositionMutableProps";
 export * from "./categoryReference";
 export * from "./categorySlug";
 export * from "./categorySlugList";
 export * from "./categorySlugListQueryParameter";
 export * from "./categoryUpdateBody";
 export * from "./categoryUpdateOKResponse";
-export * from "./categoryUpdateOrderBody";
+export * from "./categoryUpdatePositionBody";
 export * from "./collection";
 export * from "./collectionAddNodeOKResponse";
 export * from "./collectionAddPostOKResponse";

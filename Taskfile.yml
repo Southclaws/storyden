@@ -78,6 +78,23 @@ tasks:
       - git reset --hard HEAD~1
       - git tag -d {{.CURRENT_VERSION}}
 
+  release-push:
+    desc: >
+      Pushes the latest commit and tags to the remote repository. This does not
+      create a GitHub release resource, you must do that separately.
+
+      You need to be signed in to the GitHub CLI (gh) and have permissions in
+      the Storyden repository to manage releases for this to work.
+    prompt:
+      - "Unreleased version: {{.CURRENT_VERSION}} | Create GitHub release draft?"
+    cmds:
+      - git push
+      - git push --tags
+      - gh release create {{.CURRENT_VERSION}}
+        --draft
+        --title {{.CURRENT_VERSION}}
+        --notes "Write the release notes..."
+
   # -
   # Code generation
   # -

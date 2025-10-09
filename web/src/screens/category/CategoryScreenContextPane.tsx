@@ -5,11 +5,11 @@ import { Unready } from "@/components/site/Unready";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
 import { SlugIcon } from "@/components/ui/icons/Slug";
 import * as Table from "@/components/ui/table";
-import { cva } from "@/styled-system/css";
-import { HStack, LStack, styled } from "@/styled-system/jsx";
-import { button } from "@/styled-system/recipes";
+import { css, cva } from "@/styled-system/css";
+import { HStack, LStack } from "@/styled-system/jsx";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
-import { Props, useCategoryScreen } from "./useCategoryScreen";
+import { Props, useCategoryScreen } from "./CategoryScreen";
 
 const valueStyles = cva({
   base: {},
@@ -52,7 +52,7 @@ export function CategoryScreenContextPane(props: Props) {
   return (
     <LStack gap="1">
       <CategoryBadge category={category} />
-      <styled.p color="fg.muted">{category.description}</styled.p>
+      <p className={css({ color: "fg.muted" })}>{category.description}</p>
 
       <Table.Root size="sm">
         <Table.Body>
@@ -78,18 +78,9 @@ export function CategoryScreenContextPane(props: Props) {
         </Table.Body>
       </Table.Root>
 
-      <styled.p>
-        <styled.a
-          color="fg.muted"
-          className={button({
-            variant: "subtle",
-            size: "xs",
-          })}
-          href="#"
-        >
-          scroll to top
-        </styled.a>
-      </styled.p>
+      <p>
+        <ScrollToTop />
+      </p>
     </LStack>
   );
 }

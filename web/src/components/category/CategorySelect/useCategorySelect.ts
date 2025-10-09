@@ -19,6 +19,7 @@ export function useCategorySelect() {
     return {
       ready: false as const,
       collection,
+      error,
     };
   }
 

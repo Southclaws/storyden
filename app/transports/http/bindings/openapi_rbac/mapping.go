@@ -274,11 +274,19 @@ func (m *Mapping) CategoryList() (bool, *rbac.Permission) {
 	return true, nil
 }
 
-func (m *Mapping) CategoryUpdateOrder() (bool, *rbac.Permission) {
+func (m *Mapping) CategoryGet() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) CategoryUpdatePosition() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageCategories
 }
 
 func (m *Mapping) CategoryUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageCategories
+}
+
+func (m *Mapping) CategoryDelete() (bool, *rbac.Permission) {
 	return true, &rbac.PermissionManageCategories
 }
 

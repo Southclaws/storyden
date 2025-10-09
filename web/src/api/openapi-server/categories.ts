@@ -5,15 +5,18 @@
  * Storyden social API for building community driven platforms.
 The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
 
- * OpenAPI spec version: v1.25.6-canary
+ * OpenAPI spec version: v1.25.7-canary
  */
 import type {
   CategoryCreateBody,
   CategoryCreateOKResponse,
+  CategoryDeleteBody,
+  CategoryDeleteOKResponse,
+  CategoryGetOKResponse,
   CategoryListOKResponse,
   CategoryUpdateBody,
   CategoryUpdateOKResponse,
-  CategoryUpdateOrderBody,
+  CategoryUpdatePositionBody,
 } from "../openapi-schema";
 import { fetcher } from "../server";
 
@@ -63,28 +66,26 @@ export const categoryList = async (
 };
 
 /**
- * Update the sort order of categories.
+ * Get information about a category.
  */
-export type categoryUpdateOrderResponse = {
-  data: CategoryListOKResponse;
+export type categoryGetResponse = {
+  data: CategoryGetOKResponse;
   status: number;
 };
 
-export const getCategoryUpdateOrderUrl = () => {
-  return `/categories`;
+export const getCategoryGetUrl = (categorySlug: string) => {
+  return `/categories/${categorySlug}`;
 };
 
-export const categoryUpdateOrder = async (
-  categoryUpdateOrderBody: CategoryUpdateOrderBody,
+export const categoryGet = async (
+  categorySlug: string,
   options?: RequestInit,
-): Promise<categoryUpdateOrderResponse> => {
-  return fetcher<Promise<categoryUpdateOrderResponse>>(
-    getCategoryUpdateOrderUrl(),
+): Promise<categoryGetResponse> => {
+  return fetcher<Promise<categoryGetResponse>>(
+    getCategoryGetUrl(categorySlug),
     {
       ...options,
-      method: "PATCH",
-      headers: { "Content-Type": "application/json", ...options?.headers },
-      body: JSON.stringify(categoryUpdateOrderBody),
+      method: "GET",
     },
   );
 };
@@ -97,22 +98,82 @@ export type categoryUpdateResponse = {
   status: number;
 };
 
-export const getCategoryUpdateUrl = (categoryId: string) => {
-  return `/categories/${categoryId}`;
+export const getCategoryUpdateUrl = (categorySlug: string) => {
+  return `/categories/${categorySlug}`;
 };
 
 export const categoryUpdate = async (
-  categoryId: string,
+  categorySlug: string,
   categoryUpdateBody: CategoryUpdateBody,
   options?: RequestInit,
 ): Promise<categoryUpdateResponse> => {
   return fetcher<Promise<categoryUpdateResponse>>(
-    getCategoryUpdateUrl(categoryId),
+    getCategoryUpdateUrl(categorySlug),
     {
       ...options,
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(categoryUpdateBody),
+    },
+  );
+};
+
+/**
+ * Delete a category. All posts in this category will be moved to the specified target category.
+ */
+export type categoryDeleteResponse = {
+  data: CategoryDeleteOKResponse;
+  status: number;
+};
+
+export const getCategoryDeleteUrl = (categorySlug: string) => {
+  return `/categories/${categorySlug}`;
+};
+
+export const categoryDelete = async (
+  categorySlug: string,
+  categoryDeleteBody: CategoryDeleteBody,
+  options?: RequestInit,
+): Promise<categoryDeleteResponse> => {
+  return fetcher<Promise<categoryDeleteResponse>>(
+    getCategoryDeleteUrl(categorySlug),
+    {
+      ...options,
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(categoryDeleteBody),
+    },
+  );
+};
+
+/**
+ * Update the category's position in the tree. You may change the parent
+using `parent`, and/or reposition the category among its siblings using
+either `before` or `after`. Use this operation for drag-and-drop
+interfaces.
+
+ */
+export type categoryUpdatePositionResponse = {
+  data: CategoryListOKResponse;
+  status: number;
+};
+
+export const getCategoryUpdatePositionUrl = (categorySlug: string) => {
+  return `/categories/${categorySlug}/position`;
+};
+
+export const categoryUpdatePosition = async (
+  categorySlug: string,
+  categoryUpdatePositionBody: CategoryUpdatePositionBody,
+  options?: RequestInit,
+): Promise<categoryUpdatePositionResponse> => {
+  return fetcher<Promise<categoryUpdatePositionResponse>>(
+    getCategoryUpdatePositionUrl(categorySlug),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(categoryUpdatePositionBody),
     },
   );
 };

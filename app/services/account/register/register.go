@@ -28,6 +28,7 @@ import (
 var (
 	errEmailAlreadyRegistered = fault.New("email already registered")
 	errAccountMismatch        = fault.New("account mismatch")
+	errEmailNotVerified       = fault.New("email not verified")
 )
 
 type Registrar struct {
@@ -66,7 +67,9 @@ func New(
 func (s *Registrar) Create(ctx context.Context, handle opt.Optional[string], opts ...account_writer.Option) (*account.Account, error) {
 	status, err := s.onboarding.GetOnboardingStatus(ctx)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to check onboarding status", "Unable to verify system setup. Please try again or contact site administration."))
 	}
 
 	if status == &onboarding.StatusRequiresFirstAccount {
@@ -79,7 +82,9 @@ func (s *Registrar) Create(ctx context.Context, handle opt.Optional[string], opt
 
 	acc, err := s.accountWriter.Create(ctx, handleOrGenerated, opts...)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to create account", "Unable to create your account."))
 	}
 
 	s.bus.Publish(ctx, &message.EventAccountCreated{
@@ -120,7 +125,9 @@ func (s *Registrar) GetOrCreateViaEmail(
 
 	emailOwner, emailExists, err := s.emailRepo.LookupAccount(ctx, email)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to lookup email address", "Unable to check if this email is already registered. Please try again."))
 	}
 
 	isVerified := func() bool {
@@ -156,13 +163,15 @@ func (s *Registrar) GetOrCreateViaEmail(
 		if authmethod.Account.ID != emailOwner.ID {
 			return nil, fault.Wrap(errEmailAlreadyRegistered,
 				fctx.With(ctx),
-				fmsg.WithDesc("email already in use by another account", "This email address is already in use by another account. Please use a different email address or log in with the existing account."),
+				fmsg.WithDesc("email already in use by another account", "Unable to complete sign-in. Please contact support if this issue persists."),
 			)
 		}
 
 		if sessionAccount, ok := session.Get(); ok {
 			if sessionAccount.ID != emailOwner.ID {
-				return nil, fault.Wrap(errAccountMismatch, fctx.With(ctx))
+				return nil, fault.Wrap(errAccountMismatch,
+					fctx.With(ctx),
+					fmsg.WithDesc("account mismatch", "This authentication method is linked to a different account. Please log out and sign in with the correct account."))
 			}
 		}
 
@@ -177,20 +186,29 @@ func (s *Registrar) GetOrCreateViaEmail(
 		// are enabled at a later date, such as with OAuth providers.
 		// Link the email address to the account and send a verification.
 
-		err = s.linkAndVerifyEmail(ctx, emailOwner.ID, email)
+		err = s.linkAndVerifyEmail(ctx, authmethod.Account.ID, email)
 		if err != nil {
-			return nil, fault.Wrap(err, fctx.With(ctx))
+			return nil, fault.Wrap(err,
+				fctx.With(ctx),
+				fmsg.WithDesc("failed to link and verify email", "Unable to link email address to your account. Please try again."))
 		}
 
 		logger.Info("get or create: auth method exists, email not recorded, linking new email to existing account")
 
-		return &emailOwner.Account, nil
+		return &authmethod.Account, nil
 
 	case !authMethodExists && emailExists:
 		// Member has already registered with this email address, perhaps on
 		// a different auth provider. We know it's the same email assuming
 		// the caller has verified this via OAuth or similar. The email may
 		// have also been added manually via a newsletter list. Link them.
+
+		if !isVerified {
+			return nil, fault.Wrap(errEmailNotVerified,
+				fctx.With(ctx),
+				fmsg.WithDesc("email not verified", "Unable to complete sign-in. Please contact support if this issue persists."),
+			)
+		}
 
 		_, err = s.authRepo.Create(ctx, emailOwner.ID, service, authentication.TokenTypeOAuth, identifier, token, nil, authentication.WithName(authName))
 		if err != nil {
@@ -212,7 +230,9 @@ func (s *Registrar) GetOrCreateViaEmail(
 		if !isVerified {
 			err = s.linkAndVerifyEmail(ctx, newAccount.ID, email)
 			if err != nil {
-				return nil, fault.Wrap(err, fctx.With(ctx))
+				return nil, fault.Wrap(err,
+					fctx.With(ctx),
+					fmsg.WithDesc("failed to link and verify email", "Unable to send verification email. Please try again or contact site administration."))
 			}
 		}
 
@@ -246,7 +266,9 @@ func (s *Registrar) GetOrCreateViaHandle(
 
 	handleOwner, handleExists, err := s.accountQuerier.LookupByHandle(ctx, handle)
 	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to lookup username", "Unable to check if this username is already registered. Please try again."))
 	}
 
 	logger := s.logger.With(
@@ -270,7 +292,9 @@ func (s *Registrar) GetOrCreateViaHandle(
 
 		if sessionAccount, ok := session.Get(); ok {
 			if sessionAccount.ID != handleOwner.ID {
-				return nil, fault.Wrap(errAccountMismatch, fctx.With(ctx))
+				return nil, fault.Wrap(errAccountMismatch,
+					fctx.With(ctx),
+					fmsg.WithDesc("account mismatch", "This authentication method is linked to a different account. Please log out and sign in with the correct account."))
 			}
 		}
 
@@ -284,7 +308,7 @@ func (s *Registrar) GetOrCreateViaHandle(
 
 		logger.Info("get or create: auth method exists, but account handle changed")
 
-		return &handleOwner.Account, nil
+		return &authmethod.Account, nil
 
 	case !authMethodExists && handleExists:
 		// Member has already registered with this handle, we can only verify
@@ -379,12 +403,16 @@ func (s *Registrar) CreateWithHandle(
 func (s *Registrar) linkAndVerifyEmail(ctx context.Context, accID account.AccountID, email mail.Address) error {
 	code, err := otp.Generate()
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
+		return fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to generate verification code", "Unable to create verification code. Please try again."))
 	}
 
 	_, err = s.emailVerify.BeginEmailVerification(ctx, accID, email, code)
 	if err != nil {
-		return fault.Wrap(err, fctx.With(ctx))
+		return fault.Wrap(err,
+			fctx.With(ctx),
+			fmsg.WithDesc("failed to begin email verification", "Unable to send verification email. Please try again or contact site administration."))
 	}
 
 	return nil

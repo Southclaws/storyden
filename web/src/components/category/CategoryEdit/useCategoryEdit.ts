@@ -1,8 +1,9 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Category } from "src/api/openapi-schema";
+import { Asset, Category } from "src/api/openapi-schema";
 import { UseDisclosureProps } from "src/utils/useDisclosure";
 
 import { handle } from "@/api/client";
@@ -16,16 +17,18 @@ export const FormSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   colour: z.string().default("#fff"),
+  cover_image: z.custom<Asset>().nullable().optional(),
 });
 export type Form = z.infer<typeof FormSchema>;
 
 export function useCategoryEdit(props: Props) {
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
-    values: {
+    defaultValues: {
       name: props.category.name,
       description: props.category.description,
       colour: props.category.colour,
+      cover_image: props.category.cover_image || null,
     },
   });
 
@@ -34,7 +37,12 @@ export function useCategoryEdit(props: Props) {
   const handleSubmit = form.handleSubmit(async (data) => {
     await handle(
       async () => {
-        await updateCategory(props.category.id, data);
+        const { cover_image, ...rest } = data;
+        const updateData = {
+          ...rest,
+          cover_image_asset_id: cover_image?.id || null,
+        };
+        await updateCategory(props.category.slug, updateData);
 
         props.onClose?.();
       },
@@ -53,11 +61,16 @@ export function useCategoryEdit(props: Props) {
     props.onClose?.();
   }
 
+  function handleImageUpload(asset: Asset) {
+    form.setValue("cover_image", asset);
+  }
+
   return {
     form,
     handlers: {
       handleSubmit,
       handleCancel,
+      handleImageUpload,
     },
   };
 }

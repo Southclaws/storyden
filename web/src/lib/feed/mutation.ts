@@ -78,11 +78,11 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
               slug: "",
-              admin: false,
               colour: "colour",
               description: "",
               name: "name",
               sort: 0,
+              children: [],
             }
           : undefined,
         id: uniqueId("optimistic_thread_id_"),

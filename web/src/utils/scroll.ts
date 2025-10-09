@@ -8,3 +8,14 @@ export function scrollToBottom(after: number = 100) {
     after,
   );
 }
+
+export function scrollToTop(after: number = 0) {
+  setTimeout(
+    () =>
+      window.scrollTo({
+        behavior: "smooth",
+        top: 0,
+      }),
+    after,
+  );
+}
