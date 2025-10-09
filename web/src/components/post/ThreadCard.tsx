@@ -21,9 +21,10 @@ import { LikeButton } from "./LikeButton/LikeButton";
 
 type Props = {
   thread: ThreadReference;
+  hideCategoryBadge?: boolean;
 };
 
-export const ThreadReferenceCard = memo(({ thread }: Props) => {
+export const ThreadReferenceCard = memo(({ thread, hideCategoryBadge = false }: Props) => {
   const session = useSession();
   const permalink = `/t/${thread.slug}`;
 
@@ -51,7 +52,7 @@ export const ThreadReferenceCard = memo(({ thread }: Props) => {
       controls={
         session && (
           <HStack>
-            {thread.category && <CategoryBadge category={thread.category} />}
+            {!hideCategoryBadge && thread.category && <CategoryBadge category={thread.category} />}
             <LikeButton thread={thread} />
             <CollectionMenu account={session} thread={thread} />
             <ThreadMenu thread={thread} />
