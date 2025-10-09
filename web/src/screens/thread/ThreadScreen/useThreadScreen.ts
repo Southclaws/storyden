@@ -28,7 +28,7 @@ export function useThreadScreen({ initialPage, slug, thread }: Props) {
     clearOnDefault: true,
   });
   const [resetKey, setResetKey] = useState("");
-  const [isEmpty, setEmpty] = useState(true);
+  const [isEmpty, setEmpty] = useState(!thread.body || thread.body.trim().length === 0);
 
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
@@ -75,6 +75,7 @@ export function useThreadScreen({ initialPage, slug, thread }: Props) {
     });
     setEditing(false);
     setResetKey(Date.now().toString());
+    setEmpty(!thread.body || thread.body.trim().length === 0);
   }
 
   const handleSave = form.handleSubmit(async (data) => {
