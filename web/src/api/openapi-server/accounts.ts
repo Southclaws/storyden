@@ -65,6 +65,32 @@ export const accountUpdate = async (
 };
 
 /**
+ * Get detailed account information by ID. Requires either the permissions
+VIEW_ACCOUNTS or ADMINISTRATOR. Users with VIEW_ACCOUNTS can view any
+account that is not ADMINISTRATOR including those with VIEW_ACCOUNTS.
+Only members with ADMINISTRATOR can view other ADMINISTRATOR accounts.
+
+ */
+export type accountViewResponse = {
+  data: AccountGetOKResponse;
+  status: number;
+};
+
+export const getAccountViewUrl = (accountId: string) => {
+  return `/accounts/${accountId}`;
+};
+
+export const accountView = async (
+  accountId: string,
+  options?: RequestInit,
+): Promise<accountViewResponse> => {
+  return fetcher<Promise<accountViewResponse>>(getAccountViewUrl(accountId), {
+    ...options,
+    method: "GET",
+  });
+};
+
+/**
  * Retrieve a list of authentication providers with a flag indicating which
 ones are active for the currently authenticated account.
 

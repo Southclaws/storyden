@@ -8,7 +8,9 @@ import { ContentFormField } from "@/components/content/ContentComposer/ContentFi
 import { MemberAvatar } from "@/components/member/MemberBadge/MemberAvatar";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { MemberOptionsMenu } from "@/components/member/MemberOptions/MemberOptionsMenu";
+import { ProfileAccountManagement } from "@/components/profile/ProfileAccountManagement/ProfileAccountManagement";
 import { ProfileContent } from "@/components/profile/ProfileContent/ProfileContent";
+import { ProfileSuspendedBanner } from "@/components/profile/ProfileSuspendedBanner";
 import { RoleBadgeList } from "@/components/role/RoleBadge/RoleBadgeList";
 import { EditAction } from "@/components/site/Action/Edit";
 import { MoreAction } from "@/components/site/Action/More";
@@ -36,7 +38,7 @@ export function ProfileScreen(props: Props) {
   }
 
   const { session, profile } = data;
-  const { isSelf, isEditing } = state;
+  const { isSelf, isEditing, canViewAccount } = state;
   const isEmpty =
     !profile.bio || profile.bio === "" || profile.bio === "<body></body>";
 
@@ -119,16 +121,6 @@ export function ProfileScreen(props: Props) {
                 })}
               </styled.time>
             </styled.p>
-            {profile.deletedAt && (
-              <styled.p color="fg.destructive" wordBreak="keep-all">
-                Suspended&nbsp;
-                <styled.time textWrap="nowrap">
-                  {formatDistanceToNow(new Date(profile.deletedAt), {
-                    addSuffix: true,
-                  })}
-                </styled.time>
-              </styled.p>
-            )}
             <DotSeparator />
             <HStack
               gap="1"
@@ -157,6 +149,18 @@ export function ProfileScreen(props: Props) {
             />
           )}
         </styled.form>
+
+        {profile.deletedAt && (
+          <Box p="3">
+            <ProfileSuspendedBanner date={new Date(profile.deletedAt)} />
+          </Box>
+        )}
+
+        {canViewAccount && (
+          <Box p="3">
+            <ProfileAccountManagement accountId={profile.id} />
+          </Box>
+        )}
       </CardBox>
 
       <ProfileContent session={session} profile={profile} />

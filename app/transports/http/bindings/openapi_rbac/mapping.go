@@ -174,6 +174,10 @@ func (m *Mapping) AccountGet() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) AccountView() (bool, *rbac.Permission) {
+	return true, nil // See NOTE.
+}
+
 func (m *Mapping) AccountUpdate() (bool, *rbac.Permission) {
 	return true, nil
 }

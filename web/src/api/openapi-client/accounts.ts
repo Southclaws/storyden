@@ -23,6 +23,7 @@ import type {
   AccountUpdateBody,
   AccountUpdateOKResponse,
   BadRequestResponse,
+  ForbiddenResponse,
   InternalServerErrorResponse,
   NotFoundResponse,
   NotModifiedResponse,
@@ -127,6 +128,66 @@ export const useAccountUpdate = <
   const swrFn = getAccountUpdateMutationFetcher();
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Get detailed account information by ID. Requires either the permissions
+VIEW_ACCOUNTS or ADMINISTRATOR. Users with VIEW_ACCOUNTS can view any
+account that is not ADMINISTRATOR including those with VIEW_ACCOUNTS.
+Only members with ADMINISTRATOR can view other ADMINISTRATOR accounts.
+
+ */
+export const accountView = (accountId: string) => {
+  return fetcher<AccountGetOKResponse>({
+    url: `/accounts/${accountId}`,
+    method: "GET",
+  });
+};
+
+export const getAccountViewKey = (accountId: string) =>
+  [`/accounts/${accountId}`] as const;
+
+export type AccountViewQueryResult = NonNullable<
+  Awaited<ReturnType<typeof accountView>>
+>;
+export type AccountViewQueryError =
+  | UnauthorisedResponse
+  | ForbiddenResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useAccountView = <
+  TError =
+    | UnauthorisedResponse
+    | ForbiddenResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  accountId: string,
+  options?: {
+    swr?: SWRConfiguration<Awaited<ReturnType<typeof accountView>>, TError> & {
+      swrKey?: Key;
+      enabled?: boolean;
+    };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!accountId;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getAccountViewKey(accountId) : null));
+  const swrFn = () => accountView(accountId);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
 
   return {
     swrKey,

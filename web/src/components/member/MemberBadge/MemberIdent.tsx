@@ -94,7 +94,7 @@ export function MemberName({
             lineHeight="tight"
             color="fg.default"
             _containerSmall={{
-              display: "none",
+              display: size === "xs" ? "none" : undefined,
             }}
           >
             {profile.name}
