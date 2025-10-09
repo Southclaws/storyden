@@ -94,6 +94,7 @@ export function MemberName({
         <Flex
           className="member-name__show-vertical"
           maxW="full"
+          minW="0"
           direction="column"
           gap="0"
           alignItems="start"
@@ -119,8 +120,13 @@ export function MemberName({
             className="member-name__handle"
             fontSize={size}
             fontWeight="normal"
+            w="full"
+            minW="0"
             textWrap="nowrap"
             color="fg.subtle"
+            overflowX="hidden"
+            overflowY="clip"
+            textOverflow="ellipsis"
             lineHeight="tight"
             // NOTE: Handles are always lowercase so our x-height upper bound is
             // quite low so we can get away with a tighter line height.
