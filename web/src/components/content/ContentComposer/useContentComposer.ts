@@ -40,7 +40,12 @@ export function useContentComposer(props: ContentComposerProps) {
   const extensions = [
     StarterKit,
     FocusClasses,
-    Link,
+    Link.configure({
+      // Disable navigation when clicking links in the editor if it's active.
+      openOnClick: props.disabled ? true : false,
+    }).extend({
+      inclusive: false,
+    }),
     ImageExtended.configure({
       allowBase64: false,
       HTMLAttributes: {

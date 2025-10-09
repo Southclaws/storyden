@@ -106,10 +106,10 @@ body {
   }
 
   a {
-    color: var(--colors-blue-10);
+    color: var(--colors-blue-9);
   }
   a:hover {
-    color: var(--colors-blue-9);
+    color: var(--colors-blue-10);
     text-decoration: underline;
   }
   a:visited {

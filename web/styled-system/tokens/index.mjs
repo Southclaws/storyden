@@ -3487,6 +3487,118 @@ const tokens = {
     "value": "var(--colors-accent-muted)",
     "variable": "var(--colors-accent-muted)"
   },
+  "colors.blue.1": {
+    "value": "var(--colors-blue-1)",
+    "variable": "var(--colors-blue-1)"
+  },
+  "colors.blue.2": {
+    "value": "var(--colors-blue-2)",
+    "variable": "var(--colors-blue-2)"
+  },
+  "colors.blue.3": {
+    "value": "var(--colors-blue-3)",
+    "variable": "var(--colors-blue-3)"
+  },
+  "colors.blue.4": {
+    "value": "var(--colors-blue-4)",
+    "variable": "var(--colors-blue-4)"
+  },
+  "colors.blue.5": {
+    "value": "var(--colors-blue-5)",
+    "variable": "var(--colors-blue-5)"
+  },
+  "colors.blue.6": {
+    "value": "var(--colors-blue-6)",
+    "variable": "var(--colors-blue-6)"
+  },
+  "colors.blue.7": {
+    "value": "var(--colors-blue-7)",
+    "variable": "var(--colors-blue-7)"
+  },
+  "colors.blue.8": {
+    "value": "var(--colors-blue-8)",
+    "variable": "var(--colors-blue-8)"
+  },
+  "colors.blue.9": {
+    "value": "var(--colors-blue-9)",
+    "variable": "var(--colors-blue-9)"
+  },
+  "colors.blue.10": {
+    "value": "var(--colors-blue-10)",
+    "variable": "var(--colors-blue-10)"
+  },
+  "colors.blue.11": {
+    "value": "var(--colors-blue-11)",
+    "variable": "var(--colors-blue-11)"
+  },
+  "colors.blue.12": {
+    "value": "var(--colors-blue-12)",
+    "variable": "var(--colors-blue-12)"
+  },
+  "colors.blue.a1": {
+    "value": "var(--colors-blue-a1)",
+    "variable": "var(--colors-blue-a1)"
+  },
+  "colors.blue.a2": {
+    "value": "var(--colors-blue-a2)",
+    "variable": "var(--colors-blue-a2)"
+  },
+  "colors.blue.a3": {
+    "value": "var(--colors-blue-a3)",
+    "variable": "var(--colors-blue-a3)"
+  },
+  "colors.blue.a4": {
+    "value": "var(--colors-blue-a4)",
+    "variable": "var(--colors-blue-a4)"
+  },
+  "colors.blue.a5": {
+    "value": "var(--colors-blue-a5)",
+    "variable": "var(--colors-blue-a5)"
+  },
+  "colors.blue.a6": {
+    "value": "var(--colors-blue-a6)",
+    "variable": "var(--colors-blue-a6)"
+  },
+  "colors.blue.a7": {
+    "value": "var(--colors-blue-a7)",
+    "variable": "var(--colors-blue-a7)"
+  },
+  "colors.blue.a8": {
+    "value": "var(--colors-blue-a8)",
+    "variable": "var(--colors-blue-a8)"
+  },
+  "colors.blue.a9": {
+    "value": "var(--colors-blue-a9)",
+    "variable": "var(--colors-blue-a9)"
+  },
+  "colors.blue.a10": {
+    "value": "var(--colors-blue-a10)",
+    "variable": "var(--colors-blue-a10)"
+  },
+  "colors.blue.a11": {
+    "value": "var(--colors-blue-a11)",
+    "variable": "var(--colors-blue-a11)"
+  },
+  "colors.blue.a12": {
+    "value": "var(--colors-blue-a12)",
+    "variable": "var(--colors-blue-a12)"
+  },
+  "colors.blue.default": {
+    "value": "var(--colors-blue-default)",
+    "variable": "var(--colors-blue-default)"
+  },
+  "colors.blue.emphasized": {
+    "value": "var(--colors-blue-emphasized)",
+    "variable": "var(--colors-blue-emphasized)"
+  },
+  "colors.blue.fg": {
+    "value": "var(--colors-blue-fg)",
+    "variable": "var(--colors-blue-fg)"
+  },
+  "colors.blue.text": {
+    "value": "var(--colors-blue-text)",
+    "variable": "var(--colors-blue-text)"
+  },
   "colors.colorPalette": {
     "value": "var(--colors-color-palette)",
     "variable": "var(--colors-color-palette)"
@@ -4018,6 +4130,10 @@ const tokens = {
   "colors.colorPalette.unlisted.border": {
     "value": "var(--colors-color-palette-unlisted-border)",
     "variable": "var(--colors-color-palette-unlisted-border)"
+  },
+  "colors.colorPalette.text": {
+    "value": "var(--colors-color-palette-text)",
+    "variable": "var(--colors-color-palette-text)"
   }
 }
 
