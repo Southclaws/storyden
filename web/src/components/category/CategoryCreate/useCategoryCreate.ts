@@ -14,6 +14,7 @@ import { handle } from "@/api/client";
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name for the category."),
+  slug: z.string().min(1, "Please enter a URL slug for the category."),
   description: z.string().min(1, "Please enter a short description."),
   colour: z.string().default("#8577ce"),
   parent: z.string().optional(),

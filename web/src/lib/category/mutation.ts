@@ -46,13 +46,16 @@ export function useCategoryMutations() {
     await mutate(keyFilterFn, data);
   };
 
-  const updateCategory = async (id: string, updated: CategoryMutableProps) => {
+  const updateCategory = async (
+    slug: string,
+    updated: CategoryMutableProps,
+  ) => {
     const mutator: MutatorCallback<CategoryListOKResponse> = (data) => {
       if (!data) return;
 
       const newData = {
         categories: data.categories.map((category) => {
-          if (category.id === id) {
+          if (category.slug === slug) {
             return {
               ...category,
               ...updated,
@@ -70,7 +73,7 @@ export function useCategoryMutations() {
       revalidate: false,
     });
 
-    await categoryUpdate(id, updated);
+    await categoryUpdate(slug, updated);
   };
 
   const deleteCategory = async (slug: string, body: CategoryDeleteBody) => {
