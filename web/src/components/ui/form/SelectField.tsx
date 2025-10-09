@@ -38,8 +38,8 @@ export function SelectField<
 
         return (
           <Select.Root
-            w="fit"
-            size="xs"
+            minW="max"
+            size="sm"
             value={[field.value]}
             defaultValue={[defaultValue]}
             collection={collection}

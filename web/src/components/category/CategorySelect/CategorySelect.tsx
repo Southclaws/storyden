@@ -21,7 +21,7 @@ export function CategorySelect<T extends FieldValues>(
         control={props.control}
         name={props.name}
         disabled={!ready}
-        placeholder={ready ? "Select a category" : "Loading categories..."}
+        placeholder={ready ? "Category" : "Loading categories..."}
         collection={collection}
       />
       <ErrorTooltip error={error} />

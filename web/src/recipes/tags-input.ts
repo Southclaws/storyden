@@ -88,6 +88,7 @@ export const tagsInput = defineSlotRecipe({
           gap: "1.5",
         },
         control: {
+          h: "8",
           fontSize: "sm",
           gap: "1.5",
           minW: "10",

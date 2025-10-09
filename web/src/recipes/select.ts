@@ -174,7 +174,7 @@ export const select = defineSlotRecipe({
         label: { textStyle: "sm" },
         trigger: {
           px: "2.5",
-          h: "9",
+          h: "8",
           minW: "9",
           fontSize: "sm",
           gap: "2",

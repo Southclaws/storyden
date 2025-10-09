@@ -24,7 +24,16 @@ export function ComposeForm(props: Props) {
       onSubmit={handlers.handlePublish}
     >
       <FormProvider {...form}>
-        <WStack>
+        <WStack
+          flexDir={{
+            base: "column-reverse",
+            md: "row",
+          }}
+          alignItems={{
+            base: "end",
+            md: "center",
+          }}
+        >
           <HStack width="full">
             <CategorySelect control={form.control} name="category" />
             <TagListField
