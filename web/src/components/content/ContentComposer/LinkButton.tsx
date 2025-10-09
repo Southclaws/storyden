@@ -8,6 +8,7 @@ import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { LinkIcon } from "@/components/ui/icons/Typography";
 import { Input } from "@/components/ui/input";
 import * as Popover from "@/components/ui/popover";
+import { isValidLinkLike, normalizeLink } from "@/lib/link/validation";
 import { HStack } from "@/styled-system/jsx";
 
 type LinkButtonProps = {
@@ -17,6 +18,7 @@ type LinkButtonProps = {
 export function LinkButton({ editor }: LinkButtonProps) {
   const [url, setUrl] = useState("");
   const [open, setOpen] = useState(false);
+  const [isInvalid, setIsInvalid] = useState(false);
 
   const isActive = editor.isActive("link");
   const currentUrl = editor.getAttributes("link")["href"] || "";
@@ -30,23 +32,49 @@ export function LinkButton({ editor }: LinkButtonProps) {
     setOpen(true);
   };
 
+  const handleChangeURL = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    if (value === "") {
+      setIsInvalid(false);
+    } else {
+      setIsInvalid(isValidLinkLike(value) === false);
+    }
+
+    setUrl(value);
+  };
+
   const handleSetLink = () => {
-    if (url === "") {
+    const trimmedUrl = url.trim();
+
+    if (!trimmedUrl) {
       if (isActive) {
         editor.chain().focus().extendMarkRange("link").unsetLink().run();
       }
-    } else {
-      if (isActive) {
-        editor
-          .chain()
-          .focus()
-          .extendMarkRange("link")
-          .setLink({ href: url })
-          .run();
-      } else {
-        editor.chain().focus().setLink({ href: url }).run();
-      }
+      setOpen(false);
+      setUrl("");
+      return;
     }
+
+    const normalizedUrl = normalizeLink(trimmedUrl);
+
+    if (!normalizedUrl) {
+      // Keep popover open.
+      setIsInvalid(true);
+      return;
+    }
+
+    if (isActive) {
+      editor
+        .chain()
+        .focus()
+        .extendMarkRange("link")
+        .setLink({ href: normalizedUrl })
+        .run();
+    } else {
+      editor.chain().focus().setLink({ href: normalizedUrl }).run();
+    }
+
     setOpen(false);
     setUrl("");
   };
@@ -54,6 +82,7 @@ export function LinkButton({ editor }: LinkButtonProps) {
   const handleRemoveLink = () => {
     editor.chain().focus().extendMarkRange("link").unsetLink().run();
     setOpen(false);
+    setUrl("");
   };
 
   return (
@@ -74,9 +103,10 @@ export function LinkButton({ editor }: LinkButtonProps) {
         <Popover.Content>
           <HStack gap="1" alignItems="stretch">
             <Input
+              borderColor={isInvalid ? "border.error" : undefined}
               size="xs"
               value={url}
-              onChange={(e) => setUrl(e.target.value)}
+              onChange={handleChangeURL}
               placeholder="Enter or paste URL"
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
