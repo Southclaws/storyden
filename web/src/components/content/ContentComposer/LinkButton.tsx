@@ -118,6 +118,7 @@ export function LinkButton({ editor }: LinkButtonProps) {
                 }
               }}
               autoFocus
+              aria-label="Link URL"
             />
             <HStack gap="2" justifyContent="flex-end">
               {isActive && (
