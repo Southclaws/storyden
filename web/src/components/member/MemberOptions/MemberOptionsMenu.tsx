@@ -48,7 +48,12 @@ export function MemberOptionsMenu({
 
   return (
     <Menu.Root onSelect={handleSelect}>
-      <Menu.Trigger maxW="full" cursor="pointer" asChild={props.asChild}>
+      <Menu.Trigger
+        className="member-options-menu__trigger"
+        maxW="full"
+        cursor="pointer"
+        asChild={props.asChild}
+      >
         {children}
       </Menu.Trigger>
 

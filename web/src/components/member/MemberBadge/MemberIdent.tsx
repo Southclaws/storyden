@@ -23,6 +23,7 @@ export function MemberIdent({
 }: Props) {
   return (
     <HStack
+      className="member-ident__container"
       minW="0"
       w="full"
       alignItems="center"
@@ -51,8 +52,15 @@ export function MemberName({
   switch (name) {
     case "full-horizontal":
       return (
-        <Flex maxW="full" direction="row" gap="1" alignItems="center">
+        <Flex
+          className="member-name__show-horizontal"
+          maxW="full"
+          direction="row"
+          gap="1"
+          alignItems="center"
+        >
           <styled.p
+            className="member-name__display-name"
             minW="0"
             fontSize={size}
             fontWeight={size === "lg" ? "bold" : "medium"}
@@ -69,6 +77,7 @@ export function MemberName({
             {profile.name}
           </styled.p>
           <styled.p
+            className="member-name__handle"
             fontSize={size}
             fontWeight="normal"
             textWrap="nowrap"
@@ -82,8 +91,15 @@ export function MemberName({
 
     case "full-vertical":
       return (
-        <Flex maxW="full" direction="column" gap="0" alignItems="start">
+        <Flex
+          className="member-name__show-vertical"
+          maxW="full"
+          direction="column"
+          gap="0"
+          alignItems="start"
+        >
           <styled.p
+            className="member-name__display-name"
             minW="0"
             fontSize={size}
             fontWeight={size === "lg" ? "bold" : "medium"}
@@ -100,6 +116,7 @@ export function MemberName({
             {profile.name}
           </styled.p>
           <styled.p
+            className="member-name__handle"
             fontSize={size}
             fontWeight="normal"
             textWrap="nowrap"
@@ -117,11 +134,21 @@ export function MemberName({
 
     case "handle":
       return (
-        <HStack maxW="full" gap="1">
+        <HStack
+          className="member-name__show-handle"
+          maxW="full"
+          gap="1"
+          minW="0"
+        >
           <styled.p
+            className="member-name__handle"
             fontSize={size}
             fontWeight="normal"
+            overflowX="hidden"
+            overflowY="clip"
             textWrap="nowrap"
+            textOverflow="ellipsis"
+            lineHeight="tight"
             color="fg.subtle"
           >
             @{profile.handle}

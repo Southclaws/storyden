@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { AccountRoleList, ProfileReference } from "@/api/openapi-schema";
 import { WEB_ADDRESS } from "@/config";
-import { css } from "@/styled-system/css";
+import { css, cx } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 
 import { MemberOptionsMenu } from "../MemberOptions/MemberOptionsMenu";
@@ -25,7 +25,9 @@ export type Props = {
 
 const identContainerStyles = css({
   maxW: "full",
+  minW: "0",
   flexShrink: "0",
+  flex: "1",
 });
 
 export function MemberBadge({
@@ -41,7 +43,9 @@ export function MemberBadge({
 
   if (as === "menu") {
     return (
-      <HStack className={identContainerStyles}>
+      <HStack
+        className={cx("member-badge__menu-container", identContainerStyles)}
+      >
         <MemberOptionsMenu profile={profile}>
           <MemberIdent
             profile={profile}
@@ -57,7 +61,10 @@ export function MemberBadge({
   }
 
   return (
-    <Link className={identContainerStyles} href={permalink}>
+    <Link
+      className={cx("member-badge__link-container", identContainerStyles)}
+      href={permalink}
+    >
       <MemberIdent
         profile={profile}
         size={size}

@@ -76,6 +76,7 @@ export const richCard = defineSlotRecipe({
       justifyContent: "start",
       width: "full",
       minWidth: "0",
+      gap: "2",
     },
 
     mediaBackdropContainer: {
@@ -162,6 +163,7 @@ export const richCard = defineSlotRecipe({
         footerContainer: {
           gridColumn: "content-start / media-end",
           gridRow: "footer-start / footer-end",
+          gap: "2",
         },
 
         mediaBackdropContainer: {
@@ -252,6 +254,7 @@ export const richCard = defineSlotRecipe({
             gridColumn: "content-start / content-end",
           },
           gridRow: "footer-start / footer-end",
+          gap: "2",
         },
 
         mediaBackdropContainer: {
@@ -323,6 +326,7 @@ export const richCard = defineSlotRecipe({
 
         footerContainer: {
           gridArea: "footer",
+          gap: "2",
         },
 
         mediaBackdropContainer: {
@@ -404,6 +408,7 @@ export const richCard = defineSlotRecipe({
           gridColumn: "edge-start / edge-end",
           paddingTop: "0",
           padding: "2",
+          gap: "2",
         },
 
         mediaBackdropContainer: {

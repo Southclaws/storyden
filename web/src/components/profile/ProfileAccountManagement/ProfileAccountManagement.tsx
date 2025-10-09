@@ -115,7 +115,7 @@ export function ProfileAccountManagement({ accountId }: Props) {
             <styled.p fontSize="xs" fontWeight="semibold" color="fg.muted">
               Account Status
             </styled.p>
-            <styled.p fontSize="sm">{emailVerifiedStatusBadge.run()}</styled.p>
+            <Box fontSize="sm">{emailVerifiedStatusBadge.run()}</Box>
           </LStack>
 
           <LStack gap="1">

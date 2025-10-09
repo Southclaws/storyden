@@ -18,16 +18,24 @@ export function Timestamp(props: Props) {
   const createdAt = timestamp(createdDate, !props.large);
 
   return (
-    <styled.span textWrap="nowrap">
+    <styled.span
+      className="timestamp__container"
+      textWrap="nowrap"
+      minW="fit"
+      flexShrink="0"
+      overflow="hidden"
+    >
       {props.href ? (
-        <Anchor href={props.href}>
+        <Anchor className="timestamp__anchor" href={props.href}>
           {props.large && (
-            <styled.span className="fluid-font-size">created</styled.span>
+            <styled.span className="timestamp__label fluid-font-size">
+              created
+            </styled.span>
           )}{" "}
           {createdAt}
         </Anchor>
       ) : (
-        <styled.span>{createdAt}</styled.span>
+        <styled.span className="timestamp__time">{createdAt}</styled.span>
       )}
     </styled.span>
   );
