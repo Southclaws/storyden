@@ -26,127 +26,127 @@ type PropertySchemaFieldUpdate struct {
 }
 
 // Where appends a list predicates to the PropertySchemaFieldUpdate builder.
-func (psfu *PropertySchemaFieldUpdate) Where(ps ...predicate.PropertySchemaField) *PropertySchemaFieldUpdate {
-	psfu.mutation.Where(ps...)
-	return psfu
+func (_u *PropertySchemaFieldUpdate) Where(ps ...predicate.PropertySchemaField) *PropertySchemaFieldUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetName sets the "name" field.
-func (psfu *PropertySchemaFieldUpdate) SetName(s string) *PropertySchemaFieldUpdate {
-	psfu.mutation.SetName(s)
-	return psfu
+func (_u *PropertySchemaFieldUpdate) SetName(v string) *PropertySchemaFieldUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (psfu *PropertySchemaFieldUpdate) SetNillableName(s *string) *PropertySchemaFieldUpdate {
-	if s != nil {
-		psfu.SetName(*s)
+func (_u *PropertySchemaFieldUpdate) SetNillableName(v *string) *PropertySchemaFieldUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return psfu
+	return _u
 }
 
 // SetType sets the "type" field.
-func (psfu *PropertySchemaFieldUpdate) SetType(s string) *PropertySchemaFieldUpdate {
-	psfu.mutation.SetType(s)
-	return psfu
+func (_u *PropertySchemaFieldUpdate) SetType(v string) *PropertySchemaFieldUpdate {
+	_u.mutation.SetType(v)
+	return _u
 }
 
 // SetNillableType sets the "type" field if the given value is not nil.
-func (psfu *PropertySchemaFieldUpdate) SetNillableType(s *string) *PropertySchemaFieldUpdate {
-	if s != nil {
-		psfu.SetType(*s)
+func (_u *PropertySchemaFieldUpdate) SetNillableType(v *string) *PropertySchemaFieldUpdate {
+	if v != nil {
+		_u.SetType(*v)
 	}
-	return psfu
+	return _u
 }
 
 // SetSort sets the "sort" field.
-func (psfu *PropertySchemaFieldUpdate) SetSort(s string) *PropertySchemaFieldUpdate {
-	psfu.mutation.SetSort(s)
-	return psfu
+func (_u *PropertySchemaFieldUpdate) SetSort(v string) *PropertySchemaFieldUpdate {
+	_u.mutation.SetSort(v)
+	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (psfu *PropertySchemaFieldUpdate) SetNillableSort(s *string) *PropertySchemaFieldUpdate {
-	if s != nil {
-		psfu.SetSort(*s)
+func (_u *PropertySchemaFieldUpdate) SetNillableSort(v *string) *PropertySchemaFieldUpdate {
+	if v != nil {
+		_u.SetSort(*v)
 	}
-	return psfu
+	return _u
 }
 
 // SetSchemaID sets the "schema_id" field.
-func (psfu *PropertySchemaFieldUpdate) SetSchemaID(x xid.ID) *PropertySchemaFieldUpdate {
-	psfu.mutation.SetSchemaID(x)
-	return psfu
+func (_u *PropertySchemaFieldUpdate) SetSchemaID(v xid.ID) *PropertySchemaFieldUpdate {
+	_u.mutation.SetSchemaID(v)
+	return _u
 }
 
 // SetNillableSchemaID sets the "schema_id" field if the given value is not nil.
-func (psfu *PropertySchemaFieldUpdate) SetNillableSchemaID(x *xid.ID) *PropertySchemaFieldUpdate {
-	if x != nil {
-		psfu.SetSchemaID(*x)
+func (_u *PropertySchemaFieldUpdate) SetNillableSchemaID(v *xid.ID) *PropertySchemaFieldUpdate {
+	if v != nil {
+		_u.SetSchemaID(*v)
 	}
-	return psfu
+	return _u
 }
 
 // SetSchema sets the "schema" edge to the PropertySchema entity.
-func (psfu *PropertySchemaFieldUpdate) SetSchema(p *PropertySchema) *PropertySchemaFieldUpdate {
-	return psfu.SetSchemaID(p.ID)
+func (_u *PropertySchemaFieldUpdate) SetSchema(v *PropertySchema) *PropertySchemaFieldUpdate {
+	return _u.SetSchemaID(v.ID)
 }
 
 // AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
-func (psfu *PropertySchemaFieldUpdate) AddPropertyIDs(ids ...xid.ID) *PropertySchemaFieldUpdate {
-	psfu.mutation.AddPropertyIDs(ids...)
-	return psfu
+func (_u *PropertySchemaFieldUpdate) AddPropertyIDs(ids ...xid.ID) *PropertySchemaFieldUpdate {
+	_u.mutation.AddPropertyIDs(ids...)
+	return _u
 }
 
 // AddProperties adds the "properties" edges to the Property entity.
-func (psfu *PropertySchemaFieldUpdate) AddProperties(p ...*Property) *PropertySchemaFieldUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PropertySchemaFieldUpdate) AddProperties(v ...*Property) *PropertySchemaFieldUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return psfu.AddPropertyIDs(ids...)
+	return _u.AddPropertyIDs(ids...)
 }
 
 // Mutation returns the PropertySchemaFieldMutation object of the builder.
-func (psfu *PropertySchemaFieldUpdate) Mutation() *PropertySchemaFieldMutation {
-	return psfu.mutation
+func (_u *PropertySchemaFieldUpdate) Mutation() *PropertySchemaFieldMutation {
+	return _u.mutation
 }
 
 // ClearSchema clears the "schema" edge to the PropertySchema entity.
-func (psfu *PropertySchemaFieldUpdate) ClearSchema() *PropertySchemaFieldUpdate {
-	psfu.mutation.ClearSchema()
-	return psfu
+func (_u *PropertySchemaFieldUpdate) ClearSchema() *PropertySchemaFieldUpdate {
+	_u.mutation.ClearSchema()
+	return _u
 }
 
 // ClearProperties clears all "properties" edges to the Property entity.
-func (psfu *PropertySchemaFieldUpdate) ClearProperties() *PropertySchemaFieldUpdate {
-	psfu.mutation.ClearProperties()
-	return psfu
+func (_u *PropertySchemaFieldUpdate) ClearProperties() *PropertySchemaFieldUpdate {
+	_u.mutation.ClearProperties()
+	return _u
 }
 
 // RemovePropertyIDs removes the "properties" edge to Property entities by IDs.
-func (psfu *PropertySchemaFieldUpdate) RemovePropertyIDs(ids ...xid.ID) *PropertySchemaFieldUpdate {
-	psfu.mutation.RemovePropertyIDs(ids...)
-	return psfu
+func (_u *PropertySchemaFieldUpdate) RemovePropertyIDs(ids ...xid.ID) *PropertySchemaFieldUpdate {
+	_u.mutation.RemovePropertyIDs(ids...)
+	return _u
 }
 
 // RemoveProperties removes "properties" edges to Property entities.
-func (psfu *PropertySchemaFieldUpdate) RemoveProperties(p ...*Property) *PropertySchemaFieldUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PropertySchemaFieldUpdate) RemoveProperties(v ...*Property) *PropertySchemaFieldUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return psfu.RemovePropertyIDs(ids...)
+	return _u.RemovePropertyIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (psfu *PropertySchemaFieldUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, psfu.sqlSave, psfu.mutation, psfu.hooks)
+func (_u *PropertySchemaFieldUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (psfu *PropertySchemaFieldUpdate) SaveX(ctx context.Context) int {
-	affected, err := psfu.Save(ctx)
+func (_u *PropertySchemaFieldUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -154,54 +154,54 @@ func (psfu *PropertySchemaFieldUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (psfu *PropertySchemaFieldUpdate) Exec(ctx context.Context) error {
-	_, err := psfu.Save(ctx)
+func (_u *PropertySchemaFieldUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (psfu *PropertySchemaFieldUpdate) ExecX(ctx context.Context) {
-	if err := psfu.Exec(ctx); err != nil {
+func (_u *PropertySchemaFieldUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (psfu *PropertySchemaFieldUpdate) check() error {
-	if psfu.mutation.SchemaCleared() && len(psfu.mutation.SchemaIDs()) > 0 {
+func (_u *PropertySchemaFieldUpdate) check() error {
+	if _u.mutation.SchemaCleared() && len(_u.mutation.SchemaIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "PropertySchemaField.schema"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (psfu *PropertySchemaFieldUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PropertySchemaFieldUpdate {
-	psfu.modifiers = append(psfu.modifiers, modifiers...)
-	return psfu
+func (_u *PropertySchemaFieldUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PropertySchemaFieldUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (psfu *PropertySchemaFieldUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := psfu.check(); err != nil {
-		return n, err
+func (_u *PropertySchemaFieldUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(propertyschemafield.Table, propertyschemafield.Columns, sqlgraph.NewFieldSpec(propertyschemafield.FieldID, field.TypeString))
-	if ps := psfu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := psfu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(propertyschemafield.FieldName, field.TypeString, value)
 	}
-	if value, ok := psfu.mutation.GetType(); ok {
+	if value, ok := _u.mutation.GetType(); ok {
 		_spec.SetField(propertyschemafield.FieldType, field.TypeString, value)
 	}
-	if value, ok := psfu.mutation.Sort(); ok {
+	if value, ok := _u.mutation.Sort(); ok {
 		_spec.SetField(propertyschemafield.FieldSort, field.TypeString, value)
 	}
-	if psfu.mutation.SchemaCleared() {
+	if _u.mutation.SchemaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -214,7 +214,7 @@ func (psfu *PropertySchemaFieldUpdate) sqlSave(ctx context.Context) (n int, err 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := psfu.mutation.SchemaIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.SchemaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -230,7 +230,7 @@ func (psfu *PropertySchemaFieldUpdate) sqlSave(ctx context.Context) (n int, err 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if psfu.mutation.PropertiesCleared() {
+	if _u.mutation.PropertiesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -243,7 +243,7 @@ func (psfu *PropertySchemaFieldUpdate) sqlSave(ctx context.Context) (n int, err 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := psfu.mutation.RemovedPropertiesIDs(); len(nodes) > 0 && !psfu.mutation.PropertiesCleared() {
+	if nodes := _u.mutation.RemovedPropertiesIDs(); len(nodes) > 0 && !_u.mutation.PropertiesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -259,7 +259,7 @@ func (psfu *PropertySchemaFieldUpdate) sqlSave(ctx context.Context) (n int, err 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := psfu.mutation.PropertiesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PropertiesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -275,8 +275,8 @@ func (psfu *PropertySchemaFieldUpdate) sqlSave(ctx context.Context) (n int, err 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(psfu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, psfu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{propertyschemafield.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -284,8 +284,8 @@ func (psfu *PropertySchemaFieldUpdate) sqlSave(ctx context.Context) (n int, err 
 		}
 		return 0, err
 	}
-	psfu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // PropertySchemaFieldUpdateOne is the builder for updating a single PropertySchemaField entity.
@@ -298,134 +298,134 @@ type PropertySchemaFieldUpdateOne struct {
 }
 
 // SetName sets the "name" field.
-func (psfuo *PropertySchemaFieldUpdateOne) SetName(s string) *PropertySchemaFieldUpdateOne {
-	psfuo.mutation.SetName(s)
-	return psfuo
+func (_u *PropertySchemaFieldUpdateOne) SetName(v string) *PropertySchemaFieldUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (psfuo *PropertySchemaFieldUpdateOne) SetNillableName(s *string) *PropertySchemaFieldUpdateOne {
-	if s != nil {
-		psfuo.SetName(*s)
+func (_u *PropertySchemaFieldUpdateOne) SetNillableName(v *string) *PropertySchemaFieldUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return psfuo
+	return _u
 }
 
 // SetType sets the "type" field.
-func (psfuo *PropertySchemaFieldUpdateOne) SetType(s string) *PropertySchemaFieldUpdateOne {
-	psfuo.mutation.SetType(s)
-	return psfuo
+func (_u *PropertySchemaFieldUpdateOne) SetType(v string) *PropertySchemaFieldUpdateOne {
+	_u.mutation.SetType(v)
+	return _u
 }
 
 // SetNillableType sets the "type" field if the given value is not nil.
-func (psfuo *PropertySchemaFieldUpdateOne) SetNillableType(s *string) *PropertySchemaFieldUpdateOne {
-	if s != nil {
-		psfuo.SetType(*s)
+func (_u *PropertySchemaFieldUpdateOne) SetNillableType(v *string) *PropertySchemaFieldUpdateOne {
+	if v != nil {
+		_u.SetType(*v)
 	}
-	return psfuo
+	return _u
 }
 
 // SetSort sets the "sort" field.
-func (psfuo *PropertySchemaFieldUpdateOne) SetSort(s string) *PropertySchemaFieldUpdateOne {
-	psfuo.mutation.SetSort(s)
-	return psfuo
+func (_u *PropertySchemaFieldUpdateOne) SetSort(v string) *PropertySchemaFieldUpdateOne {
+	_u.mutation.SetSort(v)
+	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (psfuo *PropertySchemaFieldUpdateOne) SetNillableSort(s *string) *PropertySchemaFieldUpdateOne {
-	if s != nil {
-		psfuo.SetSort(*s)
+func (_u *PropertySchemaFieldUpdateOne) SetNillableSort(v *string) *PropertySchemaFieldUpdateOne {
+	if v != nil {
+		_u.SetSort(*v)
 	}
-	return psfuo
+	return _u
 }
 
 // SetSchemaID sets the "schema_id" field.
-func (psfuo *PropertySchemaFieldUpdateOne) SetSchemaID(x xid.ID) *PropertySchemaFieldUpdateOne {
-	psfuo.mutation.SetSchemaID(x)
-	return psfuo
+func (_u *PropertySchemaFieldUpdateOne) SetSchemaID(v xid.ID) *PropertySchemaFieldUpdateOne {
+	_u.mutation.SetSchemaID(v)
+	return _u
 }
 
 // SetNillableSchemaID sets the "schema_id" field if the given value is not nil.
-func (psfuo *PropertySchemaFieldUpdateOne) SetNillableSchemaID(x *xid.ID) *PropertySchemaFieldUpdateOne {
-	if x != nil {
-		psfuo.SetSchemaID(*x)
+func (_u *PropertySchemaFieldUpdateOne) SetNillableSchemaID(v *xid.ID) *PropertySchemaFieldUpdateOne {
+	if v != nil {
+		_u.SetSchemaID(*v)
 	}
-	return psfuo
+	return _u
 }
 
 // SetSchema sets the "schema" edge to the PropertySchema entity.
-func (psfuo *PropertySchemaFieldUpdateOne) SetSchema(p *PropertySchema) *PropertySchemaFieldUpdateOne {
-	return psfuo.SetSchemaID(p.ID)
+func (_u *PropertySchemaFieldUpdateOne) SetSchema(v *PropertySchema) *PropertySchemaFieldUpdateOne {
+	return _u.SetSchemaID(v.ID)
 }
 
 // AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
-func (psfuo *PropertySchemaFieldUpdateOne) AddPropertyIDs(ids ...xid.ID) *PropertySchemaFieldUpdateOne {
-	psfuo.mutation.AddPropertyIDs(ids...)
-	return psfuo
+func (_u *PropertySchemaFieldUpdateOne) AddPropertyIDs(ids ...xid.ID) *PropertySchemaFieldUpdateOne {
+	_u.mutation.AddPropertyIDs(ids...)
+	return _u
 }
 
 // AddProperties adds the "properties" edges to the Property entity.
-func (psfuo *PropertySchemaFieldUpdateOne) AddProperties(p ...*Property) *PropertySchemaFieldUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PropertySchemaFieldUpdateOne) AddProperties(v ...*Property) *PropertySchemaFieldUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return psfuo.AddPropertyIDs(ids...)
+	return _u.AddPropertyIDs(ids...)
 }
 
 // Mutation returns the PropertySchemaFieldMutation object of the builder.
-func (psfuo *PropertySchemaFieldUpdateOne) Mutation() *PropertySchemaFieldMutation {
-	return psfuo.mutation
+func (_u *PropertySchemaFieldUpdateOne) Mutation() *PropertySchemaFieldMutation {
+	return _u.mutation
 }
 
 // ClearSchema clears the "schema" edge to the PropertySchema entity.
-func (psfuo *PropertySchemaFieldUpdateOne) ClearSchema() *PropertySchemaFieldUpdateOne {
-	psfuo.mutation.ClearSchema()
-	return psfuo
+func (_u *PropertySchemaFieldUpdateOne) ClearSchema() *PropertySchemaFieldUpdateOne {
+	_u.mutation.ClearSchema()
+	return _u
 }
 
 // ClearProperties clears all "properties" edges to the Property entity.
-func (psfuo *PropertySchemaFieldUpdateOne) ClearProperties() *PropertySchemaFieldUpdateOne {
-	psfuo.mutation.ClearProperties()
-	return psfuo
+func (_u *PropertySchemaFieldUpdateOne) ClearProperties() *PropertySchemaFieldUpdateOne {
+	_u.mutation.ClearProperties()
+	return _u
 }
 
 // RemovePropertyIDs removes the "properties" edge to Property entities by IDs.
-func (psfuo *PropertySchemaFieldUpdateOne) RemovePropertyIDs(ids ...xid.ID) *PropertySchemaFieldUpdateOne {
-	psfuo.mutation.RemovePropertyIDs(ids...)
-	return psfuo
+func (_u *PropertySchemaFieldUpdateOne) RemovePropertyIDs(ids ...xid.ID) *PropertySchemaFieldUpdateOne {
+	_u.mutation.RemovePropertyIDs(ids...)
+	return _u
 }
 
 // RemoveProperties removes "properties" edges to Property entities.
-func (psfuo *PropertySchemaFieldUpdateOne) RemoveProperties(p ...*Property) *PropertySchemaFieldUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PropertySchemaFieldUpdateOne) RemoveProperties(v ...*Property) *PropertySchemaFieldUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return psfuo.RemovePropertyIDs(ids...)
+	return _u.RemovePropertyIDs(ids...)
 }
 
 // Where appends a list predicates to the PropertySchemaFieldUpdate builder.
-func (psfuo *PropertySchemaFieldUpdateOne) Where(ps ...predicate.PropertySchemaField) *PropertySchemaFieldUpdateOne {
-	psfuo.mutation.Where(ps...)
-	return psfuo
+func (_u *PropertySchemaFieldUpdateOne) Where(ps ...predicate.PropertySchemaField) *PropertySchemaFieldUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (psfuo *PropertySchemaFieldUpdateOne) Select(field string, fields ...string) *PropertySchemaFieldUpdateOne {
-	psfuo.fields = append([]string{field}, fields...)
-	return psfuo
+func (_u *PropertySchemaFieldUpdateOne) Select(field string, fields ...string) *PropertySchemaFieldUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated PropertySchemaField entity.
-func (psfuo *PropertySchemaFieldUpdateOne) Save(ctx context.Context) (*PropertySchemaField, error) {
-	return withHooks(ctx, psfuo.sqlSave, psfuo.mutation, psfuo.hooks)
+func (_u *PropertySchemaFieldUpdateOne) Save(ctx context.Context) (*PropertySchemaField, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (psfuo *PropertySchemaFieldUpdateOne) SaveX(ctx context.Context) *PropertySchemaField {
-	node, err := psfuo.Save(ctx)
+func (_u *PropertySchemaFieldUpdateOne) SaveX(ctx context.Context) *PropertySchemaField {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -433,43 +433,43 @@ func (psfuo *PropertySchemaFieldUpdateOne) SaveX(ctx context.Context) *PropertyS
 }
 
 // Exec executes the query on the entity.
-func (psfuo *PropertySchemaFieldUpdateOne) Exec(ctx context.Context) error {
-	_, err := psfuo.Save(ctx)
+func (_u *PropertySchemaFieldUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (psfuo *PropertySchemaFieldUpdateOne) ExecX(ctx context.Context) {
-	if err := psfuo.Exec(ctx); err != nil {
+func (_u *PropertySchemaFieldUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (psfuo *PropertySchemaFieldUpdateOne) check() error {
-	if psfuo.mutation.SchemaCleared() && len(psfuo.mutation.SchemaIDs()) > 0 {
+func (_u *PropertySchemaFieldUpdateOne) check() error {
+	if _u.mutation.SchemaCleared() && len(_u.mutation.SchemaIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "PropertySchemaField.schema"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (psfuo *PropertySchemaFieldUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PropertySchemaFieldUpdateOne {
-	psfuo.modifiers = append(psfuo.modifiers, modifiers...)
-	return psfuo
+func (_u *PropertySchemaFieldUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PropertySchemaFieldUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (psfuo *PropertySchemaFieldUpdateOne) sqlSave(ctx context.Context) (_node *PropertySchemaField, err error) {
-	if err := psfuo.check(); err != nil {
+func (_u *PropertySchemaFieldUpdateOne) sqlSave(ctx context.Context) (_node *PropertySchemaField, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(propertyschemafield.Table, propertyschemafield.Columns, sqlgraph.NewFieldSpec(propertyschemafield.FieldID, field.TypeString))
-	id, ok := psfuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "PropertySchemaField.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := psfuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, propertyschemafield.FieldID)
 		for _, f := range fields {
@@ -481,23 +481,23 @@ func (psfuo *PropertySchemaFieldUpdateOne) sqlSave(ctx context.Context) (_node *
 			}
 		}
 	}
-	if ps := psfuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := psfuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(propertyschemafield.FieldName, field.TypeString, value)
 	}
-	if value, ok := psfuo.mutation.GetType(); ok {
+	if value, ok := _u.mutation.GetType(); ok {
 		_spec.SetField(propertyschemafield.FieldType, field.TypeString, value)
 	}
-	if value, ok := psfuo.mutation.Sort(); ok {
+	if value, ok := _u.mutation.Sort(); ok {
 		_spec.SetField(propertyschemafield.FieldSort, field.TypeString, value)
 	}
-	if psfuo.mutation.SchemaCleared() {
+	if _u.mutation.SchemaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -510,7 +510,7 @@ func (psfuo *PropertySchemaFieldUpdateOne) sqlSave(ctx context.Context) (_node *
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := psfuo.mutation.SchemaIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.SchemaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -526,7 +526,7 @@ func (psfuo *PropertySchemaFieldUpdateOne) sqlSave(ctx context.Context) (_node *
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if psfuo.mutation.PropertiesCleared() {
+	if _u.mutation.PropertiesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -539,7 +539,7 @@ func (psfuo *PropertySchemaFieldUpdateOne) sqlSave(ctx context.Context) (_node *
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := psfuo.mutation.RemovedPropertiesIDs(); len(nodes) > 0 && !psfuo.mutation.PropertiesCleared() {
+	if nodes := _u.mutation.RemovedPropertiesIDs(); len(nodes) > 0 && !_u.mutation.PropertiesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -555,7 +555,7 @@ func (psfuo *PropertySchemaFieldUpdateOne) sqlSave(ctx context.Context) (_node *
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := psfuo.mutation.PropertiesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PropertiesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -571,11 +571,11 @@ func (psfuo *PropertySchemaFieldUpdateOne) sqlSave(ctx context.Context) (_node *
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(psfuo.modifiers...)
-	_node = &PropertySchemaField{config: psfuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &PropertySchemaField{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, psfuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{propertyschemafield.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -583,6 +583,6 @@ func (psfuo *PropertySchemaFieldUpdateOne) sqlSave(ctx context.Context) (_node *
 		}
 		return nil, err
 	}
-	psfuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

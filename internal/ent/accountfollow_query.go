@@ -33,44 +33,44 @@ type AccountFollowQuery struct {
 }
 
 // Where adds a new predicate for the AccountFollowQuery builder.
-func (afq *AccountFollowQuery) Where(ps ...predicate.AccountFollow) *AccountFollowQuery {
-	afq.predicates = append(afq.predicates, ps...)
-	return afq
+func (_q *AccountFollowQuery) Where(ps ...predicate.AccountFollow) *AccountFollowQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (afq *AccountFollowQuery) Limit(limit int) *AccountFollowQuery {
-	afq.ctx.Limit = &limit
-	return afq
+func (_q *AccountFollowQuery) Limit(limit int) *AccountFollowQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (afq *AccountFollowQuery) Offset(offset int) *AccountFollowQuery {
-	afq.ctx.Offset = &offset
-	return afq
+func (_q *AccountFollowQuery) Offset(offset int) *AccountFollowQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (afq *AccountFollowQuery) Unique(unique bool) *AccountFollowQuery {
-	afq.ctx.Unique = &unique
-	return afq
+func (_q *AccountFollowQuery) Unique(unique bool) *AccountFollowQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (afq *AccountFollowQuery) Order(o ...accountfollow.OrderOption) *AccountFollowQuery {
-	afq.order = append(afq.order, o...)
-	return afq
+func (_q *AccountFollowQuery) Order(o ...accountfollow.OrderOption) *AccountFollowQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryFollower chains the current query on the "follower" edge.
-func (afq *AccountFollowQuery) QueryFollower() *AccountQuery {
-	query := (&AccountClient{config: afq.config}).Query()
+func (_q *AccountFollowQuery) QueryFollower() *AccountQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := afq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := afq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -79,20 +79,20 @@ func (afq *AccountFollowQuery) QueryFollower() *AccountQuery {
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, accountfollow.FollowerTable, accountfollow.FollowerColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(afq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryFollowing chains the current query on the "following" edge.
-func (afq *AccountFollowQuery) QueryFollowing() *AccountQuery {
-	query := (&AccountClient{config: afq.config}).Query()
+func (_q *AccountFollowQuery) QueryFollowing() *AccountQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := afq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := afq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -101,7 +101,7 @@ func (afq *AccountFollowQuery) QueryFollowing() *AccountQuery {
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, accountfollow.FollowingTable, accountfollow.FollowingColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(afq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -109,8 +109,8 @@ func (afq *AccountFollowQuery) QueryFollowing() *AccountQuery {
 
 // First returns the first AccountFollow entity from the query.
 // Returns a *NotFoundError when no AccountFollow was found.
-func (afq *AccountFollowQuery) First(ctx context.Context) (*AccountFollow, error) {
-	nodes, err := afq.Limit(1).All(setContextOp(ctx, afq.ctx, ent.OpQueryFirst))
+func (_q *AccountFollowQuery) First(ctx context.Context) (*AccountFollow, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +121,8 @@ func (afq *AccountFollowQuery) First(ctx context.Context) (*AccountFollow, error
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (afq *AccountFollowQuery) FirstX(ctx context.Context) *AccountFollow {
-	node, err := afq.First(ctx)
+func (_q *AccountFollowQuery) FirstX(ctx context.Context) *AccountFollow {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -131,9 +131,9 @@ func (afq *AccountFollowQuery) FirstX(ctx context.Context) *AccountFollow {
 
 // FirstID returns the first AccountFollow ID from the query.
 // Returns a *NotFoundError when no AccountFollow ID was found.
-func (afq *AccountFollowQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+func (_q *AccountFollowQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = afq.Limit(1).IDs(setContextOp(ctx, afq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -144,8 +144,8 @@ func (afq *AccountFollowQuery) FirstID(ctx context.Context) (id xid.ID, err erro
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (afq *AccountFollowQuery) FirstIDX(ctx context.Context) xid.ID {
-	id, err := afq.FirstID(ctx)
+func (_q *AccountFollowQuery) FirstIDX(ctx context.Context) xid.ID {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -155,8 +155,8 @@ func (afq *AccountFollowQuery) FirstIDX(ctx context.Context) xid.ID {
 // Only returns a single AccountFollow entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one AccountFollow entity is found.
 // Returns a *NotFoundError when no AccountFollow entities are found.
-func (afq *AccountFollowQuery) Only(ctx context.Context) (*AccountFollow, error) {
-	nodes, err := afq.Limit(2).All(setContextOp(ctx, afq.ctx, ent.OpQueryOnly))
+func (_q *AccountFollowQuery) Only(ctx context.Context) (*AccountFollow, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -171,8 +171,8 @@ func (afq *AccountFollowQuery) Only(ctx context.Context) (*AccountFollow, error)
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (afq *AccountFollowQuery) OnlyX(ctx context.Context) *AccountFollow {
-	node, err := afq.Only(ctx)
+func (_q *AccountFollowQuery) OnlyX(ctx context.Context) *AccountFollow {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -182,9 +182,9 @@ func (afq *AccountFollowQuery) OnlyX(ctx context.Context) *AccountFollow {
 // OnlyID is like Only, but returns the only AccountFollow ID in the query.
 // Returns a *NotSingularError when more than one AccountFollow ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (afq *AccountFollowQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+func (_q *AccountFollowQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = afq.Limit(2).IDs(setContextOp(ctx, afq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -199,8 +199,8 @@ func (afq *AccountFollowQuery) OnlyID(ctx context.Context) (id xid.ID, err error
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (afq *AccountFollowQuery) OnlyIDX(ctx context.Context) xid.ID {
-	id, err := afq.OnlyID(ctx)
+func (_q *AccountFollowQuery) OnlyIDX(ctx context.Context) xid.ID {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -208,18 +208,18 @@ func (afq *AccountFollowQuery) OnlyIDX(ctx context.Context) xid.ID {
 }
 
 // All executes the query and returns a list of AccountFollows.
-func (afq *AccountFollowQuery) All(ctx context.Context) ([]*AccountFollow, error) {
-	ctx = setContextOp(ctx, afq.ctx, ent.OpQueryAll)
-	if err := afq.prepareQuery(ctx); err != nil {
+func (_q *AccountFollowQuery) All(ctx context.Context) ([]*AccountFollow, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*AccountFollow, *AccountFollowQuery]()
-	return withInterceptors[[]*AccountFollow](ctx, afq, qr, afq.inters)
+	return withInterceptors[[]*AccountFollow](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (afq *AccountFollowQuery) AllX(ctx context.Context) []*AccountFollow {
-	nodes, err := afq.All(ctx)
+func (_q *AccountFollowQuery) AllX(ctx context.Context) []*AccountFollow {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -227,20 +227,20 @@ func (afq *AccountFollowQuery) AllX(ctx context.Context) []*AccountFollow {
 }
 
 // IDs executes the query and returns a list of AccountFollow IDs.
-func (afq *AccountFollowQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
-	if afq.ctx.Unique == nil && afq.path != nil {
-		afq.Unique(true)
+func (_q *AccountFollowQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, afq.ctx, ent.OpQueryIDs)
-	if err = afq.Select(accountfollow.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(accountfollow.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (afq *AccountFollowQuery) IDsX(ctx context.Context) []xid.ID {
-	ids, err := afq.IDs(ctx)
+func (_q *AccountFollowQuery) IDsX(ctx context.Context) []xid.ID {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -248,17 +248,17 @@ func (afq *AccountFollowQuery) IDsX(ctx context.Context) []xid.ID {
 }
 
 // Count returns the count of the given query.
-func (afq *AccountFollowQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, afq.ctx, ent.OpQueryCount)
-	if err := afq.prepareQuery(ctx); err != nil {
+func (_q *AccountFollowQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, afq, querierCount[*AccountFollowQuery](), afq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*AccountFollowQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (afq *AccountFollowQuery) CountX(ctx context.Context) int {
-	count, err := afq.Count(ctx)
+func (_q *AccountFollowQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -266,9 +266,9 @@ func (afq *AccountFollowQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (afq *AccountFollowQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, afq.ctx, ent.OpQueryExist)
-	switch _, err := afq.FirstID(ctx); {
+func (_q *AccountFollowQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -279,8 +279,8 @@ func (afq *AccountFollowQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (afq *AccountFollowQuery) ExistX(ctx context.Context) bool {
-	exist, err := afq.Exist(ctx)
+func (_q *AccountFollowQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -289,45 +289,45 @@ func (afq *AccountFollowQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the AccountFollowQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (afq *AccountFollowQuery) Clone() *AccountFollowQuery {
-	if afq == nil {
+func (_q *AccountFollowQuery) Clone() *AccountFollowQuery {
+	if _q == nil {
 		return nil
 	}
 	return &AccountFollowQuery{
-		config:        afq.config,
-		ctx:           afq.ctx.Clone(),
-		order:         append([]accountfollow.OrderOption{}, afq.order...),
-		inters:        append([]Interceptor{}, afq.inters...),
-		predicates:    append([]predicate.AccountFollow{}, afq.predicates...),
-		withFollower:  afq.withFollower.Clone(),
-		withFollowing: afq.withFollowing.Clone(),
+		config:        _q.config,
+		ctx:           _q.ctx.Clone(),
+		order:         append([]accountfollow.OrderOption{}, _q.order...),
+		inters:        append([]Interceptor{}, _q.inters...),
+		predicates:    append([]predicate.AccountFollow{}, _q.predicates...),
+		withFollower:  _q.withFollower.Clone(),
+		withFollowing: _q.withFollowing.Clone(),
 		// clone intermediate query.
-		sql:       afq.sql.Clone(),
-		path:      afq.path,
-		modifiers: append([]func(*sql.Selector){}, afq.modifiers...),
+		sql:       _q.sql.Clone(),
+		path:      _q.path,
+		modifiers: append([]func(*sql.Selector){}, _q.modifiers...),
 	}
 }
 
 // WithFollower tells the query-builder to eager-load the nodes that are connected to
 // the "follower" edge. The optional arguments are used to configure the query builder of the edge.
-func (afq *AccountFollowQuery) WithFollower(opts ...func(*AccountQuery)) *AccountFollowQuery {
-	query := (&AccountClient{config: afq.config}).Query()
+func (_q *AccountFollowQuery) WithFollower(opts ...func(*AccountQuery)) *AccountFollowQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	afq.withFollower = query
-	return afq
+	_q.withFollower = query
+	return _q
 }
 
 // WithFollowing tells the query-builder to eager-load the nodes that are connected to
 // the "following" edge. The optional arguments are used to configure the query builder of the edge.
-func (afq *AccountFollowQuery) WithFollowing(opts ...func(*AccountQuery)) *AccountFollowQuery {
-	query := (&AccountClient{config: afq.config}).Query()
+func (_q *AccountFollowQuery) WithFollowing(opts ...func(*AccountQuery)) *AccountFollowQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	afq.withFollowing = query
-	return afq
+	_q.withFollowing = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -344,10 +344,10 @@ func (afq *AccountFollowQuery) WithFollowing(opts ...func(*AccountQuery)) *Accou
 //		GroupBy(accountfollow.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (afq *AccountFollowQuery) GroupBy(field string, fields ...string) *AccountFollowGroupBy {
-	afq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &AccountFollowGroupBy{build: afq}
-	grbuild.flds = &afq.ctx.Fields
+func (_q *AccountFollowQuery) GroupBy(field string, fields ...string) *AccountFollowGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &AccountFollowGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = accountfollow.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -365,83 +365,83 @@ func (afq *AccountFollowQuery) GroupBy(field string, fields ...string) *AccountF
 //	client.AccountFollow.Query().
 //		Select(accountfollow.FieldCreatedAt).
 //		Scan(ctx, &v)
-func (afq *AccountFollowQuery) Select(fields ...string) *AccountFollowSelect {
-	afq.ctx.Fields = append(afq.ctx.Fields, fields...)
-	sbuild := &AccountFollowSelect{AccountFollowQuery: afq}
+func (_q *AccountFollowQuery) Select(fields ...string) *AccountFollowSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &AccountFollowSelect{AccountFollowQuery: _q}
 	sbuild.label = accountfollow.Label
-	sbuild.flds, sbuild.scan = &afq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a AccountFollowSelect configured with the given aggregations.
-func (afq *AccountFollowQuery) Aggregate(fns ...AggregateFunc) *AccountFollowSelect {
-	return afq.Select().Aggregate(fns...)
+func (_q *AccountFollowQuery) Aggregate(fns ...AggregateFunc) *AccountFollowSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (afq *AccountFollowQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range afq.inters {
+func (_q *AccountFollowQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, afq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range afq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !accountfollow.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if afq.path != nil {
-		prev, err := afq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		afq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (afq *AccountFollowQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AccountFollow, error) {
+func (_q *AccountFollowQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AccountFollow, error) {
 	var (
 		nodes       = []*AccountFollow{}
-		_spec       = afq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
-			afq.withFollower != nil,
-			afq.withFollowing != nil,
+			_q.withFollower != nil,
+			_q.withFollowing != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*AccountFollow).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &AccountFollow{config: afq.config}
+		node := &AccountFollow{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(afq.modifiers) > 0 {
-		_spec.Modifiers = afq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, afq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := afq.withFollower; query != nil {
-		if err := afq.loadFollower(ctx, query, nodes, nil,
+	if query := _q.withFollower; query != nil {
+		if err := _q.loadFollower(ctx, query, nodes, nil,
 			func(n *AccountFollow, e *Account) { n.Edges.Follower = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := afq.withFollowing; query != nil {
-		if err := afq.loadFollowing(ctx, query, nodes, nil,
+	if query := _q.withFollowing; query != nil {
+		if err := _q.loadFollowing(ctx, query, nodes, nil,
 			func(n *AccountFollow, e *Account) { n.Edges.Following = e }); err != nil {
 			return nil, err
 		}
@@ -449,7 +449,7 @@ func (afq *AccountFollowQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 	return nodes, nil
 }
 
-func (afq *AccountFollowQuery) loadFollower(ctx context.Context, query *AccountQuery, nodes []*AccountFollow, init func(*AccountFollow), assign func(*AccountFollow, *Account)) error {
+func (_q *AccountFollowQuery) loadFollower(ctx context.Context, query *AccountQuery, nodes []*AccountFollow, init func(*AccountFollow), assign func(*AccountFollow, *Account)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*AccountFollow)
 	for i := range nodes {
@@ -478,7 +478,7 @@ func (afq *AccountFollowQuery) loadFollower(ctx context.Context, query *AccountQ
 	}
 	return nil
 }
-func (afq *AccountFollowQuery) loadFollowing(ctx context.Context, query *AccountQuery, nodes []*AccountFollow, init func(*AccountFollow), assign func(*AccountFollow, *Account)) error {
+func (_q *AccountFollowQuery) loadFollowing(ctx context.Context, query *AccountQuery, nodes []*AccountFollow, init func(*AccountFollow), assign func(*AccountFollow, *Account)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*AccountFollow)
 	for i := range nodes {
@@ -508,27 +508,27 @@ func (afq *AccountFollowQuery) loadFollowing(ctx context.Context, query *Account
 	return nil
 }
 
-func (afq *AccountFollowQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := afq.querySpec()
-	if len(afq.modifiers) > 0 {
-		_spec.Modifiers = afq.modifiers
+func (_q *AccountFollowQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = afq.ctx.Fields
-	if len(afq.ctx.Fields) > 0 {
-		_spec.Unique = afq.ctx.Unique != nil && *afq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, afq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (afq *AccountFollowQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *AccountFollowQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(accountfollow.Table, accountfollow.Columns, sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString))
-	_spec.From = afq.sql
-	if unique := afq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if afq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := afq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, accountfollow.FieldID)
 		for i := range fields {
@@ -536,27 +536,27 @@ func (afq *AccountFollowQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if afq.withFollower != nil {
+		if _q.withFollower != nil {
 			_spec.Node.AddColumnOnce(accountfollow.FieldFollowerAccountID)
 		}
-		if afq.withFollowing != nil {
+		if _q.withFollowing != nil {
 			_spec.Node.AddColumnOnce(accountfollow.FieldFollowingAccountID)
 		}
 	}
-	if ps := afq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := afq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := afq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := afq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -566,45 +566,45 @@ func (afq *AccountFollowQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (afq *AccountFollowQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(afq.driver.Dialect())
+func (_q *AccountFollowQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(accountfollow.Table)
-	columns := afq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = accountfollow.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if afq.sql != nil {
-		selector = afq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if afq.ctx.Unique != nil && *afq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, m := range afq.modifiers {
+	for _, m := range _q.modifiers {
 		m(selector)
 	}
-	for _, p := range afq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range afq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := afq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := afq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (afq *AccountFollowQuery) Modify(modifiers ...func(s *sql.Selector)) *AccountFollowSelect {
-	afq.modifiers = append(afq.modifiers, modifiers...)
-	return afq.Select()
+func (_q *AccountFollowQuery) Modify(modifiers ...func(s *sql.Selector)) *AccountFollowSelect {
+	_q.modifiers = append(_q.modifiers, modifiers...)
+	return _q.Select()
 }
 
 // AccountFollowGroupBy is the group-by builder for AccountFollow entities.
@@ -614,41 +614,41 @@ type AccountFollowGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (afgb *AccountFollowGroupBy) Aggregate(fns ...AggregateFunc) *AccountFollowGroupBy {
-	afgb.fns = append(afgb.fns, fns...)
-	return afgb
+func (_g *AccountFollowGroupBy) Aggregate(fns ...AggregateFunc) *AccountFollowGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (afgb *AccountFollowGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, afgb.build.ctx, ent.OpQueryGroupBy)
-	if err := afgb.build.prepareQuery(ctx); err != nil {
+func (_g *AccountFollowGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*AccountFollowQuery, *AccountFollowGroupBy](ctx, afgb.build, afgb, afgb.build.inters, v)
+	return scanWithInterceptors[*AccountFollowQuery, *AccountFollowGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (afgb *AccountFollowGroupBy) sqlScan(ctx context.Context, root *AccountFollowQuery, v any) error {
+func (_g *AccountFollowGroupBy) sqlScan(ctx context.Context, root *AccountFollowQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(afgb.fns))
-	for _, fn := range afgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*afgb.flds)+len(afgb.fns))
-		for _, f := range *afgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*afgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := afgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -662,27 +662,27 @@ type AccountFollowSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (afs *AccountFollowSelect) Aggregate(fns ...AggregateFunc) *AccountFollowSelect {
-	afs.fns = append(afs.fns, fns...)
-	return afs
+func (_s *AccountFollowSelect) Aggregate(fns ...AggregateFunc) *AccountFollowSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (afs *AccountFollowSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, afs.ctx, ent.OpQuerySelect)
-	if err := afs.prepareQuery(ctx); err != nil {
+func (_s *AccountFollowSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*AccountFollowQuery, *AccountFollowSelect](ctx, afs.AccountFollowQuery, afs, afs.inters, v)
+	return scanWithInterceptors[*AccountFollowQuery, *AccountFollowSelect](ctx, _s.AccountFollowQuery, _s, _s.inters, v)
 }
 
-func (afs *AccountFollowSelect) sqlScan(ctx context.Context, root *AccountFollowQuery, v any) error {
+func (_s *AccountFollowSelect) sqlScan(ctx context.Context, root *AccountFollowQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(afs.fns))
-	for _, fn := range afs.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*afs.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -690,7 +690,7 @@ func (afs *AccountFollowSelect) sqlScan(ctx context.Context, root *AccountFollow
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := afs.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -698,7 +698,7 @@ func (afs *AccountFollowSelect) sqlScan(ctx context.Context, root *AccountFollow
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (afs *AccountFollowSelect) Modify(modifiers ...func(s *sql.Selector)) *AccountFollowSelect {
-	afs.modifiers = append(afs.modifiers, modifiers...)
-	return afs
+func (_s *AccountFollowSelect) Modify(modifiers ...func(s *sql.Selector)) *AccountFollowSelect {
+	_s.modifiers = append(_s.modifiers, modifiers...)
+	return _s
 }

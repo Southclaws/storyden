@@ -27,296 +27,296 @@ type CategoryUpdate struct {
 }
 
 // Where appends a list predicates to the CategoryUpdate builder.
-func (cu *CategoryUpdate) Where(ps ...predicate.Category) *CategoryUpdate {
-	cu.mutation.Where(ps...)
-	return cu
+func (_u *CategoryUpdate) Where(ps ...predicate.Category) *CategoryUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (cu *CategoryUpdate) SetUpdatedAt(t time.Time) *CategoryUpdate {
-	cu.mutation.SetUpdatedAt(t)
-	return cu
+func (_u *CategoryUpdate) SetUpdatedAt(v time.Time) *CategoryUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetName sets the "name" field.
-func (cu *CategoryUpdate) SetName(s string) *CategoryUpdate {
-	cu.mutation.SetName(s)
-	return cu
+func (_u *CategoryUpdate) SetName(v string) *CategoryUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (cu *CategoryUpdate) SetNillableName(s *string) *CategoryUpdate {
-	if s != nil {
-		cu.SetName(*s)
+func (_u *CategoryUpdate) SetNillableName(v *string) *CategoryUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return cu
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (cu *CategoryUpdate) SetSlug(s string) *CategoryUpdate {
-	cu.mutation.SetSlug(s)
-	return cu
+func (_u *CategoryUpdate) SetSlug(v string) *CategoryUpdate {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (cu *CategoryUpdate) SetNillableSlug(s *string) *CategoryUpdate {
-	if s != nil {
-		cu.SetSlug(*s)
+func (_u *CategoryUpdate) SetNillableSlug(v *string) *CategoryUpdate {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return cu
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (cu *CategoryUpdate) SetDescription(s string) *CategoryUpdate {
-	cu.mutation.SetDescription(s)
-	return cu
+func (_u *CategoryUpdate) SetDescription(v string) *CategoryUpdate {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (cu *CategoryUpdate) SetNillableDescription(s *string) *CategoryUpdate {
-	if s != nil {
-		cu.SetDescription(*s)
+func (_u *CategoryUpdate) SetNillableDescription(v *string) *CategoryUpdate {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return cu
+	return _u
 }
 
 // SetColour sets the "colour" field.
-func (cu *CategoryUpdate) SetColour(s string) *CategoryUpdate {
-	cu.mutation.SetColour(s)
-	return cu
+func (_u *CategoryUpdate) SetColour(v string) *CategoryUpdate {
+	_u.mutation.SetColour(v)
+	return _u
 }
 
 // SetNillableColour sets the "colour" field if the given value is not nil.
-func (cu *CategoryUpdate) SetNillableColour(s *string) *CategoryUpdate {
-	if s != nil {
-		cu.SetColour(*s)
+func (_u *CategoryUpdate) SetNillableColour(v *string) *CategoryUpdate {
+	if v != nil {
+		_u.SetColour(*v)
 	}
-	return cu
+	return _u
 }
 
 // SetSort sets the "sort" field.
-func (cu *CategoryUpdate) SetSort(i int) *CategoryUpdate {
-	cu.mutation.ResetSort()
-	cu.mutation.SetSort(i)
-	return cu
+func (_u *CategoryUpdate) SetSort(v int) *CategoryUpdate {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (cu *CategoryUpdate) SetNillableSort(i *int) *CategoryUpdate {
-	if i != nil {
-		cu.SetSort(*i)
+func (_u *CategoryUpdate) SetNillableSort(v *int) *CategoryUpdate {
+	if v != nil {
+		_u.SetSort(*v)
 	}
-	return cu
+	return _u
 }
 
-// AddSort adds i to the "sort" field.
-func (cu *CategoryUpdate) AddSort(i int) *CategoryUpdate {
-	cu.mutation.AddSort(i)
-	return cu
+// AddSort adds value to the "sort" field.
+func (_u *CategoryUpdate) AddSort(v int) *CategoryUpdate {
+	_u.mutation.AddSort(v)
+	return _u
 }
 
 // SetAdmin sets the "admin" field.
-func (cu *CategoryUpdate) SetAdmin(b bool) *CategoryUpdate {
-	cu.mutation.SetAdmin(b)
-	return cu
+func (_u *CategoryUpdate) SetAdmin(v bool) *CategoryUpdate {
+	_u.mutation.SetAdmin(v)
+	return _u
 }
 
 // SetNillableAdmin sets the "admin" field if the given value is not nil.
-func (cu *CategoryUpdate) SetNillableAdmin(b *bool) *CategoryUpdate {
-	if b != nil {
-		cu.SetAdmin(*b)
+func (_u *CategoryUpdate) SetNillableAdmin(v *bool) *CategoryUpdate {
+	if v != nil {
+		_u.SetAdmin(*v)
 	}
-	return cu
+	return _u
 }
 
 // SetParentCategoryID sets the "parent_category_id" field.
-func (cu *CategoryUpdate) SetParentCategoryID(x xid.ID) *CategoryUpdate {
-	cu.mutation.SetParentCategoryID(x)
-	return cu
+func (_u *CategoryUpdate) SetParentCategoryID(v xid.ID) *CategoryUpdate {
+	_u.mutation.SetParentCategoryID(v)
+	return _u
 }
 
 // SetNillableParentCategoryID sets the "parent_category_id" field if the given value is not nil.
-func (cu *CategoryUpdate) SetNillableParentCategoryID(x *xid.ID) *CategoryUpdate {
-	if x != nil {
-		cu.SetParentCategoryID(*x)
+func (_u *CategoryUpdate) SetNillableParentCategoryID(v *xid.ID) *CategoryUpdate {
+	if v != nil {
+		_u.SetParentCategoryID(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearParentCategoryID clears the value of the "parent_category_id" field.
-func (cu *CategoryUpdate) ClearParentCategoryID() *CategoryUpdate {
-	cu.mutation.ClearParentCategoryID()
-	return cu
+func (_u *CategoryUpdate) ClearParentCategoryID() *CategoryUpdate {
+	_u.mutation.ClearParentCategoryID()
+	return _u
 }
 
 // SetCoverImageAssetID sets the "cover_image_asset_id" field.
-func (cu *CategoryUpdate) SetCoverImageAssetID(x xid.ID) *CategoryUpdate {
-	cu.mutation.SetCoverImageAssetID(x)
-	return cu
+func (_u *CategoryUpdate) SetCoverImageAssetID(v xid.ID) *CategoryUpdate {
+	_u.mutation.SetCoverImageAssetID(v)
+	return _u
 }
 
 // SetNillableCoverImageAssetID sets the "cover_image_asset_id" field if the given value is not nil.
-func (cu *CategoryUpdate) SetNillableCoverImageAssetID(x *xid.ID) *CategoryUpdate {
-	if x != nil {
-		cu.SetCoverImageAssetID(*x)
+func (_u *CategoryUpdate) SetNillableCoverImageAssetID(v *xid.ID) *CategoryUpdate {
+	if v != nil {
+		_u.SetCoverImageAssetID(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearCoverImageAssetID clears the value of the "cover_image_asset_id" field.
-func (cu *CategoryUpdate) ClearCoverImageAssetID() *CategoryUpdate {
-	cu.mutation.ClearCoverImageAssetID()
-	return cu
+func (_u *CategoryUpdate) ClearCoverImageAssetID() *CategoryUpdate {
+	_u.mutation.ClearCoverImageAssetID()
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (cu *CategoryUpdate) SetMetadata(m map[string]interface{}) *CategoryUpdate {
-	cu.mutation.SetMetadata(m)
-	return cu
+func (_u *CategoryUpdate) SetMetadata(v map[string]interface{}) *CategoryUpdate {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (cu *CategoryUpdate) ClearMetadata() *CategoryUpdate {
-	cu.mutation.ClearMetadata()
-	return cu
+func (_u *CategoryUpdate) ClearMetadata() *CategoryUpdate {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (cu *CategoryUpdate) AddPostIDs(ids ...xid.ID) *CategoryUpdate {
-	cu.mutation.AddPostIDs(ids...)
-	return cu
+func (_u *CategoryUpdate) AddPostIDs(ids ...xid.ID) *CategoryUpdate {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (cu *CategoryUpdate) AddPosts(p ...*Post) *CategoryUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *CategoryUpdate) AddPosts(v ...*Post) *CategoryUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cu.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // SetParentID sets the "parent" edge to the Category entity by ID.
-func (cu *CategoryUpdate) SetParentID(id xid.ID) *CategoryUpdate {
-	cu.mutation.SetParentID(id)
-	return cu
+func (_u *CategoryUpdate) SetParentID(id xid.ID) *CategoryUpdate {
+	_u.mutation.SetParentID(id)
+	return _u
 }
 
 // SetNillableParentID sets the "parent" edge to the Category entity by ID if the given value is not nil.
-func (cu *CategoryUpdate) SetNillableParentID(id *xid.ID) *CategoryUpdate {
+func (_u *CategoryUpdate) SetNillableParentID(id *xid.ID) *CategoryUpdate {
 	if id != nil {
-		cu = cu.SetParentID(*id)
+		_u = _u.SetParentID(*id)
 	}
-	return cu
+	return _u
 }
 
 // SetParent sets the "parent" edge to the Category entity.
-func (cu *CategoryUpdate) SetParent(c *Category) *CategoryUpdate {
-	return cu.SetParentID(c.ID)
+func (_u *CategoryUpdate) SetParent(v *Category) *CategoryUpdate {
+	return _u.SetParentID(v.ID)
 }
 
 // AddChildIDs adds the "children" edge to the Category entity by IDs.
-func (cu *CategoryUpdate) AddChildIDs(ids ...xid.ID) *CategoryUpdate {
-	cu.mutation.AddChildIDs(ids...)
-	return cu
+func (_u *CategoryUpdate) AddChildIDs(ids ...xid.ID) *CategoryUpdate {
+	_u.mutation.AddChildIDs(ids...)
+	return _u
 }
 
 // AddChildren adds the "children" edges to the Category entity.
-func (cu *CategoryUpdate) AddChildren(c ...*Category) *CategoryUpdate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *CategoryUpdate) AddChildren(v ...*Category) *CategoryUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cu.AddChildIDs(ids...)
+	return _u.AddChildIDs(ids...)
 }
 
 // SetCoverImageID sets the "cover_image" edge to the Asset entity by ID.
-func (cu *CategoryUpdate) SetCoverImageID(id xid.ID) *CategoryUpdate {
-	cu.mutation.SetCoverImageID(id)
-	return cu
+func (_u *CategoryUpdate) SetCoverImageID(id xid.ID) *CategoryUpdate {
+	_u.mutation.SetCoverImageID(id)
+	return _u
 }
 
 // SetNillableCoverImageID sets the "cover_image" edge to the Asset entity by ID if the given value is not nil.
-func (cu *CategoryUpdate) SetNillableCoverImageID(id *xid.ID) *CategoryUpdate {
+func (_u *CategoryUpdate) SetNillableCoverImageID(id *xid.ID) *CategoryUpdate {
 	if id != nil {
-		cu = cu.SetCoverImageID(*id)
+		_u = _u.SetCoverImageID(*id)
 	}
-	return cu
+	return _u
 }
 
 // SetCoverImage sets the "cover_image" edge to the Asset entity.
-func (cu *CategoryUpdate) SetCoverImage(a *Asset) *CategoryUpdate {
-	return cu.SetCoverImageID(a.ID)
+func (_u *CategoryUpdate) SetCoverImage(v *Asset) *CategoryUpdate {
+	return _u.SetCoverImageID(v.ID)
 }
 
 // Mutation returns the CategoryMutation object of the builder.
-func (cu *CategoryUpdate) Mutation() *CategoryMutation {
-	return cu.mutation
+func (_u *CategoryUpdate) Mutation() *CategoryMutation {
+	return _u.mutation
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (cu *CategoryUpdate) ClearPosts() *CategoryUpdate {
-	cu.mutation.ClearPosts()
-	return cu
+func (_u *CategoryUpdate) ClearPosts() *CategoryUpdate {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (cu *CategoryUpdate) RemovePostIDs(ids ...xid.ID) *CategoryUpdate {
-	cu.mutation.RemovePostIDs(ids...)
-	return cu
+func (_u *CategoryUpdate) RemovePostIDs(ids ...xid.ID) *CategoryUpdate {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (cu *CategoryUpdate) RemovePosts(p ...*Post) *CategoryUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *CategoryUpdate) RemovePosts(v ...*Post) *CategoryUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cu.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearParent clears the "parent" edge to the Category entity.
-func (cu *CategoryUpdate) ClearParent() *CategoryUpdate {
-	cu.mutation.ClearParent()
-	return cu
+func (_u *CategoryUpdate) ClearParent() *CategoryUpdate {
+	_u.mutation.ClearParent()
+	return _u
 }
 
 // ClearChildren clears all "children" edges to the Category entity.
-func (cu *CategoryUpdate) ClearChildren() *CategoryUpdate {
-	cu.mutation.ClearChildren()
-	return cu
+func (_u *CategoryUpdate) ClearChildren() *CategoryUpdate {
+	_u.mutation.ClearChildren()
+	return _u
 }
 
 // RemoveChildIDs removes the "children" edge to Category entities by IDs.
-func (cu *CategoryUpdate) RemoveChildIDs(ids ...xid.ID) *CategoryUpdate {
-	cu.mutation.RemoveChildIDs(ids...)
-	return cu
+func (_u *CategoryUpdate) RemoveChildIDs(ids ...xid.ID) *CategoryUpdate {
+	_u.mutation.RemoveChildIDs(ids...)
+	return _u
 }
 
 // RemoveChildren removes "children" edges to Category entities.
-func (cu *CategoryUpdate) RemoveChildren(c ...*Category) *CategoryUpdate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *CategoryUpdate) RemoveChildren(v ...*Category) *CategoryUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cu.RemoveChildIDs(ids...)
+	return _u.RemoveChildIDs(ids...)
 }
 
 // ClearCoverImage clears the "cover_image" edge to the Asset entity.
-func (cu *CategoryUpdate) ClearCoverImage() *CategoryUpdate {
-	cu.mutation.ClearCoverImage()
-	return cu
+func (_u *CategoryUpdate) ClearCoverImage() *CategoryUpdate {
+	_u.mutation.ClearCoverImage()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (cu *CategoryUpdate) Save(ctx context.Context) (int, error) {
-	cu.defaults()
-	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
+func (_u *CategoryUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cu *CategoryUpdate) SaveX(ctx context.Context) int {
-	affected, err := cu.Save(ctx)
+func (_u *CategoryUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -324,72 +324,72 @@ func (cu *CategoryUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (cu *CategoryUpdate) Exec(ctx context.Context) error {
-	_, err := cu.Save(ctx)
+func (_u *CategoryUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cu *CategoryUpdate) ExecX(ctx context.Context) {
-	if err := cu.Exec(ctx); err != nil {
+func (_u *CategoryUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cu *CategoryUpdate) defaults() {
-	if _, ok := cu.mutation.UpdatedAt(); !ok {
+func (_u *CategoryUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := category.UpdateDefaultUpdatedAt()
-		cu.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (cu *CategoryUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CategoryUpdate {
-	cu.modifiers = append(cu.modifiers, modifiers...)
-	return cu
+func (_u *CategoryUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CategoryUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (_u *CategoryUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(category.Table, category.Columns, sqlgraph.NewFieldSpec(category.FieldID, field.TypeString))
-	if ps := cu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(category.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := cu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(category.FieldName, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(category.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(category.FieldDescription, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.Colour(); ok {
+	if value, ok := _u.mutation.Colour(); ok {
 		_spec.SetField(category.FieldColour, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.Sort(); ok {
+	if value, ok := _u.mutation.Sort(); ok {
 		_spec.SetField(category.FieldSort, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.AddedSort(); ok {
+	if value, ok := _u.mutation.AddedSort(); ok {
 		_spec.AddField(category.FieldSort, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.Admin(); ok {
+	if value, ok := _u.mutation.Admin(); ok {
 		_spec.SetField(category.FieldAdmin, field.TypeBool, value)
 	}
-	if value, ok := cu.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(category.FieldMetadata, field.TypeJSON, value)
 	}
-	if cu.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(category.FieldMetadata, field.TypeJSON)
 	}
-	if cu.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -402,7 +402,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.RemovedPostsIDs(); len(nodes) > 0 && !cu.mutation.PostsCleared() {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -418,7 +418,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -434,7 +434,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.ParentCleared() {
+	if _u.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -447,7 +447,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -463,7 +463,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.ChildrenCleared() {
+	if _u.mutation.ChildrenCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -476,7 +476,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !cu.mutation.ChildrenCleared() {
+	if nodes := _u.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !_u.mutation.ChildrenCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -492,7 +492,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.ChildrenIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ChildrenIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -508,7 +508,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.CoverImageCleared() {
+	if _u.mutation.CoverImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -521,7 +521,7 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.CoverImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CoverImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -537,8 +537,8 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(cu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{category.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -546,8 +546,8 @@ func (cu *CategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	cu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // CategoryUpdateOne is the builder for updating a single Category entity.
@@ -560,303 +560,303 @@ type CategoryUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (cuo *CategoryUpdateOne) SetUpdatedAt(t time.Time) *CategoryUpdateOne {
-	cuo.mutation.SetUpdatedAt(t)
-	return cuo
+func (_u *CategoryUpdateOne) SetUpdatedAt(v time.Time) *CategoryUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetName sets the "name" field.
-func (cuo *CategoryUpdateOne) SetName(s string) *CategoryUpdateOne {
-	cuo.mutation.SetName(s)
-	return cuo
+func (_u *CategoryUpdateOne) SetName(v string) *CategoryUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (cuo *CategoryUpdateOne) SetNillableName(s *string) *CategoryUpdateOne {
-	if s != nil {
-		cuo.SetName(*s)
+func (_u *CategoryUpdateOne) SetNillableName(v *string) *CategoryUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return cuo
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (cuo *CategoryUpdateOne) SetSlug(s string) *CategoryUpdateOne {
-	cuo.mutation.SetSlug(s)
-	return cuo
+func (_u *CategoryUpdateOne) SetSlug(v string) *CategoryUpdateOne {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (cuo *CategoryUpdateOne) SetNillableSlug(s *string) *CategoryUpdateOne {
-	if s != nil {
-		cuo.SetSlug(*s)
+func (_u *CategoryUpdateOne) SetNillableSlug(v *string) *CategoryUpdateOne {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return cuo
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (cuo *CategoryUpdateOne) SetDescription(s string) *CategoryUpdateOne {
-	cuo.mutation.SetDescription(s)
-	return cuo
+func (_u *CategoryUpdateOne) SetDescription(v string) *CategoryUpdateOne {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (cuo *CategoryUpdateOne) SetNillableDescription(s *string) *CategoryUpdateOne {
-	if s != nil {
-		cuo.SetDescription(*s)
+func (_u *CategoryUpdateOne) SetNillableDescription(v *string) *CategoryUpdateOne {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return cuo
+	return _u
 }
 
 // SetColour sets the "colour" field.
-func (cuo *CategoryUpdateOne) SetColour(s string) *CategoryUpdateOne {
-	cuo.mutation.SetColour(s)
-	return cuo
+func (_u *CategoryUpdateOne) SetColour(v string) *CategoryUpdateOne {
+	_u.mutation.SetColour(v)
+	return _u
 }
 
 // SetNillableColour sets the "colour" field if the given value is not nil.
-func (cuo *CategoryUpdateOne) SetNillableColour(s *string) *CategoryUpdateOne {
-	if s != nil {
-		cuo.SetColour(*s)
+func (_u *CategoryUpdateOne) SetNillableColour(v *string) *CategoryUpdateOne {
+	if v != nil {
+		_u.SetColour(*v)
 	}
-	return cuo
+	return _u
 }
 
 // SetSort sets the "sort" field.
-func (cuo *CategoryUpdateOne) SetSort(i int) *CategoryUpdateOne {
-	cuo.mutation.ResetSort()
-	cuo.mutation.SetSort(i)
-	return cuo
+func (_u *CategoryUpdateOne) SetSort(v int) *CategoryUpdateOne {
+	_u.mutation.ResetSort()
+	_u.mutation.SetSort(v)
+	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (cuo *CategoryUpdateOne) SetNillableSort(i *int) *CategoryUpdateOne {
-	if i != nil {
-		cuo.SetSort(*i)
+func (_u *CategoryUpdateOne) SetNillableSort(v *int) *CategoryUpdateOne {
+	if v != nil {
+		_u.SetSort(*v)
 	}
-	return cuo
+	return _u
 }
 
-// AddSort adds i to the "sort" field.
-func (cuo *CategoryUpdateOne) AddSort(i int) *CategoryUpdateOne {
-	cuo.mutation.AddSort(i)
-	return cuo
+// AddSort adds value to the "sort" field.
+func (_u *CategoryUpdateOne) AddSort(v int) *CategoryUpdateOne {
+	_u.mutation.AddSort(v)
+	return _u
 }
 
 // SetAdmin sets the "admin" field.
-func (cuo *CategoryUpdateOne) SetAdmin(b bool) *CategoryUpdateOne {
-	cuo.mutation.SetAdmin(b)
-	return cuo
+func (_u *CategoryUpdateOne) SetAdmin(v bool) *CategoryUpdateOne {
+	_u.mutation.SetAdmin(v)
+	return _u
 }
 
 // SetNillableAdmin sets the "admin" field if the given value is not nil.
-func (cuo *CategoryUpdateOne) SetNillableAdmin(b *bool) *CategoryUpdateOne {
-	if b != nil {
-		cuo.SetAdmin(*b)
+func (_u *CategoryUpdateOne) SetNillableAdmin(v *bool) *CategoryUpdateOne {
+	if v != nil {
+		_u.SetAdmin(*v)
 	}
-	return cuo
+	return _u
 }
 
 // SetParentCategoryID sets the "parent_category_id" field.
-func (cuo *CategoryUpdateOne) SetParentCategoryID(x xid.ID) *CategoryUpdateOne {
-	cuo.mutation.SetParentCategoryID(x)
-	return cuo
+func (_u *CategoryUpdateOne) SetParentCategoryID(v xid.ID) *CategoryUpdateOne {
+	_u.mutation.SetParentCategoryID(v)
+	return _u
 }
 
 // SetNillableParentCategoryID sets the "parent_category_id" field if the given value is not nil.
-func (cuo *CategoryUpdateOne) SetNillableParentCategoryID(x *xid.ID) *CategoryUpdateOne {
-	if x != nil {
-		cuo.SetParentCategoryID(*x)
+func (_u *CategoryUpdateOne) SetNillableParentCategoryID(v *xid.ID) *CategoryUpdateOne {
+	if v != nil {
+		_u.SetParentCategoryID(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearParentCategoryID clears the value of the "parent_category_id" field.
-func (cuo *CategoryUpdateOne) ClearParentCategoryID() *CategoryUpdateOne {
-	cuo.mutation.ClearParentCategoryID()
-	return cuo
+func (_u *CategoryUpdateOne) ClearParentCategoryID() *CategoryUpdateOne {
+	_u.mutation.ClearParentCategoryID()
+	return _u
 }
 
 // SetCoverImageAssetID sets the "cover_image_asset_id" field.
-func (cuo *CategoryUpdateOne) SetCoverImageAssetID(x xid.ID) *CategoryUpdateOne {
-	cuo.mutation.SetCoverImageAssetID(x)
-	return cuo
+func (_u *CategoryUpdateOne) SetCoverImageAssetID(v xid.ID) *CategoryUpdateOne {
+	_u.mutation.SetCoverImageAssetID(v)
+	return _u
 }
 
 // SetNillableCoverImageAssetID sets the "cover_image_asset_id" field if the given value is not nil.
-func (cuo *CategoryUpdateOne) SetNillableCoverImageAssetID(x *xid.ID) *CategoryUpdateOne {
-	if x != nil {
-		cuo.SetCoverImageAssetID(*x)
+func (_u *CategoryUpdateOne) SetNillableCoverImageAssetID(v *xid.ID) *CategoryUpdateOne {
+	if v != nil {
+		_u.SetCoverImageAssetID(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearCoverImageAssetID clears the value of the "cover_image_asset_id" field.
-func (cuo *CategoryUpdateOne) ClearCoverImageAssetID() *CategoryUpdateOne {
-	cuo.mutation.ClearCoverImageAssetID()
-	return cuo
+func (_u *CategoryUpdateOne) ClearCoverImageAssetID() *CategoryUpdateOne {
+	_u.mutation.ClearCoverImageAssetID()
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (cuo *CategoryUpdateOne) SetMetadata(m map[string]interface{}) *CategoryUpdateOne {
-	cuo.mutation.SetMetadata(m)
-	return cuo
+func (_u *CategoryUpdateOne) SetMetadata(v map[string]interface{}) *CategoryUpdateOne {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (cuo *CategoryUpdateOne) ClearMetadata() *CategoryUpdateOne {
-	cuo.mutation.ClearMetadata()
-	return cuo
+func (_u *CategoryUpdateOne) ClearMetadata() *CategoryUpdateOne {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (cuo *CategoryUpdateOne) AddPostIDs(ids ...xid.ID) *CategoryUpdateOne {
-	cuo.mutation.AddPostIDs(ids...)
-	return cuo
+func (_u *CategoryUpdateOne) AddPostIDs(ids ...xid.ID) *CategoryUpdateOne {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (cuo *CategoryUpdateOne) AddPosts(p ...*Post) *CategoryUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *CategoryUpdateOne) AddPosts(v ...*Post) *CategoryUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cuo.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // SetParentID sets the "parent" edge to the Category entity by ID.
-func (cuo *CategoryUpdateOne) SetParentID(id xid.ID) *CategoryUpdateOne {
-	cuo.mutation.SetParentID(id)
-	return cuo
+func (_u *CategoryUpdateOne) SetParentID(id xid.ID) *CategoryUpdateOne {
+	_u.mutation.SetParentID(id)
+	return _u
 }
 
 // SetNillableParentID sets the "parent" edge to the Category entity by ID if the given value is not nil.
-func (cuo *CategoryUpdateOne) SetNillableParentID(id *xid.ID) *CategoryUpdateOne {
+func (_u *CategoryUpdateOne) SetNillableParentID(id *xid.ID) *CategoryUpdateOne {
 	if id != nil {
-		cuo = cuo.SetParentID(*id)
+		_u = _u.SetParentID(*id)
 	}
-	return cuo
+	return _u
 }
 
 // SetParent sets the "parent" edge to the Category entity.
-func (cuo *CategoryUpdateOne) SetParent(c *Category) *CategoryUpdateOne {
-	return cuo.SetParentID(c.ID)
+func (_u *CategoryUpdateOne) SetParent(v *Category) *CategoryUpdateOne {
+	return _u.SetParentID(v.ID)
 }
 
 // AddChildIDs adds the "children" edge to the Category entity by IDs.
-func (cuo *CategoryUpdateOne) AddChildIDs(ids ...xid.ID) *CategoryUpdateOne {
-	cuo.mutation.AddChildIDs(ids...)
-	return cuo
+func (_u *CategoryUpdateOne) AddChildIDs(ids ...xid.ID) *CategoryUpdateOne {
+	_u.mutation.AddChildIDs(ids...)
+	return _u
 }
 
 // AddChildren adds the "children" edges to the Category entity.
-func (cuo *CategoryUpdateOne) AddChildren(c ...*Category) *CategoryUpdateOne {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *CategoryUpdateOne) AddChildren(v ...*Category) *CategoryUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cuo.AddChildIDs(ids...)
+	return _u.AddChildIDs(ids...)
 }
 
 // SetCoverImageID sets the "cover_image" edge to the Asset entity by ID.
-func (cuo *CategoryUpdateOne) SetCoverImageID(id xid.ID) *CategoryUpdateOne {
-	cuo.mutation.SetCoverImageID(id)
-	return cuo
+func (_u *CategoryUpdateOne) SetCoverImageID(id xid.ID) *CategoryUpdateOne {
+	_u.mutation.SetCoverImageID(id)
+	return _u
 }
 
 // SetNillableCoverImageID sets the "cover_image" edge to the Asset entity by ID if the given value is not nil.
-func (cuo *CategoryUpdateOne) SetNillableCoverImageID(id *xid.ID) *CategoryUpdateOne {
+func (_u *CategoryUpdateOne) SetNillableCoverImageID(id *xid.ID) *CategoryUpdateOne {
 	if id != nil {
-		cuo = cuo.SetCoverImageID(*id)
+		_u = _u.SetCoverImageID(*id)
 	}
-	return cuo
+	return _u
 }
 
 // SetCoverImage sets the "cover_image" edge to the Asset entity.
-func (cuo *CategoryUpdateOne) SetCoverImage(a *Asset) *CategoryUpdateOne {
-	return cuo.SetCoverImageID(a.ID)
+func (_u *CategoryUpdateOne) SetCoverImage(v *Asset) *CategoryUpdateOne {
+	return _u.SetCoverImageID(v.ID)
 }
 
 // Mutation returns the CategoryMutation object of the builder.
-func (cuo *CategoryUpdateOne) Mutation() *CategoryMutation {
-	return cuo.mutation
+func (_u *CategoryUpdateOne) Mutation() *CategoryMutation {
+	return _u.mutation
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (cuo *CategoryUpdateOne) ClearPosts() *CategoryUpdateOne {
-	cuo.mutation.ClearPosts()
-	return cuo
+func (_u *CategoryUpdateOne) ClearPosts() *CategoryUpdateOne {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (cuo *CategoryUpdateOne) RemovePostIDs(ids ...xid.ID) *CategoryUpdateOne {
-	cuo.mutation.RemovePostIDs(ids...)
-	return cuo
+func (_u *CategoryUpdateOne) RemovePostIDs(ids ...xid.ID) *CategoryUpdateOne {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (cuo *CategoryUpdateOne) RemovePosts(p ...*Post) *CategoryUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *CategoryUpdateOne) RemovePosts(v ...*Post) *CategoryUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cuo.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearParent clears the "parent" edge to the Category entity.
-func (cuo *CategoryUpdateOne) ClearParent() *CategoryUpdateOne {
-	cuo.mutation.ClearParent()
-	return cuo
+func (_u *CategoryUpdateOne) ClearParent() *CategoryUpdateOne {
+	_u.mutation.ClearParent()
+	return _u
 }
 
 // ClearChildren clears all "children" edges to the Category entity.
-func (cuo *CategoryUpdateOne) ClearChildren() *CategoryUpdateOne {
-	cuo.mutation.ClearChildren()
-	return cuo
+func (_u *CategoryUpdateOne) ClearChildren() *CategoryUpdateOne {
+	_u.mutation.ClearChildren()
+	return _u
 }
 
 // RemoveChildIDs removes the "children" edge to Category entities by IDs.
-func (cuo *CategoryUpdateOne) RemoveChildIDs(ids ...xid.ID) *CategoryUpdateOne {
-	cuo.mutation.RemoveChildIDs(ids...)
-	return cuo
+func (_u *CategoryUpdateOne) RemoveChildIDs(ids ...xid.ID) *CategoryUpdateOne {
+	_u.mutation.RemoveChildIDs(ids...)
+	return _u
 }
 
 // RemoveChildren removes "children" edges to Category entities.
-func (cuo *CategoryUpdateOne) RemoveChildren(c ...*Category) *CategoryUpdateOne {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *CategoryUpdateOne) RemoveChildren(v ...*Category) *CategoryUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cuo.RemoveChildIDs(ids...)
+	return _u.RemoveChildIDs(ids...)
 }
 
 // ClearCoverImage clears the "cover_image" edge to the Asset entity.
-func (cuo *CategoryUpdateOne) ClearCoverImage() *CategoryUpdateOne {
-	cuo.mutation.ClearCoverImage()
-	return cuo
+func (_u *CategoryUpdateOne) ClearCoverImage() *CategoryUpdateOne {
+	_u.mutation.ClearCoverImage()
+	return _u
 }
 
 // Where appends a list predicates to the CategoryUpdate builder.
-func (cuo *CategoryUpdateOne) Where(ps ...predicate.Category) *CategoryUpdateOne {
-	cuo.mutation.Where(ps...)
-	return cuo
+func (_u *CategoryUpdateOne) Where(ps ...predicate.Category) *CategoryUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (cuo *CategoryUpdateOne) Select(field string, fields ...string) *CategoryUpdateOne {
-	cuo.fields = append([]string{field}, fields...)
-	return cuo
+func (_u *CategoryUpdateOne) Select(field string, fields ...string) *CategoryUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Category entity.
-func (cuo *CategoryUpdateOne) Save(ctx context.Context) (*Category, error) {
-	cuo.defaults()
-	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+func (_u *CategoryUpdateOne) Save(ctx context.Context) (*Category, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cuo *CategoryUpdateOne) SaveX(ctx context.Context) *Category {
-	node, err := cuo.Save(ctx)
+func (_u *CategoryUpdateOne) SaveX(ctx context.Context) *Category {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -864,40 +864,40 @@ func (cuo *CategoryUpdateOne) SaveX(ctx context.Context) *Category {
 }
 
 // Exec executes the query on the entity.
-func (cuo *CategoryUpdateOne) Exec(ctx context.Context) error {
-	_, err := cuo.Save(ctx)
+func (_u *CategoryUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cuo *CategoryUpdateOne) ExecX(ctx context.Context) {
-	if err := cuo.Exec(ctx); err != nil {
+func (_u *CategoryUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cuo *CategoryUpdateOne) defaults() {
-	if _, ok := cuo.mutation.UpdatedAt(); !ok {
+func (_u *CategoryUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := category.UpdateDefaultUpdatedAt()
-		cuo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (cuo *CategoryUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CategoryUpdateOne {
-	cuo.modifiers = append(cuo.modifiers, modifiers...)
-	return cuo
+func (_u *CategoryUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CategoryUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err error) {
+func (_u *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err error) {
 	_spec := sqlgraph.NewUpdateSpec(category.Table, category.Columns, sqlgraph.NewFieldSpec(category.FieldID, field.TypeString))
-	id, ok := cuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Category.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := cuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, category.FieldID)
 		for _, f := range fields {
@@ -909,44 +909,44 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 			}
 		}
 	}
-	if ps := cuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(category.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := cuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(category.FieldName, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(category.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(category.FieldDescription, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.Colour(); ok {
+	if value, ok := _u.mutation.Colour(); ok {
 		_spec.SetField(category.FieldColour, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.Sort(); ok {
+	if value, ok := _u.mutation.Sort(); ok {
 		_spec.SetField(category.FieldSort, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.AddedSort(); ok {
+	if value, ok := _u.mutation.AddedSort(); ok {
 		_spec.AddField(category.FieldSort, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.Admin(); ok {
+	if value, ok := _u.mutation.Admin(); ok {
 		_spec.SetField(category.FieldAdmin, field.TypeBool, value)
 	}
-	if value, ok := cuo.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(category.FieldMetadata, field.TypeJSON, value)
 	}
-	if cuo.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(category.FieldMetadata, field.TypeJSON)
 	}
-	if cuo.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -959,7 +959,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.RemovedPostsIDs(); len(nodes) > 0 && !cuo.mutation.PostsCleared() {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -975,7 +975,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -991,7 +991,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.ParentCleared() {
+	if _u.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1004,7 +1004,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1020,7 +1020,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.ChildrenCleared() {
+	if _u.mutation.ChildrenCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1033,7 +1033,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !cuo.mutation.ChildrenCleared() {
+	if nodes := _u.mutation.RemovedChildrenIDs(); len(nodes) > 0 && !_u.mutation.ChildrenCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1049,7 +1049,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.ChildrenIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ChildrenIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1065,7 +1065,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.CoverImageCleared() {
+	if _u.mutation.CoverImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1078,7 +1078,7 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.CoverImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CoverImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1094,11 +1094,11 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(cuo.modifiers...)
-	_node = &Category{config: cuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Category{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, cuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{category.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -1106,6 +1106,6 @@ func (cuo *CategoryUpdateOne) sqlSave(ctx context.Context) (_node *Category, err
 		}
 		return nil, err
 	}
-	cuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

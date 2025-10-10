@@ -98,7 +98,7 @@ func (*Notification) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Notification fields.
-func (n *Notification) assignValues(columns []string, values []any) error {
+func (_m *Notification) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -108,62 +108,62 @@ func (n *Notification) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				n.ID = *value
+				_m.ID = *value
 			}
 		case notification.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				n.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case notification.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				n.DeletedAt = new(time.Time)
-				*n.DeletedAt = value.Time
+				_m.DeletedAt = new(time.Time)
+				*_m.DeletedAt = value.Time
 			}
 		case notification.FieldEventType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field event_type", values[i])
 			} else if value.Valid {
-				n.EventType = value.String
+				_m.EventType = value.String
 			}
 		case notification.FieldDatagraphKind:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field datagraph_kind", values[i])
 			} else if value.Valid {
-				n.DatagraphKind = new(string)
-				*n.DatagraphKind = value.String
+				_m.DatagraphKind = new(string)
+				*_m.DatagraphKind = value.String
 			}
 		case notification.FieldDatagraphID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field datagraph_id", values[i])
 			} else if value.Valid {
-				n.DatagraphID = new(xid.ID)
-				*n.DatagraphID = *value.S.(*xid.ID)
+				_m.DatagraphID = new(xid.ID)
+				*_m.DatagraphID = *value.S.(*xid.ID)
 			}
 		case notification.FieldRead:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field read", values[i])
 			} else if value.Valid {
-				n.Read = value.Bool
+				_m.Read = value.Bool
 			}
 		case notification.FieldOwnerAccountID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field owner_account_id", values[i])
 			} else if value != nil {
-				n.OwnerAccountID = *value
+				_m.OwnerAccountID = *value
 			}
 		case notification.FieldSourceAccountID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field source_account_id", values[i])
 			} else if value.Valid {
-				n.SourceAccountID = new(xid.ID)
-				*n.SourceAccountID = *value.S.(*xid.ID)
+				_m.SourceAccountID = new(xid.ID)
+				*_m.SourceAccountID = *value.S.(*xid.ID)
 			}
 		default:
-			n.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -171,71 +171,71 @@ func (n *Notification) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Notification.
 // This includes values selected through modifiers, order, etc.
-func (n *Notification) Value(name string) (ent.Value, error) {
-	return n.selectValues.Get(name)
+func (_m *Notification) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryOwner queries the "owner" edge of the Notification entity.
-func (n *Notification) QueryOwner() *AccountQuery {
-	return NewNotificationClient(n.config).QueryOwner(n)
+func (_m *Notification) QueryOwner() *AccountQuery {
+	return NewNotificationClient(_m.config).QueryOwner(_m)
 }
 
 // QuerySource queries the "source" edge of the Notification entity.
-func (n *Notification) QuerySource() *AccountQuery {
-	return NewNotificationClient(n.config).QuerySource(n)
+func (_m *Notification) QuerySource() *AccountQuery {
+	return NewNotificationClient(_m.config).QuerySource(_m)
 }
 
 // Update returns a builder for updating this Notification.
 // Note that you need to call Notification.Unwrap() before calling this method if this Notification
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (n *Notification) Update() *NotificationUpdateOne {
-	return NewNotificationClient(n.config).UpdateOne(n)
+func (_m *Notification) Update() *NotificationUpdateOne {
+	return NewNotificationClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Notification entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (n *Notification) Unwrap() *Notification {
-	_tx, ok := n.config.driver.(*txDriver)
+func (_m *Notification) Unwrap() *Notification {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Notification is not a transactional entity")
 	}
-	n.config.driver = _tx.drv
-	return n
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (n *Notification) String() string {
+func (_m *Notification) String() string {
 	var builder strings.Builder
 	builder.WriteString("Notification(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", n.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(n.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := n.DeletedAt; v != nil {
+	if v := _m.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("event_type=")
-	builder.WriteString(n.EventType)
+	builder.WriteString(_m.EventType)
 	builder.WriteString(", ")
-	if v := n.DatagraphKind; v != nil {
+	if v := _m.DatagraphKind; v != nil {
 		builder.WriteString("datagraph_kind=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := n.DatagraphID; v != nil {
+	if v := _m.DatagraphID; v != nil {
 		builder.WriteString("datagraph_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("read=")
-	builder.WriteString(fmt.Sprintf("%v", n.Read))
+	builder.WriteString(fmt.Sprintf("%v", _m.Read))
 	builder.WriteString(", ")
 	builder.WriteString("owner_account_id=")
-	builder.WriteString(fmt.Sprintf("%v", n.OwnerAccountID))
+	builder.WriteString(fmt.Sprintf("%v", _m.OwnerAccountID))
 	builder.WriteString(", ")
-	if v := n.SourceAccountID; v != nil {
+	if v := _m.SourceAccountID; v != nil {
 		builder.WriteString("source_account_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}

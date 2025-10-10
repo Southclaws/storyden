@@ -68,7 +68,7 @@ func (*PropertySchema) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the PropertySchema fields.
-func (ps *PropertySchema) assignValues(columns []string, values []any) error {
+func (_m *PropertySchema) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -78,10 +78,10 @@ func (ps *PropertySchema) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				ps.ID = *value
+				_m.ID = *value
 			}
 		default:
-			ps.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -89,43 +89,43 @@ func (ps *PropertySchema) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the PropertySchema.
 // This includes values selected through modifiers, order, etc.
-func (ps *PropertySchema) Value(name string) (ent.Value, error) {
-	return ps.selectValues.Get(name)
+func (_m *PropertySchema) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryNode queries the "node" edge of the PropertySchema entity.
-func (ps *PropertySchema) QueryNode() *NodeQuery {
-	return NewPropertySchemaClient(ps.config).QueryNode(ps)
+func (_m *PropertySchema) QueryNode() *NodeQuery {
+	return NewPropertySchemaClient(_m.config).QueryNode(_m)
 }
 
 // QueryFields queries the "fields" edge of the PropertySchema entity.
-func (ps *PropertySchema) QueryFields() *PropertySchemaFieldQuery {
-	return NewPropertySchemaClient(ps.config).QueryFields(ps)
+func (_m *PropertySchema) QueryFields() *PropertySchemaFieldQuery {
+	return NewPropertySchemaClient(_m.config).QueryFields(_m)
 }
 
 // Update returns a builder for updating this PropertySchema.
 // Note that you need to call PropertySchema.Unwrap() before calling this method if this PropertySchema
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (ps *PropertySchema) Update() *PropertySchemaUpdateOne {
-	return NewPropertySchemaClient(ps.config).UpdateOne(ps)
+func (_m *PropertySchema) Update() *PropertySchemaUpdateOne {
+	return NewPropertySchemaClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the PropertySchema entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (ps *PropertySchema) Unwrap() *PropertySchema {
-	_tx, ok := ps.config.driver.(*txDriver)
+func (_m *PropertySchema) Unwrap() *PropertySchema {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: PropertySchema is not a transactional entity")
 	}
-	ps.config.driver = _tx.drv
-	return ps
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (ps *PropertySchema) String() string {
+func (_m *PropertySchema) String() string {
 	var builder strings.Builder
 	builder.WriteString("PropertySchema(")
-	builder.WriteString(fmt.Sprintf("id=%v", ps.ID))
+	builder.WriteString(fmt.Sprintf("id=%v", _m.ID))
 	builder.WriteByte(')')
 	return builder.String()
 }

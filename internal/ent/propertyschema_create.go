@@ -26,63 +26,63 @@ type PropertySchemaCreate struct {
 }
 
 // SetID sets the "id" field.
-func (psc *PropertySchemaCreate) SetID(x xid.ID) *PropertySchemaCreate {
-	psc.mutation.SetID(x)
-	return psc
+func (_c *PropertySchemaCreate) SetID(v xid.ID) *PropertySchemaCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (psc *PropertySchemaCreate) SetNillableID(x *xid.ID) *PropertySchemaCreate {
-	if x != nil {
-		psc.SetID(*x)
+func (_c *PropertySchemaCreate) SetNillableID(v *xid.ID) *PropertySchemaCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return psc
+	return _c
 }
 
 // AddNodeIDs adds the "node" edge to the Node entity by IDs.
-func (psc *PropertySchemaCreate) AddNodeIDs(ids ...xid.ID) *PropertySchemaCreate {
-	psc.mutation.AddNodeIDs(ids...)
-	return psc
+func (_c *PropertySchemaCreate) AddNodeIDs(ids ...xid.ID) *PropertySchemaCreate {
+	_c.mutation.AddNodeIDs(ids...)
+	return _c
 }
 
 // AddNode adds the "node" edges to the Node entity.
-func (psc *PropertySchemaCreate) AddNode(n ...*Node) *PropertySchemaCreate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_c *PropertySchemaCreate) AddNode(v ...*Node) *PropertySchemaCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return psc.AddNodeIDs(ids...)
+	return _c.AddNodeIDs(ids...)
 }
 
 // AddFieldIDs adds the "fields" edge to the PropertySchemaField entity by IDs.
-func (psc *PropertySchemaCreate) AddFieldIDs(ids ...xid.ID) *PropertySchemaCreate {
-	psc.mutation.AddFieldIDs(ids...)
-	return psc
+func (_c *PropertySchemaCreate) AddFieldIDs(ids ...xid.ID) *PropertySchemaCreate {
+	_c.mutation.AddFieldIDs(ids...)
+	return _c
 }
 
 // AddFields adds the "fields" edges to the PropertySchemaField entity.
-func (psc *PropertySchemaCreate) AddFields(p ...*PropertySchemaField) *PropertySchemaCreate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_c *PropertySchemaCreate) AddFields(v ...*PropertySchemaField) *PropertySchemaCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return psc.AddFieldIDs(ids...)
+	return _c.AddFieldIDs(ids...)
 }
 
 // Mutation returns the PropertySchemaMutation object of the builder.
-func (psc *PropertySchemaCreate) Mutation() *PropertySchemaMutation {
-	return psc.mutation
+func (_c *PropertySchemaCreate) Mutation() *PropertySchemaMutation {
+	return _c.mutation
 }
 
 // Save creates the PropertySchema in the database.
-func (psc *PropertySchemaCreate) Save(ctx context.Context) (*PropertySchema, error) {
-	psc.defaults()
-	return withHooks(ctx, psc.sqlSave, psc.mutation, psc.hooks)
+func (_c *PropertySchemaCreate) Save(ctx context.Context) (*PropertySchema, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (psc *PropertySchemaCreate) SaveX(ctx context.Context) *PropertySchema {
-	v, err := psc.Save(ctx)
+func (_c *PropertySchemaCreate) SaveX(ctx context.Context) *PropertySchema {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -90,29 +90,29 @@ func (psc *PropertySchemaCreate) SaveX(ctx context.Context) *PropertySchema {
 }
 
 // Exec executes the query.
-func (psc *PropertySchemaCreate) Exec(ctx context.Context) error {
-	_, err := psc.Save(ctx)
+func (_c *PropertySchemaCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (psc *PropertySchemaCreate) ExecX(ctx context.Context) {
-	if err := psc.Exec(ctx); err != nil {
+func (_c *PropertySchemaCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (psc *PropertySchemaCreate) defaults() {
-	if _, ok := psc.mutation.ID(); !ok {
+func (_c *PropertySchemaCreate) defaults() {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := propertyschema.DefaultID()
-		psc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (psc *PropertySchemaCreate) check() error {
-	if v, ok := psc.mutation.ID(); ok {
+func (_c *PropertySchemaCreate) check() error {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := propertyschema.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "PropertySchema.id": %w`, err)}
 		}
@@ -120,12 +120,12 @@ func (psc *PropertySchemaCreate) check() error {
 	return nil
 }
 
-func (psc *PropertySchemaCreate) sqlSave(ctx context.Context) (*PropertySchema, error) {
-	if err := psc.check(); err != nil {
+func (_c *PropertySchemaCreate) sqlSave(ctx context.Context) (*PropertySchema, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := psc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, psc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -138,22 +138,22 @@ func (psc *PropertySchemaCreate) sqlSave(ctx context.Context) (*PropertySchema, 
 			return nil, err
 		}
 	}
-	psc.mutation.id = &_node.ID
-	psc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (psc *PropertySchemaCreate) createSpec() (*PropertySchema, *sqlgraph.CreateSpec) {
+func (_c *PropertySchemaCreate) createSpec() (*PropertySchema, *sqlgraph.CreateSpec) {
 	var (
-		_node = &PropertySchema{config: psc.config}
+		_node = &PropertySchema{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(propertyschema.Table, sqlgraph.NewFieldSpec(propertyschema.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = psc.conflict
-	if id, ok := psc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if nodes := psc.mutation.NodeIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -169,7 +169,7 @@ func (psc *PropertySchemaCreate) createSpec() (*PropertySchema, *sqlgraph.Create
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := psc.mutation.FieldsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.FieldsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -198,10 +198,10 @@ func (psc *PropertySchemaCreate) createSpec() (*PropertySchema, *sqlgraph.Create
 //			sql.ResolveWithNewValues(),
 //		).
 //		Exec(ctx)
-func (psc *PropertySchemaCreate) OnConflict(opts ...sql.ConflictOption) *PropertySchemaUpsertOne {
-	psc.conflict = opts
+func (_c *PropertySchemaCreate) OnConflict(opts ...sql.ConflictOption) *PropertySchemaUpsertOne {
+	_c.conflict = opts
 	return &PropertySchemaUpsertOne{
-		create: psc,
+		create: _c,
 	}
 }
 
@@ -211,10 +211,10 @@ func (psc *PropertySchemaCreate) OnConflict(opts ...sql.ConflictOption) *Propert
 //	client.PropertySchema.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (psc *PropertySchemaCreate) OnConflictColumns(columns ...string) *PropertySchemaUpsertOne {
-	psc.conflict = append(psc.conflict, sql.ConflictColumns(columns...))
+func (_c *PropertySchemaCreate) OnConflictColumns(columns ...string) *PropertySchemaUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &PropertySchemaUpsertOne{
-		create: psc,
+		create: _c,
 	}
 }
 
@@ -326,16 +326,16 @@ type PropertySchemaCreateBulk struct {
 }
 
 // Save creates the PropertySchema entities in the database.
-func (pscb *PropertySchemaCreateBulk) Save(ctx context.Context) ([]*PropertySchema, error) {
-	if pscb.err != nil {
-		return nil, pscb.err
+func (_c *PropertySchemaCreateBulk) Save(ctx context.Context) ([]*PropertySchema, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(pscb.builders))
-	nodes := make([]*PropertySchema, len(pscb.builders))
-	mutators := make([]Mutator, len(pscb.builders))
-	for i := range pscb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*PropertySchema, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := pscb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*PropertySchemaMutation)
@@ -349,12 +349,12 @@ func (pscb *PropertySchemaCreateBulk) Save(ctx context.Context) ([]*PropertySche
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, pscb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = pscb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, pscb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -374,7 +374,7 @@ func (pscb *PropertySchemaCreateBulk) Save(ctx context.Context) ([]*PropertySche
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, pscb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -382,8 +382,8 @@ func (pscb *PropertySchemaCreateBulk) Save(ctx context.Context) ([]*PropertySche
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (pscb *PropertySchemaCreateBulk) SaveX(ctx context.Context) []*PropertySchema {
-	v, err := pscb.Save(ctx)
+func (_c *PropertySchemaCreateBulk) SaveX(ctx context.Context) []*PropertySchema {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -391,14 +391,14 @@ func (pscb *PropertySchemaCreateBulk) SaveX(ctx context.Context) []*PropertySche
 }
 
 // Exec executes the query.
-func (pscb *PropertySchemaCreateBulk) Exec(ctx context.Context) error {
-	_, err := pscb.Save(ctx)
+func (_c *PropertySchemaCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pscb *PropertySchemaCreateBulk) ExecX(ctx context.Context) {
-	if err := pscb.Exec(ctx); err != nil {
+func (_c *PropertySchemaCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -413,10 +413,10 @@ func (pscb *PropertySchemaCreateBulk) ExecX(ctx context.Context) {
 //			sql.ResolveWithNewValues(),
 //		).
 //		Exec(ctx)
-func (pscb *PropertySchemaCreateBulk) OnConflict(opts ...sql.ConflictOption) *PropertySchemaUpsertBulk {
-	pscb.conflict = opts
+func (_c *PropertySchemaCreateBulk) OnConflict(opts ...sql.ConflictOption) *PropertySchemaUpsertBulk {
+	_c.conflict = opts
 	return &PropertySchemaUpsertBulk{
-		create: pscb,
+		create: _c,
 	}
 }
 
@@ -426,10 +426,10 @@ func (pscb *PropertySchemaCreateBulk) OnConflict(opts ...sql.ConflictOption) *Pr
 //	client.PropertySchema.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (pscb *PropertySchemaCreateBulk) OnConflictColumns(columns ...string) *PropertySchemaUpsertBulk {
-	pscb.conflict = append(pscb.conflict, sql.ConflictColumns(columns...))
+func (_c *PropertySchemaCreateBulk) OnConflictColumns(columns ...string) *PropertySchemaUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &PropertySchemaUpsertBulk{
-		create: pscb,
+		create: _c,
 	}
 }
 

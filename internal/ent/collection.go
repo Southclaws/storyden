@@ -144,7 +144,7 @@ func (*Collection) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Collection fields.
-func (c *Collection) assignValues(columns []string, values []any) error {
+func (_m *Collection) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -154,68 +154,68 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				c.ID = *value
+				_m.ID = *value
 			}
 		case collection.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				c.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case collection.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				c.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case collection.FieldIndexedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field indexed_at", values[i])
 			} else if value.Valid {
-				c.IndexedAt = new(time.Time)
-				*c.IndexedAt = value.Time
+				_m.IndexedAt = new(time.Time)
+				*_m.IndexedAt = value.Time
 			}
 		case collection.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				c.Name = value.String
+				_m.Name = value.String
 			}
 		case collection.FieldSlug:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field slug", values[i])
 			} else if value.Valid {
-				c.Slug = value.String
+				_m.Slug = value.String
 			}
 		case collection.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				c.Description = new(string)
-				*c.Description = value.String
+				_m.Description = new(string)
+				*_m.Description = value.String
 			}
 		case collection.FieldCoverAssetID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field cover_asset_id", values[i])
 			} else if value.Valid {
-				c.CoverAssetID = new(xid.ID)
-				*c.CoverAssetID = *value.S.(*xid.ID)
+				_m.CoverAssetID = new(xid.ID)
+				*_m.CoverAssetID = *value.S.(*xid.ID)
 			}
 		case collection.FieldVisibility:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field visibility", values[i])
 			} else if value.Valid {
-				c.Visibility = collection.Visibility(value.String)
+				_m.Visibility = collection.Visibility(value.String)
 			}
 		case collection.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field account_collections", values[i])
 			} else if value.Valid {
-				c.account_collections = new(xid.ID)
-				*c.account_collections = *value.S.(*xid.ID)
+				_m.account_collections = new(xid.ID)
+				*_m.account_collections = *value.S.(*xid.ID)
 			}
 		default:
-			c.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -223,92 +223,92 @@ func (c *Collection) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Collection.
 // This includes values selected through modifiers, order, etc.
-func (c *Collection) Value(name string) (ent.Value, error) {
-	return c.selectValues.Get(name)
+func (_m *Collection) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryOwner queries the "owner" edge of the Collection entity.
-func (c *Collection) QueryOwner() *AccountQuery {
-	return NewCollectionClient(c.config).QueryOwner(c)
+func (_m *Collection) QueryOwner() *AccountQuery {
+	return NewCollectionClient(_m.config).QueryOwner(_m)
 }
 
 // QueryCoverImage queries the "cover_image" edge of the Collection entity.
-func (c *Collection) QueryCoverImage() *AssetQuery {
-	return NewCollectionClient(c.config).QueryCoverImage(c)
+func (_m *Collection) QueryCoverImage() *AssetQuery {
+	return NewCollectionClient(_m.config).QueryCoverImage(_m)
 }
 
 // QueryPosts queries the "posts" edge of the Collection entity.
-func (c *Collection) QueryPosts() *PostQuery {
-	return NewCollectionClient(c.config).QueryPosts(c)
+func (_m *Collection) QueryPosts() *PostQuery {
+	return NewCollectionClient(_m.config).QueryPosts(_m)
 }
 
 // QueryNodes queries the "nodes" edge of the Collection entity.
-func (c *Collection) QueryNodes() *NodeQuery {
-	return NewCollectionClient(c.config).QueryNodes(c)
+func (_m *Collection) QueryNodes() *NodeQuery {
+	return NewCollectionClient(_m.config).QueryNodes(_m)
 }
 
 // QueryCollectionPosts queries the "collection_posts" edge of the Collection entity.
-func (c *Collection) QueryCollectionPosts() *CollectionPostQuery {
-	return NewCollectionClient(c.config).QueryCollectionPosts(c)
+func (_m *Collection) QueryCollectionPosts() *CollectionPostQuery {
+	return NewCollectionClient(_m.config).QueryCollectionPosts(_m)
 }
 
 // QueryCollectionNodes queries the "collection_nodes" edge of the Collection entity.
-func (c *Collection) QueryCollectionNodes() *CollectionNodeQuery {
-	return NewCollectionClient(c.config).QueryCollectionNodes(c)
+func (_m *Collection) QueryCollectionNodes() *CollectionNodeQuery {
+	return NewCollectionClient(_m.config).QueryCollectionNodes(_m)
 }
 
 // Update returns a builder for updating this Collection.
 // Note that you need to call Collection.Unwrap() before calling this method if this Collection
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (c *Collection) Update() *CollectionUpdateOne {
-	return NewCollectionClient(c.config).UpdateOne(c)
+func (_m *Collection) Update() *CollectionUpdateOne {
+	return NewCollectionClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Collection entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (c *Collection) Unwrap() *Collection {
-	_tx, ok := c.config.driver.(*txDriver)
+func (_m *Collection) Unwrap() *Collection {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Collection is not a transactional entity")
 	}
-	c.config.driver = _tx.drv
-	return c
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (c *Collection) String() string {
+func (_m *Collection) String() string {
 	var builder strings.Builder
 	builder.WriteString("Collection(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := c.IndexedAt; v != nil {
+	if v := _m.IndexedAt; v != nil {
 		builder.WriteString("indexed_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(c.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("slug=")
-	builder.WriteString(c.Slug)
+	builder.WriteString(_m.Slug)
 	builder.WriteString(", ")
-	if v := c.Description; v != nil {
+	if v := _m.Description; v != nil {
 		builder.WriteString("description=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := c.CoverAssetID; v != nil {
+	if v := _m.CoverAssetID; v != nil {
 		builder.WriteString("cover_asset_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("visibility=")
-	builder.WriteString(fmt.Sprintf("%v", c.Visibility))
+	builder.WriteString(fmt.Sprintf("%v", _m.Visibility))
 	builder.WriteByte(')')
 	return builder.String()
 }

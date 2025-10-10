@@ -26,88 +26,88 @@ type CollectionPostUpdate struct {
 }
 
 // Where appends a list predicates to the CollectionPostUpdate builder.
-func (cpu *CollectionPostUpdate) Where(ps ...predicate.CollectionPost) *CollectionPostUpdate {
-	cpu.mutation.Where(ps...)
-	return cpu
+func (_u *CollectionPostUpdate) Where(ps ...predicate.CollectionPost) *CollectionPostUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetCollectionID sets the "collection_id" field.
-func (cpu *CollectionPostUpdate) SetCollectionID(x xid.ID) *CollectionPostUpdate {
-	cpu.mutation.SetCollectionID(x)
-	return cpu
+func (_u *CollectionPostUpdate) SetCollectionID(v xid.ID) *CollectionPostUpdate {
+	_u.mutation.SetCollectionID(v)
+	return _u
 }
 
 // SetNillableCollectionID sets the "collection_id" field if the given value is not nil.
-func (cpu *CollectionPostUpdate) SetNillableCollectionID(x *xid.ID) *CollectionPostUpdate {
-	if x != nil {
-		cpu.SetCollectionID(*x)
+func (_u *CollectionPostUpdate) SetNillableCollectionID(v *xid.ID) *CollectionPostUpdate {
+	if v != nil {
+		_u.SetCollectionID(*v)
 	}
-	return cpu
+	return _u
 }
 
 // SetPostID sets the "post_id" field.
-func (cpu *CollectionPostUpdate) SetPostID(x xid.ID) *CollectionPostUpdate {
-	cpu.mutation.SetPostID(x)
-	return cpu
+func (_u *CollectionPostUpdate) SetPostID(v xid.ID) *CollectionPostUpdate {
+	_u.mutation.SetPostID(v)
+	return _u
 }
 
 // SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (cpu *CollectionPostUpdate) SetNillablePostID(x *xid.ID) *CollectionPostUpdate {
-	if x != nil {
-		cpu.SetPostID(*x)
+func (_u *CollectionPostUpdate) SetNillablePostID(v *xid.ID) *CollectionPostUpdate {
+	if v != nil {
+		_u.SetPostID(*v)
 	}
-	return cpu
+	return _u
 }
 
 // SetMembershipType sets the "membership_type" field.
-func (cpu *CollectionPostUpdate) SetMembershipType(s string) *CollectionPostUpdate {
-	cpu.mutation.SetMembershipType(s)
-	return cpu
+func (_u *CollectionPostUpdate) SetMembershipType(v string) *CollectionPostUpdate {
+	_u.mutation.SetMembershipType(v)
+	return _u
 }
 
 // SetNillableMembershipType sets the "membership_type" field if the given value is not nil.
-func (cpu *CollectionPostUpdate) SetNillableMembershipType(s *string) *CollectionPostUpdate {
-	if s != nil {
-		cpu.SetMembershipType(*s)
+func (_u *CollectionPostUpdate) SetNillableMembershipType(v *string) *CollectionPostUpdate {
+	if v != nil {
+		_u.SetMembershipType(*v)
 	}
-	return cpu
+	return _u
 }
 
 // SetCollection sets the "collection" edge to the Collection entity.
-func (cpu *CollectionPostUpdate) SetCollection(c *Collection) *CollectionPostUpdate {
-	return cpu.SetCollectionID(c.ID)
+func (_u *CollectionPostUpdate) SetCollection(v *Collection) *CollectionPostUpdate {
+	return _u.SetCollectionID(v.ID)
 }
 
 // SetPost sets the "post" edge to the Post entity.
-func (cpu *CollectionPostUpdate) SetPost(p *Post) *CollectionPostUpdate {
-	return cpu.SetPostID(p.ID)
+func (_u *CollectionPostUpdate) SetPost(v *Post) *CollectionPostUpdate {
+	return _u.SetPostID(v.ID)
 }
 
 // Mutation returns the CollectionPostMutation object of the builder.
-func (cpu *CollectionPostUpdate) Mutation() *CollectionPostMutation {
-	return cpu.mutation
+func (_u *CollectionPostUpdate) Mutation() *CollectionPostMutation {
+	return _u.mutation
 }
 
 // ClearCollection clears the "collection" edge to the Collection entity.
-func (cpu *CollectionPostUpdate) ClearCollection() *CollectionPostUpdate {
-	cpu.mutation.ClearCollection()
-	return cpu
+func (_u *CollectionPostUpdate) ClearCollection() *CollectionPostUpdate {
+	_u.mutation.ClearCollection()
+	return _u
 }
 
 // ClearPost clears the "post" edge to the Post entity.
-func (cpu *CollectionPostUpdate) ClearPost() *CollectionPostUpdate {
-	cpu.mutation.ClearPost()
-	return cpu
+func (_u *CollectionPostUpdate) ClearPost() *CollectionPostUpdate {
+	_u.mutation.ClearPost()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (cpu *CollectionPostUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, cpu.sqlSave, cpu.mutation, cpu.hooks)
+func (_u *CollectionPostUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cpu *CollectionPostUpdate) SaveX(ctx context.Context) int {
-	affected, err := cpu.Save(ctx)
+func (_u *CollectionPostUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -115,61 +115,61 @@ func (cpu *CollectionPostUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (cpu *CollectionPostUpdate) Exec(ctx context.Context) error {
-	_, err := cpu.Save(ctx)
+func (_u *CollectionPostUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cpu *CollectionPostUpdate) ExecX(ctx context.Context) {
-	if err := cpu.Exec(ctx); err != nil {
+func (_u *CollectionPostUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cpu *CollectionPostUpdate) check() error {
-	if v, ok := cpu.mutation.CollectionID(); ok {
+func (_u *CollectionPostUpdate) check() error {
+	if v, ok := _u.mutation.CollectionID(); ok {
 		if err := collectionpost.CollectionIDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "collection_id", err: fmt.Errorf(`ent: validator failed for field "CollectionPost.collection_id": %w`, err)}
 		}
 	}
-	if v, ok := cpu.mutation.PostID(); ok {
+	if v, ok := _u.mutation.PostID(); ok {
 		if err := collectionpost.PostIDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "post_id", err: fmt.Errorf(`ent: validator failed for field "CollectionPost.post_id": %w`, err)}
 		}
 	}
-	if cpu.mutation.CollectionCleared() && len(cpu.mutation.CollectionIDs()) > 0 {
+	if _u.mutation.CollectionCleared() && len(_u.mutation.CollectionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionPost.collection"`)
 	}
-	if cpu.mutation.PostCleared() && len(cpu.mutation.PostIDs()) > 0 {
+	if _u.mutation.PostCleared() && len(_u.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionPost.post"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (cpu *CollectionPostUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionPostUpdate {
-	cpu.modifiers = append(cpu.modifiers, modifiers...)
-	return cpu
+func (_u *CollectionPostUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionPostUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (cpu *CollectionPostUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := cpu.check(); err != nil {
-		return n, err
+func (_u *CollectionPostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(collectionpost.Table, collectionpost.Columns, sqlgraph.NewFieldSpec(collectionpost.FieldCollectionID, field.TypeString), sqlgraph.NewFieldSpec(collectionpost.FieldPostID, field.TypeString))
-	if ps := cpu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cpu.mutation.MembershipType(); ok {
+	if value, ok := _u.mutation.MembershipType(); ok {
 		_spec.SetField(collectionpost.FieldMembershipType, field.TypeString, value)
 	}
-	if cpu.mutation.CollectionCleared() {
+	if _u.mutation.CollectionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -182,7 +182,7 @@ func (cpu *CollectionPostUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cpu.mutation.CollectionIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CollectionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -198,7 +198,7 @@ func (cpu *CollectionPostUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cpu.mutation.PostCleared() {
+	if _u.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -211,7 +211,7 @@ func (cpu *CollectionPostUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cpu.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -227,8 +227,8 @@ func (cpu *CollectionPostUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(cpu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, cpu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{collectionpost.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -236,8 +236,8 @@ func (cpu *CollectionPostUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		return 0, err
 	}
-	cpu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // CollectionPostUpdateOne is the builder for updating a single CollectionPost entity.
@@ -250,95 +250,95 @@ type CollectionPostUpdateOne struct {
 }
 
 // SetCollectionID sets the "collection_id" field.
-func (cpuo *CollectionPostUpdateOne) SetCollectionID(x xid.ID) *CollectionPostUpdateOne {
-	cpuo.mutation.SetCollectionID(x)
-	return cpuo
+func (_u *CollectionPostUpdateOne) SetCollectionID(v xid.ID) *CollectionPostUpdateOne {
+	_u.mutation.SetCollectionID(v)
+	return _u
 }
 
 // SetNillableCollectionID sets the "collection_id" field if the given value is not nil.
-func (cpuo *CollectionPostUpdateOne) SetNillableCollectionID(x *xid.ID) *CollectionPostUpdateOne {
-	if x != nil {
-		cpuo.SetCollectionID(*x)
+func (_u *CollectionPostUpdateOne) SetNillableCollectionID(v *xid.ID) *CollectionPostUpdateOne {
+	if v != nil {
+		_u.SetCollectionID(*v)
 	}
-	return cpuo
+	return _u
 }
 
 // SetPostID sets the "post_id" field.
-func (cpuo *CollectionPostUpdateOne) SetPostID(x xid.ID) *CollectionPostUpdateOne {
-	cpuo.mutation.SetPostID(x)
-	return cpuo
+func (_u *CollectionPostUpdateOne) SetPostID(v xid.ID) *CollectionPostUpdateOne {
+	_u.mutation.SetPostID(v)
+	return _u
 }
 
 // SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (cpuo *CollectionPostUpdateOne) SetNillablePostID(x *xid.ID) *CollectionPostUpdateOne {
-	if x != nil {
-		cpuo.SetPostID(*x)
+func (_u *CollectionPostUpdateOne) SetNillablePostID(v *xid.ID) *CollectionPostUpdateOne {
+	if v != nil {
+		_u.SetPostID(*v)
 	}
-	return cpuo
+	return _u
 }
 
 // SetMembershipType sets the "membership_type" field.
-func (cpuo *CollectionPostUpdateOne) SetMembershipType(s string) *CollectionPostUpdateOne {
-	cpuo.mutation.SetMembershipType(s)
-	return cpuo
+func (_u *CollectionPostUpdateOne) SetMembershipType(v string) *CollectionPostUpdateOne {
+	_u.mutation.SetMembershipType(v)
+	return _u
 }
 
 // SetNillableMembershipType sets the "membership_type" field if the given value is not nil.
-func (cpuo *CollectionPostUpdateOne) SetNillableMembershipType(s *string) *CollectionPostUpdateOne {
-	if s != nil {
-		cpuo.SetMembershipType(*s)
+func (_u *CollectionPostUpdateOne) SetNillableMembershipType(v *string) *CollectionPostUpdateOne {
+	if v != nil {
+		_u.SetMembershipType(*v)
 	}
-	return cpuo
+	return _u
 }
 
 // SetCollection sets the "collection" edge to the Collection entity.
-func (cpuo *CollectionPostUpdateOne) SetCollection(c *Collection) *CollectionPostUpdateOne {
-	return cpuo.SetCollectionID(c.ID)
+func (_u *CollectionPostUpdateOne) SetCollection(v *Collection) *CollectionPostUpdateOne {
+	return _u.SetCollectionID(v.ID)
 }
 
 // SetPost sets the "post" edge to the Post entity.
-func (cpuo *CollectionPostUpdateOne) SetPost(p *Post) *CollectionPostUpdateOne {
-	return cpuo.SetPostID(p.ID)
+func (_u *CollectionPostUpdateOne) SetPost(v *Post) *CollectionPostUpdateOne {
+	return _u.SetPostID(v.ID)
 }
 
 // Mutation returns the CollectionPostMutation object of the builder.
-func (cpuo *CollectionPostUpdateOne) Mutation() *CollectionPostMutation {
-	return cpuo.mutation
+func (_u *CollectionPostUpdateOne) Mutation() *CollectionPostMutation {
+	return _u.mutation
 }
 
 // ClearCollection clears the "collection" edge to the Collection entity.
-func (cpuo *CollectionPostUpdateOne) ClearCollection() *CollectionPostUpdateOne {
-	cpuo.mutation.ClearCollection()
-	return cpuo
+func (_u *CollectionPostUpdateOne) ClearCollection() *CollectionPostUpdateOne {
+	_u.mutation.ClearCollection()
+	return _u
 }
 
 // ClearPost clears the "post" edge to the Post entity.
-func (cpuo *CollectionPostUpdateOne) ClearPost() *CollectionPostUpdateOne {
-	cpuo.mutation.ClearPost()
-	return cpuo
+func (_u *CollectionPostUpdateOne) ClearPost() *CollectionPostUpdateOne {
+	_u.mutation.ClearPost()
+	return _u
 }
 
 // Where appends a list predicates to the CollectionPostUpdate builder.
-func (cpuo *CollectionPostUpdateOne) Where(ps ...predicate.CollectionPost) *CollectionPostUpdateOne {
-	cpuo.mutation.Where(ps...)
-	return cpuo
+func (_u *CollectionPostUpdateOne) Where(ps ...predicate.CollectionPost) *CollectionPostUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (cpuo *CollectionPostUpdateOne) Select(field string, fields ...string) *CollectionPostUpdateOne {
-	cpuo.fields = append([]string{field}, fields...)
-	return cpuo
+func (_u *CollectionPostUpdateOne) Select(field string, fields ...string) *CollectionPostUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated CollectionPost entity.
-func (cpuo *CollectionPostUpdateOne) Save(ctx context.Context) (*CollectionPost, error) {
-	return withHooks(ctx, cpuo.sqlSave, cpuo.mutation, cpuo.hooks)
+func (_u *CollectionPostUpdateOne) Save(ctx context.Context) (*CollectionPost, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cpuo *CollectionPostUpdateOne) SaveX(ctx context.Context) *CollectionPost {
-	node, err := cpuo.Save(ctx)
+func (_u *CollectionPostUpdateOne) SaveX(ctx context.Context) *CollectionPost {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -346,61 +346,61 @@ func (cpuo *CollectionPostUpdateOne) SaveX(ctx context.Context) *CollectionPost 
 }
 
 // Exec executes the query on the entity.
-func (cpuo *CollectionPostUpdateOne) Exec(ctx context.Context) error {
-	_, err := cpuo.Save(ctx)
+func (_u *CollectionPostUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cpuo *CollectionPostUpdateOne) ExecX(ctx context.Context) {
-	if err := cpuo.Exec(ctx); err != nil {
+func (_u *CollectionPostUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cpuo *CollectionPostUpdateOne) check() error {
-	if v, ok := cpuo.mutation.CollectionID(); ok {
+func (_u *CollectionPostUpdateOne) check() error {
+	if v, ok := _u.mutation.CollectionID(); ok {
 		if err := collectionpost.CollectionIDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "collection_id", err: fmt.Errorf(`ent: validator failed for field "CollectionPost.collection_id": %w`, err)}
 		}
 	}
-	if v, ok := cpuo.mutation.PostID(); ok {
+	if v, ok := _u.mutation.PostID(); ok {
 		if err := collectionpost.PostIDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "post_id", err: fmt.Errorf(`ent: validator failed for field "CollectionPost.post_id": %w`, err)}
 		}
 	}
-	if cpuo.mutation.CollectionCleared() && len(cpuo.mutation.CollectionIDs()) > 0 {
+	if _u.mutation.CollectionCleared() && len(_u.mutation.CollectionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionPost.collection"`)
 	}
-	if cpuo.mutation.PostCleared() && len(cpuo.mutation.PostIDs()) > 0 {
+	if _u.mutation.PostCleared() && len(_u.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionPost.post"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (cpuo *CollectionPostUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionPostUpdateOne {
-	cpuo.modifiers = append(cpuo.modifiers, modifiers...)
-	return cpuo
+func (_u *CollectionPostUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionPostUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (cpuo *CollectionPostUpdateOne) sqlSave(ctx context.Context) (_node *CollectionPost, err error) {
-	if err := cpuo.check(); err != nil {
+func (_u *CollectionPostUpdateOne) sqlSave(ctx context.Context) (_node *CollectionPost, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(collectionpost.Table, collectionpost.Columns, sqlgraph.NewFieldSpec(collectionpost.FieldCollectionID, field.TypeString), sqlgraph.NewFieldSpec(collectionpost.FieldPostID, field.TypeString))
-	if id, ok := cpuo.mutation.CollectionID(); !ok {
+	if id, ok := _u.mutation.CollectionID(); !ok {
 		return nil, &ValidationError{Name: "collection_id", err: errors.New(`ent: missing "CollectionPost.collection_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[0].Value = id
 	}
-	if id, ok := cpuo.mutation.PostID(); !ok {
+	if id, ok := _u.mutation.PostID(); !ok {
 		return nil, &ValidationError{Name: "post_id", err: errors.New(`ent: missing "CollectionPost.post_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[1].Value = id
 	}
-	if fields := cpuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, len(fields))
 		for i, f := range fields {
 			if !collectionpost.ValidColumn(f) {
@@ -409,17 +409,17 @@ func (cpuo *CollectionPostUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 			_spec.Node.Columns[i] = f
 		}
 	}
-	if ps := cpuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cpuo.mutation.MembershipType(); ok {
+	if value, ok := _u.mutation.MembershipType(); ok {
 		_spec.SetField(collectionpost.FieldMembershipType, field.TypeString, value)
 	}
-	if cpuo.mutation.CollectionCleared() {
+	if _u.mutation.CollectionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -432,7 +432,7 @@ func (cpuo *CollectionPostUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cpuo.mutation.CollectionIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CollectionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -448,7 +448,7 @@ func (cpuo *CollectionPostUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cpuo.mutation.PostCleared() {
+	if _u.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -461,7 +461,7 @@ func (cpuo *CollectionPostUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cpuo.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -477,11 +477,11 @@ func (cpuo *CollectionPostUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(cpuo.modifiers...)
-	_node = &CollectionPost{config: cpuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &CollectionPost{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, cpuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{collectionpost.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -489,6 +489,6 @@ func (cpuo *CollectionPostUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 		}
 		return nil, err
 	}
-	cpuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

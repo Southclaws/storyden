@@ -90,7 +90,7 @@ func (*Authentication) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Authentication fields.
-func (a *Authentication) assignValues(columns []string, values []any) error {
+func (_m *Authentication) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -100,63 +100,63 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				a.ID = *value
+				_m.ID = *value
 			}
 		case authentication.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				a.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case authentication.FieldExpiresAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field expires_at", values[i])
 			} else if value.Valid {
-				a.ExpiresAt = new(time.Time)
-				*a.ExpiresAt = value.Time
+				_m.ExpiresAt = new(time.Time)
+				*_m.ExpiresAt = value.Time
 			}
 		case authentication.FieldService:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field service", values[i])
 			} else if value.Valid {
-				a.Service = value.String
+				_m.Service = value.String
 			}
 		case authentication.FieldTokenType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field token_type", values[i])
 			} else if value.Valid {
-				a.TokenType = value.String
+				_m.TokenType = value.String
 			}
 		case authentication.FieldIdentifier:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field identifier", values[i])
 			} else if value.Valid {
-				a.Identifier = value.String
+				_m.Identifier = value.String
 			}
 		case authentication.FieldToken:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field token", values[i])
 			} else if value.Valid {
-				a.Token = value.String
+				_m.Token = value.String
 			}
 		case authentication.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				a.Name = new(string)
-				*a.Name = value.String
+				_m.Name = new(string)
+				*_m.Name = value.String
 			}
 		case authentication.FieldDisabled:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field disabled", values[i])
 			} else if value.Valid {
-				a.Disabled = value.Bool
+				_m.Disabled = value.Bool
 			}
 		case authentication.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field metadata", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &a.Metadata); err != nil {
+				if err := json.Unmarshal(*value, &_m.Metadata); err != nil {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
@@ -164,10 +164,10 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_authentication", values[i])
 			} else if value != nil {
-				a.AccountAuthentication = *value
+				_m.AccountAuthentication = *value
 			}
 		default:
-			a.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -175,70 +175,70 @@ func (a *Authentication) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Authentication.
 // This includes values selected through modifiers, order, etc.
-func (a *Authentication) Value(name string) (ent.Value, error) {
-	return a.selectValues.Get(name)
+func (_m *Authentication) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryAccount queries the "account" edge of the Authentication entity.
-func (a *Authentication) QueryAccount() *AccountQuery {
-	return NewAuthenticationClient(a.config).QueryAccount(a)
+func (_m *Authentication) QueryAccount() *AccountQuery {
+	return NewAuthenticationClient(_m.config).QueryAccount(_m)
 }
 
 // Update returns a builder for updating this Authentication.
 // Note that you need to call Authentication.Unwrap() before calling this method if this Authentication
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (a *Authentication) Update() *AuthenticationUpdateOne {
-	return NewAuthenticationClient(a.config).UpdateOne(a)
+func (_m *Authentication) Update() *AuthenticationUpdateOne {
+	return NewAuthenticationClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Authentication entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (a *Authentication) Unwrap() *Authentication {
-	_tx, ok := a.config.driver.(*txDriver)
+func (_m *Authentication) Unwrap() *Authentication {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Authentication is not a transactional entity")
 	}
-	a.config.driver = _tx.drv
-	return a
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (a *Authentication) String() string {
+func (_m *Authentication) String() string {
 	var builder strings.Builder
 	builder.WriteString("Authentication(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := a.ExpiresAt; v != nil {
+	if v := _m.ExpiresAt; v != nil {
 		builder.WriteString("expires_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("service=")
-	builder.WriteString(a.Service)
+	builder.WriteString(_m.Service)
 	builder.WriteString(", ")
 	builder.WriteString("token_type=")
-	builder.WriteString(a.TokenType)
+	builder.WriteString(_m.TokenType)
 	builder.WriteString(", ")
 	builder.WriteString("identifier=")
-	builder.WriteString(a.Identifier)
+	builder.WriteString(_m.Identifier)
 	builder.WriteString(", ")
 	builder.WriteString("token=<sensitive>")
 	builder.WriteString(", ")
-	if v := a.Name; v != nil {
+	if v := _m.Name; v != nil {
 		builder.WriteString("name=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
 	builder.WriteString("disabled=")
-	builder.WriteString(fmt.Sprintf("%v", a.Disabled))
+	builder.WriteString(fmt.Sprintf("%v", _m.Disabled))
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
-	builder.WriteString(fmt.Sprintf("%v", a.Metadata))
+	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))
 	builder.WriteString(", ")
 	builder.WriteString("account_authentication=")
-	builder.WriteString(fmt.Sprintf("%v", a.AccountAuthentication))
+	builder.WriteString(fmt.Sprintf("%v", _m.AccountAuthentication))
 	builder.WriteByte(')')
 	return builder.String()
 }

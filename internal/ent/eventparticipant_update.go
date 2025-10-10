@@ -26,102 +26,102 @@ type EventParticipantUpdate struct {
 }
 
 // Where appends a list predicates to the EventParticipantUpdate builder.
-func (epu *EventParticipantUpdate) Where(ps ...predicate.EventParticipant) *EventParticipantUpdate {
-	epu.mutation.Where(ps...)
-	return epu
+func (_u *EventParticipantUpdate) Where(ps ...predicate.EventParticipant) *EventParticipantUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetRole sets the "role" field.
-func (epu *EventParticipantUpdate) SetRole(s string) *EventParticipantUpdate {
-	epu.mutation.SetRole(s)
-	return epu
+func (_u *EventParticipantUpdate) SetRole(v string) *EventParticipantUpdate {
+	_u.mutation.SetRole(v)
+	return _u
 }
 
 // SetNillableRole sets the "role" field if the given value is not nil.
-func (epu *EventParticipantUpdate) SetNillableRole(s *string) *EventParticipantUpdate {
-	if s != nil {
-		epu.SetRole(*s)
+func (_u *EventParticipantUpdate) SetNillableRole(v *string) *EventParticipantUpdate {
+	if v != nil {
+		_u.SetRole(*v)
 	}
-	return epu
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (epu *EventParticipantUpdate) SetStatus(s string) *EventParticipantUpdate {
-	epu.mutation.SetStatus(s)
-	return epu
+func (_u *EventParticipantUpdate) SetStatus(v string) *EventParticipantUpdate {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (epu *EventParticipantUpdate) SetNillableStatus(s *string) *EventParticipantUpdate {
-	if s != nil {
-		epu.SetStatus(*s)
+func (_u *EventParticipantUpdate) SetNillableStatus(v *string) *EventParticipantUpdate {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return epu
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (epu *EventParticipantUpdate) SetAccountID(x xid.ID) *EventParticipantUpdate {
-	epu.mutation.SetAccountID(x)
-	return epu
+func (_u *EventParticipantUpdate) SetAccountID(v xid.ID) *EventParticipantUpdate {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (epu *EventParticipantUpdate) SetNillableAccountID(x *xid.ID) *EventParticipantUpdate {
-	if x != nil {
-		epu.SetAccountID(*x)
+func (_u *EventParticipantUpdate) SetNillableAccountID(v *xid.ID) *EventParticipantUpdate {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return epu
+	return _u
 }
 
 // SetEventID sets the "event_id" field.
-func (epu *EventParticipantUpdate) SetEventID(x xid.ID) *EventParticipantUpdate {
-	epu.mutation.SetEventID(x)
-	return epu
+func (_u *EventParticipantUpdate) SetEventID(v xid.ID) *EventParticipantUpdate {
+	_u.mutation.SetEventID(v)
+	return _u
 }
 
 // SetNillableEventID sets the "event_id" field if the given value is not nil.
-func (epu *EventParticipantUpdate) SetNillableEventID(x *xid.ID) *EventParticipantUpdate {
-	if x != nil {
-		epu.SetEventID(*x)
+func (_u *EventParticipantUpdate) SetNillableEventID(v *xid.ID) *EventParticipantUpdate {
+	if v != nil {
+		_u.SetEventID(*v)
 	}
-	return epu
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (epu *EventParticipantUpdate) SetAccount(a *Account) *EventParticipantUpdate {
-	return epu.SetAccountID(a.ID)
+func (_u *EventParticipantUpdate) SetAccount(v *Account) *EventParticipantUpdate {
+	return _u.SetAccountID(v.ID)
 }
 
 // SetEvent sets the "event" edge to the Event entity.
-func (epu *EventParticipantUpdate) SetEvent(e *Event) *EventParticipantUpdate {
-	return epu.SetEventID(e.ID)
+func (_u *EventParticipantUpdate) SetEvent(v *Event) *EventParticipantUpdate {
+	return _u.SetEventID(v.ID)
 }
 
 // Mutation returns the EventParticipantMutation object of the builder.
-func (epu *EventParticipantUpdate) Mutation() *EventParticipantMutation {
-	return epu.mutation
+func (_u *EventParticipantUpdate) Mutation() *EventParticipantMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (epu *EventParticipantUpdate) ClearAccount() *EventParticipantUpdate {
-	epu.mutation.ClearAccount()
-	return epu
+func (_u *EventParticipantUpdate) ClearAccount() *EventParticipantUpdate {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // ClearEvent clears the "event" edge to the Event entity.
-func (epu *EventParticipantUpdate) ClearEvent() *EventParticipantUpdate {
-	epu.mutation.ClearEvent()
-	return epu
+func (_u *EventParticipantUpdate) ClearEvent() *EventParticipantUpdate {
+	_u.mutation.ClearEvent()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (epu *EventParticipantUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, epu.sqlSave, epu.mutation, epu.hooks)
+func (_u *EventParticipantUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (epu *EventParticipantUpdate) SaveX(ctx context.Context) int {
-	affected, err := epu.Save(ctx)
+func (_u *EventParticipantUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -129,54 +129,54 @@ func (epu *EventParticipantUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (epu *EventParticipantUpdate) Exec(ctx context.Context) error {
-	_, err := epu.Save(ctx)
+func (_u *EventParticipantUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (epu *EventParticipantUpdate) ExecX(ctx context.Context) {
-	if err := epu.Exec(ctx); err != nil {
+func (_u *EventParticipantUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (epu *EventParticipantUpdate) check() error {
-	if epu.mutation.AccountCleared() && len(epu.mutation.AccountIDs()) > 0 {
+func (_u *EventParticipantUpdate) check() error {
+	if _u.mutation.AccountCleared() && len(_u.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "EventParticipant.account"`)
 	}
-	if epu.mutation.EventCleared() && len(epu.mutation.EventIDs()) > 0 {
+	if _u.mutation.EventCleared() && len(_u.mutation.EventIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "EventParticipant.event"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (epu *EventParticipantUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventParticipantUpdate {
-	epu.modifiers = append(epu.modifiers, modifiers...)
-	return epu
+func (_u *EventParticipantUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventParticipantUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (epu *EventParticipantUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := epu.check(); err != nil {
-		return n, err
+func (_u *EventParticipantUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(eventparticipant.Table, eventparticipant.Columns, sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString))
-	if ps := epu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := epu.mutation.Role(); ok {
+	if value, ok := _u.mutation.Role(); ok {
 		_spec.SetField(eventparticipant.FieldRole, field.TypeString, value)
 	}
-	if value, ok := epu.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(eventparticipant.FieldStatus, field.TypeString, value)
 	}
-	if epu.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -189,7 +189,7 @@ func (epu *EventParticipantUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := epu.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -205,7 +205,7 @@ func (epu *EventParticipantUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if epu.mutation.EventCleared() {
+	if _u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -218,7 +218,7 @@ func (epu *EventParticipantUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := epu.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -234,8 +234,8 @@ func (epu *EventParticipantUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(epu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, epu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{eventparticipant.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -243,8 +243,8 @@ func (epu *EventParticipantUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		return 0, err
 	}
-	epu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // EventParticipantUpdateOne is the builder for updating a single EventParticipant entity.
@@ -257,109 +257,109 @@ type EventParticipantUpdateOne struct {
 }
 
 // SetRole sets the "role" field.
-func (epuo *EventParticipantUpdateOne) SetRole(s string) *EventParticipantUpdateOne {
-	epuo.mutation.SetRole(s)
-	return epuo
+func (_u *EventParticipantUpdateOne) SetRole(v string) *EventParticipantUpdateOne {
+	_u.mutation.SetRole(v)
+	return _u
 }
 
 // SetNillableRole sets the "role" field if the given value is not nil.
-func (epuo *EventParticipantUpdateOne) SetNillableRole(s *string) *EventParticipantUpdateOne {
-	if s != nil {
-		epuo.SetRole(*s)
+func (_u *EventParticipantUpdateOne) SetNillableRole(v *string) *EventParticipantUpdateOne {
+	if v != nil {
+		_u.SetRole(*v)
 	}
-	return epuo
+	return _u
 }
 
 // SetStatus sets the "status" field.
-func (epuo *EventParticipantUpdateOne) SetStatus(s string) *EventParticipantUpdateOne {
-	epuo.mutation.SetStatus(s)
-	return epuo
+func (_u *EventParticipantUpdateOne) SetStatus(v string) *EventParticipantUpdateOne {
+	_u.mutation.SetStatus(v)
+	return _u
 }
 
 // SetNillableStatus sets the "status" field if the given value is not nil.
-func (epuo *EventParticipantUpdateOne) SetNillableStatus(s *string) *EventParticipantUpdateOne {
-	if s != nil {
-		epuo.SetStatus(*s)
+func (_u *EventParticipantUpdateOne) SetNillableStatus(v *string) *EventParticipantUpdateOne {
+	if v != nil {
+		_u.SetStatus(*v)
 	}
-	return epuo
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (epuo *EventParticipantUpdateOne) SetAccountID(x xid.ID) *EventParticipantUpdateOne {
-	epuo.mutation.SetAccountID(x)
-	return epuo
+func (_u *EventParticipantUpdateOne) SetAccountID(v xid.ID) *EventParticipantUpdateOne {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (epuo *EventParticipantUpdateOne) SetNillableAccountID(x *xid.ID) *EventParticipantUpdateOne {
-	if x != nil {
-		epuo.SetAccountID(*x)
+func (_u *EventParticipantUpdateOne) SetNillableAccountID(v *xid.ID) *EventParticipantUpdateOne {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return epuo
+	return _u
 }
 
 // SetEventID sets the "event_id" field.
-func (epuo *EventParticipantUpdateOne) SetEventID(x xid.ID) *EventParticipantUpdateOne {
-	epuo.mutation.SetEventID(x)
-	return epuo
+func (_u *EventParticipantUpdateOne) SetEventID(v xid.ID) *EventParticipantUpdateOne {
+	_u.mutation.SetEventID(v)
+	return _u
 }
 
 // SetNillableEventID sets the "event_id" field if the given value is not nil.
-func (epuo *EventParticipantUpdateOne) SetNillableEventID(x *xid.ID) *EventParticipantUpdateOne {
-	if x != nil {
-		epuo.SetEventID(*x)
+func (_u *EventParticipantUpdateOne) SetNillableEventID(v *xid.ID) *EventParticipantUpdateOne {
+	if v != nil {
+		_u.SetEventID(*v)
 	}
-	return epuo
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (epuo *EventParticipantUpdateOne) SetAccount(a *Account) *EventParticipantUpdateOne {
-	return epuo.SetAccountID(a.ID)
+func (_u *EventParticipantUpdateOne) SetAccount(v *Account) *EventParticipantUpdateOne {
+	return _u.SetAccountID(v.ID)
 }
 
 // SetEvent sets the "event" edge to the Event entity.
-func (epuo *EventParticipantUpdateOne) SetEvent(e *Event) *EventParticipantUpdateOne {
-	return epuo.SetEventID(e.ID)
+func (_u *EventParticipantUpdateOne) SetEvent(v *Event) *EventParticipantUpdateOne {
+	return _u.SetEventID(v.ID)
 }
 
 // Mutation returns the EventParticipantMutation object of the builder.
-func (epuo *EventParticipantUpdateOne) Mutation() *EventParticipantMutation {
-	return epuo.mutation
+func (_u *EventParticipantUpdateOne) Mutation() *EventParticipantMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (epuo *EventParticipantUpdateOne) ClearAccount() *EventParticipantUpdateOne {
-	epuo.mutation.ClearAccount()
-	return epuo
+func (_u *EventParticipantUpdateOne) ClearAccount() *EventParticipantUpdateOne {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // ClearEvent clears the "event" edge to the Event entity.
-func (epuo *EventParticipantUpdateOne) ClearEvent() *EventParticipantUpdateOne {
-	epuo.mutation.ClearEvent()
-	return epuo
+func (_u *EventParticipantUpdateOne) ClearEvent() *EventParticipantUpdateOne {
+	_u.mutation.ClearEvent()
+	return _u
 }
 
 // Where appends a list predicates to the EventParticipantUpdate builder.
-func (epuo *EventParticipantUpdateOne) Where(ps ...predicate.EventParticipant) *EventParticipantUpdateOne {
-	epuo.mutation.Where(ps...)
-	return epuo
+func (_u *EventParticipantUpdateOne) Where(ps ...predicate.EventParticipant) *EventParticipantUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (epuo *EventParticipantUpdateOne) Select(field string, fields ...string) *EventParticipantUpdateOne {
-	epuo.fields = append([]string{field}, fields...)
-	return epuo
+func (_u *EventParticipantUpdateOne) Select(field string, fields ...string) *EventParticipantUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated EventParticipant entity.
-func (epuo *EventParticipantUpdateOne) Save(ctx context.Context) (*EventParticipant, error) {
-	return withHooks(ctx, epuo.sqlSave, epuo.mutation, epuo.hooks)
+func (_u *EventParticipantUpdateOne) Save(ctx context.Context) (*EventParticipant, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (epuo *EventParticipantUpdateOne) SaveX(ctx context.Context) *EventParticipant {
-	node, err := epuo.Save(ctx)
+func (_u *EventParticipantUpdateOne) SaveX(ctx context.Context) *EventParticipant {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -367,46 +367,46 @@ func (epuo *EventParticipantUpdateOne) SaveX(ctx context.Context) *EventParticip
 }
 
 // Exec executes the query on the entity.
-func (epuo *EventParticipantUpdateOne) Exec(ctx context.Context) error {
-	_, err := epuo.Save(ctx)
+func (_u *EventParticipantUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (epuo *EventParticipantUpdateOne) ExecX(ctx context.Context) {
-	if err := epuo.Exec(ctx); err != nil {
+func (_u *EventParticipantUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (epuo *EventParticipantUpdateOne) check() error {
-	if epuo.mutation.AccountCleared() && len(epuo.mutation.AccountIDs()) > 0 {
+func (_u *EventParticipantUpdateOne) check() error {
+	if _u.mutation.AccountCleared() && len(_u.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "EventParticipant.account"`)
 	}
-	if epuo.mutation.EventCleared() && len(epuo.mutation.EventIDs()) > 0 {
+	if _u.mutation.EventCleared() && len(_u.mutation.EventIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "EventParticipant.event"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (epuo *EventParticipantUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventParticipantUpdateOne {
-	epuo.modifiers = append(epuo.modifiers, modifiers...)
-	return epuo
+func (_u *EventParticipantUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventParticipantUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (epuo *EventParticipantUpdateOne) sqlSave(ctx context.Context) (_node *EventParticipant, err error) {
-	if err := epuo.check(); err != nil {
+func (_u *EventParticipantUpdateOne) sqlSave(ctx context.Context) (_node *EventParticipant, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(eventparticipant.Table, eventparticipant.Columns, sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString))
-	id, ok := epuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "EventParticipant.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := epuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, eventparticipant.FieldID)
 		for _, f := range fields {
@@ -418,20 +418,20 @@ func (epuo *EventParticipantUpdateOne) sqlSave(ctx context.Context) (_node *Even
 			}
 		}
 	}
-	if ps := epuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := epuo.mutation.Role(); ok {
+	if value, ok := _u.mutation.Role(); ok {
 		_spec.SetField(eventparticipant.FieldRole, field.TypeString, value)
 	}
-	if value, ok := epuo.mutation.Status(); ok {
+	if value, ok := _u.mutation.Status(); ok {
 		_spec.SetField(eventparticipant.FieldStatus, field.TypeString, value)
 	}
-	if epuo.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -444,7 +444,7 @@ func (epuo *EventParticipantUpdateOne) sqlSave(ctx context.Context) (_node *Even
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := epuo.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -460,7 +460,7 @@ func (epuo *EventParticipantUpdateOne) sqlSave(ctx context.Context) (_node *Even
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if epuo.mutation.EventCleared() {
+	if _u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -473,7 +473,7 @@ func (epuo *EventParticipantUpdateOne) sqlSave(ctx context.Context) (_node *Even
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := epuo.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -489,11 +489,11 @@ func (epuo *EventParticipantUpdateOne) sqlSave(ctx context.Context) (_node *Even
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(epuo.modifiers...)
-	_node = &EventParticipant{config: epuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &EventParticipant{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, epuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{eventparticipant.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -501,6 +501,6 @@ func (epuo *EventParticipantUpdateOne) sqlSave(ctx context.Context) (_node *Even
 		}
 		return nil, err
 	}
-	epuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

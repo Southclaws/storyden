@@ -26,77 +26,77 @@ type PropertySchemaFieldCreate struct {
 }
 
 // SetName sets the "name" field.
-func (psfc *PropertySchemaFieldCreate) SetName(s string) *PropertySchemaFieldCreate {
-	psfc.mutation.SetName(s)
-	return psfc
+func (_c *PropertySchemaFieldCreate) SetName(v string) *PropertySchemaFieldCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetType sets the "type" field.
-func (psfc *PropertySchemaFieldCreate) SetType(s string) *PropertySchemaFieldCreate {
-	psfc.mutation.SetType(s)
-	return psfc
+func (_c *PropertySchemaFieldCreate) SetType(v string) *PropertySchemaFieldCreate {
+	_c.mutation.SetType(v)
+	return _c
 }
 
 // SetSort sets the "sort" field.
-func (psfc *PropertySchemaFieldCreate) SetSort(s string) *PropertySchemaFieldCreate {
-	psfc.mutation.SetSort(s)
-	return psfc
+func (_c *PropertySchemaFieldCreate) SetSort(v string) *PropertySchemaFieldCreate {
+	_c.mutation.SetSort(v)
+	return _c
 }
 
 // SetSchemaID sets the "schema_id" field.
-func (psfc *PropertySchemaFieldCreate) SetSchemaID(x xid.ID) *PropertySchemaFieldCreate {
-	psfc.mutation.SetSchemaID(x)
-	return psfc
+func (_c *PropertySchemaFieldCreate) SetSchemaID(v xid.ID) *PropertySchemaFieldCreate {
+	_c.mutation.SetSchemaID(v)
+	return _c
 }
 
 // SetID sets the "id" field.
-func (psfc *PropertySchemaFieldCreate) SetID(x xid.ID) *PropertySchemaFieldCreate {
-	psfc.mutation.SetID(x)
-	return psfc
+func (_c *PropertySchemaFieldCreate) SetID(v xid.ID) *PropertySchemaFieldCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (psfc *PropertySchemaFieldCreate) SetNillableID(x *xid.ID) *PropertySchemaFieldCreate {
-	if x != nil {
-		psfc.SetID(*x)
+func (_c *PropertySchemaFieldCreate) SetNillableID(v *xid.ID) *PropertySchemaFieldCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return psfc
+	return _c
 }
 
 // SetSchema sets the "schema" edge to the PropertySchema entity.
-func (psfc *PropertySchemaFieldCreate) SetSchema(p *PropertySchema) *PropertySchemaFieldCreate {
-	return psfc.SetSchemaID(p.ID)
+func (_c *PropertySchemaFieldCreate) SetSchema(v *PropertySchema) *PropertySchemaFieldCreate {
+	return _c.SetSchemaID(v.ID)
 }
 
 // AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
-func (psfc *PropertySchemaFieldCreate) AddPropertyIDs(ids ...xid.ID) *PropertySchemaFieldCreate {
-	psfc.mutation.AddPropertyIDs(ids...)
-	return psfc
+func (_c *PropertySchemaFieldCreate) AddPropertyIDs(ids ...xid.ID) *PropertySchemaFieldCreate {
+	_c.mutation.AddPropertyIDs(ids...)
+	return _c
 }
 
 // AddProperties adds the "properties" edges to the Property entity.
-func (psfc *PropertySchemaFieldCreate) AddProperties(p ...*Property) *PropertySchemaFieldCreate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_c *PropertySchemaFieldCreate) AddProperties(v ...*Property) *PropertySchemaFieldCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return psfc.AddPropertyIDs(ids...)
+	return _c.AddPropertyIDs(ids...)
 }
 
 // Mutation returns the PropertySchemaFieldMutation object of the builder.
-func (psfc *PropertySchemaFieldCreate) Mutation() *PropertySchemaFieldMutation {
-	return psfc.mutation
+func (_c *PropertySchemaFieldCreate) Mutation() *PropertySchemaFieldMutation {
+	return _c.mutation
 }
 
 // Save creates the PropertySchemaField in the database.
-func (psfc *PropertySchemaFieldCreate) Save(ctx context.Context) (*PropertySchemaField, error) {
-	psfc.defaults()
-	return withHooks(ctx, psfc.sqlSave, psfc.mutation, psfc.hooks)
+func (_c *PropertySchemaFieldCreate) Save(ctx context.Context) (*PropertySchemaField, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (psfc *PropertySchemaFieldCreate) SaveX(ctx context.Context) *PropertySchemaField {
-	v, err := psfc.Save(ctx)
+func (_c *PropertySchemaFieldCreate) SaveX(ctx context.Context) *PropertySchemaField {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -104,57 +104,57 @@ func (psfc *PropertySchemaFieldCreate) SaveX(ctx context.Context) *PropertySchem
 }
 
 // Exec executes the query.
-func (psfc *PropertySchemaFieldCreate) Exec(ctx context.Context) error {
-	_, err := psfc.Save(ctx)
+func (_c *PropertySchemaFieldCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (psfc *PropertySchemaFieldCreate) ExecX(ctx context.Context) {
-	if err := psfc.Exec(ctx); err != nil {
+func (_c *PropertySchemaFieldCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (psfc *PropertySchemaFieldCreate) defaults() {
-	if _, ok := psfc.mutation.ID(); !ok {
+func (_c *PropertySchemaFieldCreate) defaults() {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := propertyschemafield.DefaultID()
-		psfc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (psfc *PropertySchemaFieldCreate) check() error {
-	if _, ok := psfc.mutation.Name(); !ok {
+func (_c *PropertySchemaFieldCreate) check() error {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "PropertySchemaField.name"`)}
 	}
-	if _, ok := psfc.mutation.GetType(); !ok {
+	if _, ok := _c.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "PropertySchemaField.type"`)}
 	}
-	if _, ok := psfc.mutation.Sort(); !ok {
+	if _, ok := _c.mutation.Sort(); !ok {
 		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "PropertySchemaField.sort"`)}
 	}
-	if _, ok := psfc.mutation.SchemaID(); !ok {
+	if _, ok := _c.mutation.SchemaID(); !ok {
 		return &ValidationError{Name: "schema_id", err: errors.New(`ent: missing required field "PropertySchemaField.schema_id"`)}
 	}
-	if v, ok := psfc.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := propertyschemafield.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "PropertySchemaField.id": %w`, err)}
 		}
 	}
-	if len(psfc.mutation.SchemaIDs()) == 0 {
+	if len(_c.mutation.SchemaIDs()) == 0 {
 		return &ValidationError{Name: "schema", err: errors.New(`ent: missing required edge "PropertySchemaField.schema"`)}
 	}
 	return nil
 }
 
-func (psfc *PropertySchemaFieldCreate) sqlSave(ctx context.Context) (*PropertySchemaField, error) {
-	if err := psfc.check(); err != nil {
+func (_c *PropertySchemaFieldCreate) sqlSave(ctx context.Context) (*PropertySchemaField, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := psfc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, psfc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -167,34 +167,34 @@ func (psfc *PropertySchemaFieldCreate) sqlSave(ctx context.Context) (*PropertySc
 			return nil, err
 		}
 	}
-	psfc.mutation.id = &_node.ID
-	psfc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (psfc *PropertySchemaFieldCreate) createSpec() (*PropertySchemaField, *sqlgraph.CreateSpec) {
+func (_c *PropertySchemaFieldCreate) createSpec() (*PropertySchemaField, *sqlgraph.CreateSpec) {
 	var (
-		_node = &PropertySchemaField{config: psfc.config}
+		_node = &PropertySchemaField{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(propertyschemafield.Table, sqlgraph.NewFieldSpec(propertyschemafield.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = psfc.conflict
-	if id, ok := psfc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := psfc.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(propertyschemafield.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := psfc.mutation.GetType(); ok {
+	if value, ok := _c.mutation.GetType(); ok {
 		_spec.SetField(propertyschemafield.FieldType, field.TypeString, value)
 		_node.Type = value
 	}
-	if value, ok := psfc.mutation.Sort(); ok {
+	if value, ok := _c.mutation.Sort(); ok {
 		_spec.SetField(propertyschemafield.FieldSort, field.TypeString, value)
 		_node.Sort = value
 	}
-	if nodes := psfc.mutation.SchemaIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.SchemaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -211,7 +211,7 @@ func (psfc *PropertySchemaFieldCreate) createSpec() (*PropertySchemaField, *sqlg
 		_node.SchemaID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := psfc.mutation.PropertiesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PropertiesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -246,10 +246,10 @@ func (psfc *PropertySchemaFieldCreate) createSpec() (*PropertySchemaField, *sqlg
 //			SetName(v+v).
 //		}).
 //		Exec(ctx)
-func (psfc *PropertySchemaFieldCreate) OnConflict(opts ...sql.ConflictOption) *PropertySchemaFieldUpsertOne {
-	psfc.conflict = opts
+func (_c *PropertySchemaFieldCreate) OnConflict(opts ...sql.ConflictOption) *PropertySchemaFieldUpsertOne {
+	_c.conflict = opts
 	return &PropertySchemaFieldUpsertOne{
-		create: psfc,
+		create: _c,
 	}
 }
 
@@ -259,10 +259,10 @@ func (psfc *PropertySchemaFieldCreate) OnConflict(opts ...sql.ConflictOption) *P
 //	client.PropertySchemaField.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (psfc *PropertySchemaFieldCreate) OnConflictColumns(columns ...string) *PropertySchemaFieldUpsertOne {
-	psfc.conflict = append(psfc.conflict, sql.ConflictColumns(columns...))
+func (_c *PropertySchemaFieldCreate) OnConflictColumns(columns ...string) *PropertySchemaFieldUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &PropertySchemaFieldUpsertOne{
-		create: psfc,
+		create: _c,
 	}
 }
 
@@ -478,16 +478,16 @@ type PropertySchemaFieldCreateBulk struct {
 }
 
 // Save creates the PropertySchemaField entities in the database.
-func (psfcb *PropertySchemaFieldCreateBulk) Save(ctx context.Context) ([]*PropertySchemaField, error) {
-	if psfcb.err != nil {
-		return nil, psfcb.err
+func (_c *PropertySchemaFieldCreateBulk) Save(ctx context.Context) ([]*PropertySchemaField, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(psfcb.builders))
-	nodes := make([]*PropertySchemaField, len(psfcb.builders))
-	mutators := make([]Mutator, len(psfcb.builders))
-	for i := range psfcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*PropertySchemaField, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := psfcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*PropertySchemaFieldMutation)
@@ -501,12 +501,12 @@ func (psfcb *PropertySchemaFieldCreateBulk) Save(ctx context.Context) ([]*Proper
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, psfcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = psfcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, psfcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -526,7 +526,7 @@ func (psfcb *PropertySchemaFieldCreateBulk) Save(ctx context.Context) ([]*Proper
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, psfcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -534,8 +534,8 @@ func (psfcb *PropertySchemaFieldCreateBulk) Save(ctx context.Context) ([]*Proper
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (psfcb *PropertySchemaFieldCreateBulk) SaveX(ctx context.Context) []*PropertySchemaField {
-	v, err := psfcb.Save(ctx)
+func (_c *PropertySchemaFieldCreateBulk) SaveX(ctx context.Context) []*PropertySchemaField {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -543,14 +543,14 @@ func (psfcb *PropertySchemaFieldCreateBulk) SaveX(ctx context.Context) []*Proper
 }
 
 // Exec executes the query.
-func (psfcb *PropertySchemaFieldCreateBulk) Exec(ctx context.Context) error {
-	_, err := psfcb.Save(ctx)
+func (_c *PropertySchemaFieldCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (psfcb *PropertySchemaFieldCreateBulk) ExecX(ctx context.Context) {
-	if err := psfcb.Exec(ctx); err != nil {
+func (_c *PropertySchemaFieldCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -570,10 +570,10 @@ func (psfcb *PropertySchemaFieldCreateBulk) ExecX(ctx context.Context) {
 //			SetName(v+v).
 //		}).
 //		Exec(ctx)
-func (psfcb *PropertySchemaFieldCreateBulk) OnConflict(opts ...sql.ConflictOption) *PropertySchemaFieldUpsertBulk {
-	psfcb.conflict = opts
+func (_c *PropertySchemaFieldCreateBulk) OnConflict(opts ...sql.ConflictOption) *PropertySchemaFieldUpsertBulk {
+	_c.conflict = opts
 	return &PropertySchemaFieldUpsertBulk{
-		create: psfcb,
+		create: _c,
 	}
 }
 
@@ -583,10 +583,10 @@ func (psfcb *PropertySchemaFieldCreateBulk) OnConflict(opts ...sql.ConflictOptio
 //	client.PropertySchemaField.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (psfcb *PropertySchemaFieldCreateBulk) OnConflictColumns(columns ...string) *PropertySchemaFieldUpsertBulk {
-	psfcb.conflict = append(psfcb.conflict, sql.ConflictColumns(columns...))
+func (_c *PropertySchemaFieldCreateBulk) OnConflictColumns(columns ...string) *PropertySchemaFieldUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &PropertySchemaFieldUpsertBulk{
-		create: psfcb,
+		create: _c,
 	}
 }
 

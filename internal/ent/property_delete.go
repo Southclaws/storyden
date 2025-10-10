@@ -20,56 +20,56 @@ type PropertyDelete struct {
 }
 
 // Where appends a list predicates to the PropertyDelete builder.
-func (pd *PropertyDelete) Where(ps ...predicate.Property) *PropertyDelete {
-	pd.mutation.Where(ps...)
-	return pd
+func (_d *PropertyDelete) Where(ps ...predicate.Property) *PropertyDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (pd *PropertyDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, pd.sqlExec, pd.mutation, pd.hooks)
+func (_d *PropertyDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pd *PropertyDelete) ExecX(ctx context.Context) int {
-	n, err := pd.Exec(ctx)
+func (_d *PropertyDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (pd *PropertyDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *PropertyDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(property.Table, sqlgraph.NewFieldSpec(property.FieldID, field.TypeString))
-	if ps := pd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, pd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	pd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // PropertyDeleteOne is the builder for deleting a single Property entity.
 type PropertyDeleteOne struct {
-	pd *PropertyDelete
+	_d *PropertyDelete
 }
 
 // Where appends a list predicates to the PropertyDelete builder.
-func (pdo *PropertyDeleteOne) Where(ps ...predicate.Property) *PropertyDeleteOne {
-	pdo.pd.mutation.Where(ps...)
-	return pdo
+func (_d *PropertyDeleteOne) Where(ps ...predicate.Property) *PropertyDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (pdo *PropertyDeleteOne) Exec(ctx context.Context) error {
-	n, err := pdo.pd.Exec(ctx)
+func (_d *PropertyDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (pdo *PropertyDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pdo *PropertyDeleteOne) ExecX(ctx context.Context) {
-	if err := pdo.Exec(ctx); err != nil {
+func (_d *PropertyDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -33,388 +33,388 @@ type NodeCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (nc *NodeCreate) SetCreatedAt(t time.Time) *NodeCreate {
-	nc.mutation.SetCreatedAt(t)
-	return nc
+func (_c *NodeCreate) SetCreatedAt(v time.Time) *NodeCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableCreatedAt(t *time.Time) *NodeCreate {
-	if t != nil {
-		nc.SetCreatedAt(*t)
+func (_c *NodeCreate) SetNillableCreatedAt(v *time.Time) *NodeCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (nc *NodeCreate) SetUpdatedAt(t time.Time) *NodeCreate {
-	nc.mutation.SetUpdatedAt(t)
-	return nc
+func (_c *NodeCreate) SetUpdatedAt(v time.Time) *NodeCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableUpdatedAt(t *time.Time) *NodeCreate {
-	if t != nil {
-		nc.SetUpdatedAt(*t)
+func (_c *NodeCreate) SetNillableUpdatedAt(v *time.Time) *NodeCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (nc *NodeCreate) SetDeletedAt(t time.Time) *NodeCreate {
-	nc.mutation.SetDeletedAt(t)
-	return nc
+func (_c *NodeCreate) SetDeletedAt(v time.Time) *NodeCreate {
+	_c.mutation.SetDeletedAt(v)
+	return _c
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableDeletedAt(t *time.Time) *NodeCreate {
-	if t != nil {
-		nc.SetDeletedAt(*t)
+func (_c *NodeCreate) SetNillableDeletedAt(v *time.Time) *NodeCreate {
+	if v != nil {
+		_c.SetDeletedAt(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (nc *NodeCreate) SetIndexedAt(t time.Time) *NodeCreate {
-	nc.mutation.SetIndexedAt(t)
-	return nc
+func (_c *NodeCreate) SetIndexedAt(v time.Time) *NodeCreate {
+	_c.mutation.SetIndexedAt(v)
+	return _c
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableIndexedAt(t *time.Time) *NodeCreate {
-	if t != nil {
-		nc.SetIndexedAt(*t)
+func (_c *NodeCreate) SetNillableIndexedAt(v *time.Time) *NodeCreate {
+	if v != nil {
+		_c.SetIndexedAt(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetName sets the "name" field.
-func (nc *NodeCreate) SetName(s string) *NodeCreate {
-	nc.mutation.SetName(s)
-	return nc
+func (_c *NodeCreate) SetName(v string) *NodeCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetSlug sets the "slug" field.
-func (nc *NodeCreate) SetSlug(s string) *NodeCreate {
-	nc.mutation.SetSlug(s)
-	return nc
+func (_c *NodeCreate) SetSlug(v string) *NodeCreate {
+	_c.mutation.SetSlug(v)
+	return _c
 }
 
 // SetDescription sets the "description" field.
-func (nc *NodeCreate) SetDescription(s string) *NodeCreate {
-	nc.mutation.SetDescription(s)
-	return nc
+func (_c *NodeCreate) SetDescription(v string) *NodeCreate {
+	_c.mutation.SetDescription(v)
+	return _c
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableDescription(s *string) *NodeCreate {
-	if s != nil {
-		nc.SetDescription(*s)
+func (_c *NodeCreate) SetNillableDescription(v *string) *NodeCreate {
+	if v != nil {
+		_c.SetDescription(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetContent sets the "content" field.
-func (nc *NodeCreate) SetContent(s string) *NodeCreate {
-	nc.mutation.SetContent(s)
-	return nc
+func (_c *NodeCreate) SetContent(v string) *NodeCreate {
+	_c.mutation.SetContent(v)
+	return _c
 }
 
 // SetNillableContent sets the "content" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableContent(s *string) *NodeCreate {
-	if s != nil {
-		nc.SetContent(*s)
+func (_c *NodeCreate) SetNillableContent(v *string) *NodeCreate {
+	if v != nil {
+		_c.SetContent(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetParentNodeID sets the "parent_node_id" field.
-func (nc *NodeCreate) SetParentNodeID(x xid.ID) *NodeCreate {
-	nc.mutation.SetParentNodeID(x)
-	return nc
+func (_c *NodeCreate) SetParentNodeID(v xid.ID) *NodeCreate {
+	_c.mutation.SetParentNodeID(v)
+	return _c
 }
 
 // SetNillableParentNodeID sets the "parent_node_id" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableParentNodeID(x *xid.ID) *NodeCreate {
-	if x != nil {
-		nc.SetParentNodeID(*x)
+func (_c *NodeCreate) SetNillableParentNodeID(v *xid.ID) *NodeCreate {
+	if v != nil {
+		_c.SetParentNodeID(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetHideChildTree sets the "hide_child_tree" field.
-func (nc *NodeCreate) SetHideChildTree(b bool) *NodeCreate {
-	nc.mutation.SetHideChildTree(b)
-	return nc
+func (_c *NodeCreate) SetHideChildTree(v bool) *NodeCreate {
+	_c.mutation.SetHideChildTree(v)
+	return _c
 }
 
 // SetNillableHideChildTree sets the "hide_child_tree" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableHideChildTree(b *bool) *NodeCreate {
-	if b != nil {
-		nc.SetHideChildTree(*b)
+func (_c *NodeCreate) SetNillableHideChildTree(v *bool) *NodeCreate {
+	if v != nil {
+		_c.SetHideChildTree(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetAccountID sets the "account_id" field.
-func (nc *NodeCreate) SetAccountID(x xid.ID) *NodeCreate {
-	nc.mutation.SetAccountID(x)
-	return nc
+func (_c *NodeCreate) SetAccountID(v xid.ID) *NodeCreate {
+	_c.mutation.SetAccountID(v)
+	return _c
 }
 
 // SetPropertySchemaID sets the "property_schema_id" field.
-func (nc *NodeCreate) SetPropertySchemaID(x xid.ID) *NodeCreate {
-	nc.mutation.SetPropertySchemaID(x)
-	return nc
+func (_c *NodeCreate) SetPropertySchemaID(v xid.ID) *NodeCreate {
+	_c.mutation.SetPropertySchemaID(v)
+	return _c
 }
 
 // SetNillablePropertySchemaID sets the "property_schema_id" field if the given value is not nil.
-func (nc *NodeCreate) SetNillablePropertySchemaID(x *xid.ID) *NodeCreate {
-	if x != nil {
-		nc.SetPropertySchemaID(*x)
+func (_c *NodeCreate) SetNillablePropertySchemaID(v *xid.ID) *NodeCreate {
+	if v != nil {
+		_c.SetPropertySchemaID(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetPrimaryAssetID sets the "primary_asset_id" field.
-func (nc *NodeCreate) SetPrimaryAssetID(x xid.ID) *NodeCreate {
-	nc.mutation.SetPrimaryAssetID(x)
-	return nc
+func (_c *NodeCreate) SetPrimaryAssetID(v xid.ID) *NodeCreate {
+	_c.mutation.SetPrimaryAssetID(v)
+	return _c
 }
 
 // SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
-func (nc *NodeCreate) SetNillablePrimaryAssetID(x *xid.ID) *NodeCreate {
-	if x != nil {
-		nc.SetPrimaryAssetID(*x)
+func (_c *NodeCreate) SetNillablePrimaryAssetID(v *xid.ID) *NodeCreate {
+	if v != nil {
+		_c.SetPrimaryAssetID(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetLinkID sets the "link_id" field.
-func (nc *NodeCreate) SetLinkID(x xid.ID) *NodeCreate {
-	nc.mutation.SetLinkID(x)
-	return nc
+func (_c *NodeCreate) SetLinkID(v xid.ID) *NodeCreate {
+	_c.mutation.SetLinkID(v)
+	return _c
 }
 
 // SetNillableLinkID sets the "link_id" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableLinkID(x *xid.ID) *NodeCreate {
-	if x != nil {
-		nc.SetLinkID(*x)
+func (_c *NodeCreate) SetNillableLinkID(v *xid.ID) *NodeCreate {
+	if v != nil {
+		_c.SetLinkID(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetVisibility sets the "visibility" field.
-func (nc *NodeCreate) SetVisibility(n node.Visibility) *NodeCreate {
-	nc.mutation.SetVisibility(n)
-	return nc
+func (_c *NodeCreate) SetVisibility(v node.Visibility) *NodeCreate {
+	_c.mutation.SetVisibility(v)
+	return _c
 }
 
 // SetNillableVisibility sets the "visibility" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableVisibility(n *node.Visibility) *NodeCreate {
-	if n != nil {
-		nc.SetVisibility(*n)
+func (_c *NodeCreate) SetNillableVisibility(v *node.Visibility) *NodeCreate {
+	if v != nil {
+		_c.SetVisibility(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetSort sets the "sort" field.
-func (nc *NodeCreate) SetSort(l lexorank.Key) *NodeCreate {
-	nc.mutation.SetSort(l)
-	return nc
+func (_c *NodeCreate) SetSort(v lexorank.Key) *NodeCreate {
+	_c.mutation.SetSort(v)
+	return _c
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableSort(l *lexorank.Key) *NodeCreate {
-	if l != nil {
-		nc.SetSort(*l)
+func (_c *NodeCreate) SetNillableSort(v *lexorank.Key) *NodeCreate {
+	if v != nil {
+		_c.SetSort(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetMetadata sets the "metadata" field.
-func (nc *NodeCreate) SetMetadata(m map[string]interface{}) *NodeCreate {
-	nc.mutation.SetMetadata(m)
-	return nc
+func (_c *NodeCreate) SetMetadata(v map[string]interface{}) *NodeCreate {
+	_c.mutation.SetMetadata(v)
+	return _c
 }
 
 // SetID sets the "id" field.
-func (nc *NodeCreate) SetID(x xid.ID) *NodeCreate {
-	nc.mutation.SetID(x)
-	return nc
+func (_c *NodeCreate) SetID(v xid.ID) *NodeCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (nc *NodeCreate) SetNillableID(x *xid.ID) *NodeCreate {
-	if x != nil {
-		nc.SetID(*x)
+func (_c *NodeCreate) SetNillableID(v *xid.ID) *NodeCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return nc
+	return _c
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
-func (nc *NodeCreate) SetOwnerID(id xid.ID) *NodeCreate {
-	nc.mutation.SetOwnerID(id)
-	return nc
+func (_c *NodeCreate) SetOwnerID(id xid.ID) *NodeCreate {
+	_c.mutation.SetOwnerID(id)
+	return _c
 }
 
 // SetOwner sets the "owner" edge to the Account entity.
-func (nc *NodeCreate) SetOwner(a *Account) *NodeCreate {
-	return nc.SetOwnerID(a.ID)
+func (_c *NodeCreate) SetOwner(v *Account) *NodeCreate {
+	return _c.SetOwnerID(v.ID)
 }
 
 // SetParentID sets the "parent" edge to the Node entity by ID.
-func (nc *NodeCreate) SetParentID(id xid.ID) *NodeCreate {
-	nc.mutation.SetParentID(id)
-	return nc
+func (_c *NodeCreate) SetParentID(id xid.ID) *NodeCreate {
+	_c.mutation.SetParentID(id)
+	return _c
 }
 
 // SetNillableParentID sets the "parent" edge to the Node entity by ID if the given value is not nil.
-func (nc *NodeCreate) SetNillableParentID(id *xid.ID) *NodeCreate {
+func (_c *NodeCreate) SetNillableParentID(id *xid.ID) *NodeCreate {
 	if id != nil {
-		nc = nc.SetParentID(*id)
+		_c = _c.SetParentID(*id)
 	}
-	return nc
+	return _c
 }
 
 // SetParent sets the "parent" edge to the Node entity.
-func (nc *NodeCreate) SetParent(n *Node) *NodeCreate {
-	return nc.SetParentID(n.ID)
+func (_c *NodeCreate) SetParent(v *Node) *NodeCreate {
+	return _c.SetParentID(v.ID)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (nc *NodeCreate) AddNodeIDs(ids ...xid.ID) *NodeCreate {
-	nc.mutation.AddNodeIDs(ids...)
-	return nc
+func (_c *NodeCreate) AddNodeIDs(ids ...xid.ID) *NodeCreate {
+	_c.mutation.AddNodeIDs(ids...)
+	return _c
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (nc *NodeCreate) AddNodes(n ...*Node) *NodeCreate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_c *NodeCreate) AddNodes(v ...*Node) *NodeCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nc.AddNodeIDs(ids...)
+	return _c.AddNodeIDs(ids...)
 }
 
 // SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
-func (nc *NodeCreate) SetPrimaryImageID(id xid.ID) *NodeCreate {
-	nc.mutation.SetPrimaryImageID(id)
-	return nc
+func (_c *NodeCreate) SetPrimaryImageID(id xid.ID) *NodeCreate {
+	_c.mutation.SetPrimaryImageID(id)
+	return _c
 }
 
 // SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
-func (nc *NodeCreate) SetNillablePrimaryImageID(id *xid.ID) *NodeCreate {
+func (_c *NodeCreate) SetNillablePrimaryImageID(id *xid.ID) *NodeCreate {
 	if id != nil {
-		nc = nc.SetPrimaryImageID(*id)
+		_c = _c.SetPrimaryImageID(*id)
 	}
-	return nc
+	return _c
 }
 
 // SetPrimaryImage sets the "primary_image" edge to the Asset entity.
-func (nc *NodeCreate) SetPrimaryImage(a *Asset) *NodeCreate {
-	return nc.SetPrimaryImageID(a.ID)
+func (_c *NodeCreate) SetPrimaryImage(v *Asset) *NodeCreate {
+	return _c.SetPrimaryImageID(v.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (nc *NodeCreate) AddAssetIDs(ids ...xid.ID) *NodeCreate {
-	nc.mutation.AddAssetIDs(ids...)
-	return nc
+func (_c *NodeCreate) AddAssetIDs(ids ...xid.ID) *NodeCreate {
+	_c.mutation.AddAssetIDs(ids...)
+	return _c
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (nc *NodeCreate) AddAssets(a ...*Asset) *NodeCreate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_c *NodeCreate) AddAssets(v ...*Asset) *NodeCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nc.AddAssetIDs(ids...)
+	return _c.AddAssetIDs(ids...)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (nc *NodeCreate) AddTagIDs(ids ...xid.ID) *NodeCreate {
-	nc.mutation.AddTagIDs(ids...)
-	return nc
+func (_c *NodeCreate) AddTagIDs(ids ...xid.ID) *NodeCreate {
+	_c.mutation.AddTagIDs(ids...)
+	return _c
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
-func (nc *NodeCreate) AddTags(t ...*Tag) *NodeCreate {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_c *NodeCreate) AddTags(v ...*Tag) *NodeCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nc.AddTagIDs(ids...)
+	return _c.AddTagIDs(ids...)
 }
 
 // AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
-func (nc *NodeCreate) AddPropertyIDs(ids ...xid.ID) *NodeCreate {
-	nc.mutation.AddPropertyIDs(ids...)
-	return nc
+func (_c *NodeCreate) AddPropertyIDs(ids ...xid.ID) *NodeCreate {
+	_c.mutation.AddPropertyIDs(ids...)
+	return _c
 }
 
 // AddProperties adds the "properties" edges to the Property entity.
-func (nc *NodeCreate) AddProperties(p ...*Property) *NodeCreate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_c *NodeCreate) AddProperties(v ...*Property) *NodeCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nc.AddPropertyIDs(ids...)
+	return _c.AddPropertyIDs(ids...)
 }
 
 // SetPropertySchema sets the "property_schema" edge to the PropertySchema entity.
-func (nc *NodeCreate) SetPropertySchema(p *PropertySchema) *NodeCreate {
-	return nc.SetPropertySchemaID(p.ID)
+func (_c *NodeCreate) SetPropertySchema(v *PropertySchema) *NodeCreate {
+	return _c.SetPropertySchemaID(v.ID)
 }
 
 // SetLink sets the "link" edge to the Link entity.
-func (nc *NodeCreate) SetLink(l *Link) *NodeCreate {
-	return nc.SetLinkID(l.ID)
+func (_c *NodeCreate) SetLink(v *Link) *NodeCreate {
+	return _c.SetLinkID(v.ID)
 }
 
 // AddContentLinkIDs adds the "content_links" edge to the Link entity by IDs.
-func (nc *NodeCreate) AddContentLinkIDs(ids ...xid.ID) *NodeCreate {
-	nc.mutation.AddContentLinkIDs(ids...)
-	return nc
+func (_c *NodeCreate) AddContentLinkIDs(ids ...xid.ID) *NodeCreate {
+	_c.mutation.AddContentLinkIDs(ids...)
+	return _c
 }
 
 // AddContentLinks adds the "content_links" edges to the Link entity.
-func (nc *NodeCreate) AddContentLinks(l ...*Link) *NodeCreate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_c *NodeCreate) AddContentLinks(v ...*Link) *NodeCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nc.AddContentLinkIDs(ids...)
+	return _c.AddContentLinkIDs(ids...)
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (nc *NodeCreate) AddCollectionIDs(ids ...xid.ID) *NodeCreate {
-	nc.mutation.AddCollectionIDs(ids...)
-	return nc
+func (_c *NodeCreate) AddCollectionIDs(ids ...xid.ID) *NodeCreate {
+	_c.mutation.AddCollectionIDs(ids...)
+	return _c
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
-func (nc *NodeCreate) AddCollections(c ...*Collection) *NodeCreate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_c *NodeCreate) AddCollections(v ...*Collection) *NodeCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nc.AddCollectionIDs(ids...)
+	return _c.AddCollectionIDs(ids...)
 }
 
 // Mutation returns the NodeMutation object of the builder.
-func (nc *NodeCreate) Mutation() *NodeMutation {
-	return nc.mutation
+func (_c *NodeCreate) Mutation() *NodeMutation {
+	return _c.mutation
 }
 
 // Save creates the Node in the database.
-func (nc *NodeCreate) Save(ctx context.Context) (*Node, error) {
-	nc.defaults()
-	return withHooks(ctx, nc.sqlSave, nc.mutation, nc.hooks)
+func (_c *NodeCreate) Save(ctx context.Context) (*Node, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (nc *NodeCreate) SaveX(ctx context.Context) *Node {
-	v, err := nc.Save(ctx)
+func (_c *NodeCreate) SaveX(ctx context.Context) *Node {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -422,97 +422,97 @@ func (nc *NodeCreate) SaveX(ctx context.Context) *Node {
 }
 
 // Exec executes the query.
-func (nc *NodeCreate) Exec(ctx context.Context) error {
-	_, err := nc.Save(ctx)
+func (_c *NodeCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (nc *NodeCreate) ExecX(ctx context.Context) {
-	if err := nc.Exec(ctx); err != nil {
+func (_c *NodeCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (nc *NodeCreate) defaults() {
-	if _, ok := nc.mutation.CreatedAt(); !ok {
+func (_c *NodeCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := node.DefaultCreatedAt()
-		nc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := nc.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		v := node.DefaultUpdatedAt()
-		nc.mutation.SetUpdatedAt(v)
+		_c.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := nc.mutation.HideChildTree(); !ok {
+	if _, ok := _c.mutation.HideChildTree(); !ok {
 		v := node.DefaultHideChildTree
-		nc.mutation.SetHideChildTree(v)
+		_c.mutation.SetHideChildTree(v)
 	}
-	if _, ok := nc.mutation.Visibility(); !ok {
+	if _, ok := _c.mutation.Visibility(); !ok {
 		v := node.DefaultVisibility
-		nc.mutation.SetVisibility(v)
+		_c.mutation.SetVisibility(v)
 	}
-	if _, ok := nc.mutation.Sort(); !ok {
+	if _, ok := _c.mutation.Sort(); !ok {
 		v := node.DefaultSort()
-		nc.mutation.SetSort(v)
+		_c.mutation.SetSort(v)
 	}
-	if _, ok := nc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := node.DefaultID()
-		nc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (nc *NodeCreate) check() error {
-	if _, ok := nc.mutation.CreatedAt(); !ok {
+func (_c *NodeCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Node.created_at"`)}
 	}
-	if _, ok := nc.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Node.updated_at"`)}
 	}
-	if _, ok := nc.mutation.Name(); !ok {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Node.name"`)}
 	}
-	if _, ok := nc.mutation.Slug(); !ok {
+	if _, ok := _c.mutation.Slug(); !ok {
 		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Node.slug"`)}
 	}
-	switch nc.driver.Dialect() {
+	switch _c.driver.Dialect() {
 	case dialect.MySQL, dialect.SQLite:
-		if _, ok := nc.mutation.HideChildTree(); !ok {
+		if _, ok := _c.mutation.HideChildTree(); !ok {
 			return &ValidationError{Name: "hide_child_tree", err: errors.New(`ent: missing required field "Node.hide_child_tree"`)}
 		}
 	}
-	if _, ok := nc.mutation.AccountID(); !ok {
+	if _, ok := _c.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "Node.account_id"`)}
 	}
-	if _, ok := nc.mutation.Visibility(); !ok {
+	if _, ok := _c.mutation.Visibility(); !ok {
 		return &ValidationError{Name: "visibility", err: errors.New(`ent: missing required field "Node.visibility"`)}
 	}
-	if v, ok := nc.mutation.Visibility(); ok {
+	if v, ok := _c.mutation.Visibility(); ok {
 		if err := node.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Node.visibility": %w`, err)}
 		}
 	}
-	if _, ok := nc.mutation.Sort(); !ok {
+	if _, ok := _c.mutation.Sort(); !ok {
 		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "Node.sort"`)}
 	}
-	if v, ok := nc.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := node.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Node.id": %w`, err)}
 		}
 	}
-	if len(nc.mutation.OwnerIDs()) == 0 {
+	if len(_c.mutation.OwnerIDs()) == 0 {
 		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Node.owner"`)}
 	}
 	return nil
 }
 
-func (nc *NodeCreate) sqlSave(ctx context.Context) (*Node, error) {
-	if err := nc.check(); err != nil {
+func (_c *NodeCreate) sqlSave(ctx context.Context) (*Node, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := nc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, nc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -525,70 +525,70 @@ func (nc *NodeCreate) sqlSave(ctx context.Context) (*Node, error) {
 			return nil, err
 		}
 	}
-	nc.mutation.id = &_node.ID
-	nc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
+func (_c *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Node{config: nc.config}
+		_node = &Node{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(node.Table, sqlgraph.NewFieldSpec(node.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = nc.conflict
-	if id, ok := nc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := nc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(node.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := nc.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(node.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := nc.mutation.DeletedAt(); ok {
+	if value, ok := _c.mutation.DeletedAt(); ok {
 		_spec.SetField(node.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
-	if value, ok := nc.mutation.IndexedAt(); ok {
+	if value, ok := _c.mutation.IndexedAt(); ok {
 		_spec.SetField(node.FieldIndexedAt, field.TypeTime, value)
 		_node.IndexedAt = &value
 	}
-	if value, ok := nc.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(node.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := nc.mutation.Slug(); ok {
+	if value, ok := _c.mutation.Slug(); ok {
 		_spec.SetField(node.FieldSlug, field.TypeString, value)
 		_node.Slug = value
 	}
-	if value, ok := nc.mutation.Description(); ok {
+	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(node.FieldDescription, field.TypeString, value)
 		_node.Description = &value
 	}
-	if value, ok := nc.mutation.Content(); ok {
+	if value, ok := _c.mutation.Content(); ok {
 		_spec.SetField(node.FieldContent, field.TypeString, value)
 		_node.Content = &value
 	}
-	if value, ok := nc.mutation.HideChildTree(); ok {
+	if value, ok := _c.mutation.HideChildTree(); ok {
 		_spec.SetField(node.FieldHideChildTree, field.TypeBool, value)
 		_node.HideChildTree = value
 	}
-	if value, ok := nc.mutation.Visibility(); ok {
+	if value, ok := _c.mutation.Visibility(); ok {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)
 		_node.Visibility = value
 	}
-	if value, ok := nc.mutation.Sort(); ok {
+	if value, ok := _c.mutation.Sort(); ok {
 		_spec.SetField(node.FieldSort, field.TypeString, value)
 		_node.Sort = value
 	}
-	if value, ok := nc.mutation.Metadata(); ok {
+	if value, ok := _c.mutation.Metadata(); ok {
 		_spec.SetField(node.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
 	}
-	if nodes := nc.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -605,7 +605,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		_node.AccountID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ParentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -622,7 +622,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		_node.ParentNodeID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -638,7 +638,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PrimaryImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -655,7 +655,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		_node.PrimaryAssetID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -671,7 +671,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.TagsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -687,7 +687,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.PropertiesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PropertiesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -703,7 +703,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.PropertySchemaIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PropertySchemaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -720,7 +720,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		_node.PropertySchemaID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.LinkIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.LinkIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -737,7 +737,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		_node.LinkID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.ContentLinksIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ContentLinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -753,7 +753,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := nc.mutation.CollectionsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.CollectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -767,7 +767,7 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionNodeCreate{config: nc.config, mutation: newCollectionNodeMutation(nc.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _c.config, mutation: newCollectionNodeMutation(_c.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -792,10 +792,10 @@ func (nc *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (nc *NodeCreate) OnConflict(opts ...sql.ConflictOption) *NodeUpsertOne {
-	nc.conflict = opts
+func (_c *NodeCreate) OnConflict(opts ...sql.ConflictOption) *NodeUpsertOne {
+	_c.conflict = opts
 	return &NodeUpsertOne{
-		create: nc,
+		create: _c,
 	}
 }
 
@@ -805,10 +805,10 @@ func (nc *NodeCreate) OnConflict(opts ...sql.ConflictOption) *NodeUpsertOne {
 //	client.Node.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (nc *NodeCreate) OnConflictColumns(columns ...string) *NodeUpsertOne {
-	nc.conflict = append(nc.conflict, sql.ConflictColumns(columns...))
+func (_c *NodeCreate) OnConflictColumns(columns ...string) *NodeUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &NodeUpsertOne{
-		create: nc,
+		create: _c,
 	}
 }
 
@@ -1456,16 +1456,16 @@ type NodeCreateBulk struct {
 }
 
 // Save creates the Node entities in the database.
-func (ncb *NodeCreateBulk) Save(ctx context.Context) ([]*Node, error) {
-	if ncb.err != nil {
-		return nil, ncb.err
+func (_c *NodeCreateBulk) Save(ctx context.Context) ([]*Node, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(ncb.builders))
-	nodes := make([]*Node, len(ncb.builders))
-	mutators := make([]Mutator, len(ncb.builders))
-	for i := range ncb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Node, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := ncb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*NodeMutation)
@@ -1479,12 +1479,12 @@ func (ncb *NodeCreateBulk) Save(ctx context.Context) ([]*Node, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, ncb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = ncb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, ncb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -1504,7 +1504,7 @@ func (ncb *NodeCreateBulk) Save(ctx context.Context) ([]*Node, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, ncb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -1512,8 +1512,8 @@ func (ncb *NodeCreateBulk) Save(ctx context.Context) ([]*Node, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ncb *NodeCreateBulk) SaveX(ctx context.Context) []*Node {
-	v, err := ncb.Save(ctx)
+func (_c *NodeCreateBulk) SaveX(ctx context.Context) []*Node {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1521,14 +1521,14 @@ func (ncb *NodeCreateBulk) SaveX(ctx context.Context) []*Node {
 }
 
 // Exec executes the query.
-func (ncb *NodeCreateBulk) Exec(ctx context.Context) error {
-	_, err := ncb.Save(ctx)
+func (_c *NodeCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ncb *NodeCreateBulk) ExecX(ctx context.Context) {
-	if err := ncb.Exec(ctx); err != nil {
+func (_c *NodeCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -1548,10 +1548,10 @@ func (ncb *NodeCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (ncb *NodeCreateBulk) OnConflict(opts ...sql.ConflictOption) *NodeUpsertBulk {
-	ncb.conflict = opts
+func (_c *NodeCreateBulk) OnConflict(opts ...sql.ConflictOption) *NodeUpsertBulk {
+	_c.conflict = opts
 	return &NodeUpsertBulk{
-		create: ncb,
+		create: _c,
 	}
 }
 
@@ -1561,10 +1561,10 @@ func (ncb *NodeCreateBulk) OnConflict(opts ...sql.ConflictOption) *NodeUpsertBul
 //	client.Node.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (ncb *NodeCreateBulk) OnConflictColumns(columns ...string) *NodeUpsertBulk {
-	ncb.conflict = append(ncb.conflict, sql.ConflictColumns(columns...))
+func (_c *NodeCreateBulk) OnConflictColumns(columns ...string) *NodeUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &NodeUpsertBulk{
-		create: ncb,
+		create: _c,
 	}
 }
 

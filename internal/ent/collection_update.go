@@ -29,255 +29,255 @@ type CollectionUpdate struct {
 }
 
 // Where appends a list predicates to the CollectionUpdate builder.
-func (cu *CollectionUpdate) Where(ps ...predicate.Collection) *CollectionUpdate {
-	cu.mutation.Where(ps...)
-	return cu
+func (_u *CollectionUpdate) Where(ps ...predicate.Collection) *CollectionUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (cu *CollectionUpdate) SetUpdatedAt(t time.Time) *CollectionUpdate {
-	cu.mutation.SetUpdatedAt(t)
-	return cu
+func (_u *CollectionUpdate) SetUpdatedAt(v time.Time) *CollectionUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (cu *CollectionUpdate) SetIndexedAt(t time.Time) *CollectionUpdate {
-	cu.mutation.SetIndexedAt(t)
-	return cu
+func (_u *CollectionUpdate) SetIndexedAt(v time.Time) *CollectionUpdate {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableIndexedAt(t *time.Time) *CollectionUpdate {
-	if t != nil {
-		cu.SetIndexedAt(*t)
+func (_u *CollectionUpdate) SetNillableIndexedAt(v *time.Time) *CollectionUpdate {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (cu *CollectionUpdate) ClearIndexedAt() *CollectionUpdate {
-	cu.mutation.ClearIndexedAt()
-	return cu
+func (_u *CollectionUpdate) ClearIndexedAt() *CollectionUpdate {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (cu *CollectionUpdate) SetName(s string) *CollectionUpdate {
-	cu.mutation.SetName(s)
-	return cu
+func (_u *CollectionUpdate) SetName(v string) *CollectionUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableName(s *string) *CollectionUpdate {
-	if s != nil {
-		cu.SetName(*s)
+func (_u *CollectionUpdate) SetNillableName(v *string) *CollectionUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return cu
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (cu *CollectionUpdate) SetSlug(s string) *CollectionUpdate {
-	cu.mutation.SetSlug(s)
-	return cu
+func (_u *CollectionUpdate) SetSlug(v string) *CollectionUpdate {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableSlug(s *string) *CollectionUpdate {
-	if s != nil {
-		cu.SetSlug(*s)
+func (_u *CollectionUpdate) SetNillableSlug(v *string) *CollectionUpdate {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return cu
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (cu *CollectionUpdate) SetDescription(s string) *CollectionUpdate {
-	cu.mutation.SetDescription(s)
-	return cu
+func (_u *CollectionUpdate) SetDescription(v string) *CollectionUpdate {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableDescription(s *string) *CollectionUpdate {
-	if s != nil {
-		cu.SetDescription(*s)
+func (_u *CollectionUpdate) SetNillableDescription(v *string) *CollectionUpdate {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearDescription clears the value of the "description" field.
-func (cu *CollectionUpdate) ClearDescription() *CollectionUpdate {
-	cu.mutation.ClearDescription()
-	return cu
+func (_u *CollectionUpdate) ClearDescription() *CollectionUpdate {
+	_u.mutation.ClearDescription()
+	return _u
 }
 
 // SetCoverAssetID sets the "cover_asset_id" field.
-func (cu *CollectionUpdate) SetCoverAssetID(x xid.ID) *CollectionUpdate {
-	cu.mutation.SetCoverAssetID(x)
-	return cu
+func (_u *CollectionUpdate) SetCoverAssetID(v xid.ID) *CollectionUpdate {
+	_u.mutation.SetCoverAssetID(v)
+	return _u
 }
 
 // SetNillableCoverAssetID sets the "cover_asset_id" field if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableCoverAssetID(x *xid.ID) *CollectionUpdate {
-	if x != nil {
-		cu.SetCoverAssetID(*x)
+func (_u *CollectionUpdate) SetNillableCoverAssetID(v *xid.ID) *CollectionUpdate {
+	if v != nil {
+		_u.SetCoverAssetID(*v)
 	}
-	return cu
+	return _u
 }
 
 // ClearCoverAssetID clears the value of the "cover_asset_id" field.
-func (cu *CollectionUpdate) ClearCoverAssetID() *CollectionUpdate {
-	cu.mutation.ClearCoverAssetID()
-	return cu
+func (_u *CollectionUpdate) ClearCoverAssetID() *CollectionUpdate {
+	_u.mutation.ClearCoverAssetID()
+	return _u
 }
 
 // SetVisibility sets the "visibility" field.
-func (cu *CollectionUpdate) SetVisibility(c collection.Visibility) *CollectionUpdate {
-	cu.mutation.SetVisibility(c)
-	return cu
+func (_u *CollectionUpdate) SetVisibility(v collection.Visibility) *CollectionUpdate {
+	_u.mutation.SetVisibility(v)
+	return _u
 }
 
 // SetNillableVisibility sets the "visibility" field if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableVisibility(c *collection.Visibility) *CollectionUpdate {
-	if c != nil {
-		cu.SetVisibility(*c)
+func (_u *CollectionUpdate) SetNillableVisibility(v *collection.Visibility) *CollectionUpdate {
+	if v != nil {
+		_u.SetVisibility(*v)
 	}
-	return cu
+	return _u
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
-func (cu *CollectionUpdate) SetOwnerID(id xid.ID) *CollectionUpdate {
-	cu.mutation.SetOwnerID(id)
-	return cu
+func (_u *CollectionUpdate) SetOwnerID(id xid.ID) *CollectionUpdate {
+	_u.mutation.SetOwnerID(id)
+	return _u
 }
 
 // SetNillableOwnerID sets the "owner" edge to the Account entity by ID if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableOwnerID(id *xid.ID) *CollectionUpdate {
+func (_u *CollectionUpdate) SetNillableOwnerID(id *xid.ID) *CollectionUpdate {
 	if id != nil {
-		cu = cu.SetOwnerID(*id)
+		_u = _u.SetOwnerID(*id)
 	}
-	return cu
+	return _u
 }
 
 // SetOwner sets the "owner" edge to the Account entity.
-func (cu *CollectionUpdate) SetOwner(a *Account) *CollectionUpdate {
-	return cu.SetOwnerID(a.ID)
+func (_u *CollectionUpdate) SetOwner(v *Account) *CollectionUpdate {
+	return _u.SetOwnerID(v.ID)
 }
 
 // SetCoverImageID sets the "cover_image" edge to the Asset entity by ID.
-func (cu *CollectionUpdate) SetCoverImageID(id xid.ID) *CollectionUpdate {
-	cu.mutation.SetCoverImageID(id)
-	return cu
+func (_u *CollectionUpdate) SetCoverImageID(id xid.ID) *CollectionUpdate {
+	_u.mutation.SetCoverImageID(id)
+	return _u
 }
 
 // SetNillableCoverImageID sets the "cover_image" edge to the Asset entity by ID if the given value is not nil.
-func (cu *CollectionUpdate) SetNillableCoverImageID(id *xid.ID) *CollectionUpdate {
+func (_u *CollectionUpdate) SetNillableCoverImageID(id *xid.ID) *CollectionUpdate {
 	if id != nil {
-		cu = cu.SetCoverImageID(*id)
+		_u = _u.SetCoverImageID(*id)
 	}
-	return cu
+	return _u
 }
 
 // SetCoverImage sets the "cover_image" edge to the Asset entity.
-func (cu *CollectionUpdate) SetCoverImage(a *Asset) *CollectionUpdate {
-	return cu.SetCoverImageID(a.ID)
+func (_u *CollectionUpdate) SetCoverImage(v *Asset) *CollectionUpdate {
+	return _u.SetCoverImageID(v.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (cu *CollectionUpdate) AddPostIDs(ids ...xid.ID) *CollectionUpdate {
-	cu.mutation.AddPostIDs(ids...)
-	return cu
+func (_u *CollectionUpdate) AddPostIDs(ids ...xid.ID) *CollectionUpdate {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (cu *CollectionUpdate) AddPosts(p ...*Post) *CollectionUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *CollectionUpdate) AddPosts(v ...*Post) *CollectionUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cu.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (cu *CollectionUpdate) AddNodeIDs(ids ...xid.ID) *CollectionUpdate {
-	cu.mutation.AddNodeIDs(ids...)
-	return cu
+func (_u *CollectionUpdate) AddNodeIDs(ids ...xid.ID) *CollectionUpdate {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (cu *CollectionUpdate) AddNodes(n ...*Node) *CollectionUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *CollectionUpdate) AddNodes(v ...*Node) *CollectionUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cu.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // Mutation returns the CollectionMutation object of the builder.
-func (cu *CollectionUpdate) Mutation() *CollectionMutation {
-	return cu.mutation
+func (_u *CollectionUpdate) Mutation() *CollectionMutation {
+	return _u.mutation
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
-func (cu *CollectionUpdate) ClearOwner() *CollectionUpdate {
-	cu.mutation.ClearOwner()
-	return cu
+func (_u *CollectionUpdate) ClearOwner() *CollectionUpdate {
+	_u.mutation.ClearOwner()
+	return _u
 }
 
 // ClearCoverImage clears the "cover_image" edge to the Asset entity.
-func (cu *CollectionUpdate) ClearCoverImage() *CollectionUpdate {
-	cu.mutation.ClearCoverImage()
-	return cu
+func (_u *CollectionUpdate) ClearCoverImage() *CollectionUpdate {
+	_u.mutation.ClearCoverImage()
+	return _u
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (cu *CollectionUpdate) ClearPosts() *CollectionUpdate {
-	cu.mutation.ClearPosts()
-	return cu
+func (_u *CollectionUpdate) ClearPosts() *CollectionUpdate {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (cu *CollectionUpdate) RemovePostIDs(ids ...xid.ID) *CollectionUpdate {
-	cu.mutation.RemovePostIDs(ids...)
-	return cu
+func (_u *CollectionUpdate) RemovePostIDs(ids ...xid.ID) *CollectionUpdate {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (cu *CollectionUpdate) RemovePosts(p ...*Post) *CollectionUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *CollectionUpdate) RemovePosts(v ...*Post) *CollectionUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cu.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (cu *CollectionUpdate) ClearNodes() *CollectionUpdate {
-	cu.mutation.ClearNodes()
-	return cu
+func (_u *CollectionUpdate) ClearNodes() *CollectionUpdate {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (cu *CollectionUpdate) RemoveNodeIDs(ids ...xid.ID) *CollectionUpdate {
-	cu.mutation.RemoveNodeIDs(ids...)
-	return cu
+func (_u *CollectionUpdate) RemoveNodeIDs(ids ...xid.ID) *CollectionUpdate {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (cu *CollectionUpdate) RemoveNodes(n ...*Node) *CollectionUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *CollectionUpdate) RemoveNodes(v ...*Node) *CollectionUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cu.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (cu *CollectionUpdate) Save(ctx context.Context) (int, error) {
-	cu.defaults()
-	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
+func (_u *CollectionUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cu *CollectionUpdate) SaveX(ctx context.Context) int {
-	affected, err := cu.Save(ctx)
+func (_u *CollectionUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -285,29 +285,29 @@ func (cu *CollectionUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (cu *CollectionUpdate) Exec(ctx context.Context) error {
-	_, err := cu.Save(ctx)
+func (_u *CollectionUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cu *CollectionUpdate) ExecX(ctx context.Context) {
-	if err := cu.Exec(ctx); err != nil {
+func (_u *CollectionUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cu *CollectionUpdate) defaults() {
-	if _, ok := cu.mutation.UpdatedAt(); !ok {
+func (_u *CollectionUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := collection.UpdateDefaultUpdatedAt()
-		cu.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cu *CollectionUpdate) check() error {
-	if v, ok := cu.mutation.Visibility(); ok {
+func (_u *CollectionUpdate) check() error {
+	if v, ok := _u.mutation.Visibility(); ok {
 		if err := collection.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Collection.visibility": %w`, err)}
 		}
@@ -316,48 +316,48 @@ func (cu *CollectionUpdate) check() error {
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (cu *CollectionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionUpdate {
-	cu.modifiers = append(cu.modifiers, modifiers...)
-	return cu
+func (_u *CollectionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := cu.check(); err != nil {
-		return n, err
+func (_u *CollectionUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(collection.Table, collection.Columns, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString))
-	if ps := cu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(collection.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := cu.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(collection.FieldIndexedAt, field.TypeTime, value)
 	}
-	if cu.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(collection.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := cu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(collection.FieldName, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(collection.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(collection.FieldDescription, field.TypeString, value)
 	}
-	if cu.mutation.DescriptionCleared() {
+	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(collection.FieldDescription, field.TypeString)
 	}
-	if value, ok := cu.mutation.Visibility(); ok {
+	if value, ok := _u.mutation.Visibility(); ok {
 		_spec.SetField(collection.FieldVisibility, field.TypeEnum, value)
 	}
-	if cu.mutation.OwnerCleared() {
+	if _u.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -370,7 +370,7 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -386,7 +386,7 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.CoverImageCleared() {
+	if _u.mutation.CoverImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -399,7 +399,7 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.CoverImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CoverImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -415,7 +415,7 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -426,13 +426,13 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
-		createE := &CollectionPostCreate{config: cu.config, mutation: newCollectionPostMutation(cu.config, OpCreate)}
+		createE := &CollectionPostCreate{config: _u.config, mutation: newCollectionPostMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.RemovedPostsIDs(); len(nodes) > 0 && !cu.mutation.PostsCleared() {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -446,13 +446,13 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionPostCreate{config: cu.config, mutation: newCollectionPostMutation(cu.config, OpCreate)}
+		createE := &CollectionPostCreate{config: _u.config, mutation: newCollectionPostMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -466,13 +466,13 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionPostCreate{config: cu.config, mutation: newCollectionPostMutation(cu.config, OpCreate)}
+		createE := &CollectionPostCreate{config: _u.config, mutation: newCollectionPostMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -483,13 +483,13 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
-		createE := &CollectionNodeCreate{config: cu.config, mutation: newCollectionNodeMutation(cu.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.RemovedNodesIDs(); len(nodes) > 0 && !cu.mutation.NodesCleared() {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -503,13 +503,13 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionNodeCreate{config: cu.config, mutation: newCollectionNodeMutation(cu.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -523,14 +523,14 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionNodeCreate{config: cu.config, mutation: newCollectionNodeMutation(cu.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(cu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{collection.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -538,8 +538,8 @@ func (cu *CollectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	cu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // CollectionUpdateOne is the builder for updating a single Collection entity.
@@ -552,262 +552,262 @@ type CollectionUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (cuo *CollectionUpdateOne) SetUpdatedAt(t time.Time) *CollectionUpdateOne {
-	cuo.mutation.SetUpdatedAt(t)
-	return cuo
+func (_u *CollectionUpdateOne) SetUpdatedAt(v time.Time) *CollectionUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (cuo *CollectionUpdateOne) SetIndexedAt(t time.Time) *CollectionUpdateOne {
-	cuo.mutation.SetIndexedAt(t)
-	return cuo
+func (_u *CollectionUpdateOne) SetIndexedAt(v time.Time) *CollectionUpdateOne {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableIndexedAt(t *time.Time) *CollectionUpdateOne {
-	if t != nil {
-		cuo.SetIndexedAt(*t)
+func (_u *CollectionUpdateOne) SetNillableIndexedAt(v *time.Time) *CollectionUpdateOne {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (cuo *CollectionUpdateOne) ClearIndexedAt() *CollectionUpdateOne {
-	cuo.mutation.ClearIndexedAt()
-	return cuo
+func (_u *CollectionUpdateOne) ClearIndexedAt() *CollectionUpdateOne {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (cuo *CollectionUpdateOne) SetName(s string) *CollectionUpdateOne {
-	cuo.mutation.SetName(s)
-	return cuo
+func (_u *CollectionUpdateOne) SetName(v string) *CollectionUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableName(s *string) *CollectionUpdateOne {
-	if s != nil {
-		cuo.SetName(*s)
+func (_u *CollectionUpdateOne) SetNillableName(v *string) *CollectionUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return cuo
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (cuo *CollectionUpdateOne) SetSlug(s string) *CollectionUpdateOne {
-	cuo.mutation.SetSlug(s)
-	return cuo
+func (_u *CollectionUpdateOne) SetSlug(v string) *CollectionUpdateOne {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableSlug(s *string) *CollectionUpdateOne {
-	if s != nil {
-		cuo.SetSlug(*s)
+func (_u *CollectionUpdateOne) SetNillableSlug(v *string) *CollectionUpdateOne {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return cuo
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (cuo *CollectionUpdateOne) SetDescription(s string) *CollectionUpdateOne {
-	cuo.mutation.SetDescription(s)
-	return cuo
+func (_u *CollectionUpdateOne) SetDescription(v string) *CollectionUpdateOne {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableDescription(s *string) *CollectionUpdateOne {
-	if s != nil {
-		cuo.SetDescription(*s)
+func (_u *CollectionUpdateOne) SetNillableDescription(v *string) *CollectionUpdateOne {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearDescription clears the value of the "description" field.
-func (cuo *CollectionUpdateOne) ClearDescription() *CollectionUpdateOne {
-	cuo.mutation.ClearDescription()
-	return cuo
+func (_u *CollectionUpdateOne) ClearDescription() *CollectionUpdateOne {
+	_u.mutation.ClearDescription()
+	return _u
 }
 
 // SetCoverAssetID sets the "cover_asset_id" field.
-func (cuo *CollectionUpdateOne) SetCoverAssetID(x xid.ID) *CollectionUpdateOne {
-	cuo.mutation.SetCoverAssetID(x)
-	return cuo
+func (_u *CollectionUpdateOne) SetCoverAssetID(v xid.ID) *CollectionUpdateOne {
+	_u.mutation.SetCoverAssetID(v)
+	return _u
 }
 
 // SetNillableCoverAssetID sets the "cover_asset_id" field if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableCoverAssetID(x *xid.ID) *CollectionUpdateOne {
-	if x != nil {
-		cuo.SetCoverAssetID(*x)
+func (_u *CollectionUpdateOne) SetNillableCoverAssetID(v *xid.ID) *CollectionUpdateOne {
+	if v != nil {
+		_u.SetCoverAssetID(*v)
 	}
-	return cuo
+	return _u
 }
 
 // ClearCoverAssetID clears the value of the "cover_asset_id" field.
-func (cuo *CollectionUpdateOne) ClearCoverAssetID() *CollectionUpdateOne {
-	cuo.mutation.ClearCoverAssetID()
-	return cuo
+func (_u *CollectionUpdateOne) ClearCoverAssetID() *CollectionUpdateOne {
+	_u.mutation.ClearCoverAssetID()
+	return _u
 }
 
 // SetVisibility sets the "visibility" field.
-func (cuo *CollectionUpdateOne) SetVisibility(c collection.Visibility) *CollectionUpdateOne {
-	cuo.mutation.SetVisibility(c)
-	return cuo
+func (_u *CollectionUpdateOne) SetVisibility(v collection.Visibility) *CollectionUpdateOne {
+	_u.mutation.SetVisibility(v)
+	return _u
 }
 
 // SetNillableVisibility sets the "visibility" field if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableVisibility(c *collection.Visibility) *CollectionUpdateOne {
-	if c != nil {
-		cuo.SetVisibility(*c)
+func (_u *CollectionUpdateOne) SetNillableVisibility(v *collection.Visibility) *CollectionUpdateOne {
+	if v != nil {
+		_u.SetVisibility(*v)
 	}
-	return cuo
+	return _u
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
-func (cuo *CollectionUpdateOne) SetOwnerID(id xid.ID) *CollectionUpdateOne {
-	cuo.mutation.SetOwnerID(id)
-	return cuo
+func (_u *CollectionUpdateOne) SetOwnerID(id xid.ID) *CollectionUpdateOne {
+	_u.mutation.SetOwnerID(id)
+	return _u
 }
 
 // SetNillableOwnerID sets the "owner" edge to the Account entity by ID if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableOwnerID(id *xid.ID) *CollectionUpdateOne {
+func (_u *CollectionUpdateOne) SetNillableOwnerID(id *xid.ID) *CollectionUpdateOne {
 	if id != nil {
-		cuo = cuo.SetOwnerID(*id)
+		_u = _u.SetOwnerID(*id)
 	}
-	return cuo
+	return _u
 }
 
 // SetOwner sets the "owner" edge to the Account entity.
-func (cuo *CollectionUpdateOne) SetOwner(a *Account) *CollectionUpdateOne {
-	return cuo.SetOwnerID(a.ID)
+func (_u *CollectionUpdateOne) SetOwner(v *Account) *CollectionUpdateOne {
+	return _u.SetOwnerID(v.ID)
 }
 
 // SetCoverImageID sets the "cover_image" edge to the Asset entity by ID.
-func (cuo *CollectionUpdateOne) SetCoverImageID(id xid.ID) *CollectionUpdateOne {
-	cuo.mutation.SetCoverImageID(id)
-	return cuo
+func (_u *CollectionUpdateOne) SetCoverImageID(id xid.ID) *CollectionUpdateOne {
+	_u.mutation.SetCoverImageID(id)
+	return _u
 }
 
 // SetNillableCoverImageID sets the "cover_image" edge to the Asset entity by ID if the given value is not nil.
-func (cuo *CollectionUpdateOne) SetNillableCoverImageID(id *xid.ID) *CollectionUpdateOne {
+func (_u *CollectionUpdateOne) SetNillableCoverImageID(id *xid.ID) *CollectionUpdateOne {
 	if id != nil {
-		cuo = cuo.SetCoverImageID(*id)
+		_u = _u.SetCoverImageID(*id)
 	}
-	return cuo
+	return _u
 }
 
 // SetCoverImage sets the "cover_image" edge to the Asset entity.
-func (cuo *CollectionUpdateOne) SetCoverImage(a *Asset) *CollectionUpdateOne {
-	return cuo.SetCoverImageID(a.ID)
+func (_u *CollectionUpdateOne) SetCoverImage(v *Asset) *CollectionUpdateOne {
+	return _u.SetCoverImageID(v.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (cuo *CollectionUpdateOne) AddPostIDs(ids ...xid.ID) *CollectionUpdateOne {
-	cuo.mutation.AddPostIDs(ids...)
-	return cuo
+func (_u *CollectionUpdateOne) AddPostIDs(ids ...xid.ID) *CollectionUpdateOne {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (cuo *CollectionUpdateOne) AddPosts(p ...*Post) *CollectionUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *CollectionUpdateOne) AddPosts(v ...*Post) *CollectionUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cuo.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (cuo *CollectionUpdateOne) AddNodeIDs(ids ...xid.ID) *CollectionUpdateOne {
-	cuo.mutation.AddNodeIDs(ids...)
-	return cuo
+func (_u *CollectionUpdateOne) AddNodeIDs(ids ...xid.ID) *CollectionUpdateOne {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (cuo *CollectionUpdateOne) AddNodes(n ...*Node) *CollectionUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *CollectionUpdateOne) AddNodes(v ...*Node) *CollectionUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cuo.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // Mutation returns the CollectionMutation object of the builder.
-func (cuo *CollectionUpdateOne) Mutation() *CollectionMutation {
-	return cuo.mutation
+func (_u *CollectionUpdateOne) Mutation() *CollectionMutation {
+	return _u.mutation
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
-func (cuo *CollectionUpdateOne) ClearOwner() *CollectionUpdateOne {
-	cuo.mutation.ClearOwner()
-	return cuo
+func (_u *CollectionUpdateOne) ClearOwner() *CollectionUpdateOne {
+	_u.mutation.ClearOwner()
+	return _u
 }
 
 // ClearCoverImage clears the "cover_image" edge to the Asset entity.
-func (cuo *CollectionUpdateOne) ClearCoverImage() *CollectionUpdateOne {
-	cuo.mutation.ClearCoverImage()
-	return cuo
+func (_u *CollectionUpdateOne) ClearCoverImage() *CollectionUpdateOne {
+	_u.mutation.ClearCoverImage()
+	return _u
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (cuo *CollectionUpdateOne) ClearPosts() *CollectionUpdateOne {
-	cuo.mutation.ClearPosts()
-	return cuo
+func (_u *CollectionUpdateOne) ClearPosts() *CollectionUpdateOne {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (cuo *CollectionUpdateOne) RemovePostIDs(ids ...xid.ID) *CollectionUpdateOne {
-	cuo.mutation.RemovePostIDs(ids...)
-	return cuo
+func (_u *CollectionUpdateOne) RemovePostIDs(ids ...xid.ID) *CollectionUpdateOne {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (cuo *CollectionUpdateOne) RemovePosts(p ...*Post) *CollectionUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *CollectionUpdateOne) RemovePosts(v ...*Post) *CollectionUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cuo.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (cuo *CollectionUpdateOne) ClearNodes() *CollectionUpdateOne {
-	cuo.mutation.ClearNodes()
-	return cuo
+func (_u *CollectionUpdateOne) ClearNodes() *CollectionUpdateOne {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (cuo *CollectionUpdateOne) RemoveNodeIDs(ids ...xid.ID) *CollectionUpdateOne {
-	cuo.mutation.RemoveNodeIDs(ids...)
-	return cuo
+func (_u *CollectionUpdateOne) RemoveNodeIDs(ids ...xid.ID) *CollectionUpdateOne {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (cuo *CollectionUpdateOne) RemoveNodes(n ...*Node) *CollectionUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *CollectionUpdateOne) RemoveNodes(v ...*Node) *CollectionUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cuo.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // Where appends a list predicates to the CollectionUpdate builder.
-func (cuo *CollectionUpdateOne) Where(ps ...predicate.Collection) *CollectionUpdateOne {
-	cuo.mutation.Where(ps...)
-	return cuo
+func (_u *CollectionUpdateOne) Where(ps ...predicate.Collection) *CollectionUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (cuo *CollectionUpdateOne) Select(field string, fields ...string) *CollectionUpdateOne {
-	cuo.fields = append([]string{field}, fields...)
-	return cuo
+func (_u *CollectionUpdateOne) Select(field string, fields ...string) *CollectionUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Collection entity.
-func (cuo *CollectionUpdateOne) Save(ctx context.Context) (*Collection, error) {
-	cuo.defaults()
-	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+func (_u *CollectionUpdateOne) Save(ctx context.Context) (*Collection, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cuo *CollectionUpdateOne) SaveX(ctx context.Context) *Collection {
-	node, err := cuo.Save(ctx)
+func (_u *CollectionUpdateOne) SaveX(ctx context.Context) *Collection {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -815,29 +815,29 @@ func (cuo *CollectionUpdateOne) SaveX(ctx context.Context) *Collection {
 }
 
 // Exec executes the query on the entity.
-func (cuo *CollectionUpdateOne) Exec(ctx context.Context) error {
-	_, err := cuo.Save(ctx)
+func (_u *CollectionUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cuo *CollectionUpdateOne) ExecX(ctx context.Context) {
-	if err := cuo.Exec(ctx); err != nil {
+func (_u *CollectionUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cuo *CollectionUpdateOne) defaults() {
-	if _, ok := cuo.mutation.UpdatedAt(); !ok {
+func (_u *CollectionUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := collection.UpdateDefaultUpdatedAt()
-		cuo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cuo *CollectionUpdateOne) check() error {
-	if v, ok := cuo.mutation.Visibility(); ok {
+func (_u *CollectionUpdateOne) check() error {
+	if v, ok := _u.mutation.Visibility(); ok {
 		if err := collection.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Collection.visibility": %w`, err)}
 		}
@@ -846,22 +846,22 @@ func (cuo *CollectionUpdateOne) check() error {
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (cuo *CollectionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionUpdateOne {
-	cuo.modifiers = append(cuo.modifiers, modifiers...)
-	return cuo
+func (_u *CollectionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection, err error) {
-	if err := cuo.check(); err != nil {
+func (_u *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(collection.Table, collection.Columns, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString))
-	id, ok := cuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Collection.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := cuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, collection.FieldID)
 		for _, f := range fields {
@@ -873,38 +873,38 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 			}
 		}
 	}
-	if ps := cuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(collection.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := cuo.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(collection.FieldIndexedAt, field.TypeTime, value)
 	}
-	if cuo.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(collection.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := cuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(collection.FieldName, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(collection.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(collection.FieldDescription, field.TypeString, value)
 	}
-	if cuo.mutation.DescriptionCleared() {
+	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(collection.FieldDescription, field.TypeString)
 	}
-	if value, ok := cuo.mutation.Visibility(); ok {
+	if value, ok := _u.mutation.Visibility(); ok {
 		_spec.SetField(collection.FieldVisibility, field.TypeEnum, value)
 	}
-	if cuo.mutation.OwnerCleared() {
+	if _u.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -917,7 +917,7 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -933,7 +933,7 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.CoverImageCleared() {
+	if _u.mutation.CoverImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -946,7 +946,7 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.CoverImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CoverImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -962,7 +962,7 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -973,13 +973,13 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
 			},
 		}
-		createE := &CollectionPostCreate{config: cuo.config, mutation: newCollectionPostMutation(cuo.config, OpCreate)}
+		createE := &CollectionPostCreate{config: _u.config, mutation: newCollectionPostMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.RemovedPostsIDs(); len(nodes) > 0 && !cuo.mutation.PostsCleared() {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -993,13 +993,13 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionPostCreate{config: cuo.config, mutation: newCollectionPostMutation(cuo.config, OpCreate)}
+		createE := &CollectionPostCreate{config: _u.config, mutation: newCollectionPostMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1013,13 +1013,13 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionPostCreate{config: cuo.config, mutation: newCollectionPostMutation(cuo.config, OpCreate)}
+		createE := &CollectionPostCreate{config: _u.config, mutation: newCollectionPostMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1030,13 +1030,13 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
 			},
 		}
-		createE := &CollectionNodeCreate{config: cuo.config, mutation: newCollectionNodeMutation(cuo.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !cuo.mutation.NodesCleared() {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1050,13 +1050,13 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionNodeCreate{config: cuo.config, mutation: newCollectionNodeMutation(cuo.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1070,17 +1070,17 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionNodeCreate{config: cuo.config, mutation: newCollectionNodeMutation(cuo.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(cuo.modifiers...)
-	_node = &Collection{config: cuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Collection{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, cuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{collection.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -1088,6 +1088,6 @@ func (cuo *CollectionUpdateOne) sqlSave(ctx context.Context) (_node *Collection,
 		}
 		return nil, err
 	}
-	cuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

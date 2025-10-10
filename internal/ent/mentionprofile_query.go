@@ -34,44 +34,44 @@ type MentionProfileQuery struct {
 }
 
 // Where adds a new predicate for the MentionProfileQuery builder.
-func (mpq *MentionProfileQuery) Where(ps ...predicate.MentionProfile) *MentionProfileQuery {
-	mpq.predicates = append(mpq.predicates, ps...)
-	return mpq
+func (_q *MentionProfileQuery) Where(ps ...predicate.MentionProfile) *MentionProfileQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (mpq *MentionProfileQuery) Limit(limit int) *MentionProfileQuery {
-	mpq.ctx.Limit = &limit
-	return mpq
+func (_q *MentionProfileQuery) Limit(limit int) *MentionProfileQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (mpq *MentionProfileQuery) Offset(offset int) *MentionProfileQuery {
-	mpq.ctx.Offset = &offset
-	return mpq
+func (_q *MentionProfileQuery) Offset(offset int) *MentionProfileQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (mpq *MentionProfileQuery) Unique(unique bool) *MentionProfileQuery {
-	mpq.ctx.Unique = &unique
-	return mpq
+func (_q *MentionProfileQuery) Unique(unique bool) *MentionProfileQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (mpq *MentionProfileQuery) Order(o ...mentionprofile.OrderOption) *MentionProfileQuery {
-	mpq.order = append(mpq.order, o...)
-	return mpq
+func (_q *MentionProfileQuery) Order(o ...mentionprofile.OrderOption) *MentionProfileQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryAccount chains the current query on the "account" edge.
-func (mpq *MentionProfileQuery) QueryAccount() *AccountQuery {
-	query := (&AccountClient{config: mpq.config}).Query()
+func (_q *MentionProfileQuery) QueryAccount() *AccountQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := mpq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := mpq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -80,20 +80,20 @@ func (mpq *MentionProfileQuery) QueryAccount() *AccountQuery {
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, mentionprofile.AccountTable, mentionprofile.AccountColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(mpq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryPost chains the current query on the "Post" edge.
-func (mpq *MentionProfileQuery) QueryPost() *PostQuery {
-	query := (&PostClient{config: mpq.config}).Query()
+func (_q *MentionProfileQuery) QueryPost() *PostQuery {
+	query := (&PostClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := mpq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := mpq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -102,7 +102,7 @@ func (mpq *MentionProfileQuery) QueryPost() *PostQuery {
 			sqlgraph.To(post.Table, post.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, mentionprofile.PostTable, mentionprofile.PostColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(mpq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -110,8 +110,8 @@ func (mpq *MentionProfileQuery) QueryPost() *PostQuery {
 
 // First returns the first MentionProfile entity from the query.
 // Returns a *NotFoundError when no MentionProfile was found.
-func (mpq *MentionProfileQuery) First(ctx context.Context) (*MentionProfile, error) {
-	nodes, err := mpq.Limit(1).All(setContextOp(ctx, mpq.ctx, ent.OpQueryFirst))
+func (_q *MentionProfileQuery) First(ctx context.Context) (*MentionProfile, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -122,8 +122,8 @@ func (mpq *MentionProfileQuery) First(ctx context.Context) (*MentionProfile, err
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (mpq *MentionProfileQuery) FirstX(ctx context.Context) *MentionProfile {
-	node, err := mpq.First(ctx)
+func (_q *MentionProfileQuery) FirstX(ctx context.Context) *MentionProfile {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -132,9 +132,9 @@ func (mpq *MentionProfileQuery) FirstX(ctx context.Context) *MentionProfile {
 
 // FirstID returns the first MentionProfile ID from the query.
 // Returns a *NotFoundError when no MentionProfile ID was found.
-func (mpq *MentionProfileQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+func (_q *MentionProfileQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = mpq.Limit(1).IDs(setContextOp(ctx, mpq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -145,8 +145,8 @@ func (mpq *MentionProfileQuery) FirstID(ctx context.Context) (id xid.ID, err err
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (mpq *MentionProfileQuery) FirstIDX(ctx context.Context) xid.ID {
-	id, err := mpq.FirstID(ctx)
+func (_q *MentionProfileQuery) FirstIDX(ctx context.Context) xid.ID {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -156,8 +156,8 @@ func (mpq *MentionProfileQuery) FirstIDX(ctx context.Context) xid.ID {
 // Only returns a single MentionProfile entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one MentionProfile entity is found.
 // Returns a *NotFoundError when no MentionProfile entities are found.
-func (mpq *MentionProfileQuery) Only(ctx context.Context) (*MentionProfile, error) {
-	nodes, err := mpq.Limit(2).All(setContextOp(ctx, mpq.ctx, ent.OpQueryOnly))
+func (_q *MentionProfileQuery) Only(ctx context.Context) (*MentionProfile, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -172,8 +172,8 @@ func (mpq *MentionProfileQuery) Only(ctx context.Context) (*MentionProfile, erro
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (mpq *MentionProfileQuery) OnlyX(ctx context.Context) *MentionProfile {
-	node, err := mpq.Only(ctx)
+func (_q *MentionProfileQuery) OnlyX(ctx context.Context) *MentionProfile {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -183,9 +183,9 @@ func (mpq *MentionProfileQuery) OnlyX(ctx context.Context) *MentionProfile {
 // OnlyID is like Only, but returns the only MentionProfile ID in the query.
 // Returns a *NotSingularError when more than one MentionProfile ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (mpq *MentionProfileQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+func (_q *MentionProfileQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = mpq.Limit(2).IDs(setContextOp(ctx, mpq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -200,8 +200,8 @@ func (mpq *MentionProfileQuery) OnlyID(ctx context.Context) (id xid.ID, err erro
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (mpq *MentionProfileQuery) OnlyIDX(ctx context.Context) xid.ID {
-	id, err := mpq.OnlyID(ctx)
+func (_q *MentionProfileQuery) OnlyIDX(ctx context.Context) xid.ID {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -209,18 +209,18 @@ func (mpq *MentionProfileQuery) OnlyIDX(ctx context.Context) xid.ID {
 }
 
 // All executes the query and returns a list of MentionProfiles.
-func (mpq *MentionProfileQuery) All(ctx context.Context) ([]*MentionProfile, error) {
-	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryAll)
-	if err := mpq.prepareQuery(ctx); err != nil {
+func (_q *MentionProfileQuery) All(ctx context.Context) ([]*MentionProfile, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*MentionProfile, *MentionProfileQuery]()
-	return withInterceptors[[]*MentionProfile](ctx, mpq, qr, mpq.inters)
+	return withInterceptors[[]*MentionProfile](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (mpq *MentionProfileQuery) AllX(ctx context.Context) []*MentionProfile {
-	nodes, err := mpq.All(ctx)
+func (_q *MentionProfileQuery) AllX(ctx context.Context) []*MentionProfile {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -228,20 +228,20 @@ func (mpq *MentionProfileQuery) AllX(ctx context.Context) []*MentionProfile {
 }
 
 // IDs executes the query and returns a list of MentionProfile IDs.
-func (mpq *MentionProfileQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
-	if mpq.ctx.Unique == nil && mpq.path != nil {
-		mpq.Unique(true)
+func (_q *MentionProfileQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryIDs)
-	if err = mpq.Select(mentionprofile.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(mentionprofile.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (mpq *MentionProfileQuery) IDsX(ctx context.Context) []xid.ID {
-	ids, err := mpq.IDs(ctx)
+func (_q *MentionProfileQuery) IDsX(ctx context.Context) []xid.ID {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -249,17 +249,17 @@ func (mpq *MentionProfileQuery) IDsX(ctx context.Context) []xid.ID {
 }
 
 // Count returns the count of the given query.
-func (mpq *MentionProfileQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryCount)
-	if err := mpq.prepareQuery(ctx); err != nil {
+func (_q *MentionProfileQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, mpq, querierCount[*MentionProfileQuery](), mpq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*MentionProfileQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (mpq *MentionProfileQuery) CountX(ctx context.Context) int {
-	count, err := mpq.Count(ctx)
+func (_q *MentionProfileQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -267,9 +267,9 @@ func (mpq *MentionProfileQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (mpq *MentionProfileQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, mpq.ctx, ent.OpQueryExist)
-	switch _, err := mpq.FirstID(ctx); {
+func (_q *MentionProfileQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -280,8 +280,8 @@ func (mpq *MentionProfileQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (mpq *MentionProfileQuery) ExistX(ctx context.Context) bool {
-	exist, err := mpq.Exist(ctx)
+func (_q *MentionProfileQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -290,45 +290,45 @@ func (mpq *MentionProfileQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the MentionProfileQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (mpq *MentionProfileQuery) Clone() *MentionProfileQuery {
-	if mpq == nil {
+func (_q *MentionProfileQuery) Clone() *MentionProfileQuery {
+	if _q == nil {
 		return nil
 	}
 	return &MentionProfileQuery{
-		config:      mpq.config,
-		ctx:         mpq.ctx.Clone(),
-		order:       append([]mentionprofile.OrderOption{}, mpq.order...),
-		inters:      append([]Interceptor{}, mpq.inters...),
-		predicates:  append([]predicate.MentionProfile{}, mpq.predicates...),
-		withAccount: mpq.withAccount.Clone(),
-		withPost:    mpq.withPost.Clone(),
+		config:      _q.config,
+		ctx:         _q.ctx.Clone(),
+		order:       append([]mentionprofile.OrderOption{}, _q.order...),
+		inters:      append([]Interceptor{}, _q.inters...),
+		predicates:  append([]predicate.MentionProfile{}, _q.predicates...),
+		withAccount: _q.withAccount.Clone(),
+		withPost:    _q.withPost.Clone(),
 		// clone intermediate query.
-		sql:       mpq.sql.Clone(),
-		path:      mpq.path,
-		modifiers: append([]func(*sql.Selector){}, mpq.modifiers...),
+		sql:       _q.sql.Clone(),
+		path:      _q.path,
+		modifiers: append([]func(*sql.Selector){}, _q.modifiers...),
 	}
 }
 
 // WithAccount tells the query-builder to eager-load the nodes that are connected to
 // the "account" edge. The optional arguments are used to configure the query builder of the edge.
-func (mpq *MentionProfileQuery) WithAccount(opts ...func(*AccountQuery)) *MentionProfileQuery {
-	query := (&AccountClient{config: mpq.config}).Query()
+func (_q *MentionProfileQuery) WithAccount(opts ...func(*AccountQuery)) *MentionProfileQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mpq.withAccount = query
-	return mpq
+	_q.withAccount = query
+	return _q
 }
 
 // WithPost tells the query-builder to eager-load the nodes that are connected to
 // the "Post" edge. The optional arguments are used to configure the query builder of the edge.
-func (mpq *MentionProfileQuery) WithPost(opts ...func(*PostQuery)) *MentionProfileQuery {
-	query := (&PostClient{config: mpq.config}).Query()
+func (_q *MentionProfileQuery) WithPost(opts ...func(*PostQuery)) *MentionProfileQuery {
+	query := (&PostClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	mpq.withPost = query
-	return mpq
+	_q.withPost = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -345,10 +345,10 @@ func (mpq *MentionProfileQuery) WithPost(opts ...func(*PostQuery)) *MentionProfi
 //		GroupBy(mentionprofile.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (mpq *MentionProfileQuery) GroupBy(field string, fields ...string) *MentionProfileGroupBy {
-	mpq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &MentionProfileGroupBy{build: mpq}
-	grbuild.flds = &mpq.ctx.Fields
+func (_q *MentionProfileQuery) GroupBy(field string, fields ...string) *MentionProfileGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &MentionProfileGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = mentionprofile.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -366,83 +366,83 @@ func (mpq *MentionProfileQuery) GroupBy(field string, fields ...string) *Mention
 //	client.MentionProfile.Query().
 //		Select(mentionprofile.FieldCreatedAt).
 //		Scan(ctx, &v)
-func (mpq *MentionProfileQuery) Select(fields ...string) *MentionProfileSelect {
-	mpq.ctx.Fields = append(mpq.ctx.Fields, fields...)
-	sbuild := &MentionProfileSelect{MentionProfileQuery: mpq}
+func (_q *MentionProfileQuery) Select(fields ...string) *MentionProfileSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &MentionProfileSelect{MentionProfileQuery: _q}
 	sbuild.label = mentionprofile.Label
-	sbuild.flds, sbuild.scan = &mpq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a MentionProfileSelect configured with the given aggregations.
-func (mpq *MentionProfileQuery) Aggregate(fns ...AggregateFunc) *MentionProfileSelect {
-	return mpq.Select().Aggregate(fns...)
+func (_q *MentionProfileQuery) Aggregate(fns ...AggregateFunc) *MentionProfileSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (mpq *MentionProfileQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range mpq.inters {
+func (_q *MentionProfileQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, mpq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range mpq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !mentionprofile.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if mpq.path != nil {
-		prev, err := mpq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		mpq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (mpq *MentionProfileQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MentionProfile, error) {
+func (_q *MentionProfileQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*MentionProfile, error) {
 	var (
 		nodes       = []*MentionProfile{}
-		_spec       = mpq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
-			mpq.withAccount != nil,
-			mpq.withPost != nil,
+			_q.withAccount != nil,
+			_q.withPost != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*MentionProfile).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &MentionProfile{config: mpq.config}
+		node := &MentionProfile{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(mpq.modifiers) > 0 {
-		_spec.Modifiers = mpq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, mpq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := mpq.withAccount; query != nil {
-		if err := mpq.loadAccount(ctx, query, nodes, nil,
+	if query := _q.withAccount; query != nil {
+		if err := _q.loadAccount(ctx, query, nodes, nil,
 			func(n *MentionProfile, e *Account) { n.Edges.Account = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := mpq.withPost; query != nil {
-		if err := mpq.loadPost(ctx, query, nodes, nil,
+	if query := _q.withPost; query != nil {
+		if err := _q.loadPost(ctx, query, nodes, nil,
 			func(n *MentionProfile, e *Post) { n.Edges.Post = e }); err != nil {
 			return nil, err
 		}
@@ -450,7 +450,7 @@ func (mpq *MentionProfileQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 	return nodes, nil
 }
 
-func (mpq *MentionProfileQuery) loadAccount(ctx context.Context, query *AccountQuery, nodes []*MentionProfile, init func(*MentionProfile), assign func(*MentionProfile, *Account)) error {
+func (_q *MentionProfileQuery) loadAccount(ctx context.Context, query *AccountQuery, nodes []*MentionProfile, init func(*MentionProfile), assign func(*MentionProfile, *Account)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*MentionProfile)
 	for i := range nodes {
@@ -479,7 +479,7 @@ func (mpq *MentionProfileQuery) loadAccount(ctx context.Context, query *AccountQ
 	}
 	return nil
 }
-func (mpq *MentionProfileQuery) loadPost(ctx context.Context, query *PostQuery, nodes []*MentionProfile, init func(*MentionProfile), assign func(*MentionProfile, *Post)) error {
+func (_q *MentionProfileQuery) loadPost(ctx context.Context, query *PostQuery, nodes []*MentionProfile, init func(*MentionProfile), assign func(*MentionProfile, *Post)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*MentionProfile)
 	for i := range nodes {
@@ -509,27 +509,27 @@ func (mpq *MentionProfileQuery) loadPost(ctx context.Context, query *PostQuery, 
 	return nil
 }
 
-func (mpq *MentionProfileQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := mpq.querySpec()
-	if len(mpq.modifiers) > 0 {
-		_spec.Modifiers = mpq.modifiers
+func (_q *MentionProfileQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = mpq.ctx.Fields
-	if len(mpq.ctx.Fields) > 0 {
-		_spec.Unique = mpq.ctx.Unique != nil && *mpq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, mpq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (mpq *MentionProfileQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *MentionProfileQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(mentionprofile.Table, mentionprofile.Columns, sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString))
-	_spec.From = mpq.sql
-	if unique := mpq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if mpq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := mpq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, mentionprofile.FieldID)
 		for i := range fields {
@@ -537,27 +537,27 @@ func (mpq *MentionProfileQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if mpq.withAccount != nil {
+		if _q.withAccount != nil {
 			_spec.Node.AddColumnOnce(mentionprofile.FieldAccountID)
 		}
-		if mpq.withPost != nil {
+		if _q.withPost != nil {
 			_spec.Node.AddColumnOnce(mentionprofile.FieldPostID)
 		}
 	}
-	if ps := mpq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := mpq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := mpq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := mpq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -567,45 +567,45 @@ func (mpq *MentionProfileQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (mpq *MentionProfileQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(mpq.driver.Dialect())
+func (_q *MentionProfileQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(mentionprofile.Table)
-	columns := mpq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = mentionprofile.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if mpq.sql != nil {
-		selector = mpq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if mpq.ctx.Unique != nil && *mpq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, m := range mpq.modifiers {
+	for _, m := range _q.modifiers {
 		m(selector)
 	}
-	for _, p := range mpq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range mpq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := mpq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := mpq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (mpq *MentionProfileQuery) Modify(modifiers ...func(s *sql.Selector)) *MentionProfileSelect {
-	mpq.modifiers = append(mpq.modifiers, modifiers...)
-	return mpq.Select()
+func (_q *MentionProfileQuery) Modify(modifiers ...func(s *sql.Selector)) *MentionProfileSelect {
+	_q.modifiers = append(_q.modifiers, modifiers...)
+	return _q.Select()
 }
 
 // MentionProfileGroupBy is the group-by builder for MentionProfile entities.
@@ -615,41 +615,41 @@ type MentionProfileGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (mpgb *MentionProfileGroupBy) Aggregate(fns ...AggregateFunc) *MentionProfileGroupBy {
-	mpgb.fns = append(mpgb.fns, fns...)
-	return mpgb
+func (_g *MentionProfileGroupBy) Aggregate(fns ...AggregateFunc) *MentionProfileGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (mpgb *MentionProfileGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mpgb.build.ctx, ent.OpQueryGroupBy)
-	if err := mpgb.build.prepareQuery(ctx); err != nil {
+func (_g *MentionProfileGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MentionProfileQuery, *MentionProfileGroupBy](ctx, mpgb.build, mpgb, mpgb.build.inters, v)
+	return scanWithInterceptors[*MentionProfileQuery, *MentionProfileGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (mpgb *MentionProfileGroupBy) sqlScan(ctx context.Context, root *MentionProfileQuery, v any) error {
+func (_g *MentionProfileGroupBy) sqlScan(ctx context.Context, root *MentionProfileQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(mpgb.fns))
-	for _, fn := range mpgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*mpgb.flds)+len(mpgb.fns))
-		for _, f := range *mpgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*mpgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := mpgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -663,27 +663,27 @@ type MentionProfileSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (mps *MentionProfileSelect) Aggregate(fns ...AggregateFunc) *MentionProfileSelect {
-	mps.fns = append(mps.fns, fns...)
-	return mps
+func (_s *MentionProfileSelect) Aggregate(fns ...AggregateFunc) *MentionProfileSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (mps *MentionProfileSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, mps.ctx, ent.OpQuerySelect)
-	if err := mps.prepareQuery(ctx); err != nil {
+func (_s *MentionProfileSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*MentionProfileQuery, *MentionProfileSelect](ctx, mps.MentionProfileQuery, mps, mps.inters, v)
+	return scanWithInterceptors[*MentionProfileQuery, *MentionProfileSelect](ctx, _s.MentionProfileQuery, _s, _s.inters, v)
 }
 
-func (mps *MentionProfileSelect) sqlScan(ctx context.Context, root *MentionProfileQuery, v any) error {
+func (_s *MentionProfileSelect) sqlScan(ctx context.Context, root *MentionProfileQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(mps.fns))
-	for _, fn := range mps.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*mps.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -691,7 +691,7 @@ func (mps *MentionProfileSelect) sqlScan(ctx context.Context, root *MentionProfi
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := mps.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -699,7 +699,7 @@ func (mps *MentionProfileSelect) sqlScan(ctx context.Context, root *MentionProfi
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (mps *MentionProfileSelect) Modify(modifiers ...func(s *sql.Selector)) *MentionProfileSelect {
-	mps.modifiers = append(mps.modifiers, modifiers...)
-	return mps
+func (_s *MentionProfileSelect) Modify(modifiers ...func(s *sql.Selector)) *MentionProfileSelect {
+	_s.modifiers = append(_s.modifiers, modifiers...)
+	return _s
 }

@@ -27,69 +27,69 @@ type LikePostCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (lpc *LikePostCreate) SetCreatedAt(t time.Time) *LikePostCreate {
-	lpc.mutation.SetCreatedAt(t)
-	return lpc
+func (_c *LikePostCreate) SetCreatedAt(v time.Time) *LikePostCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (lpc *LikePostCreate) SetNillableCreatedAt(t *time.Time) *LikePostCreate {
-	if t != nil {
-		lpc.SetCreatedAt(*t)
+func (_c *LikePostCreate) SetNillableCreatedAt(v *time.Time) *LikePostCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return lpc
+	return _c
 }
 
 // SetAccountID sets the "account_id" field.
-func (lpc *LikePostCreate) SetAccountID(x xid.ID) *LikePostCreate {
-	lpc.mutation.SetAccountID(x)
-	return lpc
+func (_c *LikePostCreate) SetAccountID(v xid.ID) *LikePostCreate {
+	_c.mutation.SetAccountID(v)
+	return _c
 }
 
 // SetPostID sets the "post_id" field.
-func (lpc *LikePostCreate) SetPostID(x xid.ID) *LikePostCreate {
-	lpc.mutation.SetPostID(x)
-	return lpc
+func (_c *LikePostCreate) SetPostID(v xid.ID) *LikePostCreate {
+	_c.mutation.SetPostID(v)
+	return _c
 }
 
 // SetID sets the "id" field.
-func (lpc *LikePostCreate) SetID(x xid.ID) *LikePostCreate {
-	lpc.mutation.SetID(x)
-	return lpc
+func (_c *LikePostCreate) SetID(v xid.ID) *LikePostCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (lpc *LikePostCreate) SetNillableID(x *xid.ID) *LikePostCreate {
-	if x != nil {
-		lpc.SetID(*x)
+func (_c *LikePostCreate) SetNillableID(v *xid.ID) *LikePostCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return lpc
+	return _c
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (lpc *LikePostCreate) SetAccount(a *Account) *LikePostCreate {
-	return lpc.SetAccountID(a.ID)
+func (_c *LikePostCreate) SetAccount(v *Account) *LikePostCreate {
+	return _c.SetAccountID(v.ID)
 }
 
 // SetPost sets the "Post" edge to the Post entity.
-func (lpc *LikePostCreate) SetPost(p *Post) *LikePostCreate {
-	return lpc.SetPostID(p.ID)
+func (_c *LikePostCreate) SetPost(v *Post) *LikePostCreate {
+	return _c.SetPostID(v.ID)
 }
 
 // Mutation returns the LikePostMutation object of the builder.
-func (lpc *LikePostCreate) Mutation() *LikePostMutation {
-	return lpc.mutation
+func (_c *LikePostCreate) Mutation() *LikePostMutation {
+	return _c.mutation
 }
 
 // Save creates the LikePost in the database.
-func (lpc *LikePostCreate) Save(ctx context.Context) (*LikePost, error) {
-	lpc.defaults()
-	return withHooks(ctx, lpc.sqlSave, lpc.mutation, lpc.hooks)
+func (_c *LikePostCreate) Save(ctx context.Context) (*LikePost, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (lpc *LikePostCreate) SaveX(ctx context.Context) *LikePost {
-	v, err := lpc.Save(ctx)
+func (_c *LikePostCreate) SaveX(ctx context.Context) *LikePost {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -97,61 +97,61 @@ func (lpc *LikePostCreate) SaveX(ctx context.Context) *LikePost {
 }
 
 // Exec executes the query.
-func (lpc *LikePostCreate) Exec(ctx context.Context) error {
-	_, err := lpc.Save(ctx)
+func (_c *LikePostCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (lpc *LikePostCreate) ExecX(ctx context.Context) {
-	if err := lpc.Exec(ctx); err != nil {
+func (_c *LikePostCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (lpc *LikePostCreate) defaults() {
-	if _, ok := lpc.mutation.CreatedAt(); !ok {
+func (_c *LikePostCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := likepost.DefaultCreatedAt()
-		lpc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := lpc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := likepost.DefaultID()
-		lpc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (lpc *LikePostCreate) check() error {
-	if _, ok := lpc.mutation.CreatedAt(); !ok {
+func (_c *LikePostCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "LikePost.created_at"`)}
 	}
-	if _, ok := lpc.mutation.AccountID(); !ok {
+	if _, ok := _c.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "LikePost.account_id"`)}
 	}
-	if _, ok := lpc.mutation.PostID(); !ok {
+	if _, ok := _c.mutation.PostID(); !ok {
 		return &ValidationError{Name: "post_id", err: errors.New(`ent: missing required field "LikePost.post_id"`)}
 	}
-	if v, ok := lpc.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := likepost.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "LikePost.id": %w`, err)}
 		}
 	}
-	if len(lpc.mutation.AccountIDs()) == 0 {
+	if len(_c.mutation.AccountIDs()) == 0 {
 		return &ValidationError{Name: "account", err: errors.New(`ent: missing required edge "LikePost.account"`)}
 	}
-	if len(lpc.mutation.PostIDs()) == 0 {
+	if len(_c.mutation.PostIDs()) == 0 {
 		return &ValidationError{Name: "Post", err: errors.New(`ent: missing required edge "LikePost.Post"`)}
 	}
 	return nil
 }
 
-func (lpc *LikePostCreate) sqlSave(ctx context.Context) (*LikePost, error) {
-	if err := lpc.check(); err != nil {
+func (_c *LikePostCreate) sqlSave(ctx context.Context) (*LikePost, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := lpc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, lpc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -164,26 +164,26 @@ func (lpc *LikePostCreate) sqlSave(ctx context.Context) (*LikePost, error) {
 			return nil, err
 		}
 	}
-	lpc.mutation.id = &_node.ID
-	lpc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (lpc *LikePostCreate) createSpec() (*LikePost, *sqlgraph.CreateSpec) {
+func (_c *LikePostCreate) createSpec() (*LikePost, *sqlgraph.CreateSpec) {
 	var (
-		_node = &LikePost{config: lpc.config}
+		_node = &LikePost{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(likepost.Table, sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = lpc.conflict
-	if id, ok := lpc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := lpc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(likepost.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if nodes := lpc.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -200,7 +200,7 @@ func (lpc *LikePostCreate) createSpec() (*LikePost, *sqlgraph.CreateSpec) {
 		_node.AccountID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := lpc.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -236,10 +236,10 @@ func (lpc *LikePostCreate) createSpec() (*LikePost, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (lpc *LikePostCreate) OnConflict(opts ...sql.ConflictOption) *LikePostUpsertOne {
-	lpc.conflict = opts
+func (_c *LikePostCreate) OnConflict(opts ...sql.ConflictOption) *LikePostUpsertOne {
+	_c.conflict = opts
 	return &LikePostUpsertOne{
-		create: lpc,
+		create: _c,
 	}
 }
 
@@ -249,10 +249,10 @@ func (lpc *LikePostCreate) OnConflict(opts ...sql.ConflictOption) *LikePostUpser
 //	client.LikePost.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (lpc *LikePostCreate) OnConflictColumns(columns ...string) *LikePostUpsertOne {
-	lpc.conflict = append(lpc.conflict, sql.ConflictColumns(columns...))
+func (_c *LikePostCreate) OnConflictColumns(columns ...string) *LikePostUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &LikePostUpsertOne{
-		create: lpc,
+		create: _c,
 	}
 }
 
@@ -419,16 +419,16 @@ type LikePostCreateBulk struct {
 }
 
 // Save creates the LikePost entities in the database.
-func (lpcb *LikePostCreateBulk) Save(ctx context.Context) ([]*LikePost, error) {
-	if lpcb.err != nil {
-		return nil, lpcb.err
+func (_c *LikePostCreateBulk) Save(ctx context.Context) ([]*LikePost, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(lpcb.builders))
-	nodes := make([]*LikePost, len(lpcb.builders))
-	mutators := make([]Mutator, len(lpcb.builders))
-	for i := range lpcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*LikePost, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := lpcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*LikePostMutation)
@@ -442,12 +442,12 @@ func (lpcb *LikePostCreateBulk) Save(ctx context.Context) ([]*LikePost, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, lpcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = lpcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, lpcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -467,7 +467,7 @@ func (lpcb *LikePostCreateBulk) Save(ctx context.Context) ([]*LikePost, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, lpcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -475,8 +475,8 @@ func (lpcb *LikePostCreateBulk) Save(ctx context.Context) ([]*LikePost, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (lpcb *LikePostCreateBulk) SaveX(ctx context.Context) []*LikePost {
-	v, err := lpcb.Save(ctx)
+func (_c *LikePostCreateBulk) SaveX(ctx context.Context) []*LikePost {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -484,14 +484,14 @@ func (lpcb *LikePostCreateBulk) SaveX(ctx context.Context) []*LikePost {
 }
 
 // Exec executes the query.
-func (lpcb *LikePostCreateBulk) Exec(ctx context.Context) error {
-	_, err := lpcb.Save(ctx)
+func (_c *LikePostCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (lpcb *LikePostCreateBulk) ExecX(ctx context.Context) {
-	if err := lpcb.Exec(ctx); err != nil {
+func (_c *LikePostCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -511,10 +511,10 @@ func (lpcb *LikePostCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (lpcb *LikePostCreateBulk) OnConflict(opts ...sql.ConflictOption) *LikePostUpsertBulk {
-	lpcb.conflict = opts
+func (_c *LikePostCreateBulk) OnConflict(opts ...sql.ConflictOption) *LikePostUpsertBulk {
+	_c.conflict = opts
 	return &LikePostUpsertBulk{
-		create: lpcb,
+		create: _c,
 	}
 }
 
@@ -524,10 +524,10 @@ func (lpcb *LikePostCreateBulk) OnConflict(opts ...sql.ConflictOption) *LikePost
 //	client.LikePost.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (lpcb *LikePostCreateBulk) OnConflictColumns(columns ...string) *LikePostUpsertBulk {
-	lpcb.conflict = append(lpcb.conflict, sql.ConflictColumns(columns...))
+func (_c *LikePostCreateBulk) OnConflictColumns(columns ...string) *LikePostUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &LikePostUpsertBulk{
-		create: lpcb,
+		create: _c,
 	}
 }
 

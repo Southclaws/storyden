@@ -26,74 +26,74 @@ type MentionProfileUpdate struct {
 }
 
 // Where appends a list predicates to the MentionProfileUpdate builder.
-func (mpu *MentionProfileUpdate) Where(ps ...predicate.MentionProfile) *MentionProfileUpdate {
-	mpu.mutation.Where(ps...)
-	return mpu
+func (_u *MentionProfileUpdate) Where(ps ...predicate.MentionProfile) *MentionProfileUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (mpu *MentionProfileUpdate) SetAccountID(x xid.ID) *MentionProfileUpdate {
-	mpu.mutation.SetAccountID(x)
-	return mpu
+func (_u *MentionProfileUpdate) SetAccountID(v xid.ID) *MentionProfileUpdate {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (mpu *MentionProfileUpdate) SetNillableAccountID(x *xid.ID) *MentionProfileUpdate {
-	if x != nil {
-		mpu.SetAccountID(*x)
+func (_u *MentionProfileUpdate) SetNillableAccountID(v *xid.ID) *MentionProfileUpdate {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return mpu
+	return _u
 }
 
 // SetPostID sets the "post_id" field.
-func (mpu *MentionProfileUpdate) SetPostID(x xid.ID) *MentionProfileUpdate {
-	mpu.mutation.SetPostID(x)
-	return mpu
+func (_u *MentionProfileUpdate) SetPostID(v xid.ID) *MentionProfileUpdate {
+	_u.mutation.SetPostID(v)
+	return _u
 }
 
 // SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (mpu *MentionProfileUpdate) SetNillablePostID(x *xid.ID) *MentionProfileUpdate {
-	if x != nil {
-		mpu.SetPostID(*x)
+func (_u *MentionProfileUpdate) SetNillablePostID(v *xid.ID) *MentionProfileUpdate {
+	if v != nil {
+		_u.SetPostID(*v)
 	}
-	return mpu
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (mpu *MentionProfileUpdate) SetAccount(a *Account) *MentionProfileUpdate {
-	return mpu.SetAccountID(a.ID)
+func (_u *MentionProfileUpdate) SetAccount(v *Account) *MentionProfileUpdate {
+	return _u.SetAccountID(v.ID)
 }
 
 // SetPost sets the "Post" edge to the Post entity.
-func (mpu *MentionProfileUpdate) SetPost(p *Post) *MentionProfileUpdate {
-	return mpu.SetPostID(p.ID)
+func (_u *MentionProfileUpdate) SetPost(v *Post) *MentionProfileUpdate {
+	return _u.SetPostID(v.ID)
 }
 
 // Mutation returns the MentionProfileMutation object of the builder.
-func (mpu *MentionProfileUpdate) Mutation() *MentionProfileMutation {
-	return mpu.mutation
+func (_u *MentionProfileUpdate) Mutation() *MentionProfileMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (mpu *MentionProfileUpdate) ClearAccount() *MentionProfileUpdate {
-	mpu.mutation.ClearAccount()
-	return mpu
+func (_u *MentionProfileUpdate) ClearAccount() *MentionProfileUpdate {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // ClearPost clears the "Post" edge to the Post entity.
-func (mpu *MentionProfileUpdate) ClearPost() *MentionProfileUpdate {
-	mpu.mutation.ClearPost()
-	return mpu
+func (_u *MentionProfileUpdate) ClearPost() *MentionProfileUpdate {
+	_u.mutation.ClearPost()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (mpu *MentionProfileUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, mpu.sqlSave, mpu.mutation, mpu.hooks)
+func (_u *MentionProfileUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mpu *MentionProfileUpdate) SaveX(ctx context.Context) int {
-	affected, err := mpu.Save(ctx)
+func (_u *MentionProfileUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -101,48 +101,48 @@ func (mpu *MentionProfileUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (mpu *MentionProfileUpdate) Exec(ctx context.Context) error {
-	_, err := mpu.Save(ctx)
+func (_u *MentionProfileUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mpu *MentionProfileUpdate) ExecX(ctx context.Context) {
-	if err := mpu.Exec(ctx); err != nil {
+func (_u *MentionProfileUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mpu *MentionProfileUpdate) check() error {
-	if mpu.mutation.AccountCleared() && len(mpu.mutation.AccountIDs()) > 0 {
+func (_u *MentionProfileUpdate) check() error {
+	if _u.mutation.AccountCleared() && len(_u.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MentionProfile.account"`)
 	}
-	if mpu.mutation.PostCleared() && len(mpu.mutation.PostIDs()) > 0 {
+	if _u.mutation.PostCleared() && len(_u.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MentionProfile.Post"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (mpu *MentionProfileUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *MentionProfileUpdate {
-	mpu.modifiers = append(mpu.modifiers, modifiers...)
-	return mpu
+func (_u *MentionProfileUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *MentionProfileUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (mpu *MentionProfileUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := mpu.check(); err != nil {
-		return n, err
+func (_u *MentionProfileUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(mentionprofile.Table, mentionprofile.Columns, sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString))
-	if ps := mpu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if mpu.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -155,7 +155,7 @@ func (mpu *MentionProfileUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mpu.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -171,7 +171,7 @@ func (mpu *MentionProfileUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if mpu.mutation.PostCleared() {
+	if _u.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -184,7 +184,7 @@ func (mpu *MentionProfileUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mpu.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -200,8 +200,8 @@ func (mpu *MentionProfileUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(mpu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, mpu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{mentionprofile.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -209,8 +209,8 @@ func (mpu *MentionProfileUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		return 0, err
 	}
-	mpu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // MentionProfileUpdateOne is the builder for updating a single MentionProfile entity.
@@ -223,81 +223,81 @@ type MentionProfileUpdateOne struct {
 }
 
 // SetAccountID sets the "account_id" field.
-func (mpuo *MentionProfileUpdateOne) SetAccountID(x xid.ID) *MentionProfileUpdateOne {
-	mpuo.mutation.SetAccountID(x)
-	return mpuo
+func (_u *MentionProfileUpdateOne) SetAccountID(v xid.ID) *MentionProfileUpdateOne {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (mpuo *MentionProfileUpdateOne) SetNillableAccountID(x *xid.ID) *MentionProfileUpdateOne {
-	if x != nil {
-		mpuo.SetAccountID(*x)
+func (_u *MentionProfileUpdateOne) SetNillableAccountID(v *xid.ID) *MentionProfileUpdateOne {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return mpuo
+	return _u
 }
 
 // SetPostID sets the "post_id" field.
-func (mpuo *MentionProfileUpdateOne) SetPostID(x xid.ID) *MentionProfileUpdateOne {
-	mpuo.mutation.SetPostID(x)
-	return mpuo
+func (_u *MentionProfileUpdateOne) SetPostID(v xid.ID) *MentionProfileUpdateOne {
+	_u.mutation.SetPostID(v)
+	return _u
 }
 
 // SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (mpuo *MentionProfileUpdateOne) SetNillablePostID(x *xid.ID) *MentionProfileUpdateOne {
-	if x != nil {
-		mpuo.SetPostID(*x)
+func (_u *MentionProfileUpdateOne) SetNillablePostID(v *xid.ID) *MentionProfileUpdateOne {
+	if v != nil {
+		_u.SetPostID(*v)
 	}
-	return mpuo
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (mpuo *MentionProfileUpdateOne) SetAccount(a *Account) *MentionProfileUpdateOne {
-	return mpuo.SetAccountID(a.ID)
+func (_u *MentionProfileUpdateOne) SetAccount(v *Account) *MentionProfileUpdateOne {
+	return _u.SetAccountID(v.ID)
 }
 
 // SetPost sets the "Post" edge to the Post entity.
-func (mpuo *MentionProfileUpdateOne) SetPost(p *Post) *MentionProfileUpdateOne {
-	return mpuo.SetPostID(p.ID)
+func (_u *MentionProfileUpdateOne) SetPost(v *Post) *MentionProfileUpdateOne {
+	return _u.SetPostID(v.ID)
 }
 
 // Mutation returns the MentionProfileMutation object of the builder.
-func (mpuo *MentionProfileUpdateOne) Mutation() *MentionProfileMutation {
-	return mpuo.mutation
+func (_u *MentionProfileUpdateOne) Mutation() *MentionProfileMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (mpuo *MentionProfileUpdateOne) ClearAccount() *MentionProfileUpdateOne {
-	mpuo.mutation.ClearAccount()
-	return mpuo
+func (_u *MentionProfileUpdateOne) ClearAccount() *MentionProfileUpdateOne {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // ClearPost clears the "Post" edge to the Post entity.
-func (mpuo *MentionProfileUpdateOne) ClearPost() *MentionProfileUpdateOne {
-	mpuo.mutation.ClearPost()
-	return mpuo
+func (_u *MentionProfileUpdateOne) ClearPost() *MentionProfileUpdateOne {
+	_u.mutation.ClearPost()
+	return _u
 }
 
 // Where appends a list predicates to the MentionProfileUpdate builder.
-func (mpuo *MentionProfileUpdateOne) Where(ps ...predicate.MentionProfile) *MentionProfileUpdateOne {
-	mpuo.mutation.Where(ps...)
-	return mpuo
+func (_u *MentionProfileUpdateOne) Where(ps ...predicate.MentionProfile) *MentionProfileUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (mpuo *MentionProfileUpdateOne) Select(field string, fields ...string) *MentionProfileUpdateOne {
-	mpuo.fields = append([]string{field}, fields...)
-	return mpuo
+func (_u *MentionProfileUpdateOne) Select(field string, fields ...string) *MentionProfileUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated MentionProfile entity.
-func (mpuo *MentionProfileUpdateOne) Save(ctx context.Context) (*MentionProfile, error) {
-	return withHooks(ctx, mpuo.sqlSave, mpuo.mutation, mpuo.hooks)
+func (_u *MentionProfileUpdateOne) Save(ctx context.Context) (*MentionProfile, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (mpuo *MentionProfileUpdateOne) SaveX(ctx context.Context) *MentionProfile {
-	node, err := mpuo.Save(ctx)
+func (_u *MentionProfileUpdateOne) SaveX(ctx context.Context) *MentionProfile {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -305,46 +305,46 @@ func (mpuo *MentionProfileUpdateOne) SaveX(ctx context.Context) *MentionProfile 
 }
 
 // Exec executes the query on the entity.
-func (mpuo *MentionProfileUpdateOne) Exec(ctx context.Context) error {
-	_, err := mpuo.Save(ctx)
+func (_u *MentionProfileUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mpuo *MentionProfileUpdateOne) ExecX(ctx context.Context) {
-	if err := mpuo.Exec(ctx); err != nil {
+func (_u *MentionProfileUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (mpuo *MentionProfileUpdateOne) check() error {
-	if mpuo.mutation.AccountCleared() && len(mpuo.mutation.AccountIDs()) > 0 {
+func (_u *MentionProfileUpdateOne) check() error {
+	if _u.mutation.AccountCleared() && len(_u.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MentionProfile.account"`)
 	}
-	if mpuo.mutation.PostCleared() && len(mpuo.mutation.PostIDs()) > 0 {
+	if _u.mutation.PostCleared() && len(_u.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "MentionProfile.Post"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (mpuo *MentionProfileUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *MentionProfileUpdateOne {
-	mpuo.modifiers = append(mpuo.modifiers, modifiers...)
-	return mpuo
+func (_u *MentionProfileUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *MentionProfileUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (mpuo *MentionProfileUpdateOne) sqlSave(ctx context.Context) (_node *MentionProfile, err error) {
-	if err := mpuo.check(); err != nil {
+func (_u *MentionProfileUpdateOne) sqlSave(ctx context.Context) (_node *MentionProfile, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(mentionprofile.Table, mentionprofile.Columns, sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString))
-	id, ok := mpuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "MentionProfile.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := mpuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, mentionprofile.FieldID)
 		for _, f := range fields {
@@ -356,14 +356,14 @@ func (mpuo *MentionProfileUpdateOne) sqlSave(ctx context.Context) (_node *Mentio
 			}
 		}
 	}
-	if ps := mpuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if mpuo.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -376,7 +376,7 @@ func (mpuo *MentionProfileUpdateOne) sqlSave(ctx context.Context) (_node *Mentio
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mpuo.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -392,7 +392,7 @@ func (mpuo *MentionProfileUpdateOne) sqlSave(ctx context.Context) (_node *Mentio
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if mpuo.mutation.PostCleared() {
+	if _u.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -405,7 +405,7 @@ func (mpuo *MentionProfileUpdateOne) sqlSave(ctx context.Context) (_node *Mentio
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := mpuo.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -421,11 +421,11 @@ func (mpuo *MentionProfileUpdateOne) sqlSave(ctx context.Context) (_node *Mentio
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(mpuo.modifiers...)
-	_node = &MentionProfile{config: mpuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &MentionProfile{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, mpuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{mentionprofile.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -433,6 +433,6 @@ func (mpuo *MentionProfileUpdateOne) sqlSave(ctx context.Context) (_node *Mentio
 		}
 		return nil, err
 	}
-	mpuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

@@ -30,348 +30,348 @@ type AssetUpdate struct {
 }
 
 // Where appends a list predicates to the AssetUpdate builder.
-func (au *AssetUpdate) Where(ps ...predicate.Asset) *AssetUpdate {
-	au.mutation.Where(ps...)
-	return au
+func (_u *AssetUpdate) Where(ps ...predicate.Asset) *AssetUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (au *AssetUpdate) SetUpdatedAt(t time.Time) *AssetUpdate {
-	au.mutation.SetUpdatedAt(t)
-	return au
+func (_u *AssetUpdate) SetUpdatedAt(v time.Time) *AssetUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetFilename sets the "filename" field.
-func (au *AssetUpdate) SetFilename(s string) *AssetUpdate {
-	au.mutation.SetFilename(s)
-	return au
+func (_u *AssetUpdate) SetFilename(v string) *AssetUpdate {
+	_u.mutation.SetFilename(v)
+	return _u
 }
 
 // SetNillableFilename sets the "filename" field if the given value is not nil.
-func (au *AssetUpdate) SetNillableFilename(s *string) *AssetUpdate {
-	if s != nil {
-		au.SetFilename(*s)
+func (_u *AssetUpdate) SetNillableFilename(v *string) *AssetUpdate {
+	if v != nil {
+		_u.SetFilename(*v)
 	}
-	return au
+	return _u
 }
 
 // SetSize sets the "size" field.
-func (au *AssetUpdate) SetSize(i int) *AssetUpdate {
-	au.mutation.ResetSize()
-	au.mutation.SetSize(i)
-	return au
+func (_u *AssetUpdate) SetSize(v int) *AssetUpdate {
+	_u.mutation.ResetSize()
+	_u.mutation.SetSize(v)
+	return _u
 }
 
 // SetNillableSize sets the "size" field if the given value is not nil.
-func (au *AssetUpdate) SetNillableSize(i *int) *AssetUpdate {
-	if i != nil {
-		au.SetSize(*i)
+func (_u *AssetUpdate) SetNillableSize(v *int) *AssetUpdate {
+	if v != nil {
+		_u.SetSize(*v)
 	}
-	return au
+	return _u
 }
 
-// AddSize adds i to the "size" field.
-func (au *AssetUpdate) AddSize(i int) *AssetUpdate {
-	au.mutation.AddSize(i)
-	return au
+// AddSize adds value to the "size" field.
+func (_u *AssetUpdate) AddSize(v int) *AssetUpdate {
+	_u.mutation.AddSize(v)
+	return _u
 }
 
 // SetMimeType sets the "mime_type" field.
-func (au *AssetUpdate) SetMimeType(s string) *AssetUpdate {
-	au.mutation.SetMimeType(s)
-	return au
+func (_u *AssetUpdate) SetMimeType(v string) *AssetUpdate {
+	_u.mutation.SetMimeType(v)
+	return _u
 }
 
 // SetNillableMimeType sets the "mime_type" field if the given value is not nil.
-func (au *AssetUpdate) SetNillableMimeType(s *string) *AssetUpdate {
-	if s != nil {
-		au.SetMimeType(*s)
+func (_u *AssetUpdate) SetNillableMimeType(v *string) *AssetUpdate {
+	if v != nil {
+		_u.SetMimeType(*v)
 	}
-	return au
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (au *AssetUpdate) SetMetadata(m map[string]interface{}) *AssetUpdate {
-	au.mutation.SetMetadata(m)
-	return au
+func (_u *AssetUpdate) SetMetadata(v map[string]interface{}) *AssetUpdate {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (au *AssetUpdate) ClearMetadata() *AssetUpdate {
-	au.mutation.ClearMetadata()
-	return au
+func (_u *AssetUpdate) ClearMetadata() *AssetUpdate {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (au *AssetUpdate) SetAccountID(x xid.ID) *AssetUpdate {
-	au.mutation.SetAccountID(x)
-	return au
+func (_u *AssetUpdate) SetAccountID(v xid.ID) *AssetUpdate {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (au *AssetUpdate) SetNillableAccountID(x *xid.ID) *AssetUpdate {
-	if x != nil {
-		au.SetAccountID(*x)
+func (_u *AssetUpdate) SetNillableAccountID(v *xid.ID) *AssetUpdate {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return au
+	return _u
 }
 
 // SetParentAssetID sets the "parent_asset_id" field.
-func (au *AssetUpdate) SetParentAssetID(x xid.ID) *AssetUpdate {
-	au.mutation.SetParentAssetID(x)
-	return au
+func (_u *AssetUpdate) SetParentAssetID(v xid.ID) *AssetUpdate {
+	_u.mutation.SetParentAssetID(v)
+	return _u
 }
 
 // SetNillableParentAssetID sets the "parent_asset_id" field if the given value is not nil.
-func (au *AssetUpdate) SetNillableParentAssetID(x *xid.ID) *AssetUpdate {
-	if x != nil {
-		au.SetParentAssetID(*x)
+func (_u *AssetUpdate) SetNillableParentAssetID(v *xid.ID) *AssetUpdate {
+	if v != nil {
+		_u.SetParentAssetID(*v)
 	}
-	return au
+	return _u
 }
 
 // ClearParentAssetID clears the value of the "parent_asset_id" field.
-func (au *AssetUpdate) ClearParentAssetID() *AssetUpdate {
-	au.mutation.ClearParentAssetID()
-	return au
+func (_u *AssetUpdate) ClearParentAssetID() *AssetUpdate {
+	_u.mutation.ClearParentAssetID()
+	return _u
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (au *AssetUpdate) AddPostIDs(ids ...xid.ID) *AssetUpdate {
-	au.mutation.AddPostIDs(ids...)
-	return au
+func (_u *AssetUpdate) AddPostIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (au *AssetUpdate) AddPosts(p ...*Post) *AssetUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *AssetUpdate) AddPosts(v ...*Post) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (au *AssetUpdate) AddNodeIDs(ids ...xid.ID) *AssetUpdate {
-	au.mutation.AddNodeIDs(ids...)
-	return au
+func (_u *AssetUpdate) AddNodeIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (au *AssetUpdate) AddNodes(n ...*Node) *AssetUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AssetUpdate) AddNodes(v ...*Node) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // AddLinkIDs adds the "links" edge to the Link entity by IDs.
-func (au *AssetUpdate) AddLinkIDs(ids ...xid.ID) *AssetUpdate {
-	au.mutation.AddLinkIDs(ids...)
-	return au
+func (_u *AssetUpdate) AddLinkIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.AddLinkIDs(ids...)
+	return _u
 }
 
 // AddLinks adds the "links" edges to the Link entity.
-func (au *AssetUpdate) AddLinks(l ...*Link) *AssetUpdate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *AssetUpdate) AddLinks(v ...*Link) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddLinkIDs(ids...)
+	return _u.AddLinkIDs(ids...)
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
-func (au *AssetUpdate) SetOwnerID(id xid.ID) *AssetUpdate {
-	au.mutation.SetOwnerID(id)
-	return au
+func (_u *AssetUpdate) SetOwnerID(id xid.ID) *AssetUpdate {
+	_u.mutation.SetOwnerID(id)
+	return _u
 }
 
 // SetOwner sets the "owner" edge to the Account entity.
-func (au *AssetUpdate) SetOwner(a *Account) *AssetUpdate {
-	return au.SetOwnerID(a.ID)
+func (_u *AssetUpdate) SetOwner(v *Account) *AssetUpdate {
+	return _u.SetOwnerID(v.ID)
 }
 
 // SetParentID sets the "parent" edge to the Asset entity by ID.
-func (au *AssetUpdate) SetParentID(id xid.ID) *AssetUpdate {
-	au.mutation.SetParentID(id)
-	return au
+func (_u *AssetUpdate) SetParentID(id xid.ID) *AssetUpdate {
+	_u.mutation.SetParentID(id)
+	return _u
 }
 
 // SetNillableParentID sets the "parent" edge to the Asset entity by ID if the given value is not nil.
-func (au *AssetUpdate) SetNillableParentID(id *xid.ID) *AssetUpdate {
+func (_u *AssetUpdate) SetNillableParentID(id *xid.ID) *AssetUpdate {
 	if id != nil {
-		au = au.SetParentID(*id)
+		_u = _u.SetParentID(*id)
 	}
-	return au
+	return _u
 }
 
 // SetParent sets the "parent" edge to the Asset entity.
-func (au *AssetUpdate) SetParent(a *Asset) *AssetUpdate {
-	return au.SetParentID(a.ID)
+func (_u *AssetUpdate) SetParent(v *Asset) *AssetUpdate {
+	return _u.SetParentID(v.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (au *AssetUpdate) AddAssetIDs(ids ...xid.ID) *AssetUpdate {
-	au.mutation.AddAssetIDs(ids...)
-	return au
+func (_u *AssetUpdate) AddAssetIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.AddAssetIDs(ids...)
+	return _u
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (au *AssetUpdate) AddAssets(a ...*Asset) *AssetUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AssetUpdate) AddAssets(v ...*Asset) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddAssetIDs(ids...)
+	return _u.AddAssetIDs(ids...)
 }
 
 // AddEventIDs adds the "event" edge to the Event entity by IDs.
-func (au *AssetUpdate) AddEventIDs(ids ...xid.ID) *AssetUpdate {
-	au.mutation.AddEventIDs(ids...)
-	return au
+func (_u *AssetUpdate) AddEventIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.AddEventIDs(ids...)
+	return _u
 }
 
 // AddEvent adds the "event" edges to the Event entity.
-func (au *AssetUpdate) AddEvent(e ...*Event) *AssetUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AssetUpdate) AddEvent(v ...*Event) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddEventIDs(ids...)
+	return _u.AddEventIDs(ids...)
 }
 
 // Mutation returns the AssetMutation object of the builder.
-func (au *AssetUpdate) Mutation() *AssetMutation {
-	return au.mutation
+func (_u *AssetUpdate) Mutation() *AssetMutation {
+	return _u.mutation
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (au *AssetUpdate) ClearPosts() *AssetUpdate {
-	au.mutation.ClearPosts()
-	return au
+func (_u *AssetUpdate) ClearPosts() *AssetUpdate {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (au *AssetUpdate) RemovePostIDs(ids ...xid.ID) *AssetUpdate {
-	au.mutation.RemovePostIDs(ids...)
-	return au
+func (_u *AssetUpdate) RemovePostIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (au *AssetUpdate) RemovePosts(p ...*Post) *AssetUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *AssetUpdate) RemovePosts(v ...*Post) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (au *AssetUpdate) ClearNodes() *AssetUpdate {
-	au.mutation.ClearNodes()
-	return au
+func (_u *AssetUpdate) ClearNodes() *AssetUpdate {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (au *AssetUpdate) RemoveNodeIDs(ids ...xid.ID) *AssetUpdate {
-	au.mutation.RemoveNodeIDs(ids...)
-	return au
+func (_u *AssetUpdate) RemoveNodeIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (au *AssetUpdate) RemoveNodes(n ...*Node) *AssetUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AssetUpdate) RemoveNodes(v ...*Node) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // ClearLinks clears all "links" edges to the Link entity.
-func (au *AssetUpdate) ClearLinks() *AssetUpdate {
-	au.mutation.ClearLinks()
-	return au
+func (_u *AssetUpdate) ClearLinks() *AssetUpdate {
+	_u.mutation.ClearLinks()
+	return _u
 }
 
 // RemoveLinkIDs removes the "links" edge to Link entities by IDs.
-func (au *AssetUpdate) RemoveLinkIDs(ids ...xid.ID) *AssetUpdate {
-	au.mutation.RemoveLinkIDs(ids...)
-	return au
+func (_u *AssetUpdate) RemoveLinkIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.RemoveLinkIDs(ids...)
+	return _u
 }
 
 // RemoveLinks removes "links" edges to Link entities.
-func (au *AssetUpdate) RemoveLinks(l ...*Link) *AssetUpdate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *AssetUpdate) RemoveLinks(v ...*Link) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveLinkIDs(ids...)
+	return _u.RemoveLinkIDs(ids...)
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
-func (au *AssetUpdate) ClearOwner() *AssetUpdate {
-	au.mutation.ClearOwner()
-	return au
+func (_u *AssetUpdate) ClearOwner() *AssetUpdate {
+	_u.mutation.ClearOwner()
+	return _u
 }
 
 // ClearParent clears the "parent" edge to the Asset entity.
-func (au *AssetUpdate) ClearParent() *AssetUpdate {
-	au.mutation.ClearParent()
-	return au
+func (_u *AssetUpdate) ClearParent() *AssetUpdate {
+	_u.mutation.ClearParent()
+	return _u
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
-func (au *AssetUpdate) ClearAssets() *AssetUpdate {
-	au.mutation.ClearAssets()
-	return au
+func (_u *AssetUpdate) ClearAssets() *AssetUpdate {
+	_u.mutation.ClearAssets()
+	return _u
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (au *AssetUpdate) RemoveAssetIDs(ids ...xid.ID) *AssetUpdate {
-	au.mutation.RemoveAssetIDs(ids...)
-	return au
+func (_u *AssetUpdate) RemoveAssetIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.RemoveAssetIDs(ids...)
+	return _u
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
-func (au *AssetUpdate) RemoveAssets(a ...*Asset) *AssetUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AssetUpdate) RemoveAssets(v ...*Asset) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveAssetIDs(ids...)
+	return _u.RemoveAssetIDs(ids...)
 }
 
 // ClearEvent clears all "event" edges to the Event entity.
-func (au *AssetUpdate) ClearEvent() *AssetUpdate {
-	au.mutation.ClearEvent()
-	return au
+func (_u *AssetUpdate) ClearEvent() *AssetUpdate {
+	_u.mutation.ClearEvent()
+	return _u
 }
 
 // RemoveEventIDs removes the "event" edge to Event entities by IDs.
-func (au *AssetUpdate) RemoveEventIDs(ids ...xid.ID) *AssetUpdate {
-	au.mutation.RemoveEventIDs(ids...)
-	return au
+func (_u *AssetUpdate) RemoveEventIDs(ids ...xid.ID) *AssetUpdate {
+	_u.mutation.RemoveEventIDs(ids...)
+	return _u
 }
 
 // RemoveEvent removes "event" edges to Event entities.
-func (au *AssetUpdate) RemoveEvent(e ...*Event) *AssetUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AssetUpdate) RemoveEvent(v ...*Event) *AssetUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveEventIDs(ids...)
+	return _u.RemoveEventIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (au *AssetUpdate) Save(ctx context.Context) (int, error) {
-	au.defaults()
-	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
+func (_u *AssetUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (au *AssetUpdate) SaveX(ctx context.Context) int {
-	affected, err := au.Save(ctx)
+func (_u *AssetUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -379,74 +379,74 @@ func (au *AssetUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (au *AssetUpdate) Exec(ctx context.Context) error {
-	_, err := au.Save(ctx)
+func (_u *AssetUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (au *AssetUpdate) ExecX(ctx context.Context) {
-	if err := au.Exec(ctx); err != nil {
+func (_u *AssetUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (au *AssetUpdate) defaults() {
-	if _, ok := au.mutation.UpdatedAt(); !ok {
+func (_u *AssetUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := asset.UpdateDefaultUpdatedAt()
-		au.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (au *AssetUpdate) check() error {
-	if au.mutation.OwnerCleared() && len(au.mutation.OwnerIDs()) > 0 {
+func (_u *AssetUpdate) check() error {
+	if _u.mutation.OwnerCleared() && len(_u.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Asset.owner"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (au *AssetUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AssetUpdate {
-	au.modifiers = append(au.modifiers, modifiers...)
-	return au
+func (_u *AssetUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AssetUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := au.check(); err != nil {
-		return n, err
+func (_u *AssetUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(asset.Table, asset.Columns, sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString))
-	if ps := au.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := au.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(asset.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := au.mutation.Filename(); ok {
+	if value, ok := _u.mutation.Filename(); ok {
 		_spec.SetField(asset.FieldFilename, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Size(); ok {
+	if value, ok := _u.mutation.Size(); ok {
 		_spec.SetField(asset.FieldSize, field.TypeInt, value)
 	}
-	if value, ok := au.mutation.AddedSize(); ok {
+	if value, ok := _u.mutation.AddedSize(); ok {
 		_spec.AddField(asset.FieldSize, field.TypeInt, value)
 	}
-	if value, ok := au.mutation.MimeType(); ok {
+	if value, ok := _u.mutation.MimeType(); ok {
 		_spec.SetField(asset.FieldMimeType, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)
 	}
-	if au.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(asset.FieldMetadata, field.TypeJSON)
 	}
-	if au.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -459,7 +459,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedPostsIDs(); len(nodes) > 0 && !au.mutation.PostsCleared() {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -475,7 +475,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -491,7 +491,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -504,7 +504,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedNodesIDs(); len(nodes) > 0 && !au.mutation.NodesCleared() {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -520,7 +520,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -536,7 +536,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.LinksCleared() {
+	if _u.mutation.LinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -549,7 +549,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedLinksIDs(); len(nodes) > 0 && !au.mutation.LinksCleared() {
+	if nodes := _u.mutation.RemovedLinksIDs(); len(nodes) > 0 && !_u.mutation.LinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -565,7 +565,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.LinksIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.LinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -581,7 +581,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.OwnerCleared() {
+	if _u.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -594,7 +594,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -610,7 +610,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.ParentCleared() {
+	if _u.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -623,7 +623,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -639,7 +639,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.AssetsCleared() {
+	if _u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -652,7 +652,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !au.mutation.AssetsCleared() {
+	if nodes := _u.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !_u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -668,7 +668,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -684,7 +684,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.EventCleared() {
+	if _u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -697,7 +697,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedEventIDs(); len(nodes) > 0 && !au.mutation.EventCleared() {
+	if nodes := _u.mutation.RemovedEventIDs(); len(nodes) > 0 && !_u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -713,7 +713,7 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -729,8 +729,8 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(au.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{asset.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -738,8 +738,8 @@ func (au *AssetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	au.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // AssetUpdateOne is the builder for updating a single Asset entity.
@@ -752,355 +752,355 @@ type AssetUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (auo *AssetUpdateOne) SetUpdatedAt(t time.Time) *AssetUpdateOne {
-	auo.mutation.SetUpdatedAt(t)
-	return auo
+func (_u *AssetUpdateOne) SetUpdatedAt(v time.Time) *AssetUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetFilename sets the "filename" field.
-func (auo *AssetUpdateOne) SetFilename(s string) *AssetUpdateOne {
-	auo.mutation.SetFilename(s)
-	return auo
+func (_u *AssetUpdateOne) SetFilename(v string) *AssetUpdateOne {
+	_u.mutation.SetFilename(v)
+	return _u
 }
 
 // SetNillableFilename sets the "filename" field if the given value is not nil.
-func (auo *AssetUpdateOne) SetNillableFilename(s *string) *AssetUpdateOne {
-	if s != nil {
-		auo.SetFilename(*s)
+func (_u *AssetUpdateOne) SetNillableFilename(v *string) *AssetUpdateOne {
+	if v != nil {
+		_u.SetFilename(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetSize sets the "size" field.
-func (auo *AssetUpdateOne) SetSize(i int) *AssetUpdateOne {
-	auo.mutation.ResetSize()
-	auo.mutation.SetSize(i)
-	return auo
+func (_u *AssetUpdateOne) SetSize(v int) *AssetUpdateOne {
+	_u.mutation.ResetSize()
+	_u.mutation.SetSize(v)
+	return _u
 }
 
 // SetNillableSize sets the "size" field if the given value is not nil.
-func (auo *AssetUpdateOne) SetNillableSize(i *int) *AssetUpdateOne {
-	if i != nil {
-		auo.SetSize(*i)
+func (_u *AssetUpdateOne) SetNillableSize(v *int) *AssetUpdateOne {
+	if v != nil {
+		_u.SetSize(*v)
 	}
-	return auo
+	return _u
 }
 
-// AddSize adds i to the "size" field.
-func (auo *AssetUpdateOne) AddSize(i int) *AssetUpdateOne {
-	auo.mutation.AddSize(i)
-	return auo
+// AddSize adds value to the "size" field.
+func (_u *AssetUpdateOne) AddSize(v int) *AssetUpdateOne {
+	_u.mutation.AddSize(v)
+	return _u
 }
 
 // SetMimeType sets the "mime_type" field.
-func (auo *AssetUpdateOne) SetMimeType(s string) *AssetUpdateOne {
-	auo.mutation.SetMimeType(s)
-	return auo
+func (_u *AssetUpdateOne) SetMimeType(v string) *AssetUpdateOne {
+	_u.mutation.SetMimeType(v)
+	return _u
 }
 
 // SetNillableMimeType sets the "mime_type" field if the given value is not nil.
-func (auo *AssetUpdateOne) SetNillableMimeType(s *string) *AssetUpdateOne {
-	if s != nil {
-		auo.SetMimeType(*s)
+func (_u *AssetUpdateOne) SetNillableMimeType(v *string) *AssetUpdateOne {
+	if v != nil {
+		_u.SetMimeType(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (auo *AssetUpdateOne) SetMetadata(m map[string]interface{}) *AssetUpdateOne {
-	auo.mutation.SetMetadata(m)
-	return auo
+func (_u *AssetUpdateOne) SetMetadata(v map[string]interface{}) *AssetUpdateOne {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (auo *AssetUpdateOne) ClearMetadata() *AssetUpdateOne {
-	auo.mutation.ClearMetadata()
-	return auo
+func (_u *AssetUpdateOne) ClearMetadata() *AssetUpdateOne {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (auo *AssetUpdateOne) SetAccountID(x xid.ID) *AssetUpdateOne {
-	auo.mutation.SetAccountID(x)
-	return auo
+func (_u *AssetUpdateOne) SetAccountID(v xid.ID) *AssetUpdateOne {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (auo *AssetUpdateOne) SetNillableAccountID(x *xid.ID) *AssetUpdateOne {
-	if x != nil {
-		auo.SetAccountID(*x)
+func (_u *AssetUpdateOne) SetNillableAccountID(v *xid.ID) *AssetUpdateOne {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetParentAssetID sets the "parent_asset_id" field.
-func (auo *AssetUpdateOne) SetParentAssetID(x xid.ID) *AssetUpdateOne {
-	auo.mutation.SetParentAssetID(x)
-	return auo
+func (_u *AssetUpdateOne) SetParentAssetID(v xid.ID) *AssetUpdateOne {
+	_u.mutation.SetParentAssetID(v)
+	return _u
 }
 
 // SetNillableParentAssetID sets the "parent_asset_id" field if the given value is not nil.
-func (auo *AssetUpdateOne) SetNillableParentAssetID(x *xid.ID) *AssetUpdateOne {
-	if x != nil {
-		auo.SetParentAssetID(*x)
+func (_u *AssetUpdateOne) SetNillableParentAssetID(v *xid.ID) *AssetUpdateOne {
+	if v != nil {
+		_u.SetParentAssetID(*v)
 	}
-	return auo
+	return _u
 }
 
 // ClearParentAssetID clears the value of the "parent_asset_id" field.
-func (auo *AssetUpdateOne) ClearParentAssetID() *AssetUpdateOne {
-	auo.mutation.ClearParentAssetID()
-	return auo
+func (_u *AssetUpdateOne) ClearParentAssetID() *AssetUpdateOne {
+	_u.mutation.ClearParentAssetID()
+	return _u
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (auo *AssetUpdateOne) AddPostIDs(ids ...xid.ID) *AssetUpdateOne {
-	auo.mutation.AddPostIDs(ids...)
-	return auo
+func (_u *AssetUpdateOne) AddPostIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (auo *AssetUpdateOne) AddPosts(p ...*Post) *AssetUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *AssetUpdateOne) AddPosts(v ...*Post) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (auo *AssetUpdateOne) AddNodeIDs(ids ...xid.ID) *AssetUpdateOne {
-	auo.mutation.AddNodeIDs(ids...)
-	return auo
+func (_u *AssetUpdateOne) AddNodeIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (auo *AssetUpdateOne) AddNodes(n ...*Node) *AssetUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AssetUpdateOne) AddNodes(v ...*Node) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // AddLinkIDs adds the "links" edge to the Link entity by IDs.
-func (auo *AssetUpdateOne) AddLinkIDs(ids ...xid.ID) *AssetUpdateOne {
-	auo.mutation.AddLinkIDs(ids...)
-	return auo
+func (_u *AssetUpdateOne) AddLinkIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.AddLinkIDs(ids...)
+	return _u
 }
 
 // AddLinks adds the "links" edges to the Link entity.
-func (auo *AssetUpdateOne) AddLinks(l ...*Link) *AssetUpdateOne {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *AssetUpdateOne) AddLinks(v ...*Link) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddLinkIDs(ids...)
+	return _u.AddLinkIDs(ids...)
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
-func (auo *AssetUpdateOne) SetOwnerID(id xid.ID) *AssetUpdateOne {
-	auo.mutation.SetOwnerID(id)
-	return auo
+func (_u *AssetUpdateOne) SetOwnerID(id xid.ID) *AssetUpdateOne {
+	_u.mutation.SetOwnerID(id)
+	return _u
 }
 
 // SetOwner sets the "owner" edge to the Account entity.
-func (auo *AssetUpdateOne) SetOwner(a *Account) *AssetUpdateOne {
-	return auo.SetOwnerID(a.ID)
+func (_u *AssetUpdateOne) SetOwner(v *Account) *AssetUpdateOne {
+	return _u.SetOwnerID(v.ID)
 }
 
 // SetParentID sets the "parent" edge to the Asset entity by ID.
-func (auo *AssetUpdateOne) SetParentID(id xid.ID) *AssetUpdateOne {
-	auo.mutation.SetParentID(id)
-	return auo
+func (_u *AssetUpdateOne) SetParentID(id xid.ID) *AssetUpdateOne {
+	_u.mutation.SetParentID(id)
+	return _u
 }
 
 // SetNillableParentID sets the "parent" edge to the Asset entity by ID if the given value is not nil.
-func (auo *AssetUpdateOne) SetNillableParentID(id *xid.ID) *AssetUpdateOne {
+func (_u *AssetUpdateOne) SetNillableParentID(id *xid.ID) *AssetUpdateOne {
 	if id != nil {
-		auo = auo.SetParentID(*id)
+		_u = _u.SetParentID(*id)
 	}
-	return auo
+	return _u
 }
 
 // SetParent sets the "parent" edge to the Asset entity.
-func (auo *AssetUpdateOne) SetParent(a *Asset) *AssetUpdateOne {
-	return auo.SetParentID(a.ID)
+func (_u *AssetUpdateOne) SetParent(v *Asset) *AssetUpdateOne {
+	return _u.SetParentID(v.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (auo *AssetUpdateOne) AddAssetIDs(ids ...xid.ID) *AssetUpdateOne {
-	auo.mutation.AddAssetIDs(ids...)
-	return auo
+func (_u *AssetUpdateOne) AddAssetIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.AddAssetIDs(ids...)
+	return _u
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (auo *AssetUpdateOne) AddAssets(a ...*Asset) *AssetUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AssetUpdateOne) AddAssets(v ...*Asset) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddAssetIDs(ids...)
+	return _u.AddAssetIDs(ids...)
 }
 
 // AddEventIDs adds the "event" edge to the Event entity by IDs.
-func (auo *AssetUpdateOne) AddEventIDs(ids ...xid.ID) *AssetUpdateOne {
-	auo.mutation.AddEventIDs(ids...)
-	return auo
+func (_u *AssetUpdateOne) AddEventIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.AddEventIDs(ids...)
+	return _u
 }
 
 // AddEvent adds the "event" edges to the Event entity.
-func (auo *AssetUpdateOne) AddEvent(e ...*Event) *AssetUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AssetUpdateOne) AddEvent(v ...*Event) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddEventIDs(ids...)
+	return _u.AddEventIDs(ids...)
 }
 
 // Mutation returns the AssetMutation object of the builder.
-func (auo *AssetUpdateOne) Mutation() *AssetMutation {
-	return auo.mutation
+func (_u *AssetUpdateOne) Mutation() *AssetMutation {
+	return _u.mutation
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (auo *AssetUpdateOne) ClearPosts() *AssetUpdateOne {
-	auo.mutation.ClearPosts()
-	return auo
+func (_u *AssetUpdateOne) ClearPosts() *AssetUpdateOne {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (auo *AssetUpdateOne) RemovePostIDs(ids ...xid.ID) *AssetUpdateOne {
-	auo.mutation.RemovePostIDs(ids...)
-	return auo
+func (_u *AssetUpdateOne) RemovePostIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (auo *AssetUpdateOne) RemovePosts(p ...*Post) *AssetUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *AssetUpdateOne) RemovePosts(v ...*Post) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (auo *AssetUpdateOne) ClearNodes() *AssetUpdateOne {
-	auo.mutation.ClearNodes()
-	return auo
+func (_u *AssetUpdateOne) ClearNodes() *AssetUpdateOne {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (auo *AssetUpdateOne) RemoveNodeIDs(ids ...xid.ID) *AssetUpdateOne {
-	auo.mutation.RemoveNodeIDs(ids...)
-	return auo
+func (_u *AssetUpdateOne) RemoveNodeIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (auo *AssetUpdateOne) RemoveNodes(n ...*Node) *AssetUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AssetUpdateOne) RemoveNodes(v ...*Node) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // ClearLinks clears all "links" edges to the Link entity.
-func (auo *AssetUpdateOne) ClearLinks() *AssetUpdateOne {
-	auo.mutation.ClearLinks()
-	return auo
+func (_u *AssetUpdateOne) ClearLinks() *AssetUpdateOne {
+	_u.mutation.ClearLinks()
+	return _u
 }
 
 // RemoveLinkIDs removes the "links" edge to Link entities by IDs.
-func (auo *AssetUpdateOne) RemoveLinkIDs(ids ...xid.ID) *AssetUpdateOne {
-	auo.mutation.RemoveLinkIDs(ids...)
-	return auo
+func (_u *AssetUpdateOne) RemoveLinkIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.RemoveLinkIDs(ids...)
+	return _u
 }
 
 // RemoveLinks removes "links" edges to Link entities.
-func (auo *AssetUpdateOne) RemoveLinks(l ...*Link) *AssetUpdateOne {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *AssetUpdateOne) RemoveLinks(v ...*Link) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveLinkIDs(ids...)
+	return _u.RemoveLinkIDs(ids...)
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
-func (auo *AssetUpdateOne) ClearOwner() *AssetUpdateOne {
-	auo.mutation.ClearOwner()
-	return auo
+func (_u *AssetUpdateOne) ClearOwner() *AssetUpdateOne {
+	_u.mutation.ClearOwner()
+	return _u
 }
 
 // ClearParent clears the "parent" edge to the Asset entity.
-func (auo *AssetUpdateOne) ClearParent() *AssetUpdateOne {
-	auo.mutation.ClearParent()
-	return auo
+func (_u *AssetUpdateOne) ClearParent() *AssetUpdateOne {
+	_u.mutation.ClearParent()
+	return _u
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
-func (auo *AssetUpdateOne) ClearAssets() *AssetUpdateOne {
-	auo.mutation.ClearAssets()
-	return auo
+func (_u *AssetUpdateOne) ClearAssets() *AssetUpdateOne {
+	_u.mutation.ClearAssets()
+	return _u
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (auo *AssetUpdateOne) RemoveAssetIDs(ids ...xid.ID) *AssetUpdateOne {
-	auo.mutation.RemoveAssetIDs(ids...)
-	return auo
+func (_u *AssetUpdateOne) RemoveAssetIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.RemoveAssetIDs(ids...)
+	return _u
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
-func (auo *AssetUpdateOne) RemoveAssets(a ...*Asset) *AssetUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AssetUpdateOne) RemoveAssets(v ...*Asset) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveAssetIDs(ids...)
+	return _u.RemoveAssetIDs(ids...)
 }
 
 // ClearEvent clears all "event" edges to the Event entity.
-func (auo *AssetUpdateOne) ClearEvent() *AssetUpdateOne {
-	auo.mutation.ClearEvent()
-	return auo
+func (_u *AssetUpdateOne) ClearEvent() *AssetUpdateOne {
+	_u.mutation.ClearEvent()
+	return _u
 }
 
 // RemoveEventIDs removes the "event" edge to Event entities by IDs.
-func (auo *AssetUpdateOne) RemoveEventIDs(ids ...xid.ID) *AssetUpdateOne {
-	auo.mutation.RemoveEventIDs(ids...)
-	return auo
+func (_u *AssetUpdateOne) RemoveEventIDs(ids ...xid.ID) *AssetUpdateOne {
+	_u.mutation.RemoveEventIDs(ids...)
+	return _u
 }
 
 // RemoveEvent removes "event" edges to Event entities.
-func (auo *AssetUpdateOne) RemoveEvent(e ...*Event) *AssetUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AssetUpdateOne) RemoveEvent(v ...*Event) *AssetUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveEventIDs(ids...)
+	return _u.RemoveEventIDs(ids...)
 }
 
 // Where appends a list predicates to the AssetUpdate builder.
-func (auo *AssetUpdateOne) Where(ps ...predicate.Asset) *AssetUpdateOne {
-	auo.mutation.Where(ps...)
-	return auo
+func (_u *AssetUpdateOne) Where(ps ...predicate.Asset) *AssetUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (auo *AssetUpdateOne) Select(field string, fields ...string) *AssetUpdateOne {
-	auo.fields = append([]string{field}, fields...)
-	return auo
+func (_u *AssetUpdateOne) Select(field string, fields ...string) *AssetUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Asset entity.
-func (auo *AssetUpdateOne) Save(ctx context.Context) (*Asset, error) {
-	auo.defaults()
-	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
+func (_u *AssetUpdateOne) Save(ctx context.Context) (*Asset, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (auo *AssetUpdateOne) SaveX(ctx context.Context) *Asset {
-	node, err := auo.Save(ctx)
+func (_u *AssetUpdateOne) SaveX(ctx context.Context) *Asset {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1108,51 +1108,51 @@ func (auo *AssetUpdateOne) SaveX(ctx context.Context) *Asset {
 }
 
 // Exec executes the query on the entity.
-func (auo *AssetUpdateOne) Exec(ctx context.Context) error {
-	_, err := auo.Save(ctx)
+func (_u *AssetUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (auo *AssetUpdateOne) ExecX(ctx context.Context) {
-	if err := auo.Exec(ctx); err != nil {
+func (_u *AssetUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (auo *AssetUpdateOne) defaults() {
-	if _, ok := auo.mutation.UpdatedAt(); !ok {
+func (_u *AssetUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := asset.UpdateDefaultUpdatedAt()
-		auo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (auo *AssetUpdateOne) check() error {
-	if auo.mutation.OwnerCleared() && len(auo.mutation.OwnerIDs()) > 0 {
+func (_u *AssetUpdateOne) check() error {
+	if _u.mutation.OwnerCleared() && len(_u.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Asset.owner"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (auo *AssetUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AssetUpdateOne {
-	auo.modifiers = append(auo.modifiers, modifiers...)
-	return auo
+func (_u *AssetUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AssetUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error) {
-	if err := auo.check(); err != nil {
+func (_u *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(asset.Table, asset.Columns, sqlgraph.NewFieldSpec(asset.FieldID, field.TypeString))
-	id, ok := auo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Asset.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := auo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, asset.FieldID)
 		for _, f := range fields {
@@ -1164,35 +1164,35 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 			}
 		}
 	}
-	if ps := auo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := auo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(asset.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := auo.mutation.Filename(); ok {
+	if value, ok := _u.mutation.Filename(); ok {
 		_spec.SetField(asset.FieldFilename, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Size(); ok {
+	if value, ok := _u.mutation.Size(); ok {
 		_spec.SetField(asset.FieldSize, field.TypeInt, value)
 	}
-	if value, ok := auo.mutation.AddedSize(); ok {
+	if value, ok := _u.mutation.AddedSize(); ok {
 		_spec.AddField(asset.FieldSize, field.TypeInt, value)
 	}
-	if value, ok := auo.mutation.MimeType(); ok {
+	if value, ok := _u.mutation.MimeType(); ok {
 		_spec.SetField(asset.FieldMimeType, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(asset.FieldMetadata, field.TypeJSON, value)
 	}
-	if auo.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(asset.FieldMetadata, field.TypeJSON)
 	}
-	if auo.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1205,7 +1205,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedPostsIDs(); len(nodes) > 0 && !auo.mutation.PostsCleared() {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1221,7 +1221,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1237,7 +1237,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1250,7 +1250,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !auo.mutation.NodesCleared() {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1266,7 +1266,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1282,7 +1282,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.LinksCleared() {
+	if _u.mutation.LinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1295,7 +1295,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedLinksIDs(); len(nodes) > 0 && !auo.mutation.LinksCleared() {
+	if nodes := _u.mutation.RemovedLinksIDs(); len(nodes) > 0 && !_u.mutation.LinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1311,7 +1311,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.LinksIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.LinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1327,7 +1327,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.OwnerCleared() {
+	if _u.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1340,7 +1340,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1356,7 +1356,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.ParentCleared() {
+	if _u.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1369,7 +1369,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1385,7 +1385,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.AssetsCleared() {
+	if _u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1398,7 +1398,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !auo.mutation.AssetsCleared() {
+	if nodes := _u.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !_u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1414,7 +1414,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1430,7 +1430,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.EventCleared() {
+	if _u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1443,7 +1443,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedEventIDs(); len(nodes) > 0 && !auo.mutation.EventCleared() {
+	if nodes := _u.mutation.RemovedEventIDs(); len(nodes) > 0 && !_u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1459,7 +1459,7 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1475,11 +1475,11 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(auo.modifiers...)
-	_node = &Asset{config: auo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Asset{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, auo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{asset.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -1487,6 +1487,6 @@ func (auo *AssetUpdateOne) sqlSave(ctx context.Context) (_node *Asset, err error
 		}
 		return nil, err
 	}
-	auo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

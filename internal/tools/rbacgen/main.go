@@ -43,13 +43,9 @@ func run(filename, outfile, enumOutfilePath string) error {
 		return fmt.Errorf("cannot create new document: %w", err)
 	}
 
-	docModel, errors := document.BuildV3Model()
-	if len(errors) > 0 {
-		for i := range errors {
-			fmt.Printf("error: %e\n", errors[i])
-		}
-
-		return fmt.Errorf("cannot create v3 model from document: %d errors reported", len(errors))
+	docModel, err := document.BuildV3Model()
+	if err != nil {
+		return fmt.Errorf("cannot create v3 model from document: %w", err)
 	}
 
 	ops := []Operation{}

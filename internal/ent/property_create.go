@@ -27,81 +27,81 @@ type PropertyCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (pc *PropertyCreate) SetCreatedAt(t time.Time) *PropertyCreate {
-	pc.mutation.SetCreatedAt(t)
-	return pc
+func (_c *PropertyCreate) SetCreatedAt(v time.Time) *PropertyCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (pc *PropertyCreate) SetNillableCreatedAt(t *time.Time) *PropertyCreate {
-	if t != nil {
-		pc.SetCreatedAt(*t)
+func (_c *PropertyCreate) SetNillableCreatedAt(v *time.Time) *PropertyCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetNodeID sets the "node_id" field.
-func (pc *PropertyCreate) SetNodeID(x xid.ID) *PropertyCreate {
-	pc.mutation.SetNodeID(x)
-	return pc
+func (_c *PropertyCreate) SetNodeID(v xid.ID) *PropertyCreate {
+	_c.mutation.SetNodeID(v)
+	return _c
 }
 
 // SetFieldID sets the "field_id" field.
-func (pc *PropertyCreate) SetFieldID(x xid.ID) *PropertyCreate {
-	pc.mutation.SetFieldID(x)
-	return pc
+func (_c *PropertyCreate) SetFieldID(v xid.ID) *PropertyCreate {
+	_c.mutation.SetFieldID(v)
+	return _c
 }
 
 // SetValue sets the "value" field.
-func (pc *PropertyCreate) SetValue(s string) *PropertyCreate {
-	pc.mutation.SetValue(s)
-	return pc
+func (_c *PropertyCreate) SetValue(v string) *PropertyCreate {
+	_c.mutation.SetValue(v)
+	return _c
 }
 
 // SetID sets the "id" field.
-func (pc *PropertyCreate) SetID(x xid.ID) *PropertyCreate {
-	pc.mutation.SetID(x)
-	return pc
+func (_c *PropertyCreate) SetID(v xid.ID) *PropertyCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (pc *PropertyCreate) SetNillableID(x *xid.ID) *PropertyCreate {
-	if x != nil {
-		pc.SetID(*x)
+func (_c *PropertyCreate) SetNillableID(v *xid.ID) *PropertyCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetNode sets the "node" edge to the Node entity.
-func (pc *PropertyCreate) SetNode(n *Node) *PropertyCreate {
-	return pc.SetNodeID(n.ID)
+func (_c *PropertyCreate) SetNode(v *Node) *PropertyCreate {
+	return _c.SetNodeID(v.ID)
 }
 
 // SetSchemaID sets the "schema" edge to the PropertySchemaField entity by ID.
-func (pc *PropertyCreate) SetSchemaID(id xid.ID) *PropertyCreate {
-	pc.mutation.SetSchemaID(id)
-	return pc
+func (_c *PropertyCreate) SetSchemaID(id xid.ID) *PropertyCreate {
+	_c.mutation.SetSchemaID(id)
+	return _c
 }
 
 // SetSchema sets the "schema" edge to the PropertySchemaField entity.
-func (pc *PropertyCreate) SetSchema(p *PropertySchemaField) *PropertyCreate {
-	return pc.SetSchemaID(p.ID)
+func (_c *PropertyCreate) SetSchema(v *PropertySchemaField) *PropertyCreate {
+	return _c.SetSchemaID(v.ID)
 }
 
 // Mutation returns the PropertyMutation object of the builder.
-func (pc *PropertyCreate) Mutation() *PropertyMutation {
-	return pc.mutation
+func (_c *PropertyCreate) Mutation() *PropertyMutation {
+	return _c.mutation
 }
 
 // Save creates the Property in the database.
-func (pc *PropertyCreate) Save(ctx context.Context) (*Property, error) {
-	pc.defaults()
-	return withHooks(ctx, pc.sqlSave, pc.mutation, pc.hooks)
+func (_c *PropertyCreate) Save(ctx context.Context) (*Property, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (pc *PropertyCreate) SaveX(ctx context.Context) *Property {
-	v, err := pc.Save(ctx)
+func (_c *PropertyCreate) SaveX(ctx context.Context) *Property {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -109,64 +109,64 @@ func (pc *PropertyCreate) SaveX(ctx context.Context) *Property {
 }
 
 // Exec executes the query.
-func (pc *PropertyCreate) Exec(ctx context.Context) error {
-	_, err := pc.Save(ctx)
+func (_c *PropertyCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pc *PropertyCreate) ExecX(ctx context.Context) {
-	if err := pc.Exec(ctx); err != nil {
+func (_c *PropertyCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (pc *PropertyCreate) defaults() {
-	if _, ok := pc.mutation.CreatedAt(); !ok {
+func (_c *PropertyCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := property.DefaultCreatedAt()
-		pc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := pc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := property.DefaultID()
-		pc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (pc *PropertyCreate) check() error {
-	if _, ok := pc.mutation.CreatedAt(); !ok {
+func (_c *PropertyCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Property.created_at"`)}
 	}
-	if _, ok := pc.mutation.NodeID(); !ok {
+	if _, ok := _c.mutation.NodeID(); !ok {
 		return &ValidationError{Name: "node_id", err: errors.New(`ent: missing required field "Property.node_id"`)}
 	}
-	if _, ok := pc.mutation.FieldID(); !ok {
+	if _, ok := _c.mutation.FieldID(); !ok {
 		return &ValidationError{Name: "field_id", err: errors.New(`ent: missing required field "Property.field_id"`)}
 	}
-	if _, ok := pc.mutation.Value(); !ok {
+	if _, ok := _c.mutation.Value(); !ok {
 		return &ValidationError{Name: "value", err: errors.New(`ent: missing required field "Property.value"`)}
 	}
-	if v, ok := pc.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := property.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Property.id": %w`, err)}
 		}
 	}
-	if len(pc.mutation.NodeIDs()) == 0 {
+	if len(_c.mutation.NodeIDs()) == 0 {
 		return &ValidationError{Name: "node", err: errors.New(`ent: missing required edge "Property.node"`)}
 	}
-	if len(pc.mutation.SchemaIDs()) == 0 {
+	if len(_c.mutation.SchemaIDs()) == 0 {
 		return &ValidationError{Name: "schema", err: errors.New(`ent: missing required edge "Property.schema"`)}
 	}
 	return nil
 }
 
-func (pc *PropertyCreate) sqlSave(ctx context.Context) (*Property, error) {
-	if err := pc.check(); err != nil {
+func (_c *PropertyCreate) sqlSave(ctx context.Context) (*Property, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := pc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, pc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -179,30 +179,30 @@ func (pc *PropertyCreate) sqlSave(ctx context.Context) (*Property, error) {
 			return nil, err
 		}
 	}
-	pc.mutation.id = &_node.ID
-	pc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (pc *PropertyCreate) createSpec() (*Property, *sqlgraph.CreateSpec) {
+func (_c *PropertyCreate) createSpec() (*Property, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Property{config: pc.config}
+		_node = &Property{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(property.Table, sqlgraph.NewFieldSpec(property.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = pc.conflict
-	if id, ok := pc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := pc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(property.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := pc.mutation.Value(); ok {
+	if value, ok := _c.mutation.Value(); ok {
 		_spec.SetField(property.FieldValue, field.TypeString, value)
 		_node.Value = value
 	}
-	if nodes := pc.mutation.NodeIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -219,7 +219,7 @@ func (pc *PropertyCreate) createSpec() (*Property, *sqlgraph.CreateSpec) {
 		_node.NodeID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.SchemaIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.SchemaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -255,10 +255,10 @@ func (pc *PropertyCreate) createSpec() (*Property, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (pc *PropertyCreate) OnConflict(opts ...sql.ConflictOption) *PropertyUpsertOne {
-	pc.conflict = opts
+func (_c *PropertyCreate) OnConflict(opts ...sql.ConflictOption) *PropertyUpsertOne {
+	_c.conflict = opts
 	return &PropertyUpsertOne{
-		create: pc,
+		create: _c,
 	}
 }
 
@@ -268,10 +268,10 @@ func (pc *PropertyCreate) OnConflict(opts ...sql.ConflictOption) *PropertyUpsert
 //	client.Property.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (pc *PropertyCreate) OnConflictColumns(columns ...string) *PropertyUpsertOne {
-	pc.conflict = append(pc.conflict, sql.ConflictColumns(columns...))
+func (_c *PropertyCreate) OnConflictColumns(columns ...string) *PropertyUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &PropertyUpsertOne{
-		create: pc,
+		create: _c,
 	}
 }
 
@@ -464,16 +464,16 @@ type PropertyCreateBulk struct {
 }
 
 // Save creates the Property entities in the database.
-func (pcb *PropertyCreateBulk) Save(ctx context.Context) ([]*Property, error) {
-	if pcb.err != nil {
-		return nil, pcb.err
+func (_c *PropertyCreateBulk) Save(ctx context.Context) ([]*Property, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(pcb.builders))
-	nodes := make([]*Property, len(pcb.builders))
-	mutators := make([]Mutator, len(pcb.builders))
-	for i := range pcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Property, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := pcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*PropertyMutation)
@@ -487,12 +487,12 @@ func (pcb *PropertyCreateBulk) Save(ctx context.Context) ([]*Property, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, pcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = pcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, pcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -512,7 +512,7 @@ func (pcb *PropertyCreateBulk) Save(ctx context.Context) ([]*Property, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, pcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -520,8 +520,8 @@ func (pcb *PropertyCreateBulk) Save(ctx context.Context) ([]*Property, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (pcb *PropertyCreateBulk) SaveX(ctx context.Context) []*Property {
-	v, err := pcb.Save(ctx)
+func (_c *PropertyCreateBulk) SaveX(ctx context.Context) []*Property {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -529,14 +529,14 @@ func (pcb *PropertyCreateBulk) SaveX(ctx context.Context) []*Property {
 }
 
 // Exec executes the query.
-func (pcb *PropertyCreateBulk) Exec(ctx context.Context) error {
-	_, err := pcb.Save(ctx)
+func (_c *PropertyCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pcb *PropertyCreateBulk) ExecX(ctx context.Context) {
-	if err := pcb.Exec(ctx); err != nil {
+func (_c *PropertyCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -556,10 +556,10 @@ func (pcb *PropertyCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (pcb *PropertyCreateBulk) OnConflict(opts ...sql.ConflictOption) *PropertyUpsertBulk {
-	pcb.conflict = opts
+func (_c *PropertyCreateBulk) OnConflict(opts ...sql.ConflictOption) *PropertyUpsertBulk {
+	_c.conflict = opts
 	return &PropertyUpsertBulk{
-		create: pcb,
+		create: _c,
 	}
 }
 
@@ -569,10 +569,10 @@ func (pcb *PropertyCreateBulk) OnConflict(opts ...sql.ConflictOption) *PropertyU
 //	client.Property.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (pcb *PropertyCreateBulk) OnConflictColumns(columns ...string) *PropertyUpsertBulk {
-	pcb.conflict = append(pcb.conflict, sql.ConflictColumns(columns...))
+func (_c *PropertyCreateBulk) OnConflictColumns(columns ...string) *PropertyUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &PropertyUpsertBulk{
-		create: pcb,
+		create: _c,
 	}
 }
 

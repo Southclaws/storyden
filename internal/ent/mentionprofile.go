@@ -83,7 +83,7 @@ func (*MentionProfile) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the MentionProfile fields.
-func (mp *MentionProfile) assignValues(columns []string, values []any) error {
+func (_m *MentionProfile) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -93,28 +93,28 @@ func (mp *MentionProfile) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				mp.ID = *value
+				_m.ID = *value
 			}
 		case mentionprofile.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				mp.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case mentionprofile.FieldAccountID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
 			} else if value != nil {
-				mp.AccountID = *value
+				_m.AccountID = *value
 			}
 		case mentionprofile.FieldPostID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field post_id", values[i])
 			} else if value != nil {
-				mp.PostID = *value
+				_m.PostID = *value
 			}
 		default:
-			mp.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -122,51 +122,51 @@ func (mp *MentionProfile) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the MentionProfile.
 // This includes values selected through modifiers, order, etc.
-func (mp *MentionProfile) Value(name string) (ent.Value, error) {
-	return mp.selectValues.Get(name)
+func (_m *MentionProfile) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryAccount queries the "account" edge of the MentionProfile entity.
-func (mp *MentionProfile) QueryAccount() *AccountQuery {
-	return NewMentionProfileClient(mp.config).QueryAccount(mp)
+func (_m *MentionProfile) QueryAccount() *AccountQuery {
+	return NewMentionProfileClient(_m.config).QueryAccount(_m)
 }
 
 // QueryPost queries the "Post" edge of the MentionProfile entity.
-func (mp *MentionProfile) QueryPost() *PostQuery {
-	return NewMentionProfileClient(mp.config).QueryPost(mp)
+func (_m *MentionProfile) QueryPost() *PostQuery {
+	return NewMentionProfileClient(_m.config).QueryPost(_m)
 }
 
 // Update returns a builder for updating this MentionProfile.
 // Note that you need to call MentionProfile.Unwrap() before calling this method if this MentionProfile
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (mp *MentionProfile) Update() *MentionProfileUpdateOne {
-	return NewMentionProfileClient(mp.config).UpdateOne(mp)
+func (_m *MentionProfile) Update() *MentionProfileUpdateOne {
+	return NewMentionProfileClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the MentionProfile entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (mp *MentionProfile) Unwrap() *MentionProfile {
-	_tx, ok := mp.config.driver.(*txDriver)
+func (_m *MentionProfile) Unwrap() *MentionProfile {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: MentionProfile is not a transactional entity")
 	}
-	mp.config.driver = _tx.drv
-	return mp
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (mp *MentionProfile) String() string {
+func (_m *MentionProfile) String() string {
 	var builder strings.Builder
 	builder.WriteString("MentionProfile(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", mp.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(mp.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
-	builder.WriteString(fmt.Sprintf("%v", mp.AccountID))
+	builder.WriteString(fmt.Sprintf("%v", _m.AccountID))
 	builder.WriteString(", ")
 	builder.WriteString("post_id=")
-	builder.WriteString(fmt.Sprintf("%v", mp.PostID))
+	builder.WriteString(fmt.Sprintf("%v", _m.PostID))
 	builder.WriteByte(')')
 	return builder.String()
 }

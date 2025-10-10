@@ -28,296 +28,296 @@ type EventCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (ec *EventCreate) SetCreatedAt(t time.Time) *EventCreate {
-	ec.mutation.SetCreatedAt(t)
-	return ec
+func (_c *EventCreate) SetCreatedAt(v time.Time) *EventCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ec *EventCreate) SetNillableCreatedAt(t *time.Time) *EventCreate {
-	if t != nil {
-		ec.SetCreatedAt(*t)
+func (_c *EventCreate) SetNillableCreatedAt(v *time.Time) *EventCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (ec *EventCreate) SetUpdatedAt(t time.Time) *EventCreate {
-	ec.mutation.SetUpdatedAt(t)
-	return ec
+func (_c *EventCreate) SetUpdatedAt(v time.Time) *EventCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (ec *EventCreate) SetNillableUpdatedAt(t *time.Time) *EventCreate {
-	if t != nil {
-		ec.SetUpdatedAt(*t)
+func (_c *EventCreate) SetNillableUpdatedAt(v *time.Time) *EventCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (ec *EventCreate) SetDeletedAt(t time.Time) *EventCreate {
-	ec.mutation.SetDeletedAt(t)
-	return ec
+func (_c *EventCreate) SetDeletedAt(v time.Time) *EventCreate {
+	_c.mutation.SetDeletedAt(v)
+	return _c
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (ec *EventCreate) SetNillableDeletedAt(t *time.Time) *EventCreate {
-	if t != nil {
-		ec.SetDeletedAt(*t)
+func (_c *EventCreate) SetNillableDeletedAt(v *time.Time) *EventCreate {
+	if v != nil {
+		_c.SetDeletedAt(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (ec *EventCreate) SetIndexedAt(t time.Time) *EventCreate {
-	ec.mutation.SetIndexedAt(t)
-	return ec
+func (_c *EventCreate) SetIndexedAt(v time.Time) *EventCreate {
+	_c.mutation.SetIndexedAt(v)
+	return _c
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (ec *EventCreate) SetNillableIndexedAt(t *time.Time) *EventCreate {
-	if t != nil {
-		ec.SetIndexedAt(*t)
+func (_c *EventCreate) SetNillableIndexedAt(v *time.Time) *EventCreate {
+	if v != nil {
+		_c.SetIndexedAt(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetName sets the "name" field.
-func (ec *EventCreate) SetName(s string) *EventCreate {
-	ec.mutation.SetName(s)
-	return ec
+func (_c *EventCreate) SetName(v string) *EventCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetSlug sets the "slug" field.
-func (ec *EventCreate) SetSlug(s string) *EventCreate {
-	ec.mutation.SetSlug(s)
-	return ec
+func (_c *EventCreate) SetSlug(v string) *EventCreate {
+	_c.mutation.SetSlug(v)
+	return _c
 }
 
 // SetDescription sets the "description" field.
-func (ec *EventCreate) SetDescription(s string) *EventCreate {
-	ec.mutation.SetDescription(s)
-	return ec
+func (_c *EventCreate) SetDescription(v string) *EventCreate {
+	_c.mutation.SetDescription(v)
+	return _c
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (ec *EventCreate) SetNillableDescription(s *string) *EventCreate {
-	if s != nil {
-		ec.SetDescription(*s)
+func (_c *EventCreate) SetNillableDescription(v *string) *EventCreate {
+	if v != nil {
+		_c.SetDescription(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetStartTime sets the "start_time" field.
-func (ec *EventCreate) SetStartTime(t time.Time) *EventCreate {
-	ec.mutation.SetStartTime(t)
-	return ec
+func (_c *EventCreate) SetStartTime(v time.Time) *EventCreate {
+	_c.mutation.SetStartTime(v)
+	return _c
 }
 
 // SetEndTime sets the "end_time" field.
-func (ec *EventCreate) SetEndTime(t time.Time) *EventCreate {
-	ec.mutation.SetEndTime(t)
-	return ec
+func (_c *EventCreate) SetEndTime(v time.Time) *EventCreate {
+	_c.mutation.SetEndTime(v)
+	return _c
 }
 
 // SetParticipationPolicy sets the "participation_policy" field.
-func (ec *EventCreate) SetParticipationPolicy(s string) *EventCreate {
-	ec.mutation.SetParticipationPolicy(s)
-	return ec
+func (_c *EventCreate) SetParticipationPolicy(v string) *EventCreate {
+	_c.mutation.SetParticipationPolicy(v)
+	return _c
 }
 
 // SetVisibility sets the "visibility" field.
-func (ec *EventCreate) SetVisibility(e event.Visibility) *EventCreate {
-	ec.mutation.SetVisibility(e)
-	return ec
+func (_c *EventCreate) SetVisibility(v event.Visibility) *EventCreate {
+	_c.mutation.SetVisibility(v)
+	return _c
 }
 
 // SetNillableVisibility sets the "visibility" field if the given value is not nil.
-func (ec *EventCreate) SetNillableVisibility(e *event.Visibility) *EventCreate {
-	if e != nil {
-		ec.SetVisibility(*e)
+func (_c *EventCreate) SetNillableVisibility(v *event.Visibility) *EventCreate {
+	if v != nil {
+		_c.SetVisibility(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetLocationType sets the "location_type" field.
-func (ec *EventCreate) SetLocationType(s string) *EventCreate {
-	ec.mutation.SetLocationType(s)
-	return ec
+func (_c *EventCreate) SetLocationType(v string) *EventCreate {
+	_c.mutation.SetLocationType(v)
+	return _c
 }
 
 // SetNillableLocationType sets the "location_type" field if the given value is not nil.
-func (ec *EventCreate) SetNillableLocationType(s *string) *EventCreate {
-	if s != nil {
-		ec.SetLocationType(*s)
+func (_c *EventCreate) SetNillableLocationType(v *string) *EventCreate {
+	if v != nil {
+		_c.SetLocationType(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetLocationName sets the "location_name" field.
-func (ec *EventCreate) SetLocationName(s string) *EventCreate {
-	ec.mutation.SetLocationName(s)
-	return ec
+func (_c *EventCreate) SetLocationName(v string) *EventCreate {
+	_c.mutation.SetLocationName(v)
+	return _c
 }
 
 // SetNillableLocationName sets the "location_name" field if the given value is not nil.
-func (ec *EventCreate) SetNillableLocationName(s *string) *EventCreate {
-	if s != nil {
-		ec.SetLocationName(*s)
+func (_c *EventCreate) SetNillableLocationName(v *string) *EventCreate {
+	if v != nil {
+		_c.SetLocationName(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetLocationAddress sets the "location_address" field.
-func (ec *EventCreate) SetLocationAddress(s string) *EventCreate {
-	ec.mutation.SetLocationAddress(s)
-	return ec
+func (_c *EventCreate) SetLocationAddress(v string) *EventCreate {
+	_c.mutation.SetLocationAddress(v)
+	return _c
 }
 
 // SetNillableLocationAddress sets the "location_address" field if the given value is not nil.
-func (ec *EventCreate) SetNillableLocationAddress(s *string) *EventCreate {
-	if s != nil {
-		ec.SetLocationAddress(*s)
+func (_c *EventCreate) SetNillableLocationAddress(v *string) *EventCreate {
+	if v != nil {
+		_c.SetLocationAddress(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetLocationLatitude sets the "location_latitude" field.
-func (ec *EventCreate) SetLocationLatitude(f float64) *EventCreate {
-	ec.mutation.SetLocationLatitude(f)
-	return ec
+func (_c *EventCreate) SetLocationLatitude(v float64) *EventCreate {
+	_c.mutation.SetLocationLatitude(v)
+	return _c
 }
 
 // SetNillableLocationLatitude sets the "location_latitude" field if the given value is not nil.
-func (ec *EventCreate) SetNillableLocationLatitude(f *float64) *EventCreate {
-	if f != nil {
-		ec.SetLocationLatitude(*f)
+func (_c *EventCreate) SetNillableLocationLatitude(v *float64) *EventCreate {
+	if v != nil {
+		_c.SetLocationLatitude(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetLocationLongitude sets the "location_longitude" field.
-func (ec *EventCreate) SetLocationLongitude(f float64) *EventCreate {
-	ec.mutation.SetLocationLongitude(f)
-	return ec
+func (_c *EventCreate) SetLocationLongitude(v float64) *EventCreate {
+	_c.mutation.SetLocationLongitude(v)
+	return _c
 }
 
 // SetNillableLocationLongitude sets the "location_longitude" field if the given value is not nil.
-func (ec *EventCreate) SetNillableLocationLongitude(f *float64) *EventCreate {
-	if f != nil {
-		ec.SetLocationLongitude(*f)
+func (_c *EventCreate) SetNillableLocationLongitude(v *float64) *EventCreate {
+	if v != nil {
+		_c.SetLocationLongitude(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetLocationURL sets the "location_url" field.
-func (ec *EventCreate) SetLocationURL(s string) *EventCreate {
-	ec.mutation.SetLocationURL(s)
-	return ec
+func (_c *EventCreate) SetLocationURL(v string) *EventCreate {
+	_c.mutation.SetLocationURL(v)
+	return _c
 }
 
 // SetNillableLocationURL sets the "location_url" field if the given value is not nil.
-func (ec *EventCreate) SetNillableLocationURL(s *string) *EventCreate {
-	if s != nil {
-		ec.SetLocationURL(*s)
+func (_c *EventCreate) SetNillableLocationURL(v *string) *EventCreate {
+	if v != nil {
+		_c.SetLocationURL(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetCapacity sets the "capacity" field.
-func (ec *EventCreate) SetCapacity(i int) *EventCreate {
-	ec.mutation.SetCapacity(i)
-	return ec
+func (_c *EventCreate) SetCapacity(v int) *EventCreate {
+	_c.mutation.SetCapacity(v)
+	return _c
 }
 
 // SetNillableCapacity sets the "capacity" field if the given value is not nil.
-func (ec *EventCreate) SetNillableCapacity(i *int) *EventCreate {
-	if i != nil {
-		ec.SetCapacity(*i)
+func (_c *EventCreate) SetNillableCapacity(v *int) *EventCreate {
+	if v != nil {
+		_c.SetCapacity(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetMetadata sets the "metadata" field.
-func (ec *EventCreate) SetMetadata(m map[string]interface{}) *EventCreate {
-	ec.mutation.SetMetadata(m)
-	return ec
+func (_c *EventCreate) SetMetadata(v map[string]interface{}) *EventCreate {
+	_c.mutation.SetMetadata(v)
+	return _c
 }
 
 // SetID sets the "id" field.
-func (ec *EventCreate) SetID(x xid.ID) *EventCreate {
-	ec.mutation.SetID(x)
-	return ec
+func (_c *EventCreate) SetID(v xid.ID) *EventCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (ec *EventCreate) SetNillableID(x *xid.ID) *EventCreate {
-	if x != nil {
-		ec.SetID(*x)
+func (_c *EventCreate) SetNillableID(v *xid.ID) *EventCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return ec
+	return _c
 }
 
 // AddParticipantIDs adds the "participants" edge to the EventParticipant entity by IDs.
-func (ec *EventCreate) AddParticipantIDs(ids ...xid.ID) *EventCreate {
-	ec.mutation.AddParticipantIDs(ids...)
-	return ec
+func (_c *EventCreate) AddParticipantIDs(ids ...xid.ID) *EventCreate {
+	_c.mutation.AddParticipantIDs(ids...)
+	return _c
 }
 
 // AddParticipants adds the "participants" edges to the EventParticipant entity.
-func (ec *EventCreate) AddParticipants(e ...*EventParticipant) *EventCreate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_c *EventCreate) AddParticipants(v ...*EventParticipant) *EventCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ec.AddParticipantIDs(ids...)
+	return _c.AddParticipantIDs(ids...)
 }
 
 // SetThreadID sets the "thread" edge to the Post entity by ID.
-func (ec *EventCreate) SetThreadID(id xid.ID) *EventCreate {
-	ec.mutation.SetThreadID(id)
-	return ec
+func (_c *EventCreate) SetThreadID(id xid.ID) *EventCreate {
+	_c.mutation.SetThreadID(id)
+	return _c
 }
 
 // SetThread sets the "thread" edge to the Post entity.
-func (ec *EventCreate) SetThread(p *Post) *EventCreate {
-	return ec.SetThreadID(p.ID)
+func (_c *EventCreate) SetThread(v *Post) *EventCreate {
+	return _c.SetThreadID(v.ID)
 }
 
 // SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
-func (ec *EventCreate) SetPrimaryImageID(id xid.ID) *EventCreate {
-	ec.mutation.SetPrimaryImageID(id)
-	return ec
+func (_c *EventCreate) SetPrimaryImageID(id xid.ID) *EventCreate {
+	_c.mutation.SetPrimaryImageID(id)
+	return _c
 }
 
 // SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
-func (ec *EventCreate) SetNillablePrimaryImageID(id *xid.ID) *EventCreate {
+func (_c *EventCreate) SetNillablePrimaryImageID(id *xid.ID) *EventCreate {
 	if id != nil {
-		ec = ec.SetPrimaryImageID(*id)
+		_c = _c.SetPrimaryImageID(*id)
 	}
-	return ec
+	return _c
 }
 
 // SetPrimaryImage sets the "primary_image" edge to the Asset entity.
-func (ec *EventCreate) SetPrimaryImage(a *Asset) *EventCreate {
-	return ec.SetPrimaryImageID(a.ID)
+func (_c *EventCreate) SetPrimaryImage(v *Asset) *EventCreate {
+	return _c.SetPrimaryImageID(v.ID)
 }
 
 // Mutation returns the EventMutation object of the builder.
-func (ec *EventCreate) Mutation() *EventMutation {
-	return ec.mutation
+func (_c *EventCreate) Mutation() *EventMutation {
+	return _c.mutation
 }
 
 // Save creates the Event in the database.
-func (ec *EventCreate) Save(ctx context.Context) (*Event, error) {
-	ec.defaults()
-	return withHooks(ctx, ec.sqlSave, ec.mutation, ec.hooks)
+func (_c *EventCreate) Save(ctx context.Context) (*Event, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (ec *EventCreate) SaveX(ctx context.Context) *Event {
-	v, err := ec.Save(ctx)
+func (_c *EventCreate) SaveX(ctx context.Context) *Event {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -325,86 +325,86 @@ func (ec *EventCreate) SaveX(ctx context.Context) *Event {
 }
 
 // Exec executes the query.
-func (ec *EventCreate) Exec(ctx context.Context) error {
-	_, err := ec.Save(ctx)
+func (_c *EventCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ec *EventCreate) ExecX(ctx context.Context) {
-	if err := ec.Exec(ctx); err != nil {
+func (_c *EventCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (ec *EventCreate) defaults() {
-	if _, ok := ec.mutation.CreatedAt(); !ok {
+func (_c *EventCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := event.DefaultCreatedAt()
-		ec.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := ec.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		v := event.DefaultUpdatedAt()
-		ec.mutation.SetUpdatedAt(v)
+		_c.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := ec.mutation.Visibility(); !ok {
+	if _, ok := _c.mutation.Visibility(); !ok {
 		v := event.DefaultVisibility
-		ec.mutation.SetVisibility(v)
+		_c.mutation.SetVisibility(v)
 	}
-	if _, ok := ec.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := event.DefaultID()
-		ec.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (ec *EventCreate) check() error {
-	if _, ok := ec.mutation.CreatedAt(); !ok {
+func (_c *EventCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Event.created_at"`)}
 	}
-	if _, ok := ec.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Event.updated_at"`)}
 	}
-	if _, ok := ec.mutation.Name(); !ok {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Event.name"`)}
 	}
-	if _, ok := ec.mutation.Slug(); !ok {
+	if _, ok := _c.mutation.Slug(); !ok {
 		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Event.slug"`)}
 	}
-	if _, ok := ec.mutation.StartTime(); !ok {
+	if _, ok := _c.mutation.StartTime(); !ok {
 		return &ValidationError{Name: "start_time", err: errors.New(`ent: missing required field "Event.start_time"`)}
 	}
-	if _, ok := ec.mutation.EndTime(); !ok {
+	if _, ok := _c.mutation.EndTime(); !ok {
 		return &ValidationError{Name: "end_time", err: errors.New(`ent: missing required field "Event.end_time"`)}
 	}
-	if _, ok := ec.mutation.ParticipationPolicy(); !ok {
+	if _, ok := _c.mutation.ParticipationPolicy(); !ok {
 		return &ValidationError{Name: "participation_policy", err: errors.New(`ent: missing required field "Event.participation_policy"`)}
 	}
-	if _, ok := ec.mutation.Visibility(); !ok {
+	if _, ok := _c.mutation.Visibility(); !ok {
 		return &ValidationError{Name: "visibility", err: errors.New(`ent: missing required field "Event.visibility"`)}
 	}
-	if v, ok := ec.mutation.Visibility(); ok {
+	if v, ok := _c.mutation.Visibility(); ok {
 		if err := event.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Event.visibility": %w`, err)}
 		}
 	}
-	if v, ok := ec.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := event.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Event.id": %w`, err)}
 		}
 	}
-	if len(ec.mutation.ThreadIDs()) == 0 {
+	if len(_c.mutation.ThreadIDs()) == 0 {
 		return &ValidationError{Name: "thread", err: errors.New(`ent: missing required edge "Event.thread"`)}
 	}
 	return nil
 }
 
-func (ec *EventCreate) sqlSave(ctx context.Context) (*Event, error) {
-	if err := ec.check(); err != nil {
+func (_c *EventCreate) sqlSave(ctx context.Context) (*Event, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := ec.createSpec()
-	if err := sqlgraph.CreateNode(ctx, ec.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -417,98 +417,98 @@ func (ec *EventCreate) sqlSave(ctx context.Context) (*Event, error) {
 			return nil, err
 		}
 	}
-	ec.mutation.id = &_node.ID
-	ec.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
+func (_c *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Event{config: ec.config}
+		_node = &Event{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(event.Table, sqlgraph.NewFieldSpec(event.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = ec.conflict
-	if id, ok := ec.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := ec.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(event.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := ec.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(event.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := ec.mutation.DeletedAt(); ok {
+	if value, ok := _c.mutation.DeletedAt(); ok {
 		_spec.SetField(event.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
-	if value, ok := ec.mutation.IndexedAt(); ok {
+	if value, ok := _c.mutation.IndexedAt(); ok {
 		_spec.SetField(event.FieldIndexedAt, field.TypeTime, value)
 		_node.IndexedAt = &value
 	}
-	if value, ok := ec.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(event.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := ec.mutation.Slug(); ok {
+	if value, ok := _c.mutation.Slug(); ok {
 		_spec.SetField(event.FieldSlug, field.TypeString, value)
 		_node.Slug = value
 	}
-	if value, ok := ec.mutation.Description(); ok {
+	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(event.FieldDescription, field.TypeString, value)
 		_node.Description = &value
 	}
-	if value, ok := ec.mutation.StartTime(); ok {
+	if value, ok := _c.mutation.StartTime(); ok {
 		_spec.SetField(event.FieldStartTime, field.TypeTime, value)
 		_node.StartTime = value
 	}
-	if value, ok := ec.mutation.EndTime(); ok {
+	if value, ok := _c.mutation.EndTime(); ok {
 		_spec.SetField(event.FieldEndTime, field.TypeTime, value)
 		_node.EndTime = value
 	}
-	if value, ok := ec.mutation.ParticipationPolicy(); ok {
+	if value, ok := _c.mutation.ParticipationPolicy(); ok {
 		_spec.SetField(event.FieldParticipationPolicy, field.TypeString, value)
 		_node.ParticipationPolicy = value
 	}
-	if value, ok := ec.mutation.Visibility(); ok {
+	if value, ok := _c.mutation.Visibility(); ok {
 		_spec.SetField(event.FieldVisibility, field.TypeEnum, value)
 		_node.Visibility = value
 	}
-	if value, ok := ec.mutation.LocationType(); ok {
+	if value, ok := _c.mutation.LocationType(); ok {
 		_spec.SetField(event.FieldLocationType, field.TypeString, value)
 		_node.LocationType = &value
 	}
-	if value, ok := ec.mutation.LocationName(); ok {
+	if value, ok := _c.mutation.LocationName(); ok {
 		_spec.SetField(event.FieldLocationName, field.TypeString, value)
 		_node.LocationName = &value
 	}
-	if value, ok := ec.mutation.LocationAddress(); ok {
+	if value, ok := _c.mutation.LocationAddress(); ok {
 		_spec.SetField(event.FieldLocationAddress, field.TypeString, value)
 		_node.LocationAddress = &value
 	}
-	if value, ok := ec.mutation.LocationLatitude(); ok {
+	if value, ok := _c.mutation.LocationLatitude(); ok {
 		_spec.SetField(event.FieldLocationLatitude, field.TypeFloat64, value)
 		_node.LocationLatitude = &value
 	}
-	if value, ok := ec.mutation.LocationLongitude(); ok {
+	if value, ok := _c.mutation.LocationLongitude(); ok {
 		_spec.SetField(event.FieldLocationLongitude, field.TypeFloat64, value)
 		_node.LocationLongitude = &value
 	}
-	if value, ok := ec.mutation.LocationURL(); ok {
+	if value, ok := _c.mutation.LocationURL(); ok {
 		_spec.SetField(event.FieldLocationURL, field.TypeString, value)
 		_node.LocationURL = &value
 	}
-	if value, ok := ec.mutation.Capacity(); ok {
+	if value, ok := _c.mutation.Capacity(); ok {
 		_spec.SetField(event.FieldCapacity, field.TypeInt, value)
 		_node.Capacity = &value
 	}
-	if value, ok := ec.mutation.Metadata(); ok {
+	if value, ok := _c.mutation.Metadata(); ok {
 		_spec.SetField(event.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
 	}
-	if nodes := ec.mutation.ParticipantsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ParticipantsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -524,7 +524,7 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.ThreadIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ThreadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -541,7 +541,7 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 		_node.post_event = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PrimaryImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -577,10 +577,10 @@ func (ec *EventCreate) createSpec() (*Event, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (ec *EventCreate) OnConflict(opts ...sql.ConflictOption) *EventUpsertOne {
-	ec.conflict = opts
+func (_c *EventCreate) OnConflict(opts ...sql.ConflictOption) *EventUpsertOne {
+	_c.conflict = opts
 	return &EventUpsertOne{
-		create: ec,
+		create: _c,
 	}
 }
 
@@ -590,10 +590,10 @@ func (ec *EventCreate) OnConflict(opts ...sql.ConflictOption) *EventUpsertOne {
 //	client.Event.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (ec *EventCreate) OnConflictColumns(columns ...string) *EventUpsertOne {
-	ec.conflict = append(ec.conflict, sql.ConflictColumns(columns...))
+func (_c *EventCreate) OnConflictColumns(columns ...string) *EventUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &EventUpsertOne{
-		create: ec,
+		create: _c,
 	}
 }
 
@@ -1358,16 +1358,16 @@ type EventCreateBulk struct {
 }
 
 // Save creates the Event entities in the database.
-func (ecb *EventCreateBulk) Save(ctx context.Context) ([]*Event, error) {
-	if ecb.err != nil {
-		return nil, ecb.err
+func (_c *EventCreateBulk) Save(ctx context.Context) ([]*Event, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(ecb.builders))
-	nodes := make([]*Event, len(ecb.builders))
-	mutators := make([]Mutator, len(ecb.builders))
-	for i := range ecb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Event, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := ecb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*EventMutation)
@@ -1381,12 +1381,12 @@ func (ecb *EventCreateBulk) Save(ctx context.Context) ([]*Event, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, ecb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = ecb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, ecb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -1406,7 +1406,7 @@ func (ecb *EventCreateBulk) Save(ctx context.Context) ([]*Event, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, ecb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -1414,8 +1414,8 @@ func (ecb *EventCreateBulk) Save(ctx context.Context) ([]*Event, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ecb *EventCreateBulk) SaveX(ctx context.Context) []*Event {
-	v, err := ecb.Save(ctx)
+func (_c *EventCreateBulk) SaveX(ctx context.Context) []*Event {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1423,14 +1423,14 @@ func (ecb *EventCreateBulk) SaveX(ctx context.Context) []*Event {
 }
 
 // Exec executes the query.
-func (ecb *EventCreateBulk) Exec(ctx context.Context) error {
-	_, err := ecb.Save(ctx)
+func (_c *EventCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ecb *EventCreateBulk) ExecX(ctx context.Context) {
-	if err := ecb.Exec(ctx); err != nil {
+func (_c *EventCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -1450,10 +1450,10 @@ func (ecb *EventCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (ecb *EventCreateBulk) OnConflict(opts ...sql.ConflictOption) *EventUpsertBulk {
-	ecb.conflict = opts
+func (_c *EventCreateBulk) OnConflict(opts ...sql.ConflictOption) *EventUpsertBulk {
+	_c.conflict = opts
 	return &EventUpsertBulk{
-		create: ecb,
+		create: _c,
 	}
 }
 
@@ -1463,10 +1463,10 @@ func (ecb *EventCreateBulk) OnConflict(opts ...sql.ConflictOption) *EventUpsertB
 //	client.Event.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (ecb *EventCreateBulk) OnConflictColumns(columns ...string) *EventUpsertBulk {
-	ecb.conflict = append(ecb.conflict, sql.ConflictColumns(columns...))
+func (_c *EventCreateBulk) OnConflictColumns(columns ...string) *EventUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &EventUpsertBulk{
-		create: ecb,
+		create: _c,
 	}
 }
 

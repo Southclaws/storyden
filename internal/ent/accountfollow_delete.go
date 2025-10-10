@@ -20,56 +20,56 @@ type AccountFollowDelete struct {
 }
 
 // Where appends a list predicates to the AccountFollowDelete builder.
-func (afd *AccountFollowDelete) Where(ps ...predicate.AccountFollow) *AccountFollowDelete {
-	afd.mutation.Where(ps...)
-	return afd
+func (_d *AccountFollowDelete) Where(ps ...predicate.AccountFollow) *AccountFollowDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (afd *AccountFollowDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, afd.sqlExec, afd.mutation, afd.hooks)
+func (_d *AccountFollowDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (afd *AccountFollowDelete) ExecX(ctx context.Context) int {
-	n, err := afd.Exec(ctx)
+func (_d *AccountFollowDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (afd *AccountFollowDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *AccountFollowDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(accountfollow.Table, sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString))
-	if ps := afd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, afd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	afd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // AccountFollowDeleteOne is the builder for deleting a single AccountFollow entity.
 type AccountFollowDeleteOne struct {
-	afd *AccountFollowDelete
+	_d *AccountFollowDelete
 }
 
 // Where appends a list predicates to the AccountFollowDelete builder.
-func (afdo *AccountFollowDeleteOne) Where(ps ...predicate.AccountFollow) *AccountFollowDeleteOne {
-	afdo.afd.mutation.Where(ps...)
-	return afdo
+func (_d *AccountFollowDeleteOne) Where(ps ...predicate.AccountFollow) *AccountFollowDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (afdo *AccountFollowDeleteOne) Exec(ctx context.Context) error {
-	n, err := afdo.afd.Exec(ctx)
+func (_d *AccountFollowDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (afdo *AccountFollowDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (afdo *AccountFollowDeleteOne) ExecX(ctx context.Context) {
-	if err := afdo.Exec(ctx); err != nil {
+func (_d *AccountFollowDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
