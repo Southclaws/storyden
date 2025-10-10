@@ -12,57 +12,57 @@ tool (
 require (
 	ariga.io/atlas v0.35.0 // indirect
 	dario.cat/mergo v1.0.2
-	entgo.io/ent v0.14.4
+	entgo.io/ent v0.14.5
 	github.com/Southclaws/dt v1.0.1
 	github.com/alexedwards/argon2id v1.0.0
-	github.com/forPelevin/gomoji v1.3.1
-	github.com/getkin/kin-openapi v0.132.0
+	github.com/forPelevin/gomoji v1.4.0
+	github.com/getkin/kin-openapi v0.133.0
 	github.com/gosimple/slug v1.15.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/pkg/errors v0.9.1
 	github.com/rs/xid v1.6.0
-	github.com/samber/lo v1.51.0
-	github.com/stretchr/testify v1.10.0
+	github.com/samber/lo v1.52.0
+	github.com/stretchr/testify v1.11.1
 	go.uber.org/dig v1.19.0
 	go.uber.org/fx v1.24.0
-	golang.org/x/oauth2 v0.30.0
+	golang.org/x/oauth2 v0.32.0
 )
 
 require github.com/Southclaws/fault v0.8.2
 
 require (
-	github.com/JohannesKaufmann/html-to-markdown/v2 v2.3.3
+	github.com/JohannesKaufmann/html-to-markdown/v2 v2.4.0
 	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/Southclaws/lexorank v1.2.3
 	github.com/Southclaws/opt v0.6.1
 	github.com/Southclaws/swirl v1.0.1
-	github.com/ThreeDotsLabs/watermill v1.4.7
-	github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.1
+	github.com/ThreeDotsLabs/watermill v1.5.1
+	github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.2
 	github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe
 	github.com/alitto/pond/v2 v2.5.0
 	github.com/bwmarrin/discordgo v0.29.0
 	github.com/cixtor/readability v1.0.0
-	github.com/coreos/go-oidc/v3 v3.14.1
+	github.com/coreos/go-oidc/v3 v3.16.0
 	github.com/dave/jennifer v1.7.1
 	github.com/dboslee/lru v0.0.1
-	github.com/dgraph-io/ristretto/v2 v2.2.0
+	github.com/dgraph-io/ristretto/v2 v2.3.0
 	github.com/disintegration/imaging v1.6.2
 	github.com/dustinkirkland/golang-petname v0.0.0-20240428194347-eebcea082ee0
-	github.com/gabriel-vasile/mimetype v1.4.9
-	github.com/getsentry/sentry-go v0.34.1
-	github.com/getsentry/sentry-go/otel v0.34.1
+	github.com/gabriel-vasile/mimetype v1.4.10
+	github.com/getsentry/sentry-go v0.35.3
+	github.com/getsentry/sentry-go/otel v0.35.3
 	github.com/glebarez/go-sqlite v1.22.0
 	github.com/golang-cz/devslog v0.0.15
-	github.com/golang-jwt/jwt/v5 v5.2.3
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/google/go-github/v75 v75.0.0
 	github.com/iancoleman/strcase v0.3.0
 	github.com/invopop/jsonschema v0.13.0
-	github.com/jackc/pgx/v5 v5.7.5
+	github.com/jackc/pgx/v5 v5.7.6
 	github.com/jmoiron/sqlx v1.4.0
-	github.com/klippa-app/go-pdfium v1.14.1
-	github.com/mark3labs/mcp-go v0.34.0
+	github.com/klippa-app/go-pdfium v1.17.2
+	github.com/mark3labs/mcp-go v0.41.1
 	github.com/matcornic/hermes/v2 v2.1.0
 	github.com/mazznoer/colorgrad v0.10.0
 	github.com/mazznoer/csscolorparser v0.1.6
@@ -74,25 +74,25 @@ require (
 	github.com/oapi-codegen/oapi-codegen/v2 v2.5.0
 	github.com/oapi-codegen/runtime v1.1.2
 	github.com/openai/openai-go v1.12.0
-	github.com/pb33f/libopenapi v0.23.0
+	github.com/pb33f/libopenapi v0.28.0
 	github.com/philippgille/chromem-go v0.7.0
-	github.com/pinecone-io/go-pinecone/v4 v4.1.1
-	github.com/puzpuzpuz/xsync/v4 v4.1.0
-	github.com/redis/rueidis v1.0.63
+	github.com/pinecone-io/go-pinecone/v4 v4.1.4
+	github.com/puzpuzpuz/xsync/v4 v4.2.0
+	github.com/redis/rueidis v1.0.66
 	github.com/rs/cors v1.11.1
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
-	github.com/shirou/gopsutil/v4 v4.25.6
-	github.com/twilio/twilio-go v1.26.5
-	github.com/weaviate/weaviate v1.32.0
-	github.com/weaviate/weaviate-go-client/v5 v5.3.0
-	go.opentelemetry.io/otel v1.37.0
-	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.37.0
-	go.opentelemetry.io/otel/sdk v1.37.0
-	go.opentelemetry.io/otel/trace v1.37.0
-	golang.org/x/exp v0.0.0-20250718183923-645b1fa84792
-	golang.org/x/sync v0.16.0
-	google.golang.org/api v0.242.0
+	github.com/shirou/gopsutil/v4 v4.25.9
+	github.com/twilio/twilio-go v1.28.3
+	github.com/weaviate/weaviate v1.33.0
+	github.com/weaviate/weaviate-go-client/v5 v5.5.0
+	go.opentelemetry.io/otel v1.38.0
+	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp v1.38.0
+	go.opentelemetry.io/otel/sdk v1.38.0
+	go.opentelemetry.io/otel/trace v1.38.0
+	golang.org/x/exp d2f985daa21b
+	golang.org/x/sync v0.17.0
+	google.golang.org/api v0.252.0
 )
 
 require (
@@ -215,7 +215,7 @@ require (
 	github.com/klauspost/compress v1.18.0 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.10 // indirect
 	github.com/minio/md5-simd v1.1.2 // indirect
-	github.com/minio/minio-go/v7 v7.0.94
+	github.com/minio/minio-go/v7 v7.0.95
 )
 
 require (
@@ -228,7 +228,7 @@ require (
 	github.com/go-openapi/inflect v0.21.2 // indirect
 	github.com/go-openapi/jsonpointer v0.21.1 // indirect
 	github.com/go-openapi/swag v0.23.1 // indirect
-	github.com/go-webauthn/webauthn v0.13.3
+	github.com/go-webauthn/webauthn v0.14.0
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1 // indirect
@@ -252,10 +252,10 @@ require (
 	go.uber.org/multierr v1.11.0
 	golang.org/x/crypto v0.40.0 // indirect
 	golang.org/x/mod v0.26.0 // indirect
-	golang.org/x/net v0.42.0
+	golang.org/x/net v0.46.0
 	golang.org/x/sys v0.34.0 // indirect
-	golang.org/x/text v0.27.0
+	golang.org/x/text v0.30.0
 	golang.org/x/time v0.12.0 // indirect
-	google.golang.org/protobuf v1.36.6
+	google.golang.org/protobuf v1.36.10
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
