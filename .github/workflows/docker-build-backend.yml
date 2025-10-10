@@ -16,7 +16,8 @@ env:
 
 jobs:
   backend-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
+
     steps:
       - uses: actions/checkout@v4
 
@@ -32,9 +33,6 @@ jobs:
             type=semver,pattern={{version}},branch=main,suffix=-${{ env.IMAGE_KIND }}
             type=semver,pattern={{version}},branch=main,enable=${{ startsWith(github.ref, 'refs/tags/') }},suffix=-${{ env.IMAGE_KIND }}
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -55,7 +53,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/arm64
           file: ${{ env.DOCKERFILE }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
