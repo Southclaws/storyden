@@ -4,7 +4,7 @@
     "config:recommended"
   ],
   "schedule": [
-    "every weekend"
+    "before 6am on the first day of the month"
   ],
   "ignorePaths": [
     "node_modules/**",
@@ -12,24 +12,131 @@
   ],
   "packageRules": [
     {
-      "matchCategories": [
-        "js"
-      ],
-      "groupName": "All web dependencies"
-    },
-    {
+      "description": "Backend code generation - requires manual `task generate`",
       "matchCategories": [
         "golang"
       ],
-      "groupName": "All api dependencies"
+      "matchPackagePatterns": [
+        "^entgo\\.io/ent",
+        "github\\.com/oapi-codegen/",
+        "github\\.com/deepmap/oapi-codegen",
+        "github\\.com/go-enumerator/"
+      ],
+      "groupName": "[Backend] codegen"
     },
     {
+      "description": "Frontend code generation - requires manual `task generate`",
+      "matchCategories": [
+        "js"
+      ],
+      "matchPackageNames": [
+        "orval"
+      ],
+      "matchPackagePatterns": [
+        "^@pandacss/"
+      ],
+      "groupName": "[Frontend] codegen"
+    },
+    {
+      "description": "Critical frontend frameworks",
+      "matchCategories": [
+        "js"
+      ],
+      "matchPackageNames": [
+        "next",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom"
+      ],
+      "groupName": "[Frontend] critical frameworks"
+    },
+    {
+      "description": "General backend dependencies (minor/patch)",
+      "matchCategories": [
+        "golang"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "excludePackagePatterns": [
+        "^entgo\\.io/ent",
+        "github\\.com/oapi-codegen/",
+        "github\\.com/deepmap/oapi-codegen",
+        "github\\.com/go-enumerator/"
+      ],
+      "groupName": "[Backend] minor versions"
+    },
+    {
+      "description": "General frontend dependencies (minor/patch)",
+      "matchCategories": [
+        "js"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "excludePackageNames": [
+        "orval",
+        "next",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom"
+      ],
+      "excludePackagePatterns": [
+        "^@ark-ui/",
+        "^@pandacss/"
+      ],
+      "groupName": "[Frontend] minor versions"
+    },
+    {
+      "description": "Major backend updates",
+      "matchCategories": [
+        "golang"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "excludePackagePatterns": [
+        "^entgo\\.io/ent",
+        "github\\.com/oapi-codegen/",
+        "github\\.com/deepmap/oapi-codegen",
+        "github\\.com/go-enumerator/"
+      ],
+      "groupName": "[Backend] major updates"
+    },
+    {
+      "description": "Major frontend updates",
+      "matchCategories": [
+        "js"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "excludePackageNames": [
+        "orval",
+        "next",
+        "react",
+        "react-dom",
+        "@types/react",
+        "@types/react-dom"
+      ],
+      "excludePackagePatterns": [
+        "^@ark-ui/",
+        "^@pandacss/"
+      ],
+      "groupName": "[Frontend] major updates"
+    },
+    {
+      "description": "Tooling: Node, Docker, CI",
       "matchCategories": [
         "node",
         "docker",
         "ci"
       ],
-      "groupName": "All other dependencies"
+      "groupName": "Tooling dependencies"
     }
   ]
 }
