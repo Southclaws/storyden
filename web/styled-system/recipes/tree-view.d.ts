@@ -13,7 +13,7 @@ type TreeViewVariantMap = {
   [key in keyof TreeViewVariant]: Array<TreeViewVariant[key]>
 }
 
-type TreeViewSlot = "root" | "label" | "tree" | "item" | "itemIndicator" | "itemText" | "branch" | "branchControl" | "branchTrigger" | "branchContent" | "branchText" | "branchIndicator"
+type TreeViewSlot = "branch" | "branchContent" | "branchControl" | "branchIndentGuide" | "branchIndicator" | "branchText" | "branchTrigger" | "item" | "itemIndicator" | "itemText" | "label" | "nodeCheckbox" | "nodeRenameInput" | "root" | "tree"
 
 export type TreeViewVariantProps = {
   [key in keyof TreeViewVariant]?: ConditionalValue<TreeViewVariant[key]> | undefined

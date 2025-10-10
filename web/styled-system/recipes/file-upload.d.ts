@@ -10,7 +10,7 @@ type FileUploadVariantMap = {
   [key in keyof FileUploadVariant]: Array<FileUploadVariant[key]>
 }
 
-type FileUploadSlot = "root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger"
+type FileUploadSlot = "root" | "dropzone" | "item" | "itemDeleteTrigger" | "itemGroup" | "itemName" | "itemPreview" | "itemPreviewImage" | "itemSizeText" | "label" | "trigger" | "clearTrigger"
 
 export type FileUploadVariantProps = {
   [key in keyof FileUploadVariant]?: ConditionalValue<FileUploadVariant[key]> | undefined

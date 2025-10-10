@@ -1,4 +1,4 @@
-import { selectAnatomy } from "@ark-ui/anatomy";
+import { selectAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
 export const select = defineSlotRecipe({

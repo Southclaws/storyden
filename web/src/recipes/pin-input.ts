@@ -1,4 +1,4 @@
-import { pinInputAnatomy } from "@ark-ui/anatomy";
+import { pinInputAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
 export const pinInput = defineSlotRecipe({

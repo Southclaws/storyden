@@ -6,14 +6,6 @@ const datePickerCompoundVariants = []
 
 const datePickerSlotNames = [
   [
-    "root",
-    "datePicker__root"
-  ],
-  [
-    "label",
-    "datePicker__label"
-  ],
-  [
     "clearTrigger",
     "datePicker__clearTrigger"
   ],
@@ -30,6 +22,10 @@ const datePickerSlotNames = [
     "datePicker__input"
   ],
   [
+    "label",
+    "datePicker__label"
+  ],
+  [
     "monthSelect",
     "datePicker__monthSelect"
   ],
@@ -42,12 +38,20 @@ const datePickerSlotNames = [
     "datePicker__positioner"
   ],
   [
+    "presetTrigger",
+    "datePicker__presetTrigger"
+  ],
+  [
     "prevTrigger",
     "datePicker__prevTrigger"
   ],
   [
     "rangeText",
     "datePicker__rangeText"
+  ],
+  [
+    "root",
+    "datePicker__root"
   ],
   [
     "table",
@@ -82,20 +86,20 @@ const datePickerSlotNames = [
     "datePicker__trigger"
   ],
   [
-    "viewTrigger",
-    "datePicker__viewTrigger"
+    "view",
+    "datePicker__view"
   ],
   [
     "viewControl",
     "datePicker__viewControl"
   ],
   [
-    "yearSelect",
-    "datePicker__yearSelect"
+    "viewTrigger",
+    "datePicker__viewTrigger"
   ],
   [
-    "presetTrigger",
-    "datePicker__presetTrigger"
+    "yearSelect",
+    "datePicker__yearSelect"
   ],
   [
     "view",

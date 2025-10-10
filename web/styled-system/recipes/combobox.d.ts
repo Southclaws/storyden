@@ -13,7 +13,7 @@ type ComboboxVariantMap = {
   [key in keyof ComboboxVariant]: Array<ComboboxVariant[key]>
 }
 
-type ComboboxSlot = "root" | "clearTrigger" | "content" | "control" | "input" | "item" | "itemGroup" | "itemGroupLabel" | "itemIndicator" | "itemText" | "label" | "list" | "positioner" | "trigger"
+type ComboboxSlot = "root" | "clearTrigger" | "content" | "control" | "input" | "item" | "itemGroup" | "itemGroupLabel" | "itemIndicator" | "itemText" | "label" | "list" | "positioner" | "trigger" | "empty"
 
 export type ComboboxVariantProps = {
   [key in keyof ComboboxVariant]?: ConditionalValue<ComboboxVariant[key]> | undefined
