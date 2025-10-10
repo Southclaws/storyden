@@ -1,6 +1,7 @@
 name: Test backend
 
-# on:
+on:
+  workflow_dispatch:
 #   push:
 #     paths-ignore:
 #       - "home/**"
