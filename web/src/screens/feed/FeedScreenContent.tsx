@@ -46,6 +46,7 @@ export function FeedScreenContent({ initialData }: Props) {
       return (
         <CategoryIndexScreen
           layout={feed.layout.type}
+          threadListMode={feed.source.threadListMode}
           initialCategoryList={initialData.categories}
           initialThreadList={initialData.threads}
           initialThreadListPage={initialData.page}

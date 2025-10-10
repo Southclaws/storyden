@@ -1,27 +1,20 @@
-import Link from "next/link";
 import { match } from "ts-pattern";
 
 import { ThreadListResult } from "@/api/openapi-schema";
 import { ComposeAnchor } from "@/components/site/Navigation/Anchors/Compose";
 import { Heading } from "@/components/ui/heading";
-import { BulletIcon } from "@/components/ui/icons/Bullet";
-import { CategoryIcon } from "@/components/ui/icons/Category";
-import { DiscussionIcon } from "@/components/ui/icons/Discussion";
-import { CardGrid, CardRows } from "@/components/ui/rich-card";
-import { categoryColourCSS } from "@/lib/category/colours";
 import { CategoryTree } from "@/lib/category/tree";
 import { ThreadFeedScreen } from "@/screens/feed/ThreadFeedScreen/ThreadFeedScreen";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
-import { linkOverlay } from "@/styled-system/patterns";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { CategoryBadge } from "../CategoryBadge";
 import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
-import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
 
-import { CategoryCardGrid, CategoryLayout } from "./CategoryCardLayout";
+import { CategoryLayout } from "./CategoryCardLayout";
 
 export type Props = {
   layout: "grid" | "list";
+  threadListMode: "none" | "all" | "uncategorised";
   categories: CategoryTree[];
   initialThreadList?: ThreadListResult;
   initialThreadListPage?: number;
@@ -30,6 +23,7 @@ export type Props = {
 
 export function CategoryIndex({
   layout,
+  threadListMode,
   categories,
   initialThreadList,
   initialThreadListPage,
@@ -83,6 +77,7 @@ export function CategoryIndex({
       </LStack>
 
       <ThreadListSection
+        mode={threadListMode}
         initialThreadList={initialThreadList}
         initialPage={initialThreadListPage}
         paginationBasePath={paginationBasePath}
@@ -92,34 +87,37 @@ export function CategoryIndex({
 }
 
 function ThreadListSection({
+  mode,
   initialThreadList,
   initialPage,
   paginationBasePath,
 }: {
+  mode: "none" | "all" | "uncategorised";
   initialThreadList?: ThreadListResult;
   initialPage?: number;
   paginationBasePath: string;
 }) {
-  if (!initialThreadList?.threads) {
+  if (mode === "none" || !initialThreadList?.threads) {
     return null;
   }
+
+  const heading =
+    mode === "all"
+      ? "All discussion threads"
+      : "Uncategorised discussion threads";
 
   return (
     <LStack>
       <WStack>
-        <Heading>Uncategorised discussion threads</Heading>
+        <Heading>{heading}</Heading>
 
         <ComposeAnchor />
       </WStack>
 
-      <styled.p color="fg.muted">
-        Threads that have not been posted within a category.
-      </styled.p>
-
       <ThreadFeedScreen
         initialPage={initialPage}
         initialPageData={initialThreadList}
-        category={null}
+        category={mode === "all" ? undefined : null}
         paginationBasePath={paginationBasePath}
         showCategorySelect={false}
       />

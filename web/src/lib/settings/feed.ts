@@ -20,23 +20,24 @@ export const FeedSourceConfigSchema = z.union([
   }),
   z.object({
     type: z.literal("categories"),
+    threadListMode: z
+      .enum(["none", "all", "uncategorised"])
+      .default("uncategorised"),
   }),
 ]);
 export type FeedSourceConfig = z.infer<typeof FeedSourceConfigSchema>;
 
-export const DefaultFeedConfig = {
+export const FeedConfigSchema = z.object({
+  layout: FeedLayoutConfigSchema,
+  source: FeedSourceConfigSchema,
+});
+export type FeedConfig = z.infer<typeof FeedConfigSchema>;
+
+export const DefaultFeedConfig: FeedConfig = {
   layout: {
     type: "list",
   },
   source: {
     type: "threads",
   },
-} as const;
-
-export const FeedConfigSchema = z
-  .object({
-    layout: FeedLayoutConfigSchema,
-    source: FeedSourceConfigSchema,
-  })
-  .default(DefaultFeedConfig);
-export type FeedConfig = z.infer<typeof FeedConfigSchema>;
+};

@@ -2,6 +2,7 @@
 
 import { SelectValueChangeDetails, createListCollection } from "@ark-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useSWRConfig } from "swr";
 
 import { Node } from "@/api/openapi-schema";
 import { LibraryPageSelect } from "@/components/library/LibraryPageSelect";
@@ -160,11 +161,25 @@ export function FeedConfig() {
 
     const feedSourceType = value[0] as typeof feed.source.type;
 
+    // Create proper source config based on type
+    let sourceConfig: typeof feed.source;
+    switch (feedSourceType) {
+      case "threads":
+        sourceConfig = { type: "threads" };
+        break;
+      case "library":
+        sourceConfig = { type: "library" };
+        break;
+      case "categories":
+        sourceConfig = { type: "categories", threadListMode: "uncategorised" };
+        break;
+      default:
+        return;
+    }
+
     await updateFeed({
       layout: feed.layout,
-      source: {
-        type: feedSourceType,
-      },
+      source: sourceConfig,
     });
   }
 
@@ -279,6 +294,8 @@ function SourceConfig() {
   switch (feed.source.type) {
     case "library":
       return <SourceLibraryConfig />;
+    case "categories":
+      return <SourceCategoriesConfig />;
     default:
       return null;
   }
@@ -320,6 +337,101 @@ function SourceLibraryConfig() {
         value={feed.source.node}
         defaultValue={feed.source.node}
       />
+    </LStack>
+  );
+}
+
+const threadListModes = [
+  {
+    label: "None",
+    value: "none" as const,
+  },
+  {
+    label: "All threads",
+    value: "all" as const,
+  },
+  {
+    label: "Uncategorised only",
+    value: "uncategorised" as const,
+  },
+];
+
+function SourceCategoriesConfig() {
+  const { feed, updateFeed } = useSettingsContext();
+  const { mutate } = useSWRConfig();
+
+  if (feed.source.type !== "categories") {
+    return null;
+  }
+
+  const threadListModeCollection = createListCollection({
+    items: threadListModes,
+  });
+
+  async function handleThreadListModeChange({
+    value,
+  }: SelectValueChangeDetails) {
+    if (value.length === 0) {
+      return;
+    }
+
+    const mode = value[0] as "none" | "all" | "uncategorised";
+
+    await updateFeed({
+      layout: feed.layout,
+      source: {
+        type: "categories",
+        threadListMode: mode,
+      },
+    });
+
+    // Invalidate all /threads calls to trigger re-fetch with new params
+    await mutate(
+      (key) => typeof key === "string" && key.startsWith("/threads"),
+    );
+  }
+
+  return (
+    <LStack gap="1">
+      <WStack alignItems="center">
+        <Heading fontWeight="medium" size="xs">
+          Thread list display
+        </Heading>
+
+        <InfoTip title="Choose what threads to show">
+          Control which threads are displayed below the categories. Select
+          &quot;None&quot; to only show categories, &quot;All threads&quot; to
+          show threads from all categories, or &quot;Uncategorised only&quot; to
+          show only threads without a category.
+        </InfoTip>
+      </WStack>
+
+      <Select.Root
+        size="xs"
+        collection={threadListModeCollection}
+        defaultValue={[feed.source.threadListMode]}
+        positioning={{ sameWidth: false }}
+        onValueChange={handleThreadListModeChange}
+      >
+        <Select.Control>
+          <Select.Trigger>
+            <Select.ValueText placeholder="Select thread list mode" />
+            <SelectIcon />
+          </Select.Trigger>
+        </Select.Control>
+        <Select.Positioner>
+          <Select.Content>
+            {threadListModes.map((item) => (
+              <Select.Item key={item.value} item={item}>
+                <Select.ItemText>{item.label}</Select.ItemText>
+                <Select.ItemIndicator>
+                  <CheckIcon />
+                </Select.ItemIndicator>
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select.Positioner>
+      </Select.Root>
     </LStack>
   );
 }
