@@ -11,6 +11,7 @@ import { useSession } from "@/auth";
 import { useConfirmation } from "@/components/site/useConfirmation";
 import { useFeedMutations } from "@/lib/feed/mutation";
 import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
+import { withUndo } from "@/lib/thread/undo";
 import { useShare } from "@/utils/client";
 
 import { getPermalinkForThread } from "../utils";
@@ -66,8 +67,16 @@ export function useThreadMenu({
   async function handleDelete() {
     await handle(
       async () => {
-        await deleteThread(thread.id);
-        router.push("/");
+        await withUndo({
+          message: "Thread deleted",
+          duration: 5000,
+          toastId: `thread-${thread.id}`,
+          action: async () => {
+            await deleteThread(thread.id);
+            router.push("/");
+          },
+          onUndo: () => {},
+        });
       },
       {
         cleanup: async () => await revalidate(),

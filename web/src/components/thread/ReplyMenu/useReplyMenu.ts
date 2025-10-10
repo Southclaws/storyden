@@ -8,6 +8,7 @@ import { useShare } from "src/utils/client";
 
 import { handle } from "@/api/client";
 import { useThreadMutations } from "@/lib/thread/mutation";
+import { withUndo } from "@/lib/thread/undo";
 
 import { getPermalinkForPost } from "../utils";
 
@@ -45,10 +46,23 @@ export function useReplyMenu({ thread, reply, onEdit }: Props) {
     onEdit();
   }
 
-  function handleDelete() {
-    handle(() => deleteReply(reply.id), {
-      cleanup: async () => await revalidate(),
-    });
+  async function handleDelete() {
+    await handle(
+      async () => {
+        await withUndo({
+          message: "Message deleted",
+          duration: 5000,
+          toastId: `reply-${reply.id}`,
+          action: async () => {
+            await deleteReply(reply.id);
+          },
+          onUndo: () => {},
+        });
+      },
+      {
+        cleanup: async () => await revalidate(),
+      },
+    );
   }
 
   return {
