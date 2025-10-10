@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@ark-ui/anatomy": "^3.5.0",
-    "@ark-ui/react": "5.22.0",
+    "@ark-ui/react": "5.26.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@heroicons/react": "^2.2.0",
@@ -46,17 +46,17 @@
     "js-cookie": "^3.0.5",
     "just-diff": "^6.0.2",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.525.0",
+    "lucide-react": "^0.545.0",
     "mime-db": "^1.54.0",
     "mitt": "^3.0.1",
     "next": "15.4.2",
     "nuqs": "^1.20.0",
     "polished": "^4.3.1",
-    "react": "19.1.0",
+    "react": "19.2.0",
     "react-advanced-cropper": "^0.20.1",
     "react-avatar-editor": "^13.0.2",
     "react-contenteditable": "^3.3.7",
-    "react-dom": "19.1.0",
+    "react-dom": "19.2.0",
     "react-hook-form": "^7.60.0",
     "react-markdown": "^9.1.0",
     "remark-parse": "^11.0.0",
@@ -82,21 +82,21 @@
     "@types/lodash": "^4.17.20",
     "@types/mime-db": "^1.43.6",
     "@types/node": "^24.0.14",
-    "@types/react": "19.1.8",
+    "@types/react": "19.2.2",
     "@types/react-avatar-editor": "^13.0.4",
     "@typescript-eslint/eslint-plugin": "^8.37.0",
     "@typescript-eslint/parser": "^8.37.0",
     "eslint": "^9.31.0",
-    "eslint-config-next": "15.4.1",
-    "orval": "7.2.0",
+    "eslint-config-next": "15.5.4",
+    "orval": "7.13.2",
     "prettier": "^3.6.2",
     "typescript": "^5.8.3"
   },
-  "packageManager": "yarn@4.9.1",
+  "packageManager": "yarn@4.10.3",
   "engines": {
     "node": "22.x"
   },
   "resolutions": {
-    "@types/react": "19.1.5"
+    "@types/react": "19.2.2"
   }
 }
