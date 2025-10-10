@@ -1,5 +1,3 @@
-ariga.io/atlas v0.35.0 h1:tzco6CEZm1/jGD2ifHhKFlsQB7Bfsc/mty4zwm6Mlbc=
-ariga.io/atlas v0.35.0/go.mod h1:9ZAIr/V85596AVxmN8edyVHYKKpnNsDMdnHLsEliW7k=
 ariga.io/atlas v0.37.0 h1:MvbQ25CAHFslttEKEySwYNFrFUdLAPhtU1izOzjXV+o=
 ariga.io/atlas v0.37.0/go.mod h1:mHE83ptCxEkd3rO3c7Rvkk6Djf6mVhEiSVhoiNu96CI=
 cloud.google.com/go/auth v0.17.0 h1:74yCm7hCj2rUyyAocqnFzsAYXgJhrG26XCFimrc/Kz4=
@@ -61,6 +59,8 @@ github.com/alitto/pond/v2 v2.5.0/go.mod h1:xkjYEgQ05RSpWdfSd1nM3OVv7TBhLdy7rMp3+
 github.com/andybalholm/cascadia v1.0.0/go.mod h1:GsXiBklL0woXo1j/WYWtSYYC4ouU9PqHO0sqidkEA4Y=
 github.com/andybalholm/cascadia v1.3.3 h1:AG2YHrzJIm4BZ19iwJ/DAua6Btl3IwJX+VI4kktS1LM=
 github.com/andybalholm/cascadia v1.3.3/go.mod h1:xNd9bqTn98Ln4DwST8/nG+H0yuB8Hmgu1YHNnWw0GeA=
+github.com/antlr4-go/antlr/v4 v4.13.0 h1:lxCg3LAv+EUK6t1i0y1V6/SLeUi0eKEKdhQAlS8TVTI=
+github.com/antlr4-go/antlr/v4 v4.13.0/go.mod h1:pfChB/xh/Unjila75QW7+VU4TSnWnnk9UTnmpPaOR2g=
 github.com/aokoli/goutils v1.0.1/go.mod h1:SijmP0QR8LtwsmDs8Yii5Z/S4trXFGFC2oO5g9DP+DQ=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0 h1:axGnT1gRIfimI7gJifB699GoE/oq+F2MU7Dml6nw9rQ=
 github.com/apapsch/go-jsonmerge/v2 v2.0.0/go.mod h1:lvDnEdqiQrp0O42VQGgmlKpxL1AP2+08jFMw88y4klk=
@@ -88,6 +88,8 @@ github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UF
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/cixtor/readability v1.0.0 h1:6YZo0JJsxt4Xor9lYpln3eSJeuQGukxIBois9wpQI6g=
 github.com/cixtor/readability v1.0.0/go.mod h1:WDrZcthrR2RVDxfMu3q0q59UKhReo5mIZAM6w1+MgFo=
+github.com/coder/websocket v1.8.12 h1:5bUXkEPPIbewrnkU8LTCLVaxi4N4J8ahufH2vlo4NAo=
+github.com/coder/websocket v1.8.12/go.mod h1:LNVeNrXQZfe5qhS9ALED3uA+l5pPqvwXg3CKoDBB2gs=
 github.com/coreos/go-oidc/v3 v3.16.0 h1:qRQUCFstKpXwmEjDQTIbyY/5jF00+asXzSkmkoa/mow=
 github.com/coreos/go-oidc/v3 v3.16.0/go.mod h1:wqPbKFrVnE90vty060SB40FCJ8fTHTxSwyXJqZH+sI8=
 github.com/cpuguy83/go-md2man/v2 v2.0.2/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=
@@ -107,8 +109,6 @@ github.com/dgryski/go-farm v0.0.0-20240924180020-3414d57e47da/go.mod h1:SqUrOPUn
 github.com/disintegration/imaging v1.6.2 h1:w1LecBlG2Lnp8B3jk5zSuNqd7b4DXhcjwek1ei82L+c=
 github.com/disintegration/imaging v1.6.2/go.mod h1:44/5580QXChDfwIclfc/PCwrr44amcmDAg8hxG0Ewe4=
 github.com/dprotaso/go-yit v0.0.0-20191028211022-135eb7262960/go.mod h1:9HQzr9D/0PGwMEbC3d5AB7oi67+h4TsQqItC1GVYG58=
-github.com/dprotaso/go-yit v0.0.0-20250704131239-f7e42b186c1e h1:4lbqJxt7qrmZc3ySO8qc9wozMGMv4V03G0TlzCwiTKA=
-github.com/dprotaso/go-yit v0.0.0-20250704131239-f7e42b186c1e/go.mod h1:zw1PdUgv7hAxHHXa+3EYG8SWGHJ/qrlpcRZyGWTRYOo=
 github.com/dprotaso/go-yit v0.0.0-20250909171706-0a81c39169bc h1:YxqE1wh+qGVXQFinuRq5lT77h6baDtBnAVh61LlXp1o=
 github.com/dprotaso/go-yit v0.0.0-20250909171706-0a81c39169bc/go.mod h1:5NQLChvz4dnEIQ8WcHIFbZ1bp0GEUZHiBH+EpTZ4lBc=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
@@ -159,12 +159,8 @@ github.com/go-openapi/analysis v0.23.0 h1:aGday7OWupfMs+LbmLZG4k0MYXIANxcuBTYUC0
 github.com/go-openapi/analysis v0.23.0/go.mod h1:9mz9ZWaSlV8TvjQHLl2mUW2PbZtemkE8yA5v22ohupo=
 github.com/go-openapi/errors v0.22.1 h1:kslMRRnK7NCb/CvR1q1VWuEQCEIsBGn5GgKD9e+HYhU=
 github.com/go-openapi/errors v0.22.1/go.mod h1:+n/5UdIqdVnLIJ6Q9Se8HNGUXYaY6CN8ImWzfi/Gzp0=
-github.com/go-openapi/inflect v0.21.2 h1:0gClGlGcxifcJR56zwvhaOulnNgnhc4qTAkob5ObnSM=
-github.com/go-openapi/inflect v0.21.2/go.mod h1:INezMuUu7SJQc2AyR3WO0DqqYUJSj8Kb4hBd7WtjlAw=
 github.com/go-openapi/inflect v0.21.3 h1:TmQvw+9eLrsNp4X0BBQacEZZtAnzk2z1FaLdQQJsDiU=
 github.com/go-openapi/inflect v0.21.3/go.mod h1:INezMuUu7SJQc2AyR3WO0DqqYUJSj8Kb4hBd7WtjlAw=
-github.com/go-openapi/jsonpointer v0.21.1 h1:whnzv/pNXtK2FbX/W9yJfRmE2gsmkfahjMKB0fZvcic=
-github.com/go-openapi/jsonpointer v0.21.1/go.mod h1:50I1STOfbY1ycR8jGz8DaMeLCdXiI6aDteEdRNNzpdk=
 github.com/go-openapi/jsonpointer v0.22.1 h1:sHYI1He3b9NqJ4wXLoJDKmUmHkWy/L7rtEo92JUxBNk=
 github.com/go-openapi/jsonpointer v0.22.1/go.mod h1:pQT9OsLkfz1yWoMgYFy4x3U5GY5nUlsOn1qSBH5MkCM=
 github.com/go-openapi/jsonreference v0.21.0 h1:Rs+Y7hSXT83Jacb7kFyjn4ijOuVGSvOdF2+tg1TRrwQ=
@@ -177,8 +173,6 @@ github.com/go-openapi/spec v0.21.0 h1:LTVzPc3p/RzRnkQqLRndbAzjY0d0BCL72A6j3CdL9Z
 github.com/go-openapi/spec v0.21.0/go.mod h1:78u6VdPw81XU44qEWGhtr982gJ5BWg2c0I5XwVMotYk=
 github.com/go-openapi/strfmt v0.23.0 h1:nlUS6BCqcnAk0pyhi9Y+kdDVZdZMHfEKQiS4HaMgO/c=
 github.com/go-openapi/strfmt v0.23.0/go.mod h1:NrtIpfKtWIygRkKVsxh7XQMDQW5HKQl6S5ik2elW+K4=
-github.com/go-openapi/swag v0.23.1 h1:lpsStH0n2ittzTnbaSloVZLuB5+fvSY/+hnagBjSNZU=
-github.com/go-openapi/swag v0.23.1/go.mod h1:STZs8TbRvEQQKUA+JZNAm3EWlgaOBGpyFDqQnDHMef0=
 github.com/go-openapi/swag v0.25.1 h1:6uwVsx+/OuvFVPqfQmOOPsqTcm5/GkBhNwLqIR916n8=
 github.com/go-openapi/swag v0.25.1/go.mod h1:bzONdGlT0fkStgGPd3bhZf1MnuPkf2YAys6h+jZipOo=
 github.com/go-openapi/swag/cmdutils v0.25.1 h1:nDke3nAFDArAa631aitksFGj2omusks88GF1VwdYqPY=
@@ -191,6 +185,8 @@ github.com/go-openapi/swag/jsonname v0.25.1 h1:Sgx+qbwa4ej6AomWC6pEfXrA6uP2RkaNj
 github.com/go-openapi/swag/jsonname v0.25.1/go.mod h1:71Tekow6UOLBD3wS7XhdT98g5J5GR13NOTQ9/6Q11Zo=
 github.com/go-openapi/swag/jsonutils v0.25.1 h1:AihLHaD0brrkJoMqEZOBNzTLnk81Kg9cWr+SPtxtgl8=
 github.com/go-openapi/swag/jsonutils v0.25.1/go.mod h1:JpEkAjxQXpiaHmRO04N1zE4qbUEg3b7Udll7AMGTNOo=
+github.com/go-openapi/swag/jsonutils/fixtures_test v0.25.1 h1:DSQGcdB6G0N9c/KhtpYc71PzzGEIc/fZ1no35x4/XBY=
+github.com/go-openapi/swag/jsonutils/fixtures_test v0.25.1/go.mod h1:kjmweouyPwRUEYMSrbAidoLMGeJ5p6zdHi9BgZiqmsg=
 github.com/go-openapi/swag/loading v0.25.1 h1:6OruqzjWoJyanZOim58iG2vj934TysYVptyaoXS24kw=
 github.com/go-openapi/swag/loading v0.25.1/go.mod h1:xoIe2EG32NOYYbqxvXgPzne989bWvSNoWoyQVWEZicc=
 github.com/go-openapi/swag/mangling v0.25.1 h1:XzILnLzhZPZNtmxKaz/2xIGPQsBsvmCjrJOWGNz/ync=
@@ -335,8 +331,6 @@ github.com/localtunnel/go-localtunnel v0.0.0-20170326223115-8a804488f275 h1:IZyc
 github.com/localtunnel/go-localtunnel v0.0.0-20170326223115-8a804488f275/go.mod h1:zt6UU74K6Z6oMOYJbJzYpYucqdcQwSMPBEdSvGiaUMw=
 github.com/lufia/plan9stats v0.0.0-20250317134145-8bc96cf8fc35 h1:PpXWgLPs+Fqr325bN2FD2ISlRRztXibcX6e8f5FR5Dc=
 github.com/lufia/plan9stats v0.0.0-20250317134145-8bc96cf8fc35/go.mod h1:autxFIvghDt3jPTLoqZ9OZ7s9qTGNAWmYCjVFWPX/zg=
-github.com/mailru/easyjson v0.9.0 h1:PrnmzHw7262yW8sTBwxi1PdJA3Iw/EKBa8psRf7d9a4=
-github.com/mailru/easyjson v0.9.0/go.mod h1:1+xMtQp2MRNVL/V1bOzuP3aP8VNwRW55fQUto+XFtTU=
 github.com/mailru/easyjson v0.9.1 h1:LbtsOm5WAswyWbvTEOqhypdPeZzHavpZx96/n553mR8=
 github.com/mailru/easyjson v0.9.1/go.mod h1:1+xMtQp2MRNVL/V1bOzuP3aP8VNwRW55fQUto+XFtTU=
 github.com/mark3labs/mcp-go v0.41.1 h1:w78eWfiQam2i8ICL7AL0WFiq7KHNJQ6UB53ZVtH4KGA=
@@ -351,9 +345,9 @@ github.com/mattn/go-runewidth v0.0.3/go.mod h1:LwmH8dsx7+W8Uxz3IHJYH5QSwggIsqBzp
 github.com/mattn/go-runewidth v0.0.9/go.mod h1:H031xJmbD/WCDINGzjvQ9THkh0rPKHF+m2gUSrubnMI=
 github.com/mattn/go-runewidth v0.0.16 h1:E5ScNMtiwvlvB5paMFdw9p4kSQzbXFikJ5SQO6TULQc=
 github.com/mattn/go-runewidth v0.0.16/go.mod h1:Jdepj2loyihRzMpdS35Xk/zdY8IAYHsh153qUoGf23w=
-github.com/mattn/go-sqlite3 v1.14.22 h1:2gZY6PC6kBnID23Tichd1K+Z0oS6nE/XwU+Vz/5o4kU=
 github.com/mattn/go-sqlite3 v1.14.22/go.mod h1:Uh1q+B4BYcTPb+yiD3kU8Ct7aC0hY9fxUwlHK0RXw+Y=
 github.com/mattn/go-sqlite3 v1.14.28 h1:ThEiQrnbtumT+QMknw63Befp/ce/nUPgBPMlRFEum7A=
+github.com/mattn/go-sqlite3 v1.14.28/go.mod h1:Uh1q+B4BYcTPb+yiD3kU8Ct7aC0hY9fxUwlHK0RXw+Y=
 github.com/mazznoer/colorgrad v0.10.0 h1:p2ImJimPGEUFhMrNx4EGSzkr2XARomIo1yyUgso3NDQ=
 github.com/mazznoer/colorgrad v0.10.0/go.mod h1:1dkoC2jE1oMVr11umiBHfyHV/W+E+By2WJaPKJJ6Nkk=
 github.com/mazznoer/csscolorparser v0.1.6 h1:uK6p5zBA8HaQZJSInHgHVmkVBodUAy+6snSmKJG7pqA=
@@ -518,6 +512,8 @@ github.com/tklauser/go-sysconf v0.3.15 h1:VE89k0criAymJ/Os65CSn1IXaol+1wrsFHEB8O
 github.com/tklauser/go-sysconf v0.3.15/go.mod h1:Dmjwr6tYFIseJw7a3dRLJfsHAMXZ3nEnL/aZY+0IuI4=
 github.com/tklauser/numcpus v0.10.0 h1:18njr6LDBk1zuna922MgdjQuJFjrdppsZG60sHGfjso=
 github.com/tklauser/numcpus v0.10.0/go.mod h1:BiTKazU708GQTYF4mB+cmlpT2Is1gLk7XVuEeem8LsQ=
+github.com/tursodatabase/libsql-client-go v0.0.0-20240902231107-85af5b9d094d h1:dOMI4+zEbDI37KGb0TI44GUAwxHF9cMsIoDTJ7UmgfU=
+github.com/tursodatabase/libsql-client-go v0.0.0-20240902231107-85af5b9d094d/go.mod h1:l8xTsYB90uaVdMHXMCxKKLSgw5wLYBwBKKefNIUnm9s=
 github.com/twilio/twilio-go v1.28.3 h1:zaDex4kAAxY2lvrMyFscvw8ga6CIrQ/bIx+ycvcDcvc=
 github.com/twilio/twilio-go v1.28.3/go.mod h1:FpgNWMoD8CFnmukpKq9RNpUSGXC0BwnbeKZj2YHlIkw=
 github.com/ugorji/go/codec v1.2.12 h1:9LC83zGrHhuUA9l16C9AHXAqEV/2wBQ4nkvumAE65EE=
@@ -540,8 +536,6 @@ github.com/weaviate/weaviate-go-client/v5 v5.5.0 h1:+5qkHodrL3/Qc7kXvMXnDaIxSBN5
 github.com/weaviate/weaviate-go-client/v5 v5.5.0/go.mod h1:Zdm2MEXG27I0Nf6fM0FZ3P2vLR4JM0iJZrOxwc+Zj34=
 github.com/wk8/go-ordered-map/v2 v2.1.9-0.20250401010720-46d686821e33 h1:VDXCpjGQPaNBkmuHllIpYxsjuugfoaFD0zIDjtqevjk=
 github.com/wk8/go-ordered-map/v2 v2.1.9-0.20250401010720-46d686821e33/go.mod h1:DbzwytT4g/odXquuOCqroKvtxxldI4nb3nuesHF/Exo=
-github.com/woodsbury/decimal128 v1.3.0 h1:8pffMNWIlC0O5vbyHWFZAt5yWvWcrHA+3ovIIjVWss0=
-github.com/woodsbury/decimal128 v1.3.0/go.mod h1:C5UTmyTjW3JftjUFzOVhC20BEQa2a4ZKOB5I6Zjb+ds=
 github.com/woodsbury/decimal128 v1.4.0 h1:xJATj7lLu4f2oObouMt2tgGiElE5gO6mSWUjQsBgUlc=
 github.com/woodsbury/decimal128 v1.4.0/go.mod h1:BP46FUrVjVhdTbKT+XuQh2xfQaGki9LMIRJSFuh6THU=
 github.com/x448/float16 v0.8.4 h1:qLwI1I70+NjRFUR3zs1JPUCgaCXSh3SW62uAKT1mSBM=
@@ -556,8 +550,6 @@ github.com/yuin/goldmark v1.7.13 h1:GPddIs617DnBLFFVJFgpo1aBfe/4xcvMc3SB5t/D0pA=
 github.com/yuin/goldmark v1.7.13/go.mod h1:ip/1k0VRfGynBgxOz0yCqHrbZXhcjxyuS66Brc7iBKg=
 github.com/yusufpapurcu/wmi v1.2.4 h1:zFUKzehAFReQwLys1b/iSMl+JQGSCSjtVqQn9bBrPo0=
 github.com/yusufpapurcu/wmi v1.2.4/go.mod h1:SBZ9tNy3G9/m5Oi98Zks0QjeHVDvuK0qfxQmPyzfmi0=
-github.com/zclconf/go-cty v1.16.3 h1:osr++gw2T61A8KVYHoQiFbFd1Lh3JOCXc/jFLJXKTxk=
-github.com/zclconf/go-cty v1.16.3/go.mod h1:VvMs5i0vgZdhYawQNq5kePSpLAoz8u1xvZgrPIxfnZE=
 github.com/zclconf/go-cty v1.17.0 h1:seZvECve6XX4tmnvRzWtJNHdscMtYEx5R7bnnVyd/d0=
 github.com/zclconf/go-cty v1.17.0/go.mod h1:wqFzcImaLTI6A5HfsRwB0nj5n0MRZFwmey8YoFPPs3U=
 github.com/zclconf/go-cty-debug v0.0.0-20240509010212-0d6042c53940 h1:4r45xpDWB6ZMSMNJFMOjqrGHynW3DIBuR2H9j0ug+Mo=
