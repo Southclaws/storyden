@@ -1,4 +1,4 @@
-name: Build backend image
+name: Build backend image amd64
 
 on:
   push:
@@ -15,7 +15,7 @@ env:
   IMAGE_KIND: backend-amd64
 
 jobs:
-  backend-build:
+  backend-build-amd64:
     runs-on: ubuntu-24.04
 
     steps:

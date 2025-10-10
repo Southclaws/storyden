@@ -1,4 +1,4 @@
-name: Build backend image
+name: Build backend image arm64
 
 on:
   push:
@@ -12,10 +12,10 @@ env:
   REGISTRY: ghcr.io
   DOCKERFILE: ./docker/api/Dockerfile
   IMAGE_NAME: ${{ github.repository }}
-  IMAGE_KIND: backend
+  IMAGE_KIND: backend-arm64
 
 jobs:
-  backend-build:
+  backend-build-arm64:
     runs-on: ubuntu-24.04-arm
 
     steps:
