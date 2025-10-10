@@ -70,44 +70,44 @@ type AccountQuery struct {
 }
 
 // Where adds a new predicate for the AccountQuery builder.
-func (aq *AccountQuery) Where(ps ...predicate.Account) *AccountQuery {
-	aq.predicates = append(aq.predicates, ps...)
-	return aq
+func (_q *AccountQuery) Where(ps ...predicate.Account) *AccountQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (aq *AccountQuery) Limit(limit int) *AccountQuery {
-	aq.ctx.Limit = &limit
-	return aq
+func (_q *AccountQuery) Limit(limit int) *AccountQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (aq *AccountQuery) Offset(offset int) *AccountQuery {
-	aq.ctx.Offset = &offset
-	return aq
+func (_q *AccountQuery) Offset(offset int) *AccountQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (aq *AccountQuery) Unique(unique bool) *AccountQuery {
-	aq.ctx.Unique = &unique
-	return aq
+func (_q *AccountQuery) Unique(unique bool) *AccountQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (aq *AccountQuery) Order(o ...account.OrderOption) *AccountQuery {
-	aq.order = append(aq.order, o...)
-	return aq
+func (_q *AccountQuery) Order(o ...account.OrderOption) *AccountQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QuerySessions chains the current query on the "sessions" edge.
-func (aq *AccountQuery) QuerySessions() *SessionQuery {
-	query := (&SessionClient{config: aq.config}).Query()
+func (_q *AccountQuery) QuerySessions() *SessionQuery {
+	query := (&SessionClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -116,20 +116,20 @@ func (aq *AccountQuery) QuerySessions() *SessionQuery {
 			sqlgraph.To(session.Table, session.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.SessionsTable, account.SessionsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryEmails chains the current query on the "emails" edge.
-func (aq *AccountQuery) QueryEmails() *EmailQuery {
-	query := (&EmailClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryEmails() *EmailQuery {
+	query := (&EmailClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -138,20 +138,20 @@ func (aq *AccountQuery) QueryEmails() *EmailQuery {
 			sqlgraph.To(email.Table, email.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.EmailsTable, account.EmailsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryNotifications chains the current query on the "notifications" edge.
-func (aq *AccountQuery) QueryNotifications() *NotificationQuery {
-	query := (&NotificationClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryNotifications() *NotificationQuery {
+	query := (&NotificationClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -160,20 +160,20 @@ func (aq *AccountQuery) QueryNotifications() *NotificationQuery {
 			sqlgraph.To(notification.Table, notification.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.NotificationsTable, account.NotificationsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryTriggeredNotifications chains the current query on the "triggered_notifications" edge.
-func (aq *AccountQuery) QueryTriggeredNotifications() *NotificationQuery {
-	query := (&NotificationClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryTriggeredNotifications() *NotificationQuery {
+	query := (&NotificationClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -182,20 +182,20 @@ func (aq *AccountQuery) QueryTriggeredNotifications() *NotificationQuery {
 			sqlgraph.To(notification.Table, notification.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.TriggeredNotificationsTable, account.TriggeredNotificationsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryFollowing chains the current query on the "following" edge.
-func (aq *AccountQuery) QueryFollowing() *AccountFollowQuery {
-	query := (&AccountFollowClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryFollowing() *AccountFollowQuery {
+	query := (&AccountFollowClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -204,20 +204,20 @@ func (aq *AccountQuery) QueryFollowing() *AccountFollowQuery {
 			sqlgraph.To(accountfollow.Table, accountfollow.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.FollowingTable, account.FollowingColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryFollowedBy chains the current query on the "followed_by" edge.
-func (aq *AccountQuery) QueryFollowedBy() *AccountFollowQuery {
-	query := (&AccountFollowClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryFollowedBy() *AccountFollowQuery {
+	query := (&AccountFollowClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -226,20 +226,20 @@ func (aq *AccountQuery) QueryFollowedBy() *AccountFollowQuery {
 			sqlgraph.To(accountfollow.Table, accountfollow.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.FollowedByTable, account.FollowedByColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryInvitations chains the current query on the "invitations" edge.
-func (aq *AccountQuery) QueryInvitations() *InvitationQuery {
-	query := (&InvitationClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryInvitations() *InvitationQuery {
+	query := (&InvitationClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -248,20 +248,20 @@ func (aq *AccountQuery) QueryInvitations() *InvitationQuery {
 			sqlgraph.To(invitation.Table, invitation.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.InvitationsTable, account.InvitationsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryInvitedBy chains the current query on the "invited_by" edge.
-func (aq *AccountQuery) QueryInvitedBy() *InvitationQuery {
-	query := (&InvitationClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryInvitedBy() *InvitationQuery {
+	query := (&InvitationClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -270,20 +270,20 @@ func (aq *AccountQuery) QueryInvitedBy() *InvitationQuery {
 			sqlgraph.To(invitation.Table, invitation.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, account.InvitedByTable, account.InvitedByColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryPosts chains the current query on the "posts" edge.
-func (aq *AccountQuery) QueryPosts() *PostQuery {
-	query := (&PostClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryPosts() *PostQuery {
+	query := (&PostClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -292,20 +292,20 @@ func (aq *AccountQuery) QueryPosts() *PostQuery {
 			sqlgraph.To(post.Table, post.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.PostsTable, account.PostsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryQuestions chains the current query on the "questions" edge.
-func (aq *AccountQuery) QueryQuestions() *QuestionQuery {
-	query := (&QuestionClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryQuestions() *QuestionQuery {
+	query := (&QuestionClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -314,20 +314,20 @@ func (aq *AccountQuery) QueryQuestions() *QuestionQuery {
 			sqlgraph.To(question.Table, question.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.QuestionsTable, account.QuestionsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryReacts chains the current query on the "reacts" edge.
-func (aq *AccountQuery) QueryReacts() *ReactQuery {
-	query := (&ReactClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryReacts() *ReactQuery {
+	query := (&ReactClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -336,20 +336,20 @@ func (aq *AccountQuery) QueryReacts() *ReactQuery {
 			sqlgraph.To(react.Table, react.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.ReactsTable, account.ReactsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryLikes chains the current query on the "likes" edge.
-func (aq *AccountQuery) QueryLikes() *LikePostQuery {
-	query := (&LikePostClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryLikes() *LikePostQuery {
+	query := (&LikePostClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -358,20 +358,20 @@ func (aq *AccountQuery) QueryLikes() *LikePostQuery {
 			sqlgraph.To(likepost.Table, likepost.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.LikesTable, account.LikesColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryMentions chains the current query on the "mentions" edge.
-func (aq *AccountQuery) QueryMentions() *MentionProfileQuery {
-	query := (&MentionProfileClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryMentions() *MentionProfileQuery {
+	query := (&MentionProfileClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -380,20 +380,20 @@ func (aq *AccountQuery) QueryMentions() *MentionProfileQuery {
 			sqlgraph.To(mentionprofile.Table, mentionprofile.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.MentionsTable, account.MentionsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryRoles chains the current query on the "roles" edge.
-func (aq *AccountQuery) QueryRoles() *RoleQuery {
-	query := (&RoleClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryRoles() *RoleQuery {
+	query := (&RoleClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -402,20 +402,20 @@ func (aq *AccountQuery) QueryRoles() *RoleQuery {
 			sqlgraph.To(role.Table, role.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, account.RolesTable, account.RolesPrimaryKey...),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryAuthentication chains the current query on the "authentication" edge.
-func (aq *AccountQuery) QueryAuthentication() *AuthenticationQuery {
-	query := (&AuthenticationClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryAuthentication() *AuthenticationQuery {
+	query := (&AuthenticationClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -424,20 +424,20 @@ func (aq *AccountQuery) QueryAuthentication() *AuthenticationQuery {
 			sqlgraph.To(authentication.Table, authentication.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.AuthenticationTable, account.AuthenticationColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryTags chains the current query on the "tags" edge.
-func (aq *AccountQuery) QueryTags() *TagQuery {
-	query := (&TagClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryTags() *TagQuery {
+	query := (&TagClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -446,20 +446,20 @@ func (aq *AccountQuery) QueryTags() *TagQuery {
 			sqlgraph.To(tag.Table, tag.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, account.TagsTable, account.TagsPrimaryKey...),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryCollections chains the current query on the "collections" edge.
-func (aq *AccountQuery) QueryCollections() *CollectionQuery {
-	query := (&CollectionClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryCollections() *CollectionQuery {
+	query := (&CollectionClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -468,20 +468,20 @@ func (aq *AccountQuery) QueryCollections() *CollectionQuery {
 			sqlgraph.To(collection.Table, collection.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.CollectionsTable, account.CollectionsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryNodes chains the current query on the "nodes" edge.
-func (aq *AccountQuery) QueryNodes() *NodeQuery {
-	query := (&NodeClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryNodes() *NodeQuery {
+	query := (&NodeClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -490,20 +490,20 @@ func (aq *AccountQuery) QueryNodes() *NodeQuery {
 			sqlgraph.To(node.Table, node.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.NodesTable, account.NodesColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryAssets chains the current query on the "assets" edge.
-func (aq *AccountQuery) QueryAssets() *AssetQuery {
-	query := (&AssetClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryAssets() *AssetQuery {
+	query := (&AssetClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -512,20 +512,20 @@ func (aq *AccountQuery) QueryAssets() *AssetQuery {
 			sqlgraph.To(asset.Table, asset.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.AssetsTable, account.AssetsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryEvents chains the current query on the "events" edge.
-func (aq *AccountQuery) QueryEvents() *EventParticipantQuery {
-	query := (&EventParticipantClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryEvents() *EventParticipantQuery {
+	query := (&EventParticipantClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -534,20 +534,20 @@ func (aq *AccountQuery) QueryEvents() *EventParticipantQuery {
 			sqlgraph.To(eventparticipant.Table, eventparticipant.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.EventsTable, account.EventsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryAccountRoles chains the current query on the "account_roles" edge.
-func (aq *AccountQuery) QueryAccountRoles() *AccountRolesQuery {
-	query := (&AccountRolesClient{config: aq.config}).Query()
+func (_q *AccountQuery) QueryAccountRoles() *AccountRolesQuery {
+	query := (&AccountRolesClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := aq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -556,7 +556,7 @@ func (aq *AccountQuery) QueryAccountRoles() *AccountRolesQuery {
 			sqlgraph.To(accountroles.Table, accountroles.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, account.AccountRolesTable, account.AccountRolesColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -564,8 +564,8 @@ func (aq *AccountQuery) QueryAccountRoles() *AccountRolesQuery {
 
 // First returns the first Account entity from the query.
 // Returns a *NotFoundError when no Account was found.
-func (aq *AccountQuery) First(ctx context.Context) (*Account, error) {
-	nodes, err := aq.Limit(1).All(setContextOp(ctx, aq.ctx, ent.OpQueryFirst))
+func (_q *AccountQuery) First(ctx context.Context) (*Account, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -576,8 +576,8 @@ func (aq *AccountQuery) First(ctx context.Context) (*Account, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (aq *AccountQuery) FirstX(ctx context.Context) *Account {
-	node, err := aq.First(ctx)
+func (_q *AccountQuery) FirstX(ctx context.Context) *Account {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -586,9 +586,9 @@ func (aq *AccountQuery) FirstX(ctx context.Context) *Account {
 
 // FirstID returns the first Account ID from the query.
 // Returns a *NotFoundError when no Account ID was found.
-func (aq *AccountQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+func (_q *AccountQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = aq.Limit(1).IDs(setContextOp(ctx, aq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -599,8 +599,8 @@ func (aq *AccountQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (aq *AccountQuery) FirstIDX(ctx context.Context) xid.ID {
-	id, err := aq.FirstID(ctx)
+func (_q *AccountQuery) FirstIDX(ctx context.Context) xid.ID {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -610,8 +610,8 @@ func (aq *AccountQuery) FirstIDX(ctx context.Context) xid.ID {
 // Only returns a single Account entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one Account entity is found.
 // Returns a *NotFoundError when no Account entities are found.
-func (aq *AccountQuery) Only(ctx context.Context) (*Account, error) {
-	nodes, err := aq.Limit(2).All(setContextOp(ctx, aq.ctx, ent.OpQueryOnly))
+func (_q *AccountQuery) Only(ctx context.Context) (*Account, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -626,8 +626,8 @@ func (aq *AccountQuery) Only(ctx context.Context) (*Account, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (aq *AccountQuery) OnlyX(ctx context.Context) *Account {
-	node, err := aq.Only(ctx)
+func (_q *AccountQuery) OnlyX(ctx context.Context) *Account {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -637,9 +637,9 @@ func (aq *AccountQuery) OnlyX(ctx context.Context) *Account {
 // OnlyID is like Only, but returns the only Account ID in the query.
 // Returns a *NotSingularError when more than one Account ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (aq *AccountQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+func (_q *AccountQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = aq.Limit(2).IDs(setContextOp(ctx, aq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -654,8 +654,8 @@ func (aq *AccountQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (aq *AccountQuery) OnlyIDX(ctx context.Context) xid.ID {
-	id, err := aq.OnlyID(ctx)
+func (_q *AccountQuery) OnlyIDX(ctx context.Context) xid.ID {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -663,18 +663,18 @@ func (aq *AccountQuery) OnlyIDX(ctx context.Context) xid.ID {
 }
 
 // All executes the query and returns a list of Accounts.
-func (aq *AccountQuery) All(ctx context.Context) ([]*Account, error) {
-	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryAll)
-	if err := aq.prepareQuery(ctx); err != nil {
+func (_q *AccountQuery) All(ctx context.Context) ([]*Account, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*Account, *AccountQuery]()
-	return withInterceptors[[]*Account](ctx, aq, qr, aq.inters)
+	return withInterceptors[[]*Account](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (aq *AccountQuery) AllX(ctx context.Context) []*Account {
-	nodes, err := aq.All(ctx)
+func (_q *AccountQuery) AllX(ctx context.Context) []*Account {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -682,20 +682,20 @@ func (aq *AccountQuery) AllX(ctx context.Context) []*Account {
 }
 
 // IDs executes the query and returns a list of Account IDs.
-func (aq *AccountQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
-	if aq.ctx.Unique == nil && aq.path != nil {
-		aq.Unique(true)
+func (_q *AccountQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryIDs)
-	if err = aq.Select(account.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(account.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (aq *AccountQuery) IDsX(ctx context.Context) []xid.ID {
-	ids, err := aq.IDs(ctx)
+func (_q *AccountQuery) IDsX(ctx context.Context) []xid.ID {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -703,17 +703,17 @@ func (aq *AccountQuery) IDsX(ctx context.Context) []xid.ID {
 }
 
 // Count returns the count of the given query.
-func (aq *AccountQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryCount)
-	if err := aq.prepareQuery(ctx); err != nil {
+func (_q *AccountQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, aq, querierCount[*AccountQuery](), aq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*AccountQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (aq *AccountQuery) CountX(ctx context.Context) int {
-	count, err := aq.Count(ctx)
+func (_q *AccountQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -721,9 +721,9 @@ func (aq *AccountQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (aq *AccountQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, aq.ctx, ent.OpQueryExist)
-	switch _, err := aq.FirstID(ctx); {
+func (_q *AccountQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -734,8 +734,8 @@ func (aq *AccountQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (aq *AccountQuery) ExistX(ctx context.Context) bool {
-	exist, err := aq.Exist(ctx)
+func (_q *AccountQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -744,273 +744,273 @@ func (aq *AccountQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the AccountQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (aq *AccountQuery) Clone() *AccountQuery {
-	if aq == nil {
+func (_q *AccountQuery) Clone() *AccountQuery {
+	if _q == nil {
 		return nil
 	}
 	return &AccountQuery{
-		config:                     aq.config,
-		ctx:                        aq.ctx.Clone(),
-		order:                      append([]account.OrderOption{}, aq.order...),
-		inters:                     append([]Interceptor{}, aq.inters...),
-		predicates:                 append([]predicate.Account{}, aq.predicates...),
-		withSessions:               aq.withSessions.Clone(),
-		withEmails:                 aq.withEmails.Clone(),
-		withNotifications:          aq.withNotifications.Clone(),
-		withTriggeredNotifications: aq.withTriggeredNotifications.Clone(),
-		withFollowing:              aq.withFollowing.Clone(),
-		withFollowedBy:             aq.withFollowedBy.Clone(),
-		withInvitations:            aq.withInvitations.Clone(),
-		withInvitedBy:              aq.withInvitedBy.Clone(),
-		withPosts:                  aq.withPosts.Clone(),
-		withQuestions:              aq.withQuestions.Clone(),
-		withReacts:                 aq.withReacts.Clone(),
-		withLikes:                  aq.withLikes.Clone(),
-		withMentions:               aq.withMentions.Clone(),
-		withRoles:                  aq.withRoles.Clone(),
-		withAuthentication:         aq.withAuthentication.Clone(),
-		withTags:                   aq.withTags.Clone(),
-		withCollections:            aq.withCollections.Clone(),
-		withNodes:                  aq.withNodes.Clone(),
-		withAssets:                 aq.withAssets.Clone(),
-		withEvents:                 aq.withEvents.Clone(),
-		withAccountRoles:           aq.withAccountRoles.Clone(),
+		config:                     _q.config,
+		ctx:                        _q.ctx.Clone(),
+		order:                      append([]account.OrderOption{}, _q.order...),
+		inters:                     append([]Interceptor{}, _q.inters...),
+		predicates:                 append([]predicate.Account{}, _q.predicates...),
+		withSessions:               _q.withSessions.Clone(),
+		withEmails:                 _q.withEmails.Clone(),
+		withNotifications:          _q.withNotifications.Clone(),
+		withTriggeredNotifications: _q.withTriggeredNotifications.Clone(),
+		withFollowing:              _q.withFollowing.Clone(),
+		withFollowedBy:             _q.withFollowedBy.Clone(),
+		withInvitations:            _q.withInvitations.Clone(),
+		withInvitedBy:              _q.withInvitedBy.Clone(),
+		withPosts:                  _q.withPosts.Clone(),
+		withQuestions:              _q.withQuestions.Clone(),
+		withReacts:                 _q.withReacts.Clone(),
+		withLikes:                  _q.withLikes.Clone(),
+		withMentions:               _q.withMentions.Clone(),
+		withRoles:                  _q.withRoles.Clone(),
+		withAuthentication:         _q.withAuthentication.Clone(),
+		withTags:                   _q.withTags.Clone(),
+		withCollections:            _q.withCollections.Clone(),
+		withNodes:                  _q.withNodes.Clone(),
+		withAssets:                 _q.withAssets.Clone(),
+		withEvents:                 _q.withEvents.Clone(),
+		withAccountRoles:           _q.withAccountRoles.Clone(),
 		// clone intermediate query.
-		sql:       aq.sql.Clone(),
-		path:      aq.path,
-		modifiers: append([]func(*sql.Selector){}, aq.modifiers...),
+		sql:       _q.sql.Clone(),
+		path:      _q.path,
+		modifiers: append([]func(*sql.Selector){}, _q.modifiers...),
 	}
 }
 
 // WithSessions tells the query-builder to eager-load the nodes that are connected to
 // the "sessions" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithSessions(opts ...func(*SessionQuery)) *AccountQuery {
-	query := (&SessionClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithSessions(opts ...func(*SessionQuery)) *AccountQuery {
+	query := (&SessionClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withSessions = query
-	return aq
+	_q.withSessions = query
+	return _q
 }
 
 // WithEmails tells the query-builder to eager-load the nodes that are connected to
 // the "emails" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithEmails(opts ...func(*EmailQuery)) *AccountQuery {
-	query := (&EmailClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithEmails(opts ...func(*EmailQuery)) *AccountQuery {
+	query := (&EmailClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withEmails = query
-	return aq
+	_q.withEmails = query
+	return _q
 }
 
 // WithNotifications tells the query-builder to eager-load the nodes that are connected to
 // the "notifications" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithNotifications(opts ...func(*NotificationQuery)) *AccountQuery {
-	query := (&NotificationClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithNotifications(opts ...func(*NotificationQuery)) *AccountQuery {
+	query := (&NotificationClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withNotifications = query
-	return aq
+	_q.withNotifications = query
+	return _q
 }
 
 // WithTriggeredNotifications tells the query-builder to eager-load the nodes that are connected to
 // the "triggered_notifications" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithTriggeredNotifications(opts ...func(*NotificationQuery)) *AccountQuery {
-	query := (&NotificationClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithTriggeredNotifications(opts ...func(*NotificationQuery)) *AccountQuery {
+	query := (&NotificationClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withTriggeredNotifications = query
-	return aq
+	_q.withTriggeredNotifications = query
+	return _q
 }
 
 // WithFollowing tells the query-builder to eager-load the nodes that are connected to
 // the "following" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithFollowing(opts ...func(*AccountFollowQuery)) *AccountQuery {
-	query := (&AccountFollowClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithFollowing(opts ...func(*AccountFollowQuery)) *AccountQuery {
+	query := (&AccountFollowClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withFollowing = query
-	return aq
+	_q.withFollowing = query
+	return _q
 }
 
 // WithFollowedBy tells the query-builder to eager-load the nodes that are connected to
 // the "followed_by" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithFollowedBy(opts ...func(*AccountFollowQuery)) *AccountQuery {
-	query := (&AccountFollowClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithFollowedBy(opts ...func(*AccountFollowQuery)) *AccountQuery {
+	query := (&AccountFollowClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withFollowedBy = query
-	return aq
+	_q.withFollowedBy = query
+	return _q
 }
 
 // WithInvitations tells the query-builder to eager-load the nodes that are connected to
 // the "invitations" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithInvitations(opts ...func(*InvitationQuery)) *AccountQuery {
-	query := (&InvitationClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithInvitations(opts ...func(*InvitationQuery)) *AccountQuery {
+	query := (&InvitationClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withInvitations = query
-	return aq
+	_q.withInvitations = query
+	return _q
 }
 
 // WithInvitedBy tells the query-builder to eager-load the nodes that are connected to
 // the "invited_by" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithInvitedBy(opts ...func(*InvitationQuery)) *AccountQuery {
-	query := (&InvitationClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithInvitedBy(opts ...func(*InvitationQuery)) *AccountQuery {
+	query := (&InvitationClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withInvitedBy = query
-	return aq
+	_q.withInvitedBy = query
+	return _q
 }
 
 // WithPosts tells the query-builder to eager-load the nodes that are connected to
 // the "posts" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithPosts(opts ...func(*PostQuery)) *AccountQuery {
-	query := (&PostClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithPosts(opts ...func(*PostQuery)) *AccountQuery {
+	query := (&PostClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withPosts = query
-	return aq
+	_q.withPosts = query
+	return _q
 }
 
 // WithQuestions tells the query-builder to eager-load the nodes that are connected to
 // the "questions" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithQuestions(opts ...func(*QuestionQuery)) *AccountQuery {
-	query := (&QuestionClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithQuestions(opts ...func(*QuestionQuery)) *AccountQuery {
+	query := (&QuestionClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withQuestions = query
-	return aq
+	_q.withQuestions = query
+	return _q
 }
 
 // WithReacts tells the query-builder to eager-load the nodes that are connected to
 // the "reacts" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithReacts(opts ...func(*ReactQuery)) *AccountQuery {
-	query := (&ReactClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithReacts(opts ...func(*ReactQuery)) *AccountQuery {
+	query := (&ReactClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withReacts = query
-	return aq
+	_q.withReacts = query
+	return _q
 }
 
 // WithLikes tells the query-builder to eager-load the nodes that are connected to
 // the "likes" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithLikes(opts ...func(*LikePostQuery)) *AccountQuery {
-	query := (&LikePostClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithLikes(opts ...func(*LikePostQuery)) *AccountQuery {
+	query := (&LikePostClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withLikes = query
-	return aq
+	_q.withLikes = query
+	return _q
 }
 
 // WithMentions tells the query-builder to eager-load the nodes that are connected to
 // the "mentions" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithMentions(opts ...func(*MentionProfileQuery)) *AccountQuery {
-	query := (&MentionProfileClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithMentions(opts ...func(*MentionProfileQuery)) *AccountQuery {
+	query := (&MentionProfileClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withMentions = query
-	return aq
+	_q.withMentions = query
+	return _q
 }
 
 // WithRoles tells the query-builder to eager-load the nodes that are connected to
 // the "roles" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithRoles(opts ...func(*RoleQuery)) *AccountQuery {
-	query := (&RoleClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithRoles(opts ...func(*RoleQuery)) *AccountQuery {
+	query := (&RoleClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withRoles = query
-	return aq
+	_q.withRoles = query
+	return _q
 }
 
 // WithAuthentication tells the query-builder to eager-load the nodes that are connected to
 // the "authentication" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithAuthentication(opts ...func(*AuthenticationQuery)) *AccountQuery {
-	query := (&AuthenticationClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithAuthentication(opts ...func(*AuthenticationQuery)) *AccountQuery {
+	query := (&AuthenticationClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withAuthentication = query
-	return aq
+	_q.withAuthentication = query
+	return _q
 }
 
 // WithTags tells the query-builder to eager-load the nodes that are connected to
 // the "tags" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithTags(opts ...func(*TagQuery)) *AccountQuery {
-	query := (&TagClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithTags(opts ...func(*TagQuery)) *AccountQuery {
+	query := (&TagClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withTags = query
-	return aq
+	_q.withTags = query
+	return _q
 }
 
 // WithCollections tells the query-builder to eager-load the nodes that are connected to
 // the "collections" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithCollections(opts ...func(*CollectionQuery)) *AccountQuery {
-	query := (&CollectionClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithCollections(opts ...func(*CollectionQuery)) *AccountQuery {
+	query := (&CollectionClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withCollections = query
-	return aq
+	_q.withCollections = query
+	return _q
 }
 
 // WithNodes tells the query-builder to eager-load the nodes that are connected to
 // the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithNodes(opts ...func(*NodeQuery)) *AccountQuery {
-	query := (&NodeClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithNodes(opts ...func(*NodeQuery)) *AccountQuery {
+	query := (&NodeClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withNodes = query
-	return aq
+	_q.withNodes = query
+	return _q
 }
 
 // WithAssets tells the query-builder to eager-load the nodes that are connected to
 // the "assets" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithAssets(opts ...func(*AssetQuery)) *AccountQuery {
-	query := (&AssetClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithAssets(opts ...func(*AssetQuery)) *AccountQuery {
+	query := (&AssetClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withAssets = query
-	return aq
+	_q.withAssets = query
+	return _q
 }
 
 // WithEvents tells the query-builder to eager-load the nodes that are connected to
 // the "events" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithEvents(opts ...func(*EventParticipantQuery)) *AccountQuery {
-	query := (&EventParticipantClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithEvents(opts ...func(*EventParticipantQuery)) *AccountQuery {
+	query := (&EventParticipantClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withEvents = query
-	return aq
+	_q.withEvents = query
+	return _q
 }
 
 // WithAccountRoles tells the query-builder to eager-load the nodes that are connected to
 // the "account_roles" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AccountQuery) WithAccountRoles(opts ...func(*AccountRolesQuery)) *AccountQuery {
-	query := (&AccountRolesClient{config: aq.config}).Query()
+func (_q *AccountQuery) WithAccountRoles(opts ...func(*AccountRolesQuery)) *AccountQuery {
+	query := (&AccountRolesClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withAccountRoles = query
-	return aq
+	_q.withAccountRoles = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -1027,10 +1027,10 @@ func (aq *AccountQuery) WithAccountRoles(opts ...func(*AccountRolesQuery)) *Acco
 //		GroupBy(account.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (aq *AccountQuery) GroupBy(field string, fields ...string) *AccountGroupBy {
-	aq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &AccountGroupBy{build: aq}
-	grbuild.flds = &aq.ctx.Fields
+func (_q *AccountQuery) GroupBy(field string, fields ...string) *AccountGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &AccountGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = account.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -1048,117 +1048,117 @@ func (aq *AccountQuery) GroupBy(field string, fields ...string) *AccountGroupBy 
 //	client.Account.Query().
 //		Select(account.FieldCreatedAt).
 //		Scan(ctx, &v)
-func (aq *AccountQuery) Select(fields ...string) *AccountSelect {
-	aq.ctx.Fields = append(aq.ctx.Fields, fields...)
-	sbuild := &AccountSelect{AccountQuery: aq}
+func (_q *AccountQuery) Select(fields ...string) *AccountSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &AccountSelect{AccountQuery: _q}
 	sbuild.label = account.Label
-	sbuild.flds, sbuild.scan = &aq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a AccountSelect configured with the given aggregations.
-func (aq *AccountQuery) Aggregate(fns ...AggregateFunc) *AccountSelect {
-	return aq.Select().Aggregate(fns...)
+func (_q *AccountQuery) Aggregate(fns ...AggregateFunc) *AccountSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (aq *AccountQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range aq.inters {
+func (_q *AccountQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, aq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range aq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !account.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if aq.path != nil {
-		prev, err := aq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		aq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Account, error) {
+func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Account, error) {
 	var (
 		nodes       = []*Account{}
-		_spec       = aq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [21]bool{
-			aq.withSessions != nil,
-			aq.withEmails != nil,
-			aq.withNotifications != nil,
-			aq.withTriggeredNotifications != nil,
-			aq.withFollowing != nil,
-			aq.withFollowedBy != nil,
-			aq.withInvitations != nil,
-			aq.withInvitedBy != nil,
-			aq.withPosts != nil,
-			aq.withQuestions != nil,
-			aq.withReacts != nil,
-			aq.withLikes != nil,
-			aq.withMentions != nil,
-			aq.withRoles != nil,
-			aq.withAuthentication != nil,
-			aq.withTags != nil,
-			aq.withCollections != nil,
-			aq.withNodes != nil,
-			aq.withAssets != nil,
-			aq.withEvents != nil,
-			aq.withAccountRoles != nil,
+			_q.withSessions != nil,
+			_q.withEmails != nil,
+			_q.withNotifications != nil,
+			_q.withTriggeredNotifications != nil,
+			_q.withFollowing != nil,
+			_q.withFollowedBy != nil,
+			_q.withInvitations != nil,
+			_q.withInvitedBy != nil,
+			_q.withPosts != nil,
+			_q.withQuestions != nil,
+			_q.withReacts != nil,
+			_q.withLikes != nil,
+			_q.withMentions != nil,
+			_q.withRoles != nil,
+			_q.withAuthentication != nil,
+			_q.withTags != nil,
+			_q.withCollections != nil,
+			_q.withNodes != nil,
+			_q.withAssets != nil,
+			_q.withEvents != nil,
+			_q.withAccountRoles != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Account).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Account{config: aq.config}
+		node := &Account{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(aq.modifiers) > 0 {
-		_spec.Modifiers = aq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, aq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := aq.withSessions; query != nil {
-		if err := aq.loadSessions(ctx, query, nodes,
+	if query := _q.withSessions; query != nil {
+		if err := _q.loadSessions(ctx, query, nodes,
 			func(n *Account) { n.Edges.Sessions = []*Session{} },
 			func(n *Account, e *Session) { n.Edges.Sessions = append(n.Edges.Sessions, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withEmails; query != nil {
-		if err := aq.loadEmails(ctx, query, nodes,
+	if query := _q.withEmails; query != nil {
+		if err := _q.loadEmails(ctx, query, nodes,
 			func(n *Account) { n.Edges.Emails = []*Email{} },
 			func(n *Account, e *Email) { n.Edges.Emails = append(n.Edges.Emails, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withNotifications; query != nil {
-		if err := aq.loadNotifications(ctx, query, nodes,
+	if query := _q.withNotifications; query != nil {
+		if err := _q.loadNotifications(ctx, query, nodes,
 			func(n *Account) { n.Edges.Notifications = []*Notification{} },
 			func(n *Account, e *Notification) { n.Edges.Notifications = append(n.Edges.Notifications, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withTriggeredNotifications; query != nil {
-		if err := aq.loadTriggeredNotifications(ctx, query, nodes,
+	if query := _q.withTriggeredNotifications; query != nil {
+		if err := _q.loadTriggeredNotifications(ctx, query, nodes,
 			func(n *Account) { n.Edges.TriggeredNotifications = []*Notification{} },
 			func(n *Account, e *Notification) {
 				n.Edges.TriggeredNotifications = append(n.Edges.TriggeredNotifications, e)
@@ -1166,119 +1166,119 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			return nil, err
 		}
 	}
-	if query := aq.withFollowing; query != nil {
-		if err := aq.loadFollowing(ctx, query, nodes,
+	if query := _q.withFollowing; query != nil {
+		if err := _q.loadFollowing(ctx, query, nodes,
 			func(n *Account) { n.Edges.Following = []*AccountFollow{} },
 			func(n *Account, e *AccountFollow) { n.Edges.Following = append(n.Edges.Following, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withFollowedBy; query != nil {
-		if err := aq.loadFollowedBy(ctx, query, nodes,
+	if query := _q.withFollowedBy; query != nil {
+		if err := _q.loadFollowedBy(ctx, query, nodes,
 			func(n *Account) { n.Edges.FollowedBy = []*AccountFollow{} },
 			func(n *Account, e *AccountFollow) { n.Edges.FollowedBy = append(n.Edges.FollowedBy, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withInvitations; query != nil {
-		if err := aq.loadInvitations(ctx, query, nodes,
+	if query := _q.withInvitations; query != nil {
+		if err := _q.loadInvitations(ctx, query, nodes,
 			func(n *Account) { n.Edges.Invitations = []*Invitation{} },
 			func(n *Account, e *Invitation) { n.Edges.Invitations = append(n.Edges.Invitations, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withInvitedBy; query != nil {
-		if err := aq.loadInvitedBy(ctx, query, nodes, nil,
+	if query := _q.withInvitedBy; query != nil {
+		if err := _q.loadInvitedBy(ctx, query, nodes, nil,
 			func(n *Account, e *Invitation) { n.Edges.InvitedBy = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withPosts; query != nil {
-		if err := aq.loadPosts(ctx, query, nodes,
+	if query := _q.withPosts; query != nil {
+		if err := _q.loadPosts(ctx, query, nodes,
 			func(n *Account) { n.Edges.Posts = []*Post{} },
 			func(n *Account, e *Post) { n.Edges.Posts = append(n.Edges.Posts, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withQuestions; query != nil {
-		if err := aq.loadQuestions(ctx, query, nodes,
+	if query := _q.withQuestions; query != nil {
+		if err := _q.loadQuestions(ctx, query, nodes,
 			func(n *Account) { n.Edges.Questions = []*Question{} },
 			func(n *Account, e *Question) { n.Edges.Questions = append(n.Edges.Questions, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withReacts; query != nil {
-		if err := aq.loadReacts(ctx, query, nodes,
+	if query := _q.withReacts; query != nil {
+		if err := _q.loadReacts(ctx, query, nodes,
 			func(n *Account) { n.Edges.Reacts = []*React{} },
 			func(n *Account, e *React) { n.Edges.Reacts = append(n.Edges.Reacts, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withLikes; query != nil {
-		if err := aq.loadLikes(ctx, query, nodes,
+	if query := _q.withLikes; query != nil {
+		if err := _q.loadLikes(ctx, query, nodes,
 			func(n *Account) { n.Edges.Likes = []*LikePost{} },
 			func(n *Account, e *LikePost) { n.Edges.Likes = append(n.Edges.Likes, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withMentions; query != nil {
-		if err := aq.loadMentions(ctx, query, nodes,
+	if query := _q.withMentions; query != nil {
+		if err := _q.loadMentions(ctx, query, nodes,
 			func(n *Account) { n.Edges.Mentions = []*MentionProfile{} },
 			func(n *Account, e *MentionProfile) { n.Edges.Mentions = append(n.Edges.Mentions, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withRoles; query != nil {
-		if err := aq.loadRoles(ctx, query, nodes,
+	if query := _q.withRoles; query != nil {
+		if err := _q.loadRoles(ctx, query, nodes,
 			func(n *Account) { n.Edges.Roles = []*Role{} },
 			func(n *Account, e *Role) { n.Edges.Roles = append(n.Edges.Roles, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withAuthentication; query != nil {
-		if err := aq.loadAuthentication(ctx, query, nodes,
+	if query := _q.withAuthentication; query != nil {
+		if err := _q.loadAuthentication(ctx, query, nodes,
 			func(n *Account) { n.Edges.Authentication = []*Authentication{} },
 			func(n *Account, e *Authentication) { n.Edges.Authentication = append(n.Edges.Authentication, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withTags; query != nil {
-		if err := aq.loadTags(ctx, query, nodes,
+	if query := _q.withTags; query != nil {
+		if err := _q.loadTags(ctx, query, nodes,
 			func(n *Account) { n.Edges.Tags = []*Tag{} },
 			func(n *Account, e *Tag) { n.Edges.Tags = append(n.Edges.Tags, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withCollections; query != nil {
-		if err := aq.loadCollections(ctx, query, nodes,
+	if query := _q.withCollections; query != nil {
+		if err := _q.loadCollections(ctx, query, nodes,
 			func(n *Account) { n.Edges.Collections = []*Collection{} },
 			func(n *Account, e *Collection) { n.Edges.Collections = append(n.Edges.Collections, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withNodes; query != nil {
-		if err := aq.loadNodes(ctx, query, nodes,
+	if query := _q.withNodes; query != nil {
+		if err := _q.loadNodes(ctx, query, nodes,
 			func(n *Account) { n.Edges.Nodes = []*Node{} },
 			func(n *Account, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withAssets; query != nil {
-		if err := aq.loadAssets(ctx, query, nodes,
+	if query := _q.withAssets; query != nil {
+		if err := _q.loadAssets(ctx, query, nodes,
 			func(n *Account) { n.Edges.Assets = []*Asset{} },
 			func(n *Account, e *Asset) { n.Edges.Assets = append(n.Edges.Assets, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withEvents; query != nil {
-		if err := aq.loadEvents(ctx, query, nodes,
+	if query := _q.withEvents; query != nil {
+		if err := _q.loadEvents(ctx, query, nodes,
 			func(n *Account) { n.Edges.Events = []*EventParticipant{} },
 			func(n *Account, e *EventParticipant) { n.Edges.Events = append(n.Edges.Events, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withAccountRoles; query != nil {
-		if err := aq.loadAccountRoles(ctx, query, nodes,
+	if query := _q.withAccountRoles; query != nil {
+		if err := _q.loadAccountRoles(ctx, query, nodes,
 			func(n *Account) { n.Edges.AccountRoles = []*AccountRoles{} },
 			func(n *Account, e *AccountRoles) { n.Edges.AccountRoles = append(n.Edges.AccountRoles, e) }); err != nil {
 			return nil, err
@@ -1287,7 +1287,7 @@ func (aq *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	return nodes, nil
 }
 
-func (aq *AccountQuery) loadSessions(ctx context.Context, query *SessionQuery, nodes []*Account, init func(*Account), assign func(*Account, *Session)) error {
+func (_q *AccountQuery) loadSessions(ctx context.Context, query *SessionQuery, nodes []*Account, init func(*Account), assign func(*Account, *Session)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1317,7 +1317,7 @@ func (aq *AccountQuery) loadSessions(ctx context.Context, query *SessionQuery, n
 	}
 	return nil
 }
-func (aq *AccountQuery) loadEmails(ctx context.Context, query *EmailQuery, nodes []*Account, init func(*Account), assign func(*Account, *Email)) error {
+func (_q *AccountQuery) loadEmails(ctx context.Context, query *EmailQuery, nodes []*Account, init func(*Account), assign func(*Account, *Email)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1350,7 +1350,7 @@ func (aq *AccountQuery) loadEmails(ctx context.Context, query *EmailQuery, nodes
 	}
 	return nil
 }
-func (aq *AccountQuery) loadNotifications(ctx context.Context, query *NotificationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Notification)) error {
+func (_q *AccountQuery) loadNotifications(ctx context.Context, query *NotificationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Notification)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1380,7 +1380,7 @@ func (aq *AccountQuery) loadNotifications(ctx context.Context, query *Notificati
 	}
 	return nil
 }
-func (aq *AccountQuery) loadTriggeredNotifications(ctx context.Context, query *NotificationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Notification)) error {
+func (_q *AccountQuery) loadTriggeredNotifications(ctx context.Context, query *NotificationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Notification)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1413,7 +1413,7 @@ func (aq *AccountQuery) loadTriggeredNotifications(ctx context.Context, query *N
 	}
 	return nil
 }
-func (aq *AccountQuery) loadFollowing(ctx context.Context, query *AccountFollowQuery, nodes []*Account, init func(*Account), assign func(*Account, *AccountFollow)) error {
+func (_q *AccountQuery) loadFollowing(ctx context.Context, query *AccountFollowQuery, nodes []*Account, init func(*Account), assign func(*Account, *AccountFollow)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1443,7 +1443,7 @@ func (aq *AccountQuery) loadFollowing(ctx context.Context, query *AccountFollowQ
 	}
 	return nil
 }
-func (aq *AccountQuery) loadFollowedBy(ctx context.Context, query *AccountFollowQuery, nodes []*Account, init func(*Account), assign func(*Account, *AccountFollow)) error {
+func (_q *AccountQuery) loadFollowedBy(ctx context.Context, query *AccountFollowQuery, nodes []*Account, init func(*Account), assign func(*Account, *AccountFollow)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1473,7 +1473,7 @@ func (aq *AccountQuery) loadFollowedBy(ctx context.Context, query *AccountFollow
 	}
 	return nil
 }
-func (aq *AccountQuery) loadInvitations(ctx context.Context, query *InvitationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Invitation)) error {
+func (_q *AccountQuery) loadInvitations(ctx context.Context, query *InvitationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Invitation)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1503,7 +1503,7 @@ func (aq *AccountQuery) loadInvitations(ctx context.Context, query *InvitationQu
 	}
 	return nil
 }
-func (aq *AccountQuery) loadInvitedBy(ctx context.Context, query *InvitationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Invitation)) error {
+func (_q *AccountQuery) loadInvitedBy(ctx context.Context, query *InvitationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Invitation)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Account)
 	for i := range nodes {
@@ -1535,7 +1535,7 @@ func (aq *AccountQuery) loadInvitedBy(ctx context.Context, query *InvitationQuer
 	}
 	return nil
 }
-func (aq *AccountQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Account, init func(*Account), assign func(*Account, *Post)) error {
+func (_q *AccountQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Account, init func(*Account), assign func(*Account, *Post)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1565,7 +1565,7 @@ func (aq *AccountQuery) loadPosts(ctx context.Context, query *PostQuery, nodes [
 	}
 	return nil
 }
-func (aq *AccountQuery) loadQuestions(ctx context.Context, query *QuestionQuery, nodes []*Account, init func(*Account), assign func(*Account, *Question)) error {
+func (_q *AccountQuery) loadQuestions(ctx context.Context, query *QuestionQuery, nodes []*Account, init func(*Account), assign func(*Account, *Question)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1595,7 +1595,7 @@ func (aq *AccountQuery) loadQuestions(ctx context.Context, query *QuestionQuery,
 	}
 	return nil
 }
-func (aq *AccountQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes []*Account, init func(*Account), assign func(*Account, *React)) error {
+func (_q *AccountQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes []*Account, init func(*Account), assign func(*Account, *React)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1625,7 +1625,7 @@ func (aq *AccountQuery) loadReacts(ctx context.Context, query *ReactQuery, nodes
 	}
 	return nil
 }
-func (aq *AccountQuery) loadLikes(ctx context.Context, query *LikePostQuery, nodes []*Account, init func(*Account), assign func(*Account, *LikePost)) error {
+func (_q *AccountQuery) loadLikes(ctx context.Context, query *LikePostQuery, nodes []*Account, init func(*Account), assign func(*Account, *LikePost)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1655,7 +1655,7 @@ func (aq *AccountQuery) loadLikes(ctx context.Context, query *LikePostQuery, nod
 	}
 	return nil
 }
-func (aq *AccountQuery) loadMentions(ctx context.Context, query *MentionProfileQuery, nodes []*Account, init func(*Account), assign func(*Account, *MentionProfile)) error {
+func (_q *AccountQuery) loadMentions(ctx context.Context, query *MentionProfileQuery, nodes []*Account, init func(*Account), assign func(*Account, *MentionProfile)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1685,7 +1685,7 @@ func (aq *AccountQuery) loadMentions(ctx context.Context, query *MentionProfileQ
 	}
 	return nil
 }
-func (aq *AccountQuery) loadRoles(ctx context.Context, query *RoleQuery, nodes []*Account, init func(*Account), assign func(*Account, *Role)) error {
+func (_q *AccountQuery) loadRoles(ctx context.Context, query *RoleQuery, nodes []*Account, init func(*Account), assign func(*Account, *Role)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Account)
 	nids := make(map[xid.ID]map[*Account]struct{})
@@ -1746,7 +1746,7 @@ func (aq *AccountQuery) loadRoles(ctx context.Context, query *RoleQuery, nodes [
 	}
 	return nil
 }
-func (aq *AccountQuery) loadAuthentication(ctx context.Context, query *AuthenticationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Authentication)) error {
+func (_q *AccountQuery) loadAuthentication(ctx context.Context, query *AuthenticationQuery, nodes []*Account, init func(*Account), assign func(*Account, *Authentication)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1776,7 +1776,7 @@ func (aq *AccountQuery) loadAuthentication(ctx context.Context, query *Authentic
 	}
 	return nil
 }
-func (aq *AccountQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Account, init func(*Account), assign func(*Account, *Tag)) error {
+func (_q *AccountQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*Account, init func(*Account), assign func(*Account, *Tag)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Account)
 	nids := make(map[xid.ID]map[*Account]struct{})
@@ -1837,7 +1837,7 @@ func (aq *AccountQuery) loadTags(ctx context.Context, query *TagQuery, nodes []*
 	}
 	return nil
 }
-func (aq *AccountQuery) loadCollections(ctx context.Context, query *CollectionQuery, nodes []*Account, init func(*Account), assign func(*Account, *Collection)) error {
+func (_q *AccountQuery) loadCollections(ctx context.Context, query *CollectionQuery, nodes []*Account, init func(*Account), assign func(*Account, *Collection)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1868,7 +1868,7 @@ func (aq *AccountQuery) loadCollections(ctx context.Context, query *CollectionQu
 	}
 	return nil
 }
-func (aq *AccountQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*Account, init func(*Account), assign func(*Account, *Node)) error {
+func (_q *AccountQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*Account, init func(*Account), assign func(*Account, *Node)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1898,7 +1898,7 @@ func (aq *AccountQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes [
 	}
 	return nil
 }
-func (aq *AccountQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes []*Account, init func(*Account), assign func(*Account, *Asset)) error {
+func (_q *AccountQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes []*Account, init func(*Account), assign func(*Account, *Asset)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1928,7 +1928,7 @@ func (aq *AccountQuery) loadAssets(ctx context.Context, query *AssetQuery, nodes
 	}
 	return nil
 }
-func (aq *AccountQuery) loadEvents(ctx context.Context, query *EventParticipantQuery, nodes []*Account, init func(*Account), assign func(*Account, *EventParticipant)) error {
+func (_q *AccountQuery) loadEvents(ctx context.Context, query *EventParticipantQuery, nodes []*Account, init func(*Account), assign func(*Account, *EventParticipant)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1958,7 +1958,7 @@ func (aq *AccountQuery) loadEvents(ctx context.Context, query *EventParticipantQ
 	}
 	return nil
 }
-func (aq *AccountQuery) loadAccountRoles(ctx context.Context, query *AccountRolesQuery, nodes []*Account, init func(*Account), assign func(*Account, *AccountRoles)) error {
+func (_q *AccountQuery) loadAccountRoles(ctx context.Context, query *AccountRolesQuery, nodes []*Account, init func(*Account), assign func(*Account, *AccountRoles)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Account)
 	for i := range nodes {
@@ -1989,27 +1989,27 @@ func (aq *AccountQuery) loadAccountRoles(ctx context.Context, query *AccountRole
 	return nil
 }
 
-func (aq *AccountQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := aq.querySpec()
-	if len(aq.modifiers) > 0 {
-		_spec.Modifiers = aq.modifiers
+func (_q *AccountQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = aq.ctx.Fields
-	if len(aq.ctx.Fields) > 0 {
-		_spec.Unique = aq.ctx.Unique != nil && *aq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, aq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (aq *AccountQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *AccountQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(account.Table, account.Columns, sqlgraph.NewFieldSpec(account.FieldID, field.TypeString))
-	_spec.From = aq.sql
-	if unique := aq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if aq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := aq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, account.FieldID)
 		for i := range fields {
@@ -2017,24 +2017,24 @@ func (aq *AccountQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if aq.withInvitedBy != nil {
+		if _q.withInvitedBy != nil {
 			_spec.Node.AddColumnOnce(account.FieldInvitedByID)
 		}
 	}
-	if ps := aq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := aq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := aq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := aq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -2044,45 +2044,45 @@ func (aq *AccountQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (aq *AccountQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(aq.driver.Dialect())
+func (_q *AccountQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(account.Table)
-	columns := aq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = account.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if aq.sql != nil {
-		selector = aq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if aq.ctx.Unique != nil && *aq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, m := range aq.modifiers {
+	for _, m := range _q.modifiers {
 		m(selector)
 	}
-	for _, p := range aq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range aq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := aq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := aq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (aq *AccountQuery) Modify(modifiers ...func(s *sql.Selector)) *AccountSelect {
-	aq.modifiers = append(aq.modifiers, modifiers...)
-	return aq.Select()
+func (_q *AccountQuery) Modify(modifiers ...func(s *sql.Selector)) *AccountSelect {
+	_q.modifiers = append(_q.modifiers, modifiers...)
+	return _q.Select()
 }
 
 // AccountGroupBy is the group-by builder for Account entities.
@@ -2092,41 +2092,41 @@ type AccountGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (agb *AccountGroupBy) Aggregate(fns ...AggregateFunc) *AccountGroupBy {
-	agb.fns = append(agb.fns, fns...)
-	return agb
+func (_g *AccountGroupBy) Aggregate(fns ...AggregateFunc) *AccountGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (agb *AccountGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, agb.build.ctx, ent.OpQueryGroupBy)
-	if err := agb.build.prepareQuery(ctx); err != nil {
+func (_g *AccountGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*AccountQuery, *AccountGroupBy](ctx, agb.build, agb, agb.build.inters, v)
+	return scanWithInterceptors[*AccountQuery, *AccountGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (agb *AccountGroupBy) sqlScan(ctx context.Context, root *AccountQuery, v any) error {
+func (_g *AccountGroupBy) sqlScan(ctx context.Context, root *AccountQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(agb.fns))
-	for _, fn := range agb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*agb.flds)+len(agb.fns))
-		for _, f := range *agb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*agb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := agb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -2140,27 +2140,27 @@ type AccountSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (as *AccountSelect) Aggregate(fns ...AggregateFunc) *AccountSelect {
-	as.fns = append(as.fns, fns...)
-	return as
+func (_s *AccountSelect) Aggregate(fns ...AggregateFunc) *AccountSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (as *AccountSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, as.ctx, ent.OpQuerySelect)
-	if err := as.prepareQuery(ctx); err != nil {
+func (_s *AccountSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*AccountQuery, *AccountSelect](ctx, as.AccountQuery, as, as.inters, v)
+	return scanWithInterceptors[*AccountQuery, *AccountSelect](ctx, _s.AccountQuery, _s, _s.inters, v)
 }
 
-func (as *AccountSelect) sqlScan(ctx context.Context, root *AccountQuery, v any) error {
+func (_s *AccountSelect) sqlScan(ctx context.Context, root *AccountQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(as.fns))
-	for _, fn := range as.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*as.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -2168,7 +2168,7 @@ func (as *AccountSelect) sqlScan(ctx context.Context, root *AccountQuery, v any)
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := as.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -2176,7 +2176,7 @@ func (as *AccountSelect) sqlScan(ctx context.Context, root *AccountQuery, v any)
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (as *AccountSelect) Modify(modifiers ...func(s *sql.Selector)) *AccountSelect {
-	as.modifiers = append(as.modifiers, modifiers...)
-	return as
+func (_s *AccountSelect) Modify(modifiers ...func(s *sql.Selector)) *AccountSelect {
+	_s.modifiers = append(_s.modifiers, modifiers...)
+	return _s
 }

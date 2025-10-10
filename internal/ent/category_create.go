@@ -27,231 +27,231 @@ type CategoryCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (cc *CategoryCreate) SetCreatedAt(t time.Time) *CategoryCreate {
-	cc.mutation.SetCreatedAt(t)
-	return cc
+func (_c *CategoryCreate) SetCreatedAt(v time.Time) *CategoryCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (cc *CategoryCreate) SetNillableCreatedAt(t *time.Time) *CategoryCreate {
-	if t != nil {
-		cc.SetCreatedAt(*t)
+func (_c *CategoryCreate) SetNillableCreatedAt(v *time.Time) *CategoryCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (cc *CategoryCreate) SetUpdatedAt(t time.Time) *CategoryCreate {
-	cc.mutation.SetUpdatedAt(t)
-	return cc
+func (_c *CategoryCreate) SetUpdatedAt(v time.Time) *CategoryCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (cc *CategoryCreate) SetNillableUpdatedAt(t *time.Time) *CategoryCreate {
-	if t != nil {
-		cc.SetUpdatedAt(*t)
+func (_c *CategoryCreate) SetNillableUpdatedAt(v *time.Time) *CategoryCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetName sets the "name" field.
-func (cc *CategoryCreate) SetName(s string) *CategoryCreate {
-	cc.mutation.SetName(s)
-	return cc
+func (_c *CategoryCreate) SetName(v string) *CategoryCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetSlug sets the "slug" field.
-func (cc *CategoryCreate) SetSlug(s string) *CategoryCreate {
-	cc.mutation.SetSlug(s)
-	return cc
+func (_c *CategoryCreate) SetSlug(v string) *CategoryCreate {
+	_c.mutation.SetSlug(v)
+	return _c
 }
 
 // SetDescription sets the "description" field.
-func (cc *CategoryCreate) SetDescription(s string) *CategoryCreate {
-	cc.mutation.SetDescription(s)
-	return cc
+func (_c *CategoryCreate) SetDescription(v string) *CategoryCreate {
+	_c.mutation.SetDescription(v)
+	return _c
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (cc *CategoryCreate) SetNillableDescription(s *string) *CategoryCreate {
-	if s != nil {
-		cc.SetDescription(*s)
+func (_c *CategoryCreate) SetNillableDescription(v *string) *CategoryCreate {
+	if v != nil {
+		_c.SetDescription(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetColour sets the "colour" field.
-func (cc *CategoryCreate) SetColour(s string) *CategoryCreate {
-	cc.mutation.SetColour(s)
-	return cc
+func (_c *CategoryCreate) SetColour(v string) *CategoryCreate {
+	_c.mutation.SetColour(v)
+	return _c
 }
 
 // SetNillableColour sets the "colour" field if the given value is not nil.
-func (cc *CategoryCreate) SetNillableColour(s *string) *CategoryCreate {
-	if s != nil {
-		cc.SetColour(*s)
+func (_c *CategoryCreate) SetNillableColour(v *string) *CategoryCreate {
+	if v != nil {
+		_c.SetColour(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetSort sets the "sort" field.
-func (cc *CategoryCreate) SetSort(i int) *CategoryCreate {
-	cc.mutation.SetSort(i)
-	return cc
+func (_c *CategoryCreate) SetSort(v int) *CategoryCreate {
+	_c.mutation.SetSort(v)
+	return _c
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (cc *CategoryCreate) SetNillableSort(i *int) *CategoryCreate {
-	if i != nil {
-		cc.SetSort(*i)
+func (_c *CategoryCreate) SetNillableSort(v *int) *CategoryCreate {
+	if v != nil {
+		_c.SetSort(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetAdmin sets the "admin" field.
-func (cc *CategoryCreate) SetAdmin(b bool) *CategoryCreate {
-	cc.mutation.SetAdmin(b)
-	return cc
+func (_c *CategoryCreate) SetAdmin(v bool) *CategoryCreate {
+	_c.mutation.SetAdmin(v)
+	return _c
 }
 
 // SetNillableAdmin sets the "admin" field if the given value is not nil.
-func (cc *CategoryCreate) SetNillableAdmin(b *bool) *CategoryCreate {
-	if b != nil {
-		cc.SetAdmin(*b)
+func (_c *CategoryCreate) SetNillableAdmin(v *bool) *CategoryCreate {
+	if v != nil {
+		_c.SetAdmin(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetParentCategoryID sets the "parent_category_id" field.
-func (cc *CategoryCreate) SetParentCategoryID(x xid.ID) *CategoryCreate {
-	cc.mutation.SetParentCategoryID(x)
-	return cc
+func (_c *CategoryCreate) SetParentCategoryID(v xid.ID) *CategoryCreate {
+	_c.mutation.SetParentCategoryID(v)
+	return _c
 }
 
 // SetNillableParentCategoryID sets the "parent_category_id" field if the given value is not nil.
-func (cc *CategoryCreate) SetNillableParentCategoryID(x *xid.ID) *CategoryCreate {
-	if x != nil {
-		cc.SetParentCategoryID(*x)
+func (_c *CategoryCreate) SetNillableParentCategoryID(v *xid.ID) *CategoryCreate {
+	if v != nil {
+		_c.SetParentCategoryID(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetCoverImageAssetID sets the "cover_image_asset_id" field.
-func (cc *CategoryCreate) SetCoverImageAssetID(x xid.ID) *CategoryCreate {
-	cc.mutation.SetCoverImageAssetID(x)
-	return cc
+func (_c *CategoryCreate) SetCoverImageAssetID(v xid.ID) *CategoryCreate {
+	_c.mutation.SetCoverImageAssetID(v)
+	return _c
 }
 
 // SetNillableCoverImageAssetID sets the "cover_image_asset_id" field if the given value is not nil.
-func (cc *CategoryCreate) SetNillableCoverImageAssetID(x *xid.ID) *CategoryCreate {
-	if x != nil {
-		cc.SetCoverImageAssetID(*x)
+func (_c *CategoryCreate) SetNillableCoverImageAssetID(v *xid.ID) *CategoryCreate {
+	if v != nil {
+		_c.SetCoverImageAssetID(*v)
 	}
-	return cc
+	return _c
 }
 
 // SetMetadata sets the "metadata" field.
-func (cc *CategoryCreate) SetMetadata(m map[string]interface{}) *CategoryCreate {
-	cc.mutation.SetMetadata(m)
-	return cc
+func (_c *CategoryCreate) SetMetadata(v map[string]interface{}) *CategoryCreate {
+	_c.mutation.SetMetadata(v)
+	return _c
 }
 
 // SetID sets the "id" field.
-func (cc *CategoryCreate) SetID(x xid.ID) *CategoryCreate {
-	cc.mutation.SetID(x)
-	return cc
+func (_c *CategoryCreate) SetID(v xid.ID) *CategoryCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (cc *CategoryCreate) SetNillableID(x *xid.ID) *CategoryCreate {
-	if x != nil {
-		cc.SetID(*x)
+func (_c *CategoryCreate) SetNillableID(v *xid.ID) *CategoryCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return cc
+	return _c
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (cc *CategoryCreate) AddPostIDs(ids ...xid.ID) *CategoryCreate {
-	cc.mutation.AddPostIDs(ids...)
-	return cc
+func (_c *CategoryCreate) AddPostIDs(ids ...xid.ID) *CategoryCreate {
+	_c.mutation.AddPostIDs(ids...)
+	return _c
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (cc *CategoryCreate) AddPosts(p ...*Post) *CategoryCreate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_c *CategoryCreate) AddPosts(v ...*Post) *CategoryCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cc.AddPostIDs(ids...)
+	return _c.AddPostIDs(ids...)
 }
 
 // SetParentID sets the "parent" edge to the Category entity by ID.
-func (cc *CategoryCreate) SetParentID(id xid.ID) *CategoryCreate {
-	cc.mutation.SetParentID(id)
-	return cc
+func (_c *CategoryCreate) SetParentID(id xid.ID) *CategoryCreate {
+	_c.mutation.SetParentID(id)
+	return _c
 }
 
 // SetNillableParentID sets the "parent" edge to the Category entity by ID if the given value is not nil.
-func (cc *CategoryCreate) SetNillableParentID(id *xid.ID) *CategoryCreate {
+func (_c *CategoryCreate) SetNillableParentID(id *xid.ID) *CategoryCreate {
 	if id != nil {
-		cc = cc.SetParentID(*id)
+		_c = _c.SetParentID(*id)
 	}
-	return cc
+	return _c
 }
 
 // SetParent sets the "parent" edge to the Category entity.
-func (cc *CategoryCreate) SetParent(c *Category) *CategoryCreate {
-	return cc.SetParentID(c.ID)
+func (_c *CategoryCreate) SetParent(v *Category) *CategoryCreate {
+	return _c.SetParentID(v.ID)
 }
 
 // AddChildIDs adds the "children" edge to the Category entity by IDs.
-func (cc *CategoryCreate) AddChildIDs(ids ...xid.ID) *CategoryCreate {
-	cc.mutation.AddChildIDs(ids...)
-	return cc
+func (_c *CategoryCreate) AddChildIDs(ids ...xid.ID) *CategoryCreate {
+	_c.mutation.AddChildIDs(ids...)
+	return _c
 }
 
 // AddChildren adds the "children" edges to the Category entity.
-func (cc *CategoryCreate) AddChildren(c ...*Category) *CategoryCreate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_c *CategoryCreate) AddChildren(v ...*Category) *CategoryCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return cc.AddChildIDs(ids...)
+	return _c.AddChildIDs(ids...)
 }
 
 // SetCoverImageID sets the "cover_image" edge to the Asset entity by ID.
-func (cc *CategoryCreate) SetCoverImageID(id xid.ID) *CategoryCreate {
-	cc.mutation.SetCoverImageID(id)
-	return cc
+func (_c *CategoryCreate) SetCoverImageID(id xid.ID) *CategoryCreate {
+	_c.mutation.SetCoverImageID(id)
+	return _c
 }
 
 // SetNillableCoverImageID sets the "cover_image" edge to the Asset entity by ID if the given value is not nil.
-func (cc *CategoryCreate) SetNillableCoverImageID(id *xid.ID) *CategoryCreate {
+func (_c *CategoryCreate) SetNillableCoverImageID(id *xid.ID) *CategoryCreate {
 	if id != nil {
-		cc = cc.SetCoverImageID(*id)
+		_c = _c.SetCoverImageID(*id)
 	}
-	return cc
+	return _c
 }
 
 // SetCoverImage sets the "cover_image" edge to the Asset entity.
-func (cc *CategoryCreate) SetCoverImage(a *Asset) *CategoryCreate {
-	return cc.SetCoverImageID(a.ID)
+func (_c *CategoryCreate) SetCoverImage(v *Asset) *CategoryCreate {
+	return _c.SetCoverImageID(v.ID)
 }
 
 // Mutation returns the CategoryMutation object of the builder.
-func (cc *CategoryCreate) Mutation() *CategoryMutation {
-	return cc.mutation
+func (_c *CategoryCreate) Mutation() *CategoryMutation {
+	return _c.mutation
 }
 
 // Save creates the Category in the database.
-func (cc *CategoryCreate) Save(ctx context.Context) (*Category, error) {
-	cc.defaults()
-	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
+func (_c *CategoryCreate) Save(ctx context.Context) (*Category, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (cc *CategoryCreate) SaveX(ctx context.Context) *Category {
-	v, err := cc.Save(ctx)
+func (_c *CategoryCreate) SaveX(ctx context.Context) *Category {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -259,77 +259,77 @@ func (cc *CategoryCreate) SaveX(ctx context.Context) *Category {
 }
 
 // Exec executes the query.
-func (cc *CategoryCreate) Exec(ctx context.Context) error {
-	_, err := cc.Save(ctx)
+func (_c *CategoryCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cc *CategoryCreate) ExecX(ctx context.Context) {
-	if err := cc.Exec(ctx); err != nil {
+func (_c *CategoryCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cc *CategoryCreate) defaults() {
-	if _, ok := cc.mutation.CreatedAt(); !ok {
+func (_c *CategoryCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := category.DefaultCreatedAt()
-		cc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := cc.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		v := category.DefaultUpdatedAt()
-		cc.mutation.SetUpdatedAt(v)
+		_c.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := cc.mutation.Description(); !ok {
+	if _, ok := _c.mutation.Description(); !ok {
 		v := category.DefaultDescription
-		cc.mutation.SetDescription(v)
+		_c.mutation.SetDescription(v)
 	}
-	if _, ok := cc.mutation.Colour(); !ok {
+	if _, ok := _c.mutation.Colour(); !ok {
 		v := category.DefaultColour
-		cc.mutation.SetColour(v)
+		_c.mutation.SetColour(v)
 	}
-	if _, ok := cc.mutation.Sort(); !ok {
+	if _, ok := _c.mutation.Sort(); !ok {
 		v := category.DefaultSort
-		cc.mutation.SetSort(v)
+		_c.mutation.SetSort(v)
 	}
-	if _, ok := cc.mutation.Admin(); !ok {
+	if _, ok := _c.mutation.Admin(); !ok {
 		v := category.DefaultAdmin
-		cc.mutation.SetAdmin(v)
+		_c.mutation.SetAdmin(v)
 	}
-	if _, ok := cc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := category.DefaultID()
-		cc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cc *CategoryCreate) check() error {
-	if _, ok := cc.mutation.CreatedAt(); !ok {
+func (_c *CategoryCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Category.created_at"`)}
 	}
-	if _, ok := cc.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Category.updated_at"`)}
 	}
-	if _, ok := cc.mutation.Name(); !ok {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Category.name"`)}
 	}
-	if _, ok := cc.mutation.Slug(); !ok {
+	if _, ok := _c.mutation.Slug(); !ok {
 		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Category.slug"`)}
 	}
-	if _, ok := cc.mutation.Description(); !ok {
+	if _, ok := _c.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Category.description"`)}
 	}
-	if _, ok := cc.mutation.Colour(); !ok {
+	if _, ok := _c.mutation.Colour(); !ok {
 		return &ValidationError{Name: "colour", err: errors.New(`ent: missing required field "Category.colour"`)}
 	}
-	if _, ok := cc.mutation.Sort(); !ok {
+	if _, ok := _c.mutation.Sort(); !ok {
 		return &ValidationError{Name: "sort", err: errors.New(`ent: missing required field "Category.sort"`)}
 	}
-	if _, ok := cc.mutation.Admin(); !ok {
+	if _, ok := _c.mutation.Admin(); !ok {
 		return &ValidationError{Name: "admin", err: errors.New(`ent: missing required field "Category.admin"`)}
 	}
-	if v, ok := cc.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := category.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Category.id": %w`, err)}
 		}
@@ -337,12 +337,12 @@ func (cc *CategoryCreate) check() error {
 	return nil
 }
 
-func (cc *CategoryCreate) sqlSave(ctx context.Context) (*Category, error) {
-	if err := cc.check(); err != nil {
+func (_c *CategoryCreate) sqlSave(ctx context.Context) (*Category, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := cc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, cc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -355,58 +355,58 @@ func (cc *CategoryCreate) sqlSave(ctx context.Context) (*Category, error) {
 			return nil, err
 		}
 	}
-	cc.mutation.id = &_node.ID
-	cc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
+func (_c *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Category{config: cc.config}
+		_node = &Category{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(category.Table, sqlgraph.NewFieldSpec(category.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = cc.conflict
-	if id, ok := cc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := cc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(category.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := cc.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(category.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := cc.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(category.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := cc.mutation.Slug(); ok {
+	if value, ok := _c.mutation.Slug(); ok {
 		_spec.SetField(category.FieldSlug, field.TypeString, value)
 		_node.Slug = value
 	}
-	if value, ok := cc.mutation.Description(); ok {
+	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(category.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
-	if value, ok := cc.mutation.Colour(); ok {
+	if value, ok := _c.mutation.Colour(); ok {
 		_spec.SetField(category.FieldColour, field.TypeString, value)
 		_node.Colour = value
 	}
-	if value, ok := cc.mutation.Sort(); ok {
+	if value, ok := _c.mutation.Sort(); ok {
 		_spec.SetField(category.FieldSort, field.TypeInt, value)
 		_node.Sort = value
 	}
-	if value, ok := cc.mutation.Admin(); ok {
+	if value, ok := _c.mutation.Admin(); ok {
 		_spec.SetField(category.FieldAdmin, field.TypeBool, value)
 		_node.Admin = value
 	}
-	if value, ok := cc.mutation.Metadata(); ok {
+	if value, ok := _c.mutation.Metadata(); ok {
 		_spec.SetField(category.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
 	}
-	if nodes := cc.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -422,7 +422,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ParentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -439,7 +439,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 		_node.ParentCategoryID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.ChildrenIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ChildrenIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -455,7 +455,7 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.CoverImageIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.CoverImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -491,10 +491,10 @@ func (cc *CategoryCreate) createSpec() (*Category, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (cc *CategoryCreate) OnConflict(opts ...sql.ConflictOption) *CategoryUpsertOne {
-	cc.conflict = opts
+func (_c *CategoryCreate) OnConflict(opts ...sql.ConflictOption) *CategoryUpsertOne {
+	_c.conflict = opts
 	return &CategoryUpsertOne{
-		create: cc,
+		create: _c,
 	}
 }
 
@@ -504,10 +504,10 @@ func (cc *CategoryCreate) OnConflict(opts ...sql.ConflictOption) *CategoryUpsert
 //	client.Category.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (cc *CategoryCreate) OnConflictColumns(columns ...string) *CategoryUpsertOne {
-	cc.conflict = append(cc.conflict, sql.ConflictColumns(columns...))
+func (_c *CategoryCreate) OnConflictColumns(columns ...string) *CategoryUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &CategoryUpsertOne{
-		create: cc,
+		create: _c,
 	}
 }
 
@@ -934,16 +934,16 @@ type CategoryCreateBulk struct {
 }
 
 // Save creates the Category entities in the database.
-func (ccb *CategoryCreateBulk) Save(ctx context.Context) ([]*Category, error) {
-	if ccb.err != nil {
-		return nil, ccb.err
+func (_c *CategoryCreateBulk) Save(ctx context.Context) ([]*Category, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
-	nodes := make([]*Category, len(ccb.builders))
-	mutators := make([]Mutator, len(ccb.builders))
-	for i := range ccb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Category, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := ccb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CategoryMutation)
@@ -957,12 +957,12 @@ func (ccb *CategoryCreateBulk) Save(ctx context.Context) ([]*Category, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = ccb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, ccb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -982,7 +982,7 @@ func (ccb *CategoryCreateBulk) Save(ctx context.Context) ([]*Category, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, ccb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -990,8 +990,8 @@ func (ccb *CategoryCreateBulk) Save(ctx context.Context) ([]*Category, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ccb *CategoryCreateBulk) SaveX(ctx context.Context) []*Category {
-	v, err := ccb.Save(ctx)
+func (_c *CategoryCreateBulk) SaveX(ctx context.Context) []*Category {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -999,14 +999,14 @@ func (ccb *CategoryCreateBulk) SaveX(ctx context.Context) []*Category {
 }
 
 // Exec executes the query.
-func (ccb *CategoryCreateBulk) Exec(ctx context.Context) error {
-	_, err := ccb.Save(ctx)
+func (_c *CategoryCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ccb *CategoryCreateBulk) ExecX(ctx context.Context) {
-	if err := ccb.Exec(ctx); err != nil {
+func (_c *CategoryCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -1026,10 +1026,10 @@ func (ccb *CategoryCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (ccb *CategoryCreateBulk) OnConflict(opts ...sql.ConflictOption) *CategoryUpsertBulk {
-	ccb.conflict = opts
+func (_c *CategoryCreateBulk) OnConflict(opts ...sql.ConflictOption) *CategoryUpsertBulk {
+	_c.conflict = opts
 	return &CategoryUpsertBulk{
-		create: ccb,
+		create: _c,
 	}
 }
 
@@ -1039,10 +1039,10 @@ func (ccb *CategoryCreateBulk) OnConflict(opts ...sql.ConflictOption) *CategoryU
 //	client.Category.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (ccb *CategoryCreateBulk) OnConflictColumns(columns ...string) *CategoryUpsertBulk {
-	ccb.conflict = append(ccb.conflict, sql.ConflictColumns(columns...))
+func (_c *CategoryCreateBulk) OnConflictColumns(columns ...string) *CategoryUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &CategoryUpsertBulk{
-		create: ccb,
+		create: _c,
 	}
 }
 

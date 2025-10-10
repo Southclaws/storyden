@@ -108,7 +108,7 @@ func (*Question) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Question fields.
-func (q *Question) assignValues(columns []string, values []any) error {
+func (_m *Question) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -118,44 +118,44 @@ func (q *Question) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				q.ID = *value
+				_m.ID = *value
 			}
 		case question.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				q.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case question.FieldIndexedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field indexed_at", values[i])
 			} else if value.Valid {
-				q.IndexedAt = new(time.Time)
-				*q.IndexedAt = value.Time
+				_m.IndexedAt = new(time.Time)
+				*_m.IndexedAt = value.Time
 			}
 		case question.FieldSlug:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field slug", values[i])
 			} else if value.Valid {
-				q.Slug = value.String
+				_m.Slug = value.String
 			}
 		case question.FieldQuery:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field query", values[i])
 			} else if value.Valid {
-				q.Query = value.String
+				_m.Query = value.String
 			}
 		case question.FieldResult:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field result", values[i])
 			} else if value.Valid {
-				q.Result = value.String
+				_m.Result = value.String
 			}
 		case question.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field metadata", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &q.Metadata); err != nil {
+				if err := json.Unmarshal(*value, &_m.Metadata); err != nil {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
@@ -163,16 +163,16 @@ func (q *Question) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
 			} else if value != nil {
-				q.AccountID = *value
+				_m.AccountID = *value
 			}
 		case question.FieldParentQuestionID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_question_id", values[i])
 			} else if value != nil {
-				q.ParentQuestionID = *value
+				_m.ParentQuestionID = *value
 			}
 		default:
-			q.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -180,73 +180,73 @@ func (q *Question) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Question.
 // This includes values selected through modifiers, order, etc.
-func (q *Question) Value(name string) (ent.Value, error) {
-	return q.selectValues.Get(name)
+func (_m *Question) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryAuthor queries the "author" edge of the Question entity.
-func (q *Question) QueryAuthor() *AccountQuery {
-	return NewQuestionClient(q.config).QueryAuthor(q)
+func (_m *Question) QueryAuthor() *AccountQuery {
+	return NewQuestionClient(_m.config).QueryAuthor(_m)
 }
 
 // QueryParent queries the "parent" edge of the Question entity.
-func (q *Question) QueryParent() *QuestionQuery {
-	return NewQuestionClient(q.config).QueryParent(q)
+func (_m *Question) QueryParent() *QuestionQuery {
+	return NewQuestionClient(_m.config).QueryParent(_m)
 }
 
 // QueryParentQuestion queries the "parent_question" edge of the Question entity.
-func (q *Question) QueryParentQuestion() *QuestionQuery {
-	return NewQuestionClient(q.config).QueryParentQuestion(q)
+func (_m *Question) QueryParentQuestion() *QuestionQuery {
+	return NewQuestionClient(_m.config).QueryParentQuestion(_m)
 }
 
 // Update returns a builder for updating this Question.
 // Note that you need to call Question.Unwrap() before calling this method if this Question
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (q *Question) Update() *QuestionUpdateOne {
-	return NewQuestionClient(q.config).UpdateOne(q)
+func (_m *Question) Update() *QuestionUpdateOne {
+	return NewQuestionClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Question entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (q *Question) Unwrap() *Question {
-	_tx, ok := q.config.driver.(*txDriver)
+func (_m *Question) Unwrap() *Question {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Question is not a transactional entity")
 	}
-	q.config.driver = _tx.drv
-	return q
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (q *Question) String() string {
+func (_m *Question) String() string {
 	var builder strings.Builder
 	builder.WriteString("Question(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", q.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(q.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := q.IndexedAt; v != nil {
+	if v := _m.IndexedAt; v != nil {
 		builder.WriteString("indexed_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("slug=")
-	builder.WriteString(q.Slug)
+	builder.WriteString(_m.Slug)
 	builder.WriteString(", ")
 	builder.WriteString("query=")
-	builder.WriteString(q.Query)
+	builder.WriteString(_m.Query)
 	builder.WriteString(", ")
 	builder.WriteString("result=")
-	builder.WriteString(q.Result)
+	builder.WriteString(_m.Result)
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
-	builder.WriteString(fmt.Sprintf("%v", q.Metadata))
+	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
-	builder.WriteString(fmt.Sprintf("%v", q.AccountID))
+	builder.WriteString(fmt.Sprintf("%v", _m.AccountID))
 	builder.WriteString(", ")
 	builder.WriteString("parent_question_id=")
-	builder.WriteString(fmt.Sprintf("%v", q.ParentQuestionID))
+	builder.WriteString(fmt.Sprintf("%v", _m.ParentQuestionID))
 	builder.WriteByte(')')
 	return builder.String()
 }

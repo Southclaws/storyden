@@ -270,7 +270,7 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Post fields.
-func (po *Post) assignValues(columns []string, values []any) error {
+func (_m *Post) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -280,94 +280,94 @@ func (po *Post) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				po.ID = *value
+				_m.ID = *value
 			}
 		case post.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				po.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case post.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				po.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case post.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				po.DeletedAt = new(time.Time)
-				*po.DeletedAt = value.Time
+				_m.DeletedAt = new(time.Time)
+				*_m.DeletedAt = value.Time
 			}
 		case post.FieldIndexedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field indexed_at", values[i])
 			} else if value.Valid {
-				po.IndexedAt = new(time.Time)
-				*po.IndexedAt = value.Time
+				_m.IndexedAt = new(time.Time)
+				*_m.IndexedAt = value.Time
 			}
 		case post.FieldFirst:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field first", values[i])
 			} else if value.Valid {
-				po.First = value.Bool
+				_m.First = value.Bool
 			}
 		case post.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
 			} else if value.Valid {
-				po.Title = value.String
+				_m.Title = value.String
 			}
 		case post.FieldSlug:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field slug", values[i])
 			} else if value.Valid {
-				po.Slug = value.String
+				_m.Slug = value.String
 			}
 		case post.FieldPinned:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field pinned", values[i])
 			} else if value.Valid {
-				po.Pinned = value.Bool
+				_m.Pinned = value.Bool
 			}
 		case post.FieldLastReplyAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field last_reply_at", values[i])
 			} else if value.Valid {
-				po.LastReplyAt = new(time.Time)
-				*po.LastReplyAt = value.Time
+				_m.LastReplyAt = new(time.Time)
+				*_m.LastReplyAt = value.Time
 			}
 		case post.FieldRootPostID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field root_post_id", values[i])
 			} else if value != nil {
-				po.RootPostID = *value
+				_m.RootPostID = *value
 			}
 		case post.FieldReplyToPostID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field reply_to_post_id", values[i])
 			} else if value != nil {
-				po.ReplyToPostID = *value
+				_m.ReplyToPostID = *value
 			}
 		case post.FieldBody:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field body", values[i])
 			} else if value.Valid {
-				po.Body = value.String
+				_m.Body = value.String
 			}
 		case post.FieldShort:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field short", values[i])
 			} else if value.Valid {
-				po.Short = value.String
+				_m.Short = value.String
 			}
 		case post.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field metadata", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &po.Metadata); err != nil {
+				if err := json.Unmarshal(*value, &_m.Metadata); err != nil {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
@@ -375,28 +375,28 @@ func (po *Post) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field visibility", values[i])
 			} else if value.Valid {
-				po.Visibility = post.Visibility(value.String)
+				_m.Visibility = post.Visibility(value.String)
 			}
 		case post.FieldAccountPosts:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_posts", values[i])
 			} else if value != nil {
-				po.AccountPosts = *value
+				_m.AccountPosts = *value
 			}
 		case post.FieldCategoryID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field category_id", values[i])
 			} else if value != nil {
-				po.CategoryID = *value
+				_m.CategoryID = *value
 			}
 		case post.FieldLinkID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field link_id", values[i])
 			} else if value != nil {
-				po.LinkID = *value
+				_m.LinkID = *value
 			}
 		default:
-			po.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -404,167 +404,167 @@ func (po *Post) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Post.
 // This includes values selected through modifiers, order, etc.
-func (po *Post) Value(name string) (ent.Value, error) {
-	return po.selectValues.Get(name)
+func (_m *Post) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryAuthor queries the "author" edge of the Post entity.
-func (po *Post) QueryAuthor() *AccountQuery {
-	return NewPostClient(po.config).QueryAuthor(po)
+func (_m *Post) QueryAuthor() *AccountQuery {
+	return NewPostClient(_m.config).QueryAuthor(_m)
 }
 
 // QueryCategory queries the "category" edge of the Post entity.
-func (po *Post) QueryCategory() *CategoryQuery {
-	return NewPostClient(po.config).QueryCategory(po)
+func (_m *Post) QueryCategory() *CategoryQuery {
+	return NewPostClient(_m.config).QueryCategory(_m)
 }
 
 // QueryTags queries the "tags" edge of the Post entity.
-func (po *Post) QueryTags() *TagQuery {
-	return NewPostClient(po.config).QueryTags(po)
+func (_m *Post) QueryTags() *TagQuery {
+	return NewPostClient(_m.config).QueryTags(_m)
 }
 
 // QueryRoot queries the "root" edge of the Post entity.
-func (po *Post) QueryRoot() *PostQuery {
-	return NewPostClient(po.config).QueryRoot(po)
+func (_m *Post) QueryRoot() *PostQuery {
+	return NewPostClient(_m.config).QueryRoot(_m)
 }
 
 // QueryPosts queries the "posts" edge of the Post entity.
-func (po *Post) QueryPosts() *PostQuery {
-	return NewPostClient(po.config).QueryPosts(po)
+func (_m *Post) QueryPosts() *PostQuery {
+	return NewPostClient(_m.config).QueryPosts(_m)
 }
 
 // QueryReplyTo queries the "replyTo" edge of the Post entity.
-func (po *Post) QueryReplyTo() *PostQuery {
-	return NewPostClient(po.config).QueryReplyTo(po)
+func (_m *Post) QueryReplyTo() *PostQuery {
+	return NewPostClient(_m.config).QueryReplyTo(_m)
 }
 
 // QueryReplies queries the "replies" edge of the Post entity.
-func (po *Post) QueryReplies() *PostQuery {
-	return NewPostClient(po.config).QueryReplies(po)
+func (_m *Post) QueryReplies() *PostQuery {
+	return NewPostClient(_m.config).QueryReplies(_m)
 }
 
 // QueryReacts queries the "reacts" edge of the Post entity.
-func (po *Post) QueryReacts() *ReactQuery {
-	return NewPostClient(po.config).QueryReacts(po)
+func (_m *Post) QueryReacts() *ReactQuery {
+	return NewPostClient(_m.config).QueryReacts(_m)
 }
 
 // QueryLikes queries the "likes" edge of the Post entity.
-func (po *Post) QueryLikes() *LikePostQuery {
-	return NewPostClient(po.config).QueryLikes(po)
+func (_m *Post) QueryLikes() *LikePostQuery {
+	return NewPostClient(_m.config).QueryLikes(_m)
 }
 
 // QueryMentions queries the "mentions" edge of the Post entity.
-func (po *Post) QueryMentions() *MentionProfileQuery {
-	return NewPostClient(po.config).QueryMentions(po)
+func (_m *Post) QueryMentions() *MentionProfileQuery {
+	return NewPostClient(_m.config).QueryMentions(_m)
 }
 
 // QueryAssets queries the "assets" edge of the Post entity.
-func (po *Post) QueryAssets() *AssetQuery {
-	return NewPostClient(po.config).QueryAssets(po)
+func (_m *Post) QueryAssets() *AssetQuery {
+	return NewPostClient(_m.config).QueryAssets(_m)
 }
 
 // QueryCollections queries the "collections" edge of the Post entity.
-func (po *Post) QueryCollections() *CollectionQuery {
-	return NewPostClient(po.config).QueryCollections(po)
+func (_m *Post) QueryCollections() *CollectionQuery {
+	return NewPostClient(_m.config).QueryCollections(_m)
 }
 
 // QueryLink queries the "link" edge of the Post entity.
-func (po *Post) QueryLink() *LinkQuery {
-	return NewPostClient(po.config).QueryLink(po)
+func (_m *Post) QueryLink() *LinkQuery {
+	return NewPostClient(_m.config).QueryLink(_m)
 }
 
 // QueryContentLinks queries the "content_links" edge of the Post entity.
-func (po *Post) QueryContentLinks() *LinkQuery {
-	return NewPostClient(po.config).QueryContentLinks(po)
+func (_m *Post) QueryContentLinks() *LinkQuery {
+	return NewPostClient(_m.config).QueryContentLinks(_m)
 }
 
 // QueryEvent queries the "event" edge of the Post entity.
-func (po *Post) QueryEvent() *EventQuery {
-	return NewPostClient(po.config).QueryEvent(po)
+func (_m *Post) QueryEvent() *EventQuery {
+	return NewPostClient(_m.config).QueryEvent(_m)
 }
 
 // Update returns a builder for updating this Post.
 // Note that you need to call Post.Unwrap() before calling this method if this Post
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (po *Post) Update() *PostUpdateOne {
-	return NewPostClient(po.config).UpdateOne(po)
+func (_m *Post) Update() *PostUpdateOne {
+	return NewPostClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Post entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (po *Post) Unwrap() *Post {
-	_tx, ok := po.config.driver.(*txDriver)
+func (_m *Post) Unwrap() *Post {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Post is not a transactional entity")
 	}
-	po.config.driver = _tx.drv
-	return po
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (po *Post) String() string {
+func (_m *Post) String() string {
 	var builder strings.Builder
 	builder.WriteString("Post(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", po.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(po.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(po.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := po.DeletedAt; v != nil {
+	if v := _m.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := po.IndexedAt; v != nil {
+	if v := _m.IndexedAt; v != nil {
 		builder.WriteString("indexed_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("first=")
-	builder.WriteString(fmt.Sprintf("%v", po.First))
+	builder.WriteString(fmt.Sprintf("%v", _m.First))
 	builder.WriteString(", ")
 	builder.WriteString("title=")
-	builder.WriteString(po.Title)
+	builder.WriteString(_m.Title)
 	builder.WriteString(", ")
 	builder.WriteString("slug=")
-	builder.WriteString(po.Slug)
+	builder.WriteString(_m.Slug)
 	builder.WriteString(", ")
 	builder.WriteString("pinned=")
-	builder.WriteString(fmt.Sprintf("%v", po.Pinned))
+	builder.WriteString(fmt.Sprintf("%v", _m.Pinned))
 	builder.WriteString(", ")
-	if v := po.LastReplyAt; v != nil {
+	if v := _m.LastReplyAt; v != nil {
 		builder.WriteString("last_reply_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("root_post_id=")
-	builder.WriteString(fmt.Sprintf("%v", po.RootPostID))
+	builder.WriteString(fmt.Sprintf("%v", _m.RootPostID))
 	builder.WriteString(", ")
 	builder.WriteString("reply_to_post_id=")
-	builder.WriteString(fmt.Sprintf("%v", po.ReplyToPostID))
+	builder.WriteString(fmt.Sprintf("%v", _m.ReplyToPostID))
 	builder.WriteString(", ")
 	builder.WriteString("body=")
-	builder.WriteString(po.Body)
+	builder.WriteString(_m.Body)
 	builder.WriteString(", ")
 	builder.WriteString("short=")
-	builder.WriteString(po.Short)
+	builder.WriteString(_m.Short)
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
-	builder.WriteString(fmt.Sprintf("%v", po.Metadata))
+	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))
 	builder.WriteString(", ")
 	builder.WriteString("visibility=")
-	builder.WriteString(fmt.Sprintf("%v", po.Visibility))
+	builder.WriteString(fmt.Sprintf("%v", _m.Visibility))
 	builder.WriteString(", ")
 	builder.WriteString("account_posts=")
-	builder.WriteString(fmt.Sprintf("%v", po.AccountPosts))
+	builder.WriteString(fmt.Sprintf("%v", _m.AccountPosts))
 	builder.WriteString(", ")
 	builder.WriteString("category_id=")
-	builder.WriteString(fmt.Sprintf("%v", po.CategoryID))
+	builder.WriteString(fmt.Sprintf("%v", _m.CategoryID))
 	builder.WriteString(", ")
 	builder.WriteString("link_id=")
-	builder.WriteString(fmt.Sprintf("%v", po.LinkID))
+	builder.WriteString(fmt.Sprintf("%v", _m.LinkID))
 	builder.WriteByte(')')
 	return builder.String()
 }

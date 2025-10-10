@@ -26,74 +26,74 @@ type LikePostUpdate struct {
 }
 
 // Where appends a list predicates to the LikePostUpdate builder.
-func (lpu *LikePostUpdate) Where(ps ...predicate.LikePost) *LikePostUpdate {
-	lpu.mutation.Where(ps...)
-	return lpu
+func (_u *LikePostUpdate) Where(ps ...predicate.LikePost) *LikePostUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (lpu *LikePostUpdate) SetAccountID(x xid.ID) *LikePostUpdate {
-	lpu.mutation.SetAccountID(x)
-	return lpu
+func (_u *LikePostUpdate) SetAccountID(v xid.ID) *LikePostUpdate {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (lpu *LikePostUpdate) SetNillableAccountID(x *xid.ID) *LikePostUpdate {
-	if x != nil {
-		lpu.SetAccountID(*x)
+func (_u *LikePostUpdate) SetNillableAccountID(v *xid.ID) *LikePostUpdate {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return lpu
+	return _u
 }
 
 // SetPostID sets the "post_id" field.
-func (lpu *LikePostUpdate) SetPostID(x xid.ID) *LikePostUpdate {
-	lpu.mutation.SetPostID(x)
-	return lpu
+func (_u *LikePostUpdate) SetPostID(v xid.ID) *LikePostUpdate {
+	_u.mutation.SetPostID(v)
+	return _u
 }
 
 // SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (lpu *LikePostUpdate) SetNillablePostID(x *xid.ID) *LikePostUpdate {
-	if x != nil {
-		lpu.SetPostID(*x)
+func (_u *LikePostUpdate) SetNillablePostID(v *xid.ID) *LikePostUpdate {
+	if v != nil {
+		_u.SetPostID(*v)
 	}
-	return lpu
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (lpu *LikePostUpdate) SetAccount(a *Account) *LikePostUpdate {
-	return lpu.SetAccountID(a.ID)
+func (_u *LikePostUpdate) SetAccount(v *Account) *LikePostUpdate {
+	return _u.SetAccountID(v.ID)
 }
 
 // SetPost sets the "Post" edge to the Post entity.
-func (lpu *LikePostUpdate) SetPost(p *Post) *LikePostUpdate {
-	return lpu.SetPostID(p.ID)
+func (_u *LikePostUpdate) SetPost(v *Post) *LikePostUpdate {
+	return _u.SetPostID(v.ID)
 }
 
 // Mutation returns the LikePostMutation object of the builder.
-func (lpu *LikePostUpdate) Mutation() *LikePostMutation {
-	return lpu.mutation
+func (_u *LikePostUpdate) Mutation() *LikePostMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (lpu *LikePostUpdate) ClearAccount() *LikePostUpdate {
-	lpu.mutation.ClearAccount()
-	return lpu
+func (_u *LikePostUpdate) ClearAccount() *LikePostUpdate {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // ClearPost clears the "Post" edge to the Post entity.
-func (lpu *LikePostUpdate) ClearPost() *LikePostUpdate {
-	lpu.mutation.ClearPost()
-	return lpu
+func (_u *LikePostUpdate) ClearPost() *LikePostUpdate {
+	_u.mutation.ClearPost()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (lpu *LikePostUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, lpu.sqlSave, lpu.mutation, lpu.hooks)
+func (_u *LikePostUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (lpu *LikePostUpdate) SaveX(ctx context.Context) int {
-	affected, err := lpu.Save(ctx)
+func (_u *LikePostUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -101,48 +101,48 @@ func (lpu *LikePostUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (lpu *LikePostUpdate) Exec(ctx context.Context) error {
-	_, err := lpu.Save(ctx)
+func (_u *LikePostUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (lpu *LikePostUpdate) ExecX(ctx context.Context) {
-	if err := lpu.Exec(ctx); err != nil {
+func (_u *LikePostUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (lpu *LikePostUpdate) check() error {
-	if lpu.mutation.AccountCleared() && len(lpu.mutation.AccountIDs()) > 0 {
+func (_u *LikePostUpdate) check() error {
+	if _u.mutation.AccountCleared() && len(_u.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "LikePost.account"`)
 	}
-	if lpu.mutation.PostCleared() && len(lpu.mutation.PostIDs()) > 0 {
+	if _u.mutation.PostCleared() && len(_u.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "LikePost.Post"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (lpu *LikePostUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LikePostUpdate {
-	lpu.modifiers = append(lpu.modifiers, modifiers...)
-	return lpu
+func (_u *LikePostUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LikePostUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (lpu *LikePostUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := lpu.check(); err != nil {
-		return n, err
+func (_u *LikePostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(likepost.Table, likepost.Columns, sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString))
-	if ps := lpu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if lpu.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -155,7 +155,7 @@ func (lpu *LikePostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lpu.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -171,7 +171,7 @@ func (lpu *LikePostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if lpu.mutation.PostCleared() {
+	if _u.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -184,7 +184,7 @@ func (lpu *LikePostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lpu.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -200,8 +200,8 @@ func (lpu *LikePostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(lpu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, lpu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{likepost.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -209,8 +209,8 @@ func (lpu *LikePostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	lpu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // LikePostUpdateOne is the builder for updating a single LikePost entity.
@@ -223,81 +223,81 @@ type LikePostUpdateOne struct {
 }
 
 // SetAccountID sets the "account_id" field.
-func (lpuo *LikePostUpdateOne) SetAccountID(x xid.ID) *LikePostUpdateOne {
-	lpuo.mutation.SetAccountID(x)
-	return lpuo
+func (_u *LikePostUpdateOne) SetAccountID(v xid.ID) *LikePostUpdateOne {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (lpuo *LikePostUpdateOne) SetNillableAccountID(x *xid.ID) *LikePostUpdateOne {
-	if x != nil {
-		lpuo.SetAccountID(*x)
+func (_u *LikePostUpdateOne) SetNillableAccountID(v *xid.ID) *LikePostUpdateOne {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return lpuo
+	return _u
 }
 
 // SetPostID sets the "post_id" field.
-func (lpuo *LikePostUpdateOne) SetPostID(x xid.ID) *LikePostUpdateOne {
-	lpuo.mutation.SetPostID(x)
-	return lpuo
+func (_u *LikePostUpdateOne) SetPostID(v xid.ID) *LikePostUpdateOne {
+	_u.mutation.SetPostID(v)
+	return _u
 }
 
 // SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (lpuo *LikePostUpdateOne) SetNillablePostID(x *xid.ID) *LikePostUpdateOne {
-	if x != nil {
-		lpuo.SetPostID(*x)
+func (_u *LikePostUpdateOne) SetNillablePostID(v *xid.ID) *LikePostUpdateOne {
+	if v != nil {
+		_u.SetPostID(*v)
 	}
-	return lpuo
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (lpuo *LikePostUpdateOne) SetAccount(a *Account) *LikePostUpdateOne {
-	return lpuo.SetAccountID(a.ID)
+func (_u *LikePostUpdateOne) SetAccount(v *Account) *LikePostUpdateOne {
+	return _u.SetAccountID(v.ID)
 }
 
 // SetPost sets the "Post" edge to the Post entity.
-func (lpuo *LikePostUpdateOne) SetPost(p *Post) *LikePostUpdateOne {
-	return lpuo.SetPostID(p.ID)
+func (_u *LikePostUpdateOne) SetPost(v *Post) *LikePostUpdateOne {
+	return _u.SetPostID(v.ID)
 }
 
 // Mutation returns the LikePostMutation object of the builder.
-func (lpuo *LikePostUpdateOne) Mutation() *LikePostMutation {
-	return lpuo.mutation
+func (_u *LikePostUpdateOne) Mutation() *LikePostMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (lpuo *LikePostUpdateOne) ClearAccount() *LikePostUpdateOne {
-	lpuo.mutation.ClearAccount()
-	return lpuo
+func (_u *LikePostUpdateOne) ClearAccount() *LikePostUpdateOne {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // ClearPost clears the "Post" edge to the Post entity.
-func (lpuo *LikePostUpdateOne) ClearPost() *LikePostUpdateOne {
-	lpuo.mutation.ClearPost()
-	return lpuo
+func (_u *LikePostUpdateOne) ClearPost() *LikePostUpdateOne {
+	_u.mutation.ClearPost()
+	return _u
 }
 
 // Where appends a list predicates to the LikePostUpdate builder.
-func (lpuo *LikePostUpdateOne) Where(ps ...predicate.LikePost) *LikePostUpdateOne {
-	lpuo.mutation.Where(ps...)
-	return lpuo
+func (_u *LikePostUpdateOne) Where(ps ...predicate.LikePost) *LikePostUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (lpuo *LikePostUpdateOne) Select(field string, fields ...string) *LikePostUpdateOne {
-	lpuo.fields = append([]string{field}, fields...)
-	return lpuo
+func (_u *LikePostUpdateOne) Select(field string, fields ...string) *LikePostUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated LikePost entity.
-func (lpuo *LikePostUpdateOne) Save(ctx context.Context) (*LikePost, error) {
-	return withHooks(ctx, lpuo.sqlSave, lpuo.mutation, lpuo.hooks)
+func (_u *LikePostUpdateOne) Save(ctx context.Context) (*LikePost, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (lpuo *LikePostUpdateOne) SaveX(ctx context.Context) *LikePost {
-	node, err := lpuo.Save(ctx)
+func (_u *LikePostUpdateOne) SaveX(ctx context.Context) *LikePost {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -305,46 +305,46 @@ func (lpuo *LikePostUpdateOne) SaveX(ctx context.Context) *LikePost {
 }
 
 // Exec executes the query on the entity.
-func (lpuo *LikePostUpdateOne) Exec(ctx context.Context) error {
-	_, err := lpuo.Save(ctx)
+func (_u *LikePostUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (lpuo *LikePostUpdateOne) ExecX(ctx context.Context) {
-	if err := lpuo.Exec(ctx); err != nil {
+func (_u *LikePostUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (lpuo *LikePostUpdateOne) check() error {
-	if lpuo.mutation.AccountCleared() && len(lpuo.mutation.AccountIDs()) > 0 {
+func (_u *LikePostUpdateOne) check() error {
+	if _u.mutation.AccountCleared() && len(_u.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "LikePost.account"`)
 	}
-	if lpuo.mutation.PostCleared() && len(lpuo.mutation.PostIDs()) > 0 {
+	if _u.mutation.PostCleared() && len(_u.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "LikePost.Post"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (lpuo *LikePostUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LikePostUpdateOne {
-	lpuo.modifiers = append(lpuo.modifiers, modifiers...)
-	return lpuo
+func (_u *LikePostUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LikePostUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (lpuo *LikePostUpdateOne) sqlSave(ctx context.Context) (_node *LikePost, err error) {
-	if err := lpuo.check(); err != nil {
+func (_u *LikePostUpdateOne) sqlSave(ctx context.Context) (_node *LikePost, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(likepost.Table, likepost.Columns, sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString))
-	id, ok := lpuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "LikePost.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := lpuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, likepost.FieldID)
 		for _, f := range fields {
@@ -356,14 +356,14 @@ func (lpuo *LikePostUpdateOne) sqlSave(ctx context.Context) (_node *LikePost, er
 			}
 		}
 	}
-	if ps := lpuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if lpuo.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -376,7 +376,7 @@ func (lpuo *LikePostUpdateOne) sqlSave(ctx context.Context) (_node *LikePost, er
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lpuo.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -392,7 +392,7 @@ func (lpuo *LikePostUpdateOne) sqlSave(ctx context.Context) (_node *LikePost, er
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if lpuo.mutation.PostCleared() {
+	if _u.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -405,7 +405,7 @@ func (lpuo *LikePostUpdateOne) sqlSave(ctx context.Context) (_node *LikePost, er
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lpuo.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -421,11 +421,11 @@ func (lpuo *LikePostUpdateOne) sqlSave(ctx context.Context) (_node *LikePost, er
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(lpuo.modifiers...)
-	_node = &LikePost{config: lpuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &LikePost{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, lpuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{likepost.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -433,6 +433,6 @@ func (lpuo *LikePostUpdateOne) sqlSave(ctx context.Context) (_node *LikePost, er
 		}
 		return nil, err
 	}
-	lpuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

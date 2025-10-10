@@ -27,336 +27,336 @@ type LinkUpdate struct {
 }
 
 // Where appends a list predicates to the LinkUpdate builder.
-func (lu *LinkUpdate) Where(ps ...predicate.Link) *LinkUpdate {
-	lu.mutation.Where(ps...)
-	return lu
+func (_u *LinkUpdate) Where(ps ...predicate.Link) *LinkUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetDomain sets the "domain" field.
-func (lu *LinkUpdate) SetDomain(s string) *LinkUpdate {
-	lu.mutation.SetDomain(s)
-	return lu
+func (_u *LinkUpdate) SetDomain(v string) *LinkUpdate {
+	_u.mutation.SetDomain(v)
+	return _u
 }
 
 // SetNillableDomain sets the "domain" field if the given value is not nil.
-func (lu *LinkUpdate) SetNillableDomain(s *string) *LinkUpdate {
-	if s != nil {
-		lu.SetDomain(*s)
+func (_u *LinkUpdate) SetNillableDomain(v *string) *LinkUpdate {
+	if v != nil {
+		_u.SetDomain(*v)
 	}
-	return lu
+	return _u
 }
 
 // SetTitle sets the "title" field.
-func (lu *LinkUpdate) SetTitle(s string) *LinkUpdate {
-	lu.mutation.SetTitle(s)
-	return lu
+func (_u *LinkUpdate) SetTitle(v string) *LinkUpdate {
+	_u.mutation.SetTitle(v)
+	return _u
 }
 
 // SetNillableTitle sets the "title" field if the given value is not nil.
-func (lu *LinkUpdate) SetNillableTitle(s *string) *LinkUpdate {
-	if s != nil {
-		lu.SetTitle(*s)
+func (_u *LinkUpdate) SetNillableTitle(v *string) *LinkUpdate {
+	if v != nil {
+		_u.SetTitle(*v)
 	}
-	return lu
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (lu *LinkUpdate) SetDescription(s string) *LinkUpdate {
-	lu.mutation.SetDescription(s)
-	return lu
+func (_u *LinkUpdate) SetDescription(v string) *LinkUpdate {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (lu *LinkUpdate) SetNillableDescription(s *string) *LinkUpdate {
-	if s != nil {
-		lu.SetDescription(*s)
+func (_u *LinkUpdate) SetNillableDescription(v *string) *LinkUpdate {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return lu
+	return _u
 }
 
 // SetPrimaryAssetID sets the "primary_asset_id" field.
-func (lu *LinkUpdate) SetPrimaryAssetID(x xid.ID) *LinkUpdate {
-	lu.mutation.SetPrimaryAssetID(x)
-	return lu
+func (_u *LinkUpdate) SetPrimaryAssetID(v xid.ID) *LinkUpdate {
+	_u.mutation.SetPrimaryAssetID(v)
+	return _u
 }
 
 // SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
-func (lu *LinkUpdate) SetNillablePrimaryAssetID(x *xid.ID) *LinkUpdate {
-	if x != nil {
-		lu.SetPrimaryAssetID(*x)
+func (_u *LinkUpdate) SetNillablePrimaryAssetID(v *xid.ID) *LinkUpdate {
+	if v != nil {
+		_u.SetPrimaryAssetID(*v)
 	}
-	return lu
+	return _u
 }
 
 // ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
-func (lu *LinkUpdate) ClearPrimaryAssetID() *LinkUpdate {
-	lu.mutation.ClearPrimaryAssetID()
-	return lu
+func (_u *LinkUpdate) ClearPrimaryAssetID() *LinkUpdate {
+	_u.mutation.ClearPrimaryAssetID()
+	return _u
 }
 
 // SetFaviconAssetID sets the "favicon_asset_id" field.
-func (lu *LinkUpdate) SetFaviconAssetID(x xid.ID) *LinkUpdate {
-	lu.mutation.SetFaviconAssetID(x)
-	return lu
+func (_u *LinkUpdate) SetFaviconAssetID(v xid.ID) *LinkUpdate {
+	_u.mutation.SetFaviconAssetID(v)
+	return _u
 }
 
 // SetNillableFaviconAssetID sets the "favicon_asset_id" field if the given value is not nil.
-func (lu *LinkUpdate) SetNillableFaviconAssetID(x *xid.ID) *LinkUpdate {
-	if x != nil {
-		lu.SetFaviconAssetID(*x)
+func (_u *LinkUpdate) SetNillableFaviconAssetID(v *xid.ID) *LinkUpdate {
+	if v != nil {
+		_u.SetFaviconAssetID(*v)
 	}
-	return lu
+	return _u
 }
 
 // ClearFaviconAssetID clears the value of the "favicon_asset_id" field.
-func (lu *LinkUpdate) ClearFaviconAssetID() *LinkUpdate {
-	lu.mutation.ClearFaviconAssetID()
-	return lu
+func (_u *LinkUpdate) ClearFaviconAssetID() *LinkUpdate {
+	_u.mutation.ClearFaviconAssetID()
+	return _u
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (lu *LinkUpdate) AddPostIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.AddPostIDs(ids...)
-	return lu
+func (_u *LinkUpdate) AddPostIDs(ids ...xid.ID) *LinkUpdate {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (lu *LinkUpdate) AddPosts(p ...*Post) *LinkUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *LinkUpdate) AddPosts(v ...*Post) *LinkUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lu.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // AddPostContentReferenceIDs adds the "post_content_references" edge to the Post entity by IDs.
-func (lu *LinkUpdate) AddPostContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.AddPostContentReferenceIDs(ids...)
-	return lu
+func (_u *LinkUpdate) AddPostContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
+	_u.mutation.AddPostContentReferenceIDs(ids...)
+	return _u
 }
 
 // AddPostContentReferences adds the "post_content_references" edges to the Post entity.
-func (lu *LinkUpdate) AddPostContentReferences(p ...*Post) *LinkUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *LinkUpdate) AddPostContentReferences(v ...*Post) *LinkUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lu.AddPostContentReferenceIDs(ids...)
+	return _u.AddPostContentReferenceIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (lu *LinkUpdate) AddNodeIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.AddNodeIDs(ids...)
-	return lu
+func (_u *LinkUpdate) AddNodeIDs(ids ...xid.ID) *LinkUpdate {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (lu *LinkUpdate) AddNodes(n ...*Node) *LinkUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *LinkUpdate) AddNodes(v ...*Node) *LinkUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lu.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // AddNodeContentReferenceIDs adds the "node_content_references" edge to the Node entity by IDs.
-func (lu *LinkUpdate) AddNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.AddNodeContentReferenceIDs(ids...)
-	return lu
+func (_u *LinkUpdate) AddNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
+	_u.mutation.AddNodeContentReferenceIDs(ids...)
+	return _u
 }
 
 // AddNodeContentReferences adds the "node_content_references" edges to the Node entity.
-func (lu *LinkUpdate) AddNodeContentReferences(n ...*Node) *LinkUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *LinkUpdate) AddNodeContentReferences(v ...*Node) *LinkUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lu.AddNodeContentReferenceIDs(ids...)
+	return _u.AddNodeContentReferenceIDs(ids...)
 }
 
 // SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
-func (lu *LinkUpdate) SetPrimaryImageID(id xid.ID) *LinkUpdate {
-	lu.mutation.SetPrimaryImageID(id)
-	return lu
+func (_u *LinkUpdate) SetPrimaryImageID(id xid.ID) *LinkUpdate {
+	_u.mutation.SetPrimaryImageID(id)
+	return _u
 }
 
 // SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
-func (lu *LinkUpdate) SetNillablePrimaryImageID(id *xid.ID) *LinkUpdate {
+func (_u *LinkUpdate) SetNillablePrimaryImageID(id *xid.ID) *LinkUpdate {
 	if id != nil {
-		lu = lu.SetPrimaryImageID(*id)
+		_u = _u.SetPrimaryImageID(*id)
 	}
-	return lu
+	return _u
 }
 
 // SetPrimaryImage sets the "primary_image" edge to the Asset entity.
-func (lu *LinkUpdate) SetPrimaryImage(a *Asset) *LinkUpdate {
-	return lu.SetPrimaryImageID(a.ID)
+func (_u *LinkUpdate) SetPrimaryImage(v *Asset) *LinkUpdate {
+	return _u.SetPrimaryImageID(v.ID)
 }
 
 // SetFaviconImageID sets the "favicon_image" edge to the Asset entity by ID.
-func (lu *LinkUpdate) SetFaviconImageID(id xid.ID) *LinkUpdate {
-	lu.mutation.SetFaviconImageID(id)
-	return lu
+func (_u *LinkUpdate) SetFaviconImageID(id xid.ID) *LinkUpdate {
+	_u.mutation.SetFaviconImageID(id)
+	return _u
 }
 
 // SetNillableFaviconImageID sets the "favicon_image" edge to the Asset entity by ID if the given value is not nil.
-func (lu *LinkUpdate) SetNillableFaviconImageID(id *xid.ID) *LinkUpdate {
+func (_u *LinkUpdate) SetNillableFaviconImageID(id *xid.ID) *LinkUpdate {
 	if id != nil {
-		lu = lu.SetFaviconImageID(*id)
+		_u = _u.SetFaviconImageID(*id)
 	}
-	return lu
+	return _u
 }
 
 // SetFaviconImage sets the "favicon_image" edge to the Asset entity.
-func (lu *LinkUpdate) SetFaviconImage(a *Asset) *LinkUpdate {
-	return lu.SetFaviconImageID(a.ID)
+func (_u *LinkUpdate) SetFaviconImage(v *Asset) *LinkUpdate {
+	return _u.SetFaviconImageID(v.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (lu *LinkUpdate) AddAssetIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.AddAssetIDs(ids...)
-	return lu
+func (_u *LinkUpdate) AddAssetIDs(ids ...xid.ID) *LinkUpdate {
+	_u.mutation.AddAssetIDs(ids...)
+	return _u
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (lu *LinkUpdate) AddAssets(a ...*Asset) *LinkUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *LinkUpdate) AddAssets(v ...*Asset) *LinkUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lu.AddAssetIDs(ids...)
+	return _u.AddAssetIDs(ids...)
 }
 
 // Mutation returns the LinkMutation object of the builder.
-func (lu *LinkUpdate) Mutation() *LinkMutation {
-	return lu.mutation
+func (_u *LinkUpdate) Mutation() *LinkMutation {
+	return _u.mutation
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (lu *LinkUpdate) ClearPosts() *LinkUpdate {
-	lu.mutation.ClearPosts()
-	return lu
+func (_u *LinkUpdate) ClearPosts() *LinkUpdate {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (lu *LinkUpdate) RemovePostIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.RemovePostIDs(ids...)
-	return lu
+func (_u *LinkUpdate) RemovePostIDs(ids ...xid.ID) *LinkUpdate {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (lu *LinkUpdate) RemovePosts(p ...*Post) *LinkUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *LinkUpdate) RemovePosts(v ...*Post) *LinkUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lu.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearPostContentReferences clears all "post_content_references" edges to the Post entity.
-func (lu *LinkUpdate) ClearPostContentReferences() *LinkUpdate {
-	lu.mutation.ClearPostContentReferences()
-	return lu
+func (_u *LinkUpdate) ClearPostContentReferences() *LinkUpdate {
+	_u.mutation.ClearPostContentReferences()
+	return _u
 }
 
 // RemovePostContentReferenceIDs removes the "post_content_references" edge to Post entities by IDs.
-func (lu *LinkUpdate) RemovePostContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.RemovePostContentReferenceIDs(ids...)
-	return lu
+func (_u *LinkUpdate) RemovePostContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
+	_u.mutation.RemovePostContentReferenceIDs(ids...)
+	return _u
 }
 
 // RemovePostContentReferences removes "post_content_references" edges to Post entities.
-func (lu *LinkUpdate) RemovePostContentReferences(p ...*Post) *LinkUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *LinkUpdate) RemovePostContentReferences(v ...*Post) *LinkUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lu.RemovePostContentReferenceIDs(ids...)
+	return _u.RemovePostContentReferenceIDs(ids...)
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (lu *LinkUpdate) ClearNodes() *LinkUpdate {
-	lu.mutation.ClearNodes()
-	return lu
+func (_u *LinkUpdate) ClearNodes() *LinkUpdate {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (lu *LinkUpdate) RemoveNodeIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.RemoveNodeIDs(ids...)
-	return lu
+func (_u *LinkUpdate) RemoveNodeIDs(ids ...xid.ID) *LinkUpdate {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (lu *LinkUpdate) RemoveNodes(n ...*Node) *LinkUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *LinkUpdate) RemoveNodes(v ...*Node) *LinkUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lu.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // ClearNodeContentReferences clears all "node_content_references" edges to the Node entity.
-func (lu *LinkUpdate) ClearNodeContentReferences() *LinkUpdate {
-	lu.mutation.ClearNodeContentReferences()
-	return lu
+func (_u *LinkUpdate) ClearNodeContentReferences() *LinkUpdate {
+	_u.mutation.ClearNodeContentReferences()
+	return _u
 }
 
 // RemoveNodeContentReferenceIDs removes the "node_content_references" edge to Node entities by IDs.
-func (lu *LinkUpdate) RemoveNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.RemoveNodeContentReferenceIDs(ids...)
-	return lu
+func (_u *LinkUpdate) RemoveNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdate {
+	_u.mutation.RemoveNodeContentReferenceIDs(ids...)
+	return _u
 }
 
 // RemoveNodeContentReferences removes "node_content_references" edges to Node entities.
-func (lu *LinkUpdate) RemoveNodeContentReferences(n ...*Node) *LinkUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *LinkUpdate) RemoveNodeContentReferences(v ...*Node) *LinkUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lu.RemoveNodeContentReferenceIDs(ids...)
+	return _u.RemoveNodeContentReferenceIDs(ids...)
 }
 
 // ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
-func (lu *LinkUpdate) ClearPrimaryImage() *LinkUpdate {
-	lu.mutation.ClearPrimaryImage()
-	return lu
+func (_u *LinkUpdate) ClearPrimaryImage() *LinkUpdate {
+	_u.mutation.ClearPrimaryImage()
+	return _u
 }
 
 // ClearFaviconImage clears the "favicon_image" edge to the Asset entity.
-func (lu *LinkUpdate) ClearFaviconImage() *LinkUpdate {
-	lu.mutation.ClearFaviconImage()
-	return lu
+func (_u *LinkUpdate) ClearFaviconImage() *LinkUpdate {
+	_u.mutation.ClearFaviconImage()
+	return _u
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
-func (lu *LinkUpdate) ClearAssets() *LinkUpdate {
-	lu.mutation.ClearAssets()
-	return lu
+func (_u *LinkUpdate) ClearAssets() *LinkUpdate {
+	_u.mutation.ClearAssets()
+	return _u
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (lu *LinkUpdate) RemoveAssetIDs(ids ...xid.ID) *LinkUpdate {
-	lu.mutation.RemoveAssetIDs(ids...)
-	return lu
+func (_u *LinkUpdate) RemoveAssetIDs(ids ...xid.ID) *LinkUpdate {
+	_u.mutation.RemoveAssetIDs(ids...)
+	return _u
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
-func (lu *LinkUpdate) RemoveAssets(a ...*Asset) *LinkUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *LinkUpdate) RemoveAssets(v ...*Asset) *LinkUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lu.RemoveAssetIDs(ids...)
+	return _u.RemoveAssetIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (lu *LinkUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, lu.sqlSave, lu.mutation, lu.hooks)
+func (_u *LinkUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (lu *LinkUpdate) SaveX(ctx context.Context) int {
-	affected, err := lu.Save(ctx)
+func (_u *LinkUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -364,43 +364,43 @@ func (lu *LinkUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (lu *LinkUpdate) Exec(ctx context.Context) error {
-	_, err := lu.Save(ctx)
+func (_u *LinkUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (lu *LinkUpdate) ExecX(ctx context.Context) {
-	if err := lu.Exec(ctx); err != nil {
+func (_u *LinkUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (lu *LinkUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LinkUpdate {
-	lu.modifiers = append(lu.modifiers, modifiers...)
-	return lu
+func (_u *LinkUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LinkUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (_u *LinkUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(link.Table, link.Columns, sqlgraph.NewFieldSpec(link.FieldID, field.TypeString))
-	if ps := lu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := lu.mutation.Domain(); ok {
+	if value, ok := _u.mutation.Domain(); ok {
 		_spec.SetField(link.FieldDomain, field.TypeString, value)
 	}
-	if value, ok := lu.mutation.Title(); ok {
+	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(link.FieldTitle, field.TypeString, value)
 	}
-	if value, ok := lu.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(link.FieldDescription, field.TypeString, value)
 	}
-	if lu.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -413,23 +413,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.RemovedPostsIDs(); len(nodes) > 0 && !lu.mutation.PostsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   link.PostsTable,
-			Columns: []string{link.PostsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := lu.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -443,9 +427,25 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   link.PostsTable,
+			Columns: []string{link.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if lu.mutation.PostContentReferencesCleared() {
+	if _u.mutation.PostContentReferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -458,7 +458,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.RemovedPostContentReferencesIDs(); len(nodes) > 0 && !lu.mutation.PostContentReferencesCleared() {
+	if nodes := _u.mutation.RemovedPostContentReferencesIDs(); len(nodes) > 0 && !_u.mutation.PostContentReferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -474,7 +474,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.PostContentReferencesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostContentReferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -490,7 +490,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if lu.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -503,7 +503,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.RemovedNodesIDs(); len(nodes) > 0 && !lu.mutation.NodesCleared() {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -519,7 +519,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -535,7 +535,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if lu.mutation.NodeContentReferencesCleared() {
+	if _u.mutation.NodeContentReferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -548,7 +548,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.RemovedNodeContentReferencesIDs(); len(nodes) > 0 && !lu.mutation.NodeContentReferencesCleared() {
+	if nodes := _u.mutation.RemovedNodeContentReferencesIDs(); len(nodes) > 0 && !_u.mutation.NodeContentReferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -564,7 +564,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.NodeContentReferencesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodeContentReferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -580,7 +580,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if lu.mutation.PrimaryImageCleared() {
+	if _u.mutation.PrimaryImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -593,7 +593,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PrimaryImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -609,7 +609,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if lu.mutation.FaviconImageCleared() {
+	if _u.mutation.FaviconImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -622,7 +622,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.FaviconImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.FaviconImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -638,7 +638,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if lu.mutation.AssetsCleared() {
+	if _u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -651,7 +651,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !lu.mutation.AssetsCleared() {
+	if nodes := _u.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !_u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -667,7 +667,7 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := lu.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -683,8 +683,8 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(lu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, lu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{link.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -692,8 +692,8 @@ func (lu *LinkUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	lu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // LinkUpdateOne is the builder for updating a single Link entity.
@@ -706,343 +706,343 @@ type LinkUpdateOne struct {
 }
 
 // SetDomain sets the "domain" field.
-func (luo *LinkUpdateOne) SetDomain(s string) *LinkUpdateOne {
-	luo.mutation.SetDomain(s)
-	return luo
+func (_u *LinkUpdateOne) SetDomain(v string) *LinkUpdateOne {
+	_u.mutation.SetDomain(v)
+	return _u
 }
 
 // SetNillableDomain sets the "domain" field if the given value is not nil.
-func (luo *LinkUpdateOne) SetNillableDomain(s *string) *LinkUpdateOne {
-	if s != nil {
-		luo.SetDomain(*s)
+func (_u *LinkUpdateOne) SetNillableDomain(v *string) *LinkUpdateOne {
+	if v != nil {
+		_u.SetDomain(*v)
 	}
-	return luo
+	return _u
 }
 
 // SetTitle sets the "title" field.
-func (luo *LinkUpdateOne) SetTitle(s string) *LinkUpdateOne {
-	luo.mutation.SetTitle(s)
-	return luo
+func (_u *LinkUpdateOne) SetTitle(v string) *LinkUpdateOne {
+	_u.mutation.SetTitle(v)
+	return _u
 }
 
 // SetNillableTitle sets the "title" field if the given value is not nil.
-func (luo *LinkUpdateOne) SetNillableTitle(s *string) *LinkUpdateOne {
-	if s != nil {
-		luo.SetTitle(*s)
+func (_u *LinkUpdateOne) SetNillableTitle(v *string) *LinkUpdateOne {
+	if v != nil {
+		_u.SetTitle(*v)
 	}
-	return luo
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (luo *LinkUpdateOne) SetDescription(s string) *LinkUpdateOne {
-	luo.mutation.SetDescription(s)
-	return luo
+func (_u *LinkUpdateOne) SetDescription(v string) *LinkUpdateOne {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (luo *LinkUpdateOne) SetNillableDescription(s *string) *LinkUpdateOne {
-	if s != nil {
-		luo.SetDescription(*s)
+func (_u *LinkUpdateOne) SetNillableDescription(v *string) *LinkUpdateOne {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return luo
+	return _u
 }
 
 // SetPrimaryAssetID sets the "primary_asset_id" field.
-func (luo *LinkUpdateOne) SetPrimaryAssetID(x xid.ID) *LinkUpdateOne {
-	luo.mutation.SetPrimaryAssetID(x)
-	return luo
+func (_u *LinkUpdateOne) SetPrimaryAssetID(v xid.ID) *LinkUpdateOne {
+	_u.mutation.SetPrimaryAssetID(v)
+	return _u
 }
 
 // SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
-func (luo *LinkUpdateOne) SetNillablePrimaryAssetID(x *xid.ID) *LinkUpdateOne {
-	if x != nil {
-		luo.SetPrimaryAssetID(*x)
+func (_u *LinkUpdateOne) SetNillablePrimaryAssetID(v *xid.ID) *LinkUpdateOne {
+	if v != nil {
+		_u.SetPrimaryAssetID(*v)
 	}
-	return luo
+	return _u
 }
 
 // ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
-func (luo *LinkUpdateOne) ClearPrimaryAssetID() *LinkUpdateOne {
-	luo.mutation.ClearPrimaryAssetID()
-	return luo
+func (_u *LinkUpdateOne) ClearPrimaryAssetID() *LinkUpdateOne {
+	_u.mutation.ClearPrimaryAssetID()
+	return _u
 }
 
 // SetFaviconAssetID sets the "favicon_asset_id" field.
-func (luo *LinkUpdateOne) SetFaviconAssetID(x xid.ID) *LinkUpdateOne {
-	luo.mutation.SetFaviconAssetID(x)
-	return luo
+func (_u *LinkUpdateOne) SetFaviconAssetID(v xid.ID) *LinkUpdateOne {
+	_u.mutation.SetFaviconAssetID(v)
+	return _u
 }
 
 // SetNillableFaviconAssetID sets the "favicon_asset_id" field if the given value is not nil.
-func (luo *LinkUpdateOne) SetNillableFaviconAssetID(x *xid.ID) *LinkUpdateOne {
-	if x != nil {
-		luo.SetFaviconAssetID(*x)
+func (_u *LinkUpdateOne) SetNillableFaviconAssetID(v *xid.ID) *LinkUpdateOne {
+	if v != nil {
+		_u.SetFaviconAssetID(*v)
 	}
-	return luo
+	return _u
 }
 
 // ClearFaviconAssetID clears the value of the "favicon_asset_id" field.
-func (luo *LinkUpdateOne) ClearFaviconAssetID() *LinkUpdateOne {
-	luo.mutation.ClearFaviconAssetID()
-	return luo
+func (_u *LinkUpdateOne) ClearFaviconAssetID() *LinkUpdateOne {
+	_u.mutation.ClearFaviconAssetID()
+	return _u
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (luo *LinkUpdateOne) AddPostIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.AddPostIDs(ids...)
-	return luo
+func (_u *LinkUpdateOne) AddPostIDs(ids ...xid.ID) *LinkUpdateOne {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (luo *LinkUpdateOne) AddPosts(p ...*Post) *LinkUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *LinkUpdateOne) AddPosts(v ...*Post) *LinkUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return luo.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // AddPostContentReferenceIDs adds the "post_content_references" edge to the Post entity by IDs.
-func (luo *LinkUpdateOne) AddPostContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.AddPostContentReferenceIDs(ids...)
-	return luo
+func (_u *LinkUpdateOne) AddPostContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
+	_u.mutation.AddPostContentReferenceIDs(ids...)
+	return _u
 }
 
 // AddPostContentReferences adds the "post_content_references" edges to the Post entity.
-func (luo *LinkUpdateOne) AddPostContentReferences(p ...*Post) *LinkUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *LinkUpdateOne) AddPostContentReferences(v ...*Post) *LinkUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return luo.AddPostContentReferenceIDs(ids...)
+	return _u.AddPostContentReferenceIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (luo *LinkUpdateOne) AddNodeIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.AddNodeIDs(ids...)
-	return luo
+func (_u *LinkUpdateOne) AddNodeIDs(ids ...xid.ID) *LinkUpdateOne {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (luo *LinkUpdateOne) AddNodes(n ...*Node) *LinkUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *LinkUpdateOne) AddNodes(v ...*Node) *LinkUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return luo.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // AddNodeContentReferenceIDs adds the "node_content_references" edge to the Node entity by IDs.
-func (luo *LinkUpdateOne) AddNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.AddNodeContentReferenceIDs(ids...)
-	return luo
+func (_u *LinkUpdateOne) AddNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
+	_u.mutation.AddNodeContentReferenceIDs(ids...)
+	return _u
 }
 
 // AddNodeContentReferences adds the "node_content_references" edges to the Node entity.
-func (luo *LinkUpdateOne) AddNodeContentReferences(n ...*Node) *LinkUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *LinkUpdateOne) AddNodeContentReferences(v ...*Node) *LinkUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return luo.AddNodeContentReferenceIDs(ids...)
+	return _u.AddNodeContentReferenceIDs(ids...)
 }
 
 // SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
-func (luo *LinkUpdateOne) SetPrimaryImageID(id xid.ID) *LinkUpdateOne {
-	luo.mutation.SetPrimaryImageID(id)
-	return luo
+func (_u *LinkUpdateOne) SetPrimaryImageID(id xid.ID) *LinkUpdateOne {
+	_u.mutation.SetPrimaryImageID(id)
+	return _u
 }
 
 // SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
-func (luo *LinkUpdateOne) SetNillablePrimaryImageID(id *xid.ID) *LinkUpdateOne {
+func (_u *LinkUpdateOne) SetNillablePrimaryImageID(id *xid.ID) *LinkUpdateOne {
 	if id != nil {
-		luo = luo.SetPrimaryImageID(*id)
+		_u = _u.SetPrimaryImageID(*id)
 	}
-	return luo
+	return _u
 }
 
 // SetPrimaryImage sets the "primary_image" edge to the Asset entity.
-func (luo *LinkUpdateOne) SetPrimaryImage(a *Asset) *LinkUpdateOne {
-	return luo.SetPrimaryImageID(a.ID)
+func (_u *LinkUpdateOne) SetPrimaryImage(v *Asset) *LinkUpdateOne {
+	return _u.SetPrimaryImageID(v.ID)
 }
 
 // SetFaviconImageID sets the "favicon_image" edge to the Asset entity by ID.
-func (luo *LinkUpdateOne) SetFaviconImageID(id xid.ID) *LinkUpdateOne {
-	luo.mutation.SetFaviconImageID(id)
-	return luo
+func (_u *LinkUpdateOne) SetFaviconImageID(id xid.ID) *LinkUpdateOne {
+	_u.mutation.SetFaviconImageID(id)
+	return _u
 }
 
 // SetNillableFaviconImageID sets the "favicon_image" edge to the Asset entity by ID if the given value is not nil.
-func (luo *LinkUpdateOne) SetNillableFaviconImageID(id *xid.ID) *LinkUpdateOne {
+func (_u *LinkUpdateOne) SetNillableFaviconImageID(id *xid.ID) *LinkUpdateOne {
 	if id != nil {
-		luo = luo.SetFaviconImageID(*id)
+		_u = _u.SetFaviconImageID(*id)
 	}
-	return luo
+	return _u
 }
 
 // SetFaviconImage sets the "favicon_image" edge to the Asset entity.
-func (luo *LinkUpdateOne) SetFaviconImage(a *Asset) *LinkUpdateOne {
-	return luo.SetFaviconImageID(a.ID)
+func (_u *LinkUpdateOne) SetFaviconImage(v *Asset) *LinkUpdateOne {
+	return _u.SetFaviconImageID(v.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (luo *LinkUpdateOne) AddAssetIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.AddAssetIDs(ids...)
-	return luo
+func (_u *LinkUpdateOne) AddAssetIDs(ids ...xid.ID) *LinkUpdateOne {
+	_u.mutation.AddAssetIDs(ids...)
+	return _u
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (luo *LinkUpdateOne) AddAssets(a ...*Asset) *LinkUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *LinkUpdateOne) AddAssets(v ...*Asset) *LinkUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return luo.AddAssetIDs(ids...)
+	return _u.AddAssetIDs(ids...)
 }
 
 // Mutation returns the LinkMutation object of the builder.
-func (luo *LinkUpdateOne) Mutation() *LinkMutation {
-	return luo.mutation
+func (_u *LinkUpdateOne) Mutation() *LinkMutation {
+	return _u.mutation
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (luo *LinkUpdateOne) ClearPosts() *LinkUpdateOne {
-	luo.mutation.ClearPosts()
-	return luo
+func (_u *LinkUpdateOne) ClearPosts() *LinkUpdateOne {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (luo *LinkUpdateOne) RemovePostIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.RemovePostIDs(ids...)
-	return luo
+func (_u *LinkUpdateOne) RemovePostIDs(ids ...xid.ID) *LinkUpdateOne {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (luo *LinkUpdateOne) RemovePosts(p ...*Post) *LinkUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *LinkUpdateOne) RemovePosts(v ...*Post) *LinkUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return luo.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearPostContentReferences clears all "post_content_references" edges to the Post entity.
-func (luo *LinkUpdateOne) ClearPostContentReferences() *LinkUpdateOne {
-	luo.mutation.ClearPostContentReferences()
-	return luo
+func (_u *LinkUpdateOne) ClearPostContentReferences() *LinkUpdateOne {
+	_u.mutation.ClearPostContentReferences()
+	return _u
 }
 
 // RemovePostContentReferenceIDs removes the "post_content_references" edge to Post entities by IDs.
-func (luo *LinkUpdateOne) RemovePostContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.RemovePostContentReferenceIDs(ids...)
-	return luo
+func (_u *LinkUpdateOne) RemovePostContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
+	_u.mutation.RemovePostContentReferenceIDs(ids...)
+	return _u
 }
 
 // RemovePostContentReferences removes "post_content_references" edges to Post entities.
-func (luo *LinkUpdateOne) RemovePostContentReferences(p ...*Post) *LinkUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *LinkUpdateOne) RemovePostContentReferences(v ...*Post) *LinkUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return luo.RemovePostContentReferenceIDs(ids...)
+	return _u.RemovePostContentReferenceIDs(ids...)
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (luo *LinkUpdateOne) ClearNodes() *LinkUpdateOne {
-	luo.mutation.ClearNodes()
-	return luo
+func (_u *LinkUpdateOne) ClearNodes() *LinkUpdateOne {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (luo *LinkUpdateOne) RemoveNodeIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.RemoveNodeIDs(ids...)
-	return luo
+func (_u *LinkUpdateOne) RemoveNodeIDs(ids ...xid.ID) *LinkUpdateOne {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (luo *LinkUpdateOne) RemoveNodes(n ...*Node) *LinkUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *LinkUpdateOne) RemoveNodes(v ...*Node) *LinkUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return luo.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // ClearNodeContentReferences clears all "node_content_references" edges to the Node entity.
-func (luo *LinkUpdateOne) ClearNodeContentReferences() *LinkUpdateOne {
-	luo.mutation.ClearNodeContentReferences()
-	return luo
+func (_u *LinkUpdateOne) ClearNodeContentReferences() *LinkUpdateOne {
+	_u.mutation.ClearNodeContentReferences()
+	return _u
 }
 
 // RemoveNodeContentReferenceIDs removes the "node_content_references" edge to Node entities by IDs.
-func (luo *LinkUpdateOne) RemoveNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.RemoveNodeContentReferenceIDs(ids...)
-	return luo
+func (_u *LinkUpdateOne) RemoveNodeContentReferenceIDs(ids ...xid.ID) *LinkUpdateOne {
+	_u.mutation.RemoveNodeContentReferenceIDs(ids...)
+	return _u
 }
 
 // RemoveNodeContentReferences removes "node_content_references" edges to Node entities.
-func (luo *LinkUpdateOne) RemoveNodeContentReferences(n ...*Node) *LinkUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *LinkUpdateOne) RemoveNodeContentReferences(v ...*Node) *LinkUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return luo.RemoveNodeContentReferenceIDs(ids...)
+	return _u.RemoveNodeContentReferenceIDs(ids...)
 }
 
 // ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
-func (luo *LinkUpdateOne) ClearPrimaryImage() *LinkUpdateOne {
-	luo.mutation.ClearPrimaryImage()
-	return luo
+func (_u *LinkUpdateOne) ClearPrimaryImage() *LinkUpdateOne {
+	_u.mutation.ClearPrimaryImage()
+	return _u
 }
 
 // ClearFaviconImage clears the "favicon_image" edge to the Asset entity.
-func (luo *LinkUpdateOne) ClearFaviconImage() *LinkUpdateOne {
-	luo.mutation.ClearFaviconImage()
-	return luo
+func (_u *LinkUpdateOne) ClearFaviconImage() *LinkUpdateOne {
+	_u.mutation.ClearFaviconImage()
+	return _u
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
-func (luo *LinkUpdateOne) ClearAssets() *LinkUpdateOne {
-	luo.mutation.ClearAssets()
-	return luo
+func (_u *LinkUpdateOne) ClearAssets() *LinkUpdateOne {
+	_u.mutation.ClearAssets()
+	return _u
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (luo *LinkUpdateOne) RemoveAssetIDs(ids ...xid.ID) *LinkUpdateOne {
-	luo.mutation.RemoveAssetIDs(ids...)
-	return luo
+func (_u *LinkUpdateOne) RemoveAssetIDs(ids ...xid.ID) *LinkUpdateOne {
+	_u.mutation.RemoveAssetIDs(ids...)
+	return _u
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
-func (luo *LinkUpdateOne) RemoveAssets(a ...*Asset) *LinkUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *LinkUpdateOne) RemoveAssets(v ...*Asset) *LinkUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return luo.RemoveAssetIDs(ids...)
+	return _u.RemoveAssetIDs(ids...)
 }
 
 // Where appends a list predicates to the LinkUpdate builder.
-func (luo *LinkUpdateOne) Where(ps ...predicate.Link) *LinkUpdateOne {
-	luo.mutation.Where(ps...)
-	return luo
+func (_u *LinkUpdateOne) Where(ps ...predicate.Link) *LinkUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (luo *LinkUpdateOne) Select(field string, fields ...string) *LinkUpdateOne {
-	luo.fields = append([]string{field}, fields...)
-	return luo
+func (_u *LinkUpdateOne) Select(field string, fields ...string) *LinkUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Link entity.
-func (luo *LinkUpdateOne) Save(ctx context.Context) (*Link, error) {
-	return withHooks(ctx, luo.sqlSave, luo.mutation, luo.hooks)
+func (_u *LinkUpdateOne) Save(ctx context.Context) (*Link, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (luo *LinkUpdateOne) SaveX(ctx context.Context) *Link {
-	node, err := luo.Save(ctx)
+func (_u *LinkUpdateOne) SaveX(ctx context.Context) *Link {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1050,32 +1050,32 @@ func (luo *LinkUpdateOne) SaveX(ctx context.Context) *Link {
 }
 
 // Exec executes the query on the entity.
-func (luo *LinkUpdateOne) Exec(ctx context.Context) error {
-	_, err := luo.Save(ctx)
+func (_u *LinkUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (luo *LinkUpdateOne) ExecX(ctx context.Context) {
-	if err := luo.Exec(ctx); err != nil {
+func (_u *LinkUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (luo *LinkUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LinkUpdateOne {
-	luo.modifiers = append(luo.modifiers, modifiers...)
-	return luo
+func (_u *LinkUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *LinkUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) {
+func (_u *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) {
 	_spec := sqlgraph.NewUpdateSpec(link.Table, link.Columns, sqlgraph.NewFieldSpec(link.FieldID, field.TypeString))
-	id, ok := luo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Link.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := luo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, link.FieldID)
 		for _, f := range fields {
@@ -1087,23 +1087,23 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 			}
 		}
 	}
-	if ps := luo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := luo.mutation.Domain(); ok {
+	if value, ok := _u.mutation.Domain(); ok {
 		_spec.SetField(link.FieldDomain, field.TypeString, value)
 	}
-	if value, ok := luo.mutation.Title(); ok {
+	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(link.FieldTitle, field.TypeString, value)
 	}
-	if value, ok := luo.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(link.FieldDescription, field.TypeString, value)
 	}
-	if luo.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1116,23 +1116,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.RemovedPostsIDs(); len(nodes) > 0 && !luo.mutation.PostsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   link.PostsTable,
-			Columns: []string{link.PostsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := luo.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1146,9 +1130,25 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   link.PostsTable,
+			Columns: []string{link.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if luo.mutation.PostContentReferencesCleared() {
+	if _u.mutation.PostContentReferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1161,7 +1161,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.RemovedPostContentReferencesIDs(); len(nodes) > 0 && !luo.mutation.PostContentReferencesCleared() {
+	if nodes := _u.mutation.RemovedPostContentReferencesIDs(); len(nodes) > 0 && !_u.mutation.PostContentReferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1177,7 +1177,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.PostContentReferencesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostContentReferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1193,7 +1193,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if luo.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1206,7 +1206,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !luo.mutation.NodesCleared() {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1222,7 +1222,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1238,7 +1238,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if luo.mutation.NodeContentReferencesCleared() {
+	if _u.mutation.NodeContentReferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1251,7 +1251,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.RemovedNodeContentReferencesIDs(); len(nodes) > 0 && !luo.mutation.NodeContentReferencesCleared() {
+	if nodes := _u.mutation.RemovedNodeContentReferencesIDs(); len(nodes) > 0 && !_u.mutation.NodeContentReferencesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1267,7 +1267,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.NodeContentReferencesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodeContentReferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1283,7 +1283,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if luo.mutation.PrimaryImageCleared() {
+	if _u.mutation.PrimaryImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1296,7 +1296,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PrimaryImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1312,7 +1312,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if luo.mutation.FaviconImageCleared() {
+	if _u.mutation.FaviconImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1325,7 +1325,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.FaviconImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.FaviconImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -1341,7 +1341,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if luo.mutation.AssetsCleared() {
+	if _u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1354,7 +1354,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !luo.mutation.AssetsCleared() {
+	if nodes := _u.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !_u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1370,7 +1370,7 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := luo.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1386,11 +1386,11 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(luo.modifiers...)
-	_node = &Link{config: luo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Link{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, luo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{link.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -1398,6 +1398,6 @@ func (luo *LinkUpdateOne) sqlSave(ctx context.Context) (_node *Link, err error) 
 		}
 		return nil, err
 	}
-	luo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

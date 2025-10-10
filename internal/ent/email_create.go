@@ -26,92 +26,92 @@ type EmailCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (ec *EmailCreate) SetCreatedAt(t time.Time) *EmailCreate {
-	ec.mutation.SetCreatedAt(t)
-	return ec
+func (_c *EmailCreate) SetCreatedAt(v time.Time) *EmailCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ec *EmailCreate) SetNillableCreatedAt(t *time.Time) *EmailCreate {
-	if t != nil {
-		ec.SetCreatedAt(*t)
+func (_c *EmailCreate) SetNillableCreatedAt(v *time.Time) *EmailCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetAccountID sets the "account_id" field.
-func (ec *EmailCreate) SetAccountID(x xid.ID) *EmailCreate {
-	ec.mutation.SetAccountID(x)
-	return ec
+func (_c *EmailCreate) SetAccountID(v xid.ID) *EmailCreate {
+	_c.mutation.SetAccountID(v)
+	return _c
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (ec *EmailCreate) SetNillableAccountID(x *xid.ID) *EmailCreate {
-	if x != nil {
-		ec.SetAccountID(*x)
+func (_c *EmailCreate) SetNillableAccountID(v *xid.ID) *EmailCreate {
+	if v != nil {
+		_c.SetAccountID(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetEmailAddress sets the "email_address" field.
-func (ec *EmailCreate) SetEmailAddress(s string) *EmailCreate {
-	ec.mutation.SetEmailAddress(s)
-	return ec
+func (_c *EmailCreate) SetEmailAddress(v string) *EmailCreate {
+	_c.mutation.SetEmailAddress(v)
+	return _c
 }
 
 // SetVerificationCode sets the "verification_code" field.
-func (ec *EmailCreate) SetVerificationCode(s string) *EmailCreate {
-	ec.mutation.SetVerificationCode(s)
-	return ec
+func (_c *EmailCreate) SetVerificationCode(v string) *EmailCreate {
+	_c.mutation.SetVerificationCode(v)
+	return _c
 }
 
 // SetVerified sets the "verified" field.
-func (ec *EmailCreate) SetVerified(b bool) *EmailCreate {
-	ec.mutation.SetVerified(b)
-	return ec
+func (_c *EmailCreate) SetVerified(v bool) *EmailCreate {
+	_c.mutation.SetVerified(v)
+	return _c
 }
 
 // SetNillableVerified sets the "verified" field if the given value is not nil.
-func (ec *EmailCreate) SetNillableVerified(b *bool) *EmailCreate {
-	if b != nil {
-		ec.SetVerified(*b)
+func (_c *EmailCreate) SetNillableVerified(v *bool) *EmailCreate {
+	if v != nil {
+		_c.SetVerified(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetID sets the "id" field.
-func (ec *EmailCreate) SetID(x xid.ID) *EmailCreate {
-	ec.mutation.SetID(x)
-	return ec
+func (_c *EmailCreate) SetID(v xid.ID) *EmailCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (ec *EmailCreate) SetNillableID(x *xid.ID) *EmailCreate {
-	if x != nil {
-		ec.SetID(*x)
+func (_c *EmailCreate) SetNillableID(v *xid.ID) *EmailCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return ec
+	return _c
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (ec *EmailCreate) SetAccount(a *Account) *EmailCreate {
-	return ec.SetAccountID(a.ID)
+func (_c *EmailCreate) SetAccount(v *Account) *EmailCreate {
+	return _c.SetAccountID(v.ID)
 }
 
 // Mutation returns the EmailMutation object of the builder.
-func (ec *EmailCreate) Mutation() *EmailMutation {
-	return ec.mutation
+func (_c *EmailCreate) Mutation() *EmailMutation {
+	return _c.mutation
 }
 
 // Save creates the Email in the database.
-func (ec *EmailCreate) Save(ctx context.Context) (*Email, error) {
-	ec.defaults()
-	return withHooks(ctx, ec.sqlSave, ec.mutation, ec.hooks)
+func (_c *EmailCreate) Save(ctx context.Context) (*Email, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (ec *EmailCreate) SaveX(ctx context.Context) *Email {
-	v, err := ec.Save(ctx)
+func (_c *EmailCreate) SaveX(ctx context.Context) *Email {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -119,59 +119,59 @@ func (ec *EmailCreate) SaveX(ctx context.Context) *Email {
 }
 
 // Exec executes the query.
-func (ec *EmailCreate) Exec(ctx context.Context) error {
-	_, err := ec.Save(ctx)
+func (_c *EmailCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ec *EmailCreate) ExecX(ctx context.Context) {
-	if err := ec.Exec(ctx); err != nil {
+func (_c *EmailCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (ec *EmailCreate) defaults() {
-	if _, ok := ec.mutation.CreatedAt(); !ok {
+func (_c *EmailCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := email.DefaultCreatedAt()
-		ec.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := ec.mutation.Verified(); !ok {
+	if _, ok := _c.mutation.Verified(); !ok {
 		v := email.DefaultVerified
-		ec.mutation.SetVerified(v)
+		_c.mutation.SetVerified(v)
 	}
-	if _, ok := ec.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := email.DefaultID()
-		ec.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (ec *EmailCreate) check() error {
-	if _, ok := ec.mutation.CreatedAt(); !ok {
+func (_c *EmailCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Email.created_at"`)}
 	}
-	if _, ok := ec.mutation.EmailAddress(); !ok {
+	if _, ok := _c.mutation.EmailAddress(); !ok {
 		return &ValidationError{Name: "email_address", err: errors.New(`ent: missing required field "Email.email_address"`)}
 	}
-	if v, ok := ec.mutation.EmailAddress(); ok {
+	if v, ok := _c.mutation.EmailAddress(); ok {
 		if err := email.EmailAddressValidator(v); err != nil {
 			return &ValidationError{Name: "email_address", err: fmt.Errorf(`ent: validator failed for field "Email.email_address": %w`, err)}
 		}
 	}
-	if _, ok := ec.mutation.VerificationCode(); !ok {
+	if _, ok := _c.mutation.VerificationCode(); !ok {
 		return &ValidationError{Name: "verification_code", err: errors.New(`ent: missing required field "Email.verification_code"`)}
 	}
-	if v, ok := ec.mutation.VerificationCode(); ok {
+	if v, ok := _c.mutation.VerificationCode(); ok {
 		if err := email.VerificationCodeValidator(v); err != nil {
 			return &ValidationError{Name: "verification_code", err: fmt.Errorf(`ent: validator failed for field "Email.verification_code": %w`, err)}
 		}
 	}
-	if _, ok := ec.mutation.Verified(); !ok {
+	if _, ok := _c.mutation.Verified(); !ok {
 		return &ValidationError{Name: "verified", err: errors.New(`ent: missing required field "Email.verified"`)}
 	}
-	if v, ok := ec.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := email.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Email.id": %w`, err)}
 		}
@@ -179,12 +179,12 @@ func (ec *EmailCreate) check() error {
 	return nil
 }
 
-func (ec *EmailCreate) sqlSave(ctx context.Context) (*Email, error) {
-	if err := ec.check(); err != nil {
+func (_c *EmailCreate) sqlSave(ctx context.Context) (*Email, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := ec.createSpec()
-	if err := sqlgraph.CreateNode(ctx, ec.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -197,38 +197,38 @@ func (ec *EmailCreate) sqlSave(ctx context.Context) (*Email, error) {
 			return nil, err
 		}
 	}
-	ec.mutation.id = &_node.ID
-	ec.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (ec *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
+func (_c *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Email{config: ec.config}
+		_node = &Email{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(email.Table, sqlgraph.NewFieldSpec(email.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = ec.conflict
-	if id, ok := ec.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := ec.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(email.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := ec.mutation.EmailAddress(); ok {
+	if value, ok := _c.mutation.EmailAddress(); ok {
 		_spec.SetField(email.FieldEmailAddress, field.TypeString, value)
 		_node.EmailAddress = value
 	}
-	if value, ok := ec.mutation.VerificationCode(); ok {
+	if value, ok := _c.mutation.VerificationCode(); ok {
 		_spec.SetField(email.FieldVerificationCode, field.TypeString, value)
 		_node.VerificationCode = value
 	}
-	if value, ok := ec.mutation.Verified(); ok {
+	if value, ok := _c.mutation.Verified(); ok {
 		_spec.SetField(email.FieldVerified, field.TypeBool, value)
 		_node.Verified = value
 	}
-	if nodes := ec.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -264,10 +264,10 @@ func (ec *EmailCreate) createSpec() (*Email, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (ec *EmailCreate) OnConflict(opts ...sql.ConflictOption) *EmailUpsertOne {
-	ec.conflict = opts
+func (_c *EmailCreate) OnConflict(opts ...sql.ConflictOption) *EmailUpsertOne {
+	_c.conflict = opts
 	return &EmailUpsertOne{
-		create: ec,
+		create: _c,
 	}
 }
 
@@ -277,10 +277,10 @@ func (ec *EmailCreate) OnConflict(opts ...sql.ConflictOption) *EmailUpsertOne {
 //	client.Email.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (ec *EmailCreate) OnConflictColumns(columns ...string) *EmailUpsertOne {
-	ec.conflict = append(ec.conflict, sql.ConflictColumns(columns...))
+func (_c *EmailCreate) OnConflictColumns(columns ...string) *EmailUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &EmailUpsertOne{
-		create: ec,
+		create: _c,
 	}
 }
 
@@ -489,16 +489,16 @@ type EmailCreateBulk struct {
 }
 
 // Save creates the Email entities in the database.
-func (ecb *EmailCreateBulk) Save(ctx context.Context) ([]*Email, error) {
-	if ecb.err != nil {
-		return nil, ecb.err
+func (_c *EmailCreateBulk) Save(ctx context.Context) ([]*Email, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(ecb.builders))
-	nodes := make([]*Email, len(ecb.builders))
-	mutators := make([]Mutator, len(ecb.builders))
-	for i := range ecb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Email, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := ecb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*EmailMutation)
@@ -512,12 +512,12 @@ func (ecb *EmailCreateBulk) Save(ctx context.Context) ([]*Email, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, ecb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = ecb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, ecb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -537,7 +537,7 @@ func (ecb *EmailCreateBulk) Save(ctx context.Context) ([]*Email, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, ecb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -545,8 +545,8 @@ func (ecb *EmailCreateBulk) Save(ctx context.Context) ([]*Email, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ecb *EmailCreateBulk) SaveX(ctx context.Context) []*Email {
-	v, err := ecb.Save(ctx)
+func (_c *EmailCreateBulk) SaveX(ctx context.Context) []*Email {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -554,14 +554,14 @@ func (ecb *EmailCreateBulk) SaveX(ctx context.Context) []*Email {
 }
 
 // Exec executes the query.
-func (ecb *EmailCreateBulk) Exec(ctx context.Context) error {
-	_, err := ecb.Save(ctx)
+func (_c *EmailCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ecb *EmailCreateBulk) ExecX(ctx context.Context) {
-	if err := ecb.Exec(ctx); err != nil {
+func (_c *EmailCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -581,10 +581,10 @@ func (ecb *EmailCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (ecb *EmailCreateBulk) OnConflict(opts ...sql.ConflictOption) *EmailUpsertBulk {
-	ecb.conflict = opts
+func (_c *EmailCreateBulk) OnConflict(opts ...sql.ConflictOption) *EmailUpsertBulk {
+	_c.conflict = opts
 	return &EmailUpsertBulk{
-		create: ecb,
+		create: _c,
 	}
 }
 
@@ -594,10 +594,10 @@ func (ecb *EmailCreateBulk) OnConflict(opts ...sql.ConflictOption) *EmailUpsertB
 //	client.Email.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (ecb *EmailCreateBulk) OnConflictColumns(columns ...string) *EmailUpsertBulk {
-	ecb.conflict = append(ecb.conflict, sql.ConflictColumns(columns...))
+func (_c *EmailCreateBulk) OnConflictColumns(columns ...string) *EmailUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &EmailUpsertBulk{
-		create: ecb,
+		create: _c,
 	}
 }
 

@@ -20,56 +20,56 @@ type PropertySchemaFieldDelete struct {
 }
 
 // Where appends a list predicates to the PropertySchemaFieldDelete builder.
-func (psfd *PropertySchemaFieldDelete) Where(ps ...predicate.PropertySchemaField) *PropertySchemaFieldDelete {
-	psfd.mutation.Where(ps...)
-	return psfd
+func (_d *PropertySchemaFieldDelete) Where(ps ...predicate.PropertySchemaField) *PropertySchemaFieldDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (psfd *PropertySchemaFieldDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, psfd.sqlExec, psfd.mutation, psfd.hooks)
+func (_d *PropertySchemaFieldDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (psfd *PropertySchemaFieldDelete) ExecX(ctx context.Context) int {
-	n, err := psfd.Exec(ctx)
+func (_d *PropertySchemaFieldDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (psfd *PropertySchemaFieldDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *PropertySchemaFieldDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(propertyschemafield.Table, sqlgraph.NewFieldSpec(propertyschemafield.FieldID, field.TypeString))
-	if ps := psfd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, psfd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	psfd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // PropertySchemaFieldDeleteOne is the builder for deleting a single PropertySchemaField entity.
 type PropertySchemaFieldDeleteOne struct {
-	psfd *PropertySchemaFieldDelete
+	_d *PropertySchemaFieldDelete
 }
 
 // Where appends a list predicates to the PropertySchemaFieldDelete builder.
-func (psfdo *PropertySchemaFieldDeleteOne) Where(ps ...predicate.PropertySchemaField) *PropertySchemaFieldDeleteOne {
-	psfdo.psfd.mutation.Where(ps...)
-	return psfdo
+func (_d *PropertySchemaFieldDeleteOne) Where(ps ...predicate.PropertySchemaField) *PropertySchemaFieldDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (psfdo *PropertySchemaFieldDeleteOne) Exec(ctx context.Context) error {
-	n, err := psfdo.psfd.Exec(ctx)
+func (_d *PropertySchemaFieldDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (psfdo *PropertySchemaFieldDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (psfdo *PropertySchemaFieldDeleteOne) ExecX(ctx context.Context) {
-	if err := psfdo.Exec(ctx); err != nil {
+func (_d *PropertySchemaFieldDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

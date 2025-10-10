@@ -141,7 +141,7 @@ func (*Event) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Event fields.
-func (e *Event) assignValues(columns []string, values []any) error {
+func (_m *Event) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -151,131 +151,131 @@ func (e *Event) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				e.ID = *value
+				_m.ID = *value
 			}
 		case event.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				e.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case event.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				e.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case event.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				e.DeletedAt = new(time.Time)
-				*e.DeletedAt = value.Time
+				_m.DeletedAt = new(time.Time)
+				*_m.DeletedAt = value.Time
 			}
 		case event.FieldIndexedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field indexed_at", values[i])
 			} else if value.Valid {
-				e.IndexedAt = new(time.Time)
-				*e.IndexedAt = value.Time
+				_m.IndexedAt = new(time.Time)
+				*_m.IndexedAt = value.Time
 			}
 		case event.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				e.Name = value.String
+				_m.Name = value.String
 			}
 		case event.FieldSlug:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field slug", values[i])
 			} else if value.Valid {
-				e.Slug = value.String
+				_m.Slug = value.String
 			}
 		case event.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				e.Description = new(string)
-				*e.Description = value.String
+				_m.Description = new(string)
+				*_m.Description = value.String
 			}
 		case event.FieldStartTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field start_time", values[i])
 			} else if value.Valid {
-				e.StartTime = value.Time
+				_m.StartTime = value.Time
 			}
 		case event.FieldEndTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field end_time", values[i])
 			} else if value.Valid {
-				e.EndTime = value.Time
+				_m.EndTime = value.Time
 			}
 		case event.FieldParticipationPolicy:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field participation_policy", values[i])
 			} else if value.Valid {
-				e.ParticipationPolicy = value.String
+				_m.ParticipationPolicy = value.String
 			}
 		case event.FieldVisibility:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field visibility", values[i])
 			} else if value.Valid {
-				e.Visibility = event.Visibility(value.String)
+				_m.Visibility = event.Visibility(value.String)
 			}
 		case event.FieldLocationType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field location_type", values[i])
 			} else if value.Valid {
-				e.LocationType = new(string)
-				*e.LocationType = value.String
+				_m.LocationType = new(string)
+				*_m.LocationType = value.String
 			}
 		case event.FieldLocationName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field location_name", values[i])
 			} else if value.Valid {
-				e.LocationName = new(string)
-				*e.LocationName = value.String
+				_m.LocationName = new(string)
+				*_m.LocationName = value.String
 			}
 		case event.FieldLocationAddress:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field location_address", values[i])
 			} else if value.Valid {
-				e.LocationAddress = new(string)
-				*e.LocationAddress = value.String
+				_m.LocationAddress = new(string)
+				*_m.LocationAddress = value.String
 			}
 		case event.FieldLocationLatitude:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field location_latitude", values[i])
 			} else if value.Valid {
-				e.LocationLatitude = new(float64)
-				*e.LocationLatitude = value.Float64
+				_m.LocationLatitude = new(float64)
+				*_m.LocationLatitude = value.Float64
 			}
 		case event.FieldLocationLongitude:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field location_longitude", values[i])
 			} else if value.Valid {
-				e.LocationLongitude = new(float64)
-				*e.LocationLongitude = value.Float64
+				_m.LocationLongitude = new(float64)
+				*_m.LocationLongitude = value.Float64
 			}
 		case event.FieldLocationURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field location_url", values[i])
 			} else if value.Valid {
-				e.LocationURL = new(string)
-				*e.LocationURL = value.String
+				_m.LocationURL = new(string)
+				*_m.LocationURL = value.String
 			}
 		case event.FieldCapacity:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field capacity", values[i])
 			} else if value.Valid {
-				e.Capacity = new(int)
-				*e.Capacity = int(value.Int64)
+				_m.Capacity = new(int)
+				*_m.Capacity = int(value.Int64)
 			}
 		case event.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field metadata", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &e.Metadata); err != nil {
+				if err := json.Unmarshal(*value, &_m.Metadata); err != nil {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
@@ -283,18 +283,18 @@ func (e *Event) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field asset_event", values[i])
 			} else if value.Valid {
-				e.asset_event = new(xid.ID)
-				*e.asset_event = *value.S.(*xid.ID)
+				_m.asset_event = new(xid.ID)
+				*_m.asset_event = *value.S.(*xid.ID)
 			}
 		case event.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field post_event", values[i])
 			} else if value.Valid {
-				e.post_event = new(xid.ID)
-				*e.post_event = *value.S.(*xid.ID)
+				_m.post_event = new(xid.ID)
+				*_m.post_event = *value.S.(*xid.ID)
 			}
 		default:
-			e.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -302,124 +302,124 @@ func (e *Event) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Event.
 // This includes values selected through modifiers, order, etc.
-func (e *Event) Value(name string) (ent.Value, error) {
-	return e.selectValues.Get(name)
+func (_m *Event) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryParticipants queries the "participants" edge of the Event entity.
-func (e *Event) QueryParticipants() *EventParticipantQuery {
-	return NewEventClient(e.config).QueryParticipants(e)
+func (_m *Event) QueryParticipants() *EventParticipantQuery {
+	return NewEventClient(_m.config).QueryParticipants(_m)
 }
 
 // QueryThread queries the "thread" edge of the Event entity.
-func (e *Event) QueryThread() *PostQuery {
-	return NewEventClient(e.config).QueryThread(e)
+func (_m *Event) QueryThread() *PostQuery {
+	return NewEventClient(_m.config).QueryThread(_m)
 }
 
 // QueryPrimaryImage queries the "primary_image" edge of the Event entity.
-func (e *Event) QueryPrimaryImage() *AssetQuery {
-	return NewEventClient(e.config).QueryPrimaryImage(e)
+func (_m *Event) QueryPrimaryImage() *AssetQuery {
+	return NewEventClient(_m.config).QueryPrimaryImage(_m)
 }
 
 // Update returns a builder for updating this Event.
 // Note that you need to call Event.Unwrap() before calling this method if this Event
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (e *Event) Update() *EventUpdateOne {
-	return NewEventClient(e.config).UpdateOne(e)
+func (_m *Event) Update() *EventUpdateOne {
+	return NewEventClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Event entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (e *Event) Unwrap() *Event {
-	_tx, ok := e.config.driver.(*txDriver)
+func (_m *Event) Unwrap() *Event {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Event is not a transactional entity")
 	}
-	e.config.driver = _tx.drv
-	return e
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (e *Event) String() string {
+func (_m *Event) String() string {
 	var builder strings.Builder
 	builder.WriteString("Event(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", e.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(e.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(e.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := e.DeletedAt; v != nil {
+	if v := _m.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := e.IndexedAt; v != nil {
+	if v := _m.IndexedAt; v != nil {
 		builder.WriteString("indexed_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(e.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("slug=")
-	builder.WriteString(e.Slug)
+	builder.WriteString(_m.Slug)
 	builder.WriteString(", ")
-	if v := e.Description; v != nil {
+	if v := _m.Description; v != nil {
 		builder.WriteString("description=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
 	builder.WriteString("start_time=")
-	builder.WriteString(e.StartTime.Format(time.ANSIC))
+	builder.WriteString(_m.StartTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("end_time=")
-	builder.WriteString(e.EndTime.Format(time.ANSIC))
+	builder.WriteString(_m.EndTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("participation_policy=")
-	builder.WriteString(e.ParticipationPolicy)
+	builder.WriteString(_m.ParticipationPolicy)
 	builder.WriteString(", ")
 	builder.WriteString("visibility=")
-	builder.WriteString(fmt.Sprintf("%v", e.Visibility))
+	builder.WriteString(fmt.Sprintf("%v", _m.Visibility))
 	builder.WriteString(", ")
-	if v := e.LocationType; v != nil {
+	if v := _m.LocationType; v != nil {
 		builder.WriteString("location_type=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := e.LocationName; v != nil {
+	if v := _m.LocationName; v != nil {
 		builder.WriteString("location_name=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := e.LocationAddress; v != nil {
+	if v := _m.LocationAddress; v != nil {
 		builder.WriteString("location_address=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := e.LocationLatitude; v != nil {
+	if v := _m.LocationLatitude; v != nil {
 		builder.WriteString("location_latitude=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := e.LocationLongitude; v != nil {
+	if v := _m.LocationLongitude; v != nil {
 		builder.WriteString("location_longitude=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := e.LocationURL; v != nil {
+	if v := _m.LocationURL; v != nil {
 		builder.WriteString("location_url=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := e.Capacity; v != nil {
+	if v := _m.Capacity; v != nil {
 		builder.WriteString("capacity=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
-	builder.WriteString(fmt.Sprintf("%v", e.Metadata))
+	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))
 	builder.WriteByte(')')
 	return builder.String()
 }

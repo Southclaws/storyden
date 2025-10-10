@@ -20,56 +20,56 @@ type AccountRolesDelete struct {
 }
 
 // Where appends a list predicates to the AccountRolesDelete builder.
-func (ard *AccountRolesDelete) Where(ps ...predicate.AccountRoles) *AccountRolesDelete {
-	ard.mutation.Where(ps...)
-	return ard
+func (_d *AccountRolesDelete) Where(ps ...predicate.AccountRoles) *AccountRolesDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (ard *AccountRolesDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, ard.sqlExec, ard.mutation, ard.hooks)
+func (_d *AccountRolesDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ard *AccountRolesDelete) ExecX(ctx context.Context) int {
-	n, err := ard.Exec(ctx)
+func (_d *AccountRolesDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (ard *AccountRolesDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *AccountRolesDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(accountroles.Table, sqlgraph.NewFieldSpec(accountroles.FieldID, field.TypeString))
-	if ps := ard.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, ard.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	ard.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // AccountRolesDeleteOne is the builder for deleting a single AccountRoles entity.
 type AccountRolesDeleteOne struct {
-	ard *AccountRolesDelete
+	_d *AccountRolesDelete
 }
 
 // Where appends a list predicates to the AccountRolesDelete builder.
-func (ardo *AccountRolesDeleteOne) Where(ps ...predicate.AccountRoles) *AccountRolesDeleteOne {
-	ardo.ard.mutation.Where(ps...)
-	return ardo
+func (_d *AccountRolesDeleteOne) Where(ps ...predicate.AccountRoles) *AccountRolesDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (ardo *AccountRolesDeleteOne) Exec(ctx context.Context) error {
-	n, err := ardo.ard.Exec(ctx)
+func (_d *AccountRolesDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (ardo *AccountRolesDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ardo *AccountRolesDeleteOne) ExecX(ctx context.Context) {
-	if err := ardo.Exec(ctx); err != nil {
+func (_d *AccountRolesDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

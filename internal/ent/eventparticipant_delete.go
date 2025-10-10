@@ -20,56 +20,56 @@ type EventParticipantDelete struct {
 }
 
 // Where appends a list predicates to the EventParticipantDelete builder.
-func (epd *EventParticipantDelete) Where(ps ...predicate.EventParticipant) *EventParticipantDelete {
-	epd.mutation.Where(ps...)
-	return epd
+func (_d *EventParticipantDelete) Where(ps ...predicate.EventParticipant) *EventParticipantDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (epd *EventParticipantDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, epd.sqlExec, epd.mutation, epd.hooks)
+func (_d *EventParticipantDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (epd *EventParticipantDelete) ExecX(ctx context.Context) int {
-	n, err := epd.Exec(ctx)
+func (_d *EventParticipantDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (epd *EventParticipantDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *EventParticipantDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(eventparticipant.Table, sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString))
-	if ps := epd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, epd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	epd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // EventParticipantDeleteOne is the builder for deleting a single EventParticipant entity.
 type EventParticipantDeleteOne struct {
-	epd *EventParticipantDelete
+	_d *EventParticipantDelete
 }
 
 // Where appends a list predicates to the EventParticipantDelete builder.
-func (epdo *EventParticipantDeleteOne) Where(ps ...predicate.EventParticipant) *EventParticipantDeleteOne {
-	epdo.epd.mutation.Where(ps...)
-	return epdo
+func (_d *EventParticipantDeleteOne) Where(ps ...predicate.EventParticipant) *EventParticipantDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (epdo *EventParticipantDeleteOne) Exec(ctx context.Context) error {
-	n, err := epdo.epd.Exec(ctx)
+func (_d *EventParticipantDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (epdo *EventParticipantDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (epdo *EventParticipantDeleteOne) ExecX(ctx context.Context) {
-	if err := epdo.Exec(ctx); err != nil {
+func (_d *EventParticipantDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -241,7 +241,7 @@ func (*Node) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Node fields.
-func (n *Node) assignValues(columns []string, values []any) error {
+func (_m *Node) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -251,120 +251,120 @@ func (n *Node) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				n.ID = *value
+				_m.ID = *value
 			}
 		case node.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				n.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case node.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				n.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case node.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				n.DeletedAt = new(time.Time)
-				*n.DeletedAt = value.Time
+				_m.DeletedAt = new(time.Time)
+				*_m.DeletedAt = value.Time
 			}
 		case node.FieldIndexedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field indexed_at", values[i])
 			} else if value.Valid {
-				n.IndexedAt = new(time.Time)
-				*n.IndexedAt = value.Time
+				_m.IndexedAt = new(time.Time)
+				*_m.IndexedAt = value.Time
 			}
 		case node.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				n.Name = value.String
+				_m.Name = value.String
 			}
 		case node.FieldSlug:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field slug", values[i])
 			} else if value.Valid {
-				n.Slug = value.String
+				_m.Slug = value.String
 			}
 		case node.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				n.Description = new(string)
-				*n.Description = value.String
+				_m.Description = new(string)
+				*_m.Description = value.String
 			}
 		case node.FieldContent:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field content", values[i])
 			} else if value.Valid {
-				n.Content = new(string)
-				*n.Content = value.String
+				_m.Content = new(string)
+				*_m.Content = value.String
 			}
 		case node.FieldParentNodeID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_node_id", values[i])
 			} else if value != nil {
-				n.ParentNodeID = *value
+				_m.ParentNodeID = *value
 			}
 		case node.FieldHideChildTree:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field hide_child_tree", values[i])
 			} else if value.Valid {
-				n.HideChildTree = value.Bool
+				_m.HideChildTree = value.Bool
 			}
 		case node.FieldAccountID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
 			} else if value != nil {
-				n.AccountID = *value
+				_m.AccountID = *value
 			}
 		case node.FieldPropertySchemaID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field property_schema_id", values[i])
 			} else if value.Valid {
-				n.PropertySchemaID = new(xid.ID)
-				*n.PropertySchemaID = *value.S.(*xid.ID)
+				_m.PropertySchemaID = new(xid.ID)
+				*_m.PropertySchemaID = *value.S.(*xid.ID)
 			}
 		case node.FieldPrimaryAssetID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field primary_asset_id", values[i])
 			} else if value.Valid {
-				n.PrimaryAssetID = new(xid.ID)
-				*n.PrimaryAssetID = *value.S.(*xid.ID)
+				_m.PrimaryAssetID = new(xid.ID)
+				*_m.PrimaryAssetID = *value.S.(*xid.ID)
 			}
 		case node.FieldLinkID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field link_id", values[i])
 			} else if value != nil {
-				n.LinkID = *value
+				_m.LinkID = *value
 			}
 		case node.FieldVisibility:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field visibility", values[i])
 			} else if value.Valid {
-				n.Visibility = node.Visibility(value.String)
+				_m.Visibility = node.Visibility(value.String)
 			}
 		case node.FieldSort:
 			if value, ok := values[i].(*lexorank.Key); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value != nil {
-				n.Sort = *value
+				_m.Sort = *value
 			}
 		case node.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field metadata", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &n.Metadata); err != nil {
+				if err := json.Unmarshal(*value, &_m.Metadata); err != nil {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
 		default:
-			n.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -372,155 +372,155 @@ func (n *Node) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Node.
 // This includes values selected through modifiers, order, etc.
-func (n *Node) Value(name string) (ent.Value, error) {
-	return n.selectValues.Get(name)
+func (_m *Node) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryOwner queries the "owner" edge of the Node entity.
-func (n *Node) QueryOwner() *AccountQuery {
-	return NewNodeClient(n.config).QueryOwner(n)
+func (_m *Node) QueryOwner() *AccountQuery {
+	return NewNodeClient(_m.config).QueryOwner(_m)
 }
 
 // QueryParent queries the "parent" edge of the Node entity.
-func (n *Node) QueryParent() *NodeQuery {
-	return NewNodeClient(n.config).QueryParent(n)
+func (_m *Node) QueryParent() *NodeQuery {
+	return NewNodeClient(_m.config).QueryParent(_m)
 }
 
 // QueryNodes queries the "nodes" edge of the Node entity.
-func (n *Node) QueryNodes() *NodeQuery {
-	return NewNodeClient(n.config).QueryNodes(n)
+func (_m *Node) QueryNodes() *NodeQuery {
+	return NewNodeClient(_m.config).QueryNodes(_m)
 }
 
 // QueryPrimaryImage queries the "primary_image" edge of the Node entity.
-func (n *Node) QueryPrimaryImage() *AssetQuery {
-	return NewNodeClient(n.config).QueryPrimaryImage(n)
+func (_m *Node) QueryPrimaryImage() *AssetQuery {
+	return NewNodeClient(_m.config).QueryPrimaryImage(_m)
 }
 
 // QueryAssets queries the "assets" edge of the Node entity.
-func (n *Node) QueryAssets() *AssetQuery {
-	return NewNodeClient(n.config).QueryAssets(n)
+func (_m *Node) QueryAssets() *AssetQuery {
+	return NewNodeClient(_m.config).QueryAssets(_m)
 }
 
 // QueryTags queries the "tags" edge of the Node entity.
-func (n *Node) QueryTags() *TagQuery {
-	return NewNodeClient(n.config).QueryTags(n)
+func (_m *Node) QueryTags() *TagQuery {
+	return NewNodeClient(_m.config).QueryTags(_m)
 }
 
 // QueryProperties queries the "properties" edge of the Node entity.
-func (n *Node) QueryProperties() *PropertyQuery {
-	return NewNodeClient(n.config).QueryProperties(n)
+func (_m *Node) QueryProperties() *PropertyQuery {
+	return NewNodeClient(_m.config).QueryProperties(_m)
 }
 
 // QueryPropertySchema queries the "property_schema" edge of the Node entity.
-func (n *Node) QueryPropertySchema() *PropertySchemaQuery {
-	return NewNodeClient(n.config).QueryPropertySchema(n)
+func (_m *Node) QueryPropertySchema() *PropertySchemaQuery {
+	return NewNodeClient(_m.config).QueryPropertySchema(_m)
 }
 
 // QueryLink queries the "link" edge of the Node entity.
-func (n *Node) QueryLink() *LinkQuery {
-	return NewNodeClient(n.config).QueryLink(n)
+func (_m *Node) QueryLink() *LinkQuery {
+	return NewNodeClient(_m.config).QueryLink(_m)
 }
 
 // QueryContentLinks queries the "content_links" edge of the Node entity.
-func (n *Node) QueryContentLinks() *LinkQuery {
-	return NewNodeClient(n.config).QueryContentLinks(n)
+func (_m *Node) QueryContentLinks() *LinkQuery {
+	return NewNodeClient(_m.config).QueryContentLinks(_m)
 }
 
 // QueryCollections queries the "collections" edge of the Node entity.
-func (n *Node) QueryCollections() *CollectionQuery {
-	return NewNodeClient(n.config).QueryCollections(n)
+func (_m *Node) QueryCollections() *CollectionQuery {
+	return NewNodeClient(_m.config).QueryCollections(_m)
 }
 
 // QueryCollectionNodes queries the "collection_nodes" edge of the Node entity.
-func (n *Node) QueryCollectionNodes() *CollectionNodeQuery {
-	return NewNodeClient(n.config).QueryCollectionNodes(n)
+func (_m *Node) QueryCollectionNodes() *CollectionNodeQuery {
+	return NewNodeClient(_m.config).QueryCollectionNodes(_m)
 }
 
 // Update returns a builder for updating this Node.
 // Note that you need to call Node.Unwrap() before calling this method if this Node
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (n *Node) Update() *NodeUpdateOne {
-	return NewNodeClient(n.config).UpdateOne(n)
+func (_m *Node) Update() *NodeUpdateOne {
+	return NewNodeClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Node entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (n *Node) Unwrap() *Node {
-	_tx, ok := n.config.driver.(*txDriver)
+func (_m *Node) Unwrap() *Node {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Node is not a transactional entity")
 	}
-	n.config.driver = _tx.drv
-	return n
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (n *Node) String() string {
+func (_m *Node) String() string {
 	var builder strings.Builder
 	builder.WriteString("Node(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", n.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(n.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(n.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := n.DeletedAt; v != nil {
+	if v := _m.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := n.IndexedAt; v != nil {
+	if v := _m.IndexedAt; v != nil {
 		builder.WriteString("indexed_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(n.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("slug=")
-	builder.WriteString(n.Slug)
+	builder.WriteString(_m.Slug)
 	builder.WriteString(", ")
-	if v := n.Description; v != nil {
+	if v := _m.Description; v != nil {
 		builder.WriteString("description=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := n.Content; v != nil {
+	if v := _m.Content; v != nil {
 		builder.WriteString("content=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
 	builder.WriteString("parent_node_id=")
-	builder.WriteString(fmt.Sprintf("%v", n.ParentNodeID))
+	builder.WriteString(fmt.Sprintf("%v", _m.ParentNodeID))
 	builder.WriteString(", ")
 	builder.WriteString("hide_child_tree=")
-	builder.WriteString(fmt.Sprintf("%v", n.HideChildTree))
+	builder.WriteString(fmt.Sprintf("%v", _m.HideChildTree))
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
-	builder.WriteString(fmt.Sprintf("%v", n.AccountID))
+	builder.WriteString(fmt.Sprintf("%v", _m.AccountID))
 	builder.WriteString(", ")
-	if v := n.PropertySchemaID; v != nil {
+	if v := _m.PropertySchemaID; v != nil {
 		builder.WriteString("property_schema_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := n.PrimaryAssetID; v != nil {
+	if v := _m.PrimaryAssetID; v != nil {
 		builder.WriteString("primary_asset_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("link_id=")
-	builder.WriteString(fmt.Sprintf("%v", n.LinkID))
+	builder.WriteString(fmt.Sprintf("%v", _m.LinkID))
 	builder.WriteString(", ")
 	builder.WriteString("visibility=")
-	builder.WriteString(fmt.Sprintf("%v", n.Visibility))
+	builder.WriteString(fmt.Sprintf("%v", _m.Visibility))
 	builder.WriteString(", ")
 	builder.WriteString("sort=")
-	builder.WriteString(fmt.Sprintf("%v", n.Sort))
+	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
-	builder.WriteString(fmt.Sprintf("%v", n.Metadata))
+	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))
 	builder.WriteByte(')')
 	return builder.String()
 }

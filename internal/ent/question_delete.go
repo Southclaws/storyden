@@ -20,56 +20,56 @@ type QuestionDelete struct {
 }
 
 // Where appends a list predicates to the QuestionDelete builder.
-func (qd *QuestionDelete) Where(ps ...predicate.Question) *QuestionDelete {
-	qd.mutation.Where(ps...)
-	return qd
+func (_d *QuestionDelete) Where(ps ...predicate.Question) *QuestionDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (qd *QuestionDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, qd.sqlExec, qd.mutation, qd.hooks)
+func (_d *QuestionDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (qd *QuestionDelete) ExecX(ctx context.Context) int {
-	n, err := qd.Exec(ctx)
+func (_d *QuestionDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (qd *QuestionDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *QuestionDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(question.Table, sqlgraph.NewFieldSpec(question.FieldID, field.TypeString))
-	if ps := qd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, qd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	qd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // QuestionDeleteOne is the builder for deleting a single Question entity.
 type QuestionDeleteOne struct {
-	qd *QuestionDelete
+	_d *QuestionDelete
 }
 
 // Where appends a list predicates to the QuestionDelete builder.
-func (qdo *QuestionDeleteOne) Where(ps ...predicate.Question) *QuestionDeleteOne {
-	qdo.qd.mutation.Where(ps...)
-	return qdo
+func (_d *QuestionDeleteOne) Where(ps ...predicate.Question) *QuestionDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (qdo *QuestionDeleteOne) Exec(ctx context.Context) error {
-	n, err := qdo.qd.Exec(ctx)
+func (_d *QuestionDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (qdo *QuestionDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (qdo *QuestionDeleteOne) ExecX(ctx context.Context) {
-	if err := qdo.Exec(ctx); err != nil {
+func (_d *QuestionDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

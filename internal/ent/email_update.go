@@ -25,83 +25,83 @@ type EmailUpdate struct {
 }
 
 // Where appends a list predicates to the EmailUpdate builder.
-func (eu *EmailUpdate) Where(ps ...predicate.Email) *EmailUpdate {
-	eu.mutation.Where(ps...)
-	return eu
+func (_u *EmailUpdate) Where(ps ...predicate.Email) *EmailUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (eu *EmailUpdate) SetAccountID(x xid.ID) *EmailUpdate {
-	eu.mutation.SetAccountID(x)
-	return eu
+func (_u *EmailUpdate) SetAccountID(v xid.ID) *EmailUpdate {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (eu *EmailUpdate) SetNillableAccountID(x *xid.ID) *EmailUpdate {
-	if x != nil {
-		eu.SetAccountID(*x)
+func (_u *EmailUpdate) SetNillableAccountID(v *xid.ID) *EmailUpdate {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return eu
+	return _u
 }
 
 // ClearAccountID clears the value of the "account_id" field.
-func (eu *EmailUpdate) ClearAccountID() *EmailUpdate {
-	eu.mutation.ClearAccountID()
-	return eu
+func (_u *EmailUpdate) ClearAccountID() *EmailUpdate {
+	_u.mutation.ClearAccountID()
+	return _u
 }
 
 // SetVerificationCode sets the "verification_code" field.
-func (eu *EmailUpdate) SetVerificationCode(s string) *EmailUpdate {
-	eu.mutation.SetVerificationCode(s)
-	return eu
+func (_u *EmailUpdate) SetVerificationCode(v string) *EmailUpdate {
+	_u.mutation.SetVerificationCode(v)
+	return _u
 }
 
 // SetNillableVerificationCode sets the "verification_code" field if the given value is not nil.
-func (eu *EmailUpdate) SetNillableVerificationCode(s *string) *EmailUpdate {
-	if s != nil {
-		eu.SetVerificationCode(*s)
+func (_u *EmailUpdate) SetNillableVerificationCode(v *string) *EmailUpdate {
+	if v != nil {
+		_u.SetVerificationCode(*v)
 	}
-	return eu
+	return _u
 }
 
 // SetVerified sets the "verified" field.
-func (eu *EmailUpdate) SetVerified(b bool) *EmailUpdate {
-	eu.mutation.SetVerified(b)
-	return eu
+func (_u *EmailUpdate) SetVerified(v bool) *EmailUpdate {
+	_u.mutation.SetVerified(v)
+	return _u
 }
 
 // SetNillableVerified sets the "verified" field if the given value is not nil.
-func (eu *EmailUpdate) SetNillableVerified(b *bool) *EmailUpdate {
-	if b != nil {
-		eu.SetVerified(*b)
+func (_u *EmailUpdate) SetNillableVerified(v *bool) *EmailUpdate {
+	if v != nil {
+		_u.SetVerified(*v)
 	}
-	return eu
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (eu *EmailUpdate) SetAccount(a *Account) *EmailUpdate {
-	return eu.SetAccountID(a.ID)
+func (_u *EmailUpdate) SetAccount(v *Account) *EmailUpdate {
+	return _u.SetAccountID(v.ID)
 }
 
 // Mutation returns the EmailMutation object of the builder.
-func (eu *EmailUpdate) Mutation() *EmailMutation {
-	return eu.mutation
+func (_u *EmailUpdate) Mutation() *EmailMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (eu *EmailUpdate) ClearAccount() *EmailUpdate {
-	eu.mutation.ClearAccount()
-	return eu
+func (_u *EmailUpdate) ClearAccount() *EmailUpdate {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (eu *EmailUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, eu.sqlSave, eu.mutation, eu.hooks)
+func (_u *EmailUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (eu *EmailUpdate) SaveX(ctx context.Context) int {
-	affected, err := eu.Save(ctx)
+func (_u *EmailUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -109,21 +109,21 @@ func (eu *EmailUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (eu *EmailUpdate) Exec(ctx context.Context) error {
-	_, err := eu.Save(ctx)
+func (_u *EmailUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (eu *EmailUpdate) ExecX(ctx context.Context) {
-	if err := eu.Exec(ctx); err != nil {
+func (_u *EmailUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (eu *EmailUpdate) check() error {
-	if v, ok := eu.mutation.VerificationCode(); ok {
+func (_u *EmailUpdate) check() error {
+	if v, ok := _u.mutation.VerificationCode(); ok {
 		if err := email.VerificationCodeValidator(v); err != nil {
 			return &ValidationError{Name: "verification_code", err: fmt.Errorf(`ent: validator failed for field "Email.verification_code": %w`, err)}
 		}
@@ -132,30 +132,30 @@ func (eu *EmailUpdate) check() error {
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (eu *EmailUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EmailUpdate {
-	eu.modifiers = append(eu.modifiers, modifiers...)
-	return eu
+func (_u *EmailUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EmailUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := eu.check(); err != nil {
-		return n, err
+func (_u *EmailUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(email.Table, email.Columns, sqlgraph.NewFieldSpec(email.FieldID, field.TypeString))
-	if ps := eu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := eu.mutation.VerificationCode(); ok {
+	if value, ok := _u.mutation.VerificationCode(); ok {
 		_spec.SetField(email.FieldVerificationCode, field.TypeString, value)
 	}
-	if value, ok := eu.mutation.Verified(); ok {
+	if value, ok := _u.mutation.Verified(); ok {
 		_spec.SetField(email.FieldVerified, field.TypeBool, value)
 	}
-	if eu.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -168,7 +168,7 @@ func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -184,8 +184,8 @@ func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(eu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{email.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -193,8 +193,8 @@ func (eu *EmailUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	eu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // EmailUpdateOne is the builder for updating a single Email entity.
@@ -207,90 +207,90 @@ type EmailUpdateOne struct {
 }
 
 // SetAccountID sets the "account_id" field.
-func (euo *EmailUpdateOne) SetAccountID(x xid.ID) *EmailUpdateOne {
-	euo.mutation.SetAccountID(x)
-	return euo
+func (_u *EmailUpdateOne) SetAccountID(v xid.ID) *EmailUpdateOne {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (euo *EmailUpdateOne) SetNillableAccountID(x *xid.ID) *EmailUpdateOne {
-	if x != nil {
-		euo.SetAccountID(*x)
+func (_u *EmailUpdateOne) SetNillableAccountID(v *xid.ID) *EmailUpdateOne {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return euo
+	return _u
 }
 
 // ClearAccountID clears the value of the "account_id" field.
-func (euo *EmailUpdateOne) ClearAccountID() *EmailUpdateOne {
-	euo.mutation.ClearAccountID()
-	return euo
+func (_u *EmailUpdateOne) ClearAccountID() *EmailUpdateOne {
+	_u.mutation.ClearAccountID()
+	return _u
 }
 
 // SetVerificationCode sets the "verification_code" field.
-func (euo *EmailUpdateOne) SetVerificationCode(s string) *EmailUpdateOne {
-	euo.mutation.SetVerificationCode(s)
-	return euo
+func (_u *EmailUpdateOne) SetVerificationCode(v string) *EmailUpdateOne {
+	_u.mutation.SetVerificationCode(v)
+	return _u
 }
 
 // SetNillableVerificationCode sets the "verification_code" field if the given value is not nil.
-func (euo *EmailUpdateOne) SetNillableVerificationCode(s *string) *EmailUpdateOne {
-	if s != nil {
-		euo.SetVerificationCode(*s)
+func (_u *EmailUpdateOne) SetNillableVerificationCode(v *string) *EmailUpdateOne {
+	if v != nil {
+		_u.SetVerificationCode(*v)
 	}
-	return euo
+	return _u
 }
 
 // SetVerified sets the "verified" field.
-func (euo *EmailUpdateOne) SetVerified(b bool) *EmailUpdateOne {
-	euo.mutation.SetVerified(b)
-	return euo
+func (_u *EmailUpdateOne) SetVerified(v bool) *EmailUpdateOne {
+	_u.mutation.SetVerified(v)
+	return _u
 }
 
 // SetNillableVerified sets the "verified" field if the given value is not nil.
-func (euo *EmailUpdateOne) SetNillableVerified(b *bool) *EmailUpdateOne {
-	if b != nil {
-		euo.SetVerified(*b)
+func (_u *EmailUpdateOne) SetNillableVerified(v *bool) *EmailUpdateOne {
+	if v != nil {
+		_u.SetVerified(*v)
 	}
-	return euo
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (euo *EmailUpdateOne) SetAccount(a *Account) *EmailUpdateOne {
-	return euo.SetAccountID(a.ID)
+func (_u *EmailUpdateOne) SetAccount(v *Account) *EmailUpdateOne {
+	return _u.SetAccountID(v.ID)
 }
 
 // Mutation returns the EmailMutation object of the builder.
-func (euo *EmailUpdateOne) Mutation() *EmailMutation {
-	return euo.mutation
+func (_u *EmailUpdateOne) Mutation() *EmailMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (euo *EmailUpdateOne) ClearAccount() *EmailUpdateOne {
-	euo.mutation.ClearAccount()
-	return euo
+func (_u *EmailUpdateOne) ClearAccount() *EmailUpdateOne {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // Where appends a list predicates to the EmailUpdate builder.
-func (euo *EmailUpdateOne) Where(ps ...predicate.Email) *EmailUpdateOne {
-	euo.mutation.Where(ps...)
-	return euo
+func (_u *EmailUpdateOne) Where(ps ...predicate.Email) *EmailUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (euo *EmailUpdateOne) Select(field string, fields ...string) *EmailUpdateOne {
-	euo.fields = append([]string{field}, fields...)
-	return euo
+func (_u *EmailUpdateOne) Select(field string, fields ...string) *EmailUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Email entity.
-func (euo *EmailUpdateOne) Save(ctx context.Context) (*Email, error) {
-	return withHooks(ctx, euo.sqlSave, euo.mutation, euo.hooks)
+func (_u *EmailUpdateOne) Save(ctx context.Context) (*Email, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (euo *EmailUpdateOne) SaveX(ctx context.Context) *Email {
-	node, err := euo.Save(ctx)
+func (_u *EmailUpdateOne) SaveX(ctx context.Context) *Email {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -298,21 +298,21 @@ func (euo *EmailUpdateOne) SaveX(ctx context.Context) *Email {
 }
 
 // Exec executes the query on the entity.
-func (euo *EmailUpdateOne) Exec(ctx context.Context) error {
-	_, err := euo.Save(ctx)
+func (_u *EmailUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (euo *EmailUpdateOne) ExecX(ctx context.Context) {
-	if err := euo.Exec(ctx); err != nil {
+func (_u *EmailUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (euo *EmailUpdateOne) check() error {
-	if v, ok := euo.mutation.VerificationCode(); ok {
+func (_u *EmailUpdateOne) check() error {
+	if v, ok := _u.mutation.VerificationCode(); ok {
 		if err := email.VerificationCodeValidator(v); err != nil {
 			return &ValidationError{Name: "verification_code", err: fmt.Errorf(`ent: validator failed for field "Email.verification_code": %w`, err)}
 		}
@@ -321,22 +321,22 @@ func (euo *EmailUpdateOne) check() error {
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (euo *EmailUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EmailUpdateOne {
-	euo.modifiers = append(euo.modifiers, modifiers...)
-	return euo
+func (_u *EmailUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EmailUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error) {
-	if err := euo.check(); err != nil {
+func (_u *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(email.Table, email.Columns, sqlgraph.NewFieldSpec(email.FieldID, field.TypeString))
-	id, ok := euo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Email.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := euo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, email.FieldID)
 		for _, f := range fields {
@@ -348,20 +348,20 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 			}
 		}
 	}
-	if ps := euo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := euo.mutation.VerificationCode(); ok {
+	if value, ok := _u.mutation.VerificationCode(); ok {
 		_spec.SetField(email.FieldVerificationCode, field.TypeString, value)
 	}
-	if value, ok := euo.mutation.Verified(); ok {
+	if value, ok := _u.mutation.Verified(); ok {
 		_spec.SetField(email.FieldVerified, field.TypeBool, value)
 	}
-	if euo.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -374,7 +374,7 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -390,11 +390,11 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(euo.modifiers...)
-	_node = &Email{config: euo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Email{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, euo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{email.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -402,6 +402,6 @@ func (euo *EmailUpdateOne) sqlSave(ctx context.Context) (_node *Email, err error
 		}
 		return nil, err
 	}
-	euo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

@@ -83,7 +83,7 @@ func (*LikePost) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the LikePost fields.
-func (lp *LikePost) assignValues(columns []string, values []any) error {
+func (_m *LikePost) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -93,28 +93,28 @@ func (lp *LikePost) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				lp.ID = *value
+				_m.ID = *value
 			}
 		case likepost.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				lp.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case likepost.FieldAccountID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
 			} else if value != nil {
-				lp.AccountID = *value
+				_m.AccountID = *value
 			}
 		case likepost.FieldPostID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field post_id", values[i])
 			} else if value != nil {
-				lp.PostID = *value
+				_m.PostID = *value
 			}
 		default:
-			lp.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -122,51 +122,51 @@ func (lp *LikePost) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the LikePost.
 // This includes values selected through modifiers, order, etc.
-func (lp *LikePost) Value(name string) (ent.Value, error) {
-	return lp.selectValues.Get(name)
+func (_m *LikePost) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryAccount queries the "account" edge of the LikePost entity.
-func (lp *LikePost) QueryAccount() *AccountQuery {
-	return NewLikePostClient(lp.config).QueryAccount(lp)
+func (_m *LikePost) QueryAccount() *AccountQuery {
+	return NewLikePostClient(_m.config).QueryAccount(_m)
 }
 
 // QueryPost queries the "Post" edge of the LikePost entity.
-func (lp *LikePost) QueryPost() *PostQuery {
-	return NewLikePostClient(lp.config).QueryPost(lp)
+func (_m *LikePost) QueryPost() *PostQuery {
+	return NewLikePostClient(_m.config).QueryPost(_m)
 }
 
 // Update returns a builder for updating this LikePost.
 // Note that you need to call LikePost.Unwrap() before calling this method if this LikePost
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (lp *LikePost) Update() *LikePostUpdateOne {
-	return NewLikePostClient(lp.config).UpdateOne(lp)
+func (_m *LikePost) Update() *LikePostUpdateOne {
+	return NewLikePostClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the LikePost entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (lp *LikePost) Unwrap() *LikePost {
-	_tx, ok := lp.config.driver.(*txDriver)
+func (_m *LikePost) Unwrap() *LikePost {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: LikePost is not a transactional entity")
 	}
-	lp.config.driver = _tx.drv
-	return lp
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (lp *LikePost) String() string {
+func (_m *LikePost) String() string {
 	var builder strings.Builder
 	builder.WriteString("LikePost(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", lp.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(lp.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
-	builder.WriteString(fmt.Sprintf("%v", lp.AccountID))
+	builder.WriteString(fmt.Sprintf("%v", _m.AccountID))
 	builder.WriteString(", ")
 	builder.WriteString("post_id=")
-	builder.WriteString(fmt.Sprintf("%v", lp.PostID))
+	builder.WriteString(fmt.Sprintf("%v", _m.PostID))
 	builder.WriteByte(')')
 	return builder.String()
 }

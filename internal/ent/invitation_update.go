@@ -26,138 +26,138 @@ type InvitationUpdate struct {
 }
 
 // Where appends a list predicates to the InvitationUpdate builder.
-func (iu *InvitationUpdate) Where(ps ...predicate.Invitation) *InvitationUpdate {
-	iu.mutation.Where(ps...)
-	return iu
+func (_u *InvitationUpdate) Where(ps ...predicate.Invitation) *InvitationUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (iu *InvitationUpdate) SetUpdatedAt(t time.Time) *InvitationUpdate {
-	iu.mutation.SetUpdatedAt(t)
-	return iu
+func (_u *InvitationUpdate) SetUpdatedAt(v time.Time) *InvitationUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (iu *InvitationUpdate) SetDeletedAt(t time.Time) *InvitationUpdate {
-	iu.mutation.SetDeletedAt(t)
-	return iu
+func (_u *InvitationUpdate) SetDeletedAt(v time.Time) *InvitationUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (iu *InvitationUpdate) SetNillableDeletedAt(t *time.Time) *InvitationUpdate {
-	if t != nil {
-		iu.SetDeletedAt(*t)
+func (_u *InvitationUpdate) SetNillableDeletedAt(v *time.Time) *InvitationUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return iu
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (iu *InvitationUpdate) ClearDeletedAt() *InvitationUpdate {
-	iu.mutation.ClearDeletedAt()
-	return iu
+func (_u *InvitationUpdate) ClearDeletedAt() *InvitationUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetMessage sets the "message" field.
-func (iu *InvitationUpdate) SetMessage(s string) *InvitationUpdate {
-	iu.mutation.SetMessage(s)
-	return iu
+func (_u *InvitationUpdate) SetMessage(v string) *InvitationUpdate {
+	_u.mutation.SetMessage(v)
+	return _u
 }
 
 // SetNillableMessage sets the "message" field if the given value is not nil.
-func (iu *InvitationUpdate) SetNillableMessage(s *string) *InvitationUpdate {
-	if s != nil {
-		iu.SetMessage(*s)
+func (_u *InvitationUpdate) SetNillableMessage(v *string) *InvitationUpdate {
+	if v != nil {
+		_u.SetMessage(*v)
 	}
-	return iu
+	return _u
 }
 
 // ClearMessage clears the value of the "message" field.
-func (iu *InvitationUpdate) ClearMessage() *InvitationUpdate {
-	iu.mutation.ClearMessage()
-	return iu
+func (_u *InvitationUpdate) ClearMessage() *InvitationUpdate {
+	_u.mutation.ClearMessage()
+	return _u
 }
 
 // SetCreatorAccountID sets the "creator_account_id" field.
-func (iu *InvitationUpdate) SetCreatorAccountID(x xid.ID) *InvitationUpdate {
-	iu.mutation.SetCreatorAccountID(x)
-	return iu
+func (_u *InvitationUpdate) SetCreatorAccountID(v xid.ID) *InvitationUpdate {
+	_u.mutation.SetCreatorAccountID(v)
+	return _u
 }
 
 // SetNillableCreatorAccountID sets the "creator_account_id" field if the given value is not nil.
-func (iu *InvitationUpdate) SetNillableCreatorAccountID(x *xid.ID) *InvitationUpdate {
-	if x != nil {
-		iu.SetCreatorAccountID(*x)
+func (_u *InvitationUpdate) SetNillableCreatorAccountID(v *xid.ID) *InvitationUpdate {
+	if v != nil {
+		_u.SetCreatorAccountID(*v)
 	}
-	return iu
+	return _u
 }
 
 // SetCreatorID sets the "creator" edge to the Account entity by ID.
-func (iu *InvitationUpdate) SetCreatorID(id xid.ID) *InvitationUpdate {
-	iu.mutation.SetCreatorID(id)
-	return iu
+func (_u *InvitationUpdate) SetCreatorID(id xid.ID) *InvitationUpdate {
+	_u.mutation.SetCreatorID(id)
+	return _u
 }
 
 // SetCreator sets the "creator" edge to the Account entity.
-func (iu *InvitationUpdate) SetCreator(a *Account) *InvitationUpdate {
-	return iu.SetCreatorID(a.ID)
+func (_u *InvitationUpdate) SetCreator(v *Account) *InvitationUpdate {
+	return _u.SetCreatorID(v.ID)
 }
 
 // AddInvitedIDs adds the "invited" edge to the Account entity by IDs.
-func (iu *InvitationUpdate) AddInvitedIDs(ids ...xid.ID) *InvitationUpdate {
-	iu.mutation.AddInvitedIDs(ids...)
-	return iu
+func (_u *InvitationUpdate) AddInvitedIDs(ids ...xid.ID) *InvitationUpdate {
+	_u.mutation.AddInvitedIDs(ids...)
+	return _u
 }
 
 // AddInvited adds the "invited" edges to the Account entity.
-func (iu *InvitationUpdate) AddInvited(a ...*Account) *InvitationUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *InvitationUpdate) AddInvited(v ...*Account) *InvitationUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return iu.AddInvitedIDs(ids...)
+	return _u.AddInvitedIDs(ids...)
 }
 
 // Mutation returns the InvitationMutation object of the builder.
-func (iu *InvitationUpdate) Mutation() *InvitationMutation {
-	return iu.mutation
+func (_u *InvitationUpdate) Mutation() *InvitationMutation {
+	return _u.mutation
 }
 
 // ClearCreator clears the "creator" edge to the Account entity.
-func (iu *InvitationUpdate) ClearCreator() *InvitationUpdate {
-	iu.mutation.ClearCreator()
-	return iu
+func (_u *InvitationUpdate) ClearCreator() *InvitationUpdate {
+	_u.mutation.ClearCreator()
+	return _u
 }
 
 // ClearInvited clears all "invited" edges to the Account entity.
-func (iu *InvitationUpdate) ClearInvited() *InvitationUpdate {
-	iu.mutation.ClearInvited()
-	return iu
+func (_u *InvitationUpdate) ClearInvited() *InvitationUpdate {
+	_u.mutation.ClearInvited()
+	return _u
 }
 
 // RemoveInvitedIDs removes the "invited" edge to Account entities by IDs.
-func (iu *InvitationUpdate) RemoveInvitedIDs(ids ...xid.ID) *InvitationUpdate {
-	iu.mutation.RemoveInvitedIDs(ids...)
-	return iu
+func (_u *InvitationUpdate) RemoveInvitedIDs(ids ...xid.ID) *InvitationUpdate {
+	_u.mutation.RemoveInvitedIDs(ids...)
+	return _u
 }
 
 // RemoveInvited removes "invited" edges to Account entities.
-func (iu *InvitationUpdate) RemoveInvited(a ...*Account) *InvitationUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *InvitationUpdate) RemoveInvited(v ...*Account) *InvitationUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return iu.RemoveInvitedIDs(ids...)
+	return _u.RemoveInvitedIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (iu *InvitationUpdate) Save(ctx context.Context) (int, error) {
-	iu.defaults()
-	return withHooks(ctx, iu.sqlSave, iu.mutation, iu.hooks)
+func (_u *InvitationUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (iu *InvitationUpdate) SaveX(ctx context.Context) int {
-	affected, err := iu.Save(ctx)
+func (_u *InvitationUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -165,68 +165,68 @@ func (iu *InvitationUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (iu *InvitationUpdate) Exec(ctx context.Context) error {
-	_, err := iu.Save(ctx)
+func (_u *InvitationUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (iu *InvitationUpdate) ExecX(ctx context.Context) {
-	if err := iu.Exec(ctx); err != nil {
+func (_u *InvitationUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (iu *InvitationUpdate) defaults() {
-	if _, ok := iu.mutation.UpdatedAt(); !ok {
+func (_u *InvitationUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := invitation.UpdateDefaultUpdatedAt()
-		iu.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (iu *InvitationUpdate) check() error {
-	if iu.mutation.CreatorCleared() && len(iu.mutation.CreatorIDs()) > 0 {
+func (_u *InvitationUpdate) check() error {
+	if _u.mutation.CreatorCleared() && len(_u.mutation.CreatorIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Invitation.creator"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (iu *InvitationUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *InvitationUpdate {
-	iu.modifiers = append(iu.modifiers, modifiers...)
-	return iu
+func (_u *InvitationUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *InvitationUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (iu *InvitationUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := iu.check(); err != nil {
-		return n, err
+func (_u *InvitationUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(invitation.Table, invitation.Columns, sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString))
-	if ps := iu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := iu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(invitation.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := iu.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(invitation.FieldDeletedAt, field.TypeTime, value)
 	}
-	if iu.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(invitation.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := iu.mutation.Message(); ok {
+	if value, ok := _u.mutation.Message(); ok {
 		_spec.SetField(invitation.FieldMessage, field.TypeString, value)
 	}
-	if iu.mutation.MessageCleared() {
+	if _u.mutation.MessageCleared() {
 		_spec.ClearField(invitation.FieldMessage, field.TypeString)
 	}
-	if iu.mutation.CreatorCleared() {
+	if _u.mutation.CreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -239,7 +239,7 @@ func (iu *InvitationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iu.mutation.CreatorIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -255,7 +255,7 @@ func (iu *InvitationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if iu.mutation.InvitedCleared() {
+	if _u.mutation.InvitedCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -268,7 +268,7 @@ func (iu *InvitationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iu.mutation.RemovedInvitedIDs(); len(nodes) > 0 && !iu.mutation.InvitedCleared() {
+	if nodes := _u.mutation.RemovedInvitedIDs(); len(nodes) > 0 && !_u.mutation.InvitedCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -284,7 +284,7 @@ func (iu *InvitationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iu.mutation.InvitedIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.InvitedIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -300,8 +300,8 @@ func (iu *InvitationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(iu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, iu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{invitation.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -309,8 +309,8 @@ func (iu *InvitationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	iu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // InvitationUpdateOne is the builder for updating a single Invitation entity.
@@ -323,145 +323,145 @@ type InvitationUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (iuo *InvitationUpdateOne) SetUpdatedAt(t time.Time) *InvitationUpdateOne {
-	iuo.mutation.SetUpdatedAt(t)
-	return iuo
+func (_u *InvitationUpdateOne) SetUpdatedAt(v time.Time) *InvitationUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (iuo *InvitationUpdateOne) SetDeletedAt(t time.Time) *InvitationUpdateOne {
-	iuo.mutation.SetDeletedAt(t)
-	return iuo
+func (_u *InvitationUpdateOne) SetDeletedAt(v time.Time) *InvitationUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (iuo *InvitationUpdateOne) SetNillableDeletedAt(t *time.Time) *InvitationUpdateOne {
-	if t != nil {
-		iuo.SetDeletedAt(*t)
+func (_u *InvitationUpdateOne) SetNillableDeletedAt(v *time.Time) *InvitationUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return iuo
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (iuo *InvitationUpdateOne) ClearDeletedAt() *InvitationUpdateOne {
-	iuo.mutation.ClearDeletedAt()
-	return iuo
+func (_u *InvitationUpdateOne) ClearDeletedAt() *InvitationUpdateOne {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetMessage sets the "message" field.
-func (iuo *InvitationUpdateOne) SetMessage(s string) *InvitationUpdateOne {
-	iuo.mutation.SetMessage(s)
-	return iuo
+func (_u *InvitationUpdateOne) SetMessage(v string) *InvitationUpdateOne {
+	_u.mutation.SetMessage(v)
+	return _u
 }
 
 // SetNillableMessage sets the "message" field if the given value is not nil.
-func (iuo *InvitationUpdateOne) SetNillableMessage(s *string) *InvitationUpdateOne {
-	if s != nil {
-		iuo.SetMessage(*s)
+func (_u *InvitationUpdateOne) SetNillableMessage(v *string) *InvitationUpdateOne {
+	if v != nil {
+		_u.SetMessage(*v)
 	}
-	return iuo
+	return _u
 }
 
 // ClearMessage clears the value of the "message" field.
-func (iuo *InvitationUpdateOne) ClearMessage() *InvitationUpdateOne {
-	iuo.mutation.ClearMessage()
-	return iuo
+func (_u *InvitationUpdateOne) ClearMessage() *InvitationUpdateOne {
+	_u.mutation.ClearMessage()
+	return _u
 }
 
 // SetCreatorAccountID sets the "creator_account_id" field.
-func (iuo *InvitationUpdateOne) SetCreatorAccountID(x xid.ID) *InvitationUpdateOne {
-	iuo.mutation.SetCreatorAccountID(x)
-	return iuo
+func (_u *InvitationUpdateOne) SetCreatorAccountID(v xid.ID) *InvitationUpdateOne {
+	_u.mutation.SetCreatorAccountID(v)
+	return _u
 }
 
 // SetNillableCreatorAccountID sets the "creator_account_id" field if the given value is not nil.
-func (iuo *InvitationUpdateOne) SetNillableCreatorAccountID(x *xid.ID) *InvitationUpdateOne {
-	if x != nil {
-		iuo.SetCreatorAccountID(*x)
+func (_u *InvitationUpdateOne) SetNillableCreatorAccountID(v *xid.ID) *InvitationUpdateOne {
+	if v != nil {
+		_u.SetCreatorAccountID(*v)
 	}
-	return iuo
+	return _u
 }
 
 // SetCreatorID sets the "creator" edge to the Account entity by ID.
-func (iuo *InvitationUpdateOne) SetCreatorID(id xid.ID) *InvitationUpdateOne {
-	iuo.mutation.SetCreatorID(id)
-	return iuo
+func (_u *InvitationUpdateOne) SetCreatorID(id xid.ID) *InvitationUpdateOne {
+	_u.mutation.SetCreatorID(id)
+	return _u
 }
 
 // SetCreator sets the "creator" edge to the Account entity.
-func (iuo *InvitationUpdateOne) SetCreator(a *Account) *InvitationUpdateOne {
-	return iuo.SetCreatorID(a.ID)
+func (_u *InvitationUpdateOne) SetCreator(v *Account) *InvitationUpdateOne {
+	return _u.SetCreatorID(v.ID)
 }
 
 // AddInvitedIDs adds the "invited" edge to the Account entity by IDs.
-func (iuo *InvitationUpdateOne) AddInvitedIDs(ids ...xid.ID) *InvitationUpdateOne {
-	iuo.mutation.AddInvitedIDs(ids...)
-	return iuo
+func (_u *InvitationUpdateOne) AddInvitedIDs(ids ...xid.ID) *InvitationUpdateOne {
+	_u.mutation.AddInvitedIDs(ids...)
+	return _u
 }
 
 // AddInvited adds the "invited" edges to the Account entity.
-func (iuo *InvitationUpdateOne) AddInvited(a ...*Account) *InvitationUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *InvitationUpdateOne) AddInvited(v ...*Account) *InvitationUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return iuo.AddInvitedIDs(ids...)
+	return _u.AddInvitedIDs(ids...)
 }
 
 // Mutation returns the InvitationMutation object of the builder.
-func (iuo *InvitationUpdateOne) Mutation() *InvitationMutation {
-	return iuo.mutation
+func (_u *InvitationUpdateOne) Mutation() *InvitationMutation {
+	return _u.mutation
 }
 
 // ClearCreator clears the "creator" edge to the Account entity.
-func (iuo *InvitationUpdateOne) ClearCreator() *InvitationUpdateOne {
-	iuo.mutation.ClearCreator()
-	return iuo
+func (_u *InvitationUpdateOne) ClearCreator() *InvitationUpdateOne {
+	_u.mutation.ClearCreator()
+	return _u
 }
 
 // ClearInvited clears all "invited" edges to the Account entity.
-func (iuo *InvitationUpdateOne) ClearInvited() *InvitationUpdateOne {
-	iuo.mutation.ClearInvited()
-	return iuo
+func (_u *InvitationUpdateOne) ClearInvited() *InvitationUpdateOne {
+	_u.mutation.ClearInvited()
+	return _u
 }
 
 // RemoveInvitedIDs removes the "invited" edge to Account entities by IDs.
-func (iuo *InvitationUpdateOne) RemoveInvitedIDs(ids ...xid.ID) *InvitationUpdateOne {
-	iuo.mutation.RemoveInvitedIDs(ids...)
-	return iuo
+func (_u *InvitationUpdateOne) RemoveInvitedIDs(ids ...xid.ID) *InvitationUpdateOne {
+	_u.mutation.RemoveInvitedIDs(ids...)
+	return _u
 }
 
 // RemoveInvited removes "invited" edges to Account entities.
-func (iuo *InvitationUpdateOne) RemoveInvited(a ...*Account) *InvitationUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *InvitationUpdateOne) RemoveInvited(v ...*Account) *InvitationUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return iuo.RemoveInvitedIDs(ids...)
+	return _u.RemoveInvitedIDs(ids...)
 }
 
 // Where appends a list predicates to the InvitationUpdate builder.
-func (iuo *InvitationUpdateOne) Where(ps ...predicate.Invitation) *InvitationUpdateOne {
-	iuo.mutation.Where(ps...)
-	return iuo
+func (_u *InvitationUpdateOne) Where(ps ...predicate.Invitation) *InvitationUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (iuo *InvitationUpdateOne) Select(field string, fields ...string) *InvitationUpdateOne {
-	iuo.fields = append([]string{field}, fields...)
-	return iuo
+func (_u *InvitationUpdateOne) Select(field string, fields ...string) *InvitationUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Invitation entity.
-func (iuo *InvitationUpdateOne) Save(ctx context.Context) (*Invitation, error) {
-	iuo.defaults()
-	return withHooks(ctx, iuo.sqlSave, iuo.mutation, iuo.hooks)
+func (_u *InvitationUpdateOne) Save(ctx context.Context) (*Invitation, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (iuo *InvitationUpdateOne) SaveX(ctx context.Context) *Invitation {
-	node, err := iuo.Save(ctx)
+func (_u *InvitationUpdateOne) SaveX(ctx context.Context) *Invitation {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -469,51 +469,51 @@ func (iuo *InvitationUpdateOne) SaveX(ctx context.Context) *Invitation {
 }
 
 // Exec executes the query on the entity.
-func (iuo *InvitationUpdateOne) Exec(ctx context.Context) error {
-	_, err := iuo.Save(ctx)
+func (_u *InvitationUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (iuo *InvitationUpdateOne) ExecX(ctx context.Context) {
-	if err := iuo.Exec(ctx); err != nil {
+func (_u *InvitationUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (iuo *InvitationUpdateOne) defaults() {
-	if _, ok := iuo.mutation.UpdatedAt(); !ok {
+func (_u *InvitationUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := invitation.UpdateDefaultUpdatedAt()
-		iuo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (iuo *InvitationUpdateOne) check() error {
-	if iuo.mutation.CreatorCleared() && len(iuo.mutation.CreatorIDs()) > 0 {
+func (_u *InvitationUpdateOne) check() error {
+	if _u.mutation.CreatorCleared() && len(_u.mutation.CreatorIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Invitation.creator"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (iuo *InvitationUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *InvitationUpdateOne {
-	iuo.modifiers = append(iuo.modifiers, modifiers...)
-	return iuo
+func (_u *InvitationUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *InvitationUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (iuo *InvitationUpdateOne) sqlSave(ctx context.Context) (_node *Invitation, err error) {
-	if err := iuo.check(); err != nil {
+func (_u *InvitationUpdateOne) sqlSave(ctx context.Context) (_node *Invitation, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(invitation.Table, invitation.Columns, sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString))
-	id, ok := iuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Invitation.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := iuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, invitation.FieldID)
 		for _, f := range fields {
@@ -525,29 +525,29 @@ func (iuo *InvitationUpdateOne) sqlSave(ctx context.Context) (_node *Invitation,
 			}
 		}
 	}
-	if ps := iuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := iuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(invitation.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := iuo.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(invitation.FieldDeletedAt, field.TypeTime, value)
 	}
-	if iuo.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(invitation.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := iuo.mutation.Message(); ok {
+	if value, ok := _u.mutation.Message(); ok {
 		_spec.SetField(invitation.FieldMessage, field.TypeString, value)
 	}
-	if iuo.mutation.MessageCleared() {
+	if _u.mutation.MessageCleared() {
 		_spec.ClearField(invitation.FieldMessage, field.TypeString)
 	}
-	if iuo.mutation.CreatorCleared() {
+	if _u.mutation.CreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -560,7 +560,7 @@ func (iuo *InvitationUpdateOne) sqlSave(ctx context.Context) (_node *Invitation,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iuo.mutation.CreatorIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -576,7 +576,7 @@ func (iuo *InvitationUpdateOne) sqlSave(ctx context.Context) (_node *Invitation,
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if iuo.mutation.InvitedCleared() {
+	if _u.mutation.InvitedCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -589,7 +589,7 @@ func (iuo *InvitationUpdateOne) sqlSave(ctx context.Context) (_node *Invitation,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iuo.mutation.RemovedInvitedIDs(); len(nodes) > 0 && !iuo.mutation.InvitedCleared() {
+	if nodes := _u.mutation.RemovedInvitedIDs(); len(nodes) > 0 && !_u.mutation.InvitedCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -605,7 +605,7 @@ func (iuo *InvitationUpdateOne) sqlSave(ctx context.Context) (_node *Invitation,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iuo.mutation.InvitedIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.InvitedIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -621,11 +621,11 @@ func (iuo *InvitationUpdateOne) sqlSave(ctx context.Context) (_node *Invitation,
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(iuo.modifiers...)
-	_node = &Invitation{config: iuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Invitation{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, iuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{invitation.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -633,6 +633,6 @@ func (iuo *InvitationUpdateOne) sqlSave(ctx context.Context) (_node *Invitation,
 		}
 		return nil, err
 	}
-	iuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

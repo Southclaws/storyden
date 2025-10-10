@@ -34,44 +34,44 @@ type LikePostQuery struct {
 }
 
 // Where adds a new predicate for the LikePostQuery builder.
-func (lpq *LikePostQuery) Where(ps ...predicate.LikePost) *LikePostQuery {
-	lpq.predicates = append(lpq.predicates, ps...)
-	return lpq
+func (_q *LikePostQuery) Where(ps ...predicate.LikePost) *LikePostQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (lpq *LikePostQuery) Limit(limit int) *LikePostQuery {
-	lpq.ctx.Limit = &limit
-	return lpq
+func (_q *LikePostQuery) Limit(limit int) *LikePostQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (lpq *LikePostQuery) Offset(offset int) *LikePostQuery {
-	lpq.ctx.Offset = &offset
-	return lpq
+func (_q *LikePostQuery) Offset(offset int) *LikePostQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (lpq *LikePostQuery) Unique(unique bool) *LikePostQuery {
-	lpq.ctx.Unique = &unique
-	return lpq
+func (_q *LikePostQuery) Unique(unique bool) *LikePostQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (lpq *LikePostQuery) Order(o ...likepost.OrderOption) *LikePostQuery {
-	lpq.order = append(lpq.order, o...)
-	return lpq
+func (_q *LikePostQuery) Order(o ...likepost.OrderOption) *LikePostQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryAccount chains the current query on the "account" edge.
-func (lpq *LikePostQuery) QueryAccount() *AccountQuery {
-	query := (&AccountClient{config: lpq.config}).Query()
+func (_q *LikePostQuery) QueryAccount() *AccountQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := lpq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := lpq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -80,20 +80,20 @@ func (lpq *LikePostQuery) QueryAccount() *AccountQuery {
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, likepost.AccountTable, likepost.AccountColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(lpq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryPost chains the current query on the "Post" edge.
-func (lpq *LikePostQuery) QueryPost() *PostQuery {
-	query := (&PostClient{config: lpq.config}).Query()
+func (_q *LikePostQuery) QueryPost() *PostQuery {
+	query := (&PostClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := lpq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := lpq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -102,7 +102,7 @@ func (lpq *LikePostQuery) QueryPost() *PostQuery {
 			sqlgraph.To(post.Table, post.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, likepost.PostTable, likepost.PostColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(lpq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -110,8 +110,8 @@ func (lpq *LikePostQuery) QueryPost() *PostQuery {
 
 // First returns the first LikePost entity from the query.
 // Returns a *NotFoundError when no LikePost was found.
-func (lpq *LikePostQuery) First(ctx context.Context) (*LikePost, error) {
-	nodes, err := lpq.Limit(1).All(setContextOp(ctx, lpq.ctx, ent.OpQueryFirst))
+func (_q *LikePostQuery) First(ctx context.Context) (*LikePost, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -122,8 +122,8 @@ func (lpq *LikePostQuery) First(ctx context.Context) (*LikePost, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (lpq *LikePostQuery) FirstX(ctx context.Context) *LikePost {
-	node, err := lpq.First(ctx)
+func (_q *LikePostQuery) FirstX(ctx context.Context) *LikePost {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -132,9 +132,9 @@ func (lpq *LikePostQuery) FirstX(ctx context.Context) *LikePost {
 
 // FirstID returns the first LikePost ID from the query.
 // Returns a *NotFoundError when no LikePost ID was found.
-func (lpq *LikePostQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+func (_q *LikePostQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = lpq.Limit(1).IDs(setContextOp(ctx, lpq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -145,8 +145,8 @@ func (lpq *LikePostQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (lpq *LikePostQuery) FirstIDX(ctx context.Context) xid.ID {
-	id, err := lpq.FirstID(ctx)
+func (_q *LikePostQuery) FirstIDX(ctx context.Context) xid.ID {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -156,8 +156,8 @@ func (lpq *LikePostQuery) FirstIDX(ctx context.Context) xid.ID {
 // Only returns a single LikePost entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one LikePost entity is found.
 // Returns a *NotFoundError when no LikePost entities are found.
-func (lpq *LikePostQuery) Only(ctx context.Context) (*LikePost, error) {
-	nodes, err := lpq.Limit(2).All(setContextOp(ctx, lpq.ctx, ent.OpQueryOnly))
+func (_q *LikePostQuery) Only(ctx context.Context) (*LikePost, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -172,8 +172,8 @@ func (lpq *LikePostQuery) Only(ctx context.Context) (*LikePost, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (lpq *LikePostQuery) OnlyX(ctx context.Context) *LikePost {
-	node, err := lpq.Only(ctx)
+func (_q *LikePostQuery) OnlyX(ctx context.Context) *LikePost {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -183,9 +183,9 @@ func (lpq *LikePostQuery) OnlyX(ctx context.Context) *LikePost {
 // OnlyID is like Only, but returns the only LikePost ID in the query.
 // Returns a *NotSingularError when more than one LikePost ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (lpq *LikePostQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+func (_q *LikePostQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = lpq.Limit(2).IDs(setContextOp(ctx, lpq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -200,8 +200,8 @@ func (lpq *LikePostQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (lpq *LikePostQuery) OnlyIDX(ctx context.Context) xid.ID {
-	id, err := lpq.OnlyID(ctx)
+func (_q *LikePostQuery) OnlyIDX(ctx context.Context) xid.ID {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -209,18 +209,18 @@ func (lpq *LikePostQuery) OnlyIDX(ctx context.Context) xid.ID {
 }
 
 // All executes the query and returns a list of LikePosts.
-func (lpq *LikePostQuery) All(ctx context.Context) ([]*LikePost, error) {
-	ctx = setContextOp(ctx, lpq.ctx, ent.OpQueryAll)
-	if err := lpq.prepareQuery(ctx); err != nil {
+func (_q *LikePostQuery) All(ctx context.Context) ([]*LikePost, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*LikePost, *LikePostQuery]()
-	return withInterceptors[[]*LikePost](ctx, lpq, qr, lpq.inters)
+	return withInterceptors[[]*LikePost](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (lpq *LikePostQuery) AllX(ctx context.Context) []*LikePost {
-	nodes, err := lpq.All(ctx)
+func (_q *LikePostQuery) AllX(ctx context.Context) []*LikePost {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -228,20 +228,20 @@ func (lpq *LikePostQuery) AllX(ctx context.Context) []*LikePost {
 }
 
 // IDs executes the query and returns a list of LikePost IDs.
-func (lpq *LikePostQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
-	if lpq.ctx.Unique == nil && lpq.path != nil {
-		lpq.Unique(true)
+func (_q *LikePostQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, lpq.ctx, ent.OpQueryIDs)
-	if err = lpq.Select(likepost.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(likepost.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (lpq *LikePostQuery) IDsX(ctx context.Context) []xid.ID {
-	ids, err := lpq.IDs(ctx)
+func (_q *LikePostQuery) IDsX(ctx context.Context) []xid.ID {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -249,17 +249,17 @@ func (lpq *LikePostQuery) IDsX(ctx context.Context) []xid.ID {
 }
 
 // Count returns the count of the given query.
-func (lpq *LikePostQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, lpq.ctx, ent.OpQueryCount)
-	if err := lpq.prepareQuery(ctx); err != nil {
+func (_q *LikePostQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, lpq, querierCount[*LikePostQuery](), lpq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*LikePostQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (lpq *LikePostQuery) CountX(ctx context.Context) int {
-	count, err := lpq.Count(ctx)
+func (_q *LikePostQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -267,9 +267,9 @@ func (lpq *LikePostQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (lpq *LikePostQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, lpq.ctx, ent.OpQueryExist)
-	switch _, err := lpq.FirstID(ctx); {
+func (_q *LikePostQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -280,8 +280,8 @@ func (lpq *LikePostQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (lpq *LikePostQuery) ExistX(ctx context.Context) bool {
-	exist, err := lpq.Exist(ctx)
+func (_q *LikePostQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -290,45 +290,45 @@ func (lpq *LikePostQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the LikePostQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (lpq *LikePostQuery) Clone() *LikePostQuery {
-	if lpq == nil {
+func (_q *LikePostQuery) Clone() *LikePostQuery {
+	if _q == nil {
 		return nil
 	}
 	return &LikePostQuery{
-		config:      lpq.config,
-		ctx:         lpq.ctx.Clone(),
-		order:       append([]likepost.OrderOption{}, lpq.order...),
-		inters:      append([]Interceptor{}, lpq.inters...),
-		predicates:  append([]predicate.LikePost{}, lpq.predicates...),
-		withAccount: lpq.withAccount.Clone(),
-		withPost:    lpq.withPost.Clone(),
+		config:      _q.config,
+		ctx:         _q.ctx.Clone(),
+		order:       append([]likepost.OrderOption{}, _q.order...),
+		inters:      append([]Interceptor{}, _q.inters...),
+		predicates:  append([]predicate.LikePost{}, _q.predicates...),
+		withAccount: _q.withAccount.Clone(),
+		withPost:    _q.withPost.Clone(),
 		// clone intermediate query.
-		sql:       lpq.sql.Clone(),
-		path:      lpq.path,
-		modifiers: append([]func(*sql.Selector){}, lpq.modifiers...),
+		sql:       _q.sql.Clone(),
+		path:      _q.path,
+		modifiers: append([]func(*sql.Selector){}, _q.modifiers...),
 	}
 }
 
 // WithAccount tells the query-builder to eager-load the nodes that are connected to
 // the "account" edge. The optional arguments are used to configure the query builder of the edge.
-func (lpq *LikePostQuery) WithAccount(opts ...func(*AccountQuery)) *LikePostQuery {
-	query := (&AccountClient{config: lpq.config}).Query()
+func (_q *LikePostQuery) WithAccount(opts ...func(*AccountQuery)) *LikePostQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	lpq.withAccount = query
-	return lpq
+	_q.withAccount = query
+	return _q
 }
 
 // WithPost tells the query-builder to eager-load the nodes that are connected to
 // the "Post" edge. The optional arguments are used to configure the query builder of the edge.
-func (lpq *LikePostQuery) WithPost(opts ...func(*PostQuery)) *LikePostQuery {
-	query := (&PostClient{config: lpq.config}).Query()
+func (_q *LikePostQuery) WithPost(opts ...func(*PostQuery)) *LikePostQuery {
+	query := (&PostClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	lpq.withPost = query
-	return lpq
+	_q.withPost = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -345,10 +345,10 @@ func (lpq *LikePostQuery) WithPost(opts ...func(*PostQuery)) *LikePostQuery {
 //		GroupBy(likepost.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (lpq *LikePostQuery) GroupBy(field string, fields ...string) *LikePostGroupBy {
-	lpq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &LikePostGroupBy{build: lpq}
-	grbuild.flds = &lpq.ctx.Fields
+func (_q *LikePostQuery) GroupBy(field string, fields ...string) *LikePostGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &LikePostGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = likepost.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -366,83 +366,83 @@ func (lpq *LikePostQuery) GroupBy(field string, fields ...string) *LikePostGroup
 //	client.LikePost.Query().
 //		Select(likepost.FieldCreatedAt).
 //		Scan(ctx, &v)
-func (lpq *LikePostQuery) Select(fields ...string) *LikePostSelect {
-	lpq.ctx.Fields = append(lpq.ctx.Fields, fields...)
-	sbuild := &LikePostSelect{LikePostQuery: lpq}
+func (_q *LikePostQuery) Select(fields ...string) *LikePostSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &LikePostSelect{LikePostQuery: _q}
 	sbuild.label = likepost.Label
-	sbuild.flds, sbuild.scan = &lpq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a LikePostSelect configured with the given aggregations.
-func (lpq *LikePostQuery) Aggregate(fns ...AggregateFunc) *LikePostSelect {
-	return lpq.Select().Aggregate(fns...)
+func (_q *LikePostQuery) Aggregate(fns ...AggregateFunc) *LikePostSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (lpq *LikePostQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range lpq.inters {
+func (_q *LikePostQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, lpq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range lpq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !likepost.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if lpq.path != nil {
-		prev, err := lpq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		lpq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (lpq *LikePostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*LikePost, error) {
+func (_q *LikePostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*LikePost, error) {
 	var (
 		nodes       = []*LikePost{}
-		_spec       = lpq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
-			lpq.withAccount != nil,
-			lpq.withPost != nil,
+			_q.withAccount != nil,
+			_q.withPost != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*LikePost).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &LikePost{config: lpq.config}
+		node := &LikePost{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(lpq.modifiers) > 0 {
-		_spec.Modifiers = lpq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, lpq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := lpq.withAccount; query != nil {
-		if err := lpq.loadAccount(ctx, query, nodes, nil,
+	if query := _q.withAccount; query != nil {
+		if err := _q.loadAccount(ctx, query, nodes, nil,
 			func(n *LikePost, e *Account) { n.Edges.Account = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := lpq.withPost; query != nil {
-		if err := lpq.loadPost(ctx, query, nodes, nil,
+	if query := _q.withPost; query != nil {
+		if err := _q.loadPost(ctx, query, nodes, nil,
 			func(n *LikePost, e *Post) { n.Edges.Post = e }); err != nil {
 			return nil, err
 		}
@@ -450,7 +450,7 @@ func (lpq *LikePostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Li
 	return nodes, nil
 }
 
-func (lpq *LikePostQuery) loadAccount(ctx context.Context, query *AccountQuery, nodes []*LikePost, init func(*LikePost), assign func(*LikePost, *Account)) error {
+func (_q *LikePostQuery) loadAccount(ctx context.Context, query *AccountQuery, nodes []*LikePost, init func(*LikePost), assign func(*LikePost, *Account)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*LikePost)
 	for i := range nodes {
@@ -479,7 +479,7 @@ func (lpq *LikePostQuery) loadAccount(ctx context.Context, query *AccountQuery, 
 	}
 	return nil
 }
-func (lpq *LikePostQuery) loadPost(ctx context.Context, query *PostQuery, nodes []*LikePost, init func(*LikePost), assign func(*LikePost, *Post)) error {
+func (_q *LikePostQuery) loadPost(ctx context.Context, query *PostQuery, nodes []*LikePost, init func(*LikePost), assign func(*LikePost, *Post)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*LikePost)
 	for i := range nodes {
@@ -509,27 +509,27 @@ func (lpq *LikePostQuery) loadPost(ctx context.Context, query *PostQuery, nodes 
 	return nil
 }
 
-func (lpq *LikePostQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := lpq.querySpec()
-	if len(lpq.modifiers) > 0 {
-		_spec.Modifiers = lpq.modifiers
+func (_q *LikePostQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = lpq.ctx.Fields
-	if len(lpq.ctx.Fields) > 0 {
-		_spec.Unique = lpq.ctx.Unique != nil && *lpq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, lpq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (lpq *LikePostQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *LikePostQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(likepost.Table, likepost.Columns, sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString))
-	_spec.From = lpq.sql
-	if unique := lpq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if lpq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := lpq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, likepost.FieldID)
 		for i := range fields {
@@ -537,27 +537,27 @@ func (lpq *LikePostQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if lpq.withAccount != nil {
+		if _q.withAccount != nil {
 			_spec.Node.AddColumnOnce(likepost.FieldAccountID)
 		}
-		if lpq.withPost != nil {
+		if _q.withPost != nil {
 			_spec.Node.AddColumnOnce(likepost.FieldPostID)
 		}
 	}
-	if ps := lpq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := lpq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := lpq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := lpq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -567,45 +567,45 @@ func (lpq *LikePostQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (lpq *LikePostQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(lpq.driver.Dialect())
+func (_q *LikePostQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(likepost.Table)
-	columns := lpq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = likepost.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if lpq.sql != nil {
-		selector = lpq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if lpq.ctx.Unique != nil && *lpq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, m := range lpq.modifiers {
+	for _, m := range _q.modifiers {
 		m(selector)
 	}
-	for _, p := range lpq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range lpq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := lpq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := lpq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (lpq *LikePostQuery) Modify(modifiers ...func(s *sql.Selector)) *LikePostSelect {
-	lpq.modifiers = append(lpq.modifiers, modifiers...)
-	return lpq.Select()
+func (_q *LikePostQuery) Modify(modifiers ...func(s *sql.Selector)) *LikePostSelect {
+	_q.modifiers = append(_q.modifiers, modifiers...)
+	return _q.Select()
 }
 
 // LikePostGroupBy is the group-by builder for LikePost entities.
@@ -615,41 +615,41 @@ type LikePostGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (lpgb *LikePostGroupBy) Aggregate(fns ...AggregateFunc) *LikePostGroupBy {
-	lpgb.fns = append(lpgb.fns, fns...)
-	return lpgb
+func (_g *LikePostGroupBy) Aggregate(fns ...AggregateFunc) *LikePostGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (lpgb *LikePostGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, lpgb.build.ctx, ent.OpQueryGroupBy)
-	if err := lpgb.build.prepareQuery(ctx); err != nil {
+func (_g *LikePostGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*LikePostQuery, *LikePostGroupBy](ctx, lpgb.build, lpgb, lpgb.build.inters, v)
+	return scanWithInterceptors[*LikePostQuery, *LikePostGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (lpgb *LikePostGroupBy) sqlScan(ctx context.Context, root *LikePostQuery, v any) error {
+func (_g *LikePostGroupBy) sqlScan(ctx context.Context, root *LikePostQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(lpgb.fns))
-	for _, fn := range lpgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*lpgb.flds)+len(lpgb.fns))
-		for _, f := range *lpgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*lpgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := lpgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -663,27 +663,27 @@ type LikePostSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (lps *LikePostSelect) Aggregate(fns ...AggregateFunc) *LikePostSelect {
-	lps.fns = append(lps.fns, fns...)
-	return lps
+func (_s *LikePostSelect) Aggregate(fns ...AggregateFunc) *LikePostSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (lps *LikePostSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, lps.ctx, ent.OpQuerySelect)
-	if err := lps.prepareQuery(ctx); err != nil {
+func (_s *LikePostSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*LikePostQuery, *LikePostSelect](ctx, lps.LikePostQuery, lps, lps.inters, v)
+	return scanWithInterceptors[*LikePostQuery, *LikePostSelect](ctx, _s.LikePostQuery, _s, _s.inters, v)
 }
 
-func (lps *LikePostSelect) sqlScan(ctx context.Context, root *LikePostQuery, v any) error {
+func (_s *LikePostSelect) sqlScan(ctx context.Context, root *LikePostQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(lps.fns))
-	for _, fn := range lps.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*lps.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -691,7 +691,7 @@ func (lps *LikePostSelect) sqlScan(ctx context.Context, root *LikePostQuery, v a
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := lps.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -699,7 +699,7 @@ func (lps *LikePostSelect) sqlScan(ctx context.Context, root *LikePostQuery, v a
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (lps *LikePostSelect) Modify(modifiers ...func(s *sql.Selector)) *LikePostSelect {
-	lps.modifiers = append(lps.modifiers, modifiers...)
-	return lps
+func (_s *LikePostSelect) Modify(modifiers ...func(s *sql.Selector)) *LikePostSelect {
+	_s.modifiers = append(_s.modifiers, modifiers...)
+	return _s
 }

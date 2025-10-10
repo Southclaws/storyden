@@ -35,446 +35,446 @@ type PostCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (pc *PostCreate) SetCreatedAt(t time.Time) *PostCreate {
-	pc.mutation.SetCreatedAt(t)
-	return pc
+func (_c *PostCreate) SetCreatedAt(v time.Time) *PostCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (pc *PostCreate) SetNillableCreatedAt(t *time.Time) *PostCreate {
-	if t != nil {
-		pc.SetCreatedAt(*t)
+func (_c *PostCreate) SetNillableCreatedAt(v *time.Time) *PostCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (pc *PostCreate) SetUpdatedAt(t time.Time) *PostCreate {
-	pc.mutation.SetUpdatedAt(t)
-	return pc
+func (_c *PostCreate) SetUpdatedAt(v time.Time) *PostCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (pc *PostCreate) SetDeletedAt(t time.Time) *PostCreate {
-	pc.mutation.SetDeletedAt(t)
-	return pc
+func (_c *PostCreate) SetDeletedAt(v time.Time) *PostCreate {
+	_c.mutation.SetDeletedAt(v)
+	return _c
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (pc *PostCreate) SetNillableDeletedAt(t *time.Time) *PostCreate {
-	if t != nil {
-		pc.SetDeletedAt(*t)
+func (_c *PostCreate) SetNillableDeletedAt(v *time.Time) *PostCreate {
+	if v != nil {
+		_c.SetDeletedAt(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (pc *PostCreate) SetIndexedAt(t time.Time) *PostCreate {
-	pc.mutation.SetIndexedAt(t)
-	return pc
+func (_c *PostCreate) SetIndexedAt(v time.Time) *PostCreate {
+	_c.mutation.SetIndexedAt(v)
+	return _c
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (pc *PostCreate) SetNillableIndexedAt(t *time.Time) *PostCreate {
-	if t != nil {
-		pc.SetIndexedAt(*t)
+func (_c *PostCreate) SetNillableIndexedAt(v *time.Time) *PostCreate {
+	if v != nil {
+		_c.SetIndexedAt(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetFirst sets the "first" field.
-func (pc *PostCreate) SetFirst(b bool) *PostCreate {
-	pc.mutation.SetFirst(b)
-	return pc
+func (_c *PostCreate) SetFirst(v bool) *PostCreate {
+	_c.mutation.SetFirst(v)
+	return _c
 }
 
 // SetTitle sets the "title" field.
-func (pc *PostCreate) SetTitle(s string) *PostCreate {
-	pc.mutation.SetTitle(s)
-	return pc
+func (_c *PostCreate) SetTitle(v string) *PostCreate {
+	_c.mutation.SetTitle(v)
+	return _c
 }
 
 // SetNillableTitle sets the "title" field if the given value is not nil.
-func (pc *PostCreate) SetNillableTitle(s *string) *PostCreate {
-	if s != nil {
-		pc.SetTitle(*s)
+func (_c *PostCreate) SetNillableTitle(v *string) *PostCreate {
+	if v != nil {
+		_c.SetTitle(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetSlug sets the "slug" field.
-func (pc *PostCreate) SetSlug(s string) *PostCreate {
-	pc.mutation.SetSlug(s)
-	return pc
+func (_c *PostCreate) SetSlug(v string) *PostCreate {
+	_c.mutation.SetSlug(v)
+	return _c
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (pc *PostCreate) SetNillableSlug(s *string) *PostCreate {
-	if s != nil {
-		pc.SetSlug(*s)
+func (_c *PostCreate) SetNillableSlug(v *string) *PostCreate {
+	if v != nil {
+		_c.SetSlug(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetPinned sets the "pinned" field.
-func (pc *PostCreate) SetPinned(b bool) *PostCreate {
-	pc.mutation.SetPinned(b)
-	return pc
+func (_c *PostCreate) SetPinned(v bool) *PostCreate {
+	_c.mutation.SetPinned(v)
+	return _c
 }
 
 // SetNillablePinned sets the "pinned" field if the given value is not nil.
-func (pc *PostCreate) SetNillablePinned(b *bool) *PostCreate {
-	if b != nil {
-		pc.SetPinned(*b)
+func (_c *PostCreate) SetNillablePinned(v *bool) *PostCreate {
+	if v != nil {
+		_c.SetPinned(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetLastReplyAt sets the "last_reply_at" field.
-func (pc *PostCreate) SetLastReplyAt(t time.Time) *PostCreate {
-	pc.mutation.SetLastReplyAt(t)
-	return pc
+func (_c *PostCreate) SetLastReplyAt(v time.Time) *PostCreate {
+	_c.mutation.SetLastReplyAt(v)
+	return _c
 }
 
 // SetNillableLastReplyAt sets the "last_reply_at" field if the given value is not nil.
-func (pc *PostCreate) SetNillableLastReplyAt(t *time.Time) *PostCreate {
-	if t != nil {
-		pc.SetLastReplyAt(*t)
+func (_c *PostCreate) SetNillableLastReplyAt(v *time.Time) *PostCreate {
+	if v != nil {
+		_c.SetLastReplyAt(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetRootPostID sets the "root_post_id" field.
-func (pc *PostCreate) SetRootPostID(x xid.ID) *PostCreate {
-	pc.mutation.SetRootPostID(x)
-	return pc
+func (_c *PostCreate) SetRootPostID(v xid.ID) *PostCreate {
+	_c.mutation.SetRootPostID(v)
+	return _c
 }
 
 // SetNillableRootPostID sets the "root_post_id" field if the given value is not nil.
-func (pc *PostCreate) SetNillableRootPostID(x *xid.ID) *PostCreate {
-	if x != nil {
-		pc.SetRootPostID(*x)
+func (_c *PostCreate) SetNillableRootPostID(v *xid.ID) *PostCreate {
+	if v != nil {
+		_c.SetRootPostID(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetReplyToPostID sets the "reply_to_post_id" field.
-func (pc *PostCreate) SetReplyToPostID(x xid.ID) *PostCreate {
-	pc.mutation.SetReplyToPostID(x)
-	return pc
+func (_c *PostCreate) SetReplyToPostID(v xid.ID) *PostCreate {
+	_c.mutation.SetReplyToPostID(v)
+	return _c
 }
 
 // SetNillableReplyToPostID sets the "reply_to_post_id" field if the given value is not nil.
-func (pc *PostCreate) SetNillableReplyToPostID(x *xid.ID) *PostCreate {
-	if x != nil {
-		pc.SetReplyToPostID(*x)
+func (_c *PostCreate) SetNillableReplyToPostID(v *xid.ID) *PostCreate {
+	if v != nil {
+		_c.SetReplyToPostID(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetBody sets the "body" field.
-func (pc *PostCreate) SetBody(s string) *PostCreate {
-	pc.mutation.SetBody(s)
-	return pc
+func (_c *PostCreate) SetBody(v string) *PostCreate {
+	_c.mutation.SetBody(v)
+	return _c
 }
 
 // SetShort sets the "short" field.
-func (pc *PostCreate) SetShort(s string) *PostCreate {
-	pc.mutation.SetShort(s)
-	return pc
+func (_c *PostCreate) SetShort(v string) *PostCreate {
+	_c.mutation.SetShort(v)
+	return _c
 }
 
 // SetMetadata sets the "metadata" field.
-func (pc *PostCreate) SetMetadata(m map[string]interface{}) *PostCreate {
-	pc.mutation.SetMetadata(m)
-	return pc
+func (_c *PostCreate) SetMetadata(v map[string]interface{}) *PostCreate {
+	_c.mutation.SetMetadata(v)
+	return _c
 }
 
 // SetVisibility sets the "visibility" field.
-func (pc *PostCreate) SetVisibility(po post.Visibility) *PostCreate {
-	pc.mutation.SetVisibility(po)
-	return pc
+func (_c *PostCreate) SetVisibility(v post.Visibility) *PostCreate {
+	_c.mutation.SetVisibility(v)
+	return _c
 }
 
 // SetNillableVisibility sets the "visibility" field if the given value is not nil.
-func (pc *PostCreate) SetNillableVisibility(po *post.Visibility) *PostCreate {
-	if po != nil {
-		pc.SetVisibility(*po)
+func (_c *PostCreate) SetNillableVisibility(v *post.Visibility) *PostCreate {
+	if v != nil {
+		_c.SetVisibility(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetAccountPosts sets the "account_posts" field.
-func (pc *PostCreate) SetAccountPosts(x xid.ID) *PostCreate {
-	pc.mutation.SetAccountPosts(x)
-	return pc
+func (_c *PostCreate) SetAccountPosts(v xid.ID) *PostCreate {
+	_c.mutation.SetAccountPosts(v)
+	return _c
 }
 
 // SetCategoryID sets the "category_id" field.
-func (pc *PostCreate) SetCategoryID(x xid.ID) *PostCreate {
-	pc.mutation.SetCategoryID(x)
-	return pc
+func (_c *PostCreate) SetCategoryID(v xid.ID) *PostCreate {
+	_c.mutation.SetCategoryID(v)
+	return _c
 }
 
 // SetNillableCategoryID sets the "category_id" field if the given value is not nil.
-func (pc *PostCreate) SetNillableCategoryID(x *xid.ID) *PostCreate {
-	if x != nil {
-		pc.SetCategoryID(*x)
+func (_c *PostCreate) SetNillableCategoryID(v *xid.ID) *PostCreate {
+	if v != nil {
+		_c.SetCategoryID(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetLinkID sets the "link_id" field.
-func (pc *PostCreate) SetLinkID(x xid.ID) *PostCreate {
-	pc.mutation.SetLinkID(x)
-	return pc
+func (_c *PostCreate) SetLinkID(v xid.ID) *PostCreate {
+	_c.mutation.SetLinkID(v)
+	return _c
 }
 
 // SetNillableLinkID sets the "link_id" field if the given value is not nil.
-func (pc *PostCreate) SetNillableLinkID(x *xid.ID) *PostCreate {
-	if x != nil {
-		pc.SetLinkID(*x)
+func (_c *PostCreate) SetNillableLinkID(v *xid.ID) *PostCreate {
+	if v != nil {
+		_c.SetLinkID(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetID sets the "id" field.
-func (pc *PostCreate) SetID(x xid.ID) *PostCreate {
-	pc.mutation.SetID(x)
-	return pc
+func (_c *PostCreate) SetID(v xid.ID) *PostCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (pc *PostCreate) SetNillableID(x *xid.ID) *PostCreate {
-	if x != nil {
-		pc.SetID(*x)
+func (_c *PostCreate) SetNillableID(v *xid.ID) *PostCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return pc
+	return _c
 }
 
 // SetAuthorID sets the "author" edge to the Account entity by ID.
-func (pc *PostCreate) SetAuthorID(id xid.ID) *PostCreate {
-	pc.mutation.SetAuthorID(id)
-	return pc
+func (_c *PostCreate) SetAuthorID(id xid.ID) *PostCreate {
+	_c.mutation.SetAuthorID(id)
+	return _c
 }
 
 // SetAuthor sets the "author" edge to the Account entity.
-func (pc *PostCreate) SetAuthor(a *Account) *PostCreate {
-	return pc.SetAuthorID(a.ID)
+func (_c *PostCreate) SetAuthor(v *Account) *PostCreate {
+	return _c.SetAuthorID(v.ID)
 }
 
 // SetCategory sets the "category" edge to the Category entity.
-func (pc *PostCreate) SetCategory(c *Category) *PostCreate {
-	return pc.SetCategoryID(c.ID)
+func (_c *PostCreate) SetCategory(v *Category) *PostCreate {
+	return _c.SetCategoryID(v.ID)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (pc *PostCreate) AddTagIDs(ids ...xid.ID) *PostCreate {
-	pc.mutation.AddTagIDs(ids...)
-	return pc
+func (_c *PostCreate) AddTagIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddTagIDs(ids...)
+	return _c
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
-func (pc *PostCreate) AddTags(t ...*Tag) *PostCreate {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_c *PostCreate) AddTags(v ...*Tag) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pc.AddTagIDs(ids...)
+	return _c.AddTagIDs(ids...)
 }
 
 // SetRootID sets the "root" edge to the Post entity by ID.
-func (pc *PostCreate) SetRootID(id xid.ID) *PostCreate {
-	pc.mutation.SetRootID(id)
-	return pc
+func (_c *PostCreate) SetRootID(id xid.ID) *PostCreate {
+	_c.mutation.SetRootID(id)
+	return _c
 }
 
 // SetNillableRootID sets the "root" edge to the Post entity by ID if the given value is not nil.
-func (pc *PostCreate) SetNillableRootID(id *xid.ID) *PostCreate {
+func (_c *PostCreate) SetNillableRootID(id *xid.ID) *PostCreate {
 	if id != nil {
-		pc = pc.SetRootID(*id)
+		_c = _c.SetRootID(*id)
 	}
-	return pc
+	return _c
 }
 
 // SetRoot sets the "root" edge to the Post entity.
-func (pc *PostCreate) SetRoot(p *Post) *PostCreate {
-	return pc.SetRootID(p.ID)
+func (_c *PostCreate) SetRoot(v *Post) *PostCreate {
+	return _c.SetRootID(v.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (pc *PostCreate) AddPostIDs(ids ...xid.ID) *PostCreate {
-	pc.mutation.AddPostIDs(ids...)
-	return pc
+func (_c *PostCreate) AddPostIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddPostIDs(ids...)
+	return _c
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (pc *PostCreate) AddPosts(p ...*Post) *PostCreate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_c *PostCreate) AddPosts(v ...*Post) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pc.AddPostIDs(ids...)
+	return _c.AddPostIDs(ids...)
 }
 
 // SetReplyToID sets the "replyTo" edge to the Post entity by ID.
-func (pc *PostCreate) SetReplyToID(id xid.ID) *PostCreate {
-	pc.mutation.SetReplyToID(id)
-	return pc
+func (_c *PostCreate) SetReplyToID(id xid.ID) *PostCreate {
+	_c.mutation.SetReplyToID(id)
+	return _c
 }
 
 // SetNillableReplyToID sets the "replyTo" edge to the Post entity by ID if the given value is not nil.
-func (pc *PostCreate) SetNillableReplyToID(id *xid.ID) *PostCreate {
+func (_c *PostCreate) SetNillableReplyToID(id *xid.ID) *PostCreate {
 	if id != nil {
-		pc = pc.SetReplyToID(*id)
+		_c = _c.SetReplyToID(*id)
 	}
-	return pc
+	return _c
 }
 
 // SetReplyTo sets the "replyTo" edge to the Post entity.
-func (pc *PostCreate) SetReplyTo(p *Post) *PostCreate {
-	return pc.SetReplyToID(p.ID)
+func (_c *PostCreate) SetReplyTo(v *Post) *PostCreate {
+	return _c.SetReplyToID(v.ID)
 }
 
 // AddReplyIDs adds the "replies" edge to the Post entity by IDs.
-func (pc *PostCreate) AddReplyIDs(ids ...xid.ID) *PostCreate {
-	pc.mutation.AddReplyIDs(ids...)
-	return pc
+func (_c *PostCreate) AddReplyIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddReplyIDs(ids...)
+	return _c
 }
 
 // AddReplies adds the "replies" edges to the Post entity.
-func (pc *PostCreate) AddReplies(p ...*Post) *PostCreate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_c *PostCreate) AddReplies(v ...*Post) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pc.AddReplyIDs(ids...)
+	return _c.AddReplyIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (pc *PostCreate) AddReactIDs(ids ...xid.ID) *PostCreate {
-	pc.mutation.AddReactIDs(ids...)
-	return pc
+func (_c *PostCreate) AddReactIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddReactIDs(ids...)
+	return _c
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
-func (pc *PostCreate) AddReacts(r ...*React) *PostCreate {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_c *PostCreate) AddReacts(v ...*React) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pc.AddReactIDs(ids...)
+	return _c.AddReactIDs(ids...)
 }
 
 // AddLikeIDs adds the "likes" edge to the LikePost entity by IDs.
-func (pc *PostCreate) AddLikeIDs(ids ...xid.ID) *PostCreate {
-	pc.mutation.AddLikeIDs(ids...)
-	return pc
+func (_c *PostCreate) AddLikeIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddLikeIDs(ids...)
+	return _c
 }
 
 // AddLikes adds the "likes" edges to the LikePost entity.
-func (pc *PostCreate) AddLikes(l ...*LikePost) *PostCreate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_c *PostCreate) AddLikes(v ...*LikePost) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pc.AddLikeIDs(ids...)
+	return _c.AddLikeIDs(ids...)
 }
 
 // AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
-func (pc *PostCreate) AddMentionIDs(ids ...xid.ID) *PostCreate {
-	pc.mutation.AddMentionIDs(ids...)
-	return pc
+func (_c *PostCreate) AddMentionIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddMentionIDs(ids...)
+	return _c
 }
 
 // AddMentions adds the "mentions" edges to the MentionProfile entity.
-func (pc *PostCreate) AddMentions(m ...*MentionProfile) *PostCreate {
-	ids := make([]xid.ID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_c *PostCreate) AddMentions(v ...*MentionProfile) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pc.AddMentionIDs(ids...)
+	return _c.AddMentionIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (pc *PostCreate) AddAssetIDs(ids ...xid.ID) *PostCreate {
-	pc.mutation.AddAssetIDs(ids...)
-	return pc
+func (_c *PostCreate) AddAssetIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddAssetIDs(ids...)
+	return _c
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (pc *PostCreate) AddAssets(a ...*Asset) *PostCreate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_c *PostCreate) AddAssets(v ...*Asset) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pc.AddAssetIDs(ids...)
+	return _c.AddAssetIDs(ids...)
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (pc *PostCreate) AddCollectionIDs(ids ...xid.ID) *PostCreate {
-	pc.mutation.AddCollectionIDs(ids...)
-	return pc
+func (_c *PostCreate) AddCollectionIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddCollectionIDs(ids...)
+	return _c
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
-func (pc *PostCreate) AddCollections(c ...*Collection) *PostCreate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_c *PostCreate) AddCollections(v ...*Collection) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pc.AddCollectionIDs(ids...)
+	return _c.AddCollectionIDs(ids...)
 }
 
 // SetLink sets the "link" edge to the Link entity.
-func (pc *PostCreate) SetLink(l *Link) *PostCreate {
-	return pc.SetLinkID(l.ID)
+func (_c *PostCreate) SetLink(v *Link) *PostCreate {
+	return _c.SetLinkID(v.ID)
 }
 
 // AddContentLinkIDs adds the "content_links" edge to the Link entity by IDs.
-func (pc *PostCreate) AddContentLinkIDs(ids ...xid.ID) *PostCreate {
-	pc.mutation.AddContentLinkIDs(ids...)
-	return pc
+func (_c *PostCreate) AddContentLinkIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddContentLinkIDs(ids...)
+	return _c
 }
 
 // AddContentLinks adds the "content_links" edges to the Link entity.
-func (pc *PostCreate) AddContentLinks(l ...*Link) *PostCreate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_c *PostCreate) AddContentLinks(v ...*Link) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pc.AddContentLinkIDs(ids...)
+	return _c.AddContentLinkIDs(ids...)
 }
 
 // AddEventIDs adds the "event" edge to the Event entity by IDs.
-func (pc *PostCreate) AddEventIDs(ids ...xid.ID) *PostCreate {
-	pc.mutation.AddEventIDs(ids...)
-	return pc
+func (_c *PostCreate) AddEventIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddEventIDs(ids...)
+	return _c
 }
 
 // AddEvent adds the "event" edges to the Event entity.
-func (pc *PostCreate) AddEvent(e ...*Event) *PostCreate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_c *PostCreate) AddEvent(v ...*Event) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pc.AddEventIDs(ids...)
+	return _c.AddEventIDs(ids...)
 }
 
 // Mutation returns the PostMutation object of the builder.
-func (pc *PostCreate) Mutation() *PostMutation {
-	return pc.mutation
+func (_c *PostCreate) Mutation() *PostMutation {
+	return _c.mutation
 }
 
 // Save creates the Post in the database.
-func (pc *PostCreate) Save(ctx context.Context) (*Post, error) {
-	pc.defaults()
-	return withHooks(ctx, pc.sqlSave, pc.mutation, pc.hooks)
+func (_c *PostCreate) Save(ctx context.Context) (*Post, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (pc *PostCreate) SaveX(ctx context.Context) *Post {
-	v, err := pc.Save(ctx)
+func (_c *PostCreate) SaveX(ctx context.Context) *Post {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -482,86 +482,86 @@ func (pc *PostCreate) SaveX(ctx context.Context) *Post {
 }
 
 // Exec executes the query.
-func (pc *PostCreate) Exec(ctx context.Context) error {
-	_, err := pc.Save(ctx)
+func (_c *PostCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pc *PostCreate) ExecX(ctx context.Context) {
-	if err := pc.Exec(ctx); err != nil {
+func (_c *PostCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (pc *PostCreate) defaults() {
-	if _, ok := pc.mutation.CreatedAt(); !ok {
+func (_c *PostCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := post.DefaultCreatedAt()
-		pc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := pc.mutation.Pinned(); !ok {
+	if _, ok := _c.mutation.Pinned(); !ok {
 		v := post.DefaultPinned
-		pc.mutation.SetPinned(v)
+		_c.mutation.SetPinned(v)
 	}
-	if _, ok := pc.mutation.Visibility(); !ok {
+	if _, ok := _c.mutation.Visibility(); !ok {
 		v := post.DefaultVisibility
-		pc.mutation.SetVisibility(v)
+		_c.mutation.SetVisibility(v)
 	}
-	if _, ok := pc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := post.DefaultID()
-		pc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (pc *PostCreate) check() error {
-	if _, ok := pc.mutation.CreatedAt(); !ok {
+func (_c *PostCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Post.created_at"`)}
 	}
-	if _, ok := pc.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Post.updated_at"`)}
 	}
-	if _, ok := pc.mutation.First(); !ok {
+	if _, ok := _c.mutation.First(); !ok {
 		return &ValidationError{Name: "first", err: errors.New(`ent: missing required field "Post.first"`)}
 	}
-	if _, ok := pc.mutation.Pinned(); !ok {
+	if _, ok := _c.mutation.Pinned(); !ok {
 		return &ValidationError{Name: "pinned", err: errors.New(`ent: missing required field "Post.pinned"`)}
 	}
-	if _, ok := pc.mutation.Body(); !ok {
+	if _, ok := _c.mutation.Body(); !ok {
 		return &ValidationError{Name: "body", err: errors.New(`ent: missing required field "Post.body"`)}
 	}
-	if _, ok := pc.mutation.Short(); !ok {
+	if _, ok := _c.mutation.Short(); !ok {
 		return &ValidationError{Name: "short", err: errors.New(`ent: missing required field "Post.short"`)}
 	}
-	if _, ok := pc.mutation.Visibility(); !ok {
+	if _, ok := _c.mutation.Visibility(); !ok {
 		return &ValidationError{Name: "visibility", err: errors.New(`ent: missing required field "Post.visibility"`)}
 	}
-	if v, ok := pc.mutation.Visibility(); ok {
+	if v, ok := _c.mutation.Visibility(); ok {
 		if err := post.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Post.visibility": %w`, err)}
 		}
 	}
-	if _, ok := pc.mutation.AccountPosts(); !ok {
+	if _, ok := _c.mutation.AccountPosts(); !ok {
 		return &ValidationError{Name: "account_posts", err: errors.New(`ent: missing required field "Post.account_posts"`)}
 	}
-	if v, ok := pc.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := post.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Post.id": %w`, err)}
 		}
 	}
-	if len(pc.mutation.AuthorIDs()) == 0 {
+	if len(_c.mutation.AuthorIDs()) == 0 {
 		return &ValidationError{Name: "author", err: errors.New(`ent: missing required edge "Post.author"`)}
 	}
 	return nil
 }
 
-func (pc *PostCreate) sqlSave(ctx context.Context) (*Post, error) {
-	if err := pc.check(); err != nil {
+func (_c *PostCreate) sqlSave(ctx context.Context) (*Post, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := pc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, pc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -574,74 +574,74 @@ func (pc *PostCreate) sqlSave(ctx context.Context) (*Post, error) {
 			return nil, err
 		}
 	}
-	pc.mutation.id = &_node.ID
-	pc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
+func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Post{config: pc.config}
+		_node = &Post{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(post.Table, sqlgraph.NewFieldSpec(post.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = pc.conflict
-	if id, ok := pc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := pc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(post.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := pc.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(post.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := pc.mutation.DeletedAt(); ok {
+	if value, ok := _c.mutation.DeletedAt(); ok {
 		_spec.SetField(post.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
-	if value, ok := pc.mutation.IndexedAt(); ok {
+	if value, ok := _c.mutation.IndexedAt(); ok {
 		_spec.SetField(post.FieldIndexedAt, field.TypeTime, value)
 		_node.IndexedAt = &value
 	}
-	if value, ok := pc.mutation.First(); ok {
+	if value, ok := _c.mutation.First(); ok {
 		_spec.SetField(post.FieldFirst, field.TypeBool, value)
 		_node.First = value
 	}
-	if value, ok := pc.mutation.Title(); ok {
+	if value, ok := _c.mutation.Title(); ok {
 		_spec.SetField(post.FieldTitle, field.TypeString, value)
 		_node.Title = value
 	}
-	if value, ok := pc.mutation.Slug(); ok {
+	if value, ok := _c.mutation.Slug(); ok {
 		_spec.SetField(post.FieldSlug, field.TypeString, value)
 		_node.Slug = value
 	}
-	if value, ok := pc.mutation.Pinned(); ok {
+	if value, ok := _c.mutation.Pinned(); ok {
 		_spec.SetField(post.FieldPinned, field.TypeBool, value)
 		_node.Pinned = value
 	}
-	if value, ok := pc.mutation.LastReplyAt(); ok {
+	if value, ok := _c.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
 		_node.LastReplyAt = &value
 	}
-	if value, ok := pc.mutation.Body(); ok {
+	if value, ok := _c.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
 		_node.Body = value
 	}
-	if value, ok := pc.mutation.Short(); ok {
+	if value, ok := _c.mutation.Short(); ok {
 		_spec.SetField(post.FieldShort, field.TypeString, value)
 		_node.Short = value
 	}
-	if value, ok := pc.mutation.Metadata(); ok {
+	if value, ok := _c.mutation.Metadata(); ok {
 		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
 	}
-	if value, ok := pc.mutation.Visibility(); ok {
+	if value, ok := _c.mutation.Visibility(); ok {
 		_spec.SetField(post.FieldVisibility, field.TypeEnum, value)
 		_node.Visibility = value
 	}
-	if nodes := pc.mutation.AuthorIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -658,7 +658,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_node.AccountPosts = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.CategoryIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -675,7 +675,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_node.CategoryID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.TagsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -691,7 +691,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.RootIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.RootIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -708,7 +708,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_node.RootPostID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -724,7 +724,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.ReplyToIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ReplyToIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -741,7 +741,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_node.ReplyToPostID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.RepliesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.RepliesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -757,7 +757,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.ReactsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ReactsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -773,7 +773,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.LikesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.LikesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -789,7 +789,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.MentionsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.MentionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -805,7 +805,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -821,7 +821,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.CollectionsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.CollectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -837,7 +837,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.LinkIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.LinkIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -854,7 +854,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_node.LinkID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.ContentLinksIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ContentLinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -870,7 +870,7 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -905,10 +905,10 @@ func (pc *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (pc *PostCreate) OnConflict(opts ...sql.ConflictOption) *PostUpsertOne {
-	pc.conflict = opts
+func (_c *PostCreate) OnConflict(opts ...sql.ConflictOption) *PostUpsertOne {
+	_c.conflict = opts
 	return &PostUpsertOne{
-		create: pc,
+		create: _c,
 	}
 }
 
@@ -918,10 +918,10 @@ func (pc *PostCreate) OnConflict(opts ...sql.ConflictOption) *PostUpsertOne {
 //	client.Post.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (pc *PostCreate) OnConflictColumns(columns ...string) *PostUpsertOne {
-	pc.conflict = append(pc.conflict, sql.ConflictColumns(columns...))
+func (_c *PostCreate) OnConflictColumns(columns ...string) *PostUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &PostUpsertOne{
-		create: pc,
+		create: _c,
 	}
 }
 
@@ -1608,16 +1608,16 @@ type PostCreateBulk struct {
 }
 
 // Save creates the Post entities in the database.
-func (pcb *PostCreateBulk) Save(ctx context.Context) ([]*Post, error) {
-	if pcb.err != nil {
-		return nil, pcb.err
+func (_c *PostCreateBulk) Save(ctx context.Context) ([]*Post, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(pcb.builders))
-	nodes := make([]*Post, len(pcb.builders))
-	mutators := make([]Mutator, len(pcb.builders))
-	for i := range pcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Post, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := pcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*PostMutation)
@@ -1631,12 +1631,12 @@ func (pcb *PostCreateBulk) Save(ctx context.Context) ([]*Post, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, pcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = pcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, pcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -1656,7 +1656,7 @@ func (pcb *PostCreateBulk) Save(ctx context.Context) ([]*Post, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, pcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -1664,8 +1664,8 @@ func (pcb *PostCreateBulk) Save(ctx context.Context) ([]*Post, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (pcb *PostCreateBulk) SaveX(ctx context.Context) []*Post {
-	v, err := pcb.Save(ctx)
+func (_c *PostCreateBulk) SaveX(ctx context.Context) []*Post {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1673,14 +1673,14 @@ func (pcb *PostCreateBulk) SaveX(ctx context.Context) []*Post {
 }
 
 // Exec executes the query.
-func (pcb *PostCreateBulk) Exec(ctx context.Context) error {
-	_, err := pcb.Save(ctx)
+func (_c *PostCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pcb *PostCreateBulk) ExecX(ctx context.Context) {
-	if err := pcb.Exec(ctx); err != nil {
+func (_c *PostCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -1700,10 +1700,10 @@ func (pcb *PostCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (pcb *PostCreateBulk) OnConflict(opts ...sql.ConflictOption) *PostUpsertBulk {
-	pcb.conflict = opts
+func (_c *PostCreateBulk) OnConflict(opts ...sql.ConflictOption) *PostUpsertBulk {
+	_c.conflict = opts
 	return &PostUpsertBulk{
-		create: pcb,
+		create: _c,
 	}
 }
 
@@ -1713,10 +1713,10 @@ func (pcb *PostCreateBulk) OnConflict(opts ...sql.ConflictOption) *PostUpsertBul
 //	client.Post.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (pcb *PostCreateBulk) OnConflictColumns(columns ...string) *PostUpsertBulk {
-	pcb.conflict = append(pcb.conflict, sql.ConflictColumns(columns...))
+func (_c *PostCreateBulk) OnConflictColumns(columns ...string) *PostUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &PostUpsertBulk{
-		create: pcb,
+		create: _c,
 	}
 }
 
