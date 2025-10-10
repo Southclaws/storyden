@@ -49,14 +49,14 @@
     "lucide-react": "^0.525.0",
     "mime-db": "^1.54.0",
     "mitt": "^3.0.1",
-    "next": "15.4.2",
+    "next": "15.5.4",
     "nuqs": "^1.20.0",
     "polished": "^4.3.1",
-    "react": "19.1.0",
+    "react": "19.2.0",
     "react-advanced-cropper": "^0.20.1",
     "react-avatar-editor": "^13.0.2",
     "react-contenteditable": "^3.3.7",
-    "react-dom": "19.1.0",
+    "react-dom": "19.2.0",
     "react-hook-form": "^7.60.0",
     "react-markdown": "^9.1.0",
     "remark-parse": "^11.0.0",
@@ -81,8 +81,8 @@
     "@types/js-cookie": "^3.0.6",
     "@types/lodash": "^4.17.20",
     "@types/mime-db": "^1.43.6",
-    "@types/node": "^24.0.14",
-    "@types/react": "19.1.8",
+    "@types/node": "^24.7.1",
+    "@types/react": "19.2.2",
     "@types/react-avatar-editor": "^13.0.4",
     "@typescript-eslint/eslint-plugin": "^8.37.0",
     "@typescript-eslint/parser": "^8.37.0",
@@ -95,8 +95,5 @@
   "packageManager": "yarn@4.9.1",
   "engines": {
     "node": "22.x"
-  },
-  "resolutions": {
-    "@types/react": "19.1.5"
   }
 }

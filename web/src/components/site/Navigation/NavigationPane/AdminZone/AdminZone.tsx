@@ -23,7 +23,7 @@ import { Box, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { Route, useRoute } from "../../useRoute";
 
-const MotionBox = motion(Box);
+const MotionBox = motion.create(Box);
 const MotionSpan = motion.span;
 
 const editableRoute: Record<Route["name"], boolean> = {
