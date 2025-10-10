@@ -125,7 +125,7 @@ func (s *Fetcher) ScrapeAndStore(ctx context.Context, u url.URL) (*link_ref.Link
 			return nil, nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
-		return ln, nil, nil
+		return ln, &scrape.WebContent{}, nil
 	}
 
 	opts := []link_writer.Option{}
