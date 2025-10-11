@@ -11,7 +11,9 @@ export async function getServerSession() {
   if (!session) return;
 
   try {
-    const { data } = await accountGet();
+    const { data } = await accountGet({
+      next: { tags: ["accounts"] },
+    });
 
     return data;
   } catch (e) {

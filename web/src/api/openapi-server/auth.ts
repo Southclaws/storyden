@@ -23,6 +23,7 @@ import type {
   AuthPasswordSignupParams,
   AuthPasswordUpdateBody,
   AuthProviderListOKResponse,
+  AuthProviderLogoutParams,
   AuthSuccessOKResponse,
   NoContentResponse,
   OAuthProviderCallbackBody,
@@ -722,22 +723,40 @@ export const accessKeyDelete = async (
 };
 
 /**
- * Remove cookies from requesting client.
+ * Performs a HTTP logout by clearing the session cookie and redirecting to
+to the requested path at the frontend's `WEB_ADDRESS`. Typically this
+may be a secondary logout route on the frontend implementation that can
+handle any frontend-specific logout tasks. This is necessary in cases
+where the frontend is running on a different origin to the API service
+such as api.site.com vs site.com because Clear-Site-Data and other
+headers are same-origin compliant and won't work cross-origin.
+
  */
 export type authProviderLogoutResponse = {
-  data: void;
+  data: unknown;
   status: number;
 };
 
-export const getAuthProviderLogoutUrl = () => {
-  return `/auth/logout`;
+export const getAuthProviderLogoutUrl = (params?: AuthProviderLogoutParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/auth/logout?${normalizedParams.toString()}`
+    : `/auth/logout`;
 };
 
 export const authProviderLogout = async (
+  params?: AuthProviderLogoutParams,
   options?: RequestInit,
 ): Promise<authProviderLogoutResponse> => {
   return fetcher<Promise<authProviderLogoutResponse>>(
-    getAuthProviderLogoutUrl(),
+    getAuthProviderLogoutUrl(params),
     {
       ...options,
       method: "GET",

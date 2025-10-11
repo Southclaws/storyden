@@ -97,9 +97,24 @@ func (o *Authentication) AuthProviderList(ctx context.Context, request openapi.A
 }
 
 func (a *Authentication) AuthProviderLogout(ctx context.Context, request openapi.AuthProviderLogoutRequestObject) (openapi.AuthProviderLogoutResponseObject, error) {
-	return openapi.AuthProviderLogout200Response{
-		Headers: openapi.AuthProviderLogout200ResponseHeaders{
-			SetCookie: a.cj.Destroy().String(),
+	redirectTo := a.webAddress
+
+	if request.Params.Redirect != nil && *request.Params.Redirect != "" {
+		parsed, err := url.Parse(*request.Params.Redirect)
+		if err == nil {
+			// Only use the path component to prevent open redirects.
+			redirectTo.Path = parsed.Path
+			redirectTo.RawQuery = parsed.RawQuery
+			redirectTo.Fragment = parsed.Fragment
+		}
+	}
+
+	return openapi.AuthProviderLogout302Response{
+		Headers: openapi.AuthProviderLogout302ResponseHeaders{
+			SetCookie:     a.cj.Destroy().String(),
+			ClearSiteData: `"cache", "cookies", "storage", "executionContexts"`,
+			CacheControl:  "no-cache, no-store, must-revalidate",
+			Location:      redirectTo.String(),
 		},
 	}, nil
 }
