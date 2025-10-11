@@ -1,7 +1,6 @@
 import { PublicProfileList } from "src/api/openapi-schema";
 
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
-import { RoleBadgeList } from "@/components/role/RoleBadge/RoleBadgeList";
 import { EmptyState } from "@/components/site/EmptyState";
 import { Timestamp } from "@/components/site/Timestamp";
 import * as Table from "@/components/ui/table";
@@ -19,14 +18,13 @@ export function MemberList({ profiles }: Props) {
   return (
     <>
       {/* Desktop Table View */}
-      <Box display={{ base: "none", md: "block" }}>
+      <Box display={{ base: "none", lg: "block" }}>
         <Table.Root size="sm">
           <Table.Head>
             <Table.Row>
               <Table.Cell>Member</Table.Cell>
               <Table.Cell>Invited by</Table.Cell>
               <Table.Cell>Likes</Table.Cell>
-              <Table.Cell>Roles</Table.Cell>
               <Table.Cell textAlign="right">Joined</Table.Cell>
             </Table.Row>
           </Table.Head>
@@ -54,15 +52,12 @@ export function MemberList({ profiles }: Props) {
                   <Table.Cell>{profile.like_score}</Table.Cell>
 
                   <Table.Cell>
-                    <RoleBadgeList roles={profile.roles} limit={1} />
-                  </Table.Cell>
-
-                  <Table.Cell>
                     <LStack gap="1" alignItems="end">
                       <Timestamp created={profile.createdAt} large />
                       {isBanned && (
                         <styled.p color="fg.destructive">
-                          banned <Timestamp created={profile.deletedAt!} large />
+                          banned{" "}
+                          <Timestamp created={profile.deletedAt!} large />
                         </styled.p>
                       )}
                     </LStack>
@@ -75,12 +70,13 @@ export function MemberList({ profiles }: Props) {
       </Box>
 
       {/* Mobile Card View */}
-      <VStack gap="3" display={{ base: "flex", md: "none" }}>
+      <VStack w="full" gap="3" display={{ base: "flex", lg: "none" }}>
         {profiles.map((profile) => {
           const isBanned = Boolean(profile.deletedAt);
 
           return (
             <Box
+              w="full"
               key={profile.id}
               borderWidth="thin"
               borderRadius="lg"
@@ -130,23 +126,6 @@ export function MemberList({ profiles }: Props) {
                       {profile.like_score}
                     </styled.span>
                   </HStack>
-
-                  {profile.roles && profile.roles.length > 0 && (
-                    <HStack
-                      justifyContent="space-between"
-                      gap="2"
-                      alignItems="center"
-                    >
-                      <styled.span
-                        color="fg.subtle"
-                        fontSize="sm"
-                        fontWeight="medium"
-                      >
-                        Roles
-                      </styled.span>
-                      <RoleBadgeList roles={profile.roles} limit={2} />
-                    </HStack>
-                  )}
 
                   <HStack justifyContent="space-between" gap="2">
                     <styled.span
