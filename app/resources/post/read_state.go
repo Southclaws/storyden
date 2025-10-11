@@ -20,7 +20,10 @@ type ReadStateResult struct {
 }
 
 func (p ReadStateResult) Status() ReadStatus {
-	t, _ := time.Parse(time.RFC3339Nano, p.LastReadAt)
+	t, err := time.Parse(time.RFC3339Nano, p.LastReadAt)
+	if err != nil {
+		t, _ = time.Parse("2006-01-02 15:04:05.999999999-07:00", p.LastReadAt)
+	}
 	return ReadStatus{
 		Count:      p.NewReplies,
 		LastReadAt: t,

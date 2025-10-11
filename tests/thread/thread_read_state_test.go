@@ -83,6 +83,8 @@ func TestThreadReadState(t *testing.T) {
 				err = rw.UpsertReadState(root, acc1.ID, post.ID(utils.Must(xid.FromString(threadCreate.JSON200.Id))))
 				r.NoError(err)
 
+				lastRead := time.Now().UTC()
+
 				// Small delay to ensure time difference
 				time.Sleep(100 * time.Millisecond)
 
@@ -103,6 +105,7 @@ func TestThreadReadState(t *testing.T) {
 				threadGet2, err := cl.ThreadGetWithResponse(acc1ctx, threadCreate.JSON200.Slug, nil, session1)
 				tests.Ok(t, err, threadGet2)
 				a.Equal(1, threadGet2.JSON200.ReadStatus.RepliesSince)
+				a.WithinDuration(lastRead, threadGet2.JSON200.ReadStatus.LastReadAt, time.Second)
 			})
 		}))
 	}))
