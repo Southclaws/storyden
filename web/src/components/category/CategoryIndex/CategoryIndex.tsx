@@ -111,6 +111,9 @@ function ThreadListSection({
       ? "All discussion threads"
       : "Uncategorised discussion threads";
 
+  // Only show the category select when showing all threads, not uncategorised.
+  const showCategorySelect = mode === "all";
+
   return (
     <LStack>
       {!showQuickShare && (
@@ -126,7 +129,7 @@ function ThreadListSection({
         initialPageData={initialThreadList}
         category={mode === "all" ? undefined : null}
         paginationBasePath={paginationBasePath}
-        showCategorySelect={false}
+        showCategorySelect={showCategorySelect}
         showQuickShare={showQuickShare}
       />
     </LStack>
