@@ -8,6 +8,8 @@ import { buildCategoryTree } from "@/lib/category/tree";
 
 export type Props = {
   layout: "grid" | "list";
+  threadListMode: "none" | "all" | "uncategorised";
+  showQuickShare: boolean;
   initialCategoryList?: CategoryListOKResponse;
   initialThreadList?: ThreadListResult;
   initialThreadListPage?: number;
@@ -46,6 +48,8 @@ export function CategoryIndexScreen(props: Props) {
   return (
     <CategoryIndex
       layout={props.layout}
+      threadListMode={props.threadListMode}
+      showQuickShare={props.showQuickShare}
       categories={tree}
       initialThreadList={props.initialThreadList}
       initialThreadListPage={props.initialThreadListPage}

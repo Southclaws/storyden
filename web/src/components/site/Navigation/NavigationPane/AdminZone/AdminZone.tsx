@@ -1,12 +1,18 @@
 "use client";
 
-import { SelectValueChangeDetails, createListCollection } from "@ark-ui/react";
+import {
+  CheckboxCheckedChangeDetails,
+  SelectValueChangeDetails,
+  createListCollection,
+} from "@ark-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useSWRConfig } from "swr";
 
 import { Node } from "@/api/openapi-schema";
 import { LibraryPageSelect } from "@/components/library/LibraryPageSelect";
 import { InfoTip } from "@/components/site/InfoTip";
 import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
+import * as Checkbox from "@/components/ui/checkbox";
 import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { AdminIcon } from "@/components/ui/icons/Admin";
@@ -160,11 +166,29 @@ export function FeedConfig() {
 
     const feedSourceType = value[0] as typeof feed.source.type;
 
+    // Create proper source config based on type
+    let sourceConfig: typeof feed.source;
+    switch (feedSourceType) {
+      case "threads":
+        sourceConfig = { type: "threads", quickShare: "enabled" };
+        break;
+      case "library":
+        sourceConfig = { type: "library" };
+        break;
+      case "categories":
+        sourceConfig = {
+          type: "categories",
+          threadListMode: "uncategorised",
+          quickShare: "enabled",
+        };
+        break;
+      default:
+        return;
+    }
+
     await updateFeed({
       layout: feed.layout,
-      source: {
-        type: feedSourceType,
-      },
+      source: sourceConfig,
     });
   }
 
@@ -277,11 +301,64 @@ function SourceConfig() {
   const { feed } = useSettingsContext();
 
   switch (feed.source.type) {
+    case "threads":
+      return <SourceThreadsConfig />;
     case "library":
       return <SourceLibraryConfig />;
+    case "categories":
+      return <SourceCategoriesConfig />;
     default:
       return null;
   }
+}
+
+function SourceThreadsConfig() {
+  const { feed, updateFeed } = useSettingsContext();
+
+  if (feed.source.type !== "threads") {
+    return null;
+  }
+
+  async function handleQuickShareChange({
+    checked,
+  }: CheckboxCheckedChangeDetails) {
+    await updateFeed({
+      layout: feed.layout,
+      source: {
+        type: "threads",
+        quickShare: checked ? "enabled" : "disabled",
+      },
+    });
+  }
+
+  return (
+    <LStack gap="1">
+      <WStack alignItems="center">
+        <Heading fontWeight="medium" size="xs">
+          Quick Share
+        </Heading>
+
+        <InfoTip title="Show quick share box">
+          Display a quick share box at the top of the thread list to allow users
+          to quickly create new threads.
+        </InfoTip>
+      </WStack>
+
+      <Checkbox.Root
+        size="sm"
+        checked={feed.source.quickShare === "enabled"}
+        onCheckedChange={handleQuickShareChange}
+      >
+        <Checkbox.Control>
+          <Checkbox.Indicator>
+            <CheckIcon />
+          </Checkbox.Indicator>
+        </Checkbox.Control>
+        <Checkbox.Label>Show Quick Share</Checkbox.Label>
+        <Checkbox.HiddenInput />
+      </Checkbox.Root>
+    </LStack>
+  );
 }
 
 function SourceLibraryConfig() {
@@ -320,6 +397,144 @@ function SourceLibraryConfig() {
         value={feed.source.node}
         defaultValue={feed.source.node}
       />
+    </LStack>
+  );
+}
+
+const threadListModes = [
+  {
+    label: "None",
+    value: "none" as const,
+  },
+  {
+    label: "All threads",
+    value: "all" as const,
+  },
+  {
+    label: "Uncategorised only",
+    value: "uncategorised" as const,
+  },
+];
+
+function SourceCategoriesConfig() {
+  const { feed, updateFeed } = useSettingsContext();
+  const { mutate } = useSWRConfig();
+
+  if (feed.source.type !== "categories") {
+    return null;
+  }
+
+  const threadListModeCollection = createListCollection({
+    items: threadListModes,
+  });
+
+  async function handleThreadListModeChange({
+    value,
+  }: SelectValueChangeDetails) {
+    if (value.length === 0 || feed.source.type !== "categories") {
+      return;
+    }
+
+    const mode = value[0] as "none" | "all" | "uncategorised";
+
+    await updateFeed({
+      layout: feed.layout,
+      source: {
+        type: "categories",
+        threadListMode: mode,
+        quickShare: feed.source.quickShare,
+      },
+    });
+
+    // Invalidate all /threads calls to trigger re-fetch with new params
+    await mutate(
+      (key) => typeof key === "string" && key.startsWith("/threads"),
+    );
+  }
+
+  async function handleQuickShareChange({
+    checked,
+  }: CheckboxCheckedChangeDetails) {
+    if (feed.source.type !== "categories") {
+      return;
+    }
+
+    await updateFeed({
+      layout: feed.layout,
+      source: {
+        type: "categories",
+        threadListMode: feed.source.threadListMode,
+        quickShare: checked ? "enabled" : "disabled",
+      },
+    });
+  }
+
+  return (
+    <LStack gap="1">
+      <WStack alignItems="center">
+        <Heading fontWeight="medium" size="xs">
+          Thread list display
+        </Heading>
+
+        <InfoTip title="Choose what threads to show">
+          Control which threads are displayed below the categories. Select
+          &quot;None&quot; to only show categories, &quot;All threads&quot; to
+          show threads from all categories, or &quot;Uncategorised only&quot; to
+          show only threads without a category.
+        </InfoTip>
+      </WStack>
+
+      <Select.Root
+        size="xs"
+        collection={threadListModeCollection}
+        defaultValue={[feed.source.threadListMode]}
+        positioning={{ sameWidth: false }}
+        onValueChange={handleThreadListModeChange}
+      >
+        <Select.Control>
+          <Select.Trigger>
+            <Select.ValueText placeholder="Select thread list mode" />
+            <SelectIcon />
+          </Select.Trigger>
+        </Select.Control>
+        <Select.Positioner>
+          <Select.Content>
+            {threadListModes.map((item) => (
+              <Select.Item key={item.value} item={item}>
+                <Select.ItemText>{item.label}</Select.ItemText>
+                <Select.ItemIndicator>
+                  <CheckIcon />
+                </Select.ItemIndicator>
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select.Positioner>
+      </Select.Root>
+
+      <WStack alignItems="center">
+        <Heading fontWeight="medium" size="xs">
+          Quick Share
+        </Heading>
+
+        <InfoTip title="Show quick share box">
+          Display a quick share box at the top of the thread list to allow users
+          to quickly create new threads.
+        </InfoTip>
+      </WStack>
+
+      <Checkbox.Root
+        size="sm"
+        checked={feed.source.quickShare === "enabled"}
+        onCheckedChange={handleQuickShareChange}
+      >
+        <Checkbox.Control>
+          <Checkbox.Indicator>
+            <CheckIcon />
+          </Checkbox.Indicator>
+        </Checkbox.Control>
+        <Checkbox.Label>Show Quick Share</Checkbox.Label>
+        <Checkbox.HiddenInput />
+      </Checkbox.Root>
     </LStack>
   );
 }

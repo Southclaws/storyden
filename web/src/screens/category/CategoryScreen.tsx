@@ -88,12 +88,14 @@ export function CategoryScreen(props: ScreenProps) {
         <styled.p color="fg.muted">{category.description}</styled.p>
       </LStack>
 
-      <LStack gap="1">
-        <Heading size="sm" color="fg.muted">
-          Subcategories
-        </Heading>
-        <CategoryLayout layout="grid" categories={category.children ?? []} />
-      </LStack>
+      {category.children && category.children.length > 0 && (
+        <LStack gap="1">
+          <Heading size="sm" color="fg.muted">
+            Subcategories
+          </Heading>
+          <CategoryLayout layout="grid" categories={category.children} />
+        </LStack>
+      )}
 
       <ThreadFeedScreen
         initialPage={props.initialPage}
