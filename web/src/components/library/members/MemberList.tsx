@@ -94,24 +94,9 @@ export function MemberList({ profiles }: Props) {
                       fontSize="sm"
                       fontWeight="medium"
                     >
-                      Invited by
+                      Joined
                     </styled.span>
-                    <Box>
-                      {profile.invited_by ? (
-                        <MemberBadge
-                          profile={profile.invited_by}
-                          name="handle"
-                        />
-                      ) : (
-                        <styled.span
-                          color="fg.subtle"
-                          fontStyle="italic"
-                          fontSize="sm"
-                        >
-                          n/a
-                        </styled.span>
-                      )}
-                    </Box>
+                    <Timestamp created={profile.createdAt} large />
                   </HStack>
 
                   <HStack justifyContent="space-between" gap="2">
@@ -133,9 +118,24 @@ export function MemberList({ profiles }: Props) {
                       fontSize="sm"
                       fontWeight="medium"
                     >
-                      Joined
+                      Invited by
                     </styled.span>
-                    <Timestamp created={profile.createdAt} large />
+                    <Box>
+                      {profile.invited_by ? (
+                        <MemberBadge
+                          profile={profile.invited_by}
+                          name="handle"
+                        />
+                      ) : (
+                        <styled.span
+                          color="fg.subtle"
+                          fontStyle="italic"
+                          fontSize="sm"
+                        >
+                          n/a
+                        </styled.span>
+                      )}
+                    </Box>
                   </HStack>
 
                   {isBanned && (
