@@ -60,7 +60,7 @@ export function MemberName({
           alignItems="center"
         >
           <styled.p
-            className="member-name__display-name"
+            className="member-name__show-horizontal-display-name"
             minW="0"
             fontSize={size}
             fontWeight={size === "lg" ? "bold" : "medium"}
@@ -77,11 +77,16 @@ export function MemberName({
             {profile.name}
           </styled.p>
           <styled.p
-            className="member-name__handle"
+            className="member-name__show-horizontal-handle"
+            color="fg.subtle"
+            minW="0"
+            textWrap="nowrap"
+            textOverflow="ellipsis"
+            overflowX="hidden"
+            overflowY="clip"
+            lineHeight="tight"
             fontSize={size}
             fontWeight="normal"
-            textWrap="nowrap"
-            color="fg.subtle"
           >
             @{profile.handle}
           </styled.p>
@@ -100,7 +105,7 @@ export function MemberName({
           alignItems="start"
         >
           <styled.p
-            className="member-name__display-name"
+            className="member-name__show-vertical-display-name"
             minW="0"
             fontSize={size}
             fontWeight={size === "lg" ? "bold" : "medium"}
@@ -117,7 +122,7 @@ export function MemberName({
             {profile.name}
           </styled.p>
           <styled.p
-            className="member-name__handle"
+            className="member-name__show-vertical-handle"
             fontSize={size}
             fontWeight="normal"
             w="full"
@@ -147,7 +152,7 @@ export function MemberName({
           minW="0"
         >
           <styled.p
-            className="member-name__handle"
+            className="member-name__show-handle-handle"
             fontSize={size}
             fontWeight="normal"
             overflowX="hidden"
