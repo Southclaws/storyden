@@ -38,6 +38,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/post_read_state"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
@@ -85,6 +86,7 @@ func Build() fx.Option {
 			like_writer.New,
 			post_search.New,
 			post_writer.New,
+			post_read_state.New,
 			collection_querier.New,
 			collection_writer.New,
 			collection_items.New,

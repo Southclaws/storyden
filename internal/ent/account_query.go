@@ -26,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -62,6 +63,7 @@ type AccountQuery struct {
 	withNodes                  *NodeQuery
 	withAssets                 *AssetQuery
 	withEvents                 *EventParticipantQuery
+	withPostReads              *PostReadQuery
 	withAccountRoles           *AccountRolesQuery
 	modifiers                  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
@@ -540,6 +542,28 @@ func (_q *AccountQuery) QueryEvents() *EventParticipantQuery {
 	return query
 }
 
+// QueryPostReads chains the current query on the "post_reads" edge.
+func (_q *AccountQuery) QueryPostReads() *PostReadQuery {
+	query := (&PostReadClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, selector),
+			sqlgraph.To(postread.Table, postread.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.PostReadsTable, account.PostReadsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryAccountRoles chains the current query on the "account_roles" edge.
 func (_q *AccountQuery) QueryAccountRoles() *AccountRolesQuery {
 	query := (&AccountRolesClient{config: _q.config}).Query()
@@ -774,6 +798,7 @@ func (_q *AccountQuery) Clone() *AccountQuery {
 		withNodes:                  _q.withNodes.Clone(),
 		withAssets:                 _q.withAssets.Clone(),
 		withEvents:                 _q.withEvents.Clone(),
+		withPostReads:              _q.withPostReads.Clone(),
 		withAccountRoles:           _q.withAccountRoles.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
@@ -1002,6 +1027,17 @@ func (_q *AccountQuery) WithEvents(opts ...func(*EventParticipantQuery)) *Accoun
 	return _q
 }
 
+// WithPostReads tells the query-builder to eager-load the nodes that are connected to
+// the "post_reads" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *AccountQuery) WithPostReads(opts ...func(*PostReadQuery)) *AccountQuery {
+	query := (&PostReadClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withPostReads = query
+	return _q
+}
+
 // WithAccountRoles tells the query-builder to eager-load the nodes that are connected to
 // the "account_roles" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *AccountQuery) WithAccountRoles(opts ...func(*AccountRolesQuery)) *AccountQuery {
@@ -1091,7 +1127,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 	var (
 		nodes       = []*Account{}
 		_spec       = _q.querySpec()
-		loadedTypes = [21]bool{
+		loadedTypes = [22]bool{
 			_q.withSessions != nil,
 			_q.withEmails != nil,
 			_q.withNotifications != nil,
@@ -1112,6 +1148,7 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 			_q.withNodes != nil,
 			_q.withAssets != nil,
 			_q.withEvents != nil,
+			_q.withPostReads != nil,
 			_q.withAccountRoles != nil,
 		}
 	)
@@ -1274,6 +1311,13 @@ func (_q *AccountQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Acco
 		if err := _q.loadEvents(ctx, query, nodes,
 			func(n *Account) { n.Edges.Events = []*EventParticipant{} },
 			func(n *Account, e *EventParticipant) { n.Edges.Events = append(n.Edges.Events, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withPostReads; query != nil {
+		if err := _q.loadPostReads(ctx, query, nodes,
+			func(n *Account) { n.Edges.PostReads = []*PostRead{} },
+			func(n *Account, e *PostRead) { n.Edges.PostReads = append(n.Edges.PostReads, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1943,6 +1987,36 @@ func (_q *AccountQuery) loadEvents(ctx context.Context, query *EventParticipantQ
 	}
 	query.Where(predicate.EventParticipant(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(account.EventsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.AccountID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "account_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *AccountQuery) loadPostReads(ctx context.Context, query *PostReadQuery, nodes []*Account, init func(*Account), assign func(*Account, *PostRead)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Account)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(postread.FieldAccountID)
+	}
+	query.Where(predicate.PostRead(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(account.PostReadsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

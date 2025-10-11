@@ -80,6 +80,8 @@ const (
 	EdgeAssets = "assets"
 	// EdgeEvents holds the string denoting the events edge name in mutations.
 	EdgeEvents = "events"
+	// EdgePostReads holds the string denoting the post_reads edge name in mutations.
+	EdgePostReads = "post_reads"
 	// EdgeAccountRoles holds the string denoting the account_roles edge name in mutations.
 	EdgeAccountRoles = "account_roles"
 	// Table holds the table name of the account in the database.
@@ -220,6 +222,13 @@ const (
 	EventsInverseTable = "event_participants"
 	// EventsColumn is the table column denoting the events relation/edge.
 	EventsColumn = "account_id"
+	// PostReadsTable is the table that holds the post_reads relation/edge.
+	PostReadsTable = "post_reads"
+	// PostReadsInverseTable is the table name for the PostRead entity.
+	// It exists in this package in order to avoid circular dependency with the "postread" package.
+	PostReadsInverseTable = "post_reads"
+	// PostReadsColumn is the table column denoting the post_reads relation/edge.
+	PostReadsColumn = "account_id"
 	// AccountRolesTable is the table that holds the account_roles relation/edge.
 	AccountRolesTable = "account_roles"
 	// AccountRolesInverseTable is the table name for the AccountRoles entity.
@@ -641,6 +650,20 @@ func ByEvents(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByPostReadsCount orders the results by post_reads count.
+func ByPostReadsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPostReadsStep(), opts...)
+	}
+}
+
+// ByPostReads orders the results by post_reads terms.
+func ByPostReads(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPostReadsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByAccountRolesCount orders the results by account_roles count.
 func ByAccountRolesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -792,6 +815,13 @@ func newEventsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EventsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, EventsTable, EventsColumn),
+	)
+}
+func newPostReadsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PostReadsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PostReadsTable, PostReadsColumn),
 	)
 }
 func newAccountRolesStep() *sqlgraph.Step {

@@ -63,6 +63,9 @@ type Notification func(*sql.Selector)
 // Post is the predicate function for post builders.
 type Post func(*sql.Selector)
 
+// PostRead is the predicate function for postread builders.
+type PostRead func(*sql.Selector)
+
 // Property is the predicate function for property builders.
 type Property func(*sql.Selector)
 

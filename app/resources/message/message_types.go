@@ -152,6 +152,11 @@ type CommandSendEmail struct {
 	Message mailer.Message
 }
 
+type CommandSendBeacon struct {
+	Item    datagraph.Ref
+	Subject opt.Optional[account.AccountID]
+}
+
 // -
 // Scraping commands
 // -

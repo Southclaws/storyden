@@ -95,6 +95,8 @@ export * from "./authenticatorAttachment";
 export * from "./authenticatorResponse";
 export * from "./authenticatorSelectionCriteria";
 export * from "./badRequestResponse";
+export * from "./beaconBody";
+export * from "./beaconProps";
 export * from "./category";
 export * from "./categoryAdditional";
 export * from "./categoryCommonProps";

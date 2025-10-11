@@ -6,7 +6,8 @@ import { z } from "zod";
 
 import { handle } from "@/api/client";
 import { threadUpdate, useThreadGet } from "@/api/openapi-client/threads";
-import { ThreadGetResponse } from "@/api/openapi-schema";
+import { DatagraphItemKind, ThreadGetResponse } from "@/api/openapi-schema";
+import { useBeacon } from "@/lib/beacon/useBeacon";
 
 export type Props = {
   initialPage?: number;
@@ -28,7 +29,9 @@ export function useThreadScreen({ initialPage, slug, thread }: Props) {
     clearOnDefault: true,
   });
   const [resetKey, setResetKey] = useState("");
-  const [isEmpty, setEmpty] = useState(!thread.body || thread.body.trim().length === 0);
+  const [isEmpty, setEmpty] = useState(
+    !thread.body || thread.body.trim().length === 0,
+  );
 
   const form = useForm<Form>({
     resolver: zodResolver(FormSchema),
@@ -50,6 +53,8 @@ export function useThreadScreen({ initialPage, slug, thread }: Props) {
       },
     },
   );
+
+  useBeacon(DatagraphItemKind.thread, data?.id);
 
   if (!data) {
     return {

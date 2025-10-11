@@ -63,6 +63,7 @@ type Bindings struct {
 	Version
 	Spec
 	Info
+	Beacon
 	Admin
 	Roles
 	Authentication
@@ -95,6 +96,7 @@ func bindingsProviders() fx.Option {
 		NewVersion,
 		NewSpec,
 		NewInfo,
+		NewBeacon,
 		NewAdmin,
 		NewRoles,
 		NewAuthentication,
@@ -168,6 +170,10 @@ func mount(
 		// will cause memory usage issues for large file uploads since it will
 		// completely remove the ability to stream request body to the uploader.
 		if c.Path() == "/api/assets" && c.Request().Method == http.MethodPost {
+			return true
+		}
+
+		if c.Path() == "/api/beacon" && c.Request().Method == http.MethodPost {
 			return true
 		}
 

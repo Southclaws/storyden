@@ -93,11 +93,13 @@ type AccountEdges struct {
 	Assets []*Asset `json:"assets,omitempty"`
 	// Events holds the value of the events edge.
 	Events []*EventParticipant `json:"events,omitempty"`
+	// PostReads holds the value of the post_reads edge.
+	PostReads []*PostRead `json:"post_reads,omitempty"`
 	// AccountRoles holds the value of the account_roles edge.
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [21]bool
+	loadedTypes [22]bool
 }
 
 // SessionsOrErr returns the Sessions value or an error if the edge
@@ -282,10 +284,19 @@ func (e AccountEdges) EventsOrErr() ([]*EventParticipant, error) {
 	return nil, &NotLoadedError{edge: "events"}
 }
 
+// PostReadsOrErr returns the PostReads value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) PostReadsOrErr() ([]*PostRead, error) {
+	if e.loadedTypes[20] {
+		return e.PostReads, nil
+	}
+	return nil, &NotLoadedError{edge: "post_reads"}
+}
+
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[20] {
+	if e.loadedTypes[21] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -519,6 +530,11 @@ func (_m *Account) QueryAssets() *AssetQuery {
 // QueryEvents queries the "events" edge of the Account entity.
 func (_m *Account) QueryEvents() *EventParticipantQuery {
 	return NewAccountClient(_m.config).QueryEvents(_m)
+}
+
+// QueryPostReads queries the "post_reads" edge of the Account entity.
+func (_m *Account) QueryPostReads() *PostReadQuery {
+	return NewAccountClient(_m.config).QueryPostReads(_m)
 }
 
 // QueryAccountRoles queries the "account_roles" edge of the Account entity.
