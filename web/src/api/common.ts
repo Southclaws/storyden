@@ -36,7 +36,7 @@ export function buildRequest({
   const address = `${apiAddress}/api${url}${cleanQuery(params)}`;
   const _method = method.toUpperCase();
 
-  const tags = url.split("/");
+  const tags = buildNextTagsFromURL(address);
 
   return new Request(address, {
     method: _method,
@@ -138,4 +138,12 @@ export function shouldLog(status: number) {
   }
 
   return true;
+}
+
+function buildNextTagsFromURL(url: string) {
+  const u = new URL(url);
+
+  const segments = u.pathname.split("/").filter(Boolean);
+
+  return segments;
 }

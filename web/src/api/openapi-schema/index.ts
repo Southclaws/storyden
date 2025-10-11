@@ -87,6 +87,7 @@ export * from "./authPasswordUpdateBody";
 export * from "./authProvider";
 export * from "./authProviderList";
 export * from "./authProviderListOKResponse";
+export * from "./authProviderLogoutParams";
 export * from "./authSuccess";
 export * from "./authSuccessOKResponse";
 export * from "./authenticationExtensionsClientInputs";

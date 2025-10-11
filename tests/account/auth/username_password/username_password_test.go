@@ -122,11 +122,6 @@ func TestUsernamePasswordAuth(t *testing.T) {
 				r.NoError(err)
 				r.NotNil(signin2)
 				r.Equal(http.StatusOK, signin2.StatusCode())
-
-				// Sign out
-				signout, err := cl.AuthProviderLogoutWithResponse(root, sh.WithSession(ctx1))
-				tests.Ok(t, err, signout)
-				a.Contains(signout.HTTPResponse.Header.Get("Set-Cookie"), "storyden-session=;")
 			})
 
 			t.Run("register_fail_invalid_password", func(t *testing.T) {

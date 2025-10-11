@@ -700,16 +700,34 @@ paths:
   /auth/logout:
     get:
       operationId: AuthProviderLogout
-      description: Remove cookies from requesting client.
+      description: |
+        Performs a HTTP logout by clearing the session cookie and redirecting to
+        to the requested path at the frontend's `WEB_ADDRESS`. Typically this
+        may be a secondary logout route on the frontend implementation that can
+        handle any frontend-specific logout tasks. This is necessary in cases
+        where the frontend is running on a different origin to the API service
+        such as api.site.com vs site.com because Clear-Site-Data and other
+        headers are same-origin compliant and won't work cross-origin.
       tags: [auth]
       security: [browser: []]
-
+      parameters:
+        - name: redirect
+          in: query
+          description: |
+            Path relative to the `WEB_ADDRESS` to redirect to. Note that this is
+            a path only and not a full URL to prevent cross-origin or cross-site
+            redirects. If not provided, redirects to `WEB_ADDRESS` index page.
+          required: false
+          schema:
+            type: string
       responses:
-        default: { $ref: "#/components/responses/InternalServerError" }
-        "400": { $ref: "#/components/responses/BadRequest" }
-        "200":
-          description: OK
-          headers: { Set-Cookie: { schema: { type: string } } }
+        "302":
+          description: Redirect to specified URL or home page
+          headers:
+            Set-Cookie: { schema: { type: string } }
+            Clear-Site-Data: { schema: { type: string } }
+            Cache-Control: { schema: { type: string } }
+            Location: { schema: { type: string } }
 
   #
   #                                                      888
