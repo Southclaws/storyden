@@ -38,6 +38,7 @@ export default async function Page({ searchParams }: Props) {
       <CategoryIndexScreen
         layout={"list"}
         threadListMode="uncategorised"
+        showQuickShare={true}
         initialCategoryList={categories}
         initialThreadList={threads}
         initialThreadListPage={page}

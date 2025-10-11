@@ -1,6 +1,10 @@
 "use client";
 
-import { SelectValueChangeDetails, createListCollection } from "@ark-ui/react";
+import {
+  CheckboxCheckedChangeDetails,
+  SelectValueChangeDetails,
+  createListCollection,
+} from "@ark-ui/react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSWRConfig } from "swr";
 
@@ -8,6 +12,7 @@ import { Node } from "@/api/openapi-schema";
 import { LibraryPageSelect } from "@/components/library/LibraryPageSelect";
 import { InfoTip } from "@/components/site/InfoTip";
 import { useSettingsContext } from "@/components/site/SettingsContext/SettingsContext";
+import * as Checkbox from "@/components/ui/checkbox";
 import { Heading } from "@/components/ui/heading";
 import { IconButton } from "@/components/ui/icon-button";
 import { AdminIcon } from "@/components/ui/icons/Admin";
@@ -165,13 +170,17 @@ export function FeedConfig() {
     let sourceConfig: typeof feed.source;
     switch (feedSourceType) {
       case "threads":
-        sourceConfig = { type: "threads" };
+        sourceConfig = { type: "threads", quickShare: "enabled" };
         break;
       case "library":
         sourceConfig = { type: "library" };
         break;
       case "categories":
-        sourceConfig = { type: "categories", threadListMode: "uncategorised" };
+        sourceConfig = {
+          type: "categories",
+          threadListMode: "uncategorised",
+          quickShare: "enabled",
+        };
         break;
       default:
         return;
@@ -292,6 +301,8 @@ function SourceConfig() {
   const { feed } = useSettingsContext();
 
   switch (feed.source.type) {
+    case "threads":
+      return <SourceThreadsConfig />;
     case "library":
       return <SourceLibraryConfig />;
     case "categories":
@@ -299,6 +310,55 @@ function SourceConfig() {
     default:
       return null;
   }
+}
+
+function SourceThreadsConfig() {
+  const { feed, updateFeed } = useSettingsContext();
+
+  if (feed.source.type !== "threads") {
+    return null;
+  }
+
+  async function handleQuickShareChange({
+    checked,
+  }: CheckboxCheckedChangeDetails) {
+    await updateFeed({
+      layout: feed.layout,
+      source: {
+        type: "threads",
+        quickShare: checked ? "enabled" : "disabled",
+      },
+    });
+  }
+
+  return (
+    <LStack gap="1">
+      <WStack alignItems="center">
+        <Heading fontWeight="medium" size="xs">
+          Quick Share
+        </Heading>
+
+        <InfoTip title="Show quick share box">
+          Display a quick share box at the top of the thread list to allow users
+          to quickly create new threads.
+        </InfoTip>
+      </WStack>
+
+      <Checkbox.Root
+        size="sm"
+        checked={feed.source.quickShare === "enabled"}
+        onCheckedChange={handleQuickShareChange}
+      >
+        <Checkbox.Control>
+          <Checkbox.Indicator>
+            <CheckIcon />
+          </Checkbox.Indicator>
+        </Checkbox.Control>
+        <Checkbox.Label>Show Quick Share</Checkbox.Label>
+        <Checkbox.HiddenInput />
+      </Checkbox.Root>
+    </LStack>
+  );
 }
 
 function SourceLibraryConfig() {
@@ -371,7 +431,7 @@ function SourceCategoriesConfig() {
   async function handleThreadListModeChange({
     value,
   }: SelectValueChangeDetails) {
-    if (value.length === 0) {
+    if (value.length === 0 || feed.source.type !== "categories") {
       return;
     }
 
@@ -382,6 +442,7 @@ function SourceCategoriesConfig() {
       source: {
         type: "categories",
         threadListMode: mode,
+        quickShare: feed.source.quickShare,
       },
     });
 
@@ -389,6 +450,23 @@ function SourceCategoriesConfig() {
     await mutate(
       (key) => typeof key === "string" && key.startsWith("/threads"),
     );
+  }
+
+  async function handleQuickShareChange({
+    checked,
+  }: CheckboxCheckedChangeDetails) {
+    if (feed.source.type !== "categories") {
+      return;
+    }
+
+    await updateFeed({
+      layout: feed.layout,
+      source: {
+        type: "categories",
+        threadListMode: feed.source.threadListMode,
+        quickShare: checked ? "enabled" : "disabled",
+      },
+    });
   }
 
   return (
@@ -432,6 +510,31 @@ function SourceCategoriesConfig() {
           </Select.Content>
         </Select.Positioner>
       </Select.Root>
+
+      <WStack alignItems="center">
+        <Heading fontWeight="medium" size="xs">
+          Quick Share
+        </Heading>
+
+        <InfoTip title="Show quick share box">
+          Display a quick share box at the top of the thread list to allow users
+          to quickly create new threads.
+        </InfoTip>
+      </WStack>
+
+      <Checkbox.Root
+        size="sm"
+        checked={feed.source.quickShare === "enabled"}
+        onCheckedChange={handleQuickShareChange}
+      >
+        <Checkbox.Control>
+          <Checkbox.Indicator>
+            <CheckIcon />
+          </Checkbox.Indicator>
+        </Checkbox.Control>
+        <Checkbox.Label>Show Quick Share</Checkbox.Label>
+        <Checkbox.HiddenInput />
+      </Checkbox.Root>
     </LStack>
   );
 }

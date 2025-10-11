@@ -15,6 +15,7 @@ import { CategoryLayout } from "./CategoryCardLayout";
 export type Props = {
   layout: "grid" | "list";
   threadListMode: "none" | "all" | "uncategorised";
+  showQuickShare: boolean;
   categories: CategoryTree[];
   initialThreadList?: ThreadListResult;
   initialThreadListPage?: number;
@@ -24,6 +25,7 @@ export type Props = {
 export function CategoryIndex({
   layout,
   threadListMode,
+  showQuickShare,
   categories,
   initialThreadList,
   initialThreadListPage,
@@ -78,6 +80,7 @@ export function CategoryIndex({
 
       <ThreadListSection
         mode={threadListMode}
+        showQuickShare={showQuickShare}
         initialThreadList={initialThreadList}
         initialPage={initialThreadListPage}
         paginationBasePath={paginationBasePath}
@@ -88,16 +91,18 @@ export function CategoryIndex({
 
 function ThreadListSection({
   mode,
+  showQuickShare,
   initialThreadList,
   initialPage,
   paginationBasePath,
 }: {
   mode: "none" | "all" | "uncategorised";
+  showQuickShare: boolean;
   initialThreadList?: ThreadListResult;
   initialPage?: number;
   paginationBasePath: string;
 }) {
-  if (mode === "none" || !initialThreadList?.threads) {
+  if (mode === "none") {
     return null;
   }
 
@@ -108,11 +113,13 @@ function ThreadListSection({
 
   return (
     <LStack>
-      <WStack>
-        <Heading>{heading}</Heading>
+      {!showQuickShare && (
+        <WStack>
+          <Heading>{heading}</Heading>
 
-        <ComposeAnchor />
-      </WStack>
+          <ComposeAnchor />
+        </WStack>
+      )}
 
       <ThreadFeedScreen
         initialPage={initialPage}
@@ -120,6 +127,7 @@ function ThreadListSection({
         category={mode === "all" ? undefined : null}
         paginationBasePath={paginationBasePath}
         showCategorySelect={false}
+        showQuickShare={showQuickShare}
       />
     </LStack>
   );
