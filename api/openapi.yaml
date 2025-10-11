@@ -5144,6 +5144,7 @@ components:
           type: boolean
           description: Whether the thread is pinned in this category.
         visibility: { $ref: "#/components/schemas/Visibility" }
+        read_status: { $ref: "#/components/schemas/ReadStatus" }
         reply_status: { $ref: "#/components/schemas/ReplyStatus" }
         category: { $ref: "#/components/schemas/CategoryReference" }
         link: { $ref: "#/components/schemas/LinkReference" }
@@ -5152,6 +5153,26 @@ components:
           type: string
           format: date-time
           description: The time of the last reply to the thread.
+
+    ReadStatus:
+      description: |
+        Information about the read status of a thread for the requesting
+        authenticated user. If the user is not authenticated or they have not
+        read the thread before, this will not be included in the Thread object.
+      type: object
+      required: [last_read_at, replies_since]
+      properties:
+        last_read_at:
+          type: string
+          format: date-time
+          description: |
+            When requested by an authenticated account, shows the last time they
+            last read the thread at.
+        replies_since:
+          type: integer
+          description: |
+            When requested by an authenticated account, shows the number of new
+            replies since they last read the thread.
 
     ReplyStatus:
       type: object

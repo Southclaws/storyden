@@ -22,19 +22,9 @@ func New(db *ent.Client) *Writer {
 }
 
 func (w *Writer) UpsertReadState(ctx context.Context, accountID account.AccountID, threadID post.ID) error {
-	threadXID := xid.ID(threadID)
-
-	p, err := w.db.Post.Get(ctx, threadXID)
-	if err != nil {
-		if ent.IsNotFound(err) {
-			return fault.Wrap(err, ftag.With(ftag.NotFound))
-		}
-		return fault.Wrap(err, ftag.With(ftag.Internal))
-	}
-
-	_, err = w.db.PostRead.Create().
+	_, err := w.db.PostRead.Create().
 		SetAccountID(xid.ID(accountID)).
-		SetRootPostID(p.ID).
+		SetRootPostID(xid.ID(threadID)).
 		SetLastSeenAt(time.Now().UTC()).
 		OnConflict().
 		UpdateNewValues().

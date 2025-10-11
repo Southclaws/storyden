@@ -163,6 +163,47 @@ func (d *database) Update(ctx context.Context, id post.ID, opts ...Option) (*Thr
 	return Map(p)
 }
 
+const newRepliesCountManyQuery_sqlite = `select
+  p.id        as post_id,          -- thread (root) ID
+  max(pr.last_seen_at) as last_read_at, -- timestamp of last read
+  count(r.id) as new_replies       -- number of replies newer than last read
+from
+  posts p
+  inner join post_reads pr
+    on pr.root_post_id = p.id and pr.account_id = $1
+  inner join posts r
+    on r.root_post_id = p.id
+    and r.deleted_at is null
+    and r.created_at > pr.last_seen_at
+group by p.id
+`
+
+const newRepliesCountManyQuery_postgres = `select
+  p.id        as post_id,               -- thread (root) ID
+  max(pr.last_seen_at) as last_read_at, -- timestamp of last read (unix timestamp)
+  count(r.id) as new_replies            -- number of replies newer than last read
+from
+  posts p
+  inner join post_reads pr
+    on pr.root_post_id = p.id and pr.account_id = $1
+  inner join posts r
+    on r.root_post_id = p.id
+    and r.deleted_at is null
+    and r.created_at > pr.last_seen_at
+group by p.id
+`
+
+func (d *database) newRepliesCountManyQuery() string {
+	switch d.raw.DriverName() {
+	case "sqlite", "sqlite3", "libsql":
+		return newRepliesCountManyQuery_sqlite
+	case "pgx", "postgres":
+		return newRepliesCountManyQuery_postgres
+	default:
+		return newRepliesCountManyQuery_postgres
+	}
+}
+
 const repliesCountManyQuery = `select
   p.id        post_id, -- post ID
   count(r.id) replies, -- number of replies,
@@ -262,6 +303,12 @@ func (d *database) List(
 		result = result[:len(result)-1]
 	}
 
+	var readStates post.ReadStateResults
+	err = d.raw.SelectContext(ctx, &readStates, d.newRepliesCountManyQuery(), accountID.String())
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
 	var replies post.PostRepliesResults
 	err = d.raw.SelectContext(ctx, &replies, repliesCountManyQuery, accountID.String())
 	if err != nil {
@@ -280,7 +327,7 @@ func (d *database) List(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	mapper := Mapper(nil, likes.Map(), collections.Map(), replies.Map(), nil)
+	mapper := Mapper(nil, readStates.Map(), likes.Map(), collections.Map(), replies.Map(), nil)
 	threads, err := dt.MapErr(result, mapper)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -388,6 +435,22 @@ func (d *database) Get(ctx context.Context, threadID post.ID, pageParams paginat
 		}
 
 		collectionsMap = collections.Map()
+
+		return nil
+	})
+
+	var readStateMap post.ReadStateMap
+	pool1.SubmitErr(func() error {
+		ctx, span := d.ins.InstrumentNamed(ctx, "read_status")
+		defer span.End()
+
+		var readStates post.ReadStateResults
+		err := d.raw.SelectContext(ctx, &readStates, d.newRepliesCountManyQuery(), accountID.String())
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+
+		readStateMap = readStates.Map()
 
 		return nil
 	})
@@ -521,7 +584,7 @@ func (d *database) Get(ctx context.Context, threadID post.ID, pageParams paginat
 	reactLookup := reaction.Reacts(reacts).Map()
 
 	replyMapper := reply.Mapper(accountLookup, likesMap, reactLookup)
-	threadMapper := Mapper(accountLookup, likesMap, collectionsMap, replyStatsMap, reactLookup)
+	threadMapper := Mapper(accountLookup, readStateMap, likesMap, collectionsMap, replyStatsMap, reactLookup)
 
 	replies, err := dt.MapErr(repliesResult, replyMapper)
 	if err != nil {
