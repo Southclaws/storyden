@@ -23,6 +23,10 @@ func Build() fx.Option {
 	) {
 		consumer := func(hctx context.Context) error {
 			_, err := pubsub.Subscribe(hctx, bus, "reply_notify.reply_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
+				if evt.ReplyAuthorID == evt.ThreadAuthorID {
+					return nil
+				}
+
 				return notifier.Send(ctx,
 					evt.ThreadAuthorID,
 					opt.New(evt.ReplyAuthorID),
