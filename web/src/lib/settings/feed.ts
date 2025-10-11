@@ -13,7 +13,7 @@ export type FeedLayoutConfig = z.infer<typeof FeedLayoutConfigSchema>;
 export const FeedSourceConfigSchema = z.union([
   z.object({
     type: z.literal("threads"),
-    quickShare: z.string().default("enabled"),
+    quickShare: z.enum(["enabled", "disabled"]).default("enabled"),
   }),
   z.object({
     type: z.literal("library"),
@@ -24,7 +24,7 @@ export const FeedSourceConfigSchema = z.union([
     threadListMode: z
       .enum(["none", "all", "uncategorised"])
       .default("uncategorised"),
-    quickShare: z.string().default("enabled"),
+    quickShare: z.enum(["enabled", "disabled"]).default("enabled"),
   }),
 ]);
 export type FeedSourceConfig = z.infer<typeof FeedSourceConfigSchema>;
