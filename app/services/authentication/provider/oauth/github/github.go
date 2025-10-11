@@ -112,9 +112,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 
 	client := github.NewClient(nil).WithAuthToken(token.AccessToken)
 
-	clientID := token.Extra("client_id").(string)
-
-	u, _, err := client.Users.Get(ctx, clientID)
+	u, _, err := client.Users.Get(ctx, "")
 	if err != nil {
 		return nil, fault.Wrap(err,
 			fctx.With(ctx),
