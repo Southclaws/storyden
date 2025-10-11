@@ -77,6 +77,7 @@
         The accepted schemes for this URL are:
         - `sqlite://` or `sqlite3://` for SQLite or Litestream.
         - `postgres://` or `postgresql://` for PostgreSQL, CockroachDB and any other PostgreSQL-compatible database
+        - `libsql://` for Turso remote SQLite. **Note:** This is currently experimental, only remote Turso databases are supported.
 
     - env: "LISTEN_ADDR"
       name: ListenAddr

@@ -74,6 +74,7 @@ type Config struct {
 	   The accepted schemes for this URL are:
 	   - `sqlite://` or `sqlite3://` for SQLite or Litestream.
 	   - `postgres://` or `postgresql://` for PostgreSQL, CockroachDB and any other PostgreSQL-compatible database
+	   - `libsql://` for Turso remote SQLite. **Note:** This is currently experimental, only remote Turso databases are supported.
 	*/
 	DatabaseURL string `default:"sqlite://data/data.db?_pragma=foreign_keys(1)" envconfig:"DATABASE_URL"`
 	/*
