@@ -26,7 +26,7 @@ func (w *Writer) UpsertReadState(ctx context.Context, accountID account.AccountI
 		SetAccountID(xid.ID(accountID)).
 		SetRootPostID(xid.ID(threadID)).
 		SetLastSeenAt(time.Now().UTC()).
-		OnConflict().
+		OnConflictColumns("root_post_id", "account_id").
 		UpdateNewValues().
 		ID(ctx)
 	if err != nil {
