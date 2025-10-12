@@ -26,9 +26,10 @@ import (
 )
 
 var (
-	errEmailAlreadyRegistered = fault.New("email already registered")
-	errAccountMismatch        = fault.New("account mismatch")
-	errEmailNotVerified       = fault.New("email not verified")
+	errEmailAlreadyRegistered  = fault.New("email already registered")
+	errAccountMismatch         = fault.New("account mismatch")
+	errEmailNotVerified        = fault.New("email not verified")
+	errAuthMethodAlreadyLinked = fault.New("authentication method already linked to another account")
 )
 
 type Registrar struct {
@@ -123,6 +124,16 @@ func (s *Registrar) GetOrCreateViaEmail(
 		return nil, fault.Wrap(err, fmsg.With("failed to lookup existing account"), fctx.With(ctx))
 	}
 
+	// For logged-in accounts, ensure the auth method being used is not already
+	// linked to a different account.
+	if sessionAccount, ok := session.Get(); ok && authMethodExists {
+		if sessionAccount.ID != authmethod.Account.ID {
+			return nil, fault.Wrap(errAccountMismatch,
+				fctx.With(ctx),
+				fmsg.WithDesc("account mismatch", "This authentication method is linked to a different account."))
+		}
+	}
+
 	emailOwner, emailExists, err := s.emailRepo.LookupAccount(ctx, email)
 	if err != nil {
 		return nil, fault.Wrap(err,
@@ -171,7 +182,7 @@ func (s *Registrar) GetOrCreateViaEmail(
 			if sessionAccount.ID != emailOwner.ID {
 				return nil, fault.Wrap(errAccountMismatch,
 					fctx.With(ctx),
-					fmsg.WithDesc("account mismatch", "This authentication method is linked to a different account. Please log out and sign in with the correct account."))
+					fmsg.WithDesc("account mismatch", "This authentication method is linked to a different account."))
 			}
 		}
 
@@ -264,6 +275,14 @@ func (s *Registrar) GetOrCreateViaHandle(
 		return nil, fault.Wrap(err, fmsg.With("failed to lookup existing account"), fctx.With(ctx))
 	}
 
+	if sessionAccount, ok := session.Get(); ok && authMethodExists {
+		if sessionAccount.ID != authmethod.Account.ID {
+			return nil, fault.Wrap(errAccountMismatch,
+				fctx.With(ctx),
+				fmsg.WithDesc("account mismatch", "This authentication method is linked to a different account."))
+		}
+	}
+
 	handleOwner, handleExists, err := s.accountQuerier.LookupByHandle(ctx, handle)
 	if err != nil {
 		return nil, fault.Wrap(err,
@@ -280,22 +299,22 @@ func (s *Registrar) GetOrCreateViaHandle(
 
 	switch {
 	case authMethodExists && handleExists:
-		// Member has already registered with this email address and the
-		// same email exists and points to an account. Verify those accounts
-		// are the same, if so, return the account. If not, bad state, error.
+		// Member has already registered with this handle and the same handle
+		// exists and points to an account. Verify those accounts are the same.
 
 		if authmethod.Account.ID != handleOwner.ID {
-			logger.Info("get or create: different account already exists with handle, generating new handle for new account")
+			// If the authentication method looked up via the OAuth provider
+			// identifier exists, we have an account and it's verified to be
+			// owned by someone due to the OAuth process. The handle passed in
+			// is purely for registration purposes fetched from the provider,
+			// but it's common for handles to change on both Storyden itself and
+			// OAuth services, so we don't use the handle for matching only the
+			// OAuth identifier. If they don't match, no problem, just return
+			// the account linked to the auth method.
 
-			return s.CreateWithRandomHandle(ctx, service, authName, identifier, token, name)
-		}
+			logger.Info("get or create: different account already exists with handle, returning existing auth method linked account")
 
-		if sessionAccount, ok := session.Get(); ok {
-			if sessionAccount.ID != handleOwner.ID {
-				return nil, fault.Wrap(errAccountMismatch,
-					fctx.With(ctx),
-					fmsg.WithDesc("account mismatch", "This authentication method is linked to a different account. Please log out and sign in with the correct account."))
-			}
+			return &authmethod.Account, nil
 		}
 
 		logger.Info("get or create: account already exists with handle")
@@ -361,6 +380,19 @@ func (s *Registrar) CreateWithRandomHandle(
 	token string,
 	name string,
 ) (*account.Account, error) {
+	_, authMethodExists, err := s.authRepo.LookupByIdentifier(ctx, service, identifier)
+	if err != nil {
+		return nil, fault.Wrap(err, fmsg.With("failed to lookup existing account"), fctx.With(ctx))
+	}
+
+	if authMethodExists {
+		return nil, fault.Wrap(errAuthMethodAlreadyLinked,
+			fctx.With(ctx),
+			fmsg.WithDesc("authMethodExists",
+				"This authentication provider has already been linked to another account."),
+		)
+	}
+
 	randomHandle := petname.Generate(3, "-")
 
 	newAccount, err := s.Create(ctx, opt.New(randomHandle),
@@ -386,6 +418,19 @@ func (s *Registrar) CreateWithHandle(
 	name string,
 	handle string,
 ) (*account.Account, error) {
+	_, authMethodExists, err := s.authRepo.LookupByIdentifier(ctx, service, identifier)
+	if err != nil {
+		return nil, fault.Wrap(err, fmsg.With("failed to lookup existing account"), fctx.With(ctx))
+	}
+
+	if authMethodExists {
+		return nil, fault.Wrap(errAuthMethodAlreadyLinked,
+			fctx.With(ctx),
+			fmsg.WithDesc("authMethodExists",
+				"This authentication provider has already been linked to another account."),
+		)
+	}
+
 	newAccount, err := s.Create(ctx, opt.New(handle),
 		account_writer.WithName(name))
 	if err != nil {

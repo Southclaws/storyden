@@ -27,132 +27,132 @@ type TagUpdate struct {
 }
 
 // Where appends a list predicates to the TagUpdate builder.
-func (tu *TagUpdate) Where(ps ...predicate.Tag) *TagUpdate {
-	tu.mutation.Where(ps...)
-	return tu
+func (_u *TagUpdate) Where(ps ...predicate.Tag) *TagUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (tu *TagUpdate) AddPostIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.AddPostIDs(ids...)
-	return tu
+func (_u *TagUpdate) AddPostIDs(ids ...xid.ID) *TagUpdate {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (tu *TagUpdate) AddPosts(p ...*Post) *TagUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *TagUpdate) AddPosts(v ...*Post) *TagUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (tu *TagUpdate) AddNodeIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.AddNodeIDs(ids...)
-	return tu
+func (_u *TagUpdate) AddNodeIDs(ids ...xid.ID) *TagUpdate {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (tu *TagUpdate) AddNodes(n ...*Node) *TagUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *TagUpdate) AddNodes(v ...*Node) *TagUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
-func (tu *TagUpdate) AddAccountIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.AddAccountIDs(ids...)
-	return tu
+func (_u *TagUpdate) AddAccountIDs(ids ...xid.ID) *TagUpdate {
+	_u.mutation.AddAccountIDs(ids...)
+	return _u
 }
 
 // AddAccounts adds the "accounts" edges to the Account entity.
-func (tu *TagUpdate) AddAccounts(a ...*Account) *TagUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *TagUpdate) AddAccounts(v ...*Account) *TagUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.AddAccountIDs(ids...)
+	return _u.AddAccountIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
-func (tu *TagUpdate) Mutation() *TagMutation {
-	return tu.mutation
+func (_u *TagUpdate) Mutation() *TagMutation {
+	return _u.mutation
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (tu *TagUpdate) ClearPosts() *TagUpdate {
-	tu.mutation.ClearPosts()
-	return tu
+func (_u *TagUpdate) ClearPosts() *TagUpdate {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (tu *TagUpdate) RemovePostIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.RemovePostIDs(ids...)
-	return tu
+func (_u *TagUpdate) RemovePostIDs(ids ...xid.ID) *TagUpdate {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (tu *TagUpdate) RemovePosts(p ...*Post) *TagUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *TagUpdate) RemovePosts(v ...*Post) *TagUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (tu *TagUpdate) ClearNodes() *TagUpdate {
-	tu.mutation.ClearNodes()
-	return tu
+func (_u *TagUpdate) ClearNodes() *TagUpdate {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (tu *TagUpdate) RemoveNodeIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.RemoveNodeIDs(ids...)
-	return tu
+func (_u *TagUpdate) RemoveNodeIDs(ids ...xid.ID) *TagUpdate {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (tu *TagUpdate) RemoveNodes(n ...*Node) *TagUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *TagUpdate) RemoveNodes(v ...*Node) *TagUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // ClearAccounts clears all "accounts" edges to the Account entity.
-func (tu *TagUpdate) ClearAccounts() *TagUpdate {
-	tu.mutation.ClearAccounts()
-	return tu
+func (_u *TagUpdate) ClearAccounts() *TagUpdate {
+	_u.mutation.ClearAccounts()
+	return _u
 }
 
 // RemoveAccountIDs removes the "accounts" edge to Account entities by IDs.
-func (tu *TagUpdate) RemoveAccountIDs(ids ...xid.ID) *TagUpdate {
-	tu.mutation.RemoveAccountIDs(ids...)
-	return tu
+func (_u *TagUpdate) RemoveAccountIDs(ids ...xid.ID) *TagUpdate {
+	_u.mutation.RemoveAccountIDs(ids...)
+	return _u
 }
 
 // RemoveAccounts removes "accounts" edges to Account entities.
-func (tu *TagUpdate) RemoveAccounts(a ...*Account) *TagUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *TagUpdate) RemoveAccounts(v ...*Account) *TagUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tu.RemoveAccountIDs(ids...)
+	return _u.RemoveAccountIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (tu *TagUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, tu.sqlSave, tu.mutation, tu.hooks)
+func (_u *TagUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tu *TagUpdate) SaveX(ctx context.Context) int {
-	affected, err := tu.Save(ctx)
+func (_u *TagUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -160,34 +160,34 @@ func (tu *TagUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (tu *TagUpdate) Exec(ctx context.Context) error {
-	_, err := tu.Save(ctx)
+func (_u *TagUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tu *TagUpdate) ExecX(ctx context.Context) {
-	if err := tu.Exec(ctx); err != nil {
+func (_u *TagUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (tu *TagUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *TagUpdate {
-	tu.modifiers = append(tu.modifiers, modifiers...)
-	return tu
+func (_u *TagUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *TagUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (_u *TagUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(tag.Table, tag.Columns, sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString))
-	if ps := tu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if tu.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -200,7 +200,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedPostsIDs(); len(nodes) > 0 && !tu.mutation.PostsCleared() {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -216,7 +216,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -232,7 +232,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -245,7 +245,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedNodesIDs(); len(nodes) > 0 && !tu.mutation.NodesCleared() {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -261,7 +261,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -277,7 +277,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tu.mutation.AccountsCleared() {
+	if _u.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -290,7 +290,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.RemovedAccountsIDs(); len(nodes) > 0 && !tu.mutation.AccountsCleared() {
+	if nodes := _u.mutation.RemovedAccountsIDs(); len(nodes) > 0 && !_u.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -306,7 +306,7 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tu.mutation.AccountsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -322,8 +322,8 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(tu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{tag.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -331,8 +331,8 @@ func (tu *TagUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	tu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // TagUpdateOne is the builder for updating a single Tag entity.
@@ -345,139 +345,139 @@ type TagUpdateOne struct {
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (tuo *TagUpdateOne) AddPostIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.AddPostIDs(ids...)
-	return tuo
+func (_u *TagUpdateOne) AddPostIDs(ids ...xid.ID) *TagUpdateOne {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (tuo *TagUpdateOne) AddPosts(p ...*Post) *TagUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *TagUpdateOne) AddPosts(v ...*Post) *TagUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (tuo *TagUpdateOne) AddNodeIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.AddNodeIDs(ids...)
-	return tuo
+func (_u *TagUpdateOne) AddNodeIDs(ids ...xid.ID) *TagUpdateOne {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (tuo *TagUpdateOne) AddNodes(n ...*Node) *TagUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *TagUpdateOne) AddNodes(v ...*Node) *TagUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
-func (tuo *TagUpdateOne) AddAccountIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.AddAccountIDs(ids...)
-	return tuo
+func (_u *TagUpdateOne) AddAccountIDs(ids ...xid.ID) *TagUpdateOne {
+	_u.mutation.AddAccountIDs(ids...)
+	return _u
 }
 
 // AddAccounts adds the "accounts" edges to the Account entity.
-func (tuo *TagUpdateOne) AddAccounts(a ...*Account) *TagUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *TagUpdateOne) AddAccounts(v ...*Account) *TagUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.AddAccountIDs(ids...)
+	return _u.AddAccountIDs(ids...)
 }
 
 // Mutation returns the TagMutation object of the builder.
-func (tuo *TagUpdateOne) Mutation() *TagMutation {
-	return tuo.mutation
+func (_u *TagUpdateOne) Mutation() *TagMutation {
+	return _u.mutation
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (tuo *TagUpdateOne) ClearPosts() *TagUpdateOne {
-	tuo.mutation.ClearPosts()
-	return tuo
+func (_u *TagUpdateOne) ClearPosts() *TagUpdateOne {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (tuo *TagUpdateOne) RemovePostIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.RemovePostIDs(ids...)
-	return tuo
+func (_u *TagUpdateOne) RemovePostIDs(ids ...xid.ID) *TagUpdateOne {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (tuo *TagUpdateOne) RemovePosts(p ...*Post) *TagUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *TagUpdateOne) RemovePosts(v ...*Post) *TagUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (tuo *TagUpdateOne) ClearNodes() *TagUpdateOne {
-	tuo.mutation.ClearNodes()
-	return tuo
+func (_u *TagUpdateOne) ClearNodes() *TagUpdateOne {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (tuo *TagUpdateOne) RemoveNodeIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.RemoveNodeIDs(ids...)
-	return tuo
+func (_u *TagUpdateOne) RemoveNodeIDs(ids ...xid.ID) *TagUpdateOne {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (tuo *TagUpdateOne) RemoveNodes(n ...*Node) *TagUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *TagUpdateOne) RemoveNodes(v ...*Node) *TagUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // ClearAccounts clears all "accounts" edges to the Account entity.
-func (tuo *TagUpdateOne) ClearAccounts() *TagUpdateOne {
-	tuo.mutation.ClearAccounts()
-	return tuo
+func (_u *TagUpdateOne) ClearAccounts() *TagUpdateOne {
+	_u.mutation.ClearAccounts()
+	return _u
 }
 
 // RemoveAccountIDs removes the "accounts" edge to Account entities by IDs.
-func (tuo *TagUpdateOne) RemoveAccountIDs(ids ...xid.ID) *TagUpdateOne {
-	tuo.mutation.RemoveAccountIDs(ids...)
-	return tuo
+func (_u *TagUpdateOne) RemoveAccountIDs(ids ...xid.ID) *TagUpdateOne {
+	_u.mutation.RemoveAccountIDs(ids...)
+	return _u
 }
 
 // RemoveAccounts removes "accounts" edges to Account entities.
-func (tuo *TagUpdateOne) RemoveAccounts(a ...*Account) *TagUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *TagUpdateOne) RemoveAccounts(v ...*Account) *TagUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return tuo.RemoveAccountIDs(ids...)
+	return _u.RemoveAccountIDs(ids...)
 }
 
 // Where appends a list predicates to the TagUpdate builder.
-func (tuo *TagUpdateOne) Where(ps ...predicate.Tag) *TagUpdateOne {
-	tuo.mutation.Where(ps...)
-	return tuo
+func (_u *TagUpdateOne) Where(ps ...predicate.Tag) *TagUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (tuo *TagUpdateOne) Select(field string, fields ...string) *TagUpdateOne {
-	tuo.fields = append([]string{field}, fields...)
-	return tuo
+func (_u *TagUpdateOne) Select(field string, fields ...string) *TagUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Tag entity.
-func (tuo *TagUpdateOne) Save(ctx context.Context) (*Tag, error) {
-	return withHooks(ctx, tuo.sqlSave, tuo.mutation, tuo.hooks)
+func (_u *TagUpdateOne) Save(ctx context.Context) (*Tag, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (tuo *TagUpdateOne) SaveX(ctx context.Context) *Tag {
-	node, err := tuo.Save(ctx)
+func (_u *TagUpdateOne) SaveX(ctx context.Context) *Tag {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -485,32 +485,32 @@ func (tuo *TagUpdateOne) SaveX(ctx context.Context) *Tag {
 }
 
 // Exec executes the query on the entity.
-func (tuo *TagUpdateOne) Exec(ctx context.Context) error {
-	_, err := tuo.Save(ctx)
+func (_u *TagUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (tuo *TagUpdateOne) ExecX(ctx context.Context) {
-	if err := tuo.Exec(ctx); err != nil {
+func (_u *TagUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (tuo *TagUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *TagUpdateOne {
-	tuo.modifiers = append(tuo.modifiers, modifiers...)
-	return tuo
+func (_u *TagUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *TagUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
+func (_u *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 	_spec := sqlgraph.NewUpdateSpec(tag.Table, tag.Columns, sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString))
-	id, ok := tuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Tag.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := tuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, tag.FieldID)
 		for _, f := range fields {
@@ -522,14 +522,14 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 			}
 		}
 	}
-	if ps := tuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if tuo.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -542,7 +542,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedPostsIDs(); len(nodes) > 0 && !tuo.mutation.PostsCleared() {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -558,7 +558,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -574,7 +574,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tuo.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -587,7 +587,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !tuo.mutation.NodesCleared() {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -603,7 +603,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -619,7 +619,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if tuo.mutation.AccountsCleared() {
+	if _u.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -632,7 +632,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.RemovedAccountsIDs(); len(nodes) > 0 && !tuo.mutation.AccountsCleared() {
+	if nodes := _u.mutation.RemovedAccountsIDs(); len(nodes) > 0 && !_u.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -648,7 +648,7 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := tuo.mutation.AccountsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -664,11 +664,11 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(tuo.modifiers...)
-	_node = &Tag{config: tuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Tag{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, tuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{tag.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -676,6 +676,6 @@ func (tuo *TagUpdateOne) sqlSave(ctx context.Context) (_node *Tag, err error) {
 		}
 		return nil, err
 	}
-	tuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

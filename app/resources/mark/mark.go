@@ -145,9 +145,10 @@ func NewQueryKeyID(id xid.ID) Queryable {
 }
 
 func NewQueryKey(raw string) Queryable {
-	exactLength := len(raw) == xidEncodedLength
-	exactLengthOrLonger := len(raw) >= xidEncodedLength
-	containsHyphen := len(raw) > xidEncodedLength && raw[xidEncodedLength] == '-'
+	runeCount := len([]rune(raw))
+	exactLength := runeCount == xidEncodedLength
+	exactLengthOrLonger := runeCount >= xidEncodedLength
+	containsHyphen := runeCount > xidEncodedLength && len(raw) > xidEncodedLength && raw[xidEncodedLength] == '-'
 
 	probablyXID := exactLength || (exactLengthOrLonger && containsHyphen)
 
@@ -170,7 +171,7 @@ func NewQueryKey(raw string) Queryable {
 		}
 
 		// Form: <xid>-<slug>
-		if len(raw) > xidEncodedLength+1 && raw[xidEncodedLength] == '-' {
+		if runeCount > xidEncodedLength+1 && len(raw) > xidEncodedLength && raw[xidEncodedLength] == '-' {
 			if len(raw) > xidEncodedLength+1 {
 				m.slug = opt.New(raw[xidEncodedLength+1:])
 			}

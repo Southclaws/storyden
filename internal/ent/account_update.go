@@ -45,928 +45,928 @@ type AccountUpdate struct {
 }
 
 // Where appends a list predicates to the AccountUpdate builder.
-func (au *AccountUpdate) Where(ps ...predicate.Account) *AccountUpdate {
-	au.mutation.Where(ps...)
-	return au
+func (_u *AccountUpdate) Where(ps ...predicate.Account) *AccountUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (au *AccountUpdate) SetUpdatedAt(t time.Time) *AccountUpdate {
-	au.mutation.SetUpdatedAt(t)
-	return au
+func (_u *AccountUpdate) SetUpdatedAt(v time.Time) *AccountUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (au *AccountUpdate) SetDeletedAt(t time.Time) *AccountUpdate {
-	au.mutation.SetDeletedAt(t)
-	return au
+func (_u *AccountUpdate) SetDeletedAt(v time.Time) *AccountUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableDeletedAt(t *time.Time) *AccountUpdate {
-	if t != nil {
-		au.SetDeletedAt(*t)
+func (_u *AccountUpdate) SetNillableDeletedAt(v *time.Time) *AccountUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return au
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (au *AccountUpdate) ClearDeletedAt() *AccountUpdate {
-	au.mutation.ClearDeletedAt()
-	return au
+func (_u *AccountUpdate) ClearDeletedAt() *AccountUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (au *AccountUpdate) SetIndexedAt(t time.Time) *AccountUpdate {
-	au.mutation.SetIndexedAt(t)
-	return au
+func (_u *AccountUpdate) SetIndexedAt(v time.Time) *AccountUpdate {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableIndexedAt(t *time.Time) *AccountUpdate {
-	if t != nil {
-		au.SetIndexedAt(*t)
+func (_u *AccountUpdate) SetNillableIndexedAt(v *time.Time) *AccountUpdate {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return au
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (au *AccountUpdate) ClearIndexedAt() *AccountUpdate {
-	au.mutation.ClearIndexedAt()
-	return au
+func (_u *AccountUpdate) ClearIndexedAt() *AccountUpdate {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetHandle sets the "handle" field.
-func (au *AccountUpdate) SetHandle(s string) *AccountUpdate {
-	au.mutation.SetHandle(s)
-	return au
+func (_u *AccountUpdate) SetHandle(v string) *AccountUpdate {
+	_u.mutation.SetHandle(v)
+	return _u
 }
 
 // SetNillableHandle sets the "handle" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableHandle(s *string) *AccountUpdate {
-	if s != nil {
-		au.SetHandle(*s)
+func (_u *AccountUpdate) SetNillableHandle(v *string) *AccountUpdate {
+	if v != nil {
+		_u.SetHandle(*v)
 	}
-	return au
+	return _u
 }
 
 // SetName sets the "name" field.
-func (au *AccountUpdate) SetName(s string) *AccountUpdate {
-	au.mutation.SetName(s)
-	return au
+func (_u *AccountUpdate) SetName(v string) *AccountUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableName(s *string) *AccountUpdate {
-	if s != nil {
-		au.SetName(*s)
+func (_u *AccountUpdate) SetNillableName(v *string) *AccountUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return au
+	return _u
 }
 
 // SetBio sets the "bio" field.
-func (au *AccountUpdate) SetBio(s string) *AccountUpdate {
-	au.mutation.SetBio(s)
-	return au
+func (_u *AccountUpdate) SetBio(v string) *AccountUpdate {
+	_u.mutation.SetBio(v)
+	return _u
 }
 
 // SetNillableBio sets the "bio" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableBio(s *string) *AccountUpdate {
-	if s != nil {
-		au.SetBio(*s)
+func (_u *AccountUpdate) SetNillableBio(v *string) *AccountUpdate {
+	if v != nil {
+		_u.SetBio(*v)
 	}
-	return au
+	return _u
 }
 
 // ClearBio clears the value of the "bio" field.
-func (au *AccountUpdate) ClearBio() *AccountUpdate {
-	au.mutation.ClearBio()
-	return au
+func (_u *AccountUpdate) ClearBio() *AccountUpdate {
+	_u.mutation.ClearBio()
+	return _u
 }
 
 // SetKind sets the "kind" field.
-func (au *AccountUpdate) SetKind(a account.Kind) *AccountUpdate {
-	au.mutation.SetKind(a)
-	return au
+func (_u *AccountUpdate) SetKind(v account.Kind) *AccountUpdate {
+	_u.mutation.SetKind(v)
+	return _u
 }
 
 // SetNillableKind sets the "kind" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableKind(a *account.Kind) *AccountUpdate {
-	if a != nil {
-		au.SetKind(*a)
+func (_u *AccountUpdate) SetNillableKind(v *account.Kind) *AccountUpdate {
+	if v != nil {
+		_u.SetKind(*v)
 	}
-	return au
+	return _u
 }
 
 // SetAdmin sets the "admin" field.
-func (au *AccountUpdate) SetAdmin(b bool) *AccountUpdate {
-	au.mutation.SetAdmin(b)
-	return au
+func (_u *AccountUpdate) SetAdmin(v bool) *AccountUpdate {
+	_u.mutation.SetAdmin(v)
+	return _u
 }
 
 // SetNillableAdmin sets the "admin" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableAdmin(b *bool) *AccountUpdate {
-	if b != nil {
-		au.SetAdmin(*b)
+func (_u *AccountUpdate) SetNillableAdmin(v *bool) *AccountUpdate {
+	if v != nil {
+		_u.SetAdmin(*v)
 	}
-	return au
+	return _u
 }
 
 // SetLinks sets the "links" field.
-func (au *AccountUpdate) SetLinks(sl []schema.ExternalLink) *AccountUpdate {
-	au.mutation.SetLinks(sl)
-	return au
+func (_u *AccountUpdate) SetLinks(v []schema.ExternalLink) *AccountUpdate {
+	_u.mutation.SetLinks(v)
+	return _u
 }
 
-// AppendLinks appends sl to the "links" field.
-func (au *AccountUpdate) AppendLinks(sl []schema.ExternalLink) *AccountUpdate {
-	au.mutation.AppendLinks(sl)
-	return au
+// AppendLinks appends value to the "links" field.
+func (_u *AccountUpdate) AppendLinks(v []schema.ExternalLink) *AccountUpdate {
+	_u.mutation.AppendLinks(v)
+	return _u
 }
 
 // ClearLinks clears the value of the "links" field.
-func (au *AccountUpdate) ClearLinks() *AccountUpdate {
-	au.mutation.ClearLinks()
-	return au
+func (_u *AccountUpdate) ClearLinks() *AccountUpdate {
+	_u.mutation.ClearLinks()
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (au *AccountUpdate) SetMetadata(m map[string]interface{}) *AccountUpdate {
-	au.mutation.SetMetadata(m)
-	return au
+func (_u *AccountUpdate) SetMetadata(v map[string]interface{}) *AccountUpdate {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (au *AccountUpdate) ClearMetadata() *AccountUpdate {
-	au.mutation.ClearMetadata()
-	return au
+func (_u *AccountUpdate) ClearMetadata() *AccountUpdate {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetInvitedByID sets the "invited_by_id" field.
-func (au *AccountUpdate) SetInvitedByID(x xid.ID) *AccountUpdate {
-	au.mutation.SetInvitedByID(x)
-	return au
+func (_u *AccountUpdate) SetInvitedByID(v xid.ID) *AccountUpdate {
+	_u.mutation.SetInvitedByID(v)
+	return _u
 }
 
 // SetNillableInvitedByID sets the "invited_by_id" field if the given value is not nil.
-func (au *AccountUpdate) SetNillableInvitedByID(x *xid.ID) *AccountUpdate {
-	if x != nil {
-		au.SetInvitedByID(*x)
+func (_u *AccountUpdate) SetNillableInvitedByID(v *xid.ID) *AccountUpdate {
+	if v != nil {
+		_u.SetInvitedByID(*v)
 	}
-	return au
+	return _u
 }
 
 // ClearInvitedByID clears the value of the "invited_by_id" field.
-func (au *AccountUpdate) ClearInvitedByID() *AccountUpdate {
-	au.mutation.ClearInvitedByID()
-	return au
+func (_u *AccountUpdate) ClearInvitedByID() *AccountUpdate {
+	_u.mutation.ClearInvitedByID()
+	return _u
 }
 
 // AddSessionIDs adds the "sessions" edge to the Session entity by IDs.
-func (au *AccountUpdate) AddSessionIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddSessionIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddSessionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddSessionIDs(ids...)
+	return _u
 }
 
 // AddSessions adds the "sessions" edges to the Session entity.
-func (au *AccountUpdate) AddSessions(s ...*Session) *AccountUpdate {
-	ids := make([]xid.ID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *AccountUpdate) AddSessions(v ...*Session) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddSessionIDs(ids...)
+	return _u.AddSessionIDs(ids...)
 }
 
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
-func (au *AccountUpdate) AddEmailIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddEmailIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddEmailIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddEmailIDs(ids...)
+	return _u
 }
 
 // AddEmails adds the "emails" edges to the Email entity.
-func (au *AccountUpdate) AddEmails(e ...*Email) *AccountUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AccountUpdate) AddEmails(v ...*Email) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddEmailIDs(ids...)
+	return _u.AddEmailIDs(ids...)
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
-func (au *AccountUpdate) AddNotificationIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddNotificationIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddNotificationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddNotificationIDs(ids...)
+	return _u
 }
 
 // AddNotifications adds the "notifications" edges to the Notification entity.
-func (au *AccountUpdate) AddNotifications(n ...*Notification) *AccountUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdate) AddNotifications(v ...*Notification) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddNotificationIDs(ids...)
+	return _u.AddNotificationIDs(ids...)
 }
 
 // AddTriggeredNotificationIDs adds the "triggered_notifications" edge to the Notification entity by IDs.
-func (au *AccountUpdate) AddTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddTriggeredNotificationIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddTriggeredNotificationIDs(ids...)
+	return _u
 }
 
 // AddTriggeredNotifications adds the "triggered_notifications" edges to the Notification entity.
-func (au *AccountUpdate) AddTriggeredNotifications(n ...*Notification) *AccountUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdate) AddTriggeredNotifications(v ...*Notification) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddTriggeredNotificationIDs(ids...)
+	return _u.AddTriggeredNotificationIDs(ids...)
 }
 
 // AddFollowingIDs adds the "following" edge to the AccountFollow entity by IDs.
-func (au *AccountUpdate) AddFollowingIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddFollowingIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddFollowingIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddFollowingIDs(ids...)
+	return _u
 }
 
 // AddFollowing adds the "following" edges to the AccountFollow entity.
-func (au *AccountUpdate) AddFollowing(a ...*AccountFollow) *AccountUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdate) AddFollowing(v ...*AccountFollow) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddFollowingIDs(ids...)
+	return _u.AddFollowingIDs(ids...)
 }
 
 // AddFollowedByIDs adds the "followed_by" edge to the AccountFollow entity by IDs.
-func (au *AccountUpdate) AddFollowedByIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddFollowedByIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddFollowedByIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddFollowedByIDs(ids...)
+	return _u
 }
 
 // AddFollowedBy adds the "followed_by" edges to the AccountFollow entity.
-func (au *AccountUpdate) AddFollowedBy(a ...*AccountFollow) *AccountUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdate) AddFollowedBy(v ...*AccountFollow) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddFollowedByIDs(ids...)
+	return _u.AddFollowedByIDs(ids...)
 }
 
 // AddInvitationIDs adds the "invitations" edge to the Invitation entity by IDs.
-func (au *AccountUpdate) AddInvitationIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddInvitationIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddInvitationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddInvitationIDs(ids...)
+	return _u
 }
 
 // AddInvitations adds the "invitations" edges to the Invitation entity.
-func (au *AccountUpdate) AddInvitations(i ...*Invitation) *AccountUpdate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+func (_u *AccountUpdate) AddInvitations(v ...*Invitation) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddInvitationIDs(ids...)
+	return _u.AddInvitationIDs(ids...)
 }
 
 // SetInvitedBy sets the "invited_by" edge to the Invitation entity.
-func (au *AccountUpdate) SetInvitedBy(i *Invitation) *AccountUpdate {
-	return au.SetInvitedByID(i.ID)
+func (_u *AccountUpdate) SetInvitedBy(v *Invitation) *AccountUpdate {
+	return _u.SetInvitedByID(v.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (au *AccountUpdate) AddPostIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddPostIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddPostIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (au *AccountUpdate) AddPosts(p ...*Post) *AccountUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *AccountUpdate) AddPosts(v ...*Post) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
-func (au *AccountUpdate) AddQuestionIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddQuestionIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddQuestionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddQuestionIDs(ids...)
+	return _u
 }
 
 // AddQuestions adds the "questions" edges to the Question entity.
-func (au *AccountUpdate) AddQuestions(q ...*Question) *AccountUpdate {
-	ids := make([]xid.ID, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+func (_u *AccountUpdate) AddQuestions(v ...*Question) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddQuestionIDs(ids...)
+	return _u.AddQuestionIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (au *AccountUpdate) AddReactIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddReactIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddReactIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddReactIDs(ids...)
+	return _u
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
-func (au *AccountUpdate) AddReacts(r ...*React) *AccountUpdate {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *AccountUpdate) AddReacts(v ...*React) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddReactIDs(ids...)
+	return _u.AddReactIDs(ids...)
 }
 
 // AddLikeIDs adds the "likes" edge to the LikePost entity by IDs.
-func (au *AccountUpdate) AddLikeIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddLikeIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddLikeIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddLikeIDs(ids...)
+	return _u
 }
 
 // AddLikes adds the "likes" edges to the LikePost entity.
-func (au *AccountUpdate) AddLikes(l ...*LikePost) *AccountUpdate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *AccountUpdate) AddLikes(v ...*LikePost) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddLikeIDs(ids...)
+	return _u.AddLikeIDs(ids...)
 }
 
 // AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
-func (au *AccountUpdate) AddMentionIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddMentionIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddMentionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddMentionIDs(ids...)
+	return _u
 }
 
 // AddMentions adds the "mentions" edges to the MentionProfile entity.
-func (au *AccountUpdate) AddMentions(m ...*MentionProfile) *AccountUpdate {
-	ids := make([]xid.ID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *AccountUpdate) AddMentions(v ...*MentionProfile) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddMentionIDs(ids...)
+	return _u.AddMentionIDs(ids...)
 }
 
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
-func (au *AccountUpdate) AddRoleIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddRoleIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddRoleIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddRoleIDs(ids...)
+	return _u
 }
 
 // AddRoles adds the "roles" edges to the Role entity.
-func (au *AccountUpdate) AddRoles(r ...*Role) *AccountUpdate {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *AccountUpdate) AddRoles(v ...*Role) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddRoleIDs(ids...)
+	return _u.AddRoleIDs(ids...)
 }
 
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
-func (au *AccountUpdate) AddAuthenticationIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddAuthenticationIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddAuthenticationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddAuthenticationIDs(ids...)
+	return _u
 }
 
 // AddAuthentication adds the "authentication" edges to the Authentication entity.
-func (au *AccountUpdate) AddAuthentication(a ...*Authentication) *AccountUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdate) AddAuthentication(v ...*Authentication) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddAuthenticationIDs(ids...)
+	return _u.AddAuthenticationIDs(ids...)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (au *AccountUpdate) AddTagIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddTagIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddTagIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddTagIDs(ids...)
+	return _u
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
-func (au *AccountUpdate) AddTags(t ...*Tag) *AccountUpdate {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *AccountUpdate) AddTags(v ...*Tag) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddTagIDs(ids...)
+	return _u.AddTagIDs(ids...)
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (au *AccountUpdate) AddCollectionIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddCollectionIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddCollectionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddCollectionIDs(ids...)
+	return _u
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
-func (au *AccountUpdate) AddCollections(c ...*Collection) *AccountUpdate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *AccountUpdate) AddCollections(v ...*Collection) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddCollectionIDs(ids...)
+	return _u.AddCollectionIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (au *AccountUpdate) AddNodeIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddNodeIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddNodeIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (au *AccountUpdate) AddNodes(n ...*Node) *AccountUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdate) AddNodes(v ...*Node) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (au *AccountUpdate) AddAssetIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddAssetIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddAssetIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddAssetIDs(ids...)
+	return _u
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (au *AccountUpdate) AddAssets(a ...*Asset) *AccountUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdate) AddAssets(v ...*Asset) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddAssetIDs(ids...)
+	return _u.AddAssetIDs(ids...)
 }
 
 // AddEventIDs adds the "events" edge to the EventParticipant entity by IDs.
-func (au *AccountUpdate) AddEventIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddEventIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddEventIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddEventIDs(ids...)
+	return _u
 }
 
 // AddEvents adds the "events" edges to the EventParticipant entity.
-func (au *AccountUpdate) AddEvents(e ...*EventParticipant) *AccountUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AccountUpdate) AddEvents(v ...*EventParticipant) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddEventIDs(ids...)
+	return _u.AddEventIDs(ids...)
 }
 
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
-func (au *AccountUpdate) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.AddAccountRoleIDs(ids...)
-	return au
+func (_u *AccountUpdate) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddAccountRoleIDs(ids...)
+	return _u
 }
 
 // AddAccountRoles adds the "account_roles" edges to the AccountRoles entity.
-func (au *AccountUpdate) AddAccountRoles(a ...*AccountRoles) *AccountUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdate) AddAccountRoles(v ...*AccountRoles) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.AddAccountRoleIDs(ids...)
+	return _u.AddAccountRoleIDs(ids...)
 }
 
 // Mutation returns the AccountMutation object of the builder.
-func (au *AccountUpdate) Mutation() *AccountMutation {
-	return au.mutation
+func (_u *AccountUpdate) Mutation() *AccountMutation {
+	return _u.mutation
 }
 
 // ClearSessions clears all "sessions" edges to the Session entity.
-func (au *AccountUpdate) ClearSessions() *AccountUpdate {
-	au.mutation.ClearSessions()
-	return au
+func (_u *AccountUpdate) ClearSessions() *AccountUpdate {
+	_u.mutation.ClearSessions()
+	return _u
 }
 
 // RemoveSessionIDs removes the "sessions" edge to Session entities by IDs.
-func (au *AccountUpdate) RemoveSessionIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveSessionIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveSessionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveSessionIDs(ids...)
+	return _u
 }
 
 // RemoveSessions removes "sessions" edges to Session entities.
-func (au *AccountUpdate) RemoveSessions(s ...*Session) *AccountUpdate {
-	ids := make([]xid.ID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *AccountUpdate) RemoveSessions(v ...*Session) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveSessionIDs(ids...)
+	return _u.RemoveSessionIDs(ids...)
 }
 
 // ClearEmails clears all "emails" edges to the Email entity.
-func (au *AccountUpdate) ClearEmails() *AccountUpdate {
-	au.mutation.ClearEmails()
-	return au
+func (_u *AccountUpdate) ClearEmails() *AccountUpdate {
+	_u.mutation.ClearEmails()
+	return _u
 }
 
 // RemoveEmailIDs removes the "emails" edge to Email entities by IDs.
-func (au *AccountUpdate) RemoveEmailIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveEmailIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveEmailIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveEmailIDs(ids...)
+	return _u
 }
 
 // RemoveEmails removes "emails" edges to Email entities.
-func (au *AccountUpdate) RemoveEmails(e ...*Email) *AccountUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AccountUpdate) RemoveEmails(v ...*Email) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveEmailIDs(ids...)
+	return _u.RemoveEmailIDs(ids...)
 }
 
 // ClearNotifications clears all "notifications" edges to the Notification entity.
-func (au *AccountUpdate) ClearNotifications() *AccountUpdate {
-	au.mutation.ClearNotifications()
-	return au
+func (_u *AccountUpdate) ClearNotifications() *AccountUpdate {
+	_u.mutation.ClearNotifications()
+	return _u
 }
 
 // RemoveNotificationIDs removes the "notifications" edge to Notification entities by IDs.
-func (au *AccountUpdate) RemoveNotificationIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveNotificationIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveNotificationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveNotificationIDs(ids...)
+	return _u
 }
 
 // RemoveNotifications removes "notifications" edges to Notification entities.
-func (au *AccountUpdate) RemoveNotifications(n ...*Notification) *AccountUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdate) RemoveNotifications(v ...*Notification) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveNotificationIDs(ids...)
+	return _u.RemoveNotificationIDs(ids...)
 }
 
 // ClearTriggeredNotifications clears all "triggered_notifications" edges to the Notification entity.
-func (au *AccountUpdate) ClearTriggeredNotifications() *AccountUpdate {
-	au.mutation.ClearTriggeredNotifications()
-	return au
+func (_u *AccountUpdate) ClearTriggeredNotifications() *AccountUpdate {
+	_u.mutation.ClearTriggeredNotifications()
+	return _u
 }
 
 // RemoveTriggeredNotificationIDs removes the "triggered_notifications" edge to Notification entities by IDs.
-func (au *AccountUpdate) RemoveTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveTriggeredNotificationIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveTriggeredNotificationIDs(ids...)
+	return _u
 }
 
 // RemoveTriggeredNotifications removes "triggered_notifications" edges to Notification entities.
-func (au *AccountUpdate) RemoveTriggeredNotifications(n ...*Notification) *AccountUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdate) RemoveTriggeredNotifications(v ...*Notification) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveTriggeredNotificationIDs(ids...)
+	return _u.RemoveTriggeredNotificationIDs(ids...)
 }
 
 // ClearFollowing clears all "following" edges to the AccountFollow entity.
-func (au *AccountUpdate) ClearFollowing() *AccountUpdate {
-	au.mutation.ClearFollowing()
-	return au
+func (_u *AccountUpdate) ClearFollowing() *AccountUpdate {
+	_u.mutation.ClearFollowing()
+	return _u
 }
 
 // RemoveFollowingIDs removes the "following" edge to AccountFollow entities by IDs.
-func (au *AccountUpdate) RemoveFollowingIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveFollowingIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveFollowingIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveFollowingIDs(ids...)
+	return _u
 }
 
 // RemoveFollowing removes "following" edges to AccountFollow entities.
-func (au *AccountUpdate) RemoveFollowing(a ...*AccountFollow) *AccountUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdate) RemoveFollowing(v ...*AccountFollow) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveFollowingIDs(ids...)
+	return _u.RemoveFollowingIDs(ids...)
 }
 
 // ClearFollowedBy clears all "followed_by" edges to the AccountFollow entity.
-func (au *AccountUpdate) ClearFollowedBy() *AccountUpdate {
-	au.mutation.ClearFollowedBy()
-	return au
+func (_u *AccountUpdate) ClearFollowedBy() *AccountUpdate {
+	_u.mutation.ClearFollowedBy()
+	return _u
 }
 
 // RemoveFollowedByIDs removes the "followed_by" edge to AccountFollow entities by IDs.
-func (au *AccountUpdate) RemoveFollowedByIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveFollowedByIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveFollowedByIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveFollowedByIDs(ids...)
+	return _u
 }
 
 // RemoveFollowedBy removes "followed_by" edges to AccountFollow entities.
-func (au *AccountUpdate) RemoveFollowedBy(a ...*AccountFollow) *AccountUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdate) RemoveFollowedBy(v ...*AccountFollow) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveFollowedByIDs(ids...)
+	return _u.RemoveFollowedByIDs(ids...)
 }
 
 // ClearInvitations clears all "invitations" edges to the Invitation entity.
-func (au *AccountUpdate) ClearInvitations() *AccountUpdate {
-	au.mutation.ClearInvitations()
-	return au
+func (_u *AccountUpdate) ClearInvitations() *AccountUpdate {
+	_u.mutation.ClearInvitations()
+	return _u
 }
 
 // RemoveInvitationIDs removes the "invitations" edge to Invitation entities by IDs.
-func (au *AccountUpdate) RemoveInvitationIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveInvitationIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveInvitationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveInvitationIDs(ids...)
+	return _u
 }
 
 // RemoveInvitations removes "invitations" edges to Invitation entities.
-func (au *AccountUpdate) RemoveInvitations(i ...*Invitation) *AccountUpdate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+func (_u *AccountUpdate) RemoveInvitations(v ...*Invitation) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveInvitationIDs(ids...)
+	return _u.RemoveInvitationIDs(ids...)
 }
 
 // ClearInvitedBy clears the "invited_by" edge to the Invitation entity.
-func (au *AccountUpdate) ClearInvitedBy() *AccountUpdate {
-	au.mutation.ClearInvitedBy()
-	return au
+func (_u *AccountUpdate) ClearInvitedBy() *AccountUpdate {
+	_u.mutation.ClearInvitedBy()
+	return _u
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (au *AccountUpdate) ClearPosts() *AccountUpdate {
-	au.mutation.ClearPosts()
-	return au
+func (_u *AccountUpdate) ClearPosts() *AccountUpdate {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (au *AccountUpdate) RemovePostIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemovePostIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemovePostIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (au *AccountUpdate) RemovePosts(p ...*Post) *AccountUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *AccountUpdate) RemovePosts(v ...*Post) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearQuestions clears all "questions" edges to the Question entity.
-func (au *AccountUpdate) ClearQuestions() *AccountUpdate {
-	au.mutation.ClearQuestions()
-	return au
+func (_u *AccountUpdate) ClearQuestions() *AccountUpdate {
+	_u.mutation.ClearQuestions()
+	return _u
 }
 
 // RemoveQuestionIDs removes the "questions" edge to Question entities by IDs.
-func (au *AccountUpdate) RemoveQuestionIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveQuestionIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveQuestionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveQuestionIDs(ids...)
+	return _u
 }
 
 // RemoveQuestions removes "questions" edges to Question entities.
-func (au *AccountUpdate) RemoveQuestions(q ...*Question) *AccountUpdate {
-	ids := make([]xid.ID, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+func (_u *AccountUpdate) RemoveQuestions(v ...*Question) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveQuestionIDs(ids...)
+	return _u.RemoveQuestionIDs(ids...)
 }
 
 // ClearReacts clears all "reacts" edges to the React entity.
-func (au *AccountUpdate) ClearReacts() *AccountUpdate {
-	au.mutation.ClearReacts()
-	return au
+func (_u *AccountUpdate) ClearReacts() *AccountUpdate {
+	_u.mutation.ClearReacts()
+	return _u
 }
 
 // RemoveReactIDs removes the "reacts" edge to React entities by IDs.
-func (au *AccountUpdate) RemoveReactIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveReactIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveReactIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveReactIDs(ids...)
+	return _u
 }
 
 // RemoveReacts removes "reacts" edges to React entities.
-func (au *AccountUpdate) RemoveReacts(r ...*React) *AccountUpdate {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *AccountUpdate) RemoveReacts(v ...*React) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveReactIDs(ids...)
+	return _u.RemoveReactIDs(ids...)
 }
 
 // ClearLikes clears all "likes" edges to the LikePost entity.
-func (au *AccountUpdate) ClearLikes() *AccountUpdate {
-	au.mutation.ClearLikes()
-	return au
+func (_u *AccountUpdate) ClearLikes() *AccountUpdate {
+	_u.mutation.ClearLikes()
+	return _u
 }
 
 // RemoveLikeIDs removes the "likes" edge to LikePost entities by IDs.
-func (au *AccountUpdate) RemoveLikeIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveLikeIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveLikeIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveLikeIDs(ids...)
+	return _u
 }
 
 // RemoveLikes removes "likes" edges to LikePost entities.
-func (au *AccountUpdate) RemoveLikes(l ...*LikePost) *AccountUpdate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *AccountUpdate) RemoveLikes(v ...*LikePost) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveLikeIDs(ids...)
+	return _u.RemoveLikeIDs(ids...)
 }
 
 // ClearMentions clears all "mentions" edges to the MentionProfile entity.
-func (au *AccountUpdate) ClearMentions() *AccountUpdate {
-	au.mutation.ClearMentions()
-	return au
+func (_u *AccountUpdate) ClearMentions() *AccountUpdate {
+	_u.mutation.ClearMentions()
+	return _u
 }
 
 // RemoveMentionIDs removes the "mentions" edge to MentionProfile entities by IDs.
-func (au *AccountUpdate) RemoveMentionIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveMentionIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveMentionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveMentionIDs(ids...)
+	return _u
 }
 
 // RemoveMentions removes "mentions" edges to MentionProfile entities.
-func (au *AccountUpdate) RemoveMentions(m ...*MentionProfile) *AccountUpdate {
-	ids := make([]xid.ID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *AccountUpdate) RemoveMentions(v ...*MentionProfile) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveMentionIDs(ids...)
+	return _u.RemoveMentionIDs(ids...)
 }
 
 // ClearRoles clears all "roles" edges to the Role entity.
-func (au *AccountUpdate) ClearRoles() *AccountUpdate {
-	au.mutation.ClearRoles()
-	return au
+func (_u *AccountUpdate) ClearRoles() *AccountUpdate {
+	_u.mutation.ClearRoles()
+	return _u
 }
 
 // RemoveRoleIDs removes the "roles" edge to Role entities by IDs.
-func (au *AccountUpdate) RemoveRoleIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveRoleIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveRoleIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveRoleIDs(ids...)
+	return _u
 }
 
 // RemoveRoles removes "roles" edges to Role entities.
-func (au *AccountUpdate) RemoveRoles(r ...*Role) *AccountUpdate {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *AccountUpdate) RemoveRoles(v ...*Role) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveRoleIDs(ids...)
+	return _u.RemoveRoleIDs(ids...)
 }
 
 // ClearAuthentication clears all "authentication" edges to the Authentication entity.
-func (au *AccountUpdate) ClearAuthentication() *AccountUpdate {
-	au.mutation.ClearAuthentication()
-	return au
+func (_u *AccountUpdate) ClearAuthentication() *AccountUpdate {
+	_u.mutation.ClearAuthentication()
+	return _u
 }
 
 // RemoveAuthenticationIDs removes the "authentication" edge to Authentication entities by IDs.
-func (au *AccountUpdate) RemoveAuthenticationIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveAuthenticationIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveAuthenticationIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveAuthenticationIDs(ids...)
+	return _u
 }
 
 // RemoveAuthentication removes "authentication" edges to Authentication entities.
-func (au *AccountUpdate) RemoveAuthentication(a ...*Authentication) *AccountUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdate) RemoveAuthentication(v ...*Authentication) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveAuthenticationIDs(ids...)
+	return _u.RemoveAuthenticationIDs(ids...)
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
-func (au *AccountUpdate) ClearTags() *AccountUpdate {
-	au.mutation.ClearTags()
-	return au
+func (_u *AccountUpdate) ClearTags() *AccountUpdate {
+	_u.mutation.ClearTags()
+	return _u
 }
 
 // RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
-func (au *AccountUpdate) RemoveTagIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveTagIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveTagIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveTagIDs(ids...)
+	return _u
 }
 
 // RemoveTags removes "tags" edges to Tag entities.
-func (au *AccountUpdate) RemoveTags(t ...*Tag) *AccountUpdate {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *AccountUpdate) RemoveTags(v ...*Tag) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveTagIDs(ids...)
+	return _u.RemoveTagIDs(ids...)
 }
 
 // ClearCollections clears all "collections" edges to the Collection entity.
-func (au *AccountUpdate) ClearCollections() *AccountUpdate {
-	au.mutation.ClearCollections()
-	return au
+func (_u *AccountUpdate) ClearCollections() *AccountUpdate {
+	_u.mutation.ClearCollections()
+	return _u
 }
 
 // RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
-func (au *AccountUpdate) RemoveCollectionIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveCollectionIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveCollectionIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveCollectionIDs(ids...)
+	return _u
 }
 
 // RemoveCollections removes "collections" edges to Collection entities.
-func (au *AccountUpdate) RemoveCollections(c ...*Collection) *AccountUpdate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *AccountUpdate) RemoveCollections(v ...*Collection) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveCollectionIDs(ids...)
+	return _u.RemoveCollectionIDs(ids...)
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (au *AccountUpdate) ClearNodes() *AccountUpdate {
-	au.mutation.ClearNodes()
-	return au
+func (_u *AccountUpdate) ClearNodes() *AccountUpdate {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (au *AccountUpdate) RemoveNodeIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveNodeIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveNodeIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (au *AccountUpdate) RemoveNodes(n ...*Node) *AccountUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdate) RemoveNodes(v ...*Node) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
-func (au *AccountUpdate) ClearAssets() *AccountUpdate {
-	au.mutation.ClearAssets()
-	return au
+func (_u *AccountUpdate) ClearAssets() *AccountUpdate {
+	_u.mutation.ClearAssets()
+	return _u
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (au *AccountUpdate) RemoveAssetIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveAssetIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveAssetIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveAssetIDs(ids...)
+	return _u
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
-func (au *AccountUpdate) RemoveAssets(a ...*Asset) *AccountUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdate) RemoveAssets(v ...*Asset) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveAssetIDs(ids...)
+	return _u.RemoveAssetIDs(ids...)
 }
 
 // ClearEvents clears all "events" edges to the EventParticipant entity.
-func (au *AccountUpdate) ClearEvents() *AccountUpdate {
-	au.mutation.ClearEvents()
-	return au
+func (_u *AccountUpdate) ClearEvents() *AccountUpdate {
+	_u.mutation.ClearEvents()
+	return _u
 }
 
 // RemoveEventIDs removes the "events" edge to EventParticipant entities by IDs.
-func (au *AccountUpdate) RemoveEventIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveEventIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveEventIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveEventIDs(ids...)
+	return _u
 }
 
 // RemoveEvents removes "events" edges to EventParticipant entities.
-func (au *AccountUpdate) RemoveEvents(e ...*EventParticipant) *AccountUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AccountUpdate) RemoveEvents(v ...*EventParticipant) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveEventIDs(ids...)
+	return _u.RemoveEventIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
-func (au *AccountUpdate) ClearAccountRoles() *AccountUpdate {
-	au.mutation.ClearAccountRoles()
-	return au
+func (_u *AccountUpdate) ClearAccountRoles() *AccountUpdate {
+	_u.mutation.ClearAccountRoles()
+	return _u
 }
 
 // RemoveAccountRoleIDs removes the "account_roles" edge to AccountRoles entities by IDs.
-func (au *AccountUpdate) RemoveAccountRoleIDs(ids ...xid.ID) *AccountUpdate {
-	au.mutation.RemoveAccountRoleIDs(ids...)
-	return au
+func (_u *AccountUpdate) RemoveAccountRoleIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemoveAccountRoleIDs(ids...)
+	return _u
 }
 
 // RemoveAccountRoles removes "account_roles" edges to AccountRoles entities.
-func (au *AccountUpdate) RemoveAccountRoles(a ...*AccountRoles) *AccountUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdate) RemoveAccountRoles(v ...*AccountRoles) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return au.RemoveAccountRoleIDs(ids...)
+	return _u.RemoveAccountRoleIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (au *AccountUpdate) Save(ctx context.Context) (int, error) {
-	au.defaults()
-	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
+func (_u *AccountUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (au *AccountUpdate) SaveX(ctx context.Context) int {
-	affected, err := au.Save(ctx)
+func (_u *AccountUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -974,39 +974,39 @@ func (au *AccountUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (au *AccountUpdate) Exec(ctx context.Context) error {
-	_, err := au.Save(ctx)
+func (_u *AccountUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (au *AccountUpdate) ExecX(ctx context.Context) {
-	if err := au.Exec(ctx); err != nil {
+func (_u *AccountUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (au *AccountUpdate) defaults() {
-	if _, ok := au.mutation.UpdatedAt(); !ok {
+func (_u *AccountUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := account.UpdateDefaultUpdatedAt()
-		au.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (au *AccountUpdate) check() error {
-	if v, ok := au.mutation.Handle(); ok {
+func (_u *AccountUpdate) check() error {
+	if v, ok := _u.mutation.Handle(); ok {
 		if err := account.HandleValidator(v); err != nil {
 			return &ValidationError{Name: "handle", err: fmt.Errorf(`ent: validator failed for field "Account.handle": %w`, err)}
 		}
 	}
-	if v, ok := au.mutation.Name(); ok {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := account.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Account.name": %w`, err)}
 		}
 	}
-	if v, ok := au.mutation.Kind(); ok {
+	if v, ok := _u.mutation.Kind(); ok {
 		if err := account.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Account.kind": %w`, err)}
 		}
@@ -1015,74 +1015,74 @@ func (au *AccountUpdate) check() error {
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (au *AccountUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AccountUpdate {
-	au.modifiers = append(au.modifiers, modifiers...)
-	return au
+func (_u *AccountUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AccountUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := au.check(); err != nil {
-		return n, err
+func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(account.Table, account.Columns, sqlgraph.NewFieldSpec(account.FieldID, field.TypeString))
-	if ps := au.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := au.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(account.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := au.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(account.FieldDeletedAt, field.TypeTime, value)
 	}
-	if au.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(account.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := au.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(account.FieldIndexedAt, field.TypeTime, value)
 	}
-	if au.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(account.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := au.mutation.Handle(); ok {
+	if value, ok := _u.mutation.Handle(); ok {
 		_spec.SetField(account.FieldHandle, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(account.FieldName, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Bio(); ok {
+	if value, ok := _u.mutation.Bio(); ok {
 		_spec.SetField(account.FieldBio, field.TypeString, value)
 	}
-	if au.mutation.BioCleared() {
+	if _u.mutation.BioCleared() {
 		_spec.ClearField(account.FieldBio, field.TypeString)
 	}
-	if value, ok := au.mutation.Kind(); ok {
+	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(account.FieldKind, field.TypeEnum, value)
 	}
-	if value, ok := au.mutation.Admin(); ok {
+	if value, ok := _u.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
 	}
-	if value, ok := au.mutation.Links(); ok {
+	if value, ok := _u.mutation.Links(); ok {
 		_spec.SetField(account.FieldLinks, field.TypeJSON, value)
 	}
-	if value, ok := au.mutation.AppendedLinks(); ok {
+	if value, ok := _u.mutation.AppendedLinks(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, account.FieldLinks, value)
 		})
 	}
-	if au.mutation.LinksCleared() {
+	if _u.mutation.LinksCleared() {
 		_spec.ClearField(account.FieldLinks, field.TypeJSON)
 	}
-	if value, ok := au.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(account.FieldMetadata, field.TypeJSON, value)
 	}
-	if au.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
 	}
-	if au.mutation.SessionsCleared() {
+	if _u.mutation.SessionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1095,23 +1095,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedSessionsIDs(); len(nodes) > 0 && !au.mutation.SessionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.SessionsTable,
-			Columns: []string{account.SessionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.SessionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedSessionsIDs(); len(nodes) > 0 && !_u.mutation.SessionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1125,9 +1109,25 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SessionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.SessionsTable,
+			Columns: []string{account.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.EmailsCleared() {
+	if _u.mutation.EmailsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1140,7 +1140,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedEmailsIDs(); len(nodes) > 0 && !au.mutation.EmailsCleared() {
+	if nodes := _u.mutation.RemovedEmailsIDs(); len(nodes) > 0 && !_u.mutation.EmailsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1156,7 +1156,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.EmailsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EmailsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1172,7 +1172,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.NotificationsCleared() {
+	if _u.mutation.NotificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1185,23 +1185,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedNotificationsIDs(); len(nodes) > 0 && !au.mutation.NotificationsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.NotificationsTable,
-			Columns: []string{account.NotificationsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.NotificationsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedNotificationsIDs(); len(nodes) > 0 && !_u.mutation.NotificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1215,9 +1199,25 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.NotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationsTable,
+			Columns: []string{account.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.TriggeredNotificationsCleared() {
+	if _u.mutation.TriggeredNotificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1230,7 +1230,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedTriggeredNotificationsIDs(); len(nodes) > 0 && !au.mutation.TriggeredNotificationsCleared() {
+	if nodes := _u.mutation.RemovedTriggeredNotificationsIDs(); len(nodes) > 0 && !_u.mutation.TriggeredNotificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1246,7 +1246,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.TriggeredNotificationsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TriggeredNotificationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1262,7 +1262,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.FollowingCleared() {
+	if _u.mutation.FollowingCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1275,7 +1275,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedFollowingIDs(); len(nodes) > 0 && !au.mutation.FollowingCleared() {
+	if nodes := _u.mutation.RemovedFollowingIDs(); len(nodes) > 0 && !_u.mutation.FollowingCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1291,7 +1291,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.FollowingIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.FollowingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1307,7 +1307,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.FollowedByCleared() {
+	if _u.mutation.FollowedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1320,7 +1320,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedFollowedByIDs(); len(nodes) > 0 && !au.mutation.FollowedByCleared() {
+	if nodes := _u.mutation.RemovedFollowedByIDs(); len(nodes) > 0 && !_u.mutation.FollowedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1336,7 +1336,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.FollowedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.FollowedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1352,7 +1352,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.InvitationsCleared() {
+	if _u.mutation.InvitationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1365,7 +1365,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedInvitationsIDs(); len(nodes) > 0 && !au.mutation.InvitationsCleared() {
+	if nodes := _u.mutation.RemovedInvitationsIDs(); len(nodes) > 0 && !_u.mutation.InvitationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1381,7 +1381,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.InvitationsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.InvitationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1397,7 +1397,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.InvitedByCleared() {
+	if _u.mutation.InvitedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1410,7 +1410,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.InvitedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.InvitedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1426,7 +1426,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1439,23 +1439,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedPostsIDs(); len(nodes) > 0 && !au.mutation.PostsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.PostsTable,
-			Columns: []string{account.PostsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1469,9 +1453,25 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PostsTable,
+			Columns: []string{account.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.QuestionsCleared() {
+	if _u.mutation.QuestionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1484,7 +1484,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedQuestionsIDs(); len(nodes) > 0 && !au.mutation.QuestionsCleared() {
+	if nodes := _u.mutation.RemovedQuestionsIDs(); len(nodes) > 0 && !_u.mutation.QuestionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1500,7 +1500,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.QuestionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.QuestionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1516,7 +1516,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.ReactsCleared() {
+	if _u.mutation.ReactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1529,23 +1529,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedReactsIDs(); len(nodes) > 0 && !au.mutation.ReactsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.ReactsTable,
-			Columns: []string{account.ReactsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.ReactsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedReactsIDs(); len(nodes) > 0 && !_u.mutation.ReactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1559,9 +1543,25 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ReactsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ReactsTable,
+			Columns: []string{account.ReactsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.LikesCleared() {
+	if _u.mutation.LikesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1574,7 +1574,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedLikesIDs(); len(nodes) > 0 && !au.mutation.LikesCleared() {
+	if nodes := _u.mutation.RemovedLikesIDs(); len(nodes) > 0 && !_u.mutation.LikesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1590,7 +1590,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.LikesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.LikesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1606,7 +1606,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.MentionsCleared() {
+	if _u.mutation.MentionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1619,23 +1619,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !au.mutation.MentionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.MentionsTable,
-			Columns: []string{account.MentionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.MentionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !_u.mutation.MentionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1649,9 +1633,25 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MentionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.MentionsTable,
+			Columns: []string{account.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.RolesCleared() {
+	if _u.mutation.RolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1662,7 +1662,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeString),
 			},
 		}
-		createE := &AccountRolesCreate{config: au.config, mutation: newAccountRolesMutation(au.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -1671,7 +1671,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedRolesIDs(); len(nodes) > 0 && !au.mutation.RolesCleared() {
+	if nodes := _u.mutation.RemovedRolesIDs(); len(nodes) > 0 && !_u.mutation.RolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1685,7 +1685,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &AccountRolesCreate{config: au.config, mutation: newAccountRolesMutation(au.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -1694,7 +1694,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RolesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1708,7 +1708,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &AccountRolesCreate{config: au.config, mutation: newAccountRolesMutation(au.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -1717,7 +1717,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.AuthenticationCleared() {
+	if _u.mutation.AuthenticationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1730,7 +1730,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedAuthenticationIDs(); len(nodes) > 0 && !au.mutation.AuthenticationCleared() {
+	if nodes := _u.mutation.RemovedAuthenticationIDs(); len(nodes) > 0 && !_u.mutation.AuthenticationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1746,7 +1746,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.AuthenticationIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AuthenticationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1762,7 +1762,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.TagsCleared() {
+	if _u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1775,23 +1775,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedTagsIDs(); len(nodes) > 0 && !au.mutation.TagsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   account.TagsTable,
-			Columns: account.TagsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.TagsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedTagsIDs(); len(nodes) > 0 && !_u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1805,9 +1789,25 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.TagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.TagsTable,
+			Columns: account.TagsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.CollectionsCleared() {
+	if _u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1820,7 +1820,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !au.mutation.CollectionsCleared() {
+	if nodes := _u.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !_u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1836,7 +1836,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.CollectionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CollectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1852,7 +1852,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1865,23 +1865,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedNodesIDs(); len(nodes) > 0 && !au.mutation.NodesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.NodesTable,
-			Columns: []string{account.NodesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1895,9 +1879,25 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NodesTable,
+			Columns: []string{account.NodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.AssetsCleared() {
+	if _u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1910,7 +1910,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !au.mutation.AssetsCleared() {
+	if nodes := _u.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !_u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1926,7 +1926,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1942,7 +1942,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.EventsCleared() {
+	if _u.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1955,7 +1955,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedEventsIDs(); len(nodes) > 0 && !au.mutation.EventsCleared() {
+	if nodes := _u.mutation.RemovedEventsIDs(); len(nodes) > 0 && !_u.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1971,7 +1971,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.EventsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EventsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1987,7 +1987,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.AccountRolesCleared() {
+	if _u.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -2000,7 +2000,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedAccountRolesIDs(); len(nodes) > 0 && !au.mutation.AccountRolesCleared() {
+	if nodes := _u.mutation.RemovedAccountRolesIDs(); len(nodes) > 0 && !_u.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -2016,7 +2016,7 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.AccountRolesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountRolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -2032,8 +2032,8 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(au.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{account.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -2041,8 +2041,8 @@ func (au *AccountUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	au.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // AccountUpdateOne is the builder for updating a single Account entity.
@@ -2055,935 +2055,935 @@ type AccountUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (auo *AccountUpdateOne) SetUpdatedAt(t time.Time) *AccountUpdateOne {
-	auo.mutation.SetUpdatedAt(t)
-	return auo
+func (_u *AccountUpdateOne) SetUpdatedAt(v time.Time) *AccountUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (auo *AccountUpdateOne) SetDeletedAt(t time.Time) *AccountUpdateOne {
-	auo.mutation.SetDeletedAt(t)
-	return auo
+func (_u *AccountUpdateOne) SetDeletedAt(v time.Time) *AccountUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableDeletedAt(t *time.Time) *AccountUpdateOne {
-	if t != nil {
-		auo.SetDeletedAt(*t)
+func (_u *AccountUpdateOne) SetNillableDeletedAt(v *time.Time) *AccountUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return auo
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (auo *AccountUpdateOne) ClearDeletedAt() *AccountUpdateOne {
-	auo.mutation.ClearDeletedAt()
-	return auo
+func (_u *AccountUpdateOne) ClearDeletedAt() *AccountUpdateOne {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (auo *AccountUpdateOne) SetIndexedAt(t time.Time) *AccountUpdateOne {
-	auo.mutation.SetIndexedAt(t)
-	return auo
+func (_u *AccountUpdateOne) SetIndexedAt(v time.Time) *AccountUpdateOne {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableIndexedAt(t *time.Time) *AccountUpdateOne {
-	if t != nil {
-		auo.SetIndexedAt(*t)
+func (_u *AccountUpdateOne) SetNillableIndexedAt(v *time.Time) *AccountUpdateOne {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return auo
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (auo *AccountUpdateOne) ClearIndexedAt() *AccountUpdateOne {
-	auo.mutation.ClearIndexedAt()
-	return auo
+func (_u *AccountUpdateOne) ClearIndexedAt() *AccountUpdateOne {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetHandle sets the "handle" field.
-func (auo *AccountUpdateOne) SetHandle(s string) *AccountUpdateOne {
-	auo.mutation.SetHandle(s)
-	return auo
+func (_u *AccountUpdateOne) SetHandle(v string) *AccountUpdateOne {
+	_u.mutation.SetHandle(v)
+	return _u
 }
 
 // SetNillableHandle sets the "handle" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableHandle(s *string) *AccountUpdateOne {
-	if s != nil {
-		auo.SetHandle(*s)
+func (_u *AccountUpdateOne) SetNillableHandle(v *string) *AccountUpdateOne {
+	if v != nil {
+		_u.SetHandle(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetName sets the "name" field.
-func (auo *AccountUpdateOne) SetName(s string) *AccountUpdateOne {
-	auo.mutation.SetName(s)
-	return auo
+func (_u *AccountUpdateOne) SetName(v string) *AccountUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableName(s *string) *AccountUpdateOne {
-	if s != nil {
-		auo.SetName(*s)
+func (_u *AccountUpdateOne) SetNillableName(v *string) *AccountUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetBio sets the "bio" field.
-func (auo *AccountUpdateOne) SetBio(s string) *AccountUpdateOne {
-	auo.mutation.SetBio(s)
-	return auo
+func (_u *AccountUpdateOne) SetBio(v string) *AccountUpdateOne {
+	_u.mutation.SetBio(v)
+	return _u
 }
 
 // SetNillableBio sets the "bio" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableBio(s *string) *AccountUpdateOne {
-	if s != nil {
-		auo.SetBio(*s)
+func (_u *AccountUpdateOne) SetNillableBio(v *string) *AccountUpdateOne {
+	if v != nil {
+		_u.SetBio(*v)
 	}
-	return auo
+	return _u
 }
 
 // ClearBio clears the value of the "bio" field.
-func (auo *AccountUpdateOne) ClearBio() *AccountUpdateOne {
-	auo.mutation.ClearBio()
-	return auo
+func (_u *AccountUpdateOne) ClearBio() *AccountUpdateOne {
+	_u.mutation.ClearBio()
+	return _u
 }
 
 // SetKind sets the "kind" field.
-func (auo *AccountUpdateOne) SetKind(a account.Kind) *AccountUpdateOne {
-	auo.mutation.SetKind(a)
-	return auo
+func (_u *AccountUpdateOne) SetKind(v account.Kind) *AccountUpdateOne {
+	_u.mutation.SetKind(v)
+	return _u
 }
 
 // SetNillableKind sets the "kind" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableKind(a *account.Kind) *AccountUpdateOne {
-	if a != nil {
-		auo.SetKind(*a)
+func (_u *AccountUpdateOne) SetNillableKind(v *account.Kind) *AccountUpdateOne {
+	if v != nil {
+		_u.SetKind(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetAdmin sets the "admin" field.
-func (auo *AccountUpdateOne) SetAdmin(b bool) *AccountUpdateOne {
-	auo.mutation.SetAdmin(b)
-	return auo
+func (_u *AccountUpdateOne) SetAdmin(v bool) *AccountUpdateOne {
+	_u.mutation.SetAdmin(v)
+	return _u
 }
 
 // SetNillableAdmin sets the "admin" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableAdmin(b *bool) *AccountUpdateOne {
-	if b != nil {
-		auo.SetAdmin(*b)
+func (_u *AccountUpdateOne) SetNillableAdmin(v *bool) *AccountUpdateOne {
+	if v != nil {
+		_u.SetAdmin(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetLinks sets the "links" field.
-func (auo *AccountUpdateOne) SetLinks(sl []schema.ExternalLink) *AccountUpdateOne {
-	auo.mutation.SetLinks(sl)
-	return auo
+func (_u *AccountUpdateOne) SetLinks(v []schema.ExternalLink) *AccountUpdateOne {
+	_u.mutation.SetLinks(v)
+	return _u
 }
 
-// AppendLinks appends sl to the "links" field.
-func (auo *AccountUpdateOne) AppendLinks(sl []schema.ExternalLink) *AccountUpdateOne {
-	auo.mutation.AppendLinks(sl)
-	return auo
+// AppendLinks appends value to the "links" field.
+func (_u *AccountUpdateOne) AppendLinks(v []schema.ExternalLink) *AccountUpdateOne {
+	_u.mutation.AppendLinks(v)
+	return _u
 }
 
 // ClearLinks clears the value of the "links" field.
-func (auo *AccountUpdateOne) ClearLinks() *AccountUpdateOne {
-	auo.mutation.ClearLinks()
-	return auo
+func (_u *AccountUpdateOne) ClearLinks() *AccountUpdateOne {
+	_u.mutation.ClearLinks()
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (auo *AccountUpdateOne) SetMetadata(m map[string]interface{}) *AccountUpdateOne {
-	auo.mutation.SetMetadata(m)
-	return auo
+func (_u *AccountUpdateOne) SetMetadata(v map[string]interface{}) *AccountUpdateOne {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (auo *AccountUpdateOne) ClearMetadata() *AccountUpdateOne {
-	auo.mutation.ClearMetadata()
-	return auo
+func (_u *AccountUpdateOne) ClearMetadata() *AccountUpdateOne {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetInvitedByID sets the "invited_by_id" field.
-func (auo *AccountUpdateOne) SetInvitedByID(x xid.ID) *AccountUpdateOne {
-	auo.mutation.SetInvitedByID(x)
-	return auo
+func (_u *AccountUpdateOne) SetInvitedByID(v xid.ID) *AccountUpdateOne {
+	_u.mutation.SetInvitedByID(v)
+	return _u
 }
 
 // SetNillableInvitedByID sets the "invited_by_id" field if the given value is not nil.
-func (auo *AccountUpdateOne) SetNillableInvitedByID(x *xid.ID) *AccountUpdateOne {
-	if x != nil {
-		auo.SetInvitedByID(*x)
+func (_u *AccountUpdateOne) SetNillableInvitedByID(v *xid.ID) *AccountUpdateOne {
+	if v != nil {
+		_u.SetInvitedByID(*v)
 	}
-	return auo
+	return _u
 }
 
 // ClearInvitedByID clears the value of the "invited_by_id" field.
-func (auo *AccountUpdateOne) ClearInvitedByID() *AccountUpdateOne {
-	auo.mutation.ClearInvitedByID()
-	return auo
+func (_u *AccountUpdateOne) ClearInvitedByID() *AccountUpdateOne {
+	_u.mutation.ClearInvitedByID()
+	return _u
 }
 
 // AddSessionIDs adds the "sessions" edge to the Session entity by IDs.
-func (auo *AccountUpdateOne) AddSessionIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddSessionIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddSessionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddSessionIDs(ids...)
+	return _u
 }
 
 // AddSessions adds the "sessions" edges to the Session entity.
-func (auo *AccountUpdateOne) AddSessions(s ...*Session) *AccountUpdateOne {
-	ids := make([]xid.ID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *AccountUpdateOne) AddSessions(v ...*Session) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddSessionIDs(ids...)
+	return _u.AddSessionIDs(ids...)
 }
 
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
-func (auo *AccountUpdateOne) AddEmailIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddEmailIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddEmailIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddEmailIDs(ids...)
+	return _u
 }
 
 // AddEmails adds the "emails" edges to the Email entity.
-func (auo *AccountUpdateOne) AddEmails(e ...*Email) *AccountUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AccountUpdateOne) AddEmails(v ...*Email) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddEmailIDs(ids...)
+	return _u.AddEmailIDs(ids...)
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
-func (auo *AccountUpdateOne) AddNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddNotificationIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddNotificationIDs(ids...)
+	return _u
 }
 
 // AddNotifications adds the "notifications" edges to the Notification entity.
-func (auo *AccountUpdateOne) AddNotifications(n ...*Notification) *AccountUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdateOne) AddNotifications(v ...*Notification) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddNotificationIDs(ids...)
+	return _u.AddNotificationIDs(ids...)
 }
 
 // AddTriggeredNotificationIDs adds the "triggered_notifications" edge to the Notification entity by IDs.
-func (auo *AccountUpdateOne) AddTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddTriggeredNotificationIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddTriggeredNotificationIDs(ids...)
+	return _u
 }
 
 // AddTriggeredNotifications adds the "triggered_notifications" edges to the Notification entity.
-func (auo *AccountUpdateOne) AddTriggeredNotifications(n ...*Notification) *AccountUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdateOne) AddTriggeredNotifications(v ...*Notification) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddTriggeredNotificationIDs(ids...)
+	return _u.AddTriggeredNotificationIDs(ids...)
 }
 
 // AddFollowingIDs adds the "following" edge to the AccountFollow entity by IDs.
-func (auo *AccountUpdateOne) AddFollowingIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddFollowingIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddFollowingIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddFollowingIDs(ids...)
+	return _u
 }
 
 // AddFollowing adds the "following" edges to the AccountFollow entity.
-func (auo *AccountUpdateOne) AddFollowing(a ...*AccountFollow) *AccountUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdateOne) AddFollowing(v ...*AccountFollow) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddFollowingIDs(ids...)
+	return _u.AddFollowingIDs(ids...)
 }
 
 // AddFollowedByIDs adds the "followed_by" edge to the AccountFollow entity by IDs.
-func (auo *AccountUpdateOne) AddFollowedByIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddFollowedByIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddFollowedByIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddFollowedByIDs(ids...)
+	return _u
 }
 
 // AddFollowedBy adds the "followed_by" edges to the AccountFollow entity.
-func (auo *AccountUpdateOne) AddFollowedBy(a ...*AccountFollow) *AccountUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdateOne) AddFollowedBy(v ...*AccountFollow) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddFollowedByIDs(ids...)
+	return _u.AddFollowedByIDs(ids...)
 }
 
 // AddInvitationIDs adds the "invitations" edge to the Invitation entity by IDs.
-func (auo *AccountUpdateOne) AddInvitationIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddInvitationIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddInvitationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddInvitationIDs(ids...)
+	return _u
 }
 
 // AddInvitations adds the "invitations" edges to the Invitation entity.
-func (auo *AccountUpdateOne) AddInvitations(i ...*Invitation) *AccountUpdateOne {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+func (_u *AccountUpdateOne) AddInvitations(v ...*Invitation) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddInvitationIDs(ids...)
+	return _u.AddInvitationIDs(ids...)
 }
 
 // SetInvitedBy sets the "invited_by" edge to the Invitation entity.
-func (auo *AccountUpdateOne) SetInvitedBy(i *Invitation) *AccountUpdateOne {
-	return auo.SetInvitedByID(i.ID)
+func (_u *AccountUpdateOne) SetInvitedBy(v *Invitation) *AccountUpdateOne {
+	return _u.SetInvitedByID(v.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (auo *AccountUpdateOne) AddPostIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddPostIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddPostIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (auo *AccountUpdateOne) AddPosts(p ...*Post) *AccountUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *AccountUpdateOne) AddPosts(v ...*Post) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
-func (auo *AccountUpdateOne) AddQuestionIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddQuestionIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddQuestionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddQuestionIDs(ids...)
+	return _u
 }
 
 // AddQuestions adds the "questions" edges to the Question entity.
-func (auo *AccountUpdateOne) AddQuestions(q ...*Question) *AccountUpdateOne {
-	ids := make([]xid.ID, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+func (_u *AccountUpdateOne) AddQuestions(v ...*Question) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddQuestionIDs(ids...)
+	return _u.AddQuestionIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (auo *AccountUpdateOne) AddReactIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddReactIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddReactIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddReactIDs(ids...)
+	return _u
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
-func (auo *AccountUpdateOne) AddReacts(r ...*React) *AccountUpdateOne {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *AccountUpdateOne) AddReacts(v ...*React) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddReactIDs(ids...)
+	return _u.AddReactIDs(ids...)
 }
 
 // AddLikeIDs adds the "likes" edge to the LikePost entity by IDs.
-func (auo *AccountUpdateOne) AddLikeIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddLikeIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddLikeIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddLikeIDs(ids...)
+	return _u
 }
 
 // AddLikes adds the "likes" edges to the LikePost entity.
-func (auo *AccountUpdateOne) AddLikes(l ...*LikePost) *AccountUpdateOne {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *AccountUpdateOne) AddLikes(v ...*LikePost) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddLikeIDs(ids...)
+	return _u.AddLikeIDs(ids...)
 }
 
 // AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
-func (auo *AccountUpdateOne) AddMentionIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddMentionIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddMentionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddMentionIDs(ids...)
+	return _u
 }
 
 // AddMentions adds the "mentions" edges to the MentionProfile entity.
-func (auo *AccountUpdateOne) AddMentions(m ...*MentionProfile) *AccountUpdateOne {
-	ids := make([]xid.ID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *AccountUpdateOne) AddMentions(v ...*MentionProfile) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddMentionIDs(ids...)
+	return _u.AddMentionIDs(ids...)
 }
 
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
-func (auo *AccountUpdateOne) AddRoleIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddRoleIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddRoleIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddRoleIDs(ids...)
+	return _u
 }
 
 // AddRoles adds the "roles" edges to the Role entity.
-func (auo *AccountUpdateOne) AddRoles(r ...*Role) *AccountUpdateOne {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *AccountUpdateOne) AddRoles(v ...*Role) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddRoleIDs(ids...)
+	return _u.AddRoleIDs(ids...)
 }
 
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
-func (auo *AccountUpdateOne) AddAuthenticationIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddAuthenticationIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddAuthenticationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddAuthenticationIDs(ids...)
+	return _u
 }
 
 // AddAuthentication adds the "authentication" edges to the Authentication entity.
-func (auo *AccountUpdateOne) AddAuthentication(a ...*Authentication) *AccountUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdateOne) AddAuthentication(v ...*Authentication) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddAuthenticationIDs(ids...)
+	return _u.AddAuthenticationIDs(ids...)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (auo *AccountUpdateOne) AddTagIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddTagIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddTagIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddTagIDs(ids...)
+	return _u
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
-func (auo *AccountUpdateOne) AddTags(t ...*Tag) *AccountUpdateOne {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *AccountUpdateOne) AddTags(v ...*Tag) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddTagIDs(ids...)
+	return _u.AddTagIDs(ids...)
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (auo *AccountUpdateOne) AddCollectionIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddCollectionIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddCollectionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddCollectionIDs(ids...)
+	return _u
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
-func (auo *AccountUpdateOne) AddCollections(c ...*Collection) *AccountUpdateOne {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *AccountUpdateOne) AddCollections(v ...*Collection) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddCollectionIDs(ids...)
+	return _u.AddCollectionIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (auo *AccountUpdateOne) AddNodeIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddNodeIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddNodeIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (auo *AccountUpdateOne) AddNodes(n ...*Node) *AccountUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdateOne) AddNodes(v ...*Node) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (auo *AccountUpdateOne) AddAssetIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddAssetIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddAssetIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddAssetIDs(ids...)
+	return _u
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (auo *AccountUpdateOne) AddAssets(a ...*Asset) *AccountUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdateOne) AddAssets(v ...*Asset) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddAssetIDs(ids...)
+	return _u.AddAssetIDs(ids...)
 }
 
 // AddEventIDs adds the "events" edge to the EventParticipant entity by IDs.
-func (auo *AccountUpdateOne) AddEventIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddEventIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddEventIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddEventIDs(ids...)
+	return _u
 }
 
 // AddEvents adds the "events" edges to the EventParticipant entity.
-func (auo *AccountUpdateOne) AddEvents(e ...*EventParticipant) *AccountUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AccountUpdateOne) AddEvents(v ...*EventParticipant) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddEventIDs(ids...)
+	return _u.AddEventIDs(ids...)
 }
 
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
-func (auo *AccountUpdateOne) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.AddAccountRoleIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddAccountRoleIDs(ids...)
+	return _u
 }
 
 // AddAccountRoles adds the "account_roles" edges to the AccountRoles entity.
-func (auo *AccountUpdateOne) AddAccountRoles(a ...*AccountRoles) *AccountUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdateOne) AddAccountRoles(v ...*AccountRoles) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.AddAccountRoleIDs(ids...)
+	return _u.AddAccountRoleIDs(ids...)
 }
 
 // Mutation returns the AccountMutation object of the builder.
-func (auo *AccountUpdateOne) Mutation() *AccountMutation {
-	return auo.mutation
+func (_u *AccountUpdateOne) Mutation() *AccountMutation {
+	return _u.mutation
 }
 
 // ClearSessions clears all "sessions" edges to the Session entity.
-func (auo *AccountUpdateOne) ClearSessions() *AccountUpdateOne {
-	auo.mutation.ClearSessions()
-	return auo
+func (_u *AccountUpdateOne) ClearSessions() *AccountUpdateOne {
+	_u.mutation.ClearSessions()
+	return _u
 }
 
 // RemoveSessionIDs removes the "sessions" edge to Session entities by IDs.
-func (auo *AccountUpdateOne) RemoveSessionIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveSessionIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveSessionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveSessionIDs(ids...)
+	return _u
 }
 
 // RemoveSessions removes "sessions" edges to Session entities.
-func (auo *AccountUpdateOne) RemoveSessions(s ...*Session) *AccountUpdateOne {
-	ids := make([]xid.ID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_u *AccountUpdateOne) RemoveSessions(v ...*Session) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveSessionIDs(ids...)
+	return _u.RemoveSessionIDs(ids...)
 }
 
 // ClearEmails clears all "emails" edges to the Email entity.
-func (auo *AccountUpdateOne) ClearEmails() *AccountUpdateOne {
-	auo.mutation.ClearEmails()
-	return auo
+func (_u *AccountUpdateOne) ClearEmails() *AccountUpdateOne {
+	_u.mutation.ClearEmails()
+	return _u
 }
 
 // RemoveEmailIDs removes the "emails" edge to Email entities by IDs.
-func (auo *AccountUpdateOne) RemoveEmailIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveEmailIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveEmailIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveEmailIDs(ids...)
+	return _u
 }
 
 // RemoveEmails removes "emails" edges to Email entities.
-func (auo *AccountUpdateOne) RemoveEmails(e ...*Email) *AccountUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AccountUpdateOne) RemoveEmails(v ...*Email) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveEmailIDs(ids...)
+	return _u.RemoveEmailIDs(ids...)
 }
 
 // ClearNotifications clears all "notifications" edges to the Notification entity.
-func (auo *AccountUpdateOne) ClearNotifications() *AccountUpdateOne {
-	auo.mutation.ClearNotifications()
-	return auo
+func (_u *AccountUpdateOne) ClearNotifications() *AccountUpdateOne {
+	_u.mutation.ClearNotifications()
+	return _u
 }
 
 // RemoveNotificationIDs removes the "notifications" edge to Notification entities by IDs.
-func (auo *AccountUpdateOne) RemoveNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveNotificationIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveNotificationIDs(ids...)
+	return _u
 }
 
 // RemoveNotifications removes "notifications" edges to Notification entities.
-func (auo *AccountUpdateOne) RemoveNotifications(n ...*Notification) *AccountUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdateOne) RemoveNotifications(v ...*Notification) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveNotificationIDs(ids...)
+	return _u.RemoveNotificationIDs(ids...)
 }
 
 // ClearTriggeredNotifications clears all "triggered_notifications" edges to the Notification entity.
-func (auo *AccountUpdateOne) ClearTriggeredNotifications() *AccountUpdateOne {
-	auo.mutation.ClearTriggeredNotifications()
-	return auo
+func (_u *AccountUpdateOne) ClearTriggeredNotifications() *AccountUpdateOne {
+	_u.mutation.ClearTriggeredNotifications()
+	return _u
 }
 
 // RemoveTriggeredNotificationIDs removes the "triggered_notifications" edge to Notification entities by IDs.
-func (auo *AccountUpdateOne) RemoveTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveTriggeredNotificationIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveTriggeredNotificationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveTriggeredNotificationIDs(ids...)
+	return _u
 }
 
 // RemoveTriggeredNotifications removes "triggered_notifications" edges to Notification entities.
-func (auo *AccountUpdateOne) RemoveTriggeredNotifications(n ...*Notification) *AccountUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdateOne) RemoveTriggeredNotifications(v ...*Notification) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveTriggeredNotificationIDs(ids...)
+	return _u.RemoveTriggeredNotificationIDs(ids...)
 }
 
 // ClearFollowing clears all "following" edges to the AccountFollow entity.
-func (auo *AccountUpdateOne) ClearFollowing() *AccountUpdateOne {
-	auo.mutation.ClearFollowing()
-	return auo
+func (_u *AccountUpdateOne) ClearFollowing() *AccountUpdateOne {
+	_u.mutation.ClearFollowing()
+	return _u
 }
 
 // RemoveFollowingIDs removes the "following" edge to AccountFollow entities by IDs.
-func (auo *AccountUpdateOne) RemoveFollowingIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveFollowingIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveFollowingIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveFollowingIDs(ids...)
+	return _u
 }
 
 // RemoveFollowing removes "following" edges to AccountFollow entities.
-func (auo *AccountUpdateOne) RemoveFollowing(a ...*AccountFollow) *AccountUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdateOne) RemoveFollowing(v ...*AccountFollow) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveFollowingIDs(ids...)
+	return _u.RemoveFollowingIDs(ids...)
 }
 
 // ClearFollowedBy clears all "followed_by" edges to the AccountFollow entity.
-func (auo *AccountUpdateOne) ClearFollowedBy() *AccountUpdateOne {
-	auo.mutation.ClearFollowedBy()
-	return auo
+func (_u *AccountUpdateOne) ClearFollowedBy() *AccountUpdateOne {
+	_u.mutation.ClearFollowedBy()
+	return _u
 }
 
 // RemoveFollowedByIDs removes the "followed_by" edge to AccountFollow entities by IDs.
-func (auo *AccountUpdateOne) RemoveFollowedByIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveFollowedByIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveFollowedByIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveFollowedByIDs(ids...)
+	return _u
 }
 
 // RemoveFollowedBy removes "followed_by" edges to AccountFollow entities.
-func (auo *AccountUpdateOne) RemoveFollowedBy(a ...*AccountFollow) *AccountUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdateOne) RemoveFollowedBy(v ...*AccountFollow) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveFollowedByIDs(ids...)
+	return _u.RemoveFollowedByIDs(ids...)
 }
 
 // ClearInvitations clears all "invitations" edges to the Invitation entity.
-func (auo *AccountUpdateOne) ClearInvitations() *AccountUpdateOne {
-	auo.mutation.ClearInvitations()
-	return auo
+func (_u *AccountUpdateOne) ClearInvitations() *AccountUpdateOne {
+	_u.mutation.ClearInvitations()
+	return _u
 }
 
 // RemoveInvitationIDs removes the "invitations" edge to Invitation entities by IDs.
-func (auo *AccountUpdateOne) RemoveInvitationIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveInvitationIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveInvitationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveInvitationIDs(ids...)
+	return _u
 }
 
 // RemoveInvitations removes "invitations" edges to Invitation entities.
-func (auo *AccountUpdateOne) RemoveInvitations(i ...*Invitation) *AccountUpdateOne {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+func (_u *AccountUpdateOne) RemoveInvitations(v ...*Invitation) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveInvitationIDs(ids...)
+	return _u.RemoveInvitationIDs(ids...)
 }
 
 // ClearInvitedBy clears the "invited_by" edge to the Invitation entity.
-func (auo *AccountUpdateOne) ClearInvitedBy() *AccountUpdateOne {
-	auo.mutation.ClearInvitedBy()
-	return auo
+func (_u *AccountUpdateOne) ClearInvitedBy() *AccountUpdateOne {
+	_u.mutation.ClearInvitedBy()
+	return _u
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (auo *AccountUpdateOne) ClearPosts() *AccountUpdateOne {
-	auo.mutation.ClearPosts()
-	return auo
+func (_u *AccountUpdateOne) ClearPosts() *AccountUpdateOne {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (auo *AccountUpdateOne) RemovePostIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemovePostIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemovePostIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (auo *AccountUpdateOne) RemovePosts(p ...*Post) *AccountUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *AccountUpdateOne) RemovePosts(v ...*Post) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearQuestions clears all "questions" edges to the Question entity.
-func (auo *AccountUpdateOne) ClearQuestions() *AccountUpdateOne {
-	auo.mutation.ClearQuestions()
-	return auo
+func (_u *AccountUpdateOne) ClearQuestions() *AccountUpdateOne {
+	_u.mutation.ClearQuestions()
+	return _u
 }
 
 // RemoveQuestionIDs removes the "questions" edge to Question entities by IDs.
-func (auo *AccountUpdateOne) RemoveQuestionIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveQuestionIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveQuestionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveQuestionIDs(ids...)
+	return _u
 }
 
 // RemoveQuestions removes "questions" edges to Question entities.
-func (auo *AccountUpdateOne) RemoveQuestions(q ...*Question) *AccountUpdateOne {
-	ids := make([]xid.ID, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+func (_u *AccountUpdateOne) RemoveQuestions(v ...*Question) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveQuestionIDs(ids...)
+	return _u.RemoveQuestionIDs(ids...)
 }
 
 // ClearReacts clears all "reacts" edges to the React entity.
-func (auo *AccountUpdateOne) ClearReacts() *AccountUpdateOne {
-	auo.mutation.ClearReacts()
-	return auo
+func (_u *AccountUpdateOne) ClearReacts() *AccountUpdateOne {
+	_u.mutation.ClearReacts()
+	return _u
 }
 
 // RemoveReactIDs removes the "reacts" edge to React entities by IDs.
-func (auo *AccountUpdateOne) RemoveReactIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveReactIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveReactIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveReactIDs(ids...)
+	return _u
 }
 
 // RemoveReacts removes "reacts" edges to React entities.
-func (auo *AccountUpdateOne) RemoveReacts(r ...*React) *AccountUpdateOne {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *AccountUpdateOne) RemoveReacts(v ...*React) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveReactIDs(ids...)
+	return _u.RemoveReactIDs(ids...)
 }
 
 // ClearLikes clears all "likes" edges to the LikePost entity.
-func (auo *AccountUpdateOne) ClearLikes() *AccountUpdateOne {
-	auo.mutation.ClearLikes()
-	return auo
+func (_u *AccountUpdateOne) ClearLikes() *AccountUpdateOne {
+	_u.mutation.ClearLikes()
+	return _u
 }
 
 // RemoveLikeIDs removes the "likes" edge to LikePost entities by IDs.
-func (auo *AccountUpdateOne) RemoveLikeIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveLikeIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveLikeIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveLikeIDs(ids...)
+	return _u
 }
 
 // RemoveLikes removes "likes" edges to LikePost entities.
-func (auo *AccountUpdateOne) RemoveLikes(l ...*LikePost) *AccountUpdateOne {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *AccountUpdateOne) RemoveLikes(v ...*LikePost) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveLikeIDs(ids...)
+	return _u.RemoveLikeIDs(ids...)
 }
 
 // ClearMentions clears all "mentions" edges to the MentionProfile entity.
-func (auo *AccountUpdateOne) ClearMentions() *AccountUpdateOne {
-	auo.mutation.ClearMentions()
-	return auo
+func (_u *AccountUpdateOne) ClearMentions() *AccountUpdateOne {
+	_u.mutation.ClearMentions()
+	return _u
 }
 
 // RemoveMentionIDs removes the "mentions" edge to MentionProfile entities by IDs.
-func (auo *AccountUpdateOne) RemoveMentionIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveMentionIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveMentionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveMentionIDs(ids...)
+	return _u
 }
 
 // RemoveMentions removes "mentions" edges to MentionProfile entities.
-func (auo *AccountUpdateOne) RemoveMentions(m ...*MentionProfile) *AccountUpdateOne {
-	ids := make([]xid.ID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *AccountUpdateOne) RemoveMentions(v ...*MentionProfile) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveMentionIDs(ids...)
+	return _u.RemoveMentionIDs(ids...)
 }
 
 // ClearRoles clears all "roles" edges to the Role entity.
-func (auo *AccountUpdateOne) ClearRoles() *AccountUpdateOne {
-	auo.mutation.ClearRoles()
-	return auo
+func (_u *AccountUpdateOne) ClearRoles() *AccountUpdateOne {
+	_u.mutation.ClearRoles()
+	return _u
 }
 
 // RemoveRoleIDs removes the "roles" edge to Role entities by IDs.
-func (auo *AccountUpdateOne) RemoveRoleIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveRoleIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveRoleIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveRoleIDs(ids...)
+	return _u
 }
 
 // RemoveRoles removes "roles" edges to Role entities.
-func (auo *AccountUpdateOne) RemoveRoles(r ...*Role) *AccountUpdateOne {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *AccountUpdateOne) RemoveRoles(v ...*Role) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveRoleIDs(ids...)
+	return _u.RemoveRoleIDs(ids...)
 }
 
 // ClearAuthentication clears all "authentication" edges to the Authentication entity.
-func (auo *AccountUpdateOne) ClearAuthentication() *AccountUpdateOne {
-	auo.mutation.ClearAuthentication()
-	return auo
+func (_u *AccountUpdateOne) ClearAuthentication() *AccountUpdateOne {
+	_u.mutation.ClearAuthentication()
+	return _u
 }
 
 // RemoveAuthenticationIDs removes the "authentication" edge to Authentication entities by IDs.
-func (auo *AccountUpdateOne) RemoveAuthenticationIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveAuthenticationIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveAuthenticationIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveAuthenticationIDs(ids...)
+	return _u
 }
 
 // RemoveAuthentication removes "authentication" edges to Authentication entities.
-func (auo *AccountUpdateOne) RemoveAuthentication(a ...*Authentication) *AccountUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdateOne) RemoveAuthentication(v ...*Authentication) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveAuthenticationIDs(ids...)
+	return _u.RemoveAuthenticationIDs(ids...)
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
-func (auo *AccountUpdateOne) ClearTags() *AccountUpdateOne {
-	auo.mutation.ClearTags()
-	return auo
+func (_u *AccountUpdateOne) ClearTags() *AccountUpdateOne {
+	_u.mutation.ClearTags()
+	return _u
 }
 
 // RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
-func (auo *AccountUpdateOne) RemoveTagIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveTagIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveTagIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveTagIDs(ids...)
+	return _u
 }
 
 // RemoveTags removes "tags" edges to Tag entities.
-func (auo *AccountUpdateOne) RemoveTags(t ...*Tag) *AccountUpdateOne {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *AccountUpdateOne) RemoveTags(v ...*Tag) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveTagIDs(ids...)
+	return _u.RemoveTagIDs(ids...)
 }
 
 // ClearCollections clears all "collections" edges to the Collection entity.
-func (auo *AccountUpdateOne) ClearCollections() *AccountUpdateOne {
-	auo.mutation.ClearCollections()
-	return auo
+func (_u *AccountUpdateOne) ClearCollections() *AccountUpdateOne {
+	_u.mutation.ClearCollections()
+	return _u
 }
 
 // RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
-func (auo *AccountUpdateOne) RemoveCollectionIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveCollectionIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveCollectionIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveCollectionIDs(ids...)
+	return _u
 }
 
 // RemoveCollections removes "collections" edges to Collection entities.
-func (auo *AccountUpdateOne) RemoveCollections(c ...*Collection) *AccountUpdateOne {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *AccountUpdateOne) RemoveCollections(v ...*Collection) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveCollectionIDs(ids...)
+	return _u.RemoveCollectionIDs(ids...)
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (auo *AccountUpdateOne) ClearNodes() *AccountUpdateOne {
-	auo.mutation.ClearNodes()
-	return auo
+func (_u *AccountUpdateOne) ClearNodes() *AccountUpdateOne {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (auo *AccountUpdateOne) RemoveNodeIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveNodeIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveNodeIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (auo *AccountUpdateOne) RemoveNodes(n ...*Node) *AccountUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *AccountUpdateOne) RemoveNodes(v ...*Node) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
-func (auo *AccountUpdateOne) ClearAssets() *AccountUpdateOne {
-	auo.mutation.ClearAssets()
-	return auo
+func (_u *AccountUpdateOne) ClearAssets() *AccountUpdateOne {
+	_u.mutation.ClearAssets()
+	return _u
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (auo *AccountUpdateOne) RemoveAssetIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveAssetIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveAssetIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveAssetIDs(ids...)
+	return _u
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
-func (auo *AccountUpdateOne) RemoveAssets(a ...*Asset) *AccountUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdateOne) RemoveAssets(v ...*Asset) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveAssetIDs(ids...)
+	return _u.RemoveAssetIDs(ids...)
 }
 
 // ClearEvents clears all "events" edges to the EventParticipant entity.
-func (auo *AccountUpdateOne) ClearEvents() *AccountUpdateOne {
-	auo.mutation.ClearEvents()
-	return auo
+func (_u *AccountUpdateOne) ClearEvents() *AccountUpdateOne {
+	_u.mutation.ClearEvents()
+	return _u
 }
 
 // RemoveEventIDs removes the "events" edge to EventParticipant entities by IDs.
-func (auo *AccountUpdateOne) RemoveEventIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveEventIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveEventIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveEventIDs(ids...)
+	return _u
 }
 
 // RemoveEvents removes "events" edges to EventParticipant entities.
-func (auo *AccountUpdateOne) RemoveEvents(e ...*EventParticipant) *AccountUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *AccountUpdateOne) RemoveEvents(v ...*EventParticipant) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveEventIDs(ids...)
+	return _u.RemoveEventIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
-func (auo *AccountUpdateOne) ClearAccountRoles() *AccountUpdateOne {
-	auo.mutation.ClearAccountRoles()
-	return auo
+func (_u *AccountUpdateOne) ClearAccountRoles() *AccountUpdateOne {
+	_u.mutation.ClearAccountRoles()
+	return _u
 }
 
 // RemoveAccountRoleIDs removes the "account_roles" edge to AccountRoles entities by IDs.
-func (auo *AccountUpdateOne) RemoveAccountRoleIDs(ids ...xid.ID) *AccountUpdateOne {
-	auo.mutation.RemoveAccountRoleIDs(ids...)
-	return auo
+func (_u *AccountUpdateOne) RemoveAccountRoleIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemoveAccountRoleIDs(ids...)
+	return _u
 }
 
 // RemoveAccountRoles removes "account_roles" edges to AccountRoles entities.
-func (auo *AccountUpdateOne) RemoveAccountRoles(a ...*AccountRoles) *AccountUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *AccountUpdateOne) RemoveAccountRoles(v ...*AccountRoles) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return auo.RemoveAccountRoleIDs(ids...)
+	return _u.RemoveAccountRoleIDs(ids...)
 }
 
 // Where appends a list predicates to the AccountUpdate builder.
-func (auo *AccountUpdateOne) Where(ps ...predicate.Account) *AccountUpdateOne {
-	auo.mutation.Where(ps...)
-	return auo
+func (_u *AccountUpdateOne) Where(ps ...predicate.Account) *AccountUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (auo *AccountUpdateOne) Select(field string, fields ...string) *AccountUpdateOne {
-	auo.fields = append([]string{field}, fields...)
-	return auo
+func (_u *AccountUpdateOne) Select(field string, fields ...string) *AccountUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Account entity.
-func (auo *AccountUpdateOne) Save(ctx context.Context) (*Account, error) {
-	auo.defaults()
-	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
+func (_u *AccountUpdateOne) Save(ctx context.Context) (*Account, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (auo *AccountUpdateOne) SaveX(ctx context.Context) *Account {
-	node, err := auo.Save(ctx)
+func (_u *AccountUpdateOne) SaveX(ctx context.Context) *Account {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -2991,39 +2991,39 @@ func (auo *AccountUpdateOne) SaveX(ctx context.Context) *Account {
 }
 
 // Exec executes the query on the entity.
-func (auo *AccountUpdateOne) Exec(ctx context.Context) error {
-	_, err := auo.Save(ctx)
+func (_u *AccountUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (auo *AccountUpdateOne) ExecX(ctx context.Context) {
-	if err := auo.Exec(ctx); err != nil {
+func (_u *AccountUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (auo *AccountUpdateOne) defaults() {
-	if _, ok := auo.mutation.UpdatedAt(); !ok {
+func (_u *AccountUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := account.UpdateDefaultUpdatedAt()
-		auo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (auo *AccountUpdateOne) check() error {
-	if v, ok := auo.mutation.Handle(); ok {
+func (_u *AccountUpdateOne) check() error {
+	if v, ok := _u.mutation.Handle(); ok {
 		if err := account.HandleValidator(v); err != nil {
 			return &ValidationError{Name: "handle", err: fmt.Errorf(`ent: validator failed for field "Account.handle": %w`, err)}
 		}
 	}
-	if v, ok := auo.mutation.Name(); ok {
+	if v, ok := _u.mutation.Name(); ok {
 		if err := account.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Account.name": %w`, err)}
 		}
 	}
-	if v, ok := auo.mutation.Kind(); ok {
+	if v, ok := _u.mutation.Kind(); ok {
 		if err := account.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Account.kind": %w`, err)}
 		}
@@ -3032,22 +3032,22 @@ func (auo *AccountUpdateOne) check() error {
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (auo *AccountUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AccountUpdateOne {
-	auo.modifiers = append(auo.modifiers, modifiers...)
-	return auo
+func (_u *AccountUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AccountUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err error) {
-	if err := auo.check(); err != nil {
+func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(account.Table, account.Columns, sqlgraph.NewFieldSpec(account.FieldID, field.TypeString))
-	id, ok := auo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Account.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := auo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, account.FieldID)
 		for _, f := range fields {
@@ -3059,64 +3059,64 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 			}
 		}
 	}
-	if ps := auo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := auo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(account.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := auo.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(account.FieldDeletedAt, field.TypeTime, value)
 	}
-	if auo.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(account.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := auo.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(account.FieldIndexedAt, field.TypeTime, value)
 	}
-	if auo.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(account.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := auo.mutation.Handle(); ok {
+	if value, ok := _u.mutation.Handle(); ok {
 		_spec.SetField(account.FieldHandle, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(account.FieldName, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Bio(); ok {
+	if value, ok := _u.mutation.Bio(); ok {
 		_spec.SetField(account.FieldBio, field.TypeString, value)
 	}
-	if auo.mutation.BioCleared() {
+	if _u.mutation.BioCleared() {
 		_spec.ClearField(account.FieldBio, field.TypeString)
 	}
-	if value, ok := auo.mutation.Kind(); ok {
+	if value, ok := _u.mutation.Kind(); ok {
 		_spec.SetField(account.FieldKind, field.TypeEnum, value)
 	}
-	if value, ok := auo.mutation.Admin(); ok {
+	if value, ok := _u.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
 	}
-	if value, ok := auo.mutation.Links(); ok {
+	if value, ok := _u.mutation.Links(); ok {
 		_spec.SetField(account.FieldLinks, field.TypeJSON, value)
 	}
-	if value, ok := auo.mutation.AppendedLinks(); ok {
+	if value, ok := _u.mutation.AppendedLinks(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, account.FieldLinks, value)
 		})
 	}
-	if auo.mutation.LinksCleared() {
+	if _u.mutation.LinksCleared() {
 		_spec.ClearField(account.FieldLinks, field.TypeJSON)
 	}
-	if value, ok := auo.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(account.FieldMetadata, field.TypeJSON, value)
 	}
-	if auo.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(account.FieldMetadata, field.TypeJSON)
 	}
-	if auo.mutation.SessionsCleared() {
+	if _u.mutation.SessionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3129,23 +3129,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedSessionsIDs(); len(nodes) > 0 && !auo.mutation.SessionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.SessionsTable,
-			Columns: []string{account.SessionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.SessionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedSessionsIDs(); len(nodes) > 0 && !_u.mutation.SessionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3159,9 +3143,25 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.SessionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.SessionsTable,
+			Columns: []string{account.SessionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.EmailsCleared() {
+	if _u.mutation.EmailsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3174,7 +3174,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedEmailsIDs(); len(nodes) > 0 && !auo.mutation.EmailsCleared() {
+	if nodes := _u.mutation.RemovedEmailsIDs(); len(nodes) > 0 && !_u.mutation.EmailsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3190,7 +3190,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.EmailsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EmailsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3206,7 +3206,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.NotificationsCleared() {
+	if _u.mutation.NotificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3219,23 +3219,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedNotificationsIDs(); len(nodes) > 0 && !auo.mutation.NotificationsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.NotificationsTable,
-			Columns: []string{account.NotificationsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.NotificationsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedNotificationsIDs(); len(nodes) > 0 && !_u.mutation.NotificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3249,9 +3233,25 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.NotificationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NotificationsTable,
+			Columns: []string{account.NotificationsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(notification.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.TriggeredNotificationsCleared() {
+	if _u.mutation.TriggeredNotificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3264,7 +3264,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedTriggeredNotificationsIDs(); len(nodes) > 0 && !auo.mutation.TriggeredNotificationsCleared() {
+	if nodes := _u.mutation.RemovedTriggeredNotificationsIDs(); len(nodes) > 0 && !_u.mutation.TriggeredNotificationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3280,7 +3280,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.TriggeredNotificationsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TriggeredNotificationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3296,7 +3296,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.FollowingCleared() {
+	if _u.mutation.FollowingCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3309,7 +3309,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedFollowingIDs(); len(nodes) > 0 && !auo.mutation.FollowingCleared() {
+	if nodes := _u.mutation.RemovedFollowingIDs(); len(nodes) > 0 && !_u.mutation.FollowingCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3325,7 +3325,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.FollowingIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.FollowingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3341,7 +3341,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.FollowedByCleared() {
+	if _u.mutation.FollowedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3354,7 +3354,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedFollowedByIDs(); len(nodes) > 0 && !auo.mutation.FollowedByCleared() {
+	if nodes := _u.mutation.RemovedFollowedByIDs(); len(nodes) > 0 && !_u.mutation.FollowedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3370,7 +3370,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.FollowedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.FollowedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3386,7 +3386,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.InvitationsCleared() {
+	if _u.mutation.InvitationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3399,7 +3399,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedInvitationsIDs(); len(nodes) > 0 && !auo.mutation.InvitationsCleared() {
+	if nodes := _u.mutation.RemovedInvitationsIDs(); len(nodes) > 0 && !_u.mutation.InvitationsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3415,7 +3415,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.InvitationsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.InvitationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3431,7 +3431,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.InvitedByCleared() {
+	if _u.mutation.InvitedByCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -3444,7 +3444,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.InvitedByIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.InvitedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -3460,7 +3460,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3473,23 +3473,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedPostsIDs(); len(nodes) > 0 && !auo.mutation.PostsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.PostsTable,
-			Columns: []string{account.PostsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3503,9 +3487,25 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PostsTable,
+			Columns: []string{account.PostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.QuestionsCleared() {
+	if _u.mutation.QuestionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3518,7 +3518,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedQuestionsIDs(); len(nodes) > 0 && !auo.mutation.QuestionsCleared() {
+	if nodes := _u.mutation.RemovedQuestionsIDs(); len(nodes) > 0 && !_u.mutation.QuestionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3534,7 +3534,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.QuestionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.QuestionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3550,7 +3550,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.ReactsCleared() {
+	if _u.mutation.ReactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3563,23 +3563,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedReactsIDs(); len(nodes) > 0 && !auo.mutation.ReactsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.ReactsTable,
-			Columns: []string{account.ReactsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.ReactsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedReactsIDs(); len(nodes) > 0 && !_u.mutation.ReactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3593,9 +3577,25 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ReactsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.ReactsTable,
+			Columns: []string{account.ReactsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(react.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.LikesCleared() {
+	if _u.mutation.LikesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3608,7 +3608,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedLikesIDs(); len(nodes) > 0 && !auo.mutation.LikesCleared() {
+	if nodes := _u.mutation.RemovedLikesIDs(); len(nodes) > 0 && !_u.mutation.LikesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3624,7 +3624,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.LikesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.LikesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3640,7 +3640,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.MentionsCleared() {
+	if _u.mutation.MentionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3653,23 +3653,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !auo.mutation.MentionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.MentionsTable,
-			Columns: []string{account.MentionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.MentionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !_u.mutation.MentionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3683,9 +3667,25 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.MentionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.MentionsTable,
+			Columns: []string{account.MentionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.RolesCleared() {
+	if _u.mutation.RolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -3696,7 +3696,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 				IDSpec: sqlgraph.NewFieldSpec(role.FieldID, field.TypeString),
 			},
 		}
-		createE := &AccountRolesCreate{config: auo.config, mutation: newAccountRolesMutation(auo.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -3705,7 +3705,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedRolesIDs(); len(nodes) > 0 && !auo.mutation.RolesCleared() {
+	if nodes := _u.mutation.RemovedRolesIDs(); len(nodes) > 0 && !_u.mutation.RolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -3719,7 +3719,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &AccountRolesCreate{config: auo.config, mutation: newAccountRolesMutation(auo.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -3728,7 +3728,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RolesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -3742,7 +3742,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &AccountRolesCreate{config: auo.config, mutation: newAccountRolesMutation(auo.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -3751,7 +3751,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.AuthenticationCleared() {
+	if _u.mutation.AuthenticationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3764,7 +3764,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedAuthenticationIDs(); len(nodes) > 0 && !auo.mutation.AuthenticationCleared() {
+	if nodes := _u.mutation.RemovedAuthenticationIDs(); len(nodes) > 0 && !_u.mutation.AuthenticationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3780,7 +3780,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.AuthenticationIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AuthenticationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3796,7 +3796,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.TagsCleared() {
+	if _u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -3809,23 +3809,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedTagsIDs(); len(nodes) > 0 && !auo.mutation.TagsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   account.TagsTable,
-			Columns: account.TagsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.TagsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedTagsIDs(); len(nodes) > 0 && !_u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -3839,9 +3823,25 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.TagsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   account.TagsTable,
+			Columns: account.TagsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tag.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.CollectionsCleared() {
+	if _u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3854,7 +3854,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !auo.mutation.CollectionsCleared() {
+	if nodes := _u.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !_u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3870,7 +3870,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.CollectionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CollectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3886,7 +3886,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3899,23 +3899,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !auo.mutation.NodesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   account.NodesTable,
-			Columns: []string{account.NodesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3929,9 +3913,25 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.NodesTable,
+			Columns: []string{account.NodesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.AssetsCleared() {
+	if _u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3944,7 +3944,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !auo.mutation.AssetsCleared() {
+	if nodes := _u.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !_u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3960,7 +3960,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3976,7 +3976,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.EventsCleared() {
+	if _u.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -3989,7 +3989,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedEventsIDs(); len(nodes) > 0 && !auo.mutation.EventsCleared() {
+	if nodes := _u.mutation.RemovedEventsIDs(); len(nodes) > 0 && !_u.mutation.EventsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -4005,7 +4005,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.EventsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EventsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -4021,7 +4021,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.AccountRolesCleared() {
+	if _u.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -4034,7 +4034,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedAccountRolesIDs(); len(nodes) > 0 && !auo.mutation.AccountRolesCleared() {
+	if nodes := _u.mutation.RemovedAccountRolesIDs(); len(nodes) > 0 && !_u.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -4050,7 +4050,7 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.AccountRolesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountRolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -4066,11 +4066,11 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(auo.modifiers...)
-	_node = &Account{config: auo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Account{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, auo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{account.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -4078,6 +4078,6 @@ func (auo *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err e
 		}
 		return nil, err
 	}
-	auo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

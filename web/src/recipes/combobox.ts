@@ -1,4 +1,4 @@
-import { comboboxAnatomy } from "@ark-ui/anatomy";
+import { comboboxAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
 export const combobox = defineSlotRecipe({

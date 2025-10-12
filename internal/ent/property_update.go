@@ -26,94 +26,94 @@ type PropertyUpdate struct {
 }
 
 // Where appends a list predicates to the PropertyUpdate builder.
-func (pu *PropertyUpdate) Where(ps ...predicate.Property) *PropertyUpdate {
-	pu.mutation.Where(ps...)
-	return pu
+func (_u *PropertyUpdate) Where(ps ...predicate.Property) *PropertyUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetNodeID sets the "node_id" field.
-func (pu *PropertyUpdate) SetNodeID(x xid.ID) *PropertyUpdate {
-	pu.mutation.SetNodeID(x)
-	return pu
+func (_u *PropertyUpdate) SetNodeID(v xid.ID) *PropertyUpdate {
+	_u.mutation.SetNodeID(v)
+	return _u
 }
 
 // SetNillableNodeID sets the "node_id" field if the given value is not nil.
-func (pu *PropertyUpdate) SetNillableNodeID(x *xid.ID) *PropertyUpdate {
-	if x != nil {
-		pu.SetNodeID(*x)
+func (_u *PropertyUpdate) SetNillableNodeID(v *xid.ID) *PropertyUpdate {
+	if v != nil {
+		_u.SetNodeID(*v)
 	}
-	return pu
+	return _u
 }
 
 // SetFieldID sets the "field_id" field.
-func (pu *PropertyUpdate) SetFieldID(x xid.ID) *PropertyUpdate {
-	pu.mutation.SetFieldID(x)
-	return pu
+func (_u *PropertyUpdate) SetFieldID(v xid.ID) *PropertyUpdate {
+	_u.mutation.SetFieldID(v)
+	return _u
 }
 
 // SetNillableFieldID sets the "field_id" field if the given value is not nil.
-func (pu *PropertyUpdate) SetNillableFieldID(x *xid.ID) *PropertyUpdate {
-	if x != nil {
-		pu.SetFieldID(*x)
+func (_u *PropertyUpdate) SetNillableFieldID(v *xid.ID) *PropertyUpdate {
+	if v != nil {
+		_u.SetFieldID(*v)
 	}
-	return pu
+	return _u
 }
 
 // SetValue sets the "value" field.
-func (pu *PropertyUpdate) SetValue(s string) *PropertyUpdate {
-	pu.mutation.SetValue(s)
-	return pu
+func (_u *PropertyUpdate) SetValue(v string) *PropertyUpdate {
+	_u.mutation.SetValue(v)
+	return _u
 }
 
 // SetNillableValue sets the "value" field if the given value is not nil.
-func (pu *PropertyUpdate) SetNillableValue(s *string) *PropertyUpdate {
-	if s != nil {
-		pu.SetValue(*s)
+func (_u *PropertyUpdate) SetNillableValue(v *string) *PropertyUpdate {
+	if v != nil {
+		_u.SetValue(*v)
 	}
-	return pu
+	return _u
 }
 
 // SetNode sets the "node" edge to the Node entity.
-func (pu *PropertyUpdate) SetNode(n *Node) *PropertyUpdate {
-	return pu.SetNodeID(n.ID)
+func (_u *PropertyUpdate) SetNode(v *Node) *PropertyUpdate {
+	return _u.SetNodeID(v.ID)
 }
 
 // SetSchemaID sets the "schema" edge to the PropertySchemaField entity by ID.
-func (pu *PropertyUpdate) SetSchemaID(id xid.ID) *PropertyUpdate {
-	pu.mutation.SetSchemaID(id)
-	return pu
+func (_u *PropertyUpdate) SetSchemaID(id xid.ID) *PropertyUpdate {
+	_u.mutation.SetSchemaID(id)
+	return _u
 }
 
 // SetSchema sets the "schema" edge to the PropertySchemaField entity.
-func (pu *PropertyUpdate) SetSchema(p *PropertySchemaField) *PropertyUpdate {
-	return pu.SetSchemaID(p.ID)
+func (_u *PropertyUpdate) SetSchema(v *PropertySchemaField) *PropertyUpdate {
+	return _u.SetSchemaID(v.ID)
 }
 
 // Mutation returns the PropertyMutation object of the builder.
-func (pu *PropertyUpdate) Mutation() *PropertyMutation {
-	return pu.mutation
+func (_u *PropertyUpdate) Mutation() *PropertyMutation {
+	return _u.mutation
 }
 
 // ClearNode clears the "node" edge to the Node entity.
-func (pu *PropertyUpdate) ClearNode() *PropertyUpdate {
-	pu.mutation.ClearNode()
-	return pu
+func (_u *PropertyUpdate) ClearNode() *PropertyUpdate {
+	_u.mutation.ClearNode()
+	return _u
 }
 
 // ClearSchema clears the "schema" edge to the PropertySchemaField entity.
-func (pu *PropertyUpdate) ClearSchema() *PropertyUpdate {
-	pu.mutation.ClearSchema()
-	return pu
+func (_u *PropertyUpdate) ClearSchema() *PropertyUpdate {
+	_u.mutation.ClearSchema()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (pu *PropertyUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, pu.sqlSave, pu.mutation, pu.hooks)
+func (_u *PropertyUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (pu *PropertyUpdate) SaveX(ctx context.Context) int {
-	affected, err := pu.Save(ctx)
+func (_u *PropertyUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -121,51 +121,51 @@ func (pu *PropertyUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (pu *PropertyUpdate) Exec(ctx context.Context) error {
-	_, err := pu.Save(ctx)
+func (_u *PropertyUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pu *PropertyUpdate) ExecX(ctx context.Context) {
-	if err := pu.Exec(ctx); err != nil {
+func (_u *PropertyUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (pu *PropertyUpdate) check() error {
-	if pu.mutation.NodeCleared() && len(pu.mutation.NodeIDs()) > 0 {
+func (_u *PropertyUpdate) check() error {
+	if _u.mutation.NodeCleared() && len(_u.mutation.NodeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Property.node"`)
 	}
-	if pu.mutation.SchemaCleared() && len(pu.mutation.SchemaIDs()) > 0 {
+	if _u.mutation.SchemaCleared() && len(_u.mutation.SchemaIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Property.schema"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (pu *PropertyUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PropertyUpdate {
-	pu.modifiers = append(pu.modifiers, modifiers...)
-	return pu
+func (_u *PropertyUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PropertyUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (pu *PropertyUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := pu.check(); err != nil {
-		return n, err
+func (_u *PropertyUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(property.Table, property.Columns, sqlgraph.NewFieldSpec(property.FieldID, field.TypeString))
-	if ps := pu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := pu.mutation.Value(); ok {
+	if value, ok := _u.mutation.Value(); ok {
 		_spec.SetField(property.FieldValue, field.TypeString, value)
 	}
-	if pu.mutation.NodeCleared() {
+	if _u.mutation.NodeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -178,7 +178,7 @@ func (pu *PropertyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.NodeIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -194,7 +194,7 @@ func (pu *PropertyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.SchemaCleared() {
+	if _u.mutation.SchemaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -207,7 +207,7 @@ func (pu *PropertyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.SchemaIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.SchemaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -223,8 +223,8 @@ func (pu *PropertyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(pu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{property.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -232,8 +232,8 @@ func (pu *PropertyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	pu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // PropertyUpdateOne is the builder for updating a single Property entity.
@@ -246,101 +246,101 @@ type PropertyUpdateOne struct {
 }
 
 // SetNodeID sets the "node_id" field.
-func (puo *PropertyUpdateOne) SetNodeID(x xid.ID) *PropertyUpdateOne {
-	puo.mutation.SetNodeID(x)
-	return puo
+func (_u *PropertyUpdateOne) SetNodeID(v xid.ID) *PropertyUpdateOne {
+	_u.mutation.SetNodeID(v)
+	return _u
 }
 
 // SetNillableNodeID sets the "node_id" field if the given value is not nil.
-func (puo *PropertyUpdateOne) SetNillableNodeID(x *xid.ID) *PropertyUpdateOne {
-	if x != nil {
-		puo.SetNodeID(*x)
+func (_u *PropertyUpdateOne) SetNillableNodeID(v *xid.ID) *PropertyUpdateOne {
+	if v != nil {
+		_u.SetNodeID(*v)
 	}
-	return puo
+	return _u
 }
 
 // SetFieldID sets the "field_id" field.
-func (puo *PropertyUpdateOne) SetFieldID(x xid.ID) *PropertyUpdateOne {
-	puo.mutation.SetFieldID(x)
-	return puo
+func (_u *PropertyUpdateOne) SetFieldID(v xid.ID) *PropertyUpdateOne {
+	_u.mutation.SetFieldID(v)
+	return _u
 }
 
 // SetNillableFieldID sets the "field_id" field if the given value is not nil.
-func (puo *PropertyUpdateOne) SetNillableFieldID(x *xid.ID) *PropertyUpdateOne {
-	if x != nil {
-		puo.SetFieldID(*x)
+func (_u *PropertyUpdateOne) SetNillableFieldID(v *xid.ID) *PropertyUpdateOne {
+	if v != nil {
+		_u.SetFieldID(*v)
 	}
-	return puo
+	return _u
 }
 
 // SetValue sets the "value" field.
-func (puo *PropertyUpdateOne) SetValue(s string) *PropertyUpdateOne {
-	puo.mutation.SetValue(s)
-	return puo
+func (_u *PropertyUpdateOne) SetValue(v string) *PropertyUpdateOne {
+	_u.mutation.SetValue(v)
+	return _u
 }
 
 // SetNillableValue sets the "value" field if the given value is not nil.
-func (puo *PropertyUpdateOne) SetNillableValue(s *string) *PropertyUpdateOne {
-	if s != nil {
-		puo.SetValue(*s)
+func (_u *PropertyUpdateOne) SetNillableValue(v *string) *PropertyUpdateOne {
+	if v != nil {
+		_u.SetValue(*v)
 	}
-	return puo
+	return _u
 }
 
 // SetNode sets the "node" edge to the Node entity.
-func (puo *PropertyUpdateOne) SetNode(n *Node) *PropertyUpdateOne {
-	return puo.SetNodeID(n.ID)
+func (_u *PropertyUpdateOne) SetNode(v *Node) *PropertyUpdateOne {
+	return _u.SetNodeID(v.ID)
 }
 
 // SetSchemaID sets the "schema" edge to the PropertySchemaField entity by ID.
-func (puo *PropertyUpdateOne) SetSchemaID(id xid.ID) *PropertyUpdateOne {
-	puo.mutation.SetSchemaID(id)
-	return puo
+func (_u *PropertyUpdateOne) SetSchemaID(id xid.ID) *PropertyUpdateOne {
+	_u.mutation.SetSchemaID(id)
+	return _u
 }
 
 // SetSchema sets the "schema" edge to the PropertySchemaField entity.
-func (puo *PropertyUpdateOne) SetSchema(p *PropertySchemaField) *PropertyUpdateOne {
-	return puo.SetSchemaID(p.ID)
+func (_u *PropertyUpdateOne) SetSchema(v *PropertySchemaField) *PropertyUpdateOne {
+	return _u.SetSchemaID(v.ID)
 }
 
 // Mutation returns the PropertyMutation object of the builder.
-func (puo *PropertyUpdateOne) Mutation() *PropertyMutation {
-	return puo.mutation
+func (_u *PropertyUpdateOne) Mutation() *PropertyMutation {
+	return _u.mutation
 }
 
 // ClearNode clears the "node" edge to the Node entity.
-func (puo *PropertyUpdateOne) ClearNode() *PropertyUpdateOne {
-	puo.mutation.ClearNode()
-	return puo
+func (_u *PropertyUpdateOne) ClearNode() *PropertyUpdateOne {
+	_u.mutation.ClearNode()
+	return _u
 }
 
 // ClearSchema clears the "schema" edge to the PropertySchemaField entity.
-func (puo *PropertyUpdateOne) ClearSchema() *PropertyUpdateOne {
-	puo.mutation.ClearSchema()
-	return puo
+func (_u *PropertyUpdateOne) ClearSchema() *PropertyUpdateOne {
+	_u.mutation.ClearSchema()
+	return _u
 }
 
 // Where appends a list predicates to the PropertyUpdate builder.
-func (puo *PropertyUpdateOne) Where(ps ...predicate.Property) *PropertyUpdateOne {
-	puo.mutation.Where(ps...)
-	return puo
+func (_u *PropertyUpdateOne) Where(ps ...predicate.Property) *PropertyUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (puo *PropertyUpdateOne) Select(field string, fields ...string) *PropertyUpdateOne {
-	puo.fields = append([]string{field}, fields...)
-	return puo
+func (_u *PropertyUpdateOne) Select(field string, fields ...string) *PropertyUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Property entity.
-func (puo *PropertyUpdateOne) Save(ctx context.Context) (*Property, error) {
-	return withHooks(ctx, puo.sqlSave, puo.mutation, puo.hooks)
+func (_u *PropertyUpdateOne) Save(ctx context.Context) (*Property, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (puo *PropertyUpdateOne) SaveX(ctx context.Context) *Property {
-	node, err := puo.Save(ctx)
+func (_u *PropertyUpdateOne) SaveX(ctx context.Context) *Property {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -348,46 +348,46 @@ func (puo *PropertyUpdateOne) SaveX(ctx context.Context) *Property {
 }
 
 // Exec executes the query on the entity.
-func (puo *PropertyUpdateOne) Exec(ctx context.Context) error {
-	_, err := puo.Save(ctx)
+func (_u *PropertyUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (puo *PropertyUpdateOne) ExecX(ctx context.Context) {
-	if err := puo.Exec(ctx); err != nil {
+func (_u *PropertyUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (puo *PropertyUpdateOne) check() error {
-	if puo.mutation.NodeCleared() && len(puo.mutation.NodeIDs()) > 0 {
+func (_u *PropertyUpdateOne) check() error {
+	if _u.mutation.NodeCleared() && len(_u.mutation.NodeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Property.node"`)
 	}
-	if puo.mutation.SchemaCleared() && len(puo.mutation.SchemaIDs()) > 0 {
+	if _u.mutation.SchemaCleared() && len(_u.mutation.SchemaIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Property.schema"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (puo *PropertyUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PropertyUpdateOne {
-	puo.modifiers = append(puo.modifiers, modifiers...)
-	return puo
+func (_u *PropertyUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PropertyUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (puo *PropertyUpdateOne) sqlSave(ctx context.Context) (_node *Property, err error) {
-	if err := puo.check(); err != nil {
+func (_u *PropertyUpdateOne) sqlSave(ctx context.Context) (_node *Property, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(property.Table, property.Columns, sqlgraph.NewFieldSpec(property.FieldID, field.TypeString))
-	id, ok := puo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Property.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := puo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, property.FieldID)
 		for _, f := range fields {
@@ -399,17 +399,17 @@ func (puo *PropertyUpdateOne) sqlSave(ctx context.Context) (_node *Property, err
 			}
 		}
 	}
-	if ps := puo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := puo.mutation.Value(); ok {
+	if value, ok := _u.mutation.Value(); ok {
 		_spec.SetField(property.FieldValue, field.TypeString, value)
 	}
-	if puo.mutation.NodeCleared() {
+	if _u.mutation.NodeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -422,7 +422,7 @@ func (puo *PropertyUpdateOne) sqlSave(ctx context.Context) (_node *Property, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.NodeIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -438,7 +438,7 @@ func (puo *PropertyUpdateOne) sqlSave(ctx context.Context) (_node *Property, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.SchemaCleared() {
+	if _u.mutation.SchemaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -451,7 +451,7 @@ func (puo *PropertyUpdateOne) sqlSave(ctx context.Context) (_node *Property, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.SchemaIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.SchemaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -467,11 +467,11 @@ func (puo *PropertyUpdateOne) sqlSave(ctx context.Context) (_node *Property, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(puo.modifiers...)
-	_node = &Property{config: puo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Property{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, puo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{property.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -479,6 +479,6 @@ func (puo *PropertyUpdateOne) sqlSave(ctx context.Context) (_node *Property, err
 		}
 		return nil, err
 	}
-	puo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

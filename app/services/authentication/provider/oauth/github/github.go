@@ -13,7 +13,7 @@ import (
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/Southclaws/opt"
-	"github.com/google/go-github/v73/github"
+	"github.com/google/go-github/v75/github"
 	"golang.org/x/oauth2"
 	oauth2_github "golang.org/x/oauth2/github"
 
@@ -112,9 +112,7 @@ func (p *Provider) Login(ctx context.Context, state, code string) (*account.Acco
 
 	client := github.NewClient(nil).WithAuthToken(token.AccessToken)
 
-	clientID := token.Extra("client_id").(string)
-
-	u, _, err := client.Users.Get(ctx, clientID)
+	u, _, err := client.Users.Get(ctx, "")
 	if err != nil {
 		return nil, fault.Wrap(err,
 			fctx.With(ctx),

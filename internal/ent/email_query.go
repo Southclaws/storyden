@@ -32,44 +32,44 @@ type EmailQuery struct {
 }
 
 // Where adds a new predicate for the EmailQuery builder.
-func (eq *EmailQuery) Where(ps ...predicate.Email) *EmailQuery {
-	eq.predicates = append(eq.predicates, ps...)
-	return eq
+func (_q *EmailQuery) Where(ps ...predicate.Email) *EmailQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (eq *EmailQuery) Limit(limit int) *EmailQuery {
-	eq.ctx.Limit = &limit
-	return eq
+func (_q *EmailQuery) Limit(limit int) *EmailQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (eq *EmailQuery) Offset(offset int) *EmailQuery {
-	eq.ctx.Offset = &offset
-	return eq
+func (_q *EmailQuery) Offset(offset int) *EmailQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (eq *EmailQuery) Unique(unique bool) *EmailQuery {
-	eq.ctx.Unique = &unique
-	return eq
+func (_q *EmailQuery) Unique(unique bool) *EmailQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (eq *EmailQuery) Order(o ...email.OrderOption) *EmailQuery {
-	eq.order = append(eq.order, o...)
-	return eq
+func (_q *EmailQuery) Order(o ...email.OrderOption) *EmailQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryAccount chains the current query on the "account" edge.
-func (eq *EmailQuery) QueryAccount() *AccountQuery {
-	query := (&AccountClient{config: eq.config}).Query()
+func (_q *EmailQuery) QueryAccount() *AccountQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := eq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := eq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -78,7 +78,7 @@ func (eq *EmailQuery) QueryAccount() *AccountQuery {
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, email.AccountTable, email.AccountColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -86,8 +86,8 @@ func (eq *EmailQuery) QueryAccount() *AccountQuery {
 
 // First returns the first Email entity from the query.
 // Returns a *NotFoundError when no Email was found.
-func (eq *EmailQuery) First(ctx context.Context) (*Email, error) {
-	nodes, err := eq.Limit(1).All(setContextOp(ctx, eq.ctx, ent.OpQueryFirst))
+func (_q *EmailQuery) First(ctx context.Context) (*Email, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -98,8 +98,8 @@ func (eq *EmailQuery) First(ctx context.Context) (*Email, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (eq *EmailQuery) FirstX(ctx context.Context) *Email {
-	node, err := eq.First(ctx)
+func (_q *EmailQuery) FirstX(ctx context.Context) *Email {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -108,9 +108,9 @@ func (eq *EmailQuery) FirstX(ctx context.Context) *Email {
 
 // FirstID returns the first Email ID from the query.
 // Returns a *NotFoundError when no Email ID was found.
-func (eq *EmailQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+func (_q *EmailQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = eq.Limit(1).IDs(setContextOp(ctx, eq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -121,8 +121,8 @@ func (eq *EmailQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (eq *EmailQuery) FirstIDX(ctx context.Context) xid.ID {
-	id, err := eq.FirstID(ctx)
+func (_q *EmailQuery) FirstIDX(ctx context.Context) xid.ID {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -132,8 +132,8 @@ func (eq *EmailQuery) FirstIDX(ctx context.Context) xid.ID {
 // Only returns a single Email entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one Email entity is found.
 // Returns a *NotFoundError when no Email entities are found.
-func (eq *EmailQuery) Only(ctx context.Context) (*Email, error) {
-	nodes, err := eq.Limit(2).All(setContextOp(ctx, eq.ctx, ent.OpQueryOnly))
+func (_q *EmailQuery) Only(ctx context.Context) (*Email, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -148,8 +148,8 @@ func (eq *EmailQuery) Only(ctx context.Context) (*Email, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (eq *EmailQuery) OnlyX(ctx context.Context) *Email {
-	node, err := eq.Only(ctx)
+func (_q *EmailQuery) OnlyX(ctx context.Context) *Email {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -159,9 +159,9 @@ func (eq *EmailQuery) OnlyX(ctx context.Context) *Email {
 // OnlyID is like Only, but returns the only Email ID in the query.
 // Returns a *NotSingularError when more than one Email ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (eq *EmailQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+func (_q *EmailQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = eq.Limit(2).IDs(setContextOp(ctx, eq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -176,8 +176,8 @@ func (eq *EmailQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (eq *EmailQuery) OnlyIDX(ctx context.Context) xid.ID {
-	id, err := eq.OnlyID(ctx)
+func (_q *EmailQuery) OnlyIDX(ctx context.Context) xid.ID {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -185,18 +185,18 @@ func (eq *EmailQuery) OnlyIDX(ctx context.Context) xid.ID {
 }
 
 // All executes the query and returns a list of Emails.
-func (eq *EmailQuery) All(ctx context.Context) ([]*Email, error) {
-	ctx = setContextOp(ctx, eq.ctx, ent.OpQueryAll)
-	if err := eq.prepareQuery(ctx); err != nil {
+func (_q *EmailQuery) All(ctx context.Context) ([]*Email, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*Email, *EmailQuery]()
-	return withInterceptors[[]*Email](ctx, eq, qr, eq.inters)
+	return withInterceptors[[]*Email](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (eq *EmailQuery) AllX(ctx context.Context) []*Email {
-	nodes, err := eq.All(ctx)
+func (_q *EmailQuery) AllX(ctx context.Context) []*Email {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -204,20 +204,20 @@ func (eq *EmailQuery) AllX(ctx context.Context) []*Email {
 }
 
 // IDs executes the query and returns a list of Email IDs.
-func (eq *EmailQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
-	if eq.ctx.Unique == nil && eq.path != nil {
-		eq.Unique(true)
+func (_q *EmailQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, eq.ctx, ent.OpQueryIDs)
-	if err = eq.Select(email.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(email.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (eq *EmailQuery) IDsX(ctx context.Context) []xid.ID {
-	ids, err := eq.IDs(ctx)
+func (_q *EmailQuery) IDsX(ctx context.Context) []xid.ID {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -225,17 +225,17 @@ func (eq *EmailQuery) IDsX(ctx context.Context) []xid.ID {
 }
 
 // Count returns the count of the given query.
-func (eq *EmailQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, eq.ctx, ent.OpQueryCount)
-	if err := eq.prepareQuery(ctx); err != nil {
+func (_q *EmailQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, eq, querierCount[*EmailQuery](), eq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*EmailQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (eq *EmailQuery) CountX(ctx context.Context) int {
-	count, err := eq.Count(ctx)
+func (_q *EmailQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -243,9 +243,9 @@ func (eq *EmailQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (eq *EmailQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, eq.ctx, ent.OpQueryExist)
-	switch _, err := eq.FirstID(ctx); {
+func (_q *EmailQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -256,8 +256,8 @@ func (eq *EmailQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (eq *EmailQuery) ExistX(ctx context.Context) bool {
-	exist, err := eq.Exist(ctx)
+func (_q *EmailQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -266,33 +266,33 @@ func (eq *EmailQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the EmailQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (eq *EmailQuery) Clone() *EmailQuery {
-	if eq == nil {
+func (_q *EmailQuery) Clone() *EmailQuery {
+	if _q == nil {
 		return nil
 	}
 	return &EmailQuery{
-		config:      eq.config,
-		ctx:         eq.ctx.Clone(),
-		order:       append([]email.OrderOption{}, eq.order...),
-		inters:      append([]Interceptor{}, eq.inters...),
-		predicates:  append([]predicate.Email{}, eq.predicates...),
-		withAccount: eq.withAccount.Clone(),
+		config:      _q.config,
+		ctx:         _q.ctx.Clone(),
+		order:       append([]email.OrderOption{}, _q.order...),
+		inters:      append([]Interceptor{}, _q.inters...),
+		predicates:  append([]predicate.Email{}, _q.predicates...),
+		withAccount: _q.withAccount.Clone(),
 		// clone intermediate query.
-		sql:       eq.sql.Clone(),
-		path:      eq.path,
-		modifiers: append([]func(*sql.Selector){}, eq.modifiers...),
+		sql:       _q.sql.Clone(),
+		path:      _q.path,
+		modifiers: append([]func(*sql.Selector){}, _q.modifiers...),
 	}
 }
 
 // WithAccount tells the query-builder to eager-load the nodes that are connected to
 // the "account" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EmailQuery) WithAccount(opts ...func(*AccountQuery)) *EmailQuery {
-	query := (&AccountClient{config: eq.config}).Query()
+func (_q *EmailQuery) WithAccount(opts ...func(*AccountQuery)) *EmailQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	eq.withAccount = query
-	return eq
+	_q.withAccount = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -309,10 +309,10 @@ func (eq *EmailQuery) WithAccount(opts ...func(*AccountQuery)) *EmailQuery {
 //		GroupBy(email.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (eq *EmailQuery) GroupBy(field string, fields ...string) *EmailGroupBy {
-	eq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &EmailGroupBy{build: eq}
-	grbuild.flds = &eq.ctx.Fields
+func (_q *EmailQuery) GroupBy(field string, fields ...string) *EmailGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &EmailGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = email.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -330,76 +330,76 @@ func (eq *EmailQuery) GroupBy(field string, fields ...string) *EmailGroupBy {
 //	client.Email.Query().
 //		Select(email.FieldCreatedAt).
 //		Scan(ctx, &v)
-func (eq *EmailQuery) Select(fields ...string) *EmailSelect {
-	eq.ctx.Fields = append(eq.ctx.Fields, fields...)
-	sbuild := &EmailSelect{EmailQuery: eq}
+func (_q *EmailQuery) Select(fields ...string) *EmailSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &EmailSelect{EmailQuery: _q}
 	sbuild.label = email.Label
-	sbuild.flds, sbuild.scan = &eq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a EmailSelect configured with the given aggregations.
-func (eq *EmailQuery) Aggregate(fns ...AggregateFunc) *EmailSelect {
-	return eq.Select().Aggregate(fns...)
+func (_q *EmailQuery) Aggregate(fns ...AggregateFunc) *EmailSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (eq *EmailQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range eq.inters {
+func (_q *EmailQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, eq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range eq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !email.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if eq.path != nil {
-		prev, err := eq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		eq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (eq *EmailQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Email, error) {
+func (_q *EmailQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Email, error) {
 	var (
 		nodes       = []*Email{}
-		_spec       = eq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [1]bool{
-			eq.withAccount != nil,
+			_q.withAccount != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Email).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Email{config: eq.config}
+		node := &Email{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(eq.modifiers) > 0 {
-		_spec.Modifiers = eq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, eq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := eq.withAccount; query != nil {
-		if err := eq.loadAccount(ctx, query, nodes, nil,
+	if query := _q.withAccount; query != nil {
+		if err := _q.loadAccount(ctx, query, nodes, nil,
 			func(n *Email, e *Account) { n.Edges.Account = e }); err != nil {
 			return nil, err
 		}
@@ -407,7 +407,7 @@ func (eq *EmailQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Email,
 	return nodes, nil
 }
 
-func (eq *EmailQuery) loadAccount(ctx context.Context, query *AccountQuery, nodes []*Email, init func(*Email), assign func(*Email, *Account)) error {
+func (_q *EmailQuery) loadAccount(ctx context.Context, query *AccountQuery, nodes []*Email, init func(*Email), assign func(*Email, *Account)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Email)
 	for i := range nodes {
@@ -440,27 +440,27 @@ func (eq *EmailQuery) loadAccount(ctx context.Context, query *AccountQuery, node
 	return nil
 }
 
-func (eq *EmailQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := eq.querySpec()
-	if len(eq.modifiers) > 0 {
-		_spec.Modifiers = eq.modifiers
+func (_q *EmailQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = eq.ctx.Fields
-	if len(eq.ctx.Fields) > 0 {
-		_spec.Unique = eq.ctx.Unique != nil && *eq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, eq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (eq *EmailQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *EmailQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(email.Table, email.Columns, sqlgraph.NewFieldSpec(email.FieldID, field.TypeString))
-	_spec.From = eq.sql
-	if unique := eq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if eq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := eq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, email.FieldID)
 		for i := range fields {
@@ -468,24 +468,24 @@ func (eq *EmailQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if eq.withAccount != nil {
+		if _q.withAccount != nil {
 			_spec.Node.AddColumnOnce(email.FieldAccountID)
 		}
 	}
-	if ps := eq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := eq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := eq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := eq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -495,45 +495,45 @@ func (eq *EmailQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (eq *EmailQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(eq.driver.Dialect())
+func (_q *EmailQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(email.Table)
-	columns := eq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = email.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if eq.sql != nil {
-		selector = eq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if eq.ctx.Unique != nil && *eq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, m := range eq.modifiers {
+	for _, m := range _q.modifiers {
 		m(selector)
 	}
-	for _, p := range eq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range eq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := eq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := eq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (eq *EmailQuery) Modify(modifiers ...func(s *sql.Selector)) *EmailSelect {
-	eq.modifiers = append(eq.modifiers, modifiers...)
-	return eq.Select()
+func (_q *EmailQuery) Modify(modifiers ...func(s *sql.Selector)) *EmailSelect {
+	_q.modifiers = append(_q.modifiers, modifiers...)
+	return _q.Select()
 }
 
 // EmailGroupBy is the group-by builder for Email entities.
@@ -543,41 +543,41 @@ type EmailGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (egb *EmailGroupBy) Aggregate(fns ...AggregateFunc) *EmailGroupBy {
-	egb.fns = append(egb.fns, fns...)
-	return egb
+func (_g *EmailGroupBy) Aggregate(fns ...AggregateFunc) *EmailGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (egb *EmailGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, egb.build.ctx, ent.OpQueryGroupBy)
-	if err := egb.build.prepareQuery(ctx); err != nil {
+func (_g *EmailGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*EmailQuery, *EmailGroupBy](ctx, egb.build, egb, egb.build.inters, v)
+	return scanWithInterceptors[*EmailQuery, *EmailGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (egb *EmailGroupBy) sqlScan(ctx context.Context, root *EmailQuery, v any) error {
+func (_g *EmailGroupBy) sqlScan(ctx context.Context, root *EmailQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(egb.fns))
-	for _, fn := range egb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*egb.flds)+len(egb.fns))
-		for _, f := range *egb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*egb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := egb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -591,27 +591,27 @@ type EmailSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (es *EmailSelect) Aggregate(fns ...AggregateFunc) *EmailSelect {
-	es.fns = append(es.fns, fns...)
-	return es
+func (_s *EmailSelect) Aggregate(fns ...AggregateFunc) *EmailSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (es *EmailSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, es.ctx, ent.OpQuerySelect)
-	if err := es.prepareQuery(ctx); err != nil {
+func (_s *EmailSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*EmailQuery, *EmailSelect](ctx, es.EmailQuery, es, es.inters, v)
+	return scanWithInterceptors[*EmailQuery, *EmailSelect](ctx, _s.EmailQuery, _s, _s.inters, v)
 }
 
-func (es *EmailSelect) sqlScan(ctx context.Context, root *EmailQuery, v any) error {
+func (_s *EmailSelect) sqlScan(ctx context.Context, root *EmailQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(es.fns))
-	for _, fn := range es.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*es.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -619,7 +619,7 @@ func (es *EmailSelect) sqlScan(ctx context.Context, root *EmailQuery, v any) err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := es.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -627,7 +627,7 @@ func (es *EmailSelect) sqlScan(ctx context.Context, root *EmailQuery, v any) err
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (es *EmailSelect) Modify(modifiers ...func(s *sql.Selector)) *EmailSelect {
-	es.modifiers = append(es.modifiers, modifiers...)
-	return es
+func (_s *EmailSelect) Modify(modifiers ...func(s *sql.Selector)) *EmailSelect {
+	_s.modifiers = append(_s.modifiers, modifiers...)
+	return _s
 }

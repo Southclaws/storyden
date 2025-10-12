@@ -35,44 +35,44 @@ type PropertySchemaFieldQuery struct {
 }
 
 // Where adds a new predicate for the PropertySchemaFieldQuery builder.
-func (psfq *PropertySchemaFieldQuery) Where(ps ...predicate.PropertySchemaField) *PropertySchemaFieldQuery {
-	psfq.predicates = append(psfq.predicates, ps...)
-	return psfq
+func (_q *PropertySchemaFieldQuery) Where(ps ...predicate.PropertySchemaField) *PropertySchemaFieldQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (psfq *PropertySchemaFieldQuery) Limit(limit int) *PropertySchemaFieldQuery {
-	psfq.ctx.Limit = &limit
-	return psfq
+func (_q *PropertySchemaFieldQuery) Limit(limit int) *PropertySchemaFieldQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (psfq *PropertySchemaFieldQuery) Offset(offset int) *PropertySchemaFieldQuery {
-	psfq.ctx.Offset = &offset
-	return psfq
+func (_q *PropertySchemaFieldQuery) Offset(offset int) *PropertySchemaFieldQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (psfq *PropertySchemaFieldQuery) Unique(unique bool) *PropertySchemaFieldQuery {
-	psfq.ctx.Unique = &unique
-	return psfq
+func (_q *PropertySchemaFieldQuery) Unique(unique bool) *PropertySchemaFieldQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (psfq *PropertySchemaFieldQuery) Order(o ...propertyschemafield.OrderOption) *PropertySchemaFieldQuery {
-	psfq.order = append(psfq.order, o...)
-	return psfq
+func (_q *PropertySchemaFieldQuery) Order(o ...propertyschemafield.OrderOption) *PropertySchemaFieldQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QuerySchema chains the current query on the "schema" edge.
-func (psfq *PropertySchemaFieldQuery) QuerySchema() *PropertySchemaQuery {
-	query := (&PropertySchemaClient{config: psfq.config}).Query()
+func (_q *PropertySchemaFieldQuery) QuerySchema() *PropertySchemaQuery {
+	query := (&PropertySchemaClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := psfq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := psfq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -81,20 +81,20 @@ func (psfq *PropertySchemaFieldQuery) QuerySchema() *PropertySchemaQuery {
 			sqlgraph.To(propertyschema.Table, propertyschema.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, propertyschemafield.SchemaTable, propertyschemafield.SchemaColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(psfq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryProperties chains the current query on the "properties" edge.
-func (psfq *PropertySchemaFieldQuery) QueryProperties() *PropertyQuery {
-	query := (&PropertyClient{config: psfq.config}).Query()
+func (_q *PropertySchemaFieldQuery) QueryProperties() *PropertyQuery {
+	query := (&PropertyClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := psfq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := psfq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -103,7 +103,7 @@ func (psfq *PropertySchemaFieldQuery) QueryProperties() *PropertyQuery {
 			sqlgraph.To(property.Table, property.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, propertyschemafield.PropertiesTable, propertyschemafield.PropertiesColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(psfq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -111,8 +111,8 @@ func (psfq *PropertySchemaFieldQuery) QueryProperties() *PropertyQuery {
 
 // First returns the first PropertySchemaField entity from the query.
 // Returns a *NotFoundError when no PropertySchemaField was found.
-func (psfq *PropertySchemaFieldQuery) First(ctx context.Context) (*PropertySchemaField, error) {
-	nodes, err := psfq.Limit(1).All(setContextOp(ctx, psfq.ctx, ent.OpQueryFirst))
+func (_q *PropertySchemaFieldQuery) First(ctx context.Context) (*PropertySchemaField, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -123,8 +123,8 @@ func (psfq *PropertySchemaFieldQuery) First(ctx context.Context) (*PropertySchem
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (psfq *PropertySchemaFieldQuery) FirstX(ctx context.Context) *PropertySchemaField {
-	node, err := psfq.First(ctx)
+func (_q *PropertySchemaFieldQuery) FirstX(ctx context.Context) *PropertySchemaField {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -133,9 +133,9 @@ func (psfq *PropertySchemaFieldQuery) FirstX(ctx context.Context) *PropertySchem
 
 // FirstID returns the first PropertySchemaField ID from the query.
 // Returns a *NotFoundError when no PropertySchemaField ID was found.
-func (psfq *PropertySchemaFieldQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+func (_q *PropertySchemaFieldQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = psfq.Limit(1).IDs(setContextOp(ctx, psfq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -146,8 +146,8 @@ func (psfq *PropertySchemaFieldQuery) FirstID(ctx context.Context) (id xid.ID, e
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (psfq *PropertySchemaFieldQuery) FirstIDX(ctx context.Context) xid.ID {
-	id, err := psfq.FirstID(ctx)
+func (_q *PropertySchemaFieldQuery) FirstIDX(ctx context.Context) xid.ID {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -157,8 +157,8 @@ func (psfq *PropertySchemaFieldQuery) FirstIDX(ctx context.Context) xid.ID {
 // Only returns a single PropertySchemaField entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one PropertySchemaField entity is found.
 // Returns a *NotFoundError when no PropertySchemaField entities are found.
-func (psfq *PropertySchemaFieldQuery) Only(ctx context.Context) (*PropertySchemaField, error) {
-	nodes, err := psfq.Limit(2).All(setContextOp(ctx, psfq.ctx, ent.OpQueryOnly))
+func (_q *PropertySchemaFieldQuery) Only(ctx context.Context) (*PropertySchemaField, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -173,8 +173,8 @@ func (psfq *PropertySchemaFieldQuery) Only(ctx context.Context) (*PropertySchema
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (psfq *PropertySchemaFieldQuery) OnlyX(ctx context.Context) *PropertySchemaField {
-	node, err := psfq.Only(ctx)
+func (_q *PropertySchemaFieldQuery) OnlyX(ctx context.Context) *PropertySchemaField {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -184,9 +184,9 @@ func (psfq *PropertySchemaFieldQuery) OnlyX(ctx context.Context) *PropertySchema
 // OnlyID is like Only, but returns the only PropertySchemaField ID in the query.
 // Returns a *NotSingularError when more than one PropertySchemaField ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (psfq *PropertySchemaFieldQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+func (_q *PropertySchemaFieldQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = psfq.Limit(2).IDs(setContextOp(ctx, psfq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -201,8 +201,8 @@ func (psfq *PropertySchemaFieldQuery) OnlyID(ctx context.Context) (id xid.ID, er
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (psfq *PropertySchemaFieldQuery) OnlyIDX(ctx context.Context) xid.ID {
-	id, err := psfq.OnlyID(ctx)
+func (_q *PropertySchemaFieldQuery) OnlyIDX(ctx context.Context) xid.ID {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -210,18 +210,18 @@ func (psfq *PropertySchemaFieldQuery) OnlyIDX(ctx context.Context) xid.ID {
 }
 
 // All executes the query and returns a list of PropertySchemaFields.
-func (psfq *PropertySchemaFieldQuery) All(ctx context.Context) ([]*PropertySchemaField, error) {
-	ctx = setContextOp(ctx, psfq.ctx, ent.OpQueryAll)
-	if err := psfq.prepareQuery(ctx); err != nil {
+func (_q *PropertySchemaFieldQuery) All(ctx context.Context) ([]*PropertySchemaField, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*PropertySchemaField, *PropertySchemaFieldQuery]()
-	return withInterceptors[[]*PropertySchemaField](ctx, psfq, qr, psfq.inters)
+	return withInterceptors[[]*PropertySchemaField](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (psfq *PropertySchemaFieldQuery) AllX(ctx context.Context) []*PropertySchemaField {
-	nodes, err := psfq.All(ctx)
+func (_q *PropertySchemaFieldQuery) AllX(ctx context.Context) []*PropertySchemaField {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -229,20 +229,20 @@ func (psfq *PropertySchemaFieldQuery) AllX(ctx context.Context) []*PropertySchem
 }
 
 // IDs executes the query and returns a list of PropertySchemaField IDs.
-func (psfq *PropertySchemaFieldQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
-	if psfq.ctx.Unique == nil && psfq.path != nil {
-		psfq.Unique(true)
+func (_q *PropertySchemaFieldQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, psfq.ctx, ent.OpQueryIDs)
-	if err = psfq.Select(propertyschemafield.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(propertyschemafield.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (psfq *PropertySchemaFieldQuery) IDsX(ctx context.Context) []xid.ID {
-	ids, err := psfq.IDs(ctx)
+func (_q *PropertySchemaFieldQuery) IDsX(ctx context.Context) []xid.ID {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -250,17 +250,17 @@ func (psfq *PropertySchemaFieldQuery) IDsX(ctx context.Context) []xid.ID {
 }
 
 // Count returns the count of the given query.
-func (psfq *PropertySchemaFieldQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, psfq.ctx, ent.OpQueryCount)
-	if err := psfq.prepareQuery(ctx); err != nil {
+func (_q *PropertySchemaFieldQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, psfq, querierCount[*PropertySchemaFieldQuery](), psfq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*PropertySchemaFieldQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (psfq *PropertySchemaFieldQuery) CountX(ctx context.Context) int {
-	count, err := psfq.Count(ctx)
+func (_q *PropertySchemaFieldQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -268,9 +268,9 @@ func (psfq *PropertySchemaFieldQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (psfq *PropertySchemaFieldQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, psfq.ctx, ent.OpQueryExist)
-	switch _, err := psfq.FirstID(ctx); {
+func (_q *PropertySchemaFieldQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -281,8 +281,8 @@ func (psfq *PropertySchemaFieldQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (psfq *PropertySchemaFieldQuery) ExistX(ctx context.Context) bool {
-	exist, err := psfq.Exist(ctx)
+func (_q *PropertySchemaFieldQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -291,45 +291,45 @@ func (psfq *PropertySchemaFieldQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the PropertySchemaFieldQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (psfq *PropertySchemaFieldQuery) Clone() *PropertySchemaFieldQuery {
-	if psfq == nil {
+func (_q *PropertySchemaFieldQuery) Clone() *PropertySchemaFieldQuery {
+	if _q == nil {
 		return nil
 	}
 	return &PropertySchemaFieldQuery{
-		config:         psfq.config,
-		ctx:            psfq.ctx.Clone(),
-		order:          append([]propertyschemafield.OrderOption{}, psfq.order...),
-		inters:         append([]Interceptor{}, psfq.inters...),
-		predicates:     append([]predicate.PropertySchemaField{}, psfq.predicates...),
-		withSchema:     psfq.withSchema.Clone(),
-		withProperties: psfq.withProperties.Clone(),
+		config:         _q.config,
+		ctx:            _q.ctx.Clone(),
+		order:          append([]propertyschemafield.OrderOption{}, _q.order...),
+		inters:         append([]Interceptor{}, _q.inters...),
+		predicates:     append([]predicate.PropertySchemaField{}, _q.predicates...),
+		withSchema:     _q.withSchema.Clone(),
+		withProperties: _q.withProperties.Clone(),
 		// clone intermediate query.
-		sql:       psfq.sql.Clone(),
-		path:      psfq.path,
-		modifiers: append([]func(*sql.Selector){}, psfq.modifiers...),
+		sql:       _q.sql.Clone(),
+		path:      _q.path,
+		modifiers: append([]func(*sql.Selector){}, _q.modifiers...),
 	}
 }
 
 // WithSchema tells the query-builder to eager-load the nodes that are connected to
 // the "schema" edge. The optional arguments are used to configure the query builder of the edge.
-func (psfq *PropertySchemaFieldQuery) WithSchema(opts ...func(*PropertySchemaQuery)) *PropertySchemaFieldQuery {
-	query := (&PropertySchemaClient{config: psfq.config}).Query()
+func (_q *PropertySchemaFieldQuery) WithSchema(opts ...func(*PropertySchemaQuery)) *PropertySchemaFieldQuery {
+	query := (&PropertySchemaClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	psfq.withSchema = query
-	return psfq
+	_q.withSchema = query
+	return _q
 }
 
 // WithProperties tells the query-builder to eager-load the nodes that are connected to
 // the "properties" edge. The optional arguments are used to configure the query builder of the edge.
-func (psfq *PropertySchemaFieldQuery) WithProperties(opts ...func(*PropertyQuery)) *PropertySchemaFieldQuery {
-	query := (&PropertyClient{config: psfq.config}).Query()
+func (_q *PropertySchemaFieldQuery) WithProperties(opts ...func(*PropertyQuery)) *PropertySchemaFieldQuery {
+	query := (&PropertyClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	psfq.withProperties = query
-	return psfq
+	_q.withProperties = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -346,10 +346,10 @@ func (psfq *PropertySchemaFieldQuery) WithProperties(opts ...func(*PropertyQuery
 //		GroupBy(propertyschemafield.FieldName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (psfq *PropertySchemaFieldQuery) GroupBy(field string, fields ...string) *PropertySchemaFieldGroupBy {
-	psfq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &PropertySchemaFieldGroupBy{build: psfq}
-	grbuild.flds = &psfq.ctx.Fields
+func (_q *PropertySchemaFieldQuery) GroupBy(field string, fields ...string) *PropertySchemaFieldGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &PropertySchemaFieldGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = propertyschemafield.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -367,83 +367,83 @@ func (psfq *PropertySchemaFieldQuery) GroupBy(field string, fields ...string) *P
 //	client.PropertySchemaField.Query().
 //		Select(propertyschemafield.FieldName).
 //		Scan(ctx, &v)
-func (psfq *PropertySchemaFieldQuery) Select(fields ...string) *PropertySchemaFieldSelect {
-	psfq.ctx.Fields = append(psfq.ctx.Fields, fields...)
-	sbuild := &PropertySchemaFieldSelect{PropertySchemaFieldQuery: psfq}
+func (_q *PropertySchemaFieldQuery) Select(fields ...string) *PropertySchemaFieldSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &PropertySchemaFieldSelect{PropertySchemaFieldQuery: _q}
 	sbuild.label = propertyschemafield.Label
-	sbuild.flds, sbuild.scan = &psfq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a PropertySchemaFieldSelect configured with the given aggregations.
-func (psfq *PropertySchemaFieldQuery) Aggregate(fns ...AggregateFunc) *PropertySchemaFieldSelect {
-	return psfq.Select().Aggregate(fns...)
+func (_q *PropertySchemaFieldQuery) Aggregate(fns ...AggregateFunc) *PropertySchemaFieldSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (psfq *PropertySchemaFieldQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range psfq.inters {
+func (_q *PropertySchemaFieldQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, psfq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range psfq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !propertyschemafield.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if psfq.path != nil {
-		prev, err := psfq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		psfq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (psfq *PropertySchemaFieldQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*PropertySchemaField, error) {
+func (_q *PropertySchemaFieldQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*PropertySchemaField, error) {
 	var (
 		nodes       = []*PropertySchemaField{}
-		_spec       = psfq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
-			psfq.withSchema != nil,
-			psfq.withProperties != nil,
+			_q.withSchema != nil,
+			_q.withProperties != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*PropertySchemaField).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &PropertySchemaField{config: psfq.config}
+		node := &PropertySchemaField{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(psfq.modifiers) > 0 {
-		_spec.Modifiers = psfq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, psfq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := psfq.withSchema; query != nil {
-		if err := psfq.loadSchema(ctx, query, nodes, nil,
+	if query := _q.withSchema; query != nil {
+		if err := _q.loadSchema(ctx, query, nodes, nil,
 			func(n *PropertySchemaField, e *PropertySchema) { n.Edges.Schema = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := psfq.withProperties; query != nil {
-		if err := psfq.loadProperties(ctx, query, nodes,
+	if query := _q.withProperties; query != nil {
+		if err := _q.loadProperties(ctx, query, nodes,
 			func(n *PropertySchemaField) { n.Edges.Properties = []*Property{} },
 			func(n *PropertySchemaField, e *Property) { n.Edges.Properties = append(n.Edges.Properties, e) }); err != nil {
 			return nil, err
@@ -452,7 +452,7 @@ func (psfq *PropertySchemaFieldQuery) sqlAll(ctx context.Context, hooks ...query
 	return nodes, nil
 }
 
-func (psfq *PropertySchemaFieldQuery) loadSchema(ctx context.Context, query *PropertySchemaQuery, nodes []*PropertySchemaField, init func(*PropertySchemaField), assign func(*PropertySchemaField, *PropertySchema)) error {
+func (_q *PropertySchemaFieldQuery) loadSchema(ctx context.Context, query *PropertySchemaQuery, nodes []*PropertySchemaField, init func(*PropertySchemaField), assign func(*PropertySchemaField, *PropertySchema)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*PropertySchemaField)
 	for i := range nodes {
@@ -481,7 +481,7 @@ func (psfq *PropertySchemaFieldQuery) loadSchema(ctx context.Context, query *Pro
 	}
 	return nil
 }
-func (psfq *PropertySchemaFieldQuery) loadProperties(ctx context.Context, query *PropertyQuery, nodes []*PropertySchemaField, init func(*PropertySchemaField), assign func(*PropertySchemaField, *Property)) error {
+func (_q *PropertySchemaFieldQuery) loadProperties(ctx context.Context, query *PropertyQuery, nodes []*PropertySchemaField, init func(*PropertySchemaField), assign func(*PropertySchemaField, *Property)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*PropertySchemaField)
 	for i := range nodes {
@@ -512,27 +512,27 @@ func (psfq *PropertySchemaFieldQuery) loadProperties(ctx context.Context, query 
 	return nil
 }
 
-func (psfq *PropertySchemaFieldQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := psfq.querySpec()
-	if len(psfq.modifiers) > 0 {
-		_spec.Modifiers = psfq.modifiers
+func (_q *PropertySchemaFieldQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = psfq.ctx.Fields
-	if len(psfq.ctx.Fields) > 0 {
-		_spec.Unique = psfq.ctx.Unique != nil && *psfq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, psfq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (psfq *PropertySchemaFieldQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *PropertySchemaFieldQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(propertyschemafield.Table, propertyschemafield.Columns, sqlgraph.NewFieldSpec(propertyschemafield.FieldID, field.TypeString))
-	_spec.From = psfq.sql
-	if unique := psfq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if psfq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := psfq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, propertyschemafield.FieldID)
 		for i := range fields {
@@ -540,24 +540,24 @@ func (psfq *PropertySchemaFieldQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if psfq.withSchema != nil {
+		if _q.withSchema != nil {
 			_spec.Node.AddColumnOnce(propertyschemafield.FieldSchemaID)
 		}
 	}
-	if ps := psfq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := psfq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := psfq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := psfq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -567,45 +567,45 @@ func (psfq *PropertySchemaFieldQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (psfq *PropertySchemaFieldQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(psfq.driver.Dialect())
+func (_q *PropertySchemaFieldQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(propertyschemafield.Table)
-	columns := psfq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = propertyschemafield.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if psfq.sql != nil {
-		selector = psfq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if psfq.ctx.Unique != nil && *psfq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, m := range psfq.modifiers {
+	for _, m := range _q.modifiers {
 		m(selector)
 	}
-	for _, p := range psfq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range psfq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := psfq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := psfq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (psfq *PropertySchemaFieldQuery) Modify(modifiers ...func(s *sql.Selector)) *PropertySchemaFieldSelect {
-	psfq.modifiers = append(psfq.modifiers, modifiers...)
-	return psfq.Select()
+func (_q *PropertySchemaFieldQuery) Modify(modifiers ...func(s *sql.Selector)) *PropertySchemaFieldSelect {
+	_q.modifiers = append(_q.modifiers, modifiers...)
+	return _q.Select()
 }
 
 // PropertySchemaFieldGroupBy is the group-by builder for PropertySchemaField entities.
@@ -615,41 +615,41 @@ type PropertySchemaFieldGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (psfgb *PropertySchemaFieldGroupBy) Aggregate(fns ...AggregateFunc) *PropertySchemaFieldGroupBy {
-	psfgb.fns = append(psfgb.fns, fns...)
-	return psfgb
+func (_g *PropertySchemaFieldGroupBy) Aggregate(fns ...AggregateFunc) *PropertySchemaFieldGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (psfgb *PropertySchemaFieldGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, psfgb.build.ctx, ent.OpQueryGroupBy)
-	if err := psfgb.build.prepareQuery(ctx); err != nil {
+func (_g *PropertySchemaFieldGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*PropertySchemaFieldQuery, *PropertySchemaFieldGroupBy](ctx, psfgb.build, psfgb, psfgb.build.inters, v)
+	return scanWithInterceptors[*PropertySchemaFieldQuery, *PropertySchemaFieldGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (psfgb *PropertySchemaFieldGroupBy) sqlScan(ctx context.Context, root *PropertySchemaFieldQuery, v any) error {
+func (_g *PropertySchemaFieldGroupBy) sqlScan(ctx context.Context, root *PropertySchemaFieldQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(psfgb.fns))
-	for _, fn := range psfgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*psfgb.flds)+len(psfgb.fns))
-		for _, f := range *psfgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*psfgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := psfgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -663,27 +663,27 @@ type PropertySchemaFieldSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (psfs *PropertySchemaFieldSelect) Aggregate(fns ...AggregateFunc) *PropertySchemaFieldSelect {
-	psfs.fns = append(psfs.fns, fns...)
-	return psfs
+func (_s *PropertySchemaFieldSelect) Aggregate(fns ...AggregateFunc) *PropertySchemaFieldSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (psfs *PropertySchemaFieldSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, psfs.ctx, ent.OpQuerySelect)
-	if err := psfs.prepareQuery(ctx); err != nil {
+func (_s *PropertySchemaFieldSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*PropertySchemaFieldQuery, *PropertySchemaFieldSelect](ctx, psfs.PropertySchemaFieldQuery, psfs, psfs.inters, v)
+	return scanWithInterceptors[*PropertySchemaFieldQuery, *PropertySchemaFieldSelect](ctx, _s.PropertySchemaFieldQuery, _s, _s.inters, v)
 }
 
-func (psfs *PropertySchemaFieldSelect) sqlScan(ctx context.Context, root *PropertySchemaFieldQuery, v any) error {
+func (_s *PropertySchemaFieldSelect) sqlScan(ctx context.Context, root *PropertySchemaFieldQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(psfs.fns))
-	for _, fn := range psfs.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*psfs.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -691,7 +691,7 @@ func (psfs *PropertySchemaFieldSelect) sqlScan(ctx context.Context, root *Proper
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := psfs.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -699,7 +699,7 @@ func (psfs *PropertySchemaFieldSelect) sqlScan(ctx context.Context, root *Proper
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (psfs *PropertySchemaFieldSelect) Modify(modifiers ...func(s *sql.Selector)) *PropertySchemaFieldSelect {
-	psfs.modifiers = append(psfs.modifiers, modifiers...)
-	return psfs
+func (_s *PropertySchemaFieldSelect) Modify(modifiers ...func(s *sql.Selector)) *PropertySchemaFieldSelect {
+	_s.modifiers = append(_s.modifiers, modifiers...)
+	return _s
 }

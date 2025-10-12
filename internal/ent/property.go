@@ -87,7 +87,7 @@ func (*Property) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Property fields.
-func (pr *Property) assignValues(columns []string, values []any) error {
+func (_m *Property) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -97,34 +97,34 @@ func (pr *Property) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				pr.ID = *value
+				_m.ID = *value
 			}
 		case property.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				pr.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case property.FieldNodeID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field node_id", values[i])
 			} else if value != nil {
-				pr.NodeID = *value
+				_m.NodeID = *value
 			}
 		case property.FieldFieldID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field field_id", values[i])
 			} else if value != nil {
-				pr.FieldID = *value
+				_m.FieldID = *value
 			}
 		case property.FieldValue:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field value", values[i])
 			} else if value.Valid {
-				pr.Value = value.String
+				_m.Value = value.String
 			}
 		default:
-			pr.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -132,54 +132,54 @@ func (pr *Property) assignValues(columns []string, values []any) error {
 
 // GetValue returns the ent.Value that was dynamically selected and assigned to the Property.
 // This includes values selected through modifiers, order, etc.
-func (pr *Property) GetValue(name string) (ent.Value, error) {
-	return pr.selectValues.Get(name)
+func (_m *Property) GetValue(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryNode queries the "node" edge of the Property entity.
-func (pr *Property) QueryNode() *NodeQuery {
-	return NewPropertyClient(pr.config).QueryNode(pr)
+func (_m *Property) QueryNode() *NodeQuery {
+	return NewPropertyClient(_m.config).QueryNode(_m)
 }
 
 // QuerySchema queries the "schema" edge of the Property entity.
-func (pr *Property) QuerySchema() *PropertySchemaFieldQuery {
-	return NewPropertyClient(pr.config).QuerySchema(pr)
+func (_m *Property) QuerySchema() *PropertySchemaFieldQuery {
+	return NewPropertyClient(_m.config).QuerySchema(_m)
 }
 
 // Update returns a builder for updating this Property.
 // Note that you need to call Property.Unwrap() before calling this method if this Property
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (pr *Property) Update() *PropertyUpdateOne {
-	return NewPropertyClient(pr.config).UpdateOne(pr)
+func (_m *Property) Update() *PropertyUpdateOne {
+	return NewPropertyClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Property entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (pr *Property) Unwrap() *Property {
-	_tx, ok := pr.config.driver.(*txDriver)
+func (_m *Property) Unwrap() *Property {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Property is not a transactional entity")
 	}
-	pr.config.driver = _tx.drv
-	return pr
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (pr *Property) String() string {
+func (_m *Property) String() string {
 	var builder strings.Builder
 	builder.WriteString("Property(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", pr.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(pr.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("node_id=")
-	builder.WriteString(fmt.Sprintf("%v", pr.NodeID))
+	builder.WriteString(fmt.Sprintf("%v", _m.NodeID))
 	builder.WriteString(", ")
 	builder.WriteString("field_id=")
-	builder.WriteString(fmt.Sprintf("%v", pr.FieldID))
+	builder.WriteString(fmt.Sprintf("%v", _m.FieldID))
 	builder.WriteString(", ")
 	builder.WriteString("value=")
-	builder.WriteString(pr.Value)
+	builder.WriteString(_m.Value)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
+	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/rs/xid"
 
@@ -49,7 +50,13 @@ func (d *database) Create(ctx context.Context,
 	r, err := create.Save(ctx)
 	if err != nil {
 		if ent.IsConstraintError(err) {
-			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.AlreadyExists))
+			return nil, fault.Wrap(err,
+				fctx.With(ctx),
+				ftag.With(ftag.AlreadyExists),
+				fmsg.WithDesc("authentication method already in use",
+					// We use "may" here because in sql's infinite wisdom,
+					// unique constraints don't tell you jack shit.
+					"This authentication method may already be linked to another account."))
 		}
 
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))

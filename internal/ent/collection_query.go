@@ -44,44 +44,44 @@ type CollectionQuery struct {
 }
 
 // Where adds a new predicate for the CollectionQuery builder.
-func (cq *CollectionQuery) Where(ps ...predicate.Collection) *CollectionQuery {
-	cq.predicates = append(cq.predicates, ps...)
-	return cq
+func (_q *CollectionQuery) Where(ps ...predicate.Collection) *CollectionQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (cq *CollectionQuery) Limit(limit int) *CollectionQuery {
-	cq.ctx.Limit = &limit
-	return cq
+func (_q *CollectionQuery) Limit(limit int) *CollectionQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (cq *CollectionQuery) Offset(offset int) *CollectionQuery {
-	cq.ctx.Offset = &offset
-	return cq
+func (_q *CollectionQuery) Offset(offset int) *CollectionQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (cq *CollectionQuery) Unique(unique bool) *CollectionQuery {
-	cq.ctx.Unique = &unique
-	return cq
+func (_q *CollectionQuery) Unique(unique bool) *CollectionQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (cq *CollectionQuery) Order(o ...collection.OrderOption) *CollectionQuery {
-	cq.order = append(cq.order, o...)
-	return cq
+func (_q *CollectionQuery) Order(o ...collection.OrderOption) *CollectionQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryOwner chains the current query on the "owner" edge.
-func (cq *CollectionQuery) QueryOwner() *AccountQuery {
-	query := (&AccountClient{config: cq.config}).Query()
+func (_q *CollectionQuery) QueryOwner() *AccountQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := cq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -90,20 +90,20 @@ func (cq *CollectionQuery) QueryOwner() *AccountQuery {
 			sqlgraph.To(account.Table, account.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, collection.OwnerTable, collection.OwnerColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryCoverImage chains the current query on the "cover_image" edge.
-func (cq *CollectionQuery) QueryCoverImage() *AssetQuery {
-	query := (&AssetClient{config: cq.config}).Query()
+func (_q *CollectionQuery) QueryCoverImage() *AssetQuery {
+	query := (&AssetClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := cq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -112,20 +112,20 @@ func (cq *CollectionQuery) QueryCoverImage() *AssetQuery {
 			sqlgraph.To(asset.Table, asset.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, collection.CoverImageTable, collection.CoverImageColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryPosts chains the current query on the "posts" edge.
-func (cq *CollectionQuery) QueryPosts() *PostQuery {
-	query := (&PostClient{config: cq.config}).Query()
+func (_q *CollectionQuery) QueryPosts() *PostQuery {
+	query := (&PostClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := cq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -134,20 +134,20 @@ func (cq *CollectionQuery) QueryPosts() *PostQuery {
 			sqlgraph.To(post.Table, post.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, collection.PostsTable, collection.PostsPrimaryKey...),
 		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryNodes chains the current query on the "nodes" edge.
-func (cq *CollectionQuery) QueryNodes() *NodeQuery {
-	query := (&NodeClient{config: cq.config}).Query()
+func (_q *CollectionQuery) QueryNodes() *NodeQuery {
+	query := (&NodeClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := cq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -156,20 +156,20 @@ func (cq *CollectionQuery) QueryNodes() *NodeQuery {
 			sqlgraph.To(node.Table, node.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, collection.NodesTable, collection.NodesPrimaryKey...),
 		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryCollectionPosts chains the current query on the "collection_posts" edge.
-func (cq *CollectionQuery) QueryCollectionPosts() *CollectionPostQuery {
-	query := (&CollectionPostClient{config: cq.config}).Query()
+func (_q *CollectionQuery) QueryCollectionPosts() *CollectionPostQuery {
+	query := (&CollectionPostClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := cq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -178,20 +178,20 @@ func (cq *CollectionQuery) QueryCollectionPosts() *CollectionPostQuery {
 			sqlgraph.To(collectionpost.Table, collectionpost.CollectionColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, collection.CollectionPostsTable, collection.CollectionPostsColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryCollectionNodes chains the current query on the "collection_nodes" edge.
-func (cq *CollectionQuery) QueryCollectionNodes() *CollectionNodeQuery {
-	query := (&CollectionNodeClient{config: cq.config}).Query()
+func (_q *CollectionQuery) QueryCollectionNodes() *CollectionNodeQuery {
+	query := (&CollectionNodeClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := cq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -200,7 +200,7 @@ func (cq *CollectionQuery) QueryCollectionNodes() *CollectionNodeQuery {
 			sqlgraph.To(collectionnode.Table, collectionnode.CollectionColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, collection.CollectionNodesTable, collection.CollectionNodesColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -208,8 +208,8 @@ func (cq *CollectionQuery) QueryCollectionNodes() *CollectionNodeQuery {
 
 // First returns the first Collection entity from the query.
 // Returns a *NotFoundError when no Collection was found.
-func (cq *CollectionQuery) First(ctx context.Context) (*Collection, error) {
-	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, ent.OpQueryFirst))
+func (_q *CollectionQuery) First(ctx context.Context) (*Collection, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -220,8 +220,8 @@ func (cq *CollectionQuery) First(ctx context.Context) (*Collection, error) {
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (cq *CollectionQuery) FirstX(ctx context.Context) *Collection {
-	node, err := cq.First(ctx)
+func (_q *CollectionQuery) FirstX(ctx context.Context) *Collection {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -230,9 +230,9 @@ func (cq *CollectionQuery) FirstX(ctx context.Context) *Collection {
 
 // FirstID returns the first Collection ID from the query.
 // Returns a *NotFoundError when no Collection ID was found.
-func (cq *CollectionQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
+func (_q *CollectionQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, ent.OpQueryFirstID)); err != nil {
+	if ids, err = _q.Limit(1).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -243,8 +243,8 @@ func (cq *CollectionQuery) FirstID(ctx context.Context) (id xid.ID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *CollectionQuery) FirstIDX(ctx context.Context) xid.ID {
-	id, err := cq.FirstID(ctx)
+func (_q *CollectionQuery) FirstIDX(ctx context.Context) xid.ID {
+	id, err := _q.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -254,8 +254,8 @@ func (cq *CollectionQuery) FirstIDX(ctx context.Context) xid.ID {
 // Only returns a single Collection entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one Collection entity is found.
 // Returns a *NotFoundError when no Collection entities are found.
-func (cq *CollectionQuery) Only(ctx context.Context) (*Collection, error) {
-	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, ent.OpQueryOnly))
+func (_q *CollectionQuery) Only(ctx context.Context) (*Collection, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -270,8 +270,8 @@ func (cq *CollectionQuery) Only(ctx context.Context) (*Collection, error) {
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (cq *CollectionQuery) OnlyX(ctx context.Context) *Collection {
-	node, err := cq.Only(ctx)
+func (_q *CollectionQuery) OnlyX(ctx context.Context) *Collection {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -281,9 +281,9 @@ func (cq *CollectionQuery) OnlyX(ctx context.Context) *Collection {
 // OnlyID is like Only, but returns the only Collection ID in the query.
 // Returns a *NotSingularError when more than one Collection ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *CollectionQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
+func (_q *CollectionQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 	var ids []xid.ID
-	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, ent.OpQueryOnlyID)); err != nil {
+	if ids, err = _q.Limit(2).IDs(setContextOp(ctx, _q.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -298,8 +298,8 @@ func (cq *CollectionQuery) OnlyID(ctx context.Context) (id xid.ID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *CollectionQuery) OnlyIDX(ctx context.Context) xid.ID {
-	id, err := cq.OnlyID(ctx)
+func (_q *CollectionQuery) OnlyIDX(ctx context.Context) xid.ID {
+	id, err := _q.OnlyID(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -307,18 +307,18 @@ func (cq *CollectionQuery) OnlyIDX(ctx context.Context) xid.ID {
 }
 
 // All executes the query and returns a list of Collections.
-func (cq *CollectionQuery) All(ctx context.Context) ([]*Collection, error) {
-	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryAll)
-	if err := cq.prepareQuery(ctx); err != nil {
+func (_q *CollectionQuery) All(ctx context.Context) ([]*Collection, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*Collection, *CollectionQuery]()
-	return withInterceptors[[]*Collection](ctx, cq, qr, cq.inters)
+	return withInterceptors[[]*Collection](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (cq *CollectionQuery) AllX(ctx context.Context) []*Collection {
-	nodes, err := cq.All(ctx)
+func (_q *CollectionQuery) AllX(ctx context.Context) []*Collection {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -326,20 +326,20 @@ func (cq *CollectionQuery) AllX(ctx context.Context) []*Collection {
 }
 
 // IDs executes the query and returns a list of Collection IDs.
-func (cq *CollectionQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
-	if cq.ctx.Unique == nil && cq.path != nil {
-		cq.Unique(true)
+func (_q *CollectionQuery) IDs(ctx context.Context) (ids []xid.ID, err error) {
+	if _q.ctx.Unique == nil && _q.path != nil {
+		_q.Unique(true)
 	}
-	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryIDs)
-	if err = cq.Select(collection.FieldID).Scan(ctx, &ids); err != nil {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryIDs)
+	if err = _q.Select(collection.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *CollectionQuery) IDsX(ctx context.Context) []xid.ID {
-	ids, err := cq.IDs(ctx)
+func (_q *CollectionQuery) IDsX(ctx context.Context) []xid.ID {
+	ids, err := _q.IDs(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -347,17 +347,17 @@ func (cq *CollectionQuery) IDsX(ctx context.Context) []xid.ID {
 }
 
 // Count returns the count of the given query.
-func (cq *CollectionQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryCount)
-	if err := cq.prepareQuery(ctx); err != nil {
+func (_q *CollectionQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, cq, querierCount[*CollectionQuery](), cq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*CollectionQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (cq *CollectionQuery) CountX(ctx context.Context) int {
-	count, err := cq.Count(ctx)
+func (_q *CollectionQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -365,9 +365,9 @@ func (cq *CollectionQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (cq *CollectionQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, cq.ctx, ent.OpQueryExist)
-	switch _, err := cq.FirstID(ctx); {
+func (_q *CollectionQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -378,8 +378,8 @@ func (cq *CollectionQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (cq *CollectionQuery) ExistX(ctx context.Context) bool {
-	exist, err := cq.Exist(ctx)
+func (_q *CollectionQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -388,93 +388,93 @@ func (cq *CollectionQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the CollectionQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (cq *CollectionQuery) Clone() *CollectionQuery {
-	if cq == nil {
+func (_q *CollectionQuery) Clone() *CollectionQuery {
+	if _q == nil {
 		return nil
 	}
 	return &CollectionQuery{
-		config:              cq.config,
-		ctx:                 cq.ctx.Clone(),
-		order:               append([]collection.OrderOption{}, cq.order...),
-		inters:              append([]Interceptor{}, cq.inters...),
-		predicates:          append([]predicate.Collection{}, cq.predicates...),
-		withOwner:           cq.withOwner.Clone(),
-		withCoverImage:      cq.withCoverImage.Clone(),
-		withPosts:           cq.withPosts.Clone(),
-		withNodes:           cq.withNodes.Clone(),
-		withCollectionPosts: cq.withCollectionPosts.Clone(),
-		withCollectionNodes: cq.withCollectionNodes.Clone(),
+		config:              _q.config,
+		ctx:                 _q.ctx.Clone(),
+		order:               append([]collection.OrderOption{}, _q.order...),
+		inters:              append([]Interceptor{}, _q.inters...),
+		predicates:          append([]predicate.Collection{}, _q.predicates...),
+		withOwner:           _q.withOwner.Clone(),
+		withCoverImage:      _q.withCoverImage.Clone(),
+		withPosts:           _q.withPosts.Clone(),
+		withNodes:           _q.withNodes.Clone(),
+		withCollectionPosts: _q.withCollectionPosts.Clone(),
+		withCollectionNodes: _q.withCollectionNodes.Clone(),
 		// clone intermediate query.
-		sql:       cq.sql.Clone(),
-		path:      cq.path,
-		modifiers: append([]func(*sql.Selector){}, cq.modifiers...),
+		sql:       _q.sql.Clone(),
+		path:      _q.path,
+		modifiers: append([]func(*sql.Selector){}, _q.modifiers...),
 	}
 }
 
 // WithOwner tells the query-builder to eager-load the nodes that are connected to
 // the "owner" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CollectionQuery) WithOwner(opts ...func(*AccountQuery)) *CollectionQuery {
-	query := (&AccountClient{config: cq.config}).Query()
+func (_q *CollectionQuery) WithOwner(opts ...func(*AccountQuery)) *CollectionQuery {
+	query := (&AccountClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withOwner = query
-	return cq
+	_q.withOwner = query
+	return _q
 }
 
 // WithCoverImage tells the query-builder to eager-load the nodes that are connected to
 // the "cover_image" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CollectionQuery) WithCoverImage(opts ...func(*AssetQuery)) *CollectionQuery {
-	query := (&AssetClient{config: cq.config}).Query()
+func (_q *CollectionQuery) WithCoverImage(opts ...func(*AssetQuery)) *CollectionQuery {
+	query := (&AssetClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withCoverImage = query
-	return cq
+	_q.withCoverImage = query
+	return _q
 }
 
 // WithPosts tells the query-builder to eager-load the nodes that are connected to
 // the "posts" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CollectionQuery) WithPosts(opts ...func(*PostQuery)) *CollectionQuery {
-	query := (&PostClient{config: cq.config}).Query()
+func (_q *CollectionQuery) WithPosts(opts ...func(*PostQuery)) *CollectionQuery {
+	query := (&PostClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withPosts = query
-	return cq
+	_q.withPosts = query
+	return _q
 }
 
 // WithNodes tells the query-builder to eager-load the nodes that are connected to
 // the "nodes" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CollectionQuery) WithNodes(opts ...func(*NodeQuery)) *CollectionQuery {
-	query := (&NodeClient{config: cq.config}).Query()
+func (_q *CollectionQuery) WithNodes(opts ...func(*NodeQuery)) *CollectionQuery {
+	query := (&NodeClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withNodes = query
-	return cq
+	_q.withNodes = query
+	return _q
 }
 
 // WithCollectionPosts tells the query-builder to eager-load the nodes that are connected to
 // the "collection_posts" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CollectionQuery) WithCollectionPosts(opts ...func(*CollectionPostQuery)) *CollectionQuery {
-	query := (&CollectionPostClient{config: cq.config}).Query()
+func (_q *CollectionQuery) WithCollectionPosts(opts ...func(*CollectionPostQuery)) *CollectionQuery {
+	query := (&CollectionPostClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withCollectionPosts = query
-	return cq
+	_q.withCollectionPosts = query
+	return _q
 }
 
 // WithCollectionNodes tells the query-builder to eager-load the nodes that are connected to
 // the "collection_nodes" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CollectionQuery) WithCollectionNodes(opts ...func(*CollectionNodeQuery)) *CollectionQuery {
-	query := (&CollectionNodeClient{config: cq.config}).Query()
+func (_q *CollectionQuery) WithCollectionNodes(opts ...func(*CollectionNodeQuery)) *CollectionQuery {
+	query := (&CollectionNodeClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withCollectionNodes = query
-	return cq
+	_q.withCollectionNodes = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -491,10 +491,10 @@ func (cq *CollectionQuery) WithCollectionNodes(opts ...func(*CollectionNodeQuery
 //		GroupBy(collection.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (cq *CollectionQuery) GroupBy(field string, fields ...string) *CollectionGroupBy {
-	cq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &CollectionGroupBy{build: cq}
-	grbuild.flds = &cq.ctx.Fields
+func (_q *CollectionQuery) GroupBy(field string, fields ...string) *CollectionGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &CollectionGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = collection.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -512,60 +512,60 @@ func (cq *CollectionQuery) GroupBy(field string, fields ...string) *CollectionGr
 //	client.Collection.Query().
 //		Select(collection.FieldCreatedAt).
 //		Scan(ctx, &v)
-func (cq *CollectionQuery) Select(fields ...string) *CollectionSelect {
-	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
-	sbuild := &CollectionSelect{CollectionQuery: cq}
+func (_q *CollectionQuery) Select(fields ...string) *CollectionSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &CollectionSelect{CollectionQuery: _q}
 	sbuild.label = collection.Label
-	sbuild.flds, sbuild.scan = &cq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a CollectionSelect configured with the given aggregations.
-func (cq *CollectionQuery) Aggregate(fns ...AggregateFunc) *CollectionSelect {
-	return cq.Select().Aggregate(fns...)
+func (_q *CollectionQuery) Aggregate(fns ...AggregateFunc) *CollectionSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (cq *CollectionQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range cq.inters {
+func (_q *CollectionQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, cq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range cq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !collection.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if cq.path != nil {
-		prev, err := cq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		cq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (cq *CollectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Collection, error) {
+func (_q *CollectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Collection, error) {
 	var (
 		nodes       = []*Collection{}
-		withFKs     = cq.withFKs
-		_spec       = cq.querySpec()
+		withFKs     = _q.withFKs
+		_spec       = _q.querySpec()
 		loadedTypes = [6]bool{
-			cq.withOwner != nil,
-			cq.withCoverImage != nil,
-			cq.withPosts != nil,
-			cq.withNodes != nil,
-			cq.withCollectionPosts != nil,
-			cq.withCollectionNodes != nil,
+			_q.withOwner != nil,
+			_q.withCoverImage != nil,
+			_q.withPosts != nil,
+			_q.withNodes != nil,
+			_q.withCollectionPosts != nil,
+			_q.withCollectionNodes != nil,
 		}
 	)
-	if cq.withOwner != nil {
+	if _q.withOwner != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -575,58 +575,58 @@ func (cq *CollectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 		return (*Collection).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Collection{config: cq.config}
+		node := &Collection{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(cq.modifiers) > 0 {
-		_spec.Modifiers = cq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, cq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cq.withOwner; query != nil {
-		if err := cq.loadOwner(ctx, query, nodes, nil,
+	if query := _q.withOwner; query != nil {
+		if err := _q.loadOwner(ctx, query, nodes, nil,
 			func(n *Collection, e *Account) { n.Edges.Owner = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := cq.withCoverImage; query != nil {
-		if err := cq.loadCoverImage(ctx, query, nodes, nil,
+	if query := _q.withCoverImage; query != nil {
+		if err := _q.loadCoverImage(ctx, query, nodes, nil,
 			func(n *Collection, e *Asset) { n.Edges.CoverImage = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := cq.withPosts; query != nil {
-		if err := cq.loadPosts(ctx, query, nodes,
+	if query := _q.withPosts; query != nil {
+		if err := _q.loadPosts(ctx, query, nodes,
 			func(n *Collection) { n.Edges.Posts = []*Post{} },
 			func(n *Collection, e *Post) { n.Edges.Posts = append(n.Edges.Posts, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := cq.withNodes; query != nil {
-		if err := cq.loadNodes(ctx, query, nodes,
+	if query := _q.withNodes; query != nil {
+		if err := _q.loadNodes(ctx, query, nodes,
 			func(n *Collection) { n.Edges.Nodes = []*Node{} },
 			func(n *Collection, e *Node) { n.Edges.Nodes = append(n.Edges.Nodes, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := cq.withCollectionPosts; query != nil {
-		if err := cq.loadCollectionPosts(ctx, query, nodes,
+	if query := _q.withCollectionPosts; query != nil {
+		if err := _q.loadCollectionPosts(ctx, query, nodes,
 			func(n *Collection) { n.Edges.CollectionPosts = []*CollectionPost{} },
 			func(n *Collection, e *CollectionPost) { n.Edges.CollectionPosts = append(n.Edges.CollectionPosts, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := cq.withCollectionNodes; query != nil {
-		if err := cq.loadCollectionNodes(ctx, query, nodes,
+	if query := _q.withCollectionNodes; query != nil {
+		if err := _q.loadCollectionNodes(ctx, query, nodes,
 			func(n *Collection) { n.Edges.CollectionNodes = []*CollectionNode{} },
 			func(n *Collection, e *CollectionNode) { n.Edges.CollectionNodes = append(n.Edges.CollectionNodes, e) }); err != nil {
 			return nil, err
@@ -635,7 +635,7 @@ func (cq *CollectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*C
 	return nodes, nil
 }
 
-func (cq *CollectionQuery) loadOwner(ctx context.Context, query *AccountQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Account)) error {
+func (_q *CollectionQuery) loadOwner(ctx context.Context, query *AccountQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Account)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Collection)
 	for i := range nodes {
@@ -667,7 +667,7 @@ func (cq *CollectionQuery) loadOwner(ctx context.Context, query *AccountQuery, n
 	}
 	return nil
 }
-func (cq *CollectionQuery) loadCoverImage(ctx context.Context, query *AssetQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Asset)) error {
+func (_q *CollectionQuery) loadCoverImage(ctx context.Context, query *AssetQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Asset)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Collection)
 	for i := range nodes {
@@ -699,7 +699,7 @@ func (cq *CollectionQuery) loadCoverImage(ctx context.Context, query *AssetQuery
 	}
 	return nil
 }
-func (cq *CollectionQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Post)) error {
+func (_q *CollectionQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Post)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Collection)
 	nids := make(map[xid.ID]map[*Collection]struct{})
@@ -760,7 +760,7 @@ func (cq *CollectionQuery) loadPosts(ctx context.Context, query *PostQuery, node
 	}
 	return nil
 }
-func (cq *CollectionQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Node)) error {
+func (_q *CollectionQuery) loadNodes(ctx context.Context, query *NodeQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *Node)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[xid.ID]*Collection)
 	nids := make(map[xid.ID]map[*Collection]struct{})
@@ -821,7 +821,7 @@ func (cq *CollectionQuery) loadNodes(ctx context.Context, query *NodeQuery, node
 	}
 	return nil
 }
-func (cq *CollectionQuery) loadCollectionPosts(ctx context.Context, query *CollectionPostQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *CollectionPost)) error {
+func (_q *CollectionQuery) loadCollectionPosts(ctx context.Context, query *CollectionPostQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *CollectionPost)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Collection)
 	for i := range nodes {
@@ -851,7 +851,7 @@ func (cq *CollectionQuery) loadCollectionPosts(ctx context.Context, query *Colle
 	}
 	return nil
 }
-func (cq *CollectionQuery) loadCollectionNodes(ctx context.Context, query *CollectionNodeQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *CollectionNode)) error {
+func (_q *CollectionQuery) loadCollectionNodes(ctx context.Context, query *CollectionNodeQuery, nodes []*Collection, init func(*Collection), assign func(*Collection, *CollectionNode)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Collection)
 	for i := range nodes {
@@ -882,27 +882,27 @@ func (cq *CollectionQuery) loadCollectionNodes(ctx context.Context, query *Colle
 	return nil
 }
 
-func (cq *CollectionQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := cq.querySpec()
-	if len(cq.modifiers) > 0 {
-		_spec.Modifiers = cq.modifiers
+func (_q *CollectionQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
-	_spec.Node.Columns = cq.ctx.Fields
-	if len(cq.ctx.Fields) > 0 {
-		_spec.Unique = cq.ctx.Unique != nil && *cq.ctx.Unique
+	_spec.Node.Columns = _q.ctx.Fields
+	if len(_q.ctx.Fields) > 0 {
+		_spec.Unique = _q.ctx.Unique != nil && *_q.ctx.Unique
 	}
-	return sqlgraph.CountNodes(ctx, cq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (cq *CollectionQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *CollectionQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(collection.Table, collection.Columns, sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString))
-	_spec.From = cq.sql
-	if unique := cq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if cq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := cq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, collection.FieldID)
 		for i := range fields {
@@ -910,24 +910,24 @@ func (cq *CollectionQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if cq.withCoverImage != nil {
+		if _q.withCoverImage != nil {
 			_spec.Node.AddColumnOnce(collection.FieldCoverAssetID)
 		}
 	}
-	if ps := cq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := cq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := cq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := cq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -937,45 +937,45 @@ func (cq *CollectionQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (cq *CollectionQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(cq.driver.Dialect())
+func (_q *CollectionQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(collection.Table)
-	columns := cq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = collection.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if cq.sql != nil {
-		selector = cq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if cq.ctx.Unique != nil && *cq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, m := range cq.modifiers {
+	for _, m := range _q.modifiers {
 		m(selector)
 	}
-	for _, p := range cq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range cq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := cq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := cq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (cq *CollectionQuery) Modify(modifiers ...func(s *sql.Selector)) *CollectionSelect {
-	cq.modifiers = append(cq.modifiers, modifiers...)
-	return cq.Select()
+func (_q *CollectionQuery) Modify(modifiers ...func(s *sql.Selector)) *CollectionSelect {
+	_q.modifiers = append(_q.modifiers, modifiers...)
+	return _q.Select()
 }
 
 // CollectionGroupBy is the group-by builder for Collection entities.
@@ -985,41 +985,41 @@ type CollectionGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (cgb *CollectionGroupBy) Aggregate(fns ...AggregateFunc) *CollectionGroupBy {
-	cgb.fns = append(cgb.fns, fns...)
-	return cgb
+func (_g *CollectionGroupBy) Aggregate(fns ...AggregateFunc) *CollectionGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (cgb *CollectionGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cgb.build.ctx, ent.OpQueryGroupBy)
-	if err := cgb.build.prepareQuery(ctx); err != nil {
+func (_g *CollectionGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*CollectionQuery, *CollectionGroupBy](ctx, cgb.build, cgb, cgb.build.inters, v)
+	return scanWithInterceptors[*CollectionQuery, *CollectionGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (cgb *CollectionGroupBy) sqlScan(ctx context.Context, root *CollectionQuery, v any) error {
+func (_g *CollectionGroupBy) sqlScan(ctx context.Context, root *CollectionQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(cgb.fns))
-	for _, fn := range cgb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*cgb.flds)+len(cgb.fns))
-		for _, f := range *cgb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*cgb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := cgb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -1033,27 +1033,27 @@ type CollectionSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (cs *CollectionSelect) Aggregate(fns ...AggregateFunc) *CollectionSelect {
-	cs.fns = append(cs.fns, fns...)
-	return cs
+func (_s *CollectionSelect) Aggregate(fns ...AggregateFunc) *CollectionSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (cs *CollectionSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cs.ctx, ent.OpQuerySelect)
-	if err := cs.prepareQuery(ctx); err != nil {
+func (_s *CollectionSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*CollectionQuery, *CollectionSelect](ctx, cs.CollectionQuery, cs, cs.inters, v)
+	return scanWithInterceptors[*CollectionQuery, *CollectionSelect](ctx, _s.CollectionQuery, _s, _s.inters, v)
 }
 
-func (cs *CollectionSelect) sqlScan(ctx context.Context, root *CollectionQuery, v any) error {
+func (_s *CollectionSelect) sqlScan(ctx context.Context, root *CollectionQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(cs.fns))
-	for _, fn := range cs.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*cs.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -1061,7 +1061,7 @@ func (cs *CollectionSelect) sqlScan(ctx context.Context, root *CollectionQuery, 
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := cs.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -1069,7 +1069,7 @@ func (cs *CollectionSelect) sqlScan(ctx context.Context, root *CollectionQuery, 
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (cs *CollectionSelect) Modify(modifiers ...func(s *sql.Selector)) *CollectionSelect {
-	cs.modifiers = append(cs.modifiers, modifiers...)
-	return cs
+func (_s *CollectionSelect) Modify(modifiers ...func(s *sql.Selector)) *CollectionSelect {
+	_s.modifiers = append(_s.modifiers, modifiers...)
+	return _s
 }

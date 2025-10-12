@@ -20,56 +20,56 @@ type LikePostDelete struct {
 }
 
 // Where appends a list predicates to the LikePostDelete builder.
-func (lpd *LikePostDelete) Where(ps ...predicate.LikePost) *LikePostDelete {
-	lpd.mutation.Where(ps...)
-	return lpd
+func (_d *LikePostDelete) Where(ps ...predicate.LikePost) *LikePostDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (lpd *LikePostDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, lpd.sqlExec, lpd.mutation, lpd.hooks)
+func (_d *LikePostDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (lpd *LikePostDelete) ExecX(ctx context.Context) int {
-	n, err := lpd.Exec(ctx)
+func (_d *LikePostDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (lpd *LikePostDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *LikePostDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(likepost.Table, sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString))
-	if ps := lpd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, lpd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	lpd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // LikePostDeleteOne is the builder for deleting a single LikePost entity.
 type LikePostDeleteOne struct {
-	lpd *LikePostDelete
+	_d *LikePostDelete
 }
 
 // Where appends a list predicates to the LikePostDelete builder.
-func (lpdo *LikePostDeleteOne) Where(ps ...predicate.LikePost) *LikePostDeleteOne {
-	lpdo.lpd.mutation.Where(ps...)
-	return lpdo
+func (_d *LikePostDeleteOne) Where(ps ...predicate.LikePost) *LikePostDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (lpdo *LikePostDeleteOne) Exec(ctx context.Context) error {
-	n, err := lpdo.lpd.Exec(ctx)
+func (_d *LikePostDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (lpdo *LikePostDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (lpdo *LikePostDeleteOne) ExecX(ctx context.Context) {
-	if err := lpdo.Exec(ctx); err != nil {
+func (_d *LikePostDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

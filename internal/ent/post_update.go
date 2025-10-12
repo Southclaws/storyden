@@ -35,763 +35,763 @@ type PostUpdate struct {
 }
 
 // Where appends a list predicates to the PostUpdate builder.
-func (pu *PostUpdate) Where(ps ...predicate.Post) *PostUpdate {
-	pu.mutation.Where(ps...)
-	return pu
+func (_u *PostUpdate) Where(ps ...predicate.Post) *PostUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (pu *PostUpdate) SetUpdatedAt(t time.Time) *PostUpdate {
-	pu.mutation.SetUpdatedAt(t)
-	return pu
+func (_u *PostUpdate) SetUpdatedAt(v time.Time) *PostUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableUpdatedAt(t *time.Time) *PostUpdate {
-	if t != nil {
-		pu.SetUpdatedAt(*t)
+func (_u *PostUpdate) SetNillableUpdatedAt(v *time.Time) *PostUpdate {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return pu
+	return _u
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (pu *PostUpdate) SetDeletedAt(t time.Time) *PostUpdate {
-	pu.mutation.SetDeletedAt(t)
-	return pu
+func (_u *PostUpdate) SetDeletedAt(v time.Time) *PostUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableDeletedAt(t *time.Time) *PostUpdate {
-	if t != nil {
-		pu.SetDeletedAt(*t)
+func (_u *PostUpdate) SetNillableDeletedAt(v *time.Time) *PostUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return pu
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (pu *PostUpdate) ClearDeletedAt() *PostUpdate {
-	pu.mutation.ClearDeletedAt()
-	return pu
+func (_u *PostUpdate) ClearDeletedAt() *PostUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (pu *PostUpdate) SetIndexedAt(t time.Time) *PostUpdate {
-	pu.mutation.SetIndexedAt(t)
-	return pu
+func (_u *PostUpdate) SetIndexedAt(v time.Time) *PostUpdate {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableIndexedAt(t *time.Time) *PostUpdate {
-	if t != nil {
-		pu.SetIndexedAt(*t)
+func (_u *PostUpdate) SetNillableIndexedAt(v *time.Time) *PostUpdate {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return pu
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (pu *PostUpdate) ClearIndexedAt() *PostUpdate {
-	pu.mutation.ClearIndexedAt()
-	return pu
+func (_u *PostUpdate) ClearIndexedAt() *PostUpdate {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetFirst sets the "first" field.
-func (pu *PostUpdate) SetFirst(b bool) *PostUpdate {
-	pu.mutation.SetFirst(b)
-	return pu
+func (_u *PostUpdate) SetFirst(v bool) *PostUpdate {
+	_u.mutation.SetFirst(v)
+	return _u
 }
 
 // SetNillableFirst sets the "first" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableFirst(b *bool) *PostUpdate {
-	if b != nil {
-		pu.SetFirst(*b)
+func (_u *PostUpdate) SetNillableFirst(v *bool) *PostUpdate {
+	if v != nil {
+		_u.SetFirst(*v)
 	}
-	return pu
+	return _u
 }
 
 // SetTitle sets the "title" field.
-func (pu *PostUpdate) SetTitle(s string) *PostUpdate {
-	pu.mutation.SetTitle(s)
-	return pu
+func (_u *PostUpdate) SetTitle(v string) *PostUpdate {
+	_u.mutation.SetTitle(v)
+	return _u
 }
 
 // SetNillableTitle sets the "title" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableTitle(s *string) *PostUpdate {
-	if s != nil {
-		pu.SetTitle(*s)
+func (_u *PostUpdate) SetNillableTitle(v *string) *PostUpdate {
+	if v != nil {
+		_u.SetTitle(*v)
 	}
-	return pu
+	return _u
 }
 
 // ClearTitle clears the value of the "title" field.
-func (pu *PostUpdate) ClearTitle() *PostUpdate {
-	pu.mutation.ClearTitle()
-	return pu
+func (_u *PostUpdate) ClearTitle() *PostUpdate {
+	_u.mutation.ClearTitle()
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (pu *PostUpdate) SetSlug(s string) *PostUpdate {
-	pu.mutation.SetSlug(s)
-	return pu
+func (_u *PostUpdate) SetSlug(v string) *PostUpdate {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableSlug(s *string) *PostUpdate {
-	if s != nil {
-		pu.SetSlug(*s)
+func (_u *PostUpdate) SetNillableSlug(v *string) *PostUpdate {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return pu
+	return _u
 }
 
 // ClearSlug clears the value of the "slug" field.
-func (pu *PostUpdate) ClearSlug() *PostUpdate {
-	pu.mutation.ClearSlug()
-	return pu
+func (_u *PostUpdate) ClearSlug() *PostUpdate {
+	_u.mutation.ClearSlug()
+	return _u
 }
 
 // SetPinned sets the "pinned" field.
-func (pu *PostUpdate) SetPinned(b bool) *PostUpdate {
-	pu.mutation.SetPinned(b)
-	return pu
+func (_u *PostUpdate) SetPinned(v bool) *PostUpdate {
+	_u.mutation.SetPinned(v)
+	return _u
 }
 
 // SetNillablePinned sets the "pinned" field if the given value is not nil.
-func (pu *PostUpdate) SetNillablePinned(b *bool) *PostUpdate {
-	if b != nil {
-		pu.SetPinned(*b)
+func (_u *PostUpdate) SetNillablePinned(v *bool) *PostUpdate {
+	if v != nil {
+		_u.SetPinned(*v)
 	}
-	return pu
+	return _u
 }
 
 // SetLastReplyAt sets the "last_reply_at" field.
-func (pu *PostUpdate) SetLastReplyAt(t time.Time) *PostUpdate {
-	pu.mutation.SetLastReplyAt(t)
-	return pu
+func (_u *PostUpdate) SetLastReplyAt(v time.Time) *PostUpdate {
+	_u.mutation.SetLastReplyAt(v)
+	return _u
 }
 
 // SetNillableLastReplyAt sets the "last_reply_at" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableLastReplyAt(t *time.Time) *PostUpdate {
-	if t != nil {
-		pu.SetLastReplyAt(*t)
+func (_u *PostUpdate) SetNillableLastReplyAt(v *time.Time) *PostUpdate {
+	if v != nil {
+		_u.SetLastReplyAt(*v)
 	}
-	return pu
+	return _u
 }
 
 // ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (pu *PostUpdate) ClearLastReplyAt() *PostUpdate {
-	pu.mutation.ClearLastReplyAt()
-	return pu
+func (_u *PostUpdate) ClearLastReplyAt() *PostUpdate {
+	_u.mutation.ClearLastReplyAt()
+	return _u
 }
 
 // SetRootPostID sets the "root_post_id" field.
-func (pu *PostUpdate) SetRootPostID(x xid.ID) *PostUpdate {
-	pu.mutation.SetRootPostID(x)
-	return pu
+func (_u *PostUpdate) SetRootPostID(v xid.ID) *PostUpdate {
+	_u.mutation.SetRootPostID(v)
+	return _u
 }
 
 // SetNillableRootPostID sets the "root_post_id" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableRootPostID(x *xid.ID) *PostUpdate {
-	if x != nil {
-		pu.SetRootPostID(*x)
+func (_u *PostUpdate) SetNillableRootPostID(v *xid.ID) *PostUpdate {
+	if v != nil {
+		_u.SetRootPostID(*v)
 	}
-	return pu
+	return _u
 }
 
 // ClearRootPostID clears the value of the "root_post_id" field.
-func (pu *PostUpdate) ClearRootPostID() *PostUpdate {
-	pu.mutation.ClearRootPostID()
-	return pu
+func (_u *PostUpdate) ClearRootPostID() *PostUpdate {
+	_u.mutation.ClearRootPostID()
+	return _u
 }
 
 // SetReplyToPostID sets the "reply_to_post_id" field.
-func (pu *PostUpdate) SetReplyToPostID(x xid.ID) *PostUpdate {
-	pu.mutation.SetReplyToPostID(x)
-	return pu
+func (_u *PostUpdate) SetReplyToPostID(v xid.ID) *PostUpdate {
+	_u.mutation.SetReplyToPostID(v)
+	return _u
 }
 
 // SetNillableReplyToPostID sets the "reply_to_post_id" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableReplyToPostID(x *xid.ID) *PostUpdate {
-	if x != nil {
-		pu.SetReplyToPostID(*x)
+func (_u *PostUpdate) SetNillableReplyToPostID(v *xid.ID) *PostUpdate {
+	if v != nil {
+		_u.SetReplyToPostID(*v)
 	}
-	return pu
+	return _u
 }
 
 // ClearReplyToPostID clears the value of the "reply_to_post_id" field.
-func (pu *PostUpdate) ClearReplyToPostID() *PostUpdate {
-	pu.mutation.ClearReplyToPostID()
-	return pu
+func (_u *PostUpdate) ClearReplyToPostID() *PostUpdate {
+	_u.mutation.ClearReplyToPostID()
+	return _u
 }
 
 // SetBody sets the "body" field.
-func (pu *PostUpdate) SetBody(s string) *PostUpdate {
-	pu.mutation.SetBody(s)
-	return pu
+func (_u *PostUpdate) SetBody(v string) *PostUpdate {
+	_u.mutation.SetBody(v)
+	return _u
 }
 
 // SetNillableBody sets the "body" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableBody(s *string) *PostUpdate {
-	if s != nil {
-		pu.SetBody(*s)
+func (_u *PostUpdate) SetNillableBody(v *string) *PostUpdate {
+	if v != nil {
+		_u.SetBody(*v)
 	}
-	return pu
+	return _u
 }
 
 // SetShort sets the "short" field.
-func (pu *PostUpdate) SetShort(s string) *PostUpdate {
-	pu.mutation.SetShort(s)
-	return pu
+func (_u *PostUpdate) SetShort(v string) *PostUpdate {
+	_u.mutation.SetShort(v)
+	return _u
 }
 
 // SetNillableShort sets the "short" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableShort(s *string) *PostUpdate {
-	if s != nil {
-		pu.SetShort(*s)
+func (_u *PostUpdate) SetNillableShort(v *string) *PostUpdate {
+	if v != nil {
+		_u.SetShort(*v)
 	}
-	return pu
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (pu *PostUpdate) SetMetadata(m map[string]interface{}) *PostUpdate {
-	pu.mutation.SetMetadata(m)
-	return pu
+func (_u *PostUpdate) SetMetadata(v map[string]interface{}) *PostUpdate {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (pu *PostUpdate) ClearMetadata() *PostUpdate {
-	pu.mutation.ClearMetadata()
-	return pu
+func (_u *PostUpdate) ClearMetadata() *PostUpdate {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetVisibility sets the "visibility" field.
-func (pu *PostUpdate) SetVisibility(po post.Visibility) *PostUpdate {
-	pu.mutation.SetVisibility(po)
-	return pu
+func (_u *PostUpdate) SetVisibility(v post.Visibility) *PostUpdate {
+	_u.mutation.SetVisibility(v)
+	return _u
 }
 
 // SetNillableVisibility sets the "visibility" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableVisibility(po *post.Visibility) *PostUpdate {
-	if po != nil {
-		pu.SetVisibility(*po)
+func (_u *PostUpdate) SetNillableVisibility(v *post.Visibility) *PostUpdate {
+	if v != nil {
+		_u.SetVisibility(*v)
 	}
-	return pu
+	return _u
 }
 
 // SetAccountPosts sets the "account_posts" field.
-func (pu *PostUpdate) SetAccountPosts(x xid.ID) *PostUpdate {
-	pu.mutation.SetAccountPosts(x)
-	return pu
+func (_u *PostUpdate) SetAccountPosts(v xid.ID) *PostUpdate {
+	_u.mutation.SetAccountPosts(v)
+	return _u
 }
 
 // SetNillableAccountPosts sets the "account_posts" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableAccountPosts(x *xid.ID) *PostUpdate {
-	if x != nil {
-		pu.SetAccountPosts(*x)
+func (_u *PostUpdate) SetNillableAccountPosts(v *xid.ID) *PostUpdate {
+	if v != nil {
+		_u.SetAccountPosts(*v)
 	}
-	return pu
+	return _u
 }
 
 // SetCategoryID sets the "category_id" field.
-func (pu *PostUpdate) SetCategoryID(x xid.ID) *PostUpdate {
-	pu.mutation.SetCategoryID(x)
-	return pu
+func (_u *PostUpdate) SetCategoryID(v xid.ID) *PostUpdate {
+	_u.mutation.SetCategoryID(v)
+	return _u
 }
 
 // SetNillableCategoryID sets the "category_id" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableCategoryID(x *xid.ID) *PostUpdate {
-	if x != nil {
-		pu.SetCategoryID(*x)
+func (_u *PostUpdate) SetNillableCategoryID(v *xid.ID) *PostUpdate {
+	if v != nil {
+		_u.SetCategoryID(*v)
 	}
-	return pu
+	return _u
 }
 
 // ClearCategoryID clears the value of the "category_id" field.
-func (pu *PostUpdate) ClearCategoryID() *PostUpdate {
-	pu.mutation.ClearCategoryID()
-	return pu
+func (_u *PostUpdate) ClearCategoryID() *PostUpdate {
+	_u.mutation.ClearCategoryID()
+	return _u
 }
 
 // SetLinkID sets the "link_id" field.
-func (pu *PostUpdate) SetLinkID(x xid.ID) *PostUpdate {
-	pu.mutation.SetLinkID(x)
-	return pu
+func (_u *PostUpdate) SetLinkID(v xid.ID) *PostUpdate {
+	_u.mutation.SetLinkID(v)
+	return _u
 }
 
 // SetNillableLinkID sets the "link_id" field if the given value is not nil.
-func (pu *PostUpdate) SetNillableLinkID(x *xid.ID) *PostUpdate {
-	if x != nil {
-		pu.SetLinkID(*x)
+func (_u *PostUpdate) SetNillableLinkID(v *xid.ID) *PostUpdate {
+	if v != nil {
+		_u.SetLinkID(*v)
 	}
-	return pu
+	return _u
 }
 
 // ClearLinkID clears the value of the "link_id" field.
-func (pu *PostUpdate) ClearLinkID() *PostUpdate {
-	pu.mutation.ClearLinkID()
-	return pu
+func (_u *PostUpdate) ClearLinkID() *PostUpdate {
+	_u.mutation.ClearLinkID()
+	return _u
 }
 
 // SetAuthorID sets the "author" edge to the Account entity by ID.
-func (pu *PostUpdate) SetAuthorID(id xid.ID) *PostUpdate {
-	pu.mutation.SetAuthorID(id)
-	return pu
+func (_u *PostUpdate) SetAuthorID(id xid.ID) *PostUpdate {
+	_u.mutation.SetAuthorID(id)
+	return _u
 }
 
 // SetAuthor sets the "author" edge to the Account entity.
-func (pu *PostUpdate) SetAuthor(a *Account) *PostUpdate {
-	return pu.SetAuthorID(a.ID)
+func (_u *PostUpdate) SetAuthor(v *Account) *PostUpdate {
+	return _u.SetAuthorID(v.ID)
 }
 
 // SetCategory sets the "category" edge to the Category entity.
-func (pu *PostUpdate) SetCategory(c *Category) *PostUpdate {
-	return pu.SetCategoryID(c.ID)
+func (_u *PostUpdate) SetCategory(v *Category) *PostUpdate {
+	return _u.SetCategoryID(v.ID)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (pu *PostUpdate) AddTagIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.AddTagIDs(ids...)
-	return pu
+func (_u *PostUpdate) AddTagIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddTagIDs(ids...)
+	return _u
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
-func (pu *PostUpdate) AddTags(t ...*Tag) *PostUpdate {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *PostUpdate) AddTags(v ...*Tag) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.AddTagIDs(ids...)
+	return _u.AddTagIDs(ids...)
 }
 
 // SetRootID sets the "root" edge to the Post entity by ID.
-func (pu *PostUpdate) SetRootID(id xid.ID) *PostUpdate {
-	pu.mutation.SetRootID(id)
-	return pu
+func (_u *PostUpdate) SetRootID(id xid.ID) *PostUpdate {
+	_u.mutation.SetRootID(id)
+	return _u
 }
 
 // SetNillableRootID sets the "root" edge to the Post entity by ID if the given value is not nil.
-func (pu *PostUpdate) SetNillableRootID(id *xid.ID) *PostUpdate {
+func (_u *PostUpdate) SetNillableRootID(id *xid.ID) *PostUpdate {
 	if id != nil {
-		pu = pu.SetRootID(*id)
+		_u = _u.SetRootID(*id)
 	}
-	return pu
+	return _u
 }
 
 // SetRoot sets the "root" edge to the Post entity.
-func (pu *PostUpdate) SetRoot(p *Post) *PostUpdate {
-	return pu.SetRootID(p.ID)
+func (_u *PostUpdate) SetRoot(v *Post) *PostUpdate {
+	return _u.SetRootID(v.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (pu *PostUpdate) AddPostIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.AddPostIDs(ids...)
-	return pu
+func (_u *PostUpdate) AddPostIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (pu *PostUpdate) AddPosts(p ...*Post) *PostUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PostUpdate) AddPosts(v ...*Post) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // SetReplyToID sets the "replyTo" edge to the Post entity by ID.
-func (pu *PostUpdate) SetReplyToID(id xid.ID) *PostUpdate {
-	pu.mutation.SetReplyToID(id)
-	return pu
+func (_u *PostUpdate) SetReplyToID(id xid.ID) *PostUpdate {
+	_u.mutation.SetReplyToID(id)
+	return _u
 }
 
 // SetNillableReplyToID sets the "replyTo" edge to the Post entity by ID if the given value is not nil.
-func (pu *PostUpdate) SetNillableReplyToID(id *xid.ID) *PostUpdate {
+func (_u *PostUpdate) SetNillableReplyToID(id *xid.ID) *PostUpdate {
 	if id != nil {
-		pu = pu.SetReplyToID(*id)
+		_u = _u.SetReplyToID(*id)
 	}
-	return pu
+	return _u
 }
 
 // SetReplyTo sets the "replyTo" edge to the Post entity.
-func (pu *PostUpdate) SetReplyTo(p *Post) *PostUpdate {
-	return pu.SetReplyToID(p.ID)
+func (_u *PostUpdate) SetReplyTo(v *Post) *PostUpdate {
+	return _u.SetReplyToID(v.ID)
 }
 
 // AddReplyIDs adds the "replies" edge to the Post entity by IDs.
-func (pu *PostUpdate) AddReplyIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.AddReplyIDs(ids...)
-	return pu
+func (_u *PostUpdate) AddReplyIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddReplyIDs(ids...)
+	return _u
 }
 
 // AddReplies adds the "replies" edges to the Post entity.
-func (pu *PostUpdate) AddReplies(p ...*Post) *PostUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PostUpdate) AddReplies(v ...*Post) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.AddReplyIDs(ids...)
+	return _u.AddReplyIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (pu *PostUpdate) AddReactIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.AddReactIDs(ids...)
-	return pu
+func (_u *PostUpdate) AddReactIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddReactIDs(ids...)
+	return _u
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
-func (pu *PostUpdate) AddReacts(r ...*React) *PostUpdate {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *PostUpdate) AddReacts(v ...*React) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.AddReactIDs(ids...)
+	return _u.AddReactIDs(ids...)
 }
 
 // AddLikeIDs adds the "likes" edge to the LikePost entity by IDs.
-func (pu *PostUpdate) AddLikeIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.AddLikeIDs(ids...)
-	return pu
+func (_u *PostUpdate) AddLikeIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddLikeIDs(ids...)
+	return _u
 }
 
 // AddLikes adds the "likes" edges to the LikePost entity.
-func (pu *PostUpdate) AddLikes(l ...*LikePost) *PostUpdate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *PostUpdate) AddLikes(v ...*LikePost) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.AddLikeIDs(ids...)
+	return _u.AddLikeIDs(ids...)
 }
 
 // AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
-func (pu *PostUpdate) AddMentionIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.AddMentionIDs(ids...)
-	return pu
+func (_u *PostUpdate) AddMentionIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddMentionIDs(ids...)
+	return _u
 }
 
 // AddMentions adds the "mentions" edges to the MentionProfile entity.
-func (pu *PostUpdate) AddMentions(m ...*MentionProfile) *PostUpdate {
-	ids := make([]xid.ID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *PostUpdate) AddMentions(v ...*MentionProfile) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.AddMentionIDs(ids...)
+	return _u.AddMentionIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (pu *PostUpdate) AddAssetIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.AddAssetIDs(ids...)
-	return pu
+func (_u *PostUpdate) AddAssetIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddAssetIDs(ids...)
+	return _u
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (pu *PostUpdate) AddAssets(a ...*Asset) *PostUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *PostUpdate) AddAssets(v ...*Asset) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.AddAssetIDs(ids...)
+	return _u.AddAssetIDs(ids...)
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (pu *PostUpdate) AddCollectionIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.AddCollectionIDs(ids...)
-	return pu
+func (_u *PostUpdate) AddCollectionIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddCollectionIDs(ids...)
+	return _u
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
-func (pu *PostUpdate) AddCollections(c ...*Collection) *PostUpdate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *PostUpdate) AddCollections(v ...*Collection) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.AddCollectionIDs(ids...)
+	return _u.AddCollectionIDs(ids...)
 }
 
 // SetLink sets the "link" edge to the Link entity.
-func (pu *PostUpdate) SetLink(l *Link) *PostUpdate {
-	return pu.SetLinkID(l.ID)
+func (_u *PostUpdate) SetLink(v *Link) *PostUpdate {
+	return _u.SetLinkID(v.ID)
 }
 
 // AddContentLinkIDs adds the "content_links" edge to the Link entity by IDs.
-func (pu *PostUpdate) AddContentLinkIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.AddContentLinkIDs(ids...)
-	return pu
+func (_u *PostUpdate) AddContentLinkIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddContentLinkIDs(ids...)
+	return _u
 }
 
 // AddContentLinks adds the "content_links" edges to the Link entity.
-func (pu *PostUpdate) AddContentLinks(l ...*Link) *PostUpdate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *PostUpdate) AddContentLinks(v ...*Link) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.AddContentLinkIDs(ids...)
+	return _u.AddContentLinkIDs(ids...)
 }
 
 // AddEventIDs adds the "event" edge to the Event entity by IDs.
-func (pu *PostUpdate) AddEventIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.AddEventIDs(ids...)
-	return pu
+func (_u *PostUpdate) AddEventIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddEventIDs(ids...)
+	return _u
 }
 
 // AddEvent adds the "event" edges to the Event entity.
-func (pu *PostUpdate) AddEvent(e ...*Event) *PostUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *PostUpdate) AddEvent(v ...*Event) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.AddEventIDs(ids...)
+	return _u.AddEventIDs(ids...)
 }
 
 // Mutation returns the PostMutation object of the builder.
-func (pu *PostUpdate) Mutation() *PostMutation {
-	return pu.mutation
+func (_u *PostUpdate) Mutation() *PostMutation {
+	return _u.mutation
 }
 
 // ClearAuthor clears the "author" edge to the Account entity.
-func (pu *PostUpdate) ClearAuthor() *PostUpdate {
-	pu.mutation.ClearAuthor()
-	return pu
+func (_u *PostUpdate) ClearAuthor() *PostUpdate {
+	_u.mutation.ClearAuthor()
+	return _u
 }
 
 // ClearCategory clears the "category" edge to the Category entity.
-func (pu *PostUpdate) ClearCategory() *PostUpdate {
-	pu.mutation.ClearCategory()
-	return pu
+func (_u *PostUpdate) ClearCategory() *PostUpdate {
+	_u.mutation.ClearCategory()
+	return _u
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
-func (pu *PostUpdate) ClearTags() *PostUpdate {
-	pu.mutation.ClearTags()
-	return pu
+func (_u *PostUpdate) ClearTags() *PostUpdate {
+	_u.mutation.ClearTags()
+	return _u
 }
 
 // RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
-func (pu *PostUpdate) RemoveTagIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.RemoveTagIDs(ids...)
-	return pu
+func (_u *PostUpdate) RemoveTagIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemoveTagIDs(ids...)
+	return _u
 }
 
 // RemoveTags removes "tags" edges to Tag entities.
-func (pu *PostUpdate) RemoveTags(t ...*Tag) *PostUpdate {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *PostUpdate) RemoveTags(v ...*Tag) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.RemoveTagIDs(ids...)
+	return _u.RemoveTagIDs(ids...)
 }
 
 // ClearRoot clears the "root" edge to the Post entity.
-func (pu *PostUpdate) ClearRoot() *PostUpdate {
-	pu.mutation.ClearRoot()
-	return pu
+func (_u *PostUpdate) ClearRoot() *PostUpdate {
+	_u.mutation.ClearRoot()
+	return _u
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (pu *PostUpdate) ClearPosts() *PostUpdate {
-	pu.mutation.ClearPosts()
-	return pu
+func (_u *PostUpdate) ClearPosts() *PostUpdate {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (pu *PostUpdate) RemovePostIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.RemovePostIDs(ids...)
-	return pu
+func (_u *PostUpdate) RemovePostIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (pu *PostUpdate) RemovePosts(p ...*Post) *PostUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PostUpdate) RemovePosts(v ...*Post) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearReplyTo clears the "replyTo" edge to the Post entity.
-func (pu *PostUpdate) ClearReplyTo() *PostUpdate {
-	pu.mutation.ClearReplyTo()
-	return pu
+func (_u *PostUpdate) ClearReplyTo() *PostUpdate {
+	_u.mutation.ClearReplyTo()
+	return _u
 }
 
 // ClearReplies clears all "replies" edges to the Post entity.
-func (pu *PostUpdate) ClearReplies() *PostUpdate {
-	pu.mutation.ClearReplies()
-	return pu
+func (_u *PostUpdate) ClearReplies() *PostUpdate {
+	_u.mutation.ClearReplies()
+	return _u
 }
 
 // RemoveReplyIDs removes the "replies" edge to Post entities by IDs.
-func (pu *PostUpdate) RemoveReplyIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.RemoveReplyIDs(ids...)
-	return pu
+func (_u *PostUpdate) RemoveReplyIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemoveReplyIDs(ids...)
+	return _u
 }
 
 // RemoveReplies removes "replies" edges to Post entities.
-func (pu *PostUpdate) RemoveReplies(p ...*Post) *PostUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PostUpdate) RemoveReplies(v ...*Post) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.RemoveReplyIDs(ids...)
+	return _u.RemoveReplyIDs(ids...)
 }
 
 // ClearReacts clears all "reacts" edges to the React entity.
-func (pu *PostUpdate) ClearReacts() *PostUpdate {
-	pu.mutation.ClearReacts()
-	return pu
+func (_u *PostUpdate) ClearReacts() *PostUpdate {
+	_u.mutation.ClearReacts()
+	return _u
 }
 
 // RemoveReactIDs removes the "reacts" edge to React entities by IDs.
-func (pu *PostUpdate) RemoveReactIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.RemoveReactIDs(ids...)
-	return pu
+func (_u *PostUpdate) RemoveReactIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemoveReactIDs(ids...)
+	return _u
 }
 
 // RemoveReacts removes "reacts" edges to React entities.
-func (pu *PostUpdate) RemoveReacts(r ...*React) *PostUpdate {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *PostUpdate) RemoveReacts(v ...*React) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.RemoveReactIDs(ids...)
+	return _u.RemoveReactIDs(ids...)
 }
 
 // ClearLikes clears all "likes" edges to the LikePost entity.
-func (pu *PostUpdate) ClearLikes() *PostUpdate {
-	pu.mutation.ClearLikes()
-	return pu
+func (_u *PostUpdate) ClearLikes() *PostUpdate {
+	_u.mutation.ClearLikes()
+	return _u
 }
 
 // RemoveLikeIDs removes the "likes" edge to LikePost entities by IDs.
-func (pu *PostUpdate) RemoveLikeIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.RemoveLikeIDs(ids...)
-	return pu
+func (_u *PostUpdate) RemoveLikeIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemoveLikeIDs(ids...)
+	return _u
 }
 
 // RemoveLikes removes "likes" edges to LikePost entities.
-func (pu *PostUpdate) RemoveLikes(l ...*LikePost) *PostUpdate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *PostUpdate) RemoveLikes(v ...*LikePost) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.RemoveLikeIDs(ids...)
+	return _u.RemoveLikeIDs(ids...)
 }
 
 // ClearMentions clears all "mentions" edges to the MentionProfile entity.
-func (pu *PostUpdate) ClearMentions() *PostUpdate {
-	pu.mutation.ClearMentions()
-	return pu
+func (_u *PostUpdate) ClearMentions() *PostUpdate {
+	_u.mutation.ClearMentions()
+	return _u
 }
 
 // RemoveMentionIDs removes the "mentions" edge to MentionProfile entities by IDs.
-func (pu *PostUpdate) RemoveMentionIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.RemoveMentionIDs(ids...)
-	return pu
+func (_u *PostUpdate) RemoveMentionIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemoveMentionIDs(ids...)
+	return _u
 }
 
 // RemoveMentions removes "mentions" edges to MentionProfile entities.
-func (pu *PostUpdate) RemoveMentions(m ...*MentionProfile) *PostUpdate {
-	ids := make([]xid.ID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *PostUpdate) RemoveMentions(v ...*MentionProfile) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.RemoveMentionIDs(ids...)
+	return _u.RemoveMentionIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
-func (pu *PostUpdate) ClearAssets() *PostUpdate {
-	pu.mutation.ClearAssets()
-	return pu
+func (_u *PostUpdate) ClearAssets() *PostUpdate {
+	_u.mutation.ClearAssets()
+	return _u
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (pu *PostUpdate) RemoveAssetIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.RemoveAssetIDs(ids...)
-	return pu
+func (_u *PostUpdate) RemoveAssetIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemoveAssetIDs(ids...)
+	return _u
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
-func (pu *PostUpdate) RemoveAssets(a ...*Asset) *PostUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *PostUpdate) RemoveAssets(v ...*Asset) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.RemoveAssetIDs(ids...)
+	return _u.RemoveAssetIDs(ids...)
 }
 
 // ClearCollections clears all "collections" edges to the Collection entity.
-func (pu *PostUpdate) ClearCollections() *PostUpdate {
-	pu.mutation.ClearCollections()
-	return pu
+func (_u *PostUpdate) ClearCollections() *PostUpdate {
+	_u.mutation.ClearCollections()
+	return _u
 }
 
 // RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
-func (pu *PostUpdate) RemoveCollectionIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.RemoveCollectionIDs(ids...)
-	return pu
+func (_u *PostUpdate) RemoveCollectionIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemoveCollectionIDs(ids...)
+	return _u
 }
 
 // RemoveCollections removes "collections" edges to Collection entities.
-func (pu *PostUpdate) RemoveCollections(c ...*Collection) *PostUpdate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *PostUpdate) RemoveCollections(v ...*Collection) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.RemoveCollectionIDs(ids...)
+	return _u.RemoveCollectionIDs(ids...)
 }
 
 // ClearLink clears the "link" edge to the Link entity.
-func (pu *PostUpdate) ClearLink() *PostUpdate {
-	pu.mutation.ClearLink()
-	return pu
+func (_u *PostUpdate) ClearLink() *PostUpdate {
+	_u.mutation.ClearLink()
+	return _u
 }
 
 // ClearContentLinks clears all "content_links" edges to the Link entity.
-func (pu *PostUpdate) ClearContentLinks() *PostUpdate {
-	pu.mutation.ClearContentLinks()
-	return pu
+func (_u *PostUpdate) ClearContentLinks() *PostUpdate {
+	_u.mutation.ClearContentLinks()
+	return _u
 }
 
 // RemoveContentLinkIDs removes the "content_links" edge to Link entities by IDs.
-func (pu *PostUpdate) RemoveContentLinkIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.RemoveContentLinkIDs(ids...)
-	return pu
+func (_u *PostUpdate) RemoveContentLinkIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemoveContentLinkIDs(ids...)
+	return _u
 }
 
 // RemoveContentLinks removes "content_links" edges to Link entities.
-func (pu *PostUpdate) RemoveContentLinks(l ...*Link) *PostUpdate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *PostUpdate) RemoveContentLinks(v ...*Link) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.RemoveContentLinkIDs(ids...)
+	return _u.RemoveContentLinkIDs(ids...)
 }
 
 // ClearEvent clears all "event" edges to the Event entity.
-func (pu *PostUpdate) ClearEvent() *PostUpdate {
-	pu.mutation.ClearEvent()
-	return pu
+func (_u *PostUpdate) ClearEvent() *PostUpdate {
+	_u.mutation.ClearEvent()
+	return _u
 }
 
 // RemoveEventIDs removes the "event" edge to Event entities by IDs.
-func (pu *PostUpdate) RemoveEventIDs(ids ...xid.ID) *PostUpdate {
-	pu.mutation.RemoveEventIDs(ids...)
-	return pu
+func (_u *PostUpdate) RemoveEventIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemoveEventIDs(ids...)
+	return _u
 }
 
 // RemoveEvent removes "event" edges to Event entities.
-func (pu *PostUpdate) RemoveEvent(e ...*Event) *PostUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *PostUpdate) RemoveEvent(v ...*Event) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return pu.RemoveEventIDs(ids...)
+	return _u.RemoveEventIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (pu *PostUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, pu.sqlSave, pu.mutation, pu.hooks)
+func (_u *PostUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (pu *PostUpdate) SaveX(ctx context.Context) int {
-	affected, err := pu.Save(ctx)
+func (_u *PostUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -799,104 +799,104 @@ func (pu *PostUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (pu *PostUpdate) Exec(ctx context.Context) error {
-	_, err := pu.Save(ctx)
+func (_u *PostUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (pu *PostUpdate) ExecX(ctx context.Context) {
-	if err := pu.Exec(ctx); err != nil {
+func (_u *PostUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (pu *PostUpdate) check() error {
-	if v, ok := pu.mutation.Visibility(); ok {
+func (_u *PostUpdate) check() error {
+	if v, ok := _u.mutation.Visibility(); ok {
 		if err := post.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Post.visibility": %w`, err)}
 		}
 	}
-	if pu.mutation.AuthorCleared() && len(pu.mutation.AuthorIDs()) > 0 {
+	if _u.mutation.AuthorCleared() && len(_u.mutation.AuthorIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Post.author"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (pu *PostUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PostUpdate {
-	pu.modifiers = append(pu.modifiers, modifiers...)
-	return pu
+func (_u *PostUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PostUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := pu.check(); err != nil {
-		return n, err
+func (_u *PostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(post.Table, post.Columns, sqlgraph.NewFieldSpec(post.FieldID, field.TypeString))
-	if ps := pu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := pu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(post.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := pu.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(post.FieldDeletedAt, field.TypeTime, value)
 	}
-	if pu.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(post.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := pu.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(post.FieldIndexedAt, field.TypeTime, value)
 	}
-	if pu.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(post.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := pu.mutation.First(); ok {
+	if value, ok := _u.mutation.First(); ok {
 		_spec.SetField(post.FieldFirst, field.TypeBool, value)
 	}
-	if value, ok := pu.mutation.Title(); ok {
+	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(post.FieldTitle, field.TypeString, value)
 	}
-	if pu.mutation.TitleCleared() {
+	if _u.mutation.TitleCleared() {
 		_spec.ClearField(post.FieldTitle, field.TypeString)
 	}
-	if value, ok := pu.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(post.FieldSlug, field.TypeString, value)
 	}
-	if pu.mutation.SlugCleared() {
+	if _u.mutation.SlugCleared() {
 		_spec.ClearField(post.FieldSlug, field.TypeString)
 	}
-	if value, ok := pu.mutation.Pinned(); ok {
+	if value, ok := _u.mutation.Pinned(); ok {
 		_spec.SetField(post.FieldPinned, field.TypeBool, value)
 	}
-	if value, ok := pu.mutation.LastReplyAt(); ok {
+	if value, ok := _u.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
 	}
-	if pu.mutation.LastReplyAtCleared() {
+	if _u.mutation.LastReplyAtCleared() {
 		_spec.ClearField(post.FieldLastReplyAt, field.TypeTime)
 	}
-	if value, ok := pu.mutation.Body(); ok {
+	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
 	}
-	if value, ok := pu.mutation.Short(); ok {
+	if value, ok := _u.mutation.Short(); ok {
 		_spec.SetField(post.FieldShort, field.TypeString, value)
 	}
-	if value, ok := pu.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
 	}
-	if pu.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(post.FieldMetadata, field.TypeJSON)
 	}
-	if value, ok := pu.mutation.Visibility(); ok {
+	if value, ok := _u.mutation.Visibility(); ok {
 		_spec.SetField(post.FieldVisibility, field.TypeEnum, value)
 	}
-	if pu.mutation.AuthorCleared() {
+	if _u.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -909,7 +909,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.AuthorIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -925,7 +925,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.CategoryCleared() {
+	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -938,7 +938,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.CategoryIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -954,7 +954,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.TagsCleared() {
+	if _u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -967,7 +967,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedTagsIDs(); len(nodes) > 0 && !pu.mutation.TagsCleared() {
+	if nodes := _u.mutation.RemovedTagsIDs(); len(nodes) > 0 && !_u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -983,7 +983,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.TagsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -999,7 +999,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.RootCleared() {
+	if _u.mutation.RootCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1012,7 +1012,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RootIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RootIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1028,7 +1028,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1041,7 +1041,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedPostsIDs(); len(nodes) > 0 && !pu.mutation.PostsCleared() {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1057,7 +1057,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1073,7 +1073,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.ReplyToCleared() {
+	if _u.mutation.ReplyToCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1086,7 +1086,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.ReplyToIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ReplyToIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1102,7 +1102,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.RepliesCleared() {
+	if _u.mutation.RepliesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1115,23 +1115,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedRepliesIDs(); len(nodes) > 0 && !pu.mutation.RepliesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.RepliesTable,
-			Columns: []string{post.RepliesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RepliesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedRepliesIDs(); len(nodes) > 0 && !_u.mutation.RepliesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1145,9 +1129,25 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RepliesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.RepliesTable,
+			Columns: []string{post.RepliesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.ReactsCleared() {
+	if _u.mutation.ReactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1160,7 +1160,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedReactsIDs(); len(nodes) > 0 && !pu.mutation.ReactsCleared() {
+	if nodes := _u.mutation.RemovedReactsIDs(); len(nodes) > 0 && !_u.mutation.ReactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1176,7 +1176,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.ReactsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ReactsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1192,7 +1192,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.LikesCleared() {
+	if _u.mutation.LikesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1205,23 +1205,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedLikesIDs(); len(nodes) > 0 && !pu.mutation.LikesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.LikesTable,
-			Columns: []string{post.LikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.LikesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedLikesIDs(); len(nodes) > 0 && !_u.mutation.LikesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1235,9 +1219,25 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.LikesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.LikesTable,
+			Columns: []string{post.LikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.MentionsCleared() {
+	if _u.mutation.MentionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1250,7 +1250,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !pu.mutation.MentionsCleared() {
+	if nodes := _u.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !_u.mutation.MentionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1266,7 +1266,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.MentionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MentionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1282,7 +1282,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.AssetsCleared() {
+	if _u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1295,7 +1295,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !pu.mutation.AssetsCleared() {
+	if nodes := _u.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !_u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1311,7 +1311,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -1327,7 +1327,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.CollectionsCleared() {
+	if _u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1340,7 +1340,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !pu.mutation.CollectionsCleared() {
+	if nodes := _u.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !_u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1356,7 +1356,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.CollectionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CollectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1372,7 +1372,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.LinkCleared() {
+	if _u.mutation.LinkCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1385,7 +1385,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.LinkIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.LinkIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1401,7 +1401,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.ContentLinksCleared() {
+	if _u.mutation.ContentLinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1414,7 +1414,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedContentLinksIDs(); len(nodes) > 0 && !pu.mutation.ContentLinksCleared() {
+	if nodes := _u.mutation.RemovedContentLinksIDs(); len(nodes) > 0 && !_u.mutation.ContentLinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1430,7 +1430,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.ContentLinksIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ContentLinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1446,7 +1446,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.EventCleared() {
+	if _u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1459,7 +1459,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedEventIDs(); len(nodes) > 0 && !pu.mutation.EventCleared() {
+	if nodes := _u.mutation.RemovedEventIDs(); len(nodes) > 0 && !_u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1475,7 +1475,7 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1491,8 +1491,8 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(pu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{post.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -1500,8 +1500,8 @@ func (pu *PostUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	pu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // PostUpdateOne is the builder for updating a single Post entity.
@@ -1514,770 +1514,770 @@ type PostUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (puo *PostUpdateOne) SetUpdatedAt(t time.Time) *PostUpdateOne {
-	puo.mutation.SetUpdatedAt(t)
-	return puo
+func (_u *PostUpdateOne) SetUpdatedAt(v time.Time) *PostUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableUpdatedAt(t *time.Time) *PostUpdateOne {
-	if t != nil {
-		puo.SetUpdatedAt(*t)
+func (_u *PostUpdateOne) SetNillableUpdatedAt(v *time.Time) *PostUpdateOne {
+	if v != nil {
+		_u.SetUpdatedAt(*v)
 	}
-	return puo
+	return _u
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (puo *PostUpdateOne) SetDeletedAt(t time.Time) *PostUpdateOne {
-	puo.mutation.SetDeletedAt(t)
-	return puo
+func (_u *PostUpdateOne) SetDeletedAt(v time.Time) *PostUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableDeletedAt(t *time.Time) *PostUpdateOne {
-	if t != nil {
-		puo.SetDeletedAt(*t)
+func (_u *PostUpdateOne) SetNillableDeletedAt(v *time.Time) *PostUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return puo
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (puo *PostUpdateOne) ClearDeletedAt() *PostUpdateOne {
-	puo.mutation.ClearDeletedAt()
-	return puo
+func (_u *PostUpdateOne) ClearDeletedAt() *PostUpdateOne {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (puo *PostUpdateOne) SetIndexedAt(t time.Time) *PostUpdateOne {
-	puo.mutation.SetIndexedAt(t)
-	return puo
+func (_u *PostUpdateOne) SetIndexedAt(v time.Time) *PostUpdateOne {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableIndexedAt(t *time.Time) *PostUpdateOne {
-	if t != nil {
-		puo.SetIndexedAt(*t)
+func (_u *PostUpdateOne) SetNillableIndexedAt(v *time.Time) *PostUpdateOne {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return puo
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (puo *PostUpdateOne) ClearIndexedAt() *PostUpdateOne {
-	puo.mutation.ClearIndexedAt()
-	return puo
+func (_u *PostUpdateOne) ClearIndexedAt() *PostUpdateOne {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetFirst sets the "first" field.
-func (puo *PostUpdateOne) SetFirst(b bool) *PostUpdateOne {
-	puo.mutation.SetFirst(b)
-	return puo
+func (_u *PostUpdateOne) SetFirst(v bool) *PostUpdateOne {
+	_u.mutation.SetFirst(v)
+	return _u
 }
 
 // SetNillableFirst sets the "first" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableFirst(b *bool) *PostUpdateOne {
-	if b != nil {
-		puo.SetFirst(*b)
+func (_u *PostUpdateOne) SetNillableFirst(v *bool) *PostUpdateOne {
+	if v != nil {
+		_u.SetFirst(*v)
 	}
-	return puo
+	return _u
 }
 
 // SetTitle sets the "title" field.
-func (puo *PostUpdateOne) SetTitle(s string) *PostUpdateOne {
-	puo.mutation.SetTitle(s)
-	return puo
+func (_u *PostUpdateOne) SetTitle(v string) *PostUpdateOne {
+	_u.mutation.SetTitle(v)
+	return _u
 }
 
 // SetNillableTitle sets the "title" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableTitle(s *string) *PostUpdateOne {
-	if s != nil {
-		puo.SetTitle(*s)
+func (_u *PostUpdateOne) SetNillableTitle(v *string) *PostUpdateOne {
+	if v != nil {
+		_u.SetTitle(*v)
 	}
-	return puo
+	return _u
 }
 
 // ClearTitle clears the value of the "title" field.
-func (puo *PostUpdateOne) ClearTitle() *PostUpdateOne {
-	puo.mutation.ClearTitle()
-	return puo
+func (_u *PostUpdateOne) ClearTitle() *PostUpdateOne {
+	_u.mutation.ClearTitle()
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (puo *PostUpdateOne) SetSlug(s string) *PostUpdateOne {
-	puo.mutation.SetSlug(s)
-	return puo
+func (_u *PostUpdateOne) SetSlug(v string) *PostUpdateOne {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableSlug(s *string) *PostUpdateOne {
-	if s != nil {
-		puo.SetSlug(*s)
+func (_u *PostUpdateOne) SetNillableSlug(v *string) *PostUpdateOne {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return puo
+	return _u
 }
 
 // ClearSlug clears the value of the "slug" field.
-func (puo *PostUpdateOne) ClearSlug() *PostUpdateOne {
-	puo.mutation.ClearSlug()
-	return puo
+func (_u *PostUpdateOne) ClearSlug() *PostUpdateOne {
+	_u.mutation.ClearSlug()
+	return _u
 }
 
 // SetPinned sets the "pinned" field.
-func (puo *PostUpdateOne) SetPinned(b bool) *PostUpdateOne {
-	puo.mutation.SetPinned(b)
-	return puo
+func (_u *PostUpdateOne) SetPinned(v bool) *PostUpdateOne {
+	_u.mutation.SetPinned(v)
+	return _u
 }
 
 // SetNillablePinned sets the "pinned" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillablePinned(b *bool) *PostUpdateOne {
-	if b != nil {
-		puo.SetPinned(*b)
+func (_u *PostUpdateOne) SetNillablePinned(v *bool) *PostUpdateOne {
+	if v != nil {
+		_u.SetPinned(*v)
 	}
-	return puo
+	return _u
 }
 
 // SetLastReplyAt sets the "last_reply_at" field.
-func (puo *PostUpdateOne) SetLastReplyAt(t time.Time) *PostUpdateOne {
-	puo.mutation.SetLastReplyAt(t)
-	return puo
+func (_u *PostUpdateOne) SetLastReplyAt(v time.Time) *PostUpdateOne {
+	_u.mutation.SetLastReplyAt(v)
+	return _u
 }
 
 // SetNillableLastReplyAt sets the "last_reply_at" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableLastReplyAt(t *time.Time) *PostUpdateOne {
-	if t != nil {
-		puo.SetLastReplyAt(*t)
+func (_u *PostUpdateOne) SetNillableLastReplyAt(v *time.Time) *PostUpdateOne {
+	if v != nil {
+		_u.SetLastReplyAt(*v)
 	}
-	return puo
+	return _u
 }
 
 // ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (puo *PostUpdateOne) ClearLastReplyAt() *PostUpdateOne {
-	puo.mutation.ClearLastReplyAt()
-	return puo
+func (_u *PostUpdateOne) ClearLastReplyAt() *PostUpdateOne {
+	_u.mutation.ClearLastReplyAt()
+	return _u
 }
 
 // SetRootPostID sets the "root_post_id" field.
-func (puo *PostUpdateOne) SetRootPostID(x xid.ID) *PostUpdateOne {
-	puo.mutation.SetRootPostID(x)
-	return puo
+func (_u *PostUpdateOne) SetRootPostID(v xid.ID) *PostUpdateOne {
+	_u.mutation.SetRootPostID(v)
+	return _u
 }
 
 // SetNillableRootPostID sets the "root_post_id" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableRootPostID(x *xid.ID) *PostUpdateOne {
-	if x != nil {
-		puo.SetRootPostID(*x)
+func (_u *PostUpdateOne) SetNillableRootPostID(v *xid.ID) *PostUpdateOne {
+	if v != nil {
+		_u.SetRootPostID(*v)
 	}
-	return puo
+	return _u
 }
 
 // ClearRootPostID clears the value of the "root_post_id" field.
-func (puo *PostUpdateOne) ClearRootPostID() *PostUpdateOne {
-	puo.mutation.ClearRootPostID()
-	return puo
+func (_u *PostUpdateOne) ClearRootPostID() *PostUpdateOne {
+	_u.mutation.ClearRootPostID()
+	return _u
 }
 
 // SetReplyToPostID sets the "reply_to_post_id" field.
-func (puo *PostUpdateOne) SetReplyToPostID(x xid.ID) *PostUpdateOne {
-	puo.mutation.SetReplyToPostID(x)
-	return puo
+func (_u *PostUpdateOne) SetReplyToPostID(v xid.ID) *PostUpdateOne {
+	_u.mutation.SetReplyToPostID(v)
+	return _u
 }
 
 // SetNillableReplyToPostID sets the "reply_to_post_id" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableReplyToPostID(x *xid.ID) *PostUpdateOne {
-	if x != nil {
-		puo.SetReplyToPostID(*x)
+func (_u *PostUpdateOne) SetNillableReplyToPostID(v *xid.ID) *PostUpdateOne {
+	if v != nil {
+		_u.SetReplyToPostID(*v)
 	}
-	return puo
+	return _u
 }
 
 // ClearReplyToPostID clears the value of the "reply_to_post_id" field.
-func (puo *PostUpdateOne) ClearReplyToPostID() *PostUpdateOne {
-	puo.mutation.ClearReplyToPostID()
-	return puo
+func (_u *PostUpdateOne) ClearReplyToPostID() *PostUpdateOne {
+	_u.mutation.ClearReplyToPostID()
+	return _u
 }
 
 // SetBody sets the "body" field.
-func (puo *PostUpdateOne) SetBody(s string) *PostUpdateOne {
-	puo.mutation.SetBody(s)
-	return puo
+func (_u *PostUpdateOne) SetBody(v string) *PostUpdateOne {
+	_u.mutation.SetBody(v)
+	return _u
 }
 
 // SetNillableBody sets the "body" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableBody(s *string) *PostUpdateOne {
-	if s != nil {
-		puo.SetBody(*s)
+func (_u *PostUpdateOne) SetNillableBody(v *string) *PostUpdateOne {
+	if v != nil {
+		_u.SetBody(*v)
 	}
-	return puo
+	return _u
 }
 
 // SetShort sets the "short" field.
-func (puo *PostUpdateOne) SetShort(s string) *PostUpdateOne {
-	puo.mutation.SetShort(s)
-	return puo
+func (_u *PostUpdateOne) SetShort(v string) *PostUpdateOne {
+	_u.mutation.SetShort(v)
+	return _u
 }
 
 // SetNillableShort sets the "short" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableShort(s *string) *PostUpdateOne {
-	if s != nil {
-		puo.SetShort(*s)
+func (_u *PostUpdateOne) SetNillableShort(v *string) *PostUpdateOne {
+	if v != nil {
+		_u.SetShort(*v)
 	}
-	return puo
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (puo *PostUpdateOne) SetMetadata(m map[string]interface{}) *PostUpdateOne {
-	puo.mutation.SetMetadata(m)
-	return puo
+func (_u *PostUpdateOne) SetMetadata(v map[string]interface{}) *PostUpdateOne {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (puo *PostUpdateOne) ClearMetadata() *PostUpdateOne {
-	puo.mutation.ClearMetadata()
-	return puo
+func (_u *PostUpdateOne) ClearMetadata() *PostUpdateOne {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetVisibility sets the "visibility" field.
-func (puo *PostUpdateOne) SetVisibility(po post.Visibility) *PostUpdateOne {
-	puo.mutation.SetVisibility(po)
-	return puo
+func (_u *PostUpdateOne) SetVisibility(v post.Visibility) *PostUpdateOne {
+	_u.mutation.SetVisibility(v)
+	return _u
 }
 
 // SetNillableVisibility sets the "visibility" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableVisibility(po *post.Visibility) *PostUpdateOne {
-	if po != nil {
-		puo.SetVisibility(*po)
+func (_u *PostUpdateOne) SetNillableVisibility(v *post.Visibility) *PostUpdateOne {
+	if v != nil {
+		_u.SetVisibility(*v)
 	}
-	return puo
+	return _u
 }
 
 // SetAccountPosts sets the "account_posts" field.
-func (puo *PostUpdateOne) SetAccountPosts(x xid.ID) *PostUpdateOne {
-	puo.mutation.SetAccountPosts(x)
-	return puo
+func (_u *PostUpdateOne) SetAccountPosts(v xid.ID) *PostUpdateOne {
+	_u.mutation.SetAccountPosts(v)
+	return _u
 }
 
 // SetNillableAccountPosts sets the "account_posts" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableAccountPosts(x *xid.ID) *PostUpdateOne {
-	if x != nil {
-		puo.SetAccountPosts(*x)
+func (_u *PostUpdateOne) SetNillableAccountPosts(v *xid.ID) *PostUpdateOne {
+	if v != nil {
+		_u.SetAccountPosts(*v)
 	}
-	return puo
+	return _u
 }
 
 // SetCategoryID sets the "category_id" field.
-func (puo *PostUpdateOne) SetCategoryID(x xid.ID) *PostUpdateOne {
-	puo.mutation.SetCategoryID(x)
-	return puo
+func (_u *PostUpdateOne) SetCategoryID(v xid.ID) *PostUpdateOne {
+	_u.mutation.SetCategoryID(v)
+	return _u
 }
 
 // SetNillableCategoryID sets the "category_id" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableCategoryID(x *xid.ID) *PostUpdateOne {
-	if x != nil {
-		puo.SetCategoryID(*x)
+func (_u *PostUpdateOne) SetNillableCategoryID(v *xid.ID) *PostUpdateOne {
+	if v != nil {
+		_u.SetCategoryID(*v)
 	}
-	return puo
+	return _u
 }
 
 // ClearCategoryID clears the value of the "category_id" field.
-func (puo *PostUpdateOne) ClearCategoryID() *PostUpdateOne {
-	puo.mutation.ClearCategoryID()
-	return puo
+func (_u *PostUpdateOne) ClearCategoryID() *PostUpdateOne {
+	_u.mutation.ClearCategoryID()
+	return _u
 }
 
 // SetLinkID sets the "link_id" field.
-func (puo *PostUpdateOne) SetLinkID(x xid.ID) *PostUpdateOne {
-	puo.mutation.SetLinkID(x)
-	return puo
+func (_u *PostUpdateOne) SetLinkID(v xid.ID) *PostUpdateOne {
+	_u.mutation.SetLinkID(v)
+	return _u
 }
 
 // SetNillableLinkID sets the "link_id" field if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableLinkID(x *xid.ID) *PostUpdateOne {
-	if x != nil {
-		puo.SetLinkID(*x)
+func (_u *PostUpdateOne) SetNillableLinkID(v *xid.ID) *PostUpdateOne {
+	if v != nil {
+		_u.SetLinkID(*v)
 	}
-	return puo
+	return _u
 }
 
 // ClearLinkID clears the value of the "link_id" field.
-func (puo *PostUpdateOne) ClearLinkID() *PostUpdateOne {
-	puo.mutation.ClearLinkID()
-	return puo
+func (_u *PostUpdateOne) ClearLinkID() *PostUpdateOne {
+	_u.mutation.ClearLinkID()
+	return _u
 }
 
 // SetAuthorID sets the "author" edge to the Account entity by ID.
-func (puo *PostUpdateOne) SetAuthorID(id xid.ID) *PostUpdateOne {
-	puo.mutation.SetAuthorID(id)
-	return puo
+func (_u *PostUpdateOne) SetAuthorID(id xid.ID) *PostUpdateOne {
+	_u.mutation.SetAuthorID(id)
+	return _u
 }
 
 // SetAuthor sets the "author" edge to the Account entity.
-func (puo *PostUpdateOne) SetAuthor(a *Account) *PostUpdateOne {
-	return puo.SetAuthorID(a.ID)
+func (_u *PostUpdateOne) SetAuthor(v *Account) *PostUpdateOne {
+	return _u.SetAuthorID(v.ID)
 }
 
 // SetCategory sets the "category" edge to the Category entity.
-func (puo *PostUpdateOne) SetCategory(c *Category) *PostUpdateOne {
-	return puo.SetCategoryID(c.ID)
+func (_u *PostUpdateOne) SetCategory(v *Category) *PostUpdateOne {
+	return _u.SetCategoryID(v.ID)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (puo *PostUpdateOne) AddTagIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.AddTagIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) AddTagIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddTagIDs(ids...)
+	return _u
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
-func (puo *PostUpdateOne) AddTags(t ...*Tag) *PostUpdateOne {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *PostUpdateOne) AddTags(v ...*Tag) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.AddTagIDs(ids...)
+	return _u.AddTagIDs(ids...)
 }
 
 // SetRootID sets the "root" edge to the Post entity by ID.
-func (puo *PostUpdateOne) SetRootID(id xid.ID) *PostUpdateOne {
-	puo.mutation.SetRootID(id)
-	return puo
+func (_u *PostUpdateOne) SetRootID(id xid.ID) *PostUpdateOne {
+	_u.mutation.SetRootID(id)
+	return _u
 }
 
 // SetNillableRootID sets the "root" edge to the Post entity by ID if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableRootID(id *xid.ID) *PostUpdateOne {
+func (_u *PostUpdateOne) SetNillableRootID(id *xid.ID) *PostUpdateOne {
 	if id != nil {
-		puo = puo.SetRootID(*id)
+		_u = _u.SetRootID(*id)
 	}
-	return puo
+	return _u
 }
 
 // SetRoot sets the "root" edge to the Post entity.
-func (puo *PostUpdateOne) SetRoot(p *Post) *PostUpdateOne {
-	return puo.SetRootID(p.ID)
+func (_u *PostUpdateOne) SetRoot(v *Post) *PostUpdateOne {
+	return _u.SetRootID(v.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (puo *PostUpdateOne) AddPostIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.AddPostIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) AddPostIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddPostIDs(ids...)
+	return _u
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (puo *PostUpdateOne) AddPosts(p ...*Post) *PostUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PostUpdateOne) AddPosts(v ...*Post) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.AddPostIDs(ids...)
+	return _u.AddPostIDs(ids...)
 }
 
 // SetReplyToID sets the "replyTo" edge to the Post entity by ID.
-func (puo *PostUpdateOne) SetReplyToID(id xid.ID) *PostUpdateOne {
-	puo.mutation.SetReplyToID(id)
-	return puo
+func (_u *PostUpdateOne) SetReplyToID(id xid.ID) *PostUpdateOne {
+	_u.mutation.SetReplyToID(id)
+	return _u
 }
 
 // SetNillableReplyToID sets the "replyTo" edge to the Post entity by ID if the given value is not nil.
-func (puo *PostUpdateOne) SetNillableReplyToID(id *xid.ID) *PostUpdateOne {
+func (_u *PostUpdateOne) SetNillableReplyToID(id *xid.ID) *PostUpdateOne {
 	if id != nil {
-		puo = puo.SetReplyToID(*id)
+		_u = _u.SetReplyToID(*id)
 	}
-	return puo
+	return _u
 }
 
 // SetReplyTo sets the "replyTo" edge to the Post entity.
-func (puo *PostUpdateOne) SetReplyTo(p *Post) *PostUpdateOne {
-	return puo.SetReplyToID(p.ID)
+func (_u *PostUpdateOne) SetReplyTo(v *Post) *PostUpdateOne {
+	return _u.SetReplyToID(v.ID)
 }
 
 // AddReplyIDs adds the "replies" edge to the Post entity by IDs.
-func (puo *PostUpdateOne) AddReplyIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.AddReplyIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) AddReplyIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddReplyIDs(ids...)
+	return _u
 }
 
 // AddReplies adds the "replies" edges to the Post entity.
-func (puo *PostUpdateOne) AddReplies(p ...*Post) *PostUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PostUpdateOne) AddReplies(v ...*Post) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.AddReplyIDs(ids...)
+	return _u.AddReplyIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (puo *PostUpdateOne) AddReactIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.AddReactIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) AddReactIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddReactIDs(ids...)
+	return _u
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
-func (puo *PostUpdateOne) AddReacts(r ...*React) *PostUpdateOne {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *PostUpdateOne) AddReacts(v ...*React) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.AddReactIDs(ids...)
+	return _u.AddReactIDs(ids...)
 }
 
 // AddLikeIDs adds the "likes" edge to the LikePost entity by IDs.
-func (puo *PostUpdateOne) AddLikeIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.AddLikeIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) AddLikeIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddLikeIDs(ids...)
+	return _u
 }
 
 // AddLikes adds the "likes" edges to the LikePost entity.
-func (puo *PostUpdateOne) AddLikes(l ...*LikePost) *PostUpdateOne {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *PostUpdateOne) AddLikes(v ...*LikePost) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.AddLikeIDs(ids...)
+	return _u.AddLikeIDs(ids...)
 }
 
 // AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
-func (puo *PostUpdateOne) AddMentionIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.AddMentionIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) AddMentionIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddMentionIDs(ids...)
+	return _u
 }
 
 // AddMentions adds the "mentions" edges to the MentionProfile entity.
-func (puo *PostUpdateOne) AddMentions(m ...*MentionProfile) *PostUpdateOne {
-	ids := make([]xid.ID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *PostUpdateOne) AddMentions(v ...*MentionProfile) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.AddMentionIDs(ids...)
+	return _u.AddMentionIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (puo *PostUpdateOne) AddAssetIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.AddAssetIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) AddAssetIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddAssetIDs(ids...)
+	return _u
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (puo *PostUpdateOne) AddAssets(a ...*Asset) *PostUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *PostUpdateOne) AddAssets(v ...*Asset) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.AddAssetIDs(ids...)
+	return _u.AddAssetIDs(ids...)
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (puo *PostUpdateOne) AddCollectionIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.AddCollectionIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) AddCollectionIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddCollectionIDs(ids...)
+	return _u
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
-func (puo *PostUpdateOne) AddCollections(c ...*Collection) *PostUpdateOne {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *PostUpdateOne) AddCollections(v ...*Collection) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.AddCollectionIDs(ids...)
+	return _u.AddCollectionIDs(ids...)
 }
 
 // SetLink sets the "link" edge to the Link entity.
-func (puo *PostUpdateOne) SetLink(l *Link) *PostUpdateOne {
-	return puo.SetLinkID(l.ID)
+func (_u *PostUpdateOne) SetLink(v *Link) *PostUpdateOne {
+	return _u.SetLinkID(v.ID)
 }
 
 // AddContentLinkIDs adds the "content_links" edge to the Link entity by IDs.
-func (puo *PostUpdateOne) AddContentLinkIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.AddContentLinkIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) AddContentLinkIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddContentLinkIDs(ids...)
+	return _u
 }
 
 // AddContentLinks adds the "content_links" edges to the Link entity.
-func (puo *PostUpdateOne) AddContentLinks(l ...*Link) *PostUpdateOne {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *PostUpdateOne) AddContentLinks(v ...*Link) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.AddContentLinkIDs(ids...)
+	return _u.AddContentLinkIDs(ids...)
 }
 
 // AddEventIDs adds the "event" edge to the Event entity by IDs.
-func (puo *PostUpdateOne) AddEventIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.AddEventIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) AddEventIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddEventIDs(ids...)
+	return _u
 }
 
 // AddEvent adds the "event" edges to the Event entity.
-func (puo *PostUpdateOne) AddEvent(e ...*Event) *PostUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *PostUpdateOne) AddEvent(v ...*Event) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.AddEventIDs(ids...)
+	return _u.AddEventIDs(ids...)
 }
 
 // Mutation returns the PostMutation object of the builder.
-func (puo *PostUpdateOne) Mutation() *PostMutation {
-	return puo.mutation
+func (_u *PostUpdateOne) Mutation() *PostMutation {
+	return _u.mutation
 }
 
 // ClearAuthor clears the "author" edge to the Account entity.
-func (puo *PostUpdateOne) ClearAuthor() *PostUpdateOne {
-	puo.mutation.ClearAuthor()
-	return puo
+func (_u *PostUpdateOne) ClearAuthor() *PostUpdateOne {
+	_u.mutation.ClearAuthor()
+	return _u
 }
 
 // ClearCategory clears the "category" edge to the Category entity.
-func (puo *PostUpdateOne) ClearCategory() *PostUpdateOne {
-	puo.mutation.ClearCategory()
-	return puo
+func (_u *PostUpdateOne) ClearCategory() *PostUpdateOne {
+	_u.mutation.ClearCategory()
+	return _u
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
-func (puo *PostUpdateOne) ClearTags() *PostUpdateOne {
-	puo.mutation.ClearTags()
-	return puo
+func (_u *PostUpdateOne) ClearTags() *PostUpdateOne {
+	_u.mutation.ClearTags()
+	return _u
 }
 
 // RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
-func (puo *PostUpdateOne) RemoveTagIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.RemoveTagIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) RemoveTagIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemoveTagIDs(ids...)
+	return _u
 }
 
 // RemoveTags removes "tags" edges to Tag entities.
-func (puo *PostUpdateOne) RemoveTags(t ...*Tag) *PostUpdateOne {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *PostUpdateOne) RemoveTags(v ...*Tag) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.RemoveTagIDs(ids...)
+	return _u.RemoveTagIDs(ids...)
 }
 
 // ClearRoot clears the "root" edge to the Post entity.
-func (puo *PostUpdateOne) ClearRoot() *PostUpdateOne {
-	puo.mutation.ClearRoot()
-	return puo
+func (_u *PostUpdateOne) ClearRoot() *PostUpdateOne {
+	_u.mutation.ClearRoot()
+	return _u
 }
 
 // ClearPosts clears all "posts" edges to the Post entity.
-func (puo *PostUpdateOne) ClearPosts() *PostUpdateOne {
-	puo.mutation.ClearPosts()
-	return puo
+func (_u *PostUpdateOne) ClearPosts() *PostUpdateOne {
+	_u.mutation.ClearPosts()
+	return _u
 }
 
 // RemovePostIDs removes the "posts" edge to Post entities by IDs.
-func (puo *PostUpdateOne) RemovePostIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.RemovePostIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) RemovePostIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemovePostIDs(ids...)
+	return _u
 }
 
 // RemovePosts removes "posts" edges to Post entities.
-func (puo *PostUpdateOne) RemovePosts(p ...*Post) *PostUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PostUpdateOne) RemovePosts(v ...*Post) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.RemovePostIDs(ids...)
+	return _u.RemovePostIDs(ids...)
 }
 
 // ClearReplyTo clears the "replyTo" edge to the Post entity.
-func (puo *PostUpdateOne) ClearReplyTo() *PostUpdateOne {
-	puo.mutation.ClearReplyTo()
-	return puo
+func (_u *PostUpdateOne) ClearReplyTo() *PostUpdateOne {
+	_u.mutation.ClearReplyTo()
+	return _u
 }
 
 // ClearReplies clears all "replies" edges to the Post entity.
-func (puo *PostUpdateOne) ClearReplies() *PostUpdateOne {
-	puo.mutation.ClearReplies()
-	return puo
+func (_u *PostUpdateOne) ClearReplies() *PostUpdateOne {
+	_u.mutation.ClearReplies()
+	return _u
 }
 
 // RemoveReplyIDs removes the "replies" edge to Post entities by IDs.
-func (puo *PostUpdateOne) RemoveReplyIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.RemoveReplyIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) RemoveReplyIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemoveReplyIDs(ids...)
+	return _u
 }
 
 // RemoveReplies removes "replies" edges to Post entities.
-func (puo *PostUpdateOne) RemoveReplies(p ...*Post) *PostUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *PostUpdateOne) RemoveReplies(v ...*Post) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.RemoveReplyIDs(ids...)
+	return _u.RemoveReplyIDs(ids...)
 }
 
 // ClearReacts clears all "reacts" edges to the React entity.
-func (puo *PostUpdateOne) ClearReacts() *PostUpdateOne {
-	puo.mutation.ClearReacts()
-	return puo
+func (_u *PostUpdateOne) ClearReacts() *PostUpdateOne {
+	_u.mutation.ClearReacts()
+	return _u
 }
 
 // RemoveReactIDs removes the "reacts" edge to React entities by IDs.
-func (puo *PostUpdateOne) RemoveReactIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.RemoveReactIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) RemoveReactIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemoveReactIDs(ids...)
+	return _u
 }
 
 // RemoveReacts removes "reacts" edges to React entities.
-func (puo *PostUpdateOne) RemoveReacts(r ...*React) *PostUpdateOne {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_u *PostUpdateOne) RemoveReacts(v ...*React) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.RemoveReactIDs(ids...)
+	return _u.RemoveReactIDs(ids...)
 }
 
 // ClearLikes clears all "likes" edges to the LikePost entity.
-func (puo *PostUpdateOne) ClearLikes() *PostUpdateOne {
-	puo.mutation.ClearLikes()
-	return puo
+func (_u *PostUpdateOne) ClearLikes() *PostUpdateOne {
+	_u.mutation.ClearLikes()
+	return _u
 }
 
 // RemoveLikeIDs removes the "likes" edge to LikePost entities by IDs.
-func (puo *PostUpdateOne) RemoveLikeIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.RemoveLikeIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) RemoveLikeIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemoveLikeIDs(ids...)
+	return _u
 }
 
 // RemoveLikes removes "likes" edges to LikePost entities.
-func (puo *PostUpdateOne) RemoveLikes(l ...*LikePost) *PostUpdateOne {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *PostUpdateOne) RemoveLikes(v ...*LikePost) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.RemoveLikeIDs(ids...)
+	return _u.RemoveLikeIDs(ids...)
 }
 
 // ClearMentions clears all "mentions" edges to the MentionProfile entity.
-func (puo *PostUpdateOne) ClearMentions() *PostUpdateOne {
-	puo.mutation.ClearMentions()
-	return puo
+func (_u *PostUpdateOne) ClearMentions() *PostUpdateOne {
+	_u.mutation.ClearMentions()
+	return _u
 }
 
 // RemoveMentionIDs removes the "mentions" edge to MentionProfile entities by IDs.
-func (puo *PostUpdateOne) RemoveMentionIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.RemoveMentionIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) RemoveMentionIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemoveMentionIDs(ids...)
+	return _u
 }
 
 // RemoveMentions removes "mentions" edges to MentionProfile entities.
-func (puo *PostUpdateOne) RemoveMentions(m ...*MentionProfile) *PostUpdateOne {
-	ids := make([]xid.ID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_u *PostUpdateOne) RemoveMentions(v ...*MentionProfile) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.RemoveMentionIDs(ids...)
+	return _u.RemoveMentionIDs(ids...)
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
-func (puo *PostUpdateOne) ClearAssets() *PostUpdateOne {
-	puo.mutation.ClearAssets()
-	return puo
+func (_u *PostUpdateOne) ClearAssets() *PostUpdateOne {
+	_u.mutation.ClearAssets()
+	return _u
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (puo *PostUpdateOne) RemoveAssetIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.RemoveAssetIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) RemoveAssetIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemoveAssetIDs(ids...)
+	return _u
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
-func (puo *PostUpdateOne) RemoveAssets(a ...*Asset) *PostUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *PostUpdateOne) RemoveAssets(v ...*Asset) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.RemoveAssetIDs(ids...)
+	return _u.RemoveAssetIDs(ids...)
 }
 
 // ClearCollections clears all "collections" edges to the Collection entity.
-func (puo *PostUpdateOne) ClearCollections() *PostUpdateOne {
-	puo.mutation.ClearCollections()
-	return puo
+func (_u *PostUpdateOne) ClearCollections() *PostUpdateOne {
+	_u.mutation.ClearCollections()
+	return _u
 }
 
 // RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
-func (puo *PostUpdateOne) RemoveCollectionIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.RemoveCollectionIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) RemoveCollectionIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemoveCollectionIDs(ids...)
+	return _u
 }
 
 // RemoveCollections removes "collections" edges to Collection entities.
-func (puo *PostUpdateOne) RemoveCollections(c ...*Collection) *PostUpdateOne {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *PostUpdateOne) RemoveCollections(v ...*Collection) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.RemoveCollectionIDs(ids...)
+	return _u.RemoveCollectionIDs(ids...)
 }
 
 // ClearLink clears the "link" edge to the Link entity.
-func (puo *PostUpdateOne) ClearLink() *PostUpdateOne {
-	puo.mutation.ClearLink()
-	return puo
+func (_u *PostUpdateOne) ClearLink() *PostUpdateOne {
+	_u.mutation.ClearLink()
+	return _u
 }
 
 // ClearContentLinks clears all "content_links" edges to the Link entity.
-func (puo *PostUpdateOne) ClearContentLinks() *PostUpdateOne {
-	puo.mutation.ClearContentLinks()
-	return puo
+func (_u *PostUpdateOne) ClearContentLinks() *PostUpdateOne {
+	_u.mutation.ClearContentLinks()
+	return _u
 }
 
 // RemoveContentLinkIDs removes the "content_links" edge to Link entities by IDs.
-func (puo *PostUpdateOne) RemoveContentLinkIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.RemoveContentLinkIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) RemoveContentLinkIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemoveContentLinkIDs(ids...)
+	return _u
 }
 
 // RemoveContentLinks removes "content_links" edges to Link entities.
-func (puo *PostUpdateOne) RemoveContentLinks(l ...*Link) *PostUpdateOne {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *PostUpdateOne) RemoveContentLinks(v ...*Link) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.RemoveContentLinkIDs(ids...)
+	return _u.RemoveContentLinkIDs(ids...)
 }
 
 // ClearEvent clears all "event" edges to the Event entity.
-func (puo *PostUpdateOne) ClearEvent() *PostUpdateOne {
-	puo.mutation.ClearEvent()
-	return puo
+func (_u *PostUpdateOne) ClearEvent() *PostUpdateOne {
+	_u.mutation.ClearEvent()
+	return _u
 }
 
 // RemoveEventIDs removes the "event" edge to Event entities by IDs.
-func (puo *PostUpdateOne) RemoveEventIDs(ids ...xid.ID) *PostUpdateOne {
-	puo.mutation.RemoveEventIDs(ids...)
-	return puo
+func (_u *PostUpdateOne) RemoveEventIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemoveEventIDs(ids...)
+	return _u
 }
 
 // RemoveEvent removes "event" edges to Event entities.
-func (puo *PostUpdateOne) RemoveEvent(e ...*Event) *PostUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *PostUpdateOne) RemoveEvent(v ...*Event) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return puo.RemoveEventIDs(ids...)
+	return _u.RemoveEventIDs(ids...)
 }
 
 // Where appends a list predicates to the PostUpdate builder.
-func (puo *PostUpdateOne) Where(ps ...predicate.Post) *PostUpdateOne {
-	puo.mutation.Where(ps...)
-	return puo
+func (_u *PostUpdateOne) Where(ps ...predicate.Post) *PostUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (puo *PostUpdateOne) Select(field string, fields ...string) *PostUpdateOne {
-	puo.fields = append([]string{field}, fields...)
-	return puo
+func (_u *PostUpdateOne) Select(field string, fields ...string) *PostUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Post entity.
-func (puo *PostUpdateOne) Save(ctx context.Context) (*Post, error) {
-	return withHooks(ctx, puo.sqlSave, puo.mutation, puo.hooks)
+func (_u *PostUpdateOne) Save(ctx context.Context) (*Post, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (puo *PostUpdateOne) SaveX(ctx context.Context) *Post {
-	node, err := puo.Save(ctx)
+func (_u *PostUpdateOne) SaveX(ctx context.Context) *Post {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -2285,48 +2285,48 @@ func (puo *PostUpdateOne) SaveX(ctx context.Context) *Post {
 }
 
 // Exec executes the query on the entity.
-func (puo *PostUpdateOne) Exec(ctx context.Context) error {
-	_, err := puo.Save(ctx)
+func (_u *PostUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (puo *PostUpdateOne) ExecX(ctx context.Context) {
-	if err := puo.Exec(ctx); err != nil {
+func (_u *PostUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (puo *PostUpdateOne) check() error {
-	if v, ok := puo.mutation.Visibility(); ok {
+func (_u *PostUpdateOne) check() error {
+	if v, ok := _u.mutation.Visibility(); ok {
 		if err := post.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Post.visibility": %w`, err)}
 		}
 	}
-	if puo.mutation.AuthorCleared() && len(puo.mutation.AuthorIDs()) > 0 {
+	if _u.mutation.AuthorCleared() && len(_u.mutation.AuthorIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Post.author"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (puo *PostUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PostUpdateOne {
-	puo.modifiers = append(puo.modifiers, modifiers...)
-	return puo
+func (_u *PostUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *PostUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
-	if err := puo.check(); err != nil {
+func (_u *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(post.Table, post.Columns, sqlgraph.NewFieldSpec(post.FieldID, field.TypeString))
-	id, ok := puo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Post.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := puo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, post.FieldID)
 		for _, f := range fields {
@@ -2338,68 +2338,68 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 			}
 		}
 	}
-	if ps := puo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := puo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(post.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := puo.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(post.FieldDeletedAt, field.TypeTime, value)
 	}
-	if puo.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(post.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := puo.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(post.FieldIndexedAt, field.TypeTime, value)
 	}
-	if puo.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(post.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := puo.mutation.First(); ok {
+	if value, ok := _u.mutation.First(); ok {
 		_spec.SetField(post.FieldFirst, field.TypeBool, value)
 	}
-	if value, ok := puo.mutation.Title(); ok {
+	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(post.FieldTitle, field.TypeString, value)
 	}
-	if puo.mutation.TitleCleared() {
+	if _u.mutation.TitleCleared() {
 		_spec.ClearField(post.FieldTitle, field.TypeString)
 	}
-	if value, ok := puo.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(post.FieldSlug, field.TypeString, value)
 	}
-	if puo.mutation.SlugCleared() {
+	if _u.mutation.SlugCleared() {
 		_spec.ClearField(post.FieldSlug, field.TypeString)
 	}
-	if value, ok := puo.mutation.Pinned(); ok {
+	if value, ok := _u.mutation.Pinned(); ok {
 		_spec.SetField(post.FieldPinned, field.TypeBool, value)
 	}
-	if value, ok := puo.mutation.LastReplyAt(); ok {
+	if value, ok := _u.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
 	}
-	if puo.mutation.LastReplyAtCleared() {
+	if _u.mutation.LastReplyAtCleared() {
 		_spec.ClearField(post.FieldLastReplyAt, field.TypeTime)
 	}
-	if value, ok := puo.mutation.Body(); ok {
+	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
 	}
-	if value, ok := puo.mutation.Short(); ok {
+	if value, ok := _u.mutation.Short(); ok {
 		_spec.SetField(post.FieldShort, field.TypeString, value)
 	}
-	if value, ok := puo.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(post.FieldMetadata, field.TypeJSON, value)
 	}
-	if puo.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(post.FieldMetadata, field.TypeJSON)
 	}
-	if value, ok := puo.mutation.Visibility(); ok {
+	if value, ok := _u.mutation.Visibility(); ok {
 		_spec.SetField(post.FieldVisibility, field.TypeEnum, value)
 	}
-	if puo.mutation.AuthorCleared() {
+	if _u.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2412,7 +2412,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.AuthorIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2428,7 +2428,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.CategoryCleared() {
+	if _u.mutation.CategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2441,7 +2441,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.CategoryIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2457,7 +2457,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.TagsCleared() {
+	if _u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2470,7 +2470,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedTagsIDs(); len(nodes) > 0 && !puo.mutation.TagsCleared() {
+	if nodes := _u.mutation.RemovedTagsIDs(); len(nodes) > 0 && !_u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2486,7 +2486,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.TagsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2502,7 +2502,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.RootCleared() {
+	if _u.mutation.RootCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2515,7 +2515,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RootIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RootIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2531,7 +2531,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.PostsCleared() {
+	if _u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2544,7 +2544,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedPostsIDs(); len(nodes) > 0 && !puo.mutation.PostsCleared() {
+	if nodes := _u.mutation.RemovedPostsIDs(); len(nodes) > 0 && !_u.mutation.PostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2560,7 +2560,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2576,7 +2576,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.ReplyToCleared() {
+	if _u.mutation.ReplyToCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2589,7 +2589,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.ReplyToIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ReplyToIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2605,7 +2605,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.RepliesCleared() {
+	if _u.mutation.RepliesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2618,23 +2618,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedRepliesIDs(); len(nodes) > 0 && !puo.mutation.RepliesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.RepliesTable,
-			Columns: []string{post.RepliesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RepliesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedRepliesIDs(); len(nodes) > 0 && !_u.mutation.RepliesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2648,9 +2632,25 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RepliesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.RepliesTable,
+			Columns: []string{post.RepliesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.ReactsCleared() {
+	if _u.mutation.ReactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2663,7 +2663,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedReactsIDs(); len(nodes) > 0 && !puo.mutation.ReactsCleared() {
+	if nodes := _u.mutation.RemovedReactsIDs(); len(nodes) > 0 && !_u.mutation.ReactsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2679,7 +2679,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.ReactsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ReactsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2695,7 +2695,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.LikesCleared() {
+	if _u.mutation.LikesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2708,23 +2708,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedLikesIDs(); len(nodes) > 0 && !puo.mutation.LikesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   post.LikesTable,
-			Columns: []string{post.LikesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.LikesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.RemovedLikesIDs(); len(nodes) > 0 && !_u.mutation.LikesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2738,9 +2722,25 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.LikesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.LikesTable,
+			Columns: []string{post.LikesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(likepost.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.MentionsCleared() {
+	if _u.mutation.MentionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2753,7 +2753,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !puo.mutation.MentionsCleared() {
+	if nodes := _u.mutation.RemovedMentionsIDs(); len(nodes) > 0 && !_u.mutation.MentionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2769,7 +2769,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.MentionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.MentionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2785,7 +2785,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.AssetsCleared() {
+	if _u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -2798,7 +2798,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !puo.mutation.AssetsCleared() {
+	if nodes := _u.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !_u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -2814,7 +2814,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -2830,7 +2830,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.CollectionsCleared() {
+	if _u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2843,7 +2843,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !puo.mutation.CollectionsCleared() {
+	if nodes := _u.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !_u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2859,7 +2859,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.CollectionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CollectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2875,7 +2875,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.LinkCleared() {
+	if _u.mutation.LinkCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2888,7 +2888,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.LinkIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.LinkIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2904,7 +2904,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.ContentLinksCleared() {
+	if _u.mutation.ContentLinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2917,7 +2917,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedContentLinksIDs(); len(nodes) > 0 && !puo.mutation.ContentLinksCleared() {
+	if nodes := _u.mutation.RemovedContentLinksIDs(); len(nodes) > 0 && !_u.mutation.ContentLinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2933,7 +2933,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.ContentLinksIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ContentLinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2949,7 +2949,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.EventCleared() {
+	if _u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2962,7 +2962,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedEventIDs(); len(nodes) > 0 && !puo.mutation.EventCleared() {
+	if nodes := _u.mutation.RemovedEventIDs(); len(nodes) > 0 && !_u.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2978,7 +2978,7 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2994,11 +2994,11 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(puo.modifiers...)
-	_node = &Post{config: puo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Post{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, puo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{post.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -3006,6 +3006,6 @@ func (puo *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) 
 		}
 		return nil, err
 	}
-	puo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

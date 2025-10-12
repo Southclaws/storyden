@@ -20,56 +20,56 @@ type MentionProfileDelete struct {
 }
 
 // Where appends a list predicates to the MentionProfileDelete builder.
-func (mpd *MentionProfileDelete) Where(ps ...predicate.MentionProfile) *MentionProfileDelete {
-	mpd.mutation.Where(ps...)
-	return mpd
+func (_d *MentionProfileDelete) Where(ps ...predicate.MentionProfile) *MentionProfileDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (mpd *MentionProfileDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, mpd.sqlExec, mpd.mutation, mpd.hooks)
+func (_d *MentionProfileDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mpd *MentionProfileDelete) ExecX(ctx context.Context) int {
-	n, err := mpd.Exec(ctx)
+func (_d *MentionProfileDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (mpd *MentionProfileDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *MentionProfileDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(mentionprofile.Table, sqlgraph.NewFieldSpec(mentionprofile.FieldID, field.TypeString))
-	if ps := mpd.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, mpd.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	mpd.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // MentionProfileDeleteOne is the builder for deleting a single MentionProfile entity.
 type MentionProfileDeleteOne struct {
-	mpd *MentionProfileDelete
+	_d *MentionProfileDelete
 }
 
 // Where appends a list predicates to the MentionProfileDelete builder.
-func (mpdo *MentionProfileDeleteOne) Where(ps ...predicate.MentionProfile) *MentionProfileDeleteOne {
-	mpdo.mpd.mutation.Where(ps...)
-	return mpdo
+func (_d *MentionProfileDeleteOne) Where(ps ...predicate.MentionProfile) *MentionProfileDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (mpdo *MentionProfileDeleteOne) Exec(ctx context.Context) error {
-	n, err := mpdo.mpd.Exec(ctx)
+func (_d *MentionProfileDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (mpdo *MentionProfileDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (mpdo *MentionProfileDeleteOne) ExecX(ctx context.Context) {
-	if err := mpdo.Exec(ctx); err != nil {
+func (_d *MentionProfileDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

@@ -87,7 +87,7 @@ func (*React) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the React fields.
-func (r *React) assignValues(columns []string, values []any) error {
+func (_m *React) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -97,34 +97,34 @@ func (r *React) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				r.ID = *value
+				_m.ID = *value
 			}
 		case react.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				r.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case react.FieldAccountID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
 			} else if value != nil {
-				r.AccountID = *value
+				_m.AccountID = *value
 			}
 		case react.FieldPostID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field post_id", values[i])
 			} else if value != nil {
-				r.PostID = *value
+				_m.PostID = *value
 			}
 		case react.FieldEmoji:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field emoji", values[i])
 			} else if value.Valid {
-				r.Emoji = value.String
+				_m.Emoji = value.String
 			}
 		default:
-			r.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -132,54 +132,54 @@ func (r *React) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the React.
 // This includes values selected through modifiers, order, etc.
-func (r *React) Value(name string) (ent.Value, error) {
-	return r.selectValues.Get(name)
+func (_m *React) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryAccount queries the "account" edge of the React entity.
-func (r *React) QueryAccount() *AccountQuery {
-	return NewReactClient(r.config).QueryAccount(r)
+func (_m *React) QueryAccount() *AccountQuery {
+	return NewReactClient(_m.config).QueryAccount(_m)
 }
 
 // QueryPost queries the "Post" edge of the React entity.
-func (r *React) QueryPost() *PostQuery {
-	return NewReactClient(r.config).QueryPost(r)
+func (_m *React) QueryPost() *PostQuery {
+	return NewReactClient(_m.config).QueryPost(_m)
 }
 
 // Update returns a builder for updating this React.
 // Note that you need to call React.Unwrap() before calling this method if this React
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (r *React) Update() *ReactUpdateOne {
-	return NewReactClient(r.config).UpdateOne(r)
+func (_m *React) Update() *ReactUpdateOne {
+	return NewReactClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the React entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (r *React) Unwrap() *React {
-	_tx, ok := r.config.driver.(*txDriver)
+func (_m *React) Unwrap() *React {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: React is not a transactional entity")
 	}
-	r.config.driver = _tx.drv
-	return r
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (r *React) String() string {
+func (_m *React) String() string {
 	var builder strings.Builder
 	builder.WriteString("React(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", r.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(r.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
-	builder.WriteString(fmt.Sprintf("%v", r.AccountID))
+	builder.WriteString(fmt.Sprintf("%v", _m.AccountID))
 	builder.WriteString(", ")
 	builder.WriteString("post_id=")
-	builder.WriteString(fmt.Sprintf("%v", r.PostID))
+	builder.WriteString(fmt.Sprintf("%v", _m.PostID))
 	builder.WriteString(", ")
 	builder.WriteString("emoji=")
-	builder.WriteString(r.Emoji)
+	builder.WriteString(_m.Emoji)
 	builder.WriteByte(')')
 	return builder.String()
 }

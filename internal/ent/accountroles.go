@@ -87,7 +87,7 @@ func (*AccountRoles) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the AccountRoles fields.
-func (ar *AccountRoles) assignValues(columns []string, values []any) error {
+func (_m *AccountRoles) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -97,35 +97,35 @@ func (ar *AccountRoles) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				ar.ID = *value
+				_m.ID = *value
 			}
 		case accountroles.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				ar.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case accountroles.FieldAccountID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
 			} else if value != nil {
-				ar.AccountID = *value
+				_m.AccountID = *value
 			}
 		case accountroles.FieldRoleID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field role_id", values[i])
 			} else if value != nil {
-				ar.RoleID = *value
+				_m.RoleID = *value
 			}
 		case accountroles.FieldBadge:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field badge", values[i])
 			} else if value.Valid {
-				ar.Badge = new(bool)
-				*ar.Badge = value.Bool
+				_m.Badge = new(bool)
+				*_m.Badge = value.Bool
 			}
 		default:
-			ar.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -133,53 +133,53 @@ func (ar *AccountRoles) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the AccountRoles.
 // This includes values selected through modifiers, order, etc.
-func (ar *AccountRoles) Value(name string) (ent.Value, error) {
-	return ar.selectValues.Get(name)
+func (_m *AccountRoles) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryAccount queries the "account" edge of the AccountRoles entity.
-func (ar *AccountRoles) QueryAccount() *AccountQuery {
-	return NewAccountRolesClient(ar.config).QueryAccount(ar)
+func (_m *AccountRoles) QueryAccount() *AccountQuery {
+	return NewAccountRolesClient(_m.config).QueryAccount(_m)
 }
 
 // QueryRole queries the "role" edge of the AccountRoles entity.
-func (ar *AccountRoles) QueryRole() *RoleQuery {
-	return NewAccountRolesClient(ar.config).QueryRole(ar)
+func (_m *AccountRoles) QueryRole() *RoleQuery {
+	return NewAccountRolesClient(_m.config).QueryRole(_m)
 }
 
 // Update returns a builder for updating this AccountRoles.
 // Note that you need to call AccountRoles.Unwrap() before calling this method if this AccountRoles
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (ar *AccountRoles) Update() *AccountRolesUpdateOne {
-	return NewAccountRolesClient(ar.config).UpdateOne(ar)
+func (_m *AccountRoles) Update() *AccountRolesUpdateOne {
+	return NewAccountRolesClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the AccountRoles entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (ar *AccountRoles) Unwrap() *AccountRoles {
-	_tx, ok := ar.config.driver.(*txDriver)
+func (_m *AccountRoles) Unwrap() *AccountRoles {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: AccountRoles is not a transactional entity")
 	}
-	ar.config.driver = _tx.drv
-	return ar
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (ar *AccountRoles) String() string {
+func (_m *AccountRoles) String() string {
 	var builder strings.Builder
 	builder.WriteString("AccountRoles(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", ar.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(ar.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
-	builder.WriteString(fmt.Sprintf("%v", ar.AccountID))
+	builder.WriteString(fmt.Sprintf("%v", _m.AccountID))
 	builder.WriteString(", ")
 	builder.WriteString("role_id=")
-	builder.WriteString(fmt.Sprintf("%v", ar.RoleID))
+	builder.WriteString(fmt.Sprintf("%v", _m.RoleID))
 	builder.WriteString(", ")
-	if v := ar.Badge; v != nil {
+	if v := _m.Badge; v != nil {
 		builder.WriteString("badge=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}

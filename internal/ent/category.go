@@ -131,7 +131,7 @@ func (*Category) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Category fields.
-func (c *Category) assignValues(columns []string, values []any) error {
+func (_m *Category) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -141,79 +141,79 @@ func (c *Category) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				c.ID = *value
+				_m.ID = *value
 			}
 		case category.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				c.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case category.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				c.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case category.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				c.Name = value.String
+				_m.Name = value.String
 			}
 		case category.FieldSlug:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field slug", values[i])
 			} else if value.Valid {
-				c.Slug = value.String
+				_m.Slug = value.String
 			}
 		case category.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				c.Description = value.String
+				_m.Description = value.String
 			}
 		case category.FieldColour:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field colour", values[i])
 			} else if value.Valid {
-				c.Colour = value.String
+				_m.Colour = value.String
 			}
 		case category.FieldSort:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
-				c.Sort = int(value.Int64)
+				_m.Sort = int(value.Int64)
 			}
 		case category.FieldAdmin:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field admin", values[i])
 			} else if value.Valid {
-				c.Admin = value.Bool
+				_m.Admin = value.Bool
 			}
 		case category.FieldParentCategoryID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_category_id", values[i])
 			} else if value != nil {
-				c.ParentCategoryID = *value
+				_m.ParentCategoryID = *value
 			}
 		case category.FieldCoverImageAssetID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field cover_image_asset_id", values[i])
 			} else if value.Valid {
-				c.CoverImageAssetID = new(xid.ID)
-				*c.CoverImageAssetID = *value.S.(*xid.ID)
+				_m.CoverImageAssetID = new(xid.ID)
+				*_m.CoverImageAssetID = *value.S.(*xid.ID)
 			}
 		case category.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field metadata", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &c.Metadata); err != nil {
+				if err := json.Unmarshal(*value, &_m.Metadata); err != nil {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
 		default:
-			c.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -221,87 +221,87 @@ func (c *Category) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Category.
 // This includes values selected through modifiers, order, etc.
-func (c *Category) Value(name string) (ent.Value, error) {
-	return c.selectValues.Get(name)
+func (_m *Category) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryPosts queries the "posts" edge of the Category entity.
-func (c *Category) QueryPosts() *PostQuery {
-	return NewCategoryClient(c.config).QueryPosts(c)
+func (_m *Category) QueryPosts() *PostQuery {
+	return NewCategoryClient(_m.config).QueryPosts(_m)
 }
 
 // QueryParent queries the "parent" edge of the Category entity.
-func (c *Category) QueryParent() *CategoryQuery {
-	return NewCategoryClient(c.config).QueryParent(c)
+func (_m *Category) QueryParent() *CategoryQuery {
+	return NewCategoryClient(_m.config).QueryParent(_m)
 }
 
 // QueryChildren queries the "children" edge of the Category entity.
-func (c *Category) QueryChildren() *CategoryQuery {
-	return NewCategoryClient(c.config).QueryChildren(c)
+func (_m *Category) QueryChildren() *CategoryQuery {
+	return NewCategoryClient(_m.config).QueryChildren(_m)
 }
 
 // QueryCoverImage queries the "cover_image" edge of the Category entity.
-func (c *Category) QueryCoverImage() *AssetQuery {
-	return NewCategoryClient(c.config).QueryCoverImage(c)
+func (_m *Category) QueryCoverImage() *AssetQuery {
+	return NewCategoryClient(_m.config).QueryCoverImage(_m)
 }
 
 // Update returns a builder for updating this Category.
 // Note that you need to call Category.Unwrap() before calling this method if this Category
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (c *Category) Update() *CategoryUpdateOne {
-	return NewCategoryClient(c.config).UpdateOne(c)
+func (_m *Category) Update() *CategoryUpdateOne {
+	return NewCategoryClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Category entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (c *Category) Unwrap() *Category {
-	_tx, ok := c.config.driver.(*txDriver)
+func (_m *Category) Unwrap() *Category {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Category is not a transactional entity")
 	}
-	c.config.driver = _tx.drv
-	return c
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (c *Category) String() string {
+func (_m *Category) String() string {
 	var builder strings.Builder
 	builder.WriteString("Category(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(c.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("slug=")
-	builder.WriteString(c.Slug)
+	builder.WriteString(_m.Slug)
 	builder.WriteString(", ")
 	builder.WriteString("description=")
-	builder.WriteString(c.Description)
+	builder.WriteString(_m.Description)
 	builder.WriteString(", ")
 	builder.WriteString("colour=")
-	builder.WriteString(c.Colour)
+	builder.WriteString(_m.Colour)
 	builder.WriteString(", ")
 	builder.WriteString("sort=")
-	builder.WriteString(fmt.Sprintf("%v", c.Sort))
+	builder.WriteString(fmt.Sprintf("%v", _m.Sort))
 	builder.WriteString(", ")
 	builder.WriteString("admin=")
-	builder.WriteString(fmt.Sprintf("%v", c.Admin))
+	builder.WriteString(fmt.Sprintf("%v", _m.Admin))
 	builder.WriteString(", ")
 	builder.WriteString("parent_category_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.ParentCategoryID))
+	builder.WriteString(fmt.Sprintf("%v", _m.ParentCategoryID))
 	builder.WriteString(", ")
-	if v := c.CoverImageAssetID; v != nil {
+	if v := _m.CoverImageAssetID; v != nil {
 		builder.WriteString("cover_image_asset_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
-	builder.WriteString(fmt.Sprintf("%v", c.Metadata))
+	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))
 	builder.WriteByte(')')
 	return builder.String()
 }

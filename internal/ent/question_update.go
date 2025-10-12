@@ -26,224 +26,224 @@ type QuestionUpdate struct {
 }
 
 // Where appends a list predicates to the QuestionUpdate builder.
-func (qu *QuestionUpdate) Where(ps ...predicate.Question) *QuestionUpdate {
-	qu.mutation.Where(ps...)
-	return qu
+func (_u *QuestionUpdate) Where(ps ...predicate.Question) *QuestionUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (qu *QuestionUpdate) SetIndexedAt(t time.Time) *QuestionUpdate {
-	qu.mutation.SetIndexedAt(t)
-	return qu
+func (_u *QuestionUpdate) SetIndexedAt(v time.Time) *QuestionUpdate {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (qu *QuestionUpdate) SetNillableIndexedAt(t *time.Time) *QuestionUpdate {
-	if t != nil {
-		qu.SetIndexedAt(*t)
+func (_u *QuestionUpdate) SetNillableIndexedAt(v *time.Time) *QuestionUpdate {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return qu
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (qu *QuestionUpdate) ClearIndexedAt() *QuestionUpdate {
-	qu.mutation.ClearIndexedAt()
-	return qu
+func (_u *QuestionUpdate) ClearIndexedAt() *QuestionUpdate {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (qu *QuestionUpdate) SetSlug(s string) *QuestionUpdate {
-	qu.mutation.SetSlug(s)
-	return qu
+func (_u *QuestionUpdate) SetSlug(v string) *QuestionUpdate {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (qu *QuestionUpdate) SetNillableSlug(s *string) *QuestionUpdate {
-	if s != nil {
-		qu.SetSlug(*s)
+func (_u *QuestionUpdate) SetNillableSlug(v *string) *QuestionUpdate {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return qu
+	return _u
 }
 
 // SetQuery sets the "query" field.
-func (qu *QuestionUpdate) SetQuery(s string) *QuestionUpdate {
-	qu.mutation.SetQuery(s)
-	return qu
+func (_u *QuestionUpdate) SetQuery(v string) *QuestionUpdate {
+	_u.mutation.SetQuery(v)
+	return _u
 }
 
 // SetNillableQuery sets the "query" field if the given value is not nil.
-func (qu *QuestionUpdate) SetNillableQuery(s *string) *QuestionUpdate {
-	if s != nil {
-		qu.SetQuery(*s)
+func (_u *QuestionUpdate) SetNillableQuery(v *string) *QuestionUpdate {
+	if v != nil {
+		_u.SetQuery(*v)
 	}
-	return qu
+	return _u
 }
 
 // SetResult sets the "result" field.
-func (qu *QuestionUpdate) SetResult(s string) *QuestionUpdate {
-	qu.mutation.SetResult(s)
-	return qu
+func (_u *QuestionUpdate) SetResult(v string) *QuestionUpdate {
+	_u.mutation.SetResult(v)
+	return _u
 }
 
 // SetNillableResult sets the "result" field if the given value is not nil.
-func (qu *QuestionUpdate) SetNillableResult(s *string) *QuestionUpdate {
-	if s != nil {
-		qu.SetResult(*s)
+func (_u *QuestionUpdate) SetNillableResult(v *string) *QuestionUpdate {
+	if v != nil {
+		_u.SetResult(*v)
 	}
-	return qu
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (qu *QuestionUpdate) SetMetadata(m map[string]interface{}) *QuestionUpdate {
-	qu.mutation.SetMetadata(m)
-	return qu
+func (_u *QuestionUpdate) SetMetadata(v map[string]interface{}) *QuestionUpdate {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (qu *QuestionUpdate) ClearMetadata() *QuestionUpdate {
-	qu.mutation.ClearMetadata()
-	return qu
+func (_u *QuestionUpdate) ClearMetadata() *QuestionUpdate {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (qu *QuestionUpdate) SetAccountID(x xid.ID) *QuestionUpdate {
-	qu.mutation.SetAccountID(x)
-	return qu
+func (_u *QuestionUpdate) SetAccountID(v xid.ID) *QuestionUpdate {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (qu *QuestionUpdate) SetNillableAccountID(x *xid.ID) *QuestionUpdate {
-	if x != nil {
-		qu.SetAccountID(*x)
+func (_u *QuestionUpdate) SetNillableAccountID(v *xid.ID) *QuestionUpdate {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return qu
+	return _u
 }
 
 // ClearAccountID clears the value of the "account_id" field.
-func (qu *QuestionUpdate) ClearAccountID() *QuestionUpdate {
-	qu.mutation.ClearAccountID()
-	return qu
+func (_u *QuestionUpdate) ClearAccountID() *QuestionUpdate {
+	_u.mutation.ClearAccountID()
+	return _u
 }
 
 // SetParentQuestionID sets the "parent_question_id" field.
-func (qu *QuestionUpdate) SetParentQuestionID(x xid.ID) *QuestionUpdate {
-	qu.mutation.SetParentQuestionID(x)
-	return qu
+func (_u *QuestionUpdate) SetParentQuestionID(v xid.ID) *QuestionUpdate {
+	_u.mutation.SetParentQuestionID(v)
+	return _u
 }
 
 // SetNillableParentQuestionID sets the "parent_question_id" field if the given value is not nil.
-func (qu *QuestionUpdate) SetNillableParentQuestionID(x *xid.ID) *QuestionUpdate {
-	if x != nil {
-		qu.SetParentQuestionID(*x)
+func (_u *QuestionUpdate) SetNillableParentQuestionID(v *xid.ID) *QuestionUpdate {
+	if v != nil {
+		_u.SetParentQuestionID(*v)
 	}
-	return qu
+	return _u
 }
 
 // ClearParentQuestionID clears the value of the "parent_question_id" field.
-func (qu *QuestionUpdate) ClearParentQuestionID() *QuestionUpdate {
-	qu.mutation.ClearParentQuestionID()
-	return qu
+func (_u *QuestionUpdate) ClearParentQuestionID() *QuestionUpdate {
+	_u.mutation.ClearParentQuestionID()
+	return _u
 }
 
 // SetAuthorID sets the "author" edge to the Account entity by ID.
-func (qu *QuestionUpdate) SetAuthorID(id xid.ID) *QuestionUpdate {
-	qu.mutation.SetAuthorID(id)
-	return qu
+func (_u *QuestionUpdate) SetAuthorID(id xid.ID) *QuestionUpdate {
+	_u.mutation.SetAuthorID(id)
+	return _u
 }
 
 // SetNillableAuthorID sets the "author" edge to the Account entity by ID if the given value is not nil.
-func (qu *QuestionUpdate) SetNillableAuthorID(id *xid.ID) *QuestionUpdate {
+func (_u *QuestionUpdate) SetNillableAuthorID(id *xid.ID) *QuestionUpdate {
 	if id != nil {
-		qu = qu.SetAuthorID(*id)
+		_u = _u.SetAuthorID(*id)
 	}
-	return qu
+	return _u
 }
 
 // SetAuthor sets the "author" edge to the Account entity.
-func (qu *QuestionUpdate) SetAuthor(a *Account) *QuestionUpdate {
-	return qu.SetAuthorID(a.ID)
+func (_u *QuestionUpdate) SetAuthor(v *Account) *QuestionUpdate {
+	return _u.SetAuthorID(v.ID)
 }
 
 // SetParentID sets the "parent" edge to the Question entity by ID.
-func (qu *QuestionUpdate) SetParentID(id xid.ID) *QuestionUpdate {
-	qu.mutation.SetParentID(id)
-	return qu
+func (_u *QuestionUpdate) SetParentID(id xid.ID) *QuestionUpdate {
+	_u.mutation.SetParentID(id)
+	return _u
 }
 
 // SetNillableParentID sets the "parent" edge to the Question entity by ID if the given value is not nil.
-func (qu *QuestionUpdate) SetNillableParentID(id *xid.ID) *QuestionUpdate {
+func (_u *QuestionUpdate) SetNillableParentID(id *xid.ID) *QuestionUpdate {
 	if id != nil {
-		qu = qu.SetParentID(*id)
+		_u = _u.SetParentID(*id)
 	}
-	return qu
+	return _u
 }
 
 // SetParent sets the "parent" edge to the Question entity.
-func (qu *QuestionUpdate) SetParent(q *Question) *QuestionUpdate {
-	return qu.SetParentID(q.ID)
+func (_u *QuestionUpdate) SetParent(v *Question) *QuestionUpdate {
+	return _u.SetParentID(v.ID)
 }
 
 // AddParentQuestionIDs adds the "parent_question" edge to the Question entity by IDs.
-func (qu *QuestionUpdate) AddParentQuestionIDs(ids ...xid.ID) *QuestionUpdate {
-	qu.mutation.AddParentQuestionIDs(ids...)
-	return qu
+func (_u *QuestionUpdate) AddParentQuestionIDs(ids ...xid.ID) *QuestionUpdate {
+	_u.mutation.AddParentQuestionIDs(ids...)
+	return _u
 }
 
 // AddParentQuestion adds the "parent_question" edges to the Question entity.
-func (qu *QuestionUpdate) AddParentQuestion(q ...*Question) *QuestionUpdate {
-	ids := make([]xid.ID, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+func (_u *QuestionUpdate) AddParentQuestion(v ...*Question) *QuestionUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return qu.AddParentQuestionIDs(ids...)
+	return _u.AddParentQuestionIDs(ids...)
 }
 
 // Mutation returns the QuestionMutation object of the builder.
-func (qu *QuestionUpdate) Mutation() *QuestionMutation {
-	return qu.mutation
+func (_u *QuestionUpdate) Mutation() *QuestionMutation {
+	return _u.mutation
 }
 
 // ClearAuthor clears the "author" edge to the Account entity.
-func (qu *QuestionUpdate) ClearAuthor() *QuestionUpdate {
-	qu.mutation.ClearAuthor()
-	return qu
+func (_u *QuestionUpdate) ClearAuthor() *QuestionUpdate {
+	_u.mutation.ClearAuthor()
+	return _u
 }
 
 // ClearParent clears the "parent" edge to the Question entity.
-func (qu *QuestionUpdate) ClearParent() *QuestionUpdate {
-	qu.mutation.ClearParent()
-	return qu
+func (_u *QuestionUpdate) ClearParent() *QuestionUpdate {
+	_u.mutation.ClearParent()
+	return _u
 }
 
 // ClearParentQuestion clears all "parent_question" edges to the Question entity.
-func (qu *QuestionUpdate) ClearParentQuestion() *QuestionUpdate {
-	qu.mutation.ClearParentQuestion()
-	return qu
+func (_u *QuestionUpdate) ClearParentQuestion() *QuestionUpdate {
+	_u.mutation.ClearParentQuestion()
+	return _u
 }
 
 // RemoveParentQuestionIDs removes the "parent_question" edge to Question entities by IDs.
-func (qu *QuestionUpdate) RemoveParentQuestionIDs(ids ...xid.ID) *QuestionUpdate {
-	qu.mutation.RemoveParentQuestionIDs(ids...)
-	return qu
+func (_u *QuestionUpdate) RemoveParentQuestionIDs(ids ...xid.ID) *QuestionUpdate {
+	_u.mutation.RemoveParentQuestionIDs(ids...)
+	return _u
 }
 
 // RemoveParentQuestion removes "parent_question" edges to Question entities.
-func (qu *QuestionUpdate) RemoveParentQuestion(q ...*Question) *QuestionUpdate {
-	ids := make([]xid.ID, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+func (_u *QuestionUpdate) RemoveParentQuestion(v ...*Question) *QuestionUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return qu.RemoveParentQuestionIDs(ids...)
+	return _u.RemoveParentQuestionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (qu *QuestionUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, qu.sqlSave, qu.mutation, qu.hooks)
+func (_u *QuestionUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (qu *QuestionUpdate) SaveX(ctx context.Context) int {
-	affected, err := qu.Save(ctx)
+func (_u *QuestionUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -251,55 +251,55 @@ func (qu *QuestionUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (qu *QuestionUpdate) Exec(ctx context.Context) error {
-	_, err := qu.Save(ctx)
+func (_u *QuestionUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (qu *QuestionUpdate) ExecX(ctx context.Context) {
-	if err := qu.Exec(ctx); err != nil {
+func (_u *QuestionUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (qu *QuestionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *QuestionUpdate {
-	qu.modifiers = append(qu.modifiers, modifiers...)
-	return qu
+func (_u *QuestionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *QuestionUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (_u *QuestionUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(question.Table, question.Columns, sqlgraph.NewFieldSpec(question.FieldID, field.TypeString))
-	if ps := qu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := qu.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(question.FieldIndexedAt, field.TypeTime, value)
 	}
-	if qu.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(question.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := qu.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(question.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := qu.mutation.Query(); ok {
+	if value, ok := _u.mutation.Query(); ok {
 		_spec.SetField(question.FieldQuery, field.TypeString, value)
 	}
-	if value, ok := qu.mutation.Result(); ok {
+	if value, ok := _u.mutation.Result(); ok {
 		_spec.SetField(question.FieldResult, field.TypeString, value)
 	}
-	if value, ok := qu.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(question.FieldMetadata, field.TypeJSON, value)
 	}
-	if qu.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(question.FieldMetadata, field.TypeJSON)
 	}
-	if qu.mutation.AuthorCleared() {
+	if _u.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -312,7 +312,7 @@ func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := qu.mutation.AuthorIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -328,7 +328,7 @@ func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if qu.mutation.ParentCleared() {
+	if _u.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -341,7 +341,7 @@ func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := qu.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -357,7 +357,7 @@ func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if qu.mutation.ParentQuestionCleared() {
+	if _u.mutation.ParentQuestionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -370,7 +370,7 @@ func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := qu.mutation.RemovedParentQuestionIDs(); len(nodes) > 0 && !qu.mutation.ParentQuestionCleared() {
+	if nodes := _u.mutation.RemovedParentQuestionIDs(); len(nodes) > 0 && !_u.mutation.ParentQuestionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -386,7 +386,7 @@ func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := qu.mutation.ParentQuestionIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParentQuestionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -402,8 +402,8 @@ func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(qu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, qu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{question.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -411,8 +411,8 @@ func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	qu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // QuestionUpdateOne is the builder for updating a single Question entity.
@@ -425,231 +425,231 @@ type QuestionUpdateOne struct {
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (quo *QuestionUpdateOne) SetIndexedAt(t time.Time) *QuestionUpdateOne {
-	quo.mutation.SetIndexedAt(t)
-	return quo
+func (_u *QuestionUpdateOne) SetIndexedAt(v time.Time) *QuestionUpdateOne {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (quo *QuestionUpdateOne) SetNillableIndexedAt(t *time.Time) *QuestionUpdateOne {
-	if t != nil {
-		quo.SetIndexedAt(*t)
+func (_u *QuestionUpdateOne) SetNillableIndexedAt(v *time.Time) *QuestionUpdateOne {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return quo
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (quo *QuestionUpdateOne) ClearIndexedAt() *QuestionUpdateOne {
-	quo.mutation.ClearIndexedAt()
-	return quo
+func (_u *QuestionUpdateOne) ClearIndexedAt() *QuestionUpdateOne {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (quo *QuestionUpdateOne) SetSlug(s string) *QuestionUpdateOne {
-	quo.mutation.SetSlug(s)
-	return quo
+func (_u *QuestionUpdateOne) SetSlug(v string) *QuestionUpdateOne {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (quo *QuestionUpdateOne) SetNillableSlug(s *string) *QuestionUpdateOne {
-	if s != nil {
-		quo.SetSlug(*s)
+func (_u *QuestionUpdateOne) SetNillableSlug(v *string) *QuestionUpdateOne {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return quo
+	return _u
 }
 
 // SetQuery sets the "query" field.
-func (quo *QuestionUpdateOne) SetQuery(s string) *QuestionUpdateOne {
-	quo.mutation.SetQuery(s)
-	return quo
+func (_u *QuestionUpdateOne) SetQuery(v string) *QuestionUpdateOne {
+	_u.mutation.SetQuery(v)
+	return _u
 }
 
 // SetNillableQuery sets the "query" field if the given value is not nil.
-func (quo *QuestionUpdateOne) SetNillableQuery(s *string) *QuestionUpdateOne {
-	if s != nil {
-		quo.SetQuery(*s)
+func (_u *QuestionUpdateOne) SetNillableQuery(v *string) *QuestionUpdateOne {
+	if v != nil {
+		_u.SetQuery(*v)
 	}
-	return quo
+	return _u
 }
 
 // SetResult sets the "result" field.
-func (quo *QuestionUpdateOne) SetResult(s string) *QuestionUpdateOne {
-	quo.mutation.SetResult(s)
-	return quo
+func (_u *QuestionUpdateOne) SetResult(v string) *QuestionUpdateOne {
+	_u.mutation.SetResult(v)
+	return _u
 }
 
 // SetNillableResult sets the "result" field if the given value is not nil.
-func (quo *QuestionUpdateOne) SetNillableResult(s *string) *QuestionUpdateOne {
-	if s != nil {
-		quo.SetResult(*s)
+func (_u *QuestionUpdateOne) SetNillableResult(v *string) *QuestionUpdateOne {
+	if v != nil {
+		_u.SetResult(*v)
 	}
-	return quo
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (quo *QuestionUpdateOne) SetMetadata(m map[string]interface{}) *QuestionUpdateOne {
-	quo.mutation.SetMetadata(m)
-	return quo
+func (_u *QuestionUpdateOne) SetMetadata(v map[string]interface{}) *QuestionUpdateOne {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (quo *QuestionUpdateOne) ClearMetadata() *QuestionUpdateOne {
-	quo.mutation.ClearMetadata()
-	return quo
+func (_u *QuestionUpdateOne) ClearMetadata() *QuestionUpdateOne {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (quo *QuestionUpdateOne) SetAccountID(x xid.ID) *QuestionUpdateOne {
-	quo.mutation.SetAccountID(x)
-	return quo
+func (_u *QuestionUpdateOne) SetAccountID(v xid.ID) *QuestionUpdateOne {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (quo *QuestionUpdateOne) SetNillableAccountID(x *xid.ID) *QuestionUpdateOne {
-	if x != nil {
-		quo.SetAccountID(*x)
+func (_u *QuestionUpdateOne) SetNillableAccountID(v *xid.ID) *QuestionUpdateOne {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return quo
+	return _u
 }
 
 // ClearAccountID clears the value of the "account_id" field.
-func (quo *QuestionUpdateOne) ClearAccountID() *QuestionUpdateOne {
-	quo.mutation.ClearAccountID()
-	return quo
+func (_u *QuestionUpdateOne) ClearAccountID() *QuestionUpdateOne {
+	_u.mutation.ClearAccountID()
+	return _u
 }
 
 // SetParentQuestionID sets the "parent_question_id" field.
-func (quo *QuestionUpdateOne) SetParentQuestionID(x xid.ID) *QuestionUpdateOne {
-	quo.mutation.SetParentQuestionID(x)
-	return quo
+func (_u *QuestionUpdateOne) SetParentQuestionID(v xid.ID) *QuestionUpdateOne {
+	_u.mutation.SetParentQuestionID(v)
+	return _u
 }
 
 // SetNillableParentQuestionID sets the "parent_question_id" field if the given value is not nil.
-func (quo *QuestionUpdateOne) SetNillableParentQuestionID(x *xid.ID) *QuestionUpdateOne {
-	if x != nil {
-		quo.SetParentQuestionID(*x)
+func (_u *QuestionUpdateOne) SetNillableParentQuestionID(v *xid.ID) *QuestionUpdateOne {
+	if v != nil {
+		_u.SetParentQuestionID(*v)
 	}
-	return quo
+	return _u
 }
 
 // ClearParentQuestionID clears the value of the "parent_question_id" field.
-func (quo *QuestionUpdateOne) ClearParentQuestionID() *QuestionUpdateOne {
-	quo.mutation.ClearParentQuestionID()
-	return quo
+func (_u *QuestionUpdateOne) ClearParentQuestionID() *QuestionUpdateOne {
+	_u.mutation.ClearParentQuestionID()
+	return _u
 }
 
 // SetAuthorID sets the "author" edge to the Account entity by ID.
-func (quo *QuestionUpdateOne) SetAuthorID(id xid.ID) *QuestionUpdateOne {
-	quo.mutation.SetAuthorID(id)
-	return quo
+func (_u *QuestionUpdateOne) SetAuthorID(id xid.ID) *QuestionUpdateOne {
+	_u.mutation.SetAuthorID(id)
+	return _u
 }
 
 // SetNillableAuthorID sets the "author" edge to the Account entity by ID if the given value is not nil.
-func (quo *QuestionUpdateOne) SetNillableAuthorID(id *xid.ID) *QuestionUpdateOne {
+func (_u *QuestionUpdateOne) SetNillableAuthorID(id *xid.ID) *QuestionUpdateOne {
 	if id != nil {
-		quo = quo.SetAuthorID(*id)
+		_u = _u.SetAuthorID(*id)
 	}
-	return quo
+	return _u
 }
 
 // SetAuthor sets the "author" edge to the Account entity.
-func (quo *QuestionUpdateOne) SetAuthor(a *Account) *QuestionUpdateOne {
-	return quo.SetAuthorID(a.ID)
+func (_u *QuestionUpdateOne) SetAuthor(v *Account) *QuestionUpdateOne {
+	return _u.SetAuthorID(v.ID)
 }
 
 // SetParentID sets the "parent" edge to the Question entity by ID.
-func (quo *QuestionUpdateOne) SetParentID(id xid.ID) *QuestionUpdateOne {
-	quo.mutation.SetParentID(id)
-	return quo
+func (_u *QuestionUpdateOne) SetParentID(id xid.ID) *QuestionUpdateOne {
+	_u.mutation.SetParentID(id)
+	return _u
 }
 
 // SetNillableParentID sets the "parent" edge to the Question entity by ID if the given value is not nil.
-func (quo *QuestionUpdateOne) SetNillableParentID(id *xid.ID) *QuestionUpdateOne {
+func (_u *QuestionUpdateOne) SetNillableParentID(id *xid.ID) *QuestionUpdateOne {
 	if id != nil {
-		quo = quo.SetParentID(*id)
+		_u = _u.SetParentID(*id)
 	}
-	return quo
+	return _u
 }
 
 // SetParent sets the "parent" edge to the Question entity.
-func (quo *QuestionUpdateOne) SetParent(q *Question) *QuestionUpdateOne {
-	return quo.SetParentID(q.ID)
+func (_u *QuestionUpdateOne) SetParent(v *Question) *QuestionUpdateOne {
+	return _u.SetParentID(v.ID)
 }
 
 // AddParentQuestionIDs adds the "parent_question" edge to the Question entity by IDs.
-func (quo *QuestionUpdateOne) AddParentQuestionIDs(ids ...xid.ID) *QuestionUpdateOne {
-	quo.mutation.AddParentQuestionIDs(ids...)
-	return quo
+func (_u *QuestionUpdateOne) AddParentQuestionIDs(ids ...xid.ID) *QuestionUpdateOne {
+	_u.mutation.AddParentQuestionIDs(ids...)
+	return _u
 }
 
 // AddParentQuestion adds the "parent_question" edges to the Question entity.
-func (quo *QuestionUpdateOne) AddParentQuestion(q ...*Question) *QuestionUpdateOne {
-	ids := make([]xid.ID, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+func (_u *QuestionUpdateOne) AddParentQuestion(v ...*Question) *QuestionUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return quo.AddParentQuestionIDs(ids...)
+	return _u.AddParentQuestionIDs(ids...)
 }
 
 // Mutation returns the QuestionMutation object of the builder.
-func (quo *QuestionUpdateOne) Mutation() *QuestionMutation {
-	return quo.mutation
+func (_u *QuestionUpdateOne) Mutation() *QuestionMutation {
+	return _u.mutation
 }
 
 // ClearAuthor clears the "author" edge to the Account entity.
-func (quo *QuestionUpdateOne) ClearAuthor() *QuestionUpdateOne {
-	quo.mutation.ClearAuthor()
-	return quo
+func (_u *QuestionUpdateOne) ClearAuthor() *QuestionUpdateOne {
+	_u.mutation.ClearAuthor()
+	return _u
 }
 
 // ClearParent clears the "parent" edge to the Question entity.
-func (quo *QuestionUpdateOne) ClearParent() *QuestionUpdateOne {
-	quo.mutation.ClearParent()
-	return quo
+func (_u *QuestionUpdateOne) ClearParent() *QuestionUpdateOne {
+	_u.mutation.ClearParent()
+	return _u
 }
 
 // ClearParentQuestion clears all "parent_question" edges to the Question entity.
-func (quo *QuestionUpdateOne) ClearParentQuestion() *QuestionUpdateOne {
-	quo.mutation.ClearParentQuestion()
-	return quo
+func (_u *QuestionUpdateOne) ClearParentQuestion() *QuestionUpdateOne {
+	_u.mutation.ClearParentQuestion()
+	return _u
 }
 
 // RemoveParentQuestionIDs removes the "parent_question" edge to Question entities by IDs.
-func (quo *QuestionUpdateOne) RemoveParentQuestionIDs(ids ...xid.ID) *QuestionUpdateOne {
-	quo.mutation.RemoveParentQuestionIDs(ids...)
-	return quo
+func (_u *QuestionUpdateOne) RemoveParentQuestionIDs(ids ...xid.ID) *QuestionUpdateOne {
+	_u.mutation.RemoveParentQuestionIDs(ids...)
+	return _u
 }
 
 // RemoveParentQuestion removes "parent_question" edges to Question entities.
-func (quo *QuestionUpdateOne) RemoveParentQuestion(q ...*Question) *QuestionUpdateOne {
-	ids := make([]xid.ID, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+func (_u *QuestionUpdateOne) RemoveParentQuestion(v ...*Question) *QuestionUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return quo.RemoveParentQuestionIDs(ids...)
+	return _u.RemoveParentQuestionIDs(ids...)
 }
 
 // Where appends a list predicates to the QuestionUpdate builder.
-func (quo *QuestionUpdateOne) Where(ps ...predicate.Question) *QuestionUpdateOne {
-	quo.mutation.Where(ps...)
-	return quo
+func (_u *QuestionUpdateOne) Where(ps ...predicate.Question) *QuestionUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (quo *QuestionUpdateOne) Select(field string, fields ...string) *QuestionUpdateOne {
-	quo.fields = append([]string{field}, fields...)
-	return quo
+func (_u *QuestionUpdateOne) Select(field string, fields ...string) *QuestionUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Question entity.
-func (quo *QuestionUpdateOne) Save(ctx context.Context) (*Question, error) {
-	return withHooks(ctx, quo.sqlSave, quo.mutation, quo.hooks)
+func (_u *QuestionUpdateOne) Save(ctx context.Context) (*Question, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (quo *QuestionUpdateOne) SaveX(ctx context.Context) *Question {
-	node, err := quo.Save(ctx)
+func (_u *QuestionUpdateOne) SaveX(ctx context.Context) *Question {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -657,32 +657,32 @@ func (quo *QuestionUpdateOne) SaveX(ctx context.Context) *Question {
 }
 
 // Exec executes the query on the entity.
-func (quo *QuestionUpdateOne) Exec(ctx context.Context) error {
-	_, err := quo.Save(ctx)
+func (_u *QuestionUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (quo *QuestionUpdateOne) ExecX(ctx context.Context) {
-	if err := quo.Exec(ctx); err != nil {
+func (_u *QuestionUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (quo *QuestionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *QuestionUpdateOne {
-	quo.modifiers = append(quo.modifiers, modifiers...)
-	return quo
+func (_u *QuestionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *QuestionUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err error) {
+func (_u *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err error) {
 	_spec := sqlgraph.NewUpdateSpec(question.Table, question.Columns, sqlgraph.NewFieldSpec(question.FieldID, field.TypeString))
-	id, ok := quo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Question.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := quo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, question.FieldID)
 		for _, f := range fields {
@@ -694,35 +694,35 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 			}
 		}
 	}
-	if ps := quo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := quo.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(question.FieldIndexedAt, field.TypeTime, value)
 	}
-	if quo.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(question.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := quo.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(question.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := quo.mutation.Query(); ok {
+	if value, ok := _u.mutation.Query(); ok {
 		_spec.SetField(question.FieldQuery, field.TypeString, value)
 	}
-	if value, ok := quo.mutation.Result(); ok {
+	if value, ok := _u.mutation.Result(); ok {
 		_spec.SetField(question.FieldResult, field.TypeString, value)
 	}
-	if value, ok := quo.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(question.FieldMetadata, field.TypeJSON, value)
 	}
-	if quo.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(question.FieldMetadata, field.TypeJSON)
 	}
-	if quo.mutation.AuthorCleared() {
+	if _u.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -735,7 +735,7 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := quo.mutation.AuthorIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AuthorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -751,7 +751,7 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if quo.mutation.ParentCleared() {
+	if _u.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -764,7 +764,7 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := quo.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -780,7 +780,7 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if quo.mutation.ParentQuestionCleared() {
+	if _u.mutation.ParentQuestionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -793,7 +793,7 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := quo.mutation.RemovedParentQuestionIDs(); len(nodes) > 0 && !quo.mutation.ParentQuestionCleared() {
+	if nodes := _u.mutation.RemovedParentQuestionIDs(); len(nodes) > 0 && !_u.mutation.ParentQuestionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -809,7 +809,7 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := quo.mutation.ParentQuestionIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParentQuestionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -825,11 +825,11 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(quo.modifiers...)
-	_node = &Question{config: quo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Question{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, quo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{question.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -837,6 +837,6 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 		}
 		return nil, err
 	}
-	quo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

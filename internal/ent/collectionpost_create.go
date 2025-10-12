@@ -26,85 +26,85 @@ type CollectionPostCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (cpc *CollectionPostCreate) SetCreatedAt(t time.Time) *CollectionPostCreate {
-	cpc.mutation.SetCreatedAt(t)
-	return cpc
+func (_c *CollectionPostCreate) SetCreatedAt(v time.Time) *CollectionPostCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (cpc *CollectionPostCreate) SetNillableCreatedAt(t *time.Time) *CollectionPostCreate {
-	if t != nil {
-		cpc.SetCreatedAt(*t)
+func (_c *CollectionPostCreate) SetNillableCreatedAt(v *time.Time) *CollectionPostCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return cpc
+	return _c
 }
 
 // SetCollectionID sets the "collection_id" field.
-func (cpc *CollectionPostCreate) SetCollectionID(x xid.ID) *CollectionPostCreate {
-	cpc.mutation.SetCollectionID(x)
-	return cpc
+func (_c *CollectionPostCreate) SetCollectionID(v xid.ID) *CollectionPostCreate {
+	_c.mutation.SetCollectionID(v)
+	return _c
 }
 
 // SetNillableCollectionID sets the "collection_id" field if the given value is not nil.
-func (cpc *CollectionPostCreate) SetNillableCollectionID(x *xid.ID) *CollectionPostCreate {
-	if x != nil {
-		cpc.SetCollectionID(*x)
+func (_c *CollectionPostCreate) SetNillableCollectionID(v *xid.ID) *CollectionPostCreate {
+	if v != nil {
+		_c.SetCollectionID(*v)
 	}
-	return cpc
+	return _c
 }
 
 // SetPostID sets the "post_id" field.
-func (cpc *CollectionPostCreate) SetPostID(x xid.ID) *CollectionPostCreate {
-	cpc.mutation.SetPostID(x)
-	return cpc
+func (_c *CollectionPostCreate) SetPostID(v xid.ID) *CollectionPostCreate {
+	_c.mutation.SetPostID(v)
+	return _c
 }
 
 // SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (cpc *CollectionPostCreate) SetNillablePostID(x *xid.ID) *CollectionPostCreate {
-	if x != nil {
-		cpc.SetPostID(*x)
+func (_c *CollectionPostCreate) SetNillablePostID(v *xid.ID) *CollectionPostCreate {
+	if v != nil {
+		_c.SetPostID(*v)
 	}
-	return cpc
+	return _c
 }
 
 // SetMembershipType sets the "membership_type" field.
-func (cpc *CollectionPostCreate) SetMembershipType(s string) *CollectionPostCreate {
-	cpc.mutation.SetMembershipType(s)
-	return cpc
+func (_c *CollectionPostCreate) SetMembershipType(v string) *CollectionPostCreate {
+	_c.mutation.SetMembershipType(v)
+	return _c
 }
 
 // SetNillableMembershipType sets the "membership_type" field if the given value is not nil.
-func (cpc *CollectionPostCreate) SetNillableMembershipType(s *string) *CollectionPostCreate {
-	if s != nil {
-		cpc.SetMembershipType(*s)
+func (_c *CollectionPostCreate) SetNillableMembershipType(v *string) *CollectionPostCreate {
+	if v != nil {
+		_c.SetMembershipType(*v)
 	}
-	return cpc
+	return _c
 }
 
 // SetCollection sets the "collection" edge to the Collection entity.
-func (cpc *CollectionPostCreate) SetCollection(c *Collection) *CollectionPostCreate {
-	return cpc.SetCollectionID(c.ID)
+func (_c *CollectionPostCreate) SetCollection(v *Collection) *CollectionPostCreate {
+	return _c.SetCollectionID(v.ID)
 }
 
 // SetPost sets the "post" edge to the Post entity.
-func (cpc *CollectionPostCreate) SetPost(p *Post) *CollectionPostCreate {
-	return cpc.SetPostID(p.ID)
+func (_c *CollectionPostCreate) SetPost(v *Post) *CollectionPostCreate {
+	return _c.SetPostID(v.ID)
 }
 
 // Mutation returns the CollectionPostMutation object of the builder.
-func (cpc *CollectionPostCreate) Mutation() *CollectionPostMutation {
-	return cpc.mutation
+func (_c *CollectionPostCreate) Mutation() *CollectionPostMutation {
+	return _c.mutation
 }
 
 // Save creates the CollectionPost in the database.
-func (cpc *CollectionPostCreate) Save(ctx context.Context) (*CollectionPost, error) {
-	cpc.defaults()
-	return withHooks(ctx, cpc.sqlSave, cpc.mutation, cpc.hooks)
+func (_c *CollectionPostCreate) Save(ctx context.Context) (*CollectionPost, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (cpc *CollectionPostCreate) SaveX(ctx context.Context) *CollectionPost {
-	v, err := cpc.Save(ctx)
+func (_c *CollectionPostCreate) SaveX(ctx context.Context) *CollectionPost {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -112,77 +112,77 @@ func (cpc *CollectionPostCreate) SaveX(ctx context.Context) *CollectionPost {
 }
 
 // Exec executes the query.
-func (cpc *CollectionPostCreate) Exec(ctx context.Context) error {
-	_, err := cpc.Save(ctx)
+func (_c *CollectionPostCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cpc *CollectionPostCreate) ExecX(ctx context.Context) {
-	if err := cpc.Exec(ctx); err != nil {
+func (_c *CollectionPostCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (cpc *CollectionPostCreate) defaults() {
-	if _, ok := cpc.mutation.CreatedAt(); !ok {
+func (_c *CollectionPostCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := collectionpost.DefaultCreatedAt()
-		cpc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := cpc.mutation.CollectionID(); !ok {
+	if _, ok := _c.mutation.CollectionID(); !ok {
 		v := collectionpost.DefaultCollectionID()
-		cpc.mutation.SetCollectionID(v)
+		_c.mutation.SetCollectionID(v)
 	}
-	if _, ok := cpc.mutation.PostID(); !ok {
+	if _, ok := _c.mutation.PostID(); !ok {
 		v := collectionpost.DefaultPostID()
-		cpc.mutation.SetPostID(v)
+		_c.mutation.SetPostID(v)
 	}
-	if _, ok := cpc.mutation.MembershipType(); !ok {
+	if _, ok := _c.mutation.MembershipType(); !ok {
 		v := collectionpost.DefaultMembershipType
-		cpc.mutation.SetMembershipType(v)
+		_c.mutation.SetMembershipType(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cpc *CollectionPostCreate) check() error {
-	if _, ok := cpc.mutation.CreatedAt(); !ok {
+func (_c *CollectionPostCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "CollectionPost.created_at"`)}
 	}
-	if _, ok := cpc.mutation.CollectionID(); !ok {
+	if _, ok := _c.mutation.CollectionID(); !ok {
 		return &ValidationError{Name: "collection_id", err: errors.New(`ent: missing required field "CollectionPost.collection_id"`)}
 	}
-	if v, ok := cpc.mutation.CollectionID(); ok {
+	if v, ok := _c.mutation.CollectionID(); ok {
 		if err := collectionpost.CollectionIDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "collection_id", err: fmt.Errorf(`ent: validator failed for field "CollectionPost.collection_id": %w`, err)}
 		}
 	}
-	if _, ok := cpc.mutation.PostID(); !ok {
+	if _, ok := _c.mutation.PostID(); !ok {
 		return &ValidationError{Name: "post_id", err: errors.New(`ent: missing required field "CollectionPost.post_id"`)}
 	}
-	if v, ok := cpc.mutation.PostID(); ok {
+	if v, ok := _c.mutation.PostID(); ok {
 		if err := collectionpost.PostIDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "post_id", err: fmt.Errorf(`ent: validator failed for field "CollectionPost.post_id": %w`, err)}
 		}
 	}
-	if _, ok := cpc.mutation.MembershipType(); !ok {
+	if _, ok := _c.mutation.MembershipType(); !ok {
 		return &ValidationError{Name: "membership_type", err: errors.New(`ent: missing required field "CollectionPost.membership_type"`)}
 	}
-	if len(cpc.mutation.CollectionIDs()) == 0 {
+	if len(_c.mutation.CollectionIDs()) == 0 {
 		return &ValidationError{Name: "collection", err: errors.New(`ent: missing required edge "CollectionPost.collection"`)}
 	}
-	if len(cpc.mutation.PostIDs()) == 0 {
+	if len(_c.mutation.PostIDs()) == 0 {
 		return &ValidationError{Name: "post", err: errors.New(`ent: missing required edge "CollectionPost.post"`)}
 	}
 	return nil
 }
 
-func (cpc *CollectionPostCreate) sqlSave(ctx context.Context) (*CollectionPost, error) {
-	if err := cpc.check(); err != nil {
+func (_c *CollectionPostCreate) sqlSave(ctx context.Context) (*CollectionPost, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := cpc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, cpc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -191,21 +191,21 @@ func (cpc *CollectionPostCreate) sqlSave(ctx context.Context) (*CollectionPost, 
 	return _node, nil
 }
 
-func (cpc *CollectionPostCreate) createSpec() (*CollectionPost, *sqlgraph.CreateSpec) {
+func (_c *CollectionPostCreate) createSpec() (*CollectionPost, *sqlgraph.CreateSpec) {
 	var (
-		_node = &CollectionPost{config: cpc.config}
+		_node = &CollectionPost{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(collectionpost.Table, nil)
 	)
-	_spec.OnConflict = cpc.conflict
-	if value, ok := cpc.mutation.CreatedAt(); ok {
+	_spec.OnConflict = _c.conflict
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(collectionpost.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := cpc.mutation.MembershipType(); ok {
+	if value, ok := _c.mutation.MembershipType(); ok {
 		_spec.SetField(collectionpost.FieldMembershipType, field.TypeString, value)
 		_node.MembershipType = value
 	}
-	if nodes := cpc.mutation.CollectionIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.CollectionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -222,7 +222,7 @@ func (cpc *CollectionPostCreate) createSpec() (*CollectionPost, *sqlgraph.Create
 		_node.CollectionID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cpc.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -258,10 +258,10 @@ func (cpc *CollectionPostCreate) createSpec() (*CollectionPost, *sqlgraph.Create
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (cpc *CollectionPostCreate) OnConflict(opts ...sql.ConflictOption) *CollectionPostUpsertOne {
-	cpc.conflict = opts
+func (_c *CollectionPostCreate) OnConflict(opts ...sql.ConflictOption) *CollectionPostUpsertOne {
+	_c.conflict = opts
 	return &CollectionPostUpsertOne{
-		create: cpc,
+		create: _c,
 	}
 }
 
@@ -271,10 +271,10 @@ func (cpc *CollectionPostCreate) OnConflict(opts ...sql.ConflictOption) *Collect
 //	client.CollectionPost.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (cpc *CollectionPostCreate) OnConflictColumns(columns ...string) *CollectionPostUpsertOne {
-	cpc.conflict = append(cpc.conflict, sql.ConflictColumns(columns...))
+func (_c *CollectionPostCreate) OnConflictColumns(columns ...string) *CollectionPostUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &CollectionPostUpsertOne{
-		create: cpc,
+		create: _c,
 	}
 }
 
@@ -438,16 +438,16 @@ type CollectionPostCreateBulk struct {
 }
 
 // Save creates the CollectionPost entities in the database.
-func (cpcb *CollectionPostCreateBulk) Save(ctx context.Context) ([]*CollectionPost, error) {
-	if cpcb.err != nil {
-		return nil, cpcb.err
+func (_c *CollectionPostCreateBulk) Save(ctx context.Context) ([]*CollectionPost, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(cpcb.builders))
-	nodes := make([]*CollectionPost, len(cpcb.builders))
-	mutators := make([]Mutator, len(cpcb.builders))
-	for i := range cpcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*CollectionPost, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := cpcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CollectionPostMutation)
@@ -461,12 +461,12 @@ func (cpcb *CollectionPostCreateBulk) Save(ctx context.Context) ([]*CollectionPo
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, cpcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = cpcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, cpcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -485,7 +485,7 @@ func (cpcb *CollectionPostCreateBulk) Save(ctx context.Context) ([]*CollectionPo
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, cpcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -493,8 +493,8 @@ func (cpcb *CollectionPostCreateBulk) Save(ctx context.Context) ([]*CollectionPo
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cpcb *CollectionPostCreateBulk) SaveX(ctx context.Context) []*CollectionPost {
-	v, err := cpcb.Save(ctx)
+func (_c *CollectionPostCreateBulk) SaveX(ctx context.Context) []*CollectionPost {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -502,14 +502,14 @@ func (cpcb *CollectionPostCreateBulk) SaveX(ctx context.Context) []*CollectionPo
 }
 
 // Exec executes the query.
-func (cpcb *CollectionPostCreateBulk) Exec(ctx context.Context) error {
-	_, err := cpcb.Save(ctx)
+func (_c *CollectionPostCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cpcb *CollectionPostCreateBulk) ExecX(ctx context.Context) {
-	if err := cpcb.Exec(ctx); err != nil {
+func (_c *CollectionPostCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -529,10 +529,10 @@ func (cpcb *CollectionPostCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (cpcb *CollectionPostCreateBulk) OnConflict(opts ...sql.ConflictOption) *CollectionPostUpsertBulk {
-	cpcb.conflict = opts
+func (_c *CollectionPostCreateBulk) OnConflict(opts ...sql.ConflictOption) *CollectionPostUpsertBulk {
+	_c.conflict = opts
 	return &CollectionPostUpsertBulk{
-		create: cpcb,
+		create: _c,
 	}
 }
 
@@ -542,10 +542,10 @@ func (cpcb *CollectionPostCreateBulk) OnConflict(opts ...sql.ConflictOption) *Co
 //	client.CollectionPost.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (cpcb *CollectionPostCreateBulk) OnConflictColumns(columns ...string) *CollectionPostUpsertBulk {
-	cpcb.conflict = append(cpcb.conflict, sql.ConflictColumns(columns...))
+func (_c *CollectionPostCreateBulk) OnConflictColumns(columns ...string) *CollectionPostUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &CollectionPostUpsertBulk{
-		create: cpcb,
+		create: _c,
 	}
 }
 

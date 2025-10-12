@@ -26,88 +26,88 @@ type ReactUpdate struct {
 }
 
 // Where appends a list predicates to the ReactUpdate builder.
-func (ru *ReactUpdate) Where(ps ...predicate.React) *ReactUpdate {
-	ru.mutation.Where(ps...)
-	return ru
+func (_u *ReactUpdate) Where(ps ...predicate.React) *ReactUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (ru *ReactUpdate) SetAccountID(x xid.ID) *ReactUpdate {
-	ru.mutation.SetAccountID(x)
-	return ru
+func (_u *ReactUpdate) SetAccountID(v xid.ID) *ReactUpdate {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (ru *ReactUpdate) SetNillableAccountID(x *xid.ID) *ReactUpdate {
-	if x != nil {
-		ru.SetAccountID(*x)
+func (_u *ReactUpdate) SetNillableAccountID(v *xid.ID) *ReactUpdate {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return ru
+	return _u
 }
 
 // SetPostID sets the "post_id" field.
-func (ru *ReactUpdate) SetPostID(x xid.ID) *ReactUpdate {
-	ru.mutation.SetPostID(x)
-	return ru
+func (_u *ReactUpdate) SetPostID(v xid.ID) *ReactUpdate {
+	_u.mutation.SetPostID(v)
+	return _u
 }
 
 // SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (ru *ReactUpdate) SetNillablePostID(x *xid.ID) *ReactUpdate {
-	if x != nil {
-		ru.SetPostID(*x)
+func (_u *ReactUpdate) SetNillablePostID(v *xid.ID) *ReactUpdate {
+	if v != nil {
+		_u.SetPostID(*v)
 	}
-	return ru
+	return _u
 }
 
 // SetEmoji sets the "emoji" field.
-func (ru *ReactUpdate) SetEmoji(s string) *ReactUpdate {
-	ru.mutation.SetEmoji(s)
-	return ru
+func (_u *ReactUpdate) SetEmoji(v string) *ReactUpdate {
+	_u.mutation.SetEmoji(v)
+	return _u
 }
 
 // SetNillableEmoji sets the "emoji" field if the given value is not nil.
-func (ru *ReactUpdate) SetNillableEmoji(s *string) *ReactUpdate {
-	if s != nil {
-		ru.SetEmoji(*s)
+func (_u *ReactUpdate) SetNillableEmoji(v *string) *ReactUpdate {
+	if v != nil {
+		_u.SetEmoji(*v)
 	}
-	return ru
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (ru *ReactUpdate) SetAccount(a *Account) *ReactUpdate {
-	return ru.SetAccountID(a.ID)
+func (_u *ReactUpdate) SetAccount(v *Account) *ReactUpdate {
+	return _u.SetAccountID(v.ID)
 }
 
 // SetPost sets the "Post" edge to the Post entity.
-func (ru *ReactUpdate) SetPost(p *Post) *ReactUpdate {
-	return ru.SetPostID(p.ID)
+func (_u *ReactUpdate) SetPost(v *Post) *ReactUpdate {
+	return _u.SetPostID(v.ID)
 }
 
 // Mutation returns the ReactMutation object of the builder.
-func (ru *ReactUpdate) Mutation() *ReactMutation {
-	return ru.mutation
+func (_u *ReactUpdate) Mutation() *ReactMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (ru *ReactUpdate) ClearAccount() *ReactUpdate {
-	ru.mutation.ClearAccount()
-	return ru
+func (_u *ReactUpdate) ClearAccount() *ReactUpdate {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // ClearPost clears the "Post" edge to the Post entity.
-func (ru *ReactUpdate) ClearPost() *ReactUpdate {
-	ru.mutation.ClearPost()
-	return ru
+func (_u *ReactUpdate) ClearPost() *ReactUpdate {
+	_u.mutation.ClearPost()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (ru *ReactUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, ru.sqlSave, ru.mutation, ru.hooks)
+func (_u *ReactUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ru *ReactUpdate) SaveX(ctx context.Context) int {
-	affected, err := ru.Save(ctx)
+func (_u *ReactUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -115,51 +115,51 @@ func (ru *ReactUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (ru *ReactUpdate) Exec(ctx context.Context) error {
-	_, err := ru.Save(ctx)
+func (_u *ReactUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ru *ReactUpdate) ExecX(ctx context.Context) {
-	if err := ru.Exec(ctx); err != nil {
+func (_u *ReactUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (ru *ReactUpdate) check() error {
-	if ru.mutation.AccountCleared() && len(ru.mutation.AccountIDs()) > 0 {
+func (_u *ReactUpdate) check() error {
+	if _u.mutation.AccountCleared() && len(_u.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "React.account"`)
 	}
-	if ru.mutation.PostCleared() && len(ru.mutation.PostIDs()) > 0 {
+	if _u.mutation.PostCleared() && len(_u.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "React.Post"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (ru *ReactUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ReactUpdate {
-	ru.modifiers = append(ru.modifiers, modifiers...)
-	return ru
+func (_u *ReactUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ReactUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := ru.check(); err != nil {
-		return n, err
+func (_u *ReactUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(react.Table, react.Columns, sqlgraph.NewFieldSpec(react.FieldID, field.TypeString))
-	if ps := ru.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := ru.mutation.Emoji(); ok {
+	if value, ok := _u.mutation.Emoji(); ok {
 		_spec.SetField(react.FieldEmoji, field.TypeString, value)
 	}
-	if ru.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -172,7 +172,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -188,7 +188,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ru.mutation.PostCleared() {
+	if _u.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -201,7 +201,7 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -217,8 +217,8 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(ru.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{react.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -226,8 +226,8 @@ func (ru *ReactUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	ru.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // ReactUpdateOne is the builder for updating a single React entity.
@@ -240,95 +240,95 @@ type ReactUpdateOne struct {
 }
 
 // SetAccountID sets the "account_id" field.
-func (ruo *ReactUpdateOne) SetAccountID(x xid.ID) *ReactUpdateOne {
-	ruo.mutation.SetAccountID(x)
-	return ruo
+func (_u *ReactUpdateOne) SetAccountID(v xid.ID) *ReactUpdateOne {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (ruo *ReactUpdateOne) SetNillableAccountID(x *xid.ID) *ReactUpdateOne {
-	if x != nil {
-		ruo.SetAccountID(*x)
+func (_u *ReactUpdateOne) SetNillableAccountID(v *xid.ID) *ReactUpdateOne {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return ruo
+	return _u
 }
 
 // SetPostID sets the "post_id" field.
-func (ruo *ReactUpdateOne) SetPostID(x xid.ID) *ReactUpdateOne {
-	ruo.mutation.SetPostID(x)
-	return ruo
+func (_u *ReactUpdateOne) SetPostID(v xid.ID) *ReactUpdateOne {
+	_u.mutation.SetPostID(v)
+	return _u
 }
 
 // SetNillablePostID sets the "post_id" field if the given value is not nil.
-func (ruo *ReactUpdateOne) SetNillablePostID(x *xid.ID) *ReactUpdateOne {
-	if x != nil {
-		ruo.SetPostID(*x)
+func (_u *ReactUpdateOne) SetNillablePostID(v *xid.ID) *ReactUpdateOne {
+	if v != nil {
+		_u.SetPostID(*v)
 	}
-	return ruo
+	return _u
 }
 
 // SetEmoji sets the "emoji" field.
-func (ruo *ReactUpdateOne) SetEmoji(s string) *ReactUpdateOne {
-	ruo.mutation.SetEmoji(s)
-	return ruo
+func (_u *ReactUpdateOne) SetEmoji(v string) *ReactUpdateOne {
+	_u.mutation.SetEmoji(v)
+	return _u
 }
 
 // SetNillableEmoji sets the "emoji" field if the given value is not nil.
-func (ruo *ReactUpdateOne) SetNillableEmoji(s *string) *ReactUpdateOne {
-	if s != nil {
-		ruo.SetEmoji(*s)
+func (_u *ReactUpdateOne) SetNillableEmoji(v *string) *ReactUpdateOne {
+	if v != nil {
+		_u.SetEmoji(*v)
 	}
-	return ruo
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (ruo *ReactUpdateOne) SetAccount(a *Account) *ReactUpdateOne {
-	return ruo.SetAccountID(a.ID)
+func (_u *ReactUpdateOne) SetAccount(v *Account) *ReactUpdateOne {
+	return _u.SetAccountID(v.ID)
 }
 
 // SetPost sets the "Post" edge to the Post entity.
-func (ruo *ReactUpdateOne) SetPost(p *Post) *ReactUpdateOne {
-	return ruo.SetPostID(p.ID)
+func (_u *ReactUpdateOne) SetPost(v *Post) *ReactUpdateOne {
+	return _u.SetPostID(v.ID)
 }
 
 // Mutation returns the ReactMutation object of the builder.
-func (ruo *ReactUpdateOne) Mutation() *ReactMutation {
-	return ruo.mutation
+func (_u *ReactUpdateOne) Mutation() *ReactMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (ruo *ReactUpdateOne) ClearAccount() *ReactUpdateOne {
-	ruo.mutation.ClearAccount()
-	return ruo
+func (_u *ReactUpdateOne) ClearAccount() *ReactUpdateOne {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // ClearPost clears the "Post" edge to the Post entity.
-func (ruo *ReactUpdateOne) ClearPost() *ReactUpdateOne {
-	ruo.mutation.ClearPost()
-	return ruo
+func (_u *ReactUpdateOne) ClearPost() *ReactUpdateOne {
+	_u.mutation.ClearPost()
+	return _u
 }
 
 // Where appends a list predicates to the ReactUpdate builder.
-func (ruo *ReactUpdateOne) Where(ps ...predicate.React) *ReactUpdateOne {
-	ruo.mutation.Where(ps...)
-	return ruo
+func (_u *ReactUpdateOne) Where(ps ...predicate.React) *ReactUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (ruo *ReactUpdateOne) Select(field string, fields ...string) *ReactUpdateOne {
-	ruo.fields = append([]string{field}, fields...)
-	return ruo
+func (_u *ReactUpdateOne) Select(field string, fields ...string) *ReactUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated React entity.
-func (ruo *ReactUpdateOne) Save(ctx context.Context) (*React, error) {
-	return withHooks(ctx, ruo.sqlSave, ruo.mutation, ruo.hooks)
+func (_u *ReactUpdateOne) Save(ctx context.Context) (*React, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ruo *ReactUpdateOne) SaveX(ctx context.Context) *React {
-	node, err := ruo.Save(ctx)
+func (_u *ReactUpdateOne) SaveX(ctx context.Context) *React {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -336,46 +336,46 @@ func (ruo *ReactUpdateOne) SaveX(ctx context.Context) *React {
 }
 
 // Exec executes the query on the entity.
-func (ruo *ReactUpdateOne) Exec(ctx context.Context) error {
-	_, err := ruo.Save(ctx)
+func (_u *ReactUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ruo *ReactUpdateOne) ExecX(ctx context.Context) {
-	if err := ruo.Exec(ctx); err != nil {
+func (_u *ReactUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (ruo *ReactUpdateOne) check() error {
-	if ruo.mutation.AccountCleared() && len(ruo.mutation.AccountIDs()) > 0 {
+func (_u *ReactUpdateOne) check() error {
+	if _u.mutation.AccountCleared() && len(_u.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "React.account"`)
 	}
-	if ruo.mutation.PostCleared() && len(ruo.mutation.PostIDs()) > 0 {
+	if _u.mutation.PostCleared() && len(_u.mutation.PostIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "React.Post"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (ruo *ReactUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ReactUpdateOne {
-	ruo.modifiers = append(ruo.modifiers, modifiers...)
-	return ruo
+func (_u *ReactUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ReactUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error) {
-	if err := ruo.check(); err != nil {
+func (_u *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(react.Table, react.Columns, sqlgraph.NewFieldSpec(react.FieldID, field.TypeString))
-	id, ok := ruo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "React.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := ruo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, react.FieldID)
 		for _, f := range fields {
@@ -387,17 +387,17 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 			}
 		}
 	}
-	if ps := ruo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := ruo.mutation.Emoji(); ok {
+	if value, ok := _u.mutation.Emoji(); ok {
 		_spec.SetField(react.FieldEmoji, field.TypeString, value)
 	}
-	if ruo.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -410,7 +410,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -426,7 +426,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ruo.mutation.PostCleared() {
+	if _u.mutation.PostCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -439,7 +439,7 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.PostIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -455,11 +455,11 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(ruo.modifiers...)
-	_node = &React{config: ruo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &React{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, ruo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{react.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -467,6 +467,6 @@ func (ruo *ReactUpdateOne) sqlSave(ctx context.Context) (_node *React, err error
 		}
 		return nil, err
 	}
-	ruo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

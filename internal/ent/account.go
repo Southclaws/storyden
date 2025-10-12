@@ -317,7 +317,7 @@ func (*Account) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Account fields.
-func (a *Account) assignValues(columns []string, values []any) error {
+func (_m *Account) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -327,69 +327,69 @@ func (a *Account) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				a.ID = *value
+				_m.ID = *value
 			}
 		case account.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				a.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case account.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				a.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case account.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				a.DeletedAt = new(time.Time)
-				*a.DeletedAt = value.Time
+				_m.DeletedAt = new(time.Time)
+				*_m.DeletedAt = value.Time
 			}
 		case account.FieldIndexedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field indexed_at", values[i])
 			} else if value.Valid {
-				a.IndexedAt = new(time.Time)
-				*a.IndexedAt = value.Time
+				_m.IndexedAt = new(time.Time)
+				*_m.IndexedAt = value.Time
 			}
 		case account.FieldHandle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field handle", values[i])
 			} else if value.Valid {
-				a.Handle = value.String
+				_m.Handle = value.String
 			}
 		case account.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				a.Name = value.String
+				_m.Name = value.String
 			}
 		case account.FieldBio:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field bio", values[i])
 			} else if value.Valid {
-				a.Bio = value.String
+				_m.Bio = value.String
 			}
 		case account.FieldKind:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field kind", values[i])
 			} else if value.Valid {
-				a.Kind = account.Kind(value.String)
+				_m.Kind = account.Kind(value.String)
 			}
 		case account.FieldAdmin:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field admin", values[i])
 			} else if value.Valid {
-				a.Admin = value.Bool
+				_m.Admin = value.Bool
 			}
 		case account.FieldLinks:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field links", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &a.Links); err != nil {
+				if err := json.Unmarshal(*value, &_m.Links); err != nil {
 					return fmt.Errorf("unmarshal field links: %w", err)
 				}
 			}
@@ -397,7 +397,7 @@ func (a *Account) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field metadata", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &a.Metadata); err != nil {
+				if err := json.Unmarshal(*value, &_m.Metadata); err != nil {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
@@ -405,11 +405,11 @@ func (a *Account) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field invited_by_id", values[i])
 			} else if value.Valid {
-				a.InvitedByID = new(xid.ID)
-				*a.InvitedByID = *value.S.(*xid.ID)
+				_m.InvitedByID = new(xid.ID)
+				*_m.InvitedByID = *value.S.(*xid.ID)
 			}
 		default:
-			a.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -417,176 +417,176 @@ func (a *Account) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Account.
 // This includes values selected through modifiers, order, etc.
-func (a *Account) Value(name string) (ent.Value, error) {
-	return a.selectValues.Get(name)
+func (_m *Account) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QuerySessions queries the "sessions" edge of the Account entity.
-func (a *Account) QuerySessions() *SessionQuery {
-	return NewAccountClient(a.config).QuerySessions(a)
+func (_m *Account) QuerySessions() *SessionQuery {
+	return NewAccountClient(_m.config).QuerySessions(_m)
 }
 
 // QueryEmails queries the "emails" edge of the Account entity.
-func (a *Account) QueryEmails() *EmailQuery {
-	return NewAccountClient(a.config).QueryEmails(a)
+func (_m *Account) QueryEmails() *EmailQuery {
+	return NewAccountClient(_m.config).QueryEmails(_m)
 }
 
 // QueryNotifications queries the "notifications" edge of the Account entity.
-func (a *Account) QueryNotifications() *NotificationQuery {
-	return NewAccountClient(a.config).QueryNotifications(a)
+func (_m *Account) QueryNotifications() *NotificationQuery {
+	return NewAccountClient(_m.config).QueryNotifications(_m)
 }
 
 // QueryTriggeredNotifications queries the "triggered_notifications" edge of the Account entity.
-func (a *Account) QueryTriggeredNotifications() *NotificationQuery {
-	return NewAccountClient(a.config).QueryTriggeredNotifications(a)
+func (_m *Account) QueryTriggeredNotifications() *NotificationQuery {
+	return NewAccountClient(_m.config).QueryTriggeredNotifications(_m)
 }
 
 // QueryFollowing queries the "following" edge of the Account entity.
-func (a *Account) QueryFollowing() *AccountFollowQuery {
-	return NewAccountClient(a.config).QueryFollowing(a)
+func (_m *Account) QueryFollowing() *AccountFollowQuery {
+	return NewAccountClient(_m.config).QueryFollowing(_m)
 }
 
 // QueryFollowedBy queries the "followed_by" edge of the Account entity.
-func (a *Account) QueryFollowedBy() *AccountFollowQuery {
-	return NewAccountClient(a.config).QueryFollowedBy(a)
+func (_m *Account) QueryFollowedBy() *AccountFollowQuery {
+	return NewAccountClient(_m.config).QueryFollowedBy(_m)
 }
 
 // QueryInvitations queries the "invitations" edge of the Account entity.
-func (a *Account) QueryInvitations() *InvitationQuery {
-	return NewAccountClient(a.config).QueryInvitations(a)
+func (_m *Account) QueryInvitations() *InvitationQuery {
+	return NewAccountClient(_m.config).QueryInvitations(_m)
 }
 
 // QueryInvitedBy queries the "invited_by" edge of the Account entity.
-func (a *Account) QueryInvitedBy() *InvitationQuery {
-	return NewAccountClient(a.config).QueryInvitedBy(a)
+func (_m *Account) QueryInvitedBy() *InvitationQuery {
+	return NewAccountClient(_m.config).QueryInvitedBy(_m)
 }
 
 // QueryPosts queries the "posts" edge of the Account entity.
-func (a *Account) QueryPosts() *PostQuery {
-	return NewAccountClient(a.config).QueryPosts(a)
+func (_m *Account) QueryPosts() *PostQuery {
+	return NewAccountClient(_m.config).QueryPosts(_m)
 }
 
 // QueryQuestions queries the "questions" edge of the Account entity.
-func (a *Account) QueryQuestions() *QuestionQuery {
-	return NewAccountClient(a.config).QueryQuestions(a)
+func (_m *Account) QueryQuestions() *QuestionQuery {
+	return NewAccountClient(_m.config).QueryQuestions(_m)
 }
 
 // QueryReacts queries the "reacts" edge of the Account entity.
-func (a *Account) QueryReacts() *ReactQuery {
-	return NewAccountClient(a.config).QueryReacts(a)
+func (_m *Account) QueryReacts() *ReactQuery {
+	return NewAccountClient(_m.config).QueryReacts(_m)
 }
 
 // QueryLikes queries the "likes" edge of the Account entity.
-func (a *Account) QueryLikes() *LikePostQuery {
-	return NewAccountClient(a.config).QueryLikes(a)
+func (_m *Account) QueryLikes() *LikePostQuery {
+	return NewAccountClient(_m.config).QueryLikes(_m)
 }
 
 // QueryMentions queries the "mentions" edge of the Account entity.
-func (a *Account) QueryMentions() *MentionProfileQuery {
-	return NewAccountClient(a.config).QueryMentions(a)
+func (_m *Account) QueryMentions() *MentionProfileQuery {
+	return NewAccountClient(_m.config).QueryMentions(_m)
 }
 
 // QueryRoles queries the "roles" edge of the Account entity.
-func (a *Account) QueryRoles() *RoleQuery {
-	return NewAccountClient(a.config).QueryRoles(a)
+func (_m *Account) QueryRoles() *RoleQuery {
+	return NewAccountClient(_m.config).QueryRoles(_m)
 }
 
 // QueryAuthentication queries the "authentication" edge of the Account entity.
-func (a *Account) QueryAuthentication() *AuthenticationQuery {
-	return NewAccountClient(a.config).QueryAuthentication(a)
+func (_m *Account) QueryAuthentication() *AuthenticationQuery {
+	return NewAccountClient(_m.config).QueryAuthentication(_m)
 }
 
 // QueryTags queries the "tags" edge of the Account entity.
-func (a *Account) QueryTags() *TagQuery {
-	return NewAccountClient(a.config).QueryTags(a)
+func (_m *Account) QueryTags() *TagQuery {
+	return NewAccountClient(_m.config).QueryTags(_m)
 }
 
 // QueryCollections queries the "collections" edge of the Account entity.
-func (a *Account) QueryCollections() *CollectionQuery {
-	return NewAccountClient(a.config).QueryCollections(a)
+func (_m *Account) QueryCollections() *CollectionQuery {
+	return NewAccountClient(_m.config).QueryCollections(_m)
 }
 
 // QueryNodes queries the "nodes" edge of the Account entity.
-func (a *Account) QueryNodes() *NodeQuery {
-	return NewAccountClient(a.config).QueryNodes(a)
+func (_m *Account) QueryNodes() *NodeQuery {
+	return NewAccountClient(_m.config).QueryNodes(_m)
 }
 
 // QueryAssets queries the "assets" edge of the Account entity.
-func (a *Account) QueryAssets() *AssetQuery {
-	return NewAccountClient(a.config).QueryAssets(a)
+func (_m *Account) QueryAssets() *AssetQuery {
+	return NewAccountClient(_m.config).QueryAssets(_m)
 }
 
 // QueryEvents queries the "events" edge of the Account entity.
-func (a *Account) QueryEvents() *EventParticipantQuery {
-	return NewAccountClient(a.config).QueryEvents(a)
+func (_m *Account) QueryEvents() *EventParticipantQuery {
+	return NewAccountClient(_m.config).QueryEvents(_m)
 }
 
 // QueryAccountRoles queries the "account_roles" edge of the Account entity.
-func (a *Account) QueryAccountRoles() *AccountRolesQuery {
-	return NewAccountClient(a.config).QueryAccountRoles(a)
+func (_m *Account) QueryAccountRoles() *AccountRolesQuery {
+	return NewAccountClient(_m.config).QueryAccountRoles(_m)
 }
 
 // Update returns a builder for updating this Account.
 // Note that you need to call Account.Unwrap() before calling this method if this Account
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (a *Account) Update() *AccountUpdateOne {
-	return NewAccountClient(a.config).UpdateOne(a)
+func (_m *Account) Update() *AccountUpdateOne {
+	return NewAccountClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Account entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (a *Account) Unwrap() *Account {
-	_tx, ok := a.config.driver.(*txDriver)
+func (_m *Account) Unwrap() *Account {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Account is not a transactional entity")
 	}
-	a.config.driver = _tx.drv
-	return a
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (a *Account) String() string {
+func (_m *Account) String() string {
 	var builder strings.Builder
 	builder.WriteString("Account(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(a.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := a.DeletedAt; v != nil {
+	if v := _m.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := a.IndexedAt; v != nil {
+	if v := _m.IndexedAt; v != nil {
 		builder.WriteString("indexed_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
 	builder.WriteString("handle=")
-	builder.WriteString(a.Handle)
+	builder.WriteString(_m.Handle)
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(a.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("bio=")
-	builder.WriteString(a.Bio)
+	builder.WriteString(_m.Bio)
 	builder.WriteString(", ")
 	builder.WriteString("kind=")
-	builder.WriteString(fmt.Sprintf("%v", a.Kind))
+	builder.WriteString(fmt.Sprintf("%v", _m.Kind))
 	builder.WriteString(", ")
 	builder.WriteString("admin=")
-	builder.WriteString(fmt.Sprintf("%v", a.Admin))
+	builder.WriteString(fmt.Sprintf("%v", _m.Admin))
 	builder.WriteString(", ")
 	builder.WriteString("links=")
-	builder.WriteString(fmt.Sprintf("%v", a.Links))
+	builder.WriteString(fmt.Sprintf("%v", _m.Links))
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
-	builder.WriteString(fmt.Sprintf("%v", a.Metadata))
+	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))
 	builder.WriteString(", ")
-	if v := a.InvitedByID; v != nil {
+	if v := _m.InvitedByID; v != nil {
 		builder.WriteString("invited_by_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}

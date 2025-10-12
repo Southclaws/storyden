@@ -44,474 +44,474 @@ type AccountCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (ac *AccountCreate) SetCreatedAt(t time.Time) *AccountCreate {
-	ac.mutation.SetCreatedAt(t)
-	return ac
+func (_c *AccountCreate) SetCreatedAt(v time.Time) *AccountCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableCreatedAt(t *time.Time) *AccountCreate {
-	if t != nil {
-		ac.SetCreatedAt(*t)
+func (_c *AccountCreate) SetNillableCreatedAt(v *time.Time) *AccountCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (ac *AccountCreate) SetUpdatedAt(t time.Time) *AccountCreate {
-	ac.mutation.SetUpdatedAt(t)
-	return ac
+func (_c *AccountCreate) SetUpdatedAt(v time.Time) *AccountCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableUpdatedAt(t *time.Time) *AccountCreate {
-	if t != nil {
-		ac.SetUpdatedAt(*t)
+func (_c *AccountCreate) SetNillableUpdatedAt(v *time.Time) *AccountCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (ac *AccountCreate) SetDeletedAt(t time.Time) *AccountCreate {
-	ac.mutation.SetDeletedAt(t)
-	return ac
+func (_c *AccountCreate) SetDeletedAt(v time.Time) *AccountCreate {
+	_c.mutation.SetDeletedAt(v)
+	return _c
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableDeletedAt(t *time.Time) *AccountCreate {
-	if t != nil {
-		ac.SetDeletedAt(*t)
+func (_c *AccountCreate) SetNillableDeletedAt(v *time.Time) *AccountCreate {
+	if v != nil {
+		_c.SetDeletedAt(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (ac *AccountCreate) SetIndexedAt(t time.Time) *AccountCreate {
-	ac.mutation.SetIndexedAt(t)
-	return ac
+func (_c *AccountCreate) SetIndexedAt(v time.Time) *AccountCreate {
+	_c.mutation.SetIndexedAt(v)
+	return _c
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableIndexedAt(t *time.Time) *AccountCreate {
-	if t != nil {
-		ac.SetIndexedAt(*t)
+func (_c *AccountCreate) SetNillableIndexedAt(v *time.Time) *AccountCreate {
+	if v != nil {
+		_c.SetIndexedAt(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetHandle sets the "handle" field.
-func (ac *AccountCreate) SetHandle(s string) *AccountCreate {
-	ac.mutation.SetHandle(s)
-	return ac
+func (_c *AccountCreate) SetHandle(v string) *AccountCreate {
+	_c.mutation.SetHandle(v)
+	return _c
 }
 
 // SetName sets the "name" field.
-func (ac *AccountCreate) SetName(s string) *AccountCreate {
-	ac.mutation.SetName(s)
-	return ac
+func (_c *AccountCreate) SetName(v string) *AccountCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetBio sets the "bio" field.
-func (ac *AccountCreate) SetBio(s string) *AccountCreate {
-	ac.mutation.SetBio(s)
-	return ac
+func (_c *AccountCreate) SetBio(v string) *AccountCreate {
+	_c.mutation.SetBio(v)
+	return _c
 }
 
 // SetNillableBio sets the "bio" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableBio(s *string) *AccountCreate {
-	if s != nil {
-		ac.SetBio(*s)
+func (_c *AccountCreate) SetNillableBio(v *string) *AccountCreate {
+	if v != nil {
+		_c.SetBio(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetKind sets the "kind" field.
-func (ac *AccountCreate) SetKind(a account.Kind) *AccountCreate {
-	ac.mutation.SetKind(a)
-	return ac
+func (_c *AccountCreate) SetKind(v account.Kind) *AccountCreate {
+	_c.mutation.SetKind(v)
+	return _c
 }
 
 // SetNillableKind sets the "kind" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableKind(a *account.Kind) *AccountCreate {
-	if a != nil {
-		ac.SetKind(*a)
+func (_c *AccountCreate) SetNillableKind(v *account.Kind) *AccountCreate {
+	if v != nil {
+		_c.SetKind(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetAdmin sets the "admin" field.
-func (ac *AccountCreate) SetAdmin(b bool) *AccountCreate {
-	ac.mutation.SetAdmin(b)
-	return ac
+func (_c *AccountCreate) SetAdmin(v bool) *AccountCreate {
+	_c.mutation.SetAdmin(v)
+	return _c
 }
 
 // SetNillableAdmin sets the "admin" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableAdmin(b *bool) *AccountCreate {
-	if b != nil {
-		ac.SetAdmin(*b)
+func (_c *AccountCreate) SetNillableAdmin(v *bool) *AccountCreate {
+	if v != nil {
+		_c.SetAdmin(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetLinks sets the "links" field.
-func (ac *AccountCreate) SetLinks(sl []schema.ExternalLink) *AccountCreate {
-	ac.mutation.SetLinks(sl)
-	return ac
+func (_c *AccountCreate) SetLinks(v []schema.ExternalLink) *AccountCreate {
+	_c.mutation.SetLinks(v)
+	return _c
 }
 
 // SetMetadata sets the "metadata" field.
-func (ac *AccountCreate) SetMetadata(m map[string]interface{}) *AccountCreate {
-	ac.mutation.SetMetadata(m)
-	return ac
+func (_c *AccountCreate) SetMetadata(v map[string]interface{}) *AccountCreate {
+	_c.mutation.SetMetadata(v)
+	return _c
 }
 
 // SetInvitedByID sets the "invited_by_id" field.
-func (ac *AccountCreate) SetInvitedByID(x xid.ID) *AccountCreate {
-	ac.mutation.SetInvitedByID(x)
-	return ac
+func (_c *AccountCreate) SetInvitedByID(v xid.ID) *AccountCreate {
+	_c.mutation.SetInvitedByID(v)
+	return _c
 }
 
 // SetNillableInvitedByID sets the "invited_by_id" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableInvitedByID(x *xid.ID) *AccountCreate {
-	if x != nil {
-		ac.SetInvitedByID(*x)
+func (_c *AccountCreate) SetNillableInvitedByID(v *xid.ID) *AccountCreate {
+	if v != nil {
+		_c.SetInvitedByID(*v)
 	}
-	return ac
+	return _c
 }
 
 // SetID sets the "id" field.
-func (ac *AccountCreate) SetID(x xid.ID) *AccountCreate {
-	ac.mutation.SetID(x)
-	return ac
+func (_c *AccountCreate) SetID(v xid.ID) *AccountCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (ac *AccountCreate) SetNillableID(x *xid.ID) *AccountCreate {
-	if x != nil {
-		ac.SetID(*x)
+func (_c *AccountCreate) SetNillableID(v *xid.ID) *AccountCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return ac
+	return _c
 }
 
 // AddSessionIDs adds the "sessions" edge to the Session entity by IDs.
-func (ac *AccountCreate) AddSessionIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddSessionIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddSessionIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddSessionIDs(ids...)
+	return _c
 }
 
 // AddSessions adds the "sessions" edges to the Session entity.
-func (ac *AccountCreate) AddSessions(s ...*Session) *AccountCreate {
-	ids := make([]xid.ID, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+func (_c *AccountCreate) AddSessions(v ...*Session) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddSessionIDs(ids...)
+	return _c.AddSessionIDs(ids...)
 }
 
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
-func (ac *AccountCreate) AddEmailIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddEmailIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddEmailIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddEmailIDs(ids...)
+	return _c
 }
 
 // AddEmails adds the "emails" edges to the Email entity.
-func (ac *AccountCreate) AddEmails(e ...*Email) *AccountCreate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_c *AccountCreate) AddEmails(v ...*Email) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddEmailIDs(ids...)
+	return _c.AddEmailIDs(ids...)
 }
 
 // AddNotificationIDs adds the "notifications" edge to the Notification entity by IDs.
-func (ac *AccountCreate) AddNotificationIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddNotificationIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddNotificationIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddNotificationIDs(ids...)
+	return _c
 }
 
 // AddNotifications adds the "notifications" edges to the Notification entity.
-func (ac *AccountCreate) AddNotifications(n ...*Notification) *AccountCreate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_c *AccountCreate) AddNotifications(v ...*Notification) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddNotificationIDs(ids...)
+	return _c.AddNotificationIDs(ids...)
 }
 
 // AddTriggeredNotificationIDs adds the "triggered_notifications" edge to the Notification entity by IDs.
-func (ac *AccountCreate) AddTriggeredNotificationIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddTriggeredNotificationIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddTriggeredNotificationIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddTriggeredNotificationIDs(ids...)
+	return _c
 }
 
 // AddTriggeredNotifications adds the "triggered_notifications" edges to the Notification entity.
-func (ac *AccountCreate) AddTriggeredNotifications(n ...*Notification) *AccountCreate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_c *AccountCreate) AddTriggeredNotifications(v ...*Notification) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddTriggeredNotificationIDs(ids...)
+	return _c.AddTriggeredNotificationIDs(ids...)
 }
 
 // AddFollowingIDs adds the "following" edge to the AccountFollow entity by IDs.
-func (ac *AccountCreate) AddFollowingIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddFollowingIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddFollowingIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddFollowingIDs(ids...)
+	return _c
 }
 
 // AddFollowing adds the "following" edges to the AccountFollow entity.
-func (ac *AccountCreate) AddFollowing(a ...*AccountFollow) *AccountCreate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_c *AccountCreate) AddFollowing(v ...*AccountFollow) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddFollowingIDs(ids...)
+	return _c.AddFollowingIDs(ids...)
 }
 
 // AddFollowedByIDs adds the "followed_by" edge to the AccountFollow entity by IDs.
-func (ac *AccountCreate) AddFollowedByIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddFollowedByIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddFollowedByIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddFollowedByIDs(ids...)
+	return _c
 }
 
 // AddFollowedBy adds the "followed_by" edges to the AccountFollow entity.
-func (ac *AccountCreate) AddFollowedBy(a ...*AccountFollow) *AccountCreate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_c *AccountCreate) AddFollowedBy(v ...*AccountFollow) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddFollowedByIDs(ids...)
+	return _c.AddFollowedByIDs(ids...)
 }
 
 // AddInvitationIDs adds the "invitations" edge to the Invitation entity by IDs.
-func (ac *AccountCreate) AddInvitationIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddInvitationIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddInvitationIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddInvitationIDs(ids...)
+	return _c
 }
 
 // AddInvitations adds the "invitations" edges to the Invitation entity.
-func (ac *AccountCreate) AddInvitations(i ...*Invitation) *AccountCreate {
-	ids := make([]xid.ID, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+func (_c *AccountCreate) AddInvitations(v ...*Invitation) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddInvitationIDs(ids...)
+	return _c.AddInvitationIDs(ids...)
 }
 
 // SetInvitedBy sets the "invited_by" edge to the Invitation entity.
-func (ac *AccountCreate) SetInvitedBy(i *Invitation) *AccountCreate {
-	return ac.SetInvitedByID(i.ID)
+func (_c *AccountCreate) SetInvitedBy(v *Invitation) *AccountCreate {
+	return _c.SetInvitedByID(v.ID)
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (ac *AccountCreate) AddPostIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddPostIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddPostIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddPostIDs(ids...)
+	return _c
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (ac *AccountCreate) AddPosts(p ...*Post) *AccountCreate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_c *AccountCreate) AddPosts(v ...*Post) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddPostIDs(ids...)
+	return _c.AddPostIDs(ids...)
 }
 
 // AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
-func (ac *AccountCreate) AddQuestionIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddQuestionIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddQuestionIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddQuestionIDs(ids...)
+	return _c
 }
 
 // AddQuestions adds the "questions" edges to the Question entity.
-func (ac *AccountCreate) AddQuestions(q ...*Question) *AccountCreate {
-	ids := make([]xid.ID, len(q))
-	for i := range q {
-		ids[i] = q[i].ID
+func (_c *AccountCreate) AddQuestions(v ...*Question) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddQuestionIDs(ids...)
+	return _c.AddQuestionIDs(ids...)
 }
 
 // AddReactIDs adds the "reacts" edge to the React entity by IDs.
-func (ac *AccountCreate) AddReactIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddReactIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddReactIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddReactIDs(ids...)
+	return _c
 }
 
 // AddReacts adds the "reacts" edges to the React entity.
-func (ac *AccountCreate) AddReacts(r ...*React) *AccountCreate {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_c *AccountCreate) AddReacts(v ...*React) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddReactIDs(ids...)
+	return _c.AddReactIDs(ids...)
 }
 
 // AddLikeIDs adds the "likes" edge to the LikePost entity by IDs.
-func (ac *AccountCreate) AddLikeIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddLikeIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddLikeIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddLikeIDs(ids...)
+	return _c
 }
 
 // AddLikes adds the "likes" edges to the LikePost entity.
-func (ac *AccountCreate) AddLikes(l ...*LikePost) *AccountCreate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_c *AccountCreate) AddLikes(v ...*LikePost) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddLikeIDs(ids...)
+	return _c.AddLikeIDs(ids...)
 }
 
 // AddMentionIDs adds the "mentions" edge to the MentionProfile entity by IDs.
-func (ac *AccountCreate) AddMentionIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddMentionIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddMentionIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddMentionIDs(ids...)
+	return _c
 }
 
 // AddMentions adds the "mentions" edges to the MentionProfile entity.
-func (ac *AccountCreate) AddMentions(m ...*MentionProfile) *AccountCreate {
-	ids := make([]xid.ID, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+func (_c *AccountCreate) AddMentions(v ...*MentionProfile) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddMentionIDs(ids...)
+	return _c.AddMentionIDs(ids...)
 }
 
 // AddRoleIDs adds the "roles" edge to the Role entity by IDs.
-func (ac *AccountCreate) AddRoleIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddRoleIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddRoleIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddRoleIDs(ids...)
+	return _c
 }
 
 // AddRoles adds the "roles" edges to the Role entity.
-func (ac *AccountCreate) AddRoles(r ...*Role) *AccountCreate {
-	ids := make([]xid.ID, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
+func (_c *AccountCreate) AddRoles(v ...*Role) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddRoleIDs(ids...)
+	return _c.AddRoleIDs(ids...)
 }
 
 // AddAuthenticationIDs adds the "authentication" edge to the Authentication entity by IDs.
-func (ac *AccountCreate) AddAuthenticationIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddAuthenticationIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddAuthenticationIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddAuthenticationIDs(ids...)
+	return _c
 }
 
 // AddAuthentication adds the "authentication" edges to the Authentication entity.
-func (ac *AccountCreate) AddAuthentication(a ...*Authentication) *AccountCreate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_c *AccountCreate) AddAuthentication(v ...*Authentication) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddAuthenticationIDs(ids...)
+	return _c.AddAuthenticationIDs(ids...)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (ac *AccountCreate) AddTagIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddTagIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddTagIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddTagIDs(ids...)
+	return _c
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
-func (ac *AccountCreate) AddTags(t ...*Tag) *AccountCreate {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_c *AccountCreate) AddTags(v ...*Tag) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddTagIDs(ids...)
+	return _c.AddTagIDs(ids...)
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (ac *AccountCreate) AddCollectionIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddCollectionIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddCollectionIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddCollectionIDs(ids...)
+	return _c
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
-func (ac *AccountCreate) AddCollections(c ...*Collection) *AccountCreate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_c *AccountCreate) AddCollections(v ...*Collection) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddCollectionIDs(ids...)
+	return _c.AddCollectionIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (ac *AccountCreate) AddNodeIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddNodeIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddNodeIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddNodeIDs(ids...)
+	return _c
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (ac *AccountCreate) AddNodes(n ...*Node) *AccountCreate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_c *AccountCreate) AddNodes(v ...*Node) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddNodeIDs(ids...)
+	return _c.AddNodeIDs(ids...)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (ac *AccountCreate) AddAssetIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddAssetIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddAssetIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddAssetIDs(ids...)
+	return _c
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (ac *AccountCreate) AddAssets(a ...*Asset) *AccountCreate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_c *AccountCreate) AddAssets(v ...*Asset) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddAssetIDs(ids...)
+	return _c.AddAssetIDs(ids...)
 }
 
 // AddEventIDs adds the "events" edge to the EventParticipant entity by IDs.
-func (ac *AccountCreate) AddEventIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddEventIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddEventIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddEventIDs(ids...)
+	return _c
 }
 
 // AddEvents adds the "events" edges to the EventParticipant entity.
-func (ac *AccountCreate) AddEvents(e ...*EventParticipant) *AccountCreate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_c *AccountCreate) AddEvents(v ...*EventParticipant) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddEventIDs(ids...)
+	return _c.AddEventIDs(ids...)
 }
 
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
-func (ac *AccountCreate) AddAccountRoleIDs(ids ...xid.ID) *AccountCreate {
-	ac.mutation.AddAccountRoleIDs(ids...)
-	return ac
+func (_c *AccountCreate) AddAccountRoleIDs(ids ...xid.ID) *AccountCreate {
+	_c.mutation.AddAccountRoleIDs(ids...)
+	return _c
 }
 
 // AddAccountRoles adds the "account_roles" edges to the AccountRoles entity.
-func (ac *AccountCreate) AddAccountRoles(a ...*AccountRoles) *AccountCreate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_c *AccountCreate) AddAccountRoles(v ...*AccountRoles) *AccountCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ac.AddAccountRoleIDs(ids...)
+	return _c.AddAccountRoleIDs(ids...)
 }
 
 // Mutation returns the AccountMutation object of the builder.
-func (ac *AccountCreate) Mutation() *AccountMutation {
-	return ac.mutation
+func (_c *AccountCreate) Mutation() *AccountMutation {
+	return _c.mutation
 }
 
 // Save creates the Account in the database.
-func (ac *AccountCreate) Save(ctx context.Context) (*Account, error) {
-	ac.defaults()
-	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
+func (_c *AccountCreate) Save(ctx context.Context) (*Account, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (ac *AccountCreate) SaveX(ctx context.Context) *Account {
-	v, err := ac.Save(ctx)
+func (_c *AccountCreate) SaveX(ctx context.Context) *Account {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -519,78 +519,78 @@ func (ac *AccountCreate) SaveX(ctx context.Context) *Account {
 }
 
 // Exec executes the query.
-func (ac *AccountCreate) Exec(ctx context.Context) error {
-	_, err := ac.Save(ctx)
+func (_c *AccountCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ac *AccountCreate) ExecX(ctx context.Context) {
-	if err := ac.Exec(ctx); err != nil {
+func (_c *AccountCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (ac *AccountCreate) defaults() {
-	if _, ok := ac.mutation.CreatedAt(); !ok {
+func (_c *AccountCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := account.DefaultCreatedAt()
-		ac.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := ac.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		v := account.DefaultUpdatedAt()
-		ac.mutation.SetUpdatedAt(v)
+		_c.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := ac.mutation.Kind(); !ok {
+	if _, ok := _c.mutation.Kind(); !ok {
 		v := account.DefaultKind
-		ac.mutation.SetKind(v)
+		_c.mutation.SetKind(v)
 	}
-	if _, ok := ac.mutation.Admin(); !ok {
+	if _, ok := _c.mutation.Admin(); !ok {
 		v := account.DefaultAdmin
-		ac.mutation.SetAdmin(v)
+		_c.mutation.SetAdmin(v)
 	}
-	if _, ok := ac.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := account.DefaultID()
-		ac.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (ac *AccountCreate) check() error {
-	if _, ok := ac.mutation.CreatedAt(); !ok {
+func (_c *AccountCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Account.created_at"`)}
 	}
-	if _, ok := ac.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Account.updated_at"`)}
 	}
-	if _, ok := ac.mutation.Handle(); !ok {
+	if _, ok := _c.mutation.Handle(); !ok {
 		return &ValidationError{Name: "handle", err: errors.New(`ent: missing required field "Account.handle"`)}
 	}
-	if v, ok := ac.mutation.Handle(); ok {
+	if v, ok := _c.mutation.Handle(); ok {
 		if err := account.HandleValidator(v); err != nil {
 			return &ValidationError{Name: "handle", err: fmt.Errorf(`ent: validator failed for field "Account.handle": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.Name(); !ok {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Account.name"`)}
 	}
-	if v, ok := ac.mutation.Name(); ok {
+	if v, ok := _c.mutation.Name(); ok {
 		if err := account.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Account.name": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.Kind(); !ok {
+	if _, ok := _c.mutation.Kind(); !ok {
 		return &ValidationError{Name: "kind", err: errors.New(`ent: missing required field "Account.kind"`)}
 	}
-	if v, ok := ac.mutation.Kind(); ok {
+	if v, ok := _c.mutation.Kind(); ok {
 		if err := account.KindValidator(v); err != nil {
 			return &ValidationError{Name: "kind", err: fmt.Errorf(`ent: validator failed for field "Account.kind": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.Admin(); !ok {
+	if _, ok := _c.mutation.Admin(); !ok {
 		return &ValidationError{Name: "admin", err: errors.New(`ent: missing required field "Account.admin"`)}
 	}
-	if v, ok := ac.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := account.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Account.id": %w`, err)}
 		}
@@ -598,12 +598,12 @@ func (ac *AccountCreate) check() error {
 	return nil
 }
 
-func (ac *AccountCreate) sqlSave(ctx context.Context) (*Account, error) {
-	if err := ac.check(); err != nil {
+func (_c *AccountCreate) sqlSave(ctx context.Context) (*Account, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := ac.createSpec()
-	if err := sqlgraph.CreateNode(ctx, ac.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -616,66 +616,66 @@ func (ac *AccountCreate) sqlSave(ctx context.Context) (*Account, error) {
 			return nil, err
 		}
 	}
-	ac.mutation.id = &_node.ID
-	ac.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
+func (_c *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Account{config: ac.config}
+		_node = &Account{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(account.Table, sqlgraph.NewFieldSpec(account.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = ac.conflict
-	if id, ok := ac.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := ac.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(account.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := ac.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(account.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := ac.mutation.DeletedAt(); ok {
+	if value, ok := _c.mutation.DeletedAt(); ok {
 		_spec.SetField(account.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
-	if value, ok := ac.mutation.IndexedAt(); ok {
+	if value, ok := _c.mutation.IndexedAt(); ok {
 		_spec.SetField(account.FieldIndexedAt, field.TypeTime, value)
 		_node.IndexedAt = &value
 	}
-	if value, ok := ac.mutation.Handle(); ok {
+	if value, ok := _c.mutation.Handle(); ok {
 		_spec.SetField(account.FieldHandle, field.TypeString, value)
 		_node.Handle = value
 	}
-	if value, ok := ac.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(account.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := ac.mutation.Bio(); ok {
+	if value, ok := _c.mutation.Bio(); ok {
 		_spec.SetField(account.FieldBio, field.TypeString, value)
 		_node.Bio = value
 	}
-	if value, ok := ac.mutation.Kind(); ok {
+	if value, ok := _c.mutation.Kind(); ok {
 		_spec.SetField(account.FieldKind, field.TypeEnum, value)
 		_node.Kind = value
 	}
-	if value, ok := ac.mutation.Admin(); ok {
+	if value, ok := _c.mutation.Admin(); ok {
 		_spec.SetField(account.FieldAdmin, field.TypeBool, value)
 		_node.Admin = value
 	}
-	if value, ok := ac.mutation.Links(); ok {
+	if value, ok := _c.mutation.Links(); ok {
 		_spec.SetField(account.FieldLinks, field.TypeJSON, value)
 		_node.Links = value
 	}
-	if value, ok := ac.mutation.Metadata(); ok {
+	if value, ok := _c.mutation.Metadata(); ok {
 		_spec.SetField(account.FieldMetadata, field.TypeJSON, value)
 		_node.Metadata = value
 	}
-	if nodes := ac.mutation.SessionsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.SessionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -691,7 +691,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.EmailsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.EmailsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -707,7 +707,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.NotificationsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.NotificationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -723,7 +723,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.TriggeredNotificationsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.TriggeredNotificationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -739,7 +739,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.FollowingIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.FollowingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -755,7 +755,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.FollowedByIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.FollowedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -771,7 +771,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.InvitationsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.InvitationsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -787,7 +787,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.InvitedByIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.InvitedByIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -804,7 +804,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		_node.InvitedByID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -820,7 +820,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.QuestionsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.QuestionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -836,7 +836,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.ReactsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.ReactsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -852,7 +852,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.LikesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.LikesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -868,7 +868,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.MentionsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.MentionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -884,7 +884,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.RolesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.RolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -898,7 +898,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &AccountRolesCreate{config: ac.config, mutation: newAccountRolesMutation(ac.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _c.config, mutation: newAccountRolesMutation(_c.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -907,7 +907,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.AuthenticationIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AuthenticationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -923,7 +923,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.TagsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -939,7 +939,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.CollectionsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.CollectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -955,7 +955,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -971,7 +971,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -987,7 +987,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.EventsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.EventsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1003,7 +1003,7 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.AccountRolesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AccountRolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -1038,10 +1038,10 @@ func (ac *AccountCreate) createSpec() (*Account, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (ac *AccountCreate) OnConflict(opts ...sql.ConflictOption) *AccountUpsertOne {
-	ac.conflict = opts
+func (_c *AccountCreate) OnConflict(opts ...sql.ConflictOption) *AccountUpsertOne {
+	_c.conflict = opts
 	return &AccountUpsertOne{
-		create: ac,
+		create: _c,
 	}
 }
 
@@ -1051,10 +1051,10 @@ func (ac *AccountCreate) OnConflict(opts ...sql.ConflictOption) *AccountUpsertOn
 //	client.Account.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (ac *AccountCreate) OnConflictColumns(columns ...string) *AccountUpsertOne {
-	ac.conflict = append(ac.conflict, sql.ConflictColumns(columns...))
+func (_c *AccountCreate) OnConflictColumns(columns ...string) *AccountUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &AccountUpsertOne{
-		create: ac,
+		create: _c,
 	}
 }
 
@@ -1533,16 +1533,16 @@ type AccountCreateBulk struct {
 }
 
 // Save creates the Account entities in the database.
-func (acb *AccountCreateBulk) Save(ctx context.Context) ([]*Account, error) {
-	if acb.err != nil {
-		return nil, acb.err
+func (_c *AccountCreateBulk) Save(ctx context.Context) ([]*Account, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(acb.builders))
-	nodes := make([]*Account, len(acb.builders))
-	mutators := make([]Mutator, len(acb.builders))
-	for i := range acb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Account, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := acb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*AccountMutation)
@@ -1556,12 +1556,12 @@ func (acb *AccountCreateBulk) Save(ctx context.Context) ([]*Account, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, acb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = acb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, acb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -1581,7 +1581,7 @@ func (acb *AccountCreateBulk) Save(ctx context.Context) ([]*Account, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, acb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -1589,8 +1589,8 @@ func (acb *AccountCreateBulk) Save(ctx context.Context) ([]*Account, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (acb *AccountCreateBulk) SaveX(ctx context.Context) []*Account {
-	v, err := acb.Save(ctx)
+func (_c *AccountCreateBulk) SaveX(ctx context.Context) []*Account {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1598,14 +1598,14 @@ func (acb *AccountCreateBulk) SaveX(ctx context.Context) []*Account {
 }
 
 // Exec executes the query.
-func (acb *AccountCreateBulk) Exec(ctx context.Context) error {
-	_, err := acb.Save(ctx)
+func (_c *AccountCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (acb *AccountCreateBulk) ExecX(ctx context.Context) {
-	if err := acb.Exec(ctx); err != nil {
+func (_c *AccountCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -1625,10 +1625,10 @@ func (acb *AccountCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (acb *AccountCreateBulk) OnConflict(opts ...sql.ConflictOption) *AccountUpsertBulk {
-	acb.conflict = opts
+func (_c *AccountCreateBulk) OnConflict(opts ...sql.ConflictOption) *AccountUpsertBulk {
+	_c.conflict = opts
 	return &AccountUpsertBulk{
-		create: acb,
+		create: _c,
 	}
 }
 
@@ -1638,10 +1638,10 @@ func (acb *AccountCreateBulk) OnConflict(opts ...sql.ConflictOption) *AccountUps
 //	client.Account.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (acb *AccountCreateBulk) OnConflictColumns(columns ...string) *AccountUpsertBulk {
-	acb.conflict = append(acb.conflict, sql.ConflictColumns(columns...))
+func (_c *AccountCreateBulk) OnConflictColumns(columns ...string) *AccountUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &AccountUpsertBulk{
-		create: acb,
+		create: _c,
 	}
 }
 

@@ -1,7 +1,8 @@
-import { Account } from "@/api/openapi-schema";
+import { Account, ThreadListResult } from "@/api/openapi-schema";
 import { categoryList } from "@/api/openapi-server/categories";
 import { nodeList } from "@/api/openapi-server/nodes";
 import { threadList } from "@/api/openapi-server/threads";
+import { getCategoryThreadListParams } from "@/lib/feed/category";
 import { FrontendConfiguration, Settings } from "@/lib/settings/settings";
 import { VStack } from "@/styled-system/jsx";
 
@@ -61,26 +62,27 @@ async function getInitialFeedData(
           library: (await nodeList()).data,
         };
 
-      case "categories":
+      case "categories": {
+        const mode = feedConfig.source.threadListMode ?? "all";
+        const categories = (await categoryList()).data;
+
+        const threadParams = getCategoryThreadListParams(mode, page);
+        const threads = (
+          await threadList(threadParams, {
+            cache: "no-store",
+            next: {
+              tags: ["feed"],
+              revalidate: 0,
+            },
+          })
+        ).data;
+
         return {
-          categories: (await categoryList()).data,
+          categories,
           page: page ?? 1,
-          threads: (
-            await threadList(
-              {
-                page: page?.toString(),
-                categories: ["null"],
-              },
-              {
-                cache: "no-store",
-                next: {
-                  tags: ["feed"],
-                  revalidate: 0,
-                },
-              },
-            )
-          ).data,
+          threads,
         };
+      }
     }
   } catch (error) {
     // NOTE: Fall back without erroring here, frontend will not be hydrated but

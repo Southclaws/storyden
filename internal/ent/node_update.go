@@ -33,592 +33,592 @@ type NodeUpdate struct {
 }
 
 // Where appends a list predicates to the NodeUpdate builder.
-func (nu *NodeUpdate) Where(ps ...predicate.Node) *NodeUpdate {
-	nu.mutation.Where(ps...)
-	return nu
+func (_u *NodeUpdate) Where(ps ...predicate.Node) *NodeUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (nu *NodeUpdate) SetUpdatedAt(t time.Time) *NodeUpdate {
-	nu.mutation.SetUpdatedAt(t)
-	return nu
+func (_u *NodeUpdate) SetUpdatedAt(v time.Time) *NodeUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (nu *NodeUpdate) SetDeletedAt(t time.Time) *NodeUpdate {
-	nu.mutation.SetDeletedAt(t)
-	return nu
+func (_u *NodeUpdate) SetDeletedAt(v time.Time) *NodeUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableDeletedAt(t *time.Time) *NodeUpdate {
-	if t != nil {
-		nu.SetDeletedAt(*t)
+func (_u *NodeUpdate) SetNillableDeletedAt(v *time.Time) *NodeUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return nu
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (nu *NodeUpdate) ClearDeletedAt() *NodeUpdate {
-	nu.mutation.ClearDeletedAt()
-	return nu
+func (_u *NodeUpdate) ClearDeletedAt() *NodeUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (nu *NodeUpdate) SetIndexedAt(t time.Time) *NodeUpdate {
-	nu.mutation.SetIndexedAt(t)
-	return nu
+func (_u *NodeUpdate) SetIndexedAt(v time.Time) *NodeUpdate {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableIndexedAt(t *time.Time) *NodeUpdate {
-	if t != nil {
-		nu.SetIndexedAt(*t)
+func (_u *NodeUpdate) SetNillableIndexedAt(v *time.Time) *NodeUpdate {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return nu
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (nu *NodeUpdate) ClearIndexedAt() *NodeUpdate {
-	nu.mutation.ClearIndexedAt()
-	return nu
+func (_u *NodeUpdate) ClearIndexedAt() *NodeUpdate {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (nu *NodeUpdate) SetName(s string) *NodeUpdate {
-	nu.mutation.SetName(s)
-	return nu
+func (_u *NodeUpdate) SetName(v string) *NodeUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableName(s *string) *NodeUpdate {
-	if s != nil {
-		nu.SetName(*s)
+func (_u *NodeUpdate) SetNillableName(v *string) *NodeUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return nu
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (nu *NodeUpdate) SetSlug(s string) *NodeUpdate {
-	nu.mutation.SetSlug(s)
-	return nu
+func (_u *NodeUpdate) SetSlug(v string) *NodeUpdate {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableSlug(s *string) *NodeUpdate {
-	if s != nil {
-		nu.SetSlug(*s)
+func (_u *NodeUpdate) SetNillableSlug(v *string) *NodeUpdate {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return nu
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (nu *NodeUpdate) SetDescription(s string) *NodeUpdate {
-	nu.mutation.SetDescription(s)
-	return nu
+func (_u *NodeUpdate) SetDescription(v string) *NodeUpdate {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableDescription(s *string) *NodeUpdate {
-	if s != nil {
-		nu.SetDescription(*s)
+func (_u *NodeUpdate) SetNillableDescription(v *string) *NodeUpdate {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return nu
+	return _u
 }
 
 // ClearDescription clears the value of the "description" field.
-func (nu *NodeUpdate) ClearDescription() *NodeUpdate {
-	nu.mutation.ClearDescription()
-	return nu
+func (_u *NodeUpdate) ClearDescription() *NodeUpdate {
+	_u.mutation.ClearDescription()
+	return _u
 }
 
 // SetContent sets the "content" field.
-func (nu *NodeUpdate) SetContent(s string) *NodeUpdate {
-	nu.mutation.SetContent(s)
-	return nu
+func (_u *NodeUpdate) SetContent(v string) *NodeUpdate {
+	_u.mutation.SetContent(v)
+	return _u
 }
 
 // SetNillableContent sets the "content" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableContent(s *string) *NodeUpdate {
-	if s != nil {
-		nu.SetContent(*s)
+func (_u *NodeUpdate) SetNillableContent(v *string) *NodeUpdate {
+	if v != nil {
+		_u.SetContent(*v)
 	}
-	return nu
+	return _u
 }
 
 // ClearContent clears the value of the "content" field.
-func (nu *NodeUpdate) ClearContent() *NodeUpdate {
-	nu.mutation.ClearContent()
-	return nu
+func (_u *NodeUpdate) ClearContent() *NodeUpdate {
+	_u.mutation.ClearContent()
+	return _u
 }
 
 // SetParentNodeID sets the "parent_node_id" field.
-func (nu *NodeUpdate) SetParentNodeID(x xid.ID) *NodeUpdate {
-	nu.mutation.SetParentNodeID(x)
-	return nu
+func (_u *NodeUpdate) SetParentNodeID(v xid.ID) *NodeUpdate {
+	_u.mutation.SetParentNodeID(v)
+	return _u
 }
 
 // SetNillableParentNodeID sets the "parent_node_id" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableParentNodeID(x *xid.ID) *NodeUpdate {
-	if x != nil {
-		nu.SetParentNodeID(*x)
+func (_u *NodeUpdate) SetNillableParentNodeID(v *xid.ID) *NodeUpdate {
+	if v != nil {
+		_u.SetParentNodeID(*v)
 	}
-	return nu
+	return _u
 }
 
 // ClearParentNodeID clears the value of the "parent_node_id" field.
-func (nu *NodeUpdate) ClearParentNodeID() *NodeUpdate {
-	nu.mutation.ClearParentNodeID()
-	return nu
+func (_u *NodeUpdate) ClearParentNodeID() *NodeUpdate {
+	_u.mutation.ClearParentNodeID()
+	return _u
 }
 
 // SetHideChildTree sets the "hide_child_tree" field.
-func (nu *NodeUpdate) SetHideChildTree(b bool) *NodeUpdate {
-	nu.mutation.SetHideChildTree(b)
-	return nu
+func (_u *NodeUpdate) SetHideChildTree(v bool) *NodeUpdate {
+	_u.mutation.SetHideChildTree(v)
+	return _u
 }
 
 // SetNillableHideChildTree sets the "hide_child_tree" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableHideChildTree(b *bool) *NodeUpdate {
-	if b != nil {
-		nu.SetHideChildTree(*b)
+func (_u *NodeUpdate) SetNillableHideChildTree(v *bool) *NodeUpdate {
+	if v != nil {
+		_u.SetHideChildTree(*v)
 	}
-	return nu
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (nu *NodeUpdate) SetAccountID(x xid.ID) *NodeUpdate {
-	nu.mutation.SetAccountID(x)
-	return nu
+func (_u *NodeUpdate) SetAccountID(v xid.ID) *NodeUpdate {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableAccountID(x *xid.ID) *NodeUpdate {
-	if x != nil {
-		nu.SetAccountID(*x)
+func (_u *NodeUpdate) SetNillableAccountID(v *xid.ID) *NodeUpdate {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return nu
+	return _u
 }
 
 // SetPropertySchemaID sets the "property_schema_id" field.
-func (nu *NodeUpdate) SetPropertySchemaID(x xid.ID) *NodeUpdate {
-	nu.mutation.SetPropertySchemaID(x)
-	return nu
+func (_u *NodeUpdate) SetPropertySchemaID(v xid.ID) *NodeUpdate {
+	_u.mutation.SetPropertySchemaID(v)
+	return _u
 }
 
 // SetNillablePropertySchemaID sets the "property_schema_id" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillablePropertySchemaID(x *xid.ID) *NodeUpdate {
-	if x != nil {
-		nu.SetPropertySchemaID(*x)
+func (_u *NodeUpdate) SetNillablePropertySchemaID(v *xid.ID) *NodeUpdate {
+	if v != nil {
+		_u.SetPropertySchemaID(*v)
 	}
-	return nu
+	return _u
 }
 
 // ClearPropertySchemaID clears the value of the "property_schema_id" field.
-func (nu *NodeUpdate) ClearPropertySchemaID() *NodeUpdate {
-	nu.mutation.ClearPropertySchemaID()
-	return nu
+func (_u *NodeUpdate) ClearPropertySchemaID() *NodeUpdate {
+	_u.mutation.ClearPropertySchemaID()
+	return _u
 }
 
 // SetPrimaryAssetID sets the "primary_asset_id" field.
-func (nu *NodeUpdate) SetPrimaryAssetID(x xid.ID) *NodeUpdate {
-	nu.mutation.SetPrimaryAssetID(x)
-	return nu
+func (_u *NodeUpdate) SetPrimaryAssetID(v xid.ID) *NodeUpdate {
+	_u.mutation.SetPrimaryAssetID(v)
+	return _u
 }
 
 // SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillablePrimaryAssetID(x *xid.ID) *NodeUpdate {
-	if x != nil {
-		nu.SetPrimaryAssetID(*x)
+func (_u *NodeUpdate) SetNillablePrimaryAssetID(v *xid.ID) *NodeUpdate {
+	if v != nil {
+		_u.SetPrimaryAssetID(*v)
 	}
-	return nu
+	return _u
 }
 
 // ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
-func (nu *NodeUpdate) ClearPrimaryAssetID() *NodeUpdate {
-	nu.mutation.ClearPrimaryAssetID()
-	return nu
+func (_u *NodeUpdate) ClearPrimaryAssetID() *NodeUpdate {
+	_u.mutation.ClearPrimaryAssetID()
+	return _u
 }
 
 // SetLinkID sets the "link_id" field.
-func (nu *NodeUpdate) SetLinkID(x xid.ID) *NodeUpdate {
-	nu.mutation.SetLinkID(x)
-	return nu
+func (_u *NodeUpdate) SetLinkID(v xid.ID) *NodeUpdate {
+	_u.mutation.SetLinkID(v)
+	return _u
 }
 
 // SetNillableLinkID sets the "link_id" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableLinkID(x *xid.ID) *NodeUpdate {
-	if x != nil {
-		nu.SetLinkID(*x)
+func (_u *NodeUpdate) SetNillableLinkID(v *xid.ID) *NodeUpdate {
+	if v != nil {
+		_u.SetLinkID(*v)
 	}
-	return nu
+	return _u
 }
 
 // ClearLinkID clears the value of the "link_id" field.
-func (nu *NodeUpdate) ClearLinkID() *NodeUpdate {
-	nu.mutation.ClearLinkID()
-	return nu
+func (_u *NodeUpdate) ClearLinkID() *NodeUpdate {
+	_u.mutation.ClearLinkID()
+	return _u
 }
 
 // SetVisibility sets the "visibility" field.
-func (nu *NodeUpdate) SetVisibility(n node.Visibility) *NodeUpdate {
-	nu.mutation.SetVisibility(n)
-	return nu
+func (_u *NodeUpdate) SetVisibility(v node.Visibility) *NodeUpdate {
+	_u.mutation.SetVisibility(v)
+	return _u
 }
 
 // SetNillableVisibility sets the "visibility" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableVisibility(n *node.Visibility) *NodeUpdate {
-	if n != nil {
-		nu.SetVisibility(*n)
+func (_u *NodeUpdate) SetNillableVisibility(v *node.Visibility) *NodeUpdate {
+	if v != nil {
+		_u.SetVisibility(*v)
 	}
-	return nu
+	return _u
 }
 
 // SetSort sets the "sort" field.
-func (nu *NodeUpdate) SetSort(l lexorank.Key) *NodeUpdate {
-	nu.mutation.SetSort(l)
-	return nu
+func (_u *NodeUpdate) SetSort(v lexorank.Key) *NodeUpdate {
+	_u.mutation.SetSort(v)
+	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (nu *NodeUpdate) SetNillableSort(l *lexorank.Key) *NodeUpdate {
-	if l != nil {
-		nu.SetSort(*l)
+func (_u *NodeUpdate) SetNillableSort(v *lexorank.Key) *NodeUpdate {
+	if v != nil {
+		_u.SetSort(*v)
 	}
-	return nu
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (nu *NodeUpdate) SetMetadata(m map[string]interface{}) *NodeUpdate {
-	nu.mutation.SetMetadata(m)
-	return nu
+func (_u *NodeUpdate) SetMetadata(v map[string]interface{}) *NodeUpdate {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (nu *NodeUpdate) ClearMetadata() *NodeUpdate {
-	nu.mutation.ClearMetadata()
-	return nu
+func (_u *NodeUpdate) ClearMetadata() *NodeUpdate {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
-func (nu *NodeUpdate) SetOwnerID(id xid.ID) *NodeUpdate {
-	nu.mutation.SetOwnerID(id)
-	return nu
+func (_u *NodeUpdate) SetOwnerID(id xid.ID) *NodeUpdate {
+	_u.mutation.SetOwnerID(id)
+	return _u
 }
 
 // SetOwner sets the "owner" edge to the Account entity.
-func (nu *NodeUpdate) SetOwner(a *Account) *NodeUpdate {
-	return nu.SetOwnerID(a.ID)
+func (_u *NodeUpdate) SetOwner(v *Account) *NodeUpdate {
+	return _u.SetOwnerID(v.ID)
 }
 
 // SetParentID sets the "parent" edge to the Node entity by ID.
-func (nu *NodeUpdate) SetParentID(id xid.ID) *NodeUpdate {
-	nu.mutation.SetParentID(id)
-	return nu
+func (_u *NodeUpdate) SetParentID(id xid.ID) *NodeUpdate {
+	_u.mutation.SetParentID(id)
+	return _u
 }
 
 // SetNillableParentID sets the "parent" edge to the Node entity by ID if the given value is not nil.
-func (nu *NodeUpdate) SetNillableParentID(id *xid.ID) *NodeUpdate {
+func (_u *NodeUpdate) SetNillableParentID(id *xid.ID) *NodeUpdate {
 	if id != nil {
-		nu = nu.SetParentID(*id)
+		_u = _u.SetParentID(*id)
 	}
-	return nu
+	return _u
 }
 
 // SetParent sets the "parent" edge to the Node entity.
-func (nu *NodeUpdate) SetParent(n *Node) *NodeUpdate {
-	return nu.SetParentID(n.ID)
+func (_u *NodeUpdate) SetParent(v *Node) *NodeUpdate {
+	return _u.SetParentID(v.ID)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (nu *NodeUpdate) AddNodeIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.AddNodeIDs(ids...)
-	return nu
+func (_u *NodeUpdate) AddNodeIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (nu *NodeUpdate) AddNodes(n ...*Node) *NodeUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *NodeUpdate) AddNodes(v ...*Node) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
-func (nu *NodeUpdate) SetPrimaryImageID(id xid.ID) *NodeUpdate {
-	nu.mutation.SetPrimaryImageID(id)
-	return nu
+func (_u *NodeUpdate) SetPrimaryImageID(id xid.ID) *NodeUpdate {
+	_u.mutation.SetPrimaryImageID(id)
+	return _u
 }
 
 // SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
-func (nu *NodeUpdate) SetNillablePrimaryImageID(id *xid.ID) *NodeUpdate {
+func (_u *NodeUpdate) SetNillablePrimaryImageID(id *xid.ID) *NodeUpdate {
 	if id != nil {
-		nu = nu.SetPrimaryImageID(*id)
+		_u = _u.SetPrimaryImageID(*id)
 	}
-	return nu
+	return _u
 }
 
 // SetPrimaryImage sets the "primary_image" edge to the Asset entity.
-func (nu *NodeUpdate) SetPrimaryImage(a *Asset) *NodeUpdate {
-	return nu.SetPrimaryImageID(a.ID)
+func (_u *NodeUpdate) SetPrimaryImage(v *Asset) *NodeUpdate {
+	return _u.SetPrimaryImageID(v.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (nu *NodeUpdate) AddAssetIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.AddAssetIDs(ids...)
-	return nu
+func (_u *NodeUpdate) AddAssetIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.AddAssetIDs(ids...)
+	return _u
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (nu *NodeUpdate) AddAssets(a ...*Asset) *NodeUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *NodeUpdate) AddAssets(v ...*Asset) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.AddAssetIDs(ids...)
+	return _u.AddAssetIDs(ids...)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (nu *NodeUpdate) AddTagIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.AddTagIDs(ids...)
-	return nu
+func (_u *NodeUpdate) AddTagIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.AddTagIDs(ids...)
+	return _u
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
-func (nu *NodeUpdate) AddTags(t ...*Tag) *NodeUpdate {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *NodeUpdate) AddTags(v ...*Tag) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.AddTagIDs(ids...)
+	return _u.AddTagIDs(ids...)
 }
 
 // AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
-func (nu *NodeUpdate) AddPropertyIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.AddPropertyIDs(ids...)
-	return nu
+func (_u *NodeUpdate) AddPropertyIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.AddPropertyIDs(ids...)
+	return _u
 }
 
 // AddProperties adds the "properties" edges to the Property entity.
-func (nu *NodeUpdate) AddProperties(p ...*Property) *NodeUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *NodeUpdate) AddProperties(v ...*Property) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.AddPropertyIDs(ids...)
+	return _u.AddPropertyIDs(ids...)
 }
 
 // SetPropertySchema sets the "property_schema" edge to the PropertySchema entity.
-func (nu *NodeUpdate) SetPropertySchema(p *PropertySchema) *NodeUpdate {
-	return nu.SetPropertySchemaID(p.ID)
+func (_u *NodeUpdate) SetPropertySchema(v *PropertySchema) *NodeUpdate {
+	return _u.SetPropertySchemaID(v.ID)
 }
 
 // SetLink sets the "link" edge to the Link entity.
-func (nu *NodeUpdate) SetLink(l *Link) *NodeUpdate {
-	return nu.SetLinkID(l.ID)
+func (_u *NodeUpdate) SetLink(v *Link) *NodeUpdate {
+	return _u.SetLinkID(v.ID)
 }
 
 // AddContentLinkIDs adds the "content_links" edge to the Link entity by IDs.
-func (nu *NodeUpdate) AddContentLinkIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.AddContentLinkIDs(ids...)
-	return nu
+func (_u *NodeUpdate) AddContentLinkIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.AddContentLinkIDs(ids...)
+	return _u
 }
 
 // AddContentLinks adds the "content_links" edges to the Link entity.
-func (nu *NodeUpdate) AddContentLinks(l ...*Link) *NodeUpdate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *NodeUpdate) AddContentLinks(v ...*Link) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.AddContentLinkIDs(ids...)
+	return _u.AddContentLinkIDs(ids...)
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (nu *NodeUpdate) AddCollectionIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.AddCollectionIDs(ids...)
-	return nu
+func (_u *NodeUpdate) AddCollectionIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.AddCollectionIDs(ids...)
+	return _u
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
-func (nu *NodeUpdate) AddCollections(c ...*Collection) *NodeUpdate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *NodeUpdate) AddCollections(v ...*Collection) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.AddCollectionIDs(ids...)
+	return _u.AddCollectionIDs(ids...)
 }
 
 // Mutation returns the NodeMutation object of the builder.
-func (nu *NodeUpdate) Mutation() *NodeMutation {
-	return nu.mutation
+func (_u *NodeUpdate) Mutation() *NodeMutation {
+	return _u.mutation
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
-func (nu *NodeUpdate) ClearOwner() *NodeUpdate {
-	nu.mutation.ClearOwner()
-	return nu
+func (_u *NodeUpdate) ClearOwner() *NodeUpdate {
+	_u.mutation.ClearOwner()
+	return _u
 }
 
 // ClearParent clears the "parent" edge to the Node entity.
-func (nu *NodeUpdate) ClearParent() *NodeUpdate {
-	nu.mutation.ClearParent()
-	return nu
+func (_u *NodeUpdate) ClearParent() *NodeUpdate {
+	_u.mutation.ClearParent()
+	return _u
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (nu *NodeUpdate) ClearNodes() *NodeUpdate {
-	nu.mutation.ClearNodes()
-	return nu
+func (_u *NodeUpdate) ClearNodes() *NodeUpdate {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (nu *NodeUpdate) RemoveNodeIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.RemoveNodeIDs(ids...)
-	return nu
+func (_u *NodeUpdate) RemoveNodeIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (nu *NodeUpdate) RemoveNodes(n ...*Node) *NodeUpdate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *NodeUpdate) RemoveNodes(v ...*Node) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
-func (nu *NodeUpdate) ClearPrimaryImage() *NodeUpdate {
-	nu.mutation.ClearPrimaryImage()
-	return nu
+func (_u *NodeUpdate) ClearPrimaryImage() *NodeUpdate {
+	_u.mutation.ClearPrimaryImage()
+	return _u
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
-func (nu *NodeUpdate) ClearAssets() *NodeUpdate {
-	nu.mutation.ClearAssets()
-	return nu
+func (_u *NodeUpdate) ClearAssets() *NodeUpdate {
+	_u.mutation.ClearAssets()
+	return _u
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (nu *NodeUpdate) RemoveAssetIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.RemoveAssetIDs(ids...)
-	return nu
+func (_u *NodeUpdate) RemoveAssetIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.RemoveAssetIDs(ids...)
+	return _u
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
-func (nu *NodeUpdate) RemoveAssets(a ...*Asset) *NodeUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *NodeUpdate) RemoveAssets(v ...*Asset) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.RemoveAssetIDs(ids...)
+	return _u.RemoveAssetIDs(ids...)
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
-func (nu *NodeUpdate) ClearTags() *NodeUpdate {
-	nu.mutation.ClearTags()
-	return nu
+func (_u *NodeUpdate) ClearTags() *NodeUpdate {
+	_u.mutation.ClearTags()
+	return _u
 }
 
 // RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
-func (nu *NodeUpdate) RemoveTagIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.RemoveTagIDs(ids...)
-	return nu
+func (_u *NodeUpdate) RemoveTagIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.RemoveTagIDs(ids...)
+	return _u
 }
 
 // RemoveTags removes "tags" edges to Tag entities.
-func (nu *NodeUpdate) RemoveTags(t ...*Tag) *NodeUpdate {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *NodeUpdate) RemoveTags(v ...*Tag) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.RemoveTagIDs(ids...)
+	return _u.RemoveTagIDs(ids...)
 }
 
 // ClearProperties clears all "properties" edges to the Property entity.
-func (nu *NodeUpdate) ClearProperties() *NodeUpdate {
-	nu.mutation.ClearProperties()
-	return nu
+func (_u *NodeUpdate) ClearProperties() *NodeUpdate {
+	_u.mutation.ClearProperties()
+	return _u
 }
 
 // RemovePropertyIDs removes the "properties" edge to Property entities by IDs.
-func (nu *NodeUpdate) RemovePropertyIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.RemovePropertyIDs(ids...)
-	return nu
+func (_u *NodeUpdate) RemovePropertyIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.RemovePropertyIDs(ids...)
+	return _u
 }
 
 // RemoveProperties removes "properties" edges to Property entities.
-func (nu *NodeUpdate) RemoveProperties(p ...*Property) *NodeUpdate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *NodeUpdate) RemoveProperties(v ...*Property) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.RemovePropertyIDs(ids...)
+	return _u.RemovePropertyIDs(ids...)
 }
 
 // ClearPropertySchema clears the "property_schema" edge to the PropertySchema entity.
-func (nu *NodeUpdate) ClearPropertySchema() *NodeUpdate {
-	nu.mutation.ClearPropertySchema()
-	return nu
+func (_u *NodeUpdate) ClearPropertySchema() *NodeUpdate {
+	_u.mutation.ClearPropertySchema()
+	return _u
 }
 
 // ClearLink clears the "link" edge to the Link entity.
-func (nu *NodeUpdate) ClearLink() *NodeUpdate {
-	nu.mutation.ClearLink()
-	return nu
+func (_u *NodeUpdate) ClearLink() *NodeUpdate {
+	_u.mutation.ClearLink()
+	return _u
 }
 
 // ClearContentLinks clears all "content_links" edges to the Link entity.
-func (nu *NodeUpdate) ClearContentLinks() *NodeUpdate {
-	nu.mutation.ClearContentLinks()
-	return nu
+func (_u *NodeUpdate) ClearContentLinks() *NodeUpdate {
+	_u.mutation.ClearContentLinks()
+	return _u
 }
 
 // RemoveContentLinkIDs removes the "content_links" edge to Link entities by IDs.
-func (nu *NodeUpdate) RemoveContentLinkIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.RemoveContentLinkIDs(ids...)
-	return nu
+func (_u *NodeUpdate) RemoveContentLinkIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.RemoveContentLinkIDs(ids...)
+	return _u
 }
 
 // RemoveContentLinks removes "content_links" edges to Link entities.
-func (nu *NodeUpdate) RemoveContentLinks(l ...*Link) *NodeUpdate {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *NodeUpdate) RemoveContentLinks(v ...*Link) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.RemoveContentLinkIDs(ids...)
+	return _u.RemoveContentLinkIDs(ids...)
 }
 
 // ClearCollections clears all "collections" edges to the Collection entity.
-func (nu *NodeUpdate) ClearCollections() *NodeUpdate {
-	nu.mutation.ClearCollections()
-	return nu
+func (_u *NodeUpdate) ClearCollections() *NodeUpdate {
+	_u.mutation.ClearCollections()
+	return _u
 }
 
 // RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
-func (nu *NodeUpdate) RemoveCollectionIDs(ids ...xid.ID) *NodeUpdate {
-	nu.mutation.RemoveCollectionIDs(ids...)
-	return nu
+func (_u *NodeUpdate) RemoveCollectionIDs(ids ...xid.ID) *NodeUpdate {
+	_u.mutation.RemoveCollectionIDs(ids...)
+	return _u
 }
 
 // RemoveCollections removes "collections" edges to Collection entities.
-func (nu *NodeUpdate) RemoveCollections(c ...*Collection) *NodeUpdate {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *NodeUpdate) RemoveCollections(v ...*Collection) *NodeUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nu.RemoveCollectionIDs(ids...)
+	return _u.RemoveCollectionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (nu *NodeUpdate) Save(ctx context.Context) (int, error) {
-	nu.defaults()
-	return withHooks(ctx, nu.sqlSave, nu.mutation, nu.hooks)
+func (_u *NodeUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (nu *NodeUpdate) SaveX(ctx context.Context) int {
-	affected, err := nu.Save(ctx)
+func (_u *NodeUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -626,106 +626,106 @@ func (nu *NodeUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (nu *NodeUpdate) Exec(ctx context.Context) error {
-	_, err := nu.Save(ctx)
+func (_u *NodeUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (nu *NodeUpdate) ExecX(ctx context.Context) {
-	if err := nu.Exec(ctx); err != nil {
+func (_u *NodeUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (nu *NodeUpdate) defaults() {
-	if _, ok := nu.mutation.UpdatedAt(); !ok {
+func (_u *NodeUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := node.UpdateDefaultUpdatedAt()
-		nu.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (nu *NodeUpdate) check() error {
-	if v, ok := nu.mutation.Visibility(); ok {
+func (_u *NodeUpdate) check() error {
+	if v, ok := _u.mutation.Visibility(); ok {
 		if err := node.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Node.visibility": %w`, err)}
 		}
 	}
-	if nu.mutation.OwnerCleared() && len(nu.mutation.OwnerIDs()) > 0 {
+	if _u.mutation.OwnerCleared() && len(_u.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Node.owner"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (nu *NodeUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NodeUpdate {
-	nu.modifiers = append(nu.modifiers, modifiers...)
-	return nu
+func (_u *NodeUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NodeUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := nu.check(); err != nil {
-		return n, err
+func (_u *NodeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(node.Table, node.Columns, sqlgraph.NewFieldSpec(node.FieldID, field.TypeString))
-	if ps := nu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := nu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(node.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := nu.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(node.FieldDeletedAt, field.TypeTime, value)
 	}
-	if nu.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(node.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := nu.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(node.FieldIndexedAt, field.TypeTime, value)
 	}
-	if nu.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(node.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := nu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(node.FieldName, field.TypeString, value)
 	}
-	if value, ok := nu.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(node.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := nu.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(node.FieldDescription, field.TypeString, value)
 	}
-	if nu.mutation.DescriptionCleared() {
+	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(node.FieldDescription, field.TypeString)
 	}
-	if value, ok := nu.mutation.Content(); ok {
+	if value, ok := _u.mutation.Content(); ok {
 		_spec.SetField(node.FieldContent, field.TypeString, value)
 	}
-	if nu.mutation.ContentCleared() {
+	if _u.mutation.ContentCleared() {
 		_spec.ClearField(node.FieldContent, field.TypeString)
 	}
-	if value, ok := nu.mutation.HideChildTree(); ok {
+	if value, ok := _u.mutation.HideChildTree(); ok {
 		_spec.SetField(node.FieldHideChildTree, field.TypeBool, value)
 	}
-	if value, ok := nu.mutation.Visibility(); ok {
+	if value, ok := _u.mutation.Visibility(); ok {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)
 	}
-	if value, ok := nu.mutation.Sort(); ok {
+	if value, ok := _u.mutation.Sort(); ok {
 		_spec.SetField(node.FieldSort, field.TypeString, value)
 	}
-	if value, ok := nu.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(node.FieldMetadata, field.TypeJSON, value)
 	}
-	if nu.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(node.FieldMetadata, field.TypeJSON)
 	}
-	if nu.mutation.OwnerCleared() {
+	if _u.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -738,7 +738,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -754,7 +754,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.ParentCleared() {
+	if _u.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -767,7 +767,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -783,7 +783,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -796,7 +796,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedNodesIDs(); len(nodes) > 0 && !nu.mutation.NodesCleared() {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -812,7 +812,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -828,7 +828,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.PrimaryImageCleared() {
+	if _u.mutation.PrimaryImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -841,7 +841,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PrimaryImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -857,7 +857,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.AssetsCleared() {
+	if _u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -870,7 +870,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !nu.mutation.AssetsCleared() {
+	if nodes := _u.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !_u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -886,7 +886,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -902,7 +902,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.TagsCleared() {
+	if _u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -915,7 +915,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedTagsIDs(); len(nodes) > 0 && !nu.mutation.TagsCleared() {
+	if nodes := _u.mutation.RemovedTagsIDs(); len(nodes) > 0 && !_u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -931,7 +931,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.TagsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -947,7 +947,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.PropertiesCleared() {
+	if _u.mutation.PropertiesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -960,7 +960,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedPropertiesIDs(); len(nodes) > 0 && !nu.mutation.PropertiesCleared() {
+	if nodes := _u.mutation.RemovedPropertiesIDs(); len(nodes) > 0 && !_u.mutation.PropertiesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -976,7 +976,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.PropertiesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PropertiesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -992,7 +992,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.PropertySchemaCleared() {
+	if _u.mutation.PropertySchemaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1005,7 +1005,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.PropertySchemaIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PropertySchemaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1021,7 +1021,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.LinkCleared() {
+	if _u.mutation.LinkCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1034,7 +1034,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.LinkIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.LinkIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1050,7 +1050,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.ContentLinksCleared() {
+	if _u.mutation.ContentLinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1063,7 +1063,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedContentLinksIDs(); len(nodes) > 0 && !nu.mutation.ContentLinksCleared() {
+	if nodes := _u.mutation.RemovedContentLinksIDs(); len(nodes) > 0 && !_u.mutation.ContentLinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1079,7 +1079,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.ContentLinksIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ContentLinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1095,7 +1095,7 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nu.mutation.CollectionsCleared() {
+	if _u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1106,13 +1106,13 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
 			},
 		}
-		createE := &CollectionNodeCreate{config: nu.config, mutation: newCollectionNodeMutation(nu.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !nu.mutation.CollectionsCleared() {
+	if nodes := _u.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !_u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1126,13 +1126,13 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionNodeCreate{config: nu.config, mutation: newCollectionNodeMutation(nu.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nu.mutation.CollectionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CollectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -1146,14 +1146,14 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionNodeCreate{config: nu.config, mutation: newCollectionNodeMutation(nu.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(nu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, nu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{node.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -1161,8 +1161,8 @@ func (nu *NodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	nu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // NodeUpdateOne is the builder for updating a single Node entity.
@@ -1175,599 +1175,599 @@ type NodeUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (nuo *NodeUpdateOne) SetUpdatedAt(t time.Time) *NodeUpdateOne {
-	nuo.mutation.SetUpdatedAt(t)
-	return nuo
+func (_u *NodeUpdateOne) SetUpdatedAt(v time.Time) *NodeUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (nuo *NodeUpdateOne) SetDeletedAt(t time.Time) *NodeUpdateOne {
-	nuo.mutation.SetDeletedAt(t)
-	return nuo
+func (_u *NodeUpdateOne) SetDeletedAt(v time.Time) *NodeUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableDeletedAt(t *time.Time) *NodeUpdateOne {
-	if t != nil {
-		nuo.SetDeletedAt(*t)
+func (_u *NodeUpdateOne) SetNillableDeletedAt(v *time.Time) *NodeUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return nuo
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (nuo *NodeUpdateOne) ClearDeletedAt() *NodeUpdateOne {
-	nuo.mutation.ClearDeletedAt()
-	return nuo
+func (_u *NodeUpdateOne) ClearDeletedAt() *NodeUpdateOne {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (nuo *NodeUpdateOne) SetIndexedAt(t time.Time) *NodeUpdateOne {
-	nuo.mutation.SetIndexedAt(t)
-	return nuo
+func (_u *NodeUpdateOne) SetIndexedAt(v time.Time) *NodeUpdateOne {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableIndexedAt(t *time.Time) *NodeUpdateOne {
-	if t != nil {
-		nuo.SetIndexedAt(*t)
+func (_u *NodeUpdateOne) SetNillableIndexedAt(v *time.Time) *NodeUpdateOne {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return nuo
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (nuo *NodeUpdateOne) ClearIndexedAt() *NodeUpdateOne {
-	nuo.mutation.ClearIndexedAt()
-	return nuo
+func (_u *NodeUpdateOne) ClearIndexedAt() *NodeUpdateOne {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (nuo *NodeUpdateOne) SetName(s string) *NodeUpdateOne {
-	nuo.mutation.SetName(s)
-	return nuo
+func (_u *NodeUpdateOne) SetName(v string) *NodeUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableName(s *string) *NodeUpdateOne {
-	if s != nil {
-		nuo.SetName(*s)
+func (_u *NodeUpdateOne) SetNillableName(v *string) *NodeUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return nuo
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (nuo *NodeUpdateOne) SetSlug(s string) *NodeUpdateOne {
-	nuo.mutation.SetSlug(s)
-	return nuo
+func (_u *NodeUpdateOne) SetSlug(v string) *NodeUpdateOne {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableSlug(s *string) *NodeUpdateOne {
-	if s != nil {
-		nuo.SetSlug(*s)
+func (_u *NodeUpdateOne) SetNillableSlug(v *string) *NodeUpdateOne {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return nuo
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (nuo *NodeUpdateOne) SetDescription(s string) *NodeUpdateOne {
-	nuo.mutation.SetDescription(s)
-	return nuo
+func (_u *NodeUpdateOne) SetDescription(v string) *NodeUpdateOne {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableDescription(s *string) *NodeUpdateOne {
-	if s != nil {
-		nuo.SetDescription(*s)
+func (_u *NodeUpdateOne) SetNillableDescription(v *string) *NodeUpdateOne {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return nuo
+	return _u
 }
 
 // ClearDescription clears the value of the "description" field.
-func (nuo *NodeUpdateOne) ClearDescription() *NodeUpdateOne {
-	nuo.mutation.ClearDescription()
-	return nuo
+func (_u *NodeUpdateOne) ClearDescription() *NodeUpdateOne {
+	_u.mutation.ClearDescription()
+	return _u
 }
 
 // SetContent sets the "content" field.
-func (nuo *NodeUpdateOne) SetContent(s string) *NodeUpdateOne {
-	nuo.mutation.SetContent(s)
-	return nuo
+func (_u *NodeUpdateOne) SetContent(v string) *NodeUpdateOne {
+	_u.mutation.SetContent(v)
+	return _u
 }
 
 // SetNillableContent sets the "content" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableContent(s *string) *NodeUpdateOne {
-	if s != nil {
-		nuo.SetContent(*s)
+func (_u *NodeUpdateOne) SetNillableContent(v *string) *NodeUpdateOne {
+	if v != nil {
+		_u.SetContent(*v)
 	}
-	return nuo
+	return _u
 }
 
 // ClearContent clears the value of the "content" field.
-func (nuo *NodeUpdateOne) ClearContent() *NodeUpdateOne {
-	nuo.mutation.ClearContent()
-	return nuo
+func (_u *NodeUpdateOne) ClearContent() *NodeUpdateOne {
+	_u.mutation.ClearContent()
+	return _u
 }
 
 // SetParentNodeID sets the "parent_node_id" field.
-func (nuo *NodeUpdateOne) SetParentNodeID(x xid.ID) *NodeUpdateOne {
-	nuo.mutation.SetParentNodeID(x)
-	return nuo
+func (_u *NodeUpdateOne) SetParentNodeID(v xid.ID) *NodeUpdateOne {
+	_u.mutation.SetParentNodeID(v)
+	return _u
 }
 
 // SetNillableParentNodeID sets the "parent_node_id" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableParentNodeID(x *xid.ID) *NodeUpdateOne {
-	if x != nil {
-		nuo.SetParentNodeID(*x)
+func (_u *NodeUpdateOne) SetNillableParentNodeID(v *xid.ID) *NodeUpdateOne {
+	if v != nil {
+		_u.SetParentNodeID(*v)
 	}
-	return nuo
+	return _u
 }
 
 // ClearParentNodeID clears the value of the "parent_node_id" field.
-func (nuo *NodeUpdateOne) ClearParentNodeID() *NodeUpdateOne {
-	nuo.mutation.ClearParentNodeID()
-	return nuo
+func (_u *NodeUpdateOne) ClearParentNodeID() *NodeUpdateOne {
+	_u.mutation.ClearParentNodeID()
+	return _u
 }
 
 // SetHideChildTree sets the "hide_child_tree" field.
-func (nuo *NodeUpdateOne) SetHideChildTree(b bool) *NodeUpdateOne {
-	nuo.mutation.SetHideChildTree(b)
-	return nuo
+func (_u *NodeUpdateOne) SetHideChildTree(v bool) *NodeUpdateOne {
+	_u.mutation.SetHideChildTree(v)
+	return _u
 }
 
 // SetNillableHideChildTree sets the "hide_child_tree" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableHideChildTree(b *bool) *NodeUpdateOne {
-	if b != nil {
-		nuo.SetHideChildTree(*b)
+func (_u *NodeUpdateOne) SetNillableHideChildTree(v *bool) *NodeUpdateOne {
+	if v != nil {
+		_u.SetHideChildTree(*v)
 	}
-	return nuo
+	return _u
 }
 
 // SetAccountID sets the "account_id" field.
-func (nuo *NodeUpdateOne) SetAccountID(x xid.ID) *NodeUpdateOne {
-	nuo.mutation.SetAccountID(x)
-	return nuo
+func (_u *NodeUpdateOne) SetAccountID(v xid.ID) *NodeUpdateOne {
+	_u.mutation.SetAccountID(v)
+	return _u
 }
 
 // SetNillableAccountID sets the "account_id" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableAccountID(x *xid.ID) *NodeUpdateOne {
-	if x != nil {
-		nuo.SetAccountID(*x)
+func (_u *NodeUpdateOne) SetNillableAccountID(v *xid.ID) *NodeUpdateOne {
+	if v != nil {
+		_u.SetAccountID(*v)
 	}
-	return nuo
+	return _u
 }
 
 // SetPropertySchemaID sets the "property_schema_id" field.
-func (nuo *NodeUpdateOne) SetPropertySchemaID(x xid.ID) *NodeUpdateOne {
-	nuo.mutation.SetPropertySchemaID(x)
-	return nuo
+func (_u *NodeUpdateOne) SetPropertySchemaID(v xid.ID) *NodeUpdateOne {
+	_u.mutation.SetPropertySchemaID(v)
+	return _u
 }
 
 // SetNillablePropertySchemaID sets the "property_schema_id" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillablePropertySchemaID(x *xid.ID) *NodeUpdateOne {
-	if x != nil {
-		nuo.SetPropertySchemaID(*x)
+func (_u *NodeUpdateOne) SetNillablePropertySchemaID(v *xid.ID) *NodeUpdateOne {
+	if v != nil {
+		_u.SetPropertySchemaID(*v)
 	}
-	return nuo
+	return _u
 }
 
 // ClearPropertySchemaID clears the value of the "property_schema_id" field.
-func (nuo *NodeUpdateOne) ClearPropertySchemaID() *NodeUpdateOne {
-	nuo.mutation.ClearPropertySchemaID()
-	return nuo
+func (_u *NodeUpdateOne) ClearPropertySchemaID() *NodeUpdateOne {
+	_u.mutation.ClearPropertySchemaID()
+	return _u
 }
 
 // SetPrimaryAssetID sets the "primary_asset_id" field.
-func (nuo *NodeUpdateOne) SetPrimaryAssetID(x xid.ID) *NodeUpdateOne {
-	nuo.mutation.SetPrimaryAssetID(x)
-	return nuo
+func (_u *NodeUpdateOne) SetPrimaryAssetID(v xid.ID) *NodeUpdateOne {
+	_u.mutation.SetPrimaryAssetID(v)
+	return _u
 }
 
 // SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillablePrimaryAssetID(x *xid.ID) *NodeUpdateOne {
-	if x != nil {
-		nuo.SetPrimaryAssetID(*x)
+func (_u *NodeUpdateOne) SetNillablePrimaryAssetID(v *xid.ID) *NodeUpdateOne {
+	if v != nil {
+		_u.SetPrimaryAssetID(*v)
 	}
-	return nuo
+	return _u
 }
 
 // ClearPrimaryAssetID clears the value of the "primary_asset_id" field.
-func (nuo *NodeUpdateOne) ClearPrimaryAssetID() *NodeUpdateOne {
-	nuo.mutation.ClearPrimaryAssetID()
-	return nuo
+func (_u *NodeUpdateOne) ClearPrimaryAssetID() *NodeUpdateOne {
+	_u.mutation.ClearPrimaryAssetID()
+	return _u
 }
 
 // SetLinkID sets the "link_id" field.
-func (nuo *NodeUpdateOne) SetLinkID(x xid.ID) *NodeUpdateOne {
-	nuo.mutation.SetLinkID(x)
-	return nuo
+func (_u *NodeUpdateOne) SetLinkID(v xid.ID) *NodeUpdateOne {
+	_u.mutation.SetLinkID(v)
+	return _u
 }
 
 // SetNillableLinkID sets the "link_id" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableLinkID(x *xid.ID) *NodeUpdateOne {
-	if x != nil {
-		nuo.SetLinkID(*x)
+func (_u *NodeUpdateOne) SetNillableLinkID(v *xid.ID) *NodeUpdateOne {
+	if v != nil {
+		_u.SetLinkID(*v)
 	}
-	return nuo
+	return _u
 }
 
 // ClearLinkID clears the value of the "link_id" field.
-func (nuo *NodeUpdateOne) ClearLinkID() *NodeUpdateOne {
-	nuo.mutation.ClearLinkID()
-	return nuo
+func (_u *NodeUpdateOne) ClearLinkID() *NodeUpdateOne {
+	_u.mutation.ClearLinkID()
+	return _u
 }
 
 // SetVisibility sets the "visibility" field.
-func (nuo *NodeUpdateOne) SetVisibility(n node.Visibility) *NodeUpdateOne {
-	nuo.mutation.SetVisibility(n)
-	return nuo
+func (_u *NodeUpdateOne) SetVisibility(v node.Visibility) *NodeUpdateOne {
+	_u.mutation.SetVisibility(v)
+	return _u
 }
 
 // SetNillableVisibility sets the "visibility" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableVisibility(n *node.Visibility) *NodeUpdateOne {
-	if n != nil {
-		nuo.SetVisibility(*n)
+func (_u *NodeUpdateOne) SetNillableVisibility(v *node.Visibility) *NodeUpdateOne {
+	if v != nil {
+		_u.SetVisibility(*v)
 	}
-	return nuo
+	return _u
 }
 
 // SetSort sets the "sort" field.
-func (nuo *NodeUpdateOne) SetSort(l lexorank.Key) *NodeUpdateOne {
-	nuo.mutation.SetSort(l)
-	return nuo
+func (_u *NodeUpdateOne) SetSort(v lexorank.Key) *NodeUpdateOne {
+	_u.mutation.SetSort(v)
+	return _u
 }
 
 // SetNillableSort sets the "sort" field if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableSort(l *lexorank.Key) *NodeUpdateOne {
-	if l != nil {
-		nuo.SetSort(*l)
+func (_u *NodeUpdateOne) SetNillableSort(v *lexorank.Key) *NodeUpdateOne {
+	if v != nil {
+		_u.SetSort(*v)
 	}
-	return nuo
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (nuo *NodeUpdateOne) SetMetadata(m map[string]interface{}) *NodeUpdateOne {
-	nuo.mutation.SetMetadata(m)
-	return nuo
+func (_u *NodeUpdateOne) SetMetadata(v map[string]interface{}) *NodeUpdateOne {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (nuo *NodeUpdateOne) ClearMetadata() *NodeUpdateOne {
-	nuo.mutation.ClearMetadata()
-	return nuo
+func (_u *NodeUpdateOne) ClearMetadata() *NodeUpdateOne {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetOwnerID sets the "owner" edge to the Account entity by ID.
-func (nuo *NodeUpdateOne) SetOwnerID(id xid.ID) *NodeUpdateOne {
-	nuo.mutation.SetOwnerID(id)
-	return nuo
+func (_u *NodeUpdateOne) SetOwnerID(id xid.ID) *NodeUpdateOne {
+	_u.mutation.SetOwnerID(id)
+	return _u
 }
 
 // SetOwner sets the "owner" edge to the Account entity.
-func (nuo *NodeUpdateOne) SetOwner(a *Account) *NodeUpdateOne {
-	return nuo.SetOwnerID(a.ID)
+func (_u *NodeUpdateOne) SetOwner(v *Account) *NodeUpdateOne {
+	return _u.SetOwnerID(v.ID)
 }
 
 // SetParentID sets the "parent" edge to the Node entity by ID.
-func (nuo *NodeUpdateOne) SetParentID(id xid.ID) *NodeUpdateOne {
-	nuo.mutation.SetParentID(id)
-	return nuo
+func (_u *NodeUpdateOne) SetParentID(id xid.ID) *NodeUpdateOne {
+	_u.mutation.SetParentID(id)
+	return _u
 }
 
 // SetNillableParentID sets the "parent" edge to the Node entity by ID if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillableParentID(id *xid.ID) *NodeUpdateOne {
+func (_u *NodeUpdateOne) SetNillableParentID(id *xid.ID) *NodeUpdateOne {
 	if id != nil {
-		nuo = nuo.SetParentID(*id)
+		_u = _u.SetParentID(*id)
 	}
-	return nuo
+	return _u
 }
 
 // SetParent sets the "parent" edge to the Node entity.
-func (nuo *NodeUpdateOne) SetParent(n *Node) *NodeUpdateOne {
-	return nuo.SetParentID(n.ID)
+func (_u *NodeUpdateOne) SetParent(v *Node) *NodeUpdateOne {
+	return _u.SetParentID(v.ID)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (nuo *NodeUpdateOne) AddNodeIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.AddNodeIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) AddNodeIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.AddNodeIDs(ids...)
+	return _u
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (nuo *NodeUpdateOne) AddNodes(n ...*Node) *NodeUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *NodeUpdateOne) AddNodes(v ...*Node) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.AddNodeIDs(ids...)
+	return _u.AddNodeIDs(ids...)
 }
 
 // SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
-func (nuo *NodeUpdateOne) SetPrimaryImageID(id xid.ID) *NodeUpdateOne {
-	nuo.mutation.SetPrimaryImageID(id)
-	return nuo
+func (_u *NodeUpdateOne) SetPrimaryImageID(id xid.ID) *NodeUpdateOne {
+	_u.mutation.SetPrimaryImageID(id)
+	return _u
 }
 
 // SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
-func (nuo *NodeUpdateOne) SetNillablePrimaryImageID(id *xid.ID) *NodeUpdateOne {
+func (_u *NodeUpdateOne) SetNillablePrimaryImageID(id *xid.ID) *NodeUpdateOne {
 	if id != nil {
-		nuo = nuo.SetPrimaryImageID(*id)
+		_u = _u.SetPrimaryImageID(*id)
 	}
-	return nuo
+	return _u
 }
 
 // SetPrimaryImage sets the "primary_image" edge to the Asset entity.
-func (nuo *NodeUpdateOne) SetPrimaryImage(a *Asset) *NodeUpdateOne {
-	return nuo.SetPrimaryImageID(a.ID)
+func (_u *NodeUpdateOne) SetPrimaryImage(v *Asset) *NodeUpdateOne {
+	return _u.SetPrimaryImageID(v.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (nuo *NodeUpdateOne) AddAssetIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.AddAssetIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) AddAssetIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.AddAssetIDs(ids...)
+	return _u
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (nuo *NodeUpdateOne) AddAssets(a ...*Asset) *NodeUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *NodeUpdateOne) AddAssets(v ...*Asset) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.AddAssetIDs(ids...)
+	return _u.AddAssetIDs(ids...)
 }
 
 // AddTagIDs adds the "tags" edge to the Tag entity by IDs.
-func (nuo *NodeUpdateOne) AddTagIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.AddTagIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) AddTagIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.AddTagIDs(ids...)
+	return _u
 }
 
 // AddTags adds the "tags" edges to the Tag entity.
-func (nuo *NodeUpdateOne) AddTags(t ...*Tag) *NodeUpdateOne {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *NodeUpdateOne) AddTags(v ...*Tag) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.AddTagIDs(ids...)
+	return _u.AddTagIDs(ids...)
 }
 
 // AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
-func (nuo *NodeUpdateOne) AddPropertyIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.AddPropertyIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) AddPropertyIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.AddPropertyIDs(ids...)
+	return _u
 }
 
 // AddProperties adds the "properties" edges to the Property entity.
-func (nuo *NodeUpdateOne) AddProperties(p ...*Property) *NodeUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *NodeUpdateOne) AddProperties(v ...*Property) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.AddPropertyIDs(ids...)
+	return _u.AddPropertyIDs(ids...)
 }
 
 // SetPropertySchema sets the "property_schema" edge to the PropertySchema entity.
-func (nuo *NodeUpdateOne) SetPropertySchema(p *PropertySchema) *NodeUpdateOne {
-	return nuo.SetPropertySchemaID(p.ID)
+func (_u *NodeUpdateOne) SetPropertySchema(v *PropertySchema) *NodeUpdateOne {
+	return _u.SetPropertySchemaID(v.ID)
 }
 
 // SetLink sets the "link" edge to the Link entity.
-func (nuo *NodeUpdateOne) SetLink(l *Link) *NodeUpdateOne {
-	return nuo.SetLinkID(l.ID)
+func (_u *NodeUpdateOne) SetLink(v *Link) *NodeUpdateOne {
+	return _u.SetLinkID(v.ID)
 }
 
 // AddContentLinkIDs adds the "content_links" edge to the Link entity by IDs.
-func (nuo *NodeUpdateOne) AddContentLinkIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.AddContentLinkIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) AddContentLinkIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.AddContentLinkIDs(ids...)
+	return _u
 }
 
 // AddContentLinks adds the "content_links" edges to the Link entity.
-func (nuo *NodeUpdateOne) AddContentLinks(l ...*Link) *NodeUpdateOne {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *NodeUpdateOne) AddContentLinks(v ...*Link) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.AddContentLinkIDs(ids...)
+	return _u.AddContentLinkIDs(ids...)
 }
 
 // AddCollectionIDs adds the "collections" edge to the Collection entity by IDs.
-func (nuo *NodeUpdateOne) AddCollectionIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.AddCollectionIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) AddCollectionIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.AddCollectionIDs(ids...)
+	return _u
 }
 
 // AddCollections adds the "collections" edges to the Collection entity.
-func (nuo *NodeUpdateOne) AddCollections(c ...*Collection) *NodeUpdateOne {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *NodeUpdateOne) AddCollections(v ...*Collection) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.AddCollectionIDs(ids...)
+	return _u.AddCollectionIDs(ids...)
 }
 
 // Mutation returns the NodeMutation object of the builder.
-func (nuo *NodeUpdateOne) Mutation() *NodeMutation {
-	return nuo.mutation
+func (_u *NodeUpdateOne) Mutation() *NodeMutation {
+	return _u.mutation
 }
 
 // ClearOwner clears the "owner" edge to the Account entity.
-func (nuo *NodeUpdateOne) ClearOwner() *NodeUpdateOne {
-	nuo.mutation.ClearOwner()
-	return nuo
+func (_u *NodeUpdateOne) ClearOwner() *NodeUpdateOne {
+	_u.mutation.ClearOwner()
+	return _u
 }
 
 // ClearParent clears the "parent" edge to the Node entity.
-func (nuo *NodeUpdateOne) ClearParent() *NodeUpdateOne {
-	nuo.mutation.ClearParent()
-	return nuo
+func (_u *NodeUpdateOne) ClearParent() *NodeUpdateOne {
+	_u.mutation.ClearParent()
+	return _u
 }
 
 // ClearNodes clears all "nodes" edges to the Node entity.
-func (nuo *NodeUpdateOne) ClearNodes() *NodeUpdateOne {
-	nuo.mutation.ClearNodes()
-	return nuo
+func (_u *NodeUpdateOne) ClearNodes() *NodeUpdateOne {
+	_u.mutation.ClearNodes()
+	return _u
 }
 
 // RemoveNodeIDs removes the "nodes" edge to Node entities by IDs.
-func (nuo *NodeUpdateOne) RemoveNodeIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.RemoveNodeIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) RemoveNodeIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.RemoveNodeIDs(ids...)
+	return _u
 }
 
 // RemoveNodes removes "nodes" edges to Node entities.
-func (nuo *NodeUpdateOne) RemoveNodes(n ...*Node) *NodeUpdateOne {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_u *NodeUpdateOne) RemoveNodes(v ...*Node) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.RemoveNodeIDs(ids...)
+	return _u.RemoveNodeIDs(ids...)
 }
 
 // ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
-func (nuo *NodeUpdateOne) ClearPrimaryImage() *NodeUpdateOne {
-	nuo.mutation.ClearPrimaryImage()
-	return nuo
+func (_u *NodeUpdateOne) ClearPrimaryImage() *NodeUpdateOne {
+	_u.mutation.ClearPrimaryImage()
+	return _u
 }
 
 // ClearAssets clears all "assets" edges to the Asset entity.
-func (nuo *NodeUpdateOne) ClearAssets() *NodeUpdateOne {
-	nuo.mutation.ClearAssets()
-	return nuo
+func (_u *NodeUpdateOne) ClearAssets() *NodeUpdateOne {
+	_u.mutation.ClearAssets()
+	return _u
 }
 
 // RemoveAssetIDs removes the "assets" edge to Asset entities by IDs.
-func (nuo *NodeUpdateOne) RemoveAssetIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.RemoveAssetIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) RemoveAssetIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.RemoveAssetIDs(ids...)
+	return _u
 }
 
 // RemoveAssets removes "assets" edges to Asset entities.
-func (nuo *NodeUpdateOne) RemoveAssets(a ...*Asset) *NodeUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *NodeUpdateOne) RemoveAssets(v ...*Asset) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.RemoveAssetIDs(ids...)
+	return _u.RemoveAssetIDs(ids...)
 }
 
 // ClearTags clears all "tags" edges to the Tag entity.
-func (nuo *NodeUpdateOne) ClearTags() *NodeUpdateOne {
-	nuo.mutation.ClearTags()
-	return nuo
+func (_u *NodeUpdateOne) ClearTags() *NodeUpdateOne {
+	_u.mutation.ClearTags()
+	return _u
 }
 
 // RemoveTagIDs removes the "tags" edge to Tag entities by IDs.
-func (nuo *NodeUpdateOne) RemoveTagIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.RemoveTagIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) RemoveTagIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.RemoveTagIDs(ids...)
+	return _u
 }
 
 // RemoveTags removes "tags" edges to Tag entities.
-func (nuo *NodeUpdateOne) RemoveTags(t ...*Tag) *NodeUpdateOne {
-	ids := make([]xid.ID, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
+func (_u *NodeUpdateOne) RemoveTags(v ...*Tag) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.RemoveTagIDs(ids...)
+	return _u.RemoveTagIDs(ids...)
 }
 
 // ClearProperties clears all "properties" edges to the Property entity.
-func (nuo *NodeUpdateOne) ClearProperties() *NodeUpdateOne {
-	nuo.mutation.ClearProperties()
-	return nuo
+func (_u *NodeUpdateOne) ClearProperties() *NodeUpdateOne {
+	_u.mutation.ClearProperties()
+	return _u
 }
 
 // RemovePropertyIDs removes the "properties" edge to Property entities by IDs.
-func (nuo *NodeUpdateOne) RemovePropertyIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.RemovePropertyIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) RemovePropertyIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.RemovePropertyIDs(ids...)
+	return _u
 }
 
 // RemoveProperties removes "properties" edges to Property entities.
-func (nuo *NodeUpdateOne) RemoveProperties(p ...*Property) *NodeUpdateOne {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_u *NodeUpdateOne) RemoveProperties(v ...*Property) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.RemovePropertyIDs(ids...)
+	return _u.RemovePropertyIDs(ids...)
 }
 
 // ClearPropertySchema clears the "property_schema" edge to the PropertySchema entity.
-func (nuo *NodeUpdateOne) ClearPropertySchema() *NodeUpdateOne {
-	nuo.mutation.ClearPropertySchema()
-	return nuo
+func (_u *NodeUpdateOne) ClearPropertySchema() *NodeUpdateOne {
+	_u.mutation.ClearPropertySchema()
+	return _u
 }
 
 // ClearLink clears the "link" edge to the Link entity.
-func (nuo *NodeUpdateOne) ClearLink() *NodeUpdateOne {
-	nuo.mutation.ClearLink()
-	return nuo
+func (_u *NodeUpdateOne) ClearLink() *NodeUpdateOne {
+	_u.mutation.ClearLink()
+	return _u
 }
 
 // ClearContentLinks clears all "content_links" edges to the Link entity.
-func (nuo *NodeUpdateOne) ClearContentLinks() *NodeUpdateOne {
-	nuo.mutation.ClearContentLinks()
-	return nuo
+func (_u *NodeUpdateOne) ClearContentLinks() *NodeUpdateOne {
+	_u.mutation.ClearContentLinks()
+	return _u
 }
 
 // RemoveContentLinkIDs removes the "content_links" edge to Link entities by IDs.
-func (nuo *NodeUpdateOne) RemoveContentLinkIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.RemoveContentLinkIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) RemoveContentLinkIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.RemoveContentLinkIDs(ids...)
+	return _u
 }
 
 // RemoveContentLinks removes "content_links" edges to Link entities.
-func (nuo *NodeUpdateOne) RemoveContentLinks(l ...*Link) *NodeUpdateOne {
-	ids := make([]xid.ID, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
+func (_u *NodeUpdateOne) RemoveContentLinks(v ...*Link) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.RemoveContentLinkIDs(ids...)
+	return _u.RemoveContentLinkIDs(ids...)
 }
 
 // ClearCollections clears all "collections" edges to the Collection entity.
-func (nuo *NodeUpdateOne) ClearCollections() *NodeUpdateOne {
-	nuo.mutation.ClearCollections()
-	return nuo
+func (_u *NodeUpdateOne) ClearCollections() *NodeUpdateOne {
+	_u.mutation.ClearCollections()
+	return _u
 }
 
 // RemoveCollectionIDs removes the "collections" edge to Collection entities by IDs.
-func (nuo *NodeUpdateOne) RemoveCollectionIDs(ids ...xid.ID) *NodeUpdateOne {
-	nuo.mutation.RemoveCollectionIDs(ids...)
-	return nuo
+func (_u *NodeUpdateOne) RemoveCollectionIDs(ids ...xid.ID) *NodeUpdateOne {
+	_u.mutation.RemoveCollectionIDs(ids...)
+	return _u
 }
 
 // RemoveCollections removes "collections" edges to Collection entities.
-func (nuo *NodeUpdateOne) RemoveCollections(c ...*Collection) *NodeUpdateOne {
-	ids := make([]xid.ID, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+func (_u *NodeUpdateOne) RemoveCollections(v ...*Collection) *NodeUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return nuo.RemoveCollectionIDs(ids...)
+	return _u.RemoveCollectionIDs(ids...)
 }
 
 // Where appends a list predicates to the NodeUpdate builder.
-func (nuo *NodeUpdateOne) Where(ps ...predicate.Node) *NodeUpdateOne {
-	nuo.mutation.Where(ps...)
-	return nuo
+func (_u *NodeUpdateOne) Where(ps ...predicate.Node) *NodeUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (nuo *NodeUpdateOne) Select(field string, fields ...string) *NodeUpdateOne {
-	nuo.fields = append([]string{field}, fields...)
-	return nuo
+func (_u *NodeUpdateOne) Select(field string, fields ...string) *NodeUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Node entity.
-func (nuo *NodeUpdateOne) Save(ctx context.Context) (*Node, error) {
-	nuo.defaults()
-	return withHooks(ctx, nuo.sqlSave, nuo.mutation, nuo.hooks)
+func (_u *NodeUpdateOne) Save(ctx context.Context) (*Node, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (nuo *NodeUpdateOne) SaveX(ctx context.Context) *Node {
-	node, err := nuo.Save(ctx)
+func (_u *NodeUpdateOne) SaveX(ctx context.Context) *Node {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1775,56 +1775,56 @@ func (nuo *NodeUpdateOne) SaveX(ctx context.Context) *Node {
 }
 
 // Exec executes the query on the entity.
-func (nuo *NodeUpdateOne) Exec(ctx context.Context) error {
-	_, err := nuo.Save(ctx)
+func (_u *NodeUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (nuo *NodeUpdateOne) ExecX(ctx context.Context) {
-	if err := nuo.Exec(ctx); err != nil {
+func (_u *NodeUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (nuo *NodeUpdateOne) defaults() {
-	if _, ok := nuo.mutation.UpdatedAt(); !ok {
+func (_u *NodeUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := node.UpdateDefaultUpdatedAt()
-		nuo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (nuo *NodeUpdateOne) check() error {
-	if v, ok := nuo.mutation.Visibility(); ok {
+func (_u *NodeUpdateOne) check() error {
+	if v, ok := _u.mutation.Visibility(); ok {
 		if err := node.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Node.visibility": %w`, err)}
 		}
 	}
-	if nuo.mutation.OwnerCleared() && len(nuo.mutation.OwnerIDs()) > 0 {
+	if _u.mutation.OwnerCleared() && len(_u.mutation.OwnerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Node.owner"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (nuo *NodeUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NodeUpdateOne {
-	nuo.modifiers = append(nuo.modifiers, modifiers...)
-	return nuo
+func (_u *NodeUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *NodeUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) {
-	if err := nuo.check(); err != nil {
+func (_u *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(node.Table, node.Columns, sqlgraph.NewFieldSpec(node.FieldID, field.TypeString))
-	id, ok := nuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Node.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := nuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, node.FieldID)
 		for _, f := range fields {
@@ -1836,62 +1836,62 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 			}
 		}
 	}
-	if ps := nuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := nuo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(node.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := nuo.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(node.FieldDeletedAt, field.TypeTime, value)
 	}
-	if nuo.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(node.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := nuo.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(node.FieldIndexedAt, field.TypeTime, value)
 	}
-	if nuo.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(node.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := nuo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(node.FieldName, field.TypeString, value)
 	}
-	if value, ok := nuo.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(node.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := nuo.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(node.FieldDescription, field.TypeString, value)
 	}
-	if nuo.mutation.DescriptionCleared() {
+	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(node.FieldDescription, field.TypeString)
 	}
-	if value, ok := nuo.mutation.Content(); ok {
+	if value, ok := _u.mutation.Content(); ok {
 		_spec.SetField(node.FieldContent, field.TypeString, value)
 	}
-	if nuo.mutation.ContentCleared() {
+	if _u.mutation.ContentCleared() {
 		_spec.ClearField(node.FieldContent, field.TypeString)
 	}
-	if value, ok := nuo.mutation.HideChildTree(); ok {
+	if value, ok := _u.mutation.HideChildTree(); ok {
 		_spec.SetField(node.FieldHideChildTree, field.TypeBool, value)
 	}
-	if value, ok := nuo.mutation.Visibility(); ok {
+	if value, ok := _u.mutation.Visibility(); ok {
 		_spec.SetField(node.FieldVisibility, field.TypeEnum, value)
 	}
-	if value, ok := nuo.mutation.Sort(); ok {
+	if value, ok := _u.mutation.Sort(); ok {
 		_spec.SetField(node.FieldSort, field.TypeString, value)
 	}
-	if value, ok := nuo.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(node.FieldMetadata, field.TypeJSON, value)
 	}
-	if nuo.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(node.FieldMetadata, field.TypeJSON)
 	}
-	if nuo.mutation.OwnerCleared() {
+	if _u.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1904,7 +1904,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.OwnerIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.OwnerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1920,7 +1920,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.ParentCleared() {
+	if _u.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1933,7 +1933,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.ParentIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1949,7 +1949,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.NodesCleared() {
+	if _u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1962,7 +1962,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedNodesIDs(); len(nodes) > 0 && !nuo.mutation.NodesCleared() {
+	if nodes := _u.mutation.RemovedNodesIDs(); len(nodes) > 0 && !_u.mutation.NodesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1978,7 +1978,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1994,7 +1994,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.PrimaryImageCleared() {
+	if _u.mutation.PrimaryImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -2007,7 +2007,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PrimaryImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -2023,7 +2023,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.AssetsCleared() {
+	if _u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -2036,7 +2036,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !nuo.mutation.AssetsCleared() {
+	if nodes := _u.mutation.RemovedAssetsIDs(); len(nodes) > 0 && !_u.mutation.AssetsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -2052,7 +2052,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -2068,7 +2068,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.TagsCleared() {
+	if _u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2081,7 +2081,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedTagsIDs(); len(nodes) > 0 && !nuo.mutation.TagsCleared() {
+	if nodes := _u.mutation.RemovedTagsIDs(); len(nodes) > 0 && !_u.mutation.TagsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2097,7 +2097,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.TagsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.TagsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2113,7 +2113,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.PropertiesCleared() {
+	if _u.mutation.PropertiesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2126,7 +2126,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedPropertiesIDs(); len(nodes) > 0 && !nuo.mutation.PropertiesCleared() {
+	if nodes := _u.mutation.RemovedPropertiesIDs(); len(nodes) > 0 && !_u.mutation.PropertiesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2142,7 +2142,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.PropertiesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PropertiesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -2158,7 +2158,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.PropertySchemaCleared() {
+	if _u.mutation.PropertySchemaCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2171,7 +2171,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.PropertySchemaIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PropertySchemaIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2187,7 +2187,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.LinkCleared() {
+	if _u.mutation.LinkCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2200,7 +2200,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.LinkIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.LinkIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -2216,7 +2216,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.ContentLinksCleared() {
+	if _u.mutation.ContentLinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2229,7 +2229,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedContentLinksIDs(); len(nodes) > 0 && !nuo.mutation.ContentLinksCleared() {
+	if nodes := _u.mutation.RemovedContentLinksIDs(); len(nodes) > 0 && !_u.mutation.ContentLinksCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2245,7 +2245,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.ContentLinksIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ContentLinksIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2261,7 +2261,7 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if nuo.mutation.CollectionsCleared() {
+	if _u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2272,13 +2272,13 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(collection.FieldID, field.TypeString),
 			},
 		}
-		createE := &CollectionNodeCreate{config: nuo.config, mutation: newCollectionNodeMutation(nuo.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !nuo.mutation.CollectionsCleared() {
+	if nodes := _u.mutation.RemovedCollectionsIDs(); len(nodes) > 0 && !_u.mutation.CollectionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2292,13 +2292,13 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionNodeCreate{config: nuo.config, mutation: newCollectionNodeMutation(nuo.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := nuo.mutation.CollectionsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CollectionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
@@ -2312,17 +2312,17 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &CollectionNodeCreate{config: nuo.config, mutation: newCollectionNodeMutation(nuo.config, OpCreate)}
+		createE := &CollectionNodeCreate{config: _u.config, mutation: newCollectionNodeMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(nuo.modifiers...)
-	_node = &Node{config: nuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Node{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, nuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{node.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -2330,6 +2330,6 @@ func (nuo *NodeUpdateOne) sqlSave(ctx context.Context) (_node *Node, err error) 
 		}
 		return nil, err
 	}
-	nuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

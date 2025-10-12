@@ -27,123 +27,123 @@ type RoleCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (rc *RoleCreate) SetCreatedAt(t time.Time) *RoleCreate {
-	rc.mutation.SetCreatedAt(t)
-	return rc
+func (_c *RoleCreate) SetCreatedAt(v time.Time) *RoleCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (rc *RoleCreate) SetNillableCreatedAt(t *time.Time) *RoleCreate {
-	if t != nil {
-		rc.SetCreatedAt(*t)
+func (_c *RoleCreate) SetNillableCreatedAt(v *time.Time) *RoleCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return rc
+	return _c
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (rc *RoleCreate) SetUpdatedAt(t time.Time) *RoleCreate {
-	rc.mutation.SetUpdatedAt(t)
-	return rc
+func (_c *RoleCreate) SetUpdatedAt(v time.Time) *RoleCreate {
+	_c.mutation.SetUpdatedAt(v)
+	return _c
 }
 
 // SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (rc *RoleCreate) SetNillableUpdatedAt(t *time.Time) *RoleCreate {
-	if t != nil {
-		rc.SetUpdatedAt(*t)
+func (_c *RoleCreate) SetNillableUpdatedAt(v *time.Time) *RoleCreate {
+	if v != nil {
+		_c.SetUpdatedAt(*v)
 	}
-	return rc
+	return _c
 }
 
 // SetName sets the "name" field.
-func (rc *RoleCreate) SetName(s string) *RoleCreate {
-	rc.mutation.SetName(s)
-	return rc
+func (_c *RoleCreate) SetName(v string) *RoleCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // SetColour sets the "colour" field.
-func (rc *RoleCreate) SetColour(s string) *RoleCreate {
-	rc.mutation.SetColour(s)
-	return rc
+func (_c *RoleCreate) SetColour(v string) *RoleCreate {
+	_c.mutation.SetColour(v)
+	return _c
 }
 
 // SetNillableColour sets the "colour" field if the given value is not nil.
-func (rc *RoleCreate) SetNillableColour(s *string) *RoleCreate {
-	if s != nil {
-		rc.SetColour(*s)
+func (_c *RoleCreate) SetNillableColour(v *string) *RoleCreate {
+	if v != nil {
+		_c.SetColour(*v)
 	}
-	return rc
+	return _c
 }
 
 // SetPermissions sets the "permissions" field.
-func (rc *RoleCreate) SetPermissions(s []string) *RoleCreate {
-	rc.mutation.SetPermissions(s)
-	return rc
+func (_c *RoleCreate) SetPermissions(v []string) *RoleCreate {
+	_c.mutation.SetPermissions(v)
+	return _c
 }
 
 // SetSortKey sets the "sort_key" field.
-func (rc *RoleCreate) SetSortKey(f float64) *RoleCreate {
-	rc.mutation.SetSortKey(f)
-	return rc
+func (_c *RoleCreate) SetSortKey(v float64) *RoleCreate {
+	_c.mutation.SetSortKey(v)
+	return _c
 }
 
 // SetID sets the "id" field.
-func (rc *RoleCreate) SetID(x xid.ID) *RoleCreate {
-	rc.mutation.SetID(x)
-	return rc
+func (_c *RoleCreate) SetID(v xid.ID) *RoleCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (rc *RoleCreate) SetNillableID(x *xid.ID) *RoleCreate {
-	if x != nil {
-		rc.SetID(*x)
+func (_c *RoleCreate) SetNillableID(v *xid.ID) *RoleCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return rc
+	return _c
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
-func (rc *RoleCreate) AddAccountIDs(ids ...xid.ID) *RoleCreate {
-	rc.mutation.AddAccountIDs(ids...)
-	return rc
+func (_c *RoleCreate) AddAccountIDs(ids ...xid.ID) *RoleCreate {
+	_c.mutation.AddAccountIDs(ids...)
+	return _c
 }
 
 // AddAccounts adds the "accounts" edges to the Account entity.
-func (rc *RoleCreate) AddAccounts(a ...*Account) *RoleCreate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_c *RoleCreate) AddAccounts(v ...*Account) *RoleCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return rc.AddAccountIDs(ids...)
+	return _c.AddAccountIDs(ids...)
 }
 
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
-func (rc *RoleCreate) AddAccountRoleIDs(ids ...xid.ID) *RoleCreate {
-	rc.mutation.AddAccountRoleIDs(ids...)
-	return rc
+func (_c *RoleCreate) AddAccountRoleIDs(ids ...xid.ID) *RoleCreate {
+	_c.mutation.AddAccountRoleIDs(ids...)
+	return _c
 }
 
 // AddAccountRoles adds the "account_roles" edges to the AccountRoles entity.
-func (rc *RoleCreate) AddAccountRoles(a ...*AccountRoles) *RoleCreate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_c *RoleCreate) AddAccountRoles(v ...*AccountRoles) *RoleCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return rc.AddAccountRoleIDs(ids...)
+	return _c.AddAccountRoleIDs(ids...)
 }
 
 // Mutation returns the RoleMutation object of the builder.
-func (rc *RoleCreate) Mutation() *RoleMutation {
-	return rc.mutation
+func (_c *RoleCreate) Mutation() *RoleMutation {
+	return _c.mutation
 }
 
 // Save creates the Role in the database.
-func (rc *RoleCreate) Save(ctx context.Context) (*Role, error) {
-	rc.defaults()
-	return withHooks(ctx, rc.sqlSave, rc.mutation, rc.hooks)
+func (_c *RoleCreate) Save(ctx context.Context) (*Role, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (rc *RoleCreate) SaveX(ctx context.Context) *Role {
-	v, err := rc.Save(ctx)
+func (_c *RoleCreate) SaveX(ctx context.Context) *Role {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -151,59 +151,59 @@ func (rc *RoleCreate) SaveX(ctx context.Context) *Role {
 }
 
 // Exec executes the query.
-func (rc *RoleCreate) Exec(ctx context.Context) error {
-	_, err := rc.Save(ctx)
+func (_c *RoleCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (rc *RoleCreate) ExecX(ctx context.Context) {
-	if err := rc.Exec(ctx); err != nil {
+func (_c *RoleCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (rc *RoleCreate) defaults() {
-	if _, ok := rc.mutation.CreatedAt(); !ok {
+func (_c *RoleCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := role.DefaultCreatedAt()
-		rc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := rc.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		v := role.DefaultUpdatedAt()
-		rc.mutation.SetUpdatedAt(v)
+		_c.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := rc.mutation.Colour(); !ok {
+	if _, ok := _c.mutation.Colour(); !ok {
 		v := role.DefaultColour
-		rc.mutation.SetColour(v)
+		_c.mutation.SetColour(v)
 	}
-	if _, ok := rc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := role.DefaultID()
-		rc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (rc *RoleCreate) check() error {
-	if _, ok := rc.mutation.CreatedAt(); !ok {
+func (_c *RoleCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Role.created_at"`)}
 	}
-	if _, ok := rc.mutation.UpdatedAt(); !ok {
+	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Role.updated_at"`)}
 	}
-	if _, ok := rc.mutation.Name(); !ok {
+	if _, ok := _c.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Role.name"`)}
 	}
-	if _, ok := rc.mutation.Colour(); !ok {
+	if _, ok := _c.mutation.Colour(); !ok {
 		return &ValidationError{Name: "colour", err: errors.New(`ent: missing required field "Role.colour"`)}
 	}
-	if _, ok := rc.mutation.Permissions(); !ok {
+	if _, ok := _c.mutation.Permissions(); !ok {
 		return &ValidationError{Name: "permissions", err: errors.New(`ent: missing required field "Role.permissions"`)}
 	}
-	if _, ok := rc.mutation.SortKey(); !ok {
+	if _, ok := _c.mutation.SortKey(); !ok {
 		return &ValidationError{Name: "sort_key", err: errors.New(`ent: missing required field "Role.sort_key"`)}
 	}
-	if v, ok := rc.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := role.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Role.id": %w`, err)}
 		}
@@ -211,12 +211,12 @@ func (rc *RoleCreate) check() error {
 	return nil
 }
 
-func (rc *RoleCreate) sqlSave(ctx context.Context) (*Role, error) {
-	if err := rc.check(); err != nil {
+func (_c *RoleCreate) sqlSave(ctx context.Context) (*Role, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := rc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, rc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -229,46 +229,46 @@ func (rc *RoleCreate) sqlSave(ctx context.Context) (*Role, error) {
 			return nil, err
 		}
 	}
-	rc.mutation.id = &_node.ID
-	rc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
+func (_c *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Role{config: rc.config}
+		_node = &Role{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(role.Table, sqlgraph.NewFieldSpec(role.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = rc.conflict
-	if id, ok := rc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := rc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(role.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := rc.mutation.UpdatedAt(); ok {
+	if value, ok := _c.mutation.UpdatedAt(); ok {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := rc.mutation.Name(); ok {
+	if value, ok := _c.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := rc.mutation.Colour(); ok {
+	if value, ok := _c.mutation.Colour(); ok {
 		_spec.SetField(role.FieldColour, field.TypeString, value)
 		_node.Colour = value
 	}
-	if value, ok := rc.mutation.Permissions(); ok {
+	if value, ok := _c.mutation.Permissions(); ok {
 		_spec.SetField(role.FieldPermissions, field.TypeJSON, value)
 		_node.Permissions = value
 	}
-	if value, ok := rc.mutation.SortKey(); ok {
+	if value, ok := _c.mutation.SortKey(); ok {
 		_spec.SetField(role.FieldSortKey, field.TypeFloat64, value)
 		_node.SortKey = value
 	}
-	if nodes := rc.mutation.AccountsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AccountsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -282,7 +282,7 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &AccountRolesCreate{config: rc.config, mutation: newAccountRolesMutation(rc.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _c.config, mutation: newAccountRolesMutation(_c.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -291,7 +291,7 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := rc.mutation.AccountRolesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AccountRolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -326,10 +326,10 @@ func (rc *RoleCreate) createSpec() (*Role, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (rc *RoleCreate) OnConflict(opts ...sql.ConflictOption) *RoleUpsertOne {
-	rc.conflict = opts
+func (_c *RoleCreate) OnConflict(opts ...sql.ConflictOption) *RoleUpsertOne {
+	_c.conflict = opts
 	return &RoleUpsertOne{
-		create: rc,
+		create: _c,
 	}
 }
 
@@ -339,10 +339,10 @@ func (rc *RoleCreate) OnConflict(opts ...sql.ConflictOption) *RoleUpsertOne {
 //	client.Role.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (rc *RoleCreate) OnConflictColumns(columns ...string) *RoleUpsertOne {
-	rc.conflict = append(rc.conflict, sql.ConflictColumns(columns...))
+func (_c *RoleCreate) OnConflictColumns(columns ...string) *RoleUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &RoleUpsertOne{
-		create: rc,
+		create: _c,
 	}
 }
 
@@ -600,16 +600,16 @@ type RoleCreateBulk struct {
 }
 
 // Save creates the Role entities in the database.
-func (rcb *RoleCreateBulk) Save(ctx context.Context) ([]*Role, error) {
-	if rcb.err != nil {
-		return nil, rcb.err
+func (_c *RoleCreateBulk) Save(ctx context.Context) ([]*Role, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(rcb.builders))
-	nodes := make([]*Role, len(rcb.builders))
-	mutators := make([]Mutator, len(rcb.builders))
-	for i := range rcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Role, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := rcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*RoleMutation)
@@ -623,12 +623,12 @@ func (rcb *RoleCreateBulk) Save(ctx context.Context) ([]*Role, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, rcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = rcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, rcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -648,7 +648,7 @@ func (rcb *RoleCreateBulk) Save(ctx context.Context) ([]*Role, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, rcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -656,8 +656,8 @@ func (rcb *RoleCreateBulk) Save(ctx context.Context) ([]*Role, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (rcb *RoleCreateBulk) SaveX(ctx context.Context) []*Role {
-	v, err := rcb.Save(ctx)
+func (_c *RoleCreateBulk) SaveX(ctx context.Context) []*Role {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -665,14 +665,14 @@ func (rcb *RoleCreateBulk) SaveX(ctx context.Context) []*Role {
 }
 
 // Exec executes the query.
-func (rcb *RoleCreateBulk) Exec(ctx context.Context) error {
-	_, err := rcb.Save(ctx)
+func (_c *RoleCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (rcb *RoleCreateBulk) ExecX(ctx context.Context) {
-	if err := rcb.Exec(ctx); err != nil {
+func (_c *RoleCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -692,10 +692,10 @@ func (rcb *RoleCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (rcb *RoleCreateBulk) OnConflict(opts ...sql.ConflictOption) *RoleUpsertBulk {
-	rcb.conflict = opts
+func (_c *RoleCreateBulk) OnConflict(opts ...sql.ConflictOption) *RoleUpsertBulk {
+	_c.conflict = opts
 	return &RoleUpsertBulk{
-		create: rcb,
+		create: _c,
 	}
 }
 
@@ -705,10 +705,10 @@ func (rcb *RoleCreateBulk) OnConflict(opts ...sql.ConflictOption) *RoleUpsertBul
 //	client.Role.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (rcb *RoleCreateBulk) OnConflictColumns(columns ...string) *RoleUpsertBulk {
-	rcb.conflict = append(rcb.conflict, sql.ConflictColumns(columns...))
+func (_c *RoleCreateBulk) OnConflictColumns(columns ...string) *RoleUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &RoleUpsertBulk{
-		create: rcb,
+		create: _c,
 	}
 }
 

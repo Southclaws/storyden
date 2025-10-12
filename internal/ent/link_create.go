@@ -28,218 +28,218 @@ type LinkCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (lc *LinkCreate) SetCreatedAt(t time.Time) *LinkCreate {
-	lc.mutation.SetCreatedAt(t)
-	return lc
+func (_c *LinkCreate) SetCreatedAt(v time.Time) *LinkCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (lc *LinkCreate) SetNillableCreatedAt(t *time.Time) *LinkCreate {
-	if t != nil {
-		lc.SetCreatedAt(*t)
+func (_c *LinkCreate) SetNillableCreatedAt(v *time.Time) *LinkCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return lc
+	return _c
 }
 
 // SetURL sets the "url" field.
-func (lc *LinkCreate) SetURL(s string) *LinkCreate {
-	lc.mutation.SetURL(s)
-	return lc
+func (_c *LinkCreate) SetURL(v string) *LinkCreate {
+	_c.mutation.SetURL(v)
+	return _c
 }
 
 // SetSlug sets the "slug" field.
-func (lc *LinkCreate) SetSlug(s string) *LinkCreate {
-	lc.mutation.SetSlug(s)
-	return lc
+func (_c *LinkCreate) SetSlug(v string) *LinkCreate {
+	_c.mutation.SetSlug(v)
+	return _c
 }
 
 // SetDomain sets the "domain" field.
-func (lc *LinkCreate) SetDomain(s string) *LinkCreate {
-	lc.mutation.SetDomain(s)
-	return lc
+func (_c *LinkCreate) SetDomain(v string) *LinkCreate {
+	_c.mutation.SetDomain(v)
+	return _c
 }
 
 // SetTitle sets the "title" field.
-func (lc *LinkCreate) SetTitle(s string) *LinkCreate {
-	lc.mutation.SetTitle(s)
-	return lc
+func (_c *LinkCreate) SetTitle(v string) *LinkCreate {
+	_c.mutation.SetTitle(v)
+	return _c
 }
 
 // SetDescription sets the "description" field.
-func (lc *LinkCreate) SetDescription(s string) *LinkCreate {
-	lc.mutation.SetDescription(s)
-	return lc
+func (_c *LinkCreate) SetDescription(v string) *LinkCreate {
+	_c.mutation.SetDescription(v)
+	return _c
 }
 
 // SetPrimaryAssetID sets the "primary_asset_id" field.
-func (lc *LinkCreate) SetPrimaryAssetID(x xid.ID) *LinkCreate {
-	lc.mutation.SetPrimaryAssetID(x)
-	return lc
+func (_c *LinkCreate) SetPrimaryAssetID(v xid.ID) *LinkCreate {
+	_c.mutation.SetPrimaryAssetID(v)
+	return _c
 }
 
 // SetNillablePrimaryAssetID sets the "primary_asset_id" field if the given value is not nil.
-func (lc *LinkCreate) SetNillablePrimaryAssetID(x *xid.ID) *LinkCreate {
-	if x != nil {
-		lc.SetPrimaryAssetID(*x)
+func (_c *LinkCreate) SetNillablePrimaryAssetID(v *xid.ID) *LinkCreate {
+	if v != nil {
+		_c.SetPrimaryAssetID(*v)
 	}
-	return lc
+	return _c
 }
 
 // SetFaviconAssetID sets the "favicon_asset_id" field.
-func (lc *LinkCreate) SetFaviconAssetID(x xid.ID) *LinkCreate {
-	lc.mutation.SetFaviconAssetID(x)
-	return lc
+func (_c *LinkCreate) SetFaviconAssetID(v xid.ID) *LinkCreate {
+	_c.mutation.SetFaviconAssetID(v)
+	return _c
 }
 
 // SetNillableFaviconAssetID sets the "favicon_asset_id" field if the given value is not nil.
-func (lc *LinkCreate) SetNillableFaviconAssetID(x *xid.ID) *LinkCreate {
-	if x != nil {
-		lc.SetFaviconAssetID(*x)
+func (_c *LinkCreate) SetNillableFaviconAssetID(v *xid.ID) *LinkCreate {
+	if v != nil {
+		_c.SetFaviconAssetID(*v)
 	}
-	return lc
+	return _c
 }
 
 // SetID sets the "id" field.
-func (lc *LinkCreate) SetID(x xid.ID) *LinkCreate {
-	lc.mutation.SetID(x)
-	return lc
+func (_c *LinkCreate) SetID(v xid.ID) *LinkCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (lc *LinkCreate) SetNillableID(x *xid.ID) *LinkCreate {
-	if x != nil {
-		lc.SetID(*x)
+func (_c *LinkCreate) SetNillableID(v *xid.ID) *LinkCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return lc
+	return _c
 }
 
 // AddPostIDs adds the "posts" edge to the Post entity by IDs.
-func (lc *LinkCreate) AddPostIDs(ids ...xid.ID) *LinkCreate {
-	lc.mutation.AddPostIDs(ids...)
-	return lc
+func (_c *LinkCreate) AddPostIDs(ids ...xid.ID) *LinkCreate {
+	_c.mutation.AddPostIDs(ids...)
+	return _c
 }
 
 // AddPosts adds the "posts" edges to the Post entity.
-func (lc *LinkCreate) AddPosts(p ...*Post) *LinkCreate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_c *LinkCreate) AddPosts(v ...*Post) *LinkCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lc.AddPostIDs(ids...)
+	return _c.AddPostIDs(ids...)
 }
 
 // AddPostContentReferenceIDs adds the "post_content_references" edge to the Post entity by IDs.
-func (lc *LinkCreate) AddPostContentReferenceIDs(ids ...xid.ID) *LinkCreate {
-	lc.mutation.AddPostContentReferenceIDs(ids...)
-	return lc
+func (_c *LinkCreate) AddPostContentReferenceIDs(ids ...xid.ID) *LinkCreate {
+	_c.mutation.AddPostContentReferenceIDs(ids...)
+	return _c
 }
 
 // AddPostContentReferences adds the "post_content_references" edges to the Post entity.
-func (lc *LinkCreate) AddPostContentReferences(p ...*Post) *LinkCreate {
-	ids := make([]xid.ID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+func (_c *LinkCreate) AddPostContentReferences(v ...*Post) *LinkCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lc.AddPostContentReferenceIDs(ids...)
+	return _c.AddPostContentReferenceIDs(ids...)
 }
 
 // AddNodeIDs adds the "nodes" edge to the Node entity by IDs.
-func (lc *LinkCreate) AddNodeIDs(ids ...xid.ID) *LinkCreate {
-	lc.mutation.AddNodeIDs(ids...)
-	return lc
+func (_c *LinkCreate) AddNodeIDs(ids ...xid.ID) *LinkCreate {
+	_c.mutation.AddNodeIDs(ids...)
+	return _c
 }
 
 // AddNodes adds the "nodes" edges to the Node entity.
-func (lc *LinkCreate) AddNodes(n ...*Node) *LinkCreate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_c *LinkCreate) AddNodes(v ...*Node) *LinkCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lc.AddNodeIDs(ids...)
+	return _c.AddNodeIDs(ids...)
 }
 
 // AddNodeContentReferenceIDs adds the "node_content_references" edge to the Node entity by IDs.
-func (lc *LinkCreate) AddNodeContentReferenceIDs(ids ...xid.ID) *LinkCreate {
-	lc.mutation.AddNodeContentReferenceIDs(ids...)
-	return lc
+func (_c *LinkCreate) AddNodeContentReferenceIDs(ids ...xid.ID) *LinkCreate {
+	_c.mutation.AddNodeContentReferenceIDs(ids...)
+	return _c
 }
 
 // AddNodeContentReferences adds the "node_content_references" edges to the Node entity.
-func (lc *LinkCreate) AddNodeContentReferences(n ...*Node) *LinkCreate {
-	ids := make([]xid.ID, len(n))
-	for i := range n {
-		ids[i] = n[i].ID
+func (_c *LinkCreate) AddNodeContentReferences(v ...*Node) *LinkCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lc.AddNodeContentReferenceIDs(ids...)
+	return _c.AddNodeContentReferenceIDs(ids...)
 }
 
 // SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
-func (lc *LinkCreate) SetPrimaryImageID(id xid.ID) *LinkCreate {
-	lc.mutation.SetPrimaryImageID(id)
-	return lc
+func (_c *LinkCreate) SetPrimaryImageID(id xid.ID) *LinkCreate {
+	_c.mutation.SetPrimaryImageID(id)
+	return _c
 }
 
 // SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
-func (lc *LinkCreate) SetNillablePrimaryImageID(id *xid.ID) *LinkCreate {
+func (_c *LinkCreate) SetNillablePrimaryImageID(id *xid.ID) *LinkCreate {
 	if id != nil {
-		lc = lc.SetPrimaryImageID(*id)
+		_c = _c.SetPrimaryImageID(*id)
 	}
-	return lc
+	return _c
 }
 
 // SetPrimaryImage sets the "primary_image" edge to the Asset entity.
-func (lc *LinkCreate) SetPrimaryImage(a *Asset) *LinkCreate {
-	return lc.SetPrimaryImageID(a.ID)
+func (_c *LinkCreate) SetPrimaryImage(v *Asset) *LinkCreate {
+	return _c.SetPrimaryImageID(v.ID)
 }
 
 // SetFaviconImageID sets the "favicon_image" edge to the Asset entity by ID.
-func (lc *LinkCreate) SetFaviconImageID(id xid.ID) *LinkCreate {
-	lc.mutation.SetFaviconImageID(id)
-	return lc
+func (_c *LinkCreate) SetFaviconImageID(id xid.ID) *LinkCreate {
+	_c.mutation.SetFaviconImageID(id)
+	return _c
 }
 
 // SetNillableFaviconImageID sets the "favicon_image" edge to the Asset entity by ID if the given value is not nil.
-func (lc *LinkCreate) SetNillableFaviconImageID(id *xid.ID) *LinkCreate {
+func (_c *LinkCreate) SetNillableFaviconImageID(id *xid.ID) *LinkCreate {
 	if id != nil {
-		lc = lc.SetFaviconImageID(*id)
+		_c = _c.SetFaviconImageID(*id)
 	}
-	return lc
+	return _c
 }
 
 // SetFaviconImage sets the "favicon_image" edge to the Asset entity.
-func (lc *LinkCreate) SetFaviconImage(a *Asset) *LinkCreate {
-	return lc.SetFaviconImageID(a.ID)
+func (_c *LinkCreate) SetFaviconImage(v *Asset) *LinkCreate {
+	return _c.SetFaviconImageID(v.ID)
 }
 
 // AddAssetIDs adds the "assets" edge to the Asset entity by IDs.
-func (lc *LinkCreate) AddAssetIDs(ids ...xid.ID) *LinkCreate {
-	lc.mutation.AddAssetIDs(ids...)
-	return lc
+func (_c *LinkCreate) AddAssetIDs(ids ...xid.ID) *LinkCreate {
+	_c.mutation.AddAssetIDs(ids...)
+	return _c
 }
 
 // AddAssets adds the "assets" edges to the Asset entity.
-func (lc *LinkCreate) AddAssets(a ...*Asset) *LinkCreate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_c *LinkCreate) AddAssets(v ...*Asset) *LinkCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return lc.AddAssetIDs(ids...)
+	return _c.AddAssetIDs(ids...)
 }
 
 // Mutation returns the LinkMutation object of the builder.
-func (lc *LinkCreate) Mutation() *LinkMutation {
-	return lc.mutation
+func (_c *LinkCreate) Mutation() *LinkMutation {
+	return _c.mutation
 }
 
 // Save creates the Link in the database.
-func (lc *LinkCreate) Save(ctx context.Context) (*Link, error) {
-	lc.defaults()
-	return withHooks(ctx, lc.sqlSave, lc.mutation, lc.hooks)
+func (_c *LinkCreate) Save(ctx context.Context) (*Link, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (lc *LinkCreate) SaveX(ctx context.Context) *Link {
-	v, err := lc.Save(ctx)
+func (_c *LinkCreate) SaveX(ctx context.Context) *Link {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -247,51 +247,51 @@ func (lc *LinkCreate) SaveX(ctx context.Context) *Link {
 }
 
 // Exec executes the query.
-func (lc *LinkCreate) Exec(ctx context.Context) error {
-	_, err := lc.Save(ctx)
+func (_c *LinkCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (lc *LinkCreate) ExecX(ctx context.Context) {
-	if err := lc.Exec(ctx); err != nil {
+func (_c *LinkCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (lc *LinkCreate) defaults() {
-	if _, ok := lc.mutation.CreatedAt(); !ok {
+func (_c *LinkCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := link.DefaultCreatedAt()
-		lc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := lc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := link.DefaultID()
-		lc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (lc *LinkCreate) check() error {
-	if _, ok := lc.mutation.CreatedAt(); !ok {
+func (_c *LinkCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Link.created_at"`)}
 	}
-	if _, ok := lc.mutation.URL(); !ok {
+	if _, ok := _c.mutation.URL(); !ok {
 		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "Link.url"`)}
 	}
-	if _, ok := lc.mutation.Slug(); !ok {
+	if _, ok := _c.mutation.Slug(); !ok {
 		return &ValidationError{Name: "slug", err: errors.New(`ent: missing required field "Link.slug"`)}
 	}
-	if _, ok := lc.mutation.Domain(); !ok {
+	if _, ok := _c.mutation.Domain(); !ok {
 		return &ValidationError{Name: "domain", err: errors.New(`ent: missing required field "Link.domain"`)}
 	}
-	if _, ok := lc.mutation.Title(); !ok {
+	if _, ok := _c.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Link.title"`)}
 	}
-	if _, ok := lc.mutation.Description(); !ok {
+	if _, ok := _c.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Link.description"`)}
 	}
-	if v, ok := lc.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := link.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Link.id": %w`, err)}
 		}
@@ -299,12 +299,12 @@ func (lc *LinkCreate) check() error {
 	return nil
 }
 
-func (lc *LinkCreate) sqlSave(ctx context.Context) (*Link, error) {
-	if err := lc.check(); err != nil {
+func (_c *LinkCreate) sqlSave(ctx context.Context) (*Link, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := lc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, lc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -317,46 +317,46 @@ func (lc *LinkCreate) sqlSave(ctx context.Context) (*Link, error) {
 			return nil, err
 		}
 	}
-	lc.mutation.id = &_node.ID
-	lc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
+func (_c *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Link{config: lc.config}
+		_node = &Link{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(link.Table, sqlgraph.NewFieldSpec(link.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = lc.conflict
-	if id, ok := lc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := lc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(link.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := lc.mutation.URL(); ok {
+	if value, ok := _c.mutation.URL(); ok {
 		_spec.SetField(link.FieldURL, field.TypeString, value)
 		_node.URL = value
 	}
-	if value, ok := lc.mutation.Slug(); ok {
+	if value, ok := _c.mutation.Slug(); ok {
 		_spec.SetField(link.FieldSlug, field.TypeString, value)
 		_node.Slug = value
 	}
-	if value, ok := lc.mutation.Domain(); ok {
+	if value, ok := _c.mutation.Domain(); ok {
 		_spec.SetField(link.FieldDomain, field.TypeString, value)
 		_node.Domain = value
 	}
-	if value, ok := lc.mutation.Title(); ok {
+	if value, ok := _c.mutation.Title(); ok {
 		_spec.SetField(link.FieldTitle, field.TypeString, value)
 		_node.Title = value
 	}
-	if value, ok := lc.mutation.Description(); ok {
+	if value, ok := _c.mutation.Description(); ok {
 		_spec.SetField(link.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
-	if nodes := lc.mutation.PostsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -372,7 +372,7 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := lc.mutation.PostContentReferencesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PostContentReferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -388,7 +388,7 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := lc.mutation.NodesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.NodesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -404,7 +404,7 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := lc.mutation.NodeContentReferencesIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.NodeContentReferencesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -420,7 +420,7 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := lc.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.PrimaryImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -437,7 +437,7 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 		_node.PrimaryAssetID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := lc.mutation.FaviconImageIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.FaviconImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -454,7 +454,7 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 		_node.FaviconAssetID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := lc.mutation.AssetsIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AssetsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -489,10 +489,10 @@ func (lc *LinkCreate) createSpec() (*Link, *sqlgraph.CreateSpec) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (lc *LinkCreate) OnConflict(opts ...sql.ConflictOption) *LinkUpsertOne {
-	lc.conflict = opts
+func (_c *LinkCreate) OnConflict(opts ...sql.ConflictOption) *LinkUpsertOne {
+	_c.conflict = opts
 	return &LinkUpsertOne{
-		create: lc,
+		create: _c,
 	}
 }
 
@@ -502,10 +502,10 @@ func (lc *LinkCreate) OnConflict(opts ...sql.ConflictOption) *LinkUpsertOne {
 //	client.Link.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (lc *LinkCreate) OnConflictColumns(columns ...string) *LinkUpsertOne {
-	lc.conflict = append(lc.conflict, sql.ConflictColumns(columns...))
+func (_c *LinkCreate) OnConflictColumns(columns ...string) *LinkUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &LinkUpsertOne{
-		create: lc,
+		create: _c,
 	}
 }
 
@@ -782,16 +782,16 @@ type LinkCreateBulk struct {
 }
 
 // Save creates the Link entities in the database.
-func (lcb *LinkCreateBulk) Save(ctx context.Context) ([]*Link, error) {
-	if lcb.err != nil {
-		return nil, lcb.err
+func (_c *LinkCreateBulk) Save(ctx context.Context) ([]*Link, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(lcb.builders))
-	nodes := make([]*Link, len(lcb.builders))
-	mutators := make([]Mutator, len(lcb.builders))
-	for i := range lcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*Link, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := lcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*LinkMutation)
@@ -805,12 +805,12 @@ func (lcb *LinkCreateBulk) Save(ctx context.Context) ([]*Link, error) {
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, lcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = lcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, lcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -830,7 +830,7 @@ func (lcb *LinkCreateBulk) Save(ctx context.Context) ([]*Link, error) {
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, lcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -838,8 +838,8 @@ func (lcb *LinkCreateBulk) Save(ctx context.Context) ([]*Link, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (lcb *LinkCreateBulk) SaveX(ctx context.Context) []*Link {
-	v, err := lcb.Save(ctx)
+func (_c *LinkCreateBulk) SaveX(ctx context.Context) []*Link {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -847,14 +847,14 @@ func (lcb *LinkCreateBulk) SaveX(ctx context.Context) []*Link {
 }
 
 // Exec executes the query.
-func (lcb *LinkCreateBulk) Exec(ctx context.Context) error {
-	_, err := lcb.Save(ctx)
+func (_c *LinkCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (lcb *LinkCreateBulk) ExecX(ctx context.Context) {
-	if err := lcb.Exec(ctx); err != nil {
+func (_c *LinkCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -874,10 +874,10 @@ func (lcb *LinkCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (lcb *LinkCreateBulk) OnConflict(opts ...sql.ConflictOption) *LinkUpsertBulk {
-	lcb.conflict = opts
+func (_c *LinkCreateBulk) OnConflict(opts ...sql.ConflictOption) *LinkUpsertBulk {
+	_c.conflict = opts
 	return &LinkUpsertBulk{
-		create: lcb,
+		create: _c,
 	}
 }
 
@@ -887,10 +887,10 @@ func (lcb *LinkCreateBulk) OnConflict(opts ...sql.ConflictOption) *LinkUpsertBul
 //	client.Link.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (lcb *LinkCreateBulk) OnConflictColumns(columns ...string) *LinkUpsertBulk {
-	lcb.conflict = append(lcb.conflict, sql.ConflictColumns(columns...))
+func (_c *LinkCreateBulk) OnConflictColumns(columns ...string) *LinkUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &LinkUpsertBulk{
-		create: lcb,
+		create: _c,
 	}
 }
 

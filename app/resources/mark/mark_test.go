@@ -60,6 +60,10 @@ func TestMark(t *testing.T) {
 		check(args{in: "thisisareallylongstringwithoutahyphen", slug: "thisisareallylongstringwithoutahyphen"})
 	})
 
+	t.Run("cyrillic slug with 20 bytes but 10 runes", func(t *testing.T) {
+		check(args{in: "единорогов", slug: "единорогов"})
+	})
+
 	t.Run("fuzz plain xid", func(t *testing.T) {
 		for range 10000 {
 			id := xid.New().String()

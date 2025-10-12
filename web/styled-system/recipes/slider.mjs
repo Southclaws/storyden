@@ -42,6 +42,10 @@ const sliderSlotNames = [
   [
     "marker",
     "slider__marker"
+  ],
+  [
+    "draggingIndicator",
+    "slider__draggingIndicator"
   ]
 ]
 const sliderSlotFns = /* @__PURE__ */ sliderSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, sliderDefaultVariants, getSlotCompoundVariant(sliderCompoundVariants, slotName))])

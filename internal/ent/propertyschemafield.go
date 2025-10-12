@@ -81,7 +81,7 @@ func (*PropertySchemaField) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the PropertySchemaField fields.
-func (psf *PropertySchemaField) assignValues(columns []string, values []any) error {
+func (_m *PropertySchemaField) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -91,34 +91,34 @@ func (psf *PropertySchemaField) assignValues(columns []string, values []any) err
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				psf.ID = *value
+				_m.ID = *value
 			}
 		case propertyschemafield.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				psf.Name = value.String
+				_m.Name = value.String
 			}
 		case propertyschemafield.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
-				psf.Type = value.String
+				_m.Type = value.String
 			}
 		case propertyschemafield.FieldSort:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field sort", values[i])
 			} else if value.Valid {
-				psf.Sort = value.String
+				_m.Sort = value.String
 			}
 		case propertyschemafield.FieldSchemaID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field schema_id", values[i])
 			} else if value != nil {
-				psf.SchemaID = *value
+				_m.SchemaID = *value
 			}
 		default:
-			psf.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -126,54 +126,54 @@ func (psf *PropertySchemaField) assignValues(columns []string, values []any) err
 
 // Value returns the ent.Value that was dynamically selected and assigned to the PropertySchemaField.
 // This includes values selected through modifiers, order, etc.
-func (psf *PropertySchemaField) Value(name string) (ent.Value, error) {
-	return psf.selectValues.Get(name)
+func (_m *PropertySchemaField) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QuerySchema queries the "schema" edge of the PropertySchemaField entity.
-func (psf *PropertySchemaField) QuerySchema() *PropertySchemaQuery {
-	return NewPropertySchemaFieldClient(psf.config).QuerySchema(psf)
+func (_m *PropertySchemaField) QuerySchema() *PropertySchemaQuery {
+	return NewPropertySchemaFieldClient(_m.config).QuerySchema(_m)
 }
 
 // QueryProperties queries the "properties" edge of the PropertySchemaField entity.
-func (psf *PropertySchemaField) QueryProperties() *PropertyQuery {
-	return NewPropertySchemaFieldClient(psf.config).QueryProperties(psf)
+func (_m *PropertySchemaField) QueryProperties() *PropertyQuery {
+	return NewPropertySchemaFieldClient(_m.config).QueryProperties(_m)
 }
 
 // Update returns a builder for updating this PropertySchemaField.
 // Note that you need to call PropertySchemaField.Unwrap() before calling this method if this PropertySchemaField
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (psf *PropertySchemaField) Update() *PropertySchemaFieldUpdateOne {
-	return NewPropertySchemaFieldClient(psf.config).UpdateOne(psf)
+func (_m *PropertySchemaField) Update() *PropertySchemaFieldUpdateOne {
+	return NewPropertySchemaFieldClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the PropertySchemaField entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (psf *PropertySchemaField) Unwrap() *PropertySchemaField {
-	_tx, ok := psf.config.driver.(*txDriver)
+func (_m *PropertySchemaField) Unwrap() *PropertySchemaField {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: PropertySchemaField is not a transactional entity")
 	}
-	psf.config.driver = _tx.drv
-	return psf
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (psf *PropertySchemaField) String() string {
+func (_m *PropertySchemaField) String() string {
 	var builder strings.Builder
 	builder.WriteString("PropertySchemaField(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", psf.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("name=")
-	builder.WriteString(psf.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteString(", ")
 	builder.WriteString("type=")
-	builder.WriteString(psf.Type)
+	builder.WriteString(_m.Type)
 	builder.WriteString(", ")
 	builder.WriteString("sort=")
-	builder.WriteString(psf.Sort)
+	builder.WriteString(_m.Sort)
 	builder.WriteString(", ")
 	builder.WriteString("schema_id=")
-	builder.WriteString(fmt.Sprintf("%v", psf.SchemaID))
+	builder.WriteString(fmt.Sprintf("%v", _m.SchemaID))
 	builder.WriteByte(')')
 	return builder.String()
 }

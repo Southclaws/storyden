@@ -28,426 +28,426 @@ type EventUpdate struct {
 }
 
 // Where appends a list predicates to the EventUpdate builder.
-func (eu *EventUpdate) Where(ps ...predicate.Event) *EventUpdate {
-	eu.mutation.Where(ps...)
-	return eu
+func (_u *EventUpdate) Where(ps ...predicate.Event) *EventUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (eu *EventUpdate) SetUpdatedAt(t time.Time) *EventUpdate {
-	eu.mutation.SetUpdatedAt(t)
-	return eu
+func (_u *EventUpdate) SetUpdatedAt(v time.Time) *EventUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (eu *EventUpdate) SetDeletedAt(t time.Time) *EventUpdate {
-	eu.mutation.SetDeletedAt(t)
-	return eu
+func (_u *EventUpdate) SetDeletedAt(v time.Time) *EventUpdate {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableDeletedAt(t *time.Time) *EventUpdate {
-	if t != nil {
-		eu.SetDeletedAt(*t)
+func (_u *EventUpdate) SetNillableDeletedAt(v *time.Time) *EventUpdate {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return eu
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (eu *EventUpdate) ClearDeletedAt() *EventUpdate {
-	eu.mutation.ClearDeletedAt()
-	return eu
+func (_u *EventUpdate) ClearDeletedAt() *EventUpdate {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (eu *EventUpdate) SetIndexedAt(t time.Time) *EventUpdate {
-	eu.mutation.SetIndexedAt(t)
-	return eu
+func (_u *EventUpdate) SetIndexedAt(v time.Time) *EventUpdate {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableIndexedAt(t *time.Time) *EventUpdate {
-	if t != nil {
-		eu.SetIndexedAt(*t)
+func (_u *EventUpdate) SetNillableIndexedAt(v *time.Time) *EventUpdate {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return eu
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (eu *EventUpdate) ClearIndexedAt() *EventUpdate {
-	eu.mutation.ClearIndexedAt()
-	return eu
+func (_u *EventUpdate) ClearIndexedAt() *EventUpdate {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (eu *EventUpdate) SetName(s string) *EventUpdate {
-	eu.mutation.SetName(s)
-	return eu
+func (_u *EventUpdate) SetName(v string) *EventUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableName(s *string) *EventUpdate {
-	if s != nil {
-		eu.SetName(*s)
+func (_u *EventUpdate) SetNillableName(v *string) *EventUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return eu
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (eu *EventUpdate) SetSlug(s string) *EventUpdate {
-	eu.mutation.SetSlug(s)
-	return eu
+func (_u *EventUpdate) SetSlug(v string) *EventUpdate {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableSlug(s *string) *EventUpdate {
-	if s != nil {
-		eu.SetSlug(*s)
+func (_u *EventUpdate) SetNillableSlug(v *string) *EventUpdate {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return eu
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (eu *EventUpdate) SetDescription(s string) *EventUpdate {
-	eu.mutation.SetDescription(s)
-	return eu
+func (_u *EventUpdate) SetDescription(v string) *EventUpdate {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableDescription(s *string) *EventUpdate {
-	if s != nil {
-		eu.SetDescription(*s)
+func (_u *EventUpdate) SetNillableDescription(v *string) *EventUpdate {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return eu
+	return _u
 }
 
 // ClearDescription clears the value of the "description" field.
-func (eu *EventUpdate) ClearDescription() *EventUpdate {
-	eu.mutation.ClearDescription()
-	return eu
+func (_u *EventUpdate) ClearDescription() *EventUpdate {
+	_u.mutation.ClearDescription()
+	return _u
 }
 
 // SetStartTime sets the "start_time" field.
-func (eu *EventUpdate) SetStartTime(t time.Time) *EventUpdate {
-	eu.mutation.SetStartTime(t)
-	return eu
+func (_u *EventUpdate) SetStartTime(v time.Time) *EventUpdate {
+	_u.mutation.SetStartTime(v)
+	return _u
 }
 
 // SetNillableStartTime sets the "start_time" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableStartTime(t *time.Time) *EventUpdate {
-	if t != nil {
-		eu.SetStartTime(*t)
+func (_u *EventUpdate) SetNillableStartTime(v *time.Time) *EventUpdate {
+	if v != nil {
+		_u.SetStartTime(*v)
 	}
-	return eu
+	return _u
 }
 
 // SetEndTime sets the "end_time" field.
-func (eu *EventUpdate) SetEndTime(t time.Time) *EventUpdate {
-	eu.mutation.SetEndTime(t)
-	return eu
+func (_u *EventUpdate) SetEndTime(v time.Time) *EventUpdate {
+	_u.mutation.SetEndTime(v)
+	return _u
 }
 
 // SetNillableEndTime sets the "end_time" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableEndTime(t *time.Time) *EventUpdate {
-	if t != nil {
-		eu.SetEndTime(*t)
+func (_u *EventUpdate) SetNillableEndTime(v *time.Time) *EventUpdate {
+	if v != nil {
+		_u.SetEndTime(*v)
 	}
-	return eu
+	return _u
 }
 
 // SetParticipationPolicy sets the "participation_policy" field.
-func (eu *EventUpdate) SetParticipationPolicy(s string) *EventUpdate {
-	eu.mutation.SetParticipationPolicy(s)
-	return eu
+func (_u *EventUpdate) SetParticipationPolicy(v string) *EventUpdate {
+	_u.mutation.SetParticipationPolicy(v)
+	return _u
 }
 
 // SetNillableParticipationPolicy sets the "participation_policy" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableParticipationPolicy(s *string) *EventUpdate {
-	if s != nil {
-		eu.SetParticipationPolicy(*s)
+func (_u *EventUpdate) SetNillableParticipationPolicy(v *string) *EventUpdate {
+	if v != nil {
+		_u.SetParticipationPolicy(*v)
 	}
-	return eu
+	return _u
 }
 
 // SetVisibility sets the "visibility" field.
-func (eu *EventUpdate) SetVisibility(e event.Visibility) *EventUpdate {
-	eu.mutation.SetVisibility(e)
-	return eu
+func (_u *EventUpdate) SetVisibility(v event.Visibility) *EventUpdate {
+	_u.mutation.SetVisibility(v)
+	return _u
 }
 
 // SetNillableVisibility sets the "visibility" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableVisibility(e *event.Visibility) *EventUpdate {
-	if e != nil {
-		eu.SetVisibility(*e)
+func (_u *EventUpdate) SetNillableVisibility(v *event.Visibility) *EventUpdate {
+	if v != nil {
+		_u.SetVisibility(*v)
 	}
-	return eu
+	return _u
 }
 
 // SetLocationType sets the "location_type" field.
-func (eu *EventUpdate) SetLocationType(s string) *EventUpdate {
-	eu.mutation.SetLocationType(s)
-	return eu
+func (_u *EventUpdate) SetLocationType(v string) *EventUpdate {
+	_u.mutation.SetLocationType(v)
+	return _u
 }
 
 // SetNillableLocationType sets the "location_type" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableLocationType(s *string) *EventUpdate {
-	if s != nil {
-		eu.SetLocationType(*s)
+func (_u *EventUpdate) SetNillableLocationType(v *string) *EventUpdate {
+	if v != nil {
+		_u.SetLocationType(*v)
 	}
-	return eu
+	return _u
 }
 
 // ClearLocationType clears the value of the "location_type" field.
-func (eu *EventUpdate) ClearLocationType() *EventUpdate {
-	eu.mutation.ClearLocationType()
-	return eu
+func (_u *EventUpdate) ClearLocationType() *EventUpdate {
+	_u.mutation.ClearLocationType()
+	return _u
 }
 
 // SetLocationName sets the "location_name" field.
-func (eu *EventUpdate) SetLocationName(s string) *EventUpdate {
-	eu.mutation.SetLocationName(s)
-	return eu
+func (_u *EventUpdate) SetLocationName(v string) *EventUpdate {
+	_u.mutation.SetLocationName(v)
+	return _u
 }
 
 // SetNillableLocationName sets the "location_name" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableLocationName(s *string) *EventUpdate {
-	if s != nil {
-		eu.SetLocationName(*s)
+func (_u *EventUpdate) SetNillableLocationName(v *string) *EventUpdate {
+	if v != nil {
+		_u.SetLocationName(*v)
 	}
-	return eu
+	return _u
 }
 
 // ClearLocationName clears the value of the "location_name" field.
-func (eu *EventUpdate) ClearLocationName() *EventUpdate {
-	eu.mutation.ClearLocationName()
-	return eu
+func (_u *EventUpdate) ClearLocationName() *EventUpdate {
+	_u.mutation.ClearLocationName()
+	return _u
 }
 
 // SetLocationAddress sets the "location_address" field.
-func (eu *EventUpdate) SetLocationAddress(s string) *EventUpdate {
-	eu.mutation.SetLocationAddress(s)
-	return eu
+func (_u *EventUpdate) SetLocationAddress(v string) *EventUpdate {
+	_u.mutation.SetLocationAddress(v)
+	return _u
 }
 
 // SetNillableLocationAddress sets the "location_address" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableLocationAddress(s *string) *EventUpdate {
-	if s != nil {
-		eu.SetLocationAddress(*s)
+func (_u *EventUpdate) SetNillableLocationAddress(v *string) *EventUpdate {
+	if v != nil {
+		_u.SetLocationAddress(*v)
 	}
-	return eu
+	return _u
 }
 
 // ClearLocationAddress clears the value of the "location_address" field.
-func (eu *EventUpdate) ClearLocationAddress() *EventUpdate {
-	eu.mutation.ClearLocationAddress()
-	return eu
+func (_u *EventUpdate) ClearLocationAddress() *EventUpdate {
+	_u.mutation.ClearLocationAddress()
+	return _u
 }
 
 // SetLocationLatitude sets the "location_latitude" field.
-func (eu *EventUpdate) SetLocationLatitude(f float64) *EventUpdate {
-	eu.mutation.ResetLocationLatitude()
-	eu.mutation.SetLocationLatitude(f)
-	return eu
+func (_u *EventUpdate) SetLocationLatitude(v float64) *EventUpdate {
+	_u.mutation.ResetLocationLatitude()
+	_u.mutation.SetLocationLatitude(v)
+	return _u
 }
 
 // SetNillableLocationLatitude sets the "location_latitude" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableLocationLatitude(f *float64) *EventUpdate {
-	if f != nil {
-		eu.SetLocationLatitude(*f)
+func (_u *EventUpdate) SetNillableLocationLatitude(v *float64) *EventUpdate {
+	if v != nil {
+		_u.SetLocationLatitude(*v)
 	}
-	return eu
+	return _u
 }
 
-// AddLocationLatitude adds f to the "location_latitude" field.
-func (eu *EventUpdate) AddLocationLatitude(f float64) *EventUpdate {
-	eu.mutation.AddLocationLatitude(f)
-	return eu
+// AddLocationLatitude adds value to the "location_latitude" field.
+func (_u *EventUpdate) AddLocationLatitude(v float64) *EventUpdate {
+	_u.mutation.AddLocationLatitude(v)
+	return _u
 }
 
 // ClearLocationLatitude clears the value of the "location_latitude" field.
-func (eu *EventUpdate) ClearLocationLatitude() *EventUpdate {
-	eu.mutation.ClearLocationLatitude()
-	return eu
+func (_u *EventUpdate) ClearLocationLatitude() *EventUpdate {
+	_u.mutation.ClearLocationLatitude()
+	return _u
 }
 
 // SetLocationLongitude sets the "location_longitude" field.
-func (eu *EventUpdate) SetLocationLongitude(f float64) *EventUpdate {
-	eu.mutation.ResetLocationLongitude()
-	eu.mutation.SetLocationLongitude(f)
-	return eu
+func (_u *EventUpdate) SetLocationLongitude(v float64) *EventUpdate {
+	_u.mutation.ResetLocationLongitude()
+	_u.mutation.SetLocationLongitude(v)
+	return _u
 }
 
 // SetNillableLocationLongitude sets the "location_longitude" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableLocationLongitude(f *float64) *EventUpdate {
-	if f != nil {
-		eu.SetLocationLongitude(*f)
+func (_u *EventUpdate) SetNillableLocationLongitude(v *float64) *EventUpdate {
+	if v != nil {
+		_u.SetLocationLongitude(*v)
 	}
-	return eu
+	return _u
 }
 
-// AddLocationLongitude adds f to the "location_longitude" field.
-func (eu *EventUpdate) AddLocationLongitude(f float64) *EventUpdate {
-	eu.mutation.AddLocationLongitude(f)
-	return eu
+// AddLocationLongitude adds value to the "location_longitude" field.
+func (_u *EventUpdate) AddLocationLongitude(v float64) *EventUpdate {
+	_u.mutation.AddLocationLongitude(v)
+	return _u
 }
 
 // ClearLocationLongitude clears the value of the "location_longitude" field.
-func (eu *EventUpdate) ClearLocationLongitude() *EventUpdate {
-	eu.mutation.ClearLocationLongitude()
-	return eu
+func (_u *EventUpdate) ClearLocationLongitude() *EventUpdate {
+	_u.mutation.ClearLocationLongitude()
+	return _u
 }
 
 // SetLocationURL sets the "location_url" field.
-func (eu *EventUpdate) SetLocationURL(s string) *EventUpdate {
-	eu.mutation.SetLocationURL(s)
-	return eu
+func (_u *EventUpdate) SetLocationURL(v string) *EventUpdate {
+	_u.mutation.SetLocationURL(v)
+	return _u
 }
 
 // SetNillableLocationURL sets the "location_url" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableLocationURL(s *string) *EventUpdate {
-	if s != nil {
-		eu.SetLocationURL(*s)
+func (_u *EventUpdate) SetNillableLocationURL(v *string) *EventUpdate {
+	if v != nil {
+		_u.SetLocationURL(*v)
 	}
-	return eu
+	return _u
 }
 
 // ClearLocationURL clears the value of the "location_url" field.
-func (eu *EventUpdate) ClearLocationURL() *EventUpdate {
-	eu.mutation.ClearLocationURL()
-	return eu
+func (_u *EventUpdate) ClearLocationURL() *EventUpdate {
+	_u.mutation.ClearLocationURL()
+	return _u
 }
 
 // SetCapacity sets the "capacity" field.
-func (eu *EventUpdate) SetCapacity(i int) *EventUpdate {
-	eu.mutation.ResetCapacity()
-	eu.mutation.SetCapacity(i)
-	return eu
+func (_u *EventUpdate) SetCapacity(v int) *EventUpdate {
+	_u.mutation.ResetCapacity()
+	_u.mutation.SetCapacity(v)
+	return _u
 }
 
 // SetNillableCapacity sets the "capacity" field if the given value is not nil.
-func (eu *EventUpdate) SetNillableCapacity(i *int) *EventUpdate {
-	if i != nil {
-		eu.SetCapacity(*i)
+func (_u *EventUpdate) SetNillableCapacity(v *int) *EventUpdate {
+	if v != nil {
+		_u.SetCapacity(*v)
 	}
-	return eu
+	return _u
 }
 
-// AddCapacity adds i to the "capacity" field.
-func (eu *EventUpdate) AddCapacity(i int) *EventUpdate {
-	eu.mutation.AddCapacity(i)
-	return eu
+// AddCapacity adds value to the "capacity" field.
+func (_u *EventUpdate) AddCapacity(v int) *EventUpdate {
+	_u.mutation.AddCapacity(v)
+	return _u
 }
 
 // ClearCapacity clears the value of the "capacity" field.
-func (eu *EventUpdate) ClearCapacity() *EventUpdate {
-	eu.mutation.ClearCapacity()
-	return eu
+func (_u *EventUpdate) ClearCapacity() *EventUpdate {
+	_u.mutation.ClearCapacity()
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (eu *EventUpdate) SetMetadata(m map[string]interface{}) *EventUpdate {
-	eu.mutation.SetMetadata(m)
-	return eu
+func (_u *EventUpdate) SetMetadata(v map[string]interface{}) *EventUpdate {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (eu *EventUpdate) ClearMetadata() *EventUpdate {
-	eu.mutation.ClearMetadata()
-	return eu
+func (_u *EventUpdate) ClearMetadata() *EventUpdate {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // AddParticipantIDs adds the "participants" edge to the EventParticipant entity by IDs.
-func (eu *EventUpdate) AddParticipantIDs(ids ...xid.ID) *EventUpdate {
-	eu.mutation.AddParticipantIDs(ids...)
-	return eu
+func (_u *EventUpdate) AddParticipantIDs(ids ...xid.ID) *EventUpdate {
+	_u.mutation.AddParticipantIDs(ids...)
+	return _u
 }
 
 // AddParticipants adds the "participants" edges to the EventParticipant entity.
-func (eu *EventUpdate) AddParticipants(e ...*EventParticipant) *EventUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *EventUpdate) AddParticipants(v ...*EventParticipant) *EventUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return eu.AddParticipantIDs(ids...)
+	return _u.AddParticipantIDs(ids...)
 }
 
 // SetThreadID sets the "thread" edge to the Post entity by ID.
-func (eu *EventUpdate) SetThreadID(id xid.ID) *EventUpdate {
-	eu.mutation.SetThreadID(id)
-	return eu
+func (_u *EventUpdate) SetThreadID(id xid.ID) *EventUpdate {
+	_u.mutation.SetThreadID(id)
+	return _u
 }
 
 // SetThread sets the "thread" edge to the Post entity.
-func (eu *EventUpdate) SetThread(p *Post) *EventUpdate {
-	return eu.SetThreadID(p.ID)
+func (_u *EventUpdate) SetThread(v *Post) *EventUpdate {
+	return _u.SetThreadID(v.ID)
 }
 
 // SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
-func (eu *EventUpdate) SetPrimaryImageID(id xid.ID) *EventUpdate {
-	eu.mutation.SetPrimaryImageID(id)
-	return eu
+func (_u *EventUpdate) SetPrimaryImageID(id xid.ID) *EventUpdate {
+	_u.mutation.SetPrimaryImageID(id)
+	return _u
 }
 
 // SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
-func (eu *EventUpdate) SetNillablePrimaryImageID(id *xid.ID) *EventUpdate {
+func (_u *EventUpdate) SetNillablePrimaryImageID(id *xid.ID) *EventUpdate {
 	if id != nil {
-		eu = eu.SetPrimaryImageID(*id)
+		_u = _u.SetPrimaryImageID(*id)
 	}
-	return eu
+	return _u
 }
 
 // SetPrimaryImage sets the "primary_image" edge to the Asset entity.
-func (eu *EventUpdate) SetPrimaryImage(a *Asset) *EventUpdate {
-	return eu.SetPrimaryImageID(a.ID)
+func (_u *EventUpdate) SetPrimaryImage(v *Asset) *EventUpdate {
+	return _u.SetPrimaryImageID(v.ID)
 }
 
 // Mutation returns the EventMutation object of the builder.
-func (eu *EventUpdate) Mutation() *EventMutation {
-	return eu.mutation
+func (_u *EventUpdate) Mutation() *EventMutation {
+	return _u.mutation
 }
 
 // ClearParticipants clears all "participants" edges to the EventParticipant entity.
-func (eu *EventUpdate) ClearParticipants() *EventUpdate {
-	eu.mutation.ClearParticipants()
-	return eu
+func (_u *EventUpdate) ClearParticipants() *EventUpdate {
+	_u.mutation.ClearParticipants()
+	return _u
 }
 
 // RemoveParticipantIDs removes the "participants" edge to EventParticipant entities by IDs.
-func (eu *EventUpdate) RemoveParticipantIDs(ids ...xid.ID) *EventUpdate {
-	eu.mutation.RemoveParticipantIDs(ids...)
-	return eu
+func (_u *EventUpdate) RemoveParticipantIDs(ids ...xid.ID) *EventUpdate {
+	_u.mutation.RemoveParticipantIDs(ids...)
+	return _u
 }
 
 // RemoveParticipants removes "participants" edges to EventParticipant entities.
-func (eu *EventUpdate) RemoveParticipants(e ...*EventParticipant) *EventUpdate {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *EventUpdate) RemoveParticipants(v ...*EventParticipant) *EventUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return eu.RemoveParticipantIDs(ids...)
+	return _u.RemoveParticipantIDs(ids...)
 }
 
 // ClearThread clears the "thread" edge to the Post entity.
-func (eu *EventUpdate) ClearThread() *EventUpdate {
-	eu.mutation.ClearThread()
-	return eu
+func (_u *EventUpdate) ClearThread() *EventUpdate {
+	_u.mutation.ClearThread()
+	return _u
 }
 
 // ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
-func (eu *EventUpdate) ClearPrimaryImage() *EventUpdate {
-	eu.mutation.ClearPrimaryImage()
-	return eu
+func (_u *EventUpdate) ClearPrimaryImage() *EventUpdate {
+	_u.mutation.ClearPrimaryImage()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (eu *EventUpdate) Save(ctx context.Context) (int, error) {
-	eu.defaults()
-	return withHooks(ctx, eu.sqlSave, eu.mutation, eu.hooks)
+func (_u *EventUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (eu *EventUpdate) SaveX(ctx context.Context) int {
-	affected, err := eu.Save(ctx)
+func (_u *EventUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -455,154 +455,154 @@ func (eu *EventUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (eu *EventUpdate) Exec(ctx context.Context) error {
-	_, err := eu.Save(ctx)
+func (_u *EventUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (eu *EventUpdate) ExecX(ctx context.Context) {
-	if err := eu.Exec(ctx); err != nil {
+func (_u *EventUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (eu *EventUpdate) defaults() {
-	if _, ok := eu.mutation.UpdatedAt(); !ok {
+func (_u *EventUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := event.UpdateDefaultUpdatedAt()
-		eu.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (eu *EventUpdate) check() error {
-	if v, ok := eu.mutation.Visibility(); ok {
+func (_u *EventUpdate) check() error {
+	if v, ok := _u.mutation.Visibility(); ok {
 		if err := event.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Event.visibility": %w`, err)}
 		}
 	}
-	if eu.mutation.ThreadCleared() && len(eu.mutation.ThreadIDs()) > 0 {
+	if _u.mutation.ThreadCleared() && len(_u.mutation.ThreadIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Event.thread"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (eu *EventUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventUpdate {
-	eu.modifiers = append(eu.modifiers, modifiers...)
-	return eu
+func (_u *EventUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := eu.check(); err != nil {
-		return n, err
+func (_u *EventUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(event.Table, event.Columns, sqlgraph.NewFieldSpec(event.FieldID, field.TypeString))
-	if ps := eu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := eu.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(event.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := eu.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(event.FieldDeletedAt, field.TypeTime, value)
 	}
-	if eu.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(event.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := eu.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(event.FieldIndexedAt, field.TypeTime, value)
 	}
-	if eu.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(event.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := eu.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(event.FieldName, field.TypeString, value)
 	}
-	if value, ok := eu.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(event.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := eu.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(event.FieldDescription, field.TypeString, value)
 	}
-	if eu.mutation.DescriptionCleared() {
+	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(event.FieldDescription, field.TypeString)
 	}
-	if value, ok := eu.mutation.StartTime(); ok {
+	if value, ok := _u.mutation.StartTime(); ok {
 		_spec.SetField(event.FieldStartTime, field.TypeTime, value)
 	}
-	if value, ok := eu.mutation.EndTime(); ok {
+	if value, ok := _u.mutation.EndTime(); ok {
 		_spec.SetField(event.FieldEndTime, field.TypeTime, value)
 	}
-	if value, ok := eu.mutation.ParticipationPolicy(); ok {
+	if value, ok := _u.mutation.ParticipationPolicy(); ok {
 		_spec.SetField(event.FieldParticipationPolicy, field.TypeString, value)
 	}
-	if value, ok := eu.mutation.Visibility(); ok {
+	if value, ok := _u.mutation.Visibility(); ok {
 		_spec.SetField(event.FieldVisibility, field.TypeEnum, value)
 	}
-	if value, ok := eu.mutation.LocationType(); ok {
+	if value, ok := _u.mutation.LocationType(); ok {
 		_spec.SetField(event.FieldLocationType, field.TypeString, value)
 	}
-	if eu.mutation.LocationTypeCleared() {
+	if _u.mutation.LocationTypeCleared() {
 		_spec.ClearField(event.FieldLocationType, field.TypeString)
 	}
-	if value, ok := eu.mutation.LocationName(); ok {
+	if value, ok := _u.mutation.LocationName(); ok {
 		_spec.SetField(event.FieldLocationName, field.TypeString, value)
 	}
-	if eu.mutation.LocationNameCleared() {
+	if _u.mutation.LocationNameCleared() {
 		_spec.ClearField(event.FieldLocationName, field.TypeString)
 	}
-	if value, ok := eu.mutation.LocationAddress(); ok {
+	if value, ok := _u.mutation.LocationAddress(); ok {
 		_spec.SetField(event.FieldLocationAddress, field.TypeString, value)
 	}
-	if eu.mutation.LocationAddressCleared() {
+	if _u.mutation.LocationAddressCleared() {
 		_spec.ClearField(event.FieldLocationAddress, field.TypeString)
 	}
-	if value, ok := eu.mutation.LocationLatitude(); ok {
+	if value, ok := _u.mutation.LocationLatitude(); ok {
 		_spec.SetField(event.FieldLocationLatitude, field.TypeFloat64, value)
 	}
-	if value, ok := eu.mutation.AddedLocationLatitude(); ok {
+	if value, ok := _u.mutation.AddedLocationLatitude(); ok {
 		_spec.AddField(event.FieldLocationLatitude, field.TypeFloat64, value)
 	}
-	if eu.mutation.LocationLatitudeCleared() {
+	if _u.mutation.LocationLatitudeCleared() {
 		_spec.ClearField(event.FieldLocationLatitude, field.TypeFloat64)
 	}
-	if value, ok := eu.mutation.LocationLongitude(); ok {
+	if value, ok := _u.mutation.LocationLongitude(); ok {
 		_spec.SetField(event.FieldLocationLongitude, field.TypeFloat64, value)
 	}
-	if value, ok := eu.mutation.AddedLocationLongitude(); ok {
+	if value, ok := _u.mutation.AddedLocationLongitude(); ok {
 		_spec.AddField(event.FieldLocationLongitude, field.TypeFloat64, value)
 	}
-	if eu.mutation.LocationLongitudeCleared() {
+	if _u.mutation.LocationLongitudeCleared() {
 		_spec.ClearField(event.FieldLocationLongitude, field.TypeFloat64)
 	}
-	if value, ok := eu.mutation.LocationURL(); ok {
+	if value, ok := _u.mutation.LocationURL(); ok {
 		_spec.SetField(event.FieldLocationURL, field.TypeString, value)
 	}
-	if eu.mutation.LocationURLCleared() {
+	if _u.mutation.LocationURLCleared() {
 		_spec.ClearField(event.FieldLocationURL, field.TypeString)
 	}
-	if value, ok := eu.mutation.Capacity(); ok {
+	if value, ok := _u.mutation.Capacity(); ok {
 		_spec.SetField(event.FieldCapacity, field.TypeInt, value)
 	}
-	if value, ok := eu.mutation.AddedCapacity(); ok {
+	if value, ok := _u.mutation.AddedCapacity(); ok {
 		_spec.AddField(event.FieldCapacity, field.TypeInt, value)
 	}
-	if eu.mutation.CapacityCleared() {
+	if _u.mutation.CapacityCleared() {
 		_spec.ClearField(event.FieldCapacity, field.TypeInt)
 	}
-	if value, ok := eu.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(event.FieldMetadata, field.TypeJSON, value)
 	}
-	if eu.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(event.FieldMetadata, field.TypeJSON)
 	}
-	if eu.mutation.ParticipantsCleared() {
+	if _u.mutation.ParticipantsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -615,7 +615,7 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.RemovedParticipantsIDs(); len(nodes) > 0 && !eu.mutation.ParticipantsCleared() {
+	if nodes := _u.mutation.RemovedParticipantsIDs(); len(nodes) > 0 && !_u.mutation.ParticipantsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -631,7 +631,7 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.ParticipantsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParticipantsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -647,7 +647,7 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eu.mutation.ThreadCleared() {
+	if _u.mutation.ThreadCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -660,7 +660,7 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.ThreadIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ThreadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -676,7 +676,7 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eu.mutation.PrimaryImageCleared() {
+	if _u.mutation.PrimaryImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -689,7 +689,7 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PrimaryImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -705,8 +705,8 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(eu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{event.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -714,8 +714,8 @@ func (eu *EventUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	eu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // EventUpdateOne is the builder for updating a single Event entity.
@@ -728,433 +728,433 @@ type EventUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (euo *EventUpdateOne) SetUpdatedAt(t time.Time) *EventUpdateOne {
-	euo.mutation.SetUpdatedAt(t)
-	return euo
+func (_u *EventUpdateOne) SetUpdatedAt(v time.Time) *EventUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (euo *EventUpdateOne) SetDeletedAt(t time.Time) *EventUpdateOne {
-	euo.mutation.SetDeletedAt(t)
-	return euo
+func (_u *EventUpdateOne) SetDeletedAt(v time.Time) *EventUpdateOne {
+	_u.mutation.SetDeletedAt(v)
+	return _u
 }
 
 // SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableDeletedAt(t *time.Time) *EventUpdateOne {
-	if t != nil {
-		euo.SetDeletedAt(*t)
+func (_u *EventUpdateOne) SetNillableDeletedAt(v *time.Time) *EventUpdateOne {
+	if v != nil {
+		_u.SetDeletedAt(*v)
 	}
-	return euo
+	return _u
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (euo *EventUpdateOne) ClearDeletedAt() *EventUpdateOne {
-	euo.mutation.ClearDeletedAt()
-	return euo
+func (_u *EventUpdateOne) ClearDeletedAt() *EventUpdateOne {
+	_u.mutation.ClearDeletedAt()
+	return _u
 }
 
 // SetIndexedAt sets the "indexed_at" field.
-func (euo *EventUpdateOne) SetIndexedAt(t time.Time) *EventUpdateOne {
-	euo.mutation.SetIndexedAt(t)
-	return euo
+func (_u *EventUpdateOne) SetIndexedAt(v time.Time) *EventUpdateOne {
+	_u.mutation.SetIndexedAt(v)
+	return _u
 }
 
 // SetNillableIndexedAt sets the "indexed_at" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableIndexedAt(t *time.Time) *EventUpdateOne {
-	if t != nil {
-		euo.SetIndexedAt(*t)
+func (_u *EventUpdateOne) SetNillableIndexedAt(v *time.Time) *EventUpdateOne {
+	if v != nil {
+		_u.SetIndexedAt(*v)
 	}
-	return euo
+	return _u
 }
 
 // ClearIndexedAt clears the value of the "indexed_at" field.
-func (euo *EventUpdateOne) ClearIndexedAt() *EventUpdateOne {
-	euo.mutation.ClearIndexedAt()
-	return euo
+func (_u *EventUpdateOne) ClearIndexedAt() *EventUpdateOne {
+	_u.mutation.ClearIndexedAt()
+	return _u
 }
 
 // SetName sets the "name" field.
-func (euo *EventUpdateOne) SetName(s string) *EventUpdateOne {
-	euo.mutation.SetName(s)
-	return euo
+func (_u *EventUpdateOne) SetName(v string) *EventUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableName(s *string) *EventUpdateOne {
-	if s != nil {
-		euo.SetName(*s)
+func (_u *EventUpdateOne) SetNillableName(v *string) *EventUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return euo
+	return _u
 }
 
 // SetSlug sets the "slug" field.
-func (euo *EventUpdateOne) SetSlug(s string) *EventUpdateOne {
-	euo.mutation.SetSlug(s)
-	return euo
+func (_u *EventUpdateOne) SetSlug(v string) *EventUpdateOne {
+	_u.mutation.SetSlug(v)
+	return _u
 }
 
 // SetNillableSlug sets the "slug" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableSlug(s *string) *EventUpdateOne {
-	if s != nil {
-		euo.SetSlug(*s)
+func (_u *EventUpdateOne) SetNillableSlug(v *string) *EventUpdateOne {
+	if v != nil {
+		_u.SetSlug(*v)
 	}
-	return euo
+	return _u
 }
 
 // SetDescription sets the "description" field.
-func (euo *EventUpdateOne) SetDescription(s string) *EventUpdateOne {
-	euo.mutation.SetDescription(s)
-	return euo
+func (_u *EventUpdateOne) SetDescription(v string) *EventUpdateOne {
+	_u.mutation.SetDescription(v)
+	return _u
 }
 
 // SetNillableDescription sets the "description" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableDescription(s *string) *EventUpdateOne {
-	if s != nil {
-		euo.SetDescription(*s)
+func (_u *EventUpdateOne) SetNillableDescription(v *string) *EventUpdateOne {
+	if v != nil {
+		_u.SetDescription(*v)
 	}
-	return euo
+	return _u
 }
 
 // ClearDescription clears the value of the "description" field.
-func (euo *EventUpdateOne) ClearDescription() *EventUpdateOne {
-	euo.mutation.ClearDescription()
-	return euo
+func (_u *EventUpdateOne) ClearDescription() *EventUpdateOne {
+	_u.mutation.ClearDescription()
+	return _u
 }
 
 // SetStartTime sets the "start_time" field.
-func (euo *EventUpdateOne) SetStartTime(t time.Time) *EventUpdateOne {
-	euo.mutation.SetStartTime(t)
-	return euo
+func (_u *EventUpdateOne) SetStartTime(v time.Time) *EventUpdateOne {
+	_u.mutation.SetStartTime(v)
+	return _u
 }
 
 // SetNillableStartTime sets the "start_time" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableStartTime(t *time.Time) *EventUpdateOne {
-	if t != nil {
-		euo.SetStartTime(*t)
+func (_u *EventUpdateOne) SetNillableStartTime(v *time.Time) *EventUpdateOne {
+	if v != nil {
+		_u.SetStartTime(*v)
 	}
-	return euo
+	return _u
 }
 
 // SetEndTime sets the "end_time" field.
-func (euo *EventUpdateOne) SetEndTime(t time.Time) *EventUpdateOne {
-	euo.mutation.SetEndTime(t)
-	return euo
+func (_u *EventUpdateOne) SetEndTime(v time.Time) *EventUpdateOne {
+	_u.mutation.SetEndTime(v)
+	return _u
 }
 
 // SetNillableEndTime sets the "end_time" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableEndTime(t *time.Time) *EventUpdateOne {
-	if t != nil {
-		euo.SetEndTime(*t)
+func (_u *EventUpdateOne) SetNillableEndTime(v *time.Time) *EventUpdateOne {
+	if v != nil {
+		_u.SetEndTime(*v)
 	}
-	return euo
+	return _u
 }
 
 // SetParticipationPolicy sets the "participation_policy" field.
-func (euo *EventUpdateOne) SetParticipationPolicy(s string) *EventUpdateOne {
-	euo.mutation.SetParticipationPolicy(s)
-	return euo
+func (_u *EventUpdateOne) SetParticipationPolicy(v string) *EventUpdateOne {
+	_u.mutation.SetParticipationPolicy(v)
+	return _u
 }
 
 // SetNillableParticipationPolicy sets the "participation_policy" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableParticipationPolicy(s *string) *EventUpdateOne {
-	if s != nil {
-		euo.SetParticipationPolicy(*s)
+func (_u *EventUpdateOne) SetNillableParticipationPolicy(v *string) *EventUpdateOne {
+	if v != nil {
+		_u.SetParticipationPolicy(*v)
 	}
-	return euo
+	return _u
 }
 
 // SetVisibility sets the "visibility" field.
-func (euo *EventUpdateOne) SetVisibility(e event.Visibility) *EventUpdateOne {
-	euo.mutation.SetVisibility(e)
-	return euo
+func (_u *EventUpdateOne) SetVisibility(v event.Visibility) *EventUpdateOne {
+	_u.mutation.SetVisibility(v)
+	return _u
 }
 
 // SetNillableVisibility sets the "visibility" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableVisibility(e *event.Visibility) *EventUpdateOne {
-	if e != nil {
-		euo.SetVisibility(*e)
+func (_u *EventUpdateOne) SetNillableVisibility(v *event.Visibility) *EventUpdateOne {
+	if v != nil {
+		_u.SetVisibility(*v)
 	}
-	return euo
+	return _u
 }
 
 // SetLocationType sets the "location_type" field.
-func (euo *EventUpdateOne) SetLocationType(s string) *EventUpdateOne {
-	euo.mutation.SetLocationType(s)
-	return euo
+func (_u *EventUpdateOne) SetLocationType(v string) *EventUpdateOne {
+	_u.mutation.SetLocationType(v)
+	return _u
 }
 
 // SetNillableLocationType sets the "location_type" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableLocationType(s *string) *EventUpdateOne {
-	if s != nil {
-		euo.SetLocationType(*s)
+func (_u *EventUpdateOne) SetNillableLocationType(v *string) *EventUpdateOne {
+	if v != nil {
+		_u.SetLocationType(*v)
 	}
-	return euo
+	return _u
 }
 
 // ClearLocationType clears the value of the "location_type" field.
-func (euo *EventUpdateOne) ClearLocationType() *EventUpdateOne {
-	euo.mutation.ClearLocationType()
-	return euo
+func (_u *EventUpdateOne) ClearLocationType() *EventUpdateOne {
+	_u.mutation.ClearLocationType()
+	return _u
 }
 
 // SetLocationName sets the "location_name" field.
-func (euo *EventUpdateOne) SetLocationName(s string) *EventUpdateOne {
-	euo.mutation.SetLocationName(s)
-	return euo
+func (_u *EventUpdateOne) SetLocationName(v string) *EventUpdateOne {
+	_u.mutation.SetLocationName(v)
+	return _u
 }
 
 // SetNillableLocationName sets the "location_name" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableLocationName(s *string) *EventUpdateOne {
-	if s != nil {
-		euo.SetLocationName(*s)
+func (_u *EventUpdateOne) SetNillableLocationName(v *string) *EventUpdateOne {
+	if v != nil {
+		_u.SetLocationName(*v)
 	}
-	return euo
+	return _u
 }
 
 // ClearLocationName clears the value of the "location_name" field.
-func (euo *EventUpdateOne) ClearLocationName() *EventUpdateOne {
-	euo.mutation.ClearLocationName()
-	return euo
+func (_u *EventUpdateOne) ClearLocationName() *EventUpdateOne {
+	_u.mutation.ClearLocationName()
+	return _u
 }
 
 // SetLocationAddress sets the "location_address" field.
-func (euo *EventUpdateOne) SetLocationAddress(s string) *EventUpdateOne {
-	euo.mutation.SetLocationAddress(s)
-	return euo
+func (_u *EventUpdateOne) SetLocationAddress(v string) *EventUpdateOne {
+	_u.mutation.SetLocationAddress(v)
+	return _u
 }
 
 // SetNillableLocationAddress sets the "location_address" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableLocationAddress(s *string) *EventUpdateOne {
-	if s != nil {
-		euo.SetLocationAddress(*s)
+func (_u *EventUpdateOne) SetNillableLocationAddress(v *string) *EventUpdateOne {
+	if v != nil {
+		_u.SetLocationAddress(*v)
 	}
-	return euo
+	return _u
 }
 
 // ClearLocationAddress clears the value of the "location_address" field.
-func (euo *EventUpdateOne) ClearLocationAddress() *EventUpdateOne {
-	euo.mutation.ClearLocationAddress()
-	return euo
+func (_u *EventUpdateOne) ClearLocationAddress() *EventUpdateOne {
+	_u.mutation.ClearLocationAddress()
+	return _u
 }
 
 // SetLocationLatitude sets the "location_latitude" field.
-func (euo *EventUpdateOne) SetLocationLatitude(f float64) *EventUpdateOne {
-	euo.mutation.ResetLocationLatitude()
-	euo.mutation.SetLocationLatitude(f)
-	return euo
+func (_u *EventUpdateOne) SetLocationLatitude(v float64) *EventUpdateOne {
+	_u.mutation.ResetLocationLatitude()
+	_u.mutation.SetLocationLatitude(v)
+	return _u
 }
 
 // SetNillableLocationLatitude sets the "location_latitude" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableLocationLatitude(f *float64) *EventUpdateOne {
-	if f != nil {
-		euo.SetLocationLatitude(*f)
+func (_u *EventUpdateOne) SetNillableLocationLatitude(v *float64) *EventUpdateOne {
+	if v != nil {
+		_u.SetLocationLatitude(*v)
 	}
-	return euo
+	return _u
 }
 
-// AddLocationLatitude adds f to the "location_latitude" field.
-func (euo *EventUpdateOne) AddLocationLatitude(f float64) *EventUpdateOne {
-	euo.mutation.AddLocationLatitude(f)
-	return euo
+// AddLocationLatitude adds value to the "location_latitude" field.
+func (_u *EventUpdateOne) AddLocationLatitude(v float64) *EventUpdateOne {
+	_u.mutation.AddLocationLatitude(v)
+	return _u
 }
 
 // ClearLocationLatitude clears the value of the "location_latitude" field.
-func (euo *EventUpdateOne) ClearLocationLatitude() *EventUpdateOne {
-	euo.mutation.ClearLocationLatitude()
-	return euo
+func (_u *EventUpdateOne) ClearLocationLatitude() *EventUpdateOne {
+	_u.mutation.ClearLocationLatitude()
+	return _u
 }
 
 // SetLocationLongitude sets the "location_longitude" field.
-func (euo *EventUpdateOne) SetLocationLongitude(f float64) *EventUpdateOne {
-	euo.mutation.ResetLocationLongitude()
-	euo.mutation.SetLocationLongitude(f)
-	return euo
+func (_u *EventUpdateOne) SetLocationLongitude(v float64) *EventUpdateOne {
+	_u.mutation.ResetLocationLongitude()
+	_u.mutation.SetLocationLongitude(v)
+	return _u
 }
 
 // SetNillableLocationLongitude sets the "location_longitude" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableLocationLongitude(f *float64) *EventUpdateOne {
-	if f != nil {
-		euo.SetLocationLongitude(*f)
+func (_u *EventUpdateOne) SetNillableLocationLongitude(v *float64) *EventUpdateOne {
+	if v != nil {
+		_u.SetLocationLongitude(*v)
 	}
-	return euo
+	return _u
 }
 
-// AddLocationLongitude adds f to the "location_longitude" field.
-func (euo *EventUpdateOne) AddLocationLongitude(f float64) *EventUpdateOne {
-	euo.mutation.AddLocationLongitude(f)
-	return euo
+// AddLocationLongitude adds value to the "location_longitude" field.
+func (_u *EventUpdateOne) AddLocationLongitude(v float64) *EventUpdateOne {
+	_u.mutation.AddLocationLongitude(v)
+	return _u
 }
 
 // ClearLocationLongitude clears the value of the "location_longitude" field.
-func (euo *EventUpdateOne) ClearLocationLongitude() *EventUpdateOne {
-	euo.mutation.ClearLocationLongitude()
-	return euo
+func (_u *EventUpdateOne) ClearLocationLongitude() *EventUpdateOne {
+	_u.mutation.ClearLocationLongitude()
+	return _u
 }
 
 // SetLocationURL sets the "location_url" field.
-func (euo *EventUpdateOne) SetLocationURL(s string) *EventUpdateOne {
-	euo.mutation.SetLocationURL(s)
-	return euo
+func (_u *EventUpdateOne) SetLocationURL(v string) *EventUpdateOne {
+	_u.mutation.SetLocationURL(v)
+	return _u
 }
 
 // SetNillableLocationURL sets the "location_url" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableLocationURL(s *string) *EventUpdateOne {
-	if s != nil {
-		euo.SetLocationURL(*s)
+func (_u *EventUpdateOne) SetNillableLocationURL(v *string) *EventUpdateOne {
+	if v != nil {
+		_u.SetLocationURL(*v)
 	}
-	return euo
+	return _u
 }
 
 // ClearLocationURL clears the value of the "location_url" field.
-func (euo *EventUpdateOne) ClearLocationURL() *EventUpdateOne {
-	euo.mutation.ClearLocationURL()
-	return euo
+func (_u *EventUpdateOne) ClearLocationURL() *EventUpdateOne {
+	_u.mutation.ClearLocationURL()
+	return _u
 }
 
 // SetCapacity sets the "capacity" field.
-func (euo *EventUpdateOne) SetCapacity(i int) *EventUpdateOne {
-	euo.mutation.ResetCapacity()
-	euo.mutation.SetCapacity(i)
-	return euo
+func (_u *EventUpdateOne) SetCapacity(v int) *EventUpdateOne {
+	_u.mutation.ResetCapacity()
+	_u.mutation.SetCapacity(v)
+	return _u
 }
 
 // SetNillableCapacity sets the "capacity" field if the given value is not nil.
-func (euo *EventUpdateOne) SetNillableCapacity(i *int) *EventUpdateOne {
-	if i != nil {
-		euo.SetCapacity(*i)
+func (_u *EventUpdateOne) SetNillableCapacity(v *int) *EventUpdateOne {
+	if v != nil {
+		_u.SetCapacity(*v)
 	}
-	return euo
+	return _u
 }
 
-// AddCapacity adds i to the "capacity" field.
-func (euo *EventUpdateOne) AddCapacity(i int) *EventUpdateOne {
-	euo.mutation.AddCapacity(i)
-	return euo
+// AddCapacity adds value to the "capacity" field.
+func (_u *EventUpdateOne) AddCapacity(v int) *EventUpdateOne {
+	_u.mutation.AddCapacity(v)
+	return _u
 }
 
 // ClearCapacity clears the value of the "capacity" field.
-func (euo *EventUpdateOne) ClearCapacity() *EventUpdateOne {
-	euo.mutation.ClearCapacity()
-	return euo
+func (_u *EventUpdateOne) ClearCapacity() *EventUpdateOne {
+	_u.mutation.ClearCapacity()
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (euo *EventUpdateOne) SetMetadata(m map[string]interface{}) *EventUpdateOne {
-	euo.mutation.SetMetadata(m)
-	return euo
+func (_u *EventUpdateOne) SetMetadata(v map[string]interface{}) *EventUpdateOne {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (euo *EventUpdateOne) ClearMetadata() *EventUpdateOne {
-	euo.mutation.ClearMetadata()
-	return euo
+func (_u *EventUpdateOne) ClearMetadata() *EventUpdateOne {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // AddParticipantIDs adds the "participants" edge to the EventParticipant entity by IDs.
-func (euo *EventUpdateOne) AddParticipantIDs(ids ...xid.ID) *EventUpdateOne {
-	euo.mutation.AddParticipantIDs(ids...)
-	return euo
+func (_u *EventUpdateOne) AddParticipantIDs(ids ...xid.ID) *EventUpdateOne {
+	_u.mutation.AddParticipantIDs(ids...)
+	return _u
 }
 
 // AddParticipants adds the "participants" edges to the EventParticipant entity.
-func (euo *EventUpdateOne) AddParticipants(e ...*EventParticipant) *EventUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *EventUpdateOne) AddParticipants(v ...*EventParticipant) *EventUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return euo.AddParticipantIDs(ids...)
+	return _u.AddParticipantIDs(ids...)
 }
 
 // SetThreadID sets the "thread" edge to the Post entity by ID.
-func (euo *EventUpdateOne) SetThreadID(id xid.ID) *EventUpdateOne {
-	euo.mutation.SetThreadID(id)
-	return euo
+func (_u *EventUpdateOne) SetThreadID(id xid.ID) *EventUpdateOne {
+	_u.mutation.SetThreadID(id)
+	return _u
 }
 
 // SetThread sets the "thread" edge to the Post entity.
-func (euo *EventUpdateOne) SetThread(p *Post) *EventUpdateOne {
-	return euo.SetThreadID(p.ID)
+func (_u *EventUpdateOne) SetThread(v *Post) *EventUpdateOne {
+	return _u.SetThreadID(v.ID)
 }
 
 // SetPrimaryImageID sets the "primary_image" edge to the Asset entity by ID.
-func (euo *EventUpdateOne) SetPrimaryImageID(id xid.ID) *EventUpdateOne {
-	euo.mutation.SetPrimaryImageID(id)
-	return euo
+func (_u *EventUpdateOne) SetPrimaryImageID(id xid.ID) *EventUpdateOne {
+	_u.mutation.SetPrimaryImageID(id)
+	return _u
 }
 
 // SetNillablePrimaryImageID sets the "primary_image" edge to the Asset entity by ID if the given value is not nil.
-func (euo *EventUpdateOne) SetNillablePrimaryImageID(id *xid.ID) *EventUpdateOne {
+func (_u *EventUpdateOne) SetNillablePrimaryImageID(id *xid.ID) *EventUpdateOne {
 	if id != nil {
-		euo = euo.SetPrimaryImageID(*id)
+		_u = _u.SetPrimaryImageID(*id)
 	}
-	return euo
+	return _u
 }
 
 // SetPrimaryImage sets the "primary_image" edge to the Asset entity.
-func (euo *EventUpdateOne) SetPrimaryImage(a *Asset) *EventUpdateOne {
-	return euo.SetPrimaryImageID(a.ID)
+func (_u *EventUpdateOne) SetPrimaryImage(v *Asset) *EventUpdateOne {
+	return _u.SetPrimaryImageID(v.ID)
 }
 
 // Mutation returns the EventMutation object of the builder.
-func (euo *EventUpdateOne) Mutation() *EventMutation {
-	return euo.mutation
+func (_u *EventUpdateOne) Mutation() *EventMutation {
+	return _u.mutation
 }
 
 // ClearParticipants clears all "participants" edges to the EventParticipant entity.
-func (euo *EventUpdateOne) ClearParticipants() *EventUpdateOne {
-	euo.mutation.ClearParticipants()
-	return euo
+func (_u *EventUpdateOne) ClearParticipants() *EventUpdateOne {
+	_u.mutation.ClearParticipants()
+	return _u
 }
 
 // RemoveParticipantIDs removes the "participants" edge to EventParticipant entities by IDs.
-func (euo *EventUpdateOne) RemoveParticipantIDs(ids ...xid.ID) *EventUpdateOne {
-	euo.mutation.RemoveParticipantIDs(ids...)
-	return euo
+func (_u *EventUpdateOne) RemoveParticipantIDs(ids ...xid.ID) *EventUpdateOne {
+	_u.mutation.RemoveParticipantIDs(ids...)
+	return _u
 }
 
 // RemoveParticipants removes "participants" edges to EventParticipant entities.
-func (euo *EventUpdateOne) RemoveParticipants(e ...*EventParticipant) *EventUpdateOne {
-	ids := make([]xid.ID, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+func (_u *EventUpdateOne) RemoveParticipants(v ...*EventParticipant) *EventUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return euo.RemoveParticipantIDs(ids...)
+	return _u.RemoveParticipantIDs(ids...)
 }
 
 // ClearThread clears the "thread" edge to the Post entity.
-func (euo *EventUpdateOne) ClearThread() *EventUpdateOne {
-	euo.mutation.ClearThread()
-	return euo
+func (_u *EventUpdateOne) ClearThread() *EventUpdateOne {
+	_u.mutation.ClearThread()
+	return _u
 }
 
 // ClearPrimaryImage clears the "primary_image" edge to the Asset entity.
-func (euo *EventUpdateOne) ClearPrimaryImage() *EventUpdateOne {
-	euo.mutation.ClearPrimaryImage()
-	return euo
+func (_u *EventUpdateOne) ClearPrimaryImage() *EventUpdateOne {
+	_u.mutation.ClearPrimaryImage()
+	return _u
 }
 
 // Where appends a list predicates to the EventUpdate builder.
-func (euo *EventUpdateOne) Where(ps ...predicate.Event) *EventUpdateOne {
-	euo.mutation.Where(ps...)
-	return euo
+func (_u *EventUpdateOne) Where(ps ...predicate.Event) *EventUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (euo *EventUpdateOne) Select(field string, fields ...string) *EventUpdateOne {
-	euo.fields = append([]string{field}, fields...)
-	return euo
+func (_u *EventUpdateOne) Select(field string, fields ...string) *EventUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Event entity.
-func (euo *EventUpdateOne) Save(ctx context.Context) (*Event, error) {
-	euo.defaults()
-	return withHooks(ctx, euo.sqlSave, euo.mutation, euo.hooks)
+func (_u *EventUpdateOne) Save(ctx context.Context) (*Event, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (euo *EventUpdateOne) SaveX(ctx context.Context) *Event {
-	node, err := euo.Save(ctx)
+func (_u *EventUpdateOne) SaveX(ctx context.Context) *Event {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -1162,56 +1162,56 @@ func (euo *EventUpdateOne) SaveX(ctx context.Context) *Event {
 }
 
 // Exec executes the query on the entity.
-func (euo *EventUpdateOne) Exec(ctx context.Context) error {
-	_, err := euo.Save(ctx)
+func (_u *EventUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (euo *EventUpdateOne) ExecX(ctx context.Context) {
-	if err := euo.Exec(ctx); err != nil {
+func (_u *EventUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (euo *EventUpdateOne) defaults() {
-	if _, ok := euo.mutation.UpdatedAt(); !ok {
+func (_u *EventUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := event.UpdateDefaultUpdatedAt()
-		euo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (euo *EventUpdateOne) check() error {
-	if v, ok := euo.mutation.Visibility(); ok {
+func (_u *EventUpdateOne) check() error {
+	if v, ok := _u.mutation.Visibility(); ok {
 		if err := event.VisibilityValidator(v); err != nil {
 			return &ValidationError{Name: "visibility", err: fmt.Errorf(`ent: validator failed for field "Event.visibility": %w`, err)}
 		}
 	}
-	if euo.mutation.ThreadCleared() && len(euo.mutation.ThreadIDs()) > 0 {
+	if _u.mutation.ThreadCleared() && len(_u.mutation.ThreadIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Event.thread"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (euo *EventUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventUpdateOne {
-	euo.modifiers = append(euo.modifiers, modifiers...)
-	return euo
+func (_u *EventUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *EventUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error) {
-	if err := euo.check(); err != nil {
+func (_u *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(event.Table, event.Columns, sqlgraph.NewFieldSpec(event.FieldID, field.TypeString))
-	id, ok := euo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Event.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := euo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, event.FieldID)
 		for _, f := range fields {
@@ -1223,110 +1223,110 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 			}
 		}
 	}
-	if ps := euo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := euo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(event.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := euo.mutation.DeletedAt(); ok {
+	if value, ok := _u.mutation.DeletedAt(); ok {
 		_spec.SetField(event.FieldDeletedAt, field.TypeTime, value)
 	}
-	if euo.mutation.DeletedAtCleared() {
+	if _u.mutation.DeletedAtCleared() {
 		_spec.ClearField(event.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := euo.mutation.IndexedAt(); ok {
+	if value, ok := _u.mutation.IndexedAt(); ok {
 		_spec.SetField(event.FieldIndexedAt, field.TypeTime, value)
 	}
-	if euo.mutation.IndexedAtCleared() {
+	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(event.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := euo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(event.FieldName, field.TypeString, value)
 	}
-	if value, ok := euo.mutation.Slug(); ok {
+	if value, ok := _u.mutation.Slug(); ok {
 		_spec.SetField(event.FieldSlug, field.TypeString, value)
 	}
-	if value, ok := euo.mutation.Description(); ok {
+	if value, ok := _u.mutation.Description(); ok {
 		_spec.SetField(event.FieldDescription, field.TypeString, value)
 	}
-	if euo.mutation.DescriptionCleared() {
+	if _u.mutation.DescriptionCleared() {
 		_spec.ClearField(event.FieldDescription, field.TypeString)
 	}
-	if value, ok := euo.mutation.StartTime(); ok {
+	if value, ok := _u.mutation.StartTime(); ok {
 		_spec.SetField(event.FieldStartTime, field.TypeTime, value)
 	}
-	if value, ok := euo.mutation.EndTime(); ok {
+	if value, ok := _u.mutation.EndTime(); ok {
 		_spec.SetField(event.FieldEndTime, field.TypeTime, value)
 	}
-	if value, ok := euo.mutation.ParticipationPolicy(); ok {
+	if value, ok := _u.mutation.ParticipationPolicy(); ok {
 		_spec.SetField(event.FieldParticipationPolicy, field.TypeString, value)
 	}
-	if value, ok := euo.mutation.Visibility(); ok {
+	if value, ok := _u.mutation.Visibility(); ok {
 		_spec.SetField(event.FieldVisibility, field.TypeEnum, value)
 	}
-	if value, ok := euo.mutation.LocationType(); ok {
+	if value, ok := _u.mutation.LocationType(); ok {
 		_spec.SetField(event.FieldLocationType, field.TypeString, value)
 	}
-	if euo.mutation.LocationTypeCleared() {
+	if _u.mutation.LocationTypeCleared() {
 		_spec.ClearField(event.FieldLocationType, field.TypeString)
 	}
-	if value, ok := euo.mutation.LocationName(); ok {
+	if value, ok := _u.mutation.LocationName(); ok {
 		_spec.SetField(event.FieldLocationName, field.TypeString, value)
 	}
-	if euo.mutation.LocationNameCleared() {
+	if _u.mutation.LocationNameCleared() {
 		_spec.ClearField(event.FieldLocationName, field.TypeString)
 	}
-	if value, ok := euo.mutation.LocationAddress(); ok {
+	if value, ok := _u.mutation.LocationAddress(); ok {
 		_spec.SetField(event.FieldLocationAddress, field.TypeString, value)
 	}
-	if euo.mutation.LocationAddressCleared() {
+	if _u.mutation.LocationAddressCleared() {
 		_spec.ClearField(event.FieldLocationAddress, field.TypeString)
 	}
-	if value, ok := euo.mutation.LocationLatitude(); ok {
+	if value, ok := _u.mutation.LocationLatitude(); ok {
 		_spec.SetField(event.FieldLocationLatitude, field.TypeFloat64, value)
 	}
-	if value, ok := euo.mutation.AddedLocationLatitude(); ok {
+	if value, ok := _u.mutation.AddedLocationLatitude(); ok {
 		_spec.AddField(event.FieldLocationLatitude, field.TypeFloat64, value)
 	}
-	if euo.mutation.LocationLatitudeCleared() {
+	if _u.mutation.LocationLatitudeCleared() {
 		_spec.ClearField(event.FieldLocationLatitude, field.TypeFloat64)
 	}
-	if value, ok := euo.mutation.LocationLongitude(); ok {
+	if value, ok := _u.mutation.LocationLongitude(); ok {
 		_spec.SetField(event.FieldLocationLongitude, field.TypeFloat64, value)
 	}
-	if value, ok := euo.mutation.AddedLocationLongitude(); ok {
+	if value, ok := _u.mutation.AddedLocationLongitude(); ok {
 		_spec.AddField(event.FieldLocationLongitude, field.TypeFloat64, value)
 	}
-	if euo.mutation.LocationLongitudeCleared() {
+	if _u.mutation.LocationLongitudeCleared() {
 		_spec.ClearField(event.FieldLocationLongitude, field.TypeFloat64)
 	}
-	if value, ok := euo.mutation.LocationURL(); ok {
+	if value, ok := _u.mutation.LocationURL(); ok {
 		_spec.SetField(event.FieldLocationURL, field.TypeString, value)
 	}
-	if euo.mutation.LocationURLCleared() {
+	if _u.mutation.LocationURLCleared() {
 		_spec.ClearField(event.FieldLocationURL, field.TypeString)
 	}
-	if value, ok := euo.mutation.Capacity(); ok {
+	if value, ok := _u.mutation.Capacity(); ok {
 		_spec.SetField(event.FieldCapacity, field.TypeInt, value)
 	}
-	if value, ok := euo.mutation.AddedCapacity(); ok {
+	if value, ok := _u.mutation.AddedCapacity(); ok {
 		_spec.AddField(event.FieldCapacity, field.TypeInt, value)
 	}
-	if euo.mutation.CapacityCleared() {
+	if _u.mutation.CapacityCleared() {
 		_spec.ClearField(event.FieldCapacity, field.TypeInt)
 	}
-	if value, ok := euo.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(event.FieldMetadata, field.TypeJSON, value)
 	}
-	if euo.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(event.FieldMetadata, field.TypeJSON)
 	}
-	if euo.mutation.ParticipantsCleared() {
+	if _u.mutation.ParticipantsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1339,7 +1339,7 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.RemovedParticipantsIDs(); len(nodes) > 0 && !euo.mutation.ParticipantsCleared() {
+	if nodes := _u.mutation.RemovedParticipantsIDs(); len(nodes) > 0 && !_u.mutation.ParticipantsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1355,7 +1355,7 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.ParticipantsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ParticipantsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
@@ -1371,7 +1371,7 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if euo.mutation.ThreadCleared() {
+	if _u.mutation.ThreadCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1384,7 +1384,7 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.ThreadIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.ThreadIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1400,7 +1400,7 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if euo.mutation.PrimaryImageCleared() {
+	if _u.mutation.PrimaryImageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1413,7 +1413,7 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.PrimaryImageIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.PrimaryImageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -1429,11 +1429,11 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(euo.modifiers...)
-	_node = &Event{config: euo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Event{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, euo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{event.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -1441,6 +1441,6 @@ func (euo *EventUpdateOne) sqlSave(ctx context.Context) (_node *Event, err error
 		}
 		return nil, err
 	}
-	euo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

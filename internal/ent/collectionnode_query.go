@@ -33,44 +33,44 @@ type CollectionNodeQuery struct {
 }
 
 // Where adds a new predicate for the CollectionNodeQuery builder.
-func (cnq *CollectionNodeQuery) Where(ps ...predicate.CollectionNode) *CollectionNodeQuery {
-	cnq.predicates = append(cnq.predicates, ps...)
-	return cnq
+func (_q *CollectionNodeQuery) Where(ps ...predicate.CollectionNode) *CollectionNodeQuery {
+	_q.predicates = append(_q.predicates, ps...)
+	return _q
 }
 
 // Limit the number of records to be returned by this query.
-func (cnq *CollectionNodeQuery) Limit(limit int) *CollectionNodeQuery {
-	cnq.ctx.Limit = &limit
-	return cnq
+func (_q *CollectionNodeQuery) Limit(limit int) *CollectionNodeQuery {
+	_q.ctx.Limit = &limit
+	return _q
 }
 
 // Offset to start from.
-func (cnq *CollectionNodeQuery) Offset(offset int) *CollectionNodeQuery {
-	cnq.ctx.Offset = &offset
-	return cnq
+func (_q *CollectionNodeQuery) Offset(offset int) *CollectionNodeQuery {
+	_q.ctx.Offset = &offset
+	return _q
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (cnq *CollectionNodeQuery) Unique(unique bool) *CollectionNodeQuery {
-	cnq.ctx.Unique = &unique
-	return cnq
+func (_q *CollectionNodeQuery) Unique(unique bool) *CollectionNodeQuery {
+	_q.ctx.Unique = &unique
+	return _q
 }
 
 // Order specifies how the records should be ordered.
-func (cnq *CollectionNodeQuery) Order(o ...collectionnode.OrderOption) *CollectionNodeQuery {
-	cnq.order = append(cnq.order, o...)
-	return cnq
+func (_q *CollectionNodeQuery) Order(o ...collectionnode.OrderOption) *CollectionNodeQuery {
+	_q.order = append(_q.order, o...)
+	return _q
 }
 
 // QueryCollection chains the current query on the "collection" edge.
-func (cnq *CollectionNodeQuery) QueryCollection() *CollectionQuery {
-	query := (&CollectionClient{config: cnq.config}).Query()
+func (_q *CollectionNodeQuery) QueryCollection() *CollectionQuery {
+	query := (&CollectionClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cnq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := cnq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -79,20 +79,20 @@ func (cnq *CollectionNodeQuery) QueryCollection() *CollectionQuery {
 			sqlgraph.To(collection.Table, collection.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, collectionnode.CollectionTable, collectionnode.CollectionColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(cnq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
 }
 
 // QueryNode chains the current query on the "node" edge.
-func (cnq *CollectionNodeQuery) QueryNode() *NodeQuery {
-	query := (&NodeClient{config: cnq.config}).Query()
+func (_q *CollectionNodeQuery) QueryNode() *NodeQuery {
+	query := (&NodeClient{config: _q.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cnq.prepareQuery(ctx); err != nil {
+		if err := _q.prepareQuery(ctx); err != nil {
 			return nil, err
 		}
-		selector := cnq.sqlQuery(ctx)
+		selector := _q.sqlQuery(ctx)
 		if err := selector.Err(); err != nil {
 			return nil, err
 		}
@@ -101,7 +101,7 @@ func (cnq *CollectionNodeQuery) QueryNode() *NodeQuery {
 			sqlgraph.To(node.Table, node.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, collectionnode.NodeTable, collectionnode.NodeColumn),
 		)
-		fromU = sqlgraph.SetNeighbors(cnq.driver.Dialect(), step)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
 	}
 	return query
@@ -109,8 +109,8 @@ func (cnq *CollectionNodeQuery) QueryNode() *NodeQuery {
 
 // First returns the first CollectionNode entity from the query.
 // Returns a *NotFoundError when no CollectionNode was found.
-func (cnq *CollectionNodeQuery) First(ctx context.Context) (*CollectionNode, error) {
-	nodes, err := cnq.Limit(1).All(setContextOp(ctx, cnq.ctx, ent.OpQueryFirst))
+func (_q *CollectionNodeQuery) First(ctx context.Context) (*CollectionNode, error) {
+	nodes, err := _q.Limit(1).All(setContextOp(ctx, _q.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -121,8 +121,8 @@ func (cnq *CollectionNodeQuery) First(ctx context.Context) (*CollectionNode, err
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (cnq *CollectionNodeQuery) FirstX(ctx context.Context) *CollectionNode {
-	node, err := cnq.First(ctx)
+func (_q *CollectionNodeQuery) FirstX(ctx context.Context) *CollectionNode {
+	node, err := _q.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
 	}
@@ -132,8 +132,8 @@ func (cnq *CollectionNodeQuery) FirstX(ctx context.Context) *CollectionNode {
 // Only returns a single CollectionNode entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one CollectionNode entity is found.
 // Returns a *NotFoundError when no CollectionNode entities are found.
-func (cnq *CollectionNodeQuery) Only(ctx context.Context) (*CollectionNode, error) {
-	nodes, err := cnq.Limit(2).All(setContextOp(ctx, cnq.ctx, ent.OpQueryOnly))
+func (_q *CollectionNodeQuery) Only(ctx context.Context) (*CollectionNode, error) {
+	nodes, err := _q.Limit(2).All(setContextOp(ctx, _q.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -148,8 +148,8 @@ func (cnq *CollectionNodeQuery) Only(ctx context.Context) (*CollectionNode, erro
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (cnq *CollectionNodeQuery) OnlyX(ctx context.Context) *CollectionNode {
-	node, err := cnq.Only(ctx)
+func (_q *CollectionNodeQuery) OnlyX(ctx context.Context) *CollectionNode {
+	node, err := _q.Only(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -157,18 +157,18 @@ func (cnq *CollectionNodeQuery) OnlyX(ctx context.Context) *CollectionNode {
 }
 
 // All executes the query and returns a list of CollectionNodes.
-func (cnq *CollectionNodeQuery) All(ctx context.Context) ([]*CollectionNode, error) {
-	ctx = setContextOp(ctx, cnq.ctx, ent.OpQueryAll)
-	if err := cnq.prepareQuery(ctx); err != nil {
+func (_q *CollectionNodeQuery) All(ctx context.Context) ([]*CollectionNode, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryAll)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
 	qr := querierAll[[]*CollectionNode, *CollectionNodeQuery]()
-	return withInterceptors[[]*CollectionNode](ctx, cnq, qr, cnq.inters)
+	return withInterceptors[[]*CollectionNode](ctx, _q, qr, _q.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (cnq *CollectionNodeQuery) AllX(ctx context.Context) []*CollectionNode {
-	nodes, err := cnq.All(ctx)
+func (_q *CollectionNodeQuery) AllX(ctx context.Context) []*CollectionNode {
+	nodes, err := _q.All(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -176,17 +176,17 @@ func (cnq *CollectionNodeQuery) AllX(ctx context.Context) []*CollectionNode {
 }
 
 // Count returns the count of the given query.
-func (cnq *CollectionNodeQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, cnq.ctx, ent.OpQueryCount)
-	if err := cnq.prepareQuery(ctx); err != nil {
+func (_q *CollectionNodeQuery) Count(ctx context.Context) (int, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryCount)
+	if err := _q.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, cnq, querierCount[*CollectionNodeQuery](), cnq.inters)
+	return withInterceptors[int](ctx, _q, querierCount[*CollectionNodeQuery](), _q.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (cnq *CollectionNodeQuery) CountX(ctx context.Context) int {
-	count, err := cnq.Count(ctx)
+func (_q *CollectionNodeQuery) CountX(ctx context.Context) int {
+	count, err := _q.Count(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -194,9 +194,9 @@ func (cnq *CollectionNodeQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (cnq *CollectionNodeQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, cnq.ctx, ent.OpQueryExist)
-	switch _, err := cnq.First(ctx); {
+func (_q *CollectionNodeQuery) Exist(ctx context.Context) (bool, error) {
+	ctx = setContextOp(ctx, _q.ctx, ent.OpQueryExist)
+	switch _, err := _q.First(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -207,8 +207,8 @@ func (cnq *CollectionNodeQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (cnq *CollectionNodeQuery) ExistX(ctx context.Context) bool {
-	exist, err := cnq.Exist(ctx)
+func (_q *CollectionNodeQuery) ExistX(ctx context.Context) bool {
+	exist, err := _q.Exist(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -217,45 +217,45 @@ func (cnq *CollectionNodeQuery) ExistX(ctx context.Context) bool {
 
 // Clone returns a duplicate of the CollectionNodeQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (cnq *CollectionNodeQuery) Clone() *CollectionNodeQuery {
-	if cnq == nil {
+func (_q *CollectionNodeQuery) Clone() *CollectionNodeQuery {
+	if _q == nil {
 		return nil
 	}
 	return &CollectionNodeQuery{
-		config:         cnq.config,
-		ctx:            cnq.ctx.Clone(),
-		order:          append([]collectionnode.OrderOption{}, cnq.order...),
-		inters:         append([]Interceptor{}, cnq.inters...),
-		predicates:     append([]predicate.CollectionNode{}, cnq.predicates...),
-		withCollection: cnq.withCollection.Clone(),
-		withNode:       cnq.withNode.Clone(),
+		config:         _q.config,
+		ctx:            _q.ctx.Clone(),
+		order:          append([]collectionnode.OrderOption{}, _q.order...),
+		inters:         append([]Interceptor{}, _q.inters...),
+		predicates:     append([]predicate.CollectionNode{}, _q.predicates...),
+		withCollection: _q.withCollection.Clone(),
+		withNode:       _q.withNode.Clone(),
 		// clone intermediate query.
-		sql:       cnq.sql.Clone(),
-		path:      cnq.path,
-		modifiers: append([]func(*sql.Selector){}, cnq.modifiers...),
+		sql:       _q.sql.Clone(),
+		path:      _q.path,
+		modifiers: append([]func(*sql.Selector){}, _q.modifiers...),
 	}
 }
 
 // WithCollection tells the query-builder to eager-load the nodes that are connected to
 // the "collection" edge. The optional arguments are used to configure the query builder of the edge.
-func (cnq *CollectionNodeQuery) WithCollection(opts ...func(*CollectionQuery)) *CollectionNodeQuery {
-	query := (&CollectionClient{config: cnq.config}).Query()
+func (_q *CollectionNodeQuery) WithCollection(opts ...func(*CollectionQuery)) *CollectionNodeQuery {
+	query := (&CollectionClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cnq.withCollection = query
-	return cnq
+	_q.withCollection = query
+	return _q
 }
 
 // WithNode tells the query-builder to eager-load the nodes that are connected to
 // the "node" edge. The optional arguments are used to configure the query builder of the edge.
-func (cnq *CollectionNodeQuery) WithNode(opts ...func(*NodeQuery)) *CollectionNodeQuery {
-	query := (&NodeClient{config: cnq.config}).Query()
+func (_q *CollectionNodeQuery) WithNode(opts ...func(*NodeQuery)) *CollectionNodeQuery {
+	query := (&NodeClient{config: _q.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cnq.withNode = query
-	return cnq
+	_q.withNode = query
+	return _q
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -272,10 +272,10 @@ func (cnq *CollectionNodeQuery) WithNode(opts ...func(*NodeQuery)) *CollectionNo
 //		GroupBy(collectionnode.FieldCreatedAt).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (cnq *CollectionNodeQuery) GroupBy(field string, fields ...string) *CollectionNodeGroupBy {
-	cnq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &CollectionNodeGroupBy{build: cnq}
-	grbuild.flds = &cnq.ctx.Fields
+func (_q *CollectionNodeQuery) GroupBy(field string, fields ...string) *CollectionNodeGroupBy {
+	_q.ctx.Fields = append([]string{field}, fields...)
+	grbuild := &CollectionNodeGroupBy{build: _q}
+	grbuild.flds = &_q.ctx.Fields
 	grbuild.label = collectionnode.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -293,83 +293,83 @@ func (cnq *CollectionNodeQuery) GroupBy(field string, fields ...string) *Collect
 //	client.CollectionNode.Query().
 //		Select(collectionnode.FieldCreatedAt).
 //		Scan(ctx, &v)
-func (cnq *CollectionNodeQuery) Select(fields ...string) *CollectionNodeSelect {
-	cnq.ctx.Fields = append(cnq.ctx.Fields, fields...)
-	sbuild := &CollectionNodeSelect{CollectionNodeQuery: cnq}
+func (_q *CollectionNodeQuery) Select(fields ...string) *CollectionNodeSelect {
+	_q.ctx.Fields = append(_q.ctx.Fields, fields...)
+	sbuild := &CollectionNodeSelect{CollectionNodeQuery: _q}
 	sbuild.label = collectionnode.Label
-	sbuild.flds, sbuild.scan = &cnq.ctx.Fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &_q.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
 // Aggregate returns a CollectionNodeSelect configured with the given aggregations.
-func (cnq *CollectionNodeQuery) Aggregate(fns ...AggregateFunc) *CollectionNodeSelect {
-	return cnq.Select().Aggregate(fns...)
+func (_q *CollectionNodeQuery) Aggregate(fns ...AggregateFunc) *CollectionNodeSelect {
+	return _q.Select().Aggregate(fns...)
 }
 
-func (cnq *CollectionNodeQuery) prepareQuery(ctx context.Context) error {
-	for _, inter := range cnq.inters {
+func (_q *CollectionNodeQuery) prepareQuery(ctx context.Context) error {
+	for _, inter := range _q.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
 		}
 		if trv, ok := inter.(Traverser); ok {
-			if err := trv.Traverse(ctx, cnq); err != nil {
+			if err := trv.Traverse(ctx, _q); err != nil {
 				return err
 			}
 		}
 	}
-	for _, f := range cnq.ctx.Fields {
+	for _, f := range _q.ctx.Fields {
 		if !collectionnode.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
-	if cnq.path != nil {
-		prev, err := cnq.path(ctx)
+	if _q.path != nil {
+		prev, err := _q.path(ctx)
 		if err != nil {
 			return err
 		}
-		cnq.sql = prev
+		_q.sql = prev
 	}
 	return nil
 }
 
-func (cnq *CollectionNodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*CollectionNode, error) {
+func (_q *CollectionNodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*CollectionNode, error) {
 	var (
 		nodes       = []*CollectionNode{}
-		_spec       = cnq.querySpec()
+		_spec       = _q.querySpec()
 		loadedTypes = [2]bool{
-			cnq.withCollection != nil,
-			cnq.withNode != nil,
+			_q.withCollection != nil,
+			_q.withNode != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*CollectionNode).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &CollectionNode{config: cnq.config}
+		node := &CollectionNode{config: _q.config}
 		nodes = append(nodes, node)
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
-	if len(cnq.modifiers) > 0 {
-		_spec.Modifiers = cnq.modifiers
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
-	if err := sqlgraph.QueryNodes(ctx, cnq.driver, _spec); err != nil {
+	if err := sqlgraph.QueryNodes(ctx, _q.driver, _spec); err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cnq.withCollection; query != nil {
-		if err := cnq.loadCollection(ctx, query, nodes, nil,
+	if query := _q.withCollection; query != nil {
+		if err := _q.loadCollection(ctx, query, nodes, nil,
 			func(n *CollectionNode, e *Collection) { n.Edges.Collection = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := cnq.withNode; query != nil {
-		if err := cnq.loadNode(ctx, query, nodes, nil,
+	if query := _q.withNode; query != nil {
+		if err := _q.loadNode(ctx, query, nodes, nil,
 			func(n *CollectionNode, e *Node) { n.Edges.Node = e }); err != nil {
 			return nil, err
 		}
@@ -377,7 +377,7 @@ func (cnq *CollectionNodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 	return nodes, nil
 }
 
-func (cnq *CollectionNodeQuery) loadCollection(ctx context.Context, query *CollectionQuery, nodes []*CollectionNode, init func(*CollectionNode), assign func(*CollectionNode, *Collection)) error {
+func (_q *CollectionNodeQuery) loadCollection(ctx context.Context, query *CollectionQuery, nodes []*CollectionNode, init func(*CollectionNode), assign func(*CollectionNode, *Collection)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*CollectionNode)
 	for i := range nodes {
@@ -406,7 +406,7 @@ func (cnq *CollectionNodeQuery) loadCollection(ctx context.Context, query *Colle
 	}
 	return nil
 }
-func (cnq *CollectionNodeQuery) loadNode(ctx context.Context, query *NodeQuery, nodes []*CollectionNode, init func(*CollectionNode), assign func(*CollectionNode, *Node)) error {
+func (_q *CollectionNodeQuery) loadNode(ctx context.Context, query *NodeQuery, nodes []*CollectionNode, init func(*CollectionNode), assign func(*CollectionNode, *Node)) error {
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*CollectionNode)
 	for i := range nodes {
@@ -436,50 +436,50 @@ func (cnq *CollectionNodeQuery) loadNode(ctx context.Context, query *NodeQuery, 
 	return nil
 }
 
-func (cnq *CollectionNodeQuery) sqlCount(ctx context.Context) (int, error) {
-	_spec := cnq.querySpec()
-	if len(cnq.modifiers) > 0 {
-		_spec.Modifiers = cnq.modifiers
+func (_q *CollectionNodeQuery) sqlCount(ctx context.Context) (int, error) {
+	_spec := _q.querySpec()
+	if len(_q.modifiers) > 0 {
+		_spec.Modifiers = _q.modifiers
 	}
 	_spec.Unique = false
 	_spec.Node.Columns = nil
-	return sqlgraph.CountNodes(ctx, cnq.driver, _spec)
+	return sqlgraph.CountNodes(ctx, _q.driver, _spec)
 }
 
-func (cnq *CollectionNodeQuery) querySpec() *sqlgraph.QuerySpec {
+func (_q *CollectionNodeQuery) querySpec() *sqlgraph.QuerySpec {
 	_spec := sqlgraph.NewQuerySpec(collectionnode.Table, collectionnode.Columns, nil)
-	_spec.From = cnq.sql
-	if unique := cnq.ctx.Unique; unique != nil {
+	_spec.From = _q.sql
+	if unique := _q.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
-	} else if cnq.path != nil {
+	} else if _q.path != nil {
 		_spec.Unique = true
 	}
-	if fields := cnq.ctx.Fields; len(fields) > 0 {
+	if fields := _q.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		for i := range fields {
 			_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 		}
-		if cnq.withCollection != nil {
+		if _q.withCollection != nil {
 			_spec.Node.AddColumnOnce(collectionnode.FieldCollectionID)
 		}
-		if cnq.withNode != nil {
+		if _q.withNode != nil {
 			_spec.Node.AddColumnOnce(collectionnode.FieldNodeID)
 		}
 	}
-	if ps := cnq.predicates; len(ps) > 0 {
+	if ps := _q.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if limit := cnq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := cnq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
-	if ps := cnq.order; len(ps) > 0 {
+	if ps := _q.order; len(ps) > 0 {
 		_spec.Order = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
@@ -489,45 +489,45 @@ func (cnq *CollectionNodeQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (cnq *CollectionNodeQuery) sqlQuery(ctx context.Context) *sql.Selector {
-	builder := sql.Dialect(cnq.driver.Dialect())
+func (_q *CollectionNodeQuery) sqlQuery(ctx context.Context) *sql.Selector {
+	builder := sql.Dialect(_q.driver.Dialect())
 	t1 := builder.Table(collectionnode.Table)
-	columns := cnq.ctx.Fields
+	columns := _q.ctx.Fields
 	if len(columns) == 0 {
 		columns = collectionnode.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
-	if cnq.sql != nil {
-		selector = cnq.sql
+	if _q.sql != nil {
+		selector = _q.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if cnq.ctx.Unique != nil && *cnq.ctx.Unique {
+	if _q.ctx.Unique != nil && *_q.ctx.Unique {
 		selector.Distinct()
 	}
-	for _, m := range cnq.modifiers {
+	for _, m := range _q.modifiers {
 		m(selector)
 	}
-	for _, p := range cnq.predicates {
+	for _, p := range _q.predicates {
 		p(selector)
 	}
-	for _, p := range cnq.order {
+	for _, p := range _q.order {
 		p(selector)
 	}
-	if offset := cnq.ctx.Offset; offset != nil {
+	if offset := _q.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := cnq.ctx.Limit; limit != nil {
+	if limit := _q.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (cnq *CollectionNodeQuery) Modify(modifiers ...func(s *sql.Selector)) *CollectionNodeSelect {
-	cnq.modifiers = append(cnq.modifiers, modifiers...)
-	return cnq.Select()
+func (_q *CollectionNodeQuery) Modify(modifiers ...func(s *sql.Selector)) *CollectionNodeSelect {
+	_q.modifiers = append(_q.modifiers, modifiers...)
+	return _q.Select()
 }
 
 // CollectionNodeGroupBy is the group-by builder for CollectionNode entities.
@@ -537,41 +537,41 @@ type CollectionNodeGroupBy struct {
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (cngb *CollectionNodeGroupBy) Aggregate(fns ...AggregateFunc) *CollectionNodeGroupBy {
-	cngb.fns = append(cngb.fns, fns...)
-	return cngb
+func (_g *CollectionNodeGroupBy) Aggregate(fns ...AggregateFunc) *CollectionNodeGroupBy {
+	_g.fns = append(_g.fns, fns...)
+	return _g
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (cngb *CollectionNodeGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cngb.build.ctx, ent.OpQueryGroupBy)
-	if err := cngb.build.prepareQuery(ctx); err != nil {
+func (_g *CollectionNodeGroupBy) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _g.build.ctx, ent.OpQueryGroupBy)
+	if err := _g.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*CollectionNodeQuery, *CollectionNodeGroupBy](ctx, cngb.build, cngb, cngb.build.inters, v)
+	return scanWithInterceptors[*CollectionNodeQuery, *CollectionNodeGroupBy](ctx, _g.build, _g, _g.build.inters, v)
 }
 
-func (cngb *CollectionNodeGroupBy) sqlScan(ctx context.Context, root *CollectionNodeQuery, v any) error {
+func (_g *CollectionNodeGroupBy) sqlScan(ctx context.Context, root *CollectionNodeQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
-	aggregation := make([]string, 0, len(cngb.fns))
-	for _, fn := range cngb.fns {
+	aggregation := make([]string, 0, len(_g.fns))
+	for _, fn := range _g.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
 	if len(selector.SelectedColumns()) == 0 {
-		columns := make([]string, 0, len(*cngb.flds)+len(cngb.fns))
-		for _, f := range *cngb.flds {
+		columns := make([]string, 0, len(*_g.flds)+len(_g.fns))
+		for _, f := range *_g.flds {
 			columns = append(columns, selector.C(f))
 		}
 		columns = append(columns, aggregation...)
 		selector.Select(columns...)
 	}
-	selector.GroupBy(selector.Columns(*cngb.flds...)...)
+	selector.GroupBy(selector.Columns(*_g.flds...)...)
 	if err := selector.Err(); err != nil {
 		return err
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := cngb.build.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _g.build.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -585,27 +585,27 @@ type CollectionNodeSelect struct {
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (cns *CollectionNodeSelect) Aggregate(fns ...AggregateFunc) *CollectionNodeSelect {
-	cns.fns = append(cns.fns, fns...)
-	return cns
+func (_s *CollectionNodeSelect) Aggregate(fns ...AggregateFunc) *CollectionNodeSelect {
+	_s.fns = append(_s.fns, fns...)
+	return _s
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (cns *CollectionNodeSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, cns.ctx, ent.OpQuerySelect)
-	if err := cns.prepareQuery(ctx); err != nil {
+func (_s *CollectionNodeSelect) Scan(ctx context.Context, v any) error {
+	ctx = setContextOp(ctx, _s.ctx, ent.OpQuerySelect)
+	if err := _s.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*CollectionNodeQuery, *CollectionNodeSelect](ctx, cns.CollectionNodeQuery, cns, cns.inters, v)
+	return scanWithInterceptors[*CollectionNodeQuery, *CollectionNodeSelect](ctx, _s.CollectionNodeQuery, _s, _s.inters, v)
 }
 
-func (cns *CollectionNodeSelect) sqlScan(ctx context.Context, root *CollectionNodeQuery, v any) error {
+func (_s *CollectionNodeSelect) sqlScan(ctx context.Context, root *CollectionNodeQuery, v any) error {
 	selector := root.sqlQuery(ctx)
-	aggregation := make([]string, 0, len(cns.fns))
-	for _, fn := range cns.fns {
+	aggregation := make([]string, 0, len(_s.fns))
+	for _, fn := range _s.fns {
 		aggregation = append(aggregation, fn(selector))
 	}
-	switch n := len(*cns.selector.flds); {
+	switch n := len(*_s.selector.flds); {
 	case n == 0 && len(aggregation) > 0:
 		selector.Select(aggregation...)
 	case n != 0 && len(aggregation) > 0:
@@ -613,7 +613,7 @@ func (cns *CollectionNodeSelect) sqlScan(ctx context.Context, root *CollectionNo
 	}
 	rows := &sql.Rows{}
 	query, args := selector.Query()
-	if err := cns.driver.Query(ctx, query, args, rows); err != nil {
+	if err := _s.driver.Query(ctx, query, args, rows); err != nil {
 		return err
 	}
 	defer rows.Close()
@@ -621,7 +621,7 @@ func (cns *CollectionNodeSelect) sqlScan(ctx context.Context, root *CollectionNo
 }
 
 // Modify adds a query modifier for attaching custom logic to queries.
-func (cns *CollectionNodeSelect) Modify(modifiers ...func(s *sql.Selector)) *CollectionNodeSelect {
-	cns.modifiers = append(cns.modifiers, modifiers...)
-	return cns
+func (_s *CollectionNodeSelect) Modify(modifiers ...func(s *sql.Selector)) *CollectionNodeSelect {
+	_s.modifiers = append(_s.modifiers, modifiers...)
+	return _s
 }

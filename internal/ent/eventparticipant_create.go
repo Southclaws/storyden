@@ -27,81 +27,81 @@ type EventParticipantCreate struct {
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (epc *EventParticipantCreate) SetCreatedAt(t time.Time) *EventParticipantCreate {
-	epc.mutation.SetCreatedAt(t)
-	return epc
+func (_c *EventParticipantCreate) SetCreatedAt(v time.Time) *EventParticipantCreate {
+	_c.mutation.SetCreatedAt(v)
+	return _c
 }
 
 // SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (epc *EventParticipantCreate) SetNillableCreatedAt(t *time.Time) *EventParticipantCreate {
-	if t != nil {
-		epc.SetCreatedAt(*t)
+func (_c *EventParticipantCreate) SetNillableCreatedAt(v *time.Time) *EventParticipantCreate {
+	if v != nil {
+		_c.SetCreatedAt(*v)
 	}
-	return epc
+	return _c
 }
 
 // SetRole sets the "role" field.
-func (epc *EventParticipantCreate) SetRole(s string) *EventParticipantCreate {
-	epc.mutation.SetRole(s)
-	return epc
+func (_c *EventParticipantCreate) SetRole(v string) *EventParticipantCreate {
+	_c.mutation.SetRole(v)
+	return _c
 }
 
 // SetStatus sets the "status" field.
-func (epc *EventParticipantCreate) SetStatus(s string) *EventParticipantCreate {
-	epc.mutation.SetStatus(s)
-	return epc
+func (_c *EventParticipantCreate) SetStatus(v string) *EventParticipantCreate {
+	_c.mutation.SetStatus(v)
+	return _c
 }
 
 // SetAccountID sets the "account_id" field.
-func (epc *EventParticipantCreate) SetAccountID(x xid.ID) *EventParticipantCreate {
-	epc.mutation.SetAccountID(x)
-	return epc
+func (_c *EventParticipantCreate) SetAccountID(v xid.ID) *EventParticipantCreate {
+	_c.mutation.SetAccountID(v)
+	return _c
 }
 
 // SetEventID sets the "event_id" field.
-func (epc *EventParticipantCreate) SetEventID(x xid.ID) *EventParticipantCreate {
-	epc.mutation.SetEventID(x)
-	return epc
+func (_c *EventParticipantCreate) SetEventID(v xid.ID) *EventParticipantCreate {
+	_c.mutation.SetEventID(v)
+	return _c
 }
 
 // SetID sets the "id" field.
-func (epc *EventParticipantCreate) SetID(x xid.ID) *EventParticipantCreate {
-	epc.mutation.SetID(x)
-	return epc
+func (_c *EventParticipantCreate) SetID(v xid.ID) *EventParticipantCreate {
+	_c.mutation.SetID(v)
+	return _c
 }
 
 // SetNillableID sets the "id" field if the given value is not nil.
-func (epc *EventParticipantCreate) SetNillableID(x *xid.ID) *EventParticipantCreate {
-	if x != nil {
-		epc.SetID(*x)
+func (_c *EventParticipantCreate) SetNillableID(v *xid.ID) *EventParticipantCreate {
+	if v != nil {
+		_c.SetID(*v)
 	}
-	return epc
+	return _c
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (epc *EventParticipantCreate) SetAccount(a *Account) *EventParticipantCreate {
-	return epc.SetAccountID(a.ID)
+func (_c *EventParticipantCreate) SetAccount(v *Account) *EventParticipantCreate {
+	return _c.SetAccountID(v.ID)
 }
 
 // SetEvent sets the "event" edge to the Event entity.
-func (epc *EventParticipantCreate) SetEvent(e *Event) *EventParticipantCreate {
-	return epc.SetEventID(e.ID)
+func (_c *EventParticipantCreate) SetEvent(v *Event) *EventParticipantCreate {
+	return _c.SetEventID(v.ID)
 }
 
 // Mutation returns the EventParticipantMutation object of the builder.
-func (epc *EventParticipantCreate) Mutation() *EventParticipantMutation {
-	return epc.mutation
+func (_c *EventParticipantCreate) Mutation() *EventParticipantMutation {
+	return _c.mutation
 }
 
 // Save creates the EventParticipant in the database.
-func (epc *EventParticipantCreate) Save(ctx context.Context) (*EventParticipant, error) {
-	epc.defaults()
-	return withHooks(ctx, epc.sqlSave, epc.mutation, epc.hooks)
+func (_c *EventParticipantCreate) Save(ctx context.Context) (*EventParticipant, error) {
+	_c.defaults()
+	return withHooks(ctx, _c.sqlSave, _c.mutation, _c.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (epc *EventParticipantCreate) SaveX(ctx context.Context) *EventParticipant {
-	v, err := epc.Save(ctx)
+func (_c *EventParticipantCreate) SaveX(ctx context.Context) *EventParticipant {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -109,67 +109,67 @@ func (epc *EventParticipantCreate) SaveX(ctx context.Context) *EventParticipant 
 }
 
 // Exec executes the query.
-func (epc *EventParticipantCreate) Exec(ctx context.Context) error {
-	_, err := epc.Save(ctx)
+func (_c *EventParticipantCreate) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (epc *EventParticipantCreate) ExecX(ctx context.Context) {
-	if err := epc.Exec(ctx); err != nil {
+func (_c *EventParticipantCreate) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (epc *EventParticipantCreate) defaults() {
-	if _, ok := epc.mutation.CreatedAt(); !ok {
+func (_c *EventParticipantCreate) defaults() {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		v := eventparticipant.DefaultCreatedAt()
-		epc.mutation.SetCreatedAt(v)
+		_c.mutation.SetCreatedAt(v)
 	}
-	if _, ok := epc.mutation.ID(); !ok {
+	if _, ok := _c.mutation.ID(); !ok {
 		v := eventparticipant.DefaultID()
-		epc.mutation.SetID(v)
+		_c.mutation.SetID(v)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (epc *EventParticipantCreate) check() error {
-	if _, ok := epc.mutation.CreatedAt(); !ok {
+func (_c *EventParticipantCreate) check() error {
+	if _, ok := _c.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "EventParticipant.created_at"`)}
 	}
-	if _, ok := epc.mutation.Role(); !ok {
+	if _, ok := _c.mutation.Role(); !ok {
 		return &ValidationError{Name: "role", err: errors.New(`ent: missing required field "EventParticipant.role"`)}
 	}
-	if _, ok := epc.mutation.Status(); !ok {
+	if _, ok := _c.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "EventParticipant.status"`)}
 	}
-	if _, ok := epc.mutation.AccountID(); !ok {
+	if _, ok := _c.mutation.AccountID(); !ok {
 		return &ValidationError{Name: "account_id", err: errors.New(`ent: missing required field "EventParticipant.account_id"`)}
 	}
-	if _, ok := epc.mutation.EventID(); !ok {
+	if _, ok := _c.mutation.EventID(); !ok {
 		return &ValidationError{Name: "event_id", err: errors.New(`ent: missing required field "EventParticipant.event_id"`)}
 	}
-	if v, ok := epc.mutation.ID(); ok {
+	if v, ok := _c.mutation.ID(); ok {
 		if err := eventparticipant.IDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "EventParticipant.id": %w`, err)}
 		}
 	}
-	if len(epc.mutation.AccountIDs()) == 0 {
+	if len(_c.mutation.AccountIDs()) == 0 {
 		return &ValidationError{Name: "account", err: errors.New(`ent: missing required edge "EventParticipant.account"`)}
 	}
-	if len(epc.mutation.EventIDs()) == 0 {
+	if len(_c.mutation.EventIDs()) == 0 {
 		return &ValidationError{Name: "event", err: errors.New(`ent: missing required edge "EventParticipant.event"`)}
 	}
 	return nil
 }
 
-func (epc *EventParticipantCreate) sqlSave(ctx context.Context) (*EventParticipant, error) {
-	if err := epc.check(); err != nil {
+func (_c *EventParticipantCreate) sqlSave(ctx context.Context) (*EventParticipant, error) {
+	if err := _c.check(); err != nil {
 		return nil, err
 	}
-	_node, _spec := epc.createSpec()
-	if err := sqlgraph.CreateNode(ctx, epc.driver, _spec); err != nil {
+	_node, _spec := _c.createSpec()
+	if err := sqlgraph.CreateNode(ctx, _c.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
 			err = &ConstraintError{msg: err.Error(), wrap: err}
 		}
@@ -182,34 +182,34 @@ func (epc *EventParticipantCreate) sqlSave(ctx context.Context) (*EventParticipa
 			return nil, err
 		}
 	}
-	epc.mutation.id = &_node.ID
-	epc.mutation.done = true
+	_c.mutation.id = &_node.ID
+	_c.mutation.done = true
 	return _node, nil
 }
 
-func (epc *EventParticipantCreate) createSpec() (*EventParticipant, *sqlgraph.CreateSpec) {
+func (_c *EventParticipantCreate) createSpec() (*EventParticipant, *sqlgraph.CreateSpec) {
 	var (
-		_node = &EventParticipant{config: epc.config}
+		_node = &EventParticipant{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(eventparticipant.Table, sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString))
 	)
-	_spec.OnConflict = epc.conflict
-	if id, ok := epc.mutation.ID(); ok {
+	_spec.OnConflict = _c.conflict
+	if id, ok := _c.mutation.ID(); ok {
 		_node.ID = id
 		_spec.ID.Value = &id
 	}
-	if value, ok := epc.mutation.CreatedAt(); ok {
+	if value, ok := _c.mutation.CreatedAt(); ok {
 		_spec.SetField(eventparticipant.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := epc.mutation.Role(); ok {
+	if value, ok := _c.mutation.Role(); ok {
 		_spec.SetField(eventparticipant.FieldRole, field.TypeString, value)
 		_node.Role = value
 	}
-	if value, ok := epc.mutation.Status(); ok {
+	if value, ok := _c.mutation.Status(); ok {
 		_spec.SetField(eventparticipant.FieldStatus, field.TypeString, value)
 		_node.Status = value
 	}
-	if nodes := epc.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -226,7 +226,7 @@ func (epc *EventParticipantCreate) createSpec() (*EventParticipant, *sqlgraph.Cr
 		_node.AccountID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := epc.mutation.EventIDs(); len(nodes) > 0 {
+	if nodes := _c.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -262,10 +262,10 @@ func (epc *EventParticipantCreate) createSpec() (*EventParticipant, *sqlgraph.Cr
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (epc *EventParticipantCreate) OnConflict(opts ...sql.ConflictOption) *EventParticipantUpsertOne {
-	epc.conflict = opts
+func (_c *EventParticipantCreate) OnConflict(opts ...sql.ConflictOption) *EventParticipantUpsertOne {
+	_c.conflict = opts
 	return &EventParticipantUpsertOne{
-		create: epc,
+		create: _c,
 	}
 }
 
@@ -275,10 +275,10 @@ func (epc *EventParticipantCreate) OnConflict(opts ...sql.ConflictOption) *Event
 //	client.EventParticipant.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (epc *EventParticipantCreate) OnConflictColumns(columns ...string) *EventParticipantUpsertOne {
-	epc.conflict = append(epc.conflict, sql.ConflictColumns(columns...))
+func (_c *EventParticipantCreate) OnConflictColumns(columns ...string) *EventParticipantUpsertOne {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &EventParticipantUpsertOne{
-		create: epc,
+		create: _c,
 	}
 }
 
@@ -497,16 +497,16 @@ type EventParticipantCreateBulk struct {
 }
 
 // Save creates the EventParticipant entities in the database.
-func (epcb *EventParticipantCreateBulk) Save(ctx context.Context) ([]*EventParticipant, error) {
-	if epcb.err != nil {
-		return nil, epcb.err
+func (_c *EventParticipantCreateBulk) Save(ctx context.Context) ([]*EventParticipant, error) {
+	if _c.err != nil {
+		return nil, _c.err
 	}
-	specs := make([]*sqlgraph.CreateSpec, len(epcb.builders))
-	nodes := make([]*EventParticipant, len(epcb.builders))
-	mutators := make([]Mutator, len(epcb.builders))
-	for i := range epcb.builders {
+	specs := make([]*sqlgraph.CreateSpec, len(_c.builders))
+	nodes := make([]*EventParticipant, len(_c.builders))
+	mutators := make([]Mutator, len(_c.builders))
+	for i := range _c.builders {
 		func(i int, root context.Context) {
-			builder := epcb.builders[i]
+			builder := _c.builders[i]
 			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*EventParticipantMutation)
@@ -520,12 +520,12 @@ func (epcb *EventParticipantCreateBulk) Save(ctx context.Context) ([]*EventParti
 				var err error
 				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
-					_, err = mutators[i+1].Mutate(root, epcb.builders[i+1].mutation)
+					_, err = mutators[i+1].Mutate(root, _c.builders[i+1].mutation)
 				} else {
 					spec := &sqlgraph.BatchCreateSpec{Nodes: specs}
-					spec.OnConflict = epcb.conflict
+					spec.OnConflict = _c.conflict
 					// Invoke the actual operation on the latest mutation in the chain.
-					if err = sqlgraph.BatchCreate(ctx, epcb.driver, spec); err != nil {
+					if err = sqlgraph.BatchCreate(ctx, _c.driver, spec); err != nil {
 						if sqlgraph.IsConstraintError(err) {
 							err = &ConstraintError{msg: err.Error(), wrap: err}
 						}
@@ -545,7 +545,7 @@ func (epcb *EventParticipantCreateBulk) Save(ctx context.Context) ([]*EventParti
 		}(i, ctx)
 	}
 	if len(mutators) > 0 {
-		if _, err := mutators[0].Mutate(ctx, epcb.builders[0].mutation); err != nil {
+		if _, err := mutators[0].Mutate(ctx, _c.builders[0].mutation); err != nil {
 			return nil, err
 		}
 	}
@@ -553,8 +553,8 @@ func (epcb *EventParticipantCreateBulk) Save(ctx context.Context) ([]*EventParti
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (epcb *EventParticipantCreateBulk) SaveX(ctx context.Context) []*EventParticipant {
-	v, err := epcb.Save(ctx)
+func (_c *EventParticipantCreateBulk) SaveX(ctx context.Context) []*EventParticipant {
+	v, err := _c.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -562,14 +562,14 @@ func (epcb *EventParticipantCreateBulk) SaveX(ctx context.Context) []*EventParti
 }
 
 // Exec executes the query.
-func (epcb *EventParticipantCreateBulk) Exec(ctx context.Context) error {
-	_, err := epcb.Save(ctx)
+func (_c *EventParticipantCreateBulk) Exec(ctx context.Context) error {
+	_, err := _c.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (epcb *EventParticipantCreateBulk) ExecX(ctx context.Context) {
-	if err := epcb.Exec(ctx); err != nil {
+func (_c *EventParticipantCreateBulk) ExecX(ctx context.Context) {
+	if err := _c.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
@@ -589,10 +589,10 @@ func (epcb *EventParticipantCreateBulk) ExecX(ctx context.Context) {
 //			SetCreatedAt(v+v).
 //		}).
 //		Exec(ctx)
-func (epcb *EventParticipantCreateBulk) OnConflict(opts ...sql.ConflictOption) *EventParticipantUpsertBulk {
-	epcb.conflict = opts
+func (_c *EventParticipantCreateBulk) OnConflict(opts ...sql.ConflictOption) *EventParticipantUpsertBulk {
+	_c.conflict = opts
 	return &EventParticipantUpsertBulk{
-		create: epcb,
+		create: _c,
 	}
 }
 
@@ -602,10 +602,10 @@ func (epcb *EventParticipantCreateBulk) OnConflict(opts ...sql.ConflictOption) *
 //	client.EventParticipant.Create().
 //		OnConflict(sql.ConflictColumns(columns...)).
 //		Exec(ctx)
-func (epcb *EventParticipantCreateBulk) OnConflictColumns(columns ...string) *EventParticipantUpsertBulk {
-	epcb.conflict = append(epcb.conflict, sql.ConflictColumns(columns...))
+func (_c *EventParticipantCreateBulk) OnConflictColumns(columns ...string) *EventParticipantUpsertBulk {
+	_c.conflict = append(_c.conflict, sql.ConflictColumns(columns...))
 	return &EventParticipantUpsertBulk{
-		create: epcb,
+		create: _c,
 	}
 }
 

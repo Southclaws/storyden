@@ -19,19 +19,23 @@ export function ThreadFeedScreen({
   paginationBasePath,
   showCategorySelect,
   hideCategoryBadge = false,
+  showQuickShare = true,
 }: Props & {
   showCategorySelect: boolean;
   hideCategoryBadge?: boolean;
+  showQuickShare?: boolean;
 }) {
   const { session } = useSettingsContext();
 
   return (
     <LStack>
-      <QuickShare
-        initialSession={session}
-        initialCategory={category}
-        showCategorySelect={showCategorySelect}
-      />
+      {showQuickShare && (
+        <QuickShare
+          initialSession={session}
+          initialCategory={category}
+          showCategorySelect={showCategorySelect}
+        />
+      )}
       <ThreadFeed
         initialPage={initialPage}
         initialPageData={initialPageData}

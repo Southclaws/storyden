@@ -28,164 +28,164 @@ type RoleUpdate struct {
 }
 
 // Where appends a list predicates to the RoleUpdate builder.
-func (ru *RoleUpdate) Where(ps ...predicate.Role) *RoleUpdate {
-	ru.mutation.Where(ps...)
-	return ru
+func (_u *RoleUpdate) Where(ps ...predicate.Role) *RoleUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (ru *RoleUpdate) SetUpdatedAt(t time.Time) *RoleUpdate {
-	ru.mutation.SetUpdatedAt(t)
-	return ru
+func (_u *RoleUpdate) SetUpdatedAt(v time.Time) *RoleUpdate {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetName sets the "name" field.
-func (ru *RoleUpdate) SetName(s string) *RoleUpdate {
-	ru.mutation.SetName(s)
-	return ru
+func (_u *RoleUpdate) SetName(v string) *RoleUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (ru *RoleUpdate) SetNillableName(s *string) *RoleUpdate {
-	if s != nil {
-		ru.SetName(*s)
+func (_u *RoleUpdate) SetNillableName(v *string) *RoleUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return ru
+	return _u
 }
 
 // SetColour sets the "colour" field.
-func (ru *RoleUpdate) SetColour(s string) *RoleUpdate {
-	ru.mutation.SetColour(s)
-	return ru
+func (_u *RoleUpdate) SetColour(v string) *RoleUpdate {
+	_u.mutation.SetColour(v)
+	return _u
 }
 
 // SetNillableColour sets the "colour" field if the given value is not nil.
-func (ru *RoleUpdate) SetNillableColour(s *string) *RoleUpdate {
-	if s != nil {
-		ru.SetColour(*s)
+func (_u *RoleUpdate) SetNillableColour(v *string) *RoleUpdate {
+	if v != nil {
+		_u.SetColour(*v)
 	}
-	return ru
+	return _u
 }
 
 // SetPermissions sets the "permissions" field.
-func (ru *RoleUpdate) SetPermissions(s []string) *RoleUpdate {
-	ru.mutation.SetPermissions(s)
-	return ru
+func (_u *RoleUpdate) SetPermissions(v []string) *RoleUpdate {
+	_u.mutation.SetPermissions(v)
+	return _u
 }
 
-// AppendPermissions appends s to the "permissions" field.
-func (ru *RoleUpdate) AppendPermissions(s []string) *RoleUpdate {
-	ru.mutation.AppendPermissions(s)
-	return ru
+// AppendPermissions appends value to the "permissions" field.
+func (_u *RoleUpdate) AppendPermissions(v []string) *RoleUpdate {
+	_u.mutation.AppendPermissions(v)
+	return _u
 }
 
 // SetSortKey sets the "sort_key" field.
-func (ru *RoleUpdate) SetSortKey(f float64) *RoleUpdate {
-	ru.mutation.ResetSortKey()
-	ru.mutation.SetSortKey(f)
-	return ru
+func (_u *RoleUpdate) SetSortKey(v float64) *RoleUpdate {
+	_u.mutation.ResetSortKey()
+	_u.mutation.SetSortKey(v)
+	return _u
 }
 
 // SetNillableSortKey sets the "sort_key" field if the given value is not nil.
-func (ru *RoleUpdate) SetNillableSortKey(f *float64) *RoleUpdate {
-	if f != nil {
-		ru.SetSortKey(*f)
+func (_u *RoleUpdate) SetNillableSortKey(v *float64) *RoleUpdate {
+	if v != nil {
+		_u.SetSortKey(*v)
 	}
-	return ru
+	return _u
 }
 
-// AddSortKey adds f to the "sort_key" field.
-func (ru *RoleUpdate) AddSortKey(f float64) *RoleUpdate {
-	ru.mutation.AddSortKey(f)
-	return ru
+// AddSortKey adds value to the "sort_key" field.
+func (_u *RoleUpdate) AddSortKey(v float64) *RoleUpdate {
+	_u.mutation.AddSortKey(v)
+	return _u
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
-func (ru *RoleUpdate) AddAccountIDs(ids ...xid.ID) *RoleUpdate {
-	ru.mutation.AddAccountIDs(ids...)
-	return ru
+func (_u *RoleUpdate) AddAccountIDs(ids ...xid.ID) *RoleUpdate {
+	_u.mutation.AddAccountIDs(ids...)
+	return _u
 }
 
 // AddAccounts adds the "accounts" edges to the Account entity.
-func (ru *RoleUpdate) AddAccounts(a ...*Account) *RoleUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *RoleUpdate) AddAccounts(v ...*Account) *RoleUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ru.AddAccountIDs(ids...)
+	return _u.AddAccountIDs(ids...)
 }
 
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
-func (ru *RoleUpdate) AddAccountRoleIDs(ids ...xid.ID) *RoleUpdate {
-	ru.mutation.AddAccountRoleIDs(ids...)
-	return ru
+func (_u *RoleUpdate) AddAccountRoleIDs(ids ...xid.ID) *RoleUpdate {
+	_u.mutation.AddAccountRoleIDs(ids...)
+	return _u
 }
 
 // AddAccountRoles adds the "account_roles" edges to the AccountRoles entity.
-func (ru *RoleUpdate) AddAccountRoles(a ...*AccountRoles) *RoleUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *RoleUpdate) AddAccountRoles(v ...*AccountRoles) *RoleUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ru.AddAccountRoleIDs(ids...)
+	return _u.AddAccountRoleIDs(ids...)
 }
 
 // Mutation returns the RoleMutation object of the builder.
-func (ru *RoleUpdate) Mutation() *RoleMutation {
-	return ru.mutation
+func (_u *RoleUpdate) Mutation() *RoleMutation {
+	return _u.mutation
 }
 
 // ClearAccounts clears all "accounts" edges to the Account entity.
-func (ru *RoleUpdate) ClearAccounts() *RoleUpdate {
-	ru.mutation.ClearAccounts()
-	return ru
+func (_u *RoleUpdate) ClearAccounts() *RoleUpdate {
+	_u.mutation.ClearAccounts()
+	return _u
 }
 
 // RemoveAccountIDs removes the "accounts" edge to Account entities by IDs.
-func (ru *RoleUpdate) RemoveAccountIDs(ids ...xid.ID) *RoleUpdate {
-	ru.mutation.RemoveAccountIDs(ids...)
-	return ru
+func (_u *RoleUpdate) RemoveAccountIDs(ids ...xid.ID) *RoleUpdate {
+	_u.mutation.RemoveAccountIDs(ids...)
+	return _u
 }
 
 // RemoveAccounts removes "accounts" edges to Account entities.
-func (ru *RoleUpdate) RemoveAccounts(a ...*Account) *RoleUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *RoleUpdate) RemoveAccounts(v ...*Account) *RoleUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ru.RemoveAccountIDs(ids...)
+	return _u.RemoveAccountIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
-func (ru *RoleUpdate) ClearAccountRoles() *RoleUpdate {
-	ru.mutation.ClearAccountRoles()
-	return ru
+func (_u *RoleUpdate) ClearAccountRoles() *RoleUpdate {
+	_u.mutation.ClearAccountRoles()
+	return _u
 }
 
 // RemoveAccountRoleIDs removes the "account_roles" edge to AccountRoles entities by IDs.
-func (ru *RoleUpdate) RemoveAccountRoleIDs(ids ...xid.ID) *RoleUpdate {
-	ru.mutation.RemoveAccountRoleIDs(ids...)
-	return ru
+func (_u *RoleUpdate) RemoveAccountRoleIDs(ids ...xid.ID) *RoleUpdate {
+	_u.mutation.RemoveAccountRoleIDs(ids...)
+	return _u
 }
 
 // RemoveAccountRoles removes "account_roles" edges to AccountRoles entities.
-func (ru *RoleUpdate) RemoveAccountRoles(a ...*AccountRoles) *RoleUpdate {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *RoleUpdate) RemoveAccountRoles(v ...*AccountRoles) *RoleUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ru.RemoveAccountRoleIDs(ids...)
+	return _u.RemoveAccountRoleIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (ru *RoleUpdate) Save(ctx context.Context) (int, error) {
-	ru.defaults()
-	return withHooks(ctx, ru.sqlSave, ru.mutation, ru.hooks)
+func (_u *RoleUpdate) Save(ctx context.Context) (int, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ru *RoleUpdate) SaveX(ctx context.Context) int {
-	affected, err := ru.Save(ctx)
+func (_u *RoleUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -193,65 +193,65 @@ func (ru *RoleUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (ru *RoleUpdate) Exec(ctx context.Context) error {
-	_, err := ru.Save(ctx)
+func (_u *RoleUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ru *RoleUpdate) ExecX(ctx context.Context) {
-	if err := ru.Exec(ctx); err != nil {
+func (_u *RoleUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (ru *RoleUpdate) defaults() {
-	if _, ok := ru.mutation.UpdatedAt(); !ok {
+func (_u *RoleUpdate) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := role.UpdateDefaultUpdatedAt()
-		ru.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (ru *RoleUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *RoleUpdate {
-	ru.modifiers = append(ru.modifiers, modifiers...)
-	return ru
+func (_u *RoleUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *RoleUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
+func (_u *RoleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	_spec := sqlgraph.NewUpdateSpec(role.Table, role.Columns, sqlgraph.NewFieldSpec(role.FieldID, field.TypeString))
-	if ps := ru.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := ru.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := ru.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
 	}
-	if value, ok := ru.mutation.Colour(); ok {
+	if value, ok := _u.mutation.Colour(); ok {
 		_spec.SetField(role.FieldColour, field.TypeString, value)
 	}
-	if value, ok := ru.mutation.Permissions(); ok {
+	if value, ok := _u.mutation.Permissions(); ok {
 		_spec.SetField(role.FieldPermissions, field.TypeJSON, value)
 	}
-	if value, ok := ru.mutation.AppendedPermissions(); ok {
+	if value, ok := _u.mutation.AppendedPermissions(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, role.FieldPermissions, value)
 		})
 	}
-	if value, ok := ru.mutation.SortKey(); ok {
+	if value, ok := _u.mutation.SortKey(); ok {
 		_spec.SetField(role.FieldSortKey, field.TypeFloat64, value)
 	}
-	if value, ok := ru.mutation.AddedSortKey(); ok {
+	if value, ok := _u.mutation.AddedSortKey(); ok {
 		_spec.AddField(role.FieldSortKey, field.TypeFloat64, value)
 	}
-	if ru.mutation.AccountsCleared() {
+	if _u.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -262,7 +262,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
-		createE := &AccountRolesCreate{config: ru.config, mutation: newAccountRolesMutation(ru.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -271,7 +271,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.RemovedAccountsIDs(); len(nodes) > 0 && !ru.mutation.AccountsCleared() {
+	if nodes := _u.mutation.RemovedAccountsIDs(); len(nodes) > 0 && !_u.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -285,7 +285,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &AccountRolesCreate{config: ru.config, mutation: newAccountRolesMutation(ru.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -294,7 +294,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.AccountsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -308,7 +308,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &AccountRolesCreate{config: ru.config, mutation: newAccountRolesMutation(ru.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -317,7 +317,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ru.mutation.AccountRolesCleared() {
+	if _u.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -330,7 +330,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.RemovedAccountRolesIDs(); len(nodes) > 0 && !ru.mutation.AccountRolesCleared() {
+	if nodes := _u.mutation.RemovedAccountRolesIDs(); len(nodes) > 0 && !_u.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -346,7 +346,7 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.AccountRolesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountRolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -362,8 +362,8 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(ru.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{role.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -371,8 +371,8 @@ func (ru *RoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
-	ru.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // RoleUpdateOne is the builder for updating a single Role entity.
@@ -385,171 +385,171 @@ type RoleUpdateOne struct {
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (ruo *RoleUpdateOne) SetUpdatedAt(t time.Time) *RoleUpdateOne {
-	ruo.mutation.SetUpdatedAt(t)
-	return ruo
+func (_u *RoleUpdateOne) SetUpdatedAt(v time.Time) *RoleUpdateOne {
+	_u.mutation.SetUpdatedAt(v)
+	return _u
 }
 
 // SetName sets the "name" field.
-func (ruo *RoleUpdateOne) SetName(s string) *RoleUpdateOne {
-	ruo.mutation.SetName(s)
-	return ruo
+func (_u *RoleUpdateOne) SetName(v string) *RoleUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (ruo *RoleUpdateOne) SetNillableName(s *string) *RoleUpdateOne {
-	if s != nil {
-		ruo.SetName(*s)
+func (_u *RoleUpdateOne) SetNillableName(v *string) *RoleUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return ruo
+	return _u
 }
 
 // SetColour sets the "colour" field.
-func (ruo *RoleUpdateOne) SetColour(s string) *RoleUpdateOne {
-	ruo.mutation.SetColour(s)
-	return ruo
+func (_u *RoleUpdateOne) SetColour(v string) *RoleUpdateOne {
+	_u.mutation.SetColour(v)
+	return _u
 }
 
 // SetNillableColour sets the "colour" field if the given value is not nil.
-func (ruo *RoleUpdateOne) SetNillableColour(s *string) *RoleUpdateOne {
-	if s != nil {
-		ruo.SetColour(*s)
+func (_u *RoleUpdateOne) SetNillableColour(v *string) *RoleUpdateOne {
+	if v != nil {
+		_u.SetColour(*v)
 	}
-	return ruo
+	return _u
 }
 
 // SetPermissions sets the "permissions" field.
-func (ruo *RoleUpdateOne) SetPermissions(s []string) *RoleUpdateOne {
-	ruo.mutation.SetPermissions(s)
-	return ruo
+func (_u *RoleUpdateOne) SetPermissions(v []string) *RoleUpdateOne {
+	_u.mutation.SetPermissions(v)
+	return _u
 }
 
-// AppendPermissions appends s to the "permissions" field.
-func (ruo *RoleUpdateOne) AppendPermissions(s []string) *RoleUpdateOne {
-	ruo.mutation.AppendPermissions(s)
-	return ruo
+// AppendPermissions appends value to the "permissions" field.
+func (_u *RoleUpdateOne) AppendPermissions(v []string) *RoleUpdateOne {
+	_u.mutation.AppendPermissions(v)
+	return _u
 }
 
 // SetSortKey sets the "sort_key" field.
-func (ruo *RoleUpdateOne) SetSortKey(f float64) *RoleUpdateOne {
-	ruo.mutation.ResetSortKey()
-	ruo.mutation.SetSortKey(f)
-	return ruo
+func (_u *RoleUpdateOne) SetSortKey(v float64) *RoleUpdateOne {
+	_u.mutation.ResetSortKey()
+	_u.mutation.SetSortKey(v)
+	return _u
 }
 
 // SetNillableSortKey sets the "sort_key" field if the given value is not nil.
-func (ruo *RoleUpdateOne) SetNillableSortKey(f *float64) *RoleUpdateOne {
-	if f != nil {
-		ruo.SetSortKey(*f)
+func (_u *RoleUpdateOne) SetNillableSortKey(v *float64) *RoleUpdateOne {
+	if v != nil {
+		_u.SetSortKey(*v)
 	}
-	return ruo
+	return _u
 }
 
-// AddSortKey adds f to the "sort_key" field.
-func (ruo *RoleUpdateOne) AddSortKey(f float64) *RoleUpdateOne {
-	ruo.mutation.AddSortKey(f)
-	return ruo
+// AddSortKey adds value to the "sort_key" field.
+func (_u *RoleUpdateOne) AddSortKey(v float64) *RoleUpdateOne {
+	_u.mutation.AddSortKey(v)
+	return _u
 }
 
 // AddAccountIDs adds the "accounts" edge to the Account entity by IDs.
-func (ruo *RoleUpdateOne) AddAccountIDs(ids ...xid.ID) *RoleUpdateOne {
-	ruo.mutation.AddAccountIDs(ids...)
-	return ruo
+func (_u *RoleUpdateOne) AddAccountIDs(ids ...xid.ID) *RoleUpdateOne {
+	_u.mutation.AddAccountIDs(ids...)
+	return _u
 }
 
 // AddAccounts adds the "accounts" edges to the Account entity.
-func (ruo *RoleUpdateOne) AddAccounts(a ...*Account) *RoleUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *RoleUpdateOne) AddAccounts(v ...*Account) *RoleUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ruo.AddAccountIDs(ids...)
+	return _u.AddAccountIDs(ids...)
 }
 
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
-func (ruo *RoleUpdateOne) AddAccountRoleIDs(ids ...xid.ID) *RoleUpdateOne {
-	ruo.mutation.AddAccountRoleIDs(ids...)
-	return ruo
+func (_u *RoleUpdateOne) AddAccountRoleIDs(ids ...xid.ID) *RoleUpdateOne {
+	_u.mutation.AddAccountRoleIDs(ids...)
+	return _u
 }
 
 // AddAccountRoles adds the "account_roles" edges to the AccountRoles entity.
-func (ruo *RoleUpdateOne) AddAccountRoles(a ...*AccountRoles) *RoleUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *RoleUpdateOne) AddAccountRoles(v ...*AccountRoles) *RoleUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ruo.AddAccountRoleIDs(ids...)
+	return _u.AddAccountRoleIDs(ids...)
 }
 
 // Mutation returns the RoleMutation object of the builder.
-func (ruo *RoleUpdateOne) Mutation() *RoleMutation {
-	return ruo.mutation
+func (_u *RoleUpdateOne) Mutation() *RoleMutation {
+	return _u.mutation
 }
 
 // ClearAccounts clears all "accounts" edges to the Account entity.
-func (ruo *RoleUpdateOne) ClearAccounts() *RoleUpdateOne {
-	ruo.mutation.ClearAccounts()
-	return ruo
+func (_u *RoleUpdateOne) ClearAccounts() *RoleUpdateOne {
+	_u.mutation.ClearAccounts()
+	return _u
 }
 
 // RemoveAccountIDs removes the "accounts" edge to Account entities by IDs.
-func (ruo *RoleUpdateOne) RemoveAccountIDs(ids ...xid.ID) *RoleUpdateOne {
-	ruo.mutation.RemoveAccountIDs(ids...)
-	return ruo
+func (_u *RoleUpdateOne) RemoveAccountIDs(ids ...xid.ID) *RoleUpdateOne {
+	_u.mutation.RemoveAccountIDs(ids...)
+	return _u
 }
 
 // RemoveAccounts removes "accounts" edges to Account entities.
-func (ruo *RoleUpdateOne) RemoveAccounts(a ...*Account) *RoleUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *RoleUpdateOne) RemoveAccounts(v ...*Account) *RoleUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ruo.RemoveAccountIDs(ids...)
+	return _u.RemoveAccountIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
-func (ruo *RoleUpdateOne) ClearAccountRoles() *RoleUpdateOne {
-	ruo.mutation.ClearAccountRoles()
-	return ruo
+func (_u *RoleUpdateOne) ClearAccountRoles() *RoleUpdateOne {
+	_u.mutation.ClearAccountRoles()
+	return _u
 }
 
 // RemoveAccountRoleIDs removes the "account_roles" edge to AccountRoles entities by IDs.
-func (ruo *RoleUpdateOne) RemoveAccountRoleIDs(ids ...xid.ID) *RoleUpdateOne {
-	ruo.mutation.RemoveAccountRoleIDs(ids...)
-	return ruo
+func (_u *RoleUpdateOne) RemoveAccountRoleIDs(ids ...xid.ID) *RoleUpdateOne {
+	_u.mutation.RemoveAccountRoleIDs(ids...)
+	return _u
 }
 
 // RemoveAccountRoles removes "account_roles" edges to AccountRoles entities.
-func (ruo *RoleUpdateOne) RemoveAccountRoles(a ...*AccountRoles) *RoleUpdateOne {
-	ids := make([]xid.ID, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+func (_u *RoleUpdateOne) RemoveAccountRoles(v ...*AccountRoles) *RoleUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
 	}
-	return ruo.RemoveAccountRoleIDs(ids...)
+	return _u.RemoveAccountRoleIDs(ids...)
 }
 
 // Where appends a list predicates to the RoleUpdate builder.
-func (ruo *RoleUpdateOne) Where(ps ...predicate.Role) *RoleUpdateOne {
-	ruo.mutation.Where(ps...)
-	return ruo
+func (_u *RoleUpdateOne) Where(ps ...predicate.Role) *RoleUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (ruo *RoleUpdateOne) Select(field string, fields ...string) *RoleUpdateOne {
-	ruo.fields = append([]string{field}, fields...)
-	return ruo
+func (_u *RoleUpdateOne) Select(field string, fields ...string) *RoleUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Role entity.
-func (ruo *RoleUpdateOne) Save(ctx context.Context) (*Role, error) {
-	ruo.defaults()
-	return withHooks(ctx, ruo.sqlSave, ruo.mutation, ruo.hooks)
+func (_u *RoleUpdateOne) Save(ctx context.Context) (*Role, error) {
+	_u.defaults()
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ruo *RoleUpdateOne) SaveX(ctx context.Context) *Role {
-	node, err := ruo.Save(ctx)
+func (_u *RoleUpdateOne) SaveX(ctx context.Context) *Role {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -557,40 +557,40 @@ func (ruo *RoleUpdateOne) SaveX(ctx context.Context) *Role {
 }
 
 // Exec executes the query on the entity.
-func (ruo *RoleUpdateOne) Exec(ctx context.Context) error {
-	_, err := ruo.Save(ctx)
+func (_u *RoleUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ruo *RoleUpdateOne) ExecX(ctx context.Context) {
-	if err := ruo.Exec(ctx); err != nil {
+func (_u *RoleUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // defaults sets the default values of the builder before save.
-func (ruo *RoleUpdateOne) defaults() {
-	if _, ok := ruo.mutation.UpdatedAt(); !ok {
+func (_u *RoleUpdateOne) defaults() {
+	if _, ok := _u.mutation.UpdatedAt(); !ok {
 		v := role.UpdateDefaultUpdatedAt()
-		ruo.mutation.SetUpdatedAt(v)
+		_u.mutation.SetUpdatedAt(v)
 	}
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (ruo *RoleUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *RoleUpdateOne {
-	ruo.modifiers = append(ruo.modifiers, modifiers...)
-	return ruo
+func (_u *RoleUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *RoleUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) {
+func (_u *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) {
 	_spec := sqlgraph.NewUpdateSpec(role.Table, role.Columns, sqlgraph.NewFieldSpec(role.FieldID, field.TypeString))
-	id, ok := ruo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Role.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := ruo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, role.FieldID)
 		for _, f := range fields {
@@ -602,37 +602,37 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 			}
 		}
 	}
-	if ps := ruo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := ruo.mutation.UpdatedAt(); ok {
+	if value, ok := _u.mutation.UpdatedAt(); ok {
 		_spec.SetField(role.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := ruo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(role.FieldName, field.TypeString, value)
 	}
-	if value, ok := ruo.mutation.Colour(); ok {
+	if value, ok := _u.mutation.Colour(); ok {
 		_spec.SetField(role.FieldColour, field.TypeString, value)
 	}
-	if value, ok := ruo.mutation.Permissions(); ok {
+	if value, ok := _u.mutation.Permissions(); ok {
 		_spec.SetField(role.FieldPermissions, field.TypeJSON, value)
 	}
-	if value, ok := ruo.mutation.AppendedPermissions(); ok {
+	if value, ok := _u.mutation.AppendedPermissions(); ok {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, role.FieldPermissions, value)
 		})
 	}
-	if value, ok := ruo.mutation.SortKey(); ok {
+	if value, ok := _u.mutation.SortKey(); ok {
 		_spec.SetField(role.FieldSortKey, field.TypeFloat64, value)
 	}
-	if value, ok := ruo.mutation.AddedSortKey(); ok {
+	if value, ok := _u.mutation.AddedSortKey(); ok {
 		_spec.AddField(role.FieldSortKey, field.TypeFloat64, value)
 	}
-	if ruo.mutation.AccountsCleared() {
+	if _u.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -643,7 +643,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 				IDSpec: sqlgraph.NewFieldSpec(account.FieldID, field.TypeString),
 			},
 		}
-		createE := &AccountRolesCreate{config: ruo.config, mutation: newAccountRolesMutation(ruo.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -652,7 +652,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.RemovedAccountsIDs(); len(nodes) > 0 && !ruo.mutation.AccountsCleared() {
+	if nodes := _u.mutation.RemovedAccountsIDs(); len(nodes) > 0 && !_u.mutation.AccountsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -666,7 +666,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &AccountRolesCreate{config: ruo.config, mutation: newAccountRolesMutation(ruo.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -675,7 +675,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.AccountsIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
@@ -689,7 +689,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		createE := &AccountRolesCreate{config: ruo.config, mutation: newAccountRolesMutation(ruo.config, OpCreate)}
+		createE := &AccountRolesCreate{config: _u.config, mutation: newAccountRolesMutation(_u.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
@@ -698,7 +698,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ruo.mutation.AccountRolesCleared() {
+	if _u.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -711,7 +711,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.RemovedAccountRolesIDs(); len(nodes) > 0 && !ruo.mutation.AccountRolesCleared() {
+	if nodes := _u.mutation.RemovedAccountRolesIDs(); len(nodes) > 0 && !_u.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -727,7 +727,7 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.AccountRolesIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountRolesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
@@ -743,11 +743,11 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(ruo.modifiers...)
-	_node = &Role{config: ruo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Role{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, ruo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{role.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -755,6 +755,6 @@ func (ruo *RoleUpdateOne) sqlSave(ctx context.Context) (_node *Role, err error) 
 		}
 		return nil, err
 	}
-	ruo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

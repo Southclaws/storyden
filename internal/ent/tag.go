@@ -88,7 +88,7 @@ func (*Tag) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Tag fields.
-func (t *Tag) assignValues(columns []string, values []any) error {
+func (_m *Tag) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -98,22 +98,22 @@ func (t *Tag) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				t.ID = *value
+				_m.ID = *value
 			}
 		case tag.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				t.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case tag.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				t.Name = value.String
+				_m.Name = value.String
 			}
 		default:
-			t.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -121,53 +121,53 @@ func (t *Tag) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Tag.
 // This includes values selected through modifiers, order, etc.
-func (t *Tag) Value(name string) (ent.Value, error) {
-	return t.selectValues.Get(name)
+func (_m *Tag) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryPosts queries the "posts" edge of the Tag entity.
-func (t *Tag) QueryPosts() *PostQuery {
-	return NewTagClient(t.config).QueryPosts(t)
+func (_m *Tag) QueryPosts() *PostQuery {
+	return NewTagClient(_m.config).QueryPosts(_m)
 }
 
 // QueryNodes queries the "nodes" edge of the Tag entity.
-func (t *Tag) QueryNodes() *NodeQuery {
-	return NewTagClient(t.config).QueryNodes(t)
+func (_m *Tag) QueryNodes() *NodeQuery {
+	return NewTagClient(_m.config).QueryNodes(_m)
 }
 
 // QueryAccounts queries the "accounts" edge of the Tag entity.
-func (t *Tag) QueryAccounts() *AccountQuery {
-	return NewTagClient(t.config).QueryAccounts(t)
+func (_m *Tag) QueryAccounts() *AccountQuery {
+	return NewTagClient(_m.config).QueryAccounts(_m)
 }
 
 // Update returns a builder for updating this Tag.
 // Note that you need to call Tag.Unwrap() before calling this method if this Tag
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (t *Tag) Update() *TagUpdateOne {
-	return NewTagClient(t.config).UpdateOne(t)
+func (_m *Tag) Update() *TagUpdateOne {
+	return NewTagClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Tag entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (t *Tag) Unwrap() *Tag {
-	_tx, ok := t.config.driver.(*txDriver)
+func (_m *Tag) Unwrap() *Tag {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Tag is not a transactional entity")
 	}
-	t.config.driver = _tx.drv
-	return t
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (t *Tag) String() string {
+func (_m *Tag) String() string {
 	var builder strings.Builder
 	builder.WriteString("Tag(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", t.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(t.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(t.Name)
+	builder.WriteString(_m.Name)
 	builder.WriteByte(')')
 	return builder.String()
 }

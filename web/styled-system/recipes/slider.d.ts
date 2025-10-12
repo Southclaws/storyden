@@ -13,7 +13,7 @@ type SliderVariantMap = {
   [key in keyof SliderVariant]: Array<SliderVariant[key]>
 }
 
-type SliderSlot = "root" | "label" | "thumb" | "valueText" | "track" | "range" | "control" | "markerGroup" | "marker"
+type SliderSlot = "root" | "label" | "thumb" | "valueText" | "track" | "range" | "control" | "markerGroup" | "marker" | "draggingIndicator"
 
 export type SliderVariantProps = {
   [key in keyof SliderVariant]?: ConditionalValue<SliderVariant[key]> | undefined

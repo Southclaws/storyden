@@ -1,4 +1,4 @@
-import { toggleGroupAnatomy } from "@ark-ui/anatomy";
+import { toggleGroupAnatomy } from "@ark-ui/react";
 import { defineSlotRecipe } from "@pandacss/dev";
 
 export const toggleGroup = defineSlotRecipe({

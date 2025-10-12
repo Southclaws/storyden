@@ -62,6 +62,10 @@ const comboboxSlotNames = [
   [
     "trigger",
     "combobox__trigger"
+  ],
+  [
+    "empty",
+    "combobox__empty"
   ]
 ]
 const comboboxSlotFns = /* @__PURE__ */ comboboxSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, comboboxDefaultVariants, getSlotCompoundVariant(comboboxCompoundVariants, slotName))])

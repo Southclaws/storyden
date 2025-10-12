@@ -85,7 +85,7 @@ func (*CollectionNode) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the CollectionNode fields.
-func (cn *CollectionNode) assignValues(columns []string, values []any) error {
+func (_m *CollectionNode) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -95,28 +95,28 @@ func (cn *CollectionNode) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				cn.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case collectionnode.FieldCollectionID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field collection_id", values[i])
 			} else if value != nil {
-				cn.CollectionID = *value
+				_m.CollectionID = *value
 			}
 		case collectionnode.FieldNodeID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field node_id", values[i])
 			} else if value != nil {
-				cn.NodeID = *value
+				_m.NodeID = *value
 			}
 		case collectionnode.FieldMembershipType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field membership_type", values[i])
 			} else if value.Valid {
-				cn.MembershipType = value.String
+				_m.MembershipType = value.String
 			}
 		default:
-			cn.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -124,53 +124,53 @@ func (cn *CollectionNode) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the CollectionNode.
 // This includes values selected through modifiers, order, etc.
-func (cn *CollectionNode) Value(name string) (ent.Value, error) {
-	return cn.selectValues.Get(name)
+func (_m *CollectionNode) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryCollection queries the "collection" edge of the CollectionNode entity.
-func (cn *CollectionNode) QueryCollection() *CollectionQuery {
-	return NewCollectionNodeClient(cn.config).QueryCollection(cn)
+func (_m *CollectionNode) QueryCollection() *CollectionQuery {
+	return NewCollectionNodeClient(_m.config).QueryCollection(_m)
 }
 
 // QueryNode queries the "node" edge of the CollectionNode entity.
-func (cn *CollectionNode) QueryNode() *NodeQuery {
-	return NewCollectionNodeClient(cn.config).QueryNode(cn)
+func (_m *CollectionNode) QueryNode() *NodeQuery {
+	return NewCollectionNodeClient(_m.config).QueryNode(_m)
 }
 
 // Update returns a builder for updating this CollectionNode.
 // Note that you need to call CollectionNode.Unwrap() before calling this method if this CollectionNode
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (cn *CollectionNode) Update() *CollectionNodeUpdateOne {
-	return NewCollectionNodeClient(cn.config).UpdateOne(cn)
+func (_m *CollectionNode) Update() *CollectionNodeUpdateOne {
+	return NewCollectionNodeClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the CollectionNode entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (cn *CollectionNode) Unwrap() *CollectionNode {
-	_tx, ok := cn.config.driver.(*txDriver)
+func (_m *CollectionNode) Unwrap() *CollectionNode {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: CollectionNode is not a transactional entity")
 	}
-	cn.config.driver = _tx.drv
-	return cn
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (cn *CollectionNode) String() string {
+func (_m *CollectionNode) String() string {
 	var builder strings.Builder
 	builder.WriteString("CollectionNode(")
 	builder.WriteString("created_at=")
-	builder.WriteString(cn.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("collection_id=")
-	builder.WriteString(fmt.Sprintf("%v", cn.CollectionID))
+	builder.WriteString(fmt.Sprintf("%v", _m.CollectionID))
 	builder.WriteString(", ")
 	builder.WriteString("node_id=")
-	builder.WriteString(fmt.Sprintf("%v", cn.NodeID))
+	builder.WriteString(fmt.Sprintf("%v", _m.NodeID))
 	builder.WriteString(", ")
 	builder.WriteString("membership_type=")
-	builder.WriteString(cn.MembershipType)
+	builder.WriteString(_m.MembershipType)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -3,6 +3,7 @@ package icon
 import (
 	"bytes"
 	"context"
+	_ "embed"
 	"fmt"
 	"image"
 	_ "image/gif"
@@ -17,6 +18,7 @@ import (
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/ftag"
 	"github.com/disintegration/imaging"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
@@ -28,8 +30,10 @@ import (
 	"github.com/Southclaws/storyden/internal/mime"
 )
 
+//go:embed embed/default_icon.png
+var defaultIcon []byte
+
 const (
-	iconRoute        = "api/info/icon"
 	iconFileTemplate = "icon-%s.png"
 )
 
@@ -143,8 +147,18 @@ func (s *service) Get(ctx context.Context, size string) (*asset.Asset, io.Reader
 
 	a, r, err := s.downloader.Get(ctx, filename)
 	if err != nil {
-		return nil, nil, fault.Wrap(err, fctx.With(ctx))
+		a, r = s.getDefaultIcon()
 	}
 
 	return a, r, nil
+}
+
+func (s *service) getDefaultIcon() (*asset.Asset, io.Reader) {
+	defaultIconReader := bytes.NewReader(defaultIcon)
+	return &asset.Asset{
+		ID:   xid.NilID(),
+		Name: asset.NewFilepathFilename("default-icon.png"),
+		Size: len(defaultIcon),
+		MIME: mime.New("image/png"),
+	}, defaultIconReader
 }

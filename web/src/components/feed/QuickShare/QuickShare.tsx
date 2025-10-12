@@ -8,7 +8,7 @@ import { ComposeField } from "@/components/ui/form/ComposeField";
 import { FormErrorText } from "@/components/ui/form/FormErrorText";
 import { CreateIcon } from "@/components/ui/icons/Create";
 import { Card } from "@/components/ui/rich-card";
-import { CardBox, Flex, HStack } from "@/styled-system/jsx";
+import { CardBox, Flex, HStack, WStack } from "@/styled-system/jsx";
 import { lstack } from "@/styled-system/patterns";
 import { getAssetURL } from "@/utils/asset";
 
@@ -36,27 +36,28 @@ export function QuickShare(props: Props) {
         onFocus={handlers.handleFocus}
         onSubmit={handlers.handlePost}
       >
-        <Flex
+        <ComposeField
+          control={form.control}
+          name="body"
+          placeholder="Share a thought, a link, something cool..."
+          resetKey={resetKey}
+        />
+
+        <WStack
           w="full"
-          gap={{
-            base: "0",
-            md: "2",
-          }}
-          flexDirection={{
-            base: "column",
-            md: "row",
-          }}
-          alignItems={{
-            base: "end",
-            md: "start",
-          }}
+          justifyContent={
+            props.showCategorySelect ? "space-between" : "flex-end"
+          }
         >
-          <ComposeField
-            control={form.control}
-            name="body"
-            placeholder="Share a thought, a link, something cool..."
-            resetKey={resetKey}
-          />
+          {props.showCategorySelect && (
+            <HStack alignItems="center">
+              <CategorySelect control={form.control} name="category" />
+
+              <FormErrorText>
+                {form.formState.errors["category"]?.message}
+              </FormErrorText>
+            </HStack>
+          )}
 
           <Button
             type="submit"
@@ -67,17 +68,7 @@ export function QuickShare(props: Props) {
             <CreateIcon />
             Share
           </Button>
-        </Flex>
-
-        {props.showCategorySelect && (
-          <HStack alignItems="center">
-            <CategorySelect control={form.control} name="category" />
-
-            <FormErrorText>
-              {form.formState.errors["category"]?.message}
-            </FormErrorText>
-          </HStack>
-        )}
+        </WStack>
       </form>
 
       {match(hydratedLink)

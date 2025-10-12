@@ -151,7 +151,7 @@ func (*Link) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Link fields.
-func (l *Link) assignValues(columns []string, values []any) error {
+func (_m *Link) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -161,60 +161,60 @@ func (l *Link) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				l.ID = *value
+				_m.ID = *value
 			}
 		case link.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				l.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case link.FieldURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field url", values[i])
 			} else if value.Valid {
-				l.URL = value.String
+				_m.URL = value.String
 			}
 		case link.FieldSlug:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field slug", values[i])
 			} else if value.Valid {
-				l.Slug = value.String
+				_m.Slug = value.String
 			}
 		case link.FieldDomain:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field domain", values[i])
 			} else if value.Valid {
-				l.Domain = value.String
+				_m.Domain = value.String
 			}
 		case link.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
 			} else if value.Valid {
-				l.Title = value.String
+				_m.Title = value.String
 			}
 		case link.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field description", values[i])
 			} else if value.Valid {
-				l.Description = value.String
+				_m.Description = value.String
 			}
 		case link.FieldPrimaryAssetID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field primary_asset_id", values[i])
 			} else if value.Valid {
-				l.PrimaryAssetID = new(xid.ID)
-				*l.PrimaryAssetID = *value.S.(*xid.ID)
+				_m.PrimaryAssetID = new(xid.ID)
+				*_m.PrimaryAssetID = *value.S.(*xid.ID)
 			}
 		case link.FieldFaviconAssetID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field favicon_asset_id", values[i])
 			} else if value.Valid {
-				l.FaviconAssetID = new(xid.ID)
-				*l.FaviconAssetID = *value.S.(*xid.ID)
+				_m.FaviconAssetID = new(xid.ID)
+				*_m.FaviconAssetID = *value.S.(*xid.ID)
 			}
 		default:
-			l.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -222,92 +222,92 @@ func (l *Link) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Link.
 // This includes values selected through modifiers, order, etc.
-func (l *Link) Value(name string) (ent.Value, error) {
-	return l.selectValues.Get(name)
+func (_m *Link) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryPosts queries the "posts" edge of the Link entity.
-func (l *Link) QueryPosts() *PostQuery {
-	return NewLinkClient(l.config).QueryPosts(l)
+func (_m *Link) QueryPosts() *PostQuery {
+	return NewLinkClient(_m.config).QueryPosts(_m)
 }
 
 // QueryPostContentReferences queries the "post_content_references" edge of the Link entity.
-func (l *Link) QueryPostContentReferences() *PostQuery {
-	return NewLinkClient(l.config).QueryPostContentReferences(l)
+func (_m *Link) QueryPostContentReferences() *PostQuery {
+	return NewLinkClient(_m.config).QueryPostContentReferences(_m)
 }
 
 // QueryNodes queries the "nodes" edge of the Link entity.
-func (l *Link) QueryNodes() *NodeQuery {
-	return NewLinkClient(l.config).QueryNodes(l)
+func (_m *Link) QueryNodes() *NodeQuery {
+	return NewLinkClient(_m.config).QueryNodes(_m)
 }
 
 // QueryNodeContentReferences queries the "node_content_references" edge of the Link entity.
-func (l *Link) QueryNodeContentReferences() *NodeQuery {
-	return NewLinkClient(l.config).QueryNodeContentReferences(l)
+func (_m *Link) QueryNodeContentReferences() *NodeQuery {
+	return NewLinkClient(_m.config).QueryNodeContentReferences(_m)
 }
 
 // QueryPrimaryImage queries the "primary_image" edge of the Link entity.
-func (l *Link) QueryPrimaryImage() *AssetQuery {
-	return NewLinkClient(l.config).QueryPrimaryImage(l)
+func (_m *Link) QueryPrimaryImage() *AssetQuery {
+	return NewLinkClient(_m.config).QueryPrimaryImage(_m)
 }
 
 // QueryFaviconImage queries the "favicon_image" edge of the Link entity.
-func (l *Link) QueryFaviconImage() *AssetQuery {
-	return NewLinkClient(l.config).QueryFaviconImage(l)
+func (_m *Link) QueryFaviconImage() *AssetQuery {
+	return NewLinkClient(_m.config).QueryFaviconImage(_m)
 }
 
 // QueryAssets queries the "assets" edge of the Link entity.
-func (l *Link) QueryAssets() *AssetQuery {
-	return NewLinkClient(l.config).QueryAssets(l)
+func (_m *Link) QueryAssets() *AssetQuery {
+	return NewLinkClient(_m.config).QueryAssets(_m)
 }
 
 // Update returns a builder for updating this Link.
 // Note that you need to call Link.Unwrap() before calling this method if this Link
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (l *Link) Update() *LinkUpdateOne {
-	return NewLinkClient(l.config).UpdateOne(l)
+func (_m *Link) Update() *LinkUpdateOne {
+	return NewLinkClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Link entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (l *Link) Unwrap() *Link {
-	_tx, ok := l.config.driver.(*txDriver)
+func (_m *Link) Unwrap() *Link {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Link is not a transactional entity")
 	}
-	l.config.driver = _tx.drv
-	return l
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (l *Link) String() string {
+func (_m *Link) String() string {
 	var builder strings.Builder
 	builder.WriteString("Link(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", l.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(l.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("url=")
-	builder.WriteString(l.URL)
+	builder.WriteString(_m.URL)
 	builder.WriteString(", ")
 	builder.WriteString("slug=")
-	builder.WriteString(l.Slug)
+	builder.WriteString(_m.Slug)
 	builder.WriteString(", ")
 	builder.WriteString("domain=")
-	builder.WriteString(l.Domain)
+	builder.WriteString(_m.Domain)
 	builder.WriteString(", ")
 	builder.WriteString("title=")
-	builder.WriteString(l.Title)
+	builder.WriteString(_m.Title)
 	builder.WriteString(", ")
 	builder.WriteString("description=")
-	builder.WriteString(l.Description)
+	builder.WriteString(_m.Description)
 	builder.WriteString(", ")
-	if v := l.PrimaryAssetID; v != nil {
+	if v := _m.PrimaryAssetID; v != nil {
 		builder.WriteString("primary_asset_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	if v := l.FaviconAssetID; v != nil {
+	if v := _m.FaviconAssetID; v != nil {
 		builder.WriteString("favicon_asset_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}

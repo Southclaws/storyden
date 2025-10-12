@@ -156,7 +156,7 @@ func (*Asset) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Asset fields.
-func (a *Asset) assignValues(columns []string, values []any) error {
+func (_m *Asset) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -166,43 +166,43 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				a.ID = *value
+				_m.ID = *value
 			}
 		case asset.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				a.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case asset.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				a.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case asset.FieldFilename:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field filename", values[i])
 			} else if value.Valid {
-				a.Filename = value.String
+				_m.Filename = value.String
 			}
 		case asset.FieldSize:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field size", values[i])
 			} else if value.Valid {
-				a.Size = int(value.Int64)
+				_m.Size = int(value.Int64)
 			}
 		case asset.FieldMimeType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field mime_type", values[i])
 			} else if value.Valid {
-				a.MimeType = value.String
+				_m.MimeType = value.String
 			}
 		case asset.FieldMetadata:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field metadata", values[i])
 			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &a.Metadata); err != nil {
+				if err := json.Unmarshal(*value, &_m.Metadata); err != nil {
 					return fmt.Errorf("unmarshal field metadata: %w", err)
 				}
 			}
@@ -210,17 +210,17 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field account_id", values[i])
 			} else if value != nil {
-				a.AccountID = *value
+				_m.AccountID = *value
 			}
 		case asset.FieldParentAssetID:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_asset_id", values[i])
 			} else if value.Valid {
-				a.ParentAssetID = new(xid.ID)
-				*a.ParentAssetID = *value.S.(*xid.ID)
+				_m.ParentAssetID = new(xid.ID)
+				*_m.ParentAssetID = *value.S.(*xid.ID)
 			}
 		default:
-			a.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -228,90 +228,90 @@ func (a *Asset) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Asset.
 // This includes values selected through modifiers, order, etc.
-func (a *Asset) Value(name string) (ent.Value, error) {
-	return a.selectValues.Get(name)
+func (_m *Asset) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryPosts queries the "posts" edge of the Asset entity.
-func (a *Asset) QueryPosts() *PostQuery {
-	return NewAssetClient(a.config).QueryPosts(a)
+func (_m *Asset) QueryPosts() *PostQuery {
+	return NewAssetClient(_m.config).QueryPosts(_m)
 }
 
 // QueryNodes queries the "nodes" edge of the Asset entity.
-func (a *Asset) QueryNodes() *NodeQuery {
-	return NewAssetClient(a.config).QueryNodes(a)
+func (_m *Asset) QueryNodes() *NodeQuery {
+	return NewAssetClient(_m.config).QueryNodes(_m)
 }
 
 // QueryLinks queries the "links" edge of the Asset entity.
-func (a *Asset) QueryLinks() *LinkQuery {
-	return NewAssetClient(a.config).QueryLinks(a)
+func (_m *Asset) QueryLinks() *LinkQuery {
+	return NewAssetClient(_m.config).QueryLinks(_m)
 }
 
 // QueryOwner queries the "owner" edge of the Asset entity.
-func (a *Asset) QueryOwner() *AccountQuery {
-	return NewAssetClient(a.config).QueryOwner(a)
+func (_m *Asset) QueryOwner() *AccountQuery {
+	return NewAssetClient(_m.config).QueryOwner(_m)
 }
 
 // QueryParent queries the "parent" edge of the Asset entity.
-func (a *Asset) QueryParent() *AssetQuery {
-	return NewAssetClient(a.config).QueryParent(a)
+func (_m *Asset) QueryParent() *AssetQuery {
+	return NewAssetClient(_m.config).QueryParent(_m)
 }
 
 // QueryAssets queries the "assets" edge of the Asset entity.
-func (a *Asset) QueryAssets() *AssetQuery {
-	return NewAssetClient(a.config).QueryAssets(a)
+func (_m *Asset) QueryAssets() *AssetQuery {
+	return NewAssetClient(_m.config).QueryAssets(_m)
 }
 
 // QueryEvent queries the "event" edge of the Asset entity.
-func (a *Asset) QueryEvent() *EventQuery {
-	return NewAssetClient(a.config).QueryEvent(a)
+func (_m *Asset) QueryEvent() *EventQuery {
+	return NewAssetClient(_m.config).QueryEvent(_m)
 }
 
 // Update returns a builder for updating this Asset.
 // Note that you need to call Asset.Unwrap() before calling this method if this Asset
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (a *Asset) Update() *AssetUpdateOne {
-	return NewAssetClient(a.config).UpdateOne(a)
+func (_m *Asset) Update() *AssetUpdateOne {
+	return NewAssetClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Asset entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (a *Asset) Unwrap() *Asset {
-	_tx, ok := a.config.driver.(*txDriver)
+func (_m *Asset) Unwrap() *Asset {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Asset is not a transactional entity")
 	}
-	a.config.driver = _tx.drv
-	return a
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (a *Asset) String() string {
+func (_m *Asset) String() string {
 	var builder strings.Builder
 	builder.WriteString("Asset(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(a.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("filename=")
-	builder.WriteString(a.Filename)
+	builder.WriteString(_m.Filename)
 	builder.WriteString(", ")
 	builder.WriteString("size=")
-	builder.WriteString(fmt.Sprintf("%v", a.Size))
+	builder.WriteString(fmt.Sprintf("%v", _m.Size))
 	builder.WriteString(", ")
 	builder.WriteString("mime_type=")
-	builder.WriteString(a.MimeType)
+	builder.WriteString(_m.MimeType)
 	builder.WriteString(", ")
 	builder.WriteString("metadata=")
-	builder.WriteString(fmt.Sprintf("%v", a.Metadata))
+	builder.WriteString(fmt.Sprintf("%v", _m.Metadata))
 	builder.WriteString(", ")
 	builder.WriteString("account_id=")
-	builder.WriteString(fmt.Sprintf("%v", a.AccountID))
+	builder.WriteString(fmt.Sprintf("%v", _m.AccountID))
 	builder.WriteString(", ")
-	if v := a.ParentAssetID; v != nil {
+	if v := _m.ParentAssetID; v != nil {
 		builder.WriteString("parent_asset_id=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
 	}

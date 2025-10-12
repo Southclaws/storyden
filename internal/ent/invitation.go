@@ -86,52 +86,52 @@ func (*Invitation) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the Invitation fields.
-func (i *Invitation) assignValues(columns []string, values []any) error {
+func (_m *Invitation) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
-	for j := range columns {
-		switch columns[j] {
+	for i := range columns {
+		switch columns[i] {
 		case invitation.FieldID:
-			if value, ok := values[j].(*xid.ID); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[j])
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
 			} else if value != nil {
-				i.ID = *value
+				_m.ID = *value
 			}
 		case invitation.FieldCreatedAt:
-			if value, ok := values[j].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[j])
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				i.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case invitation.FieldUpdatedAt:
-			if value, ok := values[j].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[j])
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				i.UpdatedAt = value.Time
+				_m.UpdatedAt = value.Time
 			}
 		case invitation.FieldDeletedAt:
-			if value, ok := values[j].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[j])
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
 			} else if value.Valid {
-				i.DeletedAt = new(time.Time)
-				*i.DeletedAt = value.Time
+				_m.DeletedAt = new(time.Time)
+				*_m.DeletedAt = value.Time
 			}
 		case invitation.FieldMessage:
-			if value, ok := values[j].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field message", values[j])
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field message", values[i])
 			} else if value.Valid {
-				i.Message = new(string)
-				*i.Message = value.String
+				_m.Message = new(string)
+				*_m.Message = value.String
 			}
 		case invitation.FieldCreatorAccountID:
-			if value, ok := values[j].(*xid.ID); !ok {
-				return fmt.Errorf("unexpected type %T for field creator_account_id", values[j])
+			if value, ok := values[i].(*xid.ID); !ok {
+				return fmt.Errorf("unexpected type %T for field creator_account_id", values[i])
 			} else if value != nil {
-				i.CreatorAccountID = *value
+				_m.CreatorAccountID = *value
 			}
 		default:
-			i.selectValues.Set(columns[j], values[j])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -139,61 +139,61 @@ func (i *Invitation) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the Invitation.
 // This includes values selected through modifiers, order, etc.
-func (i *Invitation) Value(name string) (ent.Value, error) {
-	return i.selectValues.Get(name)
+func (_m *Invitation) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryCreator queries the "creator" edge of the Invitation entity.
-func (i *Invitation) QueryCreator() *AccountQuery {
-	return NewInvitationClient(i.config).QueryCreator(i)
+func (_m *Invitation) QueryCreator() *AccountQuery {
+	return NewInvitationClient(_m.config).QueryCreator(_m)
 }
 
 // QueryInvited queries the "invited" edge of the Invitation entity.
-func (i *Invitation) QueryInvited() *AccountQuery {
-	return NewInvitationClient(i.config).QueryInvited(i)
+func (_m *Invitation) QueryInvited() *AccountQuery {
+	return NewInvitationClient(_m.config).QueryInvited(_m)
 }
 
 // Update returns a builder for updating this Invitation.
 // Note that you need to call Invitation.Unwrap() before calling this method if this Invitation
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (i *Invitation) Update() *InvitationUpdateOne {
-	return NewInvitationClient(i.config).UpdateOne(i)
+func (_m *Invitation) Update() *InvitationUpdateOne {
+	return NewInvitationClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the Invitation entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (i *Invitation) Unwrap() *Invitation {
-	_tx, ok := i.config.driver.(*txDriver)
+func (_m *Invitation) Unwrap() *Invitation {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: Invitation is not a transactional entity")
 	}
-	i.config.driver = _tx.drv
-	return i
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (i *Invitation) String() string {
+func (_m *Invitation) String() string {
 	var builder strings.Builder
 	builder.WriteString("Invitation(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", i.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", _m.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(i.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(i.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	if v := i.DeletedAt; v != nil {
+	if v := _m.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	if v := i.Message; v != nil {
+	if v := _m.Message; v != nil {
 		builder.WriteString("message=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
 	builder.WriteString("creator_account_id=")
-	builder.WriteString(fmt.Sprintf("%v", i.CreatorAccountID))
+	builder.WriteString(fmt.Sprintf("%v", _m.CreatorAccountID))
 	builder.WriteByte(')')
 	return builder.String()
 }

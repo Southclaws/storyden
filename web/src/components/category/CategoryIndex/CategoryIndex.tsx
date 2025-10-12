@@ -1,27 +1,21 @@
-import Link from "next/link";
 import { match } from "ts-pattern";
 
 import { ThreadListResult } from "@/api/openapi-schema";
 import { ComposeAnchor } from "@/components/site/Navigation/Anchors/Compose";
 import { Heading } from "@/components/ui/heading";
-import { BulletIcon } from "@/components/ui/icons/Bullet";
-import { CategoryIcon } from "@/components/ui/icons/Category";
-import { DiscussionIcon } from "@/components/ui/icons/Discussion";
-import { CardGrid, CardRows } from "@/components/ui/rich-card";
-import { categoryColourCSS } from "@/lib/category/colours";
 import { CategoryTree } from "@/lib/category/tree";
 import { ThreadFeedScreen } from "@/screens/feed/ThreadFeedScreen/ThreadFeedScreen";
-import { CardBox, HStack, LStack, WStack, styled } from "@/styled-system/jsx";
-import { linkOverlay } from "@/styled-system/patterns";
+import { HStack, LStack, WStack, styled } from "@/styled-system/jsx";
 
 import { CategoryBadge } from "../CategoryBadge";
 import { CategoryCreateTrigger } from "../CategoryCreate/CategoryCreateTrigger";
-import { CategoryMenu } from "../CategoryMenu/CategoryMenu";
 
-import { CategoryCardGrid, CategoryLayout } from "./CategoryCardLayout";
+import { CategoryLayout } from "./CategoryCardLayout";
 
 export type Props = {
   layout: "grid" | "list";
+  threadListMode: "none" | "all" | "uncategorised";
+  showQuickShare: boolean;
   categories: CategoryTree[];
   initialThreadList?: ThreadListResult;
   initialThreadListPage?: number;
@@ -30,6 +24,8 @@ export type Props = {
 
 export function CategoryIndex({
   layout,
+  threadListMode,
+  showQuickShare,
   categories,
   initialThreadList,
   initialThreadListPage,
@@ -83,6 +79,8 @@ export function CategoryIndex({
       </LStack>
 
       <ThreadListSection
+        mode={threadListMode}
+        showQuickShare={showQuickShare}
         initialThreadList={initialThreadList}
         initialPage={initialThreadListPage}
         paginationBasePath={paginationBasePath}
@@ -92,36 +90,47 @@ export function CategoryIndex({
 }
 
 function ThreadListSection({
+  mode,
+  showQuickShare,
   initialThreadList,
   initialPage,
   paginationBasePath,
 }: {
+  mode: "none" | "all" | "uncategorised";
+  showQuickShare: boolean;
   initialThreadList?: ThreadListResult;
   initialPage?: number;
   paginationBasePath: string;
 }) {
-  if (!initialThreadList?.threads) {
+  if (mode === "none") {
     return null;
   }
 
+  const heading =
+    mode === "all"
+      ? "All discussion threads"
+      : "Uncategorised discussion threads";
+
+  // Only show the category select when showing all threads, not uncategorised.
+  const showCategorySelect = mode === "all";
+
   return (
     <LStack>
-      <WStack>
-        <Heading>Uncategorised discussion threads</Heading>
+      {!showQuickShare && (
+        <WStack>
+          <Heading>{heading}</Heading>
 
-        <ComposeAnchor />
-      </WStack>
-
-      <styled.p color="fg.muted">
-        Threads that have not been posted within a category.
-      </styled.p>
+          <ComposeAnchor />
+        </WStack>
+      )}
 
       <ThreadFeedScreen
         initialPage={initialPage}
         initialPageData={initialThreadList}
-        category={null}
+        category={mode === "all" ? undefined : null}
         paginationBasePath={paginationBasePath}
-        showCategorySelect={false}
+        showCategorySelect={showCategorySelect}
+        showQuickShare={showQuickShare}
       />
     </LStack>
   );

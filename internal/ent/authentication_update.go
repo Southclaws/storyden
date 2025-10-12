@@ -26,177 +26,177 @@ type AuthenticationUpdate struct {
 }
 
 // Where appends a list predicates to the AuthenticationUpdate builder.
-func (au *AuthenticationUpdate) Where(ps ...predicate.Authentication) *AuthenticationUpdate {
-	au.mutation.Where(ps...)
-	return au
+func (_u *AuthenticationUpdate) Where(ps ...predicate.Authentication) *AuthenticationUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (au *AuthenticationUpdate) SetExpiresAt(t time.Time) *AuthenticationUpdate {
-	au.mutation.SetExpiresAt(t)
-	return au
+func (_u *AuthenticationUpdate) SetExpiresAt(v time.Time) *AuthenticationUpdate {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableExpiresAt(t *time.Time) *AuthenticationUpdate {
-	if t != nil {
-		au.SetExpiresAt(*t)
+func (_u *AuthenticationUpdate) SetNillableExpiresAt(v *time.Time) *AuthenticationUpdate {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return au
+	return _u
 }
 
 // ClearExpiresAt clears the value of the "expires_at" field.
-func (au *AuthenticationUpdate) ClearExpiresAt() *AuthenticationUpdate {
-	au.mutation.ClearExpiresAt()
-	return au
+func (_u *AuthenticationUpdate) ClearExpiresAt() *AuthenticationUpdate {
+	_u.mutation.ClearExpiresAt()
+	return _u
 }
 
 // SetService sets the "service" field.
-func (au *AuthenticationUpdate) SetService(s string) *AuthenticationUpdate {
-	au.mutation.SetService(s)
-	return au
+func (_u *AuthenticationUpdate) SetService(v string) *AuthenticationUpdate {
+	_u.mutation.SetService(v)
+	return _u
 }
 
 // SetNillableService sets the "service" field if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableService(s *string) *AuthenticationUpdate {
-	if s != nil {
-		au.SetService(*s)
+func (_u *AuthenticationUpdate) SetNillableService(v *string) *AuthenticationUpdate {
+	if v != nil {
+		_u.SetService(*v)
 	}
-	return au
+	return _u
 }
 
 // SetTokenType sets the "token_type" field.
-func (au *AuthenticationUpdate) SetTokenType(s string) *AuthenticationUpdate {
-	au.mutation.SetTokenType(s)
-	return au
+func (_u *AuthenticationUpdate) SetTokenType(v string) *AuthenticationUpdate {
+	_u.mutation.SetTokenType(v)
+	return _u
 }
 
 // SetNillableTokenType sets the "token_type" field if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableTokenType(s *string) *AuthenticationUpdate {
-	if s != nil {
-		au.SetTokenType(*s)
+func (_u *AuthenticationUpdate) SetNillableTokenType(v *string) *AuthenticationUpdate {
+	if v != nil {
+		_u.SetTokenType(*v)
 	}
-	return au
+	return _u
 }
 
 // SetIdentifier sets the "identifier" field.
-func (au *AuthenticationUpdate) SetIdentifier(s string) *AuthenticationUpdate {
-	au.mutation.SetIdentifier(s)
-	return au
+func (_u *AuthenticationUpdate) SetIdentifier(v string) *AuthenticationUpdate {
+	_u.mutation.SetIdentifier(v)
+	return _u
 }
 
 // SetNillableIdentifier sets the "identifier" field if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableIdentifier(s *string) *AuthenticationUpdate {
-	if s != nil {
-		au.SetIdentifier(*s)
+func (_u *AuthenticationUpdate) SetNillableIdentifier(v *string) *AuthenticationUpdate {
+	if v != nil {
+		_u.SetIdentifier(*v)
 	}
-	return au
+	return _u
 }
 
 // SetToken sets the "token" field.
-func (au *AuthenticationUpdate) SetToken(s string) *AuthenticationUpdate {
-	au.mutation.SetToken(s)
-	return au
+func (_u *AuthenticationUpdate) SetToken(v string) *AuthenticationUpdate {
+	_u.mutation.SetToken(v)
+	return _u
 }
 
 // SetNillableToken sets the "token" field if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableToken(s *string) *AuthenticationUpdate {
-	if s != nil {
-		au.SetToken(*s)
+func (_u *AuthenticationUpdate) SetNillableToken(v *string) *AuthenticationUpdate {
+	if v != nil {
+		_u.SetToken(*v)
 	}
-	return au
+	return _u
 }
 
 // SetName sets the "name" field.
-func (au *AuthenticationUpdate) SetName(s string) *AuthenticationUpdate {
-	au.mutation.SetName(s)
-	return au
+func (_u *AuthenticationUpdate) SetName(v string) *AuthenticationUpdate {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableName(s *string) *AuthenticationUpdate {
-	if s != nil {
-		au.SetName(*s)
+func (_u *AuthenticationUpdate) SetNillableName(v *string) *AuthenticationUpdate {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return au
+	return _u
 }
 
 // ClearName clears the value of the "name" field.
-func (au *AuthenticationUpdate) ClearName() *AuthenticationUpdate {
-	au.mutation.ClearName()
-	return au
+func (_u *AuthenticationUpdate) ClearName() *AuthenticationUpdate {
+	_u.mutation.ClearName()
+	return _u
 }
 
 // SetDisabled sets the "disabled" field.
-func (au *AuthenticationUpdate) SetDisabled(b bool) *AuthenticationUpdate {
-	au.mutation.SetDisabled(b)
-	return au
+func (_u *AuthenticationUpdate) SetDisabled(v bool) *AuthenticationUpdate {
+	_u.mutation.SetDisabled(v)
+	return _u
 }
 
 // SetNillableDisabled sets the "disabled" field if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableDisabled(b *bool) *AuthenticationUpdate {
-	if b != nil {
-		au.SetDisabled(*b)
+func (_u *AuthenticationUpdate) SetNillableDisabled(v *bool) *AuthenticationUpdate {
+	if v != nil {
+		_u.SetDisabled(*v)
 	}
-	return au
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (au *AuthenticationUpdate) SetMetadata(m map[string]interface{}) *AuthenticationUpdate {
-	au.mutation.SetMetadata(m)
-	return au
+func (_u *AuthenticationUpdate) SetMetadata(v map[string]interface{}) *AuthenticationUpdate {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (au *AuthenticationUpdate) ClearMetadata() *AuthenticationUpdate {
-	au.mutation.ClearMetadata()
-	return au
+func (_u *AuthenticationUpdate) ClearMetadata() *AuthenticationUpdate {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetAccountAuthentication sets the "account_authentication" field.
-func (au *AuthenticationUpdate) SetAccountAuthentication(x xid.ID) *AuthenticationUpdate {
-	au.mutation.SetAccountAuthentication(x)
-	return au
+func (_u *AuthenticationUpdate) SetAccountAuthentication(v xid.ID) *AuthenticationUpdate {
+	_u.mutation.SetAccountAuthentication(v)
+	return _u
 }
 
 // SetNillableAccountAuthentication sets the "account_authentication" field if the given value is not nil.
-func (au *AuthenticationUpdate) SetNillableAccountAuthentication(x *xid.ID) *AuthenticationUpdate {
-	if x != nil {
-		au.SetAccountAuthentication(*x)
+func (_u *AuthenticationUpdate) SetNillableAccountAuthentication(v *xid.ID) *AuthenticationUpdate {
+	if v != nil {
+		_u.SetAccountAuthentication(*v)
 	}
-	return au
+	return _u
 }
 
 // SetAccountID sets the "account" edge to the Account entity by ID.
-func (au *AuthenticationUpdate) SetAccountID(id xid.ID) *AuthenticationUpdate {
-	au.mutation.SetAccountID(id)
-	return au
+func (_u *AuthenticationUpdate) SetAccountID(id xid.ID) *AuthenticationUpdate {
+	_u.mutation.SetAccountID(id)
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (au *AuthenticationUpdate) SetAccount(a *Account) *AuthenticationUpdate {
-	return au.SetAccountID(a.ID)
+func (_u *AuthenticationUpdate) SetAccount(v *Account) *AuthenticationUpdate {
+	return _u.SetAccountID(v.ID)
 }
 
 // Mutation returns the AuthenticationMutation object of the builder.
-func (au *AuthenticationUpdate) Mutation() *AuthenticationMutation {
-	return au.mutation
+func (_u *AuthenticationUpdate) Mutation() *AuthenticationMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (au *AuthenticationUpdate) ClearAccount() *AuthenticationUpdate {
-	au.mutation.ClearAccount()
-	return au
+func (_u *AuthenticationUpdate) ClearAccount() *AuthenticationUpdate {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (au *AuthenticationUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
+func (_u *AuthenticationUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (au *AuthenticationUpdate) SaveX(ctx context.Context) int {
-	affected, err := au.Save(ctx)
+func (_u *AuthenticationUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -204,93 +204,93 @@ func (au *AuthenticationUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (au *AuthenticationUpdate) Exec(ctx context.Context) error {
-	_, err := au.Save(ctx)
+func (_u *AuthenticationUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (au *AuthenticationUpdate) ExecX(ctx context.Context) {
-	if err := au.Exec(ctx); err != nil {
+func (_u *AuthenticationUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (au *AuthenticationUpdate) check() error {
-	if v, ok := au.mutation.Service(); ok {
+func (_u *AuthenticationUpdate) check() error {
+	if v, ok := _u.mutation.Service(); ok {
 		if err := authentication.ServiceValidator(v); err != nil {
 			return &ValidationError{Name: "service", err: fmt.Errorf(`ent: validator failed for field "Authentication.service": %w`, err)}
 		}
 	}
-	if v, ok := au.mutation.TokenType(); ok {
+	if v, ok := _u.mutation.TokenType(); ok {
 		if err := authentication.TokenTypeValidator(v); err != nil {
 			return &ValidationError{Name: "token_type", err: fmt.Errorf(`ent: validator failed for field "Authentication.token_type": %w`, err)}
 		}
 	}
-	if v, ok := au.mutation.Token(); ok {
+	if v, ok := _u.mutation.Token(); ok {
 		if err := authentication.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "Authentication.token": %w`, err)}
 		}
 	}
-	if au.mutation.AccountCleared() && len(au.mutation.AccountIDs()) > 0 {
+	if _u.mutation.AccountCleared() && len(_u.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Authentication.account"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (au *AuthenticationUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AuthenticationUpdate {
-	au.modifiers = append(au.modifiers, modifiers...)
-	return au
+func (_u *AuthenticationUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AuthenticationUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := au.check(); err != nil {
-		return n, err
+func (_u *AuthenticationUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(authentication.Table, authentication.Columns, sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString))
-	if ps := au.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := au.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(authentication.FieldExpiresAt, field.TypeTime, value)
 	}
-	if au.mutation.ExpiresAtCleared() {
+	if _u.mutation.ExpiresAtCleared() {
 		_spec.ClearField(authentication.FieldExpiresAt, field.TypeTime)
 	}
-	if value, ok := au.mutation.Service(); ok {
+	if value, ok := _u.mutation.Service(); ok {
 		_spec.SetField(authentication.FieldService, field.TypeString, value)
 	}
-	if value, ok := au.mutation.TokenType(); ok {
+	if value, ok := _u.mutation.TokenType(); ok {
 		_spec.SetField(authentication.FieldTokenType, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Identifier(); ok {
+	if value, ok := _u.mutation.Identifier(); ok {
 		_spec.SetField(authentication.FieldIdentifier, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Token(); ok {
+	if value, ok := _u.mutation.Token(); ok {
 		_spec.SetField(authentication.FieldToken, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(authentication.FieldName, field.TypeString, value)
 	}
-	if au.mutation.NameCleared() {
+	if _u.mutation.NameCleared() {
 		_spec.ClearField(authentication.FieldName, field.TypeString)
 	}
-	if value, ok := au.mutation.Disabled(); ok {
+	if value, ok := _u.mutation.Disabled(); ok {
 		_spec.SetField(authentication.FieldDisabled, field.TypeBool, value)
 	}
-	if value, ok := au.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(authentication.FieldMetadata, field.TypeJSON, value)
 	}
-	if au.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(authentication.FieldMetadata, field.TypeJSON)
 	}
-	if au.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -303,7 +303,7 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -319,8 +319,8 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(au.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{authentication.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -328,8 +328,8 @@ func (au *AuthenticationUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		return 0, err
 	}
-	au.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // AuthenticationUpdateOne is the builder for updating a single Authentication entity.
@@ -342,184 +342,184 @@ type AuthenticationUpdateOne struct {
 }
 
 // SetExpiresAt sets the "expires_at" field.
-func (auo *AuthenticationUpdateOne) SetExpiresAt(t time.Time) *AuthenticationUpdateOne {
-	auo.mutation.SetExpiresAt(t)
-	return auo
+func (_u *AuthenticationUpdateOne) SetExpiresAt(v time.Time) *AuthenticationUpdateOne {
+	_u.mutation.SetExpiresAt(v)
+	return _u
 }
 
 // SetNillableExpiresAt sets the "expires_at" field if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableExpiresAt(t *time.Time) *AuthenticationUpdateOne {
-	if t != nil {
-		auo.SetExpiresAt(*t)
+func (_u *AuthenticationUpdateOne) SetNillableExpiresAt(v *time.Time) *AuthenticationUpdateOne {
+	if v != nil {
+		_u.SetExpiresAt(*v)
 	}
-	return auo
+	return _u
 }
 
 // ClearExpiresAt clears the value of the "expires_at" field.
-func (auo *AuthenticationUpdateOne) ClearExpiresAt() *AuthenticationUpdateOne {
-	auo.mutation.ClearExpiresAt()
-	return auo
+func (_u *AuthenticationUpdateOne) ClearExpiresAt() *AuthenticationUpdateOne {
+	_u.mutation.ClearExpiresAt()
+	return _u
 }
 
 // SetService sets the "service" field.
-func (auo *AuthenticationUpdateOne) SetService(s string) *AuthenticationUpdateOne {
-	auo.mutation.SetService(s)
-	return auo
+func (_u *AuthenticationUpdateOne) SetService(v string) *AuthenticationUpdateOne {
+	_u.mutation.SetService(v)
+	return _u
 }
 
 // SetNillableService sets the "service" field if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableService(s *string) *AuthenticationUpdateOne {
-	if s != nil {
-		auo.SetService(*s)
+func (_u *AuthenticationUpdateOne) SetNillableService(v *string) *AuthenticationUpdateOne {
+	if v != nil {
+		_u.SetService(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetTokenType sets the "token_type" field.
-func (auo *AuthenticationUpdateOne) SetTokenType(s string) *AuthenticationUpdateOne {
-	auo.mutation.SetTokenType(s)
-	return auo
+func (_u *AuthenticationUpdateOne) SetTokenType(v string) *AuthenticationUpdateOne {
+	_u.mutation.SetTokenType(v)
+	return _u
 }
 
 // SetNillableTokenType sets the "token_type" field if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableTokenType(s *string) *AuthenticationUpdateOne {
-	if s != nil {
-		auo.SetTokenType(*s)
+func (_u *AuthenticationUpdateOne) SetNillableTokenType(v *string) *AuthenticationUpdateOne {
+	if v != nil {
+		_u.SetTokenType(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetIdentifier sets the "identifier" field.
-func (auo *AuthenticationUpdateOne) SetIdentifier(s string) *AuthenticationUpdateOne {
-	auo.mutation.SetIdentifier(s)
-	return auo
+func (_u *AuthenticationUpdateOne) SetIdentifier(v string) *AuthenticationUpdateOne {
+	_u.mutation.SetIdentifier(v)
+	return _u
 }
 
 // SetNillableIdentifier sets the "identifier" field if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableIdentifier(s *string) *AuthenticationUpdateOne {
-	if s != nil {
-		auo.SetIdentifier(*s)
+func (_u *AuthenticationUpdateOne) SetNillableIdentifier(v *string) *AuthenticationUpdateOne {
+	if v != nil {
+		_u.SetIdentifier(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetToken sets the "token" field.
-func (auo *AuthenticationUpdateOne) SetToken(s string) *AuthenticationUpdateOne {
-	auo.mutation.SetToken(s)
-	return auo
+func (_u *AuthenticationUpdateOne) SetToken(v string) *AuthenticationUpdateOne {
+	_u.mutation.SetToken(v)
+	return _u
 }
 
 // SetNillableToken sets the "token" field if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableToken(s *string) *AuthenticationUpdateOne {
-	if s != nil {
-		auo.SetToken(*s)
+func (_u *AuthenticationUpdateOne) SetNillableToken(v *string) *AuthenticationUpdateOne {
+	if v != nil {
+		_u.SetToken(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetName sets the "name" field.
-func (auo *AuthenticationUpdateOne) SetName(s string) *AuthenticationUpdateOne {
-	auo.mutation.SetName(s)
-	return auo
+func (_u *AuthenticationUpdateOne) SetName(v string) *AuthenticationUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
 }
 
 // SetNillableName sets the "name" field if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableName(s *string) *AuthenticationUpdateOne {
-	if s != nil {
-		auo.SetName(*s)
+func (_u *AuthenticationUpdateOne) SetNillableName(v *string) *AuthenticationUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
 	}
-	return auo
+	return _u
 }
 
 // ClearName clears the value of the "name" field.
-func (auo *AuthenticationUpdateOne) ClearName() *AuthenticationUpdateOne {
-	auo.mutation.ClearName()
-	return auo
+func (_u *AuthenticationUpdateOne) ClearName() *AuthenticationUpdateOne {
+	_u.mutation.ClearName()
+	return _u
 }
 
 // SetDisabled sets the "disabled" field.
-func (auo *AuthenticationUpdateOne) SetDisabled(b bool) *AuthenticationUpdateOne {
-	auo.mutation.SetDisabled(b)
-	return auo
+func (_u *AuthenticationUpdateOne) SetDisabled(v bool) *AuthenticationUpdateOne {
+	_u.mutation.SetDisabled(v)
+	return _u
 }
 
 // SetNillableDisabled sets the "disabled" field if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableDisabled(b *bool) *AuthenticationUpdateOne {
-	if b != nil {
-		auo.SetDisabled(*b)
+func (_u *AuthenticationUpdateOne) SetNillableDisabled(v *bool) *AuthenticationUpdateOne {
+	if v != nil {
+		_u.SetDisabled(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetMetadata sets the "metadata" field.
-func (auo *AuthenticationUpdateOne) SetMetadata(m map[string]interface{}) *AuthenticationUpdateOne {
-	auo.mutation.SetMetadata(m)
-	return auo
+func (_u *AuthenticationUpdateOne) SetMetadata(v map[string]interface{}) *AuthenticationUpdateOne {
+	_u.mutation.SetMetadata(v)
+	return _u
 }
 
 // ClearMetadata clears the value of the "metadata" field.
-func (auo *AuthenticationUpdateOne) ClearMetadata() *AuthenticationUpdateOne {
-	auo.mutation.ClearMetadata()
-	return auo
+func (_u *AuthenticationUpdateOne) ClearMetadata() *AuthenticationUpdateOne {
+	_u.mutation.ClearMetadata()
+	return _u
 }
 
 // SetAccountAuthentication sets the "account_authentication" field.
-func (auo *AuthenticationUpdateOne) SetAccountAuthentication(x xid.ID) *AuthenticationUpdateOne {
-	auo.mutation.SetAccountAuthentication(x)
-	return auo
+func (_u *AuthenticationUpdateOne) SetAccountAuthentication(v xid.ID) *AuthenticationUpdateOne {
+	_u.mutation.SetAccountAuthentication(v)
+	return _u
 }
 
 // SetNillableAccountAuthentication sets the "account_authentication" field if the given value is not nil.
-func (auo *AuthenticationUpdateOne) SetNillableAccountAuthentication(x *xid.ID) *AuthenticationUpdateOne {
-	if x != nil {
-		auo.SetAccountAuthentication(*x)
+func (_u *AuthenticationUpdateOne) SetNillableAccountAuthentication(v *xid.ID) *AuthenticationUpdateOne {
+	if v != nil {
+		_u.SetAccountAuthentication(*v)
 	}
-	return auo
+	return _u
 }
 
 // SetAccountID sets the "account" edge to the Account entity by ID.
-func (auo *AuthenticationUpdateOne) SetAccountID(id xid.ID) *AuthenticationUpdateOne {
-	auo.mutation.SetAccountID(id)
-	return auo
+func (_u *AuthenticationUpdateOne) SetAccountID(id xid.ID) *AuthenticationUpdateOne {
+	_u.mutation.SetAccountID(id)
+	return _u
 }
 
 // SetAccount sets the "account" edge to the Account entity.
-func (auo *AuthenticationUpdateOne) SetAccount(a *Account) *AuthenticationUpdateOne {
-	return auo.SetAccountID(a.ID)
+func (_u *AuthenticationUpdateOne) SetAccount(v *Account) *AuthenticationUpdateOne {
+	return _u.SetAccountID(v.ID)
 }
 
 // Mutation returns the AuthenticationMutation object of the builder.
-func (auo *AuthenticationUpdateOne) Mutation() *AuthenticationMutation {
-	return auo.mutation
+func (_u *AuthenticationUpdateOne) Mutation() *AuthenticationMutation {
+	return _u.mutation
 }
 
 // ClearAccount clears the "account" edge to the Account entity.
-func (auo *AuthenticationUpdateOne) ClearAccount() *AuthenticationUpdateOne {
-	auo.mutation.ClearAccount()
-	return auo
+func (_u *AuthenticationUpdateOne) ClearAccount() *AuthenticationUpdateOne {
+	_u.mutation.ClearAccount()
+	return _u
 }
 
 // Where appends a list predicates to the AuthenticationUpdate builder.
-func (auo *AuthenticationUpdateOne) Where(ps ...predicate.Authentication) *AuthenticationUpdateOne {
-	auo.mutation.Where(ps...)
-	return auo
+func (_u *AuthenticationUpdateOne) Where(ps ...predicate.Authentication) *AuthenticationUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (auo *AuthenticationUpdateOne) Select(field string, fields ...string) *AuthenticationUpdateOne {
-	auo.fields = append([]string{field}, fields...)
-	return auo
+func (_u *AuthenticationUpdateOne) Select(field string, fields ...string) *AuthenticationUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated Authentication entity.
-func (auo *AuthenticationUpdateOne) Save(ctx context.Context) (*Authentication, error) {
-	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
+func (_u *AuthenticationUpdateOne) Save(ctx context.Context) (*Authentication, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (auo *AuthenticationUpdateOne) SaveX(ctx context.Context) *Authentication {
-	node, err := auo.Save(ctx)
+func (_u *AuthenticationUpdateOne) SaveX(ctx context.Context) *Authentication {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -527,58 +527,58 @@ func (auo *AuthenticationUpdateOne) SaveX(ctx context.Context) *Authentication {
 }
 
 // Exec executes the query on the entity.
-func (auo *AuthenticationUpdateOne) Exec(ctx context.Context) error {
-	_, err := auo.Save(ctx)
+func (_u *AuthenticationUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (auo *AuthenticationUpdateOne) ExecX(ctx context.Context) {
-	if err := auo.Exec(ctx); err != nil {
+func (_u *AuthenticationUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (auo *AuthenticationUpdateOne) check() error {
-	if v, ok := auo.mutation.Service(); ok {
+func (_u *AuthenticationUpdateOne) check() error {
+	if v, ok := _u.mutation.Service(); ok {
 		if err := authentication.ServiceValidator(v); err != nil {
 			return &ValidationError{Name: "service", err: fmt.Errorf(`ent: validator failed for field "Authentication.service": %w`, err)}
 		}
 	}
-	if v, ok := auo.mutation.TokenType(); ok {
+	if v, ok := _u.mutation.TokenType(); ok {
 		if err := authentication.TokenTypeValidator(v); err != nil {
 			return &ValidationError{Name: "token_type", err: fmt.Errorf(`ent: validator failed for field "Authentication.token_type": %w`, err)}
 		}
 	}
-	if v, ok := auo.mutation.Token(); ok {
+	if v, ok := _u.mutation.Token(); ok {
 		if err := authentication.TokenValidator(v); err != nil {
 			return &ValidationError{Name: "token", err: fmt.Errorf(`ent: validator failed for field "Authentication.token": %w`, err)}
 		}
 	}
-	if auo.mutation.AccountCleared() && len(auo.mutation.AccountIDs()) > 0 {
+	if _u.mutation.AccountCleared() && len(_u.mutation.AccountIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "Authentication.account"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (auo *AuthenticationUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AuthenticationUpdateOne {
-	auo.modifiers = append(auo.modifiers, modifiers...)
-	return auo
+func (_u *AuthenticationUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AuthenticationUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authentication, err error) {
-	if err := auo.check(); err != nil {
+func (_u *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authentication, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(authentication.Table, authentication.Columns, sqlgraph.NewFieldSpec(authentication.FieldID, field.TypeString))
-	id, ok := auo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Authentication.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := auo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, authentication.FieldID)
 		for _, f := range fields {
@@ -590,47 +590,47 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 			}
 		}
 	}
-	if ps := auo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := auo.mutation.ExpiresAt(); ok {
+	if value, ok := _u.mutation.ExpiresAt(); ok {
 		_spec.SetField(authentication.FieldExpiresAt, field.TypeTime, value)
 	}
-	if auo.mutation.ExpiresAtCleared() {
+	if _u.mutation.ExpiresAtCleared() {
 		_spec.ClearField(authentication.FieldExpiresAt, field.TypeTime)
 	}
-	if value, ok := auo.mutation.Service(); ok {
+	if value, ok := _u.mutation.Service(); ok {
 		_spec.SetField(authentication.FieldService, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.TokenType(); ok {
+	if value, ok := _u.mutation.TokenType(); ok {
 		_spec.SetField(authentication.FieldTokenType, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Identifier(); ok {
+	if value, ok := _u.mutation.Identifier(); ok {
 		_spec.SetField(authentication.FieldIdentifier, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Token(); ok {
+	if value, ok := _u.mutation.Token(); ok {
 		_spec.SetField(authentication.FieldToken, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Name(); ok {
+	if value, ok := _u.mutation.Name(); ok {
 		_spec.SetField(authentication.FieldName, field.TypeString, value)
 	}
-	if auo.mutation.NameCleared() {
+	if _u.mutation.NameCleared() {
 		_spec.ClearField(authentication.FieldName, field.TypeString)
 	}
-	if value, ok := auo.mutation.Disabled(); ok {
+	if value, ok := _u.mutation.Disabled(); ok {
 		_spec.SetField(authentication.FieldDisabled, field.TypeBool, value)
 	}
-	if value, ok := auo.mutation.Metadata(); ok {
+	if value, ok := _u.mutation.Metadata(); ok {
 		_spec.SetField(authentication.FieldMetadata, field.TypeJSON, value)
 	}
-	if auo.mutation.MetadataCleared() {
+	if _u.mutation.MetadataCleared() {
 		_spec.ClearField(authentication.FieldMetadata, field.TypeJSON)
 	}
-	if auo.mutation.AccountCleared() {
+	if _u.mutation.AccountCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -643,7 +643,7 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.AccountIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.AccountIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -659,11 +659,11 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(auo.modifiers...)
-	_node = &Authentication{config: auo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &Authentication{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, auo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{authentication.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -671,6 +671,6 @@ func (auo *AuthenticationUpdateOne) sqlSave(ctx context.Context) (_node *Authent
 		}
 		return nil, err
 	}
-	auo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

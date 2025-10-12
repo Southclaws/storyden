@@ -85,7 +85,7 @@ func (*CollectionPost) scanValues(columns []string) ([]any, error) {
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
 // to the CollectionPost fields.
-func (cp *CollectionPost) assignValues(columns []string, values []any) error {
+func (_m *CollectionPost) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
@@ -95,28 +95,28 @@ func (cp *CollectionPost) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				cp.CreatedAt = value.Time
+				_m.CreatedAt = value.Time
 			}
 		case collectionpost.FieldCollectionID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field collection_id", values[i])
 			} else if value != nil {
-				cp.CollectionID = *value
+				_m.CollectionID = *value
 			}
 		case collectionpost.FieldPostID:
 			if value, ok := values[i].(*xid.ID); !ok {
 				return fmt.Errorf("unexpected type %T for field post_id", values[i])
 			} else if value != nil {
-				cp.PostID = *value
+				_m.PostID = *value
 			}
 		case collectionpost.FieldMembershipType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field membership_type", values[i])
 			} else if value.Valid {
-				cp.MembershipType = value.String
+				_m.MembershipType = value.String
 			}
 		default:
-			cp.selectValues.Set(columns[i], values[i])
+			_m.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
@@ -124,53 +124,53 @@ func (cp *CollectionPost) assignValues(columns []string, values []any) error {
 
 // Value returns the ent.Value that was dynamically selected and assigned to the CollectionPost.
 // This includes values selected through modifiers, order, etc.
-func (cp *CollectionPost) Value(name string) (ent.Value, error) {
-	return cp.selectValues.Get(name)
+func (_m *CollectionPost) Value(name string) (ent.Value, error) {
+	return _m.selectValues.Get(name)
 }
 
 // QueryCollection queries the "collection" edge of the CollectionPost entity.
-func (cp *CollectionPost) QueryCollection() *CollectionQuery {
-	return NewCollectionPostClient(cp.config).QueryCollection(cp)
+func (_m *CollectionPost) QueryCollection() *CollectionQuery {
+	return NewCollectionPostClient(_m.config).QueryCollection(_m)
 }
 
 // QueryPost queries the "post" edge of the CollectionPost entity.
-func (cp *CollectionPost) QueryPost() *PostQuery {
-	return NewCollectionPostClient(cp.config).QueryPost(cp)
+func (_m *CollectionPost) QueryPost() *PostQuery {
+	return NewCollectionPostClient(_m.config).QueryPost(_m)
 }
 
 // Update returns a builder for updating this CollectionPost.
 // Note that you need to call CollectionPost.Unwrap() before calling this method if this CollectionPost
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (cp *CollectionPost) Update() *CollectionPostUpdateOne {
-	return NewCollectionPostClient(cp.config).UpdateOne(cp)
+func (_m *CollectionPost) Update() *CollectionPostUpdateOne {
+	return NewCollectionPostClient(_m.config).UpdateOne(_m)
 }
 
 // Unwrap unwraps the CollectionPost entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (cp *CollectionPost) Unwrap() *CollectionPost {
-	_tx, ok := cp.config.driver.(*txDriver)
+func (_m *CollectionPost) Unwrap() *CollectionPost {
+	_tx, ok := _m.config.driver.(*txDriver)
 	if !ok {
 		panic("ent: CollectionPost is not a transactional entity")
 	}
-	cp.config.driver = _tx.drv
-	return cp
+	_m.config.driver = _tx.drv
+	return _m
 }
 
 // String implements the fmt.Stringer.
-func (cp *CollectionPost) String() string {
+func (_m *CollectionPost) String() string {
 	var builder strings.Builder
 	builder.WriteString("CollectionPost(")
 	builder.WriteString("created_at=")
-	builder.WriteString(cp.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(_m.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("collection_id=")
-	builder.WriteString(fmt.Sprintf("%v", cp.CollectionID))
+	builder.WriteString(fmt.Sprintf("%v", _m.CollectionID))
 	builder.WriteString(", ")
 	builder.WriteString("post_id=")
-	builder.WriteString(fmt.Sprintf("%v", cp.PostID))
+	builder.WriteString(fmt.Sprintf("%v", _m.PostID))
 	builder.WriteString(", ")
 	builder.WriteString("membership_type=")
-	builder.WriteString(cp.MembershipType)
+	builder.WriteString(_m.MembershipType)
 	builder.WriteByte(')')
 	return builder.String()
 }

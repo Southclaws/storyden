@@ -27,7 +27,7 @@ export default async function Layout({ children }: PropsWithChildren) {
           </WStack>
           <VStack>
             <Image
-              className={css({ width: "24" })}
+              className={css({ width: "24", borderRadius: "md" })}
               src={getIconURL("512x512")}
               width={512}
               height={512}

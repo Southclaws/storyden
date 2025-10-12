@@ -8,16 +8,32 @@ const treeViewCompoundVariants = []
 
 const treeViewSlotNames = [
   [
-    "root",
-    "treeView__root"
+    "branch",
+    "treeView__branch"
   ],
   [
-    "label",
-    "treeView__label"
+    "branchContent",
+    "treeView__branchContent"
   ],
   [
-    "tree",
-    "treeView__tree"
+    "branchControl",
+    "treeView__branchControl"
+  ],
+  [
+    "branchIndentGuide",
+    "treeView__branchIndentGuide"
+  ],
+  [
+    "branchIndicator",
+    "treeView__branchIndicator"
+  ],
+  [
+    "branchText",
+    "treeView__branchText"
+  ],
+  [
+    "branchTrigger",
+    "treeView__branchTrigger"
   ],
   [
     "item",
@@ -32,28 +48,24 @@ const treeViewSlotNames = [
     "treeView__itemText"
   ],
   [
-    "branch",
-    "treeView__branch"
+    "label",
+    "treeView__label"
   ],
   [
-    "branchControl",
-    "treeView__branchControl"
+    "nodeCheckbox",
+    "treeView__nodeCheckbox"
   ],
   [
-    "branchTrigger",
-    "treeView__branchTrigger"
+    "nodeRenameInput",
+    "treeView__nodeRenameInput"
   ],
   [
-    "branchContent",
-    "treeView__branchContent"
+    "root",
+    "treeView__root"
   ],
   [
-    "branchText",
-    "treeView__branchText"
-  ],
-  [
-    "branchIndicator",
-    "treeView__branchIndicator"
+    "tree",
+    "treeView__tree"
   ]
 ]
 const treeViewSlotFns = /* @__PURE__ */ treeViewSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, treeViewDefaultVariants, getSlotCompoundVariant(treeViewCompoundVariants, slotName))])

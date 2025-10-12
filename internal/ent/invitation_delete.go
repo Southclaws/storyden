@@ -20,56 +20,56 @@ type InvitationDelete struct {
 }
 
 // Where appends a list predicates to the InvitationDelete builder.
-func (id *InvitationDelete) Where(ps ...predicate.Invitation) *InvitationDelete {
-	id.mutation.Where(ps...)
-	return id
+func (_d *InvitationDelete) Where(ps ...predicate.Invitation) *InvitationDelete {
+	_d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (id *InvitationDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks(ctx, id.sqlExec, id.mutation, id.hooks)
+func (_d *InvitationDelete) Exec(ctx context.Context) (int, error) {
+	return withHooks(ctx, _d.sqlExec, _d.mutation, _d.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (id *InvitationDelete) ExecX(ctx context.Context) int {
-	n, err := id.Exec(ctx)
+func (_d *InvitationDelete) ExecX(ctx context.Context) int {
+	n, err := _d.Exec(ctx)
 	if err != nil {
 		panic(err)
 	}
 	return n
 }
 
-func (id *InvitationDelete) sqlExec(ctx context.Context) (int, error) {
+func (_d *InvitationDelete) sqlExec(ctx context.Context) (int, error) {
 	_spec := sqlgraph.NewDeleteSpec(invitation.Table, sqlgraph.NewFieldSpec(invitation.FieldID, field.TypeString))
-	if ps := id.mutation.predicates; len(ps) > 0 {
+	if ps := _d.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	affected, err := sqlgraph.DeleteNodes(ctx, id.driver, _spec)
+	affected, err := sqlgraph.DeleteNodes(ctx, _d.driver, _spec)
 	if err != nil && sqlgraph.IsConstraintError(err) {
 		err = &ConstraintError{msg: err.Error(), wrap: err}
 	}
-	id.mutation.done = true
+	_d.mutation.done = true
 	return affected, err
 }
 
 // InvitationDeleteOne is the builder for deleting a single Invitation entity.
 type InvitationDeleteOne struct {
-	id *InvitationDelete
+	_d *InvitationDelete
 }
 
 // Where appends a list predicates to the InvitationDelete builder.
-func (ido *InvitationDeleteOne) Where(ps ...predicate.Invitation) *InvitationDeleteOne {
-	ido.id.mutation.Where(ps...)
-	return ido
+func (_d *InvitationDeleteOne) Where(ps ...predicate.Invitation) *InvitationDeleteOne {
+	_d._d.mutation.Where(ps...)
+	return _d
 }
 
 // Exec executes the deletion query.
-func (ido *InvitationDeleteOne) Exec(ctx context.Context) error {
-	n, err := ido.id.Exec(ctx)
+func (_d *InvitationDeleteOne) Exec(ctx context.Context) error {
+	n, err := _d._d.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
@@ -81,8 +81,8 @@ func (ido *InvitationDeleteOne) Exec(ctx context.Context) error {
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ido *InvitationDeleteOne) ExecX(ctx context.Context) {
-	if err := ido.Exec(ctx); err != nil {
+func (_d *InvitationDeleteOne) ExecX(ctx context.Context) {
+	if err := _d.Exec(ctx); err != nil {
 		panic(err)
 	}
 }

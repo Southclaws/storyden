@@ -48,6 +48,10 @@ const fileUploadSlotNames = [
   [
     "trigger",
     "fileUpload__trigger"
+  ],
+  [
+    "clearTrigger",
+    "fileUpload__clearTrigger"
   ]
 ]
 const fileUploadSlotFns = /* @__PURE__ */ fileUploadSlotNames.map(([slotName, slotKey]) => [slotName, createRecipe(slotKey, fileUploadDefaultVariants, getSlotCompoundVariant(fileUploadCompoundVariants, slotName))])

@@ -25,86 +25,86 @@ type AccountFollowUpdate struct {
 }
 
 // Where appends a list predicates to the AccountFollowUpdate builder.
-func (afu *AccountFollowUpdate) Where(ps ...predicate.AccountFollow) *AccountFollowUpdate {
-	afu.mutation.Where(ps...)
-	return afu
+func (_u *AccountFollowUpdate) Where(ps ...predicate.AccountFollow) *AccountFollowUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetFollowerAccountID sets the "follower_account_id" field.
-func (afu *AccountFollowUpdate) SetFollowerAccountID(x xid.ID) *AccountFollowUpdate {
-	afu.mutation.SetFollowerAccountID(x)
-	return afu
+func (_u *AccountFollowUpdate) SetFollowerAccountID(v xid.ID) *AccountFollowUpdate {
+	_u.mutation.SetFollowerAccountID(v)
+	return _u
 }
 
 // SetNillableFollowerAccountID sets the "follower_account_id" field if the given value is not nil.
-func (afu *AccountFollowUpdate) SetNillableFollowerAccountID(x *xid.ID) *AccountFollowUpdate {
-	if x != nil {
-		afu.SetFollowerAccountID(*x)
+func (_u *AccountFollowUpdate) SetNillableFollowerAccountID(v *xid.ID) *AccountFollowUpdate {
+	if v != nil {
+		_u.SetFollowerAccountID(*v)
 	}
-	return afu
+	return _u
 }
 
 // SetFollowingAccountID sets the "following_account_id" field.
-func (afu *AccountFollowUpdate) SetFollowingAccountID(x xid.ID) *AccountFollowUpdate {
-	afu.mutation.SetFollowingAccountID(x)
-	return afu
+func (_u *AccountFollowUpdate) SetFollowingAccountID(v xid.ID) *AccountFollowUpdate {
+	_u.mutation.SetFollowingAccountID(v)
+	return _u
 }
 
 // SetNillableFollowingAccountID sets the "following_account_id" field if the given value is not nil.
-func (afu *AccountFollowUpdate) SetNillableFollowingAccountID(x *xid.ID) *AccountFollowUpdate {
-	if x != nil {
-		afu.SetFollowingAccountID(*x)
+func (_u *AccountFollowUpdate) SetNillableFollowingAccountID(v *xid.ID) *AccountFollowUpdate {
+	if v != nil {
+		_u.SetFollowingAccountID(*v)
 	}
-	return afu
+	return _u
 }
 
 // SetFollowerID sets the "follower" edge to the Account entity by ID.
-func (afu *AccountFollowUpdate) SetFollowerID(id xid.ID) *AccountFollowUpdate {
-	afu.mutation.SetFollowerID(id)
-	return afu
+func (_u *AccountFollowUpdate) SetFollowerID(id xid.ID) *AccountFollowUpdate {
+	_u.mutation.SetFollowerID(id)
+	return _u
 }
 
 // SetFollower sets the "follower" edge to the Account entity.
-func (afu *AccountFollowUpdate) SetFollower(a *Account) *AccountFollowUpdate {
-	return afu.SetFollowerID(a.ID)
+func (_u *AccountFollowUpdate) SetFollower(v *Account) *AccountFollowUpdate {
+	return _u.SetFollowerID(v.ID)
 }
 
 // SetFollowingID sets the "following" edge to the Account entity by ID.
-func (afu *AccountFollowUpdate) SetFollowingID(id xid.ID) *AccountFollowUpdate {
-	afu.mutation.SetFollowingID(id)
-	return afu
+func (_u *AccountFollowUpdate) SetFollowingID(id xid.ID) *AccountFollowUpdate {
+	_u.mutation.SetFollowingID(id)
+	return _u
 }
 
 // SetFollowing sets the "following" edge to the Account entity.
-func (afu *AccountFollowUpdate) SetFollowing(a *Account) *AccountFollowUpdate {
-	return afu.SetFollowingID(a.ID)
+func (_u *AccountFollowUpdate) SetFollowing(v *Account) *AccountFollowUpdate {
+	return _u.SetFollowingID(v.ID)
 }
 
 // Mutation returns the AccountFollowMutation object of the builder.
-func (afu *AccountFollowUpdate) Mutation() *AccountFollowMutation {
-	return afu.mutation
+func (_u *AccountFollowUpdate) Mutation() *AccountFollowMutation {
+	return _u.mutation
 }
 
 // ClearFollower clears the "follower" edge to the Account entity.
-func (afu *AccountFollowUpdate) ClearFollower() *AccountFollowUpdate {
-	afu.mutation.ClearFollower()
-	return afu
+func (_u *AccountFollowUpdate) ClearFollower() *AccountFollowUpdate {
+	_u.mutation.ClearFollower()
+	return _u
 }
 
 // ClearFollowing clears the "following" edge to the Account entity.
-func (afu *AccountFollowUpdate) ClearFollowing() *AccountFollowUpdate {
-	afu.mutation.ClearFollowing()
-	return afu
+func (_u *AccountFollowUpdate) ClearFollowing() *AccountFollowUpdate {
+	_u.mutation.ClearFollowing()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (afu *AccountFollowUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, afu.sqlSave, afu.mutation, afu.hooks)
+func (_u *AccountFollowUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (afu *AccountFollowUpdate) SaveX(ctx context.Context) int {
-	affected, err := afu.Save(ctx)
+func (_u *AccountFollowUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -112,48 +112,48 @@ func (afu *AccountFollowUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (afu *AccountFollowUpdate) Exec(ctx context.Context) error {
-	_, err := afu.Save(ctx)
+func (_u *AccountFollowUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (afu *AccountFollowUpdate) ExecX(ctx context.Context) {
-	if err := afu.Exec(ctx); err != nil {
+func (_u *AccountFollowUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (afu *AccountFollowUpdate) check() error {
-	if afu.mutation.FollowerCleared() && len(afu.mutation.FollowerIDs()) > 0 {
+func (_u *AccountFollowUpdate) check() error {
+	if _u.mutation.FollowerCleared() && len(_u.mutation.FollowerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountFollow.follower"`)
 	}
-	if afu.mutation.FollowingCleared() && len(afu.mutation.FollowingIDs()) > 0 {
+	if _u.mutation.FollowingCleared() && len(_u.mutation.FollowingIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountFollow.following"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (afu *AccountFollowUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AccountFollowUpdate {
-	afu.modifiers = append(afu.modifiers, modifiers...)
-	return afu
+func (_u *AccountFollowUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AccountFollowUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (afu *AccountFollowUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := afu.check(); err != nil {
-		return n, err
+func (_u *AccountFollowUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(accountfollow.Table, accountfollow.Columns, sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString))
-	if ps := afu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if afu.mutation.FollowerCleared() {
+	if _u.mutation.FollowerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -166,7 +166,7 @@ func (afu *AccountFollowUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := afu.mutation.FollowerIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.FollowerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -182,7 +182,7 @@ func (afu *AccountFollowUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if afu.mutation.FollowingCleared() {
+	if _u.mutation.FollowingCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -195,7 +195,7 @@ func (afu *AccountFollowUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := afu.mutation.FollowingIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.FollowingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -211,8 +211,8 @@ func (afu *AccountFollowUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(afu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, afu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{accountfollow.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -220,8 +220,8 @@ func (afu *AccountFollowUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		return 0, err
 	}
-	afu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // AccountFollowUpdateOne is the builder for updating a single AccountFollow entity.
@@ -234,93 +234,93 @@ type AccountFollowUpdateOne struct {
 }
 
 // SetFollowerAccountID sets the "follower_account_id" field.
-func (afuo *AccountFollowUpdateOne) SetFollowerAccountID(x xid.ID) *AccountFollowUpdateOne {
-	afuo.mutation.SetFollowerAccountID(x)
-	return afuo
+func (_u *AccountFollowUpdateOne) SetFollowerAccountID(v xid.ID) *AccountFollowUpdateOne {
+	_u.mutation.SetFollowerAccountID(v)
+	return _u
 }
 
 // SetNillableFollowerAccountID sets the "follower_account_id" field if the given value is not nil.
-func (afuo *AccountFollowUpdateOne) SetNillableFollowerAccountID(x *xid.ID) *AccountFollowUpdateOne {
-	if x != nil {
-		afuo.SetFollowerAccountID(*x)
+func (_u *AccountFollowUpdateOne) SetNillableFollowerAccountID(v *xid.ID) *AccountFollowUpdateOne {
+	if v != nil {
+		_u.SetFollowerAccountID(*v)
 	}
-	return afuo
+	return _u
 }
 
 // SetFollowingAccountID sets the "following_account_id" field.
-func (afuo *AccountFollowUpdateOne) SetFollowingAccountID(x xid.ID) *AccountFollowUpdateOne {
-	afuo.mutation.SetFollowingAccountID(x)
-	return afuo
+func (_u *AccountFollowUpdateOne) SetFollowingAccountID(v xid.ID) *AccountFollowUpdateOne {
+	_u.mutation.SetFollowingAccountID(v)
+	return _u
 }
 
 // SetNillableFollowingAccountID sets the "following_account_id" field if the given value is not nil.
-func (afuo *AccountFollowUpdateOne) SetNillableFollowingAccountID(x *xid.ID) *AccountFollowUpdateOne {
-	if x != nil {
-		afuo.SetFollowingAccountID(*x)
+func (_u *AccountFollowUpdateOne) SetNillableFollowingAccountID(v *xid.ID) *AccountFollowUpdateOne {
+	if v != nil {
+		_u.SetFollowingAccountID(*v)
 	}
-	return afuo
+	return _u
 }
 
 // SetFollowerID sets the "follower" edge to the Account entity by ID.
-func (afuo *AccountFollowUpdateOne) SetFollowerID(id xid.ID) *AccountFollowUpdateOne {
-	afuo.mutation.SetFollowerID(id)
-	return afuo
+func (_u *AccountFollowUpdateOne) SetFollowerID(id xid.ID) *AccountFollowUpdateOne {
+	_u.mutation.SetFollowerID(id)
+	return _u
 }
 
 // SetFollower sets the "follower" edge to the Account entity.
-func (afuo *AccountFollowUpdateOne) SetFollower(a *Account) *AccountFollowUpdateOne {
-	return afuo.SetFollowerID(a.ID)
+func (_u *AccountFollowUpdateOne) SetFollower(v *Account) *AccountFollowUpdateOne {
+	return _u.SetFollowerID(v.ID)
 }
 
 // SetFollowingID sets the "following" edge to the Account entity by ID.
-func (afuo *AccountFollowUpdateOne) SetFollowingID(id xid.ID) *AccountFollowUpdateOne {
-	afuo.mutation.SetFollowingID(id)
-	return afuo
+func (_u *AccountFollowUpdateOne) SetFollowingID(id xid.ID) *AccountFollowUpdateOne {
+	_u.mutation.SetFollowingID(id)
+	return _u
 }
 
 // SetFollowing sets the "following" edge to the Account entity.
-func (afuo *AccountFollowUpdateOne) SetFollowing(a *Account) *AccountFollowUpdateOne {
-	return afuo.SetFollowingID(a.ID)
+func (_u *AccountFollowUpdateOne) SetFollowing(v *Account) *AccountFollowUpdateOne {
+	return _u.SetFollowingID(v.ID)
 }
 
 // Mutation returns the AccountFollowMutation object of the builder.
-func (afuo *AccountFollowUpdateOne) Mutation() *AccountFollowMutation {
-	return afuo.mutation
+func (_u *AccountFollowUpdateOne) Mutation() *AccountFollowMutation {
+	return _u.mutation
 }
 
 // ClearFollower clears the "follower" edge to the Account entity.
-func (afuo *AccountFollowUpdateOne) ClearFollower() *AccountFollowUpdateOne {
-	afuo.mutation.ClearFollower()
-	return afuo
+func (_u *AccountFollowUpdateOne) ClearFollower() *AccountFollowUpdateOne {
+	_u.mutation.ClearFollower()
+	return _u
 }
 
 // ClearFollowing clears the "following" edge to the Account entity.
-func (afuo *AccountFollowUpdateOne) ClearFollowing() *AccountFollowUpdateOne {
-	afuo.mutation.ClearFollowing()
-	return afuo
+func (_u *AccountFollowUpdateOne) ClearFollowing() *AccountFollowUpdateOne {
+	_u.mutation.ClearFollowing()
+	return _u
 }
 
 // Where appends a list predicates to the AccountFollowUpdate builder.
-func (afuo *AccountFollowUpdateOne) Where(ps ...predicate.AccountFollow) *AccountFollowUpdateOne {
-	afuo.mutation.Where(ps...)
-	return afuo
+func (_u *AccountFollowUpdateOne) Where(ps ...predicate.AccountFollow) *AccountFollowUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (afuo *AccountFollowUpdateOne) Select(field string, fields ...string) *AccountFollowUpdateOne {
-	afuo.fields = append([]string{field}, fields...)
-	return afuo
+func (_u *AccountFollowUpdateOne) Select(field string, fields ...string) *AccountFollowUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated AccountFollow entity.
-func (afuo *AccountFollowUpdateOne) Save(ctx context.Context) (*AccountFollow, error) {
-	return withHooks(ctx, afuo.sqlSave, afuo.mutation, afuo.hooks)
+func (_u *AccountFollowUpdateOne) Save(ctx context.Context) (*AccountFollow, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (afuo *AccountFollowUpdateOne) SaveX(ctx context.Context) *AccountFollow {
-	node, err := afuo.Save(ctx)
+func (_u *AccountFollowUpdateOne) SaveX(ctx context.Context) *AccountFollow {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -328,46 +328,46 @@ func (afuo *AccountFollowUpdateOne) SaveX(ctx context.Context) *AccountFollow {
 }
 
 // Exec executes the query on the entity.
-func (afuo *AccountFollowUpdateOne) Exec(ctx context.Context) error {
-	_, err := afuo.Save(ctx)
+func (_u *AccountFollowUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (afuo *AccountFollowUpdateOne) ExecX(ctx context.Context) {
-	if err := afuo.Exec(ctx); err != nil {
+func (_u *AccountFollowUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (afuo *AccountFollowUpdateOne) check() error {
-	if afuo.mutation.FollowerCleared() && len(afuo.mutation.FollowerIDs()) > 0 {
+func (_u *AccountFollowUpdateOne) check() error {
+	if _u.mutation.FollowerCleared() && len(_u.mutation.FollowerIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountFollow.follower"`)
 	}
-	if afuo.mutation.FollowingCleared() && len(afuo.mutation.FollowingIDs()) > 0 {
+	if _u.mutation.FollowingCleared() && len(_u.mutation.FollowingIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AccountFollow.following"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (afuo *AccountFollowUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AccountFollowUpdateOne {
-	afuo.modifiers = append(afuo.modifiers, modifiers...)
-	return afuo
+func (_u *AccountFollowUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AccountFollowUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (afuo *AccountFollowUpdateOne) sqlSave(ctx context.Context) (_node *AccountFollow, err error) {
-	if err := afuo.check(); err != nil {
+func (_u *AccountFollowUpdateOne) sqlSave(ctx context.Context) (_node *AccountFollow, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(accountfollow.Table, accountfollow.Columns, sqlgraph.NewFieldSpec(accountfollow.FieldID, field.TypeString))
-	id, ok := afuo.mutation.ID()
+	id, ok := _u.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "AccountFollow.id" for update`)}
 	}
 	_spec.Node.ID.Value = id
-	if fields := afuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, accountfollow.FieldID)
 		for _, f := range fields {
@@ -379,14 +379,14 @@ func (afuo *AccountFollowUpdateOne) sqlSave(ctx context.Context) (_node *Account
 			}
 		}
 	}
-	if ps := afuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if afuo.mutation.FollowerCleared() {
+	if _u.mutation.FollowerCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -399,7 +399,7 @@ func (afuo *AccountFollowUpdateOne) sqlSave(ctx context.Context) (_node *Account
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := afuo.mutation.FollowerIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.FollowerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -415,7 +415,7 @@ func (afuo *AccountFollowUpdateOne) sqlSave(ctx context.Context) (_node *Account
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if afuo.mutation.FollowingCleared() {
+	if _u.mutation.FollowingCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -428,7 +428,7 @@ func (afuo *AccountFollowUpdateOne) sqlSave(ctx context.Context) (_node *Account
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := afuo.mutation.FollowingIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.FollowingIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
@@ -444,11 +444,11 @@ func (afuo *AccountFollowUpdateOne) sqlSave(ctx context.Context) (_node *Account
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(afuo.modifiers...)
-	_node = &AccountFollow{config: afuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &AccountFollow{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, afuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{accountfollow.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -456,6 +456,6 @@ func (afuo *AccountFollowUpdateOne) sqlSave(ctx context.Context) (_node *Account
 		}
 		return nil, err
 	}
-	afuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

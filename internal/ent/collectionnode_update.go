@@ -26,88 +26,88 @@ type CollectionNodeUpdate struct {
 }
 
 // Where appends a list predicates to the CollectionNodeUpdate builder.
-func (cnu *CollectionNodeUpdate) Where(ps ...predicate.CollectionNode) *CollectionNodeUpdate {
-	cnu.mutation.Where(ps...)
-	return cnu
+func (_u *CollectionNodeUpdate) Where(ps ...predicate.CollectionNode) *CollectionNodeUpdate {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // SetCollectionID sets the "collection_id" field.
-func (cnu *CollectionNodeUpdate) SetCollectionID(x xid.ID) *CollectionNodeUpdate {
-	cnu.mutation.SetCollectionID(x)
-	return cnu
+func (_u *CollectionNodeUpdate) SetCollectionID(v xid.ID) *CollectionNodeUpdate {
+	_u.mutation.SetCollectionID(v)
+	return _u
 }
 
 // SetNillableCollectionID sets the "collection_id" field if the given value is not nil.
-func (cnu *CollectionNodeUpdate) SetNillableCollectionID(x *xid.ID) *CollectionNodeUpdate {
-	if x != nil {
-		cnu.SetCollectionID(*x)
+func (_u *CollectionNodeUpdate) SetNillableCollectionID(v *xid.ID) *CollectionNodeUpdate {
+	if v != nil {
+		_u.SetCollectionID(*v)
 	}
-	return cnu
+	return _u
 }
 
 // SetNodeID sets the "node_id" field.
-func (cnu *CollectionNodeUpdate) SetNodeID(x xid.ID) *CollectionNodeUpdate {
-	cnu.mutation.SetNodeID(x)
-	return cnu
+func (_u *CollectionNodeUpdate) SetNodeID(v xid.ID) *CollectionNodeUpdate {
+	_u.mutation.SetNodeID(v)
+	return _u
 }
 
 // SetNillableNodeID sets the "node_id" field if the given value is not nil.
-func (cnu *CollectionNodeUpdate) SetNillableNodeID(x *xid.ID) *CollectionNodeUpdate {
-	if x != nil {
-		cnu.SetNodeID(*x)
+func (_u *CollectionNodeUpdate) SetNillableNodeID(v *xid.ID) *CollectionNodeUpdate {
+	if v != nil {
+		_u.SetNodeID(*v)
 	}
-	return cnu
+	return _u
 }
 
 // SetMembershipType sets the "membership_type" field.
-func (cnu *CollectionNodeUpdate) SetMembershipType(s string) *CollectionNodeUpdate {
-	cnu.mutation.SetMembershipType(s)
-	return cnu
+func (_u *CollectionNodeUpdate) SetMembershipType(v string) *CollectionNodeUpdate {
+	_u.mutation.SetMembershipType(v)
+	return _u
 }
 
 // SetNillableMembershipType sets the "membership_type" field if the given value is not nil.
-func (cnu *CollectionNodeUpdate) SetNillableMembershipType(s *string) *CollectionNodeUpdate {
-	if s != nil {
-		cnu.SetMembershipType(*s)
+func (_u *CollectionNodeUpdate) SetNillableMembershipType(v *string) *CollectionNodeUpdate {
+	if v != nil {
+		_u.SetMembershipType(*v)
 	}
-	return cnu
+	return _u
 }
 
 // SetCollection sets the "collection" edge to the Collection entity.
-func (cnu *CollectionNodeUpdate) SetCollection(c *Collection) *CollectionNodeUpdate {
-	return cnu.SetCollectionID(c.ID)
+func (_u *CollectionNodeUpdate) SetCollection(v *Collection) *CollectionNodeUpdate {
+	return _u.SetCollectionID(v.ID)
 }
 
 // SetNode sets the "node" edge to the Node entity.
-func (cnu *CollectionNodeUpdate) SetNode(n *Node) *CollectionNodeUpdate {
-	return cnu.SetNodeID(n.ID)
+func (_u *CollectionNodeUpdate) SetNode(v *Node) *CollectionNodeUpdate {
+	return _u.SetNodeID(v.ID)
 }
 
 // Mutation returns the CollectionNodeMutation object of the builder.
-func (cnu *CollectionNodeUpdate) Mutation() *CollectionNodeMutation {
-	return cnu.mutation
+func (_u *CollectionNodeUpdate) Mutation() *CollectionNodeMutation {
+	return _u.mutation
 }
 
 // ClearCollection clears the "collection" edge to the Collection entity.
-func (cnu *CollectionNodeUpdate) ClearCollection() *CollectionNodeUpdate {
-	cnu.mutation.ClearCollection()
-	return cnu
+func (_u *CollectionNodeUpdate) ClearCollection() *CollectionNodeUpdate {
+	_u.mutation.ClearCollection()
+	return _u
 }
 
 // ClearNode clears the "node" edge to the Node entity.
-func (cnu *CollectionNodeUpdate) ClearNode() *CollectionNodeUpdate {
-	cnu.mutation.ClearNode()
-	return cnu
+func (_u *CollectionNodeUpdate) ClearNode() *CollectionNodeUpdate {
+	_u.mutation.ClearNode()
+	return _u
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
-func (cnu *CollectionNodeUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks(ctx, cnu.sqlSave, cnu.mutation, cnu.hooks)
+func (_u *CollectionNodeUpdate) Save(ctx context.Context) (int, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cnu *CollectionNodeUpdate) SaveX(ctx context.Context) int {
-	affected, err := cnu.Save(ctx)
+func (_u *CollectionNodeUpdate) SaveX(ctx context.Context) int {
+	affected, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -115,61 +115,61 @@ func (cnu *CollectionNodeUpdate) SaveX(ctx context.Context) int {
 }
 
 // Exec executes the query.
-func (cnu *CollectionNodeUpdate) Exec(ctx context.Context) error {
-	_, err := cnu.Save(ctx)
+func (_u *CollectionNodeUpdate) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cnu *CollectionNodeUpdate) ExecX(ctx context.Context) {
-	if err := cnu.Exec(ctx); err != nil {
+func (_u *CollectionNodeUpdate) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cnu *CollectionNodeUpdate) check() error {
-	if v, ok := cnu.mutation.CollectionID(); ok {
+func (_u *CollectionNodeUpdate) check() error {
+	if v, ok := _u.mutation.CollectionID(); ok {
 		if err := collectionnode.CollectionIDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "collection_id", err: fmt.Errorf(`ent: validator failed for field "CollectionNode.collection_id": %w`, err)}
 		}
 	}
-	if v, ok := cnu.mutation.NodeID(); ok {
+	if v, ok := _u.mutation.NodeID(); ok {
 		if err := collectionnode.NodeIDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "node_id", err: fmt.Errorf(`ent: validator failed for field "CollectionNode.node_id": %w`, err)}
 		}
 	}
-	if cnu.mutation.CollectionCleared() && len(cnu.mutation.CollectionIDs()) > 0 {
+	if _u.mutation.CollectionCleared() && len(_u.mutation.CollectionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionNode.collection"`)
 	}
-	if cnu.mutation.NodeCleared() && len(cnu.mutation.NodeIDs()) > 0 {
+	if _u.mutation.NodeCleared() && len(_u.mutation.NodeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionNode.node"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (cnu *CollectionNodeUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionNodeUpdate {
-	cnu.modifiers = append(cnu.modifiers, modifiers...)
-	return cnu
+func (_u *CollectionNodeUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionNodeUpdate {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (cnu *CollectionNodeUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := cnu.check(); err != nil {
-		return n, err
+func (_u *CollectionNodeUpdate) sqlSave(ctx context.Context) (_node int, err error) {
+	if err := _u.check(); err != nil {
+		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(collectionnode.Table, collectionnode.Columns, sqlgraph.NewFieldSpec(collectionnode.FieldCollectionID, field.TypeString), sqlgraph.NewFieldSpec(collectionnode.FieldNodeID, field.TypeString))
-	if ps := cnu.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cnu.mutation.MembershipType(); ok {
+	if value, ok := _u.mutation.MembershipType(); ok {
 		_spec.SetField(collectionnode.FieldMembershipType, field.TypeString, value)
 	}
-	if cnu.mutation.CollectionCleared() {
+	if _u.mutation.CollectionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -182,7 +182,7 @@ func (cnu *CollectionNodeUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cnu.mutation.CollectionIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CollectionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -198,7 +198,7 @@ func (cnu *CollectionNodeUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cnu.mutation.NodeCleared() {
+	if _u.mutation.NodeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -211,7 +211,7 @@ func (cnu *CollectionNodeUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cnu.mutation.NodeIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -227,8 +227,8 @@ func (cnu *CollectionNodeUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(cnu.modifiers...)
-	if n, err = sqlgraph.UpdateNodes(ctx, cnu.driver, _spec); err != nil {
+	_spec.AddModifiers(_u.modifiers...)
+	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{collectionnode.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -236,8 +236,8 @@ func (cnu *CollectionNodeUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		return 0, err
 	}
-	cnu.mutation.done = true
-	return n, nil
+	_u.mutation.done = true
+	return _node, nil
 }
 
 // CollectionNodeUpdateOne is the builder for updating a single CollectionNode entity.
@@ -250,95 +250,95 @@ type CollectionNodeUpdateOne struct {
 }
 
 // SetCollectionID sets the "collection_id" field.
-func (cnuo *CollectionNodeUpdateOne) SetCollectionID(x xid.ID) *CollectionNodeUpdateOne {
-	cnuo.mutation.SetCollectionID(x)
-	return cnuo
+func (_u *CollectionNodeUpdateOne) SetCollectionID(v xid.ID) *CollectionNodeUpdateOne {
+	_u.mutation.SetCollectionID(v)
+	return _u
 }
 
 // SetNillableCollectionID sets the "collection_id" field if the given value is not nil.
-func (cnuo *CollectionNodeUpdateOne) SetNillableCollectionID(x *xid.ID) *CollectionNodeUpdateOne {
-	if x != nil {
-		cnuo.SetCollectionID(*x)
+func (_u *CollectionNodeUpdateOne) SetNillableCollectionID(v *xid.ID) *CollectionNodeUpdateOne {
+	if v != nil {
+		_u.SetCollectionID(*v)
 	}
-	return cnuo
+	return _u
 }
 
 // SetNodeID sets the "node_id" field.
-func (cnuo *CollectionNodeUpdateOne) SetNodeID(x xid.ID) *CollectionNodeUpdateOne {
-	cnuo.mutation.SetNodeID(x)
-	return cnuo
+func (_u *CollectionNodeUpdateOne) SetNodeID(v xid.ID) *CollectionNodeUpdateOne {
+	_u.mutation.SetNodeID(v)
+	return _u
 }
 
 // SetNillableNodeID sets the "node_id" field if the given value is not nil.
-func (cnuo *CollectionNodeUpdateOne) SetNillableNodeID(x *xid.ID) *CollectionNodeUpdateOne {
-	if x != nil {
-		cnuo.SetNodeID(*x)
+func (_u *CollectionNodeUpdateOne) SetNillableNodeID(v *xid.ID) *CollectionNodeUpdateOne {
+	if v != nil {
+		_u.SetNodeID(*v)
 	}
-	return cnuo
+	return _u
 }
 
 // SetMembershipType sets the "membership_type" field.
-func (cnuo *CollectionNodeUpdateOne) SetMembershipType(s string) *CollectionNodeUpdateOne {
-	cnuo.mutation.SetMembershipType(s)
-	return cnuo
+func (_u *CollectionNodeUpdateOne) SetMembershipType(v string) *CollectionNodeUpdateOne {
+	_u.mutation.SetMembershipType(v)
+	return _u
 }
 
 // SetNillableMembershipType sets the "membership_type" field if the given value is not nil.
-func (cnuo *CollectionNodeUpdateOne) SetNillableMembershipType(s *string) *CollectionNodeUpdateOne {
-	if s != nil {
-		cnuo.SetMembershipType(*s)
+func (_u *CollectionNodeUpdateOne) SetNillableMembershipType(v *string) *CollectionNodeUpdateOne {
+	if v != nil {
+		_u.SetMembershipType(*v)
 	}
-	return cnuo
+	return _u
 }
 
 // SetCollection sets the "collection" edge to the Collection entity.
-func (cnuo *CollectionNodeUpdateOne) SetCollection(c *Collection) *CollectionNodeUpdateOne {
-	return cnuo.SetCollectionID(c.ID)
+func (_u *CollectionNodeUpdateOne) SetCollection(v *Collection) *CollectionNodeUpdateOne {
+	return _u.SetCollectionID(v.ID)
 }
 
 // SetNode sets the "node" edge to the Node entity.
-func (cnuo *CollectionNodeUpdateOne) SetNode(n *Node) *CollectionNodeUpdateOne {
-	return cnuo.SetNodeID(n.ID)
+func (_u *CollectionNodeUpdateOne) SetNode(v *Node) *CollectionNodeUpdateOne {
+	return _u.SetNodeID(v.ID)
 }
 
 // Mutation returns the CollectionNodeMutation object of the builder.
-func (cnuo *CollectionNodeUpdateOne) Mutation() *CollectionNodeMutation {
-	return cnuo.mutation
+func (_u *CollectionNodeUpdateOne) Mutation() *CollectionNodeMutation {
+	return _u.mutation
 }
 
 // ClearCollection clears the "collection" edge to the Collection entity.
-func (cnuo *CollectionNodeUpdateOne) ClearCollection() *CollectionNodeUpdateOne {
-	cnuo.mutation.ClearCollection()
-	return cnuo
+func (_u *CollectionNodeUpdateOne) ClearCollection() *CollectionNodeUpdateOne {
+	_u.mutation.ClearCollection()
+	return _u
 }
 
 // ClearNode clears the "node" edge to the Node entity.
-func (cnuo *CollectionNodeUpdateOne) ClearNode() *CollectionNodeUpdateOne {
-	cnuo.mutation.ClearNode()
-	return cnuo
+func (_u *CollectionNodeUpdateOne) ClearNode() *CollectionNodeUpdateOne {
+	_u.mutation.ClearNode()
+	return _u
 }
 
 // Where appends a list predicates to the CollectionNodeUpdate builder.
-func (cnuo *CollectionNodeUpdateOne) Where(ps ...predicate.CollectionNode) *CollectionNodeUpdateOne {
-	cnuo.mutation.Where(ps...)
-	return cnuo
+func (_u *CollectionNodeUpdateOne) Where(ps ...predicate.CollectionNode) *CollectionNodeUpdateOne {
+	_u.mutation.Where(ps...)
+	return _u
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
-func (cnuo *CollectionNodeUpdateOne) Select(field string, fields ...string) *CollectionNodeUpdateOne {
-	cnuo.fields = append([]string{field}, fields...)
-	return cnuo
+func (_u *CollectionNodeUpdateOne) Select(field string, fields ...string) *CollectionNodeUpdateOne {
+	_u.fields = append([]string{field}, fields...)
+	return _u
 }
 
 // Save executes the query and returns the updated CollectionNode entity.
-func (cnuo *CollectionNodeUpdateOne) Save(ctx context.Context) (*CollectionNode, error) {
-	return withHooks(ctx, cnuo.sqlSave, cnuo.mutation, cnuo.hooks)
+func (_u *CollectionNodeUpdateOne) Save(ctx context.Context) (*CollectionNode, error) {
+	return withHooks(ctx, _u.sqlSave, _u.mutation, _u.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (cnuo *CollectionNodeUpdateOne) SaveX(ctx context.Context) *CollectionNode {
-	node, err := cnuo.Save(ctx)
+func (_u *CollectionNodeUpdateOne) SaveX(ctx context.Context) *CollectionNode {
+	node, err := _u.Save(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -346,61 +346,61 @@ func (cnuo *CollectionNodeUpdateOne) SaveX(ctx context.Context) *CollectionNode 
 }
 
 // Exec executes the query on the entity.
-func (cnuo *CollectionNodeUpdateOne) Exec(ctx context.Context) error {
-	_, err := cnuo.Save(ctx)
+func (_u *CollectionNodeUpdateOne) Exec(ctx context.Context) error {
+	_, err := _u.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cnuo *CollectionNodeUpdateOne) ExecX(ctx context.Context) {
-	if err := cnuo.Exec(ctx); err != nil {
+func (_u *CollectionNodeUpdateOne) ExecX(ctx context.Context) {
+	if err := _u.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cnuo *CollectionNodeUpdateOne) check() error {
-	if v, ok := cnuo.mutation.CollectionID(); ok {
+func (_u *CollectionNodeUpdateOne) check() error {
+	if v, ok := _u.mutation.CollectionID(); ok {
 		if err := collectionnode.CollectionIDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "collection_id", err: fmt.Errorf(`ent: validator failed for field "CollectionNode.collection_id": %w`, err)}
 		}
 	}
-	if v, ok := cnuo.mutation.NodeID(); ok {
+	if v, ok := _u.mutation.NodeID(); ok {
 		if err := collectionnode.NodeIDValidator(v.String()); err != nil {
 			return &ValidationError{Name: "node_id", err: fmt.Errorf(`ent: validator failed for field "CollectionNode.node_id": %w`, err)}
 		}
 	}
-	if cnuo.mutation.CollectionCleared() && len(cnuo.mutation.CollectionIDs()) > 0 {
+	if _u.mutation.CollectionCleared() && len(_u.mutation.CollectionIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionNode.collection"`)
 	}
-	if cnuo.mutation.NodeCleared() && len(cnuo.mutation.NodeIDs()) > 0 {
+	if _u.mutation.NodeCleared() && len(_u.mutation.NodeIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CollectionNode.node"`)
 	}
 	return nil
 }
 
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
-func (cnuo *CollectionNodeUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionNodeUpdateOne {
-	cnuo.modifiers = append(cnuo.modifiers, modifiers...)
-	return cnuo
+func (_u *CollectionNodeUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CollectionNodeUpdateOne {
+	_u.modifiers = append(_u.modifiers, modifiers...)
+	return _u
 }
 
-func (cnuo *CollectionNodeUpdateOne) sqlSave(ctx context.Context) (_node *CollectionNode, err error) {
-	if err := cnuo.check(); err != nil {
+func (_u *CollectionNodeUpdateOne) sqlSave(ctx context.Context) (_node *CollectionNode, err error) {
+	if err := _u.check(); err != nil {
 		return _node, err
 	}
 	_spec := sqlgraph.NewUpdateSpec(collectionnode.Table, collectionnode.Columns, sqlgraph.NewFieldSpec(collectionnode.FieldCollectionID, field.TypeString), sqlgraph.NewFieldSpec(collectionnode.FieldNodeID, field.TypeString))
-	if id, ok := cnuo.mutation.CollectionID(); !ok {
+	if id, ok := _u.mutation.CollectionID(); !ok {
 		return nil, &ValidationError{Name: "collection_id", err: errors.New(`ent: missing "CollectionNode.collection_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[0].Value = id
 	}
-	if id, ok := cnuo.mutation.NodeID(); !ok {
+	if id, ok := _u.mutation.NodeID(); !ok {
 		return nil, &ValidationError{Name: "node_id", err: errors.New(`ent: missing "CollectionNode.node_id" for update`)}
 	} else {
 		_spec.Node.CompositeID[1].Value = id
 	}
-	if fields := cnuo.fields; len(fields) > 0 {
+	if fields := _u.fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, len(fields))
 		for i, f := range fields {
 			if !collectionnode.ValidColumn(f) {
@@ -409,17 +409,17 @@ func (cnuo *CollectionNodeUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 			_spec.Node.Columns[i] = f
 		}
 	}
-	if ps := cnuo.mutation.predicates; len(ps) > 0 {
+	if ps := _u.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
 	}
-	if value, ok := cnuo.mutation.MembershipType(); ok {
+	if value, ok := _u.mutation.MembershipType(); ok {
 		_spec.SetField(collectionnode.FieldMembershipType, field.TypeString, value)
 	}
-	if cnuo.mutation.CollectionCleared() {
+	if _u.mutation.CollectionCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -432,7 +432,7 @@ func (cnuo *CollectionNodeUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cnuo.mutation.CollectionIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.CollectionIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -448,7 +448,7 @@ func (cnuo *CollectionNodeUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cnuo.mutation.NodeCleared() {
+	if _u.mutation.NodeCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -461,7 +461,7 @@ func (cnuo *CollectionNodeUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cnuo.mutation.NodeIDs(); len(nodes) > 0 {
+	if nodes := _u.mutation.NodeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
@@ -477,11 +477,11 @@ func (cnuo *CollectionNodeUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	_spec.AddModifiers(cnuo.modifiers...)
-	_node = &CollectionNode{config: cnuo.config}
+	_spec.AddModifiers(_u.modifiers...)
+	_node = &CollectionNode{config: _u.config}
 	_spec.Assign = _node.assignValues
 	_spec.ScanValues = _node.scanValues
-	if err = sqlgraph.UpdateNode(ctx, cnuo.driver, _spec); err != nil {
+	if err = sqlgraph.UpdateNode(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{collectionnode.Label}
 		} else if sqlgraph.IsConstraintError(err) {
@@ -489,6 +489,6 @@ func (cnuo *CollectionNodeUpdateOne) sqlSave(ctx context.Context) (_node *Collec
 		}
 		return nil, err
 	}
-	cnuo.mutation.done = true
+	_u.mutation.done = true
 	return _node, nil
 }

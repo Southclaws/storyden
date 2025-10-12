@@ -80,10 +80,11 @@ export function NotificationsMenu(props: Props) {
                     height="auto"
                     py="1"
                   >
-                    <WStack>
+                    <WStack className="notification-menu__row" minW="0" gap="1">
                       <Link
                         className={hstack({
                           w: "full",
+                          minW: "0",
                           justify: "space-between",
                         })}
                         href={notification.url}
@@ -92,8 +93,14 @@ export function NotificationsMenu(props: Props) {
                         }
                       >
                         <NotificationAvatar notification={notification} />
-                        <LStack gap="0">
-                          <styled.span fontWeight="bold">
+                        <LStack gap="0" minW="0">
+                          <styled.span
+                            fontWeight="bold"
+                            textWrap="nowrap"
+                            textOverflow="ellipsis"
+                            overflow="hidden"
+                            maxW="full"
+                          >
                             {notification.source?.handle ?? "System"}
                           </styled.span>
                           <styled.span fontWeight="normal">

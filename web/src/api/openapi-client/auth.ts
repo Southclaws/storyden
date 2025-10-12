@@ -5,7 +5,7 @@
  * Storyden social API for building community driven platforms.
 The Storyden API does not adhere to semantic versioning but instead applies a rolling strategy with deprecations and minimal breaking changes. This has been done mainly for a simpler development process and it may be changed to a more fixed versioning strategy in the future. Ultimately, the primary way Storyden tracks versions is dates, there are no set release tags currently.
 
- * OpenAPI spec version: v1.25.7-canary
+ * OpenAPI spec version: v1.25.8-canary
  */
 import useSwr from "swr";
 import type { Arguments, Key, SWRConfiguration } from "swr";
@@ -29,6 +29,7 @@ import type {
   AuthPasswordSignupParams,
   AuthPasswordUpdateBody,
   AuthProviderListOKResponse,
+  AuthProviderLogoutParams,
   AuthSuccessOKResponse,
   BadRequestResponse,
   ForbiddenResponse,
@@ -1372,36 +1373,43 @@ export const useAccessKeyDelete = <
   };
 };
 /**
- * Remove cookies from requesting client.
+ * Performs a HTTP logout by clearing the session cookie and redirecting to
+to the requested path at the frontend's `WEB_ADDRESS`. Typically this
+may be a secondary logout route on the frontend implementation that can
+handle any frontend-specific logout tasks. This is necessary in cases
+where the frontend is running on a different origin to the API service
+such as api.site.com vs site.com because Clear-Site-Data and other
+headers are same-origin compliant and won't work cross-origin.
+
  */
-export const authProviderLogout = () => {
-  return fetcher<void>({ url: `/auth/logout`, method: "GET" });
+export const authProviderLogout = (params?: AuthProviderLogoutParams) => {
+  return fetcher<unknown>({ url: `/auth/logout`, method: "GET", params });
 };
 
-export const getAuthProviderLogoutKey = () => [`/auth/logout`] as const;
+export const getAuthProviderLogoutKey = (params?: AuthProviderLogoutParams) =>
+  [`/auth/logout`, ...(params ? [params] : [])] as const;
 
 export type AuthProviderLogoutQueryResult = NonNullable<
   Awaited<ReturnType<typeof authProviderLogout>>
 >;
-export type AuthProviderLogoutQueryError =
-  | BadRequestResponse
-  | InternalServerErrorResponse;
+export type AuthProviderLogoutQueryError = void;
 
-export const useAuthProviderLogout = <
-  TError = BadRequestResponse | InternalServerErrorResponse,
->(options?: {
-  swr?: SWRConfiguration<
-    Awaited<ReturnType<typeof authProviderLogout>>,
-    TError
-  > & { swrKey?: Key; enabled?: boolean };
-}) => {
+export const useAuthProviderLogout = <TError = void>(
+  params?: AuthProviderLogoutParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof authProviderLogout>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
   const { swr: swrOptions } = options ?? {};
 
   const isEnabled = swrOptions?.enabled !== false;
   const swrKey =
     swrOptions?.swrKey ??
-    (() => (isEnabled ? getAuthProviderLogoutKey() : null));
-  const swrFn = () => authProviderLogout();
+    (() => (isEnabled ? getAuthProviderLogoutKey(params) : null));
+  const swrFn = () => authProviderLogout(params);
 
   const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
     swrKey,

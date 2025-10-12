@@ -36,6 +36,7 @@ export function FeedScreenContent({ initialData }: Props) {
           category={undefined}
           paginationBasePath="/"
           showCategorySelect={true}
+          showQuickShare={feed.source.quickShare === "enabled"}
         />
       );
 
@@ -46,6 +47,8 @@ export function FeedScreenContent({ initialData }: Props) {
       return (
         <CategoryIndexScreen
           layout={feed.layout.type}
+          threadListMode={feed.source.threadListMode}
+          showQuickShare={feed.source.quickShare === "enabled"}
           initialCategoryList={initialData.categories}
           initialThreadList={initialData.threads}
           initialThreadListPage={initialData.page}
