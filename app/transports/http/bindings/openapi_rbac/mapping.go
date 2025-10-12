@@ -246,6 +246,10 @@ func (m *Mapping) NotificationUpdate() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) NotificationMarkAllRead() (bool, *rbac.Permission) {
+	return true, nil
+}
+
 func (m *Mapping) ProfileList() (bool, *rbac.Permission) {
 	return false, &rbac.PermissionListProfiles
 }
