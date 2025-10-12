@@ -127,15 +127,15 @@ func (d *Writer) Create(
 	// If a category was specified, check if it exists first.
 	if categoryID, ok := mutate.CategoryID(); ok {
 		exists, err := d.db.Category.Query().Where(category.ID(xid.ID(categoryID))).Exist(ctx)
-		if err != nil || !exists {
-			if ent.IsNotFound(err) {
-				return nil, fault.Wrap(err,
-					fctx.With(ctx),
-					ftag.With(ftag.NotFound),
-					fmsg.WithDesc("category not found",
-						"The specified category was not found while creating the thread."))
-			}
+		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
+		}
+		if !exists {
+			return nil, fault.Wrap(fault.New("category not found"),
+				fctx.With(ctx),
+				ftag.With(ftag.InvalidArgument),
+				fmsg.WithDesc("category not found",
+					"The specified category was not found."))
 		}
 	}
 
