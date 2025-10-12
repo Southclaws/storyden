@@ -8,7 +8,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  * OpenAPI spec version: v1.25.8-canary
  */
 import useSwr from "swr";
-import type { Key, SWRConfiguration } from "swr";
+import type { Arguments, Key, SWRConfiguration } from "swr";
 import useSWRMutation from "swr/mutation";
 import type { SWRMutationConfiguration } from "swr/mutation";
 
@@ -19,6 +19,7 @@ import type {
   NotFoundResponse,
   NotificationListOKResponse,
   NotificationListParams,
+  NotificationMarkAllReadOKResponse,
   NotificationUpdateBody,
   NotificationUpdateOKResponse,
   UnauthorisedResponse,
@@ -137,6 +138,57 @@ export const useNotificationUpdate = <
   const swrKey =
     swrOptions?.swrKey ?? getNotificationUpdateMutationKey(notificationId);
   const swrFn = getNotificationUpdateMutationFetcher(notificationId);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Mark all unread notifications as read for the authenticated user.
+ */
+export const notificationMarkAllRead = () => {
+  return fetcher<NotificationMarkAllReadOKResponse>({
+    url: `/notifications/mark-all-read`,
+    method: "POST",
+  });
+};
+
+export const getNotificationMarkAllReadMutationFetcher = () => {
+  return (
+    _: Key,
+    __: { arg: Arguments },
+  ): Promise<NotificationMarkAllReadOKResponse> => {
+    return notificationMarkAllRead();
+  };
+};
+export const getNotificationMarkAllReadMutationKey = () =>
+  [`/notifications/mark-all-read`] as const;
+
+export type NotificationMarkAllReadMutationResult = NonNullable<
+  Awaited<ReturnType<typeof notificationMarkAllRead>>
+>;
+export type NotificationMarkAllReadMutationError =
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useNotificationMarkAllRead = <
+  TError = UnauthorisedResponse | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof notificationMarkAllRead>>,
+    TError,
+    Key,
+    Arguments,
+    Awaited<ReturnType<typeof notificationMarkAllRead>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getNotificationMarkAllReadMutationKey();
+  const swrFn = getNotificationMarkAllReadMutationFetcher();
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
