@@ -1054,6 +1054,16 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NotificationUpdateOK" }
 
+  /notifications/mark-all-read:
+    post:
+      operationId: NotificationMarkAllRead
+      description: Mark all unread notifications as read for the authenticated user.
+      tags: [notifications]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NotificationMarkAllReadOK" }
+
   #
   #                                           888
   #                                           888
@@ -3206,6 +3216,13 @@ components:
           schema:
             $ref: "#/components/schemas/Report"
 
+    NotificationMarkAllReadOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NotificationMarkAllReadOKResponse"
+
     ProfileListOK:
       description: OK
       content:
@@ -4762,6 +4779,16 @@ components:
           required: [notifications]
           properties:
             notifications: { $ref: "#/components/schemas/NotificationList" }
+
+    NotificationMarkAllReadOKResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Indicates if the operation was successful
+        message:
+          type: string
+          description: Human readable message about the operation result
 
     NotificationEvent:
       description: |

@@ -12,6 +12,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/notification"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/internal/ent"
+	entaccount "github.com/Southclaws/storyden/internal/ent/account"
+	entnotification "github.com/Southclaws/storyden/internal/ent/notification"
 )
 
 type Writer struct {
@@ -69,4 +71,19 @@ func (n *Writer) SetRead(ctx context.Context, id xid.ID, read bool) (*notificati
 	}
 
 	return nr, nil
+}
+
+func (n *Writer) SetAllRead(ctx context.Context, accountID account.AccountID) (int, error) {
+	count, err := n.db.Notification.Update().
+		Where(
+			entnotification.HasOwnerWith(entaccount.ID(xid.ID(accountID))),
+			entnotification.ReadEQ(false),
+		).
+		SetRead(true).
+		Save(ctx)
+	if err != nil {
+		return 0, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return count, nil
 }
