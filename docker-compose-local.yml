@@ -1,0 +1,18 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: ./docker/api/Dockerfile.local
+    volumes:
+      - ./:/app
+      - go-mod-cache:/go/pkg/mod
+    working_dir: /app
+    command: air -c docker/api/.air.toml
+    ports:
+      - "8000:8000"
+    environment:
+      - PUBLIC_WEB_ADDRESS=http://localhost:3000
+      - PUBLIC_API_ADDRESS=http://localhost:8000
+
+volumes:
+  go-mod-cache:
