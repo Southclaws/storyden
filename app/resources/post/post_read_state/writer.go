@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/ent/postread"
 )
 
 type Writer struct {
@@ -26,7 +27,7 @@ func (w *Writer) UpsertReadState(ctx context.Context, accountID account.AccountI
 		SetAccountID(xid.ID(accountID)).
 		SetRootPostID(xid.ID(threadID)).
 		SetLastSeenAt(time.Now().UTC()).
-		OnConflictColumns("root_post_id", "account_id").
+		OnConflictColumns(postread.FieldRootPostID, postread.FieldAccountID).
 		UpdateNewValues().
 		ID(ctx)
 	if err != nil {
