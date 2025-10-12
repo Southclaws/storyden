@@ -15,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -39,7 +40,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	thr, err := s.thread_repo.Get(ctx, threadID, pagination.Parameters{}, nil)
+	thr, err := s.threadQuerier.Get(ctx, threadID, pagination.Parameters{}, nil)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -69,18 +70,18 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 			return acc
 		}, []tag_ref.ID{})
 
-		opts = append(opts, thread.WithTagsAdd(addIDs...))
-		opts = append(opts, thread.WithTagsRemove(removeIDs...))
+		opts = append(opts, thread_writer.WithTagsAdd(addIDs...))
+		opts = append(opts, thread_writer.WithTagsRemove(removeIDs...))
 	}
 
 	if u, ok := partial.URL.Get(); ok {
 		ln, err := s.fetcher.Fetch(ctx, u, fetcher.Options{})
 		if err == nil {
-			opts = append(opts, thread.WithLink(xid.ID(ln.ID)))
+			opts = append(opts, thread_writer.WithLink(xid.ID(ln.ID)))
 		}
 	}
 
-	thr, err = s.thread_repo.Update(ctx, threadID, opts...)
+	thr, err = s.threadWriter.Update(ctx, threadID, opts...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

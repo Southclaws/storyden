@@ -85,8 +85,9 @@ func TestThreadReadState(t *testing.T) {
 
 				lastRead := time.Now().UTC()
 
-				// Small delay to ensure time difference
-				time.Sleep(100 * time.Millisecond)
+				// Sleep for >1 second to ensure unixepoch() will show different values
+				// we don't store millisecond level precision in the database.
+				time.Sleep(1100 * time.Millisecond)
 
 				replyCreate, err := cl.ReplyCreateWithResponse(acc2ctx, threadCreate.JSON200.Slug, openapi.ReplyInitialProps{
 					Body: "this is a reply from acc2",

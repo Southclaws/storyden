@@ -22,7 +22,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/asset"
-	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/services/asset/asset_download"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 	"github.com/Southclaws/storyden/internal/config"
@@ -68,7 +67,6 @@ type service struct {
 	accountQuery *account_querier.Querier
 	uploader     *asset_upload.Uploader
 	downloader   *asset_download.Downloader
-	thread_repo  thread.Repository
 
 	os object.Storer
 
@@ -79,7 +77,6 @@ func New(
 	accountQuery *account_querier.Querier,
 	uploader *asset_upload.Uploader,
 	downloader *asset_download.Downloader,
-	thread_repo thread.Repository,
 
 	os object.Storer,
 	cfg config.Config,
@@ -88,7 +85,6 @@ func New(
 		accountQuery: accountQuery,
 		uploader:     uploader,
 		downloader:   downloader,
-		thread_repo:  thread_repo,
 		os:           os,
 		address:      cfg.PublicWebAddress,
 	}

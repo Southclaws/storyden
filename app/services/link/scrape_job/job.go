@@ -23,7 +23,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
-	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
@@ -37,7 +37,7 @@ type scrapeConsumer struct {
 	postWriter  *post_writer.PostWriter
 	postQuery   reply.Repository
 	nodeWriter  *node_writer.Writer
-	threadQuery thread.Repository
+	threadQuery *thread_querier.Querier
 	nodeQuery   *node_querier.Querier
 	bus         *pubsub.Bus
 }
@@ -51,7 +51,7 @@ func runScrapeConsumer(
 	postWriter *post_writer.PostWriter,
 	postQuery reply.Repository,
 	nodeWriter *node_writer.Writer,
-	threadQuery thread.Repository,
+	threadQuery *thread_querier.Querier,
 	nodeQuery *node_querier.Querier,
 ) {
 	ic := scrapeConsumer{

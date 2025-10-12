@@ -28,7 +28,7 @@ func (s *service) Get(
 
 	session := session.GetOptAccountID(ctx)
 
-	thr, err := s.thread_repo.Get(ctx, threadID, pageParams, session)
+	thr, err := s.threadQuerier.Get(ctx, threadID, pageParams, session)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to get thread"))
 	}

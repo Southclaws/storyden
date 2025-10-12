@@ -28,7 +28,7 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 	}
 
 	// TODO: Minimal reader interface for thread.
-	thr, err := s.thread_repo.Get(ctx, id, pagination.Parameters{}, nil)
+	thr, err := s.threadQuerier.Get(ctx, id, pagination.Parameters{}, nil)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
@@ -37,7 +37,7 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	err = s.thread_repo.Delete(ctx, id)
+	err = s.threadWriter.Delete(ctx, id)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to delete thread"))
 	}
