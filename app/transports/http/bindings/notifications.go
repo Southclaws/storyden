@@ -2,7 +2,6 @@ package bindings
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -79,27 +78,6 @@ func (h *Notifications) NotificationUpdate(ctx context.Context, request openapi.
 
 	return openapi.NotificationUpdate200JSONResponse{
 		NotificationUpdateOKJSONResponse: openapi.NotificationUpdateOKJSONResponse(serialiseNotificationRef(n)),
-	}, nil
-}
-
-func (h *Notifications) NotificationMarkAllRead(ctx context.Context, request openapi.NotificationMarkAllReadRequestObject) (openapi.NotificationMarkAllReadResponseObject, error) {
-	session, err := session.GetAccountID(ctx)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	count, err := h.notifyWriter.SetAllRead(ctx, session)
-	if err != nil {
-		return nil, fault.Wrap(err, fctx.With(ctx))
-	}
-
-	message := fmt.Sprintf("Marked %d notifications as read", count)
-
-	return openapi.NotificationMarkAllRead200JSONResponse{
-		NotificationMarkAllReadOKJSONResponse: openapi.NotificationMarkAllReadOKJSONResponse{
-			Success: opt.New(true).Ptr(),
-			Message: opt.New(message).Ptr(),
-		},
 	}, nil
 }
 

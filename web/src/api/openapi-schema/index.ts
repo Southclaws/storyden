@@ -319,7 +319,6 @@ export * from "./notificationListOKResponse";
 export * from "./notificationListParams";
 export * from "./notificationListResult";
 export * from "./notificationListResultAllOf";
-export * from "./notificationMarkAllReadOKResponse";
 export * from "./notificationMutableProps";
 export * from "./notificationStatus";
 export * from "./notificationStatusList";

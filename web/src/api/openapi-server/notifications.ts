@@ -10,7 +10,6 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   NotificationListOKResponse,
   NotificationListParams,
-  NotificationMarkAllReadOKResponse,
   NotificationUpdateBody,
   NotificationUpdateOKResponse,
 } from "../openapi-schema";
@@ -75,30 +74,6 @@ export const notificationUpdate = async (
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(notificationUpdateBody),
-    },
-  );
-};
-
-/**
- * Mark all unread notifications as read for the authenticated user.
- */
-export type notificationMarkAllReadResponse = {
-  data: NotificationMarkAllReadOKResponse;
-  status: number;
-};
-
-export const getNotificationMarkAllReadUrl = () => {
-  return `/notifications/mark-all-read`;
-};
-
-export const notificationMarkAllRead = async (
-  options?: RequestInit,
-): Promise<notificationMarkAllReadResponse> => {
-  return fetcher<Promise<notificationMarkAllReadResponse>>(
-    getNotificationMarkAllReadUrl(),
-    {
-      ...options,
-      method: "POST",
     },
   );
 };

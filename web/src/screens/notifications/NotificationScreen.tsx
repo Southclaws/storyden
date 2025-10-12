@@ -9,7 +9,6 @@ import {
 import { NotificationCardList } from "@/components/notifications/NotificationCardList";
 import { useNotifications } from "@/components/notifications/useNotifications";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
 
@@ -55,7 +54,6 @@ export function useNotificationScreen(props: Props) {
     handlers: {
       handleToggleStatus,
       handleMarkAs: handlers.handleMarkAs,
-      handleMarkAllAsRead: handlers.handleMarkAllAsRead,
     },
   };
 }
@@ -70,11 +68,9 @@ export function NotificationScreen(props: Props) {
 
   const showingArchived = status === NotificationStatus.read;
 
-  const hasUnreadNotifications = data.unreads > 0 && !showingArchived;
-
   return (
     <LStack>
-      <WStack justifyContent="space-between" alignItems="flex-start">
+      <WStack>
         <LStack>
           <styled.h1 fontWeight="bold">Notifications</styled.h1>
 
@@ -86,17 +82,6 @@ export function NotificationScreen(props: Props) {
             Archived
           </Switch>
         </LStack>
-
-        {hasUnreadNotifications && (
-          <Button
-            variant="ghost"
-            size="sm"
-            colorPalette="accent"
-            onClick={handlers.handleMarkAllAsRead}
-          >
-            Mark all as read
-          </Button>
-        )}
       </WStack>
 
       <NotificationCardList
