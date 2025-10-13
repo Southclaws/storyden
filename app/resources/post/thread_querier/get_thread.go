@@ -118,7 +118,6 @@ func (d *Querier) Get(ctx context.Context, threadID post.ID, pageParams paginati
 		r, err := d.db.Post.Query().
 			Where(
 				ent_post.DeletedAtIsNil(),
-				ent_post.First(false),
 				ent_post.RootPostID(xid.ID(threadID)),
 			).
 			Limit(pageParams.Limit()).
@@ -142,7 +141,7 @@ func (d *Querier) Get(ctx context.Context, threadID post.ID, pageParams paginati
 		r, err := d.db.Post.Query().
 			Where(
 				ent_post.DeletedAtIsNil(),
-				ent_post.First(true),
+				ent_post.RootPostIDIsNil(),
 				ent_post.ID(xid.ID(threadID)),
 			).
 			WithCategory().

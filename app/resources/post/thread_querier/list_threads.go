@@ -2,7 +2,6 @@ package thread_querier
 
 import (
 	"context"
-	"fmt"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
@@ -40,7 +39,7 @@ func (d *Querier) List(
 		size = 100
 	}
 
-	query := d.db.Post.Query().Where(ent_post.First(true))
+	query := d.db.Post.Query().Where(ent_post.RootPostIDIsNil())
 
 	for _, fn := range opts {
 		fn(query)
@@ -59,12 +58,7 @@ func (d *Querier) List(
 			lq.WithFaviconImage().WithPrimaryImage()
 			lq.WithAssets().Order(link.ByCreatedAt(sql.OrderDesc()))
 		}).
-		Order(func(s *sql.Selector) {
-			s.OrderBy(fmt.Sprintf("COALESCE(%s, %s) DESC",
-				s.C(ent_post.FieldLastReplyAt),
-				s.C(ent_post.FieldCreatedAt)),
-			)
-		})
+		Order(ent.Desc(ent_post.FieldLastReplyAt))
 
 	total, err := query.Count(ctx)
 	if err != nil {
