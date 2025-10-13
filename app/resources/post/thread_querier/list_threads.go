@@ -80,7 +80,7 @@ func (d *Querier) List(
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	isNextPage := len(result) >= size
+	isNextPage := len(result) > size
 	nextPage := opt.NewSafe(page+1, isNextPage)
 	totalPages := int(math.Ceil(float64(total) / float64(size)))
 
