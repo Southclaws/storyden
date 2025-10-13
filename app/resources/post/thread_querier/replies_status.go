@@ -26,6 +26,10 @@ group by p.id
 `
 
 func (d *Querier) getRepliesStatus(ctx context.Context, ids []xid.ID, accountID string) (post.PostRepliesMap, error) {
+	if len(ids) == 0 {
+		return post.PostRepliesMap{}, nil
+	}
+
 	quotedIDs := dt.Map(ids, func(id xid.ID) string { return fmt.Sprintf("'%s'", id.String()) })
 	idList := strings.Join(quotedIDs, ",")
 

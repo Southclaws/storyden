@@ -27,6 +27,10 @@ group by p.id
 `
 
 func (d *Querier) getCollectionsStatus(ctx context.Context, ids []xid.ID, accountID string) (collection_item_status.CollectionStatusMap, error) {
+	if len(ids) == 0 {
+		return collection_item_status.CollectionStatusMap{}, nil
+	}
+
 	quotedIDs := dt.Map(ids, func(id xid.ID) string { return fmt.Sprintf("'%s'", id.String()) })
 	idList := strings.Join(quotedIDs, ",")
 

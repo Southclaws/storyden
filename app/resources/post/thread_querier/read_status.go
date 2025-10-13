@@ -57,6 +57,10 @@ func (d *Querier) newRepliesCountManyQuery() string {
 }
 
 func (d *Querier) getReadStatus(ctx context.Context, ids []xid.ID, accountID string) (post.ReadStateMap, error) {
+	if len(ids) == 0 {
+		return post.ReadStateMap{}, nil
+	}
+
 	quotedIDs := dt.Map(ids, func(id xid.ID) string { return fmt.Sprintf("'%s'", id.String()) })
 	idList := strings.Join(quotedIDs, ",")
 

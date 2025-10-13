@@ -26,6 +26,10 @@ group by p.id
 `
 
 func (d *Querier) getLikesStatus(ctx context.Context, ids []xid.ID, accountID string) (post.PostLikesMap, error) {
+	if len(ids) == 0 {
+		return post.PostLikesMap{}, nil
+	}
+
 	quotedIDs := dt.Map(ids, func(id xid.ID) string { return fmt.Sprintf("'%s'", id.String()) })
 	idList := strings.Join(quotedIDs, ",")
 
