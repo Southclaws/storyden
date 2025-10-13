@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/Southclaws/dt"
@@ -50,24 +51,24 @@ func NewWebAuthn(
 ) WebAuthn {
 	// in order to retain context across the credential request and creation,
 	// a session cookie is used which stores the webauthn session information.
-	// router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
-	// 	return func(c echo.Context) error {
-	// 		if s, err := c.Cookie(cookieName); err == nil {
+	router.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			if s, err := c.Cookie(cookieName); err == nil {
 
-	// 			r := base64.NewDecoder(base64.URLEncoding, strings.NewReader(s.Value))
+				r := base64.NewDecoder(base64.URLEncoding, strings.NewReader(s.Value))
 
-	// 			session := &webauthn.SessionData{}
-	// 			if err := json.NewDecoder(r).Decode(&session); err == nil {
-	// 				r := c.Request()
-	// 				ctx := r.Context()
-	// 				ctx = context.WithValue(ctx, "webauthn", session)
-	// 				c.SetRequest(r.WithContext(ctx))
-	// 			}
-	// 		}
+				session := &webauthn.SessionData{}
+				if err := json.NewDecoder(r).Decode(&session); err == nil {
+					r := c.Request()
+					ctx := r.Context()
+					ctx = context.WithValue(ctx, "webauthn", session)
+					c.SetRequest(r.WithContext(ctx))
+				}
+			}
 
-	// 		return next(c)
-	// 	}
-	// })
+			return next(c)
+		}
+	})
 
 	return WebAuthn{cj, si, accountQuery, wa, cfg.PublicAPIAddress}
 }
