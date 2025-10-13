@@ -26,23 +26,23 @@ func newListener(logger *slog.Logger, postReadStateWriter *post_read_state.Write
 }
 
 func (l *listener) handleBeacon(ctx context.Context, cmd *message.CommandSendBeacon) error {
-	l.logger.Debug("received beacon",
-		slog.String("kind", cmd.Item.Kind.String()),
-		slog.String("id", cmd.Item.ID.String()),
-		slog.Any("subject", cmd.Subject.String()),
+	log := l.logger.With(
+		slog.String("datagraph_kind", cmd.Item.Kind.String()),
+		slog.String("datagraph_id", cmd.Item.ID.String()),
 	)
+
+	log.Debug("received beacon")
 
 	switch cmd.Item.Kind {
 	case datagraph.KindThread:
 		if subject, ok := cmd.Subject.Get(); ok {
+			log = log.With(slog.String("account_id", subject.String()))
+
 			err := l.postReadStateWriter.UpsertReadState(ctx, subject, post.ID(cmd.Item.ID))
 			if err != nil {
-				l.logger.Error("failed to update read state",
-					slog.String("error", err.Error()),
-					slog.String("account_id", subject.String()),
-					slog.String("thread_id", cmd.Item.ID.String()),
-				)
-				return err
+				log.Error("failed to update read state", slog.String("error", err.Error()))
+				// NOTE: No error here, we don't care enough about read states
+				// to re-queue the message in the DLQ and try again.
 			}
 		}
 	}
@@ -59,11 +59,7 @@ func runBeaconListener(
 ) {
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
 		_, err := pubsub.SubscribeCommand(hctx, bus, "beacon_listener.handler", func(ctx context.Context, cmd *message.CommandSendBeacon) error {
-			if err := l.handleBeacon(ctx, cmd); err != nil {
-				logger.Error("failed to handle beacon", slog.String("error", err.Error()))
-				return err
-			}
-			return nil
+			return l.handleBeacon(ctx, cmd)
 		})
 
 		return err
