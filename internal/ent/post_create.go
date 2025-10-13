@@ -21,6 +21,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/tag"
 	"github.com/rs/xid"
@@ -461,6 +462,21 @@ func (_c *PostCreate) AddEvent(v ...*Event) *PostCreate {
 	return _c.AddEventIDs(ids...)
 }
 
+// AddPostReadIDs adds the "post_reads" edge to the PostRead entity by IDs.
+func (_c *PostCreate) AddPostReadIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddPostReadIDs(ids...)
+	return _c
+}
+
+// AddPostReads adds the "post_reads" edges to the PostRead entity.
+func (_c *PostCreate) AddPostReads(v ...*PostRead) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddPostReadIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (_c *PostCreate) Mutation() *PostMutation {
 	return _c.mutation
@@ -879,6 +895,22 @@ func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.PostReadsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.PostReadsTable,
+			Columns: []string{post.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

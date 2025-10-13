@@ -38,12 +38,14 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/post_read_state"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
-	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
+	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
+	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_querier"
 	"github.com/Southclaws/storyden/app/resources/profile/follow_writer"
 	"github.com/Southclaws/storyden/app/resources/profile/profile_cache"
@@ -78,13 +80,15 @@ func Build() fx.Option {
 			reply.New,
 			tag_querier.New,
 			tag_writer.New,
-			thread.New,
+			thread_writer.New,
+			thread_querier.New,
 			thread_cache.New,
 			reaction.New,
 			like_querier.New,
 			like_writer.New,
 			post_search.New,
 			post_writer.New,
+			post_read_state.New,
 			collection_querier.New,
 			collection_writer.New,
 			collection_items.New,

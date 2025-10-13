@@ -35,6 +35,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
@@ -91,6 +92,8 @@ type Client struct {
 	Notification *NotificationClient
 	// Post is the client for interacting with the Post builders.
 	Post *PostClient
+	// PostRead is the client for interacting with the PostRead builders.
+	PostRead *PostReadClient
 	// Property is the client for interacting with the Property builders.
 	Property *PropertyClient
 	// PropertySchema is the client for interacting with the PropertySchema builders.
@@ -139,6 +142,7 @@ func (c *Client) init() {
 	c.Node = NewNodeClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
 	c.Post = NewPostClient(c.config)
+	c.PostRead = NewPostReadClient(c.config)
 	c.Property = NewPropertyClient(c.config)
 	c.PropertySchema = NewPropertySchemaClient(c.config)
 	c.PropertySchemaField = NewPropertySchemaFieldClient(c.config)
@@ -259,6 +263,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Node:                NewNodeClient(cfg),
 		Notification:        NewNotificationClient(cfg),
 		Post:                NewPostClient(cfg),
+		PostRead:            NewPostReadClient(cfg),
 		Property:            NewPropertyClient(cfg),
 		PropertySchema:      NewPropertySchemaClient(cfg),
 		PropertySchemaField: NewPropertySchemaFieldClient(cfg),
@@ -306,6 +311,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Node:                NewNodeClient(cfg),
 		Notification:        NewNotificationClient(cfg),
 		Post:                NewPostClient(cfg),
+		PostRead:            NewPostReadClient(cfg),
 		Property:            NewPropertyClient(cfg),
 		PropertySchema:      NewPropertySchemaClient(cfg),
 		PropertySchemaField: NewPropertySchemaFieldClient(cfg),
@@ -347,8 +353,9 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
 		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
 		c.EventParticipant, c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.Node,
-		c.Notification, c.Post, c.Property, c.PropertySchema, c.PropertySchemaField,
-		c.Question, c.React, c.Role, c.Session, c.Setting, c.Tag,
+		c.Notification, c.Post, c.PostRead, c.Property, c.PropertySchema,
+		c.PropertySchemaField, c.Question, c.React, c.Role, c.Session, c.Setting,
+		c.Tag,
 	} {
 		n.Use(hooks...)
 	}
@@ -361,8 +368,9 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
 		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
 		c.EventParticipant, c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.Node,
-		c.Notification, c.Post, c.Property, c.PropertySchema, c.PropertySchemaField,
-		c.Question, c.React, c.Role, c.Session, c.Setting, c.Tag,
+		c.Notification, c.Post, c.PostRead, c.Property, c.PropertySchema,
+		c.PropertySchemaField, c.Question, c.React, c.Role, c.Session, c.Setting,
+		c.Tag,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -409,6 +417,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Notification.mutate(ctx, m)
 	case *PostMutation:
 		return c.Post.mutate(ctx, m)
+	case *PostReadMutation:
+		return c.PostRead.mutate(ctx, m)
 	case *PropertyMutation:
 		return c.Property.mutate(ctx, m)
 	case *PropertySchemaMutation:
@@ -853,6 +863,22 @@ func (c *AccountClient) QueryEvents(_m *Account) *EventParticipantQuery {
 			sqlgraph.From(account.Table, account.FieldID, id),
 			sqlgraph.To(eventparticipant.Table, eventparticipant.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, account.EventsTable, account.EventsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPostReads queries the post_reads edge of a Account.
+func (c *AccountClient) QueryPostReads(_m *Account) *PostReadQuery {
+	query := (&PostReadClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(account.Table, account.FieldID, id),
+			sqlgraph.To(postread.Table, postread.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, account.PostReadsTable, account.PostReadsColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -4356,6 +4382,22 @@ func (c *PostClient) QueryEvent(_m *Post) *EventQuery {
 	return query
 }
 
+// QueryPostReads queries the post_reads edge of a Post.
+func (c *PostClient) QueryPostReads(_m *Post) *PostReadQuery {
+	query := (&PostReadClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, id),
+			sqlgraph.To(postread.Table, postread.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, post.PostReadsTable, post.PostReadsColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *PostClient) Hooks() []Hook {
 	return c.hooks.Post
@@ -4378,6 +4420,171 @@ func (c *PostClient) mutate(ctx context.Context, m *PostMutation) (Value, error)
 		return (&PostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Post mutation op: %q", m.Op())
+	}
+}
+
+// PostReadClient is a client for the PostRead schema.
+type PostReadClient struct {
+	config
+}
+
+// NewPostReadClient returns a client for the PostRead from the given config.
+func NewPostReadClient(c config) *PostReadClient {
+	return &PostReadClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `postread.Hooks(f(g(h())))`.
+func (c *PostReadClient) Use(hooks ...Hook) {
+	c.hooks.PostRead = append(c.hooks.PostRead, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `postread.Intercept(f(g(h())))`.
+func (c *PostReadClient) Intercept(interceptors ...Interceptor) {
+	c.inters.PostRead = append(c.inters.PostRead, interceptors...)
+}
+
+// Create returns a builder for creating a PostRead entity.
+func (c *PostReadClient) Create() *PostReadCreate {
+	mutation := newPostReadMutation(c.config, OpCreate)
+	return &PostReadCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of PostRead entities.
+func (c *PostReadClient) CreateBulk(builders ...*PostReadCreate) *PostReadCreateBulk {
+	return &PostReadCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PostReadClient) MapCreateBulk(slice any, setFunc func(*PostReadCreate, int)) *PostReadCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PostReadCreateBulk{err: fmt.Errorf("calling to PostReadClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PostReadCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PostReadCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for PostRead.
+func (c *PostReadClient) Update() *PostReadUpdate {
+	mutation := newPostReadMutation(c.config, OpUpdate)
+	return &PostReadUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PostReadClient) UpdateOne(_m *PostRead) *PostReadUpdateOne {
+	mutation := newPostReadMutation(c.config, OpUpdateOne, withPostRead(_m))
+	return &PostReadUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PostReadClient) UpdateOneID(id xid.ID) *PostReadUpdateOne {
+	mutation := newPostReadMutation(c.config, OpUpdateOne, withPostReadID(id))
+	return &PostReadUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for PostRead.
+func (c *PostReadClient) Delete() *PostReadDelete {
+	mutation := newPostReadMutation(c.config, OpDelete)
+	return &PostReadDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PostReadClient) DeleteOne(_m *PostRead) *PostReadDeleteOne {
+	return c.DeleteOneID(_m.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PostReadClient) DeleteOneID(id xid.ID) *PostReadDeleteOne {
+	builder := c.Delete().Where(postread.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PostReadDeleteOne{builder}
+}
+
+// Query returns a query builder for PostRead.
+func (c *PostReadClient) Query() *PostReadQuery {
+	return &PostReadQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePostRead},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a PostRead entity by its id.
+func (c *PostReadClient) Get(ctx context.Context, id xid.ID) (*PostRead, error) {
+	return c.Query().Where(postread.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PostReadClient) GetX(ctx context.Context, id xid.ID) *PostRead {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRootPost queries the root_post edge of a PostRead.
+func (c *PostReadClient) QueryRootPost(_m *PostRead) *PostQuery {
+	query := (&PostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(postread.Table, postread.FieldID, id),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, postread.RootPostTable, postread.RootPostColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAccount queries the account edge of a PostRead.
+func (c *PostReadClient) QueryAccount(_m *PostRead) *AccountQuery {
+	query := (&AccountClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(postread.Table, postread.FieldID, id),
+			sqlgraph.To(account.Table, account.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, postread.AccountTable, postread.AccountColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PostReadClient) Hooks() []Hook {
+	return c.hooks.PostRead
+}
+
+// Interceptors returns the client interceptors.
+func (c *PostReadClient) Interceptors() []Interceptor {
+	return c.inters.PostRead
+}
+
+func (c *PostReadClient) mutate(ctx context.Context, m *PostReadMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PostReadCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PostReadUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PostReadUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PostReadDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown PostRead mutation op: %q", m.Op())
 	}
 }
 
@@ -5855,16 +6062,16 @@ type (
 	hooks struct {
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, Property,
-		PropertySchema, PropertySchemaField, Question, React, Role, Session, Setting,
-		Tag []ent.Hook
+		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, PostRead,
+		Property, PropertySchema, PropertySchemaField, Question, React, Role, Session,
+		Setting, Tag []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, Property,
-		PropertySchema, PropertySchemaField, Question, React, Role, Session, Setting,
-		Tag []ent.Interceptor
+		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, PostRead,
+		Property, PropertySchema, PropertySchemaField, Question, React, Role, Session,
+		Setting, Tag []ent.Interceptor
 	}
 )
 

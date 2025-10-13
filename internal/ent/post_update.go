@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
 	"github.com/Southclaws/storyden/internal/ent/tag"
@@ -539,6 +540,21 @@ func (_u *PostUpdate) AddEvent(v ...*Event) *PostUpdate {
 	return _u.AddEventIDs(ids...)
 }
 
+// AddPostReadIDs adds the "post_reads" edge to the PostRead entity by IDs.
+func (_u *PostUpdate) AddPostReadIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddPostReadIDs(ids...)
+	return _u
+}
+
+// AddPostReads adds the "post_reads" edges to the PostRead entity.
+func (_u *PostUpdate) AddPostReads(v ...*PostRead) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPostReadIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (_u *PostUpdate) Mutation() *PostMutation {
 	return _u.mutation
@@ -782,6 +798,27 @@ func (_u *PostUpdate) RemoveEvent(v ...*Event) *PostUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveEventIDs(ids...)
+}
+
+// ClearPostReads clears all "post_reads" edges to the PostRead entity.
+func (_u *PostUpdate) ClearPostReads() *PostUpdate {
+	_u.mutation.ClearPostReads()
+	return _u
+}
+
+// RemovePostReadIDs removes the "post_reads" edge to PostRead entities by IDs.
+func (_u *PostUpdate) RemovePostReadIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemovePostReadIDs(ids...)
+	return _u
+}
+
+// RemovePostReads removes "post_reads" edges to PostRead entities.
+func (_u *PostUpdate) RemovePostReads(v ...*PostRead) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePostReadIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1491,6 +1528,51 @@ func (_u *PostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.PostReadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.PostReadsTable,
+			Columns: []string{post.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPostReadsIDs(); len(nodes) > 0 && !_u.mutation.PostReadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.PostReadsTable,
+			Columns: []string{post.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PostReadsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.PostReadsTable,
+			Columns: []string{post.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -2012,6 +2094,21 @@ func (_u *PostUpdateOne) AddEvent(v ...*Event) *PostUpdateOne {
 	return _u.AddEventIDs(ids...)
 }
 
+// AddPostReadIDs adds the "post_reads" edge to the PostRead entity by IDs.
+func (_u *PostUpdateOne) AddPostReadIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddPostReadIDs(ids...)
+	return _u
+}
+
+// AddPostReads adds the "post_reads" edges to the PostRead entity.
+func (_u *PostUpdateOne) AddPostReads(v ...*PostRead) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPostReadIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (_u *PostUpdateOne) Mutation() *PostMutation {
 	return _u.mutation
@@ -2255,6 +2352,27 @@ func (_u *PostUpdateOne) RemoveEvent(v ...*Event) *PostUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveEventIDs(ids...)
+}
+
+// ClearPostReads clears all "post_reads" edges to the PostRead entity.
+func (_u *PostUpdateOne) ClearPostReads() *PostUpdateOne {
+	_u.mutation.ClearPostReads()
+	return _u
+}
+
+// RemovePostReadIDs removes the "post_reads" edge to PostRead entities by IDs.
+func (_u *PostUpdateOne) RemovePostReadIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemovePostReadIDs(ids...)
+	return _u
+}
+
+// RemovePostReads removes "post_reads" edges to PostRead entities.
+func (_u *PostUpdateOne) RemovePostReads(v ...*PostRead) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePostReadIDs(ids...)
 }
 
 // Where appends a list predicates to the PostUpdate builder.
@@ -2987,6 +3105,51 @@ func (_u *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PostReadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.PostReadsTable,
+			Columns: []string{post.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPostReadsIDs(); len(nodes) > 0 && !_u.mutation.PostReadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.PostReadsTable,
+			Columns: []string{post.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PostReadsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   post.PostReadsTable,
+			Columns: []string{post.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

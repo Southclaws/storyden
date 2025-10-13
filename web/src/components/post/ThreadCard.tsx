@@ -9,6 +9,7 @@ import { CollectionMenu } from "src/components/content/CollectionMenu/Collection
 import { Card } from "@/components/ui/rich-card";
 import { Box, HStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
+import { timestamp } from "@/utils/date";
 
 import { CategoryBadge } from "../category/CategoryBadge";
 import { ThreadMenu } from "../thread/ThreadMenu/ThreadMenu";
@@ -39,6 +40,13 @@ export const ThreadReferenceCard = memo(
     const replyStatusLabel = hasReplied
       ? `${replyCountLabel} (including you!)`
       : replyCountLabel;
+
+    const newRepliesCount = thread.read_status?.replies_since ?? 0;
+    const lastReadAt = thread.read_status?.last_read_at;
+    const newRepliesLabel =
+      newRepliesCount > 0 && lastReadAt
+        ? `${newRepliesCount} ${newRepliesCount === 1 ? "reply" : "replies"} since you last visited ${timestamp(lastReadAt, false)} ago`
+        : undefined;
 
     return (
       <Card
@@ -81,9 +89,10 @@ export const ThreadReferenceCard = memo(
               >
                 <styled.span
                   className="thread-byline__reply-status-label"
-                  color="fg.subtle"
+                  color="fg.muted"
                   display="flex"
-                  gap="1"
+                  gap="0.5"
+                  alignItems="center"
                 >
                   {hasReplied ? (
                     <DiscussionParticipatingIcon width="4" />
@@ -91,6 +100,15 @@ export const ThreadReferenceCard = memo(
                     <DiscussionIcon width="4" />
                   )}
                   {replyCount}
+                  {newRepliesCount > 0 && (
+                    <styled.span
+                      color="fg.muted"
+                      fontSize="xs"
+                      title={newRepliesLabel}
+                    >
+                      +{newRepliesCount}
+                    </styled.span>
+                  )}
                 </styled.span>
               </Link>
             </Box>

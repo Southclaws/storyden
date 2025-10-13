@@ -82,6 +82,8 @@ const (
 	EdgeContentLinks = "content_links"
 	// EdgeEvent holds the string denoting the event edge name in mutations.
 	EdgeEvent = "event"
+	// EdgePostReads holds the string denoting the post_reads edge name in mutations.
+	EdgePostReads = "post_reads"
 	// Table holds the table name of the post in the database.
 	Table = "posts"
 	// AuthorTable is the table that holds the author relation/edge.
@@ -169,6 +171,13 @@ const (
 	EventInverseTable = "events"
 	// EventColumn is the table column denoting the event relation/edge.
 	EventColumn = "post_event"
+	// PostReadsTable is the table that holds the post_reads relation/edge.
+	PostReadsTable = "post_reads"
+	// PostReadsInverseTable is the table name for the PostRead entity.
+	// It exists in this package in order to avoid circular dependency with the "postread" package.
+	PostReadsInverseTable = "post_reads"
+	// PostReadsColumn is the table column denoting the post_reads relation/edge.
+	PostReadsColumn = "root_post_id"
 )
 
 // Columns holds all SQL columns for post fields.
@@ -525,6 +534,20 @@ func ByEvent(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newEventStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByPostReadsCount orders the results by post_reads count.
+func ByPostReadsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPostReadsStep(), opts...)
+	}
+}
+
+// ByPostReads orders the results by post_reads terms.
+func ByPostReads(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPostReadsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newAuthorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -628,5 +651,12 @@ func newEventStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EventInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, EventTable, EventColumn),
+	)
+}
+func newPostReadsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PostReadsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PostReadsTable, PostReadsColumn),
 	)
 }

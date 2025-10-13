@@ -10,7 +10,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 )
 
 var ErrInvalidThreadMark = fault.New("invalid thread mark: thread mark did not point to a valid thread ID", ftag.With(ftag.NotFound))
@@ -28,11 +28,11 @@ func Build() fx.Option {
 
 type service struct {
 	cache       *lru.SyncCache[string, xid.ID]
-	thread_repo thread.Repository
+	thread_repo *thread_querier.Querier
 }
 
 func New(
-	thread_repo thread.Repository,
+	thread_repo *thread_querier.Querier,
 ) Service {
 	return &service{
 		cache:       lru.NewSync[string, xid.ID](lru.WithCapacity(1000)),

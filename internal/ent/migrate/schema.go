@@ -719,6 +719,40 @@ var (
 			},
 		},
 	}
+	// PostReadsColumns holds the columns for the "post_reads" table.
+	PostReadsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "last_seen_at", Type: field.TypeTime},
+		{Name: "account_id", Type: field.TypeString, Size: 20},
+		{Name: "root_post_id", Type: field.TypeString, Size: 20},
+	}
+	// PostReadsTable holds the schema information for the "post_reads" table.
+	PostReadsTable = &schema.Table{
+		Name:       "post_reads",
+		Columns:    PostReadsColumns,
+		PrimaryKey: []*schema.Column{PostReadsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "post_reads_accounts_post_reads",
+				Columns:    []*schema.Column{PostReadsColumns[2]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "post_reads_posts_post_reads",
+				Columns:    []*schema.Column{PostReadsColumns[3]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "unique_post_read",
+				Unique:  true,
+				Columns: []*schema.Column{PostReadsColumns[3], PostReadsColumns[2]},
+			},
+		},
+	}
 	// PropertiesColumns holds the columns for the "properties" table.
 	PropertiesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -1158,6 +1192,7 @@ var (
 		NodesTable,
 		NotificationsTable,
 		PostsTable,
+		PostReadsTable,
 		PropertiesTable,
 		PropertySchemasTable,
 		PropertySchemaFieldsTable,
@@ -1219,6 +1254,8 @@ func init() {
 	PostsTable.ForeignKeys[2].RefTable = LinksTable
 	PostsTable.ForeignKeys[3].RefTable = PostsTable
 	PostsTable.ForeignKeys[4].RefTable = PostsTable
+	PostReadsTable.ForeignKeys[0].RefTable = AccountsTable
+	PostReadsTable.ForeignKeys[1].RefTable = PostsTable
 	PropertiesTable.ForeignKeys[0].RefTable = NodesTable
 	PropertiesTable.ForeignKeys[1].RefTable = PropertySchemaFieldsTable
 	PropertySchemaFieldsTable.ForeignKeys[0].RefTable = PropertySchemasTable

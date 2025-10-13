@@ -85,6 +85,7 @@ func serialiseThreadReference(t *thread.Thread) openapi.ThreadReference {
 		Category:    opt.Map(t.Category, serialiseCategoryReference).Ptr(),
 		Visibility:  serialiseVisibility(t.Visibility),
 		Pinned:      t.Pinned,
+		ReadStatus:  opt.PtrMap(t.ReadStatus, serialiseReadStatus),
 		ReplyStatus: serialiseReplyStatus(t.ReplyStatus),
 		Likes:       serialiseLikeStatus(&t.Likes),
 		Reacts:      serialiseReactList(t.Reacts),
@@ -115,6 +116,7 @@ func serialiseThread(t *thread.Thread) openapi.Thread {
 		Link:           opt.Map(t.WebLink, serialiseLinkRef).Ptr(),
 		Meta:           (*openapi.Metadata)(&t.Meta),
 		Pinned:         t.Pinned,
+		ReadStatus:     opt.PtrMap(t.ReadStatus, serialiseReadStatus),
 		ReplyStatus:    serialiseReplyStatus(t.ReplyStatus),
 		Reacts:         dt.Map(t.Reacts, serialiseReact),
 		Recomentations: dt.Map(t.Related, serialiseDatagraphItem),
@@ -142,6 +144,13 @@ func serialiseReplyStatus(s post.ReplyStatus) openapi.ReplyStatus {
 	return openapi.ReplyStatus{
 		Replies: s.Count,
 		Replied: s.Replied,
+	}
+}
+
+func serialiseReadStatus(s post.ReadStatus) openapi.ReadStatus {
+	return openapi.ReadStatus{
+		RepliesSince: s.Count,
+		LastReadAt:   s.LastReadAt,
 	}
 }
 

@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication"
 	"github.com/Southclaws/storyden/app/services/avatar"
 	"github.com/Southclaws/storyden/app/services/avatar_gen"
+	"github.com/Southclaws/storyden/app/services/beacon_listener"
 	"github.com/Southclaws/storyden/app/services/branding"
 	"github.com/Southclaws/storyden/app/services/category"
 	"github.com/Southclaws/storyden/app/services/collection"
@@ -59,6 +60,7 @@ func Build() fx.Option {
 		link.Build(),
 		notify_job.Build(),
 		mention_job.Build(),
+		beacon_listener.Build(),
 		generative.Build(),
 		semdexer.Build(),
 		event.Build(),

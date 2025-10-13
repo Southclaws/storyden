@@ -15,7 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
-	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure/db"
@@ -54,7 +54,7 @@ func New(
 	account_writer *account_writer.Writer,
 	auth_repo authentication.Repository,
 	category_repo category.Repository,
-	thread_repo thread.Repository,
+	thread_repo *thread_writer.Writer,
 	post_repo reply.Repository,
 	react_repo *reaction.Writer,
 	assetWriter *asset_writer.Writer,

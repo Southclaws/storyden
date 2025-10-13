@@ -101,5 +101,8 @@ func (Post) Edges() []ent.Edge {
 			Ref("post_content_references"),
 
 		edge.To("event", Event.Type),
+
+		edge.To("post_reads", PostRead.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 	}
 }

@@ -237,6 +237,18 @@ func (f PostFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PostMutation", m)
 }
 
+// The PostReadFunc type is an adapter to allow the use of ordinary
+// function as PostRead mutator.
+type PostReadFunc func(context.Context, *ent.PostReadMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PostReadFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PostReadMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PostReadMutation", m)
+}
+
 // The PropertyFunc type is an adapter to allow the use of ordinary
 // function as Property mutator.
 type PropertyFunc func(context.Context, *ent.PropertyMutation) (ent.Value, error)

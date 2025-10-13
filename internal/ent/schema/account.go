@@ -105,5 +105,8 @@ func (Account) Edges() []ent.Edge {
 
 		edge.To("events", EventParticipant.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("post_reads", PostRead.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
 	}
 }

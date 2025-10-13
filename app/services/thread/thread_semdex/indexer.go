@@ -9,7 +9,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
-	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 )
 
@@ -29,7 +29,7 @@ func (i *semdexer) indexThread(ctx context.Context, id post.ID) error {
 	}
 
 	if updates > 0 {
-		_, err = i.threadWriter.Update(ctx, id, thread.WithIndexed())
+		_, err = i.threadWriter.Update(ctx, id, thread_writer.WithIndexed())
 		if err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
@@ -44,7 +44,7 @@ func (i *semdexer) deindexThread(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = i.threadWriter.Update(ctx, id, thread.WithIndexed())
+	_, err = i.threadWriter.Update(ctx, id, thread_writer.WithIndexed())
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

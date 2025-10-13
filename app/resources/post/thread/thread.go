@@ -33,6 +33,7 @@ type Thread struct {
 	Pinned      bool
 	LastReplyAt opt.Optional[time.Time]
 
+	ReadStatus  opt.Optional[post.ReadStatus]
 	ReplyStatus post.ReplyStatus
 	Replies     pagination.Result[*reply.Reply]
 	Category    opt.Optional[category.Category]
@@ -100,6 +101,7 @@ func Map(m *ent.Post) (*Thread, error) {
 
 func Mapper(
 	am account.Lookup,
+	rr post.ReadStateMap,
 	ls post.PostLikesMap,
 	cs collection_item_status.CollectionStatusMap,
 	rs post.PostRepliesMap,
@@ -158,6 +160,7 @@ func Mapper(
 			Pinned:      m.Pinned,
 			LastReplyAt: opt.NewPtr(m.LastReplyAt),
 
+			ReadStatus:  rr.Status(m.ID),
 			ReplyStatus: rs.Status(m.ID),
 			Category:    category,
 			Visibility:  visibility.NewVisibilityFromEnt(m.Visibility),

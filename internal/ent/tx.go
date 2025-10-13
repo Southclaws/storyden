@@ -52,6 +52,8 @@ type Tx struct {
 	Notification *NotificationClient
 	// Post is the client for interacting with the Post builders.
 	Post *PostClient
+	// PostRead is the client for interacting with the PostRead builders.
+	PostRead *PostReadClient
 	// Property is the client for interacting with the Property builders.
 	Property *PropertyClient
 	// PropertySchema is the client for interacting with the PropertySchema builders.
@@ -220,6 +222,7 @@ func (tx *Tx) init() {
 	tx.Node = NewNodeClient(tx.config)
 	tx.Notification = NewNotificationClient(tx.config)
 	tx.Post = NewPostClient(tx.config)
+	tx.PostRead = NewPostReadClient(tx.config)
 	tx.Property = NewPropertyClient(tx.config)
 	tx.PropertySchema = NewPropertySchemaClient(tx.config)
 	tx.PropertySchemaField = NewPropertySchemaFieldClient(tx.config)

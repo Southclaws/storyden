@@ -26,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -512,6 +513,21 @@ func (_u *AccountUpdate) AddEvents(v ...*EventParticipant) *AccountUpdate {
 	return _u.AddEventIDs(ids...)
 }
 
+// AddPostReadIDs adds the "post_reads" edge to the PostRead entity by IDs.
+func (_u *AccountUpdate) AddPostReadIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddPostReadIDs(ids...)
+	return _u
+}
+
+// AddPostReads adds the "post_reads" edges to the PostRead entity.
+func (_u *AccountUpdate) AddPostReads(v ...*PostRead) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPostReadIDs(ids...)
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
 func (_u *AccountUpdate) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdate {
 	_u.mutation.AddAccountRoleIDs(ids...)
@@ -935,6 +951,27 @@ func (_u *AccountUpdate) RemoveEvents(v ...*EventParticipant) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveEventIDs(ids...)
+}
+
+// ClearPostReads clears all "post_reads" edges to the PostRead entity.
+func (_u *AccountUpdate) ClearPostReads() *AccountUpdate {
+	_u.mutation.ClearPostReads()
+	return _u
+}
+
+// RemovePostReadIDs removes the "post_reads" edge to PostRead entities by IDs.
+func (_u *AccountUpdate) RemovePostReadIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemovePostReadIDs(ids...)
+	return _u
+}
+
+// RemovePostReads removes "post_reads" edges to PostRead entities.
+func (_u *AccountUpdate) RemovePostReads(v ...*PostRead) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePostReadIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
@@ -1987,6 +2024,51 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.PostReadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PostReadsTable,
+			Columns: []string{account.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPostReadsIDs(); len(nodes) > 0 && !_u.mutation.PostReadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PostReadsTable,
+			Columns: []string{account.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PostReadsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PostReadsTable,
+			Columns: []string{account.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if _u.mutation.AccountRolesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -2516,6 +2598,21 @@ func (_u *AccountUpdateOne) AddEvents(v ...*EventParticipant) *AccountUpdateOne 
 	return _u.AddEventIDs(ids...)
 }
 
+// AddPostReadIDs adds the "post_reads" edge to the PostRead entity by IDs.
+func (_u *AccountUpdateOne) AddPostReadIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddPostReadIDs(ids...)
+	return _u
+}
+
+// AddPostReads adds the "post_reads" edges to the PostRead entity.
+func (_u *AccountUpdateOne) AddPostReads(v ...*PostRead) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPostReadIDs(ids...)
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by IDs.
 func (_u *AccountUpdateOne) AddAccountRoleIDs(ids ...xid.ID) *AccountUpdateOne {
 	_u.mutation.AddAccountRoleIDs(ids...)
@@ -2939,6 +3036,27 @@ func (_u *AccountUpdateOne) RemoveEvents(v ...*EventParticipant) *AccountUpdateO
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveEventIDs(ids...)
+}
+
+// ClearPostReads clears all "post_reads" edges to the PostRead entity.
+func (_u *AccountUpdateOne) ClearPostReads() *AccountUpdateOne {
+	_u.mutation.ClearPostReads()
+	return _u
+}
+
+// RemovePostReadIDs removes the "post_reads" edge to PostRead entities by IDs.
+func (_u *AccountUpdateOne) RemovePostReadIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemovePostReadIDs(ids...)
+	return _u
+}
+
+// RemovePostReads removes "post_reads" edges to PostRead entities.
+func (_u *AccountUpdateOne) RemovePostReads(v ...*PostRead) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePostReadIDs(ids...)
 }
 
 // ClearAccountRoles clears all "account_roles" edges to the AccountRoles entity.
@@ -4014,6 +4132,51 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(eventparticipant.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PostReadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PostReadsTable,
+			Columns: []string{account.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPostReadsIDs(); len(nodes) > 0 && !_u.mutation.PostReadsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PostReadsTable,
+			Columns: []string{account.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PostReadsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PostReadsTable,
+			Columns: []string{account.PostReadsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(postread.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
