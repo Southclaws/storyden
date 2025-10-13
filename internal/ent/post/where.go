@@ -526,16 +526,6 @@ func LastReplyAtLTE(v time.Time) predicate.Post {
 	return predicate.Post(sql.FieldLTE(FieldLastReplyAt, v))
 }
 
-// LastReplyAtIsNil applies the IsNil predicate on the "last_reply_at" field.
-func LastReplyAtIsNil() predicate.Post {
-	return predicate.Post(sql.FieldIsNull(FieldLastReplyAt))
-}
-
-// LastReplyAtNotNil applies the NotNil predicate on the "last_reply_at" field.
-func LastReplyAtNotNil() predicate.Post {
-	return predicate.Post(sql.FieldNotNull(FieldLastReplyAt))
-}
-
 // RootPostIDEQ applies the EQ predicate on the "root_post_id" field.
 func RootPostIDEQ(v xid.ID) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldRootPostID, v))

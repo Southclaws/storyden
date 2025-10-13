@@ -19436,7 +19436,7 @@ func (m *PostMutation) LastReplyAt() (r time.Time, exists bool) {
 // OldLastReplyAt returns the old "last_reply_at" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldLastReplyAt(ctx context.Context) (v *time.Time, err error) {
+func (m *PostMutation) OldLastReplyAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldLastReplyAt is only allowed on UpdateOne operations")
 	}
@@ -19450,22 +19450,9 @@ func (m *PostMutation) OldLastReplyAt(ctx context.Context) (v *time.Time, err er
 	return oldValue.LastReplyAt, nil
 }
 
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (m *PostMutation) ClearLastReplyAt() {
-	m.last_reply_at = nil
-	m.clearedFields[post.FieldLastReplyAt] = struct{}{}
-}
-
-// LastReplyAtCleared returns if the "last_reply_at" field was cleared in this mutation.
-func (m *PostMutation) LastReplyAtCleared() bool {
-	_, ok := m.clearedFields[post.FieldLastReplyAt]
-	return ok
-}
-
 // ResetLastReplyAt resets all changes to the "last_reply_at" field.
 func (m *PostMutation) ResetLastReplyAt() {
 	m.last_reply_at = nil
-	delete(m.clearedFields, post.FieldLastReplyAt)
 }
 
 // SetRootPostID sets the "root_post_id" field.
@@ -20980,9 +20967,6 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldSlug) {
 		fields = append(fields, post.FieldSlug)
 	}
-	if m.FieldCleared(post.FieldLastReplyAt) {
-		fields = append(fields, post.FieldLastReplyAt)
-	}
 	if m.FieldCleared(post.FieldRootPostID) {
 		fields = append(fields, post.FieldRootPostID)
 	}
@@ -21023,9 +21007,6 @@ func (m *PostMutation) ClearField(name string) error {
 		return nil
 	case post.FieldSlug:
 		m.ClearSlug()
-		return nil
-	case post.FieldLastReplyAt:
-		m.ClearLastReplyAt()
 		return nil
 	case post.FieldRootPostID:
 		m.ClearRootPostID()

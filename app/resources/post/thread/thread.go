@@ -91,7 +91,7 @@ func Map(m *ent.Post) (*Thread, error) {
 		Slug:        m.Slug,
 		Short:       m.Short,
 		Pinned:      m.Pinned,
-		LastReplyAt: opt.NewPtr(m.LastReplyAt),
+		LastReplyAt: opt.New(m.LastReplyAt),
 
 		Category:   category,
 		Visibility: visibility.NewVisibilityFromEnt(m.Visibility),
@@ -158,7 +158,7 @@ func Mapper(
 			Slug:        m.Slug,
 			Short:       m.Short,
 			Pinned:      m.Pinned,
-			LastReplyAt: opt.NewPtr(m.LastReplyAt),
+			LastReplyAt: opt.New(m.LastReplyAt),
 
 			ReadStatus:  rr.Status(m.ID),
 			ReplyStatus: rs.Status(m.ID),

@@ -137,14 +137,6 @@ func (_c *PostCreate) SetLastReplyAt(v time.Time) *PostCreate {
 	return _c
 }
 
-// SetNillableLastReplyAt sets the "last_reply_at" field if the given value is not nil.
-func (_c *PostCreate) SetNillableLastReplyAt(v *time.Time) *PostCreate {
-	if v != nil {
-		_c.SetLastReplyAt(*v)
-	}
-	return _c
-}
-
 // SetRootPostID sets the "root_post_id" field.
 func (_c *PostCreate) SetRootPostID(v xid.ID) *PostCreate {
 	_c.mutation.SetRootPostID(v)
@@ -544,6 +536,9 @@ func (_c *PostCreate) check() error {
 	if _, ok := _c.mutation.Pinned(); !ok {
 		return &ValidationError{Name: "pinned", err: errors.New(`ent: missing required field "Post.pinned"`)}
 	}
+	if _, ok := _c.mutation.LastReplyAt(); !ok {
+		return &ValidationError{Name: "last_reply_at", err: errors.New(`ent: missing required field "Post.last_reply_at"`)}
+	}
 	if _, ok := _c.mutation.Body(); !ok {
 		return &ValidationError{Name: "body", err: errors.New(`ent: missing required field "Post.body"`)}
 	}
@@ -639,7 +634,7 @@ func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := _c.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
-		_node.LastReplyAt = &value
+		_node.LastReplyAt = value
 	}
 	if value, ok := _c.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
@@ -1090,12 +1085,6 @@ func (u *PostUpsert) UpdateLastReplyAt() *PostUpsert {
 	return u
 }
 
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (u *PostUpsert) ClearLastReplyAt() *PostUpsert {
-	u.SetNull(post.FieldLastReplyAt)
-	return u
-}
-
 // SetRootPostID sets the "root_post_id" field.
 func (u *PostUpsert) SetRootPostID(v xid.ID) *PostUpsert {
 	u.Set(post.FieldRootPostID, v)
@@ -1422,13 +1411,6 @@ func (u *PostUpsertOne) SetLastReplyAt(v time.Time) *PostUpsertOne {
 func (u *PostUpsertOne) UpdateLastReplyAt() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateLastReplyAt()
-	})
-}
-
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (u *PostUpsertOne) ClearLastReplyAt() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearLastReplyAt()
 	})
 }
 
@@ -1948,13 +1930,6 @@ func (u *PostUpsertBulk) SetLastReplyAt(v time.Time) *PostUpsertBulk {
 func (u *PostUpsertBulk) UpdateLastReplyAt() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateLastReplyAt()
-	})
-}
-
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (u *PostUpsertBulk) ClearLastReplyAt() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearLastReplyAt()
 	})
 }
 
