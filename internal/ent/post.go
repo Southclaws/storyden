@@ -39,7 +39,7 @@ type Post struct {
 	// Pinned holds the value of the "pinned" field.
 	Pinned bool `json:"pinned,omitempty"`
 	// LastReplyAt holds the value of the "last_reply_at" field.
-	LastReplyAt *time.Time `json:"last_reply_at,omitempty"`
+	LastReplyAt time.Time `json:"last_reply_at,omitempty"`
 	// RootPostID holds the value of the "root_post_id" field.
 	RootPostID xid.ID `json:"root_post_id,omitempty"`
 	// ReplyToPostID holds the value of the "reply_to_post_id" field.
@@ -347,8 +347,7 @@ func (_m *Post) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field last_reply_at", values[i])
 			} else if value.Valid {
-				_m.LastReplyAt = new(time.Time)
-				*_m.LastReplyAt = value.Time
+				_m.LastReplyAt = value.Time
 			}
 		case post.FieldRootPostID:
 			if value, ok := values[i].(*xid.ID); !ok {
@@ -550,10 +549,8 @@ func (_m *Post) String() string {
 	builder.WriteString("pinned=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Pinned))
 	builder.WriteString(", ")
-	if v := _m.LastReplyAt; v != nil {
-		builder.WriteString("last_reply_at=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
+	builder.WriteString("last_reply_at=")
+	builder.WriteString(_m.LastReplyAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("root_post_id=")
 	builder.WriteString(fmt.Sprintf("%v", _m.RootPostID))
