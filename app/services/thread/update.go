@@ -7,6 +7,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
+	"github.com/Southclaws/opt"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 
@@ -40,7 +41,7 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	thr, err := s.threadQuerier.Get(ctx, threadID, pagination.Parameters{}, nil)
+	thr, err := s.threadQuerier.Get(ctx, threadID, pagination.Parameters{}, opt.NewEmpty[account.AccountID]())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
