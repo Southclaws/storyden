@@ -15,7 +15,6 @@ import { sendBeacon } from "./beacon";
  * @param id - The unique identifier of the item
  */
 export function useBeacon(kind: DatagraphItemKind, id: string | undefined) {
-  console.log("useBeacon", { kind, id });
   useEffect(() => {
     if (!id) {
       return;
