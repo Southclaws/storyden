@@ -1,6 +1,17 @@
-import { SortableContext } from "@dnd-kit/sortable";
+import { Portal } from "@ark-ui/react";
+import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
+  FloatingPortal,
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  useFloating,
+  useMergeRefs,
+} from "@floating-ui/react";
 import Link from "next/link";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useLayoutEffect, useRef, useState } from "react";
 import { match } from "ts-pattern";
 
 import {
@@ -16,7 +27,10 @@ import { CreatePageFromURLAction } from "@/components/library/CreatePageFromURL/
 import { LinkRefButton } from "@/components/library/links/LinkCard";
 import { SortIndicator } from "@/components/site/SortIndicator";
 import { IconButton } from "@/components/ui/icon-button";
+import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import * as Table from "@/components/ui/table";
+import * as Tooltip from "@/components/ui/tooltip";
+import { DragItemNode } from "@/lib/dragdrop/provider";
 import { visibilityColour } from "@/lib/library/visibilityColours";
 import { isValidLinkLike } from "@/lib/link/validation";
 import { css, cx } from "@/styled-system/css";
@@ -140,7 +154,7 @@ export function LibraryPageDirectoryBlockTable({
           </Table.Row>
         </Table.Head>
         <Table.Body>
-          <SortableContext items={nodes}>
+          <SortableContext items={nodes.map((n) => n.id)}>
             {nodes.map((child) => {
               const columns = mergeFieldsAndProperties(
                 currentChildPropertySchema,
@@ -225,6 +239,28 @@ function Row({
   ) => void;
   editing: boolean;
 }) {
+  const { refs, floatingStyles } = useFloating({
+    nodeId: child.id,
+    whileElementsMounted: autoUpdate,
+    placement: "left",
+    middleware: [offset(7), flip(), shift()],
+  });
+
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: child.id,
+    data: {
+      type: "node",
+      node: child,
+    } as DragItemNode,
+  });
+
   const visCol = visibilityColour(child.visibility);
 
   const visibilityStyles = css({
@@ -239,9 +275,28 @@ function Row({
     borderLeftStyle:
       child.visibility === Visibility.published ? "solid" : "dashed",
   });
+
+  const dragStyle = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    flexShrink: 0,
+  };
+
+  const dragHandleStyle = {
+    cursor: isDragging ? "grabbing" : "grab",
+  };
+
+  const rowRef = useMergeRefs([setNodeRef, refs.setReference]);
+
   return (
-    <Table.Row className={cx("group", visibilityStyles)} key={child.id}>
-      {columns.map((column) => {
+    <Table.Row
+      ref={rowRef}
+      className={cx("group", visibilityStyles)}
+      key={child.id}
+      style={dragStyle}
+    >
+      {columns.map((column, idx) => {
         function handleCellChange(v: ChangeEvent<HTMLInputElement>) {
           onFieldValueChange(
             child.id,
@@ -255,6 +310,9 @@ function Row({
         // But it's here and ready in case we ever actually do that.
         const isValid = checkValidColumnValue(column);
 
+        // TODO: Pass in as prop.
+        const isFirstColumn = idx === 0;
+
         return (
           <Table.Cell
             key={column.fid}
@@ -265,10 +323,79 @@ function Row({
             //   bg: "bg.muted",
             // }}
             _hover={{ bg: "bg.subtle" }}
-            position="relative"
+            // position="relative"
           >
             {editing ? (
               <>
+                {isFirstColumn && (
+                  <FloatingPortal>
+                    <Box
+                      ref={refs.setFloating}
+                      style={floatingStyles}
+                      {...listeners}
+                      {...attributes}
+                    >
+                      <Tooltip.Root
+                        openDelay={0}
+                        closeDelay={0}
+                        // disabled={isDraggingAnything}
+                        positioning={{
+                          slide: true,
+                          gutter: 4,
+                          placement: "bottom-start",
+                        }}
+                      >
+                        <Tooltip.Trigger asChild>
+                          <Box position="relative">
+                            <Box style={dragHandleStyle}>
+                              <IconButton
+                                style={dragHandleStyle}
+                                variant="ghost"
+                                size="xs"
+                                minWidth="5"
+                                width="5"
+                                height="5"
+                                padding="0"
+                                color="fg.muted"
+                                // onClick={handleMenuToggle}
+                              >
+                                <DragHandleIcon width="4" />
+                              </IconButton>
+                            </Box>
+                          </Box>
+                        </Tooltip.Trigger>
+                        <Portal>
+                          <Tooltip.Positioner>
+                            <Tooltip.Arrow>
+                              <Tooltip.ArrowTip />
+                            </Tooltip.Arrow>
+
+                            <Tooltip.Content p="1" borderRadius="sm">
+                              <p>
+                                <styled.span fontWeight="semibold">
+                                  Click
+                                </styled.span>
+                                &nbsp;
+                                <styled.span fontWeight="normal">
+                                  to open menu
+                                </styled.span>
+                              </p>
+                              <p>
+                                <styled.span fontWeight="semibold">
+                                  Drag
+                                </styled.span>
+                                &nbsp;
+                                <styled.span fontWeight="normal">
+                                  to move
+                                </styled.span>
+                              </p>
+                            </Tooltip.Content>
+                          </Tooltip.Positioner>
+                        </Portal>
+                      </Tooltip.Root>
+                    </Box>
+                  </FloatingPortal>
+                )}
                 <styled.input
                   w="full"
                   defaultValue={column.value}
