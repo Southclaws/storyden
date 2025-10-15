@@ -5,10 +5,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Thread } from "src/api/openapi-schema";
+import { DatagraphItemKind, Thread } from "src/api/openapi-schema";
 
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";
+import { sendBeacon } from "@/lib/beacon/beacon";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { scrollToBottom } from "@/utils/scroll";
 
@@ -37,6 +38,9 @@ export function useReplyBox(thread: Thread) {
     await handle(
       async () => {
         await createReply(data);
+
+        // Mark the thread as read after successfully replying to it
+        sendBeacon(DatagraphItemKind.thread, thread.id);
 
         // This is a little hack tbh, essentially if this prop for the
         // ContentComposer component changes, its value is reset. Could have
