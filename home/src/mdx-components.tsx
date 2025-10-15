@@ -1,4 +1,4 @@
-import { openapi } from "@/lib/source";
+import { openapi } from "@/lib/openapi";
 import { APIPage } from "fumadocs-openapi/ui";
 import defaultComponents from "fumadocs-ui/mdx";
 import type { MDXComponents } from "mdx/types";

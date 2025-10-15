@@ -1,0 +1,208 @@
+---
+title: Nodes
+description: Structured knowledgebase content tree.
+full: false
+_openapi:
+  toc:
+    - depth: 2
+      title: Node List
+      url: '#node-list'
+    - depth: 2
+      title: Node Create
+      url: '#node-create'
+    - depth: 2
+      title: Node Get
+      url: '#node-get'
+    - depth: 2
+      title: Node Update
+      url: '#node-update'
+    - depth: 2
+      title: Node Delete
+      url: '#node-delete'
+    - depth: 2
+      title: Node Generate Title
+      url: '#node-generate-title'
+    - depth: 2
+      title: Node Generate Tags
+      url: '#node-generate-tags'
+    - depth: 2
+      title: Node Generate Content
+      url: '#node-generate-content'
+    - depth: 2
+      title: Node List Children
+      url: '#node-list-children'
+    - depth: 2
+      title: Node Update Children Property Schema
+      url: '#node-update-children-property-schema'
+    - depth: 2
+      title: Node Update Property Schema
+      url: '#node-update-property-schema'
+    - depth: 2
+      title: Node Update Properties
+      url: '#node-update-properties'
+    - depth: 2
+      title: Node Update Visibility
+      url: '#node-update-visibility'
+    - depth: 2
+      title: Node Remove Asset
+      url: '#node-remove-asset'
+    - depth: 2
+      title: Node Add Asset
+      url: '#node-add-asset'
+    - depth: 2
+      title: Node Remove Node
+      url: '#node-remove-node'
+    - depth: 2
+      title: Node Add Node
+      url: '#node-add-node'
+    - depth: 2
+      title: Node Update Position
+      url: '#node-update-position'
+  structuredData:
+    headings:
+      - content: Node List
+        id: node-list
+      - content: Node Create
+        id: node-create
+      - content: Node Get
+        id: node-get
+      - content: Node Update
+        id: node-update
+      - content: Node Delete
+        id: node-delete
+      - content: Node Generate Title
+        id: node-generate-title
+      - content: Node Generate Tags
+        id: node-generate-tags
+      - content: Node Generate Content
+        id: node-generate-content
+      - content: Node List Children
+        id: node-list-children
+      - content: Node Update Children Property Schema
+        id: node-update-children-property-schema
+      - content: Node Update Property Schema
+        id: node-update-property-schema
+      - content: Node Update Properties
+        id: node-update-properties
+      - content: Node Update Visibility
+        id: node-update-visibility
+      - content: Node Remove Asset
+        id: node-remove-asset
+      - content: Node Add Asset
+        id: node-add-asset
+      - content: Node Remove Node
+        id: node-remove-node
+      - content: Node Add Node
+        id: node-add-node
+      - content: Node Update Position
+        id: node-update-position
+    contents:
+      - content: |
+          List nodes using the given filters. Can be used to get a full tree.
+        heading: node-list
+      - content: |
+          Create a node for curating structured knowledge together.
+        heading: node-create
+      - content: Get a node by its URL slug.
+        heading: node-get
+      - content: Update a node.
+        heading: node-update
+      - content: Delete a node and move all children to its parent or root.
+        heading: node-delete
+      - content: |
+          Generate a proposed title for the specified node. Will not actually
+          mutate the specified node, instead will return a proposal based on the
+          output from a language model call.
+        heading: node-generate-title
+      - content: >
+          Generate proposed tags for the specified node. Will not actually
+          mutate
+
+          the specified node, instead will return a proposal based on the output
+
+          from a language model call.
+        heading: node-generate-tags
+      - content: |
+          Generate proposed content for the specified node. Will not actually
+          mutate the specified node, instead will return a proposal based on the
+          output from a language model call.
+        heading: node-generate-content
+      - content: >
+          Get all the children of a given node using the provided filters and
+          page
+
+          parameters. This can be used for rendering the child nodes of the
+          given
+
+          node as an interactive table where properties can be used as columns.
+        heading: node-list-children
+      - content: |
+          Updates the property schema of the children of this node. All children
+          of a node use the same schema for properties resulting in a table-like
+          structure and behaviour. See also: NodeUpdatePropertySchema
+        heading: node-update-children-property-schema
+      - content: >
+          Updates the property schema of this node and its siblings. All
+          children
+
+          of a node use the same schema for properties resulting in a table-like
+
+          structure and behaviour. Property schemas are loosely structured and
+          can
+
+          automatically cast their values sometimes. A failed cast will not
+          change
+
+          data and instead just yield an empty value when reading however
+          changing
+
+          the schema back to the original type (or a type compatible with what
+          the
+
+          type was before changing) will retain the original data upon next
+          read.
+
+          This permits clients to undo changes to the schema easily while
+          allowing
+
+          quick schema changes without the need to remove or update values
+          before.
+        heading: node-update-property-schema
+      - content: |
+          Update the properties of a node. New schema fields will result in the
+          schema of the node being updated before values are assigned. This will
+          also propagate to all sibling nodes as they all share the same schema.
+        heading: node-update-properties
+      - content: >
+          Update the visibility of a node. When changed, this may trigger other
+
+          operations such as notifications/newsletters. Changing the visibility
+          of
+
+          anything to "published" is often accompanied by some other side
+          effects.
+        heading: node-update-visibility
+      - content: Remove an asset from a node.
+        heading: node-remove-asset
+      - content: Add an asset to a node.
+        heading: node-add-asset
+      - content: |
+          Remove a node from its parent node and back to the top level.
+        heading: node-remove-node
+      - content: Set a node's parent to the specified node
+        heading: node-add-node
+      - content: |
+          Update the node's position in the tree, which optionally allows for 
+          changing the node's parent either to another node or to `null` which
+          severs the parent and moves the node to the root. This endpoint also
+          allows for moving the node's sort position within either its current
+          parent, or when moving it to a new parent. Use this operation for a
+          draggable tree interface or a table interface.
+        heading: node-update-position
+---
+
+{/* This file was generated by Fumadocs. Do not edit this file directly. Any changes should be made by running the generation command again. */}
+
+Structured knowledgebase content tree.
+
+<APIPage document={"../api/openapi.yaml"} operations={[{"path":"/nodes","method":"get"},{"path":"/nodes","method":"post"},{"path":"/nodes/{node_slug}","method":"get"},{"path":"/nodes/{node_slug}","method":"patch"},{"path":"/nodes/{node_slug}","method":"delete"},{"path":"/nodes/{node_slug}/title","method":"post"},{"path":"/nodes/{node_slug}/tags","method":"post"},{"path":"/nodes/{node_slug}/content","method":"post"},{"path":"/nodes/{node_slug}/children","method":"get"},{"path":"/nodes/{node_slug}/children/property-schema","method":"patch"},{"path":"/nodes/{node_slug}/property-schema","method":"patch"},{"path":"/nodes/{node_slug}/properties","method":"patch"},{"path":"/nodes/{node_slug}/visibility","method":"patch"},{"path":"/nodes/{node_slug}/assets/{asset_id}","method":"delete"},{"path":"/nodes/{node_slug}/assets/{asset_id}","method":"put"},{"path":"/nodes/{node_slug}/nodes/{node_slug_child}","method":"delete"},{"path":"/nodes/{node_slug}/nodes/{node_slug_child}","method":"put"},{"path":"/nodes/{node_slug}/position","method":"patch"}]} webhooks={[]} hasHead={true} />
