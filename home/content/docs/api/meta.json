@@ -1,5 +1,28 @@
 {
-    "root": true,
-    "title": "API Reference",
-    "description": "The Storyden RESTful API."
+  "root": true,
+  "title": "API Reference",
+  "description": "The Storyden RESTful API.",
+  "pages": [
+    "index",
+    "misc",
+    "admin",
+    "roles",
+    "auth",
+    "accounts",
+    "invitations",
+    "notifications",
+    "profiles",
+    "categories",
+    "tags",
+    "posts",
+    "threads",
+    "replies",
+    "assets",
+    "likes",
+    "collections",
+    "nodes",
+    "links",
+    "datagraph",
+    "events"
+  ]
 }
