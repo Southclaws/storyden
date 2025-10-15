@@ -7,7 +7,8 @@ import { parse } from "yaml";
 void generateFiles({
   input: openapi,
   output: "./content/docs/api",
-  per: "tag",
+  per: "operation",
+  groupBy: "tag",
   includeDescription: true,
   frontmatter: (title, description) => ({
     title,
