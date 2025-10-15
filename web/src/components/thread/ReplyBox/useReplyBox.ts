@@ -40,7 +40,11 @@ export function useReplyBox(thread: Thread) {
         await createReply(data);
 
         // Mark the thread as read after successfully replying to it
-        sendBeacon(DatagraphItemKind.thread, thread.id);
+        try {
+          sendBeacon(DatagraphItemKind.thread, thread.id);
+        } catch (error) {
+          console.warn("failed to send beacon:", error);
+        }
 
         // This is a little hack tbh, essentially if this prop for the
         // ContentComposer component changes, its value is reset. Could have
