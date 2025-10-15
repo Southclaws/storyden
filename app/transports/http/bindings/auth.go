@@ -3,6 +3,7 @@ package bindings
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/url"
 
 	"github.com/Southclaws/dt"
@@ -15,6 +16,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/authentication/access_key"
 	"github.com/Southclaws/storyden/app/resources/account/email"
+	"github.com/Southclaws/storyden/app/resources/account/token"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	auth_svc "github.com/Southclaws/storyden/app/services/authentication"
@@ -29,8 +31,10 @@ import (
 )
 
 type Authentication struct {
+	logger                        *slog.Logger
 	cj                            *session_cookie.Jar
 	si                            *session.Issuer
+	tokenRepo                     token.Repository
 	settings                      *settings.SettingsRepository
 	passwordAuthProvider          *password.Provider
 	emailVerificationAuthProvider *email_only.Provider
@@ -44,8 +48,10 @@ type Authentication struct {
 
 func NewAuthentication(
 	cfg config.Config,
+	logger *slog.Logger,
 	cj *session_cookie.Jar,
 	si *session.Issuer,
+	tokenRepo token.Repository,
 	settings *settings.SettingsRepository,
 	passwordAuthProvider *password.Provider,
 	emailVerificationAuthProvider *email_only.Provider,
@@ -56,8 +62,10 @@ func NewAuthentication(
 	access_key *access_key.Repository,
 ) Authentication {
 	return Authentication{
+		logger:                        logger,
 		cj:                            cj,
 		si:                            si,
+		tokenRepo:                     tokenRepo,
 		settings:                      settings,
 		passwordAuthProvider:          passwordAuthProvider,
 		emailVerificationAuthProvider: emailVerificationAuthProvider,
@@ -106,6 +114,16 @@ func (a *Authentication) AuthProviderLogout(ctx context.Context, request openapi
 			redirectTo.Path = parsed.Path
 			redirectTo.RawQuery = parsed.RawQuery
 			redirectTo.Fragment = parsed.Fragment
+		}
+	}
+
+	if sessionToken, ok := session.GetSessionToken(ctx).Get(); ok {
+		t, err := token.FromString(sessionToken)
+		if err == nil {
+			if err := a.tokenRepo.Revoke(ctx, t); err != nil {
+				a.logger.Warn("failed to revoke session token on logout",
+					slog.String("error", err.Error()))
+			}
 		}
 	}
 
