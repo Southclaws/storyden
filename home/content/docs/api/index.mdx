@@ -141,8 +141,44 @@ You'll see your account information in the response:
 }
 ```
 
-## API tokens
+## Access Keys
 
-<Callout>
-  Service account tokens for programmatic/bot access is coming soon!
-</Callout>
+For programmatic access, scripts, and integrations, Storyden provides **access keys** as an alternative to session cookies. Access keys are bearer tokens that authenticate API requests and inherit the permissions of the account that created them.
+
+Access keys are ideal for:
+
+- Building bots and automation workflows
+- Integrating with third-party services (Discord, n8n, Zapier, etc.)
+- Server-to-server communication
+
+To create and manage access keys, see the [Access Keys documentation](/docs/operation/access-keys). You'll need the `USE_PERSONAL_ACCESS_KEYS` permission to create keys for your account.
+
+Example usage:
+
+<Tabs groupId="shell" items={["Escaped", "One line", "NuShell"]}>
+  <Tab value="Escaped">
+
+    ```bash
+    curl http://localhost:8000/api/threads \
+      --header 'Authorization: Bearer your_access_key_here'
+    ```
+
+  </Tab>
+
+  <Tab value="One line">
+
+    ```sh
+    curl http://localhost:8000/api/threads --header 'Authorization: Bearer your_access_key_here'
+    ```
+
+  </Tab>
+
+  <Tab value="NuShell">
+
+    ```sh
+    http get http://localhost:8000/api/threads Authorization:'Bearer your_access_key_here'
+    ```
+
+  </Tab>
+
+</Tabs>
