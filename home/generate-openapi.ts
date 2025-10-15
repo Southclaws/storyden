@@ -32,5 +32,3 @@ writeFileSync(
   "./content/docs/api/meta.json",
   JSON.stringify(meta, null, 2) + "\n"
 );
-
-// BUILD
