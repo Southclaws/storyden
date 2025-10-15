@@ -30,5 +30,5 @@ const meta = {
 
 writeFileSync(
   "./content/docs/api/meta.json",
-  JSON.stringify(meta, null, 2) + "\n",
+  JSON.stringify(meta, null, 2) + "\n"
 );
