@@ -1,7 +1,11 @@
 import { docs, blog as blogPosts } from "@/.source";
 import { loader } from "fumadocs-core/source";
 import { createMDXSource } from "fumadocs-mdx";
-import { createOpenAPI, attachFile } from "fumadocs-openapi/server";
+import {
+  createOpenAPI,
+  attachFile,
+  openapiPlugin,
+} from "fumadocs-openapi/server";
 
 export const source = loader({
   baseUrl: "/docs",
@@ -9,6 +13,7 @@ export const source = loader({
   pageTree: {
     attachFile,
   },
+  plugins: [openapiPlugin()],
 });
 
 export const blog = loader({
