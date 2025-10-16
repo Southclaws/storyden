@@ -30,11 +30,7 @@ export async function getRSS() {
     page: (typeof pages)[number]
   ): Promise<string | undefined> {
     try {
-      const filePath = join(
-        process.cwd(),
-        "content/blog",
-        `${page.file.path}.mdx`
-      );
+      const filePath = join(process.cwd(), "content/blog", page.path);
       const content = readFileSync(filePath, "utf-8");
 
       const bodyContent = content.replace(/^---[\s\S]*?---\n/, "");

@@ -70,7 +70,7 @@ export const checkbox = defineSlotRecipe({
           },
         },
         label: {
-          textStyle: "sm",
+          textStyle: "xs",
         },
       },
       md: {

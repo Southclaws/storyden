@@ -16,6 +16,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
+	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_writer"
 	"github.com/Southclaws/storyden/app/resources/visibility"
@@ -46,7 +48,7 @@ type Service interface {
 		page int,
 		size int,
 		opts Params,
-	) (*thread.Result, error)
+	) (*thread_querier.Result, error)
 
 	// Get one thread and the posts within it.
 	Get(
@@ -66,12 +68,12 @@ type Partial struct {
 	Meta       opt.Optional[map[string]any]
 }
 
-func (p Partial) Opts() (opts []thread.Option) {
-	p.Title.Call(func(v string) { opts = append(opts, thread.WithTitle(v)) })
-	p.Content.Call(func(v datagraph.Content) { opts = append(opts, thread.WithContent(v)) })
-	p.Category.Call(func(v xid.ID) { opts = append(opts, thread.WithCategory(xid.ID(v))) })
-	p.Visibility.Call(func(v visibility.Visibility) { opts = append(opts, thread.WithVisibility(v)) })
-	p.Meta.Call(func(v map[string]any) { opts = append(opts, thread.WithMeta(v)) })
+func (p Partial) Opts() (opts []thread_writer.Option) {
+	p.Title.Call(func(v string) { opts = append(opts, thread_writer.WithTitle(v)) })
+	p.Content.Call(func(v datagraph.Content) { opts = append(opts, thread_writer.WithContent(v)) })
+	p.Category.Call(func(v xid.ID) { opts = append(opts, thread_writer.WithCategory(xid.ID(v))) })
+	p.Visibility.Call(func(v visibility.Visibility) { opts = append(opts, thread_writer.WithVisibility(v)) })
+	p.Meta.Call(func(v map[string]any) { opts = append(opts, thread_writer.WithMeta(v)) })
 	return
 }
 
@@ -85,21 +87,23 @@ func Build() fx.Option {
 type service struct {
 	ins spanner.Instrumentation
 
-	accountQuery *account_querier.Querier
-	thread_repo  thread.Repository
-	tagWriter    *tag_writer.Writer
-	fetcher      *fetcher.Fetcher
-	recommender  semdex.Recommender
-	bus          *pubsub.Bus
-	mentioner    *mentioner.Mentioner
-	cpm          *content_policy.Manager
+	accountQuery  *account_querier.Querier
+	threadQuerier *thread_querier.Querier
+	threadWriter  *thread_writer.Writer
+	tagWriter     *tag_writer.Writer
+	fetcher       *fetcher.Fetcher
+	recommender   semdex.Recommender
+	bus           *pubsub.Bus
+	mentioner     *mentioner.Mentioner
+	cpm           *content_policy.Manager
 }
 
 func New(
 	ins spanner.Builder,
 
 	accountQuery *account_querier.Querier,
-	thread_repo thread.Repository,
+	threadQuerier *thread_querier.Querier,
+	threadWriter *thread_writer.Writer,
 	tagWriter *tag_writer.Writer,
 	fetcher *fetcher.Fetcher,
 	recommender semdex.Recommender,
@@ -110,13 +114,14 @@ func New(
 	return &service{
 		ins: ins.Build(),
 
-		accountQuery: accountQuery,
-		thread_repo:  thread_repo,
-		tagWriter:    tagWriter,
-		fetcher:      fetcher,
-		recommender:  recommender,
-		bus:          bus,
-		mentioner:    mentioner,
-		cpm:          cpm,
+		accountQuery:  accountQuery,
+		threadQuerier: threadQuerier,
+		threadWriter:  threadWriter,
+		tagWriter:     tagWriter,
+		fetcher:       fetcher,
+		recommender:   recommender,
+		bus:           bus,
+		mentioner:     mentioner,
+		cpm:           cpm,
 	}
 }

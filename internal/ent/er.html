@@ -216,6 +216,12 @@ erDiagram
         xidDOTID category_id
         xidDOTID link_id
     }
+    PostRead {
+        xidDOTID id
+        xidDOTID root_post_id
+        xidDOTID account_id
+        timeDOTTime last_seen_at
+    }
     Property {
         xidDOTID id
         timeDOTTime created_at
@@ -295,6 +301,7 @@ erDiagram
     	Account |o--o{ Node : "nodes/owner"
     	Account |o--o{ Asset : "assets/owner"
     	Account |o--o{ EventParticipant : "events/account"
+    	Account |o--o{ PostRead : "post_reads/account"
     	AccountRoles }o--o| Account : "account"
     	AccountRoles }o--o| Role : "role"
     	Asset |o--o{ Asset : "assets/parent"
@@ -329,6 +336,7 @@ erDiagram
     	Post |o--o{ MentionProfile : "mentions/Post"
     	Post }o--o{ Asset : "assets/posts"
     	Post |o--o{ Event : "event/thread"
+    	Post |o--o{ PostRead : "post_reads/root_post"
     	PropertySchema |o--o{ Node : "node/property_schema"
     	PropertySchema |o--o{ PropertySchemaField : "fields/schema"
     	PropertySchemaField |o--o{ Property : "properties/schema"

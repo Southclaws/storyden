@@ -62,7 +62,7 @@ func (v *Validator) ValidateSessionToken(ctx context.Context, raw string) (conte
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return WithAccount(ctx, acc.Account, acc.Roles.Roles()), nil
+	return WithAccountAndToken(ctx, acc.Account, acc.Roles.Roles(), raw), nil
 }
 
 func (v *Validator) ValidateAccessKeyToken(ctx context.Context, raw string) (context.Context, error) {

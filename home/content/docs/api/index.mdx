@@ -5,13 +5,6 @@ description: Build powerful clients, automations and more with the API.
 
 import { Tab, Tabs } from "fumadocs-ui/components/tabs";
 
-<Callout type="warn">
-  The API documentation is not currently available. However, if you boot up an
-  instance of Storyden, you can visit http://localhost:8000/api/docs for
-  interactive documentation. See [here](/docs/introduction/vps/docker#api-only)
-  for more information.
-</Callout>
-
 Unlike other forum software, Storyden is built around a (fairly) HTTP standards-compliant RESTful API. This enables endless possibilities for developers to build powerful frontends, automations, integrations and more.
 
 ## Using the API
@@ -38,7 +31,7 @@ Because Storyden uses simple browser cookies, you can use the docs to immediatel
 
 ## Authentication
 
-Storyden uses secure cookies for authentication. You can register for an account or log in using the API or normally, via a browser to obtain a session token. You'll find the session cookie under a cookie named:
+Storyden uses secure cookies for authentication. You can register for an account (or log in) either via the browser or via the API itself in order to obtain a session token. You'll find the session cookie under a cookie named:
 
 ```
 storyden-session
@@ -148,8 +141,44 @@ You'll see your account information in the response:
 }
 ```
 
-## API tokens
+## Access Keys
 
-<Callout>
-  Service account tokens for programmatic/bot access is coming soon!
-</Callout>
+For programmatic access, scripts, and integrations, Storyden provides **access keys** as an alternative to session cookies. Access keys are bearer tokens that authenticate API requests and inherit the permissions of the account that created them.
+
+Access keys are ideal for:
+
+- Building bots and automation workflows
+- Integrating with third-party services (Discord, n8n, Zapier, etc.)
+- Server-to-server communication
+
+To create and manage access keys, see the [Access Keys documentation](/docs/operation/access-keys). You'll need the `USE_PERSONAL_ACCESS_KEYS` permission to create keys for your account.
+
+Example usage:
+
+<Tabs groupId="shell" items={["Escaped", "One line", "NuShell"]}>
+  <Tab value="Escaped">
+
+    ```bash
+    curl http://localhost:8000/api/threads \
+      --header 'Authorization: Bearer your_access_key_here'
+    ```
+
+  </Tab>
+
+  <Tab value="One line">
+
+    ```sh
+    curl http://localhost:8000/api/threads --header 'Authorization: Bearer your_access_key_here'
+    ```
+
+  </Tab>
+
+  <Tab value="NuShell">
+
+    ```sh
+    http get http://localhost:8000/api/threads Authorization:'Bearer your_access_key_here'
+    ```
+
+  </Tab>
+
+</Tabs>

@@ -31,6 +31,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
@@ -119,6 +120,7 @@ func checkColumn(t, c string) error {
 			node.Table:                node.ValidColumn,
 			notification.Table:        notification.ValidColumn,
 			post.Table:                post.ValidColumn,
+			postread.Table:            postread.ValidColumn,
 			property.Table:            property.ValidColumn,
 			propertyschema.Table:      propertyschema.ValidColumn,
 			propertyschemafield.Table: propertyschemafield.ValidColumn,

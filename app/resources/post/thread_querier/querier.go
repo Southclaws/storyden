@@ -1,14 +1,14 @@
 package thread_querier
 
 import (
-	"context"
 	"time"
 
+	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
+	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -16,7 +16,22 @@ import (
 	ent_category "github.com/Southclaws/storyden/internal/ent/category"
 	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	ent_tag "github.com/Southclaws/storyden/internal/ent/tag"
+	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 )
+
+type Querier struct {
+	ins spanner.Instrumentation
+	db  *ent.Client
+	raw *sqlx.DB
+}
+
+func New(ins spanner.Builder, db *ent.Client, raw *sqlx.DB) *Querier {
+	return &Querier{
+		ins: ins.Build(),
+		db:  db,
+		raw: raw,
+	}
+}
 
 type Result struct {
 	PageSize    int
@@ -27,16 +42,13 @@ type Result struct {
 	Threads     []*thread.Thread
 }
 
-type Querier interface {
-	// List is used for listing threads or filtering with basic queries. It's
-	// not sufficient for full scale text-based or semantic search however.
-	List(ctx context.Context,
-		page int,
-		size int,
-		opts ...Query,
-	) (*Result, error)
-
-	Get(ctx context.Context, threadID post.ID) (*thread.Thread, error)
+// 3 states:
+// 1. Slugs filled - filter by slugs, ignore other fields.
+// 2. Slugs empty, Uncategorised true - fetch uncategorised threads only.
+// 3. Slugs empty, Uncategorised false - fetch all threads.
+type CategoryFilter struct {
+	Slugs         []string
+	Uncategorised bool
 }
 
 type Query func(q *ent.PostQuery)
@@ -75,15 +87,24 @@ func HasTags(ids []xid.ID) Query {
 	}
 }
 
-func HasCategories(ids []string) Query {
+func HasCategories(cf CategoryFilter) Query {
 	return func(q *ent.PostQuery) {
-		q.Where(ent_post.HasCategoryWith(ent_category.SlugIn(ids...)))
+		if len(cf.Slugs) > 0 {
+			q.Where(ent_post.HasCategoryWith(ent_category.SlugIn(cf.Slugs...)))
+		} else {
+			if cf.Uncategorised {
+				q.Where(ent_post.CategoryIDIsNil())
+			} else {
+				// No filter, fetch all threads.
+			}
+		}
 	}
 }
 
-func HasStatus(status visibility.Visibility) Query {
+func HasStatus(status ...visibility.Visibility) Query {
+	pv := dt.Map(status, func(v visibility.Visibility) ent_post.Visibility { return ent_post.Visibility(v.String()) })
 	return func(q *ent.PostQuery) {
-		q.Where(ent_post.VisibilityEQ(ent_post.Visibility(status.String())))
+		q.Where(ent_post.VisibilityIn(pv...))
 	}
 }
 

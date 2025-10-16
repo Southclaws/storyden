@@ -5,10 +5,11 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-import { Thread } from "src/api/openapi-schema";
+import { DatagraphItemKind, Thread } from "src/api/openapi-schema";
 
 import { handle } from "@/api/client";
 import { useSession } from "@/auth";
+import { sendBeacon } from "@/lib/beacon/beacon";
 import { useThreadMutations } from "@/lib/thread/mutation";
 import { scrollToBottom } from "@/utils/scroll";
 
@@ -37,6 +38,13 @@ export function useReplyBox(thread: Thread) {
     await handle(
       async () => {
         await createReply(data);
+
+        // Mark the thread as read after successfully replying to it
+        try {
+          sendBeacon(DatagraphItemKind.thread, thread.id);
+        } catch (error) {
+          console.warn("failed to send beacon:", error);
+        }
 
         // This is a little hack tbh, essentially if this prop for the
         // ContentComposer component changes, its value is reset. Could have

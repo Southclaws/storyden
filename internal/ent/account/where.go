@@ -1076,6 +1076,29 @@ func HasEventsWith(preds ...predicate.EventParticipant) predicate.Account {
 	})
 }
 
+// HasPostReads applies the HasEdge predicate on the "post_reads" edge.
+func HasPostReads() predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PostReadsTable, PostReadsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPostReadsWith applies the HasEdge predicate on the "post_reads" edge with a given conditions (other predicates).
+func HasPostReadsWith(preds ...predicate.PostRead) predicate.Account {
+	return predicate.Account(func(s *sql.Selector) {
+		step := newPostReadsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasAccountRoles applies the HasEdge predicate on the "account_roles" edge.
 func HasAccountRoles() predicate.Account {
 	return predicate.Account(func(s *sql.Selector) {

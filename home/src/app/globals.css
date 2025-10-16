@@ -1,6 +1,6 @@
 @layer reset, theme, base, panda_base, components,  panda_tokens, panda_recipes, panda_utilities, utilities;
 
-@source '../node_modules/fumadocs-openapi/dist/**/*.js';
+@import "fumadocs-openapi/css/preset.css";
 
 *::selection {
   color: hsla(160, 9%, 92%, 1);

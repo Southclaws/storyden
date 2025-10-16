@@ -8,7 +8,8 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/message"
-	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
+	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
 	"github.com/Southclaws/storyden/app/services/semdex"
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -33,8 +34,8 @@ var (
 type semdexer struct {
 	logger        *slog.Logger
 	db            *ent.Client
-	threadQuerier thread.Repository
-	threadWriter  thread.Repository
+	threadQuerier *thread_querier.Querier
+	threadWriter  *thread_writer.Writer
 	semdexMutator semdex.Mutator
 	semdexQuerier semdex.Querier
 	bus           *pubsub.Bus
@@ -47,8 +48,8 @@ func newSemdexer(
 	logger *slog.Logger,
 
 	db *ent.Client,
-	threadQuerier thread.Repository,
-	threadWriter thread.Repository,
+	threadQuerier *thread_querier.Querier,
+	threadWriter *thread_writer.Writer,
 	semdexMutator semdex.Mutator,
 	semdexQuerier semdex.Querier,
 	bus *pubsub.Bus,

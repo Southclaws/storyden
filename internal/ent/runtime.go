@@ -25,6 +25,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
@@ -802,6 +803,31 @@ func init() {
 	// post.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	post.IDValidator = func() func(string) error {
 		validators := postDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	postreadMixin := schema.PostRead{}.Mixin()
+	postreadMixinFields0 := postreadMixin[0].Fields()
+	_ = postreadMixinFields0
+	postreadFields := schema.PostRead{}.Fields()
+	_ = postreadFields
+	// postreadDescID is the schema descriptor for id field.
+	postreadDescID := postreadMixinFields0[0].Descriptor()
+	// postread.DefaultID holds the default value on creation for the id field.
+	postread.DefaultID = postreadDescID.Default.(func() xid.ID)
+	// postread.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	postread.IDValidator = func() func(string) error {
+		validators := postreadDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

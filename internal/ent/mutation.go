@@ -31,6 +31,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
@@ -73,6 +74,7 @@ const (
 	TypeNode                = "Node"
 	TypeNotification        = "Notification"
 	TypePost                = "Post"
+	TypePostRead            = "PostRead"
 	TypeProperty            = "Property"
 	TypePropertySchema      = "PropertySchema"
 	TypePropertySchemaField = "PropertySchemaField"
@@ -162,6 +164,9 @@ type AccountMutation struct {
 	events                         map[xid.ID]struct{}
 	removedevents                  map[xid.ID]struct{}
 	clearedevents                  bool
+	post_reads                     map[xid.ID]struct{}
+	removedpost_reads              map[xid.ID]struct{}
+	clearedpost_reads              bool
 	account_roles                  map[xid.ID]struct{}
 	removedaccount_roles           map[xid.ID]struct{}
 	clearedaccount_roles           bool
@@ -1853,6 +1858,60 @@ func (m *AccountMutation) ResetEvents() {
 	m.removedevents = nil
 }
 
+// AddPostReadIDs adds the "post_reads" edge to the PostRead entity by ids.
+func (m *AccountMutation) AddPostReadIDs(ids ...xid.ID) {
+	if m.post_reads == nil {
+		m.post_reads = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.post_reads[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPostReads clears the "post_reads" edge to the PostRead entity.
+func (m *AccountMutation) ClearPostReads() {
+	m.clearedpost_reads = true
+}
+
+// PostReadsCleared reports if the "post_reads" edge to the PostRead entity was cleared.
+func (m *AccountMutation) PostReadsCleared() bool {
+	return m.clearedpost_reads
+}
+
+// RemovePostReadIDs removes the "post_reads" edge to the PostRead entity by IDs.
+func (m *AccountMutation) RemovePostReadIDs(ids ...xid.ID) {
+	if m.removedpost_reads == nil {
+		m.removedpost_reads = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.post_reads, ids[i])
+		m.removedpost_reads[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPostReads returns the removed IDs of the "post_reads" edge to the PostRead entity.
+func (m *AccountMutation) RemovedPostReadsIDs() (ids []xid.ID) {
+	for id := range m.removedpost_reads {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PostReadsIDs returns the "post_reads" edge IDs in the mutation.
+func (m *AccountMutation) PostReadsIDs() (ids []xid.ID) {
+	for id := range m.post_reads {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPostReads resets all changes to the "post_reads" edge.
+func (m *AccountMutation) ResetPostReads() {
+	m.post_reads = nil
+	m.clearedpost_reads = false
+	m.removedpost_reads = nil
+}
+
 // AddAccountRoleIDs adds the "account_roles" edge to the AccountRoles entity by ids.
 func (m *AccountMutation) AddAccountRoleIDs(ids ...xid.ID) {
 	if m.account_roles == nil {
@@ -2266,7 +2325,7 @@ func (m *AccountMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AccountMutation) AddedEdges() []string {
-	edges := make([]string, 0, 21)
+	edges := make([]string, 0, 22)
 	if m.sessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -2326,6 +2385,9 @@ func (m *AccountMutation) AddedEdges() []string {
 	}
 	if m.events != nil {
 		edges = append(edges, account.EdgeEvents)
+	}
+	if m.post_reads != nil {
+		edges = append(edges, account.EdgePostReads)
 	}
 	if m.account_roles != nil {
 		edges = append(edges, account.EdgeAccountRoles)
@@ -2455,6 +2517,12 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgePostReads:
+		ids := make([]ent.Value, 0, len(m.post_reads))
+		for id := range m.post_reads {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAccountRoles:
 		ids := make([]ent.Value, 0, len(m.account_roles))
 		for id := range m.account_roles {
@@ -2467,7 +2535,7 @@ func (m *AccountMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AccountMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 21)
+	edges := make([]string, 0, 22)
 	if m.removedsessions != nil {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -2524,6 +2592,9 @@ func (m *AccountMutation) RemovedEdges() []string {
 	}
 	if m.removedevents != nil {
 		edges = append(edges, account.EdgeEvents)
+	}
+	if m.removedpost_reads != nil {
+		edges = append(edges, account.EdgePostReads)
 	}
 	if m.removedaccount_roles != nil {
 		edges = append(edges, account.EdgeAccountRoles)
@@ -2649,6 +2720,12 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case account.EdgePostReads:
+		ids := make([]ent.Value, 0, len(m.removedpost_reads))
+		for id := range m.removedpost_reads {
+			ids = append(ids, id)
+		}
+		return ids
 	case account.EdgeAccountRoles:
 		ids := make([]ent.Value, 0, len(m.removedaccount_roles))
 		for id := range m.removedaccount_roles {
@@ -2661,7 +2738,7 @@ func (m *AccountMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AccountMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 21)
+	edges := make([]string, 0, 22)
 	if m.clearedsessions {
 		edges = append(edges, account.EdgeSessions)
 	}
@@ -2722,6 +2799,9 @@ func (m *AccountMutation) ClearedEdges() []string {
 	if m.clearedevents {
 		edges = append(edges, account.EdgeEvents)
 	}
+	if m.clearedpost_reads {
+		edges = append(edges, account.EdgePostReads)
+	}
 	if m.clearedaccount_roles {
 		edges = append(edges, account.EdgeAccountRoles)
 	}
@@ -2772,6 +2852,8 @@ func (m *AccountMutation) EdgeCleared(name string) bool {
 		return m.clearedassets
 	case account.EdgeEvents:
 		return m.clearedevents
+	case account.EdgePostReads:
+		return m.clearedpost_reads
 	case account.EdgeAccountRoles:
 		return m.clearedaccount_roles
 	}
@@ -2852,6 +2934,9 @@ func (m *AccountMutation) ResetEdge(name string) error {
 		return nil
 	case account.EdgeEvents:
 		m.ResetEvents()
+		return nil
+	case account.EdgePostReads:
+		m.ResetPostReads()
 		return nil
 	case account.EdgeAccountRoles:
 		m.ResetAccountRoles()
@@ -18882,6 +18967,9 @@ type PostMutation struct {
 	event                map[xid.ID]struct{}
 	removedevent         map[xid.ID]struct{}
 	clearedevent         bool
+	post_reads           map[xid.ID]struct{}
+	removedpost_reads    map[xid.ID]struct{}
+	clearedpost_reads    bool
 	done                 bool
 	oldValue             func(context.Context) (*Post, error)
 	predicates           []predicate.Post
@@ -20483,6 +20571,60 @@ func (m *PostMutation) ResetEvent() {
 	m.removedevent = nil
 }
 
+// AddPostReadIDs adds the "post_reads" edge to the PostRead entity by ids.
+func (m *PostMutation) AddPostReadIDs(ids ...xid.ID) {
+	if m.post_reads == nil {
+		m.post_reads = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.post_reads[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPostReads clears the "post_reads" edge to the PostRead entity.
+func (m *PostMutation) ClearPostReads() {
+	m.clearedpost_reads = true
+}
+
+// PostReadsCleared reports if the "post_reads" edge to the PostRead entity was cleared.
+func (m *PostMutation) PostReadsCleared() bool {
+	return m.clearedpost_reads
+}
+
+// RemovePostReadIDs removes the "post_reads" edge to the PostRead entity by IDs.
+func (m *PostMutation) RemovePostReadIDs(ids ...xid.ID) {
+	if m.removedpost_reads == nil {
+		m.removedpost_reads = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.post_reads, ids[i])
+		m.removedpost_reads[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPostReads returns the removed IDs of the "post_reads" edge to the PostRead entity.
+func (m *PostMutation) RemovedPostReadsIDs() (ids []xid.ID) {
+	for id := range m.removedpost_reads {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PostReadsIDs returns the "post_reads" edge IDs in the mutation.
+func (m *PostMutation) PostReadsIDs() (ids []xid.ID) {
+	for id := range m.post_reads {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPostReads resets all changes to the "post_reads" edge.
+func (m *PostMutation) ResetPostReads() {
+	m.post_reads = nil
+	m.clearedpost_reads = false
+	m.removedpost_reads = nil
+}
+
 // Where appends a list predicates to the PostMutation builder.
 func (m *PostMutation) Where(ps ...predicate.Post) {
 	m.predicates = append(m.predicates, ps...)
@@ -20968,7 +21110,7 @@ func (m *PostMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PostMutation) AddedEdges() []string {
-	edges := make([]string, 0, 15)
+	edges := make([]string, 0, 16)
 	if m.author != nil {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -21013,6 +21155,9 @@ func (m *PostMutation) AddedEdges() []string {
 	}
 	if m.event != nil {
 		edges = append(edges, post.EdgeEvent)
+	}
+	if m.post_reads != nil {
+		edges = append(edges, post.EdgePostReads)
 	}
 	return edges
 }
@@ -21101,13 +21246,19 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgePostReads:
+		ids := make([]ent.Value, 0, len(m.post_reads))
+		for id := range m.post_reads {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PostMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 15)
+	edges := make([]string, 0, 16)
 	if m.removedtags != nil {
 		edges = append(edges, post.EdgeTags)
 	}
@@ -21137,6 +21288,9 @@ func (m *PostMutation) RemovedEdges() []string {
 	}
 	if m.removedevent != nil {
 		edges = append(edges, post.EdgeEvent)
+	}
+	if m.removedpost_reads != nil {
+		edges = append(edges, post.EdgePostReads)
 	}
 	return edges
 }
@@ -21205,13 +21359,19 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgePostReads:
+		ids := make([]ent.Value, 0, len(m.removedpost_reads))
+		for id := range m.removedpost_reads {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PostMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 15)
+	edges := make([]string, 0, 16)
 	if m.clearedauthor {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -21257,6 +21417,9 @@ func (m *PostMutation) ClearedEdges() []string {
 	if m.clearedevent {
 		edges = append(edges, post.EdgeEvent)
 	}
+	if m.clearedpost_reads {
+		edges = append(edges, post.EdgePostReads)
+	}
 	return edges
 }
 
@@ -21294,6 +21457,8 @@ func (m *PostMutation) EdgeCleared(name string) bool {
 		return m.clearedcontent_links
 	case post.EdgeEvent:
 		return m.clearedevent
+	case post.EdgePostReads:
+		return m.clearedpost_reads
 	}
 	return false
 }
@@ -21370,8 +21535,551 @@ func (m *PostMutation) ResetEdge(name string) error {
 	case post.EdgeEvent:
 		m.ResetEvent()
 		return nil
+	case post.EdgePostReads:
+		m.ResetPostReads()
+		return nil
 	}
 	return fmt.Errorf("unknown Post edge %s", name)
+}
+
+// PostReadMutation represents an operation that mutates the PostRead nodes in the graph.
+type PostReadMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *xid.ID
+	last_seen_at     *time.Time
+	clearedFields    map[string]struct{}
+	root_post        *xid.ID
+	clearedroot_post bool
+	account          *xid.ID
+	clearedaccount   bool
+	done             bool
+	oldValue         func(context.Context) (*PostRead, error)
+	predicates       []predicate.PostRead
+}
+
+var _ ent.Mutation = (*PostReadMutation)(nil)
+
+// postreadOption allows management of the mutation configuration using functional options.
+type postreadOption func(*PostReadMutation)
+
+// newPostReadMutation creates new mutation for the PostRead entity.
+func newPostReadMutation(c config, op Op, opts ...postreadOption) *PostReadMutation {
+	m := &PostReadMutation{
+		config:        c,
+		op:            op,
+		typ:           TypePostRead,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withPostReadID sets the ID field of the mutation.
+func withPostReadID(id xid.ID) postreadOption {
+	return func(m *PostReadMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *PostRead
+		)
+		m.oldValue = func(ctx context.Context) (*PostRead, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().PostRead.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withPostRead sets the old PostRead of the mutation.
+func withPostRead(node *PostRead) postreadOption {
+	return func(m *PostReadMutation) {
+		m.oldValue = func(context.Context) (*PostRead, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PostReadMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PostReadMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of PostRead entities.
+func (m *PostReadMutation) SetID(id xid.ID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *PostReadMutation) ID() (id xid.ID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *PostReadMutation) IDs(ctx context.Context) ([]xid.ID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []xid.ID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().PostRead.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetRootPostID sets the "root_post_id" field.
+func (m *PostReadMutation) SetRootPostID(x xid.ID) {
+	m.root_post = &x
+}
+
+// RootPostID returns the value of the "root_post_id" field in the mutation.
+func (m *PostReadMutation) RootPostID() (r xid.ID, exists bool) {
+	v := m.root_post
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRootPostID returns the old "root_post_id" field's value of the PostRead entity.
+// If the PostRead object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostReadMutation) OldRootPostID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRootPostID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRootPostID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRootPostID: %w", err)
+	}
+	return oldValue.RootPostID, nil
+}
+
+// ResetRootPostID resets all changes to the "root_post_id" field.
+func (m *PostReadMutation) ResetRootPostID() {
+	m.root_post = nil
+}
+
+// SetAccountID sets the "account_id" field.
+func (m *PostReadMutation) SetAccountID(x xid.ID) {
+	m.account = &x
+}
+
+// AccountID returns the value of the "account_id" field in the mutation.
+func (m *PostReadMutation) AccountID() (r xid.ID, exists bool) {
+	v := m.account
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAccountID returns the old "account_id" field's value of the PostRead entity.
+// If the PostRead object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostReadMutation) OldAccountID(ctx context.Context) (v xid.ID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAccountID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAccountID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAccountID: %w", err)
+	}
+	return oldValue.AccountID, nil
+}
+
+// ResetAccountID resets all changes to the "account_id" field.
+func (m *PostReadMutation) ResetAccountID() {
+	m.account = nil
+}
+
+// SetLastSeenAt sets the "last_seen_at" field.
+func (m *PostReadMutation) SetLastSeenAt(t time.Time) {
+	m.last_seen_at = &t
+}
+
+// LastSeenAt returns the value of the "last_seen_at" field in the mutation.
+func (m *PostReadMutation) LastSeenAt() (r time.Time, exists bool) {
+	v := m.last_seen_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLastSeenAt returns the old "last_seen_at" field's value of the PostRead entity.
+// If the PostRead object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PostReadMutation) OldLastSeenAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLastSeenAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLastSeenAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLastSeenAt: %w", err)
+	}
+	return oldValue.LastSeenAt, nil
+}
+
+// ResetLastSeenAt resets all changes to the "last_seen_at" field.
+func (m *PostReadMutation) ResetLastSeenAt() {
+	m.last_seen_at = nil
+}
+
+// ClearRootPost clears the "root_post" edge to the Post entity.
+func (m *PostReadMutation) ClearRootPost() {
+	m.clearedroot_post = true
+	m.clearedFields[postread.FieldRootPostID] = struct{}{}
+}
+
+// RootPostCleared reports if the "root_post" edge to the Post entity was cleared.
+func (m *PostReadMutation) RootPostCleared() bool {
+	return m.clearedroot_post
+}
+
+// RootPostIDs returns the "root_post" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// RootPostID instead. It exists only for internal usage by the builders.
+func (m *PostReadMutation) RootPostIDs() (ids []xid.ID) {
+	if id := m.root_post; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRootPost resets all changes to the "root_post" edge.
+func (m *PostReadMutation) ResetRootPost() {
+	m.root_post = nil
+	m.clearedroot_post = false
+}
+
+// ClearAccount clears the "account" edge to the Account entity.
+func (m *PostReadMutation) ClearAccount() {
+	m.clearedaccount = true
+	m.clearedFields[postread.FieldAccountID] = struct{}{}
+}
+
+// AccountCleared reports if the "account" edge to the Account entity was cleared.
+func (m *PostReadMutation) AccountCleared() bool {
+	return m.clearedaccount
+}
+
+// AccountIDs returns the "account" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AccountID instead. It exists only for internal usage by the builders.
+func (m *PostReadMutation) AccountIDs() (ids []xid.ID) {
+	if id := m.account; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetAccount resets all changes to the "account" edge.
+func (m *PostReadMutation) ResetAccount() {
+	m.account = nil
+	m.clearedaccount = false
+}
+
+// Where appends a list predicates to the PostReadMutation builder.
+func (m *PostReadMutation) Where(ps ...predicate.PostRead) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the PostReadMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *PostReadMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.PostRead, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *PostReadMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *PostReadMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (PostRead).
+func (m *PostReadMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *PostReadMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.root_post != nil {
+		fields = append(fields, postread.FieldRootPostID)
+	}
+	if m.account != nil {
+		fields = append(fields, postread.FieldAccountID)
+	}
+	if m.last_seen_at != nil {
+		fields = append(fields, postread.FieldLastSeenAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *PostReadMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case postread.FieldRootPostID:
+		return m.RootPostID()
+	case postread.FieldAccountID:
+		return m.AccountID()
+	case postread.FieldLastSeenAt:
+		return m.LastSeenAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *PostReadMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case postread.FieldRootPostID:
+		return m.OldRootPostID(ctx)
+	case postread.FieldAccountID:
+		return m.OldAccountID(ctx)
+	case postread.FieldLastSeenAt:
+		return m.OldLastSeenAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown PostRead field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PostReadMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case postread.FieldRootPostID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRootPostID(v)
+		return nil
+	case postread.FieldAccountID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAccountID(v)
+		return nil
+	case postread.FieldLastSeenAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLastSeenAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown PostRead field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *PostReadMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *PostReadMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PostReadMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown PostRead numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *PostReadMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *PostReadMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PostReadMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown PostRead nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *PostReadMutation) ResetField(name string) error {
+	switch name {
+	case postread.FieldRootPostID:
+		m.ResetRootPostID()
+		return nil
+	case postread.FieldAccountID:
+		m.ResetAccountID()
+		return nil
+	case postread.FieldLastSeenAt:
+		m.ResetLastSeenAt()
+		return nil
+	}
+	return fmt.Errorf("unknown PostRead field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *PostReadMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.root_post != nil {
+		edges = append(edges, postread.EdgeRootPost)
+	}
+	if m.account != nil {
+		edges = append(edges, postread.EdgeAccount)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *PostReadMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case postread.EdgeRootPost:
+		if id := m.root_post; id != nil {
+			return []ent.Value{*id}
+		}
+	case postread.EdgeAccount:
+		if id := m.account; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *PostReadMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *PostReadMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *PostReadMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedroot_post {
+		edges = append(edges, postread.EdgeRootPost)
+	}
+	if m.clearedaccount {
+		edges = append(edges, postread.EdgeAccount)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *PostReadMutation) EdgeCleared(name string) bool {
+	switch name {
+	case postread.EdgeRootPost:
+		return m.clearedroot_post
+	case postread.EdgeAccount:
+		return m.clearedaccount
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *PostReadMutation) ClearEdge(name string) error {
+	switch name {
+	case postread.EdgeRootPost:
+		m.ClearRootPost()
+		return nil
+	case postread.EdgeAccount:
+		m.ClearAccount()
+		return nil
+	}
+	return fmt.Errorf("unknown PostRead unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *PostReadMutation) ResetEdge(name string) error {
+	switch name {
+	case postread.EdgeRootPost:
+		m.ResetRootPost()
+		return nil
+	case postread.EdgeAccount:
+		m.ResetAccount()
+		return nil
+	}
+	return fmt.Errorf("unknown PostRead edge %s", name)
 }
 
 // PropertyMutation represents an operation that mutates the Property nodes in the graph.

@@ -96,9 +96,11 @@ type PostEdges struct {
 	ContentLinks []*Link `json:"content_links,omitempty"`
 	// Event holds the value of the event edge.
 	Event []*Event `json:"event,omitempty"`
+	// PostReads holds the value of the post_reads edge.
+	PostReads []*PostRead `json:"post_reads,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [15]bool
+	loadedTypes [16]bool
 }
 
 // AuthorOrErr returns the Author value or an error if the edge
@@ -244,6 +246,15 @@ func (e PostEdges) EventOrErr() ([]*Event, error) {
 		return e.Event, nil
 	}
 	return nil, &NotLoadedError{edge: "event"}
+}
+
+// PostReadsOrErr returns the PostReads value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) PostReadsOrErr() ([]*PostRead, error) {
+	if e.loadedTypes[15] {
+		return e.PostReads, nil
+	}
+	return nil, &NotLoadedError{edge: "post_reads"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -481,6 +492,11 @@ func (_m *Post) QueryContentLinks() *LinkQuery {
 // QueryEvent queries the "event" edge of the Post entity.
 func (_m *Post) QueryEvent() *EventQuery {
 	return NewPostClient(_m.config).QueryEvent(_m)
+}
+
+// QueryPostReads queries the "post_reads" edge of the Post entity.
+func (_m *Post) QueryPostReads() *PostReadQuery {
+	return NewPostClient(_m.config).QueryPostReads(_m)
 }
 
 // Update returns a builder for updating this Post.

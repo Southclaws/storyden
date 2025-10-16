@@ -19,8 +19,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/profile/profile_querier"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
 
-	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/post/thread_cache"
+	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/reqinfo"
@@ -263,22 +263,22 @@ func deserialiseThreadStatus(in openapi.Visibility) (visibility.Visibility, erro
 	return s, nil
 }
 
-func deserialiseCategorySlugQueryParam(in *openapi.CategorySlugListQuery) opt.Optional[thread.CategoryFilter] {
+func deserialiseCategorySlugQueryParam(in *openapi.CategorySlugListQuery) opt.Optional[thread_querier.CategoryFilter] {
 	// Do not filter by any categorise, return all threads.
 	if in == nil {
-		return opt.NewEmpty[thread.CategoryFilter]()
+		return opt.NewEmpty[thread_querier.CategoryFilter]()
 	}
 
 	// Fetch uncategorised threads only.
 	_, isExplicitlyNull := lo.Find(*in, func(s string) bool { return s == "null" })
 	if isExplicitlyNull {
-		return opt.New(thread.CategoryFilter{
+		return opt.New(thread_querier.CategoryFilter{
 			Uncategorised: true,
 		})
 	}
 
 	// Filter by these categories.
-	return opt.New(thread.CategoryFilter{
+	return opt.New(thread_querier.CategoryFilter{
 		Slugs:         *in,
 		Uncategorised: false,
 	})

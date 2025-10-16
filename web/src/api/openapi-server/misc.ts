@@ -10,6 +10,7 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   AssetGetOKResponse,
   AssetUploadBody,
+  BeaconBody,
   GetInfoOKResponse,
   GetSpec200,
 } from "../openapi-schema";
@@ -210,5 +211,36 @@ export const bannerUpload = async (
       ...options?.headers,
     },
     body: JSON.stringify(assetUploadBody),
+  });
+};
+
+/**
+ * A catch-all endpoint for tracking read states and other things that are
+not critical to the functioning of the platform. This endpoint is fire
+and forget and does not return any meaningful data. It is designed to
+be used with the `navigator.sendBeacon` API in browsers to mark things
+such as how far down a thread a member has read, or whether or not a
+Library Page has been visited recently. It may queue the work for later
+processing and is not guaranteed to be processed immediately or at all.
+
+ */
+export type sendBeaconResponse = {
+  data: void;
+  status: number;
+};
+
+export const getSendBeaconUrl = () => {
+  return `/beacon`;
+};
+
+export const sendBeacon = async (
+  beaconBody: BeaconBody,
+  options?: RequestInit,
+): Promise<sendBeaconResponse> => {
+  return fetcher<Promise<sendBeaconResponse>>(getSendBeaconUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "text/plain", ...options?.headers },
+    body: JSON.stringify(beaconBody),
   });
 };

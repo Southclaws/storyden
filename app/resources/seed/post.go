@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/reaction"
 	"github.com/Southclaws/storyden/app/resources/post/reply"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
+	"github.com/Southclaws/storyden/app/resources/post/thread_writer"
 	"github.com/Southclaws/storyden/app/resources/profile"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -254,7 +255,7 @@ Storyden is still in development so please give the repository a watch if you're
 	}
 )
 
-func threads(tr thread.Repository, pr reply.Repository, rr *reaction.Writer, ar *asset_writer.Writer) {
+func threads(tr *thread_writer.Writer, pr reply.Repository, rr *reaction.Writer, ar *asset_writer.Writer) {
 	ctx := context.Background()
 
 	for _, t := range Threads {
@@ -273,11 +274,11 @@ func threads(tr thread.Repository, pr reply.Repository, rr *reaction.Writer, ar 
 		th, err := tr.Create(ctx,
 			t.Title,
 			t.Author.ID,
-			thread.WithID(t.ID),
-			thread.WithContent(t.Content),
-			thread.WithVisibility(visibility.VisibilityPublished),
-			thread.WithAssets(assetIDs),
-			thread.WithCategory(xid.ID(t.Category.OrZero().ID)),
+			thread_writer.WithID(t.ID),
+			thread_writer.WithContent(t.Content),
+			thread_writer.WithVisibility(visibility.VisibilityPublished),
+			thread_writer.WithAssets(assetIDs),
+			thread_writer.WithCategory(xid.ID(t.Category.OrZero().ID)),
 		)
 		if err != nil {
 			if ent.IsConstraintError(err) {

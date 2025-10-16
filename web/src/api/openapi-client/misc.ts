@@ -16,6 +16,7 @@ import { fetcher } from "../client";
 import type {
   AssetGetOKResponse,
   AssetUploadBody,
+  BeaconBody,
   GetInfoOKResponse,
   GetSpec200,
   InternalServerErrorResponse,
@@ -374,6 +375,58 @@ export const useBannerUpload = <
 
   const swrKey = swrOptions?.swrKey ?? getBannerUploadMutationKey();
   const swrFn = getBannerUploadMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * A catch-all endpoint for tracking read states and other things that are
+not critical to the functioning of the platform. This endpoint is fire
+and forget and does not return any meaningful data. It is designed to
+be used with the `navigator.sendBeacon` API in browsers to mark things
+such as how far down a thread a member has read, or whether or not a
+Library Page has been visited recently. It may queue the work for later
+processing and is not guaranteed to be processed immediately or at all.
+
+ */
+export const sendBeacon = (beaconBody: BeaconBody) => {
+  return fetcher<void>({
+    url: `/beacon`,
+    method: "POST",
+    headers: { "Content-Type": "text/plain" },
+    data: beaconBody,
+  });
+};
+
+export const getSendBeaconMutationFetcher = () => {
+  return (_: Key, { arg }: { arg: BeaconBody }): Promise<void> => {
+    return sendBeacon(arg);
+  };
+};
+export const getSendBeaconMutationKey = () => [`/beacon`] as const;
+
+export type SendBeaconMutationResult = NonNullable<
+  Awaited<ReturnType<typeof sendBeacon>>
+>;
+export type SendBeaconMutationError = InternalServerErrorResponse;
+
+export const useSendBeacon = <TError = InternalServerErrorResponse>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof sendBeacon>>,
+    TError,
+    Key,
+    BeaconBody,
+    Awaited<ReturnType<typeof sendBeacon>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getSendBeaconMutationKey();
+  const swrFn = getSendBeaconMutationFetcher();
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
