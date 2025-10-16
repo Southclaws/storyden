@@ -250,6 +250,18 @@ func (m *Mapping) NotificationUpdate() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) ReportCreate() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) ReportList() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) ReportUpdate() (bool, *rbac.Permission) {
+	return true, nil
+}
+
 func (m *Mapping) ProfileList() (bool, *rbac.Permission) {
 	return false, &rbac.PermissionListProfiles
 }
@@ -530,16 +542,4 @@ func (m *Mapping) EventParticipantUpdate() (bool, *rbac.Permission) {
 func (m *Mapping) EventParticipantRemove() (bool, *rbac.Permission) {
 	// Requires PermissionManageEvents unless deleting self
 	return true, nil
-}
-
-func (m *Mapping) ReportCreate() (bool, *rbac.Permission) {
-	return true, nil
-}
-
-func (m *Mapping) ReportList() (bool, *rbac.Permission) {
-	return true, nil
-}
-
-func (m *Mapping) ReportUpdate() (bool, *rbac.Permission) {
-	return true, &rbac.PermissionManageReports
 }
