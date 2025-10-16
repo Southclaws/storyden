@@ -909,6 +909,39 @@ var (
 			},
 		},
 	}
+	// ReportsColumns holds the columns for the "reports" table.
+	ReportsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "target_id", Type: field.TypeString},
+		{Name: "target_kind", Type: field.TypeString},
+		{Name: "comment", Type: field.TypeString, Nullable: true, Size: 2147483647},
+		{Name: "reason", Type: field.TypeString, Nullable: true},
+		{Name: "status", Type: field.TypeString, Default: "submitted"},
+		{Name: "reported_by_id", Type: field.TypeString, Size: 20},
+		{Name: "handled_by_id", Type: field.TypeString, Nullable: true, Size: 20},
+	}
+	// ReportsTable holds the schema information for the "reports" table.
+	ReportsTable = &schema.Table{
+		Name:       "reports",
+		Columns:    ReportsColumns,
+		PrimaryKey: []*schema.Column{ReportsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "reports_accounts_reports",
+				Columns:    []*schema.Column{ReportsColumns[8]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "reports_accounts_handled_reports",
+				Columns:    []*schema.Column{ReportsColumns[9]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// RolesColumns holds the columns for the "roles" table.
 	RolesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -1198,6 +1231,7 @@ var (
 		PropertySchemaFieldsTable,
 		QuestionsTable,
 		ReactsTable,
+		ReportsTable,
 		RolesTable,
 		SessionsTable,
 		SettingsTable,
@@ -1263,6 +1297,8 @@ func init() {
 	QuestionsTable.ForeignKeys[1].RefTable = QuestionsTable
 	ReactsTable.ForeignKeys[0].RefTable = AccountsTable
 	ReactsTable.ForeignKeys[1].RefTable = PostsTable
+	ReportsTable.ForeignKeys[0].RefTable = AccountsTable
+	ReportsTable.ForeignKeys[1].RefTable = AccountsTable
 	SessionsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[0].RefTable = AccountsTable
 	AccountTagsTable.ForeignKeys[1].RefTable = TagsTable

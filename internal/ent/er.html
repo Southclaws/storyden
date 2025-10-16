@@ -257,6 +257,18 @@ erDiagram
         xidDOTID post_id
         string emoji
     }
+    Report {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        xidDOTID target_id
+        string target_kind
+        xidDOTID reported_by_id
+        xidDOTID handled_by_id
+        string comment
+        string reason
+        string status
+    }
     Role {
         xidDOTID id
         timeDOTTime created_at
@@ -302,6 +314,8 @@ erDiagram
     	Account |o--o{ Asset : "assets/owner"
     	Account |o--o{ EventParticipant : "events/account"
     	Account |o--o{ PostRead : "post_reads/account"
+    	Account |o--o{ Report : "reports/reported_by"
+    	Account |o--o{ Report : "handled_reports/handled_by"
     	AccountRoles }o--o| Account : "account"
     	AccountRoles }o--o| Role : "role"
     	Asset |o--o{ Asset : "assets/parent"

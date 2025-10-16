@@ -531,3 +531,15 @@ func (m *Mapping) EventParticipantRemove() (bool, *rbac.Permission) {
 	// Requires PermissionManageEvents unless deleting self
 	return true, nil
 }
+
+func (m *Mapping) ReportCreate() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) ReportList() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) ReportUpdate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionManageReports
+}

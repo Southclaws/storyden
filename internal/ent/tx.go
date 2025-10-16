@@ -64,6 +64,8 @@ type Tx struct {
 	Question *QuestionClient
 	// React is the client for interacting with the React builders.
 	React *ReactClient
+	// Report is the client for interacting with the Report builders.
+	Report *ReportClient
 	// Role is the client for interacting with the Role builders.
 	Role *RoleClient
 	// Session is the client for interacting with the Session builders.
@@ -228,6 +230,7 @@ func (tx *Tx) init() {
 	tx.PropertySchemaField = NewPropertySchemaFieldClient(tx.config)
 	tx.Question = NewQuestionClient(tx.config)
 	tx.React = NewReactClient(tx.config)
+	tx.Report = NewReportClient(tx.config)
 	tx.Role = NewRoleClient(tx.config)
 	tx.Session = NewSessionClient(tx.config)
 	tx.Setting = NewSettingClient(tx.config)
