@@ -91,6 +91,10 @@ export function useLibraryPageMenu(props: Props) {
   }
 
   function handleSelect({ value }: MenuSelectionDetails) {
+    if (value === "report-node") {
+      return;
+    }
+
     switch (value as Visibility | "toggle-hide-in-tree" | "delete") {
       case "toggle-hide-in-tree":
         return handleToggleChildrenVisibility();

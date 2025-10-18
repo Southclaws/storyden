@@ -14,6 +14,7 @@ import { hasPermission } from "@/utils/permissions";
 import { MemberIdent } from "../MemberBadge/MemberIdent";
 import { MemberRoleMenu } from "../MemberRoleMenu/MemberRoleMenu";
 import { MemberSuspensionTrigger } from "../MemberSuspension/MemberSuspensionTrigger";
+import { ReportMemberMenuItem } from "@/components/report/ReportMemberMenuItem";
 
 export type Props = {
   profile: ProfileReference;
@@ -74,6 +75,8 @@ export function MemberOptionsMenu({
               </Menu.ItemGroup>
 
               <Menu.Item value="copy-link">Copy link</Menu.Item>
+
+              <ReportMemberMenuItem profile={profile} />
 
               {isRoleChangeEnabled && <MemberRoleMenu profile={profile} />}
 
