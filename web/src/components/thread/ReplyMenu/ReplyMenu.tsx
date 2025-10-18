@@ -5,6 +5,11 @@ import { format } from "date-fns/format";
 
 import { MoreAction } from "src/components/site/Action/More";
 
+import { DatagraphItemKind } from "@/api/openapi-schema";
+import {
+  ReportPostMenuItem,
+  truncateBody,
+} from "@/components/report/ReportPostMenuItem";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { EditIcon } from "@/components/ui/icons/Edit";
 import { LinkIcon } from "@/components/ui/icons/Link";
@@ -55,6 +60,15 @@ export function ReplyMenu(props: Props) {
                   </HStack>
                 </Menu.Item>
               )}
+
+              <ReportPostMenuItem
+                menuLabel="Report reply"
+                targetKind={DatagraphItemKind.reply}
+                targetId={props.reply.id}
+                author={props.reply.author}
+                headline={`Reply from ${props.reply.author.name}`}
+                body={truncateBody(props.reply.body)}
+              />
 
               {isEditingEnabled && (
                 <Menu.Item value="edit" onClick={handlers.handleSetEditing}>

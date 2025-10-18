@@ -250,6 +250,18 @@ func (m *Mapping) NotificationUpdate() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) ReportCreate() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) ReportList() (bool, *rbac.Permission) {
+	return true, nil
+}
+
+func (m *Mapping) ReportUpdate() (bool, *rbac.Permission) {
+	return true, nil
+}
+
 func (m *Mapping) ProfileList() (bool, *rbac.Permission) {
 	return false, &rbac.PermissionListProfiles
 }

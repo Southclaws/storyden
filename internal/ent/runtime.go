@@ -31,6 +31,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/propertyschemafield"
 	"github.com/Southclaws/storyden/internal/ent/question"
 	"github.com/Southclaws/storyden/internal/ent/react"
+	"github.com/Southclaws/storyden/internal/ent/report"
 	"github.com/Southclaws/storyden/internal/ent/role"
 	"github.com/Southclaws/storyden/internal/ent/schema"
 	"github.com/Southclaws/storyden/internal/ent/session"
@@ -971,6 +972,49 @@ func init() {
 	// react.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	react.IDValidator = func() func(string) error {
 		validators := reactDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	reportMixin := schema.Report{}.Mixin()
+	reportMixinFields0 := reportMixin[0].Fields()
+	_ = reportMixinFields0
+	reportMixinFields1 := reportMixin[1].Fields()
+	_ = reportMixinFields1
+	reportMixinFields2 := reportMixin[2].Fields()
+	_ = reportMixinFields2
+	reportFields := schema.Report{}.Fields()
+	_ = reportFields
+	// reportDescCreatedAt is the schema descriptor for created_at field.
+	reportDescCreatedAt := reportMixinFields1[0].Descriptor()
+	// report.DefaultCreatedAt holds the default value on creation for the created_at field.
+	report.DefaultCreatedAt = reportDescCreatedAt.Default.(func() time.Time)
+	// reportDescUpdatedAt is the schema descriptor for updated_at field.
+	reportDescUpdatedAt := reportMixinFields2[0].Descriptor()
+	// report.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	report.DefaultUpdatedAt = reportDescUpdatedAt.Default.(func() time.Time)
+	// report.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	report.UpdateDefaultUpdatedAt = reportDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// reportDescStatus is the schema descriptor for status field.
+	reportDescStatus := reportFields[6].Descriptor()
+	// report.DefaultStatus holds the default value on creation for the status field.
+	report.DefaultStatus = reportDescStatus.Default.(string)
+	// reportDescID is the schema descriptor for id field.
+	reportDescID := reportMixinFields0[0].Descriptor()
+	// report.DefaultID holds the default value on creation for the id field.
+	report.DefaultID = reportDescID.Default.(func() xid.ID)
+	// report.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	report.IDValidator = func() func(string) error {
+		validators := reportDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),

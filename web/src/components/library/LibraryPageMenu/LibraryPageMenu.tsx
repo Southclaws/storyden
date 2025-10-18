@@ -8,6 +8,7 @@ import { ButtonProps } from "@/components/ui/button";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
 import { menuItemColorPalette } from "@/styled-system/patterns";
+import { ReportNodeMenuItem } from "@/components/report/ReportNodeMenuItem";
 
 import { Props, useLibraryPageMenu } from "./useLibraryPageMenu";
 
@@ -80,6 +81,8 @@ export function LibraryPageMenu({
                   {op.label}
                 </Menu.Item>
               ))}
+
+              <ReportNodeMenuItem node={node} />
 
               {isManager && (
                 <Menu.Item value="toggle-hide-in-tree">

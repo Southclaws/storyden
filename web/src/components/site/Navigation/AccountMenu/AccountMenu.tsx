@@ -11,6 +11,7 @@ import { DraftsMenuItem } from "../Anchors/Drafts";
 import { LogoutMenuItem } from "../Anchors/Logout";
 import { ProfileMenuItem } from "../Anchors/Profile";
 import { QueueMenuItem } from "../Anchors/Queue";
+import { ReportsMenuItem } from "../Anchors/Reports";
 import { SettingsMenuItem } from "../Anchors/Settings";
 
 type Props = {
@@ -58,6 +59,7 @@ export function AccountMenu({ account, size = "md" }: Props) {
             <Menu.ItemGroup id="content">
               <DraftsMenuItem />
               <QueueMenuItem />
+              <ReportsMenuItem />
             </Menu.ItemGroup>
 
             <Menu.Separator />

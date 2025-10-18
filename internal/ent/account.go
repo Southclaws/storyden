@@ -95,11 +95,15 @@ type AccountEdges struct {
 	Events []*EventParticipant `json:"events,omitempty"`
 	// PostReads holds the value of the post_reads edge.
 	PostReads []*PostRead `json:"post_reads,omitempty"`
+	// Reports holds the value of the reports edge.
+	Reports []*Report `json:"reports,omitempty"`
+	// HandledReports holds the value of the handled_reports edge.
+	HandledReports []*Report `json:"handled_reports,omitempty"`
 	// AccountRoles holds the value of the account_roles edge.
 	AccountRoles []*AccountRoles `json:"account_roles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [22]bool
+	loadedTypes [24]bool
 }
 
 // SessionsOrErr returns the Sessions value or an error if the edge
@@ -293,10 +297,28 @@ func (e AccountEdges) PostReadsOrErr() ([]*PostRead, error) {
 	return nil, &NotLoadedError{edge: "post_reads"}
 }
 
+// ReportsOrErr returns the Reports value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) ReportsOrErr() ([]*Report, error) {
+	if e.loadedTypes[21] {
+		return e.Reports, nil
+	}
+	return nil, &NotLoadedError{edge: "reports"}
+}
+
+// HandledReportsOrErr returns the HandledReports value or an error if the edge
+// was not loaded in eager-loading.
+func (e AccountEdges) HandledReportsOrErr() ([]*Report, error) {
+	if e.loadedTypes[22] {
+		return e.HandledReports, nil
+	}
+	return nil, &NotLoadedError{edge: "handled_reports"}
+}
+
 // AccountRolesOrErr returns the AccountRoles value or an error if the edge
 // was not loaded in eager-loading.
 func (e AccountEdges) AccountRolesOrErr() ([]*AccountRoles, error) {
-	if e.loadedTypes[21] {
+	if e.loadedTypes[23] {
 		return e.AccountRoles, nil
 	}
 	return nil, &NotLoadedError{edge: "account_roles"}
@@ -535,6 +557,16 @@ func (_m *Account) QueryEvents() *EventParticipantQuery {
 // QueryPostReads queries the "post_reads" edge of the Account entity.
 func (_m *Account) QueryPostReads() *PostReadQuery {
 	return NewAccountClient(_m.config).QueryPostReads(_m)
+}
+
+// QueryReports queries the "reports" edge of the Account entity.
+func (_m *Account) QueryReports() *ReportQuery {
+	return NewAccountClient(_m.config).QueryReports(_m)
+}
+
+// QueryHandledReports queries the "handled_reports" edge of the Account entity.
+func (_m *Account) QueryHandledReports() *ReportQuery {
+	return NewAccountClient(_m.config).QueryHandledReports(_m)
 }
 
 // QueryAccountRoles queries the "account_roles" edge of the Account entity.

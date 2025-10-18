@@ -108,5 +108,11 @@ func (Account) Edges() []ent.Edge {
 
 		edge.To("post_reads", PostRead.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("reports", Report.Type).
+			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.To("handled_reports", Report.Type).
+			Annotations(entsql.OnDelete(entsql.SetNull)),
 	}
 }

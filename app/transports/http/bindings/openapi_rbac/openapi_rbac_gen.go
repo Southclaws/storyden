@@ -64,6 +64,9 @@ type OperationPermissions interface {
 	InvitationDelete() (bool, *rbac.Permission)
 	NotificationList() (bool, *rbac.Permission)
 	NotificationUpdate() (bool, *rbac.Permission)
+	ReportCreate() (bool, *rbac.Permission)
+	ReportList() (bool, *rbac.Permission)
+	ReportUpdate() (bool, *rbac.Permission)
 	ProfileList() (bool, *rbac.Permission)
 	ProfileGet() (bool, *rbac.Permission)
 	ProfileFollowersGet() (bool, *rbac.Permission)
@@ -259,6 +262,12 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.NotificationList()
 	case "NotificationUpdate":
 		return optable.NotificationUpdate()
+	case "ReportCreate":
+		return optable.ReportCreate()
+	case "ReportList":
+		return optable.ReportList()
+	case "ReportUpdate":
+		return optable.ReportUpdate()
 	case "ProfileList":
 		return optable.ProfileList()
 	case "ProfileGet":

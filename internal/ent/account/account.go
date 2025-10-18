@@ -82,6 +82,10 @@ const (
 	EdgeEvents = "events"
 	// EdgePostReads holds the string denoting the post_reads edge name in mutations.
 	EdgePostReads = "post_reads"
+	// EdgeReports holds the string denoting the reports edge name in mutations.
+	EdgeReports = "reports"
+	// EdgeHandledReports holds the string denoting the handled_reports edge name in mutations.
+	EdgeHandledReports = "handled_reports"
 	// EdgeAccountRoles holds the string denoting the account_roles edge name in mutations.
 	EdgeAccountRoles = "account_roles"
 	// Table holds the table name of the account in the database.
@@ -229,6 +233,20 @@ const (
 	PostReadsInverseTable = "post_reads"
 	// PostReadsColumn is the table column denoting the post_reads relation/edge.
 	PostReadsColumn = "account_id"
+	// ReportsTable is the table that holds the reports relation/edge.
+	ReportsTable = "reports"
+	// ReportsInverseTable is the table name for the Report entity.
+	// It exists in this package in order to avoid circular dependency with the "report" package.
+	ReportsInverseTable = "reports"
+	// ReportsColumn is the table column denoting the reports relation/edge.
+	ReportsColumn = "reported_by_id"
+	// HandledReportsTable is the table that holds the handled_reports relation/edge.
+	HandledReportsTable = "reports"
+	// HandledReportsInverseTable is the table name for the Report entity.
+	// It exists in this package in order to avoid circular dependency with the "report" package.
+	HandledReportsInverseTable = "reports"
+	// HandledReportsColumn is the table column denoting the handled_reports relation/edge.
+	HandledReportsColumn = "handled_by_id"
 	// AccountRolesTable is the table that holds the account_roles relation/edge.
 	AccountRolesTable = "account_roles"
 	// AccountRolesInverseTable is the table name for the AccountRoles entity.
@@ -664,6 +682,34 @@ func ByPostReads(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByReportsCount orders the results by reports count.
+func ByReportsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newReportsStep(), opts...)
+	}
+}
+
+// ByReports orders the results by reports terms.
+func ByReports(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newReportsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByHandledReportsCount orders the results by handled_reports count.
+func ByHandledReportsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newHandledReportsStep(), opts...)
+	}
+}
+
+// ByHandledReports orders the results by handled_reports terms.
+func ByHandledReports(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newHandledReportsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByAccountRolesCount orders the results by account_roles count.
 func ByAccountRolesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -822,6 +868,20 @@ func newPostReadsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PostReadsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, PostReadsTable, PostReadsColumn),
+	)
+}
+func newReportsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ReportsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ReportsTable, ReportsColumn),
+	)
+}
+func newHandledReportsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(HandledReportsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, HandledReportsTable, HandledReportsColumn),
 	)
 }
 func newAccountRolesStep() *sqlgraph.Step {

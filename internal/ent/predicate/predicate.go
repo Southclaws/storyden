@@ -81,6 +81,9 @@ type Question func(*sql.Selector)
 // React is the predicate function for react builders.
 type React func(*sql.Selector)
 
+// Report is the predicate function for report builders.
+type Report func(*sql.Selector)
+
 // Role is the predicate function for role builders.
 type Role func(*sql.Selector)
 

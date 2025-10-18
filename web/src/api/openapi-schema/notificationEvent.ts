@@ -22,4 +22,10 @@ export const NotificationEvent = {
   post_like: "post_like",
   follow: "follow",
   profile_mention: "profile_mention",
+  event_host_added: "event_host_added",
+  member_attending_event: "member_attending_event",
+  member_declined_event: "member_declined_event",
+  attendee_removed: "attendee_removed",
+  report_submitted: "report_submitted",
+  report_updated: "report_updated",
 } as const;

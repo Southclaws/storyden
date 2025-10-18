@@ -34,6 +34,7 @@ var (
 	PermissionManageSettings        = Permission{`MANAGE_SETTINGS`}
 	PermissionManageSuspensions     = Permission{`MANAGE_SUSPENSIONS`}
 	PermissionManageRoles           = Permission{`MANAGE_ROLES`}
+	PermissionManageReports         = Permission{`MANAGE_REPORTS`}
 	PermissionViewAccounts          = Permission{`VIEW_ACCOUNTS`}
 	PermissionAdministrator         = Permission{`ADMINISTRATOR`}
 )
@@ -119,6 +120,8 @@ func NewPermission(__iNpUt__ string) (Permission, error) {
 		return PermissionManageSuspensions, nil
 	case string(`MANAGE_ROLES`):
 		return PermissionManageRoles, nil
+	case string(`MANAGE_REPORTS`):
+		return PermissionManageReports, nil
 	case string(`VIEW_ACCOUNTS`):
 		return PermissionViewAccounts, nil
 	case string(`ADMINISTRATOR`):

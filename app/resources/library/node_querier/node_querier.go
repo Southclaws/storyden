@@ -405,6 +405,34 @@ func (q *Querier) Probe(ctx context.Context, id library.NodeID) (*library.Node, 
 	return r, nil
 }
 
+// ProbeMany fetches multiple nodes without pulling edges, fast for batch checks.
+func (q *Querier) ProbeMany(ctx context.Context, ids ...library.NodeID) ([]*library.Node, error) {
+	if len(ids) == 0 {
+		return []*library.Node{}, nil
+	}
+
+	xids := dt.Map(ids, func(id library.NodeID) xid.ID {
+		return xid.ID(id)
+	})
+
+	query := q.db.Node.
+		Query().
+		Where(node.IDIn(xids...)).
+		WithOwner()
+
+	nodes, err := query.All(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	result, err := dt.MapErr(nodes, library.MapNode(false, nil))
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return result, nil
+}
+
 func (q *Querier) getRequestingAccount(ctx context.Context, o *options) (opt.Optional[account.AccountWithEdges], error) {
 	if !o.visibilityRules {
 		return nil, nil

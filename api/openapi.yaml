@@ -63,6 +63,8 @@ tags:
     description: Account invitations.
   - name: notifications
     description: Event notifications.
+  - name: reports
+    description: Content and user reports.
   - name: profiles
     description: Public profiles.
   - name: categories
@@ -1051,6 +1053,72 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NotificationUpdateOK" }
+
+  #
+  #                                           888
+  #                                           888
+  #                                           888
+  # 888d888 .d88b.  88888b.   .d88b.  888d888 888888 .d8888b
+  # 888P"  d8P  Y8b 888 "88b d88""88b 888P"   888    88K
+  # 888    88888888 888  888 888  888 888     888    "Y8888b.
+  # 888    Y8b.     888 d88P Y88..88P 888     Y88b.       X88
+  # 888     "Y8888  88888P"   "Y88P"  888      "Y888  88888P'
+  #                 888
+  #                 888
+  #                 888
+  #
+
+  /reports:
+    post:
+      operationId: ReportCreate
+      description: |
+        Create a new report for content or user violations.
+
+        Reports can be against any kind of user-generated content as well as
+        members themselves. The kind of report is specified in the request body
+        which dictates which resource the `id` field refers to.
+      tags: [reports]
+      requestBody: { $ref: "#/components/requestBodies/ReportCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ReportCreateOK" }
+    get:
+      operationId: ReportList
+      description: |
+        List reports. Regular members see only their own reports. Members with
+        `MANAGE_REPORTS` permission will see all submitted reports. Reports can
+        be filtered by status. By default filters open and acknowledged reports.
+        Returns a list ordered by most recently updated.
+      tags: [reports]
+      parameters:
+        - $ref: "#/components/parameters/PaginationQuery"
+        - $ref: "#/components/parameters/ReportStatusQuery"
+        - $ref: "#/components/parameters/ReportKindQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/ReportListOK" }
+
+  /reports/{report_id}:
+    patch:
+      operationId: ReportUpdate
+      description: |
+        Update a report's status and optionally assign handler. Requires the
+        `MANAGE_REPORTS` permission to set the status to anything other than
+        closed. In other words, regular members can only close their own reports
+        while "moderators" can acknowledge, assign and resolve reports.
+      tags: [reports]
+      parameters: [$ref: "#/components/parameters/ReportIDParam"]
+      requestBody: { $ref: "#/components/requestBodies/ReportUpdate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/ReportUpdateOK" }
 
   #
   #                           .d888 d8b 888
@@ -2334,6 +2402,30 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    ReportIDParam:
+      description: Unique report ID.
+      name: report_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
+    ReportStatusQuery:
+      description: Report status filter.
+      name: status
+      in: query
+      required: false
+      schema:
+        $ref: "#/components/schemas/ReportStatus"
+
+    ReportKindQuery:
+      description: Report target kind filter.
+      name: kind
+      in: query
+      required: false
+      schema:
+        type: string
+
     ThreadMarkParam:
       description: Thread unique and permanent identifier.
       name: thread_mark
@@ -2743,6 +2835,16 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/NotificationMutableProps" }
 
+    ReportCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ReportInitialProps" }
+
+    ReportUpdate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ReportMutableProps" }
+
     CategoryCreate:
       content:
         application/json:
@@ -3082,6 +3184,27 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Notification"
+
+    ReportCreateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Report"
+
+    ReportListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ReportListResult"
+
+    ReportUpdateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Report"
 
     ProfileListOK:
       description: OK
@@ -3923,6 +4046,7 @@ components:
         - "MANAGE_SETTINGS"
         - "MANAGE_SUSPENSIONS"
         - "MANAGE_ROLES"
+        - "MANAGE_REPORTS"
         - "VIEW_ACCOUNTS"
         # Administrator implicitly has all permissions.
         - "ADMINISTRATOR"
@@ -4644,7 +4768,17 @@ components:
         The kind of event that triggered the notification.
         Identical to the `notification.Event` enumerated type.
       type: string
-      enum: [thread_reply, post_like, follow, profile_mention]
+      enum:
+        - thread_reply
+        - post_like
+        - follow
+        - profile_mention
+        - event_host_added
+        - member_attending_event
+        - member_declined_event
+        - attendee_removed
+        - report_submitted
+        - report_updated
 
     NotificationStatus:
       type: string
@@ -4656,6 +4790,85 @@ components:
 
     NotificationCount:
       type: integer
+
+    #
+    # 8888888b.                                    888
+    # 888   Y88b                                   888
+    # 888    888                                   888
+    # 888   d88P .d88b.  88888b.   .d88b.  888d888 888888
+    # 8888888P" d8P  Y8b 888 "88b d88""88b 888P"   888
+    # 888 T88b  88888888 888  888 888  888 888     888
+    # 888  T88b Y8b.     888 d88P Y88..88P 888     Y88b.
+    # 888   T88b "Y8888  88888P"   "Y88P"  888      "Y888
+    #                    888
+    #                    888
+    #                    888
+    #
+
+    Report:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/CommonProperties"
+        - $ref: "#/components/schemas/ReportRefProps"
+        - $ref: "#/components/schemas/ReportProps"
+
+    ReportList:
+      type: array
+      items: { $ref: "#/components/schemas/Report" }
+
+    ReportListResult:
+      type: object
+      allOf:
+        - { $ref: "#/components/schemas/PaginatedResult" }
+        - type: object
+          required: [reports]
+          properties:
+            reports: { $ref: "#/components/schemas/ReportList" }
+
+    ReportProps:
+      type: object
+      properties:
+        item: { $ref: "#/components/schemas/DatagraphItem" }
+
+    ReportRefProps:
+      type: object
+      required: [target_id, target_kind, reported_by, status]
+      properties:
+        target_id:
+          $ref: "#/components/schemas/Identifier"
+        target_kind:
+          $ref: "#/components/schemas/DatagraphItemKind"
+        reported_by:
+          $ref: "#/components/schemas/ProfileReference"
+        handled_by:
+          $ref: "#/components/schemas/ProfileReference"
+        comment:
+          type: string
+        status:
+          $ref: "#/components/schemas/ReportStatus"
+
+    ReportInitialProps:
+      type: object
+      required: [target_id, target_kind]
+      properties:
+        target_id:
+          $ref: "#/components/schemas/Identifier"
+        target_kind:
+          $ref: "#/components/schemas/DatagraphItemKind"
+        comment:
+          type: string
+
+    ReportMutableProps:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/ReportStatus"
+        handled_by:
+          $ref: "#/components/schemas/Identifier"
+
+    ReportStatus:
+      type: string
+      enum: [submitted, acknowledged, resolved]
 
     #
     # 8888888b.                   .d888 d8b 888
