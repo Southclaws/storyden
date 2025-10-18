@@ -122,7 +122,14 @@ func (q *Querier) hydrateRefs(ctx context.Context, refs report.ReportRefs) (repo
 	pids := dt.Map(grouped[datagraph.KindPost], func(r *report.ReportRef) post.ID {
 		return post.ID(r.TargetRef.ID)
 	})
-	posts, err := q.postSearcher.GetMany(ctx, pids...)
+	tids := dt.Map(grouped[datagraph.KindThread], func(r *report.ReportRef) post.ID {
+		return post.ID(r.TargetRef.ID)
+	})
+	rids := dt.Map(grouped[datagraph.KindReply], func(r *report.ReportRef) post.ID {
+		return post.ID(r.TargetRef.ID)
+	})
+	allIDs := append(append(pids, tids...), rids...)
+	posts, err := q.postSearcher.GetMany(ctx, allIDs...)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -141,7 +148,7 @@ func (q *Querier) hydrateRefs(ctx context.Context, refs report.ReportRefs) (repo
 		var item datagraph.Item
 
 		switch r.TargetRef.Kind {
-		case datagraph.KindPost:
+		case datagraph.KindPost, datagraph.KindThread, datagraph.KindReply:
 			p := pg[post.ID(r.TargetRef.ID)]
 			if p != nil {
 				item = p

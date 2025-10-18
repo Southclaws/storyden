@@ -5,6 +5,7 @@ import (
 
 	"github.com/Southclaws/storyden/app/services/report/member_report"
 	"github.com/Southclaws/storyden/app/services/report/report_manager"
+	"github.com/Southclaws/storyden/app/services/report/report_notify"
 )
 
 func Build() fx.Option {
@@ -13,5 +14,6 @@ func Build() fx.Option {
 			member_report.New,
 			report_manager.New,
 		),
+		report_notify.Build(),
 	)
 }

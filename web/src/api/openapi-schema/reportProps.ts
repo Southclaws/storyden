@@ -10,5 +10,5 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type { DatagraphItem } from "./datagraphItem";
 
 export interface ReportProps {
-  item: DatagraphItem;
+  item?: DatagraphItem;
 }

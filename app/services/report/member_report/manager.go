@@ -11,25 +11,30 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/report"
 	"github.com/Southclaws/storyden/app/resources/report/report_querier"
 	"github.com/Southclaws/storyden/app/resources/report/report_writer"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Manager struct {
 	reportQuerier *report_querier.Querier
 	reportWriter  *report_writer.Writer
+	bus           *pubsub.Bus
 }
 
 func New(
 	reportQuerier *report_querier.Querier,
 	reportWriter *report_writer.Writer,
+	bus *pubsub.Bus,
 ) *Manager {
 	return &Manager{
 		reportQuerier: reportQuerier,
 		reportWriter:  reportWriter,
+		bus:           bus,
 	}
 }
 
@@ -48,6 +53,17 @@ func (m *Manager) Submit(
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	var targetRef *datagraph.Ref
+	if rep.TargetItem != nil {
+		targetRef = datagraph.NewRef(rep.TargetItem)
+	}
+
+	m.bus.Publish(ctx, &message.EventReportCreated{
+		ID:         rep.ID,
+		Target:     targetRef,
+		ReportedBy: rep.ReportedBy.ID,
+	})
 
 	return rep, nil
 }
@@ -104,6 +120,21 @@ func (m *Manager) Resolve(
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	var targetRef *datagraph.Ref
+	if rep.TargetItem != nil {
+		targetRef = datagraph.NewRef(rep.TargetItem)
+	}
+
+	m.bus.Publish(ctx, &message.EventReportUpdated{
+		ID:         rep.ID,
+		Target:     targetRef,
+		ReportedBy: rep.ReportedBy.ID,
+		HandledBy: opt.Map(rep.HandledBy, func(a account.Account) account.AccountID {
+			return a.ID
+		}),
+		Status: rep.Status,
+	})
 
 	return rep, nil
 }
