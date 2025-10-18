@@ -11,6 +11,8 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
@@ -25,17 +27,20 @@ type Querier struct {
 	db             *ent.Client
 	postSearcher   post_search.Repository
 	profileQuerier *profile_querier.Querier
+	nodeQuerier    *node_querier.Querier
 }
 
 func New(
 	db *ent.Client,
 	postSearcher post_search.Repository,
 	profileQuerier *profile_querier.Querier,
+	nodeQuerier *node_querier.Querier,
 ) *Querier {
 	return &Querier{
 		db:             db,
 		postSearcher:   postSearcher,
 		profileQuerier: profileQuerier,
+		nodeQuerier:    nodeQuerier,
 	}
 }
 
@@ -119,6 +124,8 @@ func (q *Querier) hydrateRefs(ctx context.Context, refs report.ReportRefs) (repo
 		return r.TargetRef.Kind
 	})
 
+	// post related reports
+
 	pids := dt.Map(grouped[datagraph.KindPost], func(r *report.ReportRef) post.ID {
 		return post.ID(r.TargetRef.ID)
 	})
@@ -135,6 +142,8 @@ func (q *Querier) hydrateRefs(ctx context.Context, refs report.ReportRefs) (repo
 	}
 	pg := lo.KeyBy(posts, func(p *post.Post) post.ID { return p.ID })
 
+	// profile related reports
+
 	profileIDs := dt.Map(grouped[datagraph.KindProfile], func(r *report.ReportRef) account.AccountID {
 		return account.AccountID(r.TargetRef.ID)
 	})
@@ -143,6 +152,17 @@ func (q *Querier) hydrateRefs(ctx context.Context, refs report.ReportRefs) (repo
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 	profilesMap := lo.KeyBy(profiles, func(p *profile.Public) account.AccountID { return p.ID })
+
+	// node related reports
+
+	nodeIDs := dt.Map(grouped[datagraph.KindNode], func(r *report.ReportRef) library.NodeID {
+		return library.NodeID(r.TargetRef.ID)
+	})
+	nodes, err := q.nodeQuerier.ProbeMany(ctx, nodeIDs...)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+	nodesMap := lo.KeyBy(nodes, func(n *library.Node) xid.ID { return n.GetID() })
 
 	reports := dt.Map(refs, func(r *report.ReportRef) *report.Report {
 		var item datagraph.Item
@@ -158,6 +178,11 @@ func (q *Querier) hydrateRefs(ctx context.Context, refs report.ReportRefs) (repo
 			p := profilesMap[account.AccountID(r.TargetRef.ID)]
 			if p != nil {
 				item = p
+			}
+		case datagraph.KindNode:
+			n := nodesMap[r.TargetRef.ID]
+			if n != nil {
+				item = n
 			}
 		}
 
