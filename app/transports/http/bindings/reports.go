@@ -68,7 +68,7 @@ func (h *Reports) ReportList(ctx context.Context, request openapi.ReportListRequ
 
 	page := deserialisePageParams(request.Params.Page, 50)
 
-	canManageReports := permissions.HasAny(rbac.PermissionManageReports)
+	canManageReports := permissions.HasAny(rbac.PermissionManageReports, rbac.PermissionAdministrator)
 
 	var result pagination.Result[*report.Report]
 	var err error
@@ -121,7 +121,7 @@ func (h *Reports) ReportUpdate(ctx context.Context, request openapi.ReportUpdate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	canManageReports := permissions.HasAny(rbac.PermissionManageReports)
+	canManageReports := permissions.HasAny(rbac.PermissionManageReports, rbac.PermissionAdministrator)
 
 	var r *report.Report
 
