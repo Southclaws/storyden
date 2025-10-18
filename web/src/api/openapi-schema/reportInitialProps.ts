@@ -7,10 +7,11 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.25.8-canary
  */
+import type { DatagraphItemKind } from "./datagraphItemKind";
 import type { Identifier } from "./identifier";
 
 export interface ReportInitialProps {
   comment?: string;
   target_id: Identifier;
-  target_kind: string;
+  target_kind: DatagraphItemKind;
 }

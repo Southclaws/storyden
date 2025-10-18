@@ -4837,7 +4837,7 @@ components:
         target_id:
           $ref: "#/components/schemas/Identifier"
         target_kind:
-          type: string
+          $ref: "#/components/schemas/DatagraphItemKind"
         reported_by:
           $ref: "#/components/schemas/ProfileReference"
         handled_by:
@@ -4854,7 +4854,7 @@ components:
         target_id:
           $ref: "#/components/schemas/Identifier"
         target_kind:
-          type: string
+          $ref: "#/components/schemas/DatagraphItemKind"
         comment:
           type: string
 

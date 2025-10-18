@@ -42,7 +42,7 @@ func (h *Reports) ReportCreate(ctx context.Context, request openapi.ReportCreate
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	targetKind, err := datagraph.NewKind(request.Body.TargetKind)
+	targetKind, err := datagraph.NewKind(string(request.Body.TargetKind))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -66,7 +66,7 @@ func (h *Reports) ReportList(ctx context.Context, request openapi.ReportListRequ
 	roles := session.GetRoles(ctx)
 	permissions := roles.Permissions()
 
-	page := deserialisePageParams(request.Params.Page, 50)
+	page := deserialisePageParams(request.Params.Page, 10)
 
 	canManageReports := permissions.HasAny(rbac.PermissionManageReports, rbac.PermissionAdministrator)
 
@@ -183,7 +183,7 @@ func serialiseReport(in *report.Report) openapi.Report {
 		CreatedAt:  in.CreatedAt,
 		UpdatedAt:  in.UpdatedAt,
 		TargetId:   in.TargetItem.GetID().String(),
-		TargetKind: in.TargetItem.GetKind().String(),
+		TargetKind: openapi.DatagraphItemKind(in.TargetItem.GetKind().String()),
 		Item:       item.Ptr(),
 		ReportedBy: serialiseProfileReferenceFromAccount(in.ReportedBy),
 		HandledBy:  opt.Map(in.HandledBy, serialiseProfileReferenceFromAccount).Ptr(),
