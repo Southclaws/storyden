@@ -4,6 +4,7 @@ import { Thread } from "src/api/openapi-schema";
 import { Anchor } from "src/components/site/Anchor";
 
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
+import { ContentComposerMarkdown } from "@/components/content/ContentComposerMarkdown/ContentComposerMarkdown";
 import { MemberIdent } from "@/components/member/MemberBadge/MemberIdent";
 import { Button } from "@/components/ui/button";
 import { DiscussionIcon } from "@/components/ui/icons/Discussion";
@@ -78,7 +79,13 @@ function ReplyBodyInput({
           onChange(value);
         }
 
-        return <ContentComposer onChange={handleChange} resetKey={resetKey} />;
+        // return <ContentComposer onChange={handleChange} resetKey={resetKey} />;
+        return (
+          <ContentComposerMarkdown
+            onChange={handleChange}
+            resetKey={resetKey}
+          />
+        );
       }}
       control={control}
       name={name}
