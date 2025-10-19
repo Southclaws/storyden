@@ -29,6 +29,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/profile/following"
 	"github.com/Southclaws/storyden/app/services/react_manager"
 	"github.com/Southclaws/storyden/app/services/reply"
+	"github.com/Southclaws/storyden/app/services/report"
 	"github.com/Southclaws/storyden/app/services/search"
 	"github.com/Southclaws/storyden/app/services/semdex/semdexer"
 	"github.com/Southclaws/storyden/app/services/system/instance_info"
@@ -48,6 +49,7 @@ func Build() fx.Option {
 		category.Build(),
 		thread.Build(),
 		reply.Build(),
+		report.Build(),
 		post_liker.Build(),
 		react_manager.Build(),
 		search.Build(),

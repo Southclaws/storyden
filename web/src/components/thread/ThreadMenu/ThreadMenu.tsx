@@ -5,8 +5,13 @@ import { format } from "date-fns/format";
 
 import { MoreAction } from "src/components/site/Action/More";
 
+import { DatagraphItemKind } from "@/api/openapi-schema";
 import { CategoryMoveMenu } from "@/components/category/CategoryMoveMenu/CategoryMoveMenu";
 import { MemberBadge } from "@/components/member/MemberBadge/MemberBadge";
+import {
+  ReportPostMenuItem,
+  truncateBody,
+} from "@/components/report/ReportPostMenuItem";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { DeleteIcon } from "@/components/ui/icons/Delete";
 import { EditIcon } from "@/components/ui/icons/Edit";
@@ -78,6 +83,15 @@ export function ThreadMenu(props: Props) {
                   </HStack>
                 </Menu.Item>
               )}
+
+              <ReportPostMenuItem
+                menuLabel="Report thread"
+                targetKind={DatagraphItemKind.thread}
+                targetId={thread.id}
+                author={thread.author}
+                headline={thread.title || "Untitled thread"}
+                body={truncateBody(thread.description)}
+              />
 
               {isEditingEnabled && (
                 <Menu.Item value="edit" onClick={handlers.handleEdit}>

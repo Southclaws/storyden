@@ -14,7 +14,7 @@ export function hasPermission(account?: Account, ...permissions: Permission[]) {
     return true;
   }
 
-  return permissions.every((permission) => accountPermissions.has(permission));
+  return permissions.some((permission) => accountPermissions.has(permission));
 }
 
 export function hasPermissionOr(

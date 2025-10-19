@@ -108,9 +108,21 @@ function getNotificationContent(n: Notification) {
       return { description: "replied to your post", url: `/t/${p?.slug}` };
     case "post_like":
       return { description: "liked your post", url: `/t/${p?.slug}` };
-    case "profile_mention":
-      return { description: "mentioned you", url: `/t/${p?.slug}` };
     case "follow":
       return { description: "followed you", url: `/m/${n.source?.handle}` };
+    case "profile_mention":
+      return { description: "mentioned you", url: `/t/${p?.slug}` };
+    case "event_host_added":
+      return { description: "added you as an event host", url: `#` }; // not implemented
+    case "member_attending_event":
+      return { description: "is attending your event", url: `#` }; // not implemented
+    case "member_declined_event":
+      return { description: "declined your event", url: `#` }; // not implemented
+    case "attendee_removed":
+      return { description: "removed you from their event", url: `#` }; // not implemented
+    case "report_submitted":
+      return { description: "submitted a report", url: `/reports` };
+    case "report_updated":
+      return { description: "report status updated", url: `/reports` };
   }
 }

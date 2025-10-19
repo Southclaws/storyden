@@ -1,6 +1,7 @@
 import { timestamp } from "src/utils/date";
 
 import { styled } from "@/styled-system/jsx";
+import { JsxStyleProps } from "@/styled-system/types";
 
 import { Anchor } from "./Anchor";
 
@@ -10,12 +11,12 @@ type Props = {
   large?: boolean;
 };
 
-export function Timestamp(props: Props) {
-  const { created } = props;
+export function Timestamp(props: Props & JsxStyleProps) {
+  const { created, href, large, ...rest } = props;
 
   const createdDate = normaliseDate(created);
 
-  const createdAt = timestamp(createdDate, !props.large);
+  const createdAt = timestamp(createdDate, !large);
 
   return (
     <styled.span
@@ -24,10 +25,11 @@ export function Timestamp(props: Props) {
       minW="fit"
       flexShrink="0"
       overflow="hidden"
+      {...rest}
     >
-      {props.href ? (
-        <Anchor className="timestamp__anchor" href={props.href}>
-          {props.large && (
+      {href ? (
+        <Anchor className="timestamp__anchor" href={href}>
+          {large && (
             <styled.span className="timestamp__label fluid-font-size">
               created
             </styled.span>
@@ -35,7 +37,12 @@ export function Timestamp(props: Props) {
           {createdAt}
         </Anchor>
       ) : (
-        <styled.span className="timestamp__time">{createdAt}</styled.span>
+        <styled.time
+          className="timestamp__time"
+          dateTime={createdDate.toISOString()}
+        >
+          {createdAt}
+        </styled.time>
       )}
     </styled.span>
   );

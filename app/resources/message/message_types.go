@@ -11,6 +11,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/event/event_ref"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/post"
+	"github.com/Southclaws/storyden/app/resources/report"
 	"github.com/Southclaws/storyden/internal/infrastructure/mailer"
 )
 
@@ -155,6 +156,24 @@ type CommandSendEmail struct {
 type CommandSendBeacon struct {
 	Item    datagraph.Ref
 	Subject opt.Optional[account.AccountID]
+}
+
+// -
+// Reports
+// -
+
+type EventReportCreated struct {
+	ID         report.ID
+	Target     *datagraph.Ref
+	ReportedBy account.AccountID
+}
+
+type EventReportUpdated struct {
+	ID         report.ID
+	Target     *datagraph.Ref
+	ReportedBy account.AccountID
+	HandledBy  opt.Optional[account.AccountID]
+	Status     report.Status
 }
 
 // -
