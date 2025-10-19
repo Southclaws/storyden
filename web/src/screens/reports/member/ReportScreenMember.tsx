@@ -48,7 +48,7 @@ export function ReportScreenMember(props: Props) {
   if (!ready) {
     return <Unready error={error} />;
   }
-  const { reports, results, current_page, total_pages, page_size } = data!;
+  const { reports, results, current_page, total_pages, page_size } = data;
   return (
     <LStack gap="4">
       <Heading>Reports</Heading>
