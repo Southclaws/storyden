@@ -123,6 +123,6 @@ function getNotificationContent(n: Notification) {
     case "report_submitted":
       return { description: "submitted a report", url: `/reports` };
     case "report_updated":
-      return { description: "updated a report", url: `/reports` };
+      return { description: "report status updated", url: `/reports` };
   }
 }
