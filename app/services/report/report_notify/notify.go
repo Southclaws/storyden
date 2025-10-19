@@ -116,7 +116,7 @@ func sendReportUpdated(
 	}
 
 	for _, acc := range accs {
-		if err := notifier.Send(ctx, acc.ID, opt.New(source), notification.EventReportSubmitted, nil); err != nil {
+		if err := notifier.Send(ctx, acc.ID, opt.New(source), notification.EventReportUpdated, nil); err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 	}
