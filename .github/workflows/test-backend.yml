@@ -35,6 +35,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+          -c max_connections=200
 
     env:
       DATABASE_URL: "postgresql://default:default@localhost:5432/postgres?sslmode=disable"
@@ -55,4 +56,4 @@ jobs:
             ${{ runner.os }}-go-
       - run: go build ./cmd/backend
       - run: go run ./cmd/migrate
-      - run: go test ./...
+      - run: go test -p 4 ./...
