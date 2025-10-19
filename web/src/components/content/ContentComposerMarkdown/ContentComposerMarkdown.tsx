@@ -3,34 +3,35 @@ import Markdown from "react-markdown";
 
 import { Switch } from "@/components/ui/switch";
 import { LStack, WStack, styled } from "@/styled-system/jsx";
+import { htmlToMarkdown, markdownToHTML } from "@/utils/markdown";
 
 type Props = {
   onChange: (value: string, isEmpty: boolean) => void;
   resetKey: string;
+  initialValue?: string;
 };
 
 export function ContentComposerMarkdown(props: Props) {
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState(() => {
+    if (props.initialValue) {
+      return htmlToMarkdown(props.initialValue);
+    }
+    return "";
+  });
   const [showPreview, setShowPreview] = useState(false);
 
-  // This is a huge hack but it means the composer doesn't need to be made into
-  // a controlled component. Baiscally, if the resetKey changes, we reset the
-  // content of the editor to the initial value or empty paragraph. Hacky? Yes.
   useEffect(() => {
-    console.log("resetKey changed", props.resetKey);
-    if (props.resetKey && value) {
-      console.log("resetting to empty from", value);
+    if (props.resetKey) {
       setValue("");
-      return;
     }
-  }, [setValue, props.resetKey]);
+  }, [props.resetKey]);
 
   async function onChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
     const markdownRaw = e.target.value;
 
     setValue(markdownRaw);
 
-    const html = /* convert markdownRaw to HTML */ markdownRaw;
+    const html = await markdownToHTML(markdownRaw);
 
     const isEmpty = markdownRaw.trim().length === 0 || html.trim().length === 0;
 
