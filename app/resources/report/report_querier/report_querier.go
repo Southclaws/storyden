@@ -201,10 +201,6 @@ func (q *Querier) hydrateRefs(ctx context.Context, refs report.ReportRefs) (repo
 		}
 	})
 
-	reports = dt.Filter(reports, func(r *report.Report) bool {
-		return r != nil
-	})
-
 	return reports, nil
 }
 
