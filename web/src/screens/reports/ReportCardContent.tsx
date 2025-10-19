@@ -79,7 +79,7 @@ function PostContent({ item }: PostContentProps) {
         <WStack>
           {path ? (
             <Link href={path}>
-              <styled.h3 fontWeight="medium" fontSize="md" lineClamp={2} _hover={{ textDecoration: "underline" }}>
+              <styled.h3 fontWeight="medium" fontSize="md" lineClamp={1}>
                 {ref.title || "(Untitled post)"}
               </styled.h3>
             </Link>
@@ -88,7 +88,7 @@ function PostContent({ item }: PostContentProps) {
               {ref.title || "(Untitled post)"}
             </styled.h3>
           )}
-          <Timestamp created={ref.createdAt} />
+          <Timestamp created={ref.createdAt} color="fg.subtle" large />
         </WStack>
 
         <HStack gap="2" fontSize="sm" color="fg.subtle" flexWrap="wrap">
@@ -113,7 +113,7 @@ function NodeContent({ item }: NodeContentProps) {
         <WStack>
           {path ? (
             <Link href={path}>
-              <styled.h3 fontWeight="medium" fontSize="md" lineClamp={2} _hover={{ textDecoration: "underline" }}>
+              <styled.h3 fontWeight="medium" fontSize="md" lineClamp={1}>
                 {ref.name}
               </styled.h3>
             </Link>
@@ -122,7 +122,7 @@ function NodeContent({ item }: NodeContentProps) {
               {ref.name}
             </styled.h3>
           )}
-          <Timestamp created={ref.createdAt} />
+          <Timestamp created={ref.createdAt} color="fg.subtle" large />
         </WStack>
 
         <LStack>
@@ -152,7 +152,7 @@ function ProfileContent({ item }: ProfileContentProps) {
         <WStack>
           {path ? (
             <Link href={path}>
-              <styled.h3 fontWeight="medium" fontSize="md" _hover={{ textDecoration: "underline" }}>
+              <styled.h3 fontWeight="medium" fontSize="md" lineClamp={1}>
                 {ref.name}
               </styled.h3>
             </Link>
@@ -161,7 +161,7 @@ function ProfileContent({ item }: ProfileContentProps) {
               {ref.name}
             </styled.h3>
           )}
-          <Timestamp created={ref.createdAt} />
+          <Timestamp created={ref.createdAt} color="fg.subtle" large />
         </WStack>
 
         <MemberBadge profile={ref} size="sm" name="handle" />
