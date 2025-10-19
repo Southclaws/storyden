@@ -179,6 +179,7 @@ func (q *Querier) hydrateRefs(ctx context.Context, refs report.ReportRefs) (repo
 			if p != nil {
 				item = p
 			}
+
 		case datagraph.KindNode:
 			n := nodesMap[r.TargetRef.ID]
 			if n != nil {
@@ -187,14 +188,16 @@ func (q *Querier) hydrateRefs(ctx context.Context, refs report.ReportRefs) (repo
 		}
 
 		return &report.Report{
-			ID:         r.ID,
-			TargetItem: item,
-			ReportedBy: r.ReportedBy,
-			HandledBy:  r.HandledBy,
-			Comment:    r.Comment,
-			Status:     r.Status,
-			CreatedAt:  r.CreatedAt,
-			UpdatedAt:  r.UpdatedAt,
+			ID:             r.ID,
+			TargetItemKind: r.TargetRef.Kind,
+			TargetItemID:   xid.ID(r.TargetRef.ID),
+			TargetItem:     item,
+			ReportedBy:     r.ReportedBy,
+			HandledBy:      r.HandledBy,
+			Comment:        r.Comment,
+			Status:         r.Status,
+			CreatedAt:      r.CreatedAt,
+			UpdatedAt:      r.UpdatedAt,
 		}
 	})
 

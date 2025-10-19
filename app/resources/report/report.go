@@ -20,11 +20,13 @@ type Report struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 
-	Status     Status
-	TargetItem datagraph.Item
-	ReportedBy account.Account
-	HandledBy  opt.Optional[account.Account]
-	Comment    opt.Optional[string]
+	Status         Status
+	TargetItemKind datagraph.Kind
+	TargetItemID   xid.ID
+	TargetItem     datagraph.Item
+	ReportedBy     account.Account
+	HandledBy      opt.Optional[account.Account]
+	Comment        opt.Optional[string]
 }
 
 type Reports []*Report
