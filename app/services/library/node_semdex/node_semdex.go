@@ -87,10 +87,15 @@ func newSemdexer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		err := re.reindex(hctx, DefaultReindexThreshold, DefaultReindexChunk)
-		if err != nil {
-			return err
-		}
+		go func() {
+			// TODO: Use something cleverer for this. Perhaps an event emitted
+			// once the http server does its boot at the root of the DI tree.
+			time.Sleep(time.Second * 10)
+			err := re.reindex(hctx, DefaultReindexThreshold, DefaultReindexChunk)
+			if err != nil {
+				re.logger.Error("failed to run initial reindex job", slog.String("error", err.Error()))
+			}
+		}()
 
 		go re.schedule(ctx, DefaultReindexSchedule, DefaultReindexThreshold, DefaultReindexChunk)
 
