@@ -37,7 +37,12 @@ export function Timestamp(props: Props & JsxStyleProps) {
           {createdAt}
         </Anchor>
       ) : (
-        <styled.time className="timestamp__time">{createdAt}</styled.time>
+        <styled.time
+          className="timestamp__time"
+          dateTime={createdDate.toISOString()}
+        >
+          {createdAt}
+        </styled.time>
       )}
     </styled.span>
   );
