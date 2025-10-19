@@ -8,6 +8,7 @@ import { UseDisclosureProps } from "src/utils/useDisclosure";
 
 import { handle } from "@/api/client";
 import { reportCreate } from "@/api/openapi-client/reports";
+import { DatagraphItemKind } from "@/api/openapi-schema";
 import { Button } from "@/components/ui/button";
 import { FormControl } from "@/components/ui/form/FormControl";
 import { FormErrorText } from "@/components/ui/form/FormErrorText";
@@ -28,7 +29,7 @@ export type ReportModalProps = UseDisclosureProps & {
   description: ReactNode;
   subject?: ReactNode;
   targetId: string;
-  targetKind: string;
+  targetKind: DatagraphItemKind;
   submitLabel?: string;
   successMessage?: string;
   loadingMessage?: string;
