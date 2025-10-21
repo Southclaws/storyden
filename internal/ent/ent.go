@@ -31,6 +31,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+
+	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/property"
@@ -122,6 +124,7 @@ func checkColumn(t, c string) error {
 			mentionprofile.Table:      mentionprofile.ValidColumn,
 			node.Table:                node.ValidColumn,
 			notification.Table:        notification.ValidColumn,
+			entplugin.Table:           entplugin.ValidColumn,
 			post.Table:                post.ValidColumn,
 			postread.Table:            postread.ValidColumn,
 			property.Table:            property.ValidColumn,

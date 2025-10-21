@@ -53,6 +53,8 @@ tags:
     description: General metadata for the instance and uncategorised routes.
   - name: admin
     description: Administration and configuration settings.
+  - name: plugins
+    description: Management of plugins.
   - name: roles
     description: Roles for permissions and aesthetics.
   - name: auth
@@ -377,6 +379,90 @@ paths:
         "400": { $ref: "#/components/responses/BadRequest" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "204": { $ref: "#/components/responses/NoContent" }
+
+  #
+  #          888                   d8b
+  #          888                   Y8P
+  #          888
+  # 88888b.  888 888  888  .d88b.  888 88888b.  .d8888b
+  # 888 "88b 888 888  888 d88P"88b 888 888 "88b 88K
+  # 888  888 888 888  888 888  888 888 888  888 "Y8888b.
+  # 888 d88P 888 Y88b 888 Y88b 888 888 888  888      X88
+  # 88888P"  888  "Y88888  "Y88888 888 888  888  88888P'
+  # 888                        888
+  # 888                   Y8b d88P
+  # 888                    "Y88P"
+  #
+
+  /plugins:
+    get:
+      operationId: PluginList
+      description: List all plugins that are installed on the instance.
+      tags: [plugins]
+      security: [browser: []]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "200": { $ref: "#/components/responses/PluginListOK" }
+    post:
+      operationId: PluginAdd
+      description: |
+        Add a plugin to the instance. This will not install or activate the
+        plugin immediately. It will validate and prepare the plugin for install.
+
+        Plugins can be uploaded directly as files or via a URL to a repository.
+      tags: [plugins]
+      security: [browser: []]
+      requestBody: { $ref: "#/components/requestBodies/PluginAdd" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginGetOK" }
+
+  /plugins/{plugin_instance_id}:
+    get:
+      operationId: PluginGet
+      description: Get information about a specific plugin.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "200": { $ref: "#/components/responses/PluginGetOK" }
+    delete:
+      operationId: PluginDelete
+      description: |
+        Completely delete a plugin from the instance. This will uninstall the
+        plugin first then remove its binary file from the storage backend.
+
+        Some plugins may write additional data to the instance, this will not
+        be removed by this operation unless the plugin cleans up after itself.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "204": { $ref: "#/components/responses/NoContent" }
+
+  /plugins/{plugin_instance_id}/active:
+    patch:
+      operationId: PluginSetActiveState
+      description: |
+        Change the active state of a plugin. When activated, the plugin will
+        install itself and become available for use. When deactivated, This will
+        uninstall the plugin but keep its data and config for reactivation.
+      tags: [plugins]
+      security: [browser: []]
+      parameters: [{ $ref: "#/components/parameters/PluginIDParam" }]
+      requestBody: { $ref: "#/components/requestBodies/PluginSetActiveState" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/PluginGetOK" }
 
   #
   #                 888
@@ -2467,6 +2553,14 @@ components:
       schema:
         $ref: "#/components/schemas/Identifier"
 
+    PluginIDParam:
+      description: Plugin ID.
+      in: path
+      name: plugin_instance_id
+      required: true
+      schema:
+        $ref: "#/components/schemas/Identifier"
+
     RoleIDParam:
       description: Role ID
       in: path
@@ -2961,6 +3055,20 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/ModerationActionInitialProps" }
 
+    PluginAdd:
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+        application/json:
+          schema: { $ref: "#/components/schemas/PluginInitialProps" }
+
+    PluginSetActiveState:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/PluginActiveStateMutableProps" }
+
     RoleCreate:
       content:
         application/json:
@@ -3284,6 +3392,20 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/AuditEvent"
+
+    PluginListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PluginListResult"
+
+    PluginGetOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Plugin"
 
     AuditEventCreatedOK:
       description: OK
@@ -4446,6 +4568,146 @@ components:
         - nodes
         - collections
         - profile_bio
+
+    #
+    # 8888888b.  888                   d8b
+    # 888   Y88b 888                   Y8P
+    # 888    888 888
+    # 888   d88P 888 888  888  .d88b.  888 88888b.
+    # 8888888P"  888 888  888 d88P"88b 888 888 "88b
+    # 888        888 888  888 888  888 888 888  888
+    # 888        888 Y88b 888 Y88b 888 888 888  888
+    # 888        888  "Y88888  "Y88888 888 888  888
+    #                              888
+    #                         Y8b d88P
+    #                          "Y88P"
+    #
+
+    Plugin:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/PluginProps"
+
+    PluginProps:
+      type: object
+      required: [id, added_at, status, manifest]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+        added_at:
+          type: string
+          format: date-time
+          description: The time the plugin was installed.
+        status: { $ref: "#/components/schemas/PluginStatus" }
+        manifest: { $ref: "#/components/schemas/PluginManifest" }
+
+    PluginInitialProps:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          format: uri
+          description: A remote URL pointing to a `.wasm` Storyden plugin file.
+
+    PluginActiveStateMutableProps:
+      type: object
+      required: [active]
+      properties:
+        active: { $ref: "#/components/schemas/PluginActiveState" }
+
+    PluginManifest:
+      type: object
+      description: |
+        The plugin's manifest information read from the plugin itself. This 
+        describes the version information, the author, its requested access and
+        other information that the plugin has provided.
+
+        This data structure is direct from the plugin itself and is not modified
+        by the runtime. This same schema is provided to plugin authors.
+      required: [name, version]
+      properties:
+        name:
+          type: string
+          description: The name of the plugin.
+        version:
+          type: string
+          description: The version of the plugin.
+
+    PluginActiveState:
+      type: string
+      description: |
+        The state of the plugin, whether it is active, inactive or in an error
+        state. When plugins are added, they are initially inactive and must be
+        activated before being used. An active plugin can be deactivated or if
+        it crashes or encounters an error, it will be set to the "error" state.
+      enum:
+        - active
+        - inactive
+        - error
+
+    PluginStatus:
+      type: object
+      discriminator:
+        propertyName: active_state
+        mapping:
+          active: "#/components/schemas/PluginStatusActive"
+          inactive: "#/components/schemas/PluginStatusInactive"
+          error: "#/components/schemas/PluginStatusError"
+      oneOf:
+        - $ref: "#/components/schemas/PluginStatusActive"
+        - $ref: "#/components/schemas/PluginStatusInactive"
+        - $ref: "#/components/schemas/PluginStatusError"
+
+    PluginStatusActive:
+      type: object
+      required: [active_state, activated_at]
+      properties:
+        active_state:
+          type: string
+          enum: [active]
+        activated_at:
+          type: string
+          format: date-time
+          description: The time the plugin was activated.
+
+    PluginStatusInactive:
+      type: object
+      required: [active_state, deactivated_at]
+      properties:
+        active_state:
+          type: string
+          enum: [inactive]
+        deactivated_at:
+          type: string
+          format: date-time
+          description: The time the plugin was deactivated.
+
+    PluginStatusError:
+      type: object
+      description: |
+        If the plugin status is "error" this object will contain the message and
+        any additional technical information provided by the plugin or runtime.
+      required: [active_state, message, details]
+      properties:
+        active_state:
+          type: string
+          enum: [error]
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+    PluginList:
+      type: array
+      items:
+        $ref: "#/components/schemas/Plugin"
+
+    PluginListResult:
+      type: object
+      required: [plugins]
+      properties:
+        plugins: { $ref: "#/components/schemas/PluginList" }
 
     #
     # 8888888b.          888

@@ -13,6 +13,8 @@ type Storer interface {
 	Exists(ctx context.Context, path string) (bool, error)
 	Read(ctx context.Context, path string) (io.Reader, int64, error)
 	Write(ctx context.Context, path string, w io.Reader, size int64) error
+	Delete(ctx context.Context, path string) error
+	List(ctx context.Context, prefix string) ([]string, error)
 }
 
 func Build() fx.Option {

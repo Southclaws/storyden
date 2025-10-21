@@ -95,3 +95,29 @@ func (s *s3Storer) Write(ctx context.Context, path string, stream io.Reader, siz
 
 	return nil
 }
+
+func (s *s3Storer) Delete(ctx context.Context, path string) error {
+	err := s.minioClient.RemoveObject(ctx, s.bucket, path, minio.RemoveObjectOptions{})
+	if err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (s *s3Storer) List(ctx context.Context, prefix string) ([]string, error) {
+	doneCh := make(chan struct{})
+	defer close(doneCh)
+
+	var objects []string
+	for object := range s.minioClient.ListObjects(ctx, s.bucket, minio.ListObjectsOptions{
+		Prefix: prefix,
+	}) {
+		if object.Err != nil {
+			return nil, fault.Wrap(object.Err, fctx.With(ctx))
+		}
+		objects = append(objects, object.Key)
+	}
+
+	return objects, nil
+}
