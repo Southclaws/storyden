@@ -15,7 +15,7 @@ const (
 	RateLimitRemaining  = "X-RateLimit-Remaining"
 	RateLimitReset      = "X-RateLimit-Reset"
 	RetryAfter          = "Retry-After"
-	MaxRequestSizeBytes = 10 * 1024 * 1024
+	MaxRequestSizeBytes = 50 * 1024 * 1024
 )
 
 type Middleware struct {

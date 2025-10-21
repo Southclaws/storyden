@@ -94,3 +94,30 @@ func (s *localStorer) Write(ctx context.Context, path string, r io.Reader, size 
 
 	return nil
 }
+
+func (s *localStorer) Delete(ctx context.Context, path string) error {
+	fullpath := filepath.Join(s.path, path)
+
+	if err := os.Remove(fullpath); err != nil {
+		if os.IsNotExist(err) {
+			return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (s *localStorer) List(ctx context.Context, prefix string) ([]string, error) {
+	entries, err := fs.ReadDir(s.s, prefix)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	var names []string
+	for _, entry := range entries {
+		names = append(names, entry.Name())
+	}
+
+	return names, nil
+}

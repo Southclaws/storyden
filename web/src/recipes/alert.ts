@@ -5,12 +5,13 @@ export const alert = defineSlotRecipe({
   slots: ["root", "content", "description", "icon", "title"],
   base: {
     root: {
-      background: "bg.default",
-      borderWidth: "1px",
+      background: "bg.muted",
+      borderColor: "border.muted",
+      borderWidth: "thin",
       borderRadius: "l3",
       display: "flex",
-      gap: "3",
-      p: "4",
+      gap: "2",
+      p: "2",
       width: "full",
     },
     content: {
@@ -23,13 +24,14 @@ export const alert = defineSlotRecipe({
       textStyle: "sm",
     },
     icon: {
-      color: "fg.default",
+      color: "fg.warning",
       flexShrink: "0",
-      width: "5",
-      height: "5",
+      pt: "0.5",
+      width: "4",
+      height: "4",
     },
     title: {
-      color: "fg.default",
+      color: "fg.warning",
       fontWeight: "semibold",
       textStyle: "sm",
     },

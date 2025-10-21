@@ -195,6 +195,19 @@ erDiagram
         xidDOTID owner_account_id
         xidDOTID source_account_id
     }
+    Plugin {
+        xidDOTID id
+        timeDOTTime created_at
+        timeDOTTime updated_at
+        string path
+        pluginDOTManifest manifest
+        mapLBRACKstringRBRACKinterface {} config
+        string active_state
+        timeDOTTime active_state_changed_at
+        string status_message
+        mapLBRACKstringRBRACKinterface {} status_details
+        xidDOTID added_by
+    }
     Post {
         xidDOTID id
         timeDOTTime created_at
@@ -296,6 +309,7 @@ erDiagram
         string name
     }
     	Account |o--o{ Session : "sessions/account"
+    	Account |o--o{ Plugin : "plugins/account"
     	Account |o--o{ Email : "emails/account"
     	Account |o--o{ Notification : "notifications/owner"
     	Account |o--o{ Notification : "triggered_notifications/source"
