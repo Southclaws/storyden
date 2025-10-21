@@ -6,6 +6,7 @@
     "index",
     "misc",
     "admin",
+    "plugins",
     "roles",
     "auth",
     "accounts",

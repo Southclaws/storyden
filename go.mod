@@ -32,6 +32,7 @@ require github.com/Southclaws/fault v0.8.2
 
 require (
 	github.com/JohannesKaufmann/html-to-markdown/v2 v2.4.0
+	github.com/Masterminds/semver v1.5.0
 	github.com/PuerkitoBio/goquery v1.10.3
 	github.com/Southclaws/lexorank v1.2.3
 	github.com/Southclaws/opt v0.6.1
@@ -80,6 +81,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0
 	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
 	github.com/shirou/gopsutil/v4 v4.25.9
+	github.com/tetratelabs/wazero v1.9.0
 	github.com/tursodatabase/libsql-client-go v0.0.0-20251219100830-236aa1ff8acc
 	github.com/twilio/twilio-go v1.28.3
 	github.com/weaviate/weaviate v1.33.4
@@ -99,7 +101,6 @@ require (
 	cloud.google.com/go/compute/metadata v0.9.0 // indirect
 	github.com/JohannesKaufmann/dom v0.2.0 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
-	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible // indirect
 	github.com/RoaringBitmap/roaring/v2 v2.4.5 // indirect
 	github.com/andybalholm/cascadia v1.3.3 // indirect
@@ -213,7 +214,6 @@ require (
 	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
-	github.com/tetratelabs/wazero v1.9.0 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect

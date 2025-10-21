@@ -21,6 +21,11 @@ type OperationPermissions interface {
 	AdminAccountBanRemove() (bool, *rbac.Permission)
 	AdminAccessKeyList() (bool, *rbac.Permission)
 	AdminAccessKeyDelete() (bool, *rbac.Permission)
+	PluginList() (bool, *rbac.Permission)
+	PluginAdd() (bool, *rbac.Permission)
+	PluginGet() (bool, *rbac.Permission)
+	PluginDelete() (bool, *rbac.Permission)
+	PluginSetActiveState() (bool, *rbac.Permission)
 	RoleCreate() (bool, *rbac.Permission)
 	RoleList() (bool, *rbac.Permission)
 	RoleUpdateOrder() (bool, *rbac.Permission)
@@ -184,6 +189,16 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.AdminAccessKeyList()
 	case "AdminAccessKeyDelete":
 		return optable.AdminAccessKeyDelete()
+	case "PluginList":
+		return optable.PluginList()
+	case "PluginAdd":
+		return optable.PluginAdd()
+	case "PluginGet":
+		return optable.PluginGet()
+	case "PluginDelete":
+		return optable.PluginDelete()
+	case "PluginSetActiveState":
+		return optable.PluginSetActiveState()
 	case "RoleCreate":
 		return optable.RoleCreate()
 	case "RoleList":

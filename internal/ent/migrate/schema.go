@@ -684,6 +684,34 @@ var (
 			},
 		},
 	}
+	// PluginsColumns holds the columns for the "plugins" table.
+	PluginsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Size: 20},
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "path", Type: field.TypeString, Unique: true},
+		{Name: "manifest", Type: field.TypeJSON},
+		{Name: "config", Type: field.TypeJSON},
+		{Name: "active_state", Type: field.TypeString},
+		{Name: "active_state_changed_at", Type: field.TypeTime},
+		{Name: "status_message", Type: field.TypeString, Nullable: true},
+		{Name: "status_details", Type: field.TypeJSON, Nullable: true},
+		{Name: "added_by", Type: field.TypeString, Size: 20},
+	}
+	// PluginsTable holds the schema information for the "plugins" table.
+	PluginsTable = &schema.Table{
+		Name:       "plugins",
+		Columns:    PluginsColumns,
+		PrimaryKey: []*schema.Column{PluginsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "plugins_accounts_plugins",
+				Columns:    []*schema.Column{PluginsColumns[10]},
+				RefColumns: []*schema.Column{AccountsColumns[0]},
+				OnDelete:   schema.Restrict,
+			},
+		},
+	}
 	// PostsColumns holds the columns for the "posts" table.
 	PostsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -1267,6 +1295,7 @@ var (
 		MentionProfilesTable,
 		NodesTable,
 		NotificationsTable,
+		PluginsTable,
 		PostsTable,
 		PostReadsTable,
 		PropertiesTable,
@@ -1327,6 +1356,7 @@ func init() {
 	NodesTable.ForeignKeys[4].RefTable = PropertySchemasTable
 	NotificationsTable.ForeignKeys[0].RefTable = AccountsTable
 	NotificationsTable.ForeignKeys[1].RefTable = AccountsTable
+	PluginsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostsTable.ForeignKeys[1].RefTable = CategoriesTable
 	PostsTable.ForeignKeys[2].RefTable = LinksTable

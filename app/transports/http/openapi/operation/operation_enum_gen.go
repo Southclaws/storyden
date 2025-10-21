@@ -30,6 +30,11 @@ var (
 	OperationIDAdminAccountBanRemove            = OperationID{`AdminAccountBanRemove`}
 	OperationIDAdminAccessKeyList               = OperationID{`AdminAccessKeyList`}
 	OperationIDAdminAccessKeyDelete             = OperationID{`AdminAccessKeyDelete`}
+	OperationIDPluginList                       = OperationID{`PluginList`}
+	OperationIDPluginAdd                        = OperationID{`PluginAdd`}
+	OperationIDPluginGet                        = OperationID{`PluginGet`}
+	OperationIDPluginDelete                     = OperationID{`PluginDelete`}
+	OperationIDPluginSetActiveState             = OperationID{`PluginSetActiveState`}
 	OperationIDRoleCreate                       = OperationID{`RoleCreate`}
 	OperationIDRoleList                         = OperationID{`RoleList`}
 	OperationIDRoleUpdateOrder                  = OperationID{`RoleUpdateOrder`}
@@ -228,6 +233,16 @@ func NewOperationID(__iNpUt__ string) (OperationID, error) {
 		return OperationIDAdminAccessKeyList, nil
 	case string(`AdminAccessKeyDelete`):
 		return OperationIDAdminAccessKeyDelete, nil
+	case string(`PluginList`):
+		return OperationIDPluginList, nil
+	case string(`PluginAdd`):
+		return OperationIDPluginAdd, nil
+	case string(`PluginGet`):
+		return OperationIDPluginGet, nil
+	case string(`PluginDelete`):
+		return OperationIDPluginDelete, nil
+	case string(`PluginSetActiveState`):
+		return OperationIDPluginSetActiveState, nil
 	case string(`RoleCreate`):
 		return OperationIDRoleCreate, nil
 	case string(`RoleList`):

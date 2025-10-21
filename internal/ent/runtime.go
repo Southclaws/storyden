@@ -25,6 +25,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/property"
@@ -801,6 +802,45 @@ func init() {
 	// notification.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	notification.IDValidator = func() func(string) error {
 		validators := notificationDescID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(id string) error {
+			for _, fn := range fns {
+				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	entpluginMixin := schema.Plugin{}.Mixin()
+	entpluginMixinFields0 := entpluginMixin[0].Fields()
+	_ = entpluginMixinFields0
+	entpluginMixinFields1 := entpluginMixin[1].Fields()
+	_ = entpluginMixinFields1
+	entpluginMixinFields2 := entpluginMixin[2].Fields()
+	_ = entpluginMixinFields2
+	entpluginFields := schema.Plugin{}.Fields()
+	_ = entpluginFields
+	// entpluginDescCreatedAt is the schema descriptor for created_at field.
+	entpluginDescCreatedAt := entpluginMixinFields1[0].Descriptor()
+	// entplugin.DefaultCreatedAt holds the default value on creation for the created_at field.
+	entplugin.DefaultCreatedAt = entpluginDescCreatedAt.Default.(func() time.Time)
+	// entpluginDescUpdatedAt is the schema descriptor for updated_at field.
+	entpluginDescUpdatedAt := entpluginMixinFields2[0].Descriptor()
+	// entplugin.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	entplugin.DefaultUpdatedAt = entpluginDescUpdatedAt.Default.(func() time.Time)
+	// entplugin.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	entplugin.UpdateDefaultUpdatedAt = entpluginDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// entpluginDescID is the schema descriptor for id field.
+	entpluginDescID := entpluginMixinFields0[0].Descriptor()
+	// entplugin.DefaultID holds the default value on creation for the id field.
+	entplugin.DefaultID = entpluginDescID.Default.(func() xid.ID)
+	// entplugin.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	entplugin.IDValidator = func() func(string) error {
+		validators := entpluginDescID.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
