@@ -36,10 +36,10 @@ func WithKinds(ks ...Kind) Filter {
 				dt.Map(ks, func(k Kind) predicate.Post {
 					switch k {
 					case KindThread:
-						return ent_post.First(true)
+						return ent_post.RootPostIDIsNil()
 
 					case KindPost:
-						return ent_post.First(false)
+						return ent_post.RootPostIDNotNil()
 
 					default:
 						return nil
@@ -55,7 +55,7 @@ func WithKeywords(q string) Filter {
 		pq.Where(
 			ent_post.Or(
 				ent_post.And(
-					ent_post.First(true),
+					ent_post.RootPostIDIsNil(),
 					ent_post.TitleContainsFold(q),
 				),
 				ent_post.BodyContainsFold(q),

@@ -177,12 +177,6 @@ func (_u *PostUpdate) SetNillableLastReplyAt(v *time.Time) *PostUpdate {
 	return _u
 }
 
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (_u *PostUpdate) ClearLastReplyAt() *PostUpdate {
-	_u.mutation.ClearLastReplyAt()
-	return _u
-}
-
 // SetRootPostID sets the "root_post_id" field.
 func (_u *PostUpdate) SetRootPostID(v xid.ID) *PostUpdate {
 	_u.mutation.SetRootPostID(v)
@@ -914,9 +908,6 @@ func (_u *PostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
-	}
-	if _u.mutation.LastReplyAtCleared() {
-		_spec.ClearField(post.FieldLastReplyAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
@@ -1731,12 +1722,6 @@ func (_u *PostUpdateOne) SetNillableLastReplyAt(v *time.Time) *PostUpdateOne {
 	return _u
 }
 
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (_u *PostUpdateOne) ClearLastReplyAt() *PostUpdateOne {
-	_u.mutation.ClearLastReplyAt()
-	return _u
-}
-
 // SetRootPostID sets the "root_post_id" field.
 func (_u *PostUpdateOne) SetRootPostID(v xid.ID) *PostUpdateOne {
 	_u.mutation.SetRootPostID(v)
@@ -2498,9 +2483,6 @@ func (_u *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
 	}
 	if value, ok := _u.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
-	}
-	if _u.mutation.LastReplyAtCleared() {
-		_spec.ClearField(post.FieldLastReplyAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)

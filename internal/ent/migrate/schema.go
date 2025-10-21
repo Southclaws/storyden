@@ -670,7 +670,7 @@ var (
 		{Name: "title", Type: field.TypeString, Nullable: true},
 		{Name: "slug", Type: field.TypeString, Nullable: true},
 		{Name: "pinned", Type: field.TypeBool, Default: false},
-		{Name: "last_reply_at", Type: field.TypeTime, Nullable: true},
+		{Name: "last_reply_at", Type: field.TypeTime},
 		{Name: "body", Type: field.TypeString},
 		{Name: "short", Type: field.TypeString},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
@@ -716,6 +716,23 @@ var (
 				Columns:    []*schema.Column{PostsColumns[18]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "post_root_post_id_deleted_at_visibility_last_reply_at",
+				Unique:  false,
+				Columns: []*schema.Column{PostsColumns[17], PostsColumns[3], PostsColumns[13], PostsColumns[9]},
+			},
+			{
+				Name:    "post_root_post_id_deleted_at_visibility_category_id_last_reply_at",
+				Unique:  false,
+				Columns: []*schema.Column{PostsColumns[17], PostsColumns[3], PostsColumns[13], PostsColumns[15], PostsColumns[9]},
+			},
+			{
+				Name:    "post_root_post_id_deleted_at_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{PostsColumns[17], PostsColumns[3], PostsColumns[1]},
 			},
 		},
 	}
