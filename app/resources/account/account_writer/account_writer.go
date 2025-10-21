@@ -15,6 +15,7 @@ var (
 	WithID        = account_repo.WithID
 	WithAdmin     = account_repo.WithAdmin
 	WithName      = account_repo.WithName
+	WithKind      = account_repo.WithKind
 	WithBio       = account_repo.WithBio
 	WithSignature = account_repo.WithSignature
 	WithInvitedBy = account_repo.WithInvitedBy

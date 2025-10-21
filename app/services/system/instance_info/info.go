@@ -12,6 +12,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/onboarding"
+	"github.com/Southclaws/storyden/app/services/plugin/plugin_runner"
 	"github.com/Southclaws/storyden/internal/config"
 )
 
@@ -74,6 +75,10 @@ func (p *Provider) Get(ctx context.Context) (*Info, error) {
 
 	if p.config.SMSProvider != "" {
 		caps = append(caps, CapabilitySMSClient)
+	}
+
+	if p.config.PluginRuntimeProvider != plugin_runner.RuntimeProviderNone.String() {
+		caps = append(caps, CapabilityPlugins)
 	}
 
 	return &Info{

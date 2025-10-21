@@ -12,11 +12,11 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/category_cache"
 	"github.com/Southclaws/storyden/internal/deletable"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 var errInvalidCategoryCreate = fault.New("invalid create args", ftag.With(ftag.InvalidArgument))
@@ -114,7 +114,7 @@ func (s *service) Create(ctx context.Context, partial Partial) (*category.Catego
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventCategoryUpdated{Slug: cat.Slug})
+	s.bus.Publish(ctx, &rpc.EventCategoryUpdated{Slug: cat.Slug})
 
 	return cat, nil
 }
@@ -153,7 +153,7 @@ func (s *service) Update(ctx context.Context, slug string, partial Partial) (*ca
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventCategoryUpdated{Slug: cat.Slug})
+	s.bus.Publish(ctx, &rpc.EventCategoryUpdated{Slug: cat.Slug})
 
 	return cat, nil
 }
@@ -197,7 +197,7 @@ func (s *service) Move(ctx context.Context, slug string, move Move) ([]*category
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventCategoryUpdated{Slug: slug})
+	s.bus.Publish(ctx, &rpc.EventCategoryUpdated{Slug: slug})
 
 	return cats, nil
 }
@@ -208,7 +208,7 @@ func (s *service) Delete(ctx context.Context, slug string, moveToID category.Cat
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventCategoryDeleted{Slug: slug})
+	s.bus.Publish(ctx, &rpc.EventCategoryDeleted{Slug: slug})
 
 	return cat, nil
 }

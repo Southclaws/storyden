@@ -1,0 +1,11 @@
+id: simple-go-plugin
+name: Simple Go Plugin
+author: storyden
+description: Minimal Go plugin example that logs thread published events.
+version: 0.1.0
+command: go
+args:
+  - run
+  - main.go
+events_consumed:
+  - EventThreadPublished

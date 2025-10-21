@@ -25,6 +25,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/post/thread_querier"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func Build() fx.Option {
@@ -73,14 +74,14 @@ func runScrapeConsumer(
 		}
 
 		// Subscribe to thread events for URL hydration
-		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_thread_created", func(ctx context.Context, evt *message.EventThreadPublished) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_thread_created", func(ctx context.Context, evt *rpc.EventThreadPublished) error {
 			return ic.hydrateThreadURLs(ctx, evt.ID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_thread_updated", func(ctx context.Context, evt *message.EventThreadUpdated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_thread_updated", func(ctx context.Context, evt *rpc.EventThreadUpdated) error {
 			return ic.hydrateThreadURLs(ctx, evt.ID)
 		})
 		if err != nil {
@@ -88,14 +89,14 @@ func runScrapeConsumer(
 		}
 
 		// Subscribe to reply events for URL hydration
-		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_reply_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_reply_created", func(ctx context.Context, evt *rpc.EventThreadReplyCreated) error {
 			return ic.hydratePostURLs(ctx, evt.ReplyID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_reply_updated", func(ctx context.Context, evt *message.EventThreadReplyUpdated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_reply_updated", func(ctx context.Context, evt *rpc.EventThreadReplyUpdated) error {
 			return ic.hydratePostURLs(ctx, evt.ReplyID)
 		})
 		if err != nil {
@@ -103,14 +104,14 @@ func runScrapeConsumer(
 		}
 
 		// Subscribe to node events for URL hydration
-		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_node_created", func(ctx context.Context, evt *message.EventNodeCreated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_node_created", func(ctx context.Context, evt *rpc.EventNodeCreated) error {
 			return ic.hydrateNodeURLs(ctx, evt.ID)
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_node_updated", func(ctx context.Context, evt *message.EventNodeUpdated) error {
+		_, err = pubsub.Subscribe(ctx, bus, "scrape_job.hydrate_node_updated", func(ctx context.Context, evt *rpc.EventNodeUpdated) error {
 			return ic.hydrateNodeURLs(ctx, evt.ID)
 		})
 		if err != nil {

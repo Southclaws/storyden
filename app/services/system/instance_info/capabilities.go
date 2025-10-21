@@ -5,6 +5,7 @@ package instance_info
 type capabilityEnum string
 
 const (
+	capabilityPlugins     capabilityEnum = `plugins`
 	capabilityGenAI       capabilityEnum = `gen_ai`
 	capabilitySemdex      capabilityEnum = `semdex`
 	capabilityEmailClient capabilityEnum = `email_client`

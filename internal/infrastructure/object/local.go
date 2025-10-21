@@ -77,7 +77,7 @@ func (s *localStorer) Write(ctx context.Context, path string, r io.Reader, size 
 	}
 
 	f, err := os.OpenFile(fullpath,
-		os.O_CREATE|os.O_WRONLY,
+		os.O_CREATE|os.O_WRONLY|os.O_TRUNC,
 		0o755,
 	)
 	if err != nil {
@@ -92,5 +92,43 @@ func (s *localStorer) Write(ctx context.Context, path string, r io.Reader, size 
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if err := f.Close(); err != nil {
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
 	return nil
+}
+
+func (s *localStorer) Delete(ctx context.Context, path string) error {
+	fullpath := filepath.Join(s.path, path)
+
+	if err := os.Remove(fullpath); err != nil {
+		if os.IsNotExist(err) {
+			return fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.NotFound))
+		}
+		return fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return nil
+}
+
+func (s *localStorer) List(ctx context.Context, prefix string) ([]string, error) {
+	entries, err := fs.ReadDir(s.s, prefix)
+	if err != nil {
+		// NOTE: The Storer interface is an abstraction over both S3-style and
+		// local filesystems. In the case of S3, listing a non-existent prefix
+		// returns an empty list, whereas in the case of a local filesystem, it
+		// returns an error. To maintain a consistent interface, we don't error.
+		if os.IsNotExist(err) {
+			return []string{}, nil
+		}
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	var names []string
+	for _, entry := range entries {
+		names = append(names, entry.Name())
+	}
+
+	return names, nil
 }

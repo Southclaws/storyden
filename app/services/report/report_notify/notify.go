@@ -11,12 +11,13 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
-	"github.com/Southclaws/storyden/app/resources/message"
+	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/resources/report/report_querier"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/notification/notify"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func Build() fx.Option {
@@ -31,7 +32,7 @@ func Build() fx.Option {
 		consumer := func(hctx context.Context) error {
 			// Report submitted
 			// Notify only members with MANAGE_REPORTS or ADMINISTRATOR perms.
-			if _, err := pubsub.Subscribe(ctx, bus, "report_notify.report_created", func(ctx context.Context, evt *message.EventReportCreated) error {
+			if _, err := pubsub.Subscribe(ctx, bus, "report_notify.report_created", func(ctx context.Context, evt *rpc.EventReportCreated) error {
 				return sendReportSubmitted(ctx, notifier, accountQuerier, evt)
 			}); err != nil {
 				return err
@@ -41,7 +42,7 @@ func Build() fx.Option {
 			// Depending on the source of the update:
 			// - author: notify handlers (admins/mods)
 			// - handler: notify author
-			if _, err := pubsub.Subscribe(ctx, bus, "report_notify.report_updated", func(ctx context.Context, evt *message.EventReportUpdated) error {
+			if _, err := pubsub.Subscribe(ctx, bus, "report_notify.report_updated", func(ctx context.Context, evt *rpc.EventReportUpdated) error {
 				return sendReportUpdated(ctx, notifier, accountQuerier, reportQuerier, evt)
 			}); err != nil {
 				return err
@@ -58,7 +59,7 @@ func sendReportSubmitted(
 	ctx context.Context,
 	notifier *notify.Notifier,
 	accountQuerier *account_querier.Querier,
-	evt *message.EventReportCreated,
+	evt *rpc.EventReportCreated,
 ) error {
 	accs, err := accountQuerier.ListByHeldPermission(ctx, rbac.PermissionAdministrator, rbac.PermissionManageReports)
 	if err != nil {
@@ -66,7 +67,10 @@ func sendReportSubmitted(
 	}
 
 	for _, acc := range accs {
-		if err := notifier.Send(ctx, acc.ID, evt.ReportedBy, notification.EventReportSubmitted, evt.Target); err != nil {
+		target := opt.Map(evt.Target, func(t rpc.DatagraphRef) datagraph.Ref {
+			return t.ToDomain()
+		})
+		if err := notifier.Send(ctx, acc.ID, evt.ReportedBy, notification.EventReportSubmitted, target.Ptr()); err != nil {
 			return fault.Wrap(err, fctx.With(ctx))
 		}
 	}
@@ -79,7 +83,7 @@ func sendReportUpdated(
 	notifier *notify.Notifier,
 	accountQuerier *account_querier.Querier,
 	reportQuerier *report_querier.Querier,
-	evt *message.EventReportUpdated,
+	evt *rpc.EventReportUpdated,
 ) error {
 	source, err := session.GetAccountID(ctx)
 	if err != nil {

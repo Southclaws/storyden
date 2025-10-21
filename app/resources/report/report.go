@@ -15,6 +15,19 @@ type ID xid.ID
 
 func (i ID) String() string { return xid.ID(i).String() }
 
+func (i ID) MarshalJSON() ([]byte, error) {
+	return xid.ID(i).MarshalJSON()
+}
+
+func (i *ID) UnmarshalJSON(data []byte) error {
+	var id xid.ID
+	if err := id.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	*i = ID(id)
+	return nil
+}
+
 type Report struct {
 	ID        ID
 	CreatedAt time.Time

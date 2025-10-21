@@ -12,9 +12,9 @@ import (
 	"github.com/Southclaws/storyden/app/resources/audit"
 	"github.com/Southclaws/storyden/app/resources/audit/audit_writer"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func Build() fx.Option {
@@ -60,7 +60,7 @@ func New(
 	return s
 }
 
-func (s *Service) onThreadDeleted(ctx context.Context, event *message.EventThreadDeleted) error {
+func (s *Service) onThreadDeleted(ctx context.Context, event *rpc.EventThreadDeleted) error {
 	enactedBy := session.GetOptAccountID(ctx)
 
 	_, err := s.writer.Create(
@@ -80,7 +80,7 @@ func (s *Service) onThreadDeleted(ctx context.Context, event *message.EventThrea
 	return nil
 }
 
-func (s *Service) onThreadReplyDeleted(ctx context.Context, event *message.EventThreadReplyDeleted) error {
+func (s *Service) onThreadReplyDeleted(ctx context.Context, event *rpc.EventThreadReplyDeleted) error {
 	enactedBy := session.GetOptAccountID(ctx)
 
 	_, err := s.writer.Create(
@@ -100,7 +100,7 @@ func (s *Service) onThreadReplyDeleted(ctx context.Context, event *message.Event
 	return nil
 }
 
-func (s *Service) onAccountSuspended(ctx context.Context, event *message.EventAccountSuspended) error {
+func (s *Service) onAccountSuspended(ctx context.Context, event *rpc.EventAccountSuspended) error {
 	enactedBy := session.GetOptAccountID(ctx)
 
 	_, err := s.writer.Create(
@@ -122,7 +122,7 @@ func (s *Service) onAccountSuspended(ctx context.Context, event *message.EventAc
 	return nil
 }
 
-func (s *Service) onAccountUnsuspended(ctx context.Context, event *message.EventAccountUnsuspended) error {
+func (s *Service) onAccountUnsuspended(ctx context.Context, event *rpc.EventAccountUnsuspended) error {
 	enactedBy := session.GetOptAccountID(ctx)
 
 	_, err := s.writer.Create(

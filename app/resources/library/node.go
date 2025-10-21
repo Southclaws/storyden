@@ -32,6 +32,19 @@ func NodeIDFromString(id string) (NodeID, error) {
 
 func (i NodeID) String() string { return xid.ID(i).String() }
 
+func (i NodeID) MarshalJSON() ([]byte, error) {
+	return xid.ID(i).MarshalJSON()
+}
+
+func (i *NodeID) UnmarshalJSON(data []byte) error {
+	var id xid.ID
+	if err := id.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	*i = NodeID(id)
+	return nil
+}
+
 type Node struct {
 	Mark      Mark
 	CreatedAt time.Time

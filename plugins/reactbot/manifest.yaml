@@ -1,0 +1,14 @@
+id: reactbot
+name: React Bot
+author: Southclaws
+description: React to every new thread reply with a fire emoji.
+version: 1.0.0
+# NOTE: On Windows, you need a file extension: ".exe"
+command: "./reactbot"
+events_consumed:
+  - EventThreadReplyCreated
+access:
+  handle: reactbot
+  name: React Bot
+  permissions:
+    - CREATE_REACTION

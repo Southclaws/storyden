@@ -9,12 +9,12 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/rbac"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func (s *service) Delete(ctx context.Context, id post.ID) error {
@@ -47,7 +47,7 @@ func (s *service) Delete(ctx context.Context, id post.ID) error {
 		return fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to delete thread"))
 	}
 
-	s.bus.Publish(ctx, &message.EventThreadDeleted{
+	s.bus.Publish(ctx, &rpc.EventThreadDeleted{
 		ID: thr.ID,
 	})
 

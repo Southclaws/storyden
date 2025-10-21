@@ -1,0 +1,27 @@
+{
+  "id": "supervised-config-test",
+  "author": "storyden",
+  "name": "Supervised Config Test Plugin",
+  "description": "Test plugin that applies configuration via configure RPC",
+  "version": "1.0.0",
+  "command": "./supervised_config",
+  "configuration_schema": {
+    "fields": [
+      {
+        "id": "name",
+        "label": "Name",
+        "type": "string"
+      },
+      {
+        "id": "enabled",
+        "label": "Enabled",
+        "type": "boolean"
+      },
+      {
+        "id": "threshold",
+        "label": "Threshold",
+        "type": "number"
+      }
+    ]
+  }
+}

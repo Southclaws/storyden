@@ -11,10 +11,10 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/settings"
 	"github.com/Southclaws/storyden/app/services/moderation/checker"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type WordChecker struct {
@@ -90,7 +90,7 @@ func normalizeWordList(words []string) map[string]string {
 	return normalized
 }
 
-func (w *WordChecker) handleSettingsUpdate(ctx context.Context, event *message.EventSettingsUpdated) error {
+func (w *WordChecker) handleSettingsUpdate(ctx context.Context, event *rpc.EventSettingsUpdated) error {
 	if err := w.loadSettings(ctx); err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

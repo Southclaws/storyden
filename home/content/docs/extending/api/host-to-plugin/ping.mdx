@@ -1,0 +1,40 @@
+---
+title: ping
+description: Host to Plugin RPC method.
+---
+
+`ping` is a **Host to Plugin** method.
+
+<Callout type="info">
+  This page is generated from `api/rpc/host-to-plugin/ping.yaml`.
+</Callout>
+
+## Types
+
+- Request type: `RPCRequestPing`
+- Response type: `RPCResponsePing`
+
+## Request contract
+
+Health-check request sent by the host to verify plugin responsiveness.
+
+
+Required fields:
+- `method`
+
+
+
+## Response contract
+
+Health-check response from the plugin.
+
+
+Required fields:
+- `pong`
+
+
+
+## Notes
+
+- JSON-RPC base request/response envelope types are defined in `api/rpc/rpc.yaml`.
+- Union wiring between host/plugin method sets is defined in `api/plugin.yaml`.

@@ -10,7 +10,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_item_status"
-
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/like"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
@@ -24,6 +23,19 @@ import (
 type ID xid.ID
 
 func (u ID) String() string { return xid.ID(u).String() }
+
+func (u ID) MarshalJSON() ([]byte, error) {
+	return xid.ID(u).MarshalJSON()
+}
+
+func (u *ID) UnmarshalJSON(data []byte) error {
+	var id xid.ID
+	if err := id.UnmarshalJSON(data); err != nil {
+		return err
+	}
+	*u = ID(id)
+	return nil
+}
 
 type Post struct {
 	ID   ID

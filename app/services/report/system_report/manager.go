@@ -10,10 +10,10 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/report"
 	"github.com/Southclaws/storyden/app/resources/report/report_writer"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Manager struct {
@@ -53,9 +53,9 @@ func (m *Manager) Submit(
 		targetRef = datagraph.NewRef(rep.TargetItem)
 	}
 
-	m.bus.Publish(ctx, &message.EventReportCreated{
+	m.bus.Publish(ctx, &rpc.EventReportCreated{
 		ID:         rep.ID,
-		Target:     targetRef,
+		Target:     opt.Map(opt.NewPtr(targetRef), rpc.DatagraphRefToRPC),
 		ReportedBy: opt.NewEmpty[account.AccountID](),
 	})
 

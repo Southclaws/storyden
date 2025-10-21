@@ -1,0 +1,8 @@
+{
+  "id": "example-plugin",
+  "author": "storyden",
+  "name": "example-plugin",
+  "description": "Example plugin that demonstrates WebSocket connection",
+  "version": "0.1.0",
+  "command": "./example-plugin"
+}

@@ -102,7 +102,7 @@ func TestNodeCacheWithPropertySchemaUpdate(t *testing.T) {
 			visibility := openapi.Published
 			name := "cache-test-schema-" + uuid.NewString()
 			slug := name
-			ptype := openapi.Text
+			ptype := openapi.PropertyTypeText
 
 			nodeCreate := tests.AssertRequest(cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
 				Name:       name,
@@ -132,7 +132,7 @@ func TestNodeCacheWithPropertySchemaUpdate(t *testing.T) {
 			schemaUpdate := tests.AssertRequest(cl.NodeUpdatePropertySchemaWithResponse(ctx, slug, openapi.NodeUpdatePropertySchemaJSONRequestBody{
 				{
 					Name: "new_field",
-					Type: openapi.Text,
+					Type: openapi.PropertyTypeText,
 					Sort: "b",
 				},
 			}, session))(t, http.StatusOK)

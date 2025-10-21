@@ -13,7 +13,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
@@ -24,6 +23,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/link/fetcher"
 	"github.com/Southclaws/storyden/app/services/moderation/checker"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial) (*thread.Thread, error) {
@@ -105,18 +105,18 @@ func (s *service) Update(ctx context.Context, threadID post.ID, partial Partial)
 	}
 
 	// Always emit a general update event
-	s.bus.Publish(ctx, &message.EventThreadUpdated{
+	s.bus.Publish(ctx, &rpc.EventThreadUpdated{
 		ID: thr.ID,
 	})
 
 	// Emit visibility-specific events when visibility changes
 	if oldVisibility != thr.Visibility {
 		if thr.Visibility == visibility.VisibilityPublished {
-			s.bus.Publish(ctx, &message.EventThreadPublished{
+			s.bus.Publish(ctx, &rpc.EventThreadPublished{
 				ID: thr.ID,
 			})
 		} else {
-			s.bus.Publish(ctx, &message.EventThreadUnpublished{
+			s.bus.Publish(ctx, &rpc.EventThreadUnpublished{
 				ID: thr.ID,
 			})
 		}

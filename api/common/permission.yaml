@@ -1,0 +1,183 @@
+$schema: "http://json-schema.org/draft-07/schema#"
+title: Permission
+description: |
+  Storyden provides a set of permissions for granular access control via Roles.
+  Permissions are how members are granted access to certain features. They are assigned to [Roles](https://storyden.org/docs/introduction/members/roles), which are then assigned to [Members](https://storyden.org/docs/introduction/members). This allows for granular access control and the ability to group members together.
+type: string
+oneOf:
+  - $ref: "#/$defs/CREATE_POST"
+  - $ref: "#/$defs/READ_PUBLISHED_THREADS"
+  - $ref: "#/$defs/CREATE_REACTION"
+  - $ref: "#/$defs/MANAGE_POSTS"
+  - $ref: "#/$defs/MANAGE_CATEGORIES"
+  - $ref: "#/$defs/CREATE_INVITATION"
+  - $ref: "#/$defs/READ_PUBLISHED_LIBRARY"
+  - $ref: "#/$defs/MANAGE_LIBRARY"
+  - $ref: "#/$defs/SUBMIT_LIBRARY_NODE"
+  - $ref: "#/$defs/UPLOAD_ASSET"
+  - $ref: "#/$defs/MANAGE_EVENTS"
+  - $ref: "#/$defs/LIST_PROFILES"
+  - $ref: "#/$defs/READ_PROFILE"
+  - $ref: "#/$defs/CREATE_COLLECTION"
+  - $ref: "#/$defs/LIST_COLLECTIONS"
+  - $ref: "#/$defs/READ_COLLECTION"
+  - $ref: "#/$defs/MANAGE_COLLECTIONS"
+  - $ref: "#/$defs/COLLECTION_SUBMIT"
+  - $ref: "#/$defs/USE_PERSONAL_ACCESS_KEYS"
+  - $ref: "#/$defs/MANAGE_SETTINGS"
+  - $ref: "#/$defs/MANAGE_SUSPENSIONS"
+  - $ref: "#/$defs/MANAGE_ROLES"
+  - $ref: "#/$defs/MANAGE_REPORTS"
+  - $ref: "#/$defs/VIEW_ACCOUNTS"
+  - $ref: "#/$defs/ADMINISTRATOR"
+
+$defs:
+  CREATE_POST:
+    type: string
+    const: CREATE_POST
+    title: Create post
+    description: Members can create posts.
+
+  READ_PUBLISHED_THREADS:
+    type: string
+    const: READ_PUBLISHED_THREADS
+    title: Read published threads
+    description: Members can read published threads.
+
+  CREATE_REACTION:
+    type: string
+    const: CREATE_REACTION
+    title: Create reactions
+    description: React to posts.
+
+  MANAGE_POSTS:
+    type: string
+    const: MANAGE_POSTS
+    title: Manage posts
+    description: Manage posts, such as delete, pin and move.
+
+  MANAGE_CATEGORIES:
+    type: string
+    const: MANAGE_CATEGORIES
+    title: Manage categories
+    description: Create and edit categories.
+
+  CREATE_INVITATION:
+    type: string
+    const: CREATE_INVITATION
+    title: Create invitations
+    description: Create invitations for new members.
+
+  READ_PUBLISHED_LIBRARY:
+    type: string
+    const: READ_PUBLISHED_LIBRARY
+    title: Read published library pages
+    description: Access published items in the library.
+
+  MANAGE_LIBRARY:
+    type: string
+    const: MANAGE_LIBRARY
+    title: Manage library
+    description: Manage items in the library, such as publish new pages, accept or reject submissions and edit pages.
+
+  SUBMIT_LIBRARY_NODE:
+    type: string
+    const: SUBMIT_LIBRARY_NODE
+    title: Submit to library
+    description: Submit new pages to the library.
+
+  UPLOAD_ASSET:
+    type: string
+    const: UPLOAD_ASSET
+    title: Upload assets
+    description: Upload images and media to posts, pages and any other areas that accept media.
+
+  MANAGE_EVENTS:
+    type: string
+    const: MANAGE_EVENTS
+    title: Manage events
+    description: Create, edit and remove events as well as change event hosts.
+
+  LIST_PROFILES:
+    type: string
+    const: LIST_PROFILES
+    title: Access member list
+    description: Access the full list of registered members.
+
+  READ_PROFILE:
+    type: string
+    const: READ_PROFILE
+    title: Access profiles
+    description: Access any registered member's profiles.
+
+  CREATE_COLLECTION:
+    type: string
+    const: CREATE_COLLECTION
+    title: Create collections
+    description: Create and manage their own collections.
+
+  LIST_COLLECTIONS:
+    type: string
+    const: LIST_COLLECTIONS
+    title: Access published collections
+    description: Access the full list of published collections from other members.
+
+  READ_COLLECTION:
+    type: string
+    const: READ_COLLECTION
+    title: Read any collection
+    description: Read any published collection from any other member.
+
+  MANAGE_COLLECTIONS:
+    type: string
+    const: MANAGE_COLLECTIONS
+    title: Manage collections
+    description: Delete, rename or move collections owned by other members.
+
+  COLLECTION_SUBMIT:
+    type: string
+    const: COLLECTION_SUBMIT
+    title: Submit to collections
+    description: Submit items for review to other members' collections.
+
+  USE_PERSONAL_ACCESS_KEYS:
+    type: string
+    const: USE_PERSONAL_ACCESS_KEYS
+    title: Use personal access keys
+    description: Use personal access keys to authenticate with the Storyden API and MCP server.
+
+  MANAGE_SETTINGS:
+    type: string
+    const: MANAGE_SETTINGS
+    title: Manage settings
+    description: Manage the administrative settings for the Storyden installation.
+
+  MANAGE_SUSPENSIONS:
+    type: string
+    const: MANAGE_SUSPENSIONS
+    title: Manage suspensions
+    description: Suspend or reinstate members from the community.
+
+  MANAGE_ROLES:
+    type: string
+    const: MANAGE_ROLES
+    title: Manage roles
+    description: Create, edit and delete roles as well as assign and remove roles of other members.
+
+  MANAGE_REPORTS:
+    type: string
+    const: MANAGE_REPORTS
+    title: Manage reports
+    description: View, triage, and resolve submitted reports.
+
+  VIEW_ACCOUNTS:
+    type: string
+    const: VIEW_ACCOUNTS
+    title: View accounts
+    description: Access detailed account records by account ID.
+
+  ADMINISTRATOR:
+    type: string
+    const: ADMINISTRATOR
+    title: Administrator
+    description: Full administrative access. Use with caution!

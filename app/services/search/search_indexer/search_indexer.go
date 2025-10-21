@@ -26,6 +26,7 @@ import (
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 type Indexer struct {
@@ -100,56 +101,56 @@ func newIndexer(
 	}
 
 	lc.Append(fx.StartHook(func(hctx context.Context) error {
-		_, err := pubsub.Subscribe(ctx, idx.bus, "search_indexer.thread_published", func(ctx context.Context, evt *message.EventThreadPublished) error {
+		_, err := pubsub.Subscribe(ctx, idx.bus, "search_indexer.thread_published", func(ctx context.Context, evt *rpc.EventThreadPublished) error {
 			return idx.bus.SendCommand(ctx, &message.CommandThreadIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.thread_updated", func(ctx context.Context, evt *message.EventThreadUpdated) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.thread_updated", func(ctx context.Context, evt *rpc.EventThreadUpdated) error {
 			return idx.bus.SendCommand(ctx, &message.CommandThreadIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.thread_unpublished", func(ctx context.Context, evt *message.EventThreadUnpublished) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.thread_unpublished", func(ctx context.Context, evt *rpc.EventThreadUnpublished) error {
 			return idx.bus.SendCommand(ctx, &message.CommandThreadDeindex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.thread_deleted", func(ctx context.Context, evt *message.EventThreadDeleted) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.thread_deleted", func(ctx context.Context, evt *rpc.EventThreadDeleted) error {
 			return idx.bus.SendCommand(ctx, &message.CommandThreadDeindex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.node_published", func(ctx context.Context, evt *message.EventNodePublished) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.node_published", func(ctx context.Context, evt *rpc.EventNodePublished) error {
 			return idx.bus.SendCommand(ctx, &message.CommandNodeIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.node_updated", func(ctx context.Context, evt *message.EventNodeUpdated) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.node_updated", func(ctx context.Context, evt *rpc.EventNodeUpdated) error {
 			return idx.bus.SendCommand(ctx, &message.CommandNodeIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.node_unpublished", func(ctx context.Context, evt *message.EventNodeUnpublished) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.node_unpublished", func(ctx context.Context, evt *rpc.EventNodeUnpublished) error {
 			return idx.bus.SendCommand(ctx, &message.CommandNodeDeindex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.node_deleted", func(ctx context.Context, evt *message.EventNodeDeleted) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.node_deleted", func(ctx context.Context, evt *rpc.EventNodeDeleted) error {
 			return idx.bus.SendCommand(ctx, &message.CommandNodeDeindex{ID: evt.ID})
 		})
 		if err != nil {
@@ -184,35 +185,35 @@ func newIndexer(
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_created", func(ctx context.Context, evt *message.EventThreadReplyCreated) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_created", func(ctx context.Context, evt *rpc.EventThreadReplyCreated) error {
 			return idx.bus.SendCommand(ctx, &message.CommandReplyIndex{ID: evt.ReplyID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_updated", func(ctx context.Context, evt *message.EventThreadReplyUpdated) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_updated", func(ctx context.Context, evt *rpc.EventThreadReplyUpdated) error {
 			return idx.bus.SendCommand(ctx, &message.CommandReplyIndex{ID: evt.ReplyID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_deleted", func(ctx context.Context, evt *message.EventThreadReplyDeleted) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_deleted", func(ctx context.Context, evt *rpc.EventThreadReplyDeleted) error {
 			return idx.bus.SendCommand(ctx, &message.CommandReplyDeindex{ID: evt.ReplyID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_published", func(ctx context.Context, evt *message.EventThreadReplyPublished) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_published", func(ctx context.Context, evt *rpc.EventThreadReplyPublished) error {
 			return idx.bus.SendCommand(ctx, &message.CommandReplyIndex{ID: evt.ReplyID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_unpublished", func(ctx context.Context, evt *message.EventThreadReplyUnpublished) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.reply_unpublished", func(ctx context.Context, evt *rpc.EventThreadReplyUnpublished) error {
 			return idx.bus.SendCommand(ctx, &message.CommandReplyDeindex{ID: evt.ReplyID})
 		})
 		if err != nil {
@@ -233,14 +234,14 @@ func newIndexer(
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.account_created", func(ctx context.Context, evt *message.EventAccountCreated) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.account_created", func(ctx context.Context, evt *rpc.EventAccountCreated) error {
 			return idx.bus.SendCommand(ctx, &message.CommandProfileIndex{ID: evt.ID})
 		})
 		if err != nil {
 			return err
 		}
 
-		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.account_updated", func(ctx context.Context, evt *message.EventAccountUpdated) error {
+		_, err = pubsub.Subscribe(ctx, idx.bus, "search_indexer.account_updated", func(ctx context.Context, evt *rpc.EventAccountUpdated) error {
 			return idx.bus.SendCommand(ctx, &message.CommandProfileIndex{ID: evt.ID})
 		})
 		if err != nil {

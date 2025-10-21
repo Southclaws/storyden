@@ -1,11 +1,35 @@
 ---
 title: Plugins
+description: Extend, embrace, ex... no wait, not that!
 ---
 
-Plugins are currently in-progress. But here's a little preview:
+Storyden supports a powerful plugin system that allows you to extend and customize your community platform. Plugins are just regular programs that communicate with Storyden over RPC, allowing you to add custom behavior without modifying the core codebase.
 
-- WebAssembly is the technology of choice: this provides secure sandboxing for running untrusted code while providing flexibility of language choice and easy local testing.
-- They will be simple, single files, easy to share, build and install - there will be a marketplace to publish and discover plugins.
-- Plugins will provide the ability to intercept operations, run scheduled jobs, connect to third-party systems and more.
+## Key Features
 
-More will be shared via the blog, Discord and GitHub
+- **Language Agnostic**: Plugins can be written in any language - they're just regular programs that speak Storyden RPC
+- **Two Execution Modes**: Choose between supervised (managed by your Storyden instance) or external (separately hosted) deployment
+- **Event-Driven**: Subscribe to pubsub events (new posts, comments, registrations) and react in real-time
+- **HTTP API Access**: Plugins can interact with Storyden's full API using authenticated requests with explicit permissions
+- **Simple Distribution**: Supervised plugins are packaged as `.zip` archives, easy to share and install
+- **Configuration Management**: Define custom configuration schemas that drive the plugin's settings page
+
+## Getting Started
+
+For complete documentation on building and deploying plugins, see the [Extending Storyden](/docs/extending) section, which covers:
+
+- [Plugin Architecture & Model](/docs/extending/model) - Understanding the plugin lifecycle and event delivery
+- [Manifest Schema](/docs/extending/manifest) - Defining your plugin's metadata and requirements
+- [Capabilities & Limits](/docs/extending/capabilities) - What plugins can and cannot do
+- [Security Model](/docs/extending/security) - Authentication, authorization, and runtime boundaries
+- [API Reference](/docs/extending/api-overview) - HTTP and RPC interfaces for plugin communication
+- [RPC Methods](/docs/extending/rpc) - Detailed reference for host-to-plugin and plugin-to-host messaging
+
+## Example Plugin
+
+Check out the [Discord Integration Plugin recipe](/docs/cookbook/discord-integration-plugin) for a complete example showing how to build a plugin that:
+
+- Subscribes to thread publication events
+- Provides Discord slash commands (`/latest`, `/save`, `/search`)
+- Uses the Storyden API to search and retrieve content
+- Handles configuration and authentication

@@ -6,12 +6,12 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/mark"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 func (c *Cache) subscribe(ctx context.Context, bus *pubsub.Bus) error {
-	if _, err := pubsub.Subscribe(ctx, bus, "node_cache.invalidate_deleted", func(ctx context.Context, evt *message.EventNodeDeleted) error {
+	if _, err := pubsub.Subscribe(ctx, bus, "node_cache.invalidate_deleted", func(ctx context.Context, evt *rpc.EventNodeDeleted) error {
 		return c.delete(ctx, eventKey(evt.Slug, xid.ID(evt.ID)))
 	}); err != nil {
 		return err

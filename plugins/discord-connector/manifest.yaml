@@ -1,0 +1,37 @@
+id: discord-connector
+name: Discord Connector
+author: Southclaws
+description: >
+  A plugin that connects to discord and allows you to /save any link that was
+  shared in any chanel, then find it again with /search.
+
+  It has some more permissions by default so feel free to clone this code and
+  build something neat!
+version: 1.0.0
+# NOTE: On Windows, you need a file extension: ".exe"
+command: "./discord-connector"
+# It can react to when threads are published! Try modifying this bot to post in
+# discord when someone posts a thread in storyden!
+events_consumed: ["EventThreadPublished"]
+access:
+  handle: discord-connector
+  name: Discord Connector
+  permissions:
+    - CREATE_POST
+    - READ_PUBLISHED_THREADS
+    - CREATE_REACTION
+    - MANAGE_POSTS
+    - READ_PUBLISHED_LIBRARY
+    - MANAGE_LIBRARY
+    - LIST_PROFILES
+    - READ_PROFILE
+configuration_schema:
+  fields:
+    - id: discord_token
+      label: "Discord Bot Token"
+      description: "The token for the Discord bot to connect with."
+      type: string
+    - id: channel_id
+      label: "Discord Channel ID"
+      description: "The channel used for thread publish notifications."
+      type: string

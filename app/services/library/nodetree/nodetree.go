@@ -14,11 +14,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
-	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_auth"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
+	"github.com/Southclaws/storyden/lib/plugin/rpc"
 )
 
 var (
@@ -119,7 +119,7 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventNodeUpdated{
+	s.bus.Publish(ctx, &rpc.EventNodeUpdated{
 		ID:   library.NodeID(cnode.Mark.ID()),
 		Slug: cnode.GetSlug(),
 	})
@@ -169,7 +169,7 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	s.bus.Publish(ctx, &message.EventNodeUpdated{
+	s.bus.Publish(ctx, &rpc.EventNodeUpdated{
 		ID:   library.NodeID(result.Mark.ID()),
 		Slug: result.GetSlug(),
 	})
