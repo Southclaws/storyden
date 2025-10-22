@@ -10,8 +10,6 @@ import { handle } from "@/api/client";
 import { OAuthCallback } from "@/api/openapi-schema";
 import { deriveError } from "@/utils/error";
 
-export const dynamic = "force-dynamic";
-
 export type Props = {
   params: Promise<{
     provider: string;

@@ -2,8 +2,6 @@ import { ImageResponse } from "next/og";
 
 import { getIconURL } from "@/utils/icon";
 
-export const dynamic = "force-dynamic";
-
 export const size = {
   width: 512,
   height: 512,
