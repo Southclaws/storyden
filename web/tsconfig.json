@@ -2,7 +2,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "target": "ES6",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -29,15 +33,19 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "plugins": [
       {
         "name": "next"
       }
     ],
     "paths": {
-      "@/*": ["src/*"],
-      "@/styled-system/*": ["styled-system/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@/styled-system/*": [
+        "styled-system/*"
+      ]
     }
   },
   "include": [
@@ -45,7 +53,10 @@
     "styled-system",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
