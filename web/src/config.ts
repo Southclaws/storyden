@@ -57,7 +57,6 @@ If you see this, please open an issue at https://github.com/Southclaws/storyden/
     return config;
   } else {
     const config = serverEnvironment();
-    console.log("loaded server config", config);
     return config;
   }
 }
