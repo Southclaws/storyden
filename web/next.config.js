@@ -4,6 +4,7 @@ const isStandalone = process.env.NEXT_BUILD_STANDALONE === "true";
 const nextConfig = {
   output: isStandalone ? "standalone" : undefined,
   reactStrictMode: true,
+  reactCompiler: true,
   images: {
     loader: "custom",
     loaderFile: "./src/lib/asset/loader.js",
@@ -15,7 +16,7 @@ const nextConfig = {
     },
   },
   experimental: {
-    devtoolSegmentExplorer: true,
+    turbopackFileSystemCacheForDev: true,
   },
 };
 

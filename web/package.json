@@ -36,6 +36,7 @@
     "@tiptap/suggestion": "^2.8.0",
     "@uidotdev/usehooks": "^2.4.1",
     "@use-gesture/react": "^10.3.1",
+    "babel-plugin-react-compiler": "^1.0.0",
     "chroma-js": "^3.1.2",
     "date-fns": "^4.1.0",
     "dequal": "^2.0.3",
@@ -48,7 +49,7 @@
     "lucide-react": "^0.545.0",
     "mime-db": "^1.54.0",
     "mitt": "^3.0.1",
-    "next": "15.5.4",
+    "next": "16.0.0",
     "nuqs": "^1.20.0",
     "polished": "^4.3.1",
     "react": "19.2.0",
@@ -86,7 +87,7 @@
     "@typescript-eslint/eslint-plugin": "^8.37.0",
     "@typescript-eslint/parser": "^8.37.0",
     "eslint": "^9.37.0",
-    "eslint-config-next": "15.5.4",
+    "eslint-config-next": "16.0.0",
     "orval": "7.2.0",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3"
@@ -94,5 +95,8 @@
   "packageManager": "yarn@4.10.3+sha512.c38cafb5c7bb273f3926d04e55e1d8c9dfa7d9c3ea1f36a4868fa028b9e5f72298f0b7f401ad5eb921749eb012eb1c3bb74bf7503df3ee43fd600d14a018266f",
   "engines": {
     "node": "22.x"
+  },
+  "resolutions": {
+    "@types/react": "19.2.2"
   }
 }

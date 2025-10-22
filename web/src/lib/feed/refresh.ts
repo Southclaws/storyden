@@ -4,5 +4,5 @@ import { revalidatePath, revalidateTag } from "next/cache";
 
 export async function refreshFeed() {
   revalidatePath("/", "layout");
-  revalidateTag("api");
+  revalidateTag("api", "max");
 }
