@@ -1,5 +1,5 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
-import { useClickAway } from "@uidotdev/usehooks";
+import { useClickAway } from "@/utils/useClickAway";
 import { PropsWithChildren, useState } from "react";
 
 import { handle } from "@/api/client";

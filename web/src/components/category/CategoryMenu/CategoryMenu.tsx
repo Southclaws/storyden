@@ -1,5 +1,4 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
-import { useCopyToClipboard } from "@uidotdev/usehooks";
 
 import { Category, Permission } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
@@ -10,6 +9,7 @@ import { WEB_ADDRESS } from "@/config";
 import { styled } from "@/styled-system/jsx";
 import { useShare } from "@/utils/client";
 import { hasPermission } from "@/utils/permissions";
+import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 
 import { CategoryCreateMenuItem } from "../CategoryCreate/CategoryCreateMenuItem";
 import { CategoryDeleteMenuItem } from "../CategoryDelete/CategoryDeleteMenuItem";
@@ -40,7 +40,6 @@ export function useCategoryMenu({ category }: Props) {
       text: category.description,
     });
   }
-
 
   async function handleSelect({ value }: MenuSelectionDetails) {
     switch (value) {

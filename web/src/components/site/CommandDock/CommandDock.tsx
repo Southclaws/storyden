@@ -1,8 +1,8 @@
-import { useClickAway } from "@uidotdev/usehooks";
 import { JSX, PropsWithChildren } from "react";
 
 import { Box, Flex } from "@/styled-system/jsx";
 import { Floating } from "@/styled-system/patterns";
+import { useClickAway } from "@/utils/useClickAway";
 
 export type Props = {
   isOpen: boolean;

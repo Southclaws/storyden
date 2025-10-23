@@ -1,5 +1,4 @@
 import { MenuSelectionDetails, Portal } from "@ark-ui/react";
-import { useCopyToClipboard } from "@uidotdev/usehooks";
 import Link from "next/link";
 import { PropsWithChildren } from "react";
 import { toast } from "sonner";
@@ -10,6 +9,7 @@ import { ProfileReference } from "@/api/openapi-schema";
 import * as Menu from "@/components/ui/menu";
 import { WEB_ADDRESS } from "@/config";
 import { hasPermission } from "@/utils/permissions";
+import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 
 import { MemberIdent } from "../MemberBadge/MemberIdent";
 import { MemberRoleMenu } from "../MemberRoleMenu/MemberRoleMenu";

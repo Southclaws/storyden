@@ -1,6 +1,5 @@
 "use client";
 
-import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { useRouter } from "next/navigation";
 import { parseAsBoolean, useQueryState } from "nuqs";
 
@@ -13,6 +12,7 @@ import { useFeedMutations } from "@/lib/feed/mutation";
 import { canDeletePost, canEditPost } from "@/lib/thread/permissions";
 import { withUndo } from "@/lib/thread/undo";
 import { useShare } from "@/utils/client";
+import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 
 import { getPermalinkForThread } from "../utils";
 

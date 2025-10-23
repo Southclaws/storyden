@@ -1,5 +1,4 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useClickAway } from "@uidotdev/usehooks";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -10,6 +9,7 @@ import { Account, Category, LinkReference } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
 import { NO_CATEGORY_VALUE } from "@/components/category/CategorySelect/useCategorySelect";
 import { useFeedMutations } from "@/lib/feed/mutation";
+import { useClickAway } from "@/utils/useClickAway";
 
 export type Props = {
   initialSession?: Account;
