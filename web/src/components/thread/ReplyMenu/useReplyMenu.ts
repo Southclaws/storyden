@@ -1,14 +1,16 @@
 "use client";
 
-import { useCopyToClipboard } from "@uidotdev/usehooks";
-
 import { Reply, Thread } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { useShare } from "src/utils/client";
 
 import { handle } from "@/api/client";
 import { useThreadMutations } from "@/lib/thread/mutation";
+<<<<<<< Updated upstream
 import { withUndo } from "@/lib/thread/undo";
+=======
+import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
+>>>>>>> Stashed changes
 
 import { getPermalinkForPost } from "../utils";
 

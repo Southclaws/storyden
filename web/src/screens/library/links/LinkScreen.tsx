@@ -11,6 +11,8 @@ import { LinkButton } from "@/components/ui/link-button";
 import { Flex, HStack, LStack, styled } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
 
+/* eslint-disable */
+
 export type Props = {
   initialLink: Link;
   slug: string;
@@ -32,6 +34,13 @@ export function LinkScreen(props: Props) {
   const mainImage = getAssetURL(link.primary_image?.path);
 
   const domainSearch = `/links?q=${link.domain}`;
+
+  const assetsForThumbnails =
+    link.assets && link.assets.length > 0
+      ? link.assets
+      : link.primary_image
+        ? [link.primary_image]
+        : [];
 
   return (
     <LStack>
@@ -91,7 +100,7 @@ export function LinkScreen(props: Props) {
         </LStack>
       </Flex>
 
-      <AssetThumbnailList assets={link.assets} />
+      <AssetThumbnailList assets={assetsForThumbnails} />
     </LStack>
   );
 }
