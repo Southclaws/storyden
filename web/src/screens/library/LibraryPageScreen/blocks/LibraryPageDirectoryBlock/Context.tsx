@@ -1,4 +1,3 @@
-import { dequal } from "dequal";
 import { debounce } from "lodash/fp";
 import { useQueryState } from "nuqs";
 import { PropsWithChildren, createContext, useContext } from "react";
@@ -11,6 +10,7 @@ import {
   TagReference,
 } from "@/api/openapi-schema";
 import { SortState, useSortIndicator } from "@/components/site/SortIndicator";
+import { deepEqual } from "@/utils/equality";
 
 import { useLibraryPageContext } from "../../Context";
 
@@ -60,7 +60,7 @@ export function LibraryPageDirectoryBlockContextProvider({
     defaultValue: [],
     clearOnDefault: true,
     // This ensures the query params are removed entirely when tags are empty.
-    eq: dequal,
+    eq: deepEqual,
     parse: (value) => {
       if (value === null || value === undefined) {
         return [];

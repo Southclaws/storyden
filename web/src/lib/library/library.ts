@@ -1,9 +1,7 @@
-import slugify from "@sindresorhus/slugify";
 import { uniqueId } from "lodash";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { MutatorCallback, useSWRConfig } from "swr";
-import { Xid } from "xid-ts";
 
 import { linkCreate } from "@/api/openapi-client/links";
 import {
@@ -32,6 +30,9 @@ import {
   replaceLibraryPath,
 } from "@/screens/library/library-path";
 import { useLibraryPath } from "@/screens/library/useLibraryPath";
+import { slugify } from "@/utils/slug";
+
+import { generateXid } from "@/utils/xid";
 
 import { useCapability } from "../settings/capabilities";
 
@@ -99,7 +100,7 @@ export function useLibraryMutation(node?: Node) {
     // node IDs not slugs. So we need to prefix the random name to prevent this.
     //
     const name = initialName?.trim() || `untitled`;
-    const slug = slugify(`${name}-${new Xid().toString()}`);
+    const slug = slugify(`${name}-${generateXid()}`);
 
     const initial: NodeWithChildren = {
       id: "optimistic_node_" + uniqueId(),

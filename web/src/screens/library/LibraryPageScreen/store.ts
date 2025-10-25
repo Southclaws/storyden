@@ -1,4 +1,3 @@
-import { dequal } from "dequal";
 import { uniqueId } from "lodash";
 import { immer } from "zustand/middleware/immer";
 import { useStoreWithEqualityFn } from "zustand/traditional";
@@ -25,6 +24,7 @@ import {
   WithMetadata,
 } from "@/lib/library/metadata";
 import { applyNodeChanges } from "@/lib/library/mutators";
+import { deepEqual } from "@/utils/equality";
 
 import { useLibraryPageContext } from "./Context";
 
@@ -492,5 +492,5 @@ export const createNodeStore = (initState: State) => {
 
 export function useWatch<T>(selector: (state: State) => T): T {
   const { store } = useLibraryPageContext();
-  return useStoreWithEqualityFn(store, selector, dequal);
+  return useStoreWithEqualityFn(store, selector, deepEqual);
 }
