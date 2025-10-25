@@ -2,7 +2,6 @@ import {
   FileUploadFileAcceptDetails,
   FileUploadFileRejectDetails,
 } from "@ark-ui/react";
-import mime from "mime-db";
 import { PropsWithChildren } from "react";
 import { toast } from "sonner";
 
@@ -13,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import * as FileUpload from "@/components/ui/file-upload";
 import { MediaAddIcon, MediaIcon } from "@/components/ui/icons/Media";
 import { ButtonVariantProps, button } from "@/styled-system/recipes";
+import { getExtensionsForMimeTypes } from "@/utils/mime-types";
 
 type AssetUploadActionProps = {
   parentAssetID?: AssetID;
@@ -66,14 +66,7 @@ export function AssetUploadAction({
       return;
     }
 
-    const accepted = acceptedMIMEs.reduce((prev: string[], curr: string) => {
-      const extensions = mime[curr]?.extensions;
-      if (!extensions) {
-        return prev;
-      }
-
-      return [...prev, ...extensions];
-    }, []);
+    const accepted = getExtensionsForMimeTypes(acceptedMIMEs);
 
     const acceptedList = accepted.map((e) => `.${e}`).join(", ");
 
