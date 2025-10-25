@@ -13867,7 +13867,6 @@ __metadata:
     usehooks-ts: "npm:^3.1.1"
     uvu: "npm:^0.5.6"
     vaul: "npm:^1.1.2"
-    xid-ts: "npm:^1.1.4"
     zod: "npm:^3.25.76"
     zustand: "npm:^5.0.8"
   languageName: unknown
@@ -14032,13 +14031,6 @@ __metadata:
     string-width: "npm:^7.0.0"
     strip-ansi: "npm:^7.1.0"
   checksum: 10c0/a139b818da9573677548dd463bd626a5a5286271211eb6e4e82f34a4f643191d74e6d4a9bb0a3c26ec90e6f904f679e0569674ac099ea12378a8b98e20706066
-  languageName: node
-  linkType: hard
-
-"xid-ts@npm:^1.1.4":
-  version: 1.1.4
-  resolution: "xid-ts@npm:1.1.4"
-  checksum: 10c0/93198a23164ed1c6317e85aacc37ba80ab268eacdd7990d5157c7c9e52f0d44576b2acd37b413e16cf277229b1429ff32c8e452dfd0ec2c5ec723e09f8ff4bef
   languageName: node
   linkType: hard
 

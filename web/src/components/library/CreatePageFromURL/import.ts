@@ -1,5 +1,3 @@
-import { Xid } from "xid-ts";
-
 import { linkCreate } from "@/api/openapi-client/links";
 import {
   nodeCreate,
@@ -9,6 +7,7 @@ import {
 } from "@/api/openapi-client/nodes";
 import { Asset, Node } from "@/api/openapi-schema";
 import { deriveError } from "@/utils/error";
+import { generateXid } from "@/utils/xid";
 
 export type ImportStep =
   | "fetching_link"
@@ -157,7 +156,7 @@ export async function* importFromURLGenerator({
 
     // Generate a slug if there's no name to fill. We do this because the API
     // cannot generate a slug from an empty name. It probably should though.
-    const slug = name === "" ? `${new Xid().toString()}` : undefined;
+    const slug = name === "" ? generateXid() : undefined;
 
     const created_node = await nodeCreate({
       name,
