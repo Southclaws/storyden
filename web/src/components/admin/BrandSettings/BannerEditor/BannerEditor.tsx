@@ -2,7 +2,6 @@ import {
   FileUploadFileAcceptDetails,
   FileUploadFileRejectDetails,
 } from "@ark-ui/react";
-import mime from "mime-db";
 import { useRef, useState } from "react";
 import {
   FixedCropper,
@@ -20,6 +19,7 @@ import { SaveIcon } from "@/components/ui/icons/Save";
 import { css } from "@/styled-system/css";
 import { Box, HStack, LStack } from "@/styled-system/jsx";
 import { getBannerURL } from "@/utils/icon";
+import { getExtensionsForMimeTypes } from "@/utils/mime-types";
 
 import "react-advanced-cropper/dist/style.css";
 
@@ -110,17 +110,7 @@ export function BannerEditor() {
       return;
     }
 
-    const accepted = ["image/png", "image/jpeg"].reduce(
-      (prev: string[], curr: string) => {
-        const extensions = mime[curr]?.extensions;
-        if (!extensions) {
-          return prev;
-        }
-
-        return [...prev, ...extensions];
-      },
-      [],
-    );
+    const accepted = getExtensionsForMimeTypes(["image/png", "image/jpeg"]);
 
     const acceptedList = accepted.map((e) => `.${e}`).join(", ");
 

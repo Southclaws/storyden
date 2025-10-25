@@ -3944,13 +3944,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mime-db@npm:^1.43.6":
-  version: 1.43.6
-  resolution: "@types/mime-db@npm:1.43.6"
-  checksum: 10c0/709e93c31d92177ef6bb90d17917c82b1c6c30f1735c345d85e53238f4efacc00b26c5bfa479f4d2139596a8a054df15fb1a011a6e6cc1c14a32710c3c680733
-  languageName: node
-  linkType: hard
-
 "@types/ms@npm:*":
   version: 0.7.34
   resolution: "@types/ms@npm:0.7.34"
@@ -9834,13 +9827,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mime-db@npm:^1.54.0":
-  version: 1.54.0
-  resolution: "mime-db@npm:1.54.0"
-  checksum: 10c0/8d907917bc2a90fa2df842cdf5dfeaf509adc15fe0531e07bb2f6ab15992416479015828d6a74200041c492e42cce3ebf78e5ce714388a0a538ea9c53eece284
-  languageName: node
-  linkType: hard
-
 "mimic-fn@npm:^2.1.0":
   version: 2.1.0
   resolution: "mimic-fn@npm:2.1.0"
@@ -13544,7 +13530,6 @@ __metadata:
     "@trivago/prettier-plugin-sort-imports": "npm:^5.2.2"
     "@types/chroma-js": "npm:^3.1.1"
     "@types/lodash": "npm:^4.17.20"
-    "@types/mime-db": "npm:^1.43.6"
     "@types/node": "npm:^24.7.1"
     "@types/react": "npm:19.2.2"
     "@types/react-avatar-editor": "npm:^13.0.4"
@@ -13563,7 +13548,6 @@ __metadata:
     just-diff: "npm:^6.0.2"
     lodash: "npm:^4.17.21"
     lucide-react: "npm:^0.545.0"
-    mime-db: "npm:^1.54.0"
     next: "npm:15.5.4"
     nuqs: "npm:^1.20.0"
     orval: "npm:7.2.0"
