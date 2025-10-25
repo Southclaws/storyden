@@ -1,4 +1,3 @@
-import { dequal } from "dequal";
 import { Arguments } from "swr";
 
 import { getNodeGetKey, getNodeListKey } from "@/api/openapi-client/nodes";
@@ -8,6 +7,7 @@ import {
   NodeListParams,
   Visibility,
 } from "@/api/openapi-schema";
+import { deepEqual } from "@/utils/equality";
 
 type NodeKey = ReturnType<typeof getNodeGetKey>;
 type NodeListKey = ReturnType<typeof getNodeListKey>;
@@ -23,7 +23,7 @@ const nodeListPrivateKey = getNodeListKey({
 });
 
 export const nodeListPrivateKeyFn = (key: Arguments) => {
-  return dequal(key, nodeListPrivateKey);
+  return deepEqual(key, nodeListPrivateKey);
 };
 
 export function buildNodeListKey(params?: NodeListParams) {
@@ -37,7 +37,7 @@ export function buildNodeListKey(params?: NodeListParams) {
     // Don't pass for /nodes/<slug> keys
     const notNodeKey = !path.startsWith(nodeListKeyPath + "/");
 
-    const paramsEqual = params === undefined ? true : dequal(key[1], params);
+    const paramsEqual = params === undefined ? true : deepEqual(key[1], params);
 
     const matches = isNodeListKey && notNodeKey && paramsEqual;
 

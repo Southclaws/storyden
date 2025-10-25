@@ -38,7 +38,6 @@
     "@use-gesture/react": "^10.3.1",
     "chroma-js": "^3.1.2",
     "date-fns": "^4.1.0",
-    "dequal": "^2.0.3",
     "emoji-picker-react": "^4.14.0",
     "framer-motion": "^12.23.24",
     "immer": "^10.1.3",

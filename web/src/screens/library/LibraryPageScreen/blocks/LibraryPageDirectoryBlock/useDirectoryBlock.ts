@@ -1,8 +1,8 @@
-import { dequal } from "dequal";
 import { keyBy } from "lodash";
 import { useEffect } from "react";
 
 import { LibraryPageBlockTypeDirectory } from "@/lib/library/metadata";
+import { deepEqual } from "@/utils/equality";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";
@@ -76,7 +76,7 @@ export function useDirectoryBlock(): LibraryPageBlockTypeDirectory {
           ...filteredAddedColumns,
         ];
 
-        if (dequal(updatedColumnConfig, block.config.columns)) {
+        if (deepEqual(updatedColumnConfig, block.config.columns)) {
           return;
         }
 

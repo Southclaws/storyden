@@ -1,4 +1,3 @@
-import { dequal } from "dequal";
 import { uniqueId } from "lodash/fp";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 
@@ -18,6 +17,7 @@ import {
   ThreadReference,
   Visibility,
 } from "@/api/openapi-schema";
+import { deepEqual } from "@/utils/equality";
 
 export function useFeedMutations(session?: Account, params?: ThreadListParams) {
   const { mutate } = useSWRConfig();
@@ -40,7 +40,7 @@ export function useFeedMutations(session?: Account, params?: ThreadListParams) {
     const pageMatch = (params.page ?? "1") === (pageKeyParams.page ?? "1");
 
     const categoryMatch = pageKeyParams.categories
-      ? dequal(params.categories, pageKeyParams.categories)
+      ? deepEqual(params.categories, pageKeyParams.categories)
       : true;
 
     const paramsMatch = pageMatch && categoryMatch;
