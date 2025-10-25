@@ -1,4 +1,3 @@
-import { dequal } from "dequal";
 import { omit } from "lodash";
 
 import {
@@ -8,6 +7,7 @@ import {
   PropertySchemaList,
   PropertySchemaMutableProps,
 } from "@/api/openapi-schema";
+import { deepEqual } from "@/utils/equality";
 
 import { isValidLinkLike, normalizeLink } from "../link/validation";
 import { isSlugReady } from "../mark/mark";
@@ -78,7 +78,7 @@ export const deriveMutationFromDifference = (
       return;
     }
 
-    const changed = !dequal(draftValue, updatedValue);
+    const changed = !deepEqual(draftValue, updatedValue);
     if (!changed) {
       console.debug(
         `Skipping mutation for '${key}' because it has not changed`,
@@ -196,7 +196,7 @@ function diffPropertySchemas(
   a: PropertySchemaList,
   b: PropertySchemaList,
 ): PropertySchemaMutableProps[] | undefined {
-  if (dequal(a, b)) {
+  if (deepEqual(a, b)) {
     return undefined;
   }
 
