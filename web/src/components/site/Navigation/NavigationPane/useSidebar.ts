@@ -22,7 +22,9 @@ export function useSidebar(initialValue: boolean) {
   function setShowLeftBar() {
     const next = !showLeftBar;
 
-    setCookie(NAVIGATION_SIDEBAR_STATE_KEY, next ? "true" : "false");
+    setCookie(NAVIGATION_SIDEBAR_STATE_KEY, next ? "true" : "false", {
+      days: 180,
+    });
     setLocalState(next);
 
     // Manipulate the DOM directly to show/hide the left bar.

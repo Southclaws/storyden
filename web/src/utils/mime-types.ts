@@ -52,10 +52,27 @@ export function getExtensionsForMimeType(mimeType: string): string[] {
 
 /**
  * Get all extensions for a list of MIME types
+ * Supports wildcard MIME types like "image/*" by expanding them to all specific types
  */
 export function getExtensionsForMimeTypes(mimeTypes: string[]): string[] {
-  return mimeTypes.reduce((prev: string[], mimeType: string) => {
+  const allExtensions = mimeTypes.reduce((prev: string[], mimeType: string) => {
+    // Handle wildcard MIME types like "image/*"
+    if (mimeType.endsWith("/*")) {
+      const topLevelType = mimeType.slice(0, -2); // Remove "/*"
+      const matchingKeys = Object.keys(MIME_EXTENSIONS).filter((key) =>
+        key.startsWith(topLevelType + "/")
+      );
+      const wildcardExtensions = matchingKeys.flatMap(
+        (key) => MIME_EXTENSIONS[key] ?? []
+      );
+      return [...prev, ...wildcardExtensions];
+    }
+
+    // Handle specific MIME types
     const extensions = getExtensionsForMimeType(mimeType);
     return [...prev, ...extensions];
   }, []);
+
+  // Deduplicate extensions
+  return Array.from(new Set(allExtensions));
 }

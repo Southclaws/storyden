@@ -44,7 +44,9 @@ export function setCookie(
   if (domain) cookie += `; Domain=${domain}`;
   if (sameSite)
     cookie += `; SameSite=${sameSite.charAt(0).toUpperCase()}${sameSite.slice(1)}`;
-  if (secure) cookie += `; Secure`;
+  // Ensure Secure when SameSite=None to satisfy browser requirements
+  const effectiveSecure = secure || sameSite === "none";
+  if (effectiveSecure) cookie += `; Secure`;
 
   document.cookie = cookie;
 }

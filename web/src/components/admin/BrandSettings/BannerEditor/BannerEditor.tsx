@@ -25,6 +25,7 @@ import "react-advanced-cropper/dist/style.css";
 
 export const CROP_STENCIL_WIDTH = 1200;
 export const CROP_STENCIL_HEIGHT = 630;
+const ACCEPTED_BANNER_MIMES = ["image/png", "image/jpeg"] as const;
 
 export function BannerEditor() {
   const [bannerURL, setBannerURL] = useState<string | undefined>(
@@ -110,7 +111,7 @@ export function BannerEditor() {
       return;
     }
 
-    const accepted = getExtensionsForMimeTypes(["image/png", "image/jpeg"]);
+    const accepted = getExtensionsForMimeTypes([...ACCEPTED_BANNER_MIMES]);
 
     const acceptedList = accepted.map((e) => `.${e}`).join(", ");
 
@@ -143,6 +144,7 @@ export function BannerEditor() {
         <FileUpload.Root
           w="min"
           maxFiles={1}
+          accept={[...ACCEPTED_BANNER_MIMES]}
           onFileAccept={handleFile}
           onFileReject={handleFileReject}
         >
