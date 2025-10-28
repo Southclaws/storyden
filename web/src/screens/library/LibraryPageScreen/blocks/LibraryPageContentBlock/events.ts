@@ -1,11 +1,12 @@
-import mitt from "mitt";
 import { useEffect } from "react";
+
+import { createEmitter } from "@/utils/emitter";
 
 export type LibraryContentEvents = {
   "library-content:update-generated": string;
 };
 
-export const libraryContentBus = mitt<LibraryContentEvents>();
+export const libraryContentBus = createEmitter<LibraryContentEvents>();
 
 export function useLibraryContentEvent<K extends keyof LibraryContentEvents>(
   type: K,

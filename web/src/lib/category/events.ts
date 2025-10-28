@@ -1,7 +1,7 @@
-import mitt from "mitt";
 import { useEffect } from "react";
 
 import { Identifier } from "@/api/openapi-schema";
+import { createEmitter } from "@/utils/emitter";
 
 export type CategoryEvents = {
   "category:reorder-category": {
@@ -12,7 +12,7 @@ export type CategoryEvents = {
   };
 };
 
-export const categoryBus = mitt<CategoryEvents>();
+export const categoryBus = createEmitter<CategoryEvents>();
 
 export function useCategoryEvent<K extends keyof CategoryEvents>(
   type: K,

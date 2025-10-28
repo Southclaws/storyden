@@ -3890,13 +3890,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/js-cookie@npm:^3.0.6":
-  version: 3.0.6
-  resolution: "@types/js-cookie@npm:3.0.6"
-  checksum: 10c0/173afaf5ea9d86c22395b9d2a00b6adb0006dcfef165d6dcb0395cdc32f5a5dcf9c3c60f97194119963a15849b8f85121e1ae730b03e40bc0c29b84396ba22f9
-  languageName: node
-  linkType: hard
-
 "@types/json-schema@npm:^7.0.11, @types/json-schema@npm:^7.0.15, @types/json-schema@npm:^7.0.4, @types/json-schema@npm:^7.0.7":
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
@@ -3948,13 +3941,6 @@ __metadata:
   version: 2.0.0
   resolution: "@types/mdurl@npm:2.0.0"
   checksum: 10c0/cde7bb571630ed1ceb3b92a28f7b59890bb38b8f34cd35326e2df43eebfc74985e6aa6fd4184e307393bad8a9e0783a519a3f9d13c8e03788c0f98e5ec869c5e
-  languageName: node
-  linkType: hard
-
-"@types/mime-db@npm:^1.43.6":
-  version: 1.43.6
-  resolution: "@types/mime-db@npm:1.43.6"
-  checksum: 10c0/709e93c31d92177ef6bb90d17917c82b1c6c30f1735c345d85e53238f4efacc00b26c5bfa479f4d2139596a8a054df15fb1a011a6e6cc1c14a32710c3c680733
   languageName: node
   linkType: hard
 
@@ -8681,13 +8667,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-cookie@npm:^3.0.5":
-  version: 3.0.5
-  resolution: "js-cookie@npm:3.0.5"
-  checksum: 10c0/04a0e560407b4489daac3a63e231d35f4e86f78bff9d792011391b49c59f721b513411cd75714c418049c8dc9750b20fcddad1ca5a2ca616c3aca4874cce5b3a
-  languageName: node
-  linkType: hard
-
 "js-tokens@npm:^3.0.0 || ^4.0.0, js-tokens@npm:^4.0.0":
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
@@ -9845,13 +9824,6 @@ __metadata:
     braces: "npm:^3.0.3"
     picomatch: "npm:^2.3.1"
   checksum: 10c0/166fa6eb926b9553f32ef81f5f531d27b4ce7da60e5baf8c021d043b27a388fb95e46a8038d5045877881e673f8134122b59624d5cecbd16eb50a42e7a6b5ca8
-  languageName: node
-  linkType: hard
-
-"mime-db@npm:^1.54.0":
-  version: 1.54.0
-  resolution: "mime-db@npm:1.54.0"
-  checksum: 10c0/8d907917bc2a90fa2df842cdf5dfeaf509adc15fe0531e07bb2f6ab15992416479015828d6a74200041c492e42cce3ebf78e5ce714388a0a538ea9c53eece284
   languageName: node
   linkType: hard
 
@@ -13557,9 +13529,7 @@ __metadata:
     "@tiptap/suggestion": "npm:^2.8.0"
     "@trivago/prettier-plugin-sort-imports": "npm:^5.2.2"
     "@types/chroma-js": "npm:^3.1.1"
-    "@types/js-cookie": "npm:^3.0.6"
     "@types/lodash": "npm:^4.17.20"
-    "@types/mime-db": "npm:^1.43.6"
     "@types/node": "npm:^24.7.1"
     "@types/react": "npm:19.2.2"
     "@types/react-avatar-editor": "npm:^13.0.4"
@@ -13575,12 +13545,9 @@ __metadata:
     eslint-config-next: "npm:15.5.4"
     framer-motion: "npm:^12.23.24"
     immer: "npm:^10.1.3"
-    js-cookie: "npm:^3.0.5"
     just-diff: "npm:^6.0.2"
     lodash: "npm:^4.17.21"
     lucide-react: "npm:^0.545.0"
-    mime-db: "npm:^1.54.0"
-    mitt: "npm:^3.0.1"
     next: "npm:15.5.4"
     nuqs: "npm:^1.20.0"
     orval: "npm:7.2.0"

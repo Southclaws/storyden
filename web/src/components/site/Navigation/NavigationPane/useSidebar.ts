@@ -1,12 +1,12 @@
-import Cookies from "js-cookie";
 import { useState } from "react";
 
 import { NAVIGATION_SIDEBAR_STATE_KEY } from "@/local/state-keys";
+import { getCookie, setCookie } from "@/utils/cookie";
 
 import { parseSidebarCookie } from "./shared";
 
 export function useSidebar(initialValue: boolean) {
-  const clientSideCookieValue = Cookies.get(NAVIGATION_SIDEBAR_STATE_KEY);
+  const clientSideCookieValue = getCookie(NAVIGATION_SIDEBAR_STATE_KEY);
   const initialState =
     initialValue ?? parseSidebarCookie(clientSideCookieValue);
 
@@ -22,9 +22,8 @@ export function useSidebar(initialValue: boolean) {
   function setShowLeftBar() {
     const next = !showLeftBar;
 
-    Cookies.set(NAVIGATION_SIDEBAR_STATE_KEY, next ? "true" : "false", {
-      secure: true,
-      sameSite: "lax",
+    setCookie(NAVIGATION_SIDEBAR_STATE_KEY, next ? "true" : "false", {
+      days: 180,
     });
     setLocalState(next);
 

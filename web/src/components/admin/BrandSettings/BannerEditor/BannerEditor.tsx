@@ -2,7 +2,6 @@ import {
   FileUploadFileAcceptDetails,
   FileUploadFileRejectDetails,
 } from "@ark-ui/react";
-import mime from "mime-db";
 import { useRef, useState } from "react";
 import {
   FixedCropper,
@@ -20,11 +19,13 @@ import { SaveIcon } from "@/components/ui/icons/Save";
 import { css } from "@/styled-system/css";
 import { Box, HStack, LStack } from "@/styled-system/jsx";
 import { getBannerURL } from "@/utils/icon";
+import { getExtensionsForMimeTypes } from "@/utils/mime-types";
 
 import "react-advanced-cropper/dist/style.css";
 
 export const CROP_STENCIL_WIDTH = 1200;
 export const CROP_STENCIL_HEIGHT = 630;
+const ACCEPTED_BANNER_MIMES = ["image/png", "image/jpeg"] as const;
 
 export function BannerEditor() {
   const [bannerURL, setBannerURL] = useState<string | undefined>(
@@ -110,17 +111,7 @@ export function BannerEditor() {
       return;
     }
 
-    const accepted = ["image/png", "image/jpeg"].reduce(
-      (prev: string[], curr: string) => {
-        const extensions = mime[curr]?.extensions;
-        if (!extensions) {
-          return prev;
-        }
-
-        return [...prev, ...extensions];
-      },
-      [],
-    );
+    const accepted = getExtensionsForMimeTypes([...ACCEPTED_BANNER_MIMES]);
 
     const acceptedList = accepted.map((e) => `.${e}`).join(", ");
 
@@ -153,6 +144,7 @@ export function BannerEditor() {
         <FileUpload.Root
           w="min"
           maxFiles={1}
+          accept={[...ACCEPTED_BANNER_MIMES]}
           onFileAccept={handleFile}
           onFileReject={handleFileReject}
         >

@@ -1,5 +1,6 @@
-import mitt from "mitt";
 import { useEffect } from "react";
+
+import { createEmitter } from "@/utils/emitter";
 
 import { LibraryPageBlockType } from "./metadata";
 
@@ -12,7 +13,7 @@ export type LibraryBlockEvents = {
   "library:remove-block": { type: LibraryPageBlockType };
 };
 
-export const libraryBus = mitt<LibraryBlockEvents>();
+export const libraryBus = createEmitter<LibraryBlockEvents>();
 
 export function useLibraryBlockEvent<K extends keyof LibraryBlockEvents>(
   type: K,
