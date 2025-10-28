@@ -64,7 +64,7 @@ export function CategoryCard({ category, showChildren }: CategoryCardProps) {
           <WStack>
             <HStack gap="1" color="fg.subtle" fontSize="sm">
               <DiscussionIcon w="4" />
-              <styled.p>{category.postCount} threads</styled.p>
+              <styled.p>{category.postCount} {category.postCount === 1 ? "thread" : "threads"}</styled.p>
               {hasSubcategories && (
                 <HStack gap="1" color="fg.subtle" fontSize="sm">
                   <CategoryIcon w="4" />

@@ -43,7 +43,7 @@ export function CategoryScreenContextPane(props: Props) {
       style: "numeric" as const,
     },
     {
-      label: "threads",
+      label: category.postCount === 1 ? "thread" : "threads",
       icon: DiscussionIcon,
       value: `${category.postCount}`,
     },
