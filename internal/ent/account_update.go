@@ -25,6 +25,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
+	entplugin "github.com/Southclaws/storyden/internal/ent/plugin"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -237,6 +238,21 @@ func (_u *AccountUpdate) AddSessions(v ...*Session) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.AddSessionIDs(ids...)
+}
+
+// AddPluginIDs adds the "plugins" edge to the Plugin entity by IDs.
+func (_u *AccountUpdate) AddPluginIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.AddPluginIDs(ids...)
+	return _u
+}
+
+// AddPlugins adds the "plugins" edges to the Plugin entity.
+func (_u *AccountUpdate) AddPlugins(v ...*Plugin) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPluginIDs(ids...)
 }
 
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
@@ -598,6 +614,27 @@ func (_u *AccountUpdate) RemoveSessions(v ...*Session) *AccountUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveSessionIDs(ids...)
+}
+
+// ClearPlugins clears all "plugins" edges to the Plugin entity.
+func (_u *AccountUpdate) ClearPlugins() *AccountUpdate {
+	_u.mutation.ClearPlugins()
+	return _u
+}
+
+// RemovePluginIDs removes the "plugins" edge to Plugin entities by IDs.
+func (_u *AccountUpdate) RemovePluginIDs(ids ...xid.ID) *AccountUpdate {
+	_u.mutation.RemovePluginIDs(ids...)
+	return _u
+}
+
+// RemovePlugins removes "plugins" edges to Plugin entities.
+func (_u *AccountUpdate) RemovePlugins(v ...*Plugin) *AccountUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePluginIDs(ids...)
 }
 
 // ClearEmails clears all "emails" edges to the Email entity.
@@ -1230,6 +1267,51 @@ func (_u *AccountUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PluginsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPluginsIDs(); len(nodes) > 0 && !_u.mutation.PluginsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PluginsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
@@ -2486,6 +2568,21 @@ func (_u *AccountUpdateOne) AddSessions(v ...*Session) *AccountUpdateOne {
 	return _u.AddSessionIDs(ids...)
 }
 
+// AddPluginIDs adds the "plugins" edge to the Plugin entity by IDs.
+func (_u *AccountUpdateOne) AddPluginIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.AddPluginIDs(ids...)
+	return _u
+}
+
+// AddPlugins adds the "plugins" edges to the Plugin entity.
+func (_u *AccountUpdateOne) AddPlugins(v ...*Plugin) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddPluginIDs(ids...)
+}
+
 // AddEmailIDs adds the "emails" edge to the Email entity by IDs.
 func (_u *AccountUpdateOne) AddEmailIDs(ids ...xid.ID) *AccountUpdateOne {
 	_u.mutation.AddEmailIDs(ids...)
@@ -2845,6 +2942,27 @@ func (_u *AccountUpdateOne) RemoveSessions(v ...*Session) *AccountUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemoveSessionIDs(ids...)
+}
+
+// ClearPlugins clears all "plugins" edges to the Plugin entity.
+func (_u *AccountUpdateOne) ClearPlugins() *AccountUpdateOne {
+	_u.mutation.ClearPlugins()
+	return _u
+}
+
+// RemovePluginIDs removes the "plugins" edge to Plugin entities by IDs.
+func (_u *AccountUpdateOne) RemovePluginIDs(ids ...xid.ID) *AccountUpdateOne {
+	_u.mutation.RemovePluginIDs(ids...)
+	return _u
+}
+
+// RemovePlugins removes "plugins" edges to Plugin entities.
+func (_u *AccountUpdateOne) RemovePlugins(v ...*Plugin) *AccountUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemovePluginIDs(ids...)
 }
 
 // ClearEmails clears all "emails" edges to the Email entity.
@@ -3507,6 +3625,51 @@ func (_u *AccountUpdateOne) sqlSave(ctx context.Context) (_node *Account, err er
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(session.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.PluginsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedPluginsIDs(); len(nodes) > 0 && !_u.mutation.PluginsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.PluginsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   account.PluginsTable,
+			Columns: []string{account.PluginsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(entplugin.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {

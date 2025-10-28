@@ -37,6 +37,8 @@ import (
 	"github.com/Southclaws/storyden/app/resources/like/like_writer"
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
+	"github.com/Southclaws/storyden/app/resources/plugin/plugin_reader"
+	"github.com/Southclaws/storyden/app/resources/plugin/plugin_writer"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/resources/post/post_read_state"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
@@ -115,6 +117,8 @@ func Build() fx.Option {
 			question.New,
 			report_querier.New,
 			report_writer.New,
+			plugin_reader.New,
+			plugin_writer.New,
 		),
 		token.Build(),
 	)

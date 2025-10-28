@@ -295,6 +295,7 @@ func (s *Subscription) Close() {
 type (
 	HandlerFunc[T any]        func(ctx context.Context, event *T) error
 	CommandHandlerFunc[T any] func(ctx context.Context, command *T) error
+	DynamicHandlerFunc        func(ctx context.Context, event any) error
 )
 
 func Subscribe[T any](ctx context.Context, bus *Bus, handlerName string, handler HandlerFunc[T]) (*Subscription, error) {
