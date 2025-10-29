@@ -80,7 +80,7 @@ func (n *Writer) UpdateStatusMany(ctx context.Context, accountID account.Account
 	}
 
 	defer func() {
-		_ = tx.Rollback()
+		err = tx.Rollback()
 	}()
 
 	updated := make([]*notification.NotificationRef, 0, len(notifications))
