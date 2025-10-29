@@ -2,11 +2,11 @@ package tag_ref
 
 import (
 	"github.com/Southclaws/dt"
-	"github.com/gosimple/slug"
 	"github.com/mazznoer/csscolorparser"
 	"github.com/rs/xid"
 	"github.com/samber/lo"
 
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/internal/ent"
 )
 
@@ -21,7 +21,7 @@ type Name struct {
 }
 
 func NewName(s string) Name {
-	return Name{s: slug.Make(s)}
+	return Name{s: mark.Slugify(s)}
 }
 
 func (n Name) String() string {

@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gosimple/slug"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/dt"
@@ -16,6 +15,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/post/thread"
 	"github.com/Southclaws/storyden/app/resources/tag/tag_ref"
@@ -157,7 +157,7 @@ func (d *Writer) Create(
 
 	_, err = d.db.Post.
 		UpdateOneID(p.ID).
-		SetSlug(fmt.Sprintf("%s-%s", p.ID, slug.Make(title))).
+		SetSlug(fmt.Sprintf("%s-%s", p.ID, mark.Slugify(title))).
 		Save(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx), ftag.With(ftag.Internal))

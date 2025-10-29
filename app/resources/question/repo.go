@@ -8,9 +8,9 @@ import (
 	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/internal/ent"
 	"github.com/Southclaws/storyden/internal/ent/question"
-	"github.com/gosimple/slug"
 	"github.com/rs/xid"
 )
 
@@ -31,7 +31,7 @@ func (r *Repository) Store(ctx context.Context,
 	create := r.db.Question.Create()
 	mutate := create.Mutation()
 
-	slug := slug.Make(query)
+	slug := mark.Slugify(query)
 
 	mutate.SetSlug(slug)
 	mutate.SetQuery(query)
@@ -76,7 +76,7 @@ func (r *Repository) Get(ctx context.Context, id xid.ID) (*Question, error) {
 }
 
 func (r *Repository) GetByQuerySlug(ctx context.Context, query string) (*Question, error) {
-	slug := slug.Make(query)
+	slug := mark.Slugify(query)
 
 	q, err := r.db.Question.Query().
 		Where(question.Slug(slug)).

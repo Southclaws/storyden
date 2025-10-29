@@ -7,13 +7,13 @@ import (
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/opt"
 	"github.com/google/uuid"
-	"github.com/gosimple/slug"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -49,7 +49,7 @@ func TestThreads(t *testing.T) {
 			tests.Ok(t, err, cat1create)
 			r.Equal(cat1name, cat1create.JSON200.Name)
 			r.Equal("category testing", cat1create.JSON200.Description)
-			r.Equal(slug.Make(cat1name), cat1create.JSON200.Slug)
+			r.Equal(mark.Slugify(cat1name), cat1create.JSON200.Slug)
 
 			t.Run("thread_replies", func(t *testing.T) {
 				t.Parallel()
@@ -424,9 +424,6 @@ func TestThreads(t *testing.T) {
 
 				a := assert.New(t)
 
-				// Verify that queries for uncategorised threads only contain uncategorised threads.
-
-				// Create a category
 				cat1create, err := cl.CategoryCreateWithResponse(root, openapi.CategoryInitialProps{
 					Colour:      "#fe4efd",
 					Description: "categorised threads",
@@ -434,7 +431,6 @@ func TestThreads(t *testing.T) {
 				}, session1)
 				tests.Ok(t, err, cat1create)
 
-				// Create 2 threads, one inside the category, one without.
 				categorisedThread, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
 					Body:       opt.New("<p>this is a thread without category</p>").Ptr(),
 					Visibility: opt.New(openapi.Published).Ptr(),
@@ -450,7 +446,6 @@ func TestThreads(t *testing.T) {
 				tests.Ok(t, err, uncategorisedThread)
 
 				{
-					// Verify the thread appears in the thread list for uncategorized filter
 					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
 						Categories: &[]string{"null"},
 					})
@@ -461,8 +456,6 @@ func TestThreads(t *testing.T) {
 				}
 
 				{
-					// Verify that both threads appear when category filter is not applied
-
 					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{})
 					tests.Ok(t, err, threadList)
 					ids := dt.Map(threadList.JSON200.Threads, func(th openapi.ThreadReference) string { return th.Id })
@@ -471,8 +464,6 @@ func TestThreads(t *testing.T) {
 				}
 
 				{
-					// Verify that categorised thread appears when filtering by its category
-
 					threadList, err := cl.ThreadListWithResponse(root, &openapi.ThreadListParams{
 						Categories: &[]string{cat1create.JSON200.Slug},
 					})
@@ -481,6 +472,26 @@ func TestThreads(t *testing.T) {
 					a.NotContains(ids, uncategorisedThread.JSON200.Id, "uncategorised thread should appear in list")
 					a.Contains(ids, categorisedThread.JSON200.Id, "categorised thread should appear in list")
 				}
+			})
+
+			t.Run("thread_with_russian_slug", func(t *testing.T) {
+				t.Parallel()
+
+				a := assert.New(t)
+
+				threadCreate, err := cl.ThreadCreateWithResponse(root, openapi.ThreadInitialProps{
+					Body:       opt.New("<p>test content</p>").Ptr(),
+					Category:   opt.New(cat1create.JSON200.Id).Ptr(),
+					Visibility: opt.New(openapi.Published).Ptr(),
+					Title:      "Бабочки",
+				}, session1)
+				tests.Ok(t, err, threadCreate)
+				a.Contains(threadCreate.JSON200.Slug, "бабочки")
+
+				threadGet, err := cl.ThreadGetWithResponse(root, threadCreate.JSON200.Slug, nil)
+				tests.Ok(t, err, threadGet)
+				a.Equal("Бабочки", threadGet.JSON200.Title)
+				a.Contains(threadGet.JSON200.Slug, "бабочки")
 			})
 		}))
 	}))

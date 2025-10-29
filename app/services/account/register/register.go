@@ -17,6 +17,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/account/authentication"
 	"github.com/Southclaws/storyden/app/resources/account/email"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
@@ -80,6 +81,10 @@ func (s *Registrar) Create(ctx context.Context, handle opt.Optional[string], opt
 
 	// If no handle was given, generate one using adjective-animal.
 	handleOrGenerated := handle.Or(petname.Generate(2, "-"))
+
+	if err := account.ValidateHandle(ctx, handleOrGenerated); err != nil {
+		return nil, err
+	}
 
 	acc, err := s.accountWriter.Create(ctx, handleOrGenerated, opts...)
 	if err != nil {
@@ -155,6 +160,11 @@ func (s *Registrar) GetOrCreateViaEmail(
 
 		return current.Verified
 	}()
+
+	// Normalize handle to slug format. We don't error here because the handle
+	// is provided by an external provider, so it's not necessarily always in
+	// the end-user's control. Erroring here would result in a dead-end UX flow.
+	handle = mark.Slugify(handle)
 
 	logger := s.logger.With(
 		slog.String("handle", handle),

@@ -53,7 +53,7 @@ func TestAccountInvitations(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				inviteeHandle := "tester-invitee-" + xid.New().String()
+				inviteeHandle := "invitee-" + xid.New().String()
 				inviteeResponse, err := cl.AuthPasswordSignupWithResponse(root, &openapi.AuthPasswordSignupParams{
 					InvitationId: &invitationID,
 				}, openapi.AuthPair{Identifier: inviteeHandle, Token: "password"})
@@ -75,7 +75,7 @@ func TestAccountInvitations(t *testing.T) {
 				r := require.New(t)
 				a := assert.New(t)
 
-				inviteeHandle := "tester-invitee-" + xid.New().String()
+				inviteeHandle := "invitee-" + xid.New().String()
 				inviteeResponse, err := cl.AuthEmailPasswordSignupWithResponse(root, &openapi.AuthEmailPasswordSignupParams{
 					InvitationId: &invitationID,
 				}, openapi.AuthEmailPassword{Handle: &inviteeHandle, Email: xid.New().String() + "sc@storyden.org", Password: "password"})

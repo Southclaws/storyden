@@ -8,7 +8,7 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/opt"
-	"github.com/gosimple/slug"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/rs/xid"
 )
 
@@ -39,13 +39,13 @@ func NewFilename(name string) Filename {
 func NewExistingFilename(id xid.ID, name string) Filename {
 	return Filename{
 		id:    opt.New(id),
-		name:  slug.Make(formatFilename(id, name)),
+		name:  mark.Slugify(formatFilename(id, name)),
 		hasID: true,
 	}
 }
 
 func NewFilepathFilename(name string) Filename {
-	return Filename{name: slug.Make(name)}
+	return Filename{name: mark.Slugify(name)}
 }
 
 func ParseAssetFilename(s string) (*Filename, error) {
@@ -59,7 +59,7 @@ func ParseAssetFilename(s string) (*Filename, error) {
 		return nil, fault.Wrap(err)
 	}
 
-	if !slug.IsSlug(parts[1]) {
+	if !mark.IsSlug(parts[1]) {
 		return nil, fault.Wrap(errInvalidFormat, fmsg.With("name is not a valid slug"))
 	}
 

@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"dario.cat/mergo"
-	"github.com/gosimple/slug"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources"
@@ -49,7 +48,7 @@ func Test(t *testing.T, cfg *config.Config, o ...fx.Option) {
 		defaultConfig.DatabaseURL = dbURL
 	} else {
 		// Generate a unique database per test, avoids SQLite write contention.
-		testDatabaseName := slug.Make(time.Now().Format(time.RFC3339) + t.Name())
+		testDatabaseName := time.Now().Format(time.RFC3339) + t.Name()
 
 		opts := url.Values{"_pragma": []string{
 			"foreign_keys(1)",

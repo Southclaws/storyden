@@ -4,7 +4,6 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fmsg"
 	"github.com/Southclaws/fault/ftag"
-	"github.com/gosimple/slug"
 )
 
 var ErrInvalidSlug = fault.New("slug is not formed well", ftag.With(ftag.InvalidArgument))
@@ -20,7 +19,7 @@ func (s Slug) String() string {
 }
 
 func NewSlug(s string) (*Slug, error) {
-	if !slug.IsSlug(s) {
+	if !IsSlug(s) {
 		return nil, fault.Wrap(ErrInvalidSlug, fmsg.WithDesc("invalid slug", "The specified slug is not valid, it must be a URL-friendly string without spaces."))
 	}
 
@@ -30,5 +29,5 @@ func NewSlug(s string) (*Slug, error) {
 }
 
 func NewSlugFromName(s string) Slug {
-	return Slug{slug: slug.Make(s)}
+	return Slug{slug: Slugify(s)}
 }
