@@ -7,10 +7,9 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 
  * OpenAPI spec version: v1.25.8-canary
  */
+import type { NotificationListResult } from "./notificationListResult";
 
-export interface NotificationMarkAllReadOKResponse {
-  /** Human readable message about the operation result */
-  message?: string;
-  /** Indicates if the operation was successful */
-  success?: boolean;
-}
+/**
+ * OK
+ */
+export type NotificationUpdateManyOKResponse = NotificationListResult;

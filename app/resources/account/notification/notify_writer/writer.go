@@ -73,17 +73,38 @@ func (n *Writer) SetRead(ctx context.Context, id xid.ID, read bool) (*notificati
 	return nr, nil
 }
 
-func (n *Writer) SetAllRead(ctx context.Context, accountID account.AccountID) (int, error) {
-	count, err := n.db.Notification.Update().
-		Where(
-			entnotification.HasOwnerWith(entaccount.ID(xid.ID(accountID))),
-			entnotification.ReadEQ(false),
-		).
-		SetRead(true).
-		Save(ctx)
+func (n *Writer) UpdateStatusMany(ctx context.Context, accountID account.AccountID, notifications []*notification.NotificationRef) ([]*notification.NotificationRef, error) {
+	tx, err := n.db.Tx(ctx)
 	if err != nil {
-		return 0, fault.Wrap(err, fctx.With(ctx))
+		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return count, nil
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	updated := make([]*notification.NotificationRef, 0, len(notifications))
+
+	for _, notif := range notifications {
+		r, err := tx.Notification.UpdateOneID(xid.ID(notif.ID)).
+			Where(entnotification.HasOwnerWith(entaccount.ID(xid.ID(accountID)))).
+			SetRead(notif.Read).
+			Save(ctx)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		nr, err := notification.Map(r)
+		if err != nil {
+			return nil, fault.Wrap(err, fctx.With(ctx))
+		}
+
+		updated = append(updated, nr)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	return updated, nil
 }

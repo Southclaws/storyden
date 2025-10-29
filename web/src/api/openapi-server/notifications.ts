@@ -10,8 +10,9 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
 import type {
   NotificationListOKResponse,
   NotificationListParams,
-  NotificationMarkAllReadOKResponse,
   NotificationUpdateBody,
+  NotificationUpdateManyBody,
+  NotificationUpdateManyOKResponse,
   NotificationUpdateOKResponse,
 } from "../openapi-schema";
 import { fetcher } from "../server";
@@ -52,6 +53,37 @@ export const notificationList = async (
 };
 
 /**
+ * Update the status of multiple notifications in a single request.
+
+This endpoint accepts a list of notification IDs with their new status values.
+Each notification's status will be updated individually according to the provided values.
+
+ */
+export type notificationUpdateManyResponse = {
+  data: NotificationUpdateManyOKResponse;
+  status: number;
+};
+
+export const getNotificationUpdateManyUrl = () => {
+  return `/notifications`;
+};
+
+export const notificationUpdateMany = async (
+  notificationUpdateManyBody: NotificationUpdateManyBody,
+  options?: RequestInit,
+): Promise<notificationUpdateManyResponse> => {
+  return fetcher<Promise<notificationUpdateManyResponse>>(
+    getNotificationUpdateManyUrl(),
+    {
+      ...options,
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(notificationUpdateManyBody),
+    },
+  );
+};
+
+/**
  * Change the read status for a notification.
  */
 export type notificationUpdateResponse = {
@@ -75,30 +107,6 @@ export const notificationUpdate = async (
       method: "PATCH",
       headers: { "Content-Type": "application/json", ...options?.headers },
       body: JSON.stringify(notificationUpdateBody),
-    },
-  );
-};
-
-/**
- * Mark all unread notifications as read for the authenticated user.
- */
-export type notificationMarkAllReadResponse = {
-  data: NotificationMarkAllReadOKResponse;
-  status: number;
-};
-
-export const getNotificationMarkAllReadUrl = () => {
-  return `/notifications/mark-all-read`;
-};
-
-export const notificationMarkAllRead = async (
-  options?: RequestInit,
-): Promise<notificationMarkAllReadResponse> => {
-  return fetcher<Promise<notificationMarkAllReadResponse>>(
-    getNotificationMarkAllReadUrl(),
-    {
-      ...options,
-      method: "POST",
     },
   );
 };

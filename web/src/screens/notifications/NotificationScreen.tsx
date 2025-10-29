@@ -91,7 +91,7 @@ export function NotificationScreen(props: Props) {
           <Button
             variant="ghost"
             size="sm"
-            colorPalette="accent"
+            flexShrink="0"
             onClick={handlers.handleMarkAllAsRead}
           >
             Mark all as read
