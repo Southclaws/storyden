@@ -20,6 +20,8 @@ import type {
   NotificationListOKResponse,
   NotificationListParams,
   NotificationUpdateBody,
+  NotificationUpdateManyBody,
+  NotificationUpdateManyOKResponse,
   NotificationUpdateOKResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
@@ -73,6 +75,69 @@ export const useNotificationList = <
     swrFn,
     swrOptions,
   );
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Update the status of multiple notifications in a single request.
+
+This endpoint accepts a list of notification IDs with their new status values.
+Each notification's status will be updated individually according to the provided values.
+
+ */
+export const notificationUpdateMany = (
+  notificationUpdateManyBody: NotificationUpdateManyBody,
+) => {
+  return fetcher<NotificationUpdateManyOKResponse>({
+    url: `/notifications`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: notificationUpdateManyBody,
+  });
+};
+
+export const getNotificationUpdateManyMutationFetcher = () => {
+  return (
+    _: Key,
+    { arg }: { arg: NotificationUpdateManyBody },
+  ): Promise<NotificationUpdateManyOKResponse> => {
+    return notificationUpdateMany(arg);
+  };
+};
+export const getNotificationUpdateManyMutationKey = () =>
+  [`/notifications`] as const;
+
+export type NotificationUpdateManyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof notificationUpdateMany>>
+>;
+export type NotificationUpdateManyMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | InternalServerErrorResponse;
+
+export const useNotificationUpdateMany = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | InternalServerErrorResponse,
+>(options?: {
+  swr?: SWRMutationConfiguration<
+    Awaited<ReturnType<typeof notificationUpdateMany>>,
+    TError,
+    Key,
+    NotificationUpdateManyBody,
+    Awaited<ReturnType<typeof notificationUpdateMany>>
+  > & { swrKey?: string };
+}) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey = swrOptions?.swrKey ?? getNotificationUpdateManyMutationKey();
+  const swrFn = getNotificationUpdateManyMutationFetcher();
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
 
   return {
     swrKey,

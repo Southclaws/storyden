@@ -4,6 +4,7 @@ import { handle } from "@/api/client";
 import {
   notificationUpdate,
   useNotificationList,
+  useNotificationUpdateMany,
 } from "@/api/openapi-client/notifications";
 import {
   Notification,
@@ -33,6 +34,9 @@ export function useNotifications(props: Props) {
       },
     },
   );
+
+  const markAllReadMutation = useNotificationUpdateMany();
+
   if (!data) {
     return {
       ready: false as const,
@@ -64,6 +68,33 @@ export function useNotifications(props: Props) {
     });
   }
 
+  async function handleMarkAllAsRead() {
+    handle(async () => {
+      if (!data) {
+        return;
+      }
+
+      const updated = data.notifications.map((n) => ({
+        id: n.id,
+        status: NotificationStatus.read,
+      }));
+
+      await markAllReadMutation.trigger({ notifications: updated });
+
+      if (data) {
+        const newList = {
+          ...data,
+          notifications: data.notifications.map((n) => ({
+            ...n,
+            status: "read" as NotificationStatus,
+          })),
+        };
+
+        await mutate(newList);
+      }
+    });
+  }
+
   return {
     ready: true as const,
     data: {
@@ -72,6 +103,7 @@ export function useNotifications(props: Props) {
     },
     handlers: {
       handleMarkAs,
+      handleMarkAllAsRead,
     },
   };
 }

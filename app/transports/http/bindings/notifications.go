@@ -56,8 +56,6 @@ func (h *Notifications) NotificationList(ctx context.Context, request openapi.No
 }
 
 func (h *Notifications) NotificationUpdate(ctx context.Context, request openapi.NotificationUpdateRequestObject) (openapi.NotificationUpdateResponseObject, error) {
-	// NOTE: Ownership is not checked, only authentication, so if you know the
-	// ID of someone elses notification (unlikely) you can mark it as read.
 	_, err := session.GetAccountID(ctx)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
@@ -78,6 +76,43 @@ func (h *Notifications) NotificationUpdate(ctx context.Context, request openapi.
 
 	return openapi.NotificationUpdate200JSONResponse{
 		NotificationUpdateOKJSONResponse: openapi.NotificationUpdateOKJSONResponse(serialiseNotificationRef(n)),
+	}, nil
+}
+
+func (h *Notifications) NotificationUpdateMany(ctx context.Context, request openapi.NotificationUpdateManyRequestObject) (openapi.NotificationUpdateManyResponseObject, error) {
+	accountID, err := session.GetAccountID(ctx)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	notificationRefs := make([]*notification.NotificationRef, 0, len(request.Body.Notifications))
+	for _, n := range request.Body.Notifications {
+		if n.Status == nil {
+			continue
+		}
+
+		notificationRefs = append(notificationRefs, &notification.NotificationRef{
+			ID:   openapi.ParseID(n.Id),
+			Read: deserialiseNotificationStatus(*n.Status),
+		})
+	}
+
+	updated, err := h.notifyWriter.UpdateStatusMany(ctx, accountID, notificationRefs)
+	if err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	notifications := dt.Map(updated, serialiseNotificationRef)
+
+	return openapi.NotificationUpdateMany200JSONResponse{
+		NotificationUpdateManyOKJSONResponse: openapi.NotificationUpdateManyOKJSONResponse{
+			CurrentPage:   1,
+			NextPage:      new(int),
+			Notifications: notifications,
+			PageSize:      len(notifications),
+			Results:       len(notifications),
+			TotalPages:    1,
+		},
 	}, nil
 }
 

@@ -1040,6 +1040,20 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NotificationListOK" }
+    patch:
+      operationId: NotificationUpdateMany
+      description: |
+        Update the status of multiple notifications in a single request.
+
+        This endpoint accepts a list of notification IDs with their new status
+        values. Used for "Mark all as read".
+      tags: [notifications]
+      requestBody: { $ref: "#/components/requestBodies/NotificationUpdateMany" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NotificationUpdateManyOK" }
 
   /notifications/{notification_id}:
     patch:
@@ -2835,6 +2849,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/NotificationMutableProps" }
 
+    NotificationUpdateMany:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/NotificationListUpdate" }
+
     ReportCreate:
       content:
         application/json:
@@ -3184,6 +3203,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/Notification"
+
+    NotificationUpdateManyOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/NotificationListResult"
 
     ReportCreateOK:
       description: OK
@@ -4749,6 +4775,27 @@ components:
       type: object
       properties:
         status: { $ref: "#/components/schemas/NotificationStatus" }
+
+    NotificationWithID:
+      type: object
+      required: [id]
+      properties:
+        id: { $ref: "#/components/schemas/Identifier" }
+
+    NotificationMutation:
+      allOf:
+        - { $ref: "#/components/schemas/NotificationWithID" }
+        - { $ref: "#/components/schemas/NotificationMutableProps" }
+
+    NotificationMutationList:
+      type: array
+      items: { $ref: "#/components/schemas/NotificationMutation" }
+
+    NotificationListUpdate:
+      type: object
+      required: [notifications]
+      properties:
+        notifications: { $ref: "#/components/schemas/NotificationMutationList" }
 
     NotificationList:
       type: array

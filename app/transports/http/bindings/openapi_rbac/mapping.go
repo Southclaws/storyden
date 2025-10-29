@@ -250,6 +250,10 @@ func (m *Mapping) NotificationUpdate() (bool, *rbac.Permission) {
 	return true, nil
 }
 
+func (m *Mapping) NotificationUpdateMany() (bool, *rbac.Permission) {
+	return true, nil
+}
+
 func (m *Mapping) ReportCreate() (bool, *rbac.Permission) {
 	return true, nil
 }
