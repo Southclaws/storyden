@@ -3,7 +3,11 @@ import { uniq } from "lodash/fp";
 import { z } from "zod";
 
 export const ParamsSchema = z.object({
-  slug: z.string().array().min(1),
+  slug: z
+    .string()
+    .array()
+    .min(1)
+    .transform((slugs) => slugs.map((s) => decodeURIComponent(s))),
 });
 export type Params = z.infer<typeof ParamsSchema>;
 

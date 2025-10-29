@@ -1,7 +1,6 @@
-import slugify from "@sindresorhus/slugify";
-
 import { LinkIcon } from "@/components/ui/icons/Link";
 import * as Menu from "@/components/ui/menu";
+import { slugify } from "@/utils/slugify";
 
 import { useLibraryPageContext } from "../../Context";
 import { useWatch } from "../../store";

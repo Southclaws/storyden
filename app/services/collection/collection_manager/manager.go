@@ -6,12 +6,12 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
-	"github.com/gosimple/slug"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/collection"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_querier"
 	"github.com/Southclaws/storyden/app/resources/collection/collection_writer"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/services/collection/collection_auth"
 )
 
@@ -42,7 +42,7 @@ func (s *Manager) Create(ctx context.Context, accID account.AccountID, name stri
 	partial.Name.Call(func(v string) { opts = append(opts, collection_writer.WithName(v)) })
 	partial.Description.Call(func(v string) { opts = append(opts, collection_writer.WithDescription(v)) })
 
-	slug := partial.Slug.Or(slug.Make(name))
+	slug := partial.Slug.Or(mark.Slugify(name))
 
 	col, err := s.colWriter.Create(ctx, accID, name, slug, opts...)
 	if err != nil {

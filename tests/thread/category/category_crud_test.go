@@ -6,13 +6,13 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/gosimple/slug"
 	"github.com/samber/lo"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/integration"
@@ -45,7 +45,7 @@ func TestCategoryCRUD(t *testing.T) {
 				tests.Ok(t, err, create)
 				r.NotNil(create.JSON200)
 				r.Equal(name, create.JSON200.Name)
-				r.Equal(slug.Make(name), create.JSON200.Slug)
+				r.Equal(mark.Slugify(name), create.JSON200.Slug)
 
 				get, err := cl.CategoryGetWithResponse(root, create.JSON200.Slug, adminSession)
 				tests.Ok(t, err, get)
@@ -75,7 +75,7 @@ func TestCategoryCRUD(t *testing.T) {
 				oldSlug := create.JSON200.Slug
 
 				newName := "Category " + uuid.NewString()
-				newSlug := slug.Make(newName)
+				newSlug := mark.Slugify(newName)
 				update, err := cl.CategoryUpdateWithResponse(root, oldSlug, openapi.CategoryUpdateJSONRequestBody{Name: lo.ToPtr(newName), Slug: lo.ToPtr(newSlug)}, adminSession)
 				tests.Ok(t, err, update)
 				r.NotNil(update.JSON200)

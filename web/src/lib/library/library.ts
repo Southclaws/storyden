@@ -1,4 +1,3 @@
-import slugify from "@sindresorhus/slugify";
 import { uniqueId } from "lodash";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -32,6 +31,7 @@ import {
   replaceLibraryPath,
 } from "@/screens/library/library-path";
 import { useLibraryPath } from "@/screens/library/useLibraryPath";
+import { slugify } from "@/utils/slugify";
 
 import { useCapability } from "../settings/capabilities";
 

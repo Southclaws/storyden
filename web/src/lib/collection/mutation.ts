@@ -1,4 +1,3 @@
-import slugify from "@sindresorhus/slugify";
 import { uniqueId } from "lodash";
 import { Arguments, MutatorCallback, useSWRConfig } from "swr";
 
@@ -22,6 +21,7 @@ import {
   Identifier,
   ThreadListOKResponse,
 } from "@/api/openapi-schema";
+import { slugify } from "@/utils/slugify";
 
 import { useFeedMutations } from "../feed/mutation";
 

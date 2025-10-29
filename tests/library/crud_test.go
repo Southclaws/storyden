@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/fx"
 
+	"github.com/Southclaws/opt"
 	"github.com/Southclaws/storyden/app/resources/account/account_writer"
 	"github.com/Southclaws/storyden/app/resources/seed"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -139,6 +140,36 @@ func TestNodesHappyPath(t *testing.T) {
 				tests.Ok(t, err, node3get)
 
 				a.Nil(node3get.JSON200.Link)
+			})
+
+			t.Run("with_russian_slug", func(t *testing.T) {
+				a := assert.New(t)
+
+				nodeCreate, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+					Slug: opt.New("бабочки").Ptr(),
+					Name: "Бабочки",
+				}, sh.WithSession(ctx))
+				tests.Ok(t, err, nodeCreate)
+				a.Contains(nodeCreate.JSON200.Slug, "бабочки")
+
+				nodeGet, err := cl.NodeGetWithResponse(ctx, nodeCreate.JSON200.Slug, nil, sh.WithSession(ctx))
+				tests.Ok(t, err, nodeGet)
+				a.Equal("Бабочки", nodeGet.JSON200.Name)
+				a.Contains(nodeGet.JSON200.Slug, "бабочки")
+			})
+
+			t.Run("with_russian_title_slugified", func(t *testing.T) {
+				a := assert.New(t)
+
+				nodeCreate, err := cl.NodeCreateWithResponse(ctx, openapi.NodeInitialProps{
+					Name: "БАБОЧКИ Example",
+				}, sh.WithSession(ctx))
+				tests.Ok(t, err, nodeCreate)
+				a.Contains(nodeCreate.JSON200.Slug, "бабочки-example")
+
+				nodeGet, err := cl.NodeGetWithResponse(ctx, nodeCreate.JSON200.Slug, nil, sh.WithSession(ctx))
+				tests.Ok(t, err, nodeGet)
+				a.Equal("БАБОЧКИ Example", nodeGet.JSON200.Name)
 			})
 		}))
 	}))

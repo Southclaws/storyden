@@ -30,9 +30,9 @@ func TestAccountAdmin(t *testing.T) {
 		lc.Append(fx.StartHook(func() {
 			r := require.New(t)
 
-			adminHandle := "tester-admin-" + xid.New().String()
-			victimHandle := "tester-victim-" + xid.New().String()
-			randomHandle := "tester-random-" + xid.New().String()
+			adminHandle := "admin-" + xid.New().String()
+			victimHandle := "victim-" + xid.New().String()
+			randomHandle := "random-" + xid.New().String()
 
 			// Sign up for a new account with a password
 

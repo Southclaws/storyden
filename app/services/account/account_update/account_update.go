@@ -43,6 +43,10 @@ func (u *Updater) Update(ctx context.Context, id account.AccountID, params Parti
 	opts := []account_writer.Mutation{}
 
 	if v, ok := params.Handle.Get(); ok {
+		if err := account.ValidateHandle(ctx, v); err != nil {
+			return nil, err
+		}
+
 		opts = append(opts, account_writer.SetHandle(v))
 	}
 	if v, ok := params.Name.Get(); ok {

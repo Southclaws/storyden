@@ -8,11 +8,11 @@ import (
 
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
-	"github.com/gosimple/slug"
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/link/link_ref"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/internal/ent"
 	link_ent "github.com/Southclaws/storyden/internal/ent/link"
 )
@@ -103,7 +103,7 @@ func getLinkAttrs(u url.URL) (string, string) {
 
 	full := fmt.Sprintf("%s-%s", host, u.Path)
 
-	slugified := slug.Make(full)
+	slugified := mark.Slugify(full)
 	domain := u.Hostname()
 
 	return slugified, domain

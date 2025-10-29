@@ -8,11 +8,11 @@ import (
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
-	"github.com/gosimple/slug"
 
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
+	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/services/asset/asset_upload"
 )
 
@@ -38,7 +38,7 @@ func (c *analyseConsumer) downloadAsset(ctx context.Context, src string, fillrul
 	}
 
 	// TODO: Better naming???
-	name := slug.Make(src)
+	name := mark.Slugify(src)
 
 	a, err := c.uploader.Upload(ctx, resp.Body, resp.ContentLength, asset.NewFilename(name), asset_upload.Options{})
 	if err != nil {

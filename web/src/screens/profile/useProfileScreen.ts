@@ -13,14 +13,12 @@ import { useSession } from "src/auth";
 import { handle } from "@/api/client";
 import { useProfileMutations } from "@/lib/profile/mutation";
 import { hasPermission, hasPermissionOr } from "@/utils/permissions";
+import { isSlug } from "@/utils/slugify";
 
 export type Props = {
   initialSession?: Account;
   profile: ProfileGetOKResponse;
 };
-
-export const profileHandleRegex =
-  /^(?!-)(?!.*--)[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
 
 export const FormSchema = z.object({
   name: z.string().min(1, "Please enter a name."),
@@ -28,10 +26,9 @@ export const FormSchema = z.object({
     .string()
     .min(1, "Please enter a handle")
     .max(30, "Handle must be 30 characters or less")
-    .regex(
-      profileHandleRegex,
-      "Handle can only contain lowercase letters, numbers, and hyphens",
-    ),
+    .refine(isSlug, {
+      message: "Handle can only contain letters, numbers, hyphens, and underscores",
+    }),
 
   bio: z.string().max(200, "Bio must be 200 characters or less"),
 });
