@@ -6,8 +6,6 @@ import { getColourAsHex } from "src/utils/colour";
 import { API_ADDRESS } from "@/config";
 import { getSettings } from "@/lib/settings/settings-server";
 
-export const dynamic = "force-dynamic";
-
 export async function GET() {
   const settings = await getSettings();
 

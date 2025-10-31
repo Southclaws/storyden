@@ -21,8 +21,6 @@ import { Text } from "@/components/ui/text";
 import { Box, HStack, VStack, styled } from "@/styled-system/jsx";
 import { getColourVariants } from "@/utils/colour";
 
-export const dynamic = "force-dynamic";
-
 const DEMO_ACCENT = "#3b82f6";
 
 export default function Page() {

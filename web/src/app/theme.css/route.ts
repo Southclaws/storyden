@@ -5,8 +5,6 @@ import { getColourVariants } from "src/utils/colour";
 
 import { getSettings } from "@/lib/settings/settings-server";
 
-export const dynamic = "force-dynamic";
-
 /**
  *
  * @returns A fully static server-side-rendered CSS document that uses the
