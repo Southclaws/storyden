@@ -231,7 +231,8 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 	if i.thread_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(postID)) {
 		return openapi.ThreadGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: "public, max-age=60, stale-while-revalidate=120",
+				// CacheControl: "public, max-age=60, stale-while-revalidate=120",
+				CacheControl: "private, max-age=15, stale-while-revalidate=20",
 			},
 		}, nil
 	}
@@ -243,12 +244,18 @@ func (i *Threads) ThreadGet(ctx context.Context, request openapi.ThreadGetReques
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	lastModified := i.thread_cache.LastModified(ctx, xid.ID(postID))
+	if lastModified == nil {
+		lm := thread.UpdatedAt
+		lastModified = &lm
+	}
+
 	return openapi.ThreadGet200JSONResponse{
 		ThreadGetJSONResponse: openapi.ThreadGetJSONResponse{
 			Body: serialiseThread(thread),
 			Headers: openapi.ThreadGetResponseHeaders{
 				CacheControl: "max-age=1",
-				LastModified: thread.UpdatedAt.Format(time.RFC1123),
+				LastModified: lastModified.UTC().Format(time.RFC1123),
 			},
 		},
 	}, nil

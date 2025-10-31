@@ -64,6 +64,10 @@ type EventPostReacted struct {
 	PostID post.ID
 }
 
+type EventPostUnreacted struct {
+	PostID post.ID
+}
+
 type EventMemberMentioned struct {
 	By     account.AccountID
 	Source datagraph.Ref
