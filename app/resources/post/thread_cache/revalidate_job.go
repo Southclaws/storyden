@@ -67,5 +67,17 @@ func (c *Cache) subscribe(ctx context.Context, bus *pubsub.Bus) error {
 		return err
 	}
 
+	if _, err := pubsub.Subscribe(ctx, bus, "thread_cache.post_liked", func(ctx context.Context, evt *message.EventPostLiked) error {
+		return c.touchForReply(ctx, xid.ID(evt.PostID))
+	}); err != nil {
+		return err
+	}
+
+	if _, err := pubsub.Subscribe(ctx, bus, "thread_cache.post_unliked", func(ctx context.Context, evt *message.EventPostUnliked) error {
+		return c.touchForReply(ctx, xid.ID(evt.PostID))
+	}); err != nil {
+		return err
+	}
+
 	return nil
 }
