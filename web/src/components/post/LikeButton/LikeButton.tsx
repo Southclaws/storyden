@@ -1,6 +1,7 @@
 import { LikeAction } from "@/components/site/Action/Like";
+import { Button } from "@/components/ui/button";
 import { LikeIcon, LikeSavedIcon } from "@/components/ui/icons/Like";
-import { HStack, styled } from "@/styled-system/jsx";
+import { styled } from "@/styled-system/jsx";
 
 import { Props, useLikeButton } from "./useLikeButton";
 
@@ -14,28 +15,16 @@ export function LikeButton({ showCount = false, ...props }: LikeButtonProps) {
 
   if (showCount) {
     return (
-      <styled.button
+      <Button
         type="button"
+        variant="ghost"
         display="flex"
+        size="xs"
         gap="1"
-        alignItems="center"
         color="fg.muted"
-        cursor="pointer"
-        background="transparent"
-        border="none"
-        padding="1"
-        borderRadius="sm"
-        transition="colors"
-        position="relative"
-        zIndex="base"
-        onClick={handleClick}
-        aria-pressed={props.thread.likes.liked}
         aria-label={props.thread.likes.liked ? "Unlike" : "Like"}
         title={props.thread.likes.liked ? "Unlike" : "Like"}
-        _hover={{
-          color: "fg.default",
-          background: "bg.muted",
-        }}
+        onClick={handleClick}
       >
         <span>
           {props.thread.likes.liked ? (
@@ -44,8 +33,15 @@ export function LikeButton({ showCount = false, ...props }: LikeButtonProps) {
             <LikeIcon width="4" />
           )}
         </span>
-        <styled.span fontSize="sm">{likeCount}</styled.span>
-      </styled.button>
+        <styled.span
+          fontSize="sm"
+          fontWeight="medium"
+          fontVariantNumeric="tabular-nums"
+          fontVariant="tabular-nums"
+        >
+          {likeCount}
+        </styled.span>
+      </Button>
     );
   }
 
