@@ -17,7 +17,7 @@ export function LikeButton({ showCount = false, ...props }: LikeButtonProps) {
     return (
       <Button
         type="button"
-        variant="ghost"
+        variant="subtle"
         display="flex"
         size="xs"
         gap="1"
