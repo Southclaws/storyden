@@ -1,6 +1,5 @@
 "use client";
 
-import { useCopyToClipboard } from "@uidotdev/usehooks";
 import { useRouter } from "next/navigation";
 
 import { Account, Collection } from "src/api/openapi-schema";
@@ -15,6 +14,7 @@ import {
 } from "@/lib/collection/permissions";
 import { useFeedMutations } from "@/lib/feed/mutation";
 import { useShare } from "@/utils/client";
+import { useCopyToClipboard } from "@/utils/useCopyToClipboard";
 
 export type Props = {
   session?: Account;
