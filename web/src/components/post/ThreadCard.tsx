@@ -64,7 +64,7 @@ export const ThreadReferenceCard = memo(
               {!hideCategoryBadge && thread.category && (
                 <CategoryBadge category={thread.category} />
               )}
-              <LikeButton thread={thread} />
+              <LikeButton thread={thread} showCount />
               <CollectionMenu account={session} thread={thread} />
               <ThreadMenu thread={thread} />
             </HStack>
