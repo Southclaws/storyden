@@ -92,7 +92,7 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 	if i.profile_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(accountID)) {
 		return openapi.AccountGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: "private, max-age=60, stale-while-revalidate=120",
+				CacheControl: "private, max-age=30",
 			},
 		}, nil
 	}
@@ -102,12 +102,18 @@ func (i *Accounts) AccountGet(ctx context.Context, request openapi.AccountGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	// Use the cache's last modified time if available, otherwise fall back to account UpdatedAt
+	lastModified := acc.UpdatedAt
+	if cacheTime := i.profile_cache.LastModified(ctx, xid.ID(accountID)); cacheTime != nil {
+		lastModified = *cacheTime
+	}
+
 	return openapi.AccountGet200JSONResponse{
 		AccountGetOKJSONResponse: openapi.AccountGetOKJSONResponse{
 			Body: serialiseAccount(acc),
 			Headers: openapi.AccountGetOKResponseHeaders{
-				CacheControl: "private, max-age=60",
-				LastModified: acc.UpdatedAt.Format(time.RFC1123),
+				CacheControl: "private, max-age=5",
+				LastModified: lastModified.Format(time.RFC1123),
 			},
 		},
 	}, nil
