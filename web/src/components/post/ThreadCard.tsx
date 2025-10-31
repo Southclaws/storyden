@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { memo } from "react";
 
-import { ThreadReference } from "src/api/openapi-schema";
+import { ThreadReference, Visibility } from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 import { Byline } from "src/components/content/Byline";
 import { CollectionMenu } from "src/components/content/CollectionMenu/CollectionMenu";
@@ -28,7 +28,8 @@ type Props = {
 export const ThreadReferenceCard = memo(
   ({ thread, hideCategoryBadge = false }: Props) => {
     const session = useSession();
-    const permalink = `/t/${thread.slug}`;
+    const isDraft = thread.visibility === Visibility.draft;
+    const permalink = isDraft ? `/new?id=${thread.id}` : `/t/${thread.slug}`;
 
     const title = thread.title || thread.link?.title || "Untitled post";
 

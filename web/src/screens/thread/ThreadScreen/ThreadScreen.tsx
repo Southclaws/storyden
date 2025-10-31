@@ -4,7 +4,7 @@ import { Controller, ControllerProps } from "react-hook-form";
 
 import { Unready } from "src/components/site/Unready";
 
-import { Thread } from "@/api/openapi-schema";
+import { Thread, Visibility } from "@/api/openapi-schema";
 import { CategoryBadge } from "@/components/category/CategoryBadge";
 import { Byline } from "@/components/content/Byline";
 import { ContentComposer } from "@/components/content/ContentComposer/ContentComposer";
@@ -27,6 +27,7 @@ import {
   DiscussionParticipatingIcon,
 } from "@/components/ui/icons/Discussion";
 import { LikeIcon, LikeSavedIcon } from "@/components/ui/icons/Like";
+import { VisibilityBadge } from "@/components/visibility/VisibilityBadge";
 import { HStack, LStack, VStack, WStack, styled } from "@/styled-system/jsx";
 
 import { Form, Props, useThreadScreen } from "./useThreadScreen";
@@ -76,15 +77,21 @@ export function ThreadScreen(props: Props) {
         {thread.deletedAt !== undefined && (
           <ThreadDeletedAlert thread={thread} />
         )}
-        <WStack>
-          <Byline
-            href={`#${thread.id}`}
-            author={thread.author}
-            time={new Date(thread.createdAt)}
-            updated={new Date(thread.updatedAt)}
-          />
+        <WStack justifyContent="space-between">
+          <HStack>
+            <Byline
+              href={`#${thread.id}`}
+              author={thread.author}
+              time={new Date(thread.createdAt)}
+              updated={new Date(thread.updatedAt)}
+            />
 
-          {thread.category && <CategoryBadge category={thread.category} />}
+            {thread.category && <CategoryBadge category={thread.category} />}
+          </HStack>
+
+          {thread.visibility !== Visibility.published && (
+            <VisibilityBadge visibility={thread.visibility} />
+          )}
         </WStack>
         <FormErrorText>{form.formState.errors.root?.message}</FormErrorText>
 
