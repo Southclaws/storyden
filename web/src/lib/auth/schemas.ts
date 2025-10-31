@@ -1,13 +1,15 @@
 import { z } from "zod";
 
+import { isSlug } from "@/utils/slugify";
+
 export const UsernameSchema = z
   .string()
   .min(1, "Please enter a username.")
   .max(30, "Maximum length is 30 characters.")
   .toLowerCase()
-  .regex(
-    /^[a-z0-9_-]+$/g,
-    "Username can only contain latin letters, numbers, dashes and underscores.",
+  .refine(
+    (val) => isSlug(val),
+    "Username must be lowercase letters, numbers, hyphens, and underscores only.",
   );
 
 export const PasswordSchema = z
