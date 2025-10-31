@@ -9,8 +9,6 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/cachecontrol"
 	"github.com/Southclaws/storyden/internal/infrastructure/cache"
-	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/kv"
-	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/spanner"
 	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
@@ -21,7 +19,6 @@ const (
 )
 
 type Cache struct {
-	ins   spanner.Instrumentation
 	store cache.Store
 	clock func() time.Time
 }
@@ -29,12 +26,10 @@ type Cache struct {
 func New(
 	ctx context.Context,
 	lc fx.Lifecycle,
-	ins spanner.Builder,
 	store cache.Store,
 	bus *pubsub.Bus,
 ) *Cache {
 	c := &Cache{
-		ins:   ins.Build(),
 		store: store,
 		clock: time.Now,
 	}
@@ -48,9 +43,6 @@ func New(
 }
 
 func (c *Cache) IsNotModified(ctx context.Context, cq cachecontrol.Query, id xid.ID) bool {
-	ctx, span := c.ins.Instrument(ctx, kv.String("id", id.String()))
-	defer span.End()
-
 	notModified := cq.NotModified(func() *time.Time {
 		return c.lastModified(ctx, id)
 	})
@@ -59,10 +51,11 @@ func (c *Cache) IsNotModified(ctx context.Context, cq cachecontrol.Query, id xid
 }
 
 func (c *Cache) LastModified(ctx context.Context, id xid.ID) *time.Time {
-	ctx, span := c.ins.Instrument(ctx, kv.String("id", id.String()))
-	defer span.End()
-
 	return c.lastModified(ctx, id)
+}
+
+func (c *Cache) Store(ctx context.Context, id xid.ID, ts time.Time) error {
+	return c.storeTimestamp(ctx, id, ts)
 }
 
 func (c *Cache) cacheKey(id xid.ID) string {

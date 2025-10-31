@@ -95,16 +95,24 @@ func (p *Profiles) ProfileList(ctx context.Context, request openapi.ProfileListR
 	}, nil
 }
 
+const profileGetCacheControl = "public, max-age=60, stale-while-revalidate=120"
+
 func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetRequestObject) (openapi.ProfileGetResponseObject, error) {
 	id, err := openapi.ResolveHandle(ctx, p.profileQuery, request.AccountHandle)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	cacheTime := p.profile_cache.LastModified(ctx, xid.ID(id))
+	lastModified := ""
+	if cacheTime != nil {
+		lastModified = cacheTime.Format(time.RFC1123)
+	}
 	if p.profile_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), xid.ID(id)) {
 		return openapi.ProfileGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
-				CacheControl: "public, max-age=60, stale-while-revalidate=120",
+				CacheControl: profileGetCacheControl,
+				LastModified: lastModified,
 			},
 		}, nil
 	}
@@ -114,17 +122,17 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	lastModified := pro.Updated
-	if cacheTime := p.profile_cache.LastModified(ctx, xid.ID(id)); cacheTime != nil {
-		lastModified = *cacheTime
+	if lastModified == "" {
+		p.profile_cache.Store(ctx, xid.ID(id), pro.Updated)
+		lastModified = pro.Updated.Format(time.RFC1123)
 	}
 
 	return openapi.ProfileGet200JSONResponse{
 		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
 			Body: serialiseProfile(pro),
 			Headers: openapi.ProfileGetOKResponseHeaders{
-				CacheControl: "public, max-age=30, stale-while-revalidate=60",
-				LastModified: lastModified.Format(time.RFC1123),
+				CacheControl: profileGetCacheControl,
+				LastModified: lastModified,
 			},
 		},
 	}, nil

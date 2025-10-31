@@ -82,14 +82,13 @@ const categoryGetCacheControl = "public, max-age=60, stale-while-revalidate=3600
 func (c Categories) CategoryGet(ctx context.Context, request openapi.CategoryGetRequestObject) (openapi.CategoryGetResponseObject, error) {
 	slug := string(request.CategorySlug)
 
-	cacheQuery := reqinfo.GetCacheQuery(ctx)
+	cacheTime := c.category_cache.LastModified(ctx, slug)
+	lastModified := ""
+	if cacheTime != nil {
+		lastModified = cacheTime.Format(time.RFC1123)
+	}
 
-	if c.category_cache.IsNotModified(ctx, cacheQuery, slug) {
-		lastModified := ""
-		if ts := c.category_cache.LastModified(ctx, slug); ts != nil {
-			lastModified = ts.UTC().Format(time.RFC1123)
-		}
-
+	if c.category_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), slug) {
 		return openapi.CategoryGet304Response{
 			Headers: openapi.NotModifiedResponseHeaders{
 				CacheControl: categoryGetCacheControl,
@@ -103,18 +102,17 @@ func (c Categories) CategoryGet(ctx context.Context, request openapi.CategoryGet
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	lastModified := time.Now().UTC() // NOTE: Should use updated at
-	if ts := c.category_cache.LastModified(ctx, slug); ts != nil {
-		lastModified = ts.UTC()
+	if lastModified == "" {
+		c.category_cache.Store(ctx, slug, cat.UpdatedAt)
+		lastModified = cat.UpdatedAt.Format(time.RFC1123)
 	}
-	c.category_cache.Store(ctx, slug, lastModified)
 
 	return openapi.CategoryGet200JSONResponse{
 		CategoryGetOKJSONResponse: openapi.CategoryGetOKJSONResponse{
 			Body: serialiseCategory(cat),
 			Headers: openapi.CategoryGetOKResponseHeaders{
 				CacheControl: categoryGetCacheControl,
-				LastModified: lastModified.Format(time.RFC1123),
+				LastModified: lastModified,
 			},
 		},
 	}, nil
