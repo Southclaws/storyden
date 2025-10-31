@@ -7,7 +7,6 @@ import { generateHTML, generateJSON } from "@tiptap/html";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { ChangeEvent, useEffect, useId, useMemo } from "react";
-import { Xid } from "xid-ts";
 
 import { Asset } from "src/api/openapi-schema";
 

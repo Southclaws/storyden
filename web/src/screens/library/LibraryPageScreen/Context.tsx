@@ -1,4 +1,3 @@
-import { dequal } from "dequal";
 import { debounce, entries, toPairs } from "lodash";
 import {
   PropsWithChildren,
@@ -23,6 +22,7 @@ import {
 import { MutationSet } from "@/lib/library/diff";
 import { useLibraryMutation } from "@/lib/library/library";
 import { WithMetadata, hydrateNode } from "@/lib/library/metadata";
+import { deepEqual } from "@/utils/equality";
 import { deriveError } from "@/utils/error";
 
 import { NodeStoreAPI, createNodeStore } from "./store";
@@ -138,7 +138,7 @@ export function LibraryPageProvider({
     }
 
     const unsub = storeRef.current.subscribe((state, prev) => {
-      if (!dequal(state.draft, prev.draft)) {
+      if (!deepEqual(state.draft, prev.draft)) {
         saveDraft();
       }
     });
@@ -166,8 +166,8 @@ export function LibraryPageProvider({
     // We compare the un-hydrated node for original comparison, because the
     // nodeWithMeta object is potentially mutated by the hydration function to
     // set up default values for new nodes. This includes the page's layout.
-    const equalToOriginal = dequal(original, node);
-    const equalToDraft = dequal(draft, nodeWithMeta);
+    const equalToOriginal = deepEqual(original, node);
+    const equalToDraft = deepEqual(draft, nodeWithMeta);
 
     storeRef.current.setState((state) => {
       if (!equalToOriginal) {
