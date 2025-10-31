@@ -10,9 +10,12 @@ import (
 	"strings"
 	"sync"
 
+	"ariga.io/atlas/sql/migrate"
+	atlas_schema "ariga.io/atlas/sql/schema"
 	entgo "entgo.io/ent"
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/schema"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/fault/fmsg"
@@ -27,6 +30,7 @@ import (
 
 	"github.com/Southclaws/storyden/internal/config"
 	"github.com/Southclaws/storyden/internal/ent"
+	ent_post "github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/infrastructure/instrumentation/tracing"
 )
 
@@ -116,9 +120,12 @@ func newEntClient(lc fx.Lifecycle, tf tracing.Factory, cfg config.Config, db *sq
 			schemaLock.Lock()
 			defer schemaLock.Unlock()
 
-			// Run create-only migrations after initialisation.
-			// This is done in tests and scripts too.
-			if err := client.Schema.Create(ctx); err != nil {
+			// Run migrations with hooks and index cleanup.
+			if err := client.Schema.Create(
+				ctx,
+				schema.WithDropIndex(true),
+				schema.WithApplyHook(populateLastReplyAt()),
+			); err != nil {
 				return fault.Wrap(err, fctx.With(ctx))
 			}
 
@@ -209,5 +216,45 @@ func getDriver(databaseURL string) (string, string, error) {
 
 	default:
 		return "", "", fault.Newf("unsupported scheme: %s", u.Scheme)
+	}
+}
+
+// populateLastReplyAt is a data migration hook that fills NULL last_reply_at values
+// with created_at for threads. This only runs when the last_reply_at column is being
+// modified (e.g., changing from nullable to non-nullable).
+//
+// This is a bit of a hack because there's no versioned migrations set up now.
+// It shouldn't run again after first run though, and if we change the column
+// again at some point in the future, this hook will just be removed.
+func populateLastReplyAt() schema.ApplyHook {
+	return func(next schema.Applier) schema.Applier {
+		return schema.ApplyFunc(func(ctx context.Context, conn dialect.ExecQuerier, plan *migrate.Plan) error {
+			// Check if the last_reply_at column is being modified in this migration
+			hasChange := func() bool {
+				for _, c := range plan.Changes {
+					m, ok := c.Source.(*atlas_schema.ModifyTable)
+					if ok && m.T.Name == ent_post.Table {
+						// Check if last_reply_at column is being modified
+						if atlas_schema.Changes(m.Changes).IndexModifyColumn(ent_post.FieldLastReplyAt) != -1 {
+							return true
+						}
+					}
+				}
+				return false
+			}()
+
+			if hasChange {
+				err := conn.Exec(ctx, `
+					UPDATE posts
+					SET last_reply_at = created_at
+					WHERE last_reply_at IS NULL
+				`, []any{}, nil)
+				if err != nil {
+					return fault.Wrap(err, fmsg.With("failed to populate last_reply_at"))
+				}
+			}
+
+			return next.Apply(ctx, conn, plan)
+		})
 	}
 }

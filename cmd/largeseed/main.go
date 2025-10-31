@@ -293,7 +293,7 @@ func (s *seeder) seedData(ctx context.Context, numThreads int, numAccounts int) 
 				SetSlug(slug).
 				SetBody(bodyHTML).
 				SetShort(shortText).
-				SetFirst(true).
+				SetLastReplyAt(time.Now()).
 				SetVisibility("published").
 				SetCreatedAt(createdAt).
 				SetUpdatedAt(createdAt).
@@ -345,7 +345,6 @@ func (s *seeder) seedData(ctx context.Context, numThreads int, numAccounts int) 
 				_, err := s.db.Post.Create().
 					SetBody(bodyHTML).
 					SetShort(shortText).
-					SetFirst(false).
 					SetVisibility("published").
 					SetCreatedAt(replyCreated).
 					SetUpdatedAt(replyCreated).

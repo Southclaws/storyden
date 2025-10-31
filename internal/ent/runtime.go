@@ -794,7 +794,7 @@ func init() {
 	// post.DefaultCreatedAt holds the default value on creation for the created_at field.
 	post.DefaultCreatedAt = postDescCreatedAt.Default.(func() time.Time)
 	// postDescPinned is the schema descriptor for pinned field.
-	postDescPinned := postFields[3].Descriptor()
+	postDescPinned := postFields[2].Descriptor()
 	// post.DefaultPinned holds the default value on creation for the pinned field.
 	post.DefaultPinned = postDescPinned.Default.(bool)
 	// postDescID is the schema descriptor for id field.

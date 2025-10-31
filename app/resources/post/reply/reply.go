@@ -89,6 +89,11 @@ func Map(m *ent.Post) (*Reply, error) {
 		return nil, err
 	}
 
+	var rootPostID post.ID
+	if m.RootPostID != nil {
+		rootPostID = post.ID(*m.RootPostID)
+	}
+
 	return &Reply{
 		Post: post.Post{
 			ID: post.ID(m.ID),
@@ -104,7 +109,7 @@ func Map(m *ent.Post) (*Reply, error) {
 		},
 		ReplyTo:         replyTo,
 		RootAuthor:      *rootAuthor,
-		RootPostID:      post.ID(m.RootPostID),
+		RootPostID:      rootPostID,
 		RootThreadMark:  m.Edges.Root.Slug,
 		RootThreadTitle: m.Edges.Root.Title,
 	}, nil
@@ -153,7 +158,10 @@ func Mapper(
 		}
 
 		if m.Edges.Root != nil {
-			rootPostID := post.ID(m.RootPostID)
+			var rootPostID post.ID
+			if m.RootPostID != nil {
+				rootPostID = post.ID(*m.RootPostID)
+			}
 			rootThreadMark := opt.NewPtr(m.Edges.Root).OrZero().Slug
 			rootThreadTitle := opt.NewPtr(m.Edges.Root).OrZero().Title
 

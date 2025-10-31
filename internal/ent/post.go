@@ -30,8 +30,6 @@ type Post struct {
 	DeletedAt *time.Time `json:"deleted_at,omitempty"`
 	// IndexedAt holds the value of the "indexed_at" field.
 	IndexedAt *time.Time `json:"indexed_at,omitempty"`
-	// First holds the value of the "first" field.
-	First bool `json:"first,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
 	// Slug holds the value of the "slug" field.
@@ -39,11 +37,11 @@ type Post struct {
 	// Pinned holds the value of the "pinned" field.
 	Pinned bool `json:"pinned,omitempty"`
 	// LastReplyAt holds the value of the "last_reply_at" field.
-	LastReplyAt *time.Time `json:"last_reply_at,omitempty"`
+	LastReplyAt time.Time `json:"last_reply_at,omitempty"`
 	// RootPostID holds the value of the "root_post_id" field.
-	RootPostID xid.ID `json:"root_post_id,omitempty"`
+	RootPostID *xid.ID `json:"root_post_id,omitempty"`
 	// ReplyToPostID holds the value of the "reply_to_post_id" field.
-	ReplyToPostID xid.ID `json:"reply_to_post_id,omitempty"`
+	ReplyToPostID *xid.ID `json:"reply_to_post_id,omitempty"`
 	// Body holds the value of the "body" field.
 	Body string `json:"body,omitempty"`
 	// Short holds the value of the "short" field.
@@ -262,15 +260,17 @@ func (*Post) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case post.FieldRootPostID, post.FieldReplyToPostID:
+			values[i] = &sql.NullScanner{S: new(xid.ID)}
 		case post.FieldMetadata:
 			values[i] = new([]byte)
-		case post.FieldFirst, post.FieldPinned:
+		case post.FieldPinned:
 			values[i] = new(sql.NullBool)
 		case post.FieldTitle, post.FieldSlug, post.FieldBody, post.FieldShort, post.FieldVisibility:
 			values[i] = new(sql.NullString)
 		case post.FieldCreatedAt, post.FieldUpdatedAt, post.FieldDeletedAt, post.FieldIndexedAt, post.FieldLastReplyAt:
 			values[i] = new(sql.NullTime)
-		case post.FieldID, post.FieldRootPostID, post.FieldReplyToPostID, post.FieldAccountPosts, post.FieldCategoryID, post.FieldLinkID:
+		case post.FieldID, post.FieldAccountPosts, post.FieldCategoryID, post.FieldLinkID:
 			values[i] = new(xid.ID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -319,12 +319,6 @@ func (_m *Post) assignValues(columns []string, values []any) error {
 				_m.IndexedAt = new(time.Time)
 				*_m.IndexedAt = value.Time
 			}
-		case post.FieldFirst:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field first", values[i])
-			} else if value.Valid {
-				_m.First = value.Bool
-			}
 		case post.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field title", values[i])
@@ -347,20 +341,21 @@ func (_m *Post) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field last_reply_at", values[i])
 			} else if value.Valid {
-				_m.LastReplyAt = new(time.Time)
-				*_m.LastReplyAt = value.Time
+				_m.LastReplyAt = value.Time
 			}
 		case post.FieldRootPostID:
-			if value, ok := values[i].(*xid.ID); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field root_post_id", values[i])
-			} else if value != nil {
-				_m.RootPostID = *value
+			} else if value.Valid {
+				_m.RootPostID = new(xid.ID)
+				*_m.RootPostID = *value.S.(*xid.ID)
 			}
 		case post.FieldReplyToPostID:
-			if value, ok := values[i].(*xid.ID); !ok {
+			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field reply_to_post_id", values[i])
-			} else if value != nil {
-				_m.ReplyToPostID = *value
+			} else if value.Valid {
+				_m.ReplyToPostID = new(xid.ID)
+				*_m.ReplyToPostID = *value.S.(*xid.ID)
 			}
 		case post.FieldBody:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -538,9 +533,6 @@ func (_m *Post) String() string {
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("first=")
-	builder.WriteString(fmt.Sprintf("%v", _m.First))
-	builder.WriteString(", ")
 	builder.WriteString("title=")
 	builder.WriteString(_m.Title)
 	builder.WriteString(", ")
@@ -550,16 +542,18 @@ func (_m *Post) String() string {
 	builder.WriteString("pinned=")
 	builder.WriteString(fmt.Sprintf("%v", _m.Pinned))
 	builder.WriteString(", ")
-	if v := _m.LastReplyAt; v != nil {
-		builder.WriteString("last_reply_at=")
-		builder.WriteString(v.Format(time.ANSIC))
+	builder.WriteString("last_reply_at=")
+	builder.WriteString(_m.LastReplyAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	if v := _m.RootPostID; v != nil {
+		builder.WriteString("root_post_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("root_post_id=")
-	builder.WriteString(fmt.Sprintf("%v", _m.RootPostID))
-	builder.WriteString(", ")
-	builder.WriteString("reply_to_post_id=")
-	builder.WriteString(fmt.Sprintf("%v", _m.ReplyToPostID))
+	if v := _m.ReplyToPostID; v != nil {
+		builder.WriteString("reply_to_post_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("body=")
 	builder.WriteString(_m.Body)

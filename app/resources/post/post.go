@@ -61,7 +61,7 @@ func (p *Post) GetUpdated() time.Time         { return p.UpdatedAt }
 
 func Map(in *ent.Post) (*Post, error) {
 	rootID, title, slug := func() (ID, string, string) {
-		if in.First {
+		if in.RootPostID == nil {
 			return ID(in.ID), in.Title, in.Slug
 		}
 

@@ -91,7 +91,7 @@ func Map(m *ent.Post) (*Thread, error) {
 		Slug:        m.Slug,
 		Short:       m.Short,
 		Pinned:      m.Pinned,
-		LastReplyAt: opt.NewPtr(m.LastReplyAt),
+		LastReplyAt: opt.New(m.LastReplyAt),
 
 		Category:   category,
 		Visibility: visibility.NewVisibilityFromEnt(m.Visibility),
@@ -154,11 +154,12 @@ func Mapper(
 				DeletedAt: opt.NewPtr(m.DeletedAt),
 			},
 
-			Title:       m.Title,
-			Slug:        m.Slug,
-			Short:       m.Short,
-			Pinned:      m.Pinned,
-			LastReplyAt: opt.NewPtr(m.LastReplyAt),
+			Title:  m.Title,
+			Slug:   m.Slug,
+			Short:  m.Short,
+			Pinned: m.Pinned,
+			// Only populate the last-reply-at if there are replies.
+			LastReplyAt: opt.NewSafe(m.LastReplyAt, rs.Status(m.ID).Count > 0),
 
 			ReadStatus:  rr.Status(m.ID),
 			ReplyStatus: rs.Status(m.ID),

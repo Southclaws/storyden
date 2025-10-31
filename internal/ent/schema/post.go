@@ -5,6 +5,7 @@ import (
 	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/rs/xid"
 )
 
@@ -18,17 +19,15 @@ func (Post) Mixin() []ent.Mixin {
 
 func (Post) Fields() []ent.Field {
 	return []ent.Field{
-		field.Bool("first"),
-
 		// parent posts
 		field.String("title").Optional(),
 		field.String("slug").Optional(),
 		field.Bool("pinned").Default(false),
-		field.Time("last_reply_at").Optional().Nillable(),
+		field.Time("last_reply_at"),
 
 		// child posts
-		field.String("root_post_id").GoType(xid.ID{}).Optional(),
-		field.String("reply_to_post_id").GoType(xid.ID{}).Optional(),
+		field.String("root_post_id").GoType(xid.ID{}).Optional().Nillable(),
+		field.String("reply_to_post_id").GoType(xid.ID{}).Optional().Nillable(),
 
 		// All posts
 		field.String("body"),
@@ -42,6 +41,21 @@ func (Post) Fields() []ent.Field {
 		field.String("account_posts").GoType(xid.ID{}),
 		field.String("category_id").GoType(xid.ID{}).Optional(),
 		field.String("link_id").GoType(xid.ID{}).Optional(),
+	}
+}
+
+func (Post) Indexes() []ent.Index {
+	return []ent.Index{
+		// Thread listing queries:
+		// - root post + soft delete + visibility always used for filtering
+		// - last_reply_at always used for ordering (denormalized, always populated)
+		index.Fields("root_post_id", "deleted_at", "visibility", "last_reply_at"),
+		index.Fields("root_post_id", "deleted_at", "visibility", "category_id", "last_reply_at"),
+
+		// Reply queries:
+		// - root post + soft delete always used for filtering
+		// - created at always used for ordering
+		index.Fields("root_post_id", "deleted_at", "created_at"),
 	}
 }
 

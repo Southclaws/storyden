@@ -76,11 +76,6 @@ func IndexedAt(v time.Time) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldIndexedAt, v))
 }
 
-// First applies equality check predicate on the "first" field. It's identical to FirstEQ.
-func First(v bool) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldFirst, v))
-}
-
 // Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
 func Title(v string) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldTitle, v))
@@ -316,16 +311,6 @@ func IndexedAtNotNil() predicate.Post {
 	return predicate.Post(sql.FieldNotNull(FieldIndexedAt))
 }
 
-// FirstEQ applies the EQ predicate on the "first" field.
-func FirstEQ(v bool) predicate.Post {
-	return predicate.Post(sql.FieldEQ(FieldFirst, v))
-}
-
-// FirstNEQ applies the NEQ predicate on the "first" field.
-func FirstNEQ(v bool) predicate.Post {
-	return predicate.Post(sql.FieldNEQ(FieldFirst, v))
-}
-
 // TitleEQ applies the EQ predicate on the "title" field.
 func TitleEQ(v string) predicate.Post {
 	return predicate.Post(sql.FieldEQ(FieldTitle, v))
@@ -524,16 +509,6 @@ func LastReplyAtLT(v time.Time) predicate.Post {
 // LastReplyAtLTE applies the LTE predicate on the "last_reply_at" field.
 func LastReplyAtLTE(v time.Time) predicate.Post {
 	return predicate.Post(sql.FieldLTE(FieldLastReplyAt, v))
-}
-
-// LastReplyAtIsNil applies the IsNil predicate on the "last_reply_at" field.
-func LastReplyAtIsNil() predicate.Post {
-	return predicate.Post(sql.FieldIsNull(FieldLastReplyAt))
-}
-
-// LastReplyAtNotNil applies the NotNil predicate on the "last_reply_at" field.
-func LastReplyAtNotNil() predicate.Post {
-	return predicate.Post(sql.FieldNotNull(FieldLastReplyAt))
 }
 
 // RootPostIDEQ applies the EQ predicate on the "root_post_id" field.

@@ -1182,7 +1182,10 @@ func (_q *PostQuery) loadRoot(ctx context.Context, query *PostQuery, nodes []*Po
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Post)
 	for i := range nodes {
-		fk := nodes[i].RootPostID
+		if nodes[i].RootPostID == nil {
+			continue
+		}
+		fk := *nodes[i].RootPostID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -1229,9 +1232,12 @@ func (_q *PostQuery) loadPosts(ctx context.Context, query *PostQuery, nodes []*P
 	}
 	for _, n := range neighbors {
 		fk := n.RootPostID
-		node, ok := nodeids[fk]
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "root_post_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "root_post_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "root_post_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1241,7 +1247,10 @@ func (_q *PostQuery) loadReplyTo(ctx context.Context, query *PostQuery, nodes []
 	ids := make([]xid.ID, 0, len(nodes))
 	nodeids := make(map[xid.ID][]*Post)
 	for i := range nodes {
-		fk := nodes[i].ReplyToPostID
+		if nodes[i].ReplyToPostID == nil {
+			continue
+		}
+		fk := *nodes[i].ReplyToPostID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -1288,9 +1297,12 @@ func (_q *PostQuery) loadReplies(ctx context.Context, query *PostQuery, nodes []
 	}
 	for _, n := range neighbors {
 		fk := n.ReplyToPostID
-		node, ok := nodeids[fk]
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "reply_to_post_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "reply_to_post_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "reply_to_post_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

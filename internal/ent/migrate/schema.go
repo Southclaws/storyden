@@ -666,11 +666,10 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "indexed_at", Type: field.TypeTime, Nullable: true},
-		{Name: "first", Type: field.TypeBool},
 		{Name: "title", Type: field.TypeString, Nullable: true},
 		{Name: "slug", Type: field.TypeString, Nullable: true},
 		{Name: "pinned", Type: field.TypeBool, Default: false},
-		{Name: "last_reply_at", Type: field.TypeTime, Nullable: true},
+		{Name: "last_reply_at", Type: field.TypeTime},
 		{Name: "body", Type: field.TypeString},
 		{Name: "short", Type: field.TypeString},
 		{Name: "metadata", Type: field.TypeJSON, Nullable: true},
@@ -689,33 +688,50 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "posts_accounts_posts",
-				Columns:    []*schema.Column{PostsColumns[14]},
+				Columns:    []*schema.Column{PostsColumns[13]},
 				RefColumns: []*schema.Column{AccountsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "posts_categories_posts",
-				Columns:    []*schema.Column{PostsColumns[15]},
+				Columns:    []*schema.Column{PostsColumns[14]},
 				RefColumns: []*schema.Column{CategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_links_posts",
-				Columns:    []*schema.Column{PostsColumns[16]},
+				Columns:    []*schema.Column{PostsColumns[15]},
 				RefColumns: []*schema.Column{LinksColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_posts_posts",
-				Columns:    []*schema.Column{PostsColumns[17]},
+				Columns:    []*schema.Column{PostsColumns[16]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "posts_posts_replies",
-				Columns:    []*schema.Column{PostsColumns[18]},
+				Columns:    []*schema.Column{PostsColumns[17]},
 				RefColumns: []*schema.Column{PostsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "post_root_post_id_deleted_at_visibility_last_reply_at",
+				Unique:  false,
+				Columns: []*schema.Column{PostsColumns[16], PostsColumns[3], PostsColumns[12], PostsColumns[8]},
+			},
+			{
+				Name:    "post_root_post_id_deleted_at_visibility_category_id_last_reply_at",
+				Unique:  false,
+				Columns: []*schema.Column{PostsColumns[16], PostsColumns[3], PostsColumns[12], PostsColumns[14], PostsColumns[8]},
+			},
+			{
+				Name:    "post_root_post_id_deleted_at_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{PostsColumns[16], PostsColumns[3], PostsColumns[1]},
 			},
 		},
 	}

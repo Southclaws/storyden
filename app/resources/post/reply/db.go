@@ -40,14 +40,14 @@ func (d *database) Create(
 		return nil, fault.Wrap(err, fmsg.With("failed to get parent thread"), fctx.With(ctx), ftag.With(ftag.Internal))
 	}
 
-	if thread.First == false {
+	if thread.RootPostID != nil {
 		return nil, fault.New("attempt to create post under non-thread post")
 	}
 
 	q := d.db.Post.
 		Create().
 		SetUpdatedAt(time.Now()).
-		SetFirst(false).
+		SetLastReplyAt(time.Now()). // Required field, but unused for Reply view
 		SetRootID(xid.ID(parentID)).
 		SetAuthorID(xid.ID(authorID))
 
