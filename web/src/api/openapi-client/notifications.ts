@@ -84,8 +84,8 @@ export const useNotificationList = <
 /**
  * Update the status of multiple notifications in a single request.
 
-This endpoint accepts a list of notification IDs with their new status values.
-Each notification's status will be updated individually according to the provided values.
+This endpoint accepts a list of notification IDs with their new status
+values. Used for "Mark all as read".
 
  */
 export const notificationUpdateMany = (
