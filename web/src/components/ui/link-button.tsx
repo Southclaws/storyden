@@ -18,7 +18,6 @@ export function LinkButton({
   href,
   ...props
 }: PropsWithChildren<LinkProps>) {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [vp, stripped] = button.splitVariantProps(props);
 
   const cn = cx(button(vp), css(stripped));

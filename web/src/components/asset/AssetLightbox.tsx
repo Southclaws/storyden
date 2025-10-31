@@ -1,5 +1,4 @@
 import { Portal, Presence, UsePresenceProps } from "@ark-ui/react";
-import { useClickAway } from "@uidotdev/usehooks";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useQueryState } from "nuqs";
@@ -8,6 +7,7 @@ import { Asset } from "@/api/openapi-schema";
 import { css, cx } from "@/styled-system/css";
 import { Box, Center, HStack } from "@/styled-system/jsx";
 import { getAssetURL } from "@/utils/asset";
+import { useClickAway } from "@/utils/useClickAway";
 
 import { IconButton } from "../ui/icon-button";
 import { ArrowLeftIcon, ArrowRightIcon } from "../ui/icons/Arrow";

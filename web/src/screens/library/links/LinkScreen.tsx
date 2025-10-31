@@ -33,6 +33,13 @@ export function LinkScreen(props: Props) {
 
   const domainSearch = `/links?q=${link.domain}`;
 
+  const assetsForThumbnails =
+    link.assets && link.assets.length > 0
+      ? link.assets
+      : link.primary_image
+        ? [link.primary_image]
+        : [];
+
   return (
     <LStack>
       <Breadcrumbs
@@ -91,7 +98,7 @@ export function LinkScreen(props: Props) {
         </LStack>
       </Flex>
 
-      <AssetThumbnailList assets={link.assets} />
+      <AssetThumbnailList assets={assetsForThumbnails} />
     </LStack>
   );
 }
