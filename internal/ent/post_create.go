@@ -83,12 +83,6 @@ func (_c *PostCreate) SetNillableIndexedAt(v *time.Time) *PostCreate {
 	return _c
 }
 
-// SetFirst sets the "first" field.
-func (_c *PostCreate) SetFirst(v bool) *PostCreate {
-	_c.mutation.SetFirst(v)
-	return _c
-}
-
 // SetTitle sets the "title" field.
 func (_c *PostCreate) SetTitle(v string) *PostCreate {
 	_c.mutation.SetTitle(v)
@@ -134,14 +128,6 @@ func (_c *PostCreate) SetNillablePinned(v *bool) *PostCreate {
 // SetLastReplyAt sets the "last_reply_at" field.
 func (_c *PostCreate) SetLastReplyAt(v time.Time) *PostCreate {
 	_c.mutation.SetLastReplyAt(v)
-	return _c
-}
-
-// SetNillableLastReplyAt sets the "last_reply_at" field if the given value is not nil.
-func (_c *PostCreate) SetNillableLastReplyAt(v *time.Time) *PostCreate {
-	if v != nil {
-		_c.SetLastReplyAt(*v)
-	}
 	return _c
 }
 
@@ -538,11 +524,11 @@ func (_c *PostCreate) check() error {
 	if _, ok := _c.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Post.updated_at"`)}
 	}
-	if _, ok := _c.mutation.First(); !ok {
-		return &ValidationError{Name: "first", err: errors.New(`ent: missing required field "Post.first"`)}
-	}
 	if _, ok := _c.mutation.Pinned(); !ok {
 		return &ValidationError{Name: "pinned", err: errors.New(`ent: missing required field "Post.pinned"`)}
+	}
+	if _, ok := _c.mutation.LastReplyAt(); !ok {
+		return &ValidationError{Name: "last_reply_at", err: errors.New(`ent: missing required field "Post.last_reply_at"`)}
 	}
 	if _, ok := _c.mutation.Body(); !ok {
 		return &ValidationError{Name: "body", err: errors.New(`ent: missing required field "Post.body"`)}
@@ -621,10 +607,6 @@ func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		_spec.SetField(post.FieldIndexedAt, field.TypeTime, value)
 		_node.IndexedAt = &value
 	}
-	if value, ok := _c.mutation.First(); ok {
-		_spec.SetField(post.FieldFirst, field.TypeBool, value)
-		_node.First = value
-	}
 	if value, ok := _c.mutation.Title(); ok {
 		_spec.SetField(post.FieldTitle, field.TypeString, value)
 		_node.Title = value
@@ -639,7 +621,7 @@ func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := _c.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
-		_node.LastReplyAt = &value
+		_node.LastReplyAt = value
 	}
 	if value, ok := _c.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
@@ -721,7 +703,7 @@ func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.RootPostID = nodes[0]
+		_node.RootPostID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.PostsIDs(); len(nodes) > 0 {
@@ -754,7 +736,7 @@ func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ReplyToPostID = nodes[0]
+		_node.ReplyToPostID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := _c.mutation.RepliesIDs(); len(nodes) > 0 {
@@ -1018,18 +1000,6 @@ func (u *PostUpsert) ClearIndexedAt() *PostUpsert {
 	return u
 }
 
-// SetFirst sets the "first" field.
-func (u *PostUpsert) SetFirst(v bool) *PostUpsert {
-	u.Set(post.FieldFirst, v)
-	return u
-}
-
-// UpdateFirst sets the "first" field to the value that was provided on create.
-func (u *PostUpsert) UpdateFirst() *PostUpsert {
-	u.SetExcluded(post.FieldFirst)
-	return u
-}
-
 // SetTitle sets the "title" field.
 func (u *PostUpsert) SetTitle(v string) *PostUpsert {
 	u.Set(post.FieldTitle, v)
@@ -1087,12 +1057,6 @@ func (u *PostUpsert) SetLastReplyAt(v time.Time) *PostUpsert {
 // UpdateLastReplyAt sets the "last_reply_at" field to the value that was provided on create.
 func (u *PostUpsert) UpdateLastReplyAt() *PostUpsert {
 	u.SetExcluded(post.FieldLastReplyAt)
-	return u
-}
-
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (u *PostUpsert) ClearLastReplyAt() *PostUpsert {
-	u.SetNull(post.FieldLastReplyAt)
 	return u
 }
 
@@ -1341,20 +1305,6 @@ func (u *PostUpsertOne) ClearIndexedAt() *PostUpsertOne {
 	})
 }
 
-// SetFirst sets the "first" field.
-func (u *PostUpsertOne) SetFirst(v bool) *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.SetFirst(v)
-	})
-}
-
-// UpdateFirst sets the "first" field to the value that was provided on create.
-func (u *PostUpsertOne) UpdateFirst() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateFirst()
-	})
-}
-
 // SetTitle sets the "title" field.
 func (u *PostUpsertOne) SetTitle(v string) *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
@@ -1422,13 +1372,6 @@ func (u *PostUpsertOne) SetLastReplyAt(v time.Time) *PostUpsertOne {
 func (u *PostUpsertOne) UpdateLastReplyAt() *PostUpsertOne {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateLastReplyAt()
-	})
-}
-
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (u *PostUpsertOne) ClearLastReplyAt() *PostUpsertOne {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearLastReplyAt()
 	})
 }
 
@@ -1867,20 +1810,6 @@ func (u *PostUpsertBulk) ClearIndexedAt() *PostUpsertBulk {
 	})
 }
 
-// SetFirst sets the "first" field.
-func (u *PostUpsertBulk) SetFirst(v bool) *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.SetFirst(v)
-	})
-}
-
-// UpdateFirst sets the "first" field to the value that was provided on create.
-func (u *PostUpsertBulk) UpdateFirst() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.UpdateFirst()
-	})
-}
-
 // SetTitle sets the "title" field.
 func (u *PostUpsertBulk) SetTitle(v string) *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
@@ -1948,13 +1877,6 @@ func (u *PostUpsertBulk) SetLastReplyAt(v time.Time) *PostUpsertBulk {
 func (u *PostUpsertBulk) UpdateLastReplyAt() *PostUpsertBulk {
 	return u.Update(func(s *PostUpsert) {
 		s.UpdateLastReplyAt()
-	})
-}
-
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (u *PostUpsertBulk) ClearLastReplyAt() *PostUpsertBulk {
-	return u.Update(func(s *PostUpsert) {
-		s.ClearLastReplyAt()
 	})
 }
 

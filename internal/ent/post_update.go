@@ -95,20 +95,6 @@ func (_u *PostUpdate) ClearIndexedAt() *PostUpdate {
 	return _u
 }
 
-// SetFirst sets the "first" field.
-func (_u *PostUpdate) SetFirst(v bool) *PostUpdate {
-	_u.mutation.SetFirst(v)
-	return _u
-}
-
-// SetNillableFirst sets the "first" field if the given value is not nil.
-func (_u *PostUpdate) SetNillableFirst(v *bool) *PostUpdate {
-	if v != nil {
-		_u.SetFirst(*v)
-	}
-	return _u
-}
-
 // SetTitle sets the "title" field.
 func (_u *PostUpdate) SetTitle(v string) *PostUpdate {
 	_u.mutation.SetTitle(v)
@@ -174,12 +160,6 @@ func (_u *PostUpdate) SetNillableLastReplyAt(v *time.Time) *PostUpdate {
 	if v != nil {
 		_u.SetLastReplyAt(*v)
 	}
-	return _u
-}
-
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (_u *PostUpdate) ClearLastReplyAt() *PostUpdate {
-	_u.mutation.ClearLastReplyAt()
 	return _u
 }
 
@@ -894,9 +874,6 @@ func (_u *PostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(post.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := _u.mutation.First(); ok {
-		_spec.SetField(post.FieldFirst, field.TypeBool, value)
-	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(post.FieldTitle, field.TypeString, value)
 	}
@@ -914,9 +891,6 @@ func (_u *PostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 	}
 	if value, ok := _u.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
-	}
-	if _u.mutation.LastReplyAtCleared() {
-		_spec.ClearField(post.FieldLastReplyAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)
@@ -1649,20 +1623,6 @@ func (_u *PostUpdateOne) ClearIndexedAt() *PostUpdateOne {
 	return _u
 }
 
-// SetFirst sets the "first" field.
-func (_u *PostUpdateOne) SetFirst(v bool) *PostUpdateOne {
-	_u.mutation.SetFirst(v)
-	return _u
-}
-
-// SetNillableFirst sets the "first" field if the given value is not nil.
-func (_u *PostUpdateOne) SetNillableFirst(v *bool) *PostUpdateOne {
-	if v != nil {
-		_u.SetFirst(*v)
-	}
-	return _u
-}
-
 // SetTitle sets the "title" field.
 func (_u *PostUpdateOne) SetTitle(v string) *PostUpdateOne {
 	_u.mutation.SetTitle(v)
@@ -1728,12 +1688,6 @@ func (_u *PostUpdateOne) SetNillableLastReplyAt(v *time.Time) *PostUpdateOne {
 	if v != nil {
 		_u.SetLastReplyAt(*v)
 	}
-	return _u
-}
-
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (_u *PostUpdateOne) ClearLastReplyAt() *PostUpdateOne {
-	_u.mutation.ClearLastReplyAt()
 	return _u
 }
 
@@ -2478,9 +2432,6 @@ func (_u *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
 	if _u.mutation.IndexedAtCleared() {
 		_spec.ClearField(post.FieldIndexedAt, field.TypeTime)
 	}
-	if value, ok := _u.mutation.First(); ok {
-		_spec.SetField(post.FieldFirst, field.TypeBool, value)
-	}
 	if value, ok := _u.mutation.Title(); ok {
 		_spec.SetField(post.FieldTitle, field.TypeString, value)
 	}
@@ -2498,9 +2449,6 @@ func (_u *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
 	}
 	if value, ok := _u.mutation.LastReplyAt(); ok {
 		_spec.SetField(post.FieldLastReplyAt, field.TypeTime, value)
-	}
-	if _u.mutation.LastReplyAtCleared() {
-		_spec.ClearField(post.FieldLastReplyAt, field.TypeTime)
 	}
 	if value, ok := _u.mutation.Body(); ok {
 		_spec.SetField(post.FieldBody, field.TypeString, value)

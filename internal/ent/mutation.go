@@ -19085,7 +19085,6 @@ type PostMutation struct {
 	updated_at           *time.Time
 	deleted_at           *time.Time
 	indexed_at           *time.Time
-	first                *bool
 	title                *string
 	slug                 *string
 	pinned               *bool
@@ -19417,42 +19416,6 @@ func (m *PostMutation) ResetIndexedAt() {
 	delete(m.clearedFields, post.FieldIndexedAt)
 }
 
-// SetFirst sets the "first" field.
-func (m *PostMutation) SetFirst(b bool) {
-	m.first = &b
-}
-
-// First returns the value of the "first" field in the mutation.
-func (m *PostMutation) First() (r bool, exists bool) {
-	v := m.first
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldFirst returns the old "first" field's value of the Post entity.
-// If the Post object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldFirst(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFirst is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFirst requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFirst: %w", err)
-	}
-	return oldValue.First, nil
-}
-
-// ResetFirst resets all changes to the "first" field.
-func (m *PostMutation) ResetFirst() {
-	m.first = nil
-}
-
 // SetTitle sets the "title" field.
 func (m *PostMutation) SetTitle(s string) {
 	m.title = &s
@@ -19604,7 +19567,7 @@ func (m *PostMutation) LastReplyAt() (r time.Time, exists bool) {
 // OldLastReplyAt returns the old "last_reply_at" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldLastReplyAt(ctx context.Context) (v *time.Time, err error) {
+func (m *PostMutation) OldLastReplyAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldLastReplyAt is only allowed on UpdateOne operations")
 	}
@@ -19618,22 +19581,9 @@ func (m *PostMutation) OldLastReplyAt(ctx context.Context) (v *time.Time, err er
 	return oldValue.LastReplyAt, nil
 }
 
-// ClearLastReplyAt clears the value of the "last_reply_at" field.
-func (m *PostMutation) ClearLastReplyAt() {
-	m.last_reply_at = nil
-	m.clearedFields[post.FieldLastReplyAt] = struct{}{}
-}
-
-// LastReplyAtCleared returns if the "last_reply_at" field was cleared in this mutation.
-func (m *PostMutation) LastReplyAtCleared() bool {
-	_, ok := m.clearedFields[post.FieldLastReplyAt]
-	return ok
-}
-
 // ResetLastReplyAt resets all changes to the "last_reply_at" field.
 func (m *PostMutation) ResetLastReplyAt() {
 	m.last_reply_at = nil
-	delete(m.clearedFields, post.FieldLastReplyAt)
 }
 
 // SetRootPostID sets the "root_post_id" field.
@@ -19653,7 +19603,7 @@ func (m *PostMutation) RootPostID() (r xid.ID, exists bool) {
 // OldRootPostID returns the old "root_post_id" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldRootPostID(ctx context.Context) (v xid.ID, err error) {
+func (m *PostMutation) OldRootPostID(ctx context.Context) (v *xid.ID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRootPostID is only allowed on UpdateOne operations")
 	}
@@ -19702,7 +19652,7 @@ func (m *PostMutation) ReplyToPostID() (r xid.ID, exists bool) {
 // OldReplyToPostID returns the old "reply_to_post_id" field's value of the Post entity.
 // If the Post object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *PostMutation) OldReplyToPostID(ctx context.Context) (v xid.ID, err error) {
+func (m *PostMutation) OldReplyToPostID(ctx context.Context) (v *xid.ID, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldReplyToPostID is only allowed on UpdateOne operations")
 	}
@@ -20827,7 +20777,7 @@ func (m *PostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *PostMutation) Fields() []string {
-	fields := make([]string, 0, 18)
+	fields := make([]string, 0, 17)
 	if m.created_at != nil {
 		fields = append(fields, post.FieldCreatedAt)
 	}
@@ -20839,9 +20789,6 @@ func (m *PostMutation) Fields() []string {
 	}
 	if m.indexed_at != nil {
 		fields = append(fields, post.FieldIndexedAt)
-	}
-	if m.first != nil {
-		fields = append(fields, post.FieldFirst)
 	}
 	if m.title != nil {
 		fields = append(fields, post.FieldTitle)
@@ -20898,8 +20845,6 @@ func (m *PostMutation) Field(name string) (ent.Value, bool) {
 		return m.DeletedAt()
 	case post.FieldIndexedAt:
 		return m.IndexedAt()
-	case post.FieldFirst:
-		return m.First()
 	case post.FieldTitle:
 		return m.Title()
 	case post.FieldSlug:
@@ -20943,8 +20888,6 @@ func (m *PostMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldDeletedAt(ctx)
 	case post.FieldIndexedAt:
 		return m.OldIndexedAt(ctx)
-	case post.FieldFirst:
-		return m.OldFirst(ctx)
 	case post.FieldTitle:
 		return m.OldTitle(ctx)
 	case post.FieldSlug:
@@ -21007,13 +20950,6 @@ func (m *PostMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetIndexedAt(v)
-		return nil
-	case post.FieldFirst:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetFirst(v)
 		return nil
 	case post.FieldTitle:
 		v, ok := value.(string)
@@ -21148,9 +21084,6 @@ func (m *PostMutation) ClearedFields() []string {
 	if m.FieldCleared(post.FieldSlug) {
 		fields = append(fields, post.FieldSlug)
 	}
-	if m.FieldCleared(post.FieldLastReplyAt) {
-		fields = append(fields, post.FieldLastReplyAt)
-	}
 	if m.FieldCleared(post.FieldRootPostID) {
 		fields = append(fields, post.FieldRootPostID)
 	}
@@ -21192,9 +21125,6 @@ func (m *PostMutation) ClearField(name string) error {
 	case post.FieldSlug:
 		m.ClearSlug()
 		return nil
-	case post.FieldLastReplyAt:
-		m.ClearLastReplyAt()
-		return nil
 	case post.FieldRootPostID:
 		m.ClearRootPostID()
 		return nil
@@ -21229,9 +21159,6 @@ func (m *PostMutation) ResetField(name string) error {
 		return nil
 	case post.FieldIndexedAt:
 		m.ResetIndexedAt()
-		return nil
-	case post.FieldFirst:
-		m.ResetFirst()
 		return nil
 	case post.FieldTitle:
 		m.ResetTitle()

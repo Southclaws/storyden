@@ -140,7 +140,7 @@ func (d *Writer) Create(
 	}
 
 	mutate.SetTitle(title)
-	mutate.SetFirst(true)
+	mutate.SetLastReplyAt(time.Now())
 	mutate.SetAuthorID(xid.ID(authorID))
 	mutate.SetTitle(title)
 

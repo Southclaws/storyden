@@ -174,7 +174,7 @@ func (d *Repository) GetCategories(ctx context.Context, admin bool) ([]*Category
 		WithPosts(func(pq *ent.PostQuery) {
 			pq.
 				Where(
-					post.FirstEQ(true),
+					post.RootPostIDIsNil(),
 					post.DeletedAtIsNil(),
 					post.VisibilityEQ(post.VisibilityPublished),
 				).
