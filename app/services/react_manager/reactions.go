@@ -77,10 +77,16 @@ func (s *Reactor) Remove(ctx context.Context, reactID reaction.ReactID) error {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
 
+	targetID := post.ID(reac.Target())
+
 	err = s.reactWriter.Remove(ctx, accountID, reactID)
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
+
+	s.bus.Publish(ctx, &message.EventPostUnreacted{
+		PostID: targetID,
+	})
 
 	return nil
 }

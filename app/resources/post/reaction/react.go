@@ -20,6 +20,8 @@ type React struct {
 	target xid.ID
 }
 
+func (r *React) Target() xid.ID { return r.target }
+
 type Reacts []*React
 
 func (r Reacts) Map() Lookup {
