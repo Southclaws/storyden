@@ -1266,6 +1266,7 @@ paths:
       responses:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
+        "304": { $ref: "#/components/responses/NotModified" }
         "200": { $ref: "#/components/responses/CategoryGetOK" }
     patch:
       operationId: CategoryUpdate
@@ -3270,6 +3271,7 @@ components:
 
     CategoryGetOK:
       description: OK
+      headers: { <<: *cache_response_headers }
       content:
         application/json:
           schema:

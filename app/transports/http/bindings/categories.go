@@ -2,6 +2,7 @@ package bindings
 
 import (
 	"context"
+	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -10,21 +11,25 @@ import (
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/category_cache"
 	category_svc "github.com/Southclaws/storyden/app/services/category"
+	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/deletable"
 )
 
 type Categories struct {
-	category_repo *category.Repository
-	category_svc  category_svc.Service
+	category_repo  *category.Repository
+	category_svc   category_svc.Service
+	category_cache *category_cache.Cache
 }
 
 func NewCategories(
 	category_repo *category.Repository,
 	category_svc category_svc.Service,
+	category_cache *category_cache.Cache,
 ) Categories {
-	return Categories{category_repo, category_svc}
+	return Categories{category_repo, category_svc, category_cache}
 }
 
 func (c Categories) CategoryCreate(ctx context.Context, request openapi.CategoryCreateRequestObject) (openapi.CategoryCreateResponseObject, error) {
@@ -70,14 +75,48 @@ func (c Categories) CategoryList(ctx context.Context, request openapi.CategoryLi
 	}, nil
 }
 
+// When serving CC headers, given categories don't change that often, we can
+// afford to have a longer max-age and stale-while-revalidate cache lifetime.
+const categoryGetCacheControl = "public, max-age=60, stale-while-revalidate=3600"
+
 func (c Categories) CategoryGet(ctx context.Context, request openapi.CategoryGetRequestObject) (openapi.CategoryGetResponseObject, error) {
+	slug := string(request.CategorySlug)
+
+	cacheQuery := reqinfo.GetCacheQuery(ctx)
+
+	if c.category_cache.IsNotModified(ctx, cacheQuery, slug) {
+		lastModified := ""
+		if ts := c.category_cache.LastModified(ctx, slug); ts != nil {
+			lastModified = ts.UTC().Format(time.RFC1123)
+		}
+
+		return openapi.CategoryGet304Response{
+			Headers: openapi.NotModifiedResponseHeaders{
+				CacheControl: categoryGetCacheControl,
+				LastModified: lastModified,
+			},
+		}, nil
+	}
+
 	cat, err := c.category_repo.Get(ctx, request.CategorySlug)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	lastModified := time.Now().UTC() // NOTE: Should use updated at
+	if ts := c.category_cache.LastModified(ctx, slug); ts != nil {
+		lastModified = ts.UTC()
+	}
+	c.category_cache.Store(ctx, slug, lastModified)
+
 	return openapi.CategoryGet200JSONResponse{
-		CategoryGetOKJSONResponse: openapi.CategoryGetOKJSONResponse(serialiseCategory(cat)),
+		CategoryGetOKJSONResponse: openapi.CategoryGetOKJSONResponse{
+			Body: serialiseCategory(cat),
+			Headers: openapi.CategoryGetOKResponseHeaders{
+				CacheControl: categoryGetCacheControl,
+				LastModified: lastModified.Format(time.RFC1123),
+			},
+		},
 	}, nil
 }
 

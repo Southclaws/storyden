@@ -26,6 +26,7 @@ import type {
   CategoryUpdatePositionBody,
   InternalServerErrorResponse,
   NotFoundResponse,
+  NotModifiedResponse,
   UnauthorisedResponse,
 } from "../openapi-schema";
 
@@ -142,11 +143,12 @@ export type CategoryGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof categoryGet>>
 >;
 export type CategoryGetQueryError =
+  | NotModifiedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
 export const useCategoryGet = <
-  TError = NotFoundResponse | InternalServerErrorResponse,
+  TError = NotModifiedResponse | NotFoundResponse | InternalServerErrorResponse,
 >(
   categorySlug: string,
   options?: {

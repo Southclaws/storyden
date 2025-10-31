@@ -38,6 +38,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/link/link_querier"
 	"github.com/Southclaws/storyden/app/resources/link/link_writer"
 	"github.com/Southclaws/storyden/app/resources/post/category"
+	"github.com/Southclaws/storyden/app/resources/post/category_cache"
 	"github.com/Southclaws/storyden/app/resources/post/post_read_state"
 	"github.com/Southclaws/storyden/app/resources/post/post_search"
 	"github.com/Southclaws/storyden/app/resources/post/post_writer"
@@ -77,6 +78,7 @@ func Build() fx.Option {
 			asset_writer.New,
 			authentication.New,
 			category.New,
+			category_cache.New,
 			notify_querier.New,
 			notify_writer.New,
 			reply.New,

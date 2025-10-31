@@ -4,6 +4,7 @@ import (
 	"net/url"
 
 	"github.com/Southclaws/opt"
+	"github.com/rs/xid"
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/notification"
@@ -66,6 +67,20 @@ type EventPostReacted struct {
 
 type EventPostUnreacted struct {
 	PostID post.ID
+}
+
+// -
+// Category events and commands
+// -
+
+type EventCategoryUpdated struct {
+	ID   xid.ID
+	Slug string
+}
+
+type EventCategoryDeleted struct {
+	ID   xid.ID
+	Slug string
 }
 
 type EventMemberMentioned struct {

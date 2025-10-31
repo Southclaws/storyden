@@ -1,6 +1,8 @@
 package category
 
 import (
+	"time"
+
 	"github.com/rs/xid"
 
 	"github.com/Southclaws/dt"
@@ -36,6 +38,7 @@ type Category struct {
 	Recent      []PostMeta
 	PostCount   int
 	Metadata    map[string]any
+	UpdatedAt   time.Time
 }
 
 func PostMetaFromModel(p *ent.Post) *PostMeta {
@@ -87,5 +90,6 @@ func FromModel(c *ent.Category) *Category {
 		Children:    children,
 		Recent:      recent,
 		Metadata:    c.Metadata,
+		UpdatedAt:   c.UpdatedAt,
 	}
 }
