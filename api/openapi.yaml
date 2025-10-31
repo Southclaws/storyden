@@ -1172,8 +1172,8 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
-        "200": { $ref: "#/components/responses/ProfileGetOK" }
         "304": { $ref: "#/components/responses/NotModified" }
+        "200": { $ref: "#/components/responses/ProfileGetOK" }
 
   /profiles/{account_handle}/followers:
     get:
