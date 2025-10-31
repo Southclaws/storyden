@@ -37,8 +37,8 @@ export default async function Page() {
     return (
       <DraftListScreen
         session={session}
-        threads={threads.data}
-        nodes={nodes.data}
+        initialThreads={threads.data}
+        initialNodes={nodes.data}
       />
     );
   } catch (e) {

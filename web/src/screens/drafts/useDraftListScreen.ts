@@ -1,4 +1,5 @@
 import { useNodeList } from "src/api/openapi-client/nodes";
+import { useThreadList } from "src/api/openapi-client/threads";
 import {
   Account,
   NodeListOKResponse,
@@ -8,34 +9,47 @@ import {
 
 export type Props = {
   session: Account;
-  threads: ThreadListOKResponse;
-  nodes: NodeListOKResponse;
+  initialThreads: ThreadListOKResponse;
+  initialNodes: NodeListOKResponse;
 };
 
-export function useDraftListScreen({ session, threads, nodes }: Props) {
+export function useDraftListScreen({
+  session,
+  initialThreads,
+  initialNodes,
+}: Props) {
+  const { data: threadsData, error: errorThreads } = useThreadList(
+    {
+      author: session.handle,
+      visibility: [Visibility.draft],
+    },
+    { swr: { fallbackData: initialThreads } },
+  );
+
   const { data: nodesData, error: errorNodes } = useNodeList(
     {
       author: session.handle,
       visibility: [Visibility.draft],
     },
-    { swr: { fallbackData: nodes } },
+    { swr: { fallbackData: initialNodes } },
   );
 
-  if (!nodesData) {
+  if (!threadsData || !nodesData) {
     return {
       ready: false as const,
-      error: errorNodes,
+      error: errorThreads || errorNodes,
     };
   }
 
-  const empty = nodes.nodes.length === 0;
+  const empty =
+    initialNodes.nodes.length === 0 && initialThreads.threads.length === 0;
 
   return {
     ready: true as const,
     empty,
     data: {
       nodes: nodesData.nodes,
-      threads: threads.threads,
+      threads: threadsData.threads,
     },
 
     session,
