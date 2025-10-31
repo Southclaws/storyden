@@ -12,16 +12,19 @@ import (
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/account_querier"
 	"github.com/Southclaws/storyden/app/resources/account/role"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/internal/ent"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 type Assignment struct {
 	db             *ent.Client
 	accountQuerier *account_querier.Querier
+	bus            *pubsub.Bus
 }
 
-func New(db *ent.Client, accountQuerier *account_querier.Querier) *Assignment {
-	return &Assignment{db: db, accountQuerier: accountQuerier}
+func New(db *ent.Client, accountQuerier *account_querier.Querier, bus *pubsub.Bus) *Assignment {
+	return &Assignment{db: db, accountQuerier: accountQuerier, bus: bus}
 }
 
 type Mutation struct {
@@ -62,8 +65,6 @@ func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountI
 	update := w.db.Account.UpdateOneID(xid.ID(accountID))
 	mutation := update.Mutation()
 
-	// NOTE: We filter out the Everyone role from mutations, it cannot be added
-	// or removed, instead it's automatically included for all role queries.
 	roles = dt.Filter(roles, func(m Mutation) bool {
 		return m.id != role.DefaultRoleMemberID
 	})
@@ -81,6 +82,10 @@ func (w *Assignment) UpdateRoles(ctx context.Context, accountID account.AccountI
 	if err != nil && !ent.IsConstraintError(err) {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
+
+	w.bus.Publish(ctx, &message.EventAccountUpdated{
+		ID: accountID,
+	})
 
 	return w.accountQuerier.GetByID(ctx, accountID)
 }

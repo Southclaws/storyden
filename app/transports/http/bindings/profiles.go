@@ -114,12 +114,17 @@ func (p *Profiles) ProfileGet(ctx context.Context, request openapi.ProfileGetReq
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	lastModified := pro.Updated
+	if cacheTime := p.profile_cache.LastModified(ctx, xid.ID(id)); cacheTime != nil {
+		lastModified = *cacheTime
+	}
+
 	return openapi.ProfileGet200JSONResponse{
 		ProfileGetOKJSONResponse: openapi.ProfileGetOKJSONResponse{
 			Body: serialiseProfile(pro),
 			Headers: openapi.ProfileGetOKResponseHeaders{
-				CacheControl: "public, max-age=1",
-				LastModified: pro.Updated.Format(time.RFC1123),
+				CacheControl: "public, max-age=30, stale-while-revalidate=60",
+				LastModified: lastModified.Format(time.RFC1123),
 			},
 		},
 	}, nil

@@ -10,17 +10,20 @@ import (
 
 	"github.com/Southclaws/storyden/app/resources/account"
 	"github.com/Southclaws/storyden/app/resources/account/email"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/authentication/email_verify"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 	"github.com/Southclaws/storyden/internal/otp"
 )
 
 type Manager struct {
 	emailRepo *email.Repository
 	verifier  *email_verify.Verifier
+	bus       *pubsub.Bus
 }
 
-func New(emailRepo *email.Repository, verifier *email_verify.Verifier) *Manager {
-	return &Manager{emailRepo: emailRepo, verifier: verifier}
+func New(emailRepo *email.Repository, verifier *email_verify.Verifier, bus *pubsub.Bus) *Manager {
+	return &Manager{emailRepo: emailRepo, verifier: verifier, bus: bus}
 }
 
 func (m *Manager) Add(ctx context.Context, accountID account.AccountID, address mail.Address) (*account.EmailAddress, error) {
@@ -34,6 +37,10 @@ func (m *Manager) Add(ctx context.Context, accountID account.AccountID, address 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	m.bus.Publish(ctx, &message.EventAccountUpdated{
+		ID: accountID,
+	})
+
 	return ae, nil
 }
 
@@ -42,6 +49,10 @@ func (m *Manager) Remove(ctx context.Context, accountID account.AccountID, id xi
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}
+
+	m.bus.Publish(ctx, &message.EventAccountUpdated{
+		ID: accountID,
+	})
 
 	return nil
 }
