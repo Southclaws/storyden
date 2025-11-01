@@ -118,7 +118,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 
 		p.bus.Publish(ctx, &message.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),
-			Mark: n.Mark.String(),
+			Slug: n.GetSlug(),
 		})
 
 		return n, nil
@@ -132,7 +132,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 
 		p.bus.Publish(ctx, &message.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),
-			Mark: n.Mark.String(),
+			Slug: n.GetSlug(),
 		})
 
 		return n, nil
@@ -146,7 +146,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 
 		p.bus.Publish(ctx, &message.EventNodeUpdated{
 			ID:   library.NodeID(n.Mark.ID()),
-			Mark: n.Mark.String(),
+			Slug: n.GetSlug(),
 		})
 
 		return n, nil

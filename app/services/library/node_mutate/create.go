@@ -62,13 +62,13 @@ func (s *Manager) Create(ctx context.Context,
 
 	s.bus.Publish(ctx, &message.EventNodeCreated{
 		ID:   library.NodeID(n.Mark.ID()),
-		Mark: n.Mark.String(),
+		Slug: n.GetSlug(),
 	})
 
 	if p.Visibility.OrZero() == visibility.VisibilityPublished {
 		s.bus.Publish(ctx, &message.EventNodePublished{
 			ID:   library.NodeID(n.Mark.ID()),
-			Mark: n.Mark.String(),
+			Slug: n.GetSlug(),
 		})
 	}
 

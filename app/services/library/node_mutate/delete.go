@@ -56,7 +56,7 @@ func (s *Manager) Delete(ctx context.Context, qk library.QueryKey, d DeleteOptio
 
 	s.bus.Publish(ctx, &message.EventNodeDeleted{
 		ID:   library.NodeID(n.GetID()),
-		Mark: n.Mark.String(),
+		Slug: n.GetSlug(),
 	})
 
 	return destination.Ptr(), nil

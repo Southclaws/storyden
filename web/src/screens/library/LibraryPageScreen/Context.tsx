@@ -33,6 +33,7 @@ type LibraryPageContext = {
   initialChildren?: NodeListResult;
   store: NodeStoreAPI;
   saving: boolean;
+  revalidate: () => void;
 };
 
 const Context = createContext<LibraryPageContext | null>(null);
@@ -99,7 +100,7 @@ export function LibraryPageProvider({
 
             const operations = entries(collapsed);
 
-            console.log("Updating child nodes", operations);
+            console.debug("Updating child nodes", operations);
 
             await Promise.all(
               operations.map(([childNodeID, child]) =>
@@ -188,6 +189,7 @@ export function LibraryPageProvider({
         initialChildren: childNodes,
         store: storeRef.current,
         saving,
+        revalidate,
       }}
     >
       {children}
