@@ -133,13 +133,15 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
                 target.type === "divider" ? target.parentID : target.node.id,
             };
 
-          case "node-children":
+          case "node-children": {
+            // NOTE: Is always sortable, for now. May not be in future.
             const isTop = target.sortable.index === 0;
             return {
               direction: isTop ? ("above" as const) : ("below" as const),
               relativeToNode: target.node.id,
               newParentNode: undefined, // For directory drags, keep in same parent.
             };
+          }
         }
       })();
 
