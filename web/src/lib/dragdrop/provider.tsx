@@ -1,10 +1,8 @@
 "use client";
 
-import { TreeView as ArkTreeView } from "@ark-ui/react/tree-view";
 import {
   DndContext,
   DragEndEvent,
-  DragOverEvent,
   DragOverlay,
   MouseSensor,
   TouchSensor,
@@ -12,15 +10,15 @@ import {
   useSensor,
   useSensors,
 } from "@dnd-kit/core";
+import { SortableData } from "@dnd-kit/sortable";
 import { useState } from "react";
 
 import { handle } from "@/api/client";
 import { Category, Identifier, NodeWithChildren } from "@/api/openapi-schema";
-import { CategoryBadge } from "@/components/category/CategoryBadge";
 import { BulletIcon } from "@/components/ui/icons/Bullet";
 import { ChevronRightIcon } from "@/components/ui/icons/Chevron";
-import { css, cx } from "@/styled-system/css";
-import { Box, CardBox, styled } from "@/styled-system/jsx";
+import { cx } from "@/styled-system/css";
+import { Box } from "@/styled-system/jsx";
 import { treeView } from "@/styled-system/recipes";
 
 import { useEmitCategoryEvent } from "../category/events";
@@ -37,6 +35,8 @@ export type DragItemNodeBlock = {
 export type DragItemNode = {
   type: "node";
   node: NodeWithChildren;
+  parentID: Identifier | null;
+  context: "sidebar" | "node-children";
 };
 
 export type DragItemCategory = {
@@ -58,6 +58,7 @@ export type DragItemDivider = {
   parentID: Identifier | null;
   siblingNode: NodeWithChildren;
   direction: "above" | "below";
+  context: "sidebar";
 };
 
 export type DragItemData =
@@ -111,20 +112,67 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
 
     if (activeData.type === "node") {
       const active = activeData as DragItemNode;
-      const target = targetData as DragItemData;
+      const target = targetData as DragItemData & SortableData;
       if (target.type !== "node" && target.type !== "divider") {
         return;
       }
 
-      const direction = target.type === "divider" ? target.direction : "inside";
-      const targetNode =
-        target.type === "divider" ? target.siblingNode : target.node;
-      const newParent =
-        target.type === "divider" ? target.parentID : target.node.id;
+      const { direction, relativeToNode, newParentNode } = (() => {
+        switch (target.context) {
+          case "sidebar":
+            return {
+              direction:
+                target.type === "divider"
+                  ? target.direction
+                  : ("inside" as const),
+              relativeToNode:
+                target.type === "divider"
+                  ? target.siblingNode.id
+                  : target.node.id,
+              newParentNode:
+                target.type === "divider" ? target.parentID : target.node.id,
+            };
+
+          case "node-children": {
+            // NOTE: Is always sortable, for now. May not be in future.
+            const isTop = target.sortable.index === 0;
+            return {
+              direction: isTop ? ("above" as const) : ("below" as const),
+              relativeToNode: target.node.id,
+              newParentNode: undefined, // For directory drags, keep in same parent.
+            };
+          }
+        }
+      })();
+
+      const oldParentID = target.parentID ?? undefined;
 
       await handle(
         async () => {
-          await moveNode(active.node.id, targetNode.id, direction, newParent);
+          await moveNode(
+            active.node.id,
+            relativeToNode,
+            direction,
+            newParentNode,
+            // NOTE: When a node is dragged between folders in the sidebar,
+            // oldParentID is derived from the drop target’s parent instead of
+            // the dragged node’s current parent. moveNode uses that ID to
+            // optimistically mutate the cached child list for the previous
+            // parent. This is intentional as currently, the only use-case for
+            // these kinds of drags is moving nodes while looking at the page
+            // directory block. This will always be the "old" parent as we want
+            // to optimistically revalidate that page (the parent) so its child
+            // node API call is revalidated and the new order is rendered.
+            // This may need to change in future as this does not currently
+            // trigger properly when a member moves a node FROM the sidebar INTO
+            // the directory block. In such cases, we will need to revalidate
+            // both the old and new parents. Which sounds wasteful, but isn't
+            // because there will only ever be a single useSWR call on the page
+            // showing a child node list. UNLESS we introduce the ability to
+            // show multiple directory blocks on the page with different source
+            // parents... but that honestly sounds over-complicated design-wise.
+            oldParentID,
+          );
         },
         {
           async cleanup() {

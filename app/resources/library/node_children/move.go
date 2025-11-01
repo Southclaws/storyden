@@ -191,9 +191,9 @@ func computeNewSortKey(targetNode *ent.Node, siblingNode opt.Optional[*ent.Node]
 		return targetNode.Sort.Between(sibling.Sort)
 	} else {
 		if direction < 0 {
-			return targetNode.Sort.Before(100)
+			return targetNode.Sort.Before(1)
 		} else {
-			return targetNode.Sort.After(100)
+			return targetNode.Sort.After(1)
 		}
 	}
 }

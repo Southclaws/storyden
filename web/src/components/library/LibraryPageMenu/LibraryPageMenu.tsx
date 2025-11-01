@@ -3,18 +3,21 @@ import { format } from "date-fns/format";
 
 import { MoreAction } from "src/components/site/Action/More";
 
+import { ReportNodeMenuItem } from "@/components/report/ReportNodeMenuItem";
 import { CancelAction } from "@/components/site/Action/Cancel";
 import { ButtonProps } from "@/components/ui/button";
 import * as Menu from "@/components/ui/menu";
 import { HStack, styled } from "@/styled-system/jsx";
 import { menuItemColorPalette } from "@/styled-system/patterns";
-import { ReportNodeMenuItem } from "@/components/report/ReportNodeMenuItem";
 
 import { Props, useLibraryPageMenu } from "./useLibraryPageMenu";
 
 export function LibraryPageMenu({
   node,
+  parentID,
+  open,
   onClose,
+  children,
   ...props
 }: Props & ButtonProps) {
   const {
@@ -27,6 +30,7 @@ export function LibraryPageMenu({
   } = useLibraryPageMenu({
     node,
     onClose,
+    parentID,
   });
 
   function handleOpenChange(d: MenuOpenChangeDetails) {
@@ -44,13 +48,14 @@ export function LibraryPageMenu({
 
   return (
     <Menu.Root
+      open={open}
       lazyMount
       positioning={{ placement: "right-start", gutter: -2 }}
       onSelect={handlers.handleSelect}
       onOpenChange={handleOpenChange}
     >
       <Menu.Trigger asChild>
-        <MoreAction variant="subtle" size="xs" {...props} />
+        {children ?? <MoreAction variant="subtle" size="xs" {...props} />}
       </Menu.Trigger>
 
       <Portal>

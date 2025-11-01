@@ -1,7 +1,13 @@
 import { MenuSelectionDetails } from "@ark-ui/react";
 import { match } from "ts-pattern";
 
-import { Account, Node, Permission, Visibility } from "src/api/openapi-schema";
+import {
+  Account,
+  Identifier,
+  Node,
+  Permission,
+  Visibility,
+} from "src/api/openapi-schema";
 import { useSession } from "src/auth";
 
 import { handle } from "@/api/client";
@@ -11,6 +17,8 @@ import { hasPermission } from "@/utils/permissions";
 
 export type Props = {
   node: Node;
+  parentID?: Identifier;
+  open?: boolean;
   onClose?: () => void;
 };
 
@@ -73,7 +81,7 @@ export function useLibraryPageMenu(props: Props) {
   async function handleVisibilityChange(visibility: Visibility) {
     await handle(
       async () => {
-        await updateNodeVisibility(props.node.slug, visibility);
+        await updateNodeVisibility(props.node.slug, visibility, props.parentID);
       },
       {
         promiseToast: {

@@ -247,6 +247,8 @@ function TreeNode({
     data: {
       type: "node",
       node,
+      parentID: parentID,
+      context: "sidebar",
     } satisfies DragItemNode,
   });
 
@@ -263,6 +265,8 @@ function TreeNode({
     data: {
       type: "node",
       node,
+      parentID: parentID,
+      context: "sidebar",
     } satisfies DragItemNode,
     resizeObserverConfig: {
       updateMeasurementsFor: [],
@@ -276,6 +280,7 @@ function TreeNode({
     overItem?.type === "node" &&
     dragged?.type === "node" &&
     overItem?.node.id === node.id &&
+    overItem.context === "sidebar" &&
     !isDragging;
 
   // handle drag-over to expand
@@ -314,7 +319,7 @@ function TreeNode({
   }
 
   const branchControlDragStyles: CSSProperties = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Translate.toString(transform),
     opacity: isDragging ? 0.5 : 1,
     ...(isDragging
       ? {
@@ -499,6 +504,7 @@ function DropIndicator({
       direction,
       siblingNode: node,
       parentID: parentID,
+      context: "sidebar",
     } satisfies DragItemDivider,
     resizeObserverConfig: {
       updateMeasurementsFor: [],
