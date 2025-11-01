@@ -20,6 +20,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -463,6 +464,21 @@ func (_c *PostCreate) AddPostReads(v ...*PostRead) *PostCreate {
 	return _c.AddPostReadIDs(ids...)
 }
 
+// AddThreadNodeIDs adds the "thread_nodes" edge to the Node entity by IDs.
+func (_c *PostCreate) AddThreadNodeIDs(ids ...xid.ID) *PostCreate {
+	_c.mutation.AddThreadNodeIDs(ids...)
+	return _c
+}
+
+// AddThreadNodes adds the "thread_nodes" edges to the Node entity.
+func (_c *PostCreate) AddThreadNodes(v ...*Node) *PostCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddThreadNodeIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (_c *PostCreate) Mutation() *PostMutation {
 	return _c.mutation
@@ -898,6 +914,26 @@ func (_c *PostCreate) createSpec() (*Post, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.ThreadNodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.ThreadNodesTable,
+			Columns: post.ThreadNodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &PostNodeCreate{config: _c.config, mutation: newPostNodeMutation(_c.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

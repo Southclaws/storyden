@@ -498,6 +498,14 @@ func (m *Mapping) NodeUpdatePosition() (bool, *rbac.Permission) {
 	return true, nil // See NOTE.
 }
 
+func (m *Mapping) NodeCommentCreate() (bool, *rbac.Permission) {
+	return true, &rbac.PermissionCreatePost
+}
+
+func (m *Mapping) NodeCommentList() (bool, *rbac.Permission) {
+	return false, &rbac.PermissionReadPublishedThreads
+}
+
 func (m *Mapping) LinkCreate() (bool, *rbac.Permission) {
 	return true, nil
 }

@@ -35,6 +35,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postnode"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
@@ -93,6 +94,8 @@ type Client struct {
 	Notification *NotificationClient
 	// Post is the client for interacting with the Post builders.
 	Post *PostClient
+	// PostNode is the client for interacting with the PostNode builders.
+	PostNode *PostNodeClient
 	// PostRead is the client for interacting with the PostRead builders.
 	PostRead *PostReadClient
 	// Property is the client for interacting with the Property builders.
@@ -145,6 +148,7 @@ func (c *Client) init() {
 	c.Node = NewNodeClient(c.config)
 	c.Notification = NewNotificationClient(c.config)
 	c.Post = NewPostClient(c.config)
+	c.PostNode = NewPostNodeClient(c.config)
 	c.PostRead = NewPostReadClient(c.config)
 	c.Property = NewPropertyClient(c.config)
 	c.PropertySchema = NewPropertySchemaClient(c.config)
@@ -267,6 +271,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Node:                NewNodeClient(cfg),
 		Notification:        NewNotificationClient(cfg),
 		Post:                NewPostClient(cfg),
+		PostNode:            NewPostNodeClient(cfg),
 		PostRead:            NewPostReadClient(cfg),
 		Property:            NewPropertyClient(cfg),
 		PropertySchema:      NewPropertySchemaClient(cfg),
@@ -316,6 +321,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Node:                NewNodeClient(cfg),
 		Notification:        NewNotificationClient(cfg),
 		Post:                NewPostClient(cfg),
+		PostNode:            NewPostNodeClient(cfg),
 		PostRead:            NewPostReadClient(cfg),
 		Property:            NewPropertyClient(cfg),
 		PropertySchema:      NewPropertySchemaClient(cfg),
@@ -359,7 +365,7 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
 		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
 		c.EventParticipant, c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.Node,
-		c.Notification, c.Post, c.PostRead, c.Property, c.PropertySchema,
+		c.Notification, c.Post, c.PostNode, c.PostRead, c.Property, c.PropertySchema,
 		c.PropertySchemaField, c.Question, c.React, c.Report, c.Role, c.Session,
 		c.Setting, c.Tag,
 	} {
@@ -374,7 +380,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Account, c.AccountFollow, c.AccountRoles, c.Asset, c.Authentication,
 		c.Category, c.Collection, c.CollectionNode, c.CollectionPost, c.Email, c.Event,
 		c.EventParticipant, c.Invitation, c.LikePost, c.Link, c.MentionProfile, c.Node,
-		c.Notification, c.Post, c.PostRead, c.Property, c.PropertySchema,
+		c.Notification, c.Post, c.PostNode, c.PostRead, c.Property, c.PropertySchema,
 		c.PropertySchemaField, c.Question, c.React, c.Report, c.Role, c.Session,
 		c.Setting, c.Tag,
 	} {
@@ -423,6 +429,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Notification.mutate(ctx, m)
 	case *PostMutation:
 		return c.Post.mutate(ctx, m)
+	case *PostNodeMutation:
+		return c.PostNode.mutate(ctx, m)
 	case *PostReadMutation:
 		return c.PostRead.mutate(ctx, m)
 	case *PropertyMutation:
@@ -3868,6 +3876,22 @@ func (c *NodeClient) QueryCollections(_m *Node) *CollectionQuery {
 	return query
 }
 
+// QueryComments queries the comments edge of a Node.
+func (c *NodeClient) QueryComments(_m *Node) *PostQuery {
+	query := (&PostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, node.CommentsTable, node.CommentsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryCollectionNodes queries the collection_nodes edge of a Node.
 func (c *NodeClient) QueryCollectionNodes(_m *Node) *CollectionNodeQuery {
 	query := (&CollectionNodeClient{config: c.config}).Query()
@@ -3877,6 +3901,22 @@ func (c *NodeClient) QueryCollectionNodes(_m *Node) *CollectionNodeQuery {
 			sqlgraph.From(node.Table, node.FieldID, id),
 			sqlgraph.To(collectionnode.Table, collectionnode.NodeColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, node.CollectionNodesTable, node.CollectionNodesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryThreadNodes queries the thread_nodes edge of a Node.
+func (c *NodeClient) QueryThreadNodes(_m *Node) *PostNodeQuery {
+	query := (&PostNodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, id),
+			sqlgraph.To(postnode.Table, postnode.NodeColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, node.ThreadNodesTable, node.ThreadNodesColumn),
 		)
 		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
 		return fromV, nil
@@ -4438,6 +4478,38 @@ func (c *PostClient) QueryPostReads(_m *Post) *PostReadQuery {
 	return query
 }
 
+// QueryThreadNodes queries the thread_nodes edge of a Post.
+func (c *PostClient) QueryThreadNodes(_m *Post) *NodeQuery {
+	query := (&NodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, id),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, post.ThreadNodesTable, post.ThreadNodesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPostNodes queries the post_nodes edge of a Post.
+func (c *PostClient) QueryPostNodes(_m *Post) *PostNodeQuery {
+	query := (&PostNodeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := _m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, id),
+			sqlgraph.To(postnode.Table, postnode.PostColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, post.PostNodesTable, post.PostNodesColumn),
+		)
+		fromV = sqlgraph.Neighbors(_m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *PostClient) Hooks() []Hook {
 	return c.hooks.Post
@@ -4460,6 +4532,122 @@ func (c *PostClient) mutate(ctx context.Context, m *PostMutation) (Value, error)
 		return (&PostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Post mutation op: %q", m.Op())
+	}
+}
+
+// PostNodeClient is a client for the PostNode schema.
+type PostNodeClient struct {
+	config
+}
+
+// NewPostNodeClient returns a client for the PostNode from the given config.
+func NewPostNodeClient(c config) *PostNodeClient {
+	return &PostNodeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `postnode.Hooks(f(g(h())))`.
+func (c *PostNodeClient) Use(hooks ...Hook) {
+	c.hooks.PostNode = append(c.hooks.PostNode, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `postnode.Intercept(f(g(h())))`.
+func (c *PostNodeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.PostNode = append(c.inters.PostNode, interceptors...)
+}
+
+// Create returns a builder for creating a PostNode entity.
+func (c *PostNodeClient) Create() *PostNodeCreate {
+	mutation := newPostNodeMutation(c.config, OpCreate)
+	return &PostNodeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of PostNode entities.
+func (c *PostNodeClient) CreateBulk(builders ...*PostNodeCreate) *PostNodeCreateBulk {
+	return &PostNodeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PostNodeClient) MapCreateBulk(slice any, setFunc func(*PostNodeCreate, int)) *PostNodeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PostNodeCreateBulk{err: fmt.Errorf("calling to PostNodeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PostNodeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PostNodeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for PostNode.
+func (c *PostNodeClient) Update() *PostNodeUpdate {
+	mutation := newPostNodeMutation(c.config, OpUpdate)
+	return &PostNodeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PostNodeClient) UpdateOne(_m *PostNode) *PostNodeUpdateOne {
+	mutation := newPostNodeMutation(c.config, OpUpdateOne)
+	mutation.node = &_m.NodeID
+	mutation.post = &_m.PostID
+	return &PostNodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for PostNode.
+func (c *PostNodeClient) Delete() *PostNodeDelete {
+	mutation := newPostNodeMutation(c.config, OpDelete)
+	return &PostNodeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Query returns a query builder for PostNode.
+func (c *PostNodeClient) Query() *PostNodeQuery {
+	return &PostNodeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePostNode},
+		inters: c.Interceptors(),
+	}
+}
+
+// QueryNode queries the node edge of a PostNode.
+func (c *PostNodeClient) QueryNode(_m *PostNode) *NodeQuery {
+	return c.Query().
+		Where(postnode.NodeID(_m.NodeID), postnode.PostID(_m.PostID)).
+		QueryNode()
+}
+
+// QueryPost queries the post edge of a PostNode.
+func (c *PostNodeClient) QueryPost(_m *PostNode) *PostQuery {
+	return c.Query().
+		Where(postnode.NodeID(_m.NodeID), postnode.PostID(_m.PostID)).
+		QueryPost()
+}
+
+// Hooks returns the client hooks.
+func (c *PostNodeClient) Hooks() []Hook {
+	return c.hooks.PostNode
+}
+
+// Interceptors returns the client interceptors.
+func (c *PostNodeClient) Interceptors() []Interceptor {
+	return c.inters.PostNode
+}
+
+func (c *PostNodeClient) mutate(ctx context.Context, m *PostNodeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PostNodeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PostNodeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PostNodeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PostNodeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown PostNode mutation op: %q", m.Op())
 	}
 }
 
@@ -6267,16 +6455,16 @@ type (
 	hooks struct {
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, PostRead,
-		Property, PropertySchema, PropertySchemaField, Question, React, Report, Role,
-		Session, Setting, Tag []ent.Hook
+		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, PostNode,
+		PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
+		Report, Role, Session, Setting, Tag []ent.Hook
 	}
 	inters struct {
 		Account, AccountFollow, AccountRoles, Asset, Authentication, Category,
 		Collection, CollectionNode, CollectionPost, Email, Event, EventParticipant,
-		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, PostRead,
-		Property, PropertySchema, PropertySchemaField, Question, React, Report, Role,
-		Session, Setting, Tag []ent.Interceptor
+		Invitation, LikePost, Link, MentionProfile, Node, Notification, Post, PostNode,
+		PostRead, Property, PropertySchema, PropertySchemaField, Question, React,
+		Report, Role, Session, Setting, Tag []ent.Interceptor
 	}
 )
 

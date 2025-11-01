@@ -20,7 +20,9 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postnode"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/react"
@@ -51,6 +53,8 @@ type PostQuery struct {
 	withContentLinks *LinkQuery
 	withEvent        *EventQuery
 	withPostReads    *PostReadQuery
+	withThreadNodes  *NodeQuery
+	withPostNodes    *PostNodeQuery
 	modifiers        []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -440,6 +444,50 @@ func (_q *PostQuery) QueryPostReads() *PostReadQuery {
 	return query
 }
 
+// QueryThreadNodes chains the current query on the "thread_nodes" edge.
+func (_q *PostQuery) QueryThreadNodes() *NodeQuery {
+	query := (&NodeClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, selector),
+			sqlgraph.To(node.Table, node.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, post.ThreadNodesTable, post.ThreadNodesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPostNodes chains the current query on the "post_nodes" edge.
+func (_q *PostQuery) QueryPostNodes() *PostNodeQuery {
+	query := (&PostNodeClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(post.Table, post.FieldID, selector),
+			sqlgraph.To(postnode.Table, postnode.PostColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, post.PostNodesTable, post.PostNodesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Post entity from the query.
 // Returns a *NotFoundError when no Post was found.
 func (_q *PostQuery) First(ctx context.Context) (*Post, error) {
@@ -648,6 +696,8 @@ func (_q *PostQuery) Clone() *PostQuery {
 		withContentLinks: _q.withContentLinks.Clone(),
 		withEvent:        _q.withEvent.Clone(),
 		withPostReads:    _q.withPostReads.Clone(),
+		withThreadNodes:  _q.withThreadNodes.Clone(),
+		withPostNodes:    _q.withPostNodes.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -831,6 +881,28 @@ func (_q *PostQuery) WithPostReads(opts ...func(*PostReadQuery)) *PostQuery {
 	return _q
 }
 
+// WithThreadNodes tells the query-builder to eager-load the nodes that are connected to
+// the "thread_nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *PostQuery) WithThreadNodes(opts ...func(*NodeQuery)) *PostQuery {
+	query := (&NodeClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withThreadNodes = query
+	return _q
+}
+
+// WithPostNodes tells the query-builder to eager-load the nodes that are connected to
+// the "post_nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *PostQuery) WithPostNodes(opts ...func(*PostNodeQuery)) *PostQuery {
+	query := (&PostNodeClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withPostNodes = query
+	return _q
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -909,7 +981,7 @@ func (_q *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 	var (
 		nodes       = []*Post{}
 		_spec       = _q.querySpec()
-		loadedTypes = [16]bool{
+		loadedTypes = [18]bool{
 			_q.withAuthor != nil,
 			_q.withCategory != nil,
 			_q.withTags != nil,
@@ -926,6 +998,8 @@ func (_q *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 			_q.withContentLinks != nil,
 			_q.withEvent != nil,
 			_q.withPostReads != nil,
+			_q.withThreadNodes != nil,
+			_q.withPostNodes != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -1053,6 +1127,20 @@ func (_q *PostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Post, e
 		if err := _q.loadPostReads(ctx, query, nodes,
 			func(n *Post) { n.Edges.PostReads = []*PostRead{} },
 			func(n *Post, e *PostRead) { n.Edges.PostReads = append(n.Edges.PostReads, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withThreadNodes; query != nil {
+		if err := _q.loadThreadNodes(ctx, query, nodes,
+			func(n *Post) { n.Edges.ThreadNodes = []*Node{} },
+			func(n *Post, e *Node) { n.Edges.ThreadNodes = append(n.Edges.ThreadNodes, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withPostNodes; query != nil {
+		if err := _q.loadPostNodes(ctx, query, nodes,
+			func(n *Post) { n.Edges.PostNodes = []*PostNode{} },
+			func(n *Post, e *PostNode) { n.Edges.PostNodes = append(n.Edges.PostNodes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1666,6 +1754,97 @@ func (_q *PostQuery) loadPostReads(ctx context.Context, query *PostReadQuery, no
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "root_post_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *PostQuery) loadThreadNodes(ctx context.Context, query *NodeQuery, nodes []*Post, init func(*Post), assign func(*Post, *Node)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[xid.ID]*Post)
+	nids := make(map[xid.ID]map[*Post]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(post.ThreadNodesTable)
+		s.Join(joinT).On(s.C(node.FieldID), joinT.C(post.ThreadNodesPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(post.ThreadNodesPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(post.ThreadNodesPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(xid.ID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*xid.ID)
+				inValue := *values[1].(*xid.ID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Post]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Node](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "thread_nodes" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (_q *PostQuery) loadPostNodes(ctx context.Context, query *PostNodeQuery, nodes []*Post, init func(*Post), assign func(*Post, *PostNode)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Post)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(postnode.FieldPostID)
+	}
+	query.Where(predicate.PostNode(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(post.PostNodesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.PostID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "post_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}

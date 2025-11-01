@@ -113,3 +113,9 @@ func HasNotBeenDeleted() Query {
 		q.Where(ent_post.DeletedAtIsNil())
 	}
 }
+
+func WithIDs(ids ...xid.ID) Query {
+	return func(q *ent.PostQuery) {
+		q.Where(ent_post.IDIn(ids...))
+	}
+}
