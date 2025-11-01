@@ -1,6 +1,6 @@
 module github.com/Southclaws/storyden
 
-go 1.24.7
+go 1.25.3
 
 tool (
 	entgo.io/ent/cmd/ent
