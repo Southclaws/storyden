@@ -2,6 +2,7 @@
 
 import { Unready } from "src/components/site/Unready";
 
+import { useSession } from "@/auth";
 import { FeedEmptyState } from "@/components/feed/FeedEmptyState";
 import { QuickShare } from "@/components/feed/QuickShare/QuickShare";
 import { ThreadReferenceCard } from "@/components/post/ThreadCard";
@@ -25,7 +26,7 @@ export function ThreadFeedScreen({
   hideCategoryBadge?: boolean;
   showQuickShare?: boolean;
 }) {
-  const { session } = useSettingsContext();
+  const session = useSession();
 
   return (
     <LStack>
@@ -71,7 +72,13 @@ export function ThreadFeed(props: Props & { hideCategoryBadge?: boolean }) {
       )}
       <ol className={lstack()}>
         {data.threads.map((t) => {
-          return <ThreadReferenceCard key={t.slug} thread={t} hideCategoryBadge={props.hideCategoryBadge} />;
+          return (
+            <ThreadReferenceCard
+              key={t.slug}
+              thread={t}
+              hideCategoryBadge={props.hideCategoryBadge}
+            />
+          );
         })}
       </ol>
 

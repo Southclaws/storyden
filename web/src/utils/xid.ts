@@ -33,7 +33,7 @@ export function generateXid(): string {
       .map((byte) => parseInt(byte, 16)),
   );
 
-  const timestamp = Math.floor(Date.now() / 1000);
+  const timestamp = 1; //Math.floor(Date.now() / 1000);
   const timestampBytes = new Uint8Array([
     (timestamp >>> 24) & 0xff,
     (timestamp >>> 16) & 0xff,

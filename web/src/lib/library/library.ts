@@ -21,7 +21,6 @@ import {
   NodeListOKResponse,
   NodeUpdatePositionBody,
   NodeWithChildren,
-  TagNameList,
   Visibility,
 } from "@/api/openapi-schema";
 import { useSession } from "@/auth";
@@ -31,7 +30,6 @@ import {
 } from "@/screens/library/library-path";
 import { useLibraryPath } from "@/screens/library/useLibraryPath";
 import { slugify } from "@/utils/slugify";
-
 import { generateXid } from "@/utils/xid";
 
 import { useCapability } from "../settings/capabilities";
