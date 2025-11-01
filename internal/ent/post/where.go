@@ -1429,6 +1429,52 @@ func HasPostReadsWith(preds ...predicate.PostRead) predicate.Post {
 	})
 }
 
+// HasThreadNodes applies the HasEdge predicate on the "thread_nodes" edge.
+func HasThreadNodes() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ThreadNodesTable, ThreadNodesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasThreadNodesWith applies the HasEdge predicate on the "thread_nodes" edge with a given conditions (other predicates).
+func HasThreadNodesWith(preds ...predicate.Node) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := newThreadNodesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasPostNodes applies the HasEdge predicate on the "post_nodes" edge.
+func HasPostNodes() predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, PostNodesTable, PostNodesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPostNodesWith applies the HasEdge predicate on the "post_nodes" edge with a given conditions (other predicates).
+func HasPostNodesWith(preds ...predicate.PostNode) predicate.Post {
+	return predicate.Post(func(s *sql.Selector) {
+		step := newPostNodesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Post) predicate.Post {
 	return predicate.Post(sql.AndPredicates(predicates...))

@@ -96,9 +96,13 @@ type PostEdges struct {
 	Event []*Event `json:"event,omitempty"`
 	// PostReads holds the value of the post_reads edge.
 	PostReads []*PostRead `json:"post_reads,omitempty"`
+	// ThreadNodes holds the value of the thread_nodes edge.
+	ThreadNodes []*Node `json:"thread_nodes,omitempty"`
+	// PostNodes holds the value of the post_nodes edge.
+	PostNodes []*PostNode `json:"post_nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [16]bool
+	loadedTypes [18]bool
 }
 
 // AuthorOrErr returns the Author value or an error if the edge
@@ -253,6 +257,24 @@ func (e PostEdges) PostReadsOrErr() ([]*PostRead, error) {
 		return e.PostReads, nil
 	}
 	return nil, &NotLoadedError{edge: "post_reads"}
+}
+
+// ThreadNodesOrErr returns the ThreadNodes value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) ThreadNodesOrErr() ([]*Node, error) {
+	if e.loadedTypes[16] {
+		return e.ThreadNodes, nil
+	}
+	return nil, &NotLoadedError{edge: "thread_nodes"}
+}
+
+// PostNodesOrErr returns the PostNodes value or an error if the edge
+// was not loaded in eager-loading.
+func (e PostEdges) PostNodesOrErr() ([]*PostNode, error) {
+	if e.loadedTypes[17] {
+		return e.PostNodes, nil
+	}
+	return nil, &NotLoadedError{edge: "post_nodes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -492,6 +514,16 @@ func (_m *Post) QueryEvent() *EventQuery {
 // QueryPostReads queries the "post_reads" edge of the Post entity.
 func (_m *Post) QueryPostReads() *PostReadQuery {
 	return NewPostClient(_m.config).QueryPostReads(_m)
+}
+
+// QueryThreadNodes queries the "thread_nodes" edge of the Post entity.
+func (_m *Post) QueryThreadNodes() *NodeQuery {
+	return NewPostClient(_m.config).QueryThreadNodes(_m)
+}
+
+// QueryPostNodes queries the "post_nodes" edge of the Post entity.
+func (_m *Post) QueryPostNodes() *PostNodeQuery {
+	return NewPostClient(_m.config).QueryPostNodes(_m)
 }
 
 // Update returns a builder for updating this Post.

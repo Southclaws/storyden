@@ -9,6 +9,10 @@ The Storyden API does not adhere to semantic versioning but instead applies a ro
  */
 import type {
   NodeAddChildOKResponse,
+  NodeCommentCreateBody,
+  NodeCommentCreateOKResponse,
+  NodeCommentListOKResponse,
+  NodeCommentListParams,
   NodeCreateBody,
   NodeCreateOKResponse,
   NodeDeleteOKResponse,
@@ -196,6 +200,96 @@ export const nodeDelete = async (
     {
       ...options,
       method: "DELETE",
+    },
+  );
+};
+
+/**
+ * Creates a "comment" on the specified node. A comment is just a regular
+thread. The target node must be published in order to create a comment.
+
+Since comments are just regular threads, once a node comment is created,
+any thread API can be used to interact with it. This includes editing,
+liking, adding to collections, replying and all moderation tools.
+
+Threads created this way have a default visibility of "unlisted" so they
+will not appear in the main feed. However, there's no restriction on
+visibility, so a comment can be created with a visibility of "published"
+which will echo the thread to the main feed. You can also specify a
+category for the thread so that it may appear in a category thread feed.
+
+This allows for flexible usage of node comments, for use-cases such as
+"Also share to feed" to encourage discussion from other contexts.
+
+ */
+export type nodeCommentCreateResponse = {
+  data: NodeCommentCreateOKResponse;
+  status: number;
+};
+
+export const getNodeCommentCreateUrl = (nodeSlug: string) => {
+  return `/nodes/${nodeSlug}/comments`;
+};
+
+export const nodeCommentCreate = async (
+  nodeSlug: string,
+  nodeCommentCreateBody: NodeCommentCreateBody,
+  options?: RequestInit,
+): Promise<nodeCommentCreateResponse> => {
+  return fetcher<Promise<nodeCommentCreateResponse>>(
+    getNodeCommentCreateUrl(nodeSlug),
+    {
+      ...options,
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...options?.headers },
+      body: JSON.stringify(nodeCommentCreateBody),
+    },
+  );
+};
+
+/**
+ * Get all comments for a given node using the provided filters and page
+parameters. Comments on nodes are fixed to sort by their created at time
+not the most recent reply. This is an internal constraint currently.
+
+The comment list will not include replies in the response. In order to
+fetch the reply tree for each comment, you must send additional API 
+requests to fetch each thread. When building user interfaces for this,
+consider lazy-loading the replies when a user expands a comment.
+
+ */
+export type nodeCommentListResponse = {
+  data: NodeCommentListOKResponse;
+  status: number;
+};
+
+export const getNodeCommentListUrl = (
+  nodeSlug: string,
+  params?: NodeCommentListParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  return normalizedParams.size
+    ? `/nodes/${nodeSlug}/comments?${normalizedParams.toString()}`
+    : `/nodes/${nodeSlug}/comments`;
+};
+
+export const nodeCommentList = async (
+  nodeSlug: string,
+  params?: NodeCommentListParams,
+  options?: RequestInit,
+): Promise<nodeCommentListResponse> => {
+  return fetcher<Promise<nodeCommentListResponse>>(
+    getNodeCommentListUrl(nodeSlug, params),
+    {
+      ...options,
+      method: "GET",
     },
   );
 };

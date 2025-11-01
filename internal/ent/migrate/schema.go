@@ -735,6 +735,44 @@ var (
 			},
 		},
 	}
+	// PostNodesColumns holds the columns for the "post_nodes" table.
+	PostNodesColumns = []*schema.Column{
+		{Name: "created_at", Type: field.TypeTime, Default: "CURRENT_TIMESTAMP"},
+		{Name: "node_id", Type: field.TypeString, Size: 20},
+		{Name: "post_id", Type: field.TypeString, Size: 20},
+	}
+	// PostNodesTable holds the schema information for the "post_nodes" table.
+	PostNodesTable = &schema.Table{
+		Name:       "post_nodes",
+		Columns:    PostNodesColumns,
+		PrimaryKey: []*schema.Column{PostNodesColumns[1], PostNodesColumns[2]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "post_nodes_nodes_node",
+				Columns:    []*schema.Column{PostNodesColumns[1]},
+				RefColumns: []*schema.Column{NodesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "post_nodes_posts_post",
+				Columns:    []*schema.Column{PostNodesColumns[2]},
+				RefColumns: []*schema.Column{PostsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "unique_post_node",
+				Unique:  true,
+				Columns: []*schema.Column{PostNodesColumns[1], PostNodesColumns[2]},
+			},
+			{
+				Name:    "idx_post_node_paginate",
+				Unique:  false,
+				Columns: []*schema.Column{PostNodesColumns[1], PostNodesColumns[0]},
+			},
+		},
+	}
 	// PostReadsColumns holds the columns for the "post_reads" table.
 	PostReadsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Size: 20},
@@ -1241,6 +1279,7 @@ var (
 		NodesTable,
 		NotificationsTable,
 		PostsTable,
+		PostNodesTable,
 		PostReadsTable,
 		PropertiesTable,
 		PropertySchemasTable,
@@ -1304,6 +1343,8 @@ func init() {
 	PostsTable.ForeignKeys[2].RefTable = LinksTable
 	PostsTable.ForeignKeys[3].RefTable = PostsTable
 	PostsTable.ForeignKeys[4].RefTable = PostsTable
+	PostNodesTable.ForeignKeys[0].RefTable = NodesTable
+	PostNodesTable.ForeignKeys[1].RefTable = PostsTable
 	PostReadsTable.ForeignKeys[0].RefTable = AccountsTable
 	PostReadsTable.ForeignKeys[1].RefTable = PostsTable
 	PropertiesTable.ForeignKeys[0].RefTable = NodesTable

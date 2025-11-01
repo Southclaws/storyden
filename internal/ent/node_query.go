@@ -18,6 +18,8 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collectionnode"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postnode"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
@@ -43,7 +45,9 @@ type NodeQuery struct {
 	withLink            *LinkQuery
 	withContentLinks    *LinkQuery
 	withCollections     *CollectionQuery
+	withComments        *PostQuery
 	withCollectionNodes *CollectionNodeQuery
+	withThreadNodes     *PostNodeQuery
 	modifiers           []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -323,6 +327,28 @@ func (_q *NodeQuery) QueryCollections() *CollectionQuery {
 	return query
 }
 
+// QueryComments chains the current query on the "comments" edge.
+func (_q *NodeQuery) QueryComments() *PostQuery {
+	query := (&PostClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, selector),
+			sqlgraph.To(post.Table, post.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, node.CommentsTable, node.CommentsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryCollectionNodes chains the current query on the "collection_nodes" edge.
 func (_q *NodeQuery) QueryCollectionNodes() *CollectionNodeQuery {
 	query := (&CollectionNodeClient{config: _q.config}).Query()
@@ -338,6 +364,28 @@ func (_q *NodeQuery) QueryCollectionNodes() *CollectionNodeQuery {
 			sqlgraph.From(node.Table, node.FieldID, selector),
 			sqlgraph.To(collectionnode.Table, collectionnode.NodeColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, node.CollectionNodesTable, node.CollectionNodesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryThreadNodes chains the current query on the "thread_nodes" edge.
+func (_q *NodeQuery) QueryThreadNodes() *PostNodeQuery {
+	query := (&PostNodeClient{config: _q.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := _q.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := _q.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(node.Table, node.FieldID, selector),
+			sqlgraph.To(postnode.Table, postnode.NodeColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, node.ThreadNodesTable, node.ThreadNodesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(_q.driver.Dialect(), step)
 		return fromU, nil
@@ -548,7 +596,9 @@ func (_q *NodeQuery) Clone() *NodeQuery {
 		withLink:            _q.withLink.Clone(),
 		withContentLinks:    _q.withContentLinks.Clone(),
 		withCollections:     _q.withCollections.Clone(),
+		withComments:        _q.withComments.Clone(),
 		withCollectionNodes: _q.withCollectionNodes.Clone(),
+		withThreadNodes:     _q.withThreadNodes.Clone(),
 		// clone intermediate query.
 		sql:       _q.sql.Clone(),
 		path:      _q.path,
@@ -677,6 +727,17 @@ func (_q *NodeQuery) WithCollections(opts ...func(*CollectionQuery)) *NodeQuery 
 	return _q
 }
 
+// WithComments tells the query-builder to eager-load the nodes that are connected to
+// the "comments" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *NodeQuery) WithComments(opts ...func(*PostQuery)) *NodeQuery {
+	query := (&PostClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withComments = query
+	return _q
+}
+
 // WithCollectionNodes tells the query-builder to eager-load the nodes that are connected to
 // the "collection_nodes" edge. The optional arguments are used to configure the query builder of the edge.
 func (_q *NodeQuery) WithCollectionNodes(opts ...func(*CollectionNodeQuery)) *NodeQuery {
@@ -685,6 +746,17 @@ func (_q *NodeQuery) WithCollectionNodes(opts ...func(*CollectionNodeQuery)) *No
 		opt(query)
 	}
 	_q.withCollectionNodes = query
+	return _q
+}
+
+// WithThreadNodes tells the query-builder to eager-load the nodes that are connected to
+// the "thread_nodes" edge. The optional arguments are used to configure the query builder of the edge.
+func (_q *NodeQuery) WithThreadNodes(opts ...func(*PostNodeQuery)) *NodeQuery {
+	query := (&PostNodeClient{config: _q.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	_q.withThreadNodes = query
 	return _q
 }
 
@@ -766,7 +838,7 @@ func (_q *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 	var (
 		nodes       = []*Node{}
 		_spec       = _q.querySpec()
-		loadedTypes = [12]bool{
+		loadedTypes = [14]bool{
 			_q.withOwner != nil,
 			_q.withParent != nil,
 			_q.withNodes != nil,
@@ -778,7 +850,9 @@ func (_q *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 			_q.withLink != nil,
 			_q.withContentLinks != nil,
 			_q.withCollections != nil,
+			_q.withComments != nil,
 			_q.withCollectionNodes != nil,
+			_q.withThreadNodes != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -874,10 +948,24 @@ func (_q *NodeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Node, e
 			return nil, err
 		}
 	}
+	if query := _q.withComments; query != nil {
+		if err := _q.loadComments(ctx, query, nodes,
+			func(n *Node) { n.Edges.Comments = []*Post{} },
+			func(n *Node, e *Post) { n.Edges.Comments = append(n.Edges.Comments, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := _q.withCollectionNodes; query != nil {
 		if err := _q.loadCollectionNodes(ctx, query, nodes,
 			func(n *Node) { n.Edges.CollectionNodes = []*CollectionNode{} },
 			func(n *Node, e *CollectionNode) { n.Edges.CollectionNodes = append(n.Edges.CollectionNodes, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := _q.withThreadNodes; query != nil {
+		if err := _q.loadThreadNodes(ctx, query, nodes,
+			func(n *Node) { n.Edges.ThreadNodes = []*PostNode{} },
+			func(n *Node, e *PostNode) { n.Edges.ThreadNodes = append(n.Edges.ThreadNodes, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1339,6 +1427,67 @@ func (_q *NodeQuery) loadCollections(ctx context.Context, query *CollectionQuery
 	}
 	return nil
 }
+func (_q *NodeQuery) loadComments(ctx context.Context, query *PostQuery, nodes []*Node, init func(*Node), assign func(*Node, *Post)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[xid.ID]*Node)
+	nids := make(map[xid.ID]map[*Node]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(node.CommentsTable)
+		s.Join(joinT).On(s.C(post.FieldID), joinT.C(node.CommentsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(node.CommentsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(node.CommentsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(xid.ID)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := *values[0].(*xid.ID)
+				inValue := *values[1].(*xid.ID)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Node]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Post](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "comments" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
 func (_q *NodeQuery) loadCollectionNodes(ctx context.Context, query *CollectionNodeQuery, nodes []*Node, init func(*Node), assign func(*Node, *CollectionNode)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[xid.ID]*Node)
@@ -1354,6 +1503,36 @@ func (_q *NodeQuery) loadCollectionNodes(ctx context.Context, query *CollectionN
 	}
 	query.Where(predicate.CollectionNode(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(node.CollectionNodesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.NodeID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "node_id" returned %v for node %v`, fk, n)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (_q *NodeQuery) loadThreadNodes(ctx context.Context, query *PostNodeQuery, nodes []*Node, init func(*Node), assign func(*Node, *PostNode)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[xid.ID]*Node)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(postnode.FieldNodeID)
+	}
+	query.Where(predicate.PostNode(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(node.ThreadNodesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

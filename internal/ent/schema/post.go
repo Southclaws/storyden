@@ -118,5 +118,9 @@ func (Post) Edges() []ent.Edge {
 
 		edge.To("post_reads", PostRead.Type).
 			Annotations(entsql.OnDelete(entsql.Cascade)),
+
+		edge.From("thread_nodes", Node.Type).
+			Ref("comments").
+			Through("post_nodes", PostNode.Type),
 	}
 }

@@ -18,6 +18,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/collection"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/node"
+	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
 	"github.com/Southclaws/storyden/internal/ent/tag"
@@ -401,6 +402,21 @@ func (_c *NodeCreate) AddCollections(v ...*Collection) *NodeCreate {
 	return _c.AddCollectionIDs(ids...)
 }
 
+// AddCommentIDs adds the "comments" edge to the Post entity by IDs.
+func (_c *NodeCreate) AddCommentIDs(ids ...xid.ID) *NodeCreate {
+	_c.mutation.AddCommentIDs(ids...)
+	return _c
+}
+
+// AddComments adds the "comments" edges to the Post entity.
+func (_c *NodeCreate) AddComments(v ...*Post) *NodeCreate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _c.AddCommentIDs(ids...)
+}
+
 // Mutation returns the NodeMutation object of the builder.
 func (_c *NodeCreate) Mutation() *NodeMutation {
 	return _c.mutation
@@ -768,6 +784,26 @@ func (_c *NodeCreate) createSpec() (*Node, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		createE := &CollectionNodeCreate{config: _c.config, mutation: newCollectionNodeMutation(_c.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := _c.mutation.CommentsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   node.CommentsTable,
+			Columns: node.CommentsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(post.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &PostNodeCreate{config: _c.config, mutation: newPostNodeMutation(_c.config, OpCreate)}
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields

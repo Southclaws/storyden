@@ -112,6 +112,8 @@ type OperationPermissions interface {
 	NodeGet() (bool, *rbac.Permission)
 	NodeUpdate() (bool, *rbac.Permission)
 	NodeDelete() (bool, *rbac.Permission)
+	NodeCommentCreate() (bool, *rbac.Permission)
+	NodeCommentList() (bool, *rbac.Permission)
 	NodeGenerateTitle() (bool, *rbac.Permission)
 	NodeGenerateTags() (bool, *rbac.Permission)
 	NodeGenerateContent() (bool, *rbac.Permission)
@@ -359,6 +361,10 @@ func GetOperationPermission(optable OperationPermissions, op string) (bool, *rba
 		return optable.NodeUpdate()
 	case "NodeDelete":
 		return optable.NodeDelete()
+	case "NodeCommentCreate":
+		return optable.NodeCommentCreate()
+	case "NodeCommentList":
+		return optable.NodeCommentList()
 	case "NodeGenerateTitle":
 		return optable.NodeGenerateTitle()
 	case "NodeGenerateTags":
