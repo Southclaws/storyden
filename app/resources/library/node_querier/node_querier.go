@@ -4,12 +4,14 @@ import (
 	"context"
 	"math"
 	"slices"
+	"strings"
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
 	"github.com/Southclaws/fault/fctx"
 	"github.com/Southclaws/opt"
+	"github.com/alitto/pond/v2"
 	"github.com/jmoiron/sqlx"
 	"github.com/rs/xid"
 
@@ -72,53 +74,84 @@ func WithFilterChildrenByTags(tags ...tag_ref.Name) Option {
 	}
 }
 
-const nodePropertiesQuery = `with
-  sibling_properties as (
-    select
-      ps.id         schema_id,
-      min(psf.id)   field_id,
-      min(psf.name) name,
-      min(psf.type) type,
-      min(psf.sort) sort,
-      'sibling' as source
-    from
-      nodes n
-      left join nodes sn on sn.parent_node_id = n.parent_node_id
-      inner join property_schemas ps on ps.id = sn.property_schema_id
-      or ps.id = n.property_schema_id
-      inner join property_schema_fields psf on psf.schema_id = ps.id
-    where
-      n.id = $1
-    group by ps.id, psf.id
-  ),
-  child_properties as (
-    select
-      ps.id         schema_id,
-      min(psf.id)   field_id,
-      min(psf.name) name,
-      min(psf.type) type,
-      min(psf.sort) sort,
-      'child' as source
-    from
-      nodes n
-      inner join nodes cn on cn.parent_node_id = n.id
-      inner join property_schemas ps on ps.id = cn.property_schema_id
-      inner join property_schema_fields psf on psf.schema_id = ps.id
-    where
-      n.id = $1
-    group by ps.id, psf.id
-  )
+const siblingPropertiesQuery = `
 select
-  *
+  ps.id         schema_id,
+  min(psf.id)   field_id,
+  min(psf.name) name,
+  min(psf.type) type,
+  min(psf.sort) sort,
+  'sibling' as source
 from
-  sibling_properties
-union all
-select
-  *
-from
-  child_properties
-order by source desc, sort asc
+  nodes n
+  left join nodes sn on sn.parent_node_id = n.parent_node_id
+  inner join property_schemas ps on ps.id = sn.property_schema_id
+  or ps.id = n.property_schema_id
+  inner join property_schema_fields psf on psf.schema_id = ps.id
+where
+  n.id = $1
+group by ps.id, psf.id
+order by sort asc
 `
+
+const childPropertiesQuery = `
+select
+  ps.id         schema_id,
+  min(psf.id)   field_id,
+  min(psf.name) name,
+  min(psf.type) type,
+  min(psf.sort) sort,
+  'child' as source
+from
+  nodes n
+  inner join nodes cn on cn.parent_node_id = n.id
+  inner join property_schemas ps on ps.id = cn.property_schema_id
+  inner join property_schema_fields psf on psf.schema_id = ps.id
+where
+  n.id = $1
+group by ps.id, psf.id
+order by sort asc
+`
+
+func (q *Querier) getNodeProperties(ctx context.Context, nodeID string) (library.PropertySchemaQueryRows, error) {
+	pool := pond.NewGroup()
+
+	var siblingRows library.PropertySchemaQueryRows
+	pool.SubmitErr(func() error {
+		err := q.raw.SelectContext(ctx, &siblingRows, siblingPropertiesQuery, nodeID)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+		return nil
+	})
+
+	var childRows library.PropertySchemaQueryRows
+	pool.SubmitErr(func() error {
+		err := q.raw.SelectContext(ctx, &childRows, childPropertiesQuery, nodeID)
+		if err != nil {
+			return fault.Wrap(err, fctx.With(ctx))
+		}
+		return nil
+	})
+
+	if err := pool.Wait(); err != nil {
+		return nil, fault.Wrap(err, fctx.With(ctx))
+	}
+
+	combined := append(siblingRows, childRows...)
+
+	slices.SortFunc(combined, func(a, b library.PropertySchemaQueryRow) int {
+		if a.Source != b.Source {
+			if a.Source == "sibling" {
+				return -1
+			}
+			return 1
+		}
+		return strings.Compare(a.Sort, b.Sort)
+	})
+
+	return combined, nil
+}
 
 func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) (*library.Node, error) {
 	query := q.db.Node.Query()
@@ -204,8 +237,7 @@ func (q *Querier) Get(ctx context.Context, qk library.QueryKey, opts ...Option) 
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	propSchema := library.PropertySchemaQueryRows{}
-	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, col.ID.String())
+	propSchema, err := q.getNodeProperties(ctx, col.ID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -352,8 +384,7 @@ func (q *Querier) ListChildren(ctx context.Context, qk library.QueryKey, pp pagi
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	propSchema := library.PropertySchemaQueryRows{}
-	err = q.raw.SelectContext(ctx, &propSchema, nodePropertiesQuery, parentID.String())
+	propSchema, err := q.getNodeProperties(ctx, parentID.String())
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
