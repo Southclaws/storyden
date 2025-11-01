@@ -17,6 +17,10 @@ import type {
   BadRequestResponse,
   InternalServerErrorResponse,
   NodeAddChildOKResponse,
+  NodeCommentCreateBody,
+  NodeCommentCreateOKResponse,
+  NodeCommentListOKResponse,
+  NodeCommentListParams,
   NodeCreateBody,
   NodeCreateOKResponse,
   NodeDeleteOKResponse,
@@ -323,6 +327,156 @@ export const useNodeDelete = <
   const swrFn = getNodeDeleteMutationFetcher(nodeSlug, params);
 
   const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Creates a "comment" on the specified node. A comment is just a regular
+thread. The target node must be published in order to create a comment.
+
+Since comments are just regular threads, once a node comment is created,
+any thread API can be used to interact with it. This includes editing,
+liking, adding to collections, replying and all moderation tools.
+
+Threads created this way have a default visibility of "unlisted" so they
+will not appear in the main feed. However, there's no restriction on
+visibility, so a comment can be created with a visibility of "published"
+which will echo the thread to the main feed. You can also specify a
+category for the thread so that it may appear in a category thread feed.
+
+This allows for flexible usage of node comments, for use-cases such as
+"Also share to feed" to encourage discussion from other contexts.
+
+ */
+export const nodeCommentCreate = (
+  nodeSlug: string,
+  nodeCommentCreateBody: NodeCommentCreateBody,
+) => {
+  return fetcher<NodeCommentCreateOKResponse>({
+    url: `/nodes/${nodeSlug}/comments`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: nodeCommentCreateBody,
+  });
+};
+
+export const getNodeCommentCreateMutationFetcher = (nodeSlug: string) => {
+  return (
+    _: Key,
+    { arg }: { arg: NodeCommentCreateBody },
+  ): Promise<NodeCommentCreateOKResponse> => {
+    return nodeCommentCreate(nodeSlug, arg);
+  };
+};
+export const getNodeCommentCreateMutationKey = (nodeSlug: string) =>
+  [`/nodes/${nodeSlug}/comments`] as const;
+
+export type NodeCommentCreateMutationResult = NonNullable<
+  Awaited<ReturnType<typeof nodeCommentCreate>>
+>;
+export type NodeCommentCreateMutationError =
+  | BadRequestResponse
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeCommentCreate = <
+  TError =
+    | BadRequestResponse
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  options?: {
+    swr?: SWRMutationConfiguration<
+      Awaited<ReturnType<typeof nodeCommentCreate>>,
+      TError,
+      Key,
+      NodeCommentCreateBody,
+      Awaited<ReturnType<typeof nodeCommentCreate>>
+    > & { swrKey?: string };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const swrKey =
+    swrOptions?.swrKey ?? getNodeCommentCreateMutationKey(nodeSlug);
+  const swrFn = getNodeCommentCreateMutationFetcher(nodeSlug);
+
+  const query = useSWRMutation(swrKey, swrFn, swrOptions);
+
+  return {
+    swrKey,
+    ...query,
+  };
+};
+/**
+ * Get all comments for a given node using the provided filters and page
+parameters. Comments on nodes are fixed to sort by their created at time
+not the most recent reply. This is an internal constraint currently.
+
+The comment list will not include replies in the response. In order to
+fetch the reply tree for each comment, you must send additional API 
+requests to fetch each thread. When building user interfaces for this,
+consider lazy-loading the replies when a user expands a comment.
+
+ */
+export const nodeCommentList = (
+  nodeSlug: string,
+  params?: NodeCommentListParams,
+) => {
+  return fetcher<NodeCommentListOKResponse>({
+    url: `/nodes/${nodeSlug}/comments`,
+    method: "GET",
+    params,
+  });
+};
+
+export const getNodeCommentListKey = (
+  nodeSlug: string,
+  params?: NodeCommentListParams,
+) => [`/nodes/${nodeSlug}/comments`, ...(params ? [params] : [])] as const;
+
+export type NodeCommentListQueryResult = NonNullable<
+  Awaited<ReturnType<typeof nodeCommentList>>
+>;
+export type NodeCommentListQueryError =
+  | UnauthorisedResponse
+  | NotFoundResponse
+  | InternalServerErrorResponse;
+
+export const useNodeCommentList = <
+  TError =
+    | UnauthorisedResponse
+    | NotFoundResponse
+    | InternalServerErrorResponse,
+>(
+  nodeSlug: string,
+  params?: NodeCommentListParams,
+  options?: {
+    swr?: SWRConfiguration<
+      Awaited<ReturnType<typeof nodeCommentList>>,
+      TError
+    > & { swrKey?: Key; enabled?: boolean };
+  },
+) => {
+  const { swr: swrOptions } = options ?? {};
+
+  const isEnabled = swrOptions?.enabled !== false && !!nodeSlug;
+  const swrKey =
+    swrOptions?.swrKey ??
+    (() => (isEnabled ? getNodeCommentListKey(nodeSlug, params) : null));
+  const swrFn = () => nodeCommentList(nodeSlug, params);
+
+  const query = useSwr<Awaited<ReturnType<typeof swrFn>>, TError>(
+    swrKey,
+    swrFn,
+    swrOptions,
+  );
 
   return {
     swrKey,

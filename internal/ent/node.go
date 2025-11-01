@@ -88,11 +88,15 @@ type NodeEdges struct {
 	ContentLinks []*Link `json:"content_links,omitempty"`
 	// Collections holds the value of the collections edge.
 	Collections []*Collection `json:"collections,omitempty"`
+	// Comments holds the value of the comments edge.
+	Comments []*Post `json:"comments,omitempty"`
 	// CollectionNodes holds the value of the collection_nodes edge.
 	CollectionNodes []*CollectionNode `json:"collection_nodes,omitempty"`
+	// ThreadNodes holds the value of the thread_nodes edge.
+	ThreadNodes []*PostNode `json:"thread_nodes,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [12]bool
+	loadedTypes [14]bool
 }
 
 // OwnerOrErr returns the Owner value or an error if the edge
@@ -204,13 +208,31 @@ func (e NodeEdges) CollectionsOrErr() ([]*Collection, error) {
 	return nil, &NotLoadedError{edge: "collections"}
 }
 
+// CommentsOrErr returns the Comments value or an error if the edge
+// was not loaded in eager-loading.
+func (e NodeEdges) CommentsOrErr() ([]*Post, error) {
+	if e.loadedTypes[11] {
+		return e.Comments, nil
+	}
+	return nil, &NotLoadedError{edge: "comments"}
+}
+
 // CollectionNodesOrErr returns the CollectionNodes value or an error if the edge
 // was not loaded in eager-loading.
 func (e NodeEdges) CollectionNodesOrErr() ([]*CollectionNode, error) {
-	if e.loadedTypes[11] {
+	if e.loadedTypes[12] {
 		return e.CollectionNodes, nil
 	}
 	return nil, &NotLoadedError{edge: "collection_nodes"}
+}
+
+// ThreadNodesOrErr returns the ThreadNodes value or an error if the edge
+// was not loaded in eager-loading.
+func (e NodeEdges) ThreadNodesOrErr() ([]*PostNode, error) {
+	if e.loadedTypes[13] {
+		return e.ThreadNodes, nil
+	}
+	return nil, &NotLoadedError{edge: "thread_nodes"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -431,9 +453,19 @@ func (_m *Node) QueryCollections() *CollectionQuery {
 	return NewNodeClient(_m.config).QueryCollections(_m)
 }
 
+// QueryComments queries the "comments" edge of the Node entity.
+func (_m *Node) QueryComments() *PostQuery {
+	return NewNodeClient(_m.config).QueryComments(_m)
+}
+
 // QueryCollectionNodes queries the "collection_nodes" edge of the Node entity.
 func (_m *Node) QueryCollectionNodes() *CollectionNodeQuery {
 	return NewNodeClient(_m.config).QueryCollectionNodes(_m)
+}
+
+// QueryThreadNodes queries the "thread_nodes" edge of the Node entity.
+func (_m *Node) QueryThreadNodes() *PostNodeQuery {
+	return NewNodeClient(_m.config).QueryThreadNodes(_m)
 }
 
 // Update returns a builder for updating this Node.

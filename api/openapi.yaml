@@ -1845,6 +1845,55 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorised" }
         "200": { $ref: "#/components/responses/NodeDeleteOK" }
 
+  /nodes/{node_slug}/comments:
+    post:
+      operationId: NodeCommentCreate
+      description: |
+        Creates a "comment" on the specified node. A comment is just a regular
+        thread. The target node must be published in order to create a comment.
+
+        Since comments are just regular threads, once a node comment is created,
+        any thread API can be used to interact with it. This includes editing,
+        liking, adding to collections, replying and all moderation tools.
+
+        Threads created this way have a default visibility of "unlisted" so they
+        will not appear in the main feed. However, there's no restriction on
+        visibility, so a comment can be created with a visibility of "published"
+        which will echo the thread to the main feed. You can also specify a
+        category for the thread so that it may appear in a category thread feed.
+
+        This allows for flexible usage of node comments, for use-cases such as
+        "Also share to feed" to encourage discussion from other contexts.
+      tags: [nodes]
+      parameters: [$ref: "#/components/parameters/NodeSlugParam"]
+      requestBody: { $ref: "#/components/requestBodies/NodeCommentCreate" }
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "200": { $ref: "#/components/responses/NodeCommentCreateOK" }
+    get:
+      operationId: NodeCommentList
+      description: |
+        Get all comments for a given node using the provided filters and page
+        parameters. Comments on nodes are fixed to sort by their created at time
+        not the most recent reply. This is an internal constraint currently.
+
+        The comment list will not include replies in the response. In order to
+        fetch the reply tree for each comment, you must send additional API 
+        requests to fetch each thread. When building user interfaces for this,
+        consider lazy-loading the replies when a user expands a comment.
+      tags: [nodes]
+      parameters:
+        - $ref: "#/components/parameters/NodeSlugParam"
+        - $ref: "#/components/parameters/PaginationQuery"
+      responses:
+        default: { $ref: "#/components/responses/InternalServerError" }
+        "404": { $ref: "#/components/responses/NotFound" }
+        "401": { $ref: "#/components/responses/Unauthorised" }
+        "200": { $ref: "#/components/responses/NodeCommentListOK" }
+
   /nodes/{node_slug}/title:
     post:
       operationId: NodeGenerateTitle
@@ -2942,6 +2991,11 @@ components:
         application/json:
           schema: { $ref: "#/components/schemas/NodeMutableProps" }
 
+    NodeCommentCreate:
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ThreadInitialProps" }
+
     NodeGenerateTitle:
       content:
         application/json:
@@ -3531,6 +3585,19 @@ components:
             properties:
               destination:
                 $ref: "#/components/schemas/Node"
+
+    NodeCommentCreateOK:
+      description: Node comment created.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Thread"
+
+    NodeCommentListOK:
+      description: Node comments list.
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ThreadListResult" }
 
     NodeAddChildOK:
       description: Node child added. Returns parent node.

@@ -19,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/likepost"
 	"github.com/Southclaws/storyden/internal/ent/link"
 	"github.com/Southclaws/storyden/internal/ent/mentionprofile"
+	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/post"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
@@ -535,6 +536,21 @@ func (_u *PostUpdate) AddPostReads(v ...*PostRead) *PostUpdate {
 	return _u.AddPostReadIDs(ids...)
 }
 
+// AddThreadNodeIDs adds the "thread_nodes" edge to the Node entity by IDs.
+func (_u *PostUpdate) AddThreadNodeIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.AddThreadNodeIDs(ids...)
+	return _u
+}
+
+// AddThreadNodes adds the "thread_nodes" edges to the Node entity.
+func (_u *PostUpdate) AddThreadNodes(v ...*Node) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddThreadNodeIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (_u *PostUpdate) Mutation() *PostMutation {
 	return _u.mutation
@@ -799,6 +815,27 @@ func (_u *PostUpdate) RemovePostReads(v ...*PostRead) *PostUpdate {
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePostReadIDs(ids...)
+}
+
+// ClearThreadNodes clears all "thread_nodes" edges to the Node entity.
+func (_u *PostUpdate) ClearThreadNodes() *PostUpdate {
+	_u.mutation.ClearThreadNodes()
+	return _u
+}
+
+// RemoveThreadNodeIDs removes the "thread_nodes" edge to Node entities by IDs.
+func (_u *PostUpdate) RemoveThreadNodeIDs(ids ...xid.ID) *PostUpdate {
+	_u.mutation.RemoveThreadNodeIDs(ids...)
+	return _u
+}
+
+// RemoveThreadNodes removes "thread_nodes" edges to Node entities.
+func (_u *PostUpdate) RemoveThreadNodes(v ...*Node) *PostUpdate {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveThreadNodeIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1547,6 +1584,63 @@ func (_u *PostUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if _u.mutation.ThreadNodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.ThreadNodesTable,
+			Columns: post.ThreadNodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		createE := &PostNodeCreate{config: _u.config, mutation: newPostNodeMutation(_u.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedThreadNodesIDs(); len(nodes) > 0 && !_u.mutation.ThreadNodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.ThreadNodesTable,
+			Columns: post.ThreadNodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &PostNodeCreate{config: _u.config, mutation: newPostNodeMutation(_u.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ThreadNodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.ThreadNodesTable,
+			Columns: post.ThreadNodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &PostNodeCreate{config: _u.config, mutation: newPostNodeMutation(_u.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(_u.modifiers...)
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -2063,6 +2157,21 @@ func (_u *PostUpdateOne) AddPostReads(v ...*PostRead) *PostUpdateOne {
 	return _u.AddPostReadIDs(ids...)
 }
 
+// AddThreadNodeIDs adds the "thread_nodes" edge to the Node entity by IDs.
+func (_u *PostUpdateOne) AddThreadNodeIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.AddThreadNodeIDs(ids...)
+	return _u
+}
+
+// AddThreadNodes adds the "thread_nodes" edges to the Node entity.
+func (_u *PostUpdateOne) AddThreadNodes(v ...*Node) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.AddThreadNodeIDs(ids...)
+}
+
 // Mutation returns the PostMutation object of the builder.
 func (_u *PostUpdateOne) Mutation() *PostMutation {
 	return _u.mutation
@@ -2327,6 +2436,27 @@ func (_u *PostUpdateOne) RemovePostReads(v ...*PostRead) *PostUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return _u.RemovePostReadIDs(ids...)
+}
+
+// ClearThreadNodes clears all "thread_nodes" edges to the Node entity.
+func (_u *PostUpdateOne) ClearThreadNodes() *PostUpdateOne {
+	_u.mutation.ClearThreadNodes()
+	return _u
+}
+
+// RemoveThreadNodeIDs removes the "thread_nodes" edge to Node entities by IDs.
+func (_u *PostUpdateOne) RemoveThreadNodeIDs(ids ...xid.ID) *PostUpdateOne {
+	_u.mutation.RemoveThreadNodeIDs(ids...)
+	return _u
+}
+
+// RemoveThreadNodes removes "thread_nodes" edges to Node entities.
+func (_u *PostUpdateOne) RemoveThreadNodes(v ...*Node) *PostUpdateOne {
+	ids := make([]xid.ID, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return _u.RemoveThreadNodeIDs(ids...)
 }
 
 // Where appends a list predicates to the PostUpdate builder.
@@ -3103,6 +3233,63 @@ func (_u *PostUpdateOne) sqlSave(ctx context.Context) (_node *Post, err error) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if _u.mutation.ThreadNodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.ThreadNodesTable,
+			Columns: post.ThreadNodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		createE := &PostNodeCreate{config: _u.config, mutation: newPostNodeMutation(_u.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.RemovedThreadNodesIDs(); len(nodes) > 0 && !_u.mutation.ThreadNodesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.ThreadNodesTable,
+			Columns: post.ThreadNodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &PostNodeCreate{config: _u.config, mutation: newPostNodeMutation(_u.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := _u.mutation.ThreadNodesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   post.ThreadNodesTable,
+			Columns: post.ThreadNodesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(node.FieldID, field.TypeString),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &PostNodeCreate{config: _u.config, mutation: newPostNodeMutation(_u.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(_u.modifiers...)

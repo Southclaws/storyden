@@ -73,8 +73,12 @@ const (
 	EdgeContentLinks = "content_links"
 	// EdgeCollections holds the string denoting the collections edge name in mutations.
 	EdgeCollections = "collections"
+	// EdgeComments holds the string denoting the comments edge name in mutations.
+	EdgeComments = "comments"
 	// EdgeCollectionNodes holds the string denoting the collection_nodes edge name in mutations.
 	EdgeCollectionNodes = "collection_nodes"
+	// EdgeThreadNodes holds the string denoting the thread_nodes edge name in mutations.
+	EdgeThreadNodes = "thread_nodes"
 	// Table holds the table name of the node in the database.
 	Table = "nodes"
 	// OwnerTable is the table that holds the owner relation/edge.
@@ -140,6 +144,11 @@ const (
 	// CollectionsInverseTable is the table name for the Collection entity.
 	// It exists in this package in order to avoid circular dependency with the "collection" package.
 	CollectionsInverseTable = "collections"
+	// CommentsTable is the table that holds the comments relation/edge. The primary key declared below.
+	CommentsTable = "post_nodes"
+	// CommentsInverseTable is the table name for the Post entity.
+	// It exists in this package in order to avoid circular dependency with the "post" package.
+	CommentsInverseTable = "posts"
 	// CollectionNodesTable is the table that holds the collection_nodes relation/edge.
 	CollectionNodesTable = "collection_nodes"
 	// CollectionNodesInverseTable is the table name for the CollectionNode entity.
@@ -147,6 +156,13 @@ const (
 	CollectionNodesInverseTable = "collection_nodes"
 	// CollectionNodesColumn is the table column denoting the collection_nodes relation/edge.
 	CollectionNodesColumn = "node_id"
+	// ThreadNodesTable is the table that holds the thread_nodes relation/edge.
+	ThreadNodesTable = "post_nodes"
+	// ThreadNodesInverseTable is the table name for the PostNode entity.
+	// It exists in this package in order to avoid circular dependency with the "postnode" package.
+	ThreadNodesInverseTable = "post_nodes"
+	// ThreadNodesColumn is the table column denoting the thread_nodes relation/edge.
+	ThreadNodesColumn = "node_id"
 )
 
 // Columns holds all SQL columns for node fields.
@@ -184,6 +200,9 @@ var (
 	// CollectionsPrimaryKey and CollectionsColumn2 are the table columns denoting the
 	// primary key for the collections relation (M2M).
 	CollectionsPrimaryKey = []string{"collection_id", "node_id"}
+	// CommentsPrimaryKey and CommentsColumn2 are the table columns denoting the
+	// primary key for the comments relation (M2M).
+	CommentsPrimaryKey = []string{"node_id", "post_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -448,6 +467,20 @@ func ByCollections(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByCommentsCount orders the results by comments count.
+func ByCommentsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCommentsStep(), opts...)
+	}
+}
+
+// ByComments orders the results by comments terms.
+func ByComments(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCommentsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByCollectionNodesCount orders the results by collection_nodes count.
 func ByCollectionNodesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -459,6 +492,20 @@ func ByCollectionNodesCount(opts ...sql.OrderTermOption) OrderOption {
 func ByCollectionNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newCollectionNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByThreadNodesCount orders the results by thread_nodes count.
+func ByThreadNodesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newThreadNodesStep(), opts...)
+	}
+}
+
+// ByThreadNodes orders the results by thread_nodes terms.
+func ByThreadNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newThreadNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newOwnerStep() *sqlgraph.Step {
@@ -538,10 +585,24 @@ func newCollectionsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, true, CollectionsTable, CollectionsPrimaryKey...),
 	)
 }
+func newCommentsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CommentsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, CommentsTable, CommentsPrimaryKey...),
+	)
+}
 func newCollectionNodesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CollectionNodesInverseTable, CollectionNodesColumn),
 		sqlgraph.Edge(sqlgraph.O2M, true, CollectionNodesTable, CollectionNodesColumn),
+	)
+}
+func newThreadNodesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ThreadNodesInverseTable, ThreadNodesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, ThreadNodesTable, ThreadNodesColumn),
 	)
 }
