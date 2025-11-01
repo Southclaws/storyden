@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/Southclaws/dt"
 	"github.com/Southclaws/fault"
@@ -18,6 +19,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/asset"
 	"github.com/Southclaws/storyden/app/resources/datagraph"
 	"github.com/Southclaws/storyden/app/resources/library"
+	"github.com/Southclaws/storyden/app/resources/library/node_cache"
 	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_traversal"
@@ -32,6 +34,7 @@ import (
 	"github.com/Southclaws/storyden/app/services/library/node_read"
 	"github.com/Southclaws/storyden/app/services/library/node_visibility"
 	"github.com/Southclaws/storyden/app/services/library/nodetree"
+	"github.com/Southclaws/storyden/app/services/reqinfo"
 	"github.com/Southclaws/storyden/app/services/tag/autotagger"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
 	"github.com/Southclaws/storyden/internal/deletable"
@@ -49,6 +52,7 @@ type Nodes struct {
 	npos          *nodetree.Position
 	ntr           node_traversal.Repository
 	schemaUpdater *node_property_schema.Updater
+	node_cache    *node_cache.Cache
 }
 
 func NewNodes(
@@ -63,6 +67,7 @@ func NewNodes(
 	npos *nodetree.Position,
 	ntr node_traversal.Repository,
 	schemaUpdater *node_property_schema.Updater,
+	node_cache *node_cache.Cache,
 ) Nodes {
 	return Nodes{
 		accountQuery:  accountQuery,
@@ -76,6 +81,7 @@ func NewNodes(
 		npos:          npos,
 		ntr:           ntr,
 		schemaUpdater: schemaUpdater,
+		node_cache:    node_cache,
 	}
 }
 
@@ -225,19 +231,50 @@ func (c *Nodes) NodeList(ctx context.Context, request openapi.NodeListRequestObj
 	}, nil
 }
 
+const nodeGetCacheControl = "public, max-age=60, stale-while-revalidate=120"
+
 func (c *Nodes) NodeGet(ctx context.Context, request openapi.NodeGetRequestObject) (openapi.NodeGetResponseObject, error) {
 	pp := deserialisePageParams(request.Params.Page, 100)
 	sortChildrenBy := opt.NewPtrMap(request.Params.ChildrenSort, func(cs string) node_querier.ChildSortRule {
 		return node_querier.NewChildSortRule(cs, pp)
 	})
 
-	node, err := c.nodeReader.GetBySlug(ctx, deserialiseNodeMark(request.NodeSlug), sortChildrenBy)
+	qk := deserialiseNodeMark(request.NodeSlug)
+	cacheKey := qk.String()
+
+	cacheTime := c.node_cache.LastModified(ctx, cacheKey)
+	lastModified := ""
+	if cacheTime != nil {
+		lastModified = cacheTime.UTC().Format(time.RFC1123)
+	}
+
+	if c.node_cache.IsNotModified(ctx, reqinfo.GetCacheQuery(ctx), cacheKey) {
+		return openapi.NodeGet304Response{
+			Headers: openapi.NotModifiedResponseHeaders{
+				CacheControl: nodeGetCacheControl,
+				LastModified: lastModified,
+			},
+		}, nil
+	}
+
+	node, err := c.nodeReader.GetBySlug(ctx, qk, sortChildrenBy)
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
+	if lastModified == "" {
+		c.node_cache.Store(ctx, cacheKey, node.UpdatedAt)
+		lastModified = node.UpdatedAt.UTC().Format(time.RFC1123)
+	}
+
 	return openapi.NodeGet200JSONResponse{
-		NodeGetOKJSONResponse: openapi.NodeGetOKJSONResponse(serialiseNodeWithItems(node)),
+		NodeGetOKJSONResponse: openapi.NodeGetOKJSONResponse{
+			Body: serialiseNodeWithItems(node),
+			Headers: openapi.NodeGetOKResponseHeaders{
+				CacheControl: nodeGetCacheControl,
+				LastModified: lastModified,
+			},
+		},
 	}, nil
 }
 

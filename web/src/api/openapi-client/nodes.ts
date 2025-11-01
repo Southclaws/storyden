@@ -42,6 +42,7 @@ import type {
   NodeUpdatePropertySchemaOKResponse,
   NotFoundResponse,
   NotImplementedResponse,
+  NotModifiedResponse,
   UnauthorisedResponse,
   VisibilityUpdateBody,
 } from "../openapi-schema";
@@ -162,12 +163,14 @@ export type NodeGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof nodeGet>>
 >;
 export type NodeGetQueryError =
+  | NotModifiedResponse
   | UnauthorisedResponse
   | NotFoundResponse
   | InternalServerErrorResponse;
 
 export const useNodeGet = <
   TError =
+    | NotModifiedResponse
     | UnauthorisedResponse
     | NotFoundResponse
     | InternalServerErrorResponse,

@@ -12,9 +12,11 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
+	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/services/authentication/session"
 	"github.com/Southclaws/storyden/app/services/library/node_auth"
 	"github.com/Southclaws/storyden/internal/deletable"
+	"github.com/Southclaws/storyden/internal/infrastructure/pubsub"
 )
 
 var ErrNoParent = fault.New("node has no parent", ftag.With(ftag.InvalidArgument))
@@ -25,6 +27,7 @@ type Position struct {
 	nodeWriter   *node_writer.Writer
 	graph        Graph
 	accountQuery *account_querier.Querier
+	bus          *pubsub.Bus
 }
 
 func NewPositionService(
@@ -33,6 +36,7 @@ func NewPositionService(
 	nodeWriter *node_writer.Writer,
 	graph Graph,
 	accountQuery *account_querier.Querier,
+	bus *pubsub.Bus,
 ) *Position {
 	return &Position{
 		nodeChildren: nodeChildren,
@@ -40,6 +44,7 @@ func NewPositionService(
 		nodeWriter:   nodeWriter,
 		graph:        graph,
 		accountQuery: accountQuery,
+		bus:          bus,
 	}
 }
 
@@ -111,6 +116,11 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
+		p.bus.Publish(ctx, &message.EventNodeUpdated{
+			ID:   library.NodeID(n.Mark.ID()),
+			Mark: n.Mark.String(),
+		})
+
 		return n, nil
 	}
 
@@ -120,6 +130,11 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
 
+		p.bus.Publish(ctx, &message.EventNodeUpdated{
+			ID:   library.NodeID(n.Mark.ID()),
+			Mark: n.Mark.String(),
+		})
+
 		return n, nil
 	}
 
@@ -128,6 +143,11 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}
+
+		p.bus.Publish(ctx, &message.EventNodeUpdated{
+			ID:   library.NodeID(n.Mark.ID()),
+			Mark: n.Mark.String(),
+		})
 
 		return n, nil
 	}

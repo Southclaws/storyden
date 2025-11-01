@@ -1818,6 +1818,7 @@ paths:
         default: { $ref: "#/components/responses/InternalServerError" }
         "404": { $ref: "#/components/responses/NotFound" }
         "401": { $ref: "#/components/responses/Unauthorised" }
+        "304": { $ref: "#/components/responses/NotModified" }
         "200": { $ref: "#/components/responses/NodeGetOK" }
     patch:
       operationId: NodeUpdate
@@ -3468,6 +3469,7 @@ components:
 
     NodeGetOK:
       description: Node information and content.
+      headers: { <<: *cache_response_headers }
       content:
         application/json:
           schema:

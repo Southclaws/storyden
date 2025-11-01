@@ -83,16 +83,19 @@ func (m *Controller) ChangeVisibility(ctx context.Context, qk library.QueryKey, 
 		switch vis {
 		case visibility.VisibilityPublished:
 			m.bus.Publish(ctx, &message.EventNodePublished{
-				ID: library.NodeID(n.Mark.ID()),
+				ID:   library.NodeID(n.Mark.ID()),
+				Mark: n.Mark.String(),
 			})
 		case visibility.VisibilityReview:
 			m.bus.Publish(ctx, &message.EventNodeSubmittedForReview{
-				ID: library.NodeID(n.Mark.ID()),
+				ID:   library.NodeID(n.Mark.ID()),
+				Mark: n.Mark.String(),
 			})
 		case visibility.VisibilityUnlisted, visibility.VisibilityDraft:
 			if oldVisibility == visibility.VisibilityPublished {
 				m.bus.Publish(ctx, &message.EventNodeUnpublished{
-					ID: library.NodeID(n.Mark.ID()),
+					ID:   library.NodeID(n.Mark.ID()),
+					Mark: n.Mark.String(),
 				})
 			}
 		}

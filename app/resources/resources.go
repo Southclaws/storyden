@@ -27,6 +27,7 @@ import (
 	"github.com/Southclaws/storyden/app/resources/event/event_writer"
 	"github.com/Southclaws/storyden/app/resources/event/participation/participant_querier"
 	"github.com/Southclaws/storyden/app/resources/event/participation/participant_writer"
+	"github.com/Southclaws/storyden/app/resources/library/node_cache"
 	"github.com/Southclaws/storyden/app/resources/library/node_children"
 	"github.com/Southclaws/storyden/app/resources/library/node_properties"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
@@ -96,6 +97,7 @@ func Build() fx.Option {
 			collection_querier.New,
 			collection_writer.New,
 			collection_items.New,
+			node_cache.New,
 			node_querier.New,
 			node_writer.New,
 			node_traversal.New,

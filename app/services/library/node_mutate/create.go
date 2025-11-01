@@ -61,15 +61,16 @@ func (s *Manager) Create(ctx context.Context,
 	}
 
 	s.bus.Publish(ctx, &message.EventNodeCreated{
-		ID: library.NodeID(n.Mark.ID()),
+		ID:   library.NodeID(n.Mark.ID()),
+		Mark: n.Mark.String(),
 	})
 
 	if p.Visibility.OrZero() == visibility.VisibilityPublished {
 		s.bus.Publish(ctx, &message.EventNodePublished{
-			ID: library.NodeID(n.Mark.ID()),
+			ID:   library.NodeID(n.Mark.ID()),
+			Mark: n.Mark.String(),
 		})
 	}
-
 
 	return n, nil
 }
