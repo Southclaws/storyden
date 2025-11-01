@@ -16,6 +16,7 @@ type (
 func NewMark(id xid.ID, slug string) Mark { return Mark{*mark.NewMark(id, slug)} }
 func NewKey(in string) QueryKey           { return QueryKey{mark.NewQueryKey(in)} }
 func NewID(id xid.ID) QueryKey            { return QueryKey{mark.NewQueryKeyID(id)} }
+func NewQueryKey(m Mark) QueryKey { return QueryKey{m.Queryable()} }
 
 func (m QueryKey) Predicate() (p predicate.Node) {
 	m.Apply(

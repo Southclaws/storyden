@@ -17,7 +17,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/library"
 	"github.com/Southclaws/storyden/app/resources/library/node_querier"
 	"github.com/Southclaws/storyden/app/resources/library/node_writer"
-	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/message"
 	"github.com/Southclaws/storyden/app/resources/pagination"
 	"github.com/Southclaws/storyden/app/resources/post"
@@ -137,7 +136,7 @@ func (s *scrapeConsumer) scrapeLink(ctx context.Context, u url.URL, item opt.Opt
 			}
 
 		case datagraph.KindNode:
-			qk := library.QueryKey{mark.NewQueryKeyID(i.ID)}
+			qk := library.NewID(i.ID)
 			_, err := s.nodeWriter.Update(ctx, qk, node_writer.WithContentLinks(xid.ID(ln.ID)))
 			if err != nil {
 				return fault.Wrap(err, fctx.With(ctx))
@@ -169,7 +168,7 @@ func (s *scrapeConsumer) hydratePostURLs(ctx context.Context, postID post.ID) er
 }
 
 func (s *scrapeConsumer) hydrateNodeURLs(ctx context.Context, nodeID library.NodeID) error {
-	node, err := s.nodeQuery.Get(ctx, library.QueryKey{mark.NewQueryKeyID(xid.ID(nodeID))})
+	node, err := s.nodeQuery.Get(ctx, library.NewID(xid.ID(nodeID)))
 	if err != nil {
 		return fault.Wrap(err, fctx.With(ctx))
 	}

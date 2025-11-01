@@ -215,7 +215,7 @@ func (w *Writer) Create(
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return w.querier.Get(ctx, library.QueryKey{mark.NewQueryKeyID(col.ID)})
+	return w.querier.Get(ctx, library.NewID(col.ID))
 }
 
 func (w *Writer) getNextSortKey(ctx context.Context, parent opt.Optional[xid.ID]) (*lexorank.Key, error) {
@@ -288,7 +288,7 @@ func (w *Writer) Update(ctx context.Context, qk library.QueryKey, opts ...Option
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	qk = library.QueryKey{mark.NewQueryKeyID(pre.Mark.ID())}
+	qk = library.NewID(pre.Mark.ID())
 
 	return w.querier.Get(ctx, qk)
 }
@@ -323,6 +323,4 @@ func (w *Writer) CleanupOrphanedSchemas(ctx context.Context) {
 			),
 		).
 		Exec(ctx)
-
-	return
 }

@@ -99,14 +99,14 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 	// connection before adding the target child to the target parent.
 	if parentParent, ok := pnode.Parent.Get(); ok {
 		if parentParent.Mark.ID() == cnode.Mark.ID() {
-			cnode, err = s.nodeWriter.Update(ctx, library.QueryKey{cnode.Mark.Queryable()}, node_writer.WithChildNodeRemove(xid.ID(pnode.Mark.ID())))
+			cnode, err = s.nodeWriter.Update(ctx, library.NewQueryKey(cnode.Mark), node_writer.WithChildNodeRemove(xid.ID(pnode.Mark.ID())))
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
 		}
 	}
 
-	cnode, err = s.nodeWriter.Update(ctx, library.QueryKey{cnode.Mark.Queryable()}, node_writer.WithParent(library.NodeID(pnode.Mark.ID())))
+	cnode, err = s.nodeWriter.Update(ctx, library.NewQueryKey(cnode.Mark), node_writer.WithParent(library.NodeID(pnode.Mark.ID())))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
@@ -147,7 +147,7 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	_, err = s.nodeWriter.Update(ctx, library.QueryKey{pnode.Mark.Queryable()}, node_writer.WithChildNodeRemove(xid.ID(cnode.Mark.ID())))
+	_, err = s.nodeWriter.Update(ctx, library.NewQueryKey(pnode.Mark), node_writer.WithChildNodeRemove(xid.ID(cnode.Mark.ID())))
 	if err != nil {
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}

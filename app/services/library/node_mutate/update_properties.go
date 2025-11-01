@@ -54,7 +54,7 @@ func (s *Manager) applyPropertyMutations(ctx context.Context, n *library.Node, p
 		})
 
 		if len(schemaUpdates) > 0 {
-			newSchema, err := s.schemaWriter.UpdateSiblings(ctx, library.QueryKey{n.Mark.Queryable()}, schemaUpdates)
+			newSchema, err := s.schemaWriter.UpdateSiblings(ctx, library.NewQueryKey(n.Mark), schemaUpdates)
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}

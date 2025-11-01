@@ -689,7 +689,7 @@ func serialiseNodeWithItems(in *library.Node) openapi.NodeWithChildren {
 }
 
 func deserialiseNodeMark(in string) library.QueryKey {
-	return library.QueryKey{deserialiseMark(in)}
+	return library.NewKey(in)
 }
 
 func deserialiseAssetSources(in openapi.AssetSourceList) []string {

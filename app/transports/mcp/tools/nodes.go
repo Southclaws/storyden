@@ -241,7 +241,7 @@ func (t *nodeTools) libraryPageCreate(ctx context.Context, request mcp.CallToolR
 
 	var parent opt.Optional[library.QueryKey]
 	if parentStr != "" {
-		parent = opt.New(library.QueryKey{mark.NewQueryKey(parentStr)})
+		parent = opt.New(library.NewKey(parentStr))
 	}
 
 	var vis opt.Optional[visibility.Visibility]
@@ -337,7 +337,7 @@ func (t *nodeTools) libraryPageUpdate(ctx context.Context, request mcp.CallToolR
 	}
 
 	if parentStr != "" {
-		partial.Parent = opt.New(library.QueryKey{mark.NewQueryKey(parentStr)})
+		partial.Parent = opt.New(library.NewKey(parentStr))
 	}
 
 	node, err := t.nodeMutator.Update(ctx, library.NewKey(slug), partial)

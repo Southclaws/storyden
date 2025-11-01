@@ -51,7 +51,6 @@ func (v *Spec) getSpecOverride(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/vnd.oai.openapi+json;version=3.1.0")
 	w.Header().Set("Cache-Control", "public, max-age=3600")
 	json.NewEncoder(w).Encode(v.spec)
-	return
 }
 
 // NOTE: Unused, overridden by middleware.

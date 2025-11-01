@@ -15,7 +15,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/event/event_ref"
 	"github.com/Southclaws/storyden/app/resources/event/location"
 	"github.com/Southclaws/storyden/app/resources/event/participation"
-	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/post"
 	"github.com/Southclaws/storyden/app/resources/visibility"
 	"github.com/Southclaws/storyden/internal/ent"
@@ -135,7 +134,7 @@ func (w *Writer) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx))
 	}
 
-	return w.querier.Get(ctx, event_ref.QueryKey{mark.NewQueryKeyID(evt.ID)})
+	return w.querier.Get(ctx, event_ref.NewID(evt.ID))
 }
 
 func (w *Writer) Update(ctx context.Context, mk event_ref.QueryKey, opts ...Option) (*event.Event, error) {

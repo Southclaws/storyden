@@ -92,7 +92,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 
 		parentNode, ok := thisnode.Parent.Get()
 		if ok {
-			thisnode, err = p.graph.Sever(ctx, nm, library.QueryKey{parentNode.Mark.Queryable()})
+			thisnode, err = p.graph.Sever(ctx, nm, library.NewQueryKey(parentNode.Mark))
 			if err != nil {
 				return nil, fault.Wrap(err, fctx.With(ctx))
 			}
@@ -102,7 +102,7 @@ func (p *Position) Move(ctx context.Context, nm library.QueryKey, opts Options) 
 
 		var err error
 
-		thisnode, err = p.graph.Move(ctx, nm, library.QueryKey{parentNode.Queryable})
+		thisnode, err = p.graph.Move(ctx, nm, parentNode)
 		if err != nil {
 			return nil, fault.Wrap(err, fctx.With(ctx))
 		}

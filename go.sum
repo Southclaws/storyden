@@ -48,8 +48,6 @@ github.com/ThreeDotsLabs/watermill v1.5.1 h1:t5xMivyf9tpmU3iozPqyrCZXHvoV1XQDfih
 github.com/ThreeDotsLabs/watermill v1.5.1/go.mod h1:Uop10dA3VeJWsSvis9qO3vbVY892LARrKAdki6WtXS4=
 github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.2 h1:aeyFSR4SUsbszmocuFiYY13nsHorc6CXIS2Hy7+xgFU=
 github.com/ThreeDotsLabs/watermill-amqp/v3 v3.0.2/go.mod h1:+8tCh6VCuBcQWhfETCwzRINKQ1uyeg9moH3h7jMKxQk=
-github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe h1:Wx1QNWtwtyIOMCJ+zQ6NkweM+TB+DbNcoz56HibaBtI=
-github.com/a8m/enter v0.0.0-20230407172335-1834787a98fe/go.mod h1:oIhrOH1HOtDThKUKzKLbeF979y2PjDTiLPSTe4kmTDE=
 github.com/agext/levenshtein v1.2.3 h1:YB2fHEn0UJagG8T1rrWknE3ZQzWM06O8AMAatNn7lmo=
 github.com/agext/levenshtein v1.2.3/go.mod h1:JEDfjyjHDjOF/1e4FlBE/PkbqA9OfWu2ki2W0IB5558=
 github.com/alexedwards/argon2id v1.0.0 h1:wJzDx66hqWX7siL/SRUmgz3F8YMrd/nfX/xHHcQQP0w=

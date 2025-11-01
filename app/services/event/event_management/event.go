@@ -117,8 +117,7 @@ func (m *Manager) Create(ctx context.Context,
 		return nil, fault.Wrap(err, fctx.With(ctx), fmsg.With("failed to create event"))
 	}
 
-	// TODO: Make going from a hydrated mark to a query key easier.
-	mk := event_ref.QueryKey{mark.NewQueryKeyID(xid.ID(evt.ID))}
+	mk := event_ref.NewID(xid.ID(evt.ID))
 
 	err = m.partWriter.Add(ctx,
 		mk,

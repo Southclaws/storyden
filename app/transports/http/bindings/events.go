@@ -16,7 +16,6 @@ import (
 	"github.com/Southclaws/storyden/app/resources/event/event_ref"
 	"github.com/Southclaws/storyden/app/resources/event/location"
 	"github.com/Southclaws/storyden/app/resources/event/participation"
-	"github.com/Southclaws/storyden/app/resources/mark"
 	"github.com/Southclaws/storyden/app/resources/post/category"
 	"github.com/Southclaws/storyden/app/services/event/event_management"
 	"github.com/Southclaws/storyden/app/transports/http/openapi"
@@ -110,7 +109,7 @@ func (h *Events) EventDelete(ctx context.Context, request openapi.EventDeleteReq
 }
 
 func (h *Events) EventGet(ctx context.Context, request openapi.EventGetRequestObject) (openapi.EventGetResponseObject, error) {
-	mk := event_ref.QueryKey{mark.NewQueryKey(request.EventMark)}
+	mk := event_ref.NewKey(request.EventMark)
 
 	evt, err := h.eventQuerier.Get(ctx, mk)
 	if err != nil {
