@@ -47,14 +47,6 @@ export const Breadcrumbs_ = (
   const paths = isEditing ? uniquePaths.slice(0, -1) : uniquePaths;
   const current = last(paths);
 
-  console.log("Breadcrumbs render:", {
-    libraryPath,
-    uniquePaths,
-    paths,
-    current,
-    isEditing,
-  });
-
   return (
     <HStack
       w="full"

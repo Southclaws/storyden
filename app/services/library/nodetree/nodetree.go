@@ -113,7 +113,7 @@ func (s *service) Move(ctx context.Context, child library.QueryKey, parent libra
 
 	s.bus.Publish(ctx, &message.EventNodeUpdated{
 		ID:   library.NodeID(cnode.Mark.ID()),
-		Mark: cnode.Mark.String(),
+		Slug: cnode.GetSlug(),
 	})
 
 	return cnode, nil
@@ -159,7 +159,7 @@ func (s *service) Sever(ctx context.Context, child library.QueryKey, parent libr
 
 	s.bus.Publish(ctx, &message.EventNodeUpdated{
 		ID:   library.NodeID(result.Mark.ID()),
-		Mark: result.Mark.String(),
+		Slug: result.GetSlug(),
 	})
 
 	return result, nil

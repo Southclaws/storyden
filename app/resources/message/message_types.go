@@ -111,32 +111,32 @@ type CommandReplyDeindex struct {
 
 type EventNodeCreated struct {
 	ID   library.NodeID
-	Mark string
+	Slug string
 }
 
 type EventNodeUpdated struct {
 	ID   library.NodeID
-	Mark string
+	Slug string
 }
 
 type EventNodeDeleted struct {
 	ID   library.NodeID
-	Mark string
+	Slug string
 }
 
 type EventNodePublished struct {
 	ID   library.NodeID
-	Mark string
+	Slug string
 }
 
 type EventNodeSubmittedForReview struct {
 	ID   library.NodeID
-	Mark string
+	Slug string
 }
 
 type EventNodeUnpublished struct {
 	ID   library.NodeID
-	Mark string
+	Slug string
 }
 
 type CommandNodeIndex struct {

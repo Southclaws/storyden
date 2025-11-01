@@ -58,7 +58,7 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 	// Emit update event
 	s.bus.Publish(ctx, &message.EventNodeUpdated{
 		ID:   library.NodeID(n.Mark.ID()),
-		Mark: n.Mark.String(),
+		Slug: n.GetSlug(),
 	})
 
 	// Emit visibility transition events
@@ -67,20 +67,20 @@ func (s *Manager) Update(ctx context.Context, qk library.QueryKey, p Partial) (*
 		case visibility.VisibilityPublished:
 			s.bus.Publish(ctx, &message.EventNodePublished{
 				ID:   library.NodeID(n.Mark.ID()),
-				Mark: n.Mark.String(),
+				Slug: n.GetSlug(),
 			})
 
 		case visibility.VisibilityReview:
 			s.bus.Publish(ctx, &message.EventNodeSubmittedForReview{
 				ID:   library.NodeID(n.Mark.ID()),
-				Mark: n.Mark.String(),
+				Slug: n.GetSlug(),
 			})
 
 		case visibility.VisibilityUnlisted, visibility.VisibilityDraft, visibility.VisibilityReview:
 			if oldVisibility == visibility.VisibilityPublished {
 				s.bus.Publish(ctx, &message.EventNodeUnpublished{
 					ID:   library.NodeID(n.Mark.ID()),
-					Mark: n.Mark.String(),
+					Slug: n.GetSlug(),
 				})
 			}
 		}

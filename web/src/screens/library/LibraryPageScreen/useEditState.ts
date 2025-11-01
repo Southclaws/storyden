@@ -10,13 +10,14 @@ export function useEditState() {
     clearOnDefault: true,
   });
 
-  const { saving } = useLibraryPageContext();
+  const { saving, revalidate } = useLibraryPageContext();
 
   const { isAllowedToEdit } = useLibraryPagePermissions();
 
   function handleToggleEditMode() {
     if (editing) {
       setEditing(false);
+      revalidate();
     } else {
       if (!isAllowedToEdit) return;
 

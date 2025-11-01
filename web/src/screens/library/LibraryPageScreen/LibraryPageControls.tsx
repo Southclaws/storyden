@@ -22,6 +22,9 @@ function useLibraryPageControls() {
   const slug = useWatch((s) => s.draft.slug);
   const visibility = useWatch((s) => s.draft.visibility);
 
+  // Ensure the final item is the real slug, not the cached copy
+  const updatedLibraryPath = [...libraryPath.slice(0, -1), slug];
+
   const { isAllowedToEdit } = useLibraryPagePermissions();
   const { editing } = useEditState();
 
@@ -36,7 +39,7 @@ function useLibraryPageControls() {
   }
 
   return {
-    libraryPath,
+    libraryPath: updatedLibraryPath,
     draft,
     slug,
     isSlugInvalid,
