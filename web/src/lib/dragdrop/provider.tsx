@@ -152,6 +152,23 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
             relativeToNode,
             direction,
             newParentNode,
+            // NOTE: When a node is dragged between folders in the sidebar,
+            // oldParentID is derived from the drop target’s parent instead of
+            // the dragged node’s current parent. moveNode uses that ID to
+            // optimistically mutate the cached child list for the previous
+            // parent. This is intentional as currently, the only use-case for
+            // these kinds of drags is moving nodes while looking at the page
+            // directory block. This will always be the "old" parent as we want
+            // to optimistically revalidate that page (the parent) so its child
+            // node API call is revalidated and the new order is rendered.
+            // This may need to change in future as this does not currently
+            // trigger properly when a member moves a node FROM the sidebar INTO
+            // the directory block. In such cases, we will need to revalidate
+            // both the old and new parents. Which sounds wasteful, but isn't
+            // because there will only ever be a single useSWR call on the page
+            // showing a child node list. UNLESS we introduce the ability to
+            // show multiple directory blocks on the page with different source
+            // parents... but that honestly sounds over-complicated design-wise.
             oldParentID,
           );
         },
