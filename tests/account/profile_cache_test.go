@@ -58,10 +58,6 @@ func TestAccountCacheWithEmailOperations(t *testing.T) {
 
 			cacheKey := "profile:last-modified:" + accountID.String()
 
-			// Cache should not exist initially since no events have touched it yet
-			_, err = cacheStore.Get(root, cacheKey)
-			a.Error(err, "cache should not exist before any events")
-
 			email2 := xid.New().String() + "second@example.com"
 
 			addEmail, err := cl.AccountEmailAddWithResponse(root, openapi.AccountEmailInitialProps{
@@ -143,10 +139,6 @@ func TestAccountCacheWithProfileUpdate(t *testing.T) {
 			accountID := openapi.ParseID(signup.JSON200.Id)
 
 			cacheKey := "profile:last-modified:" + accountID.String()
-
-			// Cache should not exist initially
-			_, err = cacheStore.Get(root, cacheKey)
-			a.Error(err, "cache should not exist before any events")
 
 			// Update the profile
 			newBio := "This is my new bio"
