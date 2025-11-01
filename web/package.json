@@ -12,7 +12,7 @@
     "test": "uvu -r tsx src '\\.test\\.ts$'"
   },
   "dependencies": {
-    "@ark-ui/react": "5.26.0",
+    "@ark-ui/react": "5.26.2",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@heroicons/react": "^2.2.0",
@@ -64,9 +64,9 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
-    "@pandacss/dev": "^1.4.1",
-    "@pandacss/studio": "^1.4.1",
-    "@pandacss/types": "^1.4.1",
+    "@pandacss/dev": "^1.4.3",
+    "@pandacss/studio": "^1.4.3",
+    "@pandacss/types": "^1.4.3",
     "@simplewebauthn/types": "^10.0.0",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/chroma-js": "^3.1.1",
