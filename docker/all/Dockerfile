@@ -2,7 +2,7 @@
 # BACKEND API LAYER
 #
 
-FROM docker.io/golang:1.24-alpine AS api-builder
+FROM docker.io/golang:1.25-alpine AS api-builder
 
 WORKDIR /server
 
@@ -19,7 +19,7 @@ RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=cache,target="/root/.cache/go-build" \
     CGO_ENABLED=0 GOOS=linux go build -o /server/storyden-api ./cmd/backend
 
-FROM docker.io/node:22.17.1-alpine AS base
+FROM docker.io/node:22.21.1-alpine AS base
 
 #
 # DEPENDENCIES LAYER
