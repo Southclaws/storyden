@@ -13,15 +13,16 @@ import {
 import { useSession } from "@/auth";
 import { CreatePageAction } from "@/components/library/CreatePage";
 import { CreatePageFromURLAction } from "@/components/library/CreatePageFromURL/CreatePageFromURL";
+import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
 import { LinkRefButton } from "@/components/library/links/LinkCard";
 import { SortIndicator } from "@/components/site/SortIndicator";
 import { IconButton } from "@/components/ui/icon-button";
 import * as Table from "@/components/ui/table";
 import { visibilityColour } from "@/lib/library/visibilityColours";
 import { isValidLinkLike } from "@/lib/link/validation";
-import { hasPermission } from "@/utils/permissions";
 import { css, cx } from "@/styled-system/css";
 import { Box, HStack, styled } from "@/styled-system/jsx";
+import { hasPermission } from "@/utils/permissions";
 
 import { useLibraryPageContext } from "../../Context";
 import { useEditState } from "../../useEditState";
@@ -148,95 +149,14 @@ export function LibraryPageDirectoryBlockTable({
                 block,
               ).filter(isAlwaysFilteredForTableViews);
 
-              const visCol = visibilityColour(child.visibility);
-
-              const visibilityStyles = css({
-                colorPalette: visCol,
-                boxSizing: "content-box",
-                borderLeftWidth:
-                  child.visibility === Visibility.published ? "none" : "medium",
-                borderLeftColor:
-                  child.visibility === Visibility.published
-                    ? "transparent"
-                    : "colorPalette.border",
-                borderLeftStyle:
-                  child.visibility === Visibility.published
-                    ? "solid"
-                    : "dashed",
-              });
-
               return (
-                <Table.Row
-                  className={cx("group", visibilityStyles)}
+                <Row
                   key={child.id}
-                >
-                  {columns.map((column) => {
-                    function handleCellChange(
-                      v: ChangeEvent<HTMLInputElement>,
-                    ) {
-                      handleChildFieldValueChange(
-                        child.id,
-                        column.fid as MappableNodeField,
-                        v.target.value,
-                      );
-                    }
-
-                    // NOTE: Does not work because this is uncontrolled at the
-                    // moment. Making it controlled would be a bit of a pain.
-                    // But it's here and ready in case we ever actually do that.
-                    const isValid = checkValidColumnValue(column);
-
-                    return (
-                      <Table.Cell
-                        key={column.fid}
-                        // NOTE: This doesn't work in edit mode because "group"
-                        // class is also used in the page edit level, need to
-                        // create a second level of hover grouping or something.
-                        // _groupHover={{
-                        //   bg: "bg.muted",
-                        // }}
-                        _hover={{ bg: "bg.subtle" }}
-                      >
-                        {editing ? (
-                          <styled.input
-                            w="full"
-                            defaultValue={column.value}
-                            onChange={handleCellChange}
-                            _focusVisible={{
-                              outline: "none",
-                            }}
-                          />
-                        ) : (
-                          <Box minH="4">
-                            {match(column.fid)
-                              .with("fixed:name", () => (
-                                <Link href={column.href ?? "#"}>
-                                  {column.value || (
-                                    <styled.em color="fg.muted">
-                                      (untitled page)
-                                    </styled.em>
-                                  )}
-                                </Link>
-                              ))
-                              .with("fixed:link", () =>
-                                child.link ? (
-                                  <LinkRefButton
-                                    link={child.link}
-                                    variant="link"
-                                  />
-                                ) : (
-                                  <>{column.value}</>
-                                ),
-                              )
-                              .otherwise(() => (
-                                <>{column.value}</>
-                              ))}
-                          </Box>
-                        )}
-                      </Table.Cell>
-                    );
-                  })}
-                </Table.Row>
+                  child={child}
+                  columns={columns}
+                  onFieldValueChange={handleChildFieldValueChange}
+                  editing={editing}
+                />
               );
             })}
           </SortableContext>
@@ -289,4 +209,101 @@ function checkValidColumnValue(column: ColumnValue) {
   }
 
   return true;
+}
+
+function Row({
+  child,
+  columns,
+  onFieldValueChange,
+  editing,
+}: {
+  child: NodeWithChildren;
+  columns: ColumnValue[];
+  onFieldValueChange: (
+    nodeID: Identifier,
+    fid: MappableNodeField,
+    value: string,
+  ) => void;
+  editing: boolean;
+}) {
+  const visCol = visibilityColour(child.visibility);
+
+  const visibilityStyles = css({
+    colorPalette: visCol,
+    boxSizing: "content-box",
+    borderLeftWidth:
+      child.visibility === Visibility.published ? "none" : "medium",
+    borderLeftColor:
+      child.visibility === Visibility.published
+        ? "transparent"
+        : "colorPalette.border",
+    borderLeftStyle:
+      child.visibility === Visibility.published ? "solid" : "dashed",
+  });
+  return (
+    <Table.Row className={cx("group", visibilityStyles)} key={child.id}>
+      {columns.map((column) => {
+        function handleCellChange(v: ChangeEvent<HTMLInputElement>) {
+          onFieldValueChange(
+            child.id,
+            column.fid as MappableNodeField,
+            v.target.value,
+          );
+        }
+
+        // NOTE: Does not work because this is uncontrolled at the
+        // moment. Making it controlled would be a bit of a pain.
+        // But it's here and ready in case we ever actually do that.
+        const isValid = checkValidColumnValue(column);
+
+        return (
+          <Table.Cell
+            key={column.fid}
+            // NOTE: This doesn't work in edit mode because "group"
+            // class is also used in the page edit level, need to
+            // create a second level of hover grouping or something.
+            // _groupHover={{
+            //   bg: "bg.muted",
+            // }}
+            _hover={{ bg: "bg.subtle" }}
+            position="relative"
+          >
+            {editing ? (
+              <>
+                <styled.input
+                  w="full"
+                  defaultValue={column.value}
+                  onChange={handleCellChange}
+                  _focusVisible={{
+                    outline: "none",
+                  }}
+                />
+              </>
+            ) : (
+              <Box minH="4">
+                {match(column.fid)
+                  .with("fixed:name", () => (
+                    <Link href={column.href ?? "#"}>
+                      {column.value || (
+                        <styled.em color="fg.muted">(untitled page)</styled.em>
+                      )}
+                    </Link>
+                  ))
+                  .with("fixed:link", () =>
+                    child.link ? (
+                      <LinkRefButton link={child.link} variant="link" />
+                    ) : (
+                      <>{column.value}</>
+                    ),
+                  )
+                  .otherwise(() => (
+                    <>{column.value}</>
+                  ))}
+              </Box>
+            )}
+          </Table.Cell>
+        );
+      })}
+    </Table.Row>
+  );
 }
