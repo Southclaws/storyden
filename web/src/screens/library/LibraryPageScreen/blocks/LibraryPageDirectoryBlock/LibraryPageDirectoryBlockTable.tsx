@@ -242,7 +242,9 @@ function Row({
   });
   return (
     <Table.Row className={cx("group", visibilityStyles)} key={child.id}>
-      {columns.map((column) => {
+      {columns.map((column, idx) => {
+        const isFirst = idx === 0;
+
         function handleCellChange(v: ChangeEvent<HTMLInputElement>) {
           onFieldValueChange(
             child.id,
@@ -269,7 +271,9 @@ function Row({
             position="relative"
           >
             {editing ? (
-              <>
+              <HStack gap="1">
+                {isFirst && <LibraryPageMenu node={child} variant="ghost" />}
+
                 <styled.input
                   w="full"
                   defaultValue={column.value}
@@ -278,7 +282,7 @@ function Row({
                     outline: "none",
                   }}
                 />
-              </>
+              </HStack>
             ) : (
               <Box minH="4">
                 {match(column.fid)
