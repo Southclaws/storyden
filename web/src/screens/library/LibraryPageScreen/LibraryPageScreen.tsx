@@ -6,12 +6,13 @@ import { parseAsBoolean, useQueryState } from "nuqs";
 import { memo } from "react";
 
 import { useNodeGet } from "@/api/openapi-client/nodes";
+import { LibraryPageCommentsList } from "@/components/library/comments/LibraryPageCommentsList";
 import { UnreadyBanner } from "@/components/site/Unready";
-import { LStack } from "@/styled-system/jsx";
+import { LStack, VStack } from "@/styled-system/jsx";
 
 import { Params } from "../library-path";
 
-import { LibraryPageProvider, Props } from "./Context";
+import { LibraryPageProvider, Props, useLibraryPageContext } from "./Context";
 import { LibraryPageControls } from "./LibraryPageControls";
 import { LibraryPageBlocks } from "./blocks/LibraryPageBlocks";
 
@@ -53,10 +54,14 @@ const LibraryPageForm = memo((props: Props) => {
 LibraryPageForm.displayName = "LibraryPageForm";
 
 export function LibraryPage() {
+  const { initialNode } = useLibraryPageContext();
   return (
-    <LStack h="full" gap="3" alignItems="start">
-      <LibraryPageControls />
-      <LibraryPageBlocks />
-    </LStack>
+    <VStack h="full" justify="space-between">
+      <LStack h="full" gap="3" alignItems="start">
+        <LibraryPageControls />
+        <LibraryPageBlocks />
+      </LStack>
+      <LibraryPageCommentsList node={initialNode} />
+    </VStack>
   );
 }

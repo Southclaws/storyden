@@ -26,3 +26,4 @@ export * from './radio-group.mjs';
 export * from './tree-view.mjs';
 export * from './toggle-group.mjs';
 export * from './tooltip.mjs';
+export * from './collapsible.mjs';
