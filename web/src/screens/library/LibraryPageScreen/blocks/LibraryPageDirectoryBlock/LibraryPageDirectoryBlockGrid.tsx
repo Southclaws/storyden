@@ -1,15 +1,31 @@
+import { Portal } from "@ark-ui/react";
+import { useDndContext } from "@dnd-kit/core";
+import {
+  SortableContext,
+  rectSortingStrategy,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { keyBy } from "lodash";
 import Link from "next/link";
-import { ChangeEvent } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 import {
   Identifier,
   NodeWithChildren,
   PropertySchemaList,
+  Visibility,
 } from "@/api/openapi-schema";
+import { LibraryPageMenu } from "@/components/library/LibraryPageMenu/LibraryPageMenu";
 import { EmptyState } from "@/components/site/EmptyState";
 import { useSortIndicator } from "@/components/site/SortIndicator";
+import { IconButton } from "@/components/ui/icon-button";
+import { DragHandleIcon } from "@/components/ui/icons/DragHandle";
 import { EmptyIcon } from "@/components/ui/icons/Empty";
+import * as Tooltip from "@/components/ui/tooltip";
+import { DragItemNode } from "@/lib/dragdrop/provider";
+import { visibilityColour } from "@/lib/library/visibilityColours";
+import { css, cx } from "@/styled-system/css";
 import {
   Box,
   Center,
@@ -28,6 +44,7 @@ import { useEditState } from "../../useEditState";
 
 import { ColumnMenu } from "./ColumnMenu";
 import {
+  ColumnValue,
   MappableNodeField,
   mergeFieldsAndProperties,
   mergeFieldsAndPropertySchema,
@@ -45,7 +62,7 @@ export function LibraryPageDirectoryBlockGrid({
   block,
   currentChildPropertySchema,
 }: Props) {
-  const { store } = useLibraryPageContext();
+  const { nodeID, store } = useLibraryPageContext();
   const { sort, handleSort } = useSortIndicator();
   const { editing } = useEditState();
 
@@ -95,267 +112,474 @@ export function LibraryPageDirectoryBlockGrid({
     );
   }
 
+  const items = nodes.map((child) => `${nodeID}.${child.id}`);
+
   return (
-    <Grid
-      w="full"
+    <SortableContext items={items} strategy={rectSortingStrategy}>
+      <Grid
+        w="full"
+        gap="2"
+        gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+      >
+        {nodes.map((node) => {
+          const columnValues = mergeFieldsAndProperties(
+            currentChildPropertySchema,
+            node,
+            block,
+          );
+
+          const valueTable = keyBy(columnValues, "fid");
+
+          // When the cover image is displayed and the node has no primary image
+          // and the name column is hidden, show the node name as a placeholder.
+          const coverImagePlaceholder =
+            node.primary_image === undefined &&
+            !coverImageHiddenState &&
+            nameColumnHiddenState;
+
+          return (
+            <GridCard
+              key={node.id}
+              nodeID={nodeID}
+              node={node}
+              editing={editing}
+              columnValues={columnValues}
+              valueTable={valueTable}
+              coverImagePlaceholder={coverImagePlaceholder}
+              fullBleedCover={fullBleedCover}
+              coverImageHiddenState={coverImageHiddenState}
+              nameColumnHiddenState={nameColumnHiddenState}
+              descColumnHiddenState={descColumnHiddenState}
+              linkColumnHiddenState={linkColumnHiddenState}
+              columns={columns}
+              sort={sort}
+              handleSort={handleSort}
+              onFieldValueChange={handleChildFieldValueChange}
+            />
+          );
+        })}
+      </Grid>
+    </SortableContext>
+  );
+}
+
+type GridCardProps = {
+  nodeID: Identifier;
+  node: NodeWithChildren;
+  editing: boolean;
+  columnValues: ColumnValue[];
+  valueTable: Record<string, ColumnValue>;
+  coverImagePlaceholder: boolean;
+  fullBleedCover: boolean;
+  coverImageHiddenState: boolean;
+  nameColumnHiddenState: boolean;
+  descColumnHiddenState: boolean;
+  linkColumnHiddenState: boolean;
+  columns: ReturnType<typeof mergeFieldsAndPropertySchema>;
+  sort: ReturnType<typeof useSortIndicator>["sort"];
+  handleSort: ReturnType<typeof useSortIndicator>["handleSort"];
+  onFieldValueChange: (
+    nodeID: Identifier,
+    fid: MappableNodeField,
+    value: string,
+  ) => void;
+};
+
+function GridCard({
+  nodeID,
+  node,
+  editing,
+  columnValues,
+  valueTable,
+  coverImagePlaceholder,
+  fullBleedCover,
+  coverImageHiddenState,
+  nameColumnHiddenState,
+  descColumnHiddenState,
+  linkColumnHiddenState,
+  columns,
+  sort,
+  handleSort,
+  onFieldValueChange,
+}: GridCardProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: `${nodeID}.${node.id}`,
+    data: {
+      type: "node",
+      node: node,
+      parentID: nodeID,
+      context: "node-children",
+    } satisfies DragItemNode,
+  });
+
+  const [isOpen, setOpen] = useState(false);
+  function handleMenuToggle() {
+    setOpen((prev) => !prev);
+  }
+
+  const elementRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handleClickAway(event: MouseEvent) {
+      if (
+        elementRef.current &&
+        !elementRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("click", handleClickAway);
+    return () => document.removeEventListener("click", handleClickAway);
+  }, [isOpen]);
+
+  const { active } = useDndContext();
+  const isDraggingAnything = active !== null;
+
+  const dragStyle = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  };
+
+  const dragHandleStyle = {
+    cursor: isDragging ? "grabbing" : "grab",
+  };
+
+  const visCol = visibilityColour(node.visibility);
+
+  const visibilityStyles = css({
+    colorPalette: visCol,
+    borderWidth: node.visibility === Visibility.published ? "none" : "thin",
+    borderColor:
+      node.visibility === Visibility.published
+        ? "transparent"
+        : "colorPalette.border",
+    borderStyle: node.visibility === Visibility.published ? "none" : "dashed",
+  });
+
+  return (
+    <GridItem
+      ref={setNodeRef}
+      style={dragStyle}
+      className={cx(visibilityStyles)}
+      position="relative"
+      borderRadius="md"
+      bg="bg.muted"
+      display="flex"
+      flexDirection="column"
+      justifyContent="space-between"
+      overflow="hidden"
       gap="2"
-      gridTemplateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+      pb={fullBleedCover ? "0" : "1"}
     >
-      {nodes.map((node) => {
-        const columnValues = mergeFieldsAndProperties(
-          currentChildPropertySchema,
-          node,
-          block,
-        );
-
-        const valueTable = keyBy(columnValues, "fid");
-
-        // When the cover image is displayed and the node has no primary image
-        // and the name column is hidden, show the node name as a placeholder.
-        const coverImagePlaceholder =
-          node.primary_image === undefined &&
-          !coverImageHiddenState &&
-          nameColumnHiddenState;
-
-        return (
-          <GridItem
-            key={node.id}
-            position="relative"
-            borderRadius="md"
-            bg="bg.muted"
-            display="flex"
-            flexDirection="column"
-            justifyContent="space-between"
-            overflow="hidden"
-            gap="2"
-            // If no other fields are displayed, but the cover image is then
-            // treat the card as a "full bleed" and remove the bottom padding.
-            pb={fullBleedCover ? "0" : "1"}
+      {editing && (
+        <Box
+          position="absolute"
+          top="2"
+          right="2"
+          zIndex="overlay"
+          {...listeners}
+          {...attributes}
+        >
+          <Tooltip.Root
+            openDelay={0}
+            closeDelay={0}
+            disabled={isDraggingAnything}
+            positioning={{
+              slide: true,
+              gutter: 4,
+              placement: "top",
+            }}
           >
-            {!coverImageHiddenState ? (
-              <Link {...linkDisabledProps(editing)} href={`/l/${node.slug}`}>
-                {node.primary_image ? (
-                  <styled.img
-                    src={getAssetURL(node.primary_image.path)}
-                    objectFit="cover"
-                    w="full"
-                    h="32"
-                  />
-                ) : (
-                  <Center h="32" p="2">
-                    {coverImagePlaceholder ? (
-                      <styled.span
-                        textAlign="center"
-                        textWrap="balance"
-                        color="fg.muted"
-                        lineClamp={3}
-                      >
-                        {node.name}
-                      </styled.span>
-                    ) : (
-                      <EmptyIcon />
-                    )}
-                  </Center>
-                )}
-              </Link>
-            ) : (
-              <Box />
-            )}
+            <Tooltip.Trigger asChild>
+              <Box position="relative">
+                <Box style={dragHandleStyle}>
+                  <IconButton
+                    style={dragHandleStyle}
+                    variant="subtle"
+                    size="xs"
+                    minWidth="5"
+                    width="5"
+                    height="5"
+                    padding="0"
+                    color="fg.muted"
+                    bg="bg.default"
+                    onClick={handleMenuToggle}
+                  >
+                    <DragHandleIcon width="4" />
+                  </IconButton>
+                </Box>
+              </Box>
+            </Tooltip.Trigger>
+            <Portal>
+              <Tooltip.Positioner>
+                <Tooltip.Arrow>
+                  <Tooltip.ArrowTip />
+                </Tooltip.Arrow>
 
-            {fullBleedCover ? null : (
-              <LStack gap="0" px="2">
-                {!nameColumnHiddenState &&
-                  (editing ? (
-                    <styled.input
-                      w="full"
-                      fontWeight="semibold"
-                      defaultValue={node.name}
-                      onChange={(event) => {
-                        handleChildFieldValueChange(
-                          node.id,
-                          "fixed:name" as MappableNodeField,
-                          event.target.value,
-                        );
-                      }}
-                      _focusVisible={{
-                        outline: "none",
-                      }}
-                    />
-                  ) : (
-                    <Link href={`/l/${node.slug}`}>
-                      <styled.div
-                        fontWeight="semibold"
-                        lineClamp="1"
-                        textOverflow="ellipsis"
-                        wordBreak="break-all"
-                      >
-                        {node.name}
-                      </styled.div>
-                    </Link>
-                  ))}
+                <Tooltip.Content p="1" borderRadius="sm">
+                  <p>
+                    <styled.span fontWeight="semibold">Click</styled.span>
+                    &nbsp;
+                    <styled.span fontWeight="normal">to open menu</styled.span>
+                  </p>
+                  <p>
+                    <styled.span fontWeight="semibold">Drag</styled.span>
+                    &nbsp;
+                    <styled.span fontWeight="normal">to move</styled.span>
+                  </p>
+                </Tooltip.Content>
+              </Tooltip.Positioner>
+            </Portal>
+          </Tooltip.Root>
+          <Box
+            position="absolute"
+            top="0"
+            width="6"
+            height="6"
+            pointerEvents="none"
+            ref={elementRef}
+          >
+            <LibraryPageMenu
+              variant="ghost"
+              node={node}
+              parentID={nodeID}
+              open={isOpen}
+            >
+              <Box position="absolute" width="6" height="6" />
+            </LibraryPageMenu>
+          </Box>
+        </Box>
+      )}
 
-                {!descColumnHiddenState &&
-                  (editing ? (
-                    <styled.input
-                      w="full"
-                      placeholder="Description..."
-                      _placeholder={{
-                        color: "fg.subtle",
-                      }}
-                      defaultValue={node.description}
-                      onChange={(event) =>
-                        handleChildFieldValueChange(
-                          node.id,
-                          "fixed:description" as MappableNodeField,
-                          event.target.value,
-                        )
-                      }
-                      _focusVisible={{
-                        outline: "none",
-                      }}
-                    />
-                  ) : (
-                    node.description && (
-                      <styled.div
-                        fontSize="sm"
-                        color="fg.muted"
-                        lineClamp="1"
-                        textOverflow="ellipsis"
-                        wordBreak="break-all"
-                      >
-                        {node.description}
-                      </styled.div>
-                    )
-                  ))}
+      {!coverImageHiddenState ? (
+        <Link {...linkDisabledProps(editing)} href={`/l/${node.slug}`}>
+          {node.primary_image ? (
+            <styled.img
+              src={getAssetURL(node.primary_image.path)}
+              objectFit="cover"
+              w="full"
+              h="32"
+            />
+          ) : (
+            <Center h="32" p="2">
+              {coverImagePlaceholder ? (
+                <styled.span
+                  textAlign="center"
+                  textWrap="balance"
+                  color="fg.muted"
+                  lineClamp={3}
+                >
+                  {node.name}
+                </styled.span>
+              ) : (
+                <EmptyIcon />
+              )}
+            </Center>
+          )}
+        </Link>
+      ) : (
+        <Box />
+      )}
 
-                {!linkColumnHiddenState &&
-                  (editing ? (
-                    <styled.input
-                      w="full"
-                      placeholder="Link..."
-                      _placeholder={{
-                        color: "fg.subtle",
-                      }}
-                      defaultValue={node.link?.url}
-                      onChange={(event) =>
-                        handleChildFieldValueChange(
-                          node.id,
-                          "fixed:link" as MappableNodeField,
-                          event.target.value,
-                        )
-                      }
-                      _focusVisible={{
-                        outline: "none",
-                      }}
-                    />
-                  ) : (
-                    node.link && (
-                      <styled.a
-                        fontSize="sm"
-                        color="fg.muted"
-                        lineClamp="1"
-                        textOverflow="ellipsis"
-                        wordBreak="break-all"
-                        href={node.link.url}
-                      >
-                        {node.link.title || node.link.url}
-                      </styled.a>
-                    )
-                  ))}
-              </LStack>
-            )}
-
-            {columns.length > 0 && (
-              <styled.dl className={lstack()} gap="0" px="2" pb="2">
-                {columns.map((property) => {
-                  const column = valueTable[property.fid];
-                  if (!column) {
-                    console.warn(
-                      `unable to find property ${property.fid} in value table`,
-                      valueTable,
-                    );
-                    return null;
-                  }
-
-                  const isSortingBy = sort?.property === property.name;
-                  const isSortingAsc = sort?.order === "asc";
-                  const isSortingDesc = sort?.order === "desc";
-                  const isSorting =
-                    isSortingBy && (isSortingAsc || isSortingDesc);
-                  const sortState = isSorting
-                    ? isSortingAsc
-                      ? "asc"
-                      : "desc"
-                    : "none";
-
-                  function handleClickSortAction() {
-                    handleSort(property.name);
-                  }
-
-                  const handleCellChange = (
-                    v: ChangeEvent<HTMLInputElement>,
-                  ) => {
-                    handleChildFieldValueChange(
-                      node.id,
-                      column.fid as MappableNodeField,
-                      v.target.value,
-                    );
-                  };
-
-                  return (
-                    <HStack
-                      w="full"
-                      key={property.fid}
-                      cursor="pointer"
-                      {...(isSorting && {
-                        "data-active": "",
-                      })}
-                      p="0"
-                    >
-                      <HStack w="full" pr="1">
-                        <ColumnMenu column={property}>
-                          <styled.dt
-                            display="inline-flex"
-                            minW="0"
-                            flexGrow="1"
-                            alignItems="center"
-                            justifyContent="space-between"
-                            gap="1"
-                            textWrap="nowrap"
-                            flexWrap="nowrap"
-                            color="fg.subtle"
-                          >
-                            {property.name}
-                          </styled.dt>
-                        </ColumnMenu>
-
-                        <styled.dd>
-                          {editing ? (
-                            <styled.input
-                              w="full"
-                              minW="0"
-                              textAlign="right"
-                              defaultValue={column.value}
-                              onChange={handleCellChange}
-                              _focusVisible={{
-                                outline: "none",
-                              }}
-                            />
-                          ) : column.href ? (
-                            <Link href={column.href}>{column.value}</Link>
-                          ) : (
-                            <>{column.value}</>
-                          )}
-                        </styled.dd>
-                      </HStack>
-                    </HStack>
+      {fullBleedCover ? null : (
+        <LStack gap="0" px="2">
+          {!nameColumnHiddenState &&
+            (editing ? (
+              <styled.input
+                w="full"
+                fontWeight="semibold"
+                defaultValue={node.name}
+                onChange={(event) => {
+                  onFieldValueChange(
+                    node.id,
+                    "fixed:name" as MappableNodeField,
+                    event.target.value,
                   );
+                }}
+                _focusVisible={{
+                  outline: "none",
+                }}
+              />
+            ) : (
+              <Link href={`/l/${node.slug}`}>
+                <styled.div
+                  fontWeight="semibold"
+                  lineClamp="1"
+                  textOverflow="ellipsis"
+                  wordBreak="break-all"
+                >
+                  {node.name}
+                </styled.div>
+              </Link>
+            ))}
+
+          {!descColumnHiddenState &&
+            (editing ? (
+              <styled.input
+                w="full"
+                placeholder="Description..."
+                _placeholder={{
+                  color: "fg.subtle",
+                }}
+                defaultValue={node.description}
+                onChange={(event) =>
+                  onFieldValueChange(
+                    node.id,
+                    "fixed:description" as MappableNodeField,
+                    event.target.value,
+                  )
+                }
+                _focusVisible={{
+                  outline: "none",
+                }}
+              />
+            ) : (
+              node.description && (
+                <styled.div
+                  fontSize="sm"
+                  color="fg.muted"
+                  lineClamp="1"
+                  textOverflow="ellipsis"
+                  wordBreak="break-all"
+                >
+                  {node.description}
+                </styled.div>
+              )
+            ))}
+
+          {!linkColumnHiddenState &&
+            (editing ? (
+              <styled.input
+                w="full"
+                placeholder="Link..."
+                _placeholder={{
+                  color: "fg.subtle",
+                }}
+                defaultValue={node.link?.url}
+                onChange={(event) =>
+                  onFieldValueChange(
+                    node.id,
+                    "fixed:link" as MappableNodeField,
+                    event.target.value,
+                  )
+                }
+                _focusVisible={{
+                  outline: "none",
+                }}
+              />
+            ) : (
+              node.link && (
+                <styled.a
+                  fontSize="sm"
+                  color="fg.muted"
+                  lineClamp="1"
+                  textOverflow="ellipsis"
+                  wordBreak="break-all"
+                  href={node.link.url}
+                >
+                  {node.link.title || node.link.url}
+                </styled.a>
+              )
+            ))}
+        </LStack>
+      )}
+
+      {columns.length > 0 && (
+        <styled.dl className={lstack()} gap="0" px="2" pb="2">
+          {columns.map((property) => {
+            const column = valueTable[property.fid];
+            if (!column) {
+              console.warn(
+                `unable to find property ${property.fid} in value table`,
+                valueTable,
+              );
+              return null;
+            }
+
+            const isSortingBy = sort?.property === property.name;
+            const isSortingAsc = sort?.order === "asc";
+            const isSortingDesc = sort?.order === "desc";
+            const isSorting = isSortingBy && (isSortingAsc || isSortingDesc);
+            const sortState = isSorting
+              ? isSortingAsc
+                ? "asc"
+                : "desc"
+              : "none";
+
+            function handleClickSortAction() {
+              handleSort(property.name);
+            }
+
+            const handleCellChange = (v: ChangeEvent<HTMLInputElement>) => {
+              onFieldValueChange(
+                node.id,
+                column.fid as MappableNodeField,
+                v.target.value,
+              );
+            };
+
+            return (
+              <HStack
+                w="full"
+                key={property.fid}
+                cursor="pointer"
+                {...(isSorting && {
+                  "data-active": "",
                 })}
-              </styled.dl>
-            )}
-          </GridItem>
-        );
-      })}
-    </Grid>
+                p="0"
+              >
+                <HStack w="full" pr="1">
+                  <ColumnMenu column={property}>
+                    <styled.dt
+                      display="inline-flex"
+                      minW="0"
+                      flexGrow="1"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      gap="1"
+                      textWrap="nowrap"
+                      flexWrap="nowrap"
+                      color="fg.subtle"
+                    >
+                      {property.name}
+                    </styled.dt>
+                  </ColumnMenu>
+
+                  <styled.dd>
+                    {editing ? (
+                      <styled.input
+                        w="full"
+                        minW="0"
+                        textAlign="right"
+                        defaultValue={column.value}
+                        onChange={handleCellChange}
+                        _focusVisible={{
+                          outline: "none",
+                        }}
+                      />
+                    ) : column.href ? (
+                      <Link href={column.href}>{column.value}</Link>
+                    ) : (
+                      <>{column.value}</>
+                    )}
+                  </styled.dd>
+                </HStack>
+              </HStack>
+            );
+          })}
+        </styled.dl>
+      )}
+    </GridItem>
   );
 }
