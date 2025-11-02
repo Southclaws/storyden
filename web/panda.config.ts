@@ -34,6 +34,7 @@ import { semanticTokens } from "@/theme/semantic";
 export default defineConfig({
   presets: ["@pandacss/preset-base"],
   preflight: true,
+  lightningcss: true,
   strictTokens: true,
   strictPropertyValues: true,
   validation: "error",
