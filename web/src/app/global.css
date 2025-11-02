@@ -254,7 +254,14 @@ body *::-webkit-scrollbar-thumb {
   border: 0.1rem solid var(--colors-bg-subtle);
 }
 
-/* Fix for Panda CSS bug */
+/*
+  Fix for Panda CSS or LightningCSS bug:
+  https://github.com/parcel-bundler/lightningcss/issues/695
+
+  Every recipe/style that uses backdrop filter must be also manually set here.
+ */
+.bkdp-blur_frosted,
 .menu__content {
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
