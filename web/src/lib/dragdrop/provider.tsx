@@ -111,44 +111,79 @@ export function DndProvider({ children }: { children: React.ReactNode }) {
     const targetData = event.over.data.current as DragItemData;
 
     if (activeData.type === "node") {
-      const active = activeData as DragItemNode;
+      const active = activeData as DragItemNode & SortableData;
       const target = targetData as DragItemData & SortableData;
       if (target.type !== "node" && target.type !== "divider") {
         return;
       }
 
-      const { direction, relativeToNode, newParentNode } = (() => {
-        switch (target.context) {
-          case "sidebar":
-            return {
-              direction:
-                target.type === "divider"
-                  ? target.direction
-                  : ("inside" as const),
-              relativeToNode:
-                target.type === "divider"
-                  ? target.siblingNode.id
-                  : target.node.id,
-              newParentNode:
-                target.type === "divider" ? target.parentID : target.node.id,
-            };
-
-          case "node-children": {
-            // NOTE: Is always sortable, for now. May not be in future.
-            const isTop = target.sortable.index === 0;
-            return {
-              direction: isTop ? ("above" as const) : ("below" as const),
-              relativeToNode: target.node.id,
-              newParentNode: undefined, // For directory drags, keep in same parent.
-            };
-          }
-        }
-      })();
-
-      const oldParentID = target.parentID ?? undefined;
-
       await handle(
         async () => {
+          const result = (() => {
+            switch (target.context) {
+              case "sidebar":
+                return {
+                  direction:
+                    target.type === "divider"
+                      ? target.direction
+                      : ("inside" as const),
+                  relativeToNode:
+                    target.type === "divider"
+                      ? target.siblingNode.id
+                      : target.node.id,
+                  newParentNode:
+                    target.type === "divider"
+                      ? target.parentID
+                      : target.node.id,
+                };
+
+              case "node-children": {
+                if (active.sortable === undefined) {
+                  throw new Error(
+                    "Active item is not within a sortable context. This is a bug in Storyden.",
+                  );
+                }
+
+                if (target.sortable === undefined) {
+                  throw new Error(
+                    "Target item is not within a sortable context. This is a bug in Storyden.",
+                  );
+                }
+
+                // NOTE: Is always sortable, for now. May not be in future.
+                // When dragging within the same parent, we need to determine if
+                // we're moving the item to a position before or after the drop
+                // target. If the active item's index is greater than the
+                // target's index, we're moving backwards, so insert "above"
+                // (before) the target. Otherwise, we're moving forwards, so
+                // insert "below" (after) the target.
+                const activeIndex = active.sortable.index;
+                const targetIndex = target.sortable.index;
+
+                // Safety check: if we don't have valid indices, throw a user-friendly error
+                if (activeIndex === -1 || targetIndex === -1) {
+                  throw new Error(
+                    "Unable to move page: invalid drag position. This is a bug in Storyden.",
+                  );
+                }
+
+                const movingBackwards = activeIndex > targetIndex;
+
+                return {
+                  direction: movingBackwards
+                    ? ("above" as const)
+                    : ("below" as const),
+                  relativeToNode: target.node.id,
+                  newParentNode: undefined, // For directory drags, keep in same parent.
+                };
+              }
+            }
+          })();
+
+          const { direction, relativeToNode, newParentNode } = result;
+
+          const oldParentID = target.parentID ?? undefined;
+
           await moveNode(
             active.node.id,
             relativeToNode,
