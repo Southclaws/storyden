@@ -265,3 +265,31 @@ body *::-webkit-scrollbar-thumb {
   -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
+
+/* For Ark collapsible component. */
+
+@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+[data-scope="collapsible"][data-part="content"][data-state="open"] {
+  animation: slideDown 250ms;
+}
+
+[data-scope="collapsible"][data-part="content"][data-state="closed"] {
+  animation: slideUp 200ms;
+}

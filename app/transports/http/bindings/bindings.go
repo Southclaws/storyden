@@ -84,6 +84,7 @@ type Bindings struct {
 	Likes
 	Collections
 	Nodes
+	NodeComments
 	Links
 	Datagraph
 	Events
@@ -118,6 +119,7 @@ func bindingsProviders() fx.Option {
 		NewLikes,
 		NewCollections,
 		NewNodes,
+		NewNodeComments,
 		NewLinks,
 		NewDatagraph,
 		NewEvents,

@@ -27,3 +27,4 @@ export * from './radio-group';
 export * from './tree-view';
 export * from './toggle-group';
 export * from './tooltip';
+export * from './collapsible';

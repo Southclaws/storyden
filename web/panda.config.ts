@@ -6,6 +6,7 @@ import { badge } from "@/recipes/badge";
 import { button } from "@/recipes/button";
 import { checkbox } from "@/recipes/checkbox";
 import { clipboard } from "@/recipes/clipboard";
+import { collapsible } from "@/recipes/collapsible";
 import { colorPicker } from "@/recipes/color-picker";
 import { combobox } from "@/recipes/combobox";
 import { datePicker } from "@/recipes/date-picker";
@@ -197,6 +198,7 @@ export default defineConfig({
       slotRecipes: {
         alert: alert,
         clipboard: clipboard,
+        collapsible: collapsible,
         datePicker: datePicker,
         select: select,
         colorPicker: colorPicker,

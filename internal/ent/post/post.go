@@ -82,6 +82,10 @@ const (
 	EdgeEvent = "event"
 	// EdgePostReads holds the string denoting the post_reads edge name in mutations.
 	EdgePostReads = "post_reads"
+	// EdgeThreadNodes holds the string denoting the thread_nodes edge name in mutations.
+	EdgeThreadNodes = "thread_nodes"
+	// EdgePostNodes holds the string denoting the post_nodes edge name in mutations.
+	EdgePostNodes = "post_nodes"
 	// Table holds the table name of the post in the database.
 	Table = "posts"
 	// AuthorTable is the table that holds the author relation/edge.
@@ -176,6 +180,18 @@ const (
 	PostReadsInverseTable = "post_reads"
 	// PostReadsColumn is the table column denoting the post_reads relation/edge.
 	PostReadsColumn = "root_post_id"
+	// ThreadNodesTable is the table that holds the thread_nodes relation/edge. The primary key declared below.
+	ThreadNodesTable = "post_nodes"
+	// ThreadNodesInverseTable is the table name for the Node entity.
+	// It exists in this package in order to avoid circular dependency with the "node" package.
+	ThreadNodesInverseTable = "nodes"
+	// PostNodesTable is the table that holds the post_nodes relation/edge.
+	PostNodesTable = "post_nodes"
+	// PostNodesInverseTable is the table name for the PostNode entity.
+	// It exists in this package in order to avoid circular dependency with the "postnode" package.
+	PostNodesInverseTable = "post_nodes"
+	// PostNodesColumn is the table column denoting the post_nodes relation/edge.
+	PostNodesColumn = "post_id"
 )
 
 // Columns holds all SQL columns for post fields.
@@ -213,6 +229,9 @@ var (
 	// ContentLinksPrimaryKey and ContentLinksColumn2 are the table columns denoting the
 	// primary key for the content_links relation (M2M).
 	ContentLinksPrimaryKey = []string{"link_id", "post_id"}
+	// ThreadNodesPrimaryKey and ThreadNodesColumn2 are the table columns denoting the
+	// primary key for the thread_nodes relation (M2M).
+	ThreadNodesPrimaryKey = []string{"node_id", "post_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -540,6 +559,34 @@ func ByPostReads(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newPostReadsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByThreadNodesCount orders the results by thread_nodes count.
+func ByThreadNodesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newThreadNodesStep(), opts...)
+	}
+}
+
+// ByThreadNodes orders the results by thread_nodes terms.
+func ByThreadNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newThreadNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByPostNodesCount orders the results by post_nodes count.
+func ByPostNodesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPostNodesStep(), opts...)
+	}
+}
+
+// ByPostNodes orders the results by post_nodes terms.
+func ByPostNodes(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPostNodesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newAuthorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -650,5 +697,19 @@ func newPostReadsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(PostReadsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, PostReadsTable, PostReadsColumn),
+	)
+}
+func newThreadNodesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ThreadNodesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ThreadNodesTable, ThreadNodesPrimaryKey...),
+	)
+}
+func newPostNodesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PostNodesInverseTable, PostNodesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, PostNodesTable, PostNodesColumn),
 	)
 }

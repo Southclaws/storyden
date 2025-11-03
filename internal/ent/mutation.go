@@ -31,6 +31,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postnode"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/predicate"
 	"github.com/Southclaws/storyden/internal/ent/property"
@@ -75,6 +76,7 @@ const (
 	TypeNode                = "Node"
 	TypeNotification        = "Notification"
 	TypePost                = "Post"
+	TypePostNode            = "PostNode"
 	TypePostRead            = "PostRead"
 	TypeProperty            = "Property"
 	TypePropertySchema      = "PropertySchema"
@@ -16060,6 +16062,9 @@ type NodeMutation struct {
 	collections            map[xid.ID]struct{}
 	removedcollections     map[xid.ID]struct{}
 	clearedcollections     bool
+	comments               map[xid.ID]struct{}
+	removedcomments        map[xid.ID]struct{}
+	clearedcomments        bool
 	done                   bool
 	oldValue               func(context.Context) (*Node, error)
 	predicates             []predicate.Node
@@ -17396,6 +17401,60 @@ func (m *NodeMutation) ResetCollections() {
 	m.removedcollections = nil
 }
 
+// AddCommentIDs adds the "comments" edge to the Post entity by ids.
+func (m *NodeMutation) AddCommentIDs(ids ...xid.ID) {
+	if m.comments == nil {
+		m.comments = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.comments[ids[i]] = struct{}{}
+	}
+}
+
+// ClearComments clears the "comments" edge to the Post entity.
+func (m *NodeMutation) ClearComments() {
+	m.clearedcomments = true
+}
+
+// CommentsCleared reports if the "comments" edge to the Post entity was cleared.
+func (m *NodeMutation) CommentsCleared() bool {
+	return m.clearedcomments
+}
+
+// RemoveCommentIDs removes the "comments" edge to the Post entity by IDs.
+func (m *NodeMutation) RemoveCommentIDs(ids ...xid.ID) {
+	if m.removedcomments == nil {
+		m.removedcomments = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.comments, ids[i])
+		m.removedcomments[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedComments returns the removed IDs of the "comments" edge to the Post entity.
+func (m *NodeMutation) RemovedCommentsIDs() (ids []xid.ID) {
+	for id := range m.removedcomments {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CommentsIDs returns the "comments" edge IDs in the mutation.
+func (m *NodeMutation) CommentsIDs() (ids []xid.ID) {
+	for id := range m.comments {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetComments resets all changes to the "comments" edge.
+func (m *NodeMutation) ResetComments() {
+	m.comments = nil
+	m.clearedcomments = false
+	m.removedcomments = nil
+}
+
 // Where appends a list predicates to the NodeMutation builder.
 func (m *NodeMutation) Where(ps ...predicate.Node) {
 	m.predicates = append(m.predicates, ps...)
@@ -17858,7 +17917,7 @@ func (m *NodeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *NodeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 12)
 	if m.owner != nil {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -17891,6 +17950,9 @@ func (m *NodeMutation) AddedEdges() []string {
 	}
 	if m.collections != nil {
 		edges = append(edges, node.EdgeCollections)
+	}
+	if m.comments != nil {
+		edges = append(edges, node.EdgeComments)
 	}
 	return edges
 }
@@ -17955,13 +18017,19 @@ func (m *NodeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case node.EdgeComments:
+		ids := make([]ent.Value, 0, len(m.comments))
+		for id := range m.comments {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *NodeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 12)
 	if m.removednodes != nil {
 		edges = append(edges, node.EdgeNodes)
 	}
@@ -17979,6 +18047,9 @@ func (m *NodeMutation) RemovedEdges() []string {
 	}
 	if m.removedcollections != nil {
 		edges = append(edges, node.EdgeCollections)
+	}
+	if m.removedcomments != nil {
+		edges = append(edges, node.EdgeComments)
 	}
 	return edges
 }
@@ -18023,13 +18094,19 @@ func (m *NodeMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case node.EdgeComments:
+		ids := make([]ent.Value, 0, len(m.removedcomments))
+		for id := range m.removedcomments {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *NodeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 11)
+	edges := make([]string, 0, 12)
 	if m.clearedowner {
 		edges = append(edges, node.EdgeOwner)
 	}
@@ -18063,6 +18140,9 @@ func (m *NodeMutation) ClearedEdges() []string {
 	if m.clearedcollections {
 		edges = append(edges, node.EdgeCollections)
 	}
+	if m.clearedcomments {
+		edges = append(edges, node.EdgeComments)
+	}
 	return edges
 }
 
@@ -18092,6 +18172,8 @@ func (m *NodeMutation) EdgeCleared(name string) bool {
 		return m.clearedcontent_links
 	case node.EdgeCollections:
 		return m.clearedcollections
+	case node.EdgeComments:
+		return m.clearedcomments
 	}
 	return false
 }
@@ -18155,6 +18237,9 @@ func (m *NodeMutation) ResetEdge(name string) error {
 		return nil
 	case node.EdgeCollections:
 		m.ResetCollections()
+		return nil
+	case node.EdgeComments:
+		m.ResetComments()
 		return nil
 	}
 	return fmt.Errorf("unknown Node edge %s", name)
@@ -19137,6 +19222,9 @@ type PostMutation struct {
 	post_reads           map[xid.ID]struct{}
 	removedpost_reads    map[xid.ID]struct{}
 	clearedpost_reads    bool
+	thread_nodes         map[xid.ID]struct{}
+	removedthread_nodes  map[xid.ID]struct{}
+	clearedthread_nodes  bool
 	done                 bool
 	oldValue             func(context.Context) (*Post, error)
 	predicates           []predicate.Post
@@ -20743,6 +20831,60 @@ func (m *PostMutation) ResetPostReads() {
 	m.removedpost_reads = nil
 }
 
+// AddThreadNodeIDs adds the "thread_nodes" edge to the Node entity by ids.
+func (m *PostMutation) AddThreadNodeIDs(ids ...xid.ID) {
+	if m.thread_nodes == nil {
+		m.thread_nodes = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		m.thread_nodes[ids[i]] = struct{}{}
+	}
+}
+
+// ClearThreadNodes clears the "thread_nodes" edge to the Node entity.
+func (m *PostMutation) ClearThreadNodes() {
+	m.clearedthread_nodes = true
+}
+
+// ThreadNodesCleared reports if the "thread_nodes" edge to the Node entity was cleared.
+func (m *PostMutation) ThreadNodesCleared() bool {
+	return m.clearedthread_nodes
+}
+
+// RemoveThreadNodeIDs removes the "thread_nodes" edge to the Node entity by IDs.
+func (m *PostMutation) RemoveThreadNodeIDs(ids ...xid.ID) {
+	if m.removedthread_nodes == nil {
+		m.removedthread_nodes = make(map[xid.ID]struct{})
+	}
+	for i := range ids {
+		delete(m.thread_nodes, ids[i])
+		m.removedthread_nodes[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedThreadNodes returns the removed IDs of the "thread_nodes" edge to the Node entity.
+func (m *PostMutation) RemovedThreadNodesIDs() (ids []xid.ID) {
+	for id := range m.removedthread_nodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ThreadNodesIDs returns the "thread_nodes" edge IDs in the mutation.
+func (m *PostMutation) ThreadNodesIDs() (ids []xid.ID) {
+	for id := range m.thread_nodes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetThreadNodes resets all changes to the "thread_nodes" edge.
+func (m *PostMutation) ResetThreadNodes() {
+	m.thread_nodes = nil
+	m.clearedthread_nodes = false
+	m.removedthread_nodes = nil
+}
+
 // Where appends a list predicates to the PostMutation builder.
 func (m *PostMutation) Where(ps ...predicate.Post) {
 	m.predicates = append(m.predicates, ps...)
@@ -21205,7 +21347,7 @@ func (m *PostMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *PostMutation) AddedEdges() []string {
-	edges := make([]string, 0, 16)
+	edges := make([]string, 0, 17)
 	if m.author != nil {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -21253,6 +21395,9 @@ func (m *PostMutation) AddedEdges() []string {
 	}
 	if m.post_reads != nil {
 		edges = append(edges, post.EdgePostReads)
+	}
+	if m.thread_nodes != nil {
+		edges = append(edges, post.EdgeThreadNodes)
 	}
 	return edges
 }
@@ -21347,13 +21492,19 @@ func (m *PostMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgeThreadNodes:
+		ids := make([]ent.Value, 0, len(m.thread_nodes))
+		for id := range m.thread_nodes {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *PostMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 16)
+	edges := make([]string, 0, 17)
 	if m.removedtags != nil {
 		edges = append(edges, post.EdgeTags)
 	}
@@ -21386,6 +21537,9 @@ func (m *PostMutation) RemovedEdges() []string {
 	}
 	if m.removedpost_reads != nil {
 		edges = append(edges, post.EdgePostReads)
+	}
+	if m.removedthread_nodes != nil {
+		edges = append(edges, post.EdgeThreadNodes)
 	}
 	return edges
 }
@@ -21460,13 +21614,19 @@ func (m *PostMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case post.EdgeThreadNodes:
+		ids := make([]ent.Value, 0, len(m.removedthread_nodes))
+		for id := range m.removedthread_nodes {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *PostMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 16)
+	edges := make([]string, 0, 17)
 	if m.clearedauthor {
 		edges = append(edges, post.EdgeAuthor)
 	}
@@ -21515,6 +21675,9 @@ func (m *PostMutation) ClearedEdges() []string {
 	if m.clearedpost_reads {
 		edges = append(edges, post.EdgePostReads)
 	}
+	if m.clearedthread_nodes {
+		edges = append(edges, post.EdgeThreadNodes)
+	}
 	return edges
 }
 
@@ -21554,6 +21717,8 @@ func (m *PostMutation) EdgeCleared(name string) bool {
 		return m.clearedevent
 	case post.EdgePostReads:
 		return m.clearedpost_reads
+	case post.EdgeThreadNodes:
+		return m.clearedthread_nodes
 	}
 	return false
 }
@@ -21633,8 +21798,425 @@ func (m *PostMutation) ResetEdge(name string) error {
 	case post.EdgePostReads:
 		m.ResetPostReads()
 		return nil
+	case post.EdgeThreadNodes:
+		m.ResetThreadNodes()
+		return nil
 	}
 	return fmt.Errorf("unknown Post edge %s", name)
+}
+
+// PostNodeMutation represents an operation that mutates the PostNode nodes in the graph.
+type PostNodeMutation struct {
+	config
+	op            Op
+	typ           string
+	created_at    *time.Time
+	clearedFields map[string]struct{}
+	node          *xid.ID
+	clearednode   bool
+	post          *xid.ID
+	clearedpost   bool
+	done          bool
+	oldValue      func(context.Context) (*PostNode, error)
+	predicates    []predicate.PostNode
+}
+
+var _ ent.Mutation = (*PostNodeMutation)(nil)
+
+// postnodeOption allows management of the mutation configuration using functional options.
+type postnodeOption func(*PostNodeMutation)
+
+// newPostNodeMutation creates new mutation for the PostNode entity.
+func newPostNodeMutation(c config, op Op, opts ...postnodeOption) *PostNodeMutation {
+	m := &PostNodeMutation{
+		config:        c,
+		op:            op,
+		typ:           TypePostNode,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PostNodeMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PostNodeMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *PostNodeMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *PostNodeMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *PostNodeMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetNodeID sets the "node_id" field.
+func (m *PostNodeMutation) SetNodeID(x xid.ID) {
+	m.node = &x
+}
+
+// NodeID returns the value of the "node_id" field in the mutation.
+func (m *PostNodeMutation) NodeID() (r xid.ID, exists bool) {
+	v := m.node
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetNodeID resets all changes to the "node_id" field.
+func (m *PostNodeMutation) ResetNodeID() {
+	m.node = nil
+}
+
+// SetPostID sets the "post_id" field.
+func (m *PostNodeMutation) SetPostID(x xid.ID) {
+	m.post = &x
+}
+
+// PostID returns the value of the "post_id" field in the mutation.
+func (m *PostNodeMutation) PostID() (r xid.ID, exists bool) {
+	v := m.post
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetPostID resets all changes to the "post_id" field.
+func (m *PostNodeMutation) ResetPostID() {
+	m.post = nil
+}
+
+// ClearNode clears the "node" edge to the Node entity.
+func (m *PostNodeMutation) ClearNode() {
+	m.clearednode = true
+	m.clearedFields[postnode.FieldNodeID] = struct{}{}
+}
+
+// NodeCleared reports if the "node" edge to the Node entity was cleared.
+func (m *PostNodeMutation) NodeCleared() bool {
+	return m.clearednode
+}
+
+// NodeIDs returns the "node" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// NodeID instead. It exists only for internal usage by the builders.
+func (m *PostNodeMutation) NodeIDs() (ids []xid.ID) {
+	if id := m.node; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetNode resets all changes to the "node" edge.
+func (m *PostNodeMutation) ResetNode() {
+	m.node = nil
+	m.clearednode = false
+}
+
+// ClearPost clears the "post" edge to the Post entity.
+func (m *PostNodeMutation) ClearPost() {
+	m.clearedpost = true
+	m.clearedFields[postnode.FieldPostID] = struct{}{}
+}
+
+// PostCleared reports if the "post" edge to the Post entity was cleared.
+func (m *PostNodeMutation) PostCleared() bool {
+	return m.clearedpost
+}
+
+// PostIDs returns the "post" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// PostID instead. It exists only for internal usage by the builders.
+func (m *PostNodeMutation) PostIDs() (ids []xid.ID) {
+	if id := m.post; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetPost resets all changes to the "post" edge.
+func (m *PostNodeMutation) ResetPost() {
+	m.post = nil
+	m.clearedpost = false
+}
+
+// Where appends a list predicates to the PostNodeMutation builder.
+func (m *PostNodeMutation) Where(ps ...predicate.PostNode) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the PostNodeMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *PostNodeMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.PostNode, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *PostNodeMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *PostNodeMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (PostNode).
+func (m *PostNodeMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *PostNodeMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.created_at != nil {
+		fields = append(fields, postnode.FieldCreatedAt)
+	}
+	if m.node != nil {
+		fields = append(fields, postnode.FieldNodeID)
+	}
+	if m.post != nil {
+		fields = append(fields, postnode.FieldPostID)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *PostNodeMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case postnode.FieldCreatedAt:
+		return m.CreatedAt()
+	case postnode.FieldNodeID:
+		return m.NodeID()
+	case postnode.FieldPostID:
+		return m.PostID()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *PostNodeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, errors.New("edge schema PostNode does not support getting old values")
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PostNodeMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case postnode.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case postnode.FieldNodeID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetNodeID(v)
+		return nil
+	case postnode.FieldPostID:
+		v, ok := value.(xid.ID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPostID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown PostNode field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *PostNodeMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *PostNodeMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PostNodeMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown PostNode numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *PostNodeMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *PostNodeMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PostNodeMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown PostNode nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *PostNodeMutation) ResetField(name string) error {
+	switch name {
+	case postnode.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case postnode.FieldNodeID:
+		m.ResetNodeID()
+		return nil
+	case postnode.FieldPostID:
+		m.ResetPostID()
+		return nil
+	}
+	return fmt.Errorf("unknown PostNode field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *PostNodeMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.node != nil {
+		edges = append(edges, postnode.EdgeNode)
+	}
+	if m.post != nil {
+		edges = append(edges, postnode.EdgePost)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *PostNodeMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case postnode.EdgeNode:
+		if id := m.node; id != nil {
+			return []ent.Value{*id}
+		}
+	case postnode.EdgePost:
+		if id := m.post; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *PostNodeMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *PostNodeMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *PostNodeMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearednode {
+		edges = append(edges, postnode.EdgeNode)
+	}
+	if m.clearedpost {
+		edges = append(edges, postnode.EdgePost)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *PostNodeMutation) EdgeCleared(name string) bool {
+	switch name {
+	case postnode.EdgeNode:
+		return m.clearednode
+	case postnode.EdgePost:
+		return m.clearedpost
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *PostNodeMutation) ClearEdge(name string) error {
+	switch name {
+	case postnode.EdgeNode:
+		m.ClearNode()
+		return nil
+	case postnode.EdgePost:
+		m.ClearPost()
+		return nil
+	}
+	return fmt.Errorf("unknown PostNode unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *PostNodeMutation) ResetEdge(name string) error {
+	switch name {
+	case postnode.EdgeNode:
+		m.ResetNode()
+		return nil
+	case postnode.EdgePost:
+		m.ResetPost()
+		return nil
+	}
+	return fmt.Errorf("unknown PostNode edge %s", name)
 }
 
 // PostReadMutation represents an operation that mutates the PostRead nodes in the graph.

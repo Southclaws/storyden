@@ -92,5 +92,8 @@ func (Node) Edges() []ent.Edge {
 		edge.From("collections", Collection.Type).
 			Ref("nodes").
 			Through("collection_nodes", CollectionNode.Type),
+
+		edge.To("comments", Post.Type).
+			Through("thread_nodes", PostNode.Type),
 	}
 }

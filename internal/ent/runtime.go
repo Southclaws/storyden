@@ -25,6 +25,7 @@ import (
 	"github.com/Southclaws/storyden/internal/ent/node"
 	"github.com/Southclaws/storyden/internal/ent/notification"
 	"github.com/Southclaws/storyden/internal/ent/post"
+	"github.com/Southclaws/storyden/internal/ent/postnode"
 	"github.com/Southclaws/storyden/internal/ent/postread"
 	"github.com/Southclaws/storyden/internal/ent/property"
 	"github.com/Southclaws/storyden/internal/ent/propertyschema"
@@ -811,6 +812,55 @@ func init() {
 		return func(id string) error {
 			for _, fn := range fns {
 				if err := fn(id); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	postnodeMixin := schema.PostNode{}.Mixin()
+	postnodeMixinFields0 := postnodeMixin[0].Fields()
+	_ = postnodeMixinFields0
+	postnodeFields := schema.PostNode{}.Fields()
+	_ = postnodeFields
+	// postnodeDescCreatedAt is the schema descriptor for created_at field.
+	postnodeDescCreatedAt := postnodeMixinFields0[0].Descriptor()
+	// postnode.DefaultCreatedAt holds the default value on creation for the created_at field.
+	postnode.DefaultCreatedAt = postnodeDescCreatedAt.Default.(func() time.Time)
+	// postnodeDescNodeID is the schema descriptor for node_id field.
+	postnodeDescNodeID := postnodeFields[0].Descriptor()
+	// postnode.DefaultNodeID holds the default value on creation for the node_id field.
+	postnode.DefaultNodeID = postnodeDescNodeID.Default.(func() xid.ID)
+	// postnode.NodeIDValidator is a validator for the "node_id" field. It is called by the builders before save.
+	postnode.NodeIDValidator = func() func(string) error {
+		validators := postnodeDescNodeID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(node string) error {
+			for _, fn := range fns {
+				if err := fn(node); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// postnodeDescPostID is the schema descriptor for post_id field.
+	postnodeDescPostID := postnodeFields[1].Descriptor()
+	// postnode.DefaultPostID holds the default value on creation for the post_id field.
+	postnode.DefaultPostID = postnodeDescPostID.Default.(func() xid.ID)
+	// postnode.PostIDValidator is a validator for the "post_id" field. It is called by the builders before save.
+	postnode.PostIDValidator = func() func(string) error {
+		validators := postnodeDescPostID.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(post string) error {
+			for _, fn := range fns {
+				if err := fn(post); err != nil {
 					return err
 				}
 			}
