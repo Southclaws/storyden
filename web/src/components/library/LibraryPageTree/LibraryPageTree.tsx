@@ -356,7 +356,7 @@ function TreeNode({
         borderColor:
           node.visibility === Visibility.published
             ? "transparent"
-            : "colorPalette.6",
+            : "colorPalette.border",
         borderStyle:
           node.visibility === Visibility.published ? "solid" : "dashed",
       });
@@ -367,7 +367,7 @@ function TreeNode({
         colorPalette: branchColourPalette,
         outlineWidth: "thin",
         outlineStyle: "dashed",
-        outlineColor: "colorPalette.6",
+        outlineColor: "colorPalette.border",
         outlineOffset: "-0.5",
       })
     : "";

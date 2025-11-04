@@ -1,5 +1,5 @@
 import { uniqueId } from "lodash";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { MutatorCallback, useSWRConfig } from "swr";
 
@@ -80,7 +80,10 @@ export function useLibraryMutation(node?: Node) {
   const genaiAvailable = useCapability("gen_ai");
   const { mutate } = useSWRConfig();
   const router = useRouter();
+  const pathname = usePathname();
   const libraryPath = useLibraryPath();
+
+  const isOnNodePage = node ? pathname.includes(`/l/${node?.slug}`) : false;
 
   const createNode = async ({
     initialName,
@@ -286,7 +289,11 @@ export function useLibraryMutation(node?: Node) {
     return updated;
   };
 
-  const deleteNode = async (slug: string, newParent?: string) => {
+  const deleteNode = async (
+    slug: string,
+    oldParent?: string,
+    newParent?: string,
+  ) => {
     const mutator: MutatorCallback<NodeListOKResponse> = (data) => {
       if (!data) return;
 
@@ -301,14 +308,20 @@ export function useLibraryMutation(node?: Node) {
     const listKeyFn = buildNodeListKey();
     await mutate(listKeyFn, mutator, { revalidate: false });
 
+    if (oldParent) {
+      const childListKeyFn = buildNodeChildrenListKey(oldParent);
+      await mutate(childListKeyFn, mutator, { revalidate: false });
+    }
+
     await nodeDelete(slug, { target_node: newParent });
 
-    // TODO: Ensure redirect only happens if you're viewing this actual page.
-    if (newParent) {
-      const newPath = replaceLibraryPath(libraryPath, slug, newParent);
-      router.push(newPath);
-    } else {
-      router.push("/l");
+    if (isOnNodePage) {
+      if (newParent) {
+        const newPath = replaceLibraryPath(libraryPath, slug, newParent);
+        router.push(newPath);
+      } else {
+        router.push("/l");
+      }
     }
   };
 
