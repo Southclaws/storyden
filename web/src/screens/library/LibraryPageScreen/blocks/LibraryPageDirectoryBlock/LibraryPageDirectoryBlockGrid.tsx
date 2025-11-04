@@ -287,22 +287,20 @@ function GridCard({
           >
             <Tooltip.Trigger asChild>
               <Box position="relative">
-                <Box style={dragHandleStyle}>
-                  <IconButton
-                    style={dragHandleStyle}
-                    variant="subtle"
-                    size="xs"
-                    minWidth="5"
-                    width="5"
-                    height="5"
-                    padding="0"
-                    color="fg.muted"
-                    bg="bg.default"
-                    onClick={handleMenuToggle}
-                  >
-                    <DragHandleIcon width="4" />
-                  </IconButton>
-                </Box>
+                <IconButton
+                  style={dragHandleStyle}
+                  variant="subtle"
+                  size="xs"
+                  minWidth="5"
+                  width="5"
+                  height="5"
+                  padding="0"
+                  color="fg.muted"
+                  bg="bg.default"
+                  onClick={handleMenuToggle}
+                >
+                  <DragHandleIcon width="4" />
+                </IconButton>
               </Box>
             </Tooltip.Trigger>
             <Portal>
@@ -496,15 +494,6 @@ function GridCard({
             const isSortingAsc = sort?.order === "asc";
             const isSortingDesc = sort?.order === "desc";
             const isSorting = isSortingBy && (isSortingAsc || isSortingDesc);
-            const sortState = isSorting
-              ? isSortingAsc
-                ? "asc"
-                : "desc"
-              : "none";
-
-            function handleClickSortAction() {
-              handleSort(property.name);
-            }
 
             const handleCellChange = (v: ChangeEvent<HTMLInputElement>) => {
               onFieldValueChange(
