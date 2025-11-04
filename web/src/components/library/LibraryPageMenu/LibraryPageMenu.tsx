@@ -12,14 +12,34 @@ import { menuItemColorPalette } from "@/styled-system/patterns";
 
 import { Props, useLibraryPageMenu } from "./useLibraryPageMenu";
 
+// For some crazy reason, Ark doesn't export these, so we gotta re-define.
+interface EventDetails<T> {
+  originalEvent: T;
+  contextmenu: boolean;
+  focusable: boolean;
+  target: EventTarget;
+}
+
+type PointerDownOutsideEvent = CustomEvent<EventDetails<PointerEvent>>;
+type FocusOutsideEvent = CustomEvent<EventDetails<FocusEvent>>;
+type InteractOutsideEvent = PointerDownOutsideEvent | FocusOutsideEvent;
+
+type LibraryPageMenuProps = Props &
+  ButtonProps & {
+    onOpenChange?: (details: MenuOpenChangeDetails) => void;
+    onInteractOutside?: (event: InteractOutsideEvent) => void;
+  };
+
 export function LibraryPageMenu({
   node,
   parentID,
   open,
   onClose,
+  onOpenChange,
+  onInteractOutside,
   children,
   ...props
-}: Props & ButtonProps) {
+}: LibraryPageMenuProps) {
   const {
     availableOperations,
     deleteEnabled,
@@ -34,6 +54,7 @@ export function LibraryPageMenu({
   });
 
   function handleOpenChange(d: MenuOpenChangeDetails) {
+    onOpenChange?.(d);
     if (!d.open) {
       onClose?.();
     }
@@ -53,6 +74,7 @@ export function LibraryPageMenu({
       positioning={{ placement: "right-start", gutter: -2 }}
       onSelect={handlers.handleSelect}
       onOpenChange={handleOpenChange}
+      onInteractOutside={onInteractOutside}
     >
       <Menu.Trigger asChild>
         {children ?? <MoreAction variant="subtle" size="xs" {...props} />}

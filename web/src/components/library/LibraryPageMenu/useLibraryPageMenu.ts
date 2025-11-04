@@ -70,7 +70,7 @@ export function useLibraryPageMenu(props: Props) {
   async function handleDelete() {
     return handle(
       async () => {
-        await deleteNode(props.node.slug);
+        await deleteNode(props.node.slug, props.parentID);
       },
       {
         cleanup: async () => await revalidate(),

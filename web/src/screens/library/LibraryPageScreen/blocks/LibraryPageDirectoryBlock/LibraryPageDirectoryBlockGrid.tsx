@@ -8,7 +8,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import { keyBy } from "lodash";
 import Link from "next/link";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 import {
   Identifier,
@@ -220,26 +220,10 @@ function GridCard({
   });
 
   const [isOpen, setOpen] = useState(false);
-  function handleMenuToggle() {
+  function handleMenuToggle(e: React.MouseEvent) {
+    e.stopPropagation();
     setOpen((prev) => !prev);
   }
-
-  const elementRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!isOpen) return;
-
-    function handleClickAway(event: MouseEvent) {
-      if (
-        elementRef.current &&
-        !elementRef.current.contains(event.target as Node)
-      ) {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener("click", handleClickAway);
-    return () => document.removeEventListener("click", handleClickAway);
-  }, [isOpen]);
 
   const { active } = useDndContext();
   const isDraggingAnything = active !== null;
@@ -348,13 +332,14 @@ function GridCard({
             width="6"
             height="6"
             pointerEvents="none"
-            ref={elementRef}
           >
             <LibraryPageMenu
               variant="ghost"
               node={node}
               parentID={nodeID}
               open={isOpen}
+              onOpenChange={(details) => setOpen(details.open)}
+              onInteractOutside={() => setOpen(false)}
             >
               <Box position="absolute" width="6" height="6" />
             </LibraryPageMenu>
